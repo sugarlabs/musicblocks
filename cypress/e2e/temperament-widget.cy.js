@@ -90,6 +90,69 @@ describe("Temperament widget", () => {
         tw().find('select[aria-label="temperament"] option').should("have.length.greaterThan", 1);
     });
 
+    // "Play all pitches" plays the scale up one octave and back down, so a table of n
+    // pitches sends 2n + 1 notes to the synth. The table is listed from the highest
+    // pitch down to the tonic.
+    const playAllAndCollectFrequencies = () => {
+        cy.window().then(win => {
+            cy.spy(win.ActivityContext.getActivity().logo.synth, "trigger").as("trigger");
+        });
+        cy.get('.windowFrame[aria-label="temperament"]')
+            .find('img[title="Play all pitches"]')
+            .click({ force: true });
+    };
+
+    const tableFrequencies = () =>
+        cy
+            .get('.windowFrame[aria-label="temperament"] tbody tr')
+            .then($rows => Array.from($rows, row => Number(row.cells[2].textContent)));
+
+    const expectScalePlayedUpAndBack = table => {
+        const ascending = [...table].reverse();
+        const expected = [...ascending, ascending[0] * 2, ...[...ascending].reverse()];
+        cy.get("@trigger", { timeout: 30000 }).should(spy => {
+            expect(spy.callCount).to.be.at.least(expected.length);
+        });
+        cy.get("@trigger").then(spy => {
+            expected.forEach((frequency, i) => {
+                expect(spy.getCall(i).args[1], `note ${i + 1}`).to.be.closeTo(frequency, 0.02);
+            });
+        });
+    };
+
+    it("changes the temperament and plays the scale at the new tuning", () => {
+        openTemperamentWidget();
+        const tw = () => cy.get('.windowFrame[aria-label="temperament"]');
+
+        tw().find("tbody tr").should("have.length", 12);
+        tw().find('select[aria-label="temperament"]').select("equal5");
+        tw().find("tbody tr").should("have.length", 5);
+        tw().find('select[aria-label="temperament"]').should("have.value", "equal5");
+
+        tableFrequencies().then(table => {
+            // 5-EDO has a different tonic than the 261.63 Hz of 12-EDO.
+            expect(table[table.length - 1]).to.not.be.closeTo(261.63, 1);
+            playAllAndCollectFrequencies();
+            expectScalePlayedUpAndBack(table);
+        });
+    });
+
+    it("plays just intonation with its exact ratios", () => {
+        openTemperamentWidget();
+        const tw = () => cy.get('.windowFrame[aria-label="temperament"]');
+
+        tw().find('select[aria-label="temperament"]').select("just intonation");
+        tw().contains("td", "1.500").should("exist");
+
+        tableFrequencies().then(table => {
+            // Tonic 264 Hz; the fifth is exactly 3/2 above it.
+            expect(table[table.length - 1]).to.be.closeTo(264, 0.02);
+            expect(table[table.length - 8]).to.be.closeTo(396, 0.02);
+            playAllAndCollectFrequencies();
+            expectScalePlayedUpAndBack(table);
+        });
+    });
+
     it("closes the Temperament widget and cleans up the DOM", () => {
         // Ignore only the known WidgetWindow.updateTitle null dereference fired
         // by close; any other app error still fails the test.
