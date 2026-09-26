@@ -1447,7 +1447,10 @@ class Blocks {
                         oldBlock
                     ]);
                 }
-            } else if (this.blockList[parentblk].name === "pitch") {
+            } else if (
+                this.blockList[parentblk].name === "pitch" ||
+                this.blockList[parentblk].name === "custompitch"
+            ) {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     /**
@@ -1487,6 +1490,10 @@ class Blocks {
                     ]);
                 }
 
+                if (this.blockList[parentblk].name !== "pitch") {
+                    return;
+                }
+
                 const oblk = this.blockList[parentblk].connections[1];
                 if (oblk === null) {
                     /**
@@ -1500,11 +1507,15 @@ class Blocks {
                         const parentblk = args[0];
                         const value = args[1];
                         const blk = args[2];
+                        const customID = args[3];
 
                         this.blockList[parentblk].connections[1] = blk;
 
                         const pitch = value;
                         this.blockList[blk].value = pitch;
+                        if (customID) {
+                            this.blockList[blk].customID = customID;
+                        }
                         if (this.blockList[blk].name === "eastindiansolfege") {
                             const obj = splitSolfege(pitch);
                             let label = WESTERN2EISOLFEGENAMES[obj[0]];
@@ -1526,8 +1537,9 @@ class Blocks {
 
                     // When the removed block was itself in the name slot, mirror its
                     // type in the replacement placeholder (e.g. notename → notename,
-                    // eastindiansolfege → eastindiansolfege). When the block came from
-                    // the octave slot (a number), fall back to the default "solfege".
+                    // eastindiansolfege → eastindiansolfege, customNote → customNote).
+                    // When the block came from the octave slot (a number), fall back
+                    // to the default "solfege".
                     let newBlockName = "solfege";
                     let newBlockValue = "sol";
                     switch (this.blockList[oldBlock].name) {
@@ -1543,6 +1555,10 @@ class Blocks {
                             newBlockName = this.blockList[oldBlock].name;
                             newBlockValue = "G";
                             break;
+                        case "customNote":
+                            newBlockName = this.blockList[oldBlock].name;
+                            newBlockValue = "C(+0¢)";
+                            break;
                         default:
                             break;
                     }
@@ -1550,7 +1566,8 @@ class Blocks {
                     this._makeNewBlockWithConnections(newBlockName, 0, [parentblk], postProcess, [
                         parentblk,
                         newBlockValue,
-                        nameBlkIdx
+                        nameBlkIdx,
+                        this.blockList[oldBlock].customID
                     ]);
                 }
             } else if (this.blockList[parentblk].name === "storein") {
@@ -1584,7 +1601,10 @@ class Blocks {
                         oldBlock
                     ]);
                 }
-            } else if (this.blockList[parentblk].isNoteContainer()) {
+            } else if (
+                typeof this.blockList[parentblk].isNoteContainer === "function" &&
+                this.blockList[parentblk].isNoteContainer()
+            ) {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     const newVspaceBlock = this.makeBlock("vspace", "__NOARG__");
@@ -4321,6 +4341,7 @@ class Blocks {
             if (
                 [
                     "pitch",
+                    "custompitch",
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
@@ -4355,6 +4376,7 @@ class Blocks {
             if (
                 [
                     "pitch",
+                    "custompitch",
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
