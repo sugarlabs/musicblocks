@@ -5457,6 +5457,7 @@ class Blocks {
                         case "slur":
                         case "staccato":
                         case "swing":
+                        case "switch":
                         case "tie":
                         case "tuplet2":
                         case "vibrato":
