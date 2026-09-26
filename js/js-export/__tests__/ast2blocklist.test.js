@@ -290,6 +290,331 @@ describe("AST2BlockList Class", () => {
         });
     });
 
+    // The Stop block ends the loop around it once the current iteration has
+    // finished (Logo.doBreak), and ends the stack when there is no loop.
+    // A bare `break` did neither, and was a syntax error outside a loop (#8929).
+    describe("Stop block", () => {
+        const ASTUtils = require("../ASTutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = require("../interface");
+            global.last = array => array[array.length - 1];
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+            delete global.last;
+        });
+
+        const exportAction = tree => astring.generate(ASTUtils.getMethodAST("demo", tree));
+        const exportStart = tree => astring.generate(ASTUtils.getMouseAST(tree));
+
+        // Runs an exported action with a mouse that records what it prints.
+        const runAction = async (tree, setup = "") => {
+            const printed = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                print: async value => {
+                    if (printed.length > 20) throw new Error("the loop did not stop");
+                    printed.push(value);
+                },
+                playNote: async (value, flow) => flow()
+            };
+            const result = await new Function(
+                "mouse",
+                `${setup}\n${exportAction(tree)}\nreturn demo(mouse);`
+            )(mouse);
+            return { printed, result };
+        };
+
+        const blockNames = code =>
+            AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config)
+                .map(block => (Array.isArray(block[1]) ? block[1][0] : block[1]))
+                .filter(name => name !== "vspace");
+
+        test("finishes the iteration, then ends the loop", async () => {
+            const { printed } = await runAction([
+                [
+                    "repeat",
+                    [3],
+                    [
+                        ["print", ["a"]],
+                        ["newnote", [["divide", [1, 4]]], [["print", ["n"]], ["break"]]],
+                        ["print", ["b"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["a", "n", "b"]);
+        });
+
+        test("ends the loop, not just the switch, from inside a case", async () => {
+            const { printed } = await runAction([
+                [
+                    "forever",
+                    null,
+                    [
+                        ["switch", [1], [["case", [1], [["print", ["c"]], ["break"]]]]],
+                        ["print", ["d"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["c", "d"]);
+        });
+
+        test("only ends the innermost loop", async () => {
+            const { printed } = await runAction([
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["repeat", [3], [["print", ["i"]], ["break"]]],
+                        ["print", ["o"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["i", "o", "i", "o"]);
+        });
+
+        const note = flow => ["newnote", [["divide", [1, 4]]], flow];
+
+        // With no loop, Logo.doBreak drops the next pending continuation: the
+        // rest of the stack one level above the Stop's clamp is skipped, and
+        // the program carries on after that.
+        test.each([
+            ["inside a note", [note([["print", ["n"]], ["break"]]), ["print", ["x"]]], ["n"]],
+            [
+                "inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside an if inside a note",
+                [
+                    note([
+                        ["if", ["bool_true"], [["break"]]],
+                        ["print", ["w"]]
+                    ]),
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ]
+        ])("skips the rest of the stack above a Stop %s", async (_, tree, expected) => {
+            const { printed } = await runAction(tree);
+            expect(printed).toEqual(expected);
+        });
+
+        test("ends the stack when there is no loop", async () => {
+            const { printed, result } = await runAction([
+                ["if", ["bool_true"], [["break"]]],
+                ["print", ["x"]]
+            ]);
+            expect(printed).toEqual([]);
+            expect(result).toBe("ENDFLOW");
+        });
+
+        // The importer only undoes the flags and labels the exporter writes;
+        // the same shapes in hand-written code must not turn into Stop blocks.
+        test.each([
+            [
+                "a hand-written flag set in a clamp",
+                `let done = false;
+                await mouse.playNote(1 / 4, async () => {
+                    done = true;
+                    return mouse.ENDFLOW;
+                });
+                if (done) return mouse.ENDMOUSE;`,
+                "done = true;"
+            ],
+            [
+                "a hand-written loop flag",
+                `{
+                    var stopLoop = false;
+                    while (1000) {
+                        stopLoop = true;
+                        if (stopLoop) break;
+                    }
+                }`,
+                "{"
+            ],
+            [
+                "a hand-written label",
+                `if (true) outer: {
+                    await mouse.print("w");
+                }`,
+                "outer:"
+            ]
+        ])("leaves %s alone", (_, body, unsupported) => {
+            const code = `
+            new Mouse(async mouse => {
+                ${body}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toBe("Unsupported statement: ");
+            expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
+        });
+
+        test("leaves the AST alone, so converting it twice gives the same blocks", () => {
+            const AST = acorn.parse(
+                exportStart([["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]]),
+                { ecmaVersion: 2020 }
+            );
+            const before = JSON.stringify(AST);
+            const first = AST2BlockList.toBlockList(AST, config);
+            const second = AST2BlockList.toBlockList(AST, config);
+            expect(second).toEqual(first);
+            expect(first.some(block => block[1] === "break")).toBe(true);
+            expect(JSON.stringify(AST)).toBe(before);
+        });
+
+        test("exports valid code for a Stop in Start and in an action", () => {
+            const start = exportStart([["print", ["x"]], ["break"]]);
+            const action = exportAction([["print", ["x"]], ["break"]]);
+            expect(() => acorn.parse(start, { ecmaVersion: 2020 })).not.toThrow();
+            expect(() => acorn.parse(`${action};`, { ecmaVersion: 2020 })).not.toThrow();
+            expect(start).toContain("return mouse.ENDMOUSE;");
+        });
+
+        test("doesn't let the loop flag shadow a box with the same name", async () => {
+            const { printed } = await runAction(
+                [["repeat", [2], [["print", ["box_stopLoop"]], ["break"]]]],
+                'let stopLoop = "box value";'
+            );
+            expect(printed).toEqual(["box value"]);
+        });
+
+        test.each([
+            [
+                "a Stop inside a note inside a loop",
+                [
+                    [
+                        "repeat",
+                        [3],
+                        [["newnote", [["divide", [1, 4]]], [["print", ["n"]], ["break"]]]]
+                    ]
+                ],
+                [
+                    "start",
+                    "repeat",
+                    "number",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break"
+                ]
+            ],
+            [
+                "a Stop inside a case inside a loop",
+                [["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]],
+                ["start", "forever", "switch", "number", "case", "number", "break"]
+            ],
+            [
+                "a Stop with no loop",
+                [["print", ["x"]], ["break"]],
+                ["start", "print", "text", "break"]
+            ],
+            [
+                "a Stop inside a note with no loop",
+                [note([["print", ["n"]], ["break"]]), ["print", ["x"]]],
+                [
+                    "start",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "if",
+                    "boolean",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a switch with no Stop in it",
+                [["switch", [1], [["case", [1], [["print", ["x"]]]]]]],
+                ["start", "switch", "number", "case", "number", "print", "text"]
+            ]
+        ])("converts %s back to the same blocks", (_, tree, names) => {
+            expect(blockNames(exportStart(tree))).toEqual(names);
+        });
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
@@ -1210,7 +1535,7 @@ describe("AST2BlockList Class", () => {
             [71, ["number", { value: 4 }], 0, 0, [69]],
             [72, "switch", 0, 0, [62, 73, 74, null]],
             [73, ["number", { value: 1 }], 0, 0, [72]],
-            [74, "case", 0, 0, [72, 75, 76, 87]],
+            [74, "case", 0, 0, [72, 75, 76, 86]],
             [75, ["number", { value: 1 }], 0, 0, [74]],
             [76, "newnote", 0, 0, [74, 77, 80, 84]],
             [77, "divide", 0, 0, [76, 78, 79]],
@@ -1221,17 +1546,16 @@ describe("AST2BlockList Class", () => {
             [82, ["solfege", { value: "sol" }], 0, 0, [81]],
             [83, ["number", { value: 4 }], 0, 0, [81]],
             [84, "break", 0, 0, [76, 85]],
-            [85, "break", 0, 0, [84, 86]],
-            [86, "break", 0, 0, [85, null]],
-            [87, "defaultcase", 0, 0, [74, 88, null]],
-            [88, "newnote", 0, 0, [87, 89, 92, null]],
-            [89, "divide", 0, 0, [88, 90, 91]],
-            [90, ["number", { value: 1 }], 0, 0, [89]],
-            [91, ["number", { value: 4 }], 0, 0, [89]],
-            [92, "vspace", 0, 0, [88, 93]],
-            [93, "pitch", 0, 0, [92, 94, 95, null]],
-            [94, ["solfege", { value: "5" }], 0, 0, [93]],
-            [95, ["number", { value: 4 }], 0, 0, [93]]
+            [85, "break", 0, 0, [84, null]],
+            [86, "defaultcase", 0, 0, [74, 87, null]],
+            [87, "newnote", 0, 0, [86, 88, 91, null]],
+            [88, "divide", 0, 0, [87, 89, 90]],
+            [89, ["number", { value: 1 }], 0, 0, [88]],
+            [90, ["number", { value: 4 }], 0, 0, [88]],
+            [91, "vspace", 0, 0, [87, 92]],
+            [92, "pitch", 0, 0, [91, 93, 94, null]],
+            [93, ["solfege", { value: "5" }], 0, 0, [92]],
+            [94, ["number", { value: 4 }], 0, 0, [92]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
