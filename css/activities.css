@@ -84,6 +84,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
         left: 50% !important;
         transform: translateX(-50%);
         max-width: calc(100vw - 32px);
+        box-sizing: border-box;
     }
 
     #confirmation-message {
