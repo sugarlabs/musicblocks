@@ -315,6 +315,55 @@ describe("JSGenerate Class", () => {
         expect(JSGenerate.actionTrees.length).toBe(1);
     });
 
+    test("should export namedarg as actionArgs index, not null", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "myAction", connections: [1] },
+            3: {
+                name: "turnright",
+                connections: [1, 4, null],
+                protoblock: { args: 1, style: "flow" }
+            },
+            4: {
+                name: "namedarg",
+                value: null,
+                privateData: 1,
+                connections: [3],
+                protoblock: { args: 0, style: "arg" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionNames).toEqual(["myAction"]);
+        expect(JSGenerate.actionTrees).toEqual([[["turnright", [["arg", [1]]], null]]]);
+    });
+
+    test("should coerce string namedarg privateData to actionArgs index", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "myAction", connections: [1] },
+            3: {
+                name: "turnright",
+                connections: [1, 4, null],
+                protoblock: { args: 1, style: "flow" }
+            },
+            4: {
+                name: "namedarg",
+                value: null,
+                privateData: "2",
+                connections: [3],
+                protoblock: { args: 0, style: "arg" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionTrees).toEqual([[["turnright", [["arg", [2]]], null]]]);
+    });
+
     test("should print tree with nested args including null and object", () => {
         JSGenerate.startTrees = [[["forward", [100, null, ["add", [3, 4]]], null]]];
         JSGenerate.actionTrees = [];
