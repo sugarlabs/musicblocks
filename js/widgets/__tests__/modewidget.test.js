@@ -809,6 +809,20 @@ describe("ModeWidget", () => {
         saveSpy.mockRestore();
     });
 
+    test("should preserve equal temperament when importing a 21-EDO mode", () => {
+        delete TEMPERAMENT.equal21;
+
+        const key = modeWidget._temperamentKeyForEDO(21);
+
+        expect(key).toBe("equal21");
+        expect(TEMPERAMENT.equal21).toMatchObject({
+            isEDO: true,
+            edo: 21,
+            pitchNumber: 21
+        });
+        delete TEMPERAMENT.equal21;
+    });
+
     test("_exportJson produces valid JSON with name, edo, pattern", () => {
         jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
             pattern: [2, 2, 1, 2, 2, 2, 1],
