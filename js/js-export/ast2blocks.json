@@ -2083,7 +2083,7 @@
             "comment": "Set scalar transposition block",
             "arguments": [
                 {
-                    "type": "modelength"
+                    "type": "NumberExpression"
                 }
             ],
             "ast": {
@@ -3639,10 +3639,10 @@
             "comment": "Scroll XY block",
             "arguments": [
                 {
-                    "type": "x"
+                    "type": "NumberExpression"
                 },
                 {
-                    "type": "y"
+                    "type": "NumberExpression"
                 }
             ],
             "ast": {
@@ -3729,7 +3729,7 @@
             "comment": "Set grey block",
             "arguments": [
                 {
-                    "type": "grey"
+                    "type": "NumberExpression"
                 }
             ],
             "ast": {
@@ -3770,7 +3770,7 @@
             "comment": "Set shade block",
             "arguments": [
                 {
-                    "type": "shade"
+                    "type": "NumberExpression"
                 }
             ],
             "ast": {
@@ -3811,7 +3811,7 @@
             "comment": "Set hue block",
             "arguments": [
                 {
-                    "type": "color"
+                    "type": "NumberExpression"
                 }
             ],
             "ast": {
@@ -3893,7 +3893,7 @@
             "comment": "Set pen size block",
             "arguments": [
                 {
-                    "type": "pensize"
+                    "type": "NumberExpression"
                 }
             ],
             "ast": {
