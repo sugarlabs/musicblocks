@@ -190,6 +190,21 @@ describe("PlanetInterface", () => {
         expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
     });
 
+    test("initialiseNewProject can leave workspace clearing to an import", () => {
+        planetInterface.planet = {
+            ProjectStorage: { initialiseNewProject: jest.fn().mockResolvedValue() }
+        };
+
+        planetInterface.initialiseNewProject("Imported Project", false);
+
+        expect(planetInterface.planet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
+            "Imported Project"
+        );
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.trashStacks).toEqual([]);
+    });
+
     // Regression test for #7350: when running from file:///index.html,
     // planet.planet is null so getCurrentProjectName() must return ""
     // to prevent _afterDelete from entering the Planet branch.
@@ -392,6 +407,57 @@ describe("PlanetInterface", () => {
             done();
         });
     });
+    test("saveLocally keeps delayed thumbnail writes on the project being saved", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("OLD_PROJECT_DATA");
+        global.base64Encode = jest.fn(s => s);
+        let currentProject = "old-project";
+        let pendingImage;
+        const saveLocally = jest.fn().mockResolvedValue();
+        planetInterface.planet = {
+            ProjectStorage: {
+                getCurrentProjectID: jest.fn(() => currentProject),
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally
+            }
+        };
+
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "NEW_IMAGE" };
+                }
+            }
+        };
+
+        await planetInterface.saveLocally();
+        currentProject = "new-project";
+        pendingImage.onload();
+        await Promise.resolve();
+
+        expect(saveLocally).toHaveBeenNthCalledWith(
+            1,
+            "OLD_PROJECT_DATA",
+            "OLD_IMAGE",
+            "old-project"
+        );
+        expect(saveLocally).toHaveBeenNthCalledWith(
+            2,
+            "OLD_PROJECT_DATA",
+            "NEW_IMAGE",
+            "old-project"
+        );
+    });
+
     test("saveLocally resolves after project data is persisted", () => {
         doSVG.mockReturnValue("<svg/>");
         mockActivity.prepareExport.mockReturnValue("EXPORT");
