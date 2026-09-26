@@ -161,6 +161,7 @@ let MYDEFINES = [
     "widgets/plugin-dialog",
     "utils/musicutils-constants",
     "utils/musicutils-i18n",
+    "utils/musicutils-temperament",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
