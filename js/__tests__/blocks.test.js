@@ -1631,6 +1631,70 @@ describe("Blocks Foundation", () => {
             expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
         });
 
+        // SwitchBlock.flow hooks its case onto the block after the switch
+        // (Logo.setDispatchBlock). Without the hidden block the switch macro
+        // adds, the case runs after that block, or never when the switch is
+        // last in its stack, so a switch loaded without one gets one (#8962).
+        describe("hidden block after a switch", () => {
+            const load = project => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                // Known block names, so the loader doesn't swap in nop blocks.
+                blocks.protoBlockDict = {};
+                for (const name of ["start", "switch", "case", "print", "hidden"]) {
+                    blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
+                }
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+                mockActivity._suppressRefresh = true;
+                mockActivity.errorMsg.mockClear();
+                blocks.loadNewBlocks(project);
+                expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+                // [name, connections] for each block the loader built, by index.
+                return blocks._makeNewBlockWithConnections.mock.calls.map(call => [
+                    call[0],
+                    call[2]
+                ]);
+            };
+
+            const switchStack = next => [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "switch", 0, 0, [0, 2, 3, next]],
+                [2, ["number", { value: 1 }], 0, 0, [1]],
+                [3, "case", 0, 0, [1, 4, 5, null]],
+                [4, ["number", { value: 1 }], 0, 0, [3]],
+                [5, "print", 0, 0, [3, 6, null]],
+                [6, ["text", { value: "hi" }], 0, 0, [5]]
+            ];
+
+            it("adds one when the switch is last in its stack", () => {
+                const built = load(switchStack(null));
+                expect(built[7]).toEqual(["hidden", [1, null]]);
+                expect(built[1]).toEqual(["switch", [0, 2, 3, 7]]);
+            });
+
+            it("puts one between the switch and the block after it", () => {
+                const project = switchStack(7);
+                project.push([7, "print", 0, 0, [1, 8, null]]);
+                project.push([8, ["text", { value: "after" }], 0, 0, [7]]);
+
+                const built = load(project);
+                expect(built[9]).toEqual(["hidden", [1, 7]]);
+                expect(built[1]).toEqual(["switch", [0, 2, 3, 9]]);
+                expect(built[7]).toEqual(["print", [9, 8, null]]);
+            });
+
+            it("leaves a switch that already has its hidden block alone", () => {
+                const project = switchStack(7);
+                project.push([7, "hidden", 0, 0, [1, null]]);
+
+                const built = load(project);
+                expect(built).toHaveLength(8);
+                expect(built.filter(([name]) => name === "hidden")).toHaveLength(1);
+                expect(built[1]).toEqual(["switch", [0, 2, 3, 7]]);
+            });
+        });
+
         it("accepts valid parent-child stacks without false cycle detection", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
