@@ -117,12 +117,13 @@ function setupVolumeBlocks(activity) {
          * @param {object} logo - Logo object.
          * @param {number} value - Volume value.
          * @param {number} turtle - Turtle index.
+         * @param {string} blk - Block ID.
          */
-        setter(logo, value, turtle) {
+        setter(logo, value, turtle, blk) {
             const len = Singer.masterVolume.length;
             Singer.masterVolume[len - 1] = value;
             if (!activity.turtles.ithTurtle(turtle).singer.suppressOutput) {
-                Singer.VolumeActions.setMasterVolume(logo, value);
+                Singer.VolumeActions.setMasterVolume(value, turtle, blk);
             }
         }
 
@@ -448,11 +449,11 @@ function setupVolumeBlocks(activity) {
                 if (logo?.synth?.loadSynth) {
                     logo.synth.loadSynth(turtle, synth);
                 }
+            }
 
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
+            if (tur.singer.synthVolume[synth] === undefined) {
+                tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
             }
 
             tur.singer.synthVolume[synth].push(arg1);

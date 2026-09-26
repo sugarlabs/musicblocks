@@ -22,7 +22,7 @@
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
-   EXPANDBUTTON, MBOUNDARY
+   EXPANDBUTTON, MBOUNDARY, makeKeyboardAccessible
  */
 
 /* exported Turtles */
@@ -193,10 +193,12 @@ class Turtles {
             // console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
-            if (turtle.running) {
+            if (turtle.running || turtle._isHovered) {
                 return;
             }
 
+            turtle._isHovered = true;
+            turtle._baseScale = turtle.container.scaleX;
             turtle.container.scaleX *= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
             turtle.container.scale = turtle.container.scaleX;
@@ -207,13 +209,16 @@ class Turtles {
             // console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
-            if (turtle.running) {
+            if (!turtle._isHovered) {
                 return;
             }
 
-            turtle.container.scaleX /= 1.2;
-            turtle.container.scaleY = turtle.container.scaleX;
-            turtle.container.scale = turtle.container.scaleX;
+            turtle._isHovered = false;
+            const targetScale =
+                turtle._baseScale !== undefined ? turtle._baseScale : turtle.container.scaleX / 1.2;
+            turtle.container.scaleX = targetScale;
+            turtle.container.scaleY = targetScale;
+            turtle.container.scale = targetScale;
             this.activity.refreshCanvas();
         });
 
@@ -475,6 +480,20 @@ Turtles.TurtlesModel = class {
                 turtle.interval = undefined;
             }
 
+            // addTurtle() attaches three children to the stage for every
+            // turtle: imageContainer, penstrokes and container. Detach them
+            // here, otherwise a removed turtle keeps costing a display-list
+            // walk on every frame and cannot be garbage collected. Anything
+            // the turtle drew or displayed also stays on screen.
+            const turtlesStage = this._stage;
+            if (turtlesStage) {
+                for (const child of [turtle.imageContainer, turtle.penstrokes, turtle.container]) {
+                    if (child) {
+                        turtlesStage.removeChild(child);
+                    }
+                }
+            }
+
             this._turtleList.splice(index, 1);
         }
     }
@@ -606,10 +625,20 @@ Turtles.TurtlesModel = class {
      * (excluding turtles in the trash and companion turtles)
      */
     turtleCount() {
-        let count = 0;
         const totalTurtles = this.getTurtleCount();
+        const firstClaimer = new Int32Array(totalTurtles).fill(-1);
+
         for (let t = 0; t < totalTurtles; t++) {
-            if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
+            const c = this.getTurtle(t).companionTurtle;
+            if (c !== undefined && firstClaimer[c] === -1) {
+                firstClaimer[c] = t;
+            }
+        }
+
+        let count = 0;
+        for (let t = 0; t < totalTurtles; t++) {
+            const comp = firstClaimer[t] !== -1 ? firstClaimer[t] : t;
+            if (comp === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
         }
@@ -855,6 +884,7 @@ Turtles.TurtlesView = class {
      */
     makeBackground(setCollapsed) {
         const activity = this.activity;
+        const getTopButtonY = () => 70 + LEADING + 6 + activity.toolbarHeight;
 
         const _doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
@@ -869,11 +899,6 @@ Turtles.TurtlesView = class {
             canvas.style.backgroundColor = this._backgroundColor;
         }
 
-        // Also update body background if available
-        if (typeof document !== "undefined") {
-            document.body.style.backgroundColor = this._backgroundColor;
-        }
-
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
@@ -883,6 +908,24 @@ Turtles.TurtlesView = class {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
+            makeKeyboardAccessible(container, object.label || object.name || "Canvas button");
+            if (typeof container.addEventListener === "function") {
+                container.addEventListener("keydown", event => {
+                    const isEscape = event.key === "Escape" || event.key === "Esc";
+                    if (!isEscape) return;
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (
+                        typeof window !== "undefined" &&
+                        window._focusCycleManager &&
+                        typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                    ) {
+                        window._focusCycleManager.exitKeyboardNavigation();
+                    }
+                    container.blur?.();
+                });
+            }
             window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
@@ -982,7 +1025,7 @@ Turtles.TurtlesView = class {
                     label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
             const that = this;
             this.gridButton.onclick = () => {
@@ -999,7 +1042,7 @@ Turtles.TurtlesView = class {
                     label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
 
             // Assign click listener to the Clear button
@@ -1020,7 +1063,7 @@ Turtles.TurtlesView = class {
                     label: _("Collapse")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
 
             this._collapseButton.onclick = () => {
@@ -1029,7 +1072,7 @@ Turtles.TurtlesView = class {
                 if (auxToolbar.style.display === "block") {
                     const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
-                    menuIcon.innerHTML = "menu";
+                    menuIcon.textContent = "menu";
                     docById("toggleAuxBtn").classList.remove("blue", "darken-1");
                 }
                 this._expandButton.style.visibility = "visible";
@@ -1052,7 +1095,7 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
+                menuIcon.textContent = "menu";
                 docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
 
@@ -1070,8 +1113,7 @@ Turtles.TurtlesView = class {
             });
             __collapse();
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.activity.closeHelpfulWheel()) {
                 this.activity.__tick();
             }
         };
@@ -1088,7 +1130,7 @@ Turtles.TurtlesView = class {
                     label: _("Expand")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
@@ -1105,7 +1147,7 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
+                menuIcon.textContent = "menu";
                 docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
             this.hideMenu();
@@ -1160,8 +1202,7 @@ Turtles.TurtlesView = class {
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChildAt(turtlesStage, 0);
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.activity.closeHelpfulWheel()) {
                 this.activity.__tick();
             }
         };
@@ -1172,7 +1213,13 @@ Turtles.TurtlesView = class {
         const __makeAllButtons = () => {
             let second = false;
             if (docById("buttoncontainerTOP")) {
-                window.jQuery(".tooltipped").tooltip("close");
+                // "remove" is the only teardown Materialize recognises. It
+                // deletes the tooltip nodes and unbinds the hover handlers,
+                // which matters because the buttons below are about to be
+                // destroyed and would otherwise leave their tooltip nodes
+                // orphaned in the body. Every tooltipped element is
+                // re-initialised at the end of this function.
+                window.jQuery(".tooltipped").tooltip("remove");
                 docById("buttoncontainerTOP").parentElement.removeChild(
                     docById("buttoncontainerTOP")
                 );

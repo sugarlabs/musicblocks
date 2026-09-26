@@ -19,7 +19,7 @@ describe("minify.js", () => {
         jest.resetModules();
     });
 
-    it("reads ast2blocks.json and writes minified output to ast2blocks.min.json", () => {
+    it("reads ast2blocks.json and writes minified output to ast2blocks.min.json and ast2blocks.config.js", () => {
         const fs = require("fs");
         fs.readFileSync.mockReturnValue('{"key":"value","arr":[1,2,3]}');
         fs.writeFileSync.mockImplementation(() => {});
@@ -28,6 +28,10 @@ describe("minify.js", () => {
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             "ast2blocks.min.json",
             '{"key":"value","arr":[1,2,3]}'
+        );
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            "ast2blocks.config.js",
+            'window.ast2blocklist_config = {"key":"value","arr":[1,2,3]};'
         );
     });
 

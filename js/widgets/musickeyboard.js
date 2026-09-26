@@ -15,17 +15,19 @@
    global
 
    docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
+   last, ManagedTimer, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
-   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, */
+   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, announceToScreenReader */
 /*
    Global Locations
     - lib/wheelnav
         slicePath, wheelnav
     - js/utils/utils.js
-        _, docById, last
+        _, docById, last, debugLog
+    - js/utils/ManagedTimer.js
+        ManagedTimer
     - js/turtle-singer.js
         Singer
     - js/utils/musicutils.js
@@ -39,6 +41,9 @@
         PREVIEWVOLUME
 */
 /* exported MusicKeyboard */
+
+/** AMD module dependencies for lazy loading. */
+MusicKeyboard.dependencies = ["widgets/musickeyboard"];
 
 /**
  * Represents a Music Keyboard interface.
@@ -56,6 +61,11 @@ function MusicKeyboard(activity) {
     const HERTZKEYS = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
+    // Black-key column indices that are gaps in the piano layout (no black
+    // key between E-F and B-C) and are rendered as invisible spacers.
+    const BLACKKEY_SPACER_INDICES = [
+        2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62
+    ];
 
     const setKeyboardCellLabel = (cell, label, octave, prefix = null) => {
         cell.replaceChildren();
@@ -65,6 +75,27 @@ function MusicKeyboard(activity) {
             cell.append(small, document.createElement("br"));
         }
         cell.append(document.createTextNode(`${label}${octave}`));
+    };
+
+    // Appends an already-created (id already set) <td> to a black-key row as
+    // an invisible spacer occupying a gap position in the piano layout.
+    const appendSpacerKey = (parentEl, keyElement) => {
+        parentEl.appendChild(keyElement);
+        keyElement.style.background = "transparent";
+        keyElement.style.border = "none";
+        keyElement.style.zIndex = "10";
+        keyElement.style.position = "relative";
+    };
+
+    // Converts a solfege (or letter) note name plus octave into the note
+    // name form the synth expects, e.g. "sol" + 4 -> "sol4", "do" + 4 -> "do4",
+    // with solfege names that have a FIXEDSOLFEGE1 alias translated first and
+    // sharp/flat symbols normalized to "#"/"b".
+    const resolveSynthNoteName = (noteName, octave) => {
+        if (noteName in FIXEDSOLFEGE1) {
+            return FIXEDSOLFEGE1[noteName].replace(SHARP, "#").replace(FLAT, "b") + octave;
+        }
+        return noteName.replace(SHARP, "#").replace(FLAT, "b") + octave;
     };
 
     const w = window.innerWidth;
@@ -93,6 +124,30 @@ function MusicKeyboard(activity) {
     const unit = beginnerMode === "true" ? 8 : 16;
 
     /**
+     * Rounds a raw note duration (in seconds) to the nearest beginner-mode
+     * eighth or normal-mode sixteenth, then clamps it to a positive,
+     * non-zero value.
+     * @param {number} rawDuration - The raw duration in seconds.
+     * @returns {number} The rounded, clamped duration.
+     */
+    this._roundNoteDuration = rawDuration => {
+        let duration;
+        if (beginnerMode === "true") {
+            duration = parseFloat((Math.round(rawDuration * 8) / 8).toFixed(3));
+        } else {
+            duration = parseFloat((Math.round(rawDuration * 16) / 16).toFixed(4));
+        }
+
+        if (duration === 0) {
+            duration = 0.125;
+        } else if (duration < 0) {
+            duration = -duration;
+        }
+
+        return duration;
+    };
+
+    /**
      * Flag to track if stop or close button is clicked.
      * @type {boolean}
      */
@@ -100,6 +155,20 @@ function MusicKeyboard(activity) {
 
     this._savedDocumentOnKeyDown = undefined;
     this._savedDocumentOnKeyUp = undefined;
+    if (typeof ManagedTimer !== "undefined") {
+        this._timerManager = new ManagedTimer();
+    } else if (typeof require !== "undefined") {
+        try {
+            const ManagedTimerCtor = require("../utils/ManagedTimer");
+            this._timerManager = new ManagedTimerCtor();
+        } catch (e) {
+            this._timerManager = null;
+        }
+    } else {
+        this._timerManager = null;
+    }
+    this._playOneTimeout = null;
+    this._chordTimeouts = [];
 
     /**
      * Flag indicating whether playback is currently active.
@@ -131,6 +200,66 @@ function MusicKeyboard(activity) {
         document.onkeyup = this._savedDocumentOnKeyUp;
         this._savedDocumentOnKeyDown = undefined;
         this._savedDocumentOnKeyUp = undefined;
+    };
+
+    this._setWidgetInterval = function (callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+        return false;
+    };
+
+    this._clearWidgetInterval = function (id) {
+        if (id === null || id === undefined || id === false) {
+            return false;
+        }
+
+        if (this._timerManager !== null) {
+            return this._timerManager.clearInterval(id);
+        }
+
+        return false;
+    };
+
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return false;
+    };
+
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined || id === false) {
+            return false;
+        }
+
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+
+        return false;
+    };
+
+    this._clearPlaybackTimers = function () {
+        if (this._playOneTimeout) {
+            this._clearWidgetTimeout(this._playOneTimeout);
+            this._playOneTimeout = null;
+        }
+        if (Array.isArray(this._chordTimeouts)) {
+            for (let i = 0; i < this._chordTimeouts.length; i++) {
+                this._clearWidgetTimeout(this._chordTimeouts[i]);
+            }
+            this._chordTimeouts = [];
+        }
+    };
+
+    this._clearWidgetTimers = function () {
+        this._clearPlaybackTimers();
+        if (this._timerManager !== null) {
+            return this._timerManager.clearAll();
+        }
+
+        return 0;
     };
 
     /**
@@ -178,7 +307,7 @@ function MusicKeyboard(activity) {
     /** Flag to track if the metronome is on.
      * @type {boolean}
      */
-    this.metronomeInterval = false;
+    this.metronomeInterval = null;
 
     /**
      * Meter arguments.
@@ -206,10 +335,37 @@ function MusicKeyboard(activity) {
     this.instrumentMapper = {};
 
     /**
+     * Mapping between note names with octaves and keyboard element IDs.
+     * @type {Object}
+     */
+    this.noteToKeyMap = {};
+
+    /**
      * Flag to track first note while using metronome.
      * @type {boolean}
      */
     this.firstNote = false;
+
+    // Turn off metronome and release timer/audio resources owned by it.
+    this.stopMetronome = () => {
+        if (this.tickButton) {
+            this.tickButton.style.removeProperty("background");
+        }
+        if (this.tick && this.loopTick) {
+            this.loopTick.stop();
+        }
+        this.tick = false;
+        this.firstNote = false;
+        this.metronomeON = false;
+        const countdownContainer = docById("countdownContainer");
+        if (countdownContainer) {
+            countdownContainer.remove();
+        }
+        if (this.metronomeInterval) {
+            this._clearWidgetInterval(this.metronomeInterval);
+            this.metronomeInterval = null;
+        }
+    };
 
     /**
      * Array of selected notes.
@@ -244,6 +400,32 @@ function MusicKeyboard(activity) {
         }
 
         this._rowBlocks.push(rowBlock);
+    };
+
+    /**
+     * Rebuilds the play button's icon/label to reflect whether playback is
+     * currently active.
+     * @param {HTMLElement} playButtonCell - The play button element.
+     * @param {boolean} isPlaying - Whether playback is currently active.
+     */
+    this._updatePlayButtonIcon = (playButtonCell, isPlaying) => {
+        playButtonCell.replaceChildren(
+            document.createTextNode("\u00a0\u00a0"),
+            (() => {
+                const img = document.createElement("img");
+                img.src = isPlaying
+                    ? "header-icons/stop-button.svg"
+                    : "header-icons/play-button.svg";
+                img.title = isPlaying ? _("Stop") : _("Play");
+                img.alt = isPlaying ? _("Stop") : _("Play");
+                img.height = ICONSIZE;
+                img.width = ICONSIZE;
+                img.style.verticalAlign = "middle";
+                img.style.alignContent = "center";
+                return img;
+            })(),
+            document.createTextNode("\u00a0\u00a0")
+        );
     };
 
     /**
@@ -357,14 +539,11 @@ function MusicKeyboard(activity) {
                 temp1[id] = ele.getAttribute("alt").split("__")[0];
                 if (temp1[id] === "hertz") {
                     temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1], 10);
-                } else if (temp1[id] in FIXEDSOLFEGE1) {
-                    temp2[id] =
-                        FIXEDSOLFEGE1[temp1[id]].replace(SHARP, "#").replace(FLAT, "b") +
-                        ele.getAttribute("alt").split("__")[1];
                 } else {
-                    temp2[id] =
-                        temp1[id].replace(SHARP, "#").replace(FLAT, "b") +
-                        ele.getAttribute("alt").split("__")[1];
+                    temp2[id] = resolveSynthNoteName(
+                        temp1[id],
+                        ele.getAttribute("alt").split("__")[1]
+                    );
                 }
 
                 if (id === "rest") {
@@ -417,13 +596,21 @@ function MusicKeyboard(activity) {
          * Handles the keyboard key down event to start playing musical notes.
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
          */
-        const __keyboarddown = function (event) {
+        const __keyboarddown = event => {
+            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
+                event.preventDefault();
+                this.shiftOctave(1);
+                return;
+            }
+            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
+                event.preventDefault();
+                this.shiftOctave(-1);
+                return;
+            }
             if (current.has(event.keyCode)) return;
 
             __startNote(event);
             current.add(event.keyCode);
-
-            //event.preventDefault();
         };
 
         /**
@@ -443,8 +630,6 @@ function MusicKeyboard(activity) {
                 } else {
                     ele.style.backgroundColor = "white";
                 }
-
-                // no = ele.getAttribute("alt").split("__")[2];
 
                 let processedDuration = duration / 60;
                 processedDuration *= this.bpm;
@@ -513,7 +698,6 @@ function MusicKeyboard(activity) {
         const __keyboardup = function (event) {
             current.delete(event.keyCode);
             __endNote(event);
-            //event.preventDefault();
         };
 
         this._cacheDocumentKeyHandlers();
@@ -534,12 +718,8 @@ function MusicKeyboard(activity) {
         let temp2;
         if (temp1 === "hertz") {
             temp2 = this.displayLayout[i].noteOctave;
-        } else if (temp1 in FIXEDSOLFEGE1) {
-            temp2 =
-                FIXEDSOLFEGE1[temp1].replace(SHARP, "#").replace(FLAT, "b") +
-                this.displayLayout[i].noteOctave;
         } else {
-            temp2 = temp1.replace(SHARP, "#").replace(FLAT, "b") + this.displayLayout[i].noteOctave;
+            temp2 = resolveSynthNoteName(temp1, this.displayLayout[i].noteOctave);
         }
 
         this.blockNumberMapper[element.id] = blockNumber;
@@ -603,17 +783,7 @@ function MusicKeyboard(activity) {
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
             );
-            if (beginnerMode === "true") {
-                duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-            } else {
-                duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
-            }
-
-            if (duration === 0) {
-                duration = 0.125;
-            } else if (duration < 0) {
-                duration = -duration;
-            }
+            duration = this._roundNoteDuration(duration);
 
             this._notesPlayed.push({
                 startTime: startTime,
@@ -649,20 +819,16 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Initializes the MusicKeyboard object by setting up the widget window, layout, and event handlers.
+     * Creates the widget window, computes the layout/BPM needed to populate it,
+     * and wires the maximize/close lifecycle handlers.
      */
-    this.init = function () {
-        this.tick = false;
-        this.playingNow = false;
-        let w = window.innerWidth;
-        this._cellScale = w / 1200;
-        // const iconSize = ICONSIZE * this._cellScale;
-
+    this._createWidgetWindow = function () {
         /**
          * Widget window instance for the MusicKeyboard.
          * @type {Window}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
+        announceToScreenReader(_("Music Keyboard opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -702,15 +868,8 @@ function MusicKeyboard(activity) {
                 myNode.replaceChildren();
             }
 
-            // Ensure countdown interval/loop resources are cleaned up on close.
-            if (typeof this.stopMetronome === "function") {
-                this.stopMetronome();
-            } else {
-                this.tick = false;
-                this.firstNote = false;
-                this.metronomeON = false;
-                if (this.loopTick) this.loopTick.stop();
-            }
+            this.stopMetronome();
+            this._clearWidgetTimers();
 
             // Stop any active pointer/keyboard notes
             if (activeKey !== null) {
@@ -733,8 +892,19 @@ function MusicKeyboard(activity) {
             this._stopOrCloseClicked = true;
             this.playingNow = false;
 
+            // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
+            if (this.midiAccess && this.midiAccess.inputs) {
+                this.midiAccess.inputs.forEach(input => {
+                    input.onmidimessage = null;
+                });
+            }
+            this.midiON = false;
+
             selectedNotes = [];
-            docById("wheelDivptm").style.display = "none";
+            const wheelDiv = docById("wheelDivptm");
+            if (wheelDiv && wheelDiv.style) {
+                wheelDiv.style.display = "none";
+            }
             if (this._menuWheel) this._menuWheel.removeWheel();
             if (this._pitchWheel) this._pitchWheel.removeWheel();
             if (this._tabsWheel) this._tabsWheel.removeWheel();
@@ -742,8 +912,17 @@ function MusicKeyboard(activity) {
             if (this._durationWheel) this._durationWheel.removeWheel();
             if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
             if (this._octavesWheel) this._octavesWheel.removeWheel();
+            announceToScreenReader(_("Music Keyboard closed"));
             widgetWindow.destroy();
         };
+    };
+
+    /**
+     * Creates the widget window's toolbar buttons (play, save, clear, add note,
+     * MIDI, metronome) and wires their click handlers.
+     */
+    this._createToolbarButtons = function () {
+        const widgetWindow = this.widgetWindow;
 
         /**
          * Button to play all musical notes.
@@ -775,10 +954,8 @@ function MusicKeyboard(activity) {
         widgetWindow.addButton("erase-button.svg", ICONSIZE, _("Clear")).onclick = () => {
             this._notesPlayed = [];
             selectedNotes = [];
-            // if (!that.keyboardShown) {
             this._createTable();
             this._updateWidgetWindowSize();
-            // }
         };
 
         /**
@@ -806,25 +983,6 @@ function MusicKeyboard(activity) {
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
 
-        // Turn off metronome
-        this.stopMetronome = () => {
-            this.tickButton.style.removeProperty("background");
-            if (this.tick && this.loopTick) {
-                this.loopTick.stop();
-            }
-            this.tick = false;
-            this.firstNote = false;
-            this.metronomeON = false;
-            const countdownContainer = docById("countdownContainer");
-            if (countdownContainer) {
-                countdownContainer.remove();
-            }
-            if (this.metronomeInterval) {
-                clearInterval(this.metronomeInterval);
-                this.metronomeInterval = null;
-            }
-        };
-
         this.tickButton.onclick = () => {
             if (this.metronomeInterval || this.metronomeON) {
                 this.stopMetronome();
@@ -845,11 +1003,11 @@ function MusicKeyboard(activity) {
 
                 // Start countdown
                 let count = 3;
-                this.metronomeInterval = setInterval(() => {
+                this.metronomeInterval = this._setWidgetInterval(() => {
                     count--;
 
                     if (count === 0) {
-                        clearInterval(this.metronomeInterval);
+                        this._clearWidgetInterval(this.metronomeInterval);
                         this.metronomeInterval = null;
 
                         countdownContainer.remove();
@@ -878,6 +1036,15 @@ function MusicKeyboard(activity) {
                 }
             }
         };
+    };
+
+    /**
+     * Creates the keyboard/table container divs, wires their scroll-propagation
+     * guards, appends them to the widget body, and renders the initial keyboard
+     * and note table.
+     */
+    this._createKeyboardContainers = function () {
+        const widgetWindow = this.widgetWindow;
 
         // Append keyboard and div on widget windows
         /**
@@ -913,13 +1080,27 @@ function MusicKeyboard(activity) {
         this._createKeyboard();
 
         this._createTable();
+    };
+
+    /**
+     * Initializes the MusicKeyboard object by setting up the widget window, layout, and event handlers.
+     */
+    this.init = function () {
+        this.tick = false;
+        this.playingNow = false;
+        let w = window.innerWidth;
+        this._cellScale = w / 1200;
+
+        this._createWidgetWindow();
+        this._createToolbarButtons();
+        this._createKeyboardContainers();
 
         w = Math.max(
             Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20),
             BUTTONDIVWIDTH
         );
 
-        widgetWindow.sendToCenter();
+        this.widgetWindow.sendToCenter();
     };
 
     /**
@@ -935,21 +1116,7 @@ function MusicKeyboard(activity) {
         const playButtonCell = this.playButton;
 
         if (this.playingNow) {
-            playButtonCell.replaceChildren(
-                document.createTextNode("\u00a0\u00a0"),
-                (() => {
-                    const img = document.createElement("img");
-                    img.src = "header-icons/stop-button.svg";
-                    img.title = _("Stop");
-                    img.alt = _("Stop");
-                    img.height = ICONSIZE;
-                    img.width = ICONSIZE;
-                    img.style.verticalAlign = "middle";
-                    img.style.alignContent = "center";
-                    return img;
-                })(),
-                document.createTextNode("\u00a0\u00a0")
-            );
+            this._updatePlayButtonIcon(playButtonCell, true);
 
             if (selectedNotes.length < 1) {
                 return;
@@ -980,6 +1147,7 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = false;
+            this._clearPlaybackTimers();
 
             // Convert durations to seconds based on BPM
             const durationInSeconds = selectedNotes[0].duration.map(
@@ -996,21 +1164,8 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = true;
-            playButtonCell.replaceChildren(
-                document.createTextNode("\u00a0\u00a0"),
-                (() => {
-                    const img = document.createElement("img");
-                    img.src = "header-icons/play-button.svg";
-                    img.title = _("Play");
-                    img.alt = _("Play");
-                    img.height = ICONSIZE;
-                    img.width = ICONSIZE;
-                    img.style.verticalAlign = "middle";
-                    img.style.alignContent = "center";
-                    return img;
-                })(),
-                document.createTextNode("\u00a0\u00a0")
-            );
+            this._clearPlaybackTimers();
+            this._updatePlayButtonIcon(playButtonCell, false);
         }
     };
 
@@ -1022,7 +1177,12 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
-        setTimeout(() => {
+        if (this._playOneTimeout) {
+            this._clearWidgetTimeout(this._playOneTimeout);
+            this._playOneTimeout = null;
+        }
+        this._playOneTimeout = this._setWidgetTimeout(() => {
+            this._playOneTimeout = null;
             let cell, eleid, ele, notes, zx, res, maxDuration;
             if (counter < selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
@@ -1085,21 +1245,7 @@ function MusicKeyboard(activity) {
 
                 this.playOne(counter + 1, maxDuration, playButtonCell);
             } else {
-                playButtonCell.replaceChildren(
-                    document.createTextNode("\u00a0\u00a0"),
-                    (() => {
-                        const img = document.createElement("img");
-                        img.src = "header-icons/play-button.svg";
-                        img.title = _("Play");
-                        img.alt = _("Play");
-                        img.height = ICONSIZE;
-                        img.width = ICONSIZE;
-                        img.style.verticalAlign = "middle";
-                        img.style.alignContent = "center";
-                        return img;
-                    })(),
-                    document.createTextNode("\u00a0\u00a0")
-                );
+                this._updatePlayButtonIcon(playButtonCell, false);
                 this.playingNow = false;
                 if (!this.keyboardShown) {
                     this._createTable();
@@ -1123,47 +1269,20 @@ function MusicKeyboard(activity) {
             return;
         }
 
-        setTimeout(() => {
-            this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
-        }, 1);
-
-        if (notes.length > 1) {
-            setTimeout(() => {
+        for (let i = 0; i < notes.length; i++) {
+            const id = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
-                    notes[1],
+                    notes[i],
                     noteValue[0],
-                    instruments[1],
+                    instruments[i],
                     null,
                     null
                 );
             }, 1);
-        }
-
-        if (notes.length > 2) {
-            setTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[2],
-                    noteValue[0],
-                    instruments[2],
-                    null,
-                    null
-                );
-            }, 1);
-        }
-
-        if (notes.length > 3) {
-            setTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[3],
-                    noteValue[0],
-                    instruments[3],
-                    null,
-                    null
-                );
-            }, 1);
+            if (id) {
+                this._chordTimeouts.push(id);
+            }
         }
     };
 
@@ -1231,7 +1350,12 @@ function MusicKeyboard(activity) {
         // Fill in any gaps
         let lastOctave = obj[1];
         let thisOctave;
-        let lastVoice;
+        // Seed the voice from the first note, the same way the left-hand
+        // padding above does. The loop below is what normally keeps this up to
+        // date, but it starts at index 1, so with a single-note keyboard it
+        // never runs and the padding added after the last note would otherwise
+        // be left without a voice.
+        let lastVoice = noteList[0].voice;
         for (let i = 1; i < noteList.length; i++) {
             if (noteList[i].noteName === "drum") {
                 drumList.push(noteList[i]);
@@ -1388,7 +1512,7 @@ function MusicKeyboard(activity) {
         });
 
         function removeBlock(that, i) {
-            setTimeout(() => {
+            that._setWidgetTimeout(() => {
                 that._removePitchBlock(that.remove[i]);
             }, 200);
         }
@@ -1489,13 +1613,8 @@ function MusicKeyboard(activity) {
             temp2 = this.layout[n - j - 1].noteOctave;
         } else if (temp1 === "drum") {
             temp2 = "c2";
-        } else if (temp1 in FIXEDSOLFEGE1) {
-            temp2 =
-                FIXEDSOLFEGE1[temp1].replace(SHARP, "#").replace(FLAT, "b") +
-                this.layout[n - j - 1].noteOctave;
         } else {
-            temp2 =
-                temp1.replace(SHARP, "#").replace(FLAT, "b") + this.layout[n - j - 1].noteOctave;
+            temp2 = resolveSynthNoteName(temp1, this.layout[n - j - 1].noteOctave);
         }
 
         const ele = docById(j + ":" + colIndex);
@@ -1561,7 +1680,6 @@ function MusicKeyboard(activity) {
                     cell = e.target;
                     isMouseDown = true;
                     const obj = cell.id.split(":");
-                    // i = Number(obj[0]);
                     const j = Number(obj[1]);
                     if (cell.style.backgroundColor === "black") {
                         cell.style.backgroundColor = cell.getAttribute("cellColor");
@@ -1573,10 +1691,6 @@ function MusicKeyboard(activity) {
                 };
 
                 cell.onmouseover = () => {
-                    // let obj, i, j;
-                    // obj = cell.id.split(":");
-                    // i = Number(obj[0]);
-                    // j = Number(obj[1]);
                     if (isMouseDown) {
                         if (cell.style.backgroundColor === "black") {
                             cell.style.backgroundColor = cell.getAttribute("cellColor");
@@ -1832,6 +1946,35 @@ function MusicKeyboard(activity) {
     };
 
     /**
+     * Creates and configures a wheelnav "exit" (close) wheel sharing the given
+     * Raphael canvas. Does not call createWheel() or attach a navigateFunction;
+     * callers finish setup with their own labels and close behavior, since
+     * those differ slightly between call sites.
+     * @param {Object} raphael - The Raphael canvas shared with the parent wheel(s).
+     * @param {number} maxRadiusPercent - The outer radius percent for this wheel.
+     * @returns {Object} The configured (but not yet built) wheelnav instance.
+     */
+    this._createExitWheel = (raphael, maxRadiusPercent) => {
+        const exitWheel = new wheelnav("_exitWheel", raphael);
+        exitWheel.colors = platformColor.exitWheelcolors;
+        exitWheel.slicePathFunction = slicePath().DonutSlice;
+        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        exitWheel.slicePathCustom.maxRadiusPercent = maxRadiusPercent;
+        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+        exitWheel.clickModeRotate = false;
+        exitWheel.selectedNavItemIndex = null;
+        return exitWheel;
+    };
+
+    this._configureExitWheel = exitWheel => {
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(exitWheel);
+        }
+    };
+
+    /**
      * Creates a pie submenu based on the cell's attributes.
      * @param {string} cellId - The ID of the cell triggering the submenu.
      * @param {string} start - The start attribute of the cell.
@@ -1841,7 +1984,8 @@ function MusicKeyboard(activity) {
         docById("wheelDivptm").style.zIndex = "10001";
 
         this._menuWheel = new wheelnav("wheelDivptm", null, 600, 600);
-        this._exitWheel = new wheelnav("_exitWheel", this._menuWheel.raphael);
+        this._exitWheel = this._createExitWheel(this._menuWheel.raphael, 0.2);
+        this._exitWheel.keynavigateEnabled = false;
 
         this._tabsWheel = new wheelnav("_tabsWheel", this._menuWheel.raphael);
         this._durationWheel = new wheelnav("_durationWheel", this._menuWheel.raphael);
@@ -1859,15 +2003,6 @@ function MusicKeyboard(activity) {
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.titleRotateAngle = 90;
         this._menuWheel.animatetime = 0; // 300;
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.keynavigateEnabled = false;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.selectedNavItemIndex = null;
 
         const tabsLabels = [
             "",
@@ -1893,9 +2028,6 @@ function MusicKeyboard(activity) {
         ];
         this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
         this._menuWheel.slicePathCustom.maxRadiusPercent = 0.5;
-
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
 
         this._tabsWheel.colors = platformColor.pitchWheelcolors;
         this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1931,6 +2063,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "250px";
@@ -2154,7 +2287,7 @@ function MusicKeyboard(activity) {
         }
 
         this._menuWheel = new wheelnav("wheelDivptm", null, 200, 200);
-        this._exitWheel = new wheelnav("_exitWheel", this._menuWheel.raphael);
+        this._exitWheel = this._createExitWheel(this._menuWheel.raphael, 0.25);
 
         wheelnav.cssMode = true;
 
@@ -2177,15 +2310,6 @@ function MusicKeyboard(activity) {
         this._menuWheel.navItems[0].setTooltip(_("pitch"));
         this._menuWheel.navItems[1].setTooltip(_("hertz"));
 
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.selectedNavItemIndex = null;
         this._exitWheel.createWheel(["×", " "]);
         this._exitWheel.navItems[1].enabled = false;
         if (this._exitWheel.navItems[0].sliceSelectedAttr) {
@@ -2194,6 +2318,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         const x = docById("addnotes").getBoundingClientRect().x;
         const y = docById("addnotes").getBoundingClientRect().y;
@@ -2230,27 +2355,26 @@ function MusicKeyboard(activity) {
             const newBlock = this.activity.blocks.blockList.length;
 
             if (label === "pitch") {
-                let i;
-                for (i = 0; i < pitchLabels.length; i++) {
-                    let lastNote,
-                        c = this.layout.length - 1;
-                    while (c > -1) {
-                        if (this.layout[c].noteName !== "hertz") {
-                            break;
-                        }
-                        c--;
-                    }
+                let i = -1;
+                let lastNote = null,
+                    c = this.layout.length - 1;
+                while (c > -1) {
                     if (this.layout[c] && this.layout[c].noteName !== "hertz") {
                         lastNote = this.layout[c].noteName;
-                    } else {
-                        lastNote = null;
-                    }
-
-                    if (
-                        lastNote !== null &&
-                        (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i]))
-                    ) {
                         break;
+                    }
+                    c--;
+                }
+
+                if (lastNote !== null) {
+                    for (let idx = 0; idx < pitchLabels.length; idx++) {
+                        if (
+                            pitchLabels[idx].includes(lastNote) ||
+                            lastNote.includes(pitchLabels[idx])
+                        ) {
+                            i = idx;
+                            break;
+                        }
                     }
                 }
 
@@ -2266,16 +2390,16 @@ function MusicKeyboard(activity) {
                         break;
                     }
                 } while (this.layout.some(note => note.noteName === rLabel));
+
+                rArg = 4;
                 for (let j = this.layout.length; j > 0; j--) {
-                    rArg = this.layout[j - 1].noteOctave;
-                    if (isNaN(rArg)) {
-                        continue;
-                    }
-                    if (rArg > 0 && rArg < 9) {
+                    const oct = Number(this.layout[j - 1].noteOctave);
+                    if (!isNaN(oct) && oct >= 1 && oct <= 8) {
+                        rArg = oct;
                         break;
                     }
                 }
-                if ((i + 1) % pitchLabels.length === 0) {
+                if (lastNote !== null && i === 0 && rArg < 8) {
                     rArg += 1;
                 }
             } else {
@@ -2317,7 +2441,7 @@ function MusicKeyboard(activity) {
                     ]);
                     break;
                 default:
-                    console.log("Nothing to do for " + label);
+                    debugLog("Nothing to do for " + label);
             }
 
             let aboveBlock = -1;
@@ -2329,7 +2453,7 @@ function MusicKeyboard(activity) {
             }
             if (aboveBlock !== -1) {
                 creatingNewNote = true;
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this._addNotesBlockBetween(aboveBlock, newBlock);
                     creatingNewNote = false;
                     this.layout.push({
@@ -2346,13 +2470,21 @@ function MusicKeyboard(activity) {
                     this._createTable();
                     const n = this.layout.length;
                     const key = this.layout[n - 1];
-                    this.getElement[key.noteName.toString() + key.noteOctave.toString()] =
-                        key.objId;
-                    this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
-                        key.objId; //convet solfege to alphabetic.
+                    if (!this.noteToKeyMap) {
+                        this.noteToKeyMap = {};
+                    }
+                    if (key) {
+                        this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] =
+                            key.objId;
+                        if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
+                            this.noteToKeyMap[
+                                FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
+                            ] = key.objId; //convet solfege to alphabetic.
+                        }
+                    }
                 }, 500);
             } else {
-                console.log("Could not find anywhere to insert new block.");
+                debugLog("Could not find anywhere to insert new block.");
             }
         };
 
@@ -2563,7 +2695,7 @@ function MusicKeyboard(activity) {
 
         this._pitchWheel = new wheelnav("wheelDivptm", null, 600, 600);
 
-        this._exitWheel = new wheelnav("_exitWheel", this._pitchWheel.raphael);
+        this._exitWheel = this._createExitWheel(this._pitchWheel.raphael, 0.2);
         if (condition === "pitchblocks") {
             this._accidentalsWheel = new wheelnav("_accidentalsWheel", this._pitchWheel.raphael);
             this._octavesWheel = new wheelnav("_octavesWheel", this._pitchWheel.raphael);
@@ -2597,15 +2729,6 @@ function MusicKeyboard(activity) {
             this._pitchWheel.createWheel(noteLabelsI18n);
         }
 
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.selectedNavItemIndex = null;
         this._exitWheel.createWheel(["x", " "]);
         this._exitWheel.navItems[1].enabled = false;
         if (this._exitWheel.navItems[0].sliceSelectedAttr) {
@@ -2614,6 +2737,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         const octaveLabels = [
             "8",
@@ -2653,13 +2777,15 @@ function MusicKeyboard(activity) {
 
             this._accidentalsWheel.animatetime = 0; // 300;
             this._accidentalsWheel.createWheel(accidentalLabels);
-            this._accidentalsWheel.setTooltips([
-                _("double sharp"),
-                _("sharp"),
-                _("natural"),
-                _("flat"),
-                _("double flat")
-            ]);
+            if (typeof this._accidentalsWheel.setTooltips === "function") {
+                this._accidentalsWheel.setTooltips([
+                    _("double sharp"),
+                    _("sharp"),
+                    _("natural"),
+                    _("flat"),
+                    _("double flat")
+                ]);
+            }
 
             this._octavesWheel.colors = platformColor.octavesWheelcolors;
             this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2670,6 +2796,18 @@ function MusicKeyboard(activity) {
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
+            if (typeof this._octavesWheel.setTooltips === "function") {
+                this._octavesWheel.setTooltips([
+                    _("Octave 8 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 7 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 6 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 5 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 4 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 3 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 2 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 1 (Shift+↑/↓ to shift octaves)")
+                ]);
+            }
         }
 
         const x = docById("labelcol" + index).getBoundingClientRect().x;
@@ -2717,7 +2855,7 @@ function MusicKeyboard(activity) {
             for (let i = 0; i < accidentals.length; i++) {
                 if (noteValue.includes(accidentals[i])) {
                     accidentalsValue = i;
-                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                    noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                     break;
                 }
             }
@@ -2829,12 +2967,7 @@ function MusicKeyboard(activity) {
             cell.textContent =
                 displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
             const temp1 = label;
-            let temp2;
-            if (temp1 in FIXEDSOLFEGE1) {
-                temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, "#").replace(FLAT, "b") + octave;
-            } else {
-                temp2 = temp1.replace(SHARP, "#").replace(FLAT, "b") + octave;
-            }
+            const temp2 = resolveSynthNoteName(temp1, octave);
 
             this._notesPlayed.map(item => {
                 if (item.objId === displayLayout[index].blockNumber) {
@@ -2963,7 +3096,6 @@ function MusicKeyboard(activity) {
             this.noteNames.push(PITCHES3[0]);
             this.octaves.push(5);
         }
-        // document.getElementById("keyboardHolder2").style.display = "block";
         this.idContainer = [];
         let myrowId = 0;
         let myrow2Id = 0;
@@ -2971,24 +3103,15 @@ function MusicKeyboard(activity) {
 
         let parenttbl = document.getElementById("myrow");
         let parenttbl2 = document.getElementById("myrow2");
-        let el, newel, newel2, nname;
+        let newel, newel2, nname;
 
         for (let p = 0; p < this.displayLayout.length; p++) {
             // If the blockNumber is null, don't add a label.
             if (this.displayLayout[p].noteName > FAKEBLOCKNUMBER) {
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                if (
-                    [2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(
-                        myrow2Id
-                    )
-                ) {
-                    parenttbl2.appendChild(newel2);
-                    el = docById("blackRow" + myrow2Id.toString());
-                    el.style.background = "transparent";
-                    el.style.border = "none";
-                    el.style.zIndex = "10";
-                    el.style.position = "relative";
+                if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
+                    appendSpacerKey(parenttbl2, newel2);
                     p--;
                     myrow2Id++;
                     continue;
@@ -3081,17 +3204,8 @@ function MusicKeyboard(activity) {
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if (
-                    [2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(
-                        myrow2Id
-                    )
-                ) {
-                    parenttbl2.appendChild(newel2);
-                    el = docById("blackRow" + myrow2Id.toString());
-                    el.style.background = "transparent";
-                    el.style.border = "none";
-                    el.style.zIndex = "10";
-                    el.style.position = "relative";
+                if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
+                    appendSpacerKey(parenttbl2, newel2);
                     p--;
                     myrow2Id++;
                     continue;
@@ -3135,20 +3249,10 @@ function MusicKeyboard(activity) {
                 this.displayLayout[p].noteName.includes("b")
             ) {
                 newel2 = document.createElement("td");
-                // elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if (
-                    [2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(
-                        myrow2Id
-                    )
-                ) {
-                    parenttbl2.appendChild(newel2);
-                    el = docById("blackRow" + myrow2Id.toString());
-                    el.style.background = "transparent";
-                    el.style.border = "none";
-                    el.style.zIndex = "10";
-                    el.style.position = "relative";
+                if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
+                    appendSpacerKey(parenttbl2, newel2);
                     p--;
                     myrow2Id++;
                     continue;
@@ -3200,8 +3304,6 @@ function MusicKeyboard(activity) {
                 parenttbl2.appendChild(newel2);
             } else {
                 newel = document.createElement("td");
-                // elementid = document.getElementsByTagName("td").length;
-
                 newel.setAttribute("id", "whiteRow" + myrowId.toString());
                 newel.style.textAlign = "center";
                 newel.setAttribute(
@@ -3563,7 +3665,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Clears the note names and octaves arrays.
-     * @memberof ClassName
+     * @memberof MusicKeyboard
      */
     this.clearBlocks = function () {
         this.noteNames = [];
@@ -3572,19 +3674,24 @@ function MusicKeyboard(activity) {
 
     /**
      * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
-     * @memberof ClassName
+     * @memberof MusicKeyboard
      */
     this.doMIDI = () => {
         let duration = 0;
         let startTime = 0;
 
-        this.getElement = {};
+        this.noteToKeyMap = {};
 
         for (let idx = 0; idx < this.layout.length; idx++) {
             const key = this.layout[idx];
-            this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
-            this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
-                key.objId; //convet solfege to alphabetic.
+            if (key) {
+                this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
+                if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
+                    this.noteToKeyMap[
+                        FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
+                    ] = key.objId; //convet solfege to alphabetic.
+                }
+            }
         }
 
         /**
@@ -3629,17 +3736,7 @@ function MusicKeyboard(activity) {
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
             );
-            if (beginnerMode === "true") {
-                duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-            } else {
-                duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
-            }
-
-            if (duration === 0) {
-                duration = 0.125;
-            } else if (duration < 0) {
-                duration = -duration;
-            }
+            duration = this._roundNoteDuration(duration);
 
             this._notesPlayed.push({
                 startTime: startTime,
@@ -3656,14 +3753,15 @@ function MusicKeyboard(activity) {
          * Converts a MIDI note number to a pitch and octave.
          * @param {number} num - The MIDI note number.
          * @returns {Array<string>} An array containing two possible pitch names and the octave.
-         * @memberof ClassName
+         * @memberof MusicKeyboard
          */
         const numberToPitch = num => {
             const offset = 4;
-            const octave = offset + Math.floor((num - 60) / 12);
-            const pitch1 = NOTESSHARP[num % 12];
-            const pitch2 = NOTESFLAT[num % 12];
-            return [pitch1, pitch2, octave];
+            const currentEDO = getCurrentEDO(this.activity.logo.synth.inTemperament);
+            const octave = offset + Math.floor((num - 60) / currentEDO);
+            const noteNames = generateNoteNames(currentEDO);
+            const pitch1 = noteNames[num % currentEDO];
+            return [pitch1, pitch1, octave];
         };
 
         //event attributes : timeStamp , data
@@ -3674,7 +3772,7 @@ function MusicKeyboard(activity) {
         /**
          * Handles MIDI messages, triggering note start or end events based on the MIDI data.
          * @param {MIDIMessageEvent} event - The MIDI message event containing note information.
-         * @memberof ClassName
+         * @memberof MusicKeyboard
          */
         const onMIDIMessage = event => {
             const pitchOctave = numberToPitch(event.data[1]);
@@ -3682,7 +3780,7 @@ function MusicKeyboard(activity) {
             const pitch2 = pitchOctave[1];
             const octave = pitchOctave[2];
             const key =
-                this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 + "" + octave];
+                this.noteToKeyMap[pitch1 + "" + octave] || this.noteToKeyMap[pitch2 + "" + octave];
             if (event.data[0] === 144 && event.data[2] !== 0) {
                 __startNote(event, docById(key));
             } else {
@@ -3694,9 +3792,10 @@ function MusicKeyboard(activity) {
          * Success callback function triggered upon receiving MIDI access.
          * Initializes MIDI widget and sets up MIDI event handlers.
          * @param {MIDIAccess} midiAccess - The MIDI access object containing MIDI inputs and outputs.
-         * @memberof ClassName
+         * @memberof MusicKeyboard
          */
         const onMIDISuccess = midiAccess => {
+            this.midiAccess = midiAccess;
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
@@ -3718,7 +3817,7 @@ function MusicKeyboard(activity) {
         /**
          * Failure callback function triggered upon failing to get MIDI access in the browser.
          * Displays an error message and updates MIDI state accordingly.
-         * @memberof ClassName
+         * @memberof MusicKeyboard
          */
         const onMIDIFailure = () => {
             activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
@@ -3728,9 +3827,93 @@ function MusicKeyboard(activity) {
         /**
          * Requests MIDI access from the browser and initializes MIDI-related functionality.
          * Calls success or failure callback functions based on the result of the request.
-         * @memberof ClassName
+         * @memberof MusicKeyboard
          */
         navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
+    };
+
+    /**
+     * Shifts keyboard octaves higher (+1) or lower (-1).
+     * @param {number} delta
+     */
+    this.shiftOctave = function (delta) {
+        if (!this.octaves || this.octaves.length === 0) return;
+
+        // Filter octaves for pitched notes only (exclude "hertz")
+        const pitchedOctaves = [];
+        for (let i = 0; i < this.octaves.length; i++) {
+            if (this.noteNames && this.noteNames[i] !== "hertz") {
+                pitchedOctaves.push(this.octaves[i]);
+            }
+        }
+        if (pitchedOctaves.length === 0) return;
+
+        const minOct = Math.min(...pitchedOctaves);
+        const maxOct = Math.max(...pitchedOctaves);
+
+        if (delta > 0 && maxOct >= 8) return;
+        if (delta < 0 && minOct <= 1) return;
+
+        for (let i = 0; i < this.octaves.length; i++) {
+            if (this.noteNames && this.noteNames[i] !== "hertz") {
+                this.octaves[i] += delta;
+            }
+        }
+
+        if (this.displayLayout) {
+            for (let i = 0; i < this.displayLayout.length; i++) {
+                if (
+                    this.displayLayout[i].noteName !== "hertz" &&
+                    this.displayLayout[i].noteOctave !== undefined
+                ) {
+                    this.displayLayout[i].noteOctave += delta;
+                }
+            }
+        }
+
+        if (this.layout) {
+            for (let i = 0; i < this.layout.length; i++) {
+                if (
+                    this.layout[i].noteName !== "hertz" &&
+                    this.layout[i].noteOctave !== undefined
+                ) {
+                    this.layout[i].noteOctave += delta;
+                }
+            }
+        }
+
+        // Update note mappings and key element labels
+        if (this.displayLayout && typeof docById === "function") {
+            for (let i = 0; i < this.displayLayout.length; i++) {
+                const item = this.displayLayout[i];
+                if (item.noteName !== "hertz") {
+                    const elem = docById("cell-" + i) || docById("blackRow" + i);
+                    if (elem) {
+                        const newSynthName = resolveSynthNoteName(item.noteName, item.noteOctave);
+                        if (this.noteMapper && elem.id) {
+                            this.noteMapper[elem.id] = newSynthName;
+                        }
+                        if (typeof elem.setAttribute === "function") {
+                            elem.setAttribute("alt", newSynthName);
+                            elem.setAttribute("title", newSynthName);
+                        }
+
+                        if (elem.childNodes && elem.childNodes.length > 0) {
+                            for (let j = 0; j < elem.childNodes.length; j++) {
+                                const node = elem.childNodes[j];
+                                if (node.nodeType === 3) {
+                                    node.textContent = `${item.noteName}${item.noteOctave}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (typeof this._createTable === "function") {
+            this._createTable();
+        }
     };
 }
 

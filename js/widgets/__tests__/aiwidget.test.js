@@ -41,11 +41,6 @@ global.ABCJS = {
 global.getVoiceSynthName = jest.fn(() => "mock-synth");
 global.platformColor = jest.fn(() => "#000000");
 global.slicePath = jest.fn(p => p);
-global.DOUBLEFLAT = "𝄫";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.SHARP = "♯";
-global.DOUBLESHARP = "𝄪";
 global.instruments = [{}];
 global.REFERENCESAMPLE = "electronic synth";
 
@@ -109,6 +104,42 @@ describe("AIWidget Utilities", () => {
         it("should handle empty or malformed arrays", () => {
             expect(searchIndexForMusicBlock([], 10)).toBe(-1);
             expect(searchIndexForMusicBlock([null, [10]], 10)).toBe(1);
+        });
+
+        it("should refresh cached indexes when block IDs change without changing array length", () => {
+            const array = [
+                [10, "start"],
+                [20, "pitch"]
+            ];
+
+            expect(searchIndexForMusicBlock(array, 20)).toBe(1);
+
+            array[1] = [30, "duration"];
+
+            expect(searchIndexForMusicBlock(array, 20)).toBe(-1);
+            expect(searchIndexForMusicBlock(array, 30)).toBe(1);
+
+            array.reverse();
+
+            expect(searchIndexForMusicBlock(array, 30)).toBe(0);
+            expect(searchIndexForMusicBlock(array, 10)).toBe(1);
+        });
+
+        it("should handle null elements during stale cache rebuild", () => {
+            const array = [
+                [10, "start"],
+                [20, "pitch"]
+            ];
+
+            // Prime the cache
+            expect(searchIndexForMusicBlock(array, 20)).toBe(1);
+
+            // Stale: replace with null element
+            array[1] = null;
+
+            // Should handle null gracefully during rebuild
+            expect(searchIndexForMusicBlock(array, 20)).toBe(-1);
+            expect(searchIndexForMusicBlock(array, 10)).toBe(0);
         });
     });
 
@@ -241,6 +272,70 @@ describe("AIWidget Instance", () => {
         expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalled();
     });
 
+    it("should retain both pitch analysers after initialization", () => {
+        aiWidget.init(mockActivity);
+
+        expect(aiWidget.pitchAnalysers[0]).toBeDefined();
+        expect(aiWidget.pitchAnalysers[1]).toBeDefined();
+    });
+
+    it("should dispose pitch analysers from the previous initialization", () => {
+        const disconnectMock = jest.fn();
+        const analysers = [];
+        global.instruments = [
+            {
+                piano: {
+                    disconnect: disconnectMock,
+                    connect: jest.fn()
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => {
+            const analyser = { dispose: jest.fn() };
+            analysers.push(analyser);
+            return analyser;
+        });
+
+        aiWidget.init(mockActivity);
+        const firstAnalysers = analysers.slice();
+        aiWidget.init(mockActivity);
+
+        for (const analyser of firstAnalysers) {
+            expect(disconnectMock).toHaveBeenCalledWith(analyser);
+            expect(analyser.dispose).toHaveBeenCalledTimes(1);
+        }
+        expect(aiWidget.pitchAnalysers[0]).toBe(analysers[2]);
+        expect(aiWidget.pitchAnalysers[1]).toBe(analysers[3]);
+    });
+
+    it("should dispose analysers before every repeated initialization", () => {
+        const analysers = [];
+        global.instruments = [
+            {
+                piano: {
+                    disconnect: jest.fn(),
+                    connect: jest.fn()
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => {
+            const analyser = { dispose: jest.fn() };
+            analysers.push(analyser);
+            return analyser;
+        });
+
+        aiWidget.init(mockActivity);
+        aiWidget.init(mockActivity);
+        aiWidget.init(mockActivity);
+
+        for (const analyser of analysers.slice(0, 4)) {
+            expect(analyser.dispose).toHaveBeenCalledTimes(1);
+        }
+        for (const analyser of analysers.slice(4)) {
+            expect(analyser.dispose).not.toHaveBeenCalled();
+        }
+    });
+
     it("should handle sample length warnings", () => {
         aiWidget.init(mockActivity);
         aiWidget.sampleData = "a".repeat(1333334); // Just over the limit
@@ -299,13 +394,14 @@ describe("AIWidget Instance", () => {
         const cancelAnimationFrameMock = jest.fn();
         global.cancelAnimationFrame = cancelAnimationFrameMock;
         const disposeMock = jest.fn();
+        const disconnectMock = jest.fn();
         global.Tone.Analyser = jest.fn(() => ({
             dispose: disposeMock
         }));
         global.instruments = [
             {
                 piano: {
-                    disconnect: jest.fn(),
+                    disconnect: disconnectMock,
                     connect: jest.fn()
                 }
             }
@@ -342,6 +438,10 @@ describe("AIWidget Instance", () => {
             one: 11,
             two: 22
         };
+        const closingDisposeMock = jest.fn();
+        const closingAnalyser = {
+            dispose: closingDisposeMock
+        };
         aiWidget.pitchAnalysers = {
             0: {
                 dispose: disposeMock
@@ -353,14 +453,13 @@ describe("AIWidget Instance", () => {
             two: 22
         };
         aiWidget.pitchAnalysers = {
-            0: {
-                dispose: disposeMock
-            }
+            0: closingAnalyser
         };
         widgetInstance.onclose();
         expect(cancelAnimationFrameMock).toHaveBeenCalledWith(11);
         expect(cancelAnimationFrameMock).toHaveBeenCalledWith(22);
-        expect(disposeMock).toHaveBeenCalled();
+        expect(disconnectMock).toHaveBeenCalledWith(closingAnalyser);
+        expect(closingDisposeMock).toHaveBeenCalledTimes(1);
         expect(widgetInstance.destroy).toHaveBeenCalled();
         expect(aiWidget.pitchAnalysers).toEqual({});
     });

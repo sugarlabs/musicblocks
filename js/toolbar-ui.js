@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, saveButton, saveButtonAdvanced, ActivityContext
+  makeKeyboardAccessible, saveButton, saveButtonAdvanced
 */
 
 /* exported ToolbarUI */
@@ -129,6 +129,7 @@ class ToolbarUI {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
+                ["recordDropdownArrow", _("Record options")],
                 ["Full screen", _("Enter Fullscreen")],
                 ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -140,8 +141,8 @@ class ToolbarUI {
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
-                ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["helpGuideItem", _("Help"), true],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -160,43 +161,44 @@ class ToolbarUI {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-midi", _("Save project as MIDI"), "innerHTML"],
-                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-wav", _("Save music as WAV"), "innerHTML"],
-                ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
-                ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
-                ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", "English (United States)", "innerHTML"],
-                ["enUK", "English (United Kingdom)", "innerHTML"],
-                ["ja", "日本語", "innerHTML"],
-                ["ko", "한국인", "innerHTML"],
-                ["es", "español", "innerHTML"],
-                ["fr", "français", "innerHTML"],
-                ["de", "Deutsch", "innerHTML"],
-                ["it", "italiana", "innerHTML"],
-                ["pt", "português", "innerHTML"],
-                ["kana", "にほんご", "innerHTML"],
-                ["zhCN", "中文", "innerHTML"],
-                ["th", "ภาษาไทย", "innerHTML"],
-                ["tr", "Türkçe", "innerHTML"],
-                ["ayc", "aymara", "innerHTML"],
-                ["quz", "quechua", "innerHTML"],
-                ["gug", "guarani", "innerHTML"],
-                ["hi", "हिंदी", "innerHTML"],
-                ["ta", "தமிழ்", "innerHTML"],
-                ["ibo", "igbo", "innerHTML"],
-                ["ar", "عربى", "innerHTML"],
-                ["te", "తెలుగు", "innerHTML"],
-                ["bn", "বাংলা", "innerHTML"],
-                ["he", "עִברִית", "innerHTML"],
-                ["ur", "اردو", "innerHTML"]
+                ["save-html-beg", _("Save project as HTML"), true],
+                ["save-png-beg", _("Save mouse artwork as PNG"), true],
+                ["save-html", _("Save project as HTML"), true],
+                ["save-midi", _("Save project as MIDI"), true],
+                ["save-svg", _("Save mouse artwork as SVG"), true],
+                ["save-png", _("Save mouse artwork as PNG"), true],
+                ["save-wav", _("Save music as WAV"), true],
+                ["save-abc", _("Save sheet music as ABC"), true],
+                ["save-ly", _("Save sheet music as Lilypond"), true],
+                ["save-mxml", _("Save sheet music as MusicXML"), true],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["new-project", _("Confirm"), true],
+                ["enUS", "English (United States)", true],
+                ["enUK", "English (United Kingdom)", true],
+                ["ja", "日本語", true],
+                ["ko", "한국인", true],
+                ["es", "español", true],
+                ["fr", "français", true],
+                ["de", "Deutsch", true],
+                ["it", "italiana", true],
+                ["pt", "português", true],
+                ["kana", "にほんご", true],
+                ["zhCN", "中文", true],
+                ["th", "ภาษาไทย", true],
+                ["tr", "Türkçe", true],
+                ["az", "azərbaycanca", true],
+                ["ayc", "aymara", true],
+                ["quz", "quechua", true],
+                ["gug", "guarani", true],
+                ["hi", "हिंदी", true],
+                ["ta", "தமிழ்", true],
+                ["ibo", "igbo", true],
+                ["ar", "عربى", true],
+                ["te", "తెలుగు", true],
+                ["bn", "বাংলা", true],
+                ["he", "עִברִית", true],
+                ["ur", "اردو", true]
             ];
 
             // Workaround for FF
@@ -205,6 +207,7 @@ class ToolbarUI {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
+                _("Record options"),
                 _("Enter Fullscreen"),
                 _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
@@ -262,6 +265,7 @@ class ToolbarUI {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
+                ["recordDropdownArrow", _("Record options")],
                 ["Full screen", _("Enter Fullscreen")],
                 ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -273,8 +277,8 @@ class ToolbarUI {
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
-                ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["helpGuideItem", _("Help"), true],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -292,38 +296,39 @@ class ToolbarUI {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save turtle artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-svg", _("Save turtle artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", "English (United States)", "innerHTML"],
-                ["enUK", "English (United Kingdom)", "innerHTML"],
-                ["ja", "日本語", "innerHTML"],
-                ["ko", "한국인", "innerHTML"],
-                ["es", "español", "innerHTML"],
-                ["fr", "français", "innerHTML"],
-                ["de", "Deutsch", "innerHTML"],
-                ["it", "italiana", "innerHTML"],
-                ["pt", "português", "innerHTML"],
-                ["kana", "にほんご", "innerHTML"],
-                ["zhCN", "中文", "innerHTML"],
-                ["th", "ภาษาไทย", "innerHTML"],
-                ["tr", "Türkçe", "innerHTML"],
-                ["ayc", "aymara", "innerHTML"],
-                ["quz", "quechua", "innerHTML"],
-                ["gug", "guarani", "innerHTML"],
-                ["hi", "हिंदी", "innerHTML"],
-                ["ta", "தமிழ்", "innerHTML"],
-                ["ibo", "igbo", "innerHTML"],
-                ["ar", "عربى", "innerHTML"],
-                ["te", "తెలుగు", "innerHTML"],
-                ["bn", "বাংলা", "innerHTML"],
-                ["he", "עִברִית", "innerHTML"],
-                ["ur", "اردو", "innerHTML"]
+                ["save-html-beg", _("Save project as HTML"), true],
+                ["save-png-beg", _("Save turtle artwork as PNG"), true],
+                ["save-html", _("Save project as HTML"), true],
+                ["save-svg", _("Save turtle artwork as SVG"), true],
+                ["save-png", _("Save turtle artwork as PNG"), true],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["new-project", _("Confirm"), true],
+                ["enUS", "English (United States)", true],
+                ["enUK", "English (United Kingdom)", true],
+                ["ja", "日本語", true],
+                ["ko", "한국인", true],
+                ["es", "español", true],
+                ["fr", "français", true],
+                ["de", "Deutsch", true],
+                ["it", "italiana", true],
+                ["pt", "português", true],
+                ["kana", "にほんご", true],
+                ["zhCN", "中文", true],
+                ["th", "ภาษาไทย", true],
+                ["tr", "Türkçe", true],
+                ["az", "azərbaycanca", true],
+                ["ayc", "aymara", true],
+                ["quz", "quechua", true],
+                ["gug", "guarani", true],
+                ["hi", "हिंदी", true],
+                ["ta", "தமிழ்", true],
+                ["ibo", "igbo", true],
+                ["ar", "عربى", true],
+                ["te", "తెలుగు", true],
+                ["bn", "বাংলা", true],
+                ["he", "עִברִית", true],
+                ["ur", "اردو", true]
             ];
 
             // Workaround for FF
@@ -332,6 +337,7 @@ class ToolbarUI {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
+                _("Record options"),
                 _("Enter Fullscreen"),
                 _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
@@ -377,24 +383,38 @@ class ToolbarUI {
         const advancedMode = docById("advancedMode");
         if (this.activity.beginnerMode) {
             // || mode === "null") {
-            advancedMode.style.display = "block";
-            beginnerMode.style.display = "none";
+            if (advancedMode) {
+                advancedMode.style.display = "block";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "none";
+            }
         } else {
-            advancedMode.style.display = "none";
-            beginnerMode.style.display = "block";
+            if (advancedMode) {
+                advancedMode.style.display = "none";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "block";
+            }
         }
 
         for (let i = 0; i < strings.length; i++) {
             const obj = strings[i];
             const trans = strings_[i];
             const elem = docById(obj[0]);
-            if (strings[i].length === 3) {
+            if (strings[i][2]) {
                 if (elem !== undefined && elem !== null) {
-                    elem.innerHTML = obj[1];
+                    elem.textContent = obj[1];
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
                     elem.setAttribute("data-tooltip", trans);
+                    // Screen readers don't read data-tooltip (a
+                    // Materialize-only visual affordance), so mirror the
+                    // same translated string as aria-label. This keeps the
+                    // accessible name correctly localized on every language
+                    // change, same as the visual tooltip.
+                    elem.setAttribute("aria-label", trans);
                 }
             }
         }
@@ -406,8 +426,10 @@ class ToolbarUI {
             });
         }
 
+        // Materialize has no "close" command. Its mouseleave handler cancels
+        // a pending show and hides an active tooltip without resetting options.
         $j(".tooltipped").on("click", function () {
-            $j(this).tooltip("close");
+            $j(this).trigger("mouseleave.tooltip");
         });
 
         const restoreWidgetFocus = () => {
@@ -442,7 +464,7 @@ class ToolbarUI {
         // Initialize Tab focus cycling (keyboard-only, never hijacks mouse).
         // Guard prevents double-init if toolbar is reconstructed.
         if (!window._focusCycleManager) {
-            window._focusCycleManager = new FocusCycleManager();
+            window._focusCycleManager = new ToolbarUI.FocusCycleManager();
             window._focusCycleManager.init();
         }
 
@@ -457,8 +479,12 @@ class ToolbarUI {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML =
-                '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
+            logoIcon.textContent = "";
+            const logoImg = document.createElement("img");
+            logoImg.style.width = "100%";
+            logoImg.style.transform = "scale(0.85)";
+            logoImg.src = "images/logo-ja.svg";
+            logoIcon.appendChild(logoImg);
         }
 
         logoIcon.onmouseenter = () => {
@@ -472,6 +498,15 @@ class ToolbarUI {
         logoIcon.onclick = () => {
             onclick(this.activity);
         };
+
+        logoIcon.setAttribute("role", "button");
+        logoIcon.setAttribute("tabindex", "0");
+        logoIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                logoIcon.click();
+            }
+        });
     }
 
     /**
@@ -525,7 +560,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
             saveButtonAdvanced.className = "grey-text inactiveLink";
-            recordButton.className = "grey-text inactiveLink";
+            recordButton.classList.add("grey-text", "inactiveLink");
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
@@ -563,7 +598,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
             saveButtonAdvanced.className = "";
-            recordButton.className = "";
+            recordButton.classList.remove("grey-text", "inactiveLink");
         };
     }
 
@@ -600,11 +635,19 @@ class ToolbarUI {
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.setAttribute("tabindex", "0"); // Make focusable
+        confirmationButton.setAttribute("role", "button");
+        confirmationButton.setAttribute("aria-label", _("Confirm"));
+        // The label alone ("Confirm") doesn't say what's being confirmed;
+        // point screen readers at the actual question being asked.
+        confirmationButton.setAttribute("aria-describedby", "confirmation-message");
         confirmationButton.textContent = _("Confirm");
 
         const cancelButton = document.createElement("div");
         cancelButton.classList.add("cancel-button");
         cancelButton.id = "cancel-project";
+        cancelButton.setAttribute("role", "button");
+        cancelButton.setAttribute("aria-label", _("Cancel"));
+        cancelButton.setAttribute("aria-describedby", "confirmation-message");
         cancelButton.textContent = _("Cancel");
 
         buttonRowLi.appendChild(confirmationButton);
@@ -618,6 +661,13 @@ class ToolbarUI {
 
         // Make modal container focusable
         modalContainer.setAttribute("tabindex", "-1");
+
+        // Screen reader semantics: identify this as a modal dialog with an
+        // accessible name, matching the pattern used by the other modals
+        // in the app (clear-workspace confirmation, LilyPond save dialog).
+        modalContainer.setAttribute("role", "dialog");
+        modalContainer.setAttribute("aria-modal", "true");
+        modalContainer.setAttribute("aria-label", _("New project confirmation"));
 
         // Setup keyboard navigation for modal
         const modalButtons = [confirmationButton, cancelButton];
@@ -761,17 +811,43 @@ class ToolbarUI {
         const icon = docById("themeSelectIcon");
         if (!icon) return;
 
-        themes.forEach(theme => {
-            if (safeStorageGet("themePreference") === theme) {
-                icon.innerHTML = docById(theme).innerHTML;
-            }
-        });
+        const updateThemeIcon = theme => {
+            const option = docById(theme);
+            if (!option) return;
 
-        icon.onclick = () => {
+            icon.textContent = "";
+            Array.from(option.childNodes).forEach(node => icon.appendChild(node.cloneNode(true)));
+        };
+
+        const updateThemeOptions = () => {
             themes.forEach(theme => {
-                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+                const option = docById(theme);
+                if (!option) return;
+
+                const listItem = option.parentElement;
+                if (listItem) {
+                    listItem.style.display = theme === themeBox._theme ? "none" : "";
+                }
             });
         };
+
+        themes.forEach(theme => {
+            const option = docById(theme);
+            if (!option) return;
+
+            if (themeBox._theme === theme || safeStorageGet("themePreference") === theme) {
+                updateThemeIcon(theme);
+            }
+
+            option.onclick = () => {
+                themeBox[`${theme}_onclick`](this.activity);
+                updateThemeIcon(theme);
+                updateThemeOptions();
+                $j(icon).dropdown("close");
+            };
+        });
+
+        icon.onclick = updateThemeOptions;
     }
 
     /**
@@ -785,6 +861,7 @@ class ToolbarUI {
         let wrapButtonTooltipData = _("Turtle Wrap Off");
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        wrapIcon.setAttribute("aria-label", wrapButtonTooltipData);
         $j(".tooltipped").tooltip({
             html: true,
             delay: 100
@@ -815,6 +892,7 @@ class ToolbarUI {
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+            wrapIcon.setAttribute("aria-label", wrapButtonTooltipData);
             $j(".tooltipped").tooltip({
                 html: true,
                 delay: 100
@@ -862,9 +940,7 @@ class ToolbarUI {
             delay: 100
         });
 
-        if (docById("helpfulWheelDiv").style.display !== "none") {
-            docById("helpfulWheelDiv").style.display = "none";
-        }
+        activity.closeHelpfulWheel();
     }
 
     /**
@@ -1022,7 +1098,12 @@ class ToolbarUI {
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
         const RecordDropdownArrow = docById("recordDropdownArrow");
-        const browser = fnBrowserDetect();
+        const browser =
+            typeof fnBrowserDetect === "function"
+                ? fnBrowserDetect()
+                : typeof window !== "undefined" && typeof window.fnBrowserDetect === "function"
+                  ? window.fnBrowserDetect()
+                  : "unknown";
         const hideIn = ["firefox", "safari"];
 
         this._cleanupRecordDropdownListeners();
@@ -1042,7 +1123,6 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
 
         // Remove any existing onclick handler
         Record.onclick = null;
@@ -1059,7 +1139,12 @@ class ToolbarUI {
                 RecordDropdownArrow.classList.remove("hide");
                 RecordDropdownArrow.style.display = "block";
             }
-            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
+            RecordDropdownArrow.textContent = "";
+            const arrowIcon = document.createElement("i");
+            arrowIcon.className = "material-icons main";
+            arrowIcon.style.fontSize = "28px";
+            arrowIcon.textContent = "arrow_drop_down";
+            RecordDropdownArrow.appendChild(arrowIcon);
 
             // Create handler function for arrow click
             const arrowClickHandler = () => {
@@ -1191,12 +1276,12 @@ class ToolbarUI {
             if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
                 onclick(this.activity, false);
                 auxToolbar.style.display = "block";
-                menuIcon.innerHTML = "more_vert";
+                menuIcon.textContent = "more_vert";
                 this._setAuxToolbarButtonState(true);
             } else {
                 onclick(this.activity, true);
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
+                menuIcon.textContent = "menu";
                 this._setAuxToolbarButtonState(false);
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
@@ -1631,6 +1716,7 @@ class ToolbarUI {
             "te",
             "ibo",
             "tr",
+            "az",
             "ar",
             "bn",
             "ur",
@@ -1705,7 +1791,13 @@ class ToolbarUI {
 
             // Set up click handlers for each language
             languages.forEach(lang => {
-                docById(lang).onclick = () => {
+                const langElem = docById(lang);
+                if (!langElem) {
+                    console.warn(`No entry for "${lang}" in #languagedropdown`);
+                    return;
+                }
+
+                langElem.onclick = () => {
                     // Update highlight to newly selected language
                     updateSelectedLanguageHighlight(lang);
 
@@ -1757,8 +1849,9 @@ class ToolbarUI {
         const getNavigableButtons = () => {
             // Main toolbar button selectors
             const mainSelectors =
-                "#play, #stop, #record, #FullScreen, #newFile, #load, " +
-                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon";
+                "#play, #stop, #record, #recordDropdownArrow, #FullScreen, #newFile, #load, " +
+                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon, " +
+                "#installButton";
 
             // Aux toolbar button selectors
             const auxSelectors =
@@ -1795,10 +1888,20 @@ class ToolbarUI {
             buttons = getNavigableButtons();
 
             // Add click handlers for mouse support - clicking a button sets keyboard focus
-            buttons.allButtons.forEach((btn, index) => {
+            buttons.allButtons.forEach(btn => {
+                makeKeyboardAccessible(btn, undefined, activateFocusedButton);
+
                 // Avoid adding duplicate listeners
                 if (!btn.hasAttribute("data-kb-nav-listener")) {
                     btn.setAttribute("data-kb-nav-listener", "true");
+                    btn.addEventListener("focus", () => {
+                        const focusedIndex = buttons.allButtons.indexOf(btn);
+                        if (focusedIndex < 0) return;
+
+                        currentFocusIndex = focusedIndex;
+                        clearFocus();
+                        btn.classList.add("toolbar-btn-focused");
+                    });
                     btn.addEventListener("click", () => {
                         // Check if this is a mode toggle button
                         const isModeToggle = btn.id === "beginnerMode" || btn.id === "advancedMode";
@@ -1864,11 +1967,35 @@ class ToolbarUI {
             const openDropdowns = document.querySelectorAll(".dropdown-content");
             openDropdowns.forEach(dropdown => {
                 // Materialize dropdowns use 'display: block' when open
-                if (dropdown.style.display === "block") {
+                if (dropdown.style.display === "block" || dropdown.classList.contains("active")) {
                     dropdown.style.display = "none";
                     dropdown.classList.remove("active");
                 }
             });
+        };
+
+        /**
+         * Leaves toolbar keyboard navigation and returns focus to the page.
+         */
+        const leaveKeyboardNavigation = () => {
+            closeAllDropdowns();
+            clearFocus();
+            currentFocusIndex = -1;
+
+            if (
+                window._focusCycleManager &&
+                typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+            ) {
+                window._focusCycleManager.exitKeyboardNavigation();
+            }
+
+            const activeElement = document.activeElement;
+            if (activeElement && typeof activeElement.blur === "function") {
+                activeElement.blur();
+            }
+            if (typeof toolbars.blur === "function") {
+                toolbars.blur();
+            }
         };
 
         /**
@@ -2009,7 +2136,7 @@ class ToolbarUI {
                             const menuItems = Array.from(dropdownMenu.querySelectorAll("li a"));
                             if (menuItems.length > 0) {
                                 // Enable keyboard navigation in dropdown
-                                enableDropdownNavigation(dropdownMenu, menuItems);
+                                enableDropdownNavigation(dropdownMenu, menuItems, button);
                                 // Focus first item
                                 menuItems[0].focus();
                                 menuItems[0].classList.add("dropdown-item-focused");
@@ -2066,7 +2193,7 @@ class ToolbarUI {
         /**
          * Enables keyboard navigation within a dropdown menu
          */
-        const enableDropdownNavigation = (dropdownMenu, menuItems) => {
+        const enableDropdownNavigation = (dropdownMenu, menuItems, triggerButton) => {
             let currentMenuIndex = 0;
 
             // Make all menu items focusable
@@ -2101,6 +2228,7 @@ class ToolbarUI {
                         setMenuFocus((currentMenuIndex - 1 + menuItems.length) % menuItems.length);
                         break;
                     case "Enter":
+                    case " ":
                         e.preventDefault();
                         e.stopPropagation();
                         if (currentMenuIndex >= 0 && currentMenuIndex < menuItems.length) {
@@ -2110,7 +2238,15 @@ class ToolbarUI {
                     case "Escape":
                         e.preventDefault();
                         e.stopPropagation();
-                        // Close dropdown and return focus to toolbar
+                        closeAllDropdowns();
+                        clearMenuFocus();
+                        if (triggerButton) {
+                            const triggerIndex = buttons.allButtons.indexOf(triggerButton);
+                            if (triggerIndex >= 0) {
+                                setFocus(triggerIndex);
+                                break;
+                            }
+                        }
                         toolbars.focus();
                         break;
                 }
@@ -2196,9 +2332,9 @@ class ToolbarUI {
                     break;
 
                 case "Escape":
-                    clearFocus();
-                    currentFocusIndex = -1;
-                    toolbars.blur();
+                    event.preventDefault();
+                    event.stopPropagation();
+                    leaveKeyboardNavigation();
                     break;
             }
         });
@@ -2252,6 +2388,9 @@ class ToolbarUI {
                 // Keep currentFocusIndex for memory
             }
         });
+
+        // Apply semantics and keyboard activation before the first Tab keypress.
+        updateButtonsList();
     }
 
     closeAuxToolbar = onclick => {
@@ -2260,7 +2399,7 @@ class ToolbarUI {
             onclick(this.activity, false);
             const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
-            menuIcon.innerHTML = "menu";
+            menuIcon.textContent = "menu";
             this._setAuxToolbarButtonState(false);
         }
     };
@@ -2345,477 +2484,24 @@ class ToolbarUI {
     }
 }
 
-/**
- * FocusCycleManager
- * ==================
- * Cycles focus between Workspace → Toolbar → Palette on Tab / Shift+Tab.
- *
- * Design rules:
- *  1. KEYBOARD ONLY – all zone logic is gated behind `_keyboardMode`.
- *  2. Any mousedown immediately turns `_keyboardMode` off and removes all
- *     visual rings – mouse clicks go through completely unchanged.
- *  3. The focus rings / palette state are never changed unless the user
- *     reached the current element via the Tab key.
- */
-class FocusCycleManager {
-    constructor() {
-        this._zones = ["workspace", "toolbar", "palette"];
-        this._currentZone = null;
-        this._keyboardMode = false; // true only while Tab-navigating
-        this._lastFocusedButton = null; // last toolbar button focused by keyboard
-        this._liveRegion = null;
-
-        // Bind handlers so they can be removed if needed.
-        this._onKeyDown = this._onKeyDown.bind(this);
-        this._onMouseDown = this._onMouseDown.bind(this);
-        this._onFocusIn = this._onFocusIn.bind(this);
-    }
-
-    init() {
-        // Capture phase so we intercept Tab before anything else.
-        document.addEventListener("keydown", this._onKeyDown, true);
-        // BUBBLE phase for mousedown — canvas and other elements receive
-        // the click first; we only clean up keyboard state afterwards.
-        document.addEventListener("mousedown", this._onMouseDown, false);
-        // Track last-focused toolbar button for memory restoration.
-        document.addEventListener("focusin", this._onFocusIn, true);
-
-        // Visually-hidden ARIA live region for screen readers.
-        if (!document.getElementById("fcm-announcer")) {
-            const r = document.createElement("div");
-            r.id = "fcm-announcer";
-            r.setAttribute("aria-live", "polite");
-            Object.assign(r.style, {
-                position: "absolute",
-                width: "1px",
-                height: "1px",
-                margin: "-1px",
-                overflow: "hidden",
-                clip: "rect(0,0,0,0)",
-                whiteSpace: "nowrap",
-                border: "0"
-            });
-            document.body.appendChild(r);
-            this._liveRegion = r;
-        }
-    }
-
-    _getActivity() {
-        try {
-            if (
-                typeof ActivityContext !== "undefined" &&
-                ActivityContext &&
-                typeof ActivityContext.getActivity === "function"
-            ) {
-                return ActivityContext.getActivity();
-            }
-        } catch {
-            // ActivityContext is optional in older embeds and tests.
-        }
-
-        try {
-            const context = globalThis?.ActivityContext;
-            if (context && typeof context.getActivity === "function") {
-                return context.getActivity();
-            }
-        } catch {
-            // Global activity context may not exist.
-        }
-
-        return null;
-    }
-
-    _isWithin(el, target) {
-        return Boolean(el && target && typeof el.contains === "function" && el.contains(target));
-    }
-
-    _workspaceElements() {
-        return {
-            holder: document.getElementById("canvasHolder"),
-            container: document.getElementById("canvasContainer"),
-            overlay: document.getElementById("canvas"),
-            canvas: document.getElementById("myCanvas")
-        };
-    }
-
-    _isWorkspaceTarget(target) {
-        if (!target) return false;
-
-        if (
-            ["canvasHolder", "canvasContainer", "canvas", "myCanvas", "overlayCanvas"].includes(
-                target.id
-            )
-        ) {
-            return true;
-        }
-
-        if (typeof target.closest === "function") {
-            const workspaceAncestor = target.closest(
-                "#canvasHolder, #canvasContainer, #canvas, #myCanvas, #overlayCanvas"
-            );
-            if (workspaceAncestor) {
-                return true;
-            }
-        }
-
-        const ws = this._workspaceElements();
-        return (
-            this._isWithin(ws.holder, target) ||
-            this._isWithin(ws.container, target) ||
-            this._isWithin(ws.overlay, target) ||
-            this._isWithin(ws.canvas, target)
-        );
-    }
-
-    _clearToolbarFocus() {
-        document.querySelectorAll(".toolbar-btn-focused").forEach(btn => {
-            btn.classList.remove("toolbar-btn-focused");
-            if (typeof btn.blur === "function") {
-                btn.blur();
-            }
-        });
-
-        const active = document.activeElement;
-        const toolbars = document.getElementById("toolbars");
-        if (this._isWithin(toolbars, active) && typeof active.blur === "function") {
-            active.blur();
-        }
-    }
-
-    _focusWorkspaceFromMouse() {
-        const { holder, overlay } = this._workspaceElements();
-        if (!holder) return;
-
-        if (typeof holder.hasAttribute !== "function" || !holder.hasAttribute("tabindex")) {
-            holder.setAttribute("tabindex", "-1");
-        }
-
-        holder.focus({ preventScroll: true });
-
-        if (overlay && typeof overlay.dispatchEvent === "function") {
-            const opts = { bubbles: true, cancelable: false };
-            overlay.dispatchEvent(new PointerEvent("pointerdown", opts));
-            overlay.dispatchEvent(new PointerEvent("pointerup", opts));
-        }
-
-        this._currentZone = "workspace";
-    }
-
-    // ------------------------------------------------------------------
-    // Mouse interaction – runs AFTER the element receives the click
-    // (bubble phase). Clears keyboard-mode state and visual rings so
-    // that clicking the canvas/workspace always feels completely normal.
-    // ------------------------------------------------------------------
-    _onMouseDown(e) {
-        // Always exit keyboard mode on any mouse interaction.
-        this._keyboardMode = false;
-
-        const toolbars = document.getElementById("toolbars");
-        const paletteEl = document.getElementById("palette");
-        const clickedToolbar = this._isWithin(toolbars, e.target);
-        const clickedPalette = this._isWithin(paletteEl, e.target);
-        const clickedWorkspace = this._isWorkspaceTarget(e.target);
-
-        // Remove the keyboard focus ring from every zone container.
-        this._clearAllRings();
-
-        if (!clickedToolbar) {
-            this._clearToolbarFocus();
-        }
-
-        try {
-            const activity = this._getActivity();
-            const p = activity?.palettes;
-            if (p && typeof p.resetKeyboardNavigation === "function") {
-                p.resetKeyboardNavigation({
-                    closeMenus: clickedWorkspace,
-                    blur: !clickedPalette
-                });
-            } else if (p) {
-                p._keyboardNavActive = false;
-            }
-
-            if (clickedWorkspace && activity?.blocks) {
-                activity.blocks.activeBlock = null;
-            }
-        } catch {
-            // Mouse handoff should not fail if palette state is unavailable.
-        }
-
-        if (clickedWorkspace) {
-            this._focusWorkspaceFromMouse();
-            return;
-        }
-
-        // Reset tracked zone so next Tab always starts relative to the new
-        // focus position rather than stale keyboard-navigation state.
-        this._currentZone = null;
-    }
-
-    // ------------------------------------------------------------------
-    // Keep track of the last toolbar button focused by ANY means so
-    // we can restore it when re-entering via Tab.
-    // ------------------------------------------------------------------
-    _onFocusIn(e) {
-        const toolbars = document.getElementById("toolbars");
-        if (toolbars && toolbars.contains(e.target)) {
-            // Only record if it's an interactive element (button / link)
-            const tag = e.target.tagName.toLowerCase();
-            if (tag === "a" || tag === "button" || e.target.getAttribute("role") === "button") {
-                this._lastFocusedButton = e.target;
-            }
-            if (this._keyboardMode) this._currentZone = "toolbar";
-        } else if (this._keyboardMode) {
-            const palette = document.getElementById("palette");
-            if (palette && palette.contains(e.target)) {
-                this._currentZone = "palette";
-            } else if (["canvasHolder", "canvas", "canvasContainer"].includes(e.target.id)) {
-                this._currentZone = "workspace";
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------
-    // Tab key handler – the only place keyboard mode is turned ON.
-    // ------------------------------------------------------------------
-    _onKeyDown(e) {
-        if (e.key !== "Tab") return;
-        if (this._shouldBypass(e)) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        this._keyboardMode = true;
-        this._cycle(e.shiftKey);
-    }
-
-    _shouldBypass(e) {
-        if (e.ctrlKey || e.altKey || e.metaKey) return true;
-        const active = document.activeElement;
-        if (!active) return false;
-        const tag = active.nodeName.toLowerCase();
-        if ((tag === "input" && active.type !== "file") || tag === "textarea" || tag === "select")
-            return true;
-        if (active.isContentEditable) return true;
-        if (active.closest('.sweet-alert, .modal, [role="dialog"], .widget, .dropdown-content')) {
-            return true;
-        }
-        return false;
-    }
-
-    // ------------------------------------------------------------------
-    // Determine next zone and transfer focus.
-    // ------------------------------------------------------------------
-    _cycle(reverse) {
-        // Determine current zone. If unknown (no zone focused yet OR the active
-        // element is body/document), treat as 'workspace' so the first Tab
-        // always lands on the toolbar (workspace → Tab → toolbar).
-        if (this._currentZone === null) {
-            const detected = this._zoneOf(document.activeElement);
-            this._currentZone = detected ?? "workspace";
-        }
-
-        const idx = this._zones.indexOf(this._currentZone);
-        const nextIdx =
-            idx === -1
-                ? 1 // safety fallback → toolbar
-                : reverse
-                  ? (idx - 1 + this._zones.length) % this._zones.length
-                  : (idx + 1) % this._zones.length;
-
-        // Clean up the zone we are leaving.
-        this._leaveZone(this._currentZone);
-
-        const next = this._zones[nextIdx];
-        this._currentZone = next;
-        this._enterZone(next);
-    }
-
-    _zoneOf(el) {
-        if (!el) return null;
-        const toolbars = document.getElementById("toolbars");
-        const palette = document.getElementById("palette");
-        if (toolbars && toolbars.contains(el)) return "toolbar";
-        if (palette && palette.contains(el)) return "palette";
-        if (["canvasHolder", "canvas", "canvasContainer"].includes(el.id)) return "workspace";
-        return null;
-    }
-
-    // ------------------------------------------------------------------
-    // Visual cleanup when leaving a zone.
-    // ------------------------------------------------------------------
-    _leaveZone(zone) {
-        this._clearRingForZone(zone);
-
-        if (zone === "toolbar") {
-            // Strip the toolbar's own keyboard-focus class so arrow-key logic
-            // goes dormant.
-            document.querySelectorAll(".toolbar-btn-focused").forEach(b => {
-                b.classList.remove("toolbar-btn-focused");
-                b.blur();
-            });
-        }
-
-        if (zone === "palette") {
-            try {
-                const p = this._getActivity()?.palettes;
-                if (p && typeof p.resetKeyboardNavigation === "function") {
-                    p.resetKeyboardNavigation({ closeMenus: true, blur: true });
-                } else if (p) {
-                    p._keyboardNavActive = false;
-                }
-            } catch {
-                // Leaving the palette should still continue if cleanup is unavailable.
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------
-    // Set focus & visual ring when entering a zone.
-    // ------------------------------------------------------------------
-    _enterZone(zone) {
-        const container = this._containerEl(zone);
-
-        if (zone === "workspace") {
-            const ws = document.getElementById("canvasHolder");
-            const cv = document.getElementById("canvas");
-            if (ws) {
-                if (typeof ws.hasAttribute !== "function" || !ws.hasAttribute("tabindex")) {
-                    ws.setAttribute("tabindex", "-1");
-                }
-                if (container) container.classList.add("focus-zone-active");
-                ws.focus({ preventScroll: true });
-                // Dispatching a synthetic pointerdown+up on the canvas re-engages
-                // the browser's native scroll target. This is what normally happens
-                // when the user physically clicks the canvas, and is needed when
-                // focus moves here via keyboard (especially after using arrow keys
-                // in the palette which can steal the scroll-active element).
-                if (cv && typeof cv.dispatchEvent === "function") {
-                    const opts = { bubbles: true, cancelable: false };
-                    cv.dispatchEvent(new PointerEvent("pointerdown", opts));
-                    cv.dispatchEvent(new PointerEvent("pointerup", opts));
-                }
-                this._announce("Workspace active");
-            }
-            return;
-        }
-
-        if (zone === "toolbar") {
-            const toolbars = document.getElementById("toolbars");
-            if (!toolbars) return;
-            // Prefer the last button the user was on; fallback to first visible.
-            let target = this._lastFocusedButton;
-            if (!target || !toolbars.contains(target) || !this._visible(target)) {
-                const buttons = Array.from(
-                    toolbars.querySelectorAll('[tabindex="0"], a[role="button"], button')
-                );
-                target = buttons.find(b => this._visible(b)) || toolbars;
-            }
-            if (container) container.classList.add("focus-zone-active");
-            target.focus({ preventScroll: true });
-            this._announce("Toolbar active");
-            return;
-        }
-
-        if (zone === "palette") {
-            const palette = document.getElementById("palette");
-            if (!palette) return;
-            if (container) container.classList.add("focus-zone-active");
-
-            // Sync palette.js's internal state so arrow keys work immediately.
-            let p = null;
-            try {
-                p = this._getActivity()?.palettes;
-                if (p) {
-                    p._keyboardNavActive = true;
-                }
-            } catch {
-                // Palette keyboard state sync is best-effort.
-            }
-
-            // Give native focus to the palette container (it has tabindex).
-            // This must happen after palette.js knows we arrived via keyboard,
-            // otherwise the collapsed palette will not auto-expand on Tab.
-            palette.focus({ preventScroll: true });
-
-            try {
-                if (p) {
-                    // Only set to blocks section if there are rows and nothing is already focused.
-                    const listBody = palette.children[0]?.children[1]?.children[1];
-                    const rows = listBody ? Array.from(listBody.children) : [];
-                    const alreadyFocused = rows.some(r => r.dataset.keyboardFocus);
-                    if (!alreadyFocused && rows.length > 0) {
-                        const targetRow = rows.length > 1 ? rows[1] : rows[0];
-                        targetRow.dataset.keyboardFocus = "true";
-                        targetRow.style.backgroundColor =
-                            window.platformColor?.hoverColor || "#0CAFFF";
-                        p._navSection = "blocks";
-                        p._navBlockIndex = rows.length > 1 ? 1 : 0;
-                    }
-                }
-            } catch {
-                // Palette keyboard state sync is best-effort.
-            }
-            this._announce("Palette active");
-        }
-    }
-
-    // ------------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------------
-    _containerEl(zone) {
-        if (zone === "workspace") return document.getElementById("canvasHolder");
-        if (zone === "toolbar") return document.getElementById("toolbars");
-        if (zone === "palette") return document.getElementById("palette");
-        return null;
-    }
-
-    _clearRingForZone(zone) {
-        const el = this._containerEl(zone);
-        if (el) el.classList.remove("focus-zone-active");
-    }
-
-    _clearAllRings() {
-        ["workspace", "toolbar", "palette"].forEach(z => this._clearRingForZone(z));
-    }
-
-    _visible(el) {
-        if (!el) return false;
-        const s = window.getComputedStyle(el);
-        return s.display !== "none" && s.visibility !== "hidden" && el.offsetWidth > 0;
-    }
-
-    _announce(msg) {
-        if (this._liveRegion) this._liveRegion.textContent = msg;
-    }
-
-    /**
-     * Removes all document-level event listeners attached by init().
-     * Must be called when the FocusCycleManager is no longer needed.
-     *
-     * @returns {void}
-     */
-    dispose() {
-        document.removeEventListener("keydown", this._onKeyDown, true);
-        document.removeEventListener("mousedown", this._onMouseDown, false);
-        document.removeEventListener("focusin", this._onFocusIn, true);
-        this._liveRegion = null;
-    }
-}
-
-ToolbarUI.FocusCycleManager = FocusCycleManager;
-
+// FocusCycleManager lives in focus-cycle-manager.js; it stays attached to
+// ToolbarUI so existing consumers (toolbar.js shim, tests, plugins) keep
+// working unchanged.
 if (typeof define === "function" && define.amd) {
-    define(function () {
+    define(["activity/focus-cycle-manager", "utils/utils", "utils/dom-helpers"], function (
+        FocusCycleManager
+    ) {
         // Expose under the legacy Toolbar name so that
         // instance.constructor.name === "Toolbar" continues to work for
         // any downstream plugin that checks it.
+        ToolbarUI.FocusCycleManager = FocusCycleManager;
         window.Toolbar = ToolbarUI;
         window.ToolbarUI = ToolbarUI;
         window.FocusCycleManager = FocusCycleManager;
         return ToolbarUI;
     });
 } else if (typeof module !== "undefined" && module.exports) {
+    ToolbarUI.FocusCycleManager = require("./focus-cycle-manager");
     module.exports = ToolbarUI;
-    module.exports.FocusCycleManager = FocusCycleManager;
+    module.exports.FocusCycleManager = ToolbarUI.FocusCycleManager;
 }

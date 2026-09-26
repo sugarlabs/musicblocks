@@ -234,6 +234,68 @@ describe("setupVolumeBlocks", () => {
             const ret = masterVolBlock.updateParameter(logo, turtleIndex, blk);
             expect(ret).toEqual(95);
         });
+
+        describe("setter", () => {
+            const blk = "blkMasterVolSetter";
+
+            beforeEach(() => {
+                // Production initialises this to [DEFAULTVOLUME].
+                Singer.masterVolume = [50];
+            });
+
+            it("hands setMasterVolume the volume, the turtle and the block", () => {
+                createdBlocks["notevolumefactor"].setter(logo, 60, turtleIndex, blk);
+
+                expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(
+                    60,
+                    turtleIndex,
+                    blk
+                );
+            });
+
+            it("does not pass the logo object where a volume is expected", () => {
+                createdBlocks["notevolumefactor"].setter(logo, 60, turtleIndex, blk);
+
+                const [volumeArg, turtleArg] = Singer.VolumeActions.setMasterVolume.mock.calls[0];
+                expect(typeof volumeArg).toBe("number");
+                expect(volumeArg).toBe(60);
+                expect(turtleArg).toBe(turtleIndex);
+            });
+
+            // Guard, not a regression case: this line is unchanged by the argument
+            // fix, so it passes either way. It pins the state update in place.
+            it("records the new volume in Singer.masterVolume", () => {
+                createdBlocks["notevolumefactor"].setter(logo, 60, turtleIndex, blk);
+
+                expect(Singer.masterVolume[Singer.masterVolume.length - 1]).toBe(60);
+            });
+
+            // Guard, not a regression case: the suppressed branch never reaches the
+            // action, so it passes either way. It pins the branch that must not call.
+            it("skips the action but still records the value when output is suppressed", () => {
+                activity.turtles.ithTurtle(turtleIndex).singer.suppressOutput = true;
+
+                createdBlocks["notevolumefactor"].setter(logo, 60, turtleIndex, blk);
+
+                expect(Singer.VolumeActions.setMasterVolume).not.toHaveBeenCalled();
+                expect(Singer.masterVolume[Singer.masterVolume.length - 1]).toBe(60);
+            });
+
+            it("forwards boundary values unchanged, leaving clamping to the action", () => {
+                for (const value of [0, 100, 150, -50]) {
+                    Singer.VolumeActions.setMasterVolume.mockClear();
+                    Singer.masterVolume = [50];
+
+                    createdBlocks["notevolumefactor"].setter(logo, value, turtleIndex, blk);
+
+                    expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(
+                        value,
+                        turtleIndex,
+                        blk
+                    );
+                }
+            });
+        });
     });
 
     describe("SetSynthVolume2Block", () => {
@@ -262,6 +324,24 @@ describe("setupVolumeBlocks", () => {
             );
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(ret).toEqual([100, 1]);
+        });
+
+        it("does not throw when the voice is already in instrumentNames without a synthVolume entry", () => {
+            const blk = "blkSSV2";
+            const args = ["piano", 90, 100];
+            const setSynthVol2Block = createdBlocks["setsynthvolume2"];
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            // A voice selected via "set default instrument" lands in
+            // instrumentNames with no synthVolume entry. The push must still
+            // find an array to push onto.
+            turtleObj.singer.instrumentNames = ["piano"];
+            turtleObj.singer.synthVolume = {};
+            turtleObj.singer.crescendoInitialVolume = {};
+            logo.synth.loadSynth = jest.fn();
+
+            expect(() => setSynthVol2Block.flow(args, logo, turtleIndex, blk)).not.toThrow();
+            expect(last(turtleObj.singer.synthVolume.piano)).toBe(90);
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
         });
     });
 

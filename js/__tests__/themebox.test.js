@@ -31,6 +31,32 @@ window.platformColor = {
     selectorSelected: "#1A8CFF"
 };
 
+// Mock platformThemes (the canonical table that themebox.js now reads from).
+// Subset stub: only the keys exercised by tests in this file. Values must
+// match js/utils/platformstyle.js:platformThemes; pulling the real file in
+// would drag the rest of the global init chain into Jest.
+global.platformThemes = {
+    light: {
+        background: "#F9F9F9",
+        header: "#4DA6FF",
+        selectorSelected: "#1A8CFF",
+        paletteColors: {}
+    },
+    dark: {
+        background: "#303030",
+        header: "#1E88E5",
+        selectorSelected: "#1E88E5",
+        paletteColors: {}
+    },
+    highcontrast: {
+        background: "#000000",
+        header: "#00FFFF",
+        selectorSelected: "#00CCCC",
+        paletteColors: {}
+    }
+};
+global.clonePlatformTheme = theme => JSON.parse(JSON.stringify(theme));
+
 // Mock document elements
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
@@ -92,6 +118,7 @@ describe("ThemeBox", () => {
     });
 
     test("light_onclick() sets theme to light", () => {
+        document.body.classList.add("light");
         themeBox.light_onclick();
         expect(themeBox._theme).toBe("light");
         expect(localStorage.getItem).toHaveBeenCalledWith("themePreference");
@@ -128,6 +155,7 @@ describe("ThemeBox", () => {
 
     test("setPreference() does not change if theme is unchanged", () => {
         const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
+        document.body.classList.add("light");
         themeBox.light_onclick();
         expect(reloadSpy).not.toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
@@ -189,5 +217,102 @@ describe("ThemeBox", () => {
         themeBox.initializeTheme();
         capturedHandler({ matches: true });
         expect(themeBox._theme).toBe("dark");
+    });
+
+    test("saved light preference can be reapplied after an OS theme change", () => {
+        let capturedHandler;
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn((_, handler) => {
+                capturedHandler = handler;
+            }),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+
+        capturedHandler({ matches: true });
+        expect(document.body.classList.contains("dark")).toBe(true);
+
+        themeBox.light_onclick();
+        expect(document.body.classList.contains("light")).toBe(true);
+        expect(document.body.classList.contains("dark")).toBe(false);
+    });
+
+    // Regression test for #7172: applyThemeInstantly must read from
+    // platformThemes, not a duplicate table inside themebox.js.
+    test("applyThemeInstantly() picks up mutations to platformThemes", () => {
+        const original = global.platformThemes.dark.background;
+        global.platformThemes.dark.background = "#222222";
+        try {
+            themeBox._theme = "dark";
+            themeBox.applyThemeInstantly();
+            expect(window.platformColor.background).toBe("#222222");
+        } finally {
+            global.platformThemes.dark.background = original;
+        }
+    });
+
+    test("theme changes do not share nested palette colors with theme definitions", () => {
+        global.platformThemes.light.paletteColors.pitch = ["#111111", "#222222"];
+        global.platformThemes.dark.paletteColors.pitch = ["#333333", "#444444"];
+        try {
+            window.platformColor.paletteColors = {};
+            themeBox._theme = "light";
+            themeBox.applyThemeInstantly();
+            window.platformColor.paletteColors.pitch[0] = "#abcdef";
+            window.platformColor.paletteColors.plugin = ["#fedcba"];
+
+            expect(global.platformThemes.light.paletteColors.pitch[0]).toBe("#111111");
+            expect(global.platformThemes.light.paletteColors.plugin).toBeUndefined();
+
+            themeBox._theme = "dark";
+            themeBox.applyThemeInstantly();
+            expect(window.platformColor.paletteColors.plugin).toEqual(["#fedcba"]);
+            window.platformColor.paletteColors.pitch[0] = "#123456";
+            expect(global.platformThemes.dark.paletteColors.pitch[0]).toBe("#333333");
+
+            themeBox._theme = "light";
+            themeBox.applyThemeInstantly();
+            expect(window.platformColor.paletteColors.pitch[0]).toBe("#111111");
+            expect(window.platformColor.paletteColors.plugin).toEqual(["#fedcba"]);
+            expect(global.platformThemes.light.paletteColors.plugin).toBeUndefined();
+        } finally {
+            delete global.platformThemes.light.paletteColors.pitch;
+            delete global.platformThemes.dark.paletteColors.pitch;
+        }
+    });
+
+    test("setPreference() does not crash when localStorage is unavailable", () => {
+        localStorage.getItem.mockImplementation(() => {
+            throw new DOMException("Access denied", "SecurityError");
+        });
+        localStorage.setItem.mockImplementation(() => {
+            throw new DOMException("Access denied", "SecurityError");
+        });
+        themeBox._theme = "dark";
+        expect(() => themeBox.setPreference()).not.toThrow();
+        expect(mockActivity.storage.themePreference).toBe("dark");
+        expect(document.body.classList.contains("dark")).toBe(true);
+    });
+
+    test("setPreference() falls back to applying theme when getItem throws", () => {
+        localStorage.getItem.mockImplementation(() => {
+            throw new DOMException("Access denied", "SecurityError");
+        });
+        themeBox._theme = "light";
+        themeBox.setPreference();
+        expect(mockActivity.storage.themePreference).toBe("light");
+        expect(mockActivity.textMsg).not.toHaveBeenCalledWith(
+            "Music Blocks is already set to this theme."
+        );
+    });
+
+    test("refreshUIComponents refreshes activity.trashcan if available", () => {
+        mockActivity.trashcan = {
+            refresh: jest.fn()
+        };
+        themeBox.refreshUIComponents();
+        expect(mockActivity.trashcan.refresh).toHaveBeenCalledTimes(1);
     });
 });

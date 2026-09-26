@@ -218,6 +218,14 @@ class AlertRenderer {
         }
 
         activity.errorMsgText.parent.visible = true;
+        activity.errorMsgText.text = msg;
+        if (typeof activity.errorMsgText.parent.updateCache === "function") {
+            activity.errorMsgText.parent.updateCache();
+        }
+        activity.stage.setChildIndex(
+            activity.errorMsgText.parent,
+            activity.stage.children.length - 1
+        );
         if (
             blk !== undefined &&
             blk !== null &&
@@ -259,6 +267,9 @@ class AlertRenderer {
             head.y = toY;
             head.rotation = angle;
         }
+
+        activity.errorText.classList.add("show");
+        activity.errorTextContent.textContent = msg;
 
         switch (msg) {
             case NOMICERRORMSG:
@@ -335,10 +346,6 @@ class AlertRenderer {
                     activity.errorArtwork["noinput"],
                     activity.stage.children.length - 1
                 );
-                break;
-            default:
-                activity.errorText.classList.add("show");
-                activity.errorTextContent.textContent = msg;
                 break;
         }
         activity.refreshCanvas();

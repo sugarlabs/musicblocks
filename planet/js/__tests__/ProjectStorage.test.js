@@ -134,18 +134,39 @@ describe("ProjectStorage", () => {
             expect(primary).toEqual({ Projects: { 1: { ProjectName: "Updated" } } });
         });
 
-        it("should not crash when save encounters an error", async () => {
+        it("should reject and log when the write fails", async () => {
             const consoleSpy = jest.spyOn(console, "error").mockImplementation();
             storage.data = { Projects: {} };
-            // Make setItem throw
             mockLocalforage.setItem.mockRejectedValueOnce(new Error("Disk full"));
 
-            // Should not throw
-            await storage.save();
+            await expect(storage.save()).rejects.toThrow("Disk full");
             expect(consoleSpy).toHaveBeenCalledWith(
                 "[ProjectStorage] Save failed:",
                 expect.any(Error)
             );
+        });
+
+        it("should not advance TimeLastSaved when the write fails", async () => {
+            jest.spyOn(console, "error").mockImplementation();
+            storage.data = { Projects: {} };
+            mockLocalforage.setItem.mockRejectedValueOnce(new Error("Disk full"));
+
+            await storage.save().catch(() => {});
+            expect(storage.TimeLastSaved).toBe(-1);
+        });
+
+        it("should keep accepting saves after a failed save", async () => {
+            jest.spyOn(console, "error").mockImplementation();
+            storage.data = { Projects: { 1: { ProjectName: "First" } } };
+            mockLocalforage.setItem.mockRejectedValueOnce(new Error("Disk full"));
+
+            await storage.save().catch(() => {});
+
+            storage.data = { Projects: { 1: { ProjectName: "Second" } } };
+            await storage.save();
+
+            const saved = await storage.get(storage.LocalStorageKey);
+            expect(saved).toEqual({ Projects: { 1: { ProjectName: "Second" } } });
         });
 
         it("should queue concurrent saves instead of dropping them", async () => {
@@ -264,6 +285,77 @@ describe("ProjectStorage", () => {
             // Primary should now be restored from backup
             const primaryAfterRestore = await storage.get(storage.LocalStorageKey);
             expect(primaryAfterRestore).toEqual(backupData);
+        });
+    });
+
+    describe("port()", () => {
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("should port legacy localStorage data when not already ported", async () => {
+            jest.spyOn(Storage.prototype, "getItem").mockReturnValueOnce(
+                JSON.stringify({ Projects: { legacy: { ProjectName: "Old Project" } } })
+            );
+
+            await storage.port();
+
+            const ported = await storage.get(storage.LocalStorageKey);
+            expect(ported).toEqual(
+                JSON.stringify({ Projects: { legacy: { ProjectName: "Old Project" } } })
+            );
+
+            const version = await storage.get(storage.VersionKey);
+            expect(version).toBe(storage.Version);
+        });
+
+        it("should not re-port if already at current version", async () => {
+            await storage.set(storage.VersionKey, storage.Version);
+            const setSpy = jest.spyOn(storage, "set");
+
+            await storage.port();
+
+            expect(setSpy).not.toHaveBeenCalledWith(storage.LocalStorageKey, expect.anything());
+        });
+
+        it("should not throw when localStorage.getItem throws (restricted environment)", async () => {
+            const consoleSpy = jest.spyOn(console, "debug").mockImplementation();
+            jest.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+                throw new Error("SecurityError: localStorage is disabled");
+            });
+
+            await expect(storage.port()).resolves.not.toThrow();
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "localStorage unavailable during port(); skipping legacy read.",
+                expect.any(Error)
+            );
+        });
+
+        it("should still set version key after a guarded localStorage failure", async () => {
+            jest.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+                throw new Error("SecurityError: localStorage is disabled");
+            });
+
+            await storage.port();
+
+            const version = await storage.get(storage.VersionKey);
+            expect(version).toBe(storage.Version);
+        });
+
+        it("should not crash init() when localStorage is unavailable throughout startup", async () => {
+            global.localforage = mockLocalforage; // init() reassigns this.LocalStorage from the global
+            Storage.prototype.getItem = jest.fn(() => {
+                throw new Error("SecurityError: localStorage is disabled");
+            });
+            jest.spyOn(console, "debug").mockImplementation();
+
+            try {
+                await expect(storage.init()).resolves.not.toThrow();
+                expect(storage.data).not.toBeNull();
+            } finally {
+                global.localforage = null;
+            }
         });
     });
 

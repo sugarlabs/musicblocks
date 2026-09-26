@@ -231,6 +231,24 @@ describe("helper.js", () => {
 
             expect(document.getElementById("target").style.display).toBe("block");
         });
+
+        it("should remove previous listener when hideOnClickOutside is called again for the same anchor element", () => {
+            document.body.innerHTML = `
+                <div id="container"><div id="inner">Inside</div></div>
+                <div id="target" style="display:block;">Target</div>
+            `;
+
+            const container = document.getElementById("container");
+            const spyRemove = jest.spyOn(document, "removeEventListener");
+
+            hideOnClickOutside([container], "target");
+            hideOnClickOutside([container], "target");
+            hideOnClickOutside([container], "target");
+
+            expect(spyRemove).toHaveBeenCalledTimes(2);
+
+            spyRemove.mockRestore();
+        });
     });
 
     describe("updateCheckboxes", () => {

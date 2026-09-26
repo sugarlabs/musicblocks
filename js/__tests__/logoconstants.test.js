@@ -61,6 +61,11 @@ describe("logoconstants", () => {
         expect(constants.INVALIDPITCH).toBe("Not a valid pitch name");
     });
 
+    test("EDOBOUNDEXCEEDED has the expected translation string", () => {
+        expect(typeof constants.EDOBOUNDEXCEEDED).toBe("string");
+        expect(constants.EDOBOUNDEXCEEDED).toBe("Pitch index exceeds EDO range");
+    });
+
     test("notation index constants are sequential integers starting at 0", () => {
         expect(constants.NOTATIONNOTE).toBe(0);
         expect(constants.NOTATIONDURATION).toBe(1);
@@ -93,6 +98,7 @@ describe("logoconstants", () => {
             "EMPTYHEAPERRORMSG",
             "POSNUMBER",
             "INVALIDPITCH",
+            "EDOBOUNDEXCEEDED",
             "NOTATIONNOTE",
             "NOTATIONDURATION",
             "NOTATIONDOTCOUNT",

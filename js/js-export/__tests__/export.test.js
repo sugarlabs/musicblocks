@@ -193,9 +193,11 @@ describe("MusicBlocks Class", () => {
     });
 
     test("should handle ENDMOUSE and remove mouse from list", async () => {
+        const clearSpy = jest.spyOn(musicBlocks, "clearExecutionTimers");
         Mouse.MouseList = [mouse];
         Mouse.AddedTurtles = [];
         await musicBlocks.ENDMOUSE;
+        expect(clearSpy).toHaveBeenCalled();
         expect(Mouse.MouseList).not.toContain(mouse);
     });
 
@@ -289,6 +291,13 @@ describe("MusicBlocks Class", () => {
             globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [];
             musicBlocks.setHeapEntry(2, 5);
             expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([0, 5]);
+
+            musicBlocks.setHeapEntry(3, "testString");
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([
+                0,
+                5,
+                "testString"
+            ]);
         });
 
         test("should push to heap", () => {
@@ -438,6 +447,44 @@ describe("MusicBlocks Class", () => {
             await musicBlocks.ENDFLOWCOMMAND;
             expect(globalActivity.stage.dispatchEvent).toHaveBeenCalledWith("second");
             expect(musicBlocks.listeners).toEqual(["first"]);
+        });
+
+        test("should route delayed ENDFLOWCOMMAND through ManagedTimer when available", async () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            const mockTimer = {
+                setTimeout: jest.fn((cb, delay) => {
+                    cb();
+                    return 202;
+                })
+            };
+            globalActivity.logo._timerManager = mockTimer;
+
+            musicBlocks.turtle.waitTime = 200;
+            musicBlocks.listeners = ["signal"];
+
+            await musicBlocks.ENDFLOWCOMMAND;
+
+            expect(mockTimer.setTimeout).toHaveBeenCalledWith(expect.any(Function), 200);
+            expect(globalActivity.stage.dispatchEvent).toHaveBeenCalledWith("signal");
+            expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
+
+            globalActivity.logo._timerManager = originalTimerManager;
+        });
+
+        test("should fall back to setTimeout for ENDFLOWCOMMAND when timerManager is unavailable", async () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            delete globalActivity.logo._timerManager;
+
+            jest.spyOn(musicBlocks, "_getTimerManager").mockReturnValueOnce(null);
+            const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+
+            musicBlocks.turtle.waitTime = 50;
+            await musicBlocks.ENDFLOWCOMMAND;
+
+            expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 50);
+
+            setTimeoutSpy.mockRestore();
+            globalActivity.logo._timerManager = originalTimerManager;
         });
     });
 
@@ -641,7 +688,136 @@ describe("MusicBlocks Class", () => {
             expect(mockPainterMethod).toHaveBeenCalled();
             expect(result).toBe("painted");
         });
+
+        test("should route delayed command execution through ManagedTimer when available", async () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            const mockTimer = {
+                setTimeout: jest.fn((cb, delay) => {
+                    cb();
+                    return 101;
+                })
+            };
+            globalActivity.logo._timerManager = mockTimer;
+
+            musicBlocks.turtle.waitTime = 300;
+            const callback = jest.fn();
+            await musicBlocks.runCommand("_anonymous", callback);
+
+            expect(mockTimer.setTimeout).toHaveBeenCalledWith(expect.any(Function), 300);
+            expect(callback).toHaveBeenCalled();
+            expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
+
+            globalActivity.logo._timerManager = originalTimerManager;
+        });
+
+        test("should fall back to setTimeout when timerManager is unavailable", async () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            delete globalActivity.logo._timerManager;
+
+            jest.spyOn(musicBlocks, "_getTimerManager").mockReturnValueOnce(null);
+            const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+
+            musicBlocks.turtle.waitTime = 50;
+            await musicBlocks.runCommand("_anonymous", undefined);
+
+            expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 50);
+
+            setTimeoutSpy.mockRestore();
+            globalActivity.logo._timerManager = originalTimerManager;
+        });
     });
+
+    describe("_setExecutionTimeout", () => {
+        test("should cancel existing _executionTimeout before scheduling a new timeout", () => {
+            const clearSpy = jest.spyOn(musicBlocks, "_clearExecutionTimeout");
+            musicBlocks._executionTimeout = 12345;
+
+            const newId = musicBlocks._setExecutionTimeout(() => {}, 10);
+
+            expect(clearSpy).toHaveBeenCalledWith(12345);
+            musicBlocks._clearExecutionTimeout(newId);
+        });
+    });
+
+    describe("_clearExecutionTimeout", () => {
+        test("should clear timer via ManagedTimer when available and return early if found", () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            const mockTimer = {
+                clearTimeout: jest.fn().mockReturnValue(true)
+            };
+            globalActivity.logo._timerManager = mockTimer;
+            const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            musicBlocks._clearExecutionTimeout(999);
+            expect(mockTimer.clearTimeout).toHaveBeenCalledWith(999);
+            expect(clearTimeoutSpy).not.toHaveBeenCalled();
+
+            clearTimeoutSpy.mockRestore();
+            globalActivity.logo._timerManager = originalTimerManager;
+        });
+
+        test("should fall back to global.clearTimeout if ManagedTimer does not find the timer", () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            const mockTimer = {
+                clearTimeout: jest.fn().mockReturnValue(false)
+            };
+            globalActivity.logo._timerManager = mockTimer;
+            const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            musicBlocks._clearExecutionTimeout(999);
+            expect(mockTimer.clearTimeout).toHaveBeenCalledWith(999);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(999);
+
+            clearTimeoutSpy.mockRestore();
+            globalActivity.logo._timerManager = originalTimerManager;
+        });
+
+        test("should clear timer via clearTimeout fallback when timerManager is unavailable", () => {
+            jest.spyOn(musicBlocks, "_getTimerManager").mockReturnValueOnce(null);
+            const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            musicBlocks._clearExecutionTimeout(888);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(888);
+
+            clearTimeoutSpy.mockRestore();
+        });
+
+        test("should do nothing if id is null or undefined", () => {
+            const originalTimerManager = globalActivity.logo._timerManager;
+            const mockTimer = {
+                clearTimeout: jest.fn()
+            };
+            globalActivity.logo._timerManager = mockTimer;
+
+            musicBlocks._clearExecutionTimeout(null);
+            musicBlocks._clearExecutionTimeout(undefined);
+            expect(mockTimer.clearTimeout).not.toHaveBeenCalled();
+
+            globalActivity.logo._timerManager = originalTimerManager;
+        });
+    });
+
+    describe("clearExecutionTimers", () => {
+        test("should clear _executionTimeout and reset it to null", () => {
+            const clearSpy = jest.spyOn(musicBlocks, "_clearExecutionTimeout");
+            musicBlocks._executionTimeout = 777;
+
+            musicBlocks.clearExecutionTimers();
+
+            expect(clearSpy).toHaveBeenCalledWith(777);
+            expect(musicBlocks._executionTimeout).toBeNull();
+        });
+
+        test("should invoke _timerManager.clearAll() when an instance timer manager exists", () => {
+            const mockInstanceTimer = { clearAll: jest.fn() };
+            musicBlocks._timerManager = mockInstanceTimer;
+
+            musicBlocks.clearExecutionTimers();
+
+            expect(mockInstanceTimer.clearAll).toHaveBeenCalled();
+        });
+    });
+
     describe("MusicBlocks.init", () => {
         test("should initialize the API method list and set isRun to true when start is true", () => {
             MusicBlocks.init(true);
@@ -668,6 +844,37 @@ describe("MusicBlocks Class", () => {
             expect(MusicBlocks._blockNo).toBe(-1);
             expect(Mouse.MouseList).toEqual([]);
             expect(Mouse.TurtleMouseMap).toEqual({});
+            // AddedTurtles is pushed to on every run, so it has to be reset
+            // alongside its siblings or it keeps the removed turtles alive.
+            expect(Mouse.AddedTurtles).toEqual([]);
+        });
+
+        test("should clear pending execution timers on all active mice when start is false", () => {
+            const mockClearTimers = jest.fn();
+            const mockMouse = { MB: { clearExecutionTimers: mockClearTimers } };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.init(false);
+
+            expect(mockClearTimers).toHaveBeenCalledTimes(1);
+            expect(Mouse.MouseList).toEqual([]);
+        });
+    });
+
+    describe("MusicBlocks.run", () => {
+        test("should clear pending execution timers on active mice when starting run", () => {
+            const mockClearTimers = jest.fn();
+            const mockMouse = {
+                MB: { clearExecutionTimers: mockClearTimers },
+                turtle: { listeners: {} },
+                run: jest.fn()
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(mockClearTimers).toHaveBeenCalledTimes(1);
+            expect(mockMouse.run).toHaveBeenCalledTimes(1);
         });
     });
 });

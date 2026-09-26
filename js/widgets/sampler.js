@@ -15,10 +15,50 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, TunerDisplay, TunerUtils,
+   ManagedTimer
 */
 
-/* exported SampleWidget */
+/* exported SampleWidget, resolveBackendURL */
+/** AMD module dependencies for lazy loading. */
+SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+
+/**
+ * Resolves the AI backend service URL based on global configuration or query parameter overrides.
+ * @param {Location} [loc] Optional location object for testability.
+ * @returns {string}
+ */
+function resolveBackendURL(loc) {
+    if (
+        typeof window !== "undefined" &&
+        typeof window.AI_SAMPLE_ENDPOINT === "string" &&
+        window.AI_SAMPLE_ENDPOINT.trim()
+    ) {
+        return window.AI_SAMPLE_ENDPOINT.trim().replace(/\/+$/, "");
+    }
+
+    try {
+        const location =
+            loc !== undefined ? loc : typeof window !== "undefined" ? window.location : null;
+        if (!location) {
+            return "";
+        }
+
+        const search = location.search || "";
+        const params = new URLSearchParams(search);
+        if (params.has("backend")) {
+            return params.get("backend").replace(/\/+$/, "");
+        }
+        if (params.has("backend_url")) {
+            return params.get("backend_url").replace(/\/+$/, "");
+        }
+
+        return "";
+    } catch (e) {
+        return "";
+    }
+}
+
 /**
  * Represents a Sample Widget.
  * @constructor
@@ -137,6 +177,191 @@ function SampleWidget() {
     this.isPitchDetectionRunning = false;
 
     /**
+     * Tracks timers owned by this widget so they can be cancelled when the widget closes.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeIntervals = new Set();
+
+    /**
+     * Interval ID for blinking status message during prompt generation.
+     * @type {number|null}
+     * @private
+     */
+    this._promptBlinkInterval = null;
+
+    /**
+     * Timeout ID for debouncing the save sample button.
+     * @type {number|null}
+     * @private
+     */
+    this._saveTimeout = null;
+
+    /**
+     * Timeout ID for debouncing tuner mode toggle.
+     * @type {number|null}
+     * @private
+     */
+    this._tunerModeTimeout = null;
+
+    /**
+     * Timeout ID for restarting reference pitch after cent adjustment.
+     * @type {number|null}
+     * @private
+     */
+    this._restartPitchTimeout = null;
+
+    /**
+     * Timeout ID for the _waitAndPlaySample delay.
+     * Cleared in pause() so a stale timer cannot fire during a subsequent play.
+     * @type {number|null}
+     * @private
+     */
+    this._playbackWaitTimeout = null;
+
+    /**
+     * Timeout ID for the _waitAndEndPlaying delay.
+     * Cleared in pause() so a stale end-of-play timer cannot call pause() again.
+     * @type {number|null}
+     * @private
+     */
+    this._endPlayingTimeout = null;
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    this._setWidgetInterval = function (callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    };
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    this._clearWidgetInterval = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        this._promptBlinkInterval = null;
+        this._saveTimeout = null;
+        this._tunerModeTimeout = null;
+        this._restartPitchTimeout = null;
+        this._playbackWaitTimeout = null;
+        this._endPlayingTimeout = null;
+
+        return count;
+    };
+
+    /**
      * Updates the blocks related to the sample.
      * @private
      * @returns {void}
@@ -154,31 +379,35 @@ function SampleWidget() {
             this.sampleOctave,
             this.centAdjustmentValue || 0
         ];
-        if (this.timbreBlock !== null) {
-            mainSampleBlock = this.activity.blocks.blockList[this.timbreBlock].connections[1];
-            if (mainSampleBlock !== null) {
-                this.activity.blocks.blockList[mainSampleBlock].value = this.sampleArray;
-                this.activity.blocks.blockList[mainSampleBlock].updateCache();
-                audiofileBlock = this.activity.blocks.blockList[mainSampleBlock].connections[1];
-                solfegeBlock = this.activity.blocks.blockList[mainSampleBlock].connections[2];
-                octaveBlock = this.activity.blocks.blockList[mainSampleBlock].connections[3];
-                if (audiofileBlock !== null) {
-                    this.activity.blocks.blockList[audiofileBlock].value = [
-                        this.sampleName,
-                        this.sampleData
-                    ];
-                    this.activity.blocks.blockList[audiofileBlock].text.text = this.sampleName;
-                    this.activity.blocks.blockList[audiofileBlock].updateCache();
+        const getBlock = id =>
+            id !== null && id !== undefined ? this.activity.blocks.blockList[id] : null;
+        const timbreBlk = getBlock(this.timbreBlock);
+        if (timbreBlk && timbreBlk.connections) {
+            mainSampleBlock = timbreBlk.connections[1];
+            const mainBlk = getBlock(mainSampleBlock);
+            if (mainBlk) {
+                mainBlk.value = this.sampleArray;
+                mainBlk.updateCache();
+                audiofileBlock = mainBlk.connections && mainBlk.connections[1];
+                solfegeBlock = mainBlk.connections && mainBlk.connections[2];
+                octaveBlock = mainBlk.connections && mainBlk.connections[3];
+                const audioBlk = getBlock(audiofileBlock);
+                if (audioBlk) {
+                    audioBlk.value = [this.sampleName, this.sampleData];
+                    if (audioBlk.text) audioBlk.text.text = this.sampleName;
+                    audioBlk.updateCache();
                 }
-                if (solfegeBlock !== null) {
-                    this.activity.blocks.blockList[solfegeBlock].value = this.samplePitch;
-                    this.activity.blocks.blockList[solfegeBlock].text.text = this.samplePitch;
-                    this.activity.blocks.blockList[solfegeBlock].updateCache();
+                const solBlk = getBlock(solfegeBlock);
+                if (solBlk) {
+                    solBlk.value = this.samplePitch;
+                    if (solBlk.text) solBlk.text.text = this.samplePitch;
+                    solBlk.updateCache();
                 }
-                if (octaveBlock !== null) {
-                    this.activity.blocks.blockList[octaveBlock].value = this.sampleOctave;
-                    this.activity.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
-                    this.activity.blocks.blockList[octaveBlock].updateCache();
+                const octBlk = getBlock(octaveBlock);
+                if (octBlk) {
+                    octBlk.value = this.sampleOctave;
+                    if (octBlk.text) octBlk.text.text = this.sampleOctave;
+                    octBlk.updateCache();
                 }
 
                 // Update the block display to show cent adjustment if applicable
@@ -207,18 +436,32 @@ function SampleWidget() {
 
     /**
      * Pauses the sample playback.
+     * Cancels any pending playback timers so a stale timer from a previous play
+     * cannot fire after this pause and corrupt the next play sequence.
      * @returns {void}
      */
     this.pause = function () {
-        const playImg = document.createElement("img");
-        playImg.src = "header-icons/play-button.svg";
-        playImg.title = _("Play");
-        playImg.alt = _("Play");
-        playImg.height = ICONSIZE;
-        playImg.width = ICONSIZE;
-        playImg.style.verticalAlign = "middle";
-        this.playBtn.textContent = "";
-        this.playBtn.appendChild(playImg);
+        this._clearWidgetTimeout(this._playbackWaitTimeout);
+        this._playbackWaitTimeout = null;
+        this._clearWidgetTimeout(this._endPlayingTimeout);
+        this._endPlayingTimeout = null;
+
+        const img = this.playBtn ? this.playBtn.getElementsByTagName("img")[0] : null;
+        if (img) {
+            img.src = "header-icons/play-button.svg";
+            img.title = _("Play");
+            img.alt = _("Play");
+        } else if (this.playBtn) {
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = _("Play");
+            playImg.alt = _("Play");
+            playImg.height = ICONSIZE;
+            playImg.width = ICONSIZE;
+            playImg.style.verticalAlign = "middle";
+            this.playBtn.textContent = "";
+            this.playBtn.appendChild(playImg);
+        }
         this.isMoving = false;
     };
 
@@ -227,15 +470,22 @@ function SampleWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        const pauseImg = document.createElement("img");
-        pauseImg.src = "header-icons/pause-button.svg";
-        pauseImg.title = _("Pause");
-        pauseImg.alt = _("Pause");
-        pauseImg.height = ICONSIZE;
-        pauseImg.width = ICONSIZE;
-        pauseImg.style.verticalAlign = "middle";
-        this.playBtn.textContent = "";
-        this.playBtn.appendChild(pauseImg);
+        const img = this.playBtn ? this.playBtn.getElementsByTagName("img")[0] : null;
+        if (img) {
+            img.src = "header-icons/pause-button.svg";
+            img.title = _("Pause");
+            img.alt = _("Pause");
+        } else if (this.playBtn) {
+            const pauseImg = document.createElement("img");
+            pauseImg.src = "header-icons/pause-button.svg";
+            pauseImg.title = _("Pause");
+            pauseImg.alt = _("Pause");
+            pauseImg.height = ICONSIZE;
+            pauseImg.width = ICONSIZE;
+            pauseImg.style.verticalAlign = "middle";
+            this.playBtn.textContent = "";
+            this.playBtn.appendChild(pauseImg);
+        }
         this.isMoving = true;
     };
 
@@ -309,7 +559,7 @@ function SampleWidget() {
      */
     this.__save = function () {
         const that = this;
-        setTimeout(function () {
+        this._setWidgetTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
@@ -472,6 +722,8 @@ function SampleWidget() {
         };
 
         widgetWindow.onclose = () => {
+            this._clearWidgetTimers();
+
             if (this.drawVisualIDs) {
                 for (const id of Object.keys(this.drawVisualIDs)) {
                     cancelAnimationFrame(this.drawVisualIDs[id]);
@@ -523,7 +775,37 @@ function SampleWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            // Dispose Tone.Analyser nodes to free Web Audio resources
+            for (const key in this.pitchAnalysers) {
+                const analyser = this.pitchAnalysers[key];
+                if (analyser) {
+                    if (typeof instruments !== "undefined" && instruments[0]) {
+                        for (const synth in instruments[0]) {
+                            try {
+                                if (
+                                    instruments[0][synth] &&
+                                    typeof instruments[0][synth].disconnect === "function"
+                                ) {
+                                    instruments[0][synth].disconnect(analyser);
+                                }
+                            } catch (_) {
+                                // Synth may not have been connected to this analyser.
+                            }
+                        }
+                    }
+                    if (typeof analyser.dispose === "function") {
+                        analyser.dispose();
+                    }
+                }
+            }
             this.pitchAnalysers = {};
+
+            // Remove any dangling file chooser listener
+            const fileChooser = docById("myOpenAll");
+            if (fileChooser && this._fileChangeHandler) {
+                fileChooser.removeEventListener("change", this._fileChangeHandler);
+                this._fileChangeHandler = null;
+            }
 
             if (this._dropZone) {
                 this._dropZone.removeEventListener("dragover", this._dragOverHandler);
@@ -532,6 +814,21 @@ function SampleWidget() {
             }
 
             widgetWindow.destroy();
+        };
+
+        let tunerOn = false;
+
+        const stopTuner = () => {
+            if (tunerOn) {
+                activity.textMsg(_("Tuner stopped."), 3000);
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+                const tunerContainer = docById("tunerContainer");
+                if (tunerContainer) {
+                    tunerContainer.remove();
+                }
+                this.tunerSegments = [];
+            }
         };
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
@@ -552,14 +849,20 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                const __readerAction = function (event) {
+                // Remove any previously attached listener to prevent duplicates
+                if (that._fileChangeHandler) {
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                }
+
+                that._fileChangeHandler = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
                     that.handleFiles(sampleFile);
-                    fileChooser.removeEventListener("change", __readerAction);
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                    that._fileChangeHandler = null;
                 };
 
-                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.addEventListener("change", that._fileChangeHandler, false);
                 fileChooser.focus();
                 fileChooser.click();
                 window.scroll(0, 0);
@@ -603,8 +906,10 @@ function SampleWidget() {
                 if (!that._get_save_lock()) {
                     that._save_lock = true;
                     that._saveSample();
-                    setTimeout(function () {
+                    that._clearWidgetTimeout(that._saveTimeout);
+                    that._saveTimeout = that._setWidgetTimeout(function () {
                         that._save_lock = false;
+                        that._saveTimeout = null;
                     }, 1000);
                 }
             };
@@ -615,17 +920,30 @@ function SampleWidget() {
 
         this._promptBtn = widgetWindow.addButton("prompt.svg", ICONSIZE, _("Prompt"), "");
 
-        // this._trimBtn = widgetWindow.addButton(
-        //     "trim.svg",
-        //     ICONSIZE,
-        //     _("Trim"),
-        //     ""
-        // );
-
         let generating = false;
         this.audioPreview = null;
 
         this._promptBtn.onclick = () => {
+            stopTuner();
+            const aiSampleEndpoint = resolveBackendURL();
+            if (!aiSampleEndpoint) {
+                activity.errorMsg(_("AI sample generation is not available."));
+                return;
+            }
+            if (aiSampleEndpoint.startsWith("http://")) {
+                console.warn("AI sample endpoint is using HTTP instead of HTTPS.");
+            }
+            if (this.is_recording) {
+                this.activity.logo.synth.stopRecording();
+                this.is_recording = false;
+                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
+            }
+            if (this.audioPreview) {
+                this.audioPreview.pause();
+                this.audioPreview.currentTime = 0;
+                this.audioPreview = null;
+            }
+
             this.widgetWindow.clearScreen();
             let width, height;
             if (!this.widgetWindow.isMaximized()) {
@@ -666,7 +984,8 @@ function SampleWidget() {
             container.style.gap = "20px";
 
             const h1 = document.createElement("h1");
-            h1.textContent = "AI Sample Generation";
+            h1.textContent = _("AI Sample Generation");
+            h1.style.color = platformColor.textColor || "var(--color-text-primary, #111827)";
             h1.style.fontSize = "40px";
             h1.style.marginTop = "0";
             h1.style.marginBottom = "0px";
@@ -678,18 +997,20 @@ function SampleWidget() {
             textArea.style.fontSize = "30px";
             textArea.style.resize = "none";
             textArea.style.borderRadius = "10px";
-            textArea.style.border = "none";
+            textArea.style.border = "1px solid #d1d5db";
+            textArea.style.color = "#111827";
+            textArea.style.backgroundColor = "#ffffff";
             textArea.style.padding = "15px";
             textArea.placeholder = randomPrompt;
             textArea.addEventListener("input", function () {
                 if (generating) {
-                    submit.disabled = true;
-                    preview.disabled = true;
-                    save.disabled = true;
+                    setPromptBtnState(submit, true);
+                    setPromptBtnState(preview, true);
+                    setPromptBtnState(save, true);
                 } else {
-                    submit.disabled = false;
-                    preview.disabled = true;
-                    save.disabled = true;
+                    setPromptBtnState(submit, false);
+                    setPromptBtnState(preview, true);
+                    setPromptBtnState(save, true);
                 }
             });
 
@@ -698,61 +1019,70 @@ function SampleWidget() {
             buttonDiv.style.justifyContent = "space-between";
             buttonDiv.style.width = "650px";
 
+            const stylePromptBtn = (btn, text) => {
+                btn.style.width = "152px";
+                btn.style.height = "61px";
+                btn.style.fontSize = "32px";
+                btn.style.borderRadius = "10px";
+                btn.style.border = "none";
+                btn.style.cursor = "pointer";
+                btn.style.backgroundColor = platformColor.fillColor || "#ffffff";
+                btn.style.color = "#282828";
+                btn.textContent = _(text);
+            };
+
+            const setPromptBtnState = (btn, disabled) => {
+                btn.disabled = disabled;
+                btn.style.opacity = disabled ? "0.45" : "1";
+                btn.style.cursor = disabled ? "not-allowed" : "pointer";
+            };
+
             const submit = document.createElement("button");
-            submit.style.width = "152px";
-            submit.style.height = "61px";
-            submit.style.fontSize = "32px";
-            submit.style.borderRadius = "10px";
-            submit.style.border = "none";
-            submit.style.cursor = "pointer";
-            submit.textContent = "Submit";
+            stylePromptBtn(submit, "Submit");
+            setPromptBtnState(submit, false);
             submit.onclick = async function () {
-                submit.disabled = true;
+                setPromptBtnState(submit, true);
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
-                const url = `http://13.61.94.100:8000/generate?prompt=${encodedPrompt}`;
-
-                let blinkInterval;
+                const url = `${aiSampleEndpoint}/generate?prompt=${encodedPrompt}`;
 
                 try {
                     generating = true;
                     activity.textMsg(_("Generating audio... (It may take up to 1 minute)"), 2500);
 
-                    blinkInterval = setInterval(() => {
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = that._setWidgetInterval(() => {
                         activity.textMsg(_("Generating audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
                     const result = await response.json();
 
-                    clearInterval(blinkInterval);
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = null;
 
                     if (result.status === "success") {
                         generating = false;
                         activity.textMsg(_("Audio ready!"), 3000);
-                        preview.disabled = false;
-                        save.disabled = false;
+                        setPromptBtnState(preview, false);
+                        setPromptBtnState(save, false);
                     } else {
                         generating = false;
                         activity.textMsg(_("Failed to generate audio."), 3000);
+                        setPromptBtnState(submit, false);
                     }
                 } catch (error) {
                     generating = false;
-                    clearInterval(blinkInterval);
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = null;
                     activity.textMsg(_("An error occurred."), 3000);
-                    submit.disabled = false;
+                    setPromptBtnState(submit, false);
                 }
             };
 
             const preview = document.createElement("button");
-            preview.style.width = "152px";
-            preview.style.height = "61px";
-            preview.style.fontSize = "32px";
-            preview.style.borderRadius = "10px";
-            preview.style.border = "none";
-            preview.style.cursor = "pointer";
-            preview.textContent = "Preview";
-            preview.disabled = true;
+            stylePromptBtn(preview, "Preview");
+            setPromptBtnState(preview, true);
             preview.onclick = () => {
                 if (that.audioPreview) {
                     that.audioPreview.pause();
@@ -760,7 +1090,7 @@ function SampleWidget() {
                     that.audioPreview = null;
                 }
 
-                const audioURL = `http://13.61.94.100:8000/preview`;
+                const audioURL = `${aiSampleEndpoint}/preview`;
                 const newAudio = new Audio(audioURL);
                 that.audioPreview = newAudio;
                 newAudio.play();
@@ -773,16 +1103,10 @@ function SampleWidget() {
             };
 
             const save = document.createElement("button");
-            save.style.width = "152px";
-            save.style.height = "61px";
-            save.style.fontSize = "32px";
-            save.style.borderRadius = "10px";
-            save.style.border = "none";
-            save.style.cursor = "pointer";
-            save.textContent = "Save";
-            save.disabled = true;
+            stylePromptBtn(save, "Save");
+            setPromptBtnState(save, true);
             save.onclick = function () {
-                const audioURL = `http://13.61.94.100:8000/save`;
+                const audioURL = `${aiSampleEndpoint}/save`;
                 const link = document.createElement("a");
                 link.href = audioURL;
                 link.download = "output.wav";
@@ -800,162 +1124,6 @@ function SampleWidget() {
             container.appendChild(buttonDiv);
         };
 
-        // Commented out the audio trimmer code because it doesn't provide a visual trimming interface.
-
-        // this._trimBtn.onclick = () => {
-
-        //     this.widgetWindow.clearScreen();
-        //     let width, height;
-        //     if (!this.widgetWindow.isMaximized()) {
-        //         width = SAMPLEWIDTH;
-        //         height = SAMPLEHEIGHT;
-        //     } else {
-        //         width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
-        //         height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
-        //     }
-
-        //     const container = document.createElement("div");
-        //     container.id = "samplerPrompt";
-        //     this.widgetWindow.getWidgetBody().appendChild(container);
-
-        //     container.style.height = height + "px";
-        //     container.style.width = width + "px";
-        //     container.style.display = "flex";
-        //     container.style.flexDirection = "column";
-        //     container.style.alignItems = "center";
-        //     container.style.justifyContent = "center";
-        //     container.style.gap = "20px";
-
-        //     const h1 = document.createElement("h1");
-        //     h1.innerHTML = "Audio Trimmer";
-        //     h1.style.fontSize = "40px";
-        //     h1.style.marginTop = "0";
-        //     h1.style.marginBottom = "0px";
-        //     h1.style.fontWeight = "200";
-
-        //     const divUploadSample = document.createElement("div");
-        //     divUploadSample.style.backgroundColor = "#8cc6ff";
-        //     divUploadSample.style.width = "50px";
-        //     divUploadSample.style.height = "50px";
-        //     divUploadSample.style.display = "flex";
-        //     divUploadSample.style.cursor = "pointer";
-        //     divUploadSample.style.justifyContent = "center";
-        //     divUploadSample.style.alignItems = "center";
-
-        //     const uploadSample = document.createElement("img");
-        //     uploadSample.setAttribute("src", "/header-icons/load-media.svg");
-        //     uploadSample.style.height = "32px";
-        //     uploadSample.style.width = "32px";
-
-        //     divUploadSample.appendChild(uploadSample);
-
-        //     const fileChooser = document.createElement("input");
-        //     fileChooser.type = "file";
-
-        //     divUploadSample.onclick = function () {
-        //         fileChooser.click();
-        //     };
-
-        //     fileChooser.onchange = function () {
-        //         const file = fileChooser.files[0];
-        //         const audioPlayer = document.createElement("audio");
-        //         audioPlayer.controls = true;
-        //         const fileURL = URL.createObjectURL(file);
-        //         audioPlayer.src = fileURL;
-        //         container.replaceChild(audioPlayer, divUploadSample);
-        //     };
-
-        //     const inputDiv = document.createElement("div");
-        //     inputDiv.style.width = "400px";
-        //     inputDiv.style.display = "flex";
-        //     inputDiv.style.justifyContent = "space-between";
-
-        //     const fromInputBox = document.createElement("input");
-        //     fromInputBox.type = "text";
-        //     fromInputBox.title = "Enter start time (in seconds)";
-        //     fromInputBox.placeholder = "0.00";
-        //     fromInputBox.style.width = "152px";
-        //     fromInputBox.style.height = "61px";
-        //     fromInputBox.style.backgroundColor = "#FFFFFF";
-        //     fromInputBox.style.color = "#766C6C";
-        //     fromInputBox.style.fontSize = "32px";
-        //     fromInputBox.style.font = "Inter";
-        //     fromInputBox.style.borderRadius = "10px"
-        //     fromInputBox.style.border = "none"
-        //     fromInputBox.style.padding = "8px";
-        //     fromInputBox.style.textAlign = "center";
-        //     fromInputBox.type = "number";
-
-        //     const toInputBox = document.createElement("input");
-        //     toInputBox.type = "text";
-        //     toInputBox.title = "Enter end time (in seconds)";
-        //     toInputBox.placeholder = "10.00";
-        //     toInputBox.style.width = "152px";
-        //     toInputBox.style.height = "61px";
-        //     toInputBox.style.backgroundColor = "#FFFFFF";
-        //     toInputBox.style.color = "#766C6C";
-        //     toInputBox.style.fontSize = "32px";
-        //     toInputBox.style.font = "Inter";
-        //     toInputBox.style.borderRadius = "10px";
-        //     toInputBox.style.border = "none";
-        //     toInputBox.style.padding = "8px";
-        //     toInputBox.style.textAlign = "center";
-        //     toInputBox.type = "number";
-
-        //     inputDiv.appendChild(fromInputBox);
-        //     inputDiv.appendChild(toInputBox);
-
-        //     const buttonDiv = document.createElement("div");
-        //     buttonDiv.style.width = "400px";
-        //     buttonDiv.style.display = "flex";
-        //     buttonDiv.style.justifyContent = "space-between";
-
-        //     const preview = document.createElement("button");
-        //     preview.style.width = "152px";
-        //     preview.style.height = "61px";
-        //     preview.style.fontSize = "32px";
-        //     preview.style.borderRadius = "10px";
-        //     preview.style.border = "none";
-        //     preview.style.cursor = "pointer";
-        //     preview.innerHTML = "Preview";
-
-        //     preview.onclick = async function() {
-        //         const from = fromInputBox.value
-        //         const to = toInputBox.value
-        //         const audioURL = `http://13.61.94.100:8000/trim-preview?start=${from}&end=${to}`;
-        //         const audio = new Audio(audioURL);
-        //         audio.play();
-        //         save.disabled = false;
-        //     };
-
-        //     const save = document.createElement("button");
-        //     save.style.width = "152px";
-        //     save.style.height = "61px";
-        //     save.style.fontSize = "32px";
-        //     save.style.borderRadius = "10px";
-        //     save.style.border = "none";
-        //     save.style.cursor = "pointer";
-        //     save.innerHTML = "Save";
-        //     save.disabled = true;
-        //     save.onclick = function (){
-        //         const audioURL = `http://13.61.94.100:8000/trim-save`;
-        //         const link = document.createElement('a');
-        //         link.href = audioURL;
-        //         link.download = 'trimmed-output.wav';
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //     };
-
-        //     buttonDiv.appendChild(preview);
-        //     buttonDiv.appendChild(save);
-
-        //     container.appendChild(h1);
-        //     container.appendChild(divUploadSample);
-        //     container.appendChild(inputDiv);
-        //     container.appendChild(buttonDiv);
-        // };
-
         this._playbackBtn.id = "playbackBtn";
         this._playbackBtn.classList.add("disabled");
 
@@ -965,11 +1133,16 @@ function SampleWidget() {
         this._recordBtn.onclick = async () => {
             stopTuner();
             if (!this.is_recording) {
-                await this.activity.logo.synth.startRecording();
-                this.is_recording = true;
-                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
-                this.displayRecordingStartMessage();
-                this.activity.logo.synth.LiveWaveForm();
+                try {
+                    await this.activity.logo.synth.startRecording();
+                    this.is_recording = true;
+                    this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
+                    this.displayRecordingStartMessage();
+                    this.activity.logo.synth.LiveWaveForm();
+                } catch (err) {
+                    console.error(err);
+                    this.activity.errorMsg(_("Microphone access denied."));
+                }
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -981,35 +1154,31 @@ function SampleWidget() {
 
         this._playbackBtn.onclick = () => {
             stopTuner();
+            const img = this._playbackBtn.getElementsByTagName("img")[0];
             if (!this.playback) {
                 this.sampleData = this.recordingURL;
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
                 this._addSample();
-                this.activity.logo.synth.playRecording();
+                if (img) {
+                    img.src = "header-icons/stop-button.svg";
+                }
+                this.activity.logo.synth.playRecording(() => {
+                    this.playback = false;
+                    if (img) {
+                        img.src = "header-icons/playback.svg";
+                    }
+                });
                 this.playback = true;
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
+                if (img) {
+                    img.src = "header-icons/playback.svg";
+                }
             }
         };
 
         this._tunerBtn = widgetWindow.addButton("tuner.svg", ICONSIZE, _("Tuner"), "");
-
-        let tunerOn = false;
-
-        // Helper function to stop tuner
-        const stopTuner = () => {
-            if (tunerOn) {
-                activity.textMsg(_("Tuner stopped."), 3000);
-                this.activity.logo.synth.stopTuner();
-                tunerOn = false;
-                const tunerContainer = docById("tunerContainer");
-                if (tunerContainer) {
-                    tunerContainer.remove();
-                }
-                this.tunerSegments = [];
-            }
-        };
 
         this._tunerBtn.onclick = async () => {
             if (docById("tunerContainer") && !tunerOn) {
@@ -1028,7 +1197,9 @@ function SampleWidget() {
                 tunerOn = true;
 
                 const samplerCanvas = docByClass("samplerCanvas")[0];
-                samplerCanvas.style.display = "none";
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "none";
+                }
 
                 const tunerContainer = document.createElement("div");
                 tunerContainer.style.display = "flex";
@@ -1091,106 +1262,9 @@ function SampleWidget() {
                     tunerSvg.appendChild(segment);
                 });
 
-                // Create mode toggle button
-                const modeToggle = document.createElement("div");
-                modeToggle.id = "modeToggle";
-                modeToggle.style.position = "absolute";
-                modeToggle.style.top = "30px";
-                modeToggle.style.left = "50%";
-                modeToggle.style.transform = "translateX(-50%)";
-                modeToggle.style.display = "flex";
-                modeToggle.style.backgroundColor = platformColor.fillColor || "#FFFFFF";
-                modeToggle.style.borderRadius = "25px";
-                modeToggle.style.padding = "3px";
-                modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
-                modeToggle.style.width = "120px";
-                modeToggle.style.height = "44px";
-                modeToggle.style.cursor = "pointer";
-
-                // Create chromatic mode button
-                const chromaticButton = document.createElement("div");
-                chromaticButton.style.flex = "1";
-                chromaticButton.style.display = "flex";
-                chromaticButton.style.alignItems = "center";
-                chromaticButton.style.justifyContent = "center";
-                chromaticButton.style.borderRadius = "22px";
-                chromaticButton.style.cursor = "pointer";
-                chromaticButton.style.transition = "all 0.2s ease";
-                chromaticButton.style.userSelect = "none";
-                chromaticButton.title = _("Chromatic");
-
-                // Create target pitch mode button
-                const targetPitchButton = document.createElement("div");
-                targetPitchButton.style.flex = "1";
-                targetPitchButton.style.display = "flex";
-                targetPitchButton.style.alignItems = "center";
-                targetPitchButton.style.justifyContent = "center";
-                targetPitchButton.style.borderRadius = "22px";
-                targetPitchButton.style.cursor = "pointer";
-                targetPitchButton.style.transition = "all 0.2s ease";
-                targetPitchButton.style.userSelect = "none";
-                targetPitchButton.title = _("Target pitch");
-
-                // Create icons
-                const chromaticIcon = document.createElement("img");
-                chromaticIcon.src = "header-icons/chromatic-mode.svg";
-                chromaticIcon.style.width = "32px";
-                chromaticIcon.style.height = "32px";
-                chromaticIcon.style.filter = "brightness(0)";
-                chromaticIcon.style.pointerEvents = "none";
-
-                const targetIcon = document.createElement("img");
-                targetIcon.src = "header-icons/target-pitch-mode.svg";
-                targetIcon.style.width = "32px";
-                targetIcon.style.height = "32px";
-                targetIcon.style.filter = "brightness(0)";
-                targetIcon.style.pointerEvents = "none";
-
-                // Initial mode state
-                let tunerMode = "chromatic";
-
-                // Function to update button styles
-                const updateButtonStyles = () => {
-                    const activeColor = platformColor.selectorSelected || "#A6CEFF";
-                    const inactiveColor = platformColor.fillColor || "#FFFFFF";
-                    if (tunerMode === "chromatic") {
-                        chromaticButton.style.backgroundColor = activeColor;
-                        targetPitchButton.style.backgroundColor = inactiveColor;
-                    } else {
-                        chromaticButton.style.backgroundColor = inactiveColor;
-                        targetPitchButton.style.backgroundColor = activeColor;
-                    }
-                };
-
-                // Add click handlers with debounce
-                let isClickable = true;
-                const handleClick = mode => {
-                    if (!isClickable) return;
-                    isClickable = false;
-                    tunerMode = mode;
-                    updateButtonStyles();
-                    setTimeout(() => {
-                        isClickable = true;
-                    }, 200);
-                };
-
-                chromaticButton.onclick = () => handleClick("chromatic");
-                targetPitchButton.onclick = () => handleClick("target");
-
-                // Assemble the toggle
-                chromaticButton.appendChild(chromaticIcon);
-                targetPitchButton.appendChild(targetIcon);
-                modeToggle.appendChild(chromaticButton);
-                modeToggle.appendChild(targetPitchButton);
-
-                // Initial style update
-                updateButtonStyles();
-
-                tunerContainer.appendChild(modeToggle);
-
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
-                await this.activity.logo.synth.startTuner();
+                await this.activity.logo.synth.startTuner(this.pitchName);
                 activity.textMsg(_("Tuner started."), 3000);
             } else {
                 activity.textMsg(_("Tuner stopped."), 3000);
@@ -1499,16 +1573,17 @@ function SampleWidget() {
      * Calculates the frequency in Hz for the current pitch.
      * @returns {number} The frequency in Hz
      */
-    this._calculateFrequency = function () {
+    this._calculateFrequency = function (edo) {
+        const currentEDO = edo || 12;
         let semitones = 0;
 
-        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
         semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
         // A4 = 440Hz at semitone position 57
         const netChange = semitones - 57;
-        const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
+        const frequency = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         return frequency;
     };
@@ -1539,18 +1614,19 @@ function SampleWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
-    this._playReferencePitch = function () {
+    this._playReferencePitch = function (edo) {
+        const currentEDO = edo || 12;
         this._updateSamplePitchValues();
         this._updateBlocks();
 
         let finalCenter = 0;
 
-        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
         finalCenter += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
         const netChange = finalCenter - 57;
-        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / 12));
+        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         this.activity.logo.synth.trigger(
             0,
@@ -1612,11 +1688,14 @@ function SampleWidget() {
 
     /**
      * Waits for a specified time and then plays the sample.
+     * Stores its timer ID in _playbackWaitTimeout so pause() can cancel it.
      * @returns {Promise<string>} A promise that resolves once the sample is played.
      */
     this._waitAndPlaySample = function () {
         return new Promise(resolve => {
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._playbackWaitTimeout);
+            this._playbackWaitTimeout = this._setWidgetTimeout(() => {
+                this._playbackWaitTimeout = null;
                 this._playSample();
                 resolve("played");
                 this._endPlaying();
@@ -1634,11 +1713,14 @@ function SampleWidget() {
 
     /**
      * Waits for the sample to finish playing.
+     * Stores its timer ID in _endPlayingTimeout so pause() can cancel it.
      * @returns {Promise<string>} A promise that resolves once the sample playback ends.
      */
     this._waitAndEndPlaying = function () {
         return new Promise(resolve => {
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._endPlayingTimeout);
+            this._endPlayingTimeout = this._setWidgetTimeout(() => {
+                this._endPlayingTimeout = null;
                 this.pause();
                 resolve("ended");
             }, this.sampleLength);
@@ -1729,6 +1811,21 @@ function SampleWidget() {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
+        if (this._exitWheel.navItems && this._exitWheel.navItems.length > 1) {
+            this._exitWheel.navItems[1].enabled = false;
+        }
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(this._exitWheel);
+        }
+        if (this._exitWheel.navItems && this._exitWheel.navItems[0]) {
+            const item = this._exitWheel.navItems[0];
+            if (item.sliceSelectedAttr) {
+                item.sliceSelectedAttr.cursor = "pointer";
+                item.sliceHoverAttr.cursor = "pointer";
+                item.titleSelectedAttr.cursor = "pointer";
+                item.titleHoverAttr.cursor = "pointer";
+            }
+        }
 
         this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
         this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1809,13 +1906,14 @@ function SampleWidget() {
         this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
         this._pitchWheel.navigateWheel(noteValue);
 
-        this._exitWheel.navItems[0].navigateFunction = () => {
+        const closePieMenu = () => {
             docById("wheelDivptm").style.display = "none";
-            this._pitchWheel.removeWheel();
-            this._exitWheel.removeWheel();
-            this._accidentalsWheel.removeWheel();
-            this._octavesWheel.removeWheel();
+            if (this._pitchWheel) this._pitchWheel.removeWheel();
+            if (this._exitWheel) this._exitWheel.removeWheel();
+            if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
+            if (this._octavesWheel) this._octavesWheel.removeWheel();
         };
+        this._exitWheel.navItems[0].navigateFunction = closePieMenu;
 
         const __selectionChanged = () => {
             const label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
@@ -2039,7 +2137,7 @@ function SampleWidget() {
                         if (dataArray && dataArray.length > 0) {
                             const pitch = detectPitch(dataArray);
                             if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
+                                const { note, cents } = TunerUtils.frequencyToNote(pitch);
                                 this.tunerDisplay.update(note, cents, this.centsValue);
 
                                 // Update segments
@@ -2176,28 +2274,6 @@ function SampleWidget() {
     };
 
     /**
-     * Convert frequency to note and cents
-     */
-    const frequencyToNote = frequency => {
-        if (frequency <= 0) return { note: "---", cents: 0 };
-
-        const A4 = 440;
-        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-        const midiNote = 69 + 12 * Math.log2(frequency / A4);
-        const roundedMidi = Math.round(midiNote);
-
-        const noteIndex = roundedMidi % 12;
-        const octave = Math.floor(roundedMidi / 12) - 1;
-        const noteName = noteNames[noteIndex] + octave;
-
-        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / 12);
-        const centsOffset = Math.round(1200 * Math.log2(frequency / nearestFreq));
-
-        return { note: noteName, cents: centsOffset };
-    };
-
-    /**
      * Stops pitch detection and releases all associated resources.
      * This prevents memory leaks from AudioContext, MediaStream, and animation frames.
      * @returns {void}
@@ -2269,7 +2345,7 @@ function SampleWidget() {
                 // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
-                        const { note, cents } = frequencyToNote(pitch);
+                        const { note, cents } = TunerUtils.frequencyToNote(pitch);
                         pitchElement.textContent = pitch.toFixed(2);
                         noteElement.textContent =
                             cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
@@ -2289,7 +2365,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert(_("Microphone access failed: %s").replace(/%s/g, err.message));
+            this.activity.errorMsg(_("Microphone access failed: %s").replace(/%s/g, err.message));
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
@@ -2310,21 +2386,27 @@ function SampleWidget() {
         container.style.boxSizing = "border-box";
 
         const heading = document.createElement("h1");
-        heading.textContent = "Tuner";
+        heading.textContent = _("Tuner");
+        heading.style.color = "#282828";
         heading.style.textAlign = "center";
         heading.style.marginBottom = "20px";
 
         const startButton = document.createElement("button");
         startButton.id = "start";
-        startButton.textContent = "Start";
+        startButton.textContent = _("Start");
         startButton.style.display = "block";
         startButton.style.margin = "0 auto 20px";
         startButton.style.padding = "10px 20px";
         startButton.style.fontSize = "16px";
         startButton.style.cursor = "pointer";
+        startButton.style.color = "#282828";
+        startButton.style.backgroundColor = "#ffffff";
+        startButton.style.border = "1px solid #ccc";
+        startButton.style.borderRadius = "6px";
 
         const pitchParagraph = document.createElement("p");
-        pitchParagraph.textContent = "Detected Pitch: ";
+        pitchParagraph.textContent = _("Detected Pitch: ");
+        pitchParagraph.style.color = "#282828";
         pitchParagraph.style.textAlign = "center";
         pitchParagraph.style.fontSize = "18px";
         const pitchSpan = document.createElement("span");
@@ -2332,7 +2414,8 @@ function SampleWidget() {
         pitchSpan.textContent = "---";
 
         const noteParagraph = document.createElement("p");
-        noteParagraph.textContent = "Note: ";
+        noteParagraph.textContent = _("Note: ");
+        noteParagraph.style.color = "#282828";
         noteParagraph.style.textAlign = "center";
         noteParagraph.style.fontSize = "18px";
         const noteSpan = document.createElement("span");
@@ -2378,15 +2461,17 @@ function SampleWidget() {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {
                 // If the instrument doesn't exist yet, we'll apply the adjustment when playing
-                console.log("Instrument not found, will apply cent adjustment during playback");
+                console.debug("Instrument not found, will apply cent adjustment during playback");
             }
         }
 
         // If we're currently playing, restart with the new adjustment
         if (this.isMoving) {
             this.pause();
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._restartPitchTimeout);
+            this._restartPitchTimeout = this._setWidgetTimeout(() => {
                 this._playReferencePitch();
+                this._restartPitchTimeout = null;
             }, 100);
         }
     };
@@ -2430,5 +2515,5 @@ class PitchSmoother {
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { SampleWidget, PitchSmoother };
+    module.exports = { SampleWidget, PitchSmoother, resolveBackendURL };
 }

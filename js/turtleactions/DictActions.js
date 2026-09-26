@@ -71,7 +71,7 @@ function setupDictActions(activity) {
             } else if (key === _("grey")) {
                 return targetTur.painter.chroma;
             } else if (key === _("pen size")) {
-                return targetTur.painter.pensize;
+                return targetTur.painter.stroke;
             } else if (key === _("font")) {
                 return targetTur.painter.font;
             } else if (key === _("heading")) {
@@ -114,6 +114,12 @@ function setupDictActions(activity) {
                     pitchToNumber(obj[0], obj[1], targetTur.singer.keySignature) -
                     targetTur.singer.pitchNumberOffset
                 );
+            } else {
+                activity.errorMsg(
+                    _("Unknown key: %s").replace(/%s/g, () => key),
+                    blk
+                );
+                return 0;
             }
         }
 
@@ -153,6 +159,20 @@ function setupDictActions(activity) {
         }
 
         /**
+         * Alias for SetDictValue for backward compatibility.
+         *
+         * @static
+         * @param {Number} target - target Turtle index in turtle.turtleList
+         * @param {Number} turtle - Turtle index in turtle.turtleList
+         * @param {String} key - key
+         * @param {*} value - value
+         * @returns {void}
+         */
+        static setDictValue(target, turtle, key, value) {
+            Turtle.DictActions.SetDictValue(target, turtle, key, value);
+        }
+
+        /**
          * Utility function to display dictionary as JSON.
          *
          * @static
@@ -170,7 +190,7 @@ function setupDictActions(activity) {
             this_dict[_("grey")] = targetTur.painter.chroma;
             this_dict[_("pen size")] = targetTur.painter.stroke;
             this_dict[_("font")] = targetTur.painter.font;
-            this_dict[_("heading")] = targetTur.painter.orientation;
+            this_dict[_("heading")] = targetTur.painter.turtle.orientation;
             this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
             this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
 

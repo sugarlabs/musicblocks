@@ -75,7 +75,8 @@ class PlanetInterface {
             document.querySelector("#theme-color").content = platformColor.header;
             this.activity.stage.enableDOMEvents(true);
             window.scroll(0, 0);
-            docById("buttoncontainerBOTTOM").style.display = "block";
+            const buttonContainerBottom = docById("buttoncontainerBOTTOM");
+            if (buttonContainerBottom) buttonContainerBottom.style.display = "block";
             docById("buttoncontainerTOP").style.display = "block";
         };
 
@@ -155,7 +156,7 @@ class PlanetInterface {
             this.activity.loading = true;
             document.body.style.cursor = "wait";
             this.activity.doLoadAnimation();
-            this.activity._allClear(false);
+            this.activity._allClear(false, true);
 
             // First, hide the palettes as they will need updating.
             this.activity.blocks.palettes._hideMenus(true);
@@ -195,7 +196,7 @@ class PlanetInterface {
         this.newProject = () => {
             this.closePlanet();
             this.initialiseNewProject();
-            this.activity._loadStart();
+            this.activity.justLoadStart();
             this.saveLocally();
         };
 
@@ -212,6 +213,8 @@ class PlanetInterface {
             this.activity.sendAllToTrash();
             this.activity.refreshCanvas();
             this.activity.blocks.trashStacks = [];
+            this.activity.blocks.actionHistory = [];
+            this.activity.blocks.redoActionHistory = [];
         };
 
         /**
@@ -236,9 +239,27 @@ class PlanetInterface {
                 240,
                 320 / this.activity.canvas.width
             );
+            const handleSaveError = e => {
+                if (
+                    e?.name === "QuotaExceededError" ||
+                    e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
+                    e?.message === "Not enough space to save locally"
+                ) {
+                    this.activity.textMsg(
+                        _(
+                            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+                        )
+                    );
+                } else {
+                    console.error(e);
+                    this.activity.textMsg(_("Could not save your project."));
+                }
+            };
             try {
                 if (svgData === null || svgData === undefined || svgData === "") {
-                    return Promise.resolve(this.planet.ProjectStorage.saveLocally(data, null));
+                    return Promise.resolve(
+                        this.planet.ProjectStorage.saveLocally(data, null)
+                    ).catch(handleSaveError);
                 } else {
                     const fallbackImage =
                         typeof this.planet.ProjectStorage.getCurrentProjectImage === "function"
@@ -246,7 +267,7 @@ class PlanetInterface {
                             : null;
                     const savePromise = Promise.resolve(
                         this.planet.ProjectStorage.saveLocally(data, fallbackImage)
-                    );
+                    ).catch(handleSaveError);
                     const img = new Image();
                     const t = this;
                     img.onload = () => {
@@ -259,9 +280,7 @@ class PlanetInterface {
                                     data,
                                     bitmap.bitmapCache.getCacheDataURL()
                                 )
-                            ).catch(error => {
-                                console.error(error);
-                            });
+                            ).catch(handleSaveError);
                         } catch (error) {
                             console.error(error);
                         }
@@ -387,22 +406,19 @@ class PlanetInterface {
          */
         this.init = async () => {
             this.iframe = document.getElementById("planet-iframe");
-            try {
-                await this.iframe.contentWindow.makePlanet(
-                    _THIS_IS_MUSIC_BLOCKS_,
-                    this.activity.storage,
-                    window._
-                );
-                this.planet = this.iframe.contentWindow.p;
-                this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
-                this.planet.setPlanetClose(this.closePlanet.bind(this));
-                this.planet.setLoadNewProject(this.newProject.bind(this));
-                this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
-                this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
-            } catch (e) {
-                console.error(e);
-                this.planet = null;
-            }
+            this.planet = null;
+            window.Converter = undefined;
+            await this.iframe.contentWindow.makePlanet(
+                _THIS_IS_MUSIC_BLOCKS_,
+                this.activity.storage,
+                window._
+            );
+            this.planet = this.iframe.contentWindow.p;
+            this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
+            this.planet.setPlanetClose(this.closePlanet.bind(this));
+            this.planet.setLoadNewProject(this.newProject.bind(this));
+            this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
+            this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
 
             window.Converter = this.planet ? this.planet.Converter : undefined;
             this.mainCanvas = this.activity.canvas;

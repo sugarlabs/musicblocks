@@ -189,6 +189,86 @@ class SearchUI {
     updateResultCounter() {}
 
     /**
+     * When a non-empty query matches nothing, keep the autocomplete menu
+     * visible with a disabled "No results found" row instead of closing it.
+     *
+     * @param {string} term - Lowercased, trimmed query used for matching.
+     * @param {Array} results - Items returned by the search source.
+     * @param {string} [displayTerm] - Original typed query for the message.
+     * @returns {Array}
+     */
+    wrapEmptySearchResults(term, results, displayTerm) {
+        if (results && results.length > 0) {
+            return results;
+        }
+        if (!term) {
+            return results || [];
+        }
+        const query = String(
+            displayTerm === undefined || displayTerm === null ? term : displayTerm
+        ).trim();
+        return [
+            {
+                label: _("No results found for %s").replace(/%s/g, query),
+                value: "",
+                artwork: "",
+                specialDict: null,
+                isEmptyState: true
+            }
+        ];
+    }
+
+    /**
+     * @param {object} item - Autocomplete item.
+     * @returns {boolean}
+     */
+    isEmptySearchResult(item) {
+        return !!(item && item.isEmptyState);
+    }
+
+    /**
+     * Renders the non-interactive empty-state row in an autocomplete menu.
+     *
+     * @param {object} $j - jQuery reference
+     * @param {object} ul - Autocomplete <ul>
+     * @param {object} item - Empty-state item
+     * @returns {object}
+     */
+    renderEmptySearchItem($j, ul, item) {
+        const li = $j("<li></li>");
+        this.decorateEmptySearchItem(li, item, $j);
+        const styled = typeof ul.css === "function" ? ul.css("z-index", 35000) : ul;
+        return li.appendTo(styled);
+    }
+
+    /**
+     * Marks an autocomplete row as the non-interactive empty-state message
+     * and exposes that message to assistive tech.
+     *
+     * @param {object} li - jQuery <li>
+     * @param {object} item - Empty-state item
+     * @param {object} $j - jQuery reference
+     * @returns {object} li
+     */
+    decorateEmptySearchItem(li, item, $j) {
+        if (typeof li.addClass === "function") {
+            li.addClass("ui-state-disabled search-no-results");
+        }
+        if (li[0]) {
+            const extra = "ui-state-disabled search-no-results";
+            li[0].className = li[0].className ? li[0].className + " " + extra : extra;
+            li[0].setAttribute("aria-disabled", "true");
+        }
+        const message = $j("<a>").text(item.label);
+        if (message[0]) {
+            message[0].setAttribute("role", "status");
+            message[0].setAttribute("aria-live", "polite");
+        }
+        li.append(message);
+        return li;
+    }
+
+    /**
      * Tears down the search UI: hides the helpful-search overlay and the
      * main search input.
      */
@@ -208,7 +288,7 @@ class SearchUI {
      * All callbacks are provided by SearchController so no logic lives here.
      *
      * @param {Function} sourceFn  (term:string) => Array  — returns filtered suggestions
-     * @param {Function} selectCb  (item, keyCode) => void — called when user picks a result
+     * @param {Function} selectCb  (item, key) => void — called when user picks a result
      * @param {Function} dropCb   (protoblk, x, y) => void — called when user drag-drops a result
      */
     setupMainAutocomplete(sourceFn, selectCb, dropCb) {
@@ -222,15 +302,18 @@ class SearchUI {
         $search.autocomplete({
             source: (request, response) => {
                 const term = (request.term || "").toLowerCase().trim();
-                response(sourceFn(term));
+                response(this.wrapEmptySearchResults(term, sourceFn(term), request.term));
             },
             appendTo: "body",
             select: (event, ui) => {
                 event.preventDefault();
+                if (this.isEmptySearchResult(ui.item)) {
+                    return false;
+                }
                 activity.searchWidget.value = ui.item.label;
                 activity.searchWidget.idInput_custom = ui.item.value;
                 activity.searchWidget.protoblk = ui.item.specialDict;
-                selectCb(ui.item, event.keyCode);
+                selectCb(ui.item, event.key);
             },
             focus: event => {
                 event.preventDefault();
@@ -240,7 +323,32 @@ class SearchUI {
         const instance = $search.autocomplete("instance");
         if (instance) {
             instance._renderItem = (ul, item) => this._renderMainItem($j, ul, item, dropCb);
+            if (instance.menu && instance.menu.element) {
+                instance.menu.element.on("mousedown mouseup click dblclick pointerdown", event => {
+                    event.stopPropagation();
+                    if (event.type === "mousedown" || event.type === "pointerdown") {
+                        event.preventDefault();
+                        $search.focus();
+                    }
+                });
+            }
+            const origClose = instance.close;
+            instance.close = function (event) {
+                if (event && event.target && window.jQuery) {
+                    const $target = window.jQuery(event.target);
+                    if (
+                        typeof $target.is === "function" &&
+                        ($target.is("#ui-id-1") ||
+                            (typeof $target.closest === "function" &&
+                                $target.closest("#ui-id-1").length > 0))
+                    ) {
+                        return;
+                    }
+                }
+                return origClose.apply(this, arguments);
+            };
         }
+
         $search.data("autocomplete-init", true);
     }
 
@@ -274,7 +382,7 @@ class SearchUI {
         activity.helpfulSearchWidget.idInput_custom = "";
         activity.helpfulSearchWidget.value = null;
         activity.helpfulSearchWidget.style.visibility = "visible";
-        document.getElementById("helpfulWheelDiv").style.display = "none";
+        activity.closeHelpfulWheel();
     }
 
     /**
@@ -303,11 +411,14 @@ class SearchUI {
         $helpfulSearch.autocomplete({
             source: (request, response) => {
                 const term = (request.term || "").toLowerCase().trim();
-                response(sourceFn(term));
+                response(this.wrapEmptySearchResults(term, sourceFn(term), request.term));
             },
             appendTo: "body",
             select: (event, ui) => {
                 event.preventDefault();
+                if (this.isEmptySearchResult(ui.item)) {
+                    return false;
+                }
                 activity.helpfulSearchWidget.value = ui.item.label;
                 activity.helpfulSearchWidget.idInput_custom = ui.item.value;
                 activity.helpfulSearchWidget.protoblk = ui.item.specialDict;
@@ -321,6 +432,9 @@ class SearchUI {
         const instance = $helpfulSearch.autocomplete("instance");
         if (instance) {
             instance._renderItem = (ul, item) => {
+                if (this.isEmptySearchResult(item)) {
+                    return this.renderEmptySearchItem($j, ul, item);
+                }
                 const li = $j("<li></li>");
                 const img = document.createElement("img");
                 img.src = item.artwork || "";
@@ -406,10 +520,7 @@ class SearchUI {
      * Hides the helpfulWheelDiv and removes helpfulSearchDiv from the DOM.
      */
     removeHelpfulSearchDiv() {
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
-        }
+        this.activity.closeHelpfulWheel();
         if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
             this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
             this.helpfulSearchDiv = null;
@@ -442,6 +553,10 @@ class SearchUI {
      * @returns {jQuery}
      */
     _renderMainItem($j, ul, item, dropCb) {
+        if (this.isEmptySearchResult(item)) {
+            return this.renderEmptySearchItem($j, ul, item);
+        }
+
         const li = $j("<li></li>");
 
         const img = document.createElement("img");
@@ -492,8 +607,8 @@ class SearchUI {
                 document.removeEventListener("mousemove", onMouseMove);
                 document.removeEventListener("touchmove", onMouseMove);
 
-                const x = parseInt(img.style.left);
-                const y = parseInt(img.style.top);
+                const x = parseInt(img.style.left, 10);
+                const y = parseInt(img.style.top, 10);
 
                 img.style.position = posit;
                 img.style.zIndex = zInd;

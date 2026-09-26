@@ -23,7 +23,7 @@
     EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
     getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
-   i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
+    i18nSolfege, INVERTMODES, isCustomTemperament, isEquallyTempered, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
@@ -32,8 +32,9 @@
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
-   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
+    updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
+   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
+   widgetWindows
  */
 
 /*
@@ -64,7 +65,8 @@
    - js/logo.js
    - js/piemenus.js
         piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
-        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
+        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes
+   - js/piemenu-block-context.js
         piemenuBlockContext
    - js/utils/platformstyle.js
         platformColor
@@ -91,127 +93,6 @@ const STRINGLEN = 9;
  * @type {number}
  */
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
-
-/**
- * List of block types that are collapsible inline.
- * @type {string[]}
- */
-const COLLAPSIBLES = [
-    "drum",
-    "start",
-    "action",
-    "temperament1",
-    "matrix",
-    "pitchdrummatrix",
-    "rhythmruler2",
-    "timbre",
-    "status",
-    "pitchstaircase",
-    "tempo",
-    "pitchslider",
-    "modewidget",
-    "newnote",
-    "musickeyboard",
-    "temperament",
-    "interval",
-    "osctime",
-    "definemode"
-];
-
-/**
- * List of block types that should not trigger any event.
- * @type {string[]}
- */
-const NOHIT = ["hidden", "hiddennoflow"];
-
-/**
- * List of blocks that behave like argument blocks even though they are not
- * strictly classified as arg/value blocks.
- * @type {string[]}
- */
-const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
-
-/**
- * List of special input types.
- * @type {string[]}
- */
-const SPECIALINPUTS = [
-    "text",
-    "number",
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "modename",
-    "chordname",
-    "drumname",
-    "effectsname",
-    "filtertype",
-    "oscillatortype",
-    "boolean",
-    "intervalname",
-    "invertmode",
-    "accidentalname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
-
-/**
- * List of block types whose names should be widened.
- * @type {string[]}
- */
-const WIDENAMES = [
-    "intervalname",
-    "accidentalname",
-    "drumname",
-    "effectsname",
-    "voicename",
-    "modename",
-    "chordname",
-    "temperamentname",
-    "noisename",
-    "outputtools"
-];
-
-/**
- * List of additional block types whose names should be widened.
- * @type {string[]}
- */
-const EXTRAWIDENAMES = [];
-
-/**
- * List of block types with pie menus.
- * @type {string[]}
- */
-const PIEMENUS = [
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "drumname",
-    "effectsname",
-    "accidentalname",
-    "invertmode",
-    "boolean",
-    "filtertype",
-    "oscillatortype",
-    "intervalname",
-    "modename",
-    "chordname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
 
 /**
  * Async function to create bitmap from SVG data.
@@ -281,6 +162,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
@@ -610,6 +492,38 @@ class Block {
         this.size = this.protoblock.size;
     }
 
+    hasCapability(name) {
+        if (this.protoblock && typeof this.protoblock.hasCapability === "function") {
+            return this.protoblock.hasCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return !!this.protoblock.capabilities[name];
+        }
+
+        return false;
+    }
+
+    getCapability(name) {
+        if (this.protoblock && typeof this.protoblock.getCapability === "function") {
+            return this.protoblock.getCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return this.protoblock.capabilities[name];
+        }
+
+        return undefined;
+    }
+
     /**
      * Retrieves information about the block.
      * @returns {string} - Information about the block.
@@ -623,7 +537,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
      */
     isCollapsible() {
-        return COLLAPSIBLES.includes(this.name);
+        return this.hasCapability("collapsible");
     }
 
     /**
@@ -631,7 +545,83 @@ class Block {
      * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
      */
     isInlineCollapsible() {
-        return INLINECOLLAPSIBLES.includes(this.name);
+        return this.hasCapability("inlineCollapsible");
+    }
+
+    /**
+     * Clean up and dispose of block resources to prevent memory leaks and circular references
+     * @public
+     * @returns {void}
+     */
+    dispose() {
+        if (
+            Array.isArray(this.connections) &&
+            this.blocks &&
+            Array.isArray(this.blocks.blockList)
+        ) {
+            const thisIdx = this.blockIndex;
+            for (let i = 0; i < this.connections.length; i++) {
+                const connId = this.connections[i];
+                if (connId !== null && connId !== undefined && this.blocks.blockList[connId]) {
+                    const connBlock = this.blocks.blockList[connId];
+                    if (Array.isArray(connBlock.connections)) {
+                        for (let j = 0; j < connBlock.connections.length; j++) {
+                            if (connBlock.connections[j] === thisIdx) {
+                                connBlock.connections[j] = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.connections = [];
+
+        if (this.label && this.label.parentNode) {
+            this.label.parentNode.removeChild(this.label);
+        }
+        if (this.labelattr && this.labelattr.parentNode) {
+            this.labelattr.parentNode.removeChild(this.labelattr);
+        }
+        this.label = null;
+        this.labelattr = null;
+
+        if (this.container) {
+            if (typeof this.container.removeAllEventListeners === "function") {
+                this.container.removeAllEventListeners();
+            }
+            if (typeof this.container.removeAllChildren === "function") {
+                this.container.removeAllChildren();
+            }
+            if (typeof this.container.uncache === "function") {
+                this.container.uncache();
+            }
+            if (this.container.parent && typeof this.container.parent.removeChild === "function") {
+                this.container.parent.removeChild(this.container);
+            }
+            this.container = null;
+        }
+
+        this.bitmap = null;
+        this.highlightBitmap = null;
+        this.disconnectedBitmap = null;
+        this.disconnectedHighlightBitmap = null;
+        this.collapseButtonBitmap = null;
+        this.expandButtonBitmap = null;
+        this.collapseBlockBitmap = null;
+        this.highlightCollapseBlockBitmap = null;
+        this.imageBitmap = null;
+
+        this.artwork = null;
+        this.collapseArtwork = null;
+        this.text = null;
+        this.value = null;
+        this.privateData = null;
+        this.postProcessArg = null;
+        this.controller = null;
+
+        this.protoblock = null;
+        this.blocks = null;
+        this.activity = null;
     }
 
     /**
@@ -659,7 +649,7 @@ class Block {
                 // block is hidden, so do nothing.
                 return;
             }
-        } else if (!this.bitmap.visible) {
+        } else if (this.bitmap === null || !this.bitmap.visible) {
             return;
         }
 
@@ -726,7 +716,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.updateCache();
+        }
     }
 
     /**
@@ -808,7 +800,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.updateCache();
+        }
     }
 
     unhighlightSelectedBlocks(blk, selection) {
@@ -817,7 +811,7 @@ class Block {
             if (!this.collapsed) {
                 this.disconnectedBitmap.visible = true;
             }
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
@@ -1374,14 +1368,14 @@ class Block {
             ) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt Sans") > TEXTWIDTH) {
-                    block_label = block_label.substr(0, STRINGLEN) + "...";
+                    block_label = block_label.slice(0, STRINGLEN) + "...";
                 }
             } else {
                 block_label = this.overrideName;
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
-            if (SPECIALINPUTS.includes(this.name)) {
+            if (this.hasValueDrivenLabel()) {
                 block_label = "";
             } else {
                 block_label = this.protoblock.staticLabels[0];
@@ -1439,7 +1433,7 @@ class Block {
         // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             if (this.value === null) {
                 switch (this.name) {
                     case "text":
@@ -1457,7 +1451,10 @@ class Block {
                             this.activity.logo.synth.startingPitch.substring(
                                 0,
                                 this.activity.logo.synth.startingPitch.length - 1
-                            ) + "(+0)";
+                            ) +
+                            "(+0" +
+                            CENTSSYMBOL +
+                            ")";
                         break;
                     case "notename":
                         this.value = "G";
@@ -1574,11 +1571,8 @@ class Block {
                 }
             }
 
-            if (
-                !WIDENAMES.includes(this.name) &&
-                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
-            ) {
-                label = label.substr(0, STRINGLEN) + "...";
+            if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                label = label.slice(0, STRINGLEN) + "...";
             }
 
             this.text.text = label;
@@ -1598,7 +1592,7 @@ class Block {
             }
 
             // this.activity.refreshCanvas();
-            this.blocks.cleanupAfterLoad(this.name);
+            this.blocks.cleanupAfterLoad(this._loadGeneration);
         } else {
             // Some blocks, e.g., Start blocks and Action blocks can
             // collapse, so add an event handler.
@@ -1658,7 +1652,7 @@ class Block {
             }
 
             that.activity.refreshCanvas();
-            that.blocks.cleanupAfterLoad(that.name);
+            that.blocks.cleanupAfterLoad(that._loadGeneration);
             if (that.trash) {
                 that.collapseText.visible = false;
                 that.collapseButtonBitmap.visible = false;
@@ -1783,13 +1777,6 @@ class Block {
                     case "pitchdrummatrix":
                         that.collapseText = new createjs.Text(
                             _("drum mapper"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "rhythmruler":
-                        that.collapseText = new createjs.Text(
-                            _("ruler"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
@@ -1952,6 +1939,9 @@ class Block {
      * @returns {void}
      */
     hide() {
+        if (!this.container) {
+            return;
+        }
         this.container.visible = false;
         if (this.isCollapsible()) {
             // Sometimes these fields are not set.
@@ -1984,8 +1974,8 @@ class Block {
             return false;
         }
 
-        if (COLLAPSIBLES.includes(this.name)) {
-            if (!INLINECOLLAPSIBLES.includes(this.name)) {
+        if (this.isCollapsible()) {
+            if (!this.isInlineCollapsible()) {
                 return false;
             }
         }
@@ -2014,8 +2004,9 @@ class Block {
      */
     show() {
         // If it is not in the trash and not in collapsed, then show it.
-        if (!this.trash && !this.inCollapsed) {
+        if (!this.trash && !this.inCollapsed && this.container) {
             this.container.visible = true;
+            this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     this.bitmap.visible = false;
@@ -2094,7 +2085,49 @@ class Block {
      * @returns {boolean} - True if the block is a no-hit block, false otherwise.
      */
     isNoHitBlock() {
-        return NOHIT.includes(this.name);
+        const noHitCapability = this.getCapability("noHit");
+        if (noHitCapability !== undefined) {
+            return !!noHitCapability;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the block is a note container.
+     * @returns {boolean} - True if the block is a note container, false otherwise.
+     */
+    isNoteContainer() {
+        const noteContainerCapability = this.getCapability("noteContainer");
+        if (noteContainerCapability !== undefined) {
+            return !!noteContainerCapability;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the block specifies a sound element (pitch, frequency, or drum).
+     * @returns {boolean} - True if the block has soundSpecifier capability.
+     */
+    isSoundSpecifier() {
+        return this.hasCapability("soundSpecifier");
+    }
+
+    /**
+     * Checks if the block derives its visible inline label from its value.
+     * @returns {boolean} - True if the block has value-driven label behavior.
+     */
+    hasValueDrivenLabel() {
+        return this.hasCapability("valueDrivenLabel");
+    }
+
+    /**
+     * Checks if the block should keep a wide (untruncated) value label layout.
+     * @returns {boolean} - True if the block has wideLabel capability.
+     */
+    hasWideLabel() {
+        return this.hasCapability("wideLabel");
     }
 
     /**
@@ -2113,7 +2146,7 @@ class Block {
      * @returns {boolean} - True if the block is argument-like, false otherwise.
      */
     isArgumentLikeBlock() {
-        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
+        return this.isArgBlock() || this.hasCapability("argumentLike");
     }
 
     /**
@@ -2256,11 +2289,14 @@ class Block {
     /**
      * Loads a thumbnail image onto the block.
      * @param {string} imagePath - The path to the image to load as a thumbnail.
+     * @param {object} [valueChangeReservation] - Reserved user-selection history entry.
      */
-    loadThumbnail(imagePath) {
+    loadThumbnail(imagePath, valueChangeReservation) {
         // Load an image thumbnail onto block.
         const thisBlock = this.blockIndex;
         const that = this;
+        this._thumbnailLoadGeneration = (this._thumbnailLoadGeneration || 0) + 1;
+        const loadGeneration = this._thumbnailLoadGeneration;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             return;
@@ -2268,8 +2304,9 @@ class Block {
         const image = new Image();
 
         image.onload = () => {
-            // Before adding new artwork, remove any old artwork.
-            that.removeChildBitmap("media");
+            if (loadGeneration !== that._thumbnailLoadGeneration) {
+                return;
+            }
 
             const bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
@@ -2291,11 +2328,11 @@ class Block {
             }
             // CRITICAL FIX: PRESERVE GIF
             const src = image.src || "";
+            let effectiveValue;
 
             if (src.startsWith("data:image/gif") || src.toLowerCase().endsWith(".gif")) {
                 // DO NOT cache GIF , keeps animation
-                that.value = src;
-                that.imageBitmap = bitmap;
+                effectiveValue = src;
             } else {
                 let bounds = myContainer.getBounds();
                 if (!bounds) {
@@ -2307,9 +2344,30 @@ class Block {
                     };
                 }
                 myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                that.value = myContainer.bitmapCache.getCacheDataURL();
-                that.imageBitmap = bitmap;
+                effectiveValue = myContainer.bitmapCache.getCacheDataURL();
             }
+
+            if (valueChangeReservation) {
+                if (!that._completeValueChange(valueChangeReservation, effectiveValue)) {
+                    if (loadGeneration === that._thumbnailLoadGeneration) {
+                        that.value = valueChangeReservation.action.oldValue;
+                    }
+                    return;
+                }
+            }
+
+            if (
+                valueChangeReservation &&
+                !that.blocks.actionHistory.includes(valueChangeReservation.action)
+            ) {
+                return;
+            }
+
+            // Before adding new artwork, remove any old artwork.
+            that.removeChildBitmap("media");
+            that.value = effectiveValue;
+            that.imageBitmap = bitmap;
+
             // Next, scale the bitmap for the thumbnail.
             that._positionMedia(
                 bitmap,
@@ -2320,11 +2378,124 @@ class Block {
             that.container.addChild(bitmap);
             that.updateCache();
         };
+        image.onerror = () => {
+            if (loadGeneration !== that._thumbnailLoadGeneration) {
+                return;
+            }
+
+            if (valueChangeReservation) {
+                that._cancelValueChange(valueChangeReservation);
+                that.value = valueChangeReservation.action.oldValue;
+            }
+        };
 
         if (imagePath === null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
+        }
+    }
+
+    /**
+     * Records one completed user value change.
+     * @param {*} oldValue - Value before the edit.
+     * @param {*} newValue - Value after the edit.
+     * @param {string|null} oldText - Displayed text before the edit.
+     * @param {string|null} newText - Displayed text after the edit.
+     */
+    _recordValueChange(oldValue, newValue, oldText = null, newText = null) {
+        const valuesMatch =
+            oldValue === newValue ||
+            (Array.isArray(oldValue) &&
+                Array.isArray(newValue) &&
+                oldValue.length === newValue.length &&
+                oldValue.every((value, index) => value === newValue[index]));
+
+        if (
+            valuesMatch ||
+            !this.blocks.actionHistory ||
+            this.blocks.isUndoingOrRedoing ||
+            this.blockIndex < 0
+        ) {
+            return;
+        }
+
+        this.blocks.actionHistory.push({
+            type: "value_change",
+            blockId: this.blockIndex,
+            oldValue,
+            newValue,
+            oldText,
+            newText
+        });
+        this.blocks.redoActionHistory = [];
+    }
+
+    /**
+     * Reserves a history position while an asynchronous user edit completes.
+     * @param {*} oldValue - Value before the edit.
+     * @param {*} newValue - Provisional value selected by the user.
+     * @returns {object|null} Reserved action and prior redo history.
+     */
+    _reserveValueChange(oldValue, newValue) {
+        if (!this.blocks.actionHistory || this.blocks.isUndoingOrRedoing || this.blockIndex < 0) {
+            return null;
+        }
+
+        const action = {
+            type: "value_change",
+            blockId: this.blockIndex,
+            oldValue,
+            newValue,
+            oldText: null,
+            newText: null
+        };
+        const reservation = {
+            action,
+            redoActionHistory: this.blocks.redoActionHistory
+        };
+        this.blocks.actionHistory.push(action);
+        this.blocks.redoActionHistory = [];
+        return reservation;
+    }
+
+    /**
+     * Completes a reserved value change.
+     * @param {object} reservation - Reservation returned by _reserveValueChange.
+     * @param {*} newValue - Effective value after asynchronous processing.
+     * @returns {boolean} Whether the effective value changed.
+     */
+    _completeValueChange(reservation, newValue) {
+        if (reservation.action.oldValue === newValue) {
+            this._cancelValueChange(reservation);
+            return false;
+        }
+
+        reservation.action.newValue = newValue;
+        return true;
+    }
+
+    /**
+     * Removes an unused reservation and restores redo history when still safe.
+     * @param {object} reservation - Reservation returned by _reserveValueChange.
+     */
+    _cancelValueChange(reservation) {
+        const actionIndex = this.blocks.actionHistory.indexOf(reservation.action);
+        if (actionIndex === -1) {
+            const redoIndex = this.blocks.redoActionHistory.indexOf(reservation.action);
+            if (redoIndex !== -1) {
+                this.blocks.redoActionHistory.splice(redoIndex, 1);
+                if (this.blocks.redoActionHistory.length === 0) {
+                    this.blocks.redoActionHistory = reservation.redoActionHistory;
+                }
+            }
+            return;
+        }
+
+        const wasLatestAction = actionIndex === this.blocks.actionHistory.length - 1;
+        this.blocks.actionHistory.splice(actionIndex, 1);
+        if (wasLatestAction && this.blocks.redoActionHistory.length === 0) {
+            this.blocks.redoActionHistory = reservation.redoActionHistory;
         }
     }
 
@@ -2349,8 +2520,10 @@ class Block {
             openSvgAssetSelector(
                 // Callback when a built-in image is selected
                 function (dataURL) {
+                    const oldValue = that.value;
+                    const reservation = that._reserveValueChange(oldValue, dataURL);
                     that.value = dataURL;
-                    that.loadThumbnail(null);
+                    that.loadThumbnail(null, reservation);
                 },
                 // Callback when the user chooses to upload from device
                 function () {
@@ -2380,12 +2553,17 @@ class Block {
             reader.onloadend = () => {
                 if (reader.result) {
                     if (that.name === "media") {
+                        const oldValue = that.value;
+                        const reservation = that._reserveValueChange(oldValue, reader.result);
                         that.value = reader.result;
-                        that.loadThumbnail(null);
+                        that.loadThumbnail(null, reservation);
                         fileChooser.value = "";
                         return;
                     }
-                    that.value = [fileChooser.files[0].name, reader.result];
+                    const oldValue = that.value;
+                    const newValue = [fileChooser.files[0].name, reader.result];
+                    that.value = newValue;
+                    that._recordValueChange(oldValue, newValue);
                     that.blocks.updateBlockText(thisBlock);
                     fileChooser.value = "";
                 }
@@ -2493,7 +2671,7 @@ class Block {
             if (this.connections[1] !== null) {
                 let text = this.blocks.blockList[this.connections[1]].value;
                 if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
-                    text = text.substr(0, STRINGLEN) + "...";
+                    text = text.slice(0, STRINGLEN) + "...";
                 }
 
                 this.collapseText.text = text;
@@ -2971,12 +3149,10 @@ class Block {
         this.text.y = Math.floor((TEXTY * blockScale) / 2 + 0.5);
 
         // Some special cases
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             this.text.textAlign = "center";
             this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
-            if (EXTRAWIDENAMES.includes(this.name)) {
-                this.text.x *= 3.0;
-            } else if (WIDENAMES.includes(this.name)) {
+            if (this.hasWideLabel()) {
                 this.text.x = Math.floor(this.text.x * 1.75 + 0.5);
             } else if (this.name === "text") {
                 this.text.x = Math.floor(this.width / 2 + 0.5);
@@ -3098,18 +3274,14 @@ class Block {
         // This avoids redundant O(N) findDragGroup and O(D) rest2 chain walks
         // on every mouse move event (which fires 60+ times per second).
         let _dragHasRest2 = false;
+        let _dragSpatialGridDirty = false;
 
         /**
          * Handles the click event on the block container.
          * @param {Event} event - The click event.
          */
         this.container.on("click", event => {
-            if (
-                _getStatic("helpfulWheelDiv") &&
-                _getStatic("helpfulWheelDiv").style.display !== "none"
-            ) {
-                _getStatic("helpfulWheelDiv").style.display = "none";
-            }
+            that.activity.closeHelpfulWheel();
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
@@ -3123,14 +3295,17 @@ class Block {
                     piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
+                    const topBlock = that.blocks.findTopBlock(thisBlock);
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
                         setTimeout(() => {
                             that.activity.logo.runLogoCommands(topBlock);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }, 250);
                     } else {
                         that.activity.logo.runLogoCommands(topBlock);
+                        that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     }
 
                     return;
@@ -3164,7 +3339,7 @@ class Block {
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
-                } else if (SPECIALINPUTS.includes(that.name)) {
+                } else if (that.hasValueDrivenLabel()) {
                     if (!that.trash) {
                         if (that._triggerLongPress) {
                             that._triggerLongPress = false;
@@ -3184,9 +3359,11 @@ class Block {
 
                             setTimeout(() => {
                                 that.activity.logo.runLogoCommands(topBlk);
+                                that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                             }, 250);
                         } else {
                             that.activity.logo.runLogoCommands(topBlk);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }
                     }
                 }
@@ -3202,9 +3379,11 @@ class Block {
 
                         setTimeout(() => {
                             that.activity.logo.runLogoCommands(topBlk);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }, 250);
                     } else {
                         that.activity.logo.runLogoCommands(topBlk);
+                        that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     }
                 }
             }
@@ -3220,9 +3399,14 @@ class Block {
             // Reset any stale hover-scaling state from prior drags.
             this._trashHoverGroupState = null;
             this._dragPointerDown = true;
+            _dragSpatialGridDirty = false;
 
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
+
+            // Record original coordinates for undoing positional changes
+            that.blocks.dragStartX = that.container.x;
+            that.blocks.dragStartY = that.container.y;
 
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
@@ -3278,6 +3462,13 @@ class Block {
             // Cache the drag group once on mousedown instead of
             // recomputing the tree traversal on every pressmove.
             that.blocks.cacheDragGroup(thisBlock);
+            // Track the drag group for viewport culling exemption during drag,
+            // so off-screen stack siblings remain visible while being dragged
+            // into view (avoids "pop-in" on release).
+            const group = that.blocks._cachedDragGroup;
+            if (group && group.length > 0) {
+                that.blocks._dragActiveGroup = new Set(group);
+            }
             // Invalidate the top-block cache since a drag may
             // disconnect blocks, changing the topology.
             that.blocks.invalidateTopBlockCache();
@@ -3337,6 +3528,14 @@ class Block {
                 );
                 if (movedDx + movedDy > 5) {
                     moved = true;
+                    // Announce block drag to screen readers (screen reader only, no visual message)
+                    if (!that._announced) {
+                        that._announced = true;
+                        const blockLabel =
+                            (that.protoblock.staticLabels && that.protoblock.staticLabels[0]) ||
+                            that.name;
+                        announceToScreenReader(_("picked up") + " " + blockLabel);
+                    }
                 }
             } else {
                 // Make it easier to select text on mobile.
@@ -3399,7 +3598,8 @@ class Block {
             }
 
             // Move the dragged block itself (batched — no checkBounds).
-            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy, true);
+            _dragSpatialGridDirty ||= dx !== 0 || dy !== 0;
 
             // If we are over the trash, warn the user.
             const overTrash = that.activity.trashcan.overTrashcan(
@@ -3411,6 +3611,29 @@ class Block {
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
+
+            // Visual dock snap indicator (throttled to ~60fps).
+            // 16ms corresponds to one frame at ~60fps (1000ms / 60 ≈ 16.6ms), preventing
+            // expensive spatial dock candidate scans on every high-frequency pointer move event.
+            const SNAP_CHECK_INTERVAL_MS = 16;
+            if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
+                if (
+                    !that.blocks._lastSnapCheckTime ||
+                    now - that.blocks._lastSnapCheckTime >= SNAP_CHECK_INTERVAL_MS
+                ) {
+                    that.blocks._lastSnapCheckTime = now;
+                    const candidate = that.blocks.findDockCandidate(thisBlock);
+                    if (candidate && typeof that.blocks.showSnapIndicator === "function") {
+                        that.blocks.showSnapIndicator(candidate);
+                    } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                        that.blocks.hideSnapIndicator();
+                    }
+                }
+            } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks._lastSnapCheckTime = 0;
+                that.blocks.hideSnapIndicator();
+            }
+
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3423,7 +3646,7 @@ class Block {
                 for (let b = 0; b < cachedGroup.length; b++) {
                     const blk = cachedGroup[b];
                     if (blk !== thisBlock) {
-                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                     }
                 }
             } else {
@@ -3433,7 +3656,7 @@ class Block {
                     for (let b = 0; b < that.blocks.dragGroup.length; b++) {
                         const blk = that.blocks.dragGroup[b];
                         if (b !== 0) {
-                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                         }
                     }
                 }
@@ -3462,6 +3685,10 @@ class Block {
                 }
                 that.blocks.clearLongPress();
                 return;
+            }
+
+            if (!that.blocks.isBlockMoving && typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
             }
 
             if (!that.blocks.getLongPressStatus()) {
@@ -3493,9 +3720,14 @@ class Block {
          */
         this.container.on("pressup", event => {
             that._dragPointerDown = false;
+            that.blocks._lastSnapCheckTime = 0;
+
+            if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
 
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false, true);
+                that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3510,32 +3742,9 @@ class Block {
 
             // Clear cached drag state.
             _dragHasRest2 = false;
+            _dragSpatialGridDirty = false;
             moved = false;
-        });
-        // Touch long-press to open context menu
-        this.container.on("touchstart", () => {
-            that.blocks.mouseDownTime = new Date().getTime();
-            that.blocks.longPressTimeout = setTimeout(() => {
-                that.blocks.activeBlock = thisBlock;
-                that._triggerLongPress = true;
-                that.blocks.triggerLongPress();
-            }, LONGPRESSTIME);
-        });
-
-        this.container.on("touchmove", () => {
-            if (that.blocks.longPressTimeout !== null) {
-                clearTimeout(that.blocks.longPressTimeout);
-                that.blocks.longPressTimeout = null;
-                that.blocks.clearLongPress();
-            }
-        });
-
-        this.container.on("touchend", () => {
-            if (that.blocks.longPressTimeout !== null) {
-                clearTimeout(that.blocks.longPressTimeout);
-                that.blocks.longPressTimeout = null;
-                that.blocks.clearLongPress();
-            }
+            that._announced = false;
         });
     }
 
@@ -3547,10 +3756,18 @@ class Block {
      * @param {boolean} haveClick - Indicates if a click event occurred.
      * @param {boolean} hideDOM - Indicates whether to hide DOM elements.
      * @param {boolean} dragEnded - Indicates whether this callback is from drag release.
+     * @param {boolean} spatialGridDirty - Indicates whether grid reconciliation was deferred.
      * Sets cursor style to default.
      * @returns {void}
      */
-    _mouseoutCallback(event, moved, haveClick, hideDOM, dragEnded = false) {
+    _mouseoutCallback(
+        event,
+        moved,
+        haveClick,
+        hideDOM,
+        dragEnded = false,
+        spatialGridDirty = false
+    ) {
         const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
@@ -3559,6 +3776,10 @@ class Block {
         // Restore drag scaling only when drag interaction actually ends.
         if (dragEnded) {
             this._setDragGroupTrashHoverScale(false, 0, 0, true);
+        }
+
+        if (spatialGridDirty) {
+            this.blocks.syncDragGroupSpatialGrid();
         }
 
         // Always hide the trash when there is no block selected.
@@ -3580,15 +3801,13 @@ class Block {
                     event.stageY / this.activity.getStageScale()
                 )
             ) {
-                if (this.activity.trashcan.isVisible) {
-                    this.blocks.sendStackToTrash(this);
-                    this.activity.textMsg(
-                        _(
-                            "You can restore deleted blocks from the trash with the Restore From Trash button."
-                        ),
-                        3000
-                    );
-                }
+                this.blocks.sendStackToTrash(this);
+                this.activity.textMsg(
+                    _(
+                        "You can restore deleted blocks from the trash with the Restore From Trash button."
+                    ),
+                    3000
+                );
             } else {
                 // Otherwise, process move.
                 // Also, keep track of the time of the last move.
@@ -3600,7 +3819,7 @@ class Block {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blockIndex, true);
             }
-        } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
+        } else if (this.hasValueDrivenLabel() || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
@@ -3651,7 +3870,7 @@ class Block {
         this._check_meter_block = null;
 
         // Special pie menus
-        if (PIEMENUS.includes(this.name)) {
+        if (this.hasCapability("discreteChoice")) {
             return true;
         }
 
@@ -3699,13 +3918,11 @@ class Block {
      * @returns {boolean} - Indicates whether a pie menu should be used.
      */
     _usePieNumberC1() {
-        // Return true if this number block plugs into Connection 1 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC1 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3724,13 +3941,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 2 of a pie menu block, false otherwise.
      */
     _usePieNumberC2() {
-        // Return true if this number block plugs into Connection 2 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC2 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3749,13 +3964,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 3 of a pie menu block, false otherwise.
      */
     _usePieNumberC3() {
-        // Return true if this number block plugs into Connection 3 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC3 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3815,6 +4028,8 @@ class Block {
      */
     _changeLabel() {
         const that = this;
+        this._capturedInitialValue = this.value;
+        this._capturedInitialText = this.text ? this.text.text : null;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -3933,16 +4148,13 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i])) {
+                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
                         customLabels.push(keys[i]);
-                    }
                 }
+                if (!customLabels.length) return;
                 let selectedCustom;
-                if (this.customID !== null) {
-                    selectedCustom = this.customID;
-                } else {
-                    selectedCustom = customLabels[0];
-                }
+                if (this.customID !== null) selectedCustom = this.customID;
+                else selectedCustom = customLabels[0];
 
                 if (this.value !== null) {
                     selectedNote = this.value;
@@ -4063,7 +4275,7 @@ class Block {
                 if (!EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "bold 30pt Sans") > 400) {
-                        drumLabels.push(label.substr(0, 8) + "...");
+                        drumLabels.push(label.slice(0, 8) + "...");
                     } else {
                         drumLabels.push(label);
                     }
@@ -4094,7 +4306,7 @@ class Block {
                 if (EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "Bold 30pt Sans") > 400) {
-                        effectLabels.push(label.substr(0, 8) + "...");
+                        effectLabels.push(label.slice(0, 8) + "...");
                     } else {
                         effectLabels.push(label);
                     }
@@ -4165,7 +4377,7 @@ class Block {
 
                 const label = _(VOICENAMES[i][1]);
                 if (getTextWidth(label, "bold 30pt Sans") > 400) {
-                    voiceLabels.push(label.substr(0, 8) + "...");
+                    voiceLabels.push(label.slice(0, 8) + "...");
                 } else {
                     voiceLabels.push(label);
                 }
@@ -4194,7 +4406,7 @@ class Block {
             for (let i = 0; i < NOISENAMES.length; i++) {
                 const label = NOISENAMES[i][0];
                 if (getTextWidth(label, "bold 30pt Sans") > 600) {
-                    noiseLabels.push(label.substr(0, 16) + "...");
+                    noiseLabels.push(label.slice(0, 16) + "...");
                 } else {
                     noiseLabels.push(label);
                 }
@@ -4531,7 +4743,7 @@ class Block {
              * @returns {void}
              */
             let __keypress = event => {
-                if ([13, 10, 9].includes(event.keyCode)) {
+                if (["Enter", "Tab"].includes(event.key)) {
                     __blur(event);
                 }
             };
@@ -4581,10 +4793,11 @@ class Block {
      * @returns {void}
      */
     _exitKeyPressed(event) {
-        if ([13, 10, 9].includes(event.keyCode)) {
+        if (["Enter", "Tab"].includes(event.key)) {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
+            docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
 
@@ -4594,6 +4807,14 @@ class Block {
      * @returns {boolean} - True if pie menu is okay to launch, false otherwise.
      */
     piemenuOKtoLaunch() {
+        // The drawing libraries are fetched in the background once the app is
+        // up (see loadPieMenuLibs in loader.js). Declining here for the short
+        // window before they land keeps an early click harmless: this method
+        // already exists to say "not right now".
+        if (typeof wheelnav === "undefined" || typeof Raphael === "undefined") {
+            return false;
+        }
+
         if (this._piemenuExitTime === null) {
             return true;
         }
@@ -4602,44 +4823,28 @@ class Block {
     }
 
     /**
-     * Checks and reinitializes widget windows if their labels are changed.
-     * @param {boolean} closeInput - Flag indicating whether to close input.
+     * Reinitialize an open widget when a block in its stack changes.
+     * Uses widgetWindows.REINIT_WIDGET_TITLES; only locks after a real
+     * title/staticLabels match so unrelated open widgets cannot block.
+     * @param {boolean} closeInput - Skip when true.
      */
     _checkWidgets(closeInput) {
-        // Detect if label is changed, then reinit widget windows
-        // if they are open.
         const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
         if (closeInput === false) {
+            const topProto = this.blocks.blockList[topBlock].protoblock;
+            const topLabel =
+                topProto && topProto.staticLabels ? topProto.staticLabels[0] : undefined;
             for (let i = 0; i < widgetTitle.length; i++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[i].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "lego bricks":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "mode":
-                        case "timbre":
-                            lockInit = true;
-                            if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[i].innerHTML
-                            ) {
-                                this.blocks.reInitWidget(topBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[i].textContent;
+                if (widgetWindows.isReinitWidgetTitle(title) && topLabel === title) {
+                    lockInit = true;
+                    this.blocks.reInitWidget(topBlock, 1500);
                 }
             }
         }
@@ -4663,12 +4868,22 @@ class Block {
 
         this._labelLock = true;
 
+        const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
+        const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
+        const oldText = hasInitialValue
+            ? this._capturedInitialText
+            : this.text
+              ? this.text.text
+              : null;
+        const commitLabelEdit = closeInput || notPieMenu === false;
+
         if (closeInput) {
             this.label.style.display = "none";
             if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
+            delete this._capturedInitialValue;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -4676,7 +4891,6 @@ class Block {
             docById("wheelDiv").style.display = "none";
         }
 
-        const oldValue = this.value;
         let newValue = this.label.value;
 
         if (this.labelattr !== null) {
@@ -4698,7 +4912,17 @@ class Block {
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            if (this.name !== "text" || c === null || this.blocks.blockList[c].name !== "storein") {
+
+            const isText = this.name === "text";
+            const parentBlock = c !== null ? this.blocks.blockList[c] : null;
+            const parentName = parentBlock ? parentBlock.name : "";
+            const requiresUpdate = isText && (parentName === "storein" || parentName === "action");
+
+            if (!requiresUpdate) {
+                if (commitLabelEdit) {
+                    delete this._capturedInitialValue;
+                    delete this._capturedInitialText;
+                }
                 return;
             }
         }
@@ -4709,20 +4933,25 @@ class Block {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    this.blocks.palettes.removeActionPrototype(oldValue);
-
-                    // Ensure new name is unique.
-                    uniqueValue = this.blocks.findUniqueActionName(newValue);
-                    if (uniqueValue !== newValue) {
-                        newValue = uniqueValue;
-                        this.value = newValue;
-                        let label = this.value.toString();
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged) {
+                            this.blocks.palettes.removeActionPrototype(oldValue);
                         }
-                        this.text.text = label;
-                        this.label.value = newValue;
-                        this.updateCache();
+
+                        // Ensure new name is unique.
+                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                        if (validatedName !== newValue) {
+                            newValue = validatedName;
+                            this.value = newValue;
+                            let label = this.value.toString();
+                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                label = label.slice(0, STRINGLEN) + "...";
+                            }
+                            this.text.text = label;
+                            this.label.value = newValue;
+                            this.updateCache();
+                        }
                     }
                     break;
                 case "pitch":
@@ -4750,7 +4979,7 @@ class Block {
                     // eslint-disable-next-line no-case-declarations
                     let label = this.value.toString();
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                        label = label.substr(0, STRINGLEN) + "...";
+                        label = label.slice(0, STRINGLEN) + "...";
                     }
                     this.text.text = label;
                     this.label.value = newValue;
@@ -4842,12 +5071,12 @@ class Block {
             label = _(this.value.toString());
         }
 
-        if (!WIDENAMES.includes(this.name) && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+        if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
             let slen = label.length - 5;
-            let nlabel = "" + label.substr(0, slen) + "...";
+            let nlabel = "" + label.slice(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
                 slen -= 1;
-                nlabel = "" + label.substr(0, slen) + "...";
+                nlabel = "" + label.slice(0, slen) + "...";
                 // const foo = getTextWidth(nlabel, "bold 20pt Sans");
                 if (slen <= STRINGLEN) {
                     break;
@@ -4873,42 +5102,55 @@ class Block {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
-                    // If the label was the name of an action, update the
-                    // associated run this.blocks and the palette buttons
-                    // Rename both do <- name and nameddo blocks.
-                    this.blocks.renameDos(oldValue, newValue);
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged && closeInput) {
+                            this.blocks.renameDos(oldValue, newValue);
 
-                    // eslint-disable-next-line no-case-declarations
-                    const metadata = this.blocks.actionMetadata(c);
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
+                            const metadata = this.blocks.actionMetadata(c);
+                            const isDefaultAction =
+                                oldValue === _("action") || oldValue === "action";
 
-                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                    // eslint-disable-next-line no-case-declarations
-                    const blockPalette = this.blocks.palettes.dict["action"];
-                    for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
-                        const block = blockPalette.protoList[blk];
-                        if (oldValue === _("action") || oldValue === "action") {
-                            if (block.name === "nameddo" && block.defaults.length === 0) {
-                                block.hidden = true;
+                            this.blocks.newNameddoBlock(
+                                newValue,
+                                metadata.hasReturn,
+                                metadata.hasArgs
+                            );
+
+                            if (isDefaultAction) {
+                                this.blocks.setActionProtoVisibility(false);
                             }
-                        } else {
-                            if (block.name === "nameddo" && block.defaults[0] === oldValue) {
-                                blockPalette.remove(block, oldValue);
+
+                            const blockPalette = this.blocks.palettes.dict["action"];
+                            for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
+                                const block = blockPalette.protoList[blk];
+                                if (isDefaultAction) {
+                                    if (block.name === "nameddo" && block.defaults.length === 0) {
+                                        block.hidden = true;
+                                    }
+                                } else {
+                                    if (
+                                        block.name === "nameddo" &&
+                                        block.defaults[0] === oldValue
+                                    ) {
+                                        blockPalette.remove(block, oldValue);
+                                    }
+                                }
                             }
+
+                            this.blocks.renameNameddos(oldValue, newValue);
+                            this.blocks.palettes.hide();
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.show();
+                            this.activity.refreshCanvas();
+                        }
+                        // Force-open the action palette so the newly created
+                        // action block is immediately visible to the user.
+                        if (closeInput) {
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.showPalette("action");
                         }
                     }
-
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
-                    this.blocks.renameNameddos(oldValue, newValue);
-                    this.blocks.palettes.hide();
-                    this.blocks.palettes.updatePalettes("action");
-                    this.blocks.palettes.show();
                     break;
                 case "storein":
                     // Check to see which connection we are using in
@@ -4958,6 +5200,17 @@ class Block {
         // Load the synth for the selected drum.
         if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+        }
+
+        if (commitLabelEdit) {
+            this._recordValueChange(
+                oldValue,
+                this.value,
+                oldText,
+                this.text ? this.text.text : null
+            );
+            delete this._capturedInitialValue;
+            delete this._capturedInitialText;
         }
     }
 }

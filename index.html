@@ -18,15 +18,8 @@
         <link rel="manifest" href="android_chrome_manifest.json" />
 
         <!-- Stylesheets -->
-        <link
-            rel="preload"
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
+        <link rel="stylesheet" href="css/tokens.css?v=fixed" />
+        <link rel="stylesheet" href="css/themes.css?v=fixed" />
         <link
             rel="preload"
             href="fonts/material-icons.css"
@@ -108,7 +101,10 @@
 
         <!-- <script src="sounds/samples/manifest.js"></script> -->
 
-        <!-- <script src="lib/mespeak.js"></script> -->
+        <!-- Release config: resolves Turtle/Music mode from URL/hostname and seeds
+     window._THIS_IS_*_ globals. Must load first, synchronously, before
+     loader.js and activity.js read those globals. -->
+        <script src="js/releaseconfig.js"></script>
 
         <script src="dist/vendor.min.js"></script>
         <link
@@ -126,16 +122,17 @@
                 href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
         /></noscript>
         <script src="js/utils/jquery-setup.js" defer></script>
+        <script src="js/utils/abcLoader.js" defer></script>
         <script src="lib/midi.js" defer></script>
-        <script src="lib/jquery.ruler.js" defer></script>
-        <script src="lib/modernizr-2.6.2.min.js" defer></script>
-        <script src="lib/raphael.min.js" defer></script>
-        <script src="lib/wheelnav.js" defer></script>
+        <!-- raphael and wheelnav are loaded from loader.js once the app is up,
+             not here. They are only used to draw the pie menus, which need a
+             block interaction to exist, and as defer scripts they had to run
+             before DOMContentLoaded and so before anything could be painted. -->
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
             rel="preload"
-            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
@@ -147,7 +144,7 @@
         <noscript
             ><link
                 rel="stylesheet"
-                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+                href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
                 integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
                 crossorigin="anonymous"
         /></noscript>
@@ -168,61 +165,41 @@
         </script>
         <script src="lib/astring.min.js" defer></script>
         <script src="lib/purify.min.js" defer></script>
+        <script src="js/utils/sessionManager.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
         <script src="env.js" defer></script>
+        <script src="js/utils/language-utils.js" defer></script>
 
         <script data-main="js/loader" src="lib/require.js" defer></script>
         <link
             rel="preload"
-            href="/fonts/material-icons.woff2"
+            href="fonts/material-icons.woff2"
             as="font"
             type="font/woff2"
             crossorigin="anonymous"
         />
-        <link
-            rel="preload"
-            href="css/tokens.css?v=fixed"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <noscript><link rel="stylesheet" href="css/tokens.css?v=fixed" /></noscript>
-        <link
-            rel="preload"
-            href="css/themes.css?v=fixed"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
+        <script src="js/js-export/ast2blocks.config.js"></script>
         <script>
-            let ast2blocklist_config;
             window.ast2blocklist_config_failed = false;
-            window.ast2blocklist_config_ready = fetch("js/js-export/ast2blocks.min.json")
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to load AST block config: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    ast2blocklist_config = data;
-                    return data;
-                })
-                .catch(() => {
-                    window.ast2blocklist_config_failed = true;
-                    return null;
-                });
+            window.ast2blocklist_config_ready = window.ast2blocklist_config
+                ? Promise.resolve(window.ast2blocklist_config)
+                : new Promise((resolve, reject) => {
+                      const script = document.createElement("script");
+                      script.src = "js/js-export/ast2blocks.config.js";
+                      script.defer = true;
+                      script.onload = () => resolve(window.ast2blocklist_config);
+                      script.onerror = () => {
+                          window.ast2blocklist_config_failed = true;
+                          reject(new Error("ast2blocks.config.js failed to load"));
+                      };
+                      document.head.appendChild(script);
+                  });
         </script>
     </head>
 
-    <body id="body" data-title="index" style="background: #f9f9f9">
+    <body id="body" data-title="index">
         <!-- Fallback for browsers that don't support preload -->
         <noscript> JavaScript is required to view this page. </noscript>
         <header>
@@ -283,29 +260,36 @@
             <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hidePrintText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close notification"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hideErrorText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close error message"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div id="hideContents" style="display: none" tabindex="-1">
                 <div class="canvasHolder" id="canvasHolder">
                     <div
                         id="clear-modal-container"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Clear workspace confirmation"
                         style="
                             display: none;
                             z-index: 999;
@@ -399,6 +383,13 @@
                             tabindex="-1"
                         />
                         <input class="file" type="file" id="myOpenAll" tabindex="-1" />
+                        <input
+                            class="file"
+                            type="file"
+                            id="myModeSclFile"
+                            accept=".scl,.json"
+                            tabindex="-1"
+                        />
                     </div>
                 </div>
                 <!-- canvasHolder -->
@@ -414,6 +405,7 @@
                     <iframe
                         src="planet/index.html"
                         id="planet-iframe"
+                        title="Music Blocks Planet — save, load, and share projects"
                         style="display: none"
                     ></iframe>
 
@@ -481,7 +473,6 @@
                             tabindex="-1"
                         />
                         <ul class="matches"></ul>
-                        <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
                     <div id="myProgress" tabindex="-1">
@@ -489,7 +480,14 @@
                     </div>
                 </footer>
 
-                <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <dialog
+                    id="lilypondModal"
+                    class="modal"
+                    tabindex="-1"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Save LilyPond score"
+                >
                     <!-- Modal content for Lilypond save dialog -->
                     <div class="modal-content" tabindex="-1">
                         <span class="close">&times;</span>
@@ -549,7 +547,13 @@
                                         data-tooltip="Record"
                                         role="button"
                                         tabindex="0"
-                                    ></a>
+                                        aria-label="Record"
+                                        ><i class="material-icons main ring" aria-hidden="true"
+                                            >radio_button_unchecked</i
+                                        ><i class="material-icons main dot" aria-hidden="true"
+                                            >fiber_manual_record</i
+                                        ></a
+                                    >
                                     <a
                                         id="recordDropdownArrow"
                                         class="left dropdown-trigger"
@@ -827,14 +831,6 @@
                                             ><i class="material-icons md-48">code</i></a
                                         >
                                     </li>
-                                    <li
-                                        class="filler"
-                                        id="aligns_merge_under_load"
-                                        style="user-select: none; visibility: hidden"
-                                    >
-                                        <a style="color: transparent">space&nbsp;&nbsp;&nbsp;</a>
-                                    </li>
-
                                     <li>
                                         <a
                                             id="restoreIcon"
@@ -931,16 +927,21 @@
                         <li><a id="enUK" role="button" tabindex="0"></a></li>
                         <li><a id="es" role="button" tabindex="0"></a></li>
                         <li><a id="pt" role="button" tabindex="0"></a></li>
+                        <li><a id="fr" role="button" tabindex="0"></a></li>
+                        <li><a id="it" role="button" tabindex="0"></a></li>
+                        <li><a id="de" role="button" tabindex="0"></a></li>
                         <li><a id="ja" role="button" tabindex="0"></a></li>
                         <li><a id="kana" role="button" tabindex="0"></a></li>
                         <li><a id="ko" role="button" tabindex="0"></a></li>
                         <li><a id="zhCN" role="button" tabindex="0"></a></li>
                         <li><a id="th" role="button" tabindex="0"></a></li>
                         <li><a id="tr" role="button" tabindex="0"></a></li>
+                        <li><a id="az" role="button" tabindex="0"></a></li>
                         <li><a id="ayc" role="button" tabindex="0"></a></li>
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>
                         <li><a id="hi" role="button" tabindex="0"></a></li>
+                        <li><a id="ta" role="button" tabindex="0"></a></li>
                         <li><a id="te" role="button" tabindex="0"></a></li>
                         <li><a id="ibo" role="button" tabindex="0"></a></li>
                         <li><a id="ar" role="button" tabindex="0"></a></li>
@@ -1111,7 +1112,6 @@
         <!-- Loading Dialog Script -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                window._ = window._ || (x => x);
                 const readStorage = key => {
                     try {
                         return localStorage.getItem(key);
@@ -1143,31 +1143,57 @@
                     }
 
                     const container = document.getElementById("loading-media");
-                    const content = lang.startsWith("ja")
-                        ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
-                        : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+                    let content;
+                    if (typeof THIS_IS_TURTLE_BLOCKS !== "undefined" && THIS_IS_TURTLE_BLOCKS) {
+                        const splashSrc =
+                            typeof getSplashScreenSrc === "function"
+                                ? getSplashScreenSrc(true)
+                                : "images/logo.svg";
+                        content = `<img src="${splashSrc}" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Turtle Blocks animation">`;
+                    } else if (lang.startsWith("ja")) {
+                        content = `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`;
+                    } else {
+                        content = `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
                        </video>`;
+                    }
                     container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
                 };
 
                 loadL10nSplashScreen();
 
+                requirejs(["utils/utils"], function (_) {
                 setTimeout(function () {
                     const loadingText = document.getElementById("loadingText");
-                    const texts = [
-                        _("Do, Re, Mi, Fa, Sol, La, Ti, Do"),
-                        _("Loading Music Blocks..."),
-                        _("Reading Music...")
-                    ];
+                    const rawTexts =
+                        typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
+                            ? LOADING_TEXTS
+                            : [
+                                  "Do, Re, Mi, Fa, Sol, La, Ti, Do",
+                                  "Loading Music Blocks...",
+                                  "Reading Music..."
+                              ];
                     let index = 0;
 
+                    const getTranslatedText = function (text) {
+                        if (
+                            typeof window !== "undefined" &&
+                            window.i18next &&
+                            window.i18next.isInitialized &&
+                            typeof _ === "function"
+                        ) {
+                            return _(text);
+                        }
+                        return text;
+                    };
+
                     window.intervalId = setInterval(function () {
-                        loadingText.textContent = texts[index];
-                        index = (index + 1) % texts.length;
+                        loadingText.textContent = getTranslatedText(rawTexts[index]);
+                        index = (index + 1) % rawTexts.length;
                     }, 1500);
                 }, 3000);
+            });
 
                 const languageDropdown = document.getElementById("languagedropdown");
                 if (languageDropdown) {
@@ -1351,7 +1377,7 @@
                     if (!persistentNotification) {
                         persistentNotification = document.createElement("div");
                         persistentNotification.id = "persistentNotification";
-                        persistentNotification.innerHTML =
+                        persistentNotification.textContent =
                             "Play only mode enabled. For full Music Blocks experience, use a larger display.";
                         document.body.appendChild(persistentNotification);
                     }

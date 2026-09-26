@@ -139,6 +139,23 @@ function createOscilloscope(turtles = []) {
     return new Oscilloscope(activity);
 }
 
+/**
+ * Creates a mock canvas context for _renderFrame tests.
+ * @returns {Object} Mock 2D context.
+ */
+function makeCtx() {
+    return {
+        fillRect: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        stroke: jest.fn(),
+        fillStyle: "",
+        strokeStyle: "",
+        lineWidth: 1
+    };
+}
+
 describe("Oscilloscope", () => {
     describe("constructor setup", () => {
         test("sets activity reference", () => {
@@ -202,10 +219,10 @@ describe("Oscilloscope", () => {
             expect(osc.widgetWindow).toBe(mockWidgetWindow);
         });
 
-        test("adds two zoom buttons", () => {
+        test("adds three buttons (zoom in, zoom out, freeze)", () => {
             createOscilloscope();
 
-            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(2);
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(3);
         });
 
         test("calls sendToCenter", () => {
@@ -305,8 +322,19 @@ describe("Oscilloscope", () => {
 
             osc._stopAnimation();
 
-            // cancelAnimationFrame should not have been called at all
             expect(cancelAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("cancels _timeoutId when set", () => {
+            const osc = createOscilloscope();
+            osc._timeoutId = 555;
+            const clearSpy = jest.spyOn(global, "clearTimeout");
+
+            osc._stopAnimation();
+
+            expect(clearSpy).toHaveBeenCalledWith(555);
+            expect(osc._timeoutId).toBeNull();
+            clearSpy.mockRestore();
         });
 
         test("cancels per-turtle drawVisualIDs", () => {
@@ -365,6 +393,29 @@ describe("Oscilloscope", () => {
         });
     });
 
+    describe("_scale", () => {
+        test("removes all existing oscilloscopeCanvas elements, not just half", () => {
+            const osc = createOscilloscope();
+            const widgetBody = osc.widgetWindow.getWidgetBody();
+            // document.getElementsByClassName (used inside _scale) only searches
+            // elements attached to the live document tree.
+            document.body.appendChild(widgetBody);
+
+            for (let i = 0; i < 4; i++) {
+                const canvas = document.createElement("canvas");
+                canvas.className = "oscilloscopeCanvas";
+                widgetBody.appendChild(canvas);
+            }
+            expect(document.getElementsByClassName("oscilloscopeCanvas").length).toBe(4);
+
+            osc._scale();
+
+            expect(document.getElementsByClassName("oscilloscopeCanvas").length).toBe(0);
+
+            document.body.removeChild(widgetBody);
+        });
+    });
+
     describe("close", () => {
         test("calls _stopAnimation", () => {
             const osc = createOscilloscope();
@@ -403,6 +454,49 @@ describe("Oscilloscope", () => {
             expect(osc.pitchAnalysers).toEqual({});
         });
 
+        test("disposes Tone.Analyser nodes in pitchAnalysers on close", () => {
+            const osc = createOscilloscope();
+            const dispose0 = jest.fn();
+            const dispose1 = jest.fn();
+            osc.pitchAnalysers = {
+                0: { dispose: dispose0 },
+                1: { dispose: dispose1 }
+            };
+
+            osc.close();
+
+            expect(dispose0).toHaveBeenCalled();
+            expect(dispose1).toHaveBeenCalled();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
+        test("skips non-disposable pitchAnalyser entries on close", () => {
+            const osc = createOscilloscope();
+            osc.pitchAnalysers = { 0: {}, 1: null, 2: undefined };
+
+            expect(() => osc.close()).not.toThrow();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
+        test("skips already-disposed analysers during close", () => {
+            const osc = createOscilloscope();
+            const alreadyDisposed = {
+                dispose: jest.fn(),
+                disposed: true
+            };
+            const stillActive = {
+                dispose: jest.fn(),
+                disposed: false
+            };
+            osc.pitchAnalysers = { 0: alreadyDisposed, 1: stillActive };
+
+            osc.close();
+
+            expect(alreadyDisposed.dispose).not.toHaveBeenCalled();
+            expect(stillActive.dispose).toHaveBeenCalled();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
         test("calls widgetWindow.destroy", () => {
             const osc = createOscilloscope();
 
@@ -424,6 +518,26 @@ describe("Oscilloscope", () => {
             osc.widgetWindow = null;
 
             expect(() => osc.close()).not.toThrow();
+        });
+
+        test("removes visibilitychange event listener", () => {
+            const removeSpy = jest.spyOn(document, "removeEventListener");
+            const osc = createOscilloscope();
+
+            osc.close();
+
+            expect(removeSpy).toHaveBeenCalledWith("visibilitychange", osc._handleVisibilityChange);
+            removeSpy.mockRestore();
+        });
+
+        test("removes keydown event listener", () => {
+            const removeSpy = jest.spyOn(document, "removeEventListener");
+            const osc = createOscilloscope();
+
+            osc.close();
+
+            expect(removeSpy).toHaveBeenCalledWith("keydown", osc._keyHandler);
+            removeSpy.mockRestore();
         });
     });
 
@@ -598,6 +712,54 @@ describe("Oscilloscope", () => {
 
             expect(osc._rafId).toBe(42);
         });
+
+        test("uses setTimeout when _isIdle is true", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._isIdle = true;
+            osc._canvasState = {};
+
+            osc.draw();
+
+            expect(osc._timeoutId).not.toBeNull();
+            jest.useRealTimers();
+        });
+
+        test("uses setTimeout when document is hidden", () => {
+            jest.useFakeTimers();
+            Object.defineProperty(document, "visibilityState", {
+                value: "hidden",
+                configurable: true
+            });
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._isIdle = false;
+            osc._canvasState = {};
+
+            osc.draw();
+
+            expect(osc._timeoutId).not.toBeNull();
+            Object.defineProperty(document, "visibilityState", {
+                value: "visible",
+                configurable: true
+            });
+            jest.useRealTimers();
+        });
+
+        test("uses setTimeout when widgetWindow is rolled", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._isIdle = false;
+            osc._canvasState = {};
+            osc.widgetWindow._rolled = true;
+
+            osc.draw();
+
+            expect(osc._timeoutId).not.toBeNull();
+            jest.useRealTimers();
+        });
     });
 
     describe("onclose integration", () => {
@@ -605,11 +767,790 @@ describe("Oscilloscope", () => {
             const osc = createOscilloscope();
             const closeSpy = jest.spyOn(osc, "close");
 
-            // The constructor stored onclose as a closure that calls this.close()
             mockWidgetWindow.onclose();
 
             expect(closeSpy).toHaveBeenCalled();
             closeSpy.mockRestore();
+        });
+    });
+
+    describe("_throttle", () => {
+        test("does nothing when not running", () => {
+            const osc = createOscilloscope();
+            osc._running = false;
+            osc._rafId = 99;
+
+            osc._throttle();
+
+            expect(osc._rafId).toBe(99);
+            expect(osc._isIdle).toBeFalsy();
+        });
+
+        test("cancels rafId sets it to null and sets _isIdle true", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._rafId = 99;
+
+            osc._throttle();
+
+            expect(osc._rafId).toBeNull();
+            expect(osc._isIdle).toBe(true);
+            jest.useRealTimers();
+        });
+
+        test("starts timeout when _timeoutId is null", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._timeoutId = null;
+
+            osc._throttle();
+
+            expect(osc._timeoutId).not.toBeNull();
+            jest.useRealTimers();
+        });
+
+        test("does not start second timeout when one already exists", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._timeoutId = 42;
+
+            osc._throttle();
+
+            expect(osc._timeoutId).toBe(42);
+            jest.useRealTimers();
+        });
+    });
+
+    describe("_wakeUp", () => {
+        test("does nothing when not running", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = false;
+            osc._timeoutId = 55;
+
+            osc._wakeUp();
+
+            expect(osc._timeoutId).toBe(55);
+            jest.useRealTimers();
+        });
+
+        test("clears timeout exits idle and calls draw", () => {
+            jest.useFakeTimers();
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._isIdle = true;
+            osc._timeoutId = 55;
+            osc._rafId = null;
+            const drawSpy = jest.spyOn(osc, "draw");
+
+            osc._wakeUp();
+
+            expect(osc._timeoutId).toBeNull();
+            expect(osc._isIdle).toBe(false);
+            expect(drawSpy).toHaveBeenCalled();
+            drawSpy.mockRestore();
+            jest.useRealTimers();
+        });
+
+        test("does not call draw when _rafId is already set", () => {
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._rafId = 77;
+            const drawSpy = jest.spyOn(osc, "draw");
+
+            osc._wakeUp();
+
+            expect(drawSpy).not.toHaveBeenCalled();
+            drawSpy.mockRestore();
+        });
+
+        test("sets _isIdle to false", () => {
+            const osc = createOscilloscope();
+            osc._running = true;
+            osc._isIdle = true;
+
+            osc._wakeUp();
+
+            expect(osc._isIdle).toBe(false);
+        });
+    });
+
+    describe("_handleVisibilityChange", () => {
+        test("calls _wakeUp when page becomes visible", () => {
+            const osc = createOscilloscope();
+            const wakeUpSpy = jest.spyOn(osc, "_wakeUp");
+            Object.defineProperty(document, "visibilityState", {
+                value: "visible",
+                configurable: true
+            });
+
+            osc._handleVisibilityChange();
+
+            expect(wakeUpSpy).toHaveBeenCalled();
+            wakeUpSpy.mockRestore();
+        });
+
+        test("calls _throttle when page becomes hidden", () => {
+            const osc = createOscilloscope();
+            const throttleSpy = jest.spyOn(osc, "_throttle");
+            Object.defineProperty(document, "visibilityState", {
+                value: "hidden",
+                configurable: true
+            });
+
+            osc._handleVisibilityChange();
+
+            expect(throttleSpy).toHaveBeenCalled();
+            throttleSpy.mockRestore();
+            Object.defineProperty(document, "visibilityState", {
+                value: "visible",
+                configurable: true
+            });
+        });
+    });
+
+    describe("reconnectSynthsToAnalyser", () => {
+        test("creates a new Tone.Analyser when none exists", () => {
+            const osc = createOscilloscope();
+            global.instruments = { 0: {} };
+
+            osc.reconnectSynthsToAnalyser(0);
+
+            expect(osc.pitchAnalysers[0]).toBeDefined();
+            expect(Tone.Analyser).toHaveBeenCalledWith({
+                type: "waveform",
+                size: Oscilloscope.analyserSize
+            });
+        });
+
+        test("reuses existing analyser when already created", () => {
+            const osc = createOscilloscope();
+            const existing = { getValue: jest.fn(), connect: jest.fn() };
+            osc.pitchAnalysers[0] = existing;
+            global.instruments = { 0: {} };
+            Tone.Analyser.mockClear();
+
+            osc.reconnectSynthsToAnalyser(0);
+
+            expect(Tone.Analyser).not.toHaveBeenCalled();
+            expect(osc.pitchAnalysers[0]).toBe(existing);
+        });
+
+        test("connects each synth instrument to the analyser", () => {
+            const osc = createOscilloscope();
+            const mockConnect = jest.fn();
+            const mockAnalyser = { getValue: jest.fn(), connect: jest.fn() };
+            Tone.Analyser.mockImplementationOnce(() => mockAnalyser);
+            global.instruments = {
+                0: {
+                    synth1: { connect: mockConnect },
+                    synth2: { connect: mockConnect }
+                }
+            };
+
+            osc.reconnectSynthsToAnalyser(0);
+
+            expect(mockConnect).toHaveBeenCalledTimes(2);
+            expect(mockConnect).toHaveBeenCalledWith(mockAnalyser);
+        });
+    });
+
+    describe("_renderFrame", () => {
+        test("draws entry by automatically creating analyser if none exists", () => {
+            const osc = createOscilloscope();
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#f00" } },
+                turtleIdx: 0,
+                resizedOnce: false
+            };
+            osc.pitchAnalysers = {}; // Start empty
+
+            osc._renderFrame();
+
+            // It should have created the analyser and drawn
+            expect(osc.pitchAnalysers[0]).toBeDefined();
+            expect(ctx.fillRect).toHaveBeenCalled();
+        });
+
+        test("draws using reconnected analyser data when not frozen", () => {
+            const osc = createOscilloscope();
+            osc.reconnectSynthsToAnalyser = jest.fn();
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0,
+                resizedOnce: false
+            };
+            osc.pitchAnalysers[0] = { getValue: jest.fn(() => new Float32Array(128)) };
+
+            osc._renderFrame();
+
+            expect(osc.reconnectSynthsToAnalyser).toHaveBeenCalledWith(0);
+            expect(ctx.fillRect).toHaveBeenCalled();
+            expect(ctx.stroke).toHaveBeenCalled();
+            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
+        });
+
+        test("skips when frozen and no cached waveform exists", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+
+            osc._renderFrame();
+
+            expect(ctx.fillRect).not.toHaveBeenCalled();
+        });
+
+        test("draws using cached waveform when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+            osc._frozenWaveforms[0] = new Float32Array(128);
+
+            osc._renderFrame();
+
+            expect(ctx.fillRect).toHaveBeenCalled();
+            expect(ctx.stroke).toHaveBeenCalled();
+        });
+
+        test("resets resizedOnce to false after drawing", () => {
+            const osc = createOscilloscope();
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#000" } },
+                turtleIdx: 0,
+                resizedOnce: true
+            };
+            osc.pitchAnalysers[0] = { getValue: jest.fn(() => new Float32Array(128)) };
+
+            osc._renderFrame();
+
+            expect(osc._canvasState[0].resizedOnce).toBe(false);
+        });
+
+        test("draws waveform using moveTo for first point and lineTo for rest", () => {
+            const osc = createOscilloscope();
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { running: true, painter: { _canvasColor: "#000" } },
+                turtleIdx: 0,
+                resizedOnce: false
+            };
+            const data = new Float32Array(4).fill(0);
+            osc.pitchAnalysers[0] = { getValue: jest.fn(() => data) };
+
+            osc._renderFrame();
+
+            expect(ctx.moveTo).toHaveBeenCalledTimes(1);
+            expect(ctx.lineTo).toHaveBeenCalledTimes(3);
+        });
+    });
+
+    describe("_scale", () => {
+        test("resets _canvasState", () => {
+            const osc = createOscilloscope();
+            osc._canvasState = { 0: {} };
+
+            osc._scale();
+
+            expect(osc._canvasState).toEqual({});
+        });
+
+        test("uses 700x400 when not maximized", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            const makeCanvasSpy = jest.spyOn(osc, "makeCanvas");
+            mockWidgetWindow.isMaximized.mockReturnValue(false);
+
+            osc._scale();
+
+            expect(makeCanvasSpy).toHaveBeenCalledWith(700, 400, turtle, expect.any(Number), true);
+            makeCanvasSpy.mockRestore();
+        });
+
+        test("starts animation when divisions exist and not yet running", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc._running = false;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+
+            osc._scale();
+
+            expect(startSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+        });
+
+        test("calls _renderFrame instead of _startAnimation when already running", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc._running = true;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            osc._scale();
+
+            expect(startSpy).not.toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
+        test("only calls _renderFrame and not _startAnimation when isFrozen is true", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc.isFrozen = true;
+            osc._running = false;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            osc._scale();
+
+            expect(startSpy).not.toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
+        test("stops animation when no divisions", () => {
+            const osc = createOscilloscope([]);
+            osc._running = true;
+            const stopSpy = jest.spyOn(osc, "_stopAnimation");
+
+            osc._scale();
+
+            expect(stopSpy).toHaveBeenCalled();
+            stopSpy.mockRestore();
+        });
+
+        test("calls reconnectSynthsToAnalyser for each turtle", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            const reconnectSpy = jest.spyOn(osc, "reconnectSynthsToAnalyser");
+            global.instruments = {};
+
+            osc._scale();
+
+            expect(reconnectSpy).toHaveBeenCalled();
+            reconnectSpy.mockRestore();
+        });
+
+        test("uses maximized dimensions when window is maximized", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            mockWidgetWindow.isMaximized.mockReturnValue(true);
+            mockWidgetWindow.getWidgetBody = jest.fn(() => ({
+                querySelectorAll: jest.fn(() => []),
+                removeChild: jest.fn(),
+                appendChild: jest.fn(),
+                getBoundingClientRect: jest.fn(() => ({ width: 1200 }))
+            }));
+            mockWidgetWindow.getWidgetFrame = jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({ height: 870 }))
+            }));
+            const makeCanvasSpy = jest.spyOn(osc, "makeCanvas");
+
+            osc._scale();
+
+            expect(makeCanvasSpy).toHaveBeenCalledWith(
+                1200,
+                expect.any(Number),
+                turtle,
+                expect.any(Number),
+                true
+            );
+            makeCanvasSpy.mockRestore();
+        });
+    });
+
+    describe("toggleFreeze and _updateFreezeButton", () => {
+        test("toggles isFrozen from false to true, updates button, and stops animation loop", () => {
+            const osc = createOscilloscope();
+            const stopSpy = jest.spyOn(osc, "_stopAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+            expect(osc.isFrozen).toBe(false);
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(true);
+            expect(stopSpy).toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            expect(osc.freezeButton.children[0].src).toContain("header-icons/play-button.svg");
+            expect(osc.freezeButton.title).toBe("Resume");
+            expect(osc.freezeButton.getAttribute("aria-label")).toBe("Resume");
+            stopSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
+        test("toggles isFrozen from true to false, updates button, and starts animation if divisions exist", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc.isFrozen = true;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(false);
+            expect(osc.freezeButton.children[0].src).toContain("header-icons/pause-button.svg");
+            expect(osc.freezeButton.title).toBe("Pause");
+            expect(osc.freezeButton.getAttribute("aria-label")).toBe("Pause");
+            expect(startSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+        });
+
+        test("does not start animation when unfreezing if divisions is empty", () => {
+            const osc = createOscilloscope([]);
+            osc.isFrozen = true;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(false);
+            expect(startSpy).not.toHaveBeenCalled();
+            startSpy.mockRestore();
+        });
+
+        test("handles null freezeButton in _updateFreezeButton gracefully", () => {
+            const osc = createOscilloscope();
+            osc.freezeButton = null;
+
+            expect(() => osc._updateFreezeButton()).not.toThrow();
+        });
+    });
+
+    describe("_keyHandler", () => {
+        test("toggles freeze and prevents default when Space is pressed on focused widget", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(toggleSpy).toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores repeated keydown events (e.repeat is true)", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: true,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores Ctrl-modified keys like Ctrl+Space", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: true,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores Meta-modified keys like Meta+Space", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: true,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores Alt-modified keys like Alt+Space", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: true,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when widget is not focused", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = null;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when active element is INPUT", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            input.focus();
+
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            document.body.removeChild(input);
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when active element is TEXTAREA", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const textarea = document.createElement("textarea");
+            document.body.appendChild(textarea);
+            textarea.focus();
+
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            document.body.removeChild(textarea);
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when active element is contentEditable", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const div = document.createElement("div");
+            Object.defineProperty(div, "isContentEditable", { value: true, configurable: true });
+            const origActiveElement = document.activeElement;
+            Object.defineProperty(document, "activeElement", {
+                value: div,
+                configurable: true
+            });
+
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+
+            Object.defineProperty(document, "activeElement", {
+                value: origActiveElement,
+                configurable: true
+            });
+            toggleSpy.mockRestore();
+        });
+
+        test("returns early if widgetWindow is null", () => {
+            const osc = createOscilloscope();
+            osc.widgetWindow = null;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("does nothing for unrelated keys", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "KeyA",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+    });
+
+    describe("toolbar buttons click handlers", () => {
+        test("zoomInButton multiplies zoomFactor and triggers _renderFrame when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+            const initialZoom = osc.zoomFactor;
+
+            const zoomInBtn = mockWidgetWindow.addButton.mock.results[0].value;
+            zoomInBtn.onclick();
+
+            expect(osc.zoomFactor).toBeCloseTo(initialZoom * 1.333);
+            expect(renderSpy).toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+
+        test("zoomInButton does not call _renderFrame when not frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = false;
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            const zoomInBtn = mockWidgetWindow.addButton.mock.results[0].value;
+            zoomInBtn.onclick();
+
+            expect(renderSpy).not.toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+
+        test("zoomOutButton divides zoomFactor and triggers _renderFrame when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+            const initialZoom = osc.zoomFactor;
+
+            const zoomOutBtn = mockWidgetWindow.addButton.mock.results[1].value;
+            zoomOutBtn.onclick();
+
+            expect(osc.zoomFactor).toBeCloseTo(initialZoom / 1.333);
+            expect(renderSpy).toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+
+        test("zoomOutButton clamps zoomFactor to minimum 1", () => {
+            const osc = createOscilloscope();
+            osc.zoomFactor = 0.5;
+
+            const zoomOutBtn = mockWidgetWindow.addButton.mock.results[1].value;
+            zoomOutBtn.onclick();
+
+            expect(osc.zoomFactor).toBe(1);
+        });
+
+        test("freezeButton onclick calls toggleFreeze", () => {
+            const osc = createOscilloscope();
+            expect(osc.isFrozen).toBe(false);
+
+            const freezeBtn = mockWidgetWindow.addButton.mock.results[2].value;
+            freezeBtn.onclick();
+
+            expect(osc.isFrozen).toBe(true);
         });
     });
 });

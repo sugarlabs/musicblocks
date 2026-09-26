@@ -18,7 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-env jest */
 const ManagedTimer = require("../ManagedTimer.js");
 
 describe("ManagedTimer", () => {

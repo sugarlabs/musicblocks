@@ -30,7 +30,6 @@ const files = {
         "node_modules/jquery/dist/jquery.min.js",
         "node_modules/jquery-ui-dist/jquery-ui.min.js",
         "node_modules/materialize-css/dist/js/materialize.min.js",
-        "node_modules/abcjs/dist/abcjs-basic-min.js",
         "node_modules/howler/howler.min.js",
         "node_modules/tone/build/Tone.js"
     ]

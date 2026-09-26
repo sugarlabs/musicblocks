@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1870"
+   version="1.1"
+   viewBox="0 0 56.103935 38.232297"
+   height="38.232296mm"
+   width="56.103935mm">
+  <defs
+     id="defs1864" />
+  <metadata
+     id="metadata1867">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-107.39776,-160.1991)"
+     id="layer1">
+    <text
+       y="192.21368"
+       x="142.19659"
+       id="text572"
+       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+      <tspan
+         style="stroke-width:0.39687499"
+         id="tspan570"
+         y="196.9762"
+         x="160.45285" />
+    </text>
+    <text
+       y="192.21368"
+       x="142.19659"
+       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+       id="text3783">
+      <tspan
+         style="stroke-width:0.39687499"
+         x="160.45285"
+         y="196.9762"
+         id="tspan3781" />
+    </text>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,107.39776,160.1991)"
+       id="g474">
+      <g
+         id="g472"
+         transform="scale(1.5)">
+        <path
+           id="path462"
+           style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 37.792969 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text466"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan464"
+             y="14"
+             x="54">set color</tspan>
+        </text>
+        <text
+           id="text470"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan468"
+             y="12"
+             x="54" />
+        </text>
+      </g>
+    </g>
+    <g
+       id="g484"
+       transform="matrix(0.26458333,0,0,0.26458333,129.93746,160.1991)">
+      <g
+         id="g482"
+         transform="scale(1.5)">
+        <path
+           id="path476"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text480"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan478"
+             y="14"
+             x="13">0</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g498"
+       transform="matrix(0.26458333,0,0,0.26458333,107.39776,168.53348)">
+      <g
+         id="g496"
+         transform="scale(1.5)">
+        <path
+           id="path486"
+           style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 43.364258 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text490"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan488"
+             y="14"
+             x="60">set shade</tspan>
+        </text>
+        <text
+           id="text494"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan492"
+             y="12"
+             x="60" />
+        </text>
+      </g>
+    </g>
+    <g
+       id="g508"
+       transform="matrix(0.26458333,0,0,0.26458333,132.14857,168.53348)">
+      <g
+         id="g506"
+         transform="scale(1.5)">
+        <path
+           id="path500"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text504"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan502"
+             y="14"
+             x="13">50</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g522"
+       transform="matrix(0.26458333,0,0,0.26458333,107.39776,176.86785)">
+      <g
+         id="g520"
+         transform="scale(1.5)">
+        <path
+           id="path510"
+           style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 53.364258 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+        <text
+           id="text514"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan512"
+             y="14"
+             x="70">set pen size</tspan>
+        </text>
+        <text
+           id="text518"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+          <tspan
+             id="tspan516"
+             y="12"
+             x="70" />
+        </text>
+      </g>
+    </g>
+    <g
+       id="g532"
+       transform="matrix(0.26458333,0,0,0.26458333,136.11732,176.86785)">
+      <g
+         id="g530"
+         transform="scale(1.5)">
+        <path
+           id="path524"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text528"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan526"
+             y="14"
+             x="13">5</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="g562"
+       transform="matrix(0.26458333,0,0,0.26458333,129.62276,190.09702)">
+      <g
+         id="g560"
+         transform="scale(1.5)">
+        <path
+           id="path554"
+           style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+        <text
+           id="text558"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan556"
+             y="14"
+             x="13">color</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

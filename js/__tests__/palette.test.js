@@ -19,14 +19,26 @@
  */
 
 const { Palettes, initPalettes } = require("../palette");
+const { mockDocById } = require("../../test/utils/domMocks");
+const { createMockActivity } = require("../../test/utils/activityFactory");
+const { createMockDOM } = require("../../test/utils/domFactory");
+const { setupImageMock } = require("../../test/utils/imageMock");
+const { setupSVGMock } = require("../../test/utils/svgMock");
+const { setupGlobalEnvironment } = require("../../test/setup/globalSetup");
+
+global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
+
+const REAL_CREATE_ELEMENT = global.document.createElement;
 
 global.LEADING = 10;
 global.DEFAULTPALETTE = "default";
+
 global.MULTIPALETTES = [
     ["rhythm", "pitch"],
     ["flow", "action"],
     ["graphics", "pen"]
 ];
+
 global.PALETTEICONS = {
     search: "<svg></svg>",
     rhythm: "<svg></svg>",
@@ -41,9 +53,9 @@ global.PALETTEICONS = {
     artwork: "<svg background_fill_color stroke_color fill_color></svg>"
 };
 global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
+global.MULTIPALETTENAMES = ["Music", "Logic", "Arts"];
 global.SKIPPALETTES = ["heap", "dictionary"];
-global.toTitleCase = str => str.charAt(0).toUpperCase() + str.slice(1);
-global._ = str => str;
+
 global.platformColor = {
     selectorSelected: "#000",
     paletteBackground: "#fff",
@@ -55,39 +67,29 @@ global.platformColor = {
     paletteText: "#000",
     textColor: "#111"
 };
-global.base64Encode = str => str;
-global.localStorage = { kanaPreference: "default" };
-global.i18nSolfege = jest.fn(() => "sol");
+
+global.PALETTEFILLCOLORS = { test: "test_fill" };
+global.PALETTESTROKECOLORS = { test: "test_stroke" };
+
+global.DISABLEDFILLCOLOR = "disabled_fill";
+global.DISABLEDSTROKECOLOR = "disabled_stroke";
+
 global.NUMBERBLOCKDEFAULT = 1;
 global.TEXTWIDTH = 100;
 global.STRINGLEN = 10;
 global.DEFAULTBLOCKSCALE = 1;
-global.SVG = class {
-    constructor() {
-        this.docks = [];
-    }
-    setScale() {}
-    setExpand() {}
-    setOutie() {}
-    basicBox() {
-        return "fill_color stroke_color block_label arg_label_0";
-    }
-    basicBlock() {
-        return "fill_color stroke_color block_label";
-    }
-    getHeight() {
-        return 12;
-    }
-};
-global.DISABLEDFILLCOLOR = "disabled_fill";
-global.DISABLEDSTROKECOLOR = "disabled_stroke";
-global.PALETTEFILLCOLORS = { test: "test_fill" };
-global.PALETTESTROKECOLORS = { test: "test_stroke" };
-global.last = arr => arr[arr.length - 1];
-global.getTextWidth = jest.fn(() => 10);
 global.STANDARDBLOCKHEIGHT = 18;
 global.CLOSEICON = "<svg fill_color></svg>";
+
+global.toTitleCase = str => str.charAt(0).toUpperCase() + str.slice(1);
+global._ = str => str;
+global.base64Encode = str => str;
+global.last = arr => arr[arr.length - 1];
 global.safeSVG = str => str;
+
+global.getTextWidth = jest.fn(() => 10);
+global.i18nSolfege = jest.fn(() => "sol");
+
 global.blockIsMacro = jest.fn(() => false);
 global.getMacroExpansion = jest.fn();
 
@@ -96,143 +98,21 @@ describe("Palettes Class", () => {
     let palettes;
 
     beforeEach(() => {
-        const paletteMock = {
-            style: { visibility: "visible", top: "100px" },
-            setAttribute: jest.fn(),
-            addEventListener: jest.fn(),
-            focus: jest.fn(),
-            children: [
-                {
-                    children: [
-                        {
-                            children: [
-                                {
-                                    insertCell: jest.fn(() => ({
-                                        appendChild: jest.fn(),
-                                        style: {}
-                                    }))
-                                }
-                            ]
-                        },
-                        {
-                            children: [
-                                {},
-                                {
-                                    parentNode: { removeChild: jest.fn() },
-                                    appendChild: jest.fn(() => ({})),
-                                    insertRow: jest.fn(() => ({
-                                        insertCell: jest.fn(() => ({
-                                            appendChild: jest.fn(),
-                                            style: {}
-                                        })),
-                                        dataset: {},
-                                        style: {},
-                                        addEventListener: jest.fn()
-                                    }))
-                                }
-                            ]
-                        }
-                    ],
-                    style: { border: "" }
-                }
-            ]
-        };
+        global.document.createElement = REAL_CREATE_ELEMENT;
+        // setup shared globals
+        setupGlobalEnvironment();
+        setupSVGMock();
 
-        global.document = {
-            createElement: jest.fn(() => ({
-                id: "",
-                setAttribute: jest.fn(),
-                classList: { add: jest.fn() },
-                appendChild: jest.fn(),
-                style: {},
-                dataset: {},
-                innerHTML: "",
-                childNodes: [{ style: {} }]
-            })),
-            getElementById: jest.fn(() => null),
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn(),
-            body: {
-                appendChild: jest.fn(),
-                style: { cursor: "default" }
-            }
-        };
-
-        global.window = Object.assign(global.window || {}, {
-            btoa: jest.fn(str => str),
-            innerHeight: 800
-        });
-        global.Image = class {
-            constructor() {
-                this.src = "";
-                this.width = 0;
-                this.height = 0;
-                this.style = {};
-            }
-            setAttribute() {}
-            removeAttribute() {}
-        };
-
-        global.docById = jest.fn(id => {
-            if (id === "PaletteBody") {
-                return { parentNode: { removeChild: jest.fn() } };
-            }
-            if (id === "palette") {
-                return {
-                    ...paletteMock,
-                    children: [
-                        {
-                            children: [
-                                {
-                                    children: [
-                                        {
-                                            insertCell: jest.fn(() => ({
-                                                appendChild: jest.fn(),
-                                                style: {}
-                                            }))
-                                        }
-                                    ]
-                                },
-                                {
-                                    children: [
-                                        {},
-                                        {
-                                            removeChild: jest.fn(),
-                                            appendChild: jest.fn(() => ({})),
-                                            parentNode: { removeChild: jest.fn() },
-                                            insertRow: jest.fn(() => ({
-                                                insertCell: jest.fn(() => ({
-                                                    appendChild: jest.fn(),
-                                                    style: {},
-                                                    textContent: ""
-                                                })),
-                                                dataset: {},
-                                                style: {},
-                                                addEventListener: jest.fn()
-                                            }))
-                                        }
-                                    ]
-                                }
-                            ],
-                            style: { border: "" }
-                        }
-                    ]
-                };
-            }
-            return { style: {}, appendChild: jest.fn(), removeChild: jest.fn() };
+        // Real DOM instead of fake one
+        const { container: paletteElement, body: paletteBody } = createMockDOM();
+        mockDocById({
+            palette: paletteElement,
+            PaletteBody: paletteBody
         });
 
-        mockActivity = {
-            cellSize: 50,
-            blocks: {
-                protoBlockDict: {},
-                makeBlock: jest.fn(() => ({}))
-            },
-            hideSearchWidget: jest.fn(),
-            showSearchWidget: jest.fn(),
-            palettes: {},
-            beginnerMode: false
-        };
+        setupImageMock();
+
+        mockActivity = createMockActivity();
 
         palettes = new Palettes(mockActivity);
     });
@@ -284,6 +164,53 @@ describe("Palettes Class", () => {
         });
     });
 
+    describe("palette keyboard activation", () => {
+        test("consumes Space and activates the current palette item", () => {
+            const paletteElement = document.createElement("div");
+            paletteElement.id = "palette";
+            document.body.appendChild(paletteElement);
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+
+            palettes._activateCurrentNavItem = jest.fn();
+            palettes._setupPaletteKeyboardNav();
+
+            const event = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            paletteElement.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+            expect(palettes._activateCurrentNavItem).toHaveBeenCalledWith([]);
+        });
+
+        test("consumes Escape and exits palette keyboard navigation", () => {
+            const paletteElement = document.createElement("div");
+            paletteElement.id = "palette";
+            document.body.appendChild(paletteElement);
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+
+            const exitKeyboardNavigation = jest.fn();
+            const previousFocusManager = window._focusCycleManager;
+            window._focusCycleManager = { exitKeyboardNavigation };
+            palettes._keyboardNavActive = true;
+            palettes._setupPaletteKeyboardNav();
+
+            const event = new KeyboardEvent("keydown", {
+                key: "Escape",
+                bubbles: true,
+                cancelable: true
+            });
+            paletteElement.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+            expect(palettes._keyboardNavActive).toBe(false);
+            expect(exitKeyboardNavigation).toHaveBeenCalled();
+            window._focusCycleManager = previousFocusManager;
+        });
+    });
+
     describe("_makeSelectorButton method", () => {
         test("creates a selector cell and hooks hover handlers", () => {
             const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
@@ -315,6 +242,43 @@ describe("Palettes Class", () => {
             expect(appendSpy).toHaveBeenCalled();
             expect(palettes.showSelection).toHaveBeenCalled();
             expect(palettes.makePalettes).toHaveBeenCalled();
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("role", "tab");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[0]
+            );
+        });
+
+        test("sets aria-selected to false for a nonzero index tab", () => {
+            const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
+            const trMock = {
+                insertCell: jest.fn(() => tdMock),
+                children: [{}, { children: [] }],
+                setAttribute: jest.fn()
+            };
+            const paletteElement = {
+                children: [
+                    {
+                        children: [{ children: [{ children: [trMock] }] }, { children: [{}, {}] }],
+                        style: { border: "" }
+                    }
+                ]
+            };
+
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+            global.document.getElementById = jest.fn(() => null);
+            jest.spyOn(document.body, "appendChild");
+            palettes.showSelection = jest.fn();
+            palettes.makePalettes = jest.fn();
+
+            palettes._makeSelectorButton(2);
+
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "false");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[2]
+            );
         });
     });
 
@@ -1225,11 +1189,9 @@ describe("Palettes Class", () => {
         });
 
         test("_hideMenuItems hides search widget and removes palette body", () => {
-            const paletteBody = {};
-            const paletteElement = { removeChild: jest.fn() };
+            const paletteBody = { remove: jest.fn() };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody") return paletteBody;
-                if (id === "palette") return paletteElement;
                 return null;
             });
             palettes.add("search");
@@ -1238,7 +1200,7 @@ describe("Palettes Class", () => {
             palette._hideMenuItems();
 
             expect(mockActivity.hideSearchWidget).toHaveBeenCalledWith(true);
-            expect(paletteElement.removeChild).toHaveBeenCalledWith(paletteBody);
+            expect(paletteBody.remove).toHaveBeenCalled();
         });
 
         test("setupGrabScroll updates scrollTop on drag", () => {
@@ -1504,11 +1466,14 @@ describe("Palettes Class", () => {
         test("showMenu creates header and menu container", () => {
             const palDiv = {
                 childNodes: [{ style: {} }],
-                appendChild: jest.fn(),
-                removeChild: jest.fn()
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
             };
             const paletteBody = {
-                insertAdjacentHTML: jest.fn(),
+                appendChild: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, { style: {} }],
                 children: [
@@ -1516,16 +1481,20 @@ describe("Palettes Class", () => {
                         insertRow: jest.fn(() => ({
                             style: {},
                             innerHTML: "",
+                            textContent: "",
+                            appendChild: jest.fn(),
                             children: [{ style: {}, appendChild: jest.fn() }]
                         }))
                     },
                     {}
                 ]
             };
+            paletteBody.childNodes[1].getBoundingClientRect = jest.fn(() => ({ top: 180 }));
             const elementFactory = tag => {
                 if (tag === "table") return paletteBody;
                 return {
                     style: {},
+                    removeAttribute: jest.fn(),
                     setAttribute: jest.fn(),
                     appendChild: jest.fn(),
                     children: [],
@@ -1536,6 +1505,7 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(id => {
                 if (id === "palette") return palDiv;
                 if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteBody.childNodes[1];
                 return null;
             });
 
@@ -1545,26 +1515,107 @@ describe("Palettes Class", () => {
 
             palette.showMenu(true);
 
-            expect(palDiv.appendChild).toHaveBeenCalledWith(paletteBody);
+            expect(palDiv.parentNode.appendChild).toHaveBeenCalledWith(paletteBody);
             expect(palette.menuContainer).toBe(paletteBody);
             expect(palette._showMenuItems).toHaveBeenCalled();
         });
 
-        test("_showMenuItems renders a basic block", () => {
-            const paletteList = {
-                insertRow: jest.fn(() => ({
-                    setAttribute: jest.fn(),
-                    insertCell: jest.fn(() => ({
-                        style: {},
-                        setAttribute: jest.fn(),
-                        appendChild: jest.fn()
-                    }))
-                })),
-                appendChild: jest.fn()
+        test("showMenu sizes the scrollable body from its rendered top", () => {
+            const paletteItems = {
+                style: {},
+                getBoundingClientRect: jest.fn(() => ({ top: 180 }))
             };
-            document.createDocumentFragment = jest.fn(() => ({
-                appendChild: jest.fn()
-            }));
+            const paletteBody = {
+                appendChild: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, paletteItems],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    }
+                ]
+            };
+            const paletteParent = { appendChild: jest.fn() };
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: paletteParent
+            };
+
+            global.document.createElement = jest.fn(tag => {
+                if (tag === "table") return paletteBody;
+                if (tag === "tbody") return paletteItems;
+                return {
+                    style: {},
+                    children: [],
+                    appendChild: jest.fn(),
+                    removeAttribute: jest.fn(),
+                    setAttribute: jest.fn()
+                };
+            });
+            global.docById = jest.fn(id => {
+                if (id === "palette") return palDiv;
+                if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteItems;
+                return null;
+            });
+            Object.defineProperty(window, "innerHeight", { value: 900, configurable: true });
+
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            palette._showMenuItems = jest.fn();
+
+            palette.showMenu(true);
+
+            expect(paletteItems.style.height).toBe("720px");
+            expect(paletteItems.style.overflow).toBe("auto");
+            expect(paletteItems.style.overflowX).toBe("hidden");
+        });
+
+        test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
+            const paletteItems = { scrollTop: 0 };
+            global.docById = jest.fn(id => (id === "PaletteBody_items" ? paletteItems : null));
+            palettes.add("test");
+            const palette = palettes.dict.test;
+
+            palette.scrollEvent(-20, 1); // arrow down: list moves up
+            expect(paletteItems.scrollTop).toBe(20);
+            expect(palette.scrollDiff).toBe(-20);
+
+            palette.scrollEvent(-palette.scrollDiff, 1); // home: back to the top
+            expect(paletteItems.scrollTop).toBe(0);
+        });
+
+        test("scrollEvent is a no-op when no palette menu is open", () => {
+            global.docById = jest.fn(() => null);
+            palettes.add("test");
+            expect(() => palettes.dict.test.scrollEvent(-20, 1)).not.toThrow();
+            expect(palettes.dict.test.scrollDiff).toBe(0);
+        });
+
+        test("_showMenuItems renders a basic block", () => {
+            const paletteList = document.createElement("table");
+
+            const realCreate = REAL_CREATE_ELEMENT;
+
+            document.createElement = jest.fn(tag => {
+                if (tag === "img") {
+                    const img = realCreate.call(document, "img");
+                    img.width = 50;
+                    img.style = {};
+                    img.style = {};
+                    return img;
+                }
+                return realCreate.call(document, tag);
+            });
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
@@ -1572,7 +1623,9 @@ describe("Palettes Class", () => {
 
             palettes.add("test");
             const palette = palettes.dict.test;
+
             palette.protoList = [{ name: "box" }];
+
             palette.model.update = jest.fn(() => {
                 palette.model.blocks = [
                     {
@@ -1586,8 +1639,7 @@ describe("Palettes Class", () => {
             });
 
             palette._showMenuItems();
-
-            expect(paletteList.appendChild).toHaveBeenCalled();
+            expect(paletteList.children.length).toBeGreaterThan(0);
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
@@ -1595,45 +1647,45 @@ describe("Palettes Class", () => {
             const paletteList = {
                 appendChild: jest.fn()
             };
-            document.createDocumentFragment = jest.fn(() => ({
-                appendChild: jest.fn()
-            }));
+            const realCreateFragment = document.createDocumentFragment;
+
+            document.createDocumentFragment = jest.fn(() => {
+                return realCreateFragment.call(document);
+            });
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
             });
 
-            // Mock DOM elements created inside _showMenuItems
+            const realCreate = REAL_CREATE_ELEMENT;
+
             document.createElement = jest.fn(tag => {
-                if (tag === "tr") {
-                    return {
-                        children: [],
-                        setAttribute: jest.fn(),
-                        appendChild(child) {
-                            this.children.push(child);
-                        }
-                    };
-                }
+                const el = realCreate.call(document, tag);
 
+                // Preserve upstream behavior for td
                 if (tag === "td") {
-                    return {
-                        style: {},
-                        setAttribute: jest.fn(),
-                        appendChild(img) {
-                            capturedImg = img;
-                        }
+                    const originalAppend = el.appendChild;
+                    el.appendChild = child => {
+                        capturedImg = child;
+                        return originalAppend.call(el, child);
                     };
                 }
 
-                return {};
+                // Preserve your img handling
+                if (tag === "img") {
+                    el.width = 50;
+                    el.style = {};
+                }
+
+                return el;
             });
             global.mediaPALETTE = "<svg></svg>";
             global.cameraPALETTE = "<svg></svg>";
             global.videoPALETTE = "<svg></svg>";
             mockActivity.pluginsImages = { customimg: "<svg></svg>" };
-            document.addEventListener = jest.fn();
-            document.removeEventListener = jest.fn();
+            jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+            jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 
             palettes.add("test");
             const palette = palettes.dict.test;
@@ -1696,39 +1748,39 @@ describe("Palettes Class", () => {
             const paletteList = {
                 appendChild: jest.fn()
             };
-            document.createDocumentFragment = jest.fn(() => ({
-                appendChild: jest.fn()
-            }));
+            const realCreateFragment = document.createDocumentFragment;
+
+            document.createDocumentFragment = jest.fn(() => {
+                return realCreateFragment.call(document);
+            });
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
             });
 
+            const realCreate = REAL_CREATE_ELEMENT;
+
             document.createElement = jest.fn(tag => {
-                if (tag === "tr") {
-                    return {
-                        children: [],
-                        setAttribute: jest.fn(),
-                        appendChild(child) {
-                            this.children.push(child);
-                        }
+                const el = realCreate.call(document, tag);
+
+                if (tag === "td") {
+                    const originalAppend = el.appendChild;
+                    el.appendChild = child => {
+                        capturedImg = child;
+                        return originalAppend.call(el, child);
                     };
                 }
 
-                if (tag === "td") {
-                    return {
-                        style: {},
-                        setAttribute: jest.fn(),
-                        appendChild(img) {
-                            capturedImg = img;
-                        }
-                    };
+                if (tag === "img") {
+                    el.width = 50;
+                    el.style = {};
                 }
-                return {};
+
+                return el;
             });
-            document.addEventListener = jest.fn();
-            document.removeEventListener = jest.fn();
+            jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+            jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 
             palettes.add("test");
             const palette = palettes.dict.test;
@@ -1771,29 +1823,39 @@ describe("Palettes Class", () => {
         });
 
         test("_showMenuItems hides palette when mobile", () => {
-            const paletteList = {
-                insertRow: jest.fn(() => ({
-                    setAttribute: jest.fn(),
-                    insertCell: jest.fn(() => ({
-                        style: {},
-                        setAttribute: jest.fn(),
-                        appendChild: jest.fn()
-                    }))
-                })),
-                appendChild: jest.fn()
-            };
-            const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
+            const paletteList = document.createElement("table");
+
+            const palDiv = document.createElement("div");
+            const child = document.createElement("div");
+            child.style = {};
+            palDiv.appendChild(child);
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 if (id === "palette") return palDiv;
                 return null;
             });
 
+            const realCreate = REAL_CREATE_ELEMENT;
+
+            document.createElement = jest.fn(tag => {
+                if (tag === "img") {
+                    const img = realCreate.call(document, "img");
+                    img.width = 50;
+                    return img;
+                }
+                return realCreate.call(document, tag);
+            });
+
             palettes.add("test");
             const palette = palettes.dict.test;
+
             palette.palettes.mobile = true;
+
             const hideSpy = jest.spyOn(palette, "hide");
+
             palette.protoList = [{ name: "box" }];
+
             palette.model.update = jest.fn(() => {
                 palette.model.blocks = [
                     {
@@ -1841,6 +1903,7 @@ describe("Palettes Class", () => {
                 [12, "bpmfactor", 0, 0, [11]]
             ]);
             mockActivity.palettes = palettes;
+            const collapseToggle = jest.fn();
             mockActivity.blocks = {
                 blockList: [],
                 dragGroup: [],
@@ -1849,6 +1912,10 @@ describe("Palettes Class", () => {
                 blockMoved: jest.fn(),
                 checkBounds: jest.fn(),
                 loadNewBlocks: jest.fn(blocks => {
+                    if (!blocks) {
+                        mockActivity.blocks.blockList = [];
+                        return;
+                    }
                     mockActivity.blocks.blockList = blocks.map(block => {
                         const blockName = Array.isArray(block[1]) ? block[1][0] : block[1];
                         const value = Array.isArray(block[1]) ? block[1][1] : null;
@@ -1859,7 +1926,7 @@ describe("Palettes Class", () => {
                             privateData: value && value.value ? value.value : undefined,
                             connections: block[4],
                             container: { x: 0, y: 0 },
-                            collapseToggle: jest.fn()
+                            collapseToggle
                         };
                     });
                 }),
@@ -1930,11 +1997,17 @@ describe("Palettes Class", () => {
 
             global.getMacroExpansion = jest.fn(() => [[0, "box", 0, 0, [null]]]);
             mockActivity.palettes = palettes;
+            const collapseToggle = jest.fn();
             mockActivity.blocks = {
                 blockList: [{ container: { x: 0, y: 0 } }],
                 loadNewBlocks: jest.fn(blocks => {
+                    if (!blocks) {
+                        mockActivity.blocks.blockList = [];
+                        return;
+                    }
                     mockActivity.blocks.blockList = blocks.map(() => ({
-                        container: { x: 0, y: 0 }
+                        container: { x: 0, y: 0 },
+                        collapseToggle
                     }));
                 }),
                 findTopBlock: jest.fn(() => 0),
@@ -1956,11 +2029,17 @@ describe("Palettes Class", () => {
             palettes.pluginMacros = { box: [[0, "box", 0, 0, [null]]] };
             jest.spyOn(palettes, "getPluginMacroExpansion");
             mockActivity.palettes = palettes;
+            const collapseToggle = jest.fn();
             mockActivity.blocks = {
                 blockList: [{ container: { x: 0, y: 0 } }],
                 loadNewBlocks: jest.fn(blocks => {
+                    if (!blocks) {
+                        mockActivity.blocks.blockList = [];
+                        return;
+                    }
                     mockActivity.blocks.blockList = blocks.map(() => ({
-                        container: { x: 0, y: 0 }
+                        container: { x: 0, y: 0 },
+                        collapseToggle
                     }));
                 }),
                 findTopBlock: jest.fn(() => 0),
@@ -1975,11 +2054,33 @@ describe("Palettes Class", () => {
 
         test("_makeBlockFromProtoblock loads myblocks macro", () => {
             jest.useFakeTimers();
-            palettes.add("myblocks");
-            const palette = palettes.dict.myblocks;
-            palette.name = "myblocks";
-            const protoblk = { name: "macro_block" };
 
+            let capturedBlocks;
+            const collapseToggle = jest.fn();
+
+            mockActivity = {
+                ...mockActivity,
+                blocks: {
+                    protoBlockDict: {},
+                    makeBlock: jest.fn(() => ({})),
+
+                    blockList: [{ container: { x: 0, y: 0 }, collapseToggle }],
+
+                    loadNewBlocks: jest.fn(blocks => {
+                        capturedBlocks = blocks;
+
+                        mockActivity.blocks.blockList = blocks.map(() => ({
+                            container: { x: 0, y: 0 },
+                            collapseToggle
+                        }));
+                    }),
+
+                    findTopBlock: jest.fn(() => 0),
+                    moveBlock: jest.fn()
+                }
+            };
+
+            mockActivity.palettes = palettes;
             mockActivity.macroDict = {
                 testmacro: [
                     [0, "raw", 0, 0, [null]],
@@ -1991,32 +2092,34 @@ describe("Palettes Class", () => {
                     [6, ["text", { value: "bye" }], 0, 0, [5]]
                 ]
             };
-            mockActivity.palettes = palettes;
-            const collapseToggle = jest.fn();
-            mockActivity.blocks = {
-                blockList: [{ container: { x: 0, y: 0 }, collapseToggle }],
-                loadNewBlocks: jest.fn(blocks => {
-                    mockActivity.blocks.blockList = blocks.map(() => ({
-                        container: { x: 0, y: 0 },
-                        collapseToggle
-                    }));
-                }),
-                findTopBlock: jest.fn(() => 0),
-                moveBlock: jest.fn()
-            };
+
+            palettes.add("myblocks");
+            const palette = palettes.dict.myblocks;
+            palette.name = "myblocks";
+
+            palette.activity = mockActivity;
+            palettes.activity = mockActivity;
+
+            const protoblk = { name: "macro_block" };
 
             palette._makeBlockFromProtoblock(protoblk, true, "macro_testmacro", null, 10, 20);
+
             jest.advanceTimersByTime(500);
 
-            const loadArg = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
-            expect(loadArg[0][1]).toBe("raw");
-            expect(loadArg[1][1]).toEqual(["text", "hi"]);
-            expect(loadArg[2][1]).toEqual(["text", "5"]);
-            expect(loadArg[3][1]).toEqual(["number", 7]);
-            expect(loadArg[4][1]).toEqual(["number", 3]);
-            expect(loadArg[5][1]).toEqual(["number", 8]);
-            expect(loadArg[6][1]).toEqual(["text", { value: "bye" }]);
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalled();
+
+            expect(capturedBlocks).toBeDefined();
+            expect(capturedBlocks[0][1]).toBe("raw");
+            expect(capturedBlocks[1][1]).toEqual(["text", "hi"]);
+            expect(capturedBlocks[2][1]).toEqual(["text", "5"]);
+            expect(capturedBlocks[3][1]).toEqual(["number", 7]);
+            expect(capturedBlocks[4][1]).toEqual(["number", 3]);
+            expect(capturedBlocks[5][1]).toEqual(["number", 8]);
+            expect(capturedBlocks[6][1]).toEqual(["text", { value: "bye" }]);
+
             expect(collapseToggle).toHaveBeenCalled();
+            expect(mockActivity.blocks.blockList.length).toBeGreaterThan(0);
+
             jest.useRealTimers();
         });
 
@@ -2031,13 +2134,22 @@ describe("Palettes Class", () => {
             mockActivity.palettes = palettes;
             mockActivity.blocks = {
                 blockList: [{ container: { x: 0, y: 0 } }],
-                moveBlock: jest.fn()
+                moveBlock: jest.fn(),
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false,
+                dragStartX: 10,
+                dragStartY: 20
             };
 
             palette._makeBlockFromProtoblock(protoblk, true, "box", null, 10, 20);
 
             expect(palette._makeBlockFromPalette).toHaveBeenCalled();
             expect(mockActivity.blocks.moveBlock).toHaveBeenCalled();
+            expect(mockActivity.blocks.actionHistory).toEqual([{ type: "restore", blockId: 0 }]);
+            expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+            expect(mockActivity.blocks.dragStartX).toBeUndefined();
+            expect(mockActivity.blocks.dragStartY).toBeUndefined();
         });
 
         test("outside click listener hides menu", () => {
@@ -2075,7 +2187,8 @@ describe("Palettes Class", () => {
             };
             const tr = {
                 children: MULTIPALETTES.map(() => ({
-                    children: [{ src: "" }, { style: { background: "" } }]
+                    children: [{ src: "" }, { style: { background: "" } }],
+                    setAttribute: jest.fn()
                 }))
             };
 
@@ -2087,6 +2200,8 @@ describe("Palettes Class", () => {
             expect(tr.children[0].children[1].style.background).toBe(
                 platformColor.paletteLabelBackground
             );
+            expect(tr.children[1].setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tr.children[0].setAttribute).toHaveBeenCalledWith("aria-selected", "false");
         });
     });
 
