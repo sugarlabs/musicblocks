@@ -4121,15 +4121,25 @@ function getNote(
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
+        // Apply the key offset before normalizing the pitch index.
+        // For example, with kOffset = 0, noteArg = -1 gives pitchValue = -1
+        // and maps to "B" in the previous octave, while noteArg = -13
+        // maps to "B" two octaves below the starting octave.
+        const pitchValue = noteArg + kOffset;
+        const pitchIndex = ((pitchValue % octaveLength) + octaveLength) % octaveLength;
+
+        if (pitchValue < 0) {
+            octave += Math.floor(pitchValue / octaveLength);
+        }
         if (octaveLength === 12) {
             if (getSharpFlatPreference(keySignature) === "sharp") {
-                noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+                noteArg = PITCHES2[pitchIndex];
             } else {
-                noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+                noteArg = PITCHES[pitchIndex];
             }
         } else {
             const edoNames = generateNoteNames(octaveLength);
-            noteArg = edoNames[(noteArg + kOffset) % octaveLength];
+            noteArg = edoNames[pitchIndex];
         }
     }
 
