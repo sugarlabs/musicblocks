@@ -3187,6 +3187,118 @@ describe("PhraseMaker Widget", () => {
             phraseMaker.handleClose();
             expect(global.announceToScreenReader).toHaveBeenCalledWith("Phrase Maker closed");
         });
+        test("closing does not throw when wheelDivptm is missing (#8231)", () => {
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+            phraseMaker.docById = jest.fn(() => null);
+
+            expect(() => phraseMaker.handleClose()).not.toThrow();
+            expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalled();
+        });
+        test("closing hides wheelDivptm when the element exists", () => {
+            const wheelDiv = { style: { display: "" } };
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+            phraseMaker.docById = jest.fn(() => wheelDiv);
+
+            phraseMaker.handleClose();
+
+            expect(wheelDiv.style.display).toBe("none");
+        });
+        test("widgetWindow.onclose does not throw when wheelDivptm is missing (#8231)", () => {
+            const mockActivity = {
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: {
+                            beatsPerMeasure: 4,
+                            noteValuePerBeat: 4,
+                            keySignature: 0
+                        }
+                    }))
+                },
+                logo: {
+                    tupletRhythms: [],
+                    synth: {
+                        inTemperament: "equal",
+                        stopSound: jest.fn(),
+                        stop: jest.fn(),
+                        loadSynth: jest.fn()
+                    }
+                },
+                blocks: {
+                    protoBlockDict: {
+                        forward: {
+                            staticLabels: ["Forward"]
+                        }
+                    }
+                },
+                canvas: { width: 800, height: 600 },
+                getStageScale: jest.fn(() => 1),
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+
+            phraseMaker._rows = [];
+            phraseMaker._headcols = [];
+            phraseMaker._labelcols = [];
+            phraseMaker._blockMap = {};
+            phraseMaker.blockNo = 0;
+            phraseMaker.rowLabels = ["C", "kick", "forward"];
+            phraseMaker.rowArgs = [4, 4, 100];
+            phraseMaker._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+            phraseMaker.lyricsON = true;
+
+            global.PhraseMakerUtils = {
+                MATRIXGRAPHICS: ["forward"],
+                MATRIXGRAPHICS2: [],
+                MATRIXSYNTHS: []
+            };
+
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    addButton: jest.fn().mockReturnValue({
+                        onclick: null,
+                        innerHTML: "",
+                        style: {},
+                        setAttribute: jest.fn()
+                    }),
+                    getWidgetBody: jest.fn().mockReturnValue({
+                        appendChild: jest.fn(),
+                        append: jest.fn()
+                    }),
+                    sendToCenter: jest.fn(),
+                    destroy: jest.fn()
+                })
+            };
+            global.PhraseMakerUI = {
+                calculateNoteWidth: jest.fn(() => 80),
+                resetMatrix: jest.fn()
+            };
+
+            phraseMaker.init(mockActivity);
+            phraseMaker.docById = jest.fn(() => null);
+
+            expect(() => phraseMaker.widgetWindow.onclose()).not.toThrow();
+            expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
     });
 });
 

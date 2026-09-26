@@ -1219,6 +1219,7 @@ describe("Sampler Widget", () => {
             };
             global.AudioContext = jest.fn(() => audioContext);
             const stream = { getTracks: jest.fn(() => [{ stop: jest.fn() }]) };
+            delete window.navigator;
             Object.defineProperty(window, "navigator", {
                 value: {
                     mediaDevices: {
@@ -1258,6 +1259,7 @@ describe("Sampler Widget", () => {
                 })),
                 close: jest.fn().mockResolvedValue()
             }));
+            delete window.navigator;
             Object.defineProperty(window, "navigator", {
                 value: {
                     mediaDevices: {
