@@ -804,11 +804,16 @@ describe("JSEditor", () => {
             expect(consoleEl.textContent).not.toContain("previous output");
         });
 
-        test("_runCode calls _codeToBlocks securely on valid code", async () => {
+        test("_runCode calls _codeToBlocks securely on valid code and clicks playNativeBtn if present", async () => {
             const editor = createEditor();
-            const consoleEl = document.createElement("div");
-            consoleEl.id = "editorConsole";
-            document.body.appendChild(consoleEl);
+
+            const consoleEl = document.getElementById("editorConsole");
+            expect(consoleEl).not.toBeNull();
+
+            const playNativeBtn = document.createElement("button");
+            playNativeBtn.id = "play";
+            document.body.appendChild(playNativeBtn);
+            const playSpy = jest.spyOn(playNativeBtn, "click");
 
             editor._code = "const a = 1;";
             acorn.parse.mockImplementation(() => ({}));
@@ -819,6 +824,33 @@ describe("JSEditor", () => {
             await editor._runCode();
 
             expect(editor._codeToBlocks).toHaveBeenCalled();
+            expect(playSpy).toHaveBeenCalled();
+            expect(consoleEl.textContent).toContain("Code executed successfully!");
+
+            playSpy.mockRestore();
+            playNativeBtn.remove();
+        });
+
+        test("_runCode logs sandbox error on _codeToBlocks failure", async () => {
+            const editor = createEditor();
+
+            const consoleEl = document.getElementById("editorConsole");
+            expect(consoleEl).not.toBeNull();
+
+            editor._code = "const a = 1;";
+            acorn.parse.mockImplementation(() => ({}));
+
+            // Mock _codeToBlocks to throw
+            const error = new Error("Mock sandbox error");
+            error.stack = "Mock stack trace";
+            jest.spyOn(editor, "_codeToBlocks").mockRejectedValue(error);
+
+            await editor._runCode();
+
+            expect(consoleEl.textContent).toContain("Sandbox Error:");
+            expect(consoleEl.textContent).toContain("Mock sandbox error");
+            expect(consoleEl.textContent).toContain("Stack trace:");
+            expect(consoleEl.textContent).toContain("Mock stack trace");
         });
 
         test("_runCode logs syntax error on parse failure", async () => {
