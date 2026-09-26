@@ -155,6 +155,20 @@ class JSGenerate {
                 return args;
             }
 
+            /**
+             * Returns the action name of a "do" block whose name slot holds a text block, or
+             * null. A name computed at run time (a box, a join) can't become a static call.
+             *
+             * @param {Object} blk - Block object
+             * @returns {?String} action name
+             */
+            function GetDoActionName(blk) {
+                if (blk.name !== "do") return null;
+                const arg = globalActivity.blocks.blockList[blk.connections[1]];
+                if (arg === undefined || arg === null || arg.name !== "text") return null;
+                return typeof arg.value === "string" && arg.value !== "" ? arg.value : null;
+            }
+
             if (level === undefined) level = 0;
 
             let nextBlk = blk.connections[blk.connections.length - 2 - level];
@@ -162,13 +176,19 @@ class JSGenerate {
             while (nextBlk !== undefined) {
                 // ignore vertical spacers and hidden blocks
                 if (nextBlk.name !== "hidden" && nextBlk.name !== "vspace") {
+                    // The beginner "do" block names its action in a text slot, where nameddo
+                    // keeps it in privateData. With a literal name it is the same call.
+                    const doName = GetDoActionName(nextBlk);
+
                     if (["storein2", "nameddo", "nameddoArg"].includes(nextBlk.name)) {
                         tree.push([nextBlk.name + "_" + nextBlk.privateData]);
+                    } else if (doName !== null) {
+                        tree.push(["nameddo_" + doName]);
                     } else {
                         tree.push([nextBlk.name]);
                     }
 
-                    const args = ParseArg(nextBlk);
+                    const args = doName !== null ? [] : ParseArg(nextBlk);
                     last(tree).push(args.length === 0 ? null : args);
 
                     if (nextBlk.protoblock.style === "clamp") {
