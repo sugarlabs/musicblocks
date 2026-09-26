@@ -799,8 +799,12 @@ describe("setupVolumeActions", () => {
             expect(Singer.VolumeActions.getSynthVolume("piano", 0)).toBe(70);
         });
 
-        it("should return undefined when getting volume for non-existent synth", () => {
-            expect(Singer.VolumeActions.getSynthVolume("nonExistentSynth", 0)).toBeUndefined();
+        it("should return 0 when getting volume for non-existent synth", () => {
+            expect(Singer.VolumeActions.getSynthVolume("nonExistentSynth", 0)).toBe(0);
+        });
+
+        it("should return 0 for inherited object properties like toString", () => {
+            expect(Singer.VolumeActions.getSynthVolume("toString", 0)).toBe(0);
         });
     });
 

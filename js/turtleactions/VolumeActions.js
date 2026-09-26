@@ -322,11 +322,11 @@ function setupVolumeActions(activity) {
         static getSynthVolume(targetSynth, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            for (const synth in tur.singer.synthVolume) {
-                if (synth === targetSynth) {
-                    return last(tur.singer.synthVolume[synth]);
-                }
+            if (Object.prototype.hasOwnProperty.call(tur.singer.synthVolume, targetSynth)) {
+                return last(tur.singer.synthVolume[targetSynth]);
             }
+
+            return 0;
         }
     };
 }
