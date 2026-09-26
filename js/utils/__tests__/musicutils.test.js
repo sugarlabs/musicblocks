@@ -2395,28 +2395,32 @@ describe("durationToNoteValue", () => {
     global.POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
     it("should correctly convert a duration to a note value with no dots", () => {
-        const result = durationToNoteValue(1); // Expect a whole note
-        expect(result).toEqual([1, 0, null]);
+        expect(durationToNoteValue(1)).toEqual([1, 0, null]);
+        expect(durationToNoteValue(2)).toEqual([2, 0, null]);
+        expect(durationToNoteValue(4)).toEqual([4, 0, null]);
     });
 
     it("should correctly convert a duration to a note value with one dot", () => {
-        const result = durationToNoteValue(1.5); // 1.5 = whole note + dotted
-        expect(result).toEqual([1, 0, [3, 0.5], 1]);
+        expect(durationToNoteValue(1 / 1.5)).toEqual([1, 1, null]);
+        expect(durationToNoteValue(2 / 1.5)).toEqual([2, 1, null]);
+        expect(durationToNoteValue(4 / 1.5)).toEqual([4, 1, null]);
+        expect(durationToNoteValue(8 / 1.5)).toEqual([8, 1, null]);
     });
 
     it("should correctly convert a duration to a note value with two dots", () => {
-        const result = durationToNoteValue(1.75);
-        expect(result).toEqual([1, 0, [3.5, 0.5], 1]);
+        expect(durationToNoteValue(1 / 1.75)).toEqual([1, 2, null]);
+        expect(durationToNoteValue(2 / 1.75)).toEqual([2, 2, null]);
+        expect(durationToNoteValue(4 / 1.75)).toEqual([4, 2, null]);
+    });
+
+    it("should handle tuplet durations that do not match power-of-two note values", () => {
+        expect(durationToNoteValue(1.5)).toEqual([1, 0, [3, 0.5], 1]);
+        expect(durationToNoteValue(1.75)).toEqual([1, 0, [3.5, 0.5], 1]);
     });
 
     it("should round down durations that do not match exact note values in POWER2", () => {
         const result = durationToNoteValue(0.3);
         expect(result).toEqual([1, 0, [0.6, 0.5], 1]);
-    });
-
-    it("should correctly return the note value for durations in POWER2", () => {
-        const result = durationToNoteValue(2);
-        expect(result).toEqual([2, 0, null]);
     });
 
     it("should return the default rounded value for durations without an exact tuplet factor", () => {
