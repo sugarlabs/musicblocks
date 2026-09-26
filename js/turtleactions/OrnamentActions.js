@@ -67,7 +67,7 @@ function setupOrnamentActions(activity) {
         /**
          * Lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.
          *
-         * @param {Number} value - staccato value
+         * @param {Number} value - slur value
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} [blk] - corresponding Block index in blocks.blockList
          * @returns {void}
@@ -85,7 +85,7 @@ function setupOrnamentActions(activity) {
                 activity.logo.notation.notationBeginSlur(turtle);
             }
 
-            const listenerName = "_staccato_" + turtle + "_" + blk;
+            const listenerName = "_slur_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
