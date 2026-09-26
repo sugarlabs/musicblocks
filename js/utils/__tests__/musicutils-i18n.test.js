@@ -76,7 +76,12 @@ describe("musicutils-i18n", () => {
             files.forEach(file => vm.runInContext(readSource(file), sandbox, { filename: file }));
             return sandbox;
         };
-        const order = ["musicutils-constants.js", "musicutils-i18n.js", "musicutils.js"];
+        const order = [
+            "musicutils-constants.js",
+            "musicutils-i18n.js",
+            "musicutils-temperament.js",
+            "musicutils.js"
+        ];
 
         it("loads between the constants and musicutils.js without redeclaration errors", () => {
             expect(() => load(order, value => value)).not.toThrow();

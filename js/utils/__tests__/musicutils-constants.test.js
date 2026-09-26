@@ -91,7 +91,12 @@ describe("musicutils-constants", () => {
             // A hoisted `var` in musicutils.js cannot redeclare a top-level `const`,
             // which would stop the whole app from starting.
             expect(() =>
-                load(["musicutils-constants.js", "musicutils-i18n.js", "musicutils.js"])
+                load([
+                    "musicutils-constants.js",
+                    "musicutils-i18n.js",
+                    "musicutils-temperament.js",
+                    "musicutils.js"
+                ])
             ).not.toThrow();
         });
 
@@ -99,6 +104,7 @@ describe("musicutils-constants", () => {
             const sandbox = load([
                 "musicutils-constants.js",
                 "musicutils-i18n.js",
+                "musicutils-temperament.js",
                 "musicutils.js"
             ]);
             for (const name of Object.keys(constants)) {
