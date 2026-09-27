@@ -818,9 +818,22 @@ const getStatsFromNotation = activity => {
                         const temperament = getTemperament(activity.logo.synth.inTemperament);
                         if (temperament) {
                             const pitchName = note.slice(0, note.length - 1);
+                            const cleanPitchName = pitchName.replace(/\(.*?\)/g, "");
                             for (const key in temperament) {
                                 const ele = temperament[key];
-                                if (Array.isArray(ele) && ele.length > 3 && ele[3] === pitchName) {
+                                if (!Array.isArray(ele)) continue;
+                                const ele1 = ele[1];
+                                const ele3 = ele[3];
+                                const cleanEle1 =
+                                    typeof ele1 === "string" ? ele1.replace(/\(.*?\)/g, "") : ele1;
+                                const cleanEle3 =
+                                    typeof ele3 === "string" ? ele3.replace(/\(.*?\)/g, "") : ele3;
+                                if (
+                                    (ele.length > 3 &&
+                                        (ele3 === pitchName || cleanEle3 === cleanPitchName)) ||
+                                    ele1 === pitchName ||
+                                    cleanEle1 === cleanPitchName
+                                ) {
                                     note = ele[1] + note[note.length - 1];
                                     break;
                                 }

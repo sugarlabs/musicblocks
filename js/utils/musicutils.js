@@ -2899,19 +2899,26 @@ function getNote(
         }
     } else if (isCustomTemperament(temperament)) {
         note = getCustomNote(noteArg);
+        const cleanNote = typeof note === "string" ? note.replace(/\(.*?\)/g, "") : note;
         let pitchNumber = null;
         // Ensure the temperament exists before accessing it
         if (TEMPERAMENT[temperament]) {
             for (const number in TEMPERAMENT[temperament]) {
                 if (number !== "pitchNumber" && number !== "interval") {
-                    if (note === TEMPERAMENT[temperament][number][3]) {
-                        if (typeof number === "string") {
-                            pitchNumber = Number(number);
-                        } else {
-                            pitchNumber = number;
-                        }
-                        break;
-                    } else if (note === TEMPERAMENT[temperament][number][1]) {
+                    const ele = TEMPERAMENT[temperament][number];
+                    if (!ele) continue;
+                    const n3 = ele[3];
+                    const n1 = ele[1];
+                    const cleanN3 = typeof n3 === "string" ? n3.replace(/\(.*?\)/g, "") : n3;
+                    const cleanN1 = typeof n1 === "string" ? n1.replace(/\(.*?\)/g, "") : n1;
+                    if (
+                        note === n3 ||
+                        (cleanNote && cleanNote === cleanN3) ||
+                        (cleanNote && cleanNote === n3) ||
+                        note === n1 ||
+                        (cleanNote && cleanNote === cleanN1) ||
+                        (cleanNote && cleanNote === n1)
+                    ) {
                         if (typeof number === "string") {
                             pitchNumber = Number(number);
                         } else {

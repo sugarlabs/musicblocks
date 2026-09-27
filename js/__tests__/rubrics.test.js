@@ -467,5 +467,47 @@ describe("rubrics.js test suite", () => {
             expect(stats.pitchNames.has("C")).toBe(true);
             expect(stats.pitches).toContain(261.6);
         });
+
+        it("resolves custom note names with 3-element entries and calculates lowest/highest notes", () => {
+            isCustomTemperament.mockReturnValue(true);
+            getTemperament.mockReturnValue({
+                pitchNumber: 12,
+                0: [1, "vvC", 4],
+                1: [1.88, "^B", 4]
+            });
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [
+                                [["vvC4"], 4],
+                                [["^B4"], 4]
+                            ]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "custom",
+                        getCustomFrequency: jest.fn(note => (note === "vvC4" ? 261.63 : 493.88)),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            try {
+                const stats = getStatsFromNotation(activity);
+
+                expect(stats.pitchNames.has("vvC")).toBe(true);
+                expect(stats.pitchNames.has("^B")).toBe(true);
+                expect(stats.pitches).toContain(261.63);
+                expect(stats.pitches).toContain(493.88);
+                expect(stats.lowestNote).toEqual(["vvC4", 0, 261.63]);
+                expect(stats.highestNote).toEqual(["^B4", 1, 493.88]);
+            } finally {
+                isCustomTemperament.mockReturnValue(false);
+                getTemperament.mockReturnValue([]);
+            }
+        });
     });
 });
