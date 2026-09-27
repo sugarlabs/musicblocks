@@ -2332,6 +2332,10 @@ describe("_setupFileHandlers inner callbacks", () => {
         const saveLocally = jest.fn(() => {
             storage["SESSION" + storage.currentProject] = projectData;
         });
+        const saveSessionAsync = jest.fn(() => {
+            storage["SESSION" + storage.currentProject] = projectData;
+            return Promise.resolve();
+        });
         const blocks = {
             ...makeActivity().blocks,
             loadNewBlocks: jest.fn(() => {
@@ -2344,6 +2348,7 @@ describe("_setupFileHandlers inner callbacks", () => {
             storage,
             blocks,
             saveLocally,
+            saveSessionAsync,
             sessionStorageManager
         });
         activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
@@ -2361,12 +2366,52 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(sessionStorageManager.loadSession).toHaveBeenCalledWith("SESSIONstudent-song");
 
         global.pubsub.emit("finishedLoading", { token: 7 });
-        await Promise.resolve();
-        await Promise.resolve();
+        await jest.advanceTimersByTimeAsync(0);
 
         expect(storage["SESSIONOriginal Project"]).toBe("latest original data");
         expect(storage["SESSIONstudent-song 3"]).toBe("new imported data");
-        expect(saveLocally).toHaveBeenCalledTimes(2);
+        expect(saveSessionAsync).toHaveBeenCalledTimes(2);
+        expect(saveLocally).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler aborts local replacement when the IndexedDB save fails", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const saveError = new Error("IndexedDB save failed");
+        const saveLocally = jest.fn();
+        const activity = makeActivity({
+            saveLocally,
+            saveSessionAsync: jest.fn().mockRejectedValue(saveError),
+            sessionStorageManager: { loadSession: jest.fn() }
+        });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.saveSessionAsync).toHaveBeenCalledTimes(1);
+        expect(saveLocally).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(saveError, {
+            operation: "saveProjectBeforeImport"
+        });
+        expect(activity.storage.currentProject).toBe("Test Project");
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
     });
 

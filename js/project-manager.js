@@ -1047,8 +1047,20 @@ class ProjectManager {
             that.storage.currentProject = projectName;
         };
 
+        const saveLocalSession = async () => {
+            if (that.sessionStorageManager && typeof that.saveSessionAsync === "function") {
+                await that.saveSessionAsync();
+            } else if (typeof that.saveLocally === "function") {
+                await that.saveLocally({ rejectOnProjectSaveError: true });
+            }
+        };
+
         const saveImportedProject = async () => {
             try {
+                if (!that.planet) {
+                    await saveLocalSession();
+                    return;
+                }
                 await (typeof that.saveLocally === "function"
                     ? that.saveLocally({ rejectOnProjectSaveError: true })
                     : that.planet && typeof that.planet.saveLocally === "function"
@@ -1104,9 +1116,7 @@ class ProjectManager {
                 that.planet.closePlanet();
             } else {
                 try {
-                    if (typeof that.saveLocally === "function") {
-                        await that.saveLocally({ rejectOnProjectSaveError: true });
-                    }
+                    await saveLocalSession();
                     await initialiseLocalImportedProject(file);
                 } catch (error) {
                     ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
