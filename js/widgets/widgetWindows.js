@@ -856,6 +856,7 @@ class WidgetWindow {
      */
     show() {
         this._frame.style.display = "block";
+        window.widgetWindows._handleResize();
     }
 
     /**
@@ -1012,4 +1013,5 @@ window.widgetWindows.showWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "block";
     });
+    window.widgetWindows._handleResize();
 };

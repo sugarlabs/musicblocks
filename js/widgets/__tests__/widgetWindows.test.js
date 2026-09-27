@@ -590,6 +590,38 @@ describe("widgetWindows", () => {
                 window.innerHeight = originalHeight;
             }
         });
+
+        test("repositions hidden windows when they are shown after a resize", () => {
+            const single = createTestWindow("Single");
+            const all = createTestWindow("All");
+            for (const win of [single, all]) {
+                win.setPosition(338, 141);
+                win._frame.getBoundingClientRect = () => ({
+                    left: parseFloat(win._frame.style.left),
+                    top: 141,
+                    width: 616,
+                    height: 500
+                });
+            }
+            window.widgetWindows.hideAllWindows();
+
+            const originalWidth = window.innerWidth;
+            window.innerWidth = 900;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(single._frame.style.left).toBe("338px");
+                expect(all._frame.style.left).toBe("338px");
+
+                single.show();
+                expect(single._frame.style.left).toBe("284px");
+                expect(all._frame.style.left).toBe("338px");
+
+                window.widgetWindows.showWindows();
+                expect(all._frame.style.left).toBe("284px");
+            } finally {
+                window.innerWidth = originalWidth;
+            }
+        });
     });
 
     describe("_maximize and _restore", () => {
