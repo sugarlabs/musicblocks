@@ -90,6 +90,7 @@ describe("musicutils-solfege", () => {
             "musicutils-lookups.js",
             "musicutils-rhythm.js",
             "musicutils-solfege.js",
+            "musicutils-modewheel.js",
             "musicutils.js"
         ];
         const load = files => {
