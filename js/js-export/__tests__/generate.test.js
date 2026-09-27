@@ -316,6 +316,8 @@ describe("JSGenerate Class", () => {
     });
 
     test("should export namedarg as actionArgs index, not null", () => {
+        // The live "arg N" block is a value style block: its index lives
+        // in privateData and its value is null.
         globalActivity.blocks.stackList = [1];
         globalActivity.blocks.blockList = {
             1: { name: "action", trash: false, connections: [null, 2, 3, null] },
@@ -330,7 +332,7 @@ describe("JSGenerate Class", () => {
                 value: null,
                 privateData: 1,
                 connections: [3],
-                protoblock: { args: 0, style: "arg" }
+                protoblock: { args: 0, style: "value" }
             }
         };
 
@@ -355,7 +357,7 @@ describe("JSGenerate Class", () => {
                 value: null,
                 privateData: "2",
                 connections: [3],
-                protoblock: { args: 0, style: "arg" }
+                protoblock: { args: 0, style: "value" }
             }
         };
 
@@ -379,7 +381,7 @@ describe("JSGenerate Class", () => {
                 value: null,
                 privateData: 1,
                 connections: [3],
-                protoblock: { args: 0, style: "arg" }
+                protoblock: { args: 0, style: "value" }
             }
         };
 
@@ -402,7 +404,69 @@ describe("JSGenerate Class", () => {
         }
 
         expect(JSON.stringify(methodAST)).toContain(
-            '{"type":"MemberExpression","object":{"type":"Identifier","name":"actionArgs"}'
+            '{"type":"MemberExpression","object":{"type":"Identifier","name":"actionArgs"},"property":{"type":"Literal","value":1},"computed":true}'
+        );
+    });
+
+    test("should export polygons style divide with value style namedarg", () => {
+        // Mirrors the polygons example: forward(divide(360, arg 1))
+        // where the arg block is loaded from file as a value style
+        // namedarg with a null value and the index in privateData.
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "polygon", connections: [1] },
+            3: {
+                name: "forward",
+                connections: [1, 4, null],
+                protoblock: { args: 1, style: "flow" }
+            },
+            4: {
+                name: "divide",
+                connections: [3, 5, 6],
+                protoblock: { args: 2, style: "arg" }
+            },
+            5: {
+                name: "number",
+                value: 360,
+                connections: [4],
+                protoblock: { args: 0, style: "value" }
+            },
+            6: {
+                name: "namedarg",
+                value: null,
+                privateData: "1",
+                connections: [4],
+                protoblock: { args: 0, style: "value" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionTrees).toEqual([
+            [["forward", [["divide", [360, ["arg", [1]]]]], null]]
+        ]);
+
+        const RealASTUtils = require("../ASTutils");
+        const RealJSInterface = require("../interface");
+        const savedInterface = global.JSInterface;
+        global.JSInterface = RealJSInterface;
+        let methodAST;
+        try {
+            methodAST = RealASTUtils.getMethodAST(
+                JSGenerate.actionNames[0],
+                JSGenerate.actionTrees[0]
+            );
+        } finally {
+            global.JSInterface = savedInterface;
+        }
+
+        expect(JSON.stringify(methodAST)).toContain(
+            '{"type":"MemberExpression","object":{"type":"Identifier","name":"actionArgs"},"property":{"type":"Literal","value":1},"computed":true}'
+        );
+        // 360 / actionArgs[1], not 360 / null
+        expect(JSON.stringify(methodAST)).toContain(
+            '"left":{"type":"Literal","value":360},"right":{"type":"MemberExpression"'
         );
     });
 

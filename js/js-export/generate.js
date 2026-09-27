@@ -129,7 +129,14 @@ class JSGenerate {
                     }
 
                     if (arg.protoblock.style === "value") {
-                        if (JSInterface.isGetter(arg.name)) {
+                        if (arg.name === "namedarg") {
+                            // The "arg N" block is a value style block in the
+                            // live codebase: its index lives in privateData
+                            // and its value is null, so export it like the
+                            // generic arg block, which becomes actionArgs[N]
+                            // downstream.
+                            args.push(["arg", [Number(arg.privateData)]]);
+                        } else if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
                             window.BooleanBlock &&
