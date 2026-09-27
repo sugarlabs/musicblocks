@@ -93,6 +93,7 @@ beforeEach(() => {
             window.widgetWindows._boundHandleGlobalMouseDown,
             true
         );
+        window.removeEventListener("resize", window.widgetWindows._boundHandleResize);
     }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
@@ -551,6 +552,43 @@ describe("widgetWindows", () => {
             win.sendToCenter();
 
             expect(win._frame.style.left).toBe("200px");
+        });
+    });
+
+    describe("viewport resize", () => {
+        test("keeps open windows within the viewport without moving windows that still fit", () => {
+            const offscreen = createTestWindow("Offscreen");
+            offscreen.setPosition(338, 141);
+            offscreen._frame.getBoundingClientRect = () => ({
+                left: 338,
+                top: 141,
+                width: 616,
+                height: 500
+            });
+
+            const fitting = createTestWindow("Fitting");
+            fitting.setPosition(100, 150);
+            fitting._frame.getBoundingClientRect = () => ({
+                left: 100,
+                top: 150,
+                width: 300,
+                height: 300
+            });
+
+            const originalWidth = window.innerWidth;
+            const originalHeight = window.innerHeight;
+            window.innerWidth = 900;
+            window.innerHeight = 700;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(offscreen._frame.style.left).toBe("284px");
+                expect(offscreen._frame.style.top).toBe("141px");
+                expect(fitting._frame.style.left).toBe("100px");
+                expect(fitting._frame.style.top).toBe("150px");
+            } finally {
+                window.innerWidth = originalWidth;
+                window.innerHeight = originalHeight;
+            }
         });
     });
 

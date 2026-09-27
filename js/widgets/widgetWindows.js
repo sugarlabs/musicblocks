@@ -187,6 +187,21 @@ window.widgetWindows = {
             }
         }
     },
+    _handleResize() {
+        if (window.innerWidth <= 600) return;
+
+        for (const win of Object.values(this.openWindows)) {
+            if (!win || win._maximized || win._frame.style.display === "none") continue;
+
+            const rect = win._frame.getBoundingClientRect();
+            const x = Math.min(Math.max(rect.left, 0), Math.max(0, window.innerWidth - rect.width));
+            const y = Math.min(
+                Math.max(rect.top, 64),
+                Math.max(64, window.innerHeight - rect.height)
+            );
+            if (x !== rect.left || y !== rect.top) win.setPosition(x, y);
+        }
+    },
     _initGlobalListeners() {
         if (this._globalListenersInitialized) return;
 
@@ -194,6 +209,7 @@ window.widgetWindows = {
         this._boundHandleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
         this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
         this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
+        this._boundHandleResize = this._handleResize.bind(this);
 
         document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
         document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
@@ -201,6 +217,7 @@ window.widgetWindows = {
         // Use capture phase (true) to handle keyboard shortcuts before individual
         // widgets can intercept them via stopPropagation().
         document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
+        window.addEventListener("resize", this._boundHandleResize);
 
         this._globalListenersInitialized = true;
     },
