@@ -630,7 +630,6 @@ class ASTUtils {
             greater: ["binexp", ">"],
             or: ["binexp", "||"],
             and: ["binexp", "&&"],
-            xor: ["binexp", "^"],
             not: ["unexp", "!"],
             neg: ["unexp", "-"],
             abs: ["method", "Math.abs"],
@@ -667,6 +666,15 @@ class ASTUtils {
                     name: `${methodName}`
                 },
                 arguments: ASTUtils._getArgsAST(args)
+            };
+        }
+
+        if (methodName === "xor") {
+            return {
+                type: "BinaryExpression",
+                left: getUnaryExpAST("!", args[0]),
+                right: getUnaryExpAST("!", args[1]),
+                operator: "!=="
             };
         }
 

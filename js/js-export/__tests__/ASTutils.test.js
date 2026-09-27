@@ -542,6 +542,16 @@ describe("ASTUtils", () => {
             });
         });
 
+        it("should preserve XOR results when compared with Equal", () => {
+            const compare = (left, right, expected) => {
+                const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
+                return new Function(`return ${astring.generate(ast)}`)();
+            };
+
+            expect(compare("bool_true", "bool_false", "bool_true")).toBe(true);
+            expect(compare(1, 2, "bool_false")).toBe(true);
+        });
+
         it("should return the AST for a unary expression", () => {
             const methodName = "not";
             const args = ["arg1"];
