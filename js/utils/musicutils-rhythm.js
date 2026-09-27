@@ -12,8 +12,7 @@
 /*
    exported
 
-   reducedFraction, toFraction, calcNoteValueToDisplay, durationToNoteValue,
-   isInt, convertFactor, MusicUtilsRhythm
+   reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor, MusicUtilsRhythm
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -33,10 +32,11 @@ if (typeof module !== "undefined" && module.exports) {
  * @returns {string} The reduced fraction as a string.
  */
 var reducedFraction = (a, b) => {
+    // Not GCD from utils-logic.js: that takes the absolute value of both arguments, but
+    // callers rely on a negative b (or a) surviving into the displayed denominator here.
     const greatestCommonMultiple = (a, b) => {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
-
     const gcm = greatestCommonMultiple(a, b);
 
     if ([1, 2, 4, 8, 16].includes(b / gcm)) {
@@ -44,47 +44,6 @@ var reducedFraction = (a, b) => {
     } else {
         return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
     }
-};
-
-/**
- * Convert a floating-point number to its approximate fractional representation.
- * @function
- * @param {number} d - The floating-point number.
- * @returns {Array} An array containing the numerator and denominator of the fraction.
- */
-var toFraction = d => {
-    // Convert float to its approximate fractional representation.
-    let flip = false;
-    if (d > 1) {
-        flip = true;
-        d = 1 / d;
-    }
-
-    let df = 1.0;
-    let top = 1;
-    let bot = 1;
-
-    let iterGuard = 0;
-    while (Math.abs(df - d) > 0.00000001) {
-        if (iterGuard++ > 10000) {
-            break;
-        }
-        if (df < d) {
-            top += 1;
-        } else {
-            bot += 1;
-            top = parseInt(d * bot, 10);
-        }
-        df = top / bot;
-    }
-
-    if (flip) {
-        const tmp = top;
-        top = bot;
-        bot = tmp;
-    }
-
-    return [top, bot];
 };
 
 /**
@@ -199,16 +158,6 @@ var durationToNoteValue = duration => {
 };
 
 /**
- * Check if a value is an integer.
- * @function
- * @param {*} value - The value to check.
- * @returns {boolean} True if the value is an integer, false otherwise.
- */
-var isInt = value => {
-    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
-};
-
-/**
  * Convert a duration factor to a string representation.
  * @function
  * @param {number} factor - The duration factor to convert.
@@ -259,10 +208,8 @@ var convertFactor = factor => {
 
 var MusicUtilsRhythm = {
     reducedFraction,
-    toFraction,
     calcNoteValueToDisplay,
     durationToNoteValue,
-    isInt,
     convertFactor
 };
 

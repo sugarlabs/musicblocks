@@ -46,7 +46,8 @@ global.fileExt = jest.fn(file => {
     if (parts.length === 1 || (parts[0] === "" && parts.length === 2)) {
         return "";
     }
-    return parts.pop();
+    // Matches the real fileExt (js/utils/utils-logic.js): extensions compare lowercase.
+    return parts.pop().toLowerCase();
 });
 global.window = {
     isElectron: false,

@@ -24,9 +24,10 @@ const musicutils = require("../musicutils");
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
 describe("musicutils-rhythm", () => {
-    it("reduces fractions and converts between fractions and decimals", () => {
-        expect(rhythm.toFraction(0.25)).toEqual([1, 4]);
-        expect(rhythm.toFraction(1.5)).toEqual([3, 2]);
+    it("reduces a fraction to its lowest terms", () => {
+        // toFraction and isInt used to live here too; they moved to utils-logic.js
+        // (see js/utils/__tests__/utils-logic.test.js) since they are pure math with no
+        // MusicBlocks-specific meaning, unlike reducedFraction's HTML/NSYMBOLS display.
         expect(rhythm.reducedFraction(4, 8)).toContain("2");
         expect(rhythm.reducedFraction(3, 9)).toContain("3");
     });
@@ -37,15 +38,6 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.convertFactor(0.25)).toBe("4");
         expect(rhythm.convertFactor(0.125)).toBe("8");
         expect(rhythm.convertFactor(4)).toBeNull();
-    });
-
-    it("tells integers from non-integers", () => {
-        expect(rhythm.isInt(4)).toBe(true);
-        expect(rhythm.isInt(4.5)).toBe(false);
-        expect(rhythm.isInt("4")).toBe(true);
-        expect(rhythm.isInt("4.5")).toBe(false);
-        expect(rhythm.isInt(null)).toBe(false);
-        expect(rhythm.isInt("")).toBe(false);
     });
 
     it("builds the display string for a note's numerator and denominator", () => {
@@ -79,6 +71,7 @@ describe("musicutils-rhythm", () => {
 
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
+            "utils-logic.js",
             "musicutils-constants.js",
             "musicutils-i18n.js",
             "musicutils-temperament.js",
@@ -118,7 +111,7 @@ describe("musicutils-rhythm", () => {
 
         it("publishes the module object for the RequireJS shim", () => {
             const sandbox = load(order);
-            expect(sandbox.window.MusicUtilsRhythm.toFraction(0.25)).toEqual([1, 4]);
+            expect(sandbox.window.MusicUtilsRhythm.reducedFraction(4, 8)).toContain("2");
         });
     });
 });

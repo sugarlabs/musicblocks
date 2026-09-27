@@ -161,14 +161,12 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsRhythm =
         (typeof window !== "undefined" && window.MusicUtilsRhythm) ||
         (typeof require !== "undefined" ? require("./musicutils-rhythm") : {});
-    var {
-        reducedFraction,
-        toFraction,
-        calcNoteValueToDisplay,
-        durationToNoteValue,
-        isInt,
-        convertFactor
-    } = MusicUtilsRhythm;
+    var { reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor } =
+        MusicUtilsRhythm;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { toFraction, isInt } = UtilsLogic;
 }
 
 const _b64Cache = new Map();
