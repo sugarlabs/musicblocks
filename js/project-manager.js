@@ -1020,19 +1020,13 @@ class ProjectManager {
             return extensionIndex === -1 ? file.name : file.name.slice(0, extensionIndex);
         };
 
-        const saveImportedProject = () => {
+        const saveImportedProject = async () => {
             try {
-                const save =
-                    typeof that.saveLocally === "function"
-                        ? that.saveLocally()
-                        : that.planet && typeof that.planet.saveLocally === "function"
-                          ? that.planet.saveLocally()
-                          : null;
-                if (save && typeof save.catch === "function") {
-                    save.catch(error => {
-                        ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
-                    });
-                }
+                await (typeof that.saveLocally === "function"
+                    ? that.saveLocally({ rejectOnProjectSaveError: true })
+                    : that.planet && typeof that.planet.saveLocally === "function"
+                      ? that.planet.saveLocally({ rejectOnProjectSaveError: true })
+                      : null);
             } catch (error) {
                 ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
             }
@@ -1046,10 +1040,10 @@ class ProjectManager {
                 pubsub.off("finishedLoading", onFinished);
                 pubsub.off("loadFailed", onFailed);
             };
-            const onFinished = payload => {
+            const onFinished = async payload => {
                 if (!belongsToThisLoad(payload)) return;
                 stopWatching();
-                saveImportedProject();
+                await saveImportedProject();
                 finishLoading();
             };
             const onFailed = payload => {

@@ -2154,6 +2154,10 @@ describe("_setupFileHandlers inner callbacks", () => {
                 return Promise.resolve({ name, clearWorkspace });
             })
         };
+        let finishImportedSave;
+        const importedSave = new Promise(resolve => {
+            finishImportedSave = resolve;
+        });
         const activity = makeActivity({
             stage,
             blocks,
@@ -2161,6 +2165,7 @@ describe("_setupFileHandlers inner callbacks", () => {
             gitDropdownUI: { clearForNewProject: jest.fn() },
             saveLocally: jest.fn(() => {
                 order.push("save-import");
+                return importedSave;
             })
         });
         activity.sendAllToTrash = jest.fn((_addStartBlock, doNotSave) => {
@@ -2193,10 +2198,17 @@ describe("_setupFileHandlers inner callbacks", () => {
             "load-import",
             "save-import"
         ]);
+        expect(activity.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(activity.loading).toBe(true);
+
+        finishImportedSave();
+        await importedSave;
+        await Promise.resolve();
+
         expect(activity.loading).toBe(false);
     });
 
-    it("change handler finishes loading when saving the imported project throws", async () => {
+    it("change handler finishes loading when saving the imported project rejects", async () => {
         origFileReader = global.FileReader;
         class MockFR {
             constructor() {
@@ -2229,9 +2241,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         const activity = makeActivity({
             stage,
             blocks,
-            saveLocally: jest.fn(() => {
-                throw saveError;
-            })
+            saveLocally: jest.fn().mockRejectedValue(saveError)
         });
         activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
         const handlers = captureHandlers(activity);
@@ -2242,7 +2252,10 @@ describe("_setupFileHandlers inner callbacks", () => {
         handlers.change();
         await jest.advanceTimersByTimeAsync(200);
         global.pubsub.emit("finishedLoading", { token: 7 });
+        await Promise.resolve();
+        await Promise.resolve();
 
+        expect(activity.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
         expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(saveError, {
             operation: "saveImportedProject"
         });
