@@ -553,9 +553,9 @@ describe("saveLilypondOutput", () => {
             0: [[["sn"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
-        expect(result).toContain("\\drumzeroVoice\n");
+        expect(result).toContain("\\drumoneVoice\n");
         expect(result).toContain('\\context TabVoice = "Turtlezero"');
-        expect(result).not.toContain('\\context TabVoice = "drumzero"');
+        expect(result).not.toContain('\\context TabVoice = "drumone"');
     });
 
     test("should handle empty drum staging correctly", () => {
@@ -897,5 +897,50 @@ describe("saveLilypondOutput", () => {
         const result = saveLilypondOutput(activity);
         expect(result.match(/\\bar "\|\."/g)).toHaveLength(1);
         expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
+    });
+});
+
+describe("saveLilypondOutput - drum staff numbering", () => {
+    const note = pitch => [[pitch], 4, 0, null, 0, -1, false];
+
+    const build = melodicStaves => {
+        const notationStaging = {};
+        const notationDrumStaging = {};
+        const turtleList = {};
+        for (let t = 0; t < melodicStaves; t++) {
+            notationStaging[t] = [note("G4")];
+            notationDrumStaging[t] = [];
+            turtleList[t] = { name: "Turtle " + t };
+        }
+        // One drum part, on the last turtle.
+        notationDrumStaging[melodicStaves - 1] = [note("sn")];
+
+        return {
+            logo: {
+                notation: { notationStaging, notationDrumStaging },
+                notationNotes: {},
+                notationOutput: "",
+                guitarOutputHead: "",
+                guitarOutputEnd: "",
+                MIDIOutput: "",
+                synth: { inTemperament: "equal" }
+            },
+            turtles: { turtleList, getTurtle: t => turtleList[t] },
+            prepareExport: jest.fn(() => "{}")
+        };
+    };
+
+    it.each([1, 2, 3])("names the only drum staff drum one above %i melodic staves", n => {
+        const result = saveLilypondOutput(build(n));
+
+        expect(result).toContain("drumone = {");
+        expect(result).not.toContain("drumtwo");
+        expect(result).not.toContain("drumthree");
+    });
+
+    it.each([1, 2, 3])("keeps the short name in step above %i melodic staves", n => {
+        const result = saveLilypondOutput(build(n));
+
+        expect(result).toContain('shortInstrumentName = "d1"');
     });
 });
