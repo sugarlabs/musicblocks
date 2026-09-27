@@ -136,7 +136,9 @@ var getIntervalRatio = name => {
  * @returns {number} The index of the drum, or -1 if not found.
  */
 var getDrumIndex = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return -1;
+    } else if (name === "") {
         // console.debug("getDrumName passed blank name. Returning " + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === "http") {
@@ -161,7 +163,9 @@ var getDrumIndex = name => {
  * @returns {string|null} The name of the drum, or null if not found.
  */
 var getDrumName = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return null;
+    } else if (name === "") {
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === "http") {
         return null;
@@ -185,7 +189,9 @@ var getDrumName = name => {
  * @returns {string} The symbol of the drum, or "hh" if not found.
  */
 var getDrumSymbol = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return "hh";
+    } else if (name === "") {
         return "hh";
     }
 
@@ -255,7 +261,9 @@ var getOscillatorTypes = name => {
  * @returns {string} The file path of the drum icon, or the default drum icon path if not found.
  */
 var getDrumIcon = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return "images/drum.svg";
+    } else if (name === "") {
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === "http") {
         return "images/drum.svg";
@@ -278,8 +286,8 @@ var getDrumIcon = name => {
  * @returns {string|null} The name of the drum synth, or null if not found.
  */
 var getDrumSynthName = name => {
-    if (name === null || name === undefined) {
-        // console.debug("getDrumSynthName passed null name. Returning null");
+    if (typeof name !== "string") {
+        // console.debug("getDrumSynthName passed non-string name. Returning null");
         return null;
     } else if (name === "") {
         name = DEFAULTDRUM;
@@ -304,7 +312,9 @@ var getDrumSynthName = name => {
  * @returns {string} The name of the noise, or the default noise if not found.
  */
 var getNoiseName = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return DEFAULTNOISE;
+    } else if (name === "") {
         name = DEFAULTNOISE;
     }
 
@@ -328,7 +338,9 @@ var getNoiseName = name => {
  * @returns {string} The file path of the noise icon, or the default noise icon path if not found.
  */
 var getNoiseIcon = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return "images/synth.svg";
+    } else if (name === "") {
         name = DEFAULTNOISE;
     } else if (name.slice(0, 4) === "http") {
         return "images/noises.svg";
@@ -351,7 +363,7 @@ var getNoiseIcon = name => {
  * @returns {string|null} The name of the noise synth, or null if not found.
  */
 var getNoiseSynthName = name => {
-    if (name === null || name === undefined) {
+    if (typeof name !== "string") {
         return null;
     } else if (name === "") {
         name = DEFAULTNOISE;
@@ -374,7 +386,9 @@ var getNoiseSynthName = name => {
  * @returns {string|null} The name of the voice, or null if not found.
  */
 var getVoiceName = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return DEFAULTVOICE;
+    } else if (name === "") {
         name = DEFAULTVOICE;
     } else if (name.slice(0, 4) === "http") {
         return null;
@@ -400,7 +414,9 @@ var getVoiceName = name => {
  * @returns {string} The file path of the voice icon, or the default voice icon path if not found.
  */
 var getVoiceIcon = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return "images/voices.svg";
+    } else if (name === "") {
         name = DEFAULTVOICE;
     } else if (name.slice(0, 4) === "http") {
         return "images/voices.svg";
@@ -429,7 +445,7 @@ var getVoiceIcon = name => {
  * @returns {string|null} The name of the voice synth, or null if not found.
  */
 var getVoiceSynthName = name => {
-    if (name === null || name === undefined) {
+    if (typeof name !== "string") {
         return null;
     } else if (name === "") {
         name = DEFAULTVOICE;
