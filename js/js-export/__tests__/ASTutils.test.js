@@ -886,6 +886,13 @@ describe("ASTUtils", () => {
                 ASTUtils._getMethodCallAST("testMethod", ["testArg"], { action: true })
             ]);
         });
+
+        it("serializes a do block named by text as an awaited action call", () => {
+            // The tree JSGenerate builds for a do block whose name is a text block.
+            const flows = [["nameddo_chorus", null, null]];
+            const code = astring.generate({ type: "Program", body: ASTUtils._getBlockAST(flows) });
+            expect(code).toContain("await chorus(mouse);");
+        });
     });
 
     describe("getMethodAST", () => {
