@@ -143,7 +143,9 @@ const {
     getModeGroupTitleFont,
     temperamentHasRatios,
     parseSclFile,
-    parseModeJson
+    parseModeJson,
+    parseNoteString,
+    stripMicrotonalPrefix
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -4814,5 +4816,254 @@ describe("generateNoteNames EDO length contract", () => {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
         }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// parseNoteString
+// ---------------------------------------------------------------------------
+describe("parseNoteString", () => {
+    // ── Happy-path: regex fast-path ─────────────────────────────────────────
+
+    it("parses a plain Western note (C4)", () => {
+        expect(parseNoteString("C4")).toEqual(["C", 4]);
+    });
+
+    it("parses every natural Western letter with a mid-range octave", () => {
+        for (const letter of ["C", "D", "E", "F", "G", "A", "B"]) {
+            const result = parseNoteString(`${letter}4`);
+            expect(result).toEqual([letter, 4]);
+        }
+    });
+
+    // ── Accidentals ─────────────────────────────────────────────────────────
+
+    it("parses a sharp accidental (#)", () => {
+        expect(parseNoteString("C#4")).toEqual(["C#", 4]);
+    });
+
+    it("parses a flat accidental (b)", () => {
+        expect(parseNoteString("Db4")).toEqual(["Db", 4]);
+    });
+
+    it("parses the double-sharp ASCII alias (x)", () => {
+        // e.g. E double-sharp is written 'Ex' in MusicBlocks
+        expect(parseNoteString("Ex4")).toEqual(["Ex", 4]);
+    });
+
+    it("parses a double-flat ASCII alias (bb)", () => {
+        expect(parseNoteString("Fbb4")).toEqual(["Fbb", 4]);
+    });
+
+    it("parses the Unicode sharp (♯)", () => {
+        expect(parseNoteString("C♯4")).toEqual(["C♯", 4]);
+    });
+
+    it("parses the Unicode flat (♭)", () => {
+        expect(parseNoteString("D♭4")).toEqual(["D♭", 4]);
+    });
+
+    it("parses the Unicode double-sharp (𝄪)", () => {
+        expect(parseNoteString("E\u{1D12A}4")).toEqual(["E\u{1D12A}", 4]);
+    });
+
+    it("parses the Unicode double-flat (𝄫)", () => {
+        expect(parseNoteString("F\u{1D12B}4")).toEqual(["F\u{1D12B}", 4]);
+    });
+
+    it("parses the Unicode natural sign (♮)", () => {
+        expect(parseNoteString("C♮4")).toEqual(["C♮", 4]);
+    });
+
+    // ── Octave edge cases ────────────────────────────────────────────────────
+
+    it("handles octave 0 (lowest standard piano octave)", () => {
+        expect(parseNoteString("A0")).toEqual(["A", 0]);
+    });
+
+    it("handles octave 8", () => {
+        expect(parseNoteString("C8")).toEqual(["C", 8]);
+    });
+
+    it("handles a multi-digit octave (C10) via the regex path", () => {
+        // The legacy single-char fallback would return ["C1", 0] — wrong.
+        // The regex path must handle this correctly.
+        expect(parseNoteString("C#10")).toEqual(["C#", 10]);
+    });
+
+    it("handles a negative octave (C-1)", () => {
+        // Sub-zero octaves appear in generated microtonal projects.
+        expect(parseNoteString("C-1")).toEqual(["C", -1]);
+    });
+
+    it("handles a negative octave with accidental (Db-1)", () => {
+        expect(parseNoteString("Db-1")).toEqual(["Db", -1]);
+    });
+
+    // ── Solfege note names ───────────────────────────────────────────────────
+
+    it("parses 'do' (solfege)", () => {
+        expect(parseNoteString("do4")).toEqual(["do", 4]);
+    });
+
+    it("parses 're' (solfege)", () => {
+        expect(parseNoteString("re4")).toEqual(["re", 4]);
+    });
+
+    it("parses 'mi' (solfege)", () => {
+        expect(parseNoteString("mi4")).toEqual(["mi", 4]);
+    });
+
+    it("parses 'fa' (solfege)", () => {
+        expect(parseNoteString("fa4")).toEqual(["fa", 4]);
+    });
+
+    it("parses 'sol' (solfege)", () => {
+        expect(parseNoteString("sol4")).toEqual(["sol", 4]);
+    });
+
+    it("parses 'la' (solfege)", () => {
+        expect(parseNoteString("la4")).toEqual(["la", 4]);
+    });
+
+    it("parses 'ti' (solfege)", () => {
+        expect(parseNoteString("ti4")).toEqual(["ti", 4]);
+    });
+
+    it("parses 'si' (solfege alias for 'ti')", () => {
+        expect(parseNoteString("si4")).toEqual(["si", 4]);
+    });
+
+    it("parses 'ut' (historic solfege alias for 'do')", () => {
+        expect(parseNoteString("ut4")).toEqual(["ut", 4]);
+    });
+
+    // ── Carnatic note names ──────────────────────────────────────────────────
+
+    it("parses 'sa' (Carnatic)", () => {
+        expect(parseNoteString("sa4")).toEqual(["sa", 4]);
+    });
+
+    it("parses 'ga' (Carnatic)", () => {
+        expect(parseNoteString("ga4")).toEqual(["ga", 4]);
+    });
+
+    it("parses 'ma' (Carnatic)", () => {
+        expect(parseNoteString("ma4")).toEqual(["ma", 4]);
+    });
+
+    it("parses 'pa' (Carnatic)", () => {
+        expect(parseNoteString("pa4")).toEqual(["pa", 4]);
+    });
+
+    it("parses 'dha' (Carnatic)", () => {
+        expect(parseNoteString("dha4")).toEqual(["dha", 4]);
+    });
+
+    it("parses 'ni' (Carnatic)", () => {
+        expect(parseNoteString("ni4")).toEqual(["ni", 4]);
+    });
+
+    // ── Microtonal prefix stripping ──────────────────────────────────────────
+    // NOTE: parseNoteString does NOT strip microtonal prefixes itself — that
+    // is the responsibility of normalizeNoteAccidentals/stripMicrotonalPrefix
+    // which callers invoke before parseNoteString.  The regex requires the
+    // note to start with a letter group, so a leading ^ / v will cause the
+    // regex to miss and fall back to the legacy path.
+
+    it("falls back gracefully for a note with a leading microtonal prefix (^C4)", () => {
+        // The regex won't match "^C4", so the legacy path runs:
+        // lastChar = "4" → octave = 4, rest = "^C"
+        const [name, oct] = parseNoteString("^C4");
+        expect(oct).toBe(4);
+        expect(name).toBe("^C");
+    });
+
+    // ── Legacy fallback path ─────────────────────────────────────────────────
+
+    it("falls back when input doesn't match the regex — returns last char as octave", () => {
+        // An unusual string that ends with a single digit but has no valid prefix
+        const [name, oct] = parseNoteString("?X5");
+        expect(oct).toBe(5);
+        expect(name).toBe("?X");
+    });
+
+    it("falls back when last char is non-numeric — octave is NaN", () => {
+        const [name, oct] = parseNoteString("?XY");
+        expect(Number.isNaN(oct)).toBe(true);
+        expect(name).toBe("?X");
+    });
+
+    // ── Empty / degenerate inputs ────────────────────────────────────────────
+
+    it("handles an empty string without throwing", () => {
+        // Empty string: len = 0, lastChar = "", octave = NaN, name = ""
+        const [name, oct] = parseNoteString("");
+        expect(typeof name).toBe("string");
+        expect(Number.isNaN(oct)).toBe(true);
+    });
+
+    it("handles a single-character string without throwing", () => {
+        // "C" → lastChar = "C", non-numeric → octave = NaN, name = ""
+        const [name, oct] = parseNoteString("C");
+        expect(Number.isNaN(oct)).toBe(true);
+        expect(name).toBe("");
+    });
+
+    // ── Return type invariant ────────────────────────────────────────────────
+
+    it("always returns a two-element array", () => {
+        for (const input of ["C4", "do4", "sa4", "C#10", "C-1", "", "??"]) {
+            const result = parseNoteString(input);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result).toHaveLength(2);
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// stripMicrotonalPrefix
+// ---------------------------------------------------------------------------
+describe("stripMicrotonalPrefix", () => {
+    it("strips a single leading ^ (up-prefix)", () => {
+        expect(stripMicrotonalPrefix("^C4")).toBe("C4");
+    });
+
+    it("strips a single leading v (down-prefix)", () => {
+        expect(stripMicrotonalPrefix("vD4")).toBe("D4");
+    });
+
+    it("strips exactly two leading ^ characters", () => {
+        expect(stripMicrotonalPrefix("^^C4")).toBe("C4");
+    });
+
+    it("strips exactly two leading v characters", () => {
+        expect(stripMicrotonalPrefix("vvD4")).toBe("D4");
+    });
+
+    it("strips a mixed pair (^v)", () => {
+        expect(stripMicrotonalPrefix("^vC4")).toBe("C4");
+    });
+
+    it("strips at most two — three carets leaves one behind", () => {
+        // ^^^C4 → regex /^[v^]{1,2}/ removes the first two, leaving "^C4"
+        expect(stripMicrotonalPrefix("^^^C4")).toBe("^C4");
+    });
+
+    it("does not strip anything from a plain note string", () => {
+        expect(stripMicrotonalPrefix("C4")).toBe("C4");
+    });
+
+    it("does not alter a string starting with a letter", () => {
+        expect(stripMicrotonalPrefix("Db4")).toBe("Db4");
+    });
+
+    it("returns an empty string unchanged", () => {
+        expect(stripMicrotonalPrefix("")).toBe("");
+    });
+
+    it("returns a string of only carets with the first two removed", () => {
+        // "^^^" → strips first 2, returns "^"
+        expect(stripMicrotonalPrefix("^^^")).toBe("^");
     });
 });
