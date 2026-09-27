@@ -12,6 +12,7 @@ import importlib.util
 import io
 import json
 import pathlib
+import re
 import unittest
 from datetime import datetime, timezone
 from unittest import mock
@@ -1418,6 +1419,201 @@ class IssueContextTests(unittest.TestCase):
         self.assertTrue(markdown.startswith("# Issue context for sugarlabs/musicblocks\n\nData as of: 2026-01-31 00:00 UTC"))
         self.assertNotIn('"schema_version"', markdown)
         self.assertIn("#### PRs referencing this issue in title or description", markdown)
+
+    # Contract: /context issue comment
+
+    def _tool_comment(self, created_at="2026-01-30T12:00:00Z"):
+        return comment(
+            "github-actions",
+            created_at=created_at,
+            body=issue_context.CONTEXT_COMMENT_MARKER + "\n# Issue context for sugarlabs/musicblocks",
+            author_type="Bot",
+            url="https://example/comments/tool",
+        )
+
+    def test_context_requests_and_tool_comment_are_left_out_of_discussion(self):
+        normalized = issue_context.normalize_issue(
+            issue(
+                8,
+                comments=[
+                    comment("amy", created_at="2026-01-29T00:00:00Z", body="Looks reproducible."),
+                    comment("newcomer", created_at="2026-01-30T00:00:00Z", body="/context"),
+                    comment("other", created_at="2026-01-30T06:00:00Z", body="  /context\r\n"),
+                    self._tool_comment(),
+                    comment("ci", created_at="2026-01-30T13:00:00Z", body="Build passed", author_type="Bot"),
+                    comment("zed", created_at="2026-01-30T14:00:00Z", body="/context please, is this still open?"),
+                ],
+            )
+        )
+        self.assertEqual([c.author for c in normalized.comments], ["amy", "ci", "zed"])
+        report = issue_context.render_markdown([normalized], "sugarlabs/musicblocks", TEST_NOW)
+        self.assertNotIn("newcomer", report)
+        self.assertNotIn("comments/tool", report)
+        recent = issue_context.issue_to_json(normalized, TEST_NOW)["recent_human_discussion"]
+        self.assertEqual([entry["author"] for entry in recent], ["amy", "zed"])
+
+    def test_only_bot_comments_with_the_marker_are_treated_as_the_tool_comment(self):
+        marker = issue_context.CONTEXT_COMMENT_MARKER
+        human_quote = comment("amy", body=marker + " quoted by a person")
+        other_bot = comment("helper", body="Unrelated " + marker, author_type="Bot")
+        self.assertFalse(issue_context.is_context_tool_comment(human_quote))
+        self.assertFalse(issue_context.is_context_tool_comment(other_bot))
+        self.assertTrue(issue_context.is_context_tool_comment(self._tool_comment()))
+
+    def test_context_requests_do_not_displace_human_comments(self):
+        humans = [
+            comment(f"person{i}", created_at=f"2026-01-2{i}T00:00:00Z", body=f"Note {i}", url=f"https://example/{i}")
+            for i in range(5)
+        ]
+        requests = [
+            comment(f"asker{i}", created_at=f"2026-01-30T0{i}:00:00Z", body="/context") for i in range(3)
+        ]
+        normalized = issue_context.normalize_issue(
+            issue(8, comments=humans + requests + [self._tool_comment()])
+        )
+        self.assertEqual([c.author for c in normalized.comments], [f"person{i}" for i in range(5)])
+        self.assertIn(f"comments(last: {issue_context.COMMENT_FETCH_WINDOW})", issue_context.ISSUE_FIELDS)
+        self.assertGreater(issue_context.COMMENT_FETCH_WINDOW, issue_context.MAX_COMMENTS)
+
+    def test_comment_window_still_keeps_only_the_last_human_comments(self):
+        many = [
+            comment(f"p{i:02d}", created_at=f"2026-01-{i + 1:02d}T00:00:00Z", url=f"https://example/{i}")
+            for i in range(12)
+        ]
+        normalized = issue_context.normalize_issue(issue(8, comments=many))
+        self.assertEqual(
+            [c.author for c in normalized.comments], [f"p{i:02d}" for i in range(7, 12)]
+        )
+
+    def test_github_comment_never_mentions_users_or_teams(self):
+        normalized = issue_context.normalize_issue(
+            issue(
+                8,
+                title="Crash reported by @reporter",
+                comments=[
+                    comment("amy", body="I'm working on this, cc @bob and @sugarlabs/maintainers (mail a@b.org)"),
+                ],
+                prs=[pull_request(20)],
+            )
+        )
+        rendered = issue_context.render_github_comment(
+            [normalized], "sugarlabs/musicblocks", TEST_NOW, scan_of()
+        )
+        self.assertIsNone(re.search(r"@[A-Za-z0-9]", rendered))
+        for name in ("reporter", "bob", "sugarlabs/maintainers", "amy", "zara"):
+            with self.subTest(name=name):
+                self.assertIn("@⁠" + name, rendered)
+        self.assertIn("PR #20", rendered)
+        self.assertIn("https://github.com/sugarlabs/musicblocks/pull/20", rendered)
+
+    def test_github_comment_wraps_the_unchanged_markdown_report(self):
+        normalized = self._rich_issue()
+        scan = scan_of(scanned_pr(50, body="Fixes #8"))
+        markdown = issue_context.render_markdown([normalized], "sugarlabs/musicblocks", TEST_NOW, scan)
+        rendered = issue_context.render_github_comment([normalized], "sugarlabs/musicblocks", TEST_NOW, scan)
+        self.assertTrue(rendered.startswith(issue_context.CONTEXT_COMMENT_MARKER + "\n# Issue context"))
+        self.assertIn(markdown, rendered.replace("@⁠", "@"))
+        self.assertTrue(rendered.endswith(issue_context.CONTEXT_COMMENT_FOOTER + "\n"))
+        self.assertIn("Data as of: 2026-01-31 00:00 UTC", rendered)
+        self.assertLess(rendered.index("## Detection limitations"), rendered.index(issue_context.CONTEXT_COMMENT_FOOTER))
+        self.assertLess(len(rendered), 65536)
+        lowered = rendered.lower()
+        for term in FORBIDDEN_TERMS:
+            with self.subTest(term=term):
+                self.assertNotIn(term, lowered)
+
+    def test_github_comment_is_recognized_by_its_own_filter(self):
+        rendered = issue_context.render_github_comment(
+            [issue_context.normalize_issue(issue(8))], "sugarlabs/musicblocks", TEST_NOW
+        )
+        posted = comment("github-actions", body=rendered, author_type="Bot")
+        self.assertTrue(issue_context.is_context_tool_comment(posted))
+
+    def test_cli_github_comment_renders_one_issue(self):
+        status, rendered, calls = self._cli(
+            ["--repo", "sugarlabs/musicblocks", "--issue", "9121", "--format", "github-comment"],
+            [
+                json.dumps({"data": {"repository": {"issue": issue(9121)}}}),
+                pr_page([scanned_pr(50, body="Related to #9121")]),
+            ],
+        )
+        self.assertEqual(status, 0)
+        self.assertTrue(rendered.startswith(issue_context.CONTEXT_COMMENT_MARKER))
+        self.assertEqual(rendered.count("## #"), 1)
+        self.assertIn("PR #50", rendered)
+        self.assertEqual(calls[0]["variables"]["number"], 9121)
+
+    def test_cli_github_comment_requires_issue(self):
+        stderr = io.StringIO()
+        with mock.patch.object(issue_context.sys, "stderr", stderr), mock.patch.object(
+            issue_context, "fetch_issues"
+        ) as fetch:
+            with self.assertRaises(SystemExit) as raised:
+                issue_context.main(["--repo", "sugarlabs/musicblocks", "--format", "github-comment"])
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("--format github-comment requires --issue", stderr.getvalue())
+        fetch.assert_not_called()
+
+
+WORKFLOW = SCRIPT.parent.parent / "workflows" / "contributor-issue-context-command.yml"
+
+
+class ContextCommandWorkflowTests(unittest.TestCase):
+    """Static checks on the /context workflow; its security relies on these lines."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = WORKFLOW.read_text(encoding="utf-8")
+
+    def test_triggers_only_on_new_issue_comments(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\npermissions:", 1)[0]
+        self.assertEqual(trigger.split(), ["issue_comment:", "types:", "[created]"])
+
+    def test_permissions_are_least_privilege(self):
+        permissions = self.text.split("\npermissions:\n", 1)[1].split("\njobs:", 1)[0]
+        self.assertEqual(
+            permissions.split(), ["contents:", "read", "issues:", "write", "pull-requests:", "read"]
+        )
+        self.assertEqual(self.text.count("permissions:"), 1)
+
+    def test_job_ignores_pull_requests_closed_issues_and_bots(self):
+        condition = self.text.split("        if: >-\n", 1)[1].split("        runs-on:", 1)[0]
+        self.assertIn("!github.event.issue.pull_request", condition)
+        self.assertIn("github.event.issue.state == 'open'", condition)
+        self.assertIn("github.event.comment.user.type != 'Bot'", condition)
+        self.assertIn(f"body.trim() !== '{issue_context.CONTEXT_COMMAND}'", self.text)
+
+    def test_untrusted_event_text_is_never_expanded_into_steps(self):
+        allowed = {
+            "github.event.issue.number",
+            "github.repository",
+            "secrets.GITHUB_TOKEN",
+            "steps.existing.outputs.comment_id",
+            "steps.existing.outputs.duplicate_ids",
+        }
+        expressions = {match.strip() for match in re.findall(r"\$\{\{(.*?)\}\}", self.text)}
+        self.assertTrue(expressions)
+        self.assertLessEqual(expressions, allowed)
+
+    def test_runs_trusted_default_branch_code_without_persisted_credentials(self):
+        self.assertIn("persist-credentials: false", self.text)
+        self.assertNotIn("ref:", self.text)
+        self.assertNotIn("pull_request_target", self.text)
+        self.assertIn(
+            '--repo "$REPOSITORY" --issue "$ISSUE_NUMBER" --format github-comment', self.text
+        )
+
+    def test_only_edits_its_own_marked_comment(self):
+        marker = issue_context.CONTEXT_COMMENT_MARKER
+        self.assertEqual(self.text.count(f"const MARKER = '{marker}';"), 2)
+        self.assertIn("c.user.type === 'Bot' && c.user.login === 'github-actions[bot]'", self.text)
+        self.assertIn(".startsWith(MARKER)", self.text)
+
+    def test_failure_never_posts_an_error_comment(self):
+        failure = self.text.split("- name: Report failure on the request", 1)[1]
+        self.assertNotIn("createComment", failure)
+        self.assertNotIn("updateComment", failure)
+        self.assertEqual(self.text.count("createComment({"), 1)
 
 
 if __name__ == "__main__":

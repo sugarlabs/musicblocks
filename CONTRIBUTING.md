@@ -539,26 +539,35 @@ competition of ideas (Sugar Labs is a meritocracy)._
 
 ### Before starting work on an issue
 
-To see the context around a specific issue before you start, run:
+Before you start, comment exactly this on the GitHub issue:
+
+```text
+/context
+```
+
+Within a minute or two, a bot comment titled "Issue context" appears on
+the issue. If one already exists, it is refreshed instead. No local setup
+is needed. Where detected, it shows:
+
+- existing pull requests: open pull requests linked to the issue or that
+  reference it, and previous linked pull requests closed without being merged
+- recent discussion on the issue
+- other signals visible on GitHub, such as comments that may indicate
+  contributor intent, and assignees
+
+This is information only. It does not assign or reserve the issue, and
+alternative implementations remain welcome. Still read the issue, its pull
+requests, and the discussion yourself. The comment shows when its data was
+collected ("Data as of") and lists its detection limitations: if no pull
+request or signal is detected, that does not prove nobody else is working on
+the issue.
+
+Maintainers and developers can also generate the same report locally. This
+is optional and needs Python 3 and the [GitHub CLI](https://cli.github.com/)
+(`gh`), signed in with `gh auth login`:
 
 ```bash
 python3 .github/scripts/issue-context.py \
   --repo sugarlabs/musicblocks \
   --issue <ISSUE_NUMBER>
 ```
-
-Where detected, the output shows:
-
-- linked open pull requests
-- open pull requests that reference the issue in their title or description
-- previous linked pull requests that were closed without being merged
-- recent human discussion on the issue
-- comments that may indicate contributor intent
-
-This is context, not ownership or permission. It does not decide who may
-work on an issue, and alternative implementations remain welcome. If no
-pull request or intent signal is detected, that does not prove nobody else
-is working on the issue; the output also lists what it could not check.
-
-The command needs Python 3 and the [GitHub CLI](https://cli.github.com/)
-(`gh`), signed in with `gh auth login`.

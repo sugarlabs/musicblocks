@@ -8,7 +8,10 @@ assign, lock, label, close, or otherwise modify GitHub resources.
 
 Usage:
     issue-context.py --repo OWNER/NAME [--state open|closed|all]
-                     [--issue N] [--format markdown|json]
+                     [--issue N] [--format markdown|json|github-comment]
+
+``--format github-comment`` renders one issue (``--issue`` is required) as the
+canonical comment that the /context workflow posts or refreshes on that issue.
 """
 
 # Copyright (c) 2026 Sugar Labs
@@ -35,6 +38,9 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
 
 
 MAX_COMMENTS = 5
+# More comments than MAX_COMMENTS are fetched so that /context requests and the
+# tool's own comment, which are dropped, do not displace human discussion.
+COMMENT_FETCH_WINDOW = 20
 MAX_LINKED_PRS = 20
 MAX_TEXT_REFERENCE_PRS = 20
 MAX_PR_SCAN_PAGES = 20
@@ -42,6 +48,17 @@ PR_SCAN_PAGE_SIZE = 50
 MAX_COMMENT_CHARS = 200
 GH_TIMEOUT_SECONDS = 30
 RECENT_COMMENT_DAYS = 30
+
+CONTEXT_COMMAND = "/context"
+CONTEXT_COMMENT_MARKER = "<!-- contributor-issue-context -->"
+CONTEXT_COMMENT_FOOTER = (
+    "Context only: this comment does not decide who may work on this issue, and alternative "
+    f"implementations remain welcome. Comment `{CONTEXT_COMMAND}` on this issue to refresh it."
+)
+
+# An "@" directly before a name would notify that user or team when the report
+# is posted as a comment.
+MENTION_PATTERN = re.compile(r"@(?=[A-Za-z0-9])")
 
 # Intent is deliberately limited to direct, first-person statements. A match
 # is only a hint for contributors to review the linked comment; it is never an
@@ -83,7 +100,7 @@ ISSUE_FIELDS = f"""
         milestone {{ title }}
         assignees(first: 20) {{ nodes {{ login }} }}
         participants {{ totalCount }}
-        comments(last: {MAX_COMMENTS}) {{
+        comments(last: {COMMENT_FETCH_WINDOW}) {{
           nodes {{ author {{ login __typename }} createdAt body url }}
         }}
         closedByPullRequestsReferences(
@@ -533,6 +550,20 @@ def _comment_from_raw(raw: Dict[str, Any]) -> Comment:
     )
 
 
+def is_context_tool_comment(raw: Dict[str, Any]) -> bool:
+    """Whether a raw comment is a /context request or the tool's own comment.
+
+    Neither is discussion about the issue, so both are left out of the
+    comment window instead of counting as recent human discussion.
+    """
+    body = _text(raw.get("body"))
+    if body.strip() == CONTEXT_COMMAND:
+        return True
+    author = raw.get("author")
+    author_type = _text(author.get("__typename")) if isinstance(author, dict) else ""
+    return author_type == "Bot" and body.startswith(CONTEXT_COMMENT_MARKER)
+
+
 def _linked_pr_from_raw(raw: Dict[str, Any]) -> LinkedPullRequest:
     return LinkedPullRequest(
         number=_parse_number(raw.get("number")),
@@ -559,7 +590,11 @@ def normalize_issue(raw: Dict[str, Any]) -> IssueContext:
     milestone_name = _text(milestone.get("title")) if isinstance(milestone, dict) else ""
 
     comments = sorted(
-        (_comment_from_raw(node) for node in _connection_nodes(raw.get("comments"))),
+        (
+            _comment_from_raw(node)
+            for node in _connection_nodes(raw.get("comments"))
+            if not is_context_tool_comment(node)
+        ),
         key=lambda comment: (_sort_key_timestamp(comment.created_at), comment.author, comment.url, comment.body),
     )[-MAX_COMMENTS:]
     linked_nodes, linked_prs_truncated = _linked_pr_connection(raw.get("closedByPullRequestsReferences"))
@@ -804,6 +839,22 @@ def render_markdown(
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
+def render_github_comment(
+    issues: Iterable[IssueContext],
+    repo: str,
+    now: Optional[datetime] = None,
+    text_scan: Optional[TextReferenceScan] = None,
+) -> str:
+    """Render the Markdown report as the canonical /context issue comment.
+
+    The hidden marker lets the workflow find and edit this comment instead of
+    adding another one. A word joiner after every "@" before a name keeps the
+    comment from notifying assignees, commenters, or users named in excerpts.
+    """
+    report = MENTION_PATTERN.sub("@\u2060", render_markdown(issues, repo, now, text_scan))
+    return f"{CONTEXT_COMMENT_MARKER}\n{report}\n---\n\n{CONTEXT_COMMENT_FOOTER}\n"
+
+
 JSON_SCHEMA_VERSION = 1
 
 
@@ -1019,8 +1070,10 @@ def main(argv: Optional[List[str]] = None, now: Optional[datetime] = None) -> in
     parser.add_argument("--repo", required=True, help="GitHub repository in OWNER/NAME format")
     parser.add_argument("--state", choices=("open", "closed", "all"), default="open")
     parser.add_argument("--issue", type=_positive_int, help="report on one issue; --state is ignored")
-    parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    parser.add_argument("--format", choices=("markdown", "json", "github-comment"), default="markdown")
     args = parser.parse_args(argv)
+    if args.format == "github-comment" and args.issue is None:
+        parser.error("--format github-comment requires --issue")
     now = now or datetime.now(timezone.utc)
     try:
         if args.issue is not None:
@@ -1029,7 +1082,10 @@ def main(argv: Optional[List[str]] = None, now: Optional[datetime] = None) -> in
             raw_issues = fetch_issues(args.repo, args.state, gh_runner=run_gh)
         issues = [normalize_issue(raw) for raw in raw_issues]
         text_scan = scan_text_references(args.repo, gh_runner=run_gh) if issues else None
-        render = render_json if args.format == "json" else render_markdown
+        render = {
+            "json": render_json,
+            "github-comment": render_github_comment,
+        }.get(args.format, render_markdown)
         sys.stdout.write(render(issues, args.repo, now, text_scan))
         return 0
     except (GitHubAPIError, ValueError) as exc:
