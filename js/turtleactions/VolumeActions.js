@@ -326,7 +326,7 @@ function setupVolumeActions(activity) {
                 return last(tur.singer.synthVolume[targetSynth]);
             }
 
-            return 0;
+            return 50;
         }
     };
 }
