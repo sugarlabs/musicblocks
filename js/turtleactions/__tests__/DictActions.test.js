@@ -216,6 +216,27 @@ describe("setupDictActions", () => {
             expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
+        it("should handle localized read-only keys by showing a localized error message", () => {
+            const originalI18n = global._;
+            // Mock translation for Spanish: "notes played" -> "notas tocadas", format string -> "Cannot set read-only key: %s" (assuming format string not translated yet)
+            global._ = jest.fn(msg => {
+                if (msg === "notes played") return "notas tocadas";
+                if (msg === "Cannot set read-only key: %s")
+                    return "No se puede configurar la clave de solo lectura: %s";
+                return msg;
+            });
+
+            // The user types the localized string in the UI
+            Turtle.DictActions.SetDictValue(0, turtle, "notas tocadas", "value");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "No se puede configurar la clave de solo lectura: notas tocadas"
+            );
+
+            // Restore original mock
+            global._ = originalI18n;
+        });
+
         it("should support lowercase setDictValue alias", () => {
             Turtle.DictActions.setDictValue(0, turtle, "color", "blue");
             expect(targetTurtle.painter.doSetColor).toHaveBeenCalledWith("blue");
