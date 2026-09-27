@@ -21,7 +21,8 @@
    deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex, safeNumber, toArray, formatSeconds
+   rationalToFraction, GCD, LCD, toFraction, isInt, resolveObject, clampNumber, isValidHex,
+   safeNumber, toArray, formatSeconds
 */
 
 /**
@@ -232,6 +233,57 @@ function GCD(a, b) {
  */
 var LCD = (a, b) => {
     return Math.abs((a * b) / GCD(a, b));
+};
+
+/**
+ * Convert a floating-point number to its approximate fractional representation.
+ * @function
+ * @param {number} d - The floating-point number.
+ * @returns {Array} An array containing the numerator and denominator of the fraction.
+ */
+var toFraction = d => {
+    // Convert float to its approximate fractional representation.
+    let flip = false;
+    if (d > 1) {
+        flip = true;
+        d = 1 / d;
+    }
+
+    let df = 1.0;
+    let top = 1;
+    let bot = 1;
+
+    let iterGuard = 0;
+    while (Math.abs(df - d) > 0.00000001) {
+        if (iterGuard++ > 10000) {
+            break;
+        }
+        if (df < d) {
+            top += 1;
+        } else {
+            bot += 1;
+            top = parseInt(d * bot, 10);
+        }
+        df = top / bot;
+    }
+
+    if (flip) {
+        const tmp = top;
+        top = bot;
+        bot = tmp;
+    }
+
+    return [top, bot];
+};
+
+/**
+ * Check if a value is an integer.
+ * @function
+ * @param {*} value - The value to check.
+ * @returns {boolean} True if the value is an integer, false otherwise.
+ */
+var isInt = value => {
+    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
 };
 
 /**
@@ -738,6 +790,8 @@ var UtilsLogic = {
     rationalToFraction,
     GCD,
     LCD,
+    toFraction,
+    isInt,
     mixedNumber,
     rationalSum,
     nearestBeat,

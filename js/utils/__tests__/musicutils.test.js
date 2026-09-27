@@ -169,6 +169,10 @@ describe("musicutils", () => {
                 path.join(__dirname, "..", "musicutils-lookups.js"),
                 "utf8"
             );
+            const rhythm = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-rhythm.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -183,6 +187,7 @@ describe("musicutils", () => {
             vm.runInContext(temperament, sandbox);
             vm.runInContext(pitch, sandbox);
             vm.runInContext(lookups, sandbox);
+            vm.runInContext(rhythm, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
