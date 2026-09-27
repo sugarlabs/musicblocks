@@ -328,7 +328,10 @@ function setupDictActions(activity) {
                     return Turtle.DictActions._GetDict(target, turtle, key, blk);
                 }
                 const turtleDict = activity.logo.turtleDicts[turtle][target];
-                if (turtleDict === undefined || !(key in turtleDict)) {
+                if (
+                    turtleDict === undefined ||
+                    !Object.prototype.hasOwnProperty.call(turtleDict, key)
+                ) {
                     return _("Key with this name does not exist in %s").replace(/%s/g, () => dict);
                 }
                 return turtleDict[key];

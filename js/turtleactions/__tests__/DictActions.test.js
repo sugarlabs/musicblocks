@@ -495,5 +495,11 @@ describe("setupDictActions", () => {
             const result = Turtle.DictActions.getValue("target", "score", turtle, 3);
             expect(result).toBe("Key with this name does not exist in target");
         });
+
+        it("should not return inherited properties as stored keys when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "score", 7, turtle);
+            const result = Turtle.DictActions.getValue("target", "toString", turtle, 3);
+            expect(result).toBe("Key with this name does not exist in target");
+        });
     });
 });
