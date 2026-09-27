@@ -226,15 +226,17 @@ describe("setupDictActions", () => {
                 return msg;
             });
 
-            // The user types the localized string in the UI
-            Turtle.DictActions.SetDictValue(0, turtle, "notas tocadas", "value");
+            try {
+                // The user types the localized string in the UI
+                Turtle.DictActions.SetDictValue(0, turtle, "notas tocadas", "value");
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(
-                "No se puede configurar la clave de solo lectura: notas tocadas"
-            );
-
-            // Restore original mock
-            global._ = originalI18n;
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "No se puede configurar la clave de solo lectura: notas tocadas"
+                );
+            } finally {
+                // Restore original mock
+                global._ = originalI18n;
+            }
         });
 
         it("should support lowercase setDictValue alias", () => {
