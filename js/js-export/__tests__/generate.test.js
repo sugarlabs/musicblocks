@@ -470,6 +470,66 @@ describe("JSGenerate Class", () => {
         );
     });
 
+    test("should export polygons style repeat count with value style namedarg", () => {
+        // Mirrors the polygons example: repeat(arg 1) where the count block
+        // is loaded from file as ["namedarg", {"value": "1"}], so at
+        // runtime its index sits in privateData and its value is null.
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "polygon", connections: [1] },
+            3: {
+                name: "repeat",
+                connections: [1, 4, 5, null],
+                protoblock: { args: 2, style: "clamp" }
+            },
+            4: {
+                name: "namedarg",
+                value: null,
+                privateData: "1",
+                connections: [3],
+                protoblock: { args: 0, style: "value" }
+            },
+            5: {
+                name: "forward",
+                connections: [3, 6, null],
+                protoblock: { args: 1, style: "flow" }
+            },
+            6: {
+                name: "number",
+                value: 100,
+                connections: [5],
+                protoblock: { args: 0, style: "value" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionTrees).toEqual([
+            [["repeat", [["arg", [1]]], [["forward", [100], null]]]]
+        ]);
+
+        const RealASTUtils = require("../ASTutils");
+        const RealJSInterface = require("../interface");
+        const savedInterface = global.JSInterface;
+        global.JSInterface = RealJSInterface;
+        let methodAST;
+        try {
+            methodAST = RealASTUtils.getMethodAST(
+                JSGenerate.actionNames[0],
+                JSGenerate.actionTrees[0]
+            );
+        } finally {
+            global.JSInterface = savedInterface;
+        }
+
+        // doRepeatCount(actionArgs[1]), not doRepeatCount(null)
+        expect(JSON.stringify(methodAST)).toContain("doRepeatCount");
+        expect(JSON.stringify(methodAST)).toContain(
+            '{"type":"MemberExpression","object":{"type":"Identifier","name":"actionArgs"},"property":{"type":"Literal","value":1},"computed":true}'
+        );
+    });
+
     test("should print tree with nested args including null and object", () => {
         JSGenerate.startTrees = [[["forward", [100, null, ["add", [3, 4]]], null]]];
         JSGenerate.actionTrees = [];

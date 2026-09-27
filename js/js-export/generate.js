@@ -132,10 +132,12 @@ class JSGenerate {
                         if (arg.name === "namedarg") {
                             // The "arg N" block is a value style block in the
                             // live codebase: its index lives in privateData
+                            // (as loaded from e.g. ["namedarg", {"value": "1"}])
                             // and its value is null, so export it like the
                             // generic arg block, which becomes actionArgs[N]
-                            // downstream.
-                            args.push(["arg", [Number(arg.privateData)]]);
+                            // downstream. Fall back to value in case the index
+                            // ended up there instead of privateData.
+                            args.push(["arg", [Number(arg.privateData ?? arg.value)]]);
                         } else if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
@@ -159,7 +161,8 @@ class JSGenerate {
                             // The "arg N" palette block keeps its index in privateData
                             // and its value is null, so export it like the generic
                             // arg block, which becomes actionArgs[N] downstream.
-                            args.push(["arg", [Number(arg.privateData)]]);
+                            // Fall back to value in case the index ended up there.
+                            args.push(["arg", [Number(arg.privateData ?? arg.value)]]);
                         } else {
                             args.push([arg.name, ParseArg(arg)]);
                         }
