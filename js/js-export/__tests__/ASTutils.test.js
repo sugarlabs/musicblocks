@@ -999,6 +999,42 @@ describe("ASTUtils", () => {
             expect(defined).toBe(identifier);
             expect(called).toBe(identifier);
         });
+
+        it("keeps join controls, which are valid after the first character", () => {
+            expect(exportAction("a\u200Cb").defined).toBe("a\u200Cb");
+            expect(exportAction("\u200Cb").defined).toBe("_\u200Cb");
+        });
+
+        describe("when two names convert to the same identifier", () => {
+            afterEach(() => ASTUtils.setActionNames([]));
+
+            it("keeps the name that is already an identifier and suffixes the other", () => {
+                ASTUtils.setActionNames(["chorus-2", "chorus_2", "chorus 2"]);
+                expect(exportAction("chorus_2").defined).toBe("chorus_2");
+                expect(exportAction("chorus-2").defined).toBe("chorus_2_2");
+                const { defined, called } = exportAction("chorus 2");
+                expect(defined).toBe("chorus_2_3");
+                expect(called).toBe("chorus_2_3");
+            });
+
+            it("does not convert a name onto a box variable", () => {
+                ASTUtils.setActionNames(["chorus-2"], ["chorus_2", "not a name"]);
+                expect(exportAction("chorus-2").defined).toBe("chorus_2_2");
+            });
+        });
+
+        describe("getBoxNames", () => {
+            it("finds storein and storein2 boxes at any depth", () => {
+                const trees = [
+                    [
+                        ["storein", ["pitch", 5]],
+                        ["repeat", [2], [["storein2_count", [1]]]]
+                    ],
+                    [["print", ["storein"]]]
+                ];
+                expect(ASTUtils.getBoxNames(trees)).toEqual(["pitch", "count"]);
+            });
+        });
     });
 
     describe("getMouseAST", () => {

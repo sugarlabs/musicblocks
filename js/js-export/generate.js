@@ -308,6 +308,10 @@ class JSGenerate {
         JSGenerate.AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
 
         try {
+            ASTUtils.setActionNames(
+                JSGenerate.actionNames,
+                ASTUtils.getBoxNames([...JSGenerate.actionTrees, ...JSGenerate.startTrees])
+            );
             for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
                 JSGenerate.AST["body"].splice(
                     i,
