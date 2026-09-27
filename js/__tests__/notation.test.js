@@ -274,9 +274,13 @@ describe("Notation Class", () => {
         it("should add harmonics notation", () => {
             const turtle = "turtle1";
             notation.__notationHarmonic(turtle);
-            // In the source code, this pushes to this._notationStaging (without the turtle index)
-            // So let's test just the side effect
             expect(notation._pickupPoint[turtle]).toBeNull();
+            expect(notation._notationStaging[turtle]).toContain("harmonic");
+
+            const turtle2 = "turtle2";
+            notation.__notationHarmonic(turtle2);
+            expect(notation._pickupPoint[turtle2]).toBeNull();
+            expect(notation._notationStaging[turtle2]).toContain("harmonic");
         });
 
         it("should begin harmonics", () => {
