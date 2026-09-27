@@ -80,6 +80,23 @@ const setupDictActions = require("../turtleactions/DictActions");
 // setValue/getValue check whether the dictionary name is a turtle name, so use the real lookup.
 global.getTargetTurtle = require("../blocks/EnsembleBlocks").getTargetTurtle;
 
+// Minimal protoblock bases so the real one-argument "get value" block (GetDictBlock2,
+// js/blocks/DictBlocks.js) can be instantiated and its own arg() dispatched.
+const dictBlocks = {};
+class StubProtoBlock {
+    constructor(name) {
+        dictBlocks[name] = this;
+    }
+    setPalette() {}
+    beginnerBlock() {}
+    setHelpString() {}
+    formBlock() {}
+    setup() {}
+}
+global.FlowBlock = StubProtoBlock;
+global.LeftBlock = StubProtoBlock;
+const { setupDictBlocks } = require("../blocks/DictBlocks");
+
 function createTurtle() {
     return {
         name: "Mr. Mouse",
@@ -250,5 +267,24 @@ describe("Logo dispatch drives the real Turtle.DictActions.setValue/getValue", (
         expect(logo.turtleDicts[0]["0"].score).toBe("green");
         expect(logo.turtleDicts[0]["Mr. Mouse"]).toBeUndefined();
         expect(readBackValue).toBe("green");
+    });
+
+    test("the real one-argument get value block reads its own turtle's dictionary", () => {
+        setupDictBlocks(activity);
+        // Seeded at the turtle index, where Load dictionary stores a turtle's custom keys.
+        logo.turtleDicts[0] = { 0: { level: 3 } };
+        // Swap the stand-in for the real GetDictBlock2, wired to a "level" key block (6).
+        activity.blocks.blockList[5] = {
+            name: "getDict2",
+            connections: [null, 6],
+            protoblock: dictBlocks.getDict2,
+            isValueBlock: () => false,
+            isArgBlock: () => true
+        };
+        activity.blocks.blockList[6] = { ...activity.blocks.blockList[2], value: "level" };
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        expect(readBackValue).toBe(3);
     });
 });
