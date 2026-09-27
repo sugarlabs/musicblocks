@@ -552,6 +552,29 @@ describe("ProjectStorage", () => {
             expect(storage.getCurrentProjectID()).toBe("proj1");
         });
 
+        it("removeSyncedDrafts should keep only pending drafts", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.Projects.proj1.commitDrafts = [
+                { id: "d1", status: "synced" },
+                { id: "d2", status: "pending" },
+                { id: "d3", status: "synced" }
+            ];
+            await storage.removeSyncedDrafts("proj1");
+            expect(storage.data.Projects.proj1.commitDrafts).toEqual([
+                { id: "d2", status: "pending" }
+            ]);
+            expect(saveSpy).toHaveBeenCalled();
+        });
+
+        it("removeSyncedDrafts should not save when nothing was synced", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.Projects.proj1.commitDrafts = [{ id: "d2", status: "pending" }];
+            await storage.removeSyncedDrafts("proj1");
+            await storage.removeSyncedDrafts("nonexistent");
+            expect(storage.data.Projects.proj1.commitDrafts.length).toBe(1);
+            expect(saveSpy).not.toHaveBeenCalled();
+        });
+
         it("deleteProject should remove project and call save", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             await storage.deleteProject("proj1");

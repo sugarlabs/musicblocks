@@ -288,6 +288,18 @@ class ProjectStorage {
         await this.save();
     }
 
+    /**
+     * Drops the drafts that have already been pushed to GitHub, keeping pending ones.
+     * @param {string} id  project ID
+     * @returns {Promise<void>}
+     */
+    async removeSyncedDrafts(id) {
+        const drafts = this.data.Projects[id]?.commitDrafts;
+        if (!Array.isArray(drafts) || !drafts.some(d => d.status === "synced")) return;
+        this.data.Projects[id].commitDrafts = drafts.filter(d => d.status !== "synced");
+        await this.save();
+    }
+
     async deleteProject(id) {
         delete this.data.Projects[id];
         await this.save();
