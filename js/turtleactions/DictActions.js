@@ -110,6 +110,9 @@ function setupDictActions(activity) {
             } else if (key === _("note value")) {
                 return Singer.RhythmActions.getNoteValue(target);
             } else if (key === _("current pitch")) {
+                if (targetTur.singer.lastNotePlayed === null) {
+                    return "G4";
+                }
                 return targetTur.singer.lastNotePlayed[0];
             } else if (key === _("pitch number")) {
                 let obj;

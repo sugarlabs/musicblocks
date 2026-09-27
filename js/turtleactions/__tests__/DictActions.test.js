@@ -131,6 +131,12 @@ describe("setupDictActions", () => {
             expect(currentPitch).toBe("C4");
         });
 
+        it("should return G4 for the current pitch before any note is played", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            expect(Turtle.DictActions._GetDict(0, turtle, "current pitch")).toBe("G4");
+            expect(Turtle.DictActions.getValue("target", "current pitch", turtle, 3)).toBe("G4");
+        });
+
         it("should get the pitch number correctly with lastNotePlayed", () => {
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number");
             expect(pitchNumber).toBe(60);
