@@ -689,10 +689,8 @@ def render_markdown(
         f"Data as of: {now.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
         "",
     ]
-    lines.extend(_limitations(text_scan))
     if not ordered:
-        lines.append("No issues matched the requested state.")
-        return "\n".join(lines) + "\n"
+        lines.extend(["No issues matched the requested state.", ""])
 
     for index, issue in enumerate(ordered):
         lines.extend(
@@ -799,7 +797,11 @@ def render_markdown(
         if index != len(ordered) - 1:
             lines.append("\n---")
 
-    return "\n".join(lines) + "\n"
+    # Limitations come last so readers reach the issue context first.
+    if ordered:
+        lines.append("")
+    lines.extend(_limitations(text_scan))
+    return "\n".join(lines).rstrip("\n") + "\n"
 
 
 JSON_SCHEMA_VERSION = 1

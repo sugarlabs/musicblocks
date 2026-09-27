@@ -833,6 +833,36 @@ class IssueContextTests(unittest.TestCase):
         report = issue_context.render_markdown([], "sugarlabs/musicblocks", TEST_NOW, scan)
         self.assertIn("bad &lt;html&gt; &amp; stuff", report)
 
+    def test_detection_limitations_follow_the_issue_payload(self):
+        normalized = issue_context.normalize_issue(
+            issue(8, comments=[comment("dev", body="I am working on this")], prs=[pull_request(42)])
+        )
+        report = issue_context.render_markdown(
+            [normalized], "sugarlabs/musicblocks", TEST_NOW, scan_of(scanned_pr(50, body="Fixes #8"))
+        )
+        order = [
+            "Data as of:",
+            "## #8 — Issue 8",
+            "### Existing work",
+            "#### Open pull requests",
+            "PR #42",
+            "#### PRs referencing this issue in title or description",
+            "PR #50",
+            "### Recent discussion",
+            "## Detection limitations",
+            "- Finding no PR in this report is not evidence",
+        ]
+        positions = [report.index(marker) for marker in order]
+        self.assertEqual(positions, sorted(positions))
+        self.assertEqual(report.count("## Detection limitations"), 1)
+        self.assertTrue(report.endswith("working on an issue.\n"))
+
+        empty = issue_context.render_markdown([], "sugarlabs/musicblocks", TEST_NOW)
+        self.assertLess(
+            empty.index("No issues matched the requested state."),
+            empty.index("## Detection limitations"),
+        )
+
     def test_limitations_cover_every_detection_scope(self):
         report = issue_context.render_markdown([], "sugarlabs/musicblocks", TEST_NOW, scan_of())
         for expected in (
