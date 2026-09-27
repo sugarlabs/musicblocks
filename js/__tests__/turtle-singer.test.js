@@ -1421,6 +1421,47 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
     });
 });
 
+describe("processPitch music keyboard with movable Do", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    test.each([
+        // [key, typed solfege, expected fixed-do name, expected octave]
+        ["E in", "fa", "la", 4],
+        ["G major", "do", "sol", 3],
+        ["A aeolian", "la", "la", 4]
+    ])("in %s, %s is stored as the fixed-do pitch the keyboard shows", (key, solf, name, oct) => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = key;
+        turtleMock.singer.movable = true;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        activityMock.logo.musicKeyboard = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+
+        Singer.processPitch(activityMock, solf, 4, 0, 0, "blk");
+
+        expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
+        expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
+    });
+});
+
 describe("processPitch internal addPitch behavior", () => {
     let turtleMock;
     let activityMock;

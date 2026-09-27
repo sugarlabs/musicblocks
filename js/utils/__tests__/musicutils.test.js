@@ -3975,6 +3975,90 @@ describe("scaleDegreeToPitchMapping extended modes", () => {
             FLAT
         ]);
     });
+
+    it("keeps degrees aligned when a tritone is skipped (minor blues)", () => {
+        // C minor blues: C E♭ F G♭ G B♭; G♭ is a passing tone, not degree 5
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d =>
+                scaleDegreeToPitchMapping("C minor blues", d, false, null)
+            )
+        ).toEqual(["C", "D", "E" + FLAT, "F", "G", "A", "B" + FLAT]);
+    });
+
+    it("maps each degree to its own note when two notes share a degree", () => {
+        // Fibonacci C D♭ D E G: D♭ and D both fall on degree 2
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d => scaleDegreeToPitchMapping("C fibonacci", d, false, null))
+        ).toEqual(["C", "D" + FLAT, "E", "F", "G", "A", "B"]);
+        // Major blues C D E♭ E G A: E♭ and E both fall on degree 3
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d =>
+                scaleDegreeToPitchMapping("C major blues", d, false, null)
+            )
+        ).toEqual(["C", "D", "E" + FLAT, "F", "G", "A", "B"]);
+    });
+
+    it("counts skipped degrees in the In mode (Sakura, #2050)", () => {
+        // E In: E F A B C, so A and B are degrees 4 and 5
+        expect(scaleDegreeToPitchMapping("E in", 4, false, null)).toBe("A");
+        expect(scaleDegreeToPitchMapping("E in", 5, false, null)).toBe("B");
+    });
+});
+
+describe("getSolfege movable do matches getNote", () => {
+    it("matches the solfege that getNote resolves in E In", () => {
+        const notes = ["E", "F", "A", "B", "C"];
+        expect(notes.map(n => getSolfege(n, "E in", true, "equal"))).toEqual([
+            "do",
+            "re",
+            "fa",
+            "sol",
+            "la"
+        ]);
+    });
+
+    it("uses la as the tonic in aeolian, as getNote does (#2050)", () => {
+        const notes = ["A", "B", "C", "D", "E", "F", "G"];
+        expect(notes.map(n => getSolfege(n, "A aeolian", true, "equal"))).toEqual([
+            "la",
+            "ti",
+            "do",
+            "re",
+            "mi",
+            "fa",
+            "sol"
+        ]);
+    });
+
+    it("round-trips every note of the rotated church modes through getNote", () => {
+        const modes = ["dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        for (const mode of modes) {
+            for (const key of ["C", "E", "G", "B" + FLAT]) {
+                const keySignature = key + " " + mode;
+                const scale = buildScale(keySignature)[0].slice(0, -1);
+                for (const note of scale) {
+                    const solfege = getSolfege(note, keySignature, true, "equal");
+                    const [back] = getNote(solfege, 4, 0, keySignature, true, null, jest.fn());
+                    expect(pitchToNumber(back, 4, keySignature) % 12).toBe(
+                        pitchToNumber(note, 4, keySignature) % 12
+                    );
+                }
+            }
+        }
+    });
+
+    it("round-trips every pentatonic scale note through getNote", () => {
+        for (const keySignature of ["C major pentatonic", "A minor pentatonic", "D hirajoshi"]) {
+            const scale = buildScale(keySignature)[0].slice(0, -1);
+            for (const note of scale) {
+                const solfege = getSolfege(note, keySignature, true, "equal");
+                const [back] = getNote(solfege, 4, 0, keySignature, true, null, jest.fn());
+                expect(pitchToNumber(back, 4, keySignature) % 12).toBe(
+                    pitchToNumber(note, 4, keySignature) % 12
+                );
+            }
+        }
+    });
 });
 
 describe("getNoteFromInterval edge intervals", () => {
