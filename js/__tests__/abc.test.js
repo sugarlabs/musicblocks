@@ -1147,3 +1147,53 @@ describe("saveAbcOutput - one K: field per turtle", () => {
         expect(result.replace(/\n+$/, "")).not.toContain("\n\n");
     });
 });
+
+describe("saveAbcOutput - one voice per turtle", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const build = staging => ({
+        logo: {
+            notationOutput: "",
+            notationNotes: Object.fromEntries(Object.keys(staging).map(t => [t, ""])),
+            notation: { notationStaging: staging }
+        },
+        turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
+    });
+
+    it("gives each turtle its own V: field", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1", "V:t2"]);
+    });
+
+    it("writes a staged voice change inside the turtle it belongs to", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: ["voice one", note("D4")] }));
+
+        // A note block inside a note block stages "voice one". Written as a
+        // bare [V:1] it would move these notes onto the first turtle's staff.
+        expect(result).toContain("[V:t2v1]");
+        expect(result).not.toContain("[V:1]");
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1", "V:t2"]);
+    });
+
+    it("returns to the turtle's own voice when the nesting ends", () => {
+        const result = saveAbcOutput(
+            build({ 0: [note("C4")], 1: ["voice one", note("D4"), "one voice", note("E4")] })
+        );
+
+        expect(result).toContain("[V:t2v1]");
+        expect(result).toContain("[V:t2]");
+    });
+
+    it("skips a turtle that staged fields but no notes", () => {
+        const result = saveAbcOutput(build({ 0: ["meter", 3, 4], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1"]);
+    });
+
+    it("starts each V: field on its own line", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result).not.toMatch(/\S +V:/);
+    });
+});
