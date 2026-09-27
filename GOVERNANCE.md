@@ -146,7 +146,9 @@ the role change.
 ### Role notes
 
 Reviewers are listed in [MAINTAINERS.md](MAINTAINERS.md). They do not get merge
-authority and are not added to [CODEOWNERS](.github/CODEOWNERS).
+authority and are not added to [CODEOWNERS](.github/CODEOWNERS). The area next
+to a Reviewer is where their reviews and merged pull requests land most. It is
+a guide for contributors, not a limit.
 
 Area Approvers are listed in [MAINTAINERS.md](MAINTAINERS.md) and
 [CODEOWNERS](.github/CODEOWNERS). Repository write access must be granted before
