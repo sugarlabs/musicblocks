@@ -18,6 +18,8 @@
  */
 
 const ASTUtils = require("../ASTutils");
+const MathUtility = require("../../utils/mathutils");
+const astring = require("../../../lib/astring.min");
 
 global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
@@ -179,6 +181,21 @@ describe("ASTUtils", () => {
                                 type: "Literal",
                                 value: 0
                             }
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "limit" + iteratorNum
+                            },
+                            init: {
+                                type: "CallExpression",
+                                callee: {
+                                    type: "Identifier",
+                                    name: "MathUtility.doRepeatCount"
+                                },
+                                arguments: ASTUtils._getArgsAST(args)
+                            }
                         }
                     ]
                 },
@@ -188,7 +205,10 @@ describe("ASTUtils", () => {
                         type: "Identifier",
                         name: "i" + iteratorNum
                     },
-                    right: ASTUtils._getArgsAST(args)[0],
+                    right: {
+                        type: "Identifier",
+                        name: "limit" + iteratorNum
+                    },
                     operator: "<"
                 },
                 update: {
@@ -205,6 +225,45 @@ describe("ASTUtils", () => {
                     body: ASTUtils._getBlockAST(flow, iteratorNum + 1)
                 }
             });
+        });
+
+        it("should keep a non-negative integer literal count as a plain loop bound", () => {
+            const result = ASTUtils._getForLoopAST([4], [], 0);
+            expect(result.init.declarations).toHaveLength(1);
+            expect(result.test.right).toEqual({ type: "Literal", value: 4 });
+        });
+
+        // Repeat works out its count once before running the body, so a body
+        // that changes the value the count came from mustn't change it.
+        it("should work out a non-literal count once, before the loop runs", () => {
+            const code = astring.generate(ASTUtils._getForLoopAST(["box_n"], [], 0));
+            let runs = 0;
+            new Function(
+                "MathUtility",
+                "tick",
+                `let n = 3; ${code.replace("{}", "{ n++; tick(); }")}`
+            )(MathUtility, () => runs++);
+            expect(runs).toBe(3);
+        });
+
+        // `i < n` runs Math.ceil(n) times, but Repeat runs Math.floor(n)
+        // times and skips counts below 1 (#8910).
+        it.each([
+            [4, 4],
+            [3.5, 3],
+            [2.2, 2],
+            [0.5, 0],
+            [0, 0],
+            [-2, 0],
+            [["divide", [7, 2]], 3]
+        ])("should export Repeat %j as a loop that runs %i times", (count, expected) => {
+            const code = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+            let runs = 0;
+            new Function("MathUtility", "tick", code.replace("{}", "{ tick(); }"))(
+                MathUtility,
+                () => runs++
+            );
+            expect(runs).toBe(expected);
         });
     });
 

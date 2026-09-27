@@ -39,6 +39,7 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
+   requestClear,
    setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -151,6 +152,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "activity/clear-confirmation",
     "activity/workspace-layout-controller",
     "activity/trash-controller",
     "activity/help-controller",
@@ -159,6 +161,10 @@ let MYDEFINES = [
     "search-ui",
     "activity/keyboard-controller",
     "widgets/plugin-dialog",
+    "utils/musicutils-constants",
+    "utils/musicutils-i18n",
+    "utils/musicutils-temperament",
+    "utils/musicutils-pitch",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -769,57 +775,6 @@ class Activity {
         /*
          * Clears "canvas"
          */
-        const renderClearConfirmation = clearCanvasAction => {
-            if (document.getElementById("clear-confirm")) return;
-            // Create a custom modal for confirmation
-            const modal = document.createElement("div");
-            modal.classList.add("modalBox");
-            modal.id = "clear-confirm";
-            const title = document.createElement("h2");
-            title.textContent = _("Clear workspace");
-            title.classList.add("modal-title");
-
-            modal.appendChild(title);
-            const message = document.createElement("p");
-            message.textContent = _("Are you sure you want to clear the workspace?");
-            message.classList.add("modal-message");
-            modal.appendChild(message);
-
-            const buttonContainer = document.createElement("div");
-            buttonContainer.classList.add("clear-button-container");
-
-            const confirmBtn = document.createElement("button");
-            confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = _("Confirm");
-            confirmBtn.style.border = "none";
-            confirmBtn.style.borderRadius = "4px";
-            confirmBtn.style.padding = "8px 16px";
-            confirmBtn.style.fontWeight = "bold";
-            confirmBtn.style.cursor = "pointer";
-            confirmBtn.style.marginRight = "16px";
-            this.addEventListener(confirmBtn, "click", () => {
-                document.body.removeChild(modal);
-                clearCanvasAction();
-            });
-
-            const cancelBtn = document.createElement("button");
-            cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = _("Cancel");
-            cancelBtn.style.border = "none";
-            cancelBtn.style.borderRadius = "4px";
-            cancelBtn.style.padding = "8px 16px";
-            cancelBtn.style.fontWeight = "bold";
-            cancelBtn.style.cursor = "pointer";
-            this.addEventListener(cancelBtn, "click", () => {
-                document.body.removeChild(modal);
-            });
-
-            buttonContainer.appendChild(confirmBtn);
-            buttonContainer.appendChild(cancelBtn);
-            modal.appendChild(buttonContainer);
-            document.body.appendChild(modal);
-        };
-
         this._allClear = (noErase, skipConfirmation = false) => {
             const clearCanvasAction = () => {
                 this.blocks.activeBlock = null;
@@ -877,11 +832,7 @@ class Activity {
                 }
             };
 
-            if (skipConfirmation) {
-                clearCanvasAction();
-            } else {
-                renderClearConfirmation(clearCanvasAction);
-            }
+            requestClear(this, skipConfirmation, clearCanvasAction);
         };
         /**
          * Sets up play button functionality; runs Music Blocks.
@@ -2831,7 +2782,15 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
+            // Initialise the Git dropdown ("My Project") after the planet
+            // is ready so activity.prepareExport() is available.
+            if (typeof GitDropdownUI !== "undefined") {
+                this.gitDropdownUI = new GitDropdownUI();
+                this.gitDropdownUI.init(this);
+                this.toolbar.renderGitDropdownIcon(this.gitDropdownUI);
+            }
             this.toolbar.renderMenuIcon(this.showHideAuxMenu);
+
             this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
@@ -2863,6 +2822,17 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
+
+            // Keep the Git dirty-check hash up to date after every local save.
+            if (this.gitDropdownUI) {
+                const _origSaveLocally = this.saveLocally;
+                this.saveLocally = (...args) => {
+                    const result = _origSaveLocally.apply(this, args);
+                    this.gitDropdownUI.onSaveLocally();
+                    return result;
+                };
+                window.saveLocally = this.saveLocally;
+            }
 
             // Auto-save live workspace every 5 minutes to guard against
             // data loss from browser crashes (see issue #2994).

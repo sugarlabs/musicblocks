@@ -2855,7 +2855,7 @@ function MusicKeyboard(activity) {
             for (let i = 0; i < accidentals.length; i++) {
                 if (noteValue.includes(accidentals[i])) {
                     accidentalsValue = i;
-                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                    noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                     break;
                 }
             }

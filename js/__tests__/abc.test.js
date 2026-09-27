@@ -228,6 +228,53 @@ describe("processABCNotes - Control Strings", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).not.toContain("K:");
     });
+
+    it("should handle slurs beginning before the first note", () => {
+        logo.notation.notationStaging["0"] = [
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("(C4 D4) ");
+    });
+
+    it("should attach tie directly to preceding note without whitespace", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 0, null, null, -1, false],
+            "tie",
+            [["C4"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("C4- C4 ");
+    });
+
+    it("should place opening slur on the correct note when preceded by another note", () => {
+        logo.notation.notationStaging["0"] = [
+            [["B3"], 4, 0, null, null, -1, false],
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("B,4 (C4 D4) ");
+    });
+
+    it("should handle nested slurs with consecutive begin slur markers", () => {
+        logo.notation.notationStaging["0"] = [
+            "begin slur",
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur",
+            [["E4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("((C4 D4) E4) ");
+    });
 });
 
 describe("processABCNotes - Chords", () => {
@@ -1072,5 +1119,31 @@ describe("processABCNotes - key signatures", () => {
 
             expect(soundedPitches("C major", staged)).toEqual([65, 66, 65]);
         });
+    });
+});
+
+describe("saveAbcOutput - one K: field per turtle", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const build = staging => ({
+        logo: {
+            notationOutput: "",
+            notationNotes: Object.fromEntries(Object.keys(staging).map(t => [t, ""])),
+            notation: { notationStaging: staging }
+        },
+        turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
+    });
+
+    it("starts each turtle's K: field on its own line", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("K:"))).toHaveLength(2);
+        expect(result).not.toMatch(/\S +K:/);
+    });
+
+    it("does not leave a blank line after an empty turtle", () => {
+        const result = saveAbcOutput(build({ 0: [], 1: [note("D4")] }));
+
+        expect(result.replace(/\n+$/, "")).not.toContain("\n\n");
     });
 });

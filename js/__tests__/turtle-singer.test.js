@@ -1787,4 +1787,29 @@ describe("Singer.processNote tuplet and legoWidget handling", () => {
 
         expect(activityMock.logo.phraseMaker.addColBlock).toHaveBeenCalledWith("mockBlk", 1);
     });
+
+    it("should store note cells under the phrase maker block when it is block 0", () => {
+        const PhraseMakerGrid = require("../widgets/PhraseMakerGrid");
+        activityMock.logo.inMatrix = true;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.pitchBlocks = ["pb1"];
+        activityMock.logo.drumBlocks = ["db1"];
+        const phraseMaker = {
+            _blockMap: {},
+            blockNo: 0,
+            addColBlock: jest.fn(),
+            addNode: (rowBlock, rhythmBlock, n, blk) =>
+                PhraseMakerGrid.addNode(phraseMaker, rowBlock, rhythmBlock, n, blk)
+        };
+        activityMock.logo.phraseMaker = phraseMaker;
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(phraseMaker._blockMap[0]).toEqual([
+            ["pb1", ["mockBlk", 0], 0],
+            ["db1", ["mockBlk", 0], 0]
+        ]);
+        expect(phraseMaker._blockMap[-1]).toBeUndefined();
+    });
 });

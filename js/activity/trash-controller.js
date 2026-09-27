@@ -166,7 +166,7 @@ class TrashController {
                     const translatedName = _(uniqueName);
                     label =
                         translatedName.length > 8
-                            ? translatedName.substr(0, 7) + "..."
+                            ? translatedName.slice(0, 7) + "..."
                             : translatedName;
                     actionArg.text.text = label;
 
@@ -187,7 +187,7 @@ class TrashController {
                             const translatedMeName = _(uniqueName);
                             label =
                                 translatedMeName.length > 8
-                                    ? translatedMeName.substr(0, 7) + "..."
+                                    ? translatedMeName.slice(0, 7) + "..."
                                     : translatedMeName;
                             me.text.text = label;
                             me.overrideName = label;

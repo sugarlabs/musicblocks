@@ -663,19 +663,30 @@ describe("JSEditor", () => {
         test("_removeDebuggerFromLine does not crash on out of bounds line", () => {
             const editor = createEditor();
             editor._code = "const x = 1;";
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
 
             expect(() => editor._removeDebuggerFromLine(-1)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+            expect(logSpy).not.toHaveBeenCalled();
+
             expect(() => editor._removeDebuggerFromLine(999)).not.toThrow();
             expect(editor._code).toBe("const x = 1;");
+            expect(logSpy).not.toHaveBeenCalled();
+
+            logSpy.mockRestore();
         });
 
         test("_removeDebuggerFromLine ignores line that is not a debugger statement", () => {
             const editor = createEditor();
             editor._code = "const x = 1;\nconst y = 2;";
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
 
             editor._removeDebuggerFromLine(0);
 
             expect(editor._code).toBe("const x = 1;\nconst y = 2;");
+            expect(logSpy).not.toHaveBeenCalled();
+
+            logSpy.mockRestore();
         });
     });
 
@@ -804,11 +815,16 @@ describe("JSEditor", () => {
             expect(consoleEl.textContent).not.toContain("previous output");
         });
 
-        test("_runCode calls _codeToBlocks securely on valid code", async () => {
+        test("_runCode calls _codeToBlocks securely on valid code and clicks playNativeBtn if present", async () => {
             const editor = createEditor();
-            const consoleEl = document.createElement("div");
-            consoleEl.id = "editorConsole";
-            document.body.appendChild(consoleEl);
+
+            const consoleEl = document.getElementById("editorConsole");
+            expect(consoleEl).not.toBeNull();
+
+            const playNativeBtn = document.createElement("button");
+            playNativeBtn.id = "play";
+            document.body.appendChild(playNativeBtn);
+            const playSpy = jest.spyOn(playNativeBtn, "click");
 
             editor._code = "const a = 1;";
             acorn.parse.mockImplementation(() => ({}));
@@ -819,6 +835,33 @@ describe("JSEditor", () => {
             await editor._runCode();
 
             expect(editor._codeToBlocks).toHaveBeenCalled();
+            expect(playSpy).toHaveBeenCalled();
+            expect(consoleEl.textContent).toContain("Code executed successfully!");
+
+            playSpy.mockRestore();
+            playNativeBtn.remove();
+        });
+
+        test("_runCode logs sandbox error on _codeToBlocks failure", async () => {
+            const editor = createEditor();
+
+            const consoleEl = document.getElementById("editorConsole");
+            expect(consoleEl).not.toBeNull();
+
+            editor._code = "const a = 1;";
+            acorn.parse.mockImplementation(() => ({}));
+
+            // Mock _codeToBlocks to throw
+            const error = new Error("Mock sandbox error");
+            error.stack = "Mock stack trace";
+            jest.spyOn(editor, "_codeToBlocks").mockRejectedValue(error);
+
+            await editor._runCode();
+
+            expect(consoleEl.textContent).toContain("Sandbox Error:");
+            expect(consoleEl.textContent).toContain("Mock sandbox error");
+            expect(consoleEl.textContent).toContain("Stack trace:");
+            expect(consoleEl.textContent).toContain("Mock stack trace");
         });
 
         test("_runCode logs syntax error on parse failure", async () => {
@@ -1220,6 +1263,103 @@ describe("JSEditor", () => {
                 // Full text content should be preserved
                 expect(el.textContent).toBe("var = 1;");
                 expect(el.querySelector(".hljs-keyword .error")).toBe(errorSpan);
+            });
+        });
+        describe("debugger and status window coverage", () => {
+            let editor;
+            beforeEach(() => {
+                editor = createEditor();
+                JSEditor.logConsole = jest.fn();
+            });
+
+            test("_triggerStatusWindow opens status window", () => {
+                global.window.widgetWindows = {
+                    isOpen: jest.fn().mockReturnValue(false),
+                    show: jest.fn()
+                };
+                global.StatusMatrix = jest.fn().mockImplementation(() => ({
+                    init: jest.fn()
+                }));
+                editor._triggerStatusWindow();
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Status window opened"),
+                    "green"
+                );
+
+                global.window.widgetWindows.isOpen.mockReturnValue(true);
+                editor._triggerStatusWindow();
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Status window is already open"),
+                    "blue"
+                );
+            });
+
+            test("_addDebuggerToLine handles edge cases", () => {
+                editor._code = "let x = 1;\nlet y = 2;";
+                JSEditor.logConsole.mockClear();
+
+                editor._addDebuggerToLine(-1); // out of bounds
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                editor._addDebuggerToLine(2); // out of bounds
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                // valid line but no semicolon
+                editor._code = "let x = 1\nlet y = 2";
+                editor._addDebuggerToLine(0);
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Cannot add breakpoint"),
+                    "red"
+                );
+                expect(editor._code).toBe("let x = 1\nlet y = 2");
+
+                // adjacent breakpoint
+                JSEditor.logConsole.mockClear();
+                editor._code = "let x = 1;\ndebugger;\nlet y = 2;";
+                editor._addDebuggerToLine(0);
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("already a breakpoint on an adjacent line"),
+                    "red"
+                );
+                expect(editor._code).toBe("let x = 1;\ndebugger;\nlet y = 2;");
+
+                // success
+                JSEditor.logConsole.mockClear();
+                editor._code = "let x = 1;\nlet y = 2;";
+                editor._addDebuggerToLine(0);
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Debugger added to line"),
+                    "green"
+                );
+            });
+
+            test("_removeDebuggerFromLine handles edge cases", () => {
+                editor._code = "let x = 1;\ndebugger;\nlet y = 2;";
+                JSEditor.logConsole.mockClear();
+
+                editor._removeDebuggerFromLine(-1);
+                expect(editor._code).toBe("let x = 1;\ndebugger;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                editor._removeDebuggerFromLine(3);
+                expect(editor._code).toBe("let x = 1;\ndebugger;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                editor._removeDebuggerFromLine(1);
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Debugger removed from line"),
+                    "orange"
+                );
+
+                // Not a debugger line
+                JSEditor.logConsole.mockClear();
+                editor._code = "let x = 1;\nlet y = 2;";
+                editor._removeDebuggerFromLine(0);
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
             });
         });
     });

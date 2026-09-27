@@ -157,11 +157,12 @@ class Notation {
             isNotatedDrum ? drumName : null
         ]);
 
-        // If no drum is specified, add a rest to the drum line.
-        // Otherwise, add the drum.
-        if (drum.length === 0) {
+        // If an identifiable drum is specified, add the drum.
+        // Otherwise (no drum, or noise), add a rest to the drum line.
+        if (isNotatedDrum) {
+            const drumSymbol = getDrumSymbol(drumName);
             this._notationDrumStaging[turtle].push([
-                ["R"],
+                [drumSymbol],
                 obj[0],
                 obj[1],
                 obj[2],
@@ -169,10 +170,9 @@ class Notation {
                 insideChord,
                 false
             ]);
-        } else if (isNotatedDrum) {
-            const drumSymbol = getDrumSymbol(drumName);
+        } else {
             this._notationDrumStaging[turtle].push([
-                [drumSymbol],
+                ["R"],
                 obj[0],
                 obj[1],
                 obj[2],

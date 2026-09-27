@@ -295,11 +295,20 @@ class KeyboardController {
                         activity.stageDirty = true;
                     }
             }
-        } else if (event.ctrlKey || (event.metaKey && event.keyCode === 90)) {
+        } else if (
+            event.ctrlKey ||
+            (event.metaKey &&
+                !disableKeys &&
+                (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V))
+        ) {
             switch (event.keyCode) {
                 case 90: // 'Z'
                     event.preventDefault();
-                    activity.blocks.undoAction();
+                    if (event.shiftKey) {
+                        activity.blocks.redoAction();
+                    } else {
+                        activity.blocks.undoAction();
+                    }
                     break;
                 case 89: // 'Y'
                     event.preventDefault();

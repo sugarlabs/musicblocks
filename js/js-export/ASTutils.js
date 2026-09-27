@@ -33,6 +33,27 @@ class ASTUtils {
         return typeof name === "string" && /^[A-Za-z_$][0-9A-Za-z_$]*$/.test(name);
     }
 
+    /**
+     * Returns the names of every identifier used in the given ASTs.
+     *
+     * @static
+     * @param {...Object} ASTs - Abstract Syntax Trees to search
+     * @returns {Set<String>} identifier names
+     */
+    static _getIdentifierNames(...ASTs) {
+        const names = new Set();
+        const visit = node => {
+            if (Array.isArray(node)) {
+                node.forEach(visit);
+            } else if (node !== null && typeof node === "object") {
+                if (node.type === "Identifier") names.add(node.name);
+                Object.values(node).forEach(visit);
+            }
+        };
+        ASTs.forEach(visit);
+        return names;
+    }
+
     static _getMouseCallExpression(methodName, args) {
         return {
             type: "CallExpression",
@@ -234,24 +255,60 @@ class ASTUtils {
     static _getForLoopAST(args, flow, iteratorNum) {
         if (iteratorNum === undefined) iteratorNum = 0;
 
+        const declarations = [
+            {
+                type: "VariableDeclarator",
+                id: {
+                    type: "Identifier",
+                    name: "i" + iteratorNum
+                },
+                init: {
+                    type: "Literal",
+                    value: 0
+                }
+            }
+        ];
+
+        // Repeat works out its count once, as MathUtility.doRepeatCount(n),
+        // but `i < n` re-evaluates n every pass and runs Math.ceil(n) times.
+        // Only a non-negative integer literal can stay as it is (a negative
+        // one prints as a unary minus, which doesn't convert back to Repeat).
+        const body = ASTUtils._getBlockAST(flow, iteratorNum + 1);
+        let limit = ASTUtils._getArgsAST(args)[0];
+        if (!(limit.type === "Literal" && Number.isInteger(limit.value) && limit.value >= 0)) {
+            // A box can have any valid name, so pick one the count and the
+            // body don't use; otherwise the limit would shadow that box.
+            const used = ASTUtils._getIdentifierNames(limit, body);
+            let limitName = "limit" + iteratorNum;
+            while (used.has(limitName)) limitName = "_" + limitName;
+
+            declarations.push({
+                type: "VariableDeclarator",
+                id: {
+                    type: "Identifier",
+                    name: limitName
+                },
+                init: {
+                    type: "CallExpression",
+                    callee: {
+                        type: "Identifier",
+                        name: "MathUtility.doRepeatCount"
+                    },
+                    arguments: [limit]
+                }
+            });
+            limit = {
+                type: "Identifier",
+                name: limitName
+            };
+        }
+
         return {
             type: "ForStatement",
             init: {
                 type: "VariableDeclaration",
                 kind: "let",
-                declarations: [
-                    {
-                        type: "VariableDeclarator",
-                        id: {
-                            type: "Identifier",
-                            name: "i" + iteratorNum
-                        },
-                        init: {
-                            type: "Literal",
-                            value: 0
-                        }
-                    }
-                ]
+                declarations
             },
             test: {
                 type: "BinaryExpression",
@@ -259,7 +316,7 @@ class ASTUtils {
                     type: "Identifier",
                     name: "i" + iteratorNum
                 },
-                right: ASTUtils._getArgsAST(args)[0],
+                right: limit,
                 operator: "<"
             },
             update: {
@@ -273,7 +330,7 @@ class ASTUtils {
             },
             body: {
                 type: "BlockStatement",
-                body: ASTUtils._getBlockAST(flow, iteratorNum + 1)
+                body
             }
         };
     }

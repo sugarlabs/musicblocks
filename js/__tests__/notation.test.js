@@ -136,16 +136,21 @@ describe("Notation Class", () => {
             );
         });
 
-        it("should update notation with noise correctly", () => {
-            const note = "C4";
-            const duration = 4;
-            const turtle = "turtle1";
-            const insideChord = false;
-            const drum = ["noise1"];
-            notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
-            expect(notation._notationStaging[turtle][0][7]).toBeNull();
-            expect(notation._notationDrumStaging[turtle].length).toBe(0);
-        });
+        it.each(["noise1", "noise2", "noise3"])(
+            "should stage a rest on the drum line when note uses %s",
+            noiseName => {
+                const note = "C4";
+                const duration = 4;
+                const turtle = "turtle1";
+                const insideChord = false;
+                const drum = [noiseName];
+                notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+                const lastStaged = notation._notationStaging[turtle].slice(-1)[0];
+                const lastDrumStaged = notation._notationDrumStaging[turtle].slice(-1)[0];
+                expect(lastStaged[7]).toBeNull();
+                expect(lastDrumStaged[0]).toEqual(["R"]);
+            }
+        );
 
         it("should handle object notes with markup", () => {
             const note = { 0: "C4", 1: "D4" };

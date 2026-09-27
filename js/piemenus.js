@@ -638,9 +638,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             scale[scale.length - 1 - i][0] === FIXEDSOLFEGE[note] ||
             scale[scale.length - 1 - i][0] === note
         ) {
-            accidental = scale[scale.length - 1 - i].substr(1);
+            accidental = scale[scale.length - 1 - i].slice(1);
         } else {
-            accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].substr(1);
+            accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].slice(1);
         }
         block.value = block.value
             .replace(SHARP, "")
@@ -891,9 +891,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     scale[i][0] === FIXEDSOLFEGE[that.value] ||
                     scale[i][0] === selection["note"]
                 ) {
-                    selection["attr"] = scale[i].substr(1);
+                    selection["attr"] = scale[i].slice(1);
                 } else {
-                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].slice(1);
                 }
             }
             switch (selection["attr"]) {

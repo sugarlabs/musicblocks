@@ -164,6 +164,35 @@ requirejs.config({
         "activity/notation": {
             exports: "Notation"
         },
+        "utils/musicutils-constants": {
+            exports: "MusicUtilsConstants"
+        },
+        "utils/musicutils-i18n": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsI18n"
+        },
+        "utils/musicutils-temperament": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsTemperament"
+        },
+        "utils/musicutils-pitch": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament"
+            ],
+            exports: "MusicUtilsPitch"
+        },
+        "utils/musicutils": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch"
+            ]
+        },
         "utils/synthutils": {
             deps: ["utils/utils", "activity/activity-context"],
             exports: "Synth"
@@ -215,6 +244,7 @@ requirejs.config({
                 "activity/alert-renderer",
                 "palette/palette-loader",
                 "activity/search-controller",
+                "activity/clear-confirmation",
                 "activity/workspace-layout-controller",
                 "activity/block-scale-controller",
                 "search-ui",
@@ -296,6 +326,7 @@ requirejs.config({
         "activity/alert-renderer": "js/activity/alert-renderer",
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
+        "activity/clear-confirmation": "js/activity/clear-confirmation",
         "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
         "activity/selection-controller": "js/activity/selection-controller",
         "activity/block-scale-controller": "js/activity/block-scale-controller",

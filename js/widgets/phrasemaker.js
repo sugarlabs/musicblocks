@@ -2311,7 +2311,7 @@ class PhraseMaker {
                     for (let i = 0; i < accidentals.length; i++) {
                         if (noteValue.includes(accidentals[i])) {
                             accidentalsValue = i;
-                            noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                            noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                             break;
                         }
                     }
@@ -3066,7 +3066,7 @@ class PhraseMaker {
             newNote = this._deps.SOLFEGECONVERSIONTABLE[note[0]];
         } else {
             octave = note[2];
-            newNote = this._deps.SOLFEGECONVERSIONTABLE[note.substr(0, 2)];
+            newNote = this._deps.SOLFEGECONVERSIONTABLE[note.slice(0, 2)];
         }
         this.rowLabels[index] = newNote;
         this.rowArgs[index] = octave;
