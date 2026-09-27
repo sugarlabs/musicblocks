@@ -354,22 +354,52 @@ describe("setupDictActions", () => {
 
         it("should return error message if dictionary does not exist", () => {
             activity.logo.turtleDicts[turtle] = {};
-            const result = Turtle.DictActions.getValue("nonexistentDict", "key", turtle);
-            expect(result).toBe("Dictionary with this name does not exist");
+            const result = Turtle.DictActions.getValue("nonexistentDict", "key", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Dictionary with this name does not exist",
+                123
+            );
         });
 
         it("should return error message if key does not exist in dictionary", () => {
             activity.logo.turtleDicts[turtle] = {
                 testDict: { existingKey: "value" }
             };
-            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle);
-            expect(result).toBe("Key with this name does not exist in testDict");
+            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in testDict",
+                123
+            );
+        });
+
+        it("should return localized error message if key does not exist", () => {
+            const originalI18n = global._;
+            global._ = jest.fn(msg => {
+                if (msg === "Key with this name does not exist in %s") {
+                    return "No existe una clave con este nombre en %s";
+                }
+                return msg;
+            });
+            activity.logo.turtleDicts[turtle] = { testDict: {} };
+            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "No existe una clave con este nombre en testDict",
+                123
+            );
+            global._ = originalI18n;
         });
 
         it("should initialize turtleDicts if it does not exist for the turtle", () => {
             delete activity.logo.turtleDicts[turtle];
-            const result = Turtle.DictActions.getValue("testDict", "key", turtle);
-            expect(result).toBe("Dictionary with this name does not exist");
+            const result = Turtle.DictActions.getValue("testDict", "key", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Dictionary with this name does not exist",
+                123
+            );
             expect(activity.logo.turtleDicts[turtle]).toEqual({});
         });
     });
