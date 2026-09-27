@@ -930,7 +930,7 @@ class Singer {
                     ? getSolfege(
                           nnote[0],
                           tur.singer.keySignature,
-                          tur.singer.movable,
+                          false, // getNote already applied movable Do; widgets use fixed Do
                           activity.logo.synth.inTemperament,
                           edo
                       )
@@ -1338,7 +1338,7 @@ class Singer {
                 ? getSolfege(
                       nnote[0],
                       tur.singer.keySignature,
-                      tur.singer.movable,
+                      false, // getNote already applied movable Do; widgets use fixed Do
                       activity.logo.synth.inTemperament,
                       edo
                   )

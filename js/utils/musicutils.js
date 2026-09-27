@@ -1902,6 +1902,18 @@ function base64Encode(str) {
     return binaryString;
 }
 
+// Movable-do syllable of the tonic (0 = do) for modes that rotate solfege.
+// Shared by getNoteFromSolfege (input) and getSolfege (display).
+const MOVABLE_TONIC_DEGREE = {
+    dorian: 1,
+    phrygian: 2,
+    lydian: 3,
+    mixolydian: 4,
+    minor: 5,
+    aeolian: 5,
+    locrian: 6
+};
+
 /**
  * Resolve a solfege note argument (e.g. "do", "re♯") to a note name for the
  * given key signature and octave length. Shared by the 12-EDO and microtonal
@@ -2004,94 +2016,19 @@ const getNoteFromSolfege = (
         }
     }
 
-    if (movable) {
-        let i;
-        switch (mode) {
-            case "dorian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 0) {
-                    transpositionFloor += octaveLength;
-                }
-
-                transpositionFloor -= octaveLength;
-                i += 6;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "phrygian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 1) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 5;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "lydian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 2) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 4;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "mixolydian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 3) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 3;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "minor":
-            case "aeolian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 4) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 2;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "locrian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 5) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 1;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "major":
-            case "ionian":
-            default:
-                break;
+    if (movable && Object.prototype.hasOwnProperty.call(MOVABLE_TONIC_DEGREE, mode)) {
+        // Rotate so the tonic takes its syllable (e.g. la in minor).
+        const tonicDegree = MOVABLE_TONIC_DEGREE[mode];
+        const i = SOLFEGENAMES.indexOf(solfegePart);
+        if (i >= tonicDegree) {
+            transpositionFloor += octaveLength;
         }
+
+        if (mode === "dorian") {
+            transpositionFloor -= octaveLength;
+        }
+
+        solfegePart = SOLFEGENAMES[(i + 7 - tonicDegree) % 7];
     }
 
     let index;
@@ -3305,8 +3242,11 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, ed
                     case 6:
                         if (definedScaleDegree[definedScaleDegree.length - 1] !== 4) {
                             definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModeScale[i] !== 7) {
+                        } else if (semitones[i] + chosenModePattern[i] !== 7) {
                             definedScaleDegree.push(5);
+                        } else {
+                            // Keep indices aligned with chosenModeScale
+                            definedScaleDegree.push(null);
                         }
                         break;
                     case 7:
@@ -3329,11 +3269,10 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, ed
 
             // For scale degrees which are defined --> Use choosen Mode's notes
             // For scale degrees which are undefined --> Use fallback notes
-            let k = 0;
             for (let i = 0; i < 7; i++) {
-                if (definedScaleDegree.includes(i + 1)) {
+                const k = definedScaleDegree.indexOf(i + 1);
+                if (k !== -1) {
                     finalScale.push(chosenModeScale[k]);
-                    k++;
                 } else {
                     finalScale.push(majorScale[i]);
                 }
@@ -3979,20 +3918,27 @@ const getSolfege = (note, keySignature, movable, temperament, edo) => {
             index = scale.indexOf(altNote);
         }
 
-        const isMinor = Array.isArray(keySignature)
-            ? keySignature[1].toLowerCase() === "minor"
-            : keySignature.toLowerCase().includes("minor");
+        // Modes with fewer than 7 notes: use the same solfege that
+        // getNoteFromSolfege resolves, so display and input agree.
+        if (index !== -1 && currentEDO === 12 && scale.length - 1 < 7) {
+            const halfSteps = scaleResult[1];
+            let offset = 0;
+            for (let i = 0; i < index; i++) {
+                offset += halfSteps[i];
+            }
+            return getScaleAndHalfSteps(keySignature)[1][offset];
+        }
+
+        const mode = Array.isArray(keySignature)
+            ? keySignature[1].toLowerCase()
+            : keySignatureToMode(keySignature)[1];
+        const tonicDegree = Object.prototype.hasOwnProperty.call(MOVABLE_TONIC_DEGREE, mode)
+            ? MOVABLE_TONIC_DEGREE[mode]
+            : 0;
 
         // diatonic note
         if (index !== -1 && index < SOLFEGENAMES.length) {
-            let solfegeIndex = index;
-
-            // minor movable-do → la-based
-            if (isMinor) {
-                solfegeIndex = (index + 5) % 7;
-            }
-
-            return SOLFEGENAMES[solfegeIndex].toLowerCase();
+            return SOLFEGENAMES[(index + tonicDegree) % 7].toLowerCase();
         }
 
         // 3) chromatic fallback (interval based)
@@ -4003,10 +3949,11 @@ const getSolfege = (note, keySignature, movable, temperament, edo) => {
         // semitones from tonic (EDO-aware)
         let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;
 
-        if (isMinor) {
-            // For minor, relative major is 3 semitones up in 12-EDO terms.
-            // Map to the current EDO and compute la-based offset.
-            const relativeMajorSteps = Math.round((3 * currentEDO) / 12);
+        if (tonicDegree > 0) {
+            // Shift so the tonic lands on its syllable (e.g. la for minor);
+            // the relative major is (12 - tonicSemitones) up in 12-EDO terms.
+            const tonicSemitones = [0, 2, 4, 5, 7, 9, 11][tonicDegree];
+            const relativeMajorSteps = Math.round(((12 - tonicSemitones) * currentEDO) / 12);
             semitones = (semitones + currentEDO - relativeMajorSteps) % currentEDO;
         }
 
