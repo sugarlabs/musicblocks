@@ -895,6 +895,9 @@ class ASTUtils {
      * or break can't leave, it sets a flag that is checked after the clamp.
      * A Stop directly in Start or an action just returns.
      *
+     * Not covered: in Music Blocks a Stop in an action also ends the loop the
+     * action was called from, but the exported action only returns (#9004).
+     *
      * @static
      * @param {Object} body - BlockStatement of a Start or action function
      * @param {String} end - "ENDMOUSE" or "ENDFLOW", the value the body returns
