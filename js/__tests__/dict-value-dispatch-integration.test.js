@@ -77,8 +77,13 @@ const { Logo } = require("../logo");
 // production code is mocked: setValue and getValue run for real.
 const setupDictActions = require("../turtleactions/DictActions");
 
+// setValue/getValue check whether the dictionary name is a turtle name, so use the real lookup.
+global.getTargetTurtle = require("../blocks/EnsembleBlocks").getTargetTurtle;
+
 function createTurtle() {
     return {
+        name: "Mr. Mouse",
+        inTrash: false,
         singer: {
             inNoteBlock: [],
             inDuplicate: false,
@@ -233,6 +238,17 @@ describe("Logo dispatch drives the real Turtle.DictActions.setValue/getValue", (
 
         // The real getValue, reached through a completely different Logo seam (parseArg -> the
         // arg block's own .arg(), not .flow()), read back the same value.
+        expect(readBackValue).toBe("green");
+    });
+
+    test("a key set on a turtle-named dictionary is read back from the same turtle dictionary", () => {
+        activity.blocks.blockList[1].value = "Mr. Mouse";
+        activity.blocks.blockList[2].value = "score";
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        expect(logo.turtleDicts[0]["0"].score).toBe("green");
+        expect(logo.turtleDicts[0]["Mr. Mouse"]).toBeUndefined();
         expect(readBackValue).toBe("green");
     });
 });
