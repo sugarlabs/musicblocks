@@ -17,12 +17,7 @@
     "dependencyDashboard": true,
     "dependencyDashboardTitle": "🔄 Renovate Dependency Dashboard",
 
-    "onboarding": false,
-    "requireConfig": "optional",
-
     "timezone": "Asia/Kolkata",
-
-    "schedule": ["before 6am on monday"],
 
     "labels": ["dependencies", "renovate"],
 
@@ -37,19 +32,21 @@
 
     "packageRules": [
         {
-            "description": "Group all patch and minor devDependency updates together",
+            "description": "Group all patch and minor devDependency updates – open PRs on Monday mornings only",
             "matchDepTypes": ["devDependencies"],
             "matchUpdateTypes": ["patch", "minor"],
             "groupName": "devDependencies (non-major)",
             "automerge": false,
+            "schedule": ["before 6am on monday"],
             "labels": ["dependencies", "renovate", "dev-dependencies"]
         },
         {
-            "description": "Group all patch and minor production dependency updates together",
+            "description": "Group all patch and minor production dependency updates – open PRs on Monday mornings only",
             "matchDepTypes": ["dependencies"],
             "matchUpdateTypes": ["patch", "minor"],
             "groupName": "dependencies (non-major)",
             "automerge": false,
+            "schedule": ["before 6am on monday"],
             "labels": ["dependencies", "renovate"]
         },
         {
@@ -59,10 +56,11 @@
             "automerge": false
         },
         {
-            "description": "Pin GitHub Actions to exact digest for security",
+            "description": "Pin GitHub Actions to exact digest for security – open PRs on Monday mornings only",
             "matchManagers": ["github-actions"],
             "pinDigests": true,
             "groupName": "GitHub Actions",
+            "schedule": ["before 6am on monday"],
             "labels": ["dependencies", "renovate", "github-actions"]
         },
         {
