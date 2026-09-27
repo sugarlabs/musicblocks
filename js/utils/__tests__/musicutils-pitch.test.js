@@ -97,6 +97,7 @@ describe("musicutils-pitch", () => {
             "musicutils-i18n.js",
             "musicutils-temperament.js",
             "musicutils-pitch.js",
+            "musicutils-lookups.js",
             "musicutils.js"
         ];
         const load = files => {

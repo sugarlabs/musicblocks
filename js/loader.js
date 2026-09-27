@@ -184,13 +184,18 @@ requirejs.config({
             ],
             exports: "MusicUtilsPitch"
         },
+        "utils/musicutils-lookups": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsLookups"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
                 "utils/musicutils-constants",
                 "utils/musicutils-i18n",
                 "utils/musicutils-temperament",
-                "utils/musicutils-pitch"
+                "utils/musicutils-pitch",
+                "utils/musicutils-lookups"
             ]
         },
         "utils/synthutils": {
