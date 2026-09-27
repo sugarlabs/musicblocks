@@ -743,6 +743,7 @@ const saveLilypondOutput = function (activity) {
         .pop();
 
     const occupiedShortNames = new Set();
+    let drumStaves = 0;
     for (const t in activity.logo.notation.notationStaging) {
         let tNumber = t;
         if (typeof t === "string") {
@@ -805,7 +806,10 @@ const saveLilypondOutput = function (activity) {
             let shortInstrumentName = "";
 
             if (tNumber > startDrums - 1) {
-                label = `${_("drum")} ${toWords(tNumber - startDrums)}`;
+                // Count the drum staves written, not the turtle this one came
+                // from, or a lone drum part is named after the staves above it.
+                drumStaves += 1;
+                label = `${_("drum")} ${toWords(drumStaves)}`;
                 instrumentName = __uniqueIdentifier(label, tNumber);
                 voiceIdentifiers[t] = instrumentName;
                 activity.logo.notationOutput += instrumentName + " = {\n";
@@ -924,8 +928,8 @@ const saveLilypondOutput = function (activity) {
             activity.logo.notationOutput += '   \\clef "' + last(clef) + '"\n';
             activity.logo.notationOutput += "   instrumentName = " + toLilypondString(label) + "\n";
             if (tNumber > startDrums - 1) {
-                const num = tNumber - startDrums;
-                activity.logo.notationOutput += '   shortInstrumentName = "' + "d" + num + '"\n';
+                activity.logo.notationOutput +=
+                    '   shortInstrumentName = "' + "d" + drumStaves + '"\n';
                 activity.logo.notationOutput += '   midiInstrument = "snare drum"\n';
             } else {
                 activity.logo.notationOutput +=
