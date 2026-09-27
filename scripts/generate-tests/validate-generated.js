@@ -256,6 +256,9 @@ const UNSAFE_FS_CALLS = new Set([
 
 const NODE_FS_MODULES = new Set(["fs", "node:fs", "fs/promises", "node:fs/promises", "fs-extra"]);
 const NODE_PROCESS_MODULES = new Set(["child_process", "node:child_process", "worker_threads"]);
+// Module-call kinds (see readModuleCall) that hand the test a real module
+// instance, so the import policy and fs-binding checks must see them too.
+const LOADING_KINDS = new Set(["require", "import", "jest.requireActual", "jest.requireMock"]);
 
 const SNAPSHOT_MATCHERS = new Set(["toMatchSnapshot", "toMatchInlineSnapshot"]);
 const EXISTENCE_MATCHERS = new Set(["toBeDefined", "toBeTruthy", "toBeUndefined", "toBeNull"]);
@@ -610,7 +613,7 @@ function collectFsBindings(ast) {
     walk(ast, node => {
         if (node.type === "VariableDeclarator" && node.init) {
             const call = readModuleCall(node.init);
-            if (call && (call.kind === "require" || call.kind === "import")) {
+            if (call && LOADING_KINDS.has(call.kind)) {
                 fromModuleCall(node.id, call.spec);
             }
         }
@@ -861,7 +864,7 @@ function validateGeneratedTest(source, options = {}) {
             : []
     );
     for (const c of moduleCalls) {
-        if (c.kind !== "require" && c.kind !== "import") continue;
+        if (!LOADING_KINDS.has(c.kind)) continue;
         if (moduleBase && isTargetSpec(c.spec)) continue;
         if (NODE_FS_MODULES.has(c.spec)) {
             errors.push(
