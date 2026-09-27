@@ -252,11 +252,14 @@ describe("PlanetInterface", () => {
         });
     });
 
-    test("saveLocally: returns null without throwing when Planet storage is unavailable", async () => {
+    test("saveLocally handles unavailable Planet storage according to its failure option", async () => {
         const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         planetInterface.planet = null;
 
         await expect(planetInterface.saveLocally()).resolves.toBeNull();
+        await expect(
+            planetInterface.saveLocally({ rejectOnProjectSaveError: true })
+        ).rejects.toThrow("[PlanetInterface] saveLocally called before Planet storage is ready.");
         expect(errorSpy).toHaveBeenCalledWith(
             "[PlanetInterface] saveLocally called before Planet storage is ready."
         );
@@ -580,6 +583,27 @@ describe("PlanetInterface", () => {
         expect(mockActivity.textMsg).toHaveBeenCalledWith("Could not save your project.");
         expect(result).toBe(false);
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+        consoleSpy.mockRestore();
+        global._ = saved_;
+    });
+
+    it("saveLocally can report and reject a project data save failure", async () => {
+        const saved_ = global._;
+        global._ = jest.fn(str => str);
+        global.doSVG.mockReturnValue("");
+        mockActivity.prepareExport.mockReturnValue("DATA");
+        const saveError = new Error("boom");
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally: jest.fn().mockRejectedValue(saveError) }
+        };
+
+        await expect(planetInterface.saveLocally({ rejectOnProjectSaveError: true })).rejects.toBe(
+            saveError
+        );
+
+        expect(mockActivity.textMsg).toHaveBeenCalledWith("Could not save your project.");
+        expect(consoleSpy).toHaveBeenCalledWith(saveError);
         consoleSpy.mockRestore();
         global._ = saved_;
     });

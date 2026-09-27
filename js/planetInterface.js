@@ -232,14 +232,18 @@ class PlanetInterface {
         /**
          * Function to save the current project locally.
          * Prepares project data for export, generates SVG data, and saves the project data locally.
-         * Returns false if the project data could not be saved.
+         * @param {Object} [options] - Save behavior options.
+         * @param {boolean} [options.rejectOnProjectSaveError=false] - Reject when project data cannot be saved.
+         * @returns {Promise|boolean} False if project data could not be saved.
          */
-        this.saveLocally = () => {
+        this.saveLocally = (options = {}) => {
+            const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
             if (!this.planet || !this.planet.ProjectStorage) {
-                console.error(
+                const error = new Error(
                     "[PlanetInterface] saveLocally called before Planet storage is ready."
                 );
-                return Promise.resolve(null);
+                console.error(error.message);
+                return rejectOnProjectSaveError ? Promise.reject(error) : Promise.resolve(null);
             }
 
             this.activity.stage.update();
@@ -252,12 +256,12 @@ class PlanetInterface {
                 240,
                 320 / this.activity.canvas.width
             );
-            const handleSaveError = e => {
-                if (
-                    e?.name === "QuotaExceededError" ||
-                    e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
-                    e?.message === "Not enough space to save locally"
-                ) {
+            const isQuotaError = e =>
+                e?.name === "QuotaExceededError" ||
+                e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
+                e?.message === "Not enough space to save locally";
+            const reportSaveError = e => {
+                if (isQuotaError(e)) {
                     this.activity.textMsg(
                         _(
                             "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
@@ -268,6 +272,11 @@ class PlanetInterface {
                     this.activity.textMsg(_("Could not save your project."));
                 }
                 return false;
+            };
+            const handleProjectSaveError = e => {
+                const result = reportSaveError(e);
+                if (rejectOnProjectSaveError) throw e;
+                return result;
             };
             try {
                 const projectStorage = this.planet.ProjectStorage;
@@ -280,14 +289,14 @@ class PlanetInterface {
                         ? projectStorage.saveLocally(data, image)
                         : projectStorage.saveLocally(data, image, projectId);
                 if (svgData === null || svgData === undefined || svgData === "") {
-                    return Promise.resolve(saveProject(null)).catch(handleSaveError);
+                    return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
                 } else {
                     const fallbackImage =
                         typeof projectStorage.getCurrentProjectImage === "function"
                             ? projectStorage.getCurrentProjectImage()
                             : null;
                     const savePromise = Promise.resolve(saveProject(fallbackImage)).catch(
-                        handleSaveError
+                        handleProjectSaveError
                     );
                     const img = new Image();
                     img.onload = () => {
@@ -297,7 +306,7 @@ class PlanetInterface {
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             Promise.resolve(
                                 saveProject(bitmap.bitmapCache.getCacheDataURL())
-                            ).catch(handleSaveError);
+                            ).catch(reportSaveError);
                         } catch (error) {
                             console.error(error);
                         }
@@ -306,16 +315,10 @@ class PlanetInterface {
                     return savePromise;
                 }
             } catch (e) {
-                if (
-                    e.code === DOMException.QUOTA_EXCEEDED_ERR ||
-                    e.message === "Not enough space to save locally"
-                ) {
-                    this.activity.textMsg(
-                        _(
-                            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
-                        )
-                    );
-                    return false;
+                if (isQuotaError(e)) {
+                    const result = reportSaveError(e);
+                    if (rejectOnProjectSaveError) throw e;
+                    return result;
                 } else {
                     console.error(e);
                     throw e;

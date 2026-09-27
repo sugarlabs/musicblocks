@@ -2175,6 +2175,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         handlers.change();
         await jest.advanceTimersByTimeAsync(200);
 
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
         expect(planet.initialiseNewProject).toHaveBeenCalledWith("student-song", false);
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
         expect(activity._allClear).toHaveBeenCalledWith(false, true);
@@ -2192,6 +2193,102 @@ describe("_setupFileHandlers inner callbacks", () => {
             "load-import",
             "save-import"
         ]);
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler finishes loading when saving the imported project throws", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => 7)
+        };
+        const saveError = new Error("import save failed");
+        const activity = makeActivity({
+            stage,
+            blocks,
+            saveLocally: jest.fn(() => {
+                throw saveError;
+            })
+        });
+        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+        global.pubsub.emit("finishedLoading", { token: 7 });
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(saveError, {
+            operation: "saveImportedProject"
+        });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler aborts replacement when preserving the current project fails", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const saveError = new Error("save failed");
+        const planet = {
+            saveLocally: jest.fn().mockRejectedValue(saveError),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(saveError, {
+            operation: "saveProjectBeforeImport"
+        });
+        expect(planet.closePlanet).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity._allClear).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
     });
 

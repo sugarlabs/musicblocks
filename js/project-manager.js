@@ -1021,16 +1021,20 @@ class ProjectManager {
         };
 
         const saveImportedProject = () => {
-            const save =
-                typeof that.saveLocally === "function"
-                    ? that.saveLocally()
-                    : that.planet && typeof that.planet.saveLocally === "function"
-                      ? that.planet.saveLocally()
-                      : null;
-            if (save && typeof save.catch === "function") {
-                save.catch(error => {
-                    ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
-                });
+            try {
+                const save =
+                    typeof that.saveLocally === "function"
+                        ? that.saveLocally()
+                        : that.planet && typeof that.planet.saveLocally === "function"
+                          ? that.planet.saveLocally()
+                          : null;
+                if (save && typeof save.catch === "function") {
+                    save.catch(error => {
+                        ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
+                    });
+                }
+            } catch (error) {
+                ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
             }
         };
 
@@ -1069,7 +1073,13 @@ class ProjectManager {
 
         const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
             if (that.planet) {
-                await that.planet.saveLocally();
+                try {
+                    await that.planet.saveLocally({ rejectOnProjectSaveError: true });
+                } catch (error) {
+                    ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
+                    finishLoading();
+                    return;
+                }
                 that.planet.closePlanet();
             }
 
