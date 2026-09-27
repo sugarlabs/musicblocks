@@ -1326,15 +1326,15 @@ function MusicKeyboard(activity) {
         if (obj[0] !== "C") {
             // Pad the left side.
             for (let i = 0; i < PITCHES2.length; i++) {
+                const isFirstNote = PITCHES2[i] === obj[0] || PITCHES[i] === obj[0];
                 newList.push({
-                    noteName: PITCHES2[i],
+                    noteName: isFirstNote ? obj[0] : PITCHES2[i],
                     noteOctave: obj[1],
                     blockNumber: noteList[0].blockNumber,
                     voice: noteList[0].voice
                 });
                 j = i;
-                if (PITCHES2[i] === obj[0]) break;
-                if (PITCHES[i] === obj[0]) break;
+                if (isFirstNote) break;
                 newList[i].blockNumber = fakeBlockNumber;
                 fakeBlockNumber += 1;
             }
@@ -3230,6 +3230,24 @@ function MusicKeyboard(activity) {
                         newel2,
                         "",
                         "",
+                        myrow2Id < BLACKKEYS.length
+                            ? String.fromCharCode(BLACKKEYS[myrow2Id])
+                            : null
+                    );
+                } else if (SOLFEGENAMES.includes(nname)) {
+                    setKeyboardCellLabel(
+                        newel2,
+                        `${i18nSolfege(nname)}${SHARP}`,
+                        this.displayLayout[p].noteOctave,
+                        myrow2Id < BLACKKEYS.length
+                            ? String.fromCharCode(BLACKKEYS[myrow2Id])
+                            : null
+                    );
+                } else {
+                    setKeyboardCellLabel(
+                        newel2,
+                        this.displayLayout[p].noteName,
+                        this.displayLayout[p].noteOctave,
                         myrow2Id < BLACKKEYS.length
                             ? String.fromCharCode(BLACKKEYS[myrow2Id])
                             : null

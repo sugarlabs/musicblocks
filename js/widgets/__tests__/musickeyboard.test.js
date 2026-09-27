@@ -996,6 +996,65 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         expect(c5Item).toBeDefined();
         expect(c5Item.voice).toBe("guitar");
     });
+
+    describe("accidentals with the real pitch tables", () => {
+        const constants = require("../../utils/musicutils-constants.js");
+        const { FIXEDSOLFEGE1 } = require("../../utils/musicutils-i18n.js");
+
+        const initKeyboard = noteNames => {
+            document.body.innerHTML = "";
+            global.PITCHES = constants.PITCHES;
+            global.PITCHES2 = constants.PITCHES2;
+            global.FIXEDSOLFEGE1 = FIXEDSOLFEGE1;
+            global.convertFromSolfege = musicutils.convertFromSolfege;
+            global.noteToFrequency = musicutils.noteToFrequency;
+
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.noteNames = noteNames;
+            keyboard.octaves = noteNames.map(() => 4);
+            keyboard._rowBlocks = noteNames.map((_, i) => 44 + i * 3);
+            keyboard.instruments = noteNames.map(() => "guitar");
+
+            const blockList = {};
+            noteNames.forEach((name, i) => {
+                const b = 44 + i * 3;
+                blockList[b] = { name: "pitch", connections: [null, b + 1, b + 2, null] };
+                blockList[b + 1] = { value: name };
+                blockList[b + 2] = { value: 4 };
+            });
+            mockActivity.blocks = {
+                blockList,
+                adjustDocks: jest.fn(),
+                clampBlocksToCheck: [],
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn()
+            };
+
+            keyboard.init();
+            return keyboard;
+        };
+
+        const keyLabelFor = blockNumber => {
+            const cell = [...document.querySelectorAll("td")].find(td =>
+                td.getAttribute("alt")?.endsWith("__" + blockNumber)
+            );
+            return cell ? cell.textContent : undefined;
+        };
+
+        test("keeps a flat lowest note (E♭4 in C minor) on its key", () => {
+            const keyboard = initKeyboard(["mi♭", "sol"]);
+
+            const eFlat = keyboard.layout.find(k => k.blockNumber === 44);
+            expect(eFlat).toMatchObject({ noteName: "mi♭", noteOctave: 4 });
+            expect(keyLabelFor(44)).toContain("E♭4");
+        });
+
+        test("labels sharp keys with their note name", () => {
+            initKeyboard(["re♯", "sol"]);
+
+            expect(keyLabelFor(44)).toContain("D♯4");
+        });
+    });
 });
 
 describe("MusicKeyboard core logic", () => {
