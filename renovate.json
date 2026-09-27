@@ -56,12 +56,17 @@
             "automerge": false
         },
         {
-            "description": "Pin GitHub Actions to exact digest for security – open PRs on Monday mornings only",
+            "description": "Pin GitHub Actions to exact digest for security",
             "matchManagers": ["github-actions"],
             "pinDigests": true,
             "groupName": "GitHub Actions",
-            "schedule": ["before 6am on monday"],
             "labels": ["dependencies", "renovate", "github-actions"]
+        },
+        {
+            "description": "Schedule GitHub Actions digest-only updates to Monday mornings – major/minor updates are not delayed",
+            "matchManagers": ["github-actions"],
+            "matchUpdateTypes": ["pinDigest", "digest"],
+            "schedule": ["before 6am on monday"]
         },
         {
             "description": "Electron is pinned – only raise a PR on major bumps",
