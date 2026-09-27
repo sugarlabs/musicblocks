@@ -51,6 +51,31 @@
 function setupDictActions(activity) {
     Turtle.DictActions = class {
         /**
+         * Utility function to check whether a key is one of the internal turtle dictionary keys
+         * handled by _GetDict.
+         *
+         * @static
+         * @param {String} key - key
+         * @returns {Boolean}
+         */
+        static IsTurtleKey(key) {
+            return (
+                key === _("color") ||
+                key === _("shade") ||
+                key === _("grey") ||
+                key === _("pen size") ||
+                key === _("font") ||
+                key === _("heading") ||
+                key === "x" ||
+                key === "y" ||
+                key === _("notes played") ||
+                key === _("note value") ||
+                key === _("current pitch") ||
+                key === _("pitch number")
+            );
+        }
+
+        /**
          * Utility function to get Turtle properties associated with target (used by get value).
          *
          * @static
@@ -263,6 +288,18 @@ function setupDictActions(activity) {
             if (!(turtle in activity.logo.turtleDicts)) {
                 activity.logo.turtleDicts[turtle] = {};
             }
+
+            // Is the dictionary the same as a turtle name?
+            const target = getTargetTurtle(activity.turtles, dict);
+            if (target !== null) {
+                if (Turtle.DictActions.IsTurtleKey(key)) {
+                    Turtle.DictActions.SetDictValue(target, turtle, key, value);
+                    return;
+                }
+                // Other keys are stored where SerializeDict reads them.
+                dict = target;
+            }
+
             if (!(dict in activity.logo.turtleDicts[turtle])) {
                 activity.logo.turtleDicts[turtle][dict] = {};
             }
@@ -283,6 +320,20 @@ function setupDictActions(activity) {
             if (!(turtle in activity.logo.turtleDicts)) {
                 activity.logo.turtleDicts[turtle] = {};
             }
+
+            // Is the dictionary the same as a turtle name?
+            const target = getTargetTurtle(activity.turtles, dict);
+            if (target !== null) {
+                if (Turtle.DictActions.IsTurtleKey(key)) {
+                    return Turtle.DictActions._GetDict(target, turtle, key, blk);
+                }
+                const turtleDict = activity.logo.turtleDicts[turtle][target];
+                if (turtleDict === undefined || !(key in turtleDict)) {
+                    return _("Key with this name does not exist in %s").replace(/%s/g, () => dict);
+                }
+                return turtleDict[key];
+            }
+
             if (!(dict in activity.logo.turtleDicts[turtle])) {
                 const msg = _("Dictionary with this name does not exist");
                 activity.errorMsg(msg, blk);

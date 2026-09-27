@@ -388,6 +388,31 @@ describe("setupDictActions", () => {
             expect(activity.logo.turtleDicts[turtle].existingDict.oldKey).toBe("oldValue");
             expect(activity.logo.turtleDicts[turtle].existingDict.newKey).toBe("newValue");
         });
+
+        test.each([
+            ["color", "blue", "doSetColor", ["blue"]],
+            ["pen size", 5, "doSetPensize", [5]],
+            ["heading", 180, "doSetHeading", [180]],
+            ["x", 150, "doSetXY", [150, 200]]
+        ])(
+            "should apply %s to the turtle when dict is a turtle name",
+            (key, value, method, args) => {
+                Turtle.DictActions.setValue("target", key, value, turtle);
+                expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
+                expect(activity.logo.turtleDicts[turtle]).toEqual({});
+            }
+        );
+
+        it("should not store read-only turtle keys when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "notes played", 3, turtle);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
+        });
+
+        it("should store other keys under the turtle index when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "score", 7, turtle);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({ 0: { score: 7 } });
+            expect(JSON.parse(Turtle.DictActions.getDict("target", turtle)).score).toBe(7);
+        });
     });
 
     describe("getValue", () => {
@@ -448,6 +473,27 @@ describe("setupDictActions", () => {
                 123
             );
             expect(activity.logo.turtleDicts[turtle]).toEqual({});
+        });
+
+        test.each([
+            ["x", 100],
+            ["heading", 90],
+            ["pen size", 2],
+            ["notes played", 0.5],
+            ["current pitch", "C4"]
+        ])("should return the turtle's %s when dict is a turtle name", (key, expected) => {
+            expect(Turtle.DictActions.getValue("target", key, turtle, 3)).toBe(expected);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should return a stored key when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "score", 7, turtle);
+            expect(Turtle.DictActions.getValue("target", "score", turtle, 3)).toBe(7);
+        });
+
+        it("should return error message for a missing key when dict is a turtle name", () => {
+            const result = Turtle.DictActions.getValue("target", "score", turtle, 3);
+            expect(result).toBe("Key with this name does not exist in target");
         });
     });
 });
