@@ -550,6 +550,7 @@ describe("ASTUtils", () => {
 
             expect(compare("bool_true", "bool_false", "bool_true")).toBe(true);
             expect(compare(1, 2, "bool_false")).toBe(true);
+            expect(compare(0, 2, 2)).toBe(true);
         });
 
         it("should return the AST for a unary expression", () => {

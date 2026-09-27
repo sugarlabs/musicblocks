@@ -670,11 +670,17 @@ class ASTUtils {
         }
 
         if (methodName === "xor") {
+            const [a, b] = ASTUtils._getArgsAST(args);
             return {
-                type: "BinaryExpression",
-                left: getUnaryExpAST("!", args[0]),
-                right: getUnaryExpAST("!", args[1]),
-                operator: "!=="
+                type: "ConditionalExpression",
+                test: a,
+                consequent: {
+                    type: "UnaryExpression",
+                    operator: "!",
+                    argument: b,
+                    prefix: true
+                },
+                alternate: b
             };
         }
 
