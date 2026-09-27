@@ -967,7 +967,7 @@ window.widgetWindows.clear = name => {
  * @returns {boolean}
  */
 window.widgetWindows.isOpen = name => {
-    return window.widgetWindows.openWindows[name] ? true : "";
+    return !!window.widgetWindows.openWindows[name];
 };
 
 /**

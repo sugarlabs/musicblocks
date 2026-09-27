@@ -959,8 +959,8 @@ describe("widgetWindows", () => {
             expect(isOpen(902)).toBeTruthy();
         });
 
-        test("isOpen returns empty string for non-existent windows", () => {
-            expect(isOpen("nonexistent")).toBe("");
+        test("isOpen returns false for non-existent windows", () => {
+            expect(isOpen("nonexistent")).toBe(false);
         });
 
         test("windowFor uses saveAs as key when blockNo is missing", () => {
