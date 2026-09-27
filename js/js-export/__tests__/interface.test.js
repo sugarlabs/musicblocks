@@ -98,6 +98,15 @@ describe("JSInterface", () => {
             expect(JSInterface.getGetterName("mynotevalue")).toBe("NOTEVALUE");
         });
 
+        it("should map the screen edge and size blocks to their getters", () => {
+            expect(JSInterface.getGetterName("toppos")).toBe("TOPPOS");
+            expect(JSInterface.getGetterName("bottompos")).toBe("BOTTOMPOS");
+            expect(JSInterface.getGetterName("leftpos")).toBe("LEFTPOS");
+            expect(JSInterface.getGetterName("rightpos")).toBe("RIGHTPOS");
+            expect(JSInterface.getGetterName("width")).toBe("WIDTH");
+            expect(JSInterface.getGetterName("height")).toBe("HEIGHT");
+        });
+
         it("should return the correct heap getter name when available", () => {
             expect(JSInterface.getGetterName("heapLength")).toBe("HEAPLENGTH");
         });
