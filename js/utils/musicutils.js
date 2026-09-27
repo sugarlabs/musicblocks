@@ -80,28 +80,14 @@ if (typeof module !== "undefined" && module.exports) {
         PITCH_COLLECTIONS,
         PITCH_COLLECTION_ALIASES,
         MAQAMTABLE,
-        MIDI_INSTRUMENTS,
-        DRUM_MIDI_MAP,
-        REVERSE_DRUM_MIDI_MAP,
         DEFAULTINVERT,
-        DEFAULTVOICE,
-        DEFAULTNOISE,
-        DEFAULTDRUM,
         DEFAULTMODE,
-        DEFAULTFILTERTYPE,
         SOLFMAPPER
     } = MusicUtilsConstants;
     var MusicUtilsI18n =
         (typeof window !== "undefined" && window.MusicUtilsI18n) ||
         (typeof require !== "undefined" ? require("./musicutils-i18n") : {});
-    var {
-        SOLFEGECONVERSIONTABLE,
-        FIXEDSOLFEGE1,
-        SEMITONETOINTERVALMAP,
-        INVERTMODES,
-        FILTERTYPES,
-        OSCTYPES
-    } = MusicUtilsI18n;
+    var { SOLFEGECONVERSIONTABLE, FIXEDSOLFEGE1, SEMITONETOINTERVALMAP } = MusicUtilsI18n;
     var MusicUtilsTemperament =
         (typeof window !== "undefined" && window.MusicUtilsTemperament) ||
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
@@ -152,6 +138,28 @@ if (typeof module !== "undefined" && module.exports) {
         calcOctave,
         calcOctaveInterval
     } = MusicUtilsPitch;
+    var MusicUtilsLookups =
+        (typeof window !== "undefined" && window.MusicUtilsLookups) ||
+        (typeof require !== "undefined" ? require("./musicutils-lookups") : {});
+    var {
+        getInvertMode,
+        getIntervalNumber,
+        getIntervalDirection,
+        getIntervalRatio,
+        getDrumIndex,
+        getDrumName,
+        getDrumSymbol,
+        getFilterTypes,
+        getOscillatorTypes,
+        getDrumIcon,
+        getDrumSynthName,
+        getNoiseName,
+        getNoiseIcon,
+        getNoiseSynthName,
+        getVoiceName,
+        getVoiceIcon,
+        getVoiceSynthName
+    } = MusicUtilsLookups;
 }
 
 const _b64Cache = new Map();
@@ -529,91 +537,10 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 /**
- * Get midi map for Instruments.
- * @function
- * @returns {Object}
- */
-const getMidiInstrument = () => {
-    return MIDI_INSTRUMENTS;
-};
-
-/**
- * Get midi map for Drums.
- * @function
- * @returns {Object}
- */
-const getMidiDrum = () => {
-    return DRUM_MIDI_MAP;
-};
-
-/**
- * Get reversed midi map for drum.
- * @function
- * @returns {Object}
- */
-const getReverseDrumMidi = () => {
-    return REVERSE_DRUM_MIDI_MAP;
-};
-
-/**
  * Custom mode from the musical modes dictionary.
  * @constant {Object}
  */
 const customMode = MUSICALMODES["custom"];
-
-/**
- * Get the invert mode name based on its identifier.
- * @function
- * @param {string} name - The identifier of the invert mode.
- * @returns {string} The name of the invert mode.
- */
-const getInvertMode = name => {
-    for (const interval in INVERTMODES) {
-        if (
-            INVERTMODES[interval][0] === name ||
-            INVERTMODES[interval][1].toLowerCase() === name.toLowerCase()
-        ) {
-            if (INVERTMODES[interval][0] !== "") {
-                return INVERTMODES[interval][0];
-            } else {
-                return INVERTMODES[interval][1];
-            }
-        }
-    }
-
-    // console.debug(name + " not found in INVERTMODES");
-    return name;
-};
-
-/**
- * Get the number of semi-tones for a specific interval.
- * @function
- * @param {string} name - The name of the interval.
- * @returns {number} The number of semi-tones for the interval.
- */
-const getIntervalNumber = name => {
-    return INTERVALVALUES[name][0];
-};
-
-/**
- * Get the direction of the interval (-1 down, 0 neutral, 1 up).
- * @function
- * @param {string} name - The name of the interval.
- * @returns {number} The direction of the interval.
- */
-const getIntervalDirection = name => {
-    return INTERVALVALUES[name][1];
-};
-
-/**
- * Get the ratio for a specific interval.
- * @function
- * @param {string} name - The name of the interval.
- * @returns {number} The ratio for the interval.
- */
-const getIntervalRatio = name => {
-    return INTERVALVALUES[name][2];
-};
 
 /**
  * Get the mode numbers for a specific mode name.
@@ -646,324 +573,6 @@ const getModeNumbers = name => {
 
     // console.debug(name + " not found in MUSICALMODES");
     return "";
-};
-
-/**
- * Get the drum index based on its name.
- * @function
- * @param {string} name - The name of the drum.
- * @returns {number} The index of the drum, or -1 if not found.
- */
-const getDrumIndex = name => {
-    if (name === "") {
-        // console.debug("getDrumName passed blank name. Returning " + DEFAULTDRUM);
-        name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
-        name = DEFAULTDRUM;
-    }
-
-    for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
-            return drum;
-        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            return drum;
-        }
-    }
-
-    return -1;
-};
-
-/**
- * Get the drum name based on its identifier.
- * @function
- * @param {string} name - The identifier of the drum.
- * @returns {string|null} The name of the drum, or null if not found.
- */
-const getDrumName = name => {
-    if (name === "") {
-        name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
-        return null;
-    }
-
-    for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
-            return DRUMNAMES[drum][0];
-        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            return DRUMNAMES[drum][1];
-        }
-    }
-
-    return null;
-};
-
-/**
- * Get the drum symbol based on its name.
- * @function
- * @param {string} name - The name of the drum.
- * @returns {string} The symbol of the drum, or "hh" if not found.
- */
-const getDrumSymbol = name => {
-    if (name === "") {
-        return "hh";
-    }
-
-    for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (
-            DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() ||
-            DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()
-        ) {
-            return DRUMNAMES[drum][3];
-        }
-    }
-
-    // console.debug(name + " not found in DRUMNAMES");
-    return "hh";
-};
-
-/**
- * Get the filter type based on its name.
- * @function
- * @param {string} name - The name of the filter type.
- * @returns {string} The filter type, or the default filter type if not found.
- */
-const getFilterTypes = name => {
-    if (name === "") {
-        name = DEFAULTFILTERTYPE;
-    }
-
-    for (let type = 0; type < FILTERTYPES.length; type++) {
-        if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase()) {
-            return FILTERTYPES[type][0];
-        } else if (FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            return FILTERTYPES[type][1];
-        }
-    }
-
-    // console.debug(name + " not found in FILTERTYPES");
-    return DEFAULTFILTERTYPE;
-};
-
-/**
- * Get the oscillator type based on its name.
- * @function
- * @param {string} name - The name of the oscillator type.
- * @returns {string|null} The oscillator type, or null if not found.
- */
-const getOscillatorTypes = name => {
-    if (name === "") {
-        name = null; // DEFAULTOSCILLATORTYPE;
-    }
-
-    for (let type = 0; type < OSCTYPES.length; type++) {
-        if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase()) {
-            return OSCTYPES[type][0];
-        } else if (OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            return OSCTYPES[type][1];
-        }
-    }
-
-    // console.debug(name + " not found in OSCTYPES");
-    return null; // DEFAULTOSCILLATORTYPE;
-};
-
-/**
- * Get the drum icon file path based on its name.
- * @function
- * @param {string} name - The name of the drum.
- * @returns {string} The file path of the drum icon, or the default drum icon path if not found.
- */
-const getDrumIcon = name => {
-    if (name === "") {
-        name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
-        return "images/drum.svg";
-    }
-
-    for (let i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
-            return DRUMNAMES[i][2];
-        }
-    }
-
-    // console.debug(name + " not found in DRUMNAMES");
-    return "images/drum.svg";
-};
-
-/**
- * Get the drum synth name based on its identifier.
- * @function
- * @param {string} name - The identifier of the drum synth.
- * @returns {string|null} The name of the drum synth, or null if not found.
- */
-const getDrumSynthName = name => {
-    if (name === null || name === undefined) {
-        // console.debug("getDrumSynthName passed null name. Returning null");
-        return null;
-    } else if (name === "") {
-        name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
-        return name;
-    }
-
-    for (let i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
-            return DRUMNAMES[i][1];
-        }
-    }
-
-    // console.debug(name + " not found in DRUMNAMES");
-    return DEFAULTDRUM;
-};
-
-/**
- * Get the noise name based on its identifier.
- * @function
- * @param {string} name - The identifier of the noise.
- * @returns {string} The name of the noise, or the default noise if not found.
- */
-const getNoiseName = name => {
-    if (name === "") {
-        name = DEFAULTNOISE;
-    }
-
-    for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][1] === name) {
-            if (NOISENAMES[i][0] !== "") {
-                return NOISENAMES[i][0];
-            } else {
-                return NOISENAMES[i][1];
-            }
-        }
-    }
-
-    return DEFAULTNOISE;
-};
-
-/**
- * Get the noise icon file path based on its name.
- * @function
- * @param {string} name - The name of the noise.
- * @returns {string} The file path of the noise icon, or the default noise icon path if not found.
- */
-const getNoiseIcon = name => {
-    if (name === "") {
-        name = DEFAULTNOISE;
-    } else if (name.slice(0, 4) === "http") {
-        return "images/noises.svg";
-    }
-
-    for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
-            return NOISENAMES[i][2];
-        }
-    }
-
-    // console.debug(name + " not found in NOISENAMES");
-    return "images/synth.svg";
-};
-
-/**
- * Get the noise synth name based on its identifier.
- * @function
- * @param {string|null} name - The identifier of the noise synth.
- * @returns {string|null} The name of the noise synth, or null if not found.
- */
-const getNoiseSynthName = name => {
-    if (name === null || name === undefined) {
-        return null;
-    } else if (name === "") {
-        name = DEFAULTNOISE;
-    }
-
-    for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
-            return NOISENAMES[i][1];
-        }
-    }
-
-    // console.debug(name + " not found in NOISENAMES");
-    return DEFAULTNOISE;
-};
-
-/**
- * Get the voice name based on its identifier.
- * @function
- * @param {string} name - The identifier of the voice.
- * @returns {string|null} The name of the voice, or null if not found.
- */
-const getVoiceName = name => {
-    if (name === "") {
-        name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) === "http") {
-        return null;
-    }
-
-    for (let i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name) {
-            if (VOICENAMES[i][0] !== "") {
-                return VOICENAMES[i][0];
-            } else if (VOICENAMES[i][1] === name) {
-                return VOICENAMES[i][1];
-            }
-        }
-    }
-
-    return DEFAULTVOICE;
-};
-
-/**
- * Get the voice icon file path based on its identifier.
- * @function
- * @param {string} name - The identifier of the voice.
- * @returns {string} The file path of the voice icon, or the default voice icon path if not found.
- */
-const getVoiceIcon = name => {
-    if (name === "") {
-        name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) === "http") {
-        return "images/voices.svg";
-    }
-
-    for (let i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
-            return VOICENAMES[i][2];
-        }
-    }
-
-    for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
-        if (CUSTOMSAMPLES[i][0] === name || CUSTOMSAMPLES[i][1] === name) {
-            return CUSTOMSAMPLES[i][0];
-        }
-    }
-
-    // console.debug(name + " not found in VOICENAMES");
-    return "images/voices.svg";
-};
-
-/**
- * Get the voice synth name based on its identifier.
- * @function
- * @param {string|null} name - The identifier of the voice synth.
- * @returns {string|null} The name of the voice synth, or null if not found.
- */
-const getVoiceSynthName = name => {
-    if (name === null || name === undefined) {
-        return null;
-    } else if (name === "") {
-        name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) === "http") {
-        return name;
-    }
-
-    for (let i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
-            return VOICENAMES[i][1];
-        }
-    }
-
-    // console.debug(name + " not found in VOICENAMES");
-    return DEFAULTVOICE;
 };
 
 /**
