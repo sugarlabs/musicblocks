@@ -192,8 +192,8 @@ describe("setupDictActions", () => {
             expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
         });
 
-        it("should handle unsupported key gracefully without doing anything", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+        it("should handle read-only key by showing an error message", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "notes played", "value");
             const painterMethods = [
                 "doSetColor",
                 "doSetValue",
@@ -206,6 +206,37 @@ describe("setupDictActions", () => {
             painterMethods.forEach(method => {
                 expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
             });
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot set read-only key: notes played"
+            );
+        });
+
+        it("should ignore unsupported custom keys without errors", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should handle localized read-only keys by showing a localized error message", () => {
+            const originalI18n = global._;
+            // Mock translation for Spanish: "notes played" -> "notas tocadas", format string -> "Cannot set read-only key: %s" (assuming format string not translated yet)
+            global._ = jest.fn(msg => {
+                if (msg === "notes played") return "notas tocadas";
+                if (msg === "Cannot set read-only key: %s")
+                    return "No se puede configurar la clave de solo lectura: %s";
+                return msg;
+            });
+
+            try {
+                // The user types the localized string in the UI
+                Turtle.DictActions.SetDictValue(0, turtle, "notas tocadas", "value");
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "No se puede configurar la clave de solo lectura: notas tocadas"
+                );
+            } finally {
+                // Restore original mock
+                global._ = originalI18n;
+            }
         });
 
         it("should support lowercase setDictValue alias", () => {
