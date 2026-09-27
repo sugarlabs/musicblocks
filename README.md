@@ -52,7 +52,7 @@ Additional background on why we combine music and programming can be found
 **Turtle Blocks**
 
 Turtle Blocks is a view into Music Blocks that focuses on graphics
-rather than music. You can learn more about Turle Blocks
+rather than music. You can learn more about Turtle Blocks
 [here](./TurtleDocs/README.md).
 
 If you are a developer (beginner, experienced, or pro), you are very
@@ -131,12 +131,12 @@ server using npm
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
 listening on port 3000.
 
-7. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
+6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
 
-For Turtle Blocks, use `localhost:3000?turtle=true` or `http:127.0.0.1:3000?turtle=true`.
+For Turtle Blocks, use `localhost:3000?turtle=true` or `http://127.0.0.1:3000?turtle=true`.
 
 ### Local Setup with Docker
 
