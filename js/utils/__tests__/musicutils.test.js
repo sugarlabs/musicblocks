@@ -3907,6 +3907,29 @@ describe("getNote additional paths", () => {
         ]);
     });
 
+    it("resolves custom temperament notes with microtonal prefixes and cents", () => {
+        TEMPERAMENT["custom"] = {
+            pitchNumber: 12,
+            0: [1, "vvC", 4],
+            1: [1.88, "^B", 4]
+        };
+        try {
+            expect(
+                getNote("vvC(+0¢)", 4, 0, "C major", false, undefined, undefined, "custom")
+            ).toEqual(["vvC", 4, 0]);
+            expect(
+                getNote("^B(+0¢)", 4, 0, "C major", false, undefined, undefined, "custom")
+            ).toEqual(["^B", 4, 0]);
+            expect(getNote("vvC", 4, 0, "C major", false, undefined, undefined, "custom")).toEqual([
+                "vvC",
+                4,
+                0
+            ]);
+        } finally {
+            delete TEMPERAMENT["custom"];
+        }
+    });
+
     it("preserves accidentals for non-predefined temperament systems", () => {
         addTemperamentToDictionary("nonstrict", {
             pitchNumber: 12,
