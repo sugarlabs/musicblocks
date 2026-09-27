@@ -431,6 +431,51 @@ describe("AST2BlockList Class", () => {
             expect(result).toBe("ENDFLOW");
         });
 
+        // A project shaped like the ones JSGenerate.generateCode exports: a Stop after a
+        // note at the end of an action, called from a Repeat. On master the action got a
+        // bare `break`, a syntax error for the whole file.
+        test("exports valid code for a Stop at the end of an action called from a loop", async () => {
+            const pitchNote = name => ["newnote", [["divide", [1, 4]]], [["pitch", [name, 4]]]];
+            const action = [["print", ["RE"]], pitchNote("re"), ["break", null]];
+            const start = [
+                [
+                    "repeat",
+                    [4],
+                    [
+                        ["print", ["DO"]],
+                        pitchNote("do"),
+                        ["nameddo_action", null],
+                        ["print", ["MI"]],
+                        pitchNote("mi")
+                    ]
+                ]
+            ];
+            const code =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+
+            expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+            expect(code).not.toMatch(/\bbreak;/);
+
+            const printed = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value),
+                playNote: async (value, flow) => flow(),
+                playPitch: async () => {}
+            };
+            let run;
+            await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                run = flow(mouse);
+            });
+            await run;
+            // The Stop ends the action. Ending the Repeat it was called from, as Music
+            // Blocks does, isn't exported yet (#9004), so the Repeat keeps going.
+            expect(printed.slice(0, 3)).toEqual(["DO", "RE", "MI"]);
+        });
+
         // The importer only undoes the flags and labels the exporter writes;
         // the same shapes in hand-written code must not turn into Stop blocks.
         test.each([
