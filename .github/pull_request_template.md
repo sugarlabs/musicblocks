@@ -15,6 +15,14 @@ Please complete the sections below to help us review your changes efficiently.
 
 ---
 
+## MusicBlocks Project Link
+
+<!-- Required for first-time contributors: Please create and publish a MusicBlocks project and provide its share link here (e.g., https://musicblocks.sugarlabs.org/index.html?id=12345&run=True). Existing contributors can leave this blank. -->
+
+**Project Link:**
+
+---
+
 ## Category
 
 <!-- NOTE: CI ENFORCED. You MUST check at least ONE category below or the CI will fail. -->
