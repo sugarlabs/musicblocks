@@ -44,6 +44,14 @@ global.Turtle = {
     }
 };
 
+// Load dictionary asks the real DictActions which keys belong to the turtle.
+{
+    const mockDictActions = global.Turtle.DictActions;
+    require("../../turtleactions/DictActions")({});
+    const { TurtleKey, IsTurtleKey } = global.Turtle.DictActions;
+    global.Turtle.DictActions = Object.assign(mockDictActions, { TurtleKey, IsTurtleKey });
+}
+
 class BaseBlock {
     constructor(name) {
         this.name = name;

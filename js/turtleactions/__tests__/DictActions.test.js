@@ -497,15 +497,23 @@ describe("setupDictActions", () => {
             expect(Turtle.DictActions.getValue("target", "score", turtle, 3)).toBe(7);
         });
 
-        it("should return error message for a missing key when dict is a turtle name", () => {
+        it("should report a missing key and return 0 when dict is a turtle name", () => {
             const result = Turtle.DictActions.getValue("target", "score", turtle, 3);
-            expect(result).toBe("Key with this name does not exist in target");
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in target",
+                3
+            );
         });
 
         it("should not return inherited properties as stored keys when dict is a turtle name", () => {
             Turtle.DictActions.setValue("target", "score", 7, turtle);
             const result = Turtle.DictActions.getValue("target", "toString", turtle, 3);
-            expect(result).toBe("Key with this name does not exist in target");
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in target",
+                3
+            );
         });
     });
 
@@ -556,6 +564,56 @@ describe("setupDictActions", () => {
         it("should still report an unknown key", () => {
             expect(Turtle.DictActions._GetDict(0, turtle, "tamaño", 3)).toBe(0);
             expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: tamaño", 3);
+        });
+    });
+
+    // A text block keeps whatever was typed, so a project can carry keys typed in one language
+    // after it is opened in another.
+    describe("keys typed in a different language", () => {
+        afterEach(() => {
+            global._.mockImplementation(key => key);
+        });
+
+        it("should read and write a Spanish key in English", () => {
+            expect(Turtle.DictActions.getValue("target", "tamaño de la pluma", turtle, 3)).toBe(2);
+            Turtle.DictActions.setValue("target", "tamaño de la pluma", 7, turtle);
+            expect(targetTurtle.painter.doSetPensize).toHaveBeenCalledWith(7);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should read and write a Hindi key in Spanish", () => {
+            const spanish = { "pen size": "tamaño de la pluma", "heading": "rumbo" };
+            global._.mockImplementation(key => spanish[key] || key);
+            expect(Turtle.DictActions.getValue("target", "शीर्षक", turtle, 3)).toBe(90);
+            Turtle.DictActions.setValue("target", "पेन आकार", 7, turtle);
+            expect(targetTurtle.painter.doSetPensize).toHaveBeenCalledWith(7);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should recognize every translation of the turtle keys in locales/*.json", () => {
+            const fs = require("fs");
+            const path = require("path");
+            const dir = path.join(__dirname, "../../../locales");
+            const names = Object.keys(
+                JSON.parse(Turtle.DictActions.SerializeDict(0, turtle))
+            ).concat(["notes played", "note value", "current pitch", "pitch number"]);
+            const missing = [];
+            for (const file of fs.readdirSync(dir).filter(f => f.endsWith(".json"))) {
+                const strings = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+                for (const name of names) {
+                    const translation = strings[name];
+                    if (
+                        typeof translation === "string" &&
+                        translation !== "" &&
+                        Turtle.DictActions.TurtleKey(translation) !== name
+                    ) {
+                        missing.push(file + ": " + name + " -> " + translation);
+                    }
+                }
+            }
+            // If this fails after a translation update, add the new strings to TURTLEKEYS.
+            expect(missing).toEqual([]);
         });
     });
 });
