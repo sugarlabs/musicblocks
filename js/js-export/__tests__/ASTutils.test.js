@@ -746,15 +746,21 @@ describe("ASTUtils", () => {
             ]);
         });
 
-        it("should return the AST for a break block", () => {
+        it("should return a Stop block marker for a break block", () => {
             const flows = [["break"]];
             const result = ASTUtils._getBlockAST(flows);
             expect(result).toEqual([
                 {
                     type: "BreakStatement",
-                    label: null
+                    label: null,
+                    stopBlock: true
                 }
             ]);
+        });
+
+        it("should leave a loop without a Stop block as it is", () => {
+            const loop = { type: "WhileStatement", body: { type: "BlockStatement", body: [] } };
+            expect(ASTUtils._getStoppableLoopAST(loop)).toBe(loop);
         });
 
         it("should return the AST for a switch block", () => {
