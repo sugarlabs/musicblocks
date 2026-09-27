@@ -18,60 +18,71 @@ global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
 global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
-const rhythm = require("../musicutils-rhythm");
+const solfege = require("../musicutils-solfege");
 const musicutils = require("../musicutils");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
-describe("musicutils-rhythm", () => {
-    it("reduces a fraction to its lowest terms", () => {
-        // toFraction and isInt used to live here too; they moved to utils-logic.js
-        // (see js/utils/__tests__/utils-logic.test.js) since they are pure math with no
-        // MusicBlocks-specific meaning, unlike reducedFraction's HTML/NSYMBOLS display.
-        expect(rhythm.reducedFraction(4, 8)).toContain("2");
-        expect(rhythm.reducedFraction(3, 9)).toContain("3");
+describe("musicutils-solfege", () => {
+    it("tells solfege names from letter names", () => {
+        expect(solfege.noteIsSolfege("sol")).toBe(true);
+        expect(solfege.noteIsSolfege("do")).toBe(true);
+        expect(solfege.noteIsSolfege("C")).toBe(false);
     });
 
-    it("converts durations to note values and rhythm-block factors", () => {
-        expect(rhythm.durationToNoteValue(0.25)).toEqual([1, 0, [0.5, 0.5], 1]);
-        expect(rhythm.durationToNoteValue(0.75)).toEqual([1, 0, [1.5, 0.5], 1]);
-        expect(rhythm.convertFactor(0.25)).toBe("4");
-        expect(rhythm.convertFactor(0.125)).toBe("8");
-        expect(rhythm.convertFactor(4)).toBeNull();
+    it("splits a solfege note into its name and octave", () => {
+        expect(solfege.splitSolfege("sol4")).toEqual(["sol", "4"]);
+        expect(solfege.splitI18nSolfege("sol4")).toEqual(["sol", "4"]);
     });
 
-    it("builds the display string for a note's numerator and denominator", () => {
-        expect(rhythm.calcNoteValueToDisplay(4, 0)).toContain("0");
-        expect(rhythm.calcNoteValueToDisplay(4, 0)).toContain("1");
-        expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("1");
-        expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("4");
+    it("splits a scale degree into its number and accidental", () => {
+        expect(solfege.splitScaleDegree("3")).toEqual(["3", ""]);
+    });
+
+    it("converts a fixed-solfege name to its letter class", () => {
+        expect(solfege.convertFromSolfege("re")).toBe("D");
+        // FIXEDSOLFEGE1 only keys bare names; octave-suffixed input passes through unchanged.
+        expect(solfege.convertFromSolfege("do4")).toBe("do4");
+        // EQUIVALENTNATURALS then resolves the sharp/flat spelling to its natural.
+        expect(solfege.convertFromSolfege("E♯")).toBe("F");
+        expect(solfege.convertFromSolfege("B♯")).toBe("C");
+    });
+
+    it("returns the seven solfege syllable names, high to low", () => {
+        const notes = solfege.getI18nSolfNotes();
+        expect(notes).toHaveLength(7);
+        expect(notes.slice(0, 3)).toEqual(["ti", "la", "sol"]);
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
-        for (const name of Object.keys(rhythm)) {
-            if (name === "MusicUtilsRhythm") continue;
-            expect(musicutils[name]).toBe(rhythm[name]);
+        for (const name of [
+            "noteIsSolfege",
+            "splitSolfege",
+            "i18nSolfege",
+            "splitScaleDegree",
+            "convertFromSolfege"
+        ]) {
+            expect(musicutils[name]).toBe(solfege[name]);
         }
     });
 
     it("exports every function the file declares", () => {
-        const source = readSource("musicutils-rhythm.js");
+        const source = readSource("musicutils-solfege.js");
         const declared = [...source.matchAll(/^var (\w+) =/gm)]
             .map(match => match[1])
-            .filter(name => name !== "MusicUtilsRhythm");
-        expect(Object.keys(rhythm).sort()).toEqual(declared.sort());
+            .filter(name => name !== "MusicUtilsSolfege");
+        expect(Object.keys(solfege).sort()).toEqual(declared.sort());
     });
 
     it("does not define anything that musicutils.js also defines", () => {
         const remaining = readSource("musicutils.js");
-        for (const name of Object.keys(rhythm)) {
+        for (const name of Object.keys(solfege)) {
             expect(remaining).not.toMatch(new RegExp(`^(const|let|var|function) ${name}\\b`, "m"));
         }
     });
 
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
-            "utils-logic.js",
             "musicutils-constants.js",
             "musicutils-i18n.js",
             "musicutils-temperament.js",
@@ -98,21 +109,21 @@ describe("musicutils-rhythm", () => {
             return sandbox;
         };
 
-        it("loads between the lookups module and musicutils.js without errors", () => {
+        it("loads between the rhythm module and musicutils.js without errors", () => {
             expect(() => load(order)).not.toThrow();
         });
 
         it("leaves every function visible as a bare global", () => {
             const sandbox = load(order);
-            for (const name of Object.keys(rhythm)) {
-                if (name === "MusicUtilsRhythm") continue;
+            for (const name of Object.keys(solfege)) {
+                if (name === "MusicUtilsSolfege") continue;
                 expect(vm.runInContext(`typeof ${name}`, sandbox)).toBe("function");
             }
         });
 
         it("publishes the module object for the RequireJS shim", () => {
             const sandbox = load(order);
-            expect(sandbox.window.MusicUtilsRhythm.reducedFraction(4, 8)).toContain("2");
+            expect(sandbox.window.MusicUtilsSolfege.noteIsSolfege("sol")).toBe(true);
         });
     });
 });

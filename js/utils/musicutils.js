@@ -167,8 +167,18 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
     var { toFraction, isInt } = UtilsLogic;
+    var MusicUtilsSolfege =
+        (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
+        (typeof require !== "undefined" ? require("./musicutils-solfege") : {});
+    var {
+        noteIsSolfege,
+        splitSolfege,
+        splitI18nSolfege,
+        i18nSolfege,
+        splitScaleDegree,
+        convertFromSolfege
+    } = MusicUtilsSolfege;
 }
-
 const _b64Cache = new Map();
 
 /*
@@ -3753,24 +3763,6 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * Check if a note string is in solfege.
- * @function
- * @param {string} note - The note string.
- * @returns {boolean} True if the note is in solfege, false otherwise.
- */
-const noteIsSolfege = note => {
-    if (SOLFEGECONVERSIONTABLE[note] !== undefined) {
-        return false;
-    }
-    // Check normalized version (ASCII to Unicode)
-    const altNote = note.replace("#", SHARP).replace("b", FLAT);
-    if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
-        return false;
-    }
-    return true;
-};
-
-/**
  * Convert a note to its solfege representation.
  * @function
  * @param {string} note - The note to convert.
@@ -3851,144 +3843,6 @@ const getSolfege = (note, keySignature, movable, temperament, edo) => {
     }
 
     return SOLFEGECONVERSIONTABLE[note];
-};
-
-/**
- * Split a solfege value into pitch and attributes.
- * @function
- * @param {string} value - The solfege value.
- * @returns {Array} An array containing pitch and attributes.
- */
-const splitSolfege = value => {
-    // Separate the pitch from any attributes, e.g., # or b
-    if (value !== null && typeof value === "string") {
-        let note, attr;
-        if (SOLFNOTES.includes(value)) {
-            note = value;
-            attr = "";
-        } else if (value.slice(0, 3) === "sol") {
-            note = "sol";
-            if (value.length === 4) {
-                attr = value[3];
-            } else {
-                attr = value[3] + value[4];
-            }
-        } else {
-            note = value.slice(0, 2);
-            if (value.length === 3) {
-                attr = value[2];
-            } else {
-                attr = value[2] + value[3];
-            }
-        }
-
-        return [note, attr];
-    }
-
-    return ["sol", ""];
-};
-
-const getI18nSolfNotes = () => {
-    //.TRANS: the note names must be separated by single spaces
-    const solfnotes = _("ti la sol fa mi re do");
-    if (typeof solfnotes !== "string") {
-        return SOLFNOTES;
-    }
-
-    const translated = solfnotes.trim().split(/\s+/);
-    if (translated.length !== SOLFNOTES.length || translated.some(note => note.length === 0)) {
-        return SOLFNOTES;
-    }
-
-    return translated;
-};
-
-const splitI18nSolfege = value => {
-    if (value !== null && typeof value === "string") {
-        const solfnotes = getI18nSolfNotes();
-        const lowerValue = value.toLowerCase();
-        const matches = solfnotes
-            .map((note, i) => ({ note, i }))
-            .sort((a, b) => b.note.length - a.note.length);
-
-        for (const match of matches) {
-            const lowerNote = match.note.toLowerCase();
-            if (lowerValue === lowerNote || lowerValue.startsWith(lowerNote)) {
-                return [SOLFNOTES[match.i], value.slice(match.note.length)];
-            }
-        }
-    }
-
-    return splitSolfege(value);
-};
-
-/**
- * Internationalize a solfege note using i18n.
- * @function
- * @param {string} note - The solfege note.
- * @returns {string} The internationalized solfege note.
- */
-const i18nSolfege = note => {
-    // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = getI18nSolfNotes();
-    const sourceObj = splitSolfege(note);
-    const obj = splitI18nSolfege(note);
-
-    if (!SOLFNOTES.includes(sourceObj[0]) && SOLFNOTES.includes(obj[0])) {
-        return obj[0] + obj[1];
-    }
-
-    const i = SOLFNOTES.indexOf(obj[0]);
-    if (i !== -1) {
-        return solfnotes_[i] + obj[1];
-    } else {
-        // Check if the note is in a different language.
-        const i = Object.values(solfnotes_).indexOf(obj[0]);
-        if (i !== -1) {
-            return SOLFNOTES[i] + obj[1];
-        }
-    }
-    // Wasn't solfege so it doesn't need translation.
-    return note;
-};
-
-/**
- * Split a scale degree value into note and attributes.
- * @function
- * @param {string} value - The scale degree value.
- * @returns {Array} An array containing note and attributes.
- */
-const splitScaleDegree = value => {
-    if (!value) {
-        return [5, NATURAL];
-    }
-
-    const note = value.slice(0, 1);
-    const attr = value.slice(1);
-    return [note, attr];
-};
-
-/**
- * Convert a solfege note to a common letter class.
- * @function
- * @param {string} note - The solfege note.
- * @returns {string} The converted note.
- */
-const convertFromSolfege = note => {
-    if (typeof note === "string") {
-        const unicodeNote = note.replace("#", SHARP).replace("b", FLAT);
-        if (unicodeNote in FIXEDSOLFEGE1) {
-            note = FIXEDSOLFEGE1[unicodeNote];
-        }
-    }
-    // Convert to common letter class
-    if (note in FIXEDSOLFEGE1) {
-        note = FIXEDSOLFEGE1[note];
-    }
-    if (note in EQUIVALENTNATURALS) {
-        note = EQUIVALENTNATURALS[note];
-    }
-    return note;
 };
 
 /**
