@@ -5624,14 +5624,12 @@ function getNote(
         }
         // Apply the key offset before normalizing the pitch index.
         // For example, with kOffset = 0, noteArg = -1 gives pitchValue = -1
-        // and maps to "B" in the previous octave, while noteArg = -13
-        // maps to "B" two octaves below the starting octave.
+        // and maps to "B" in the previous octave, while noteArg = 13
+        // maps to "D♭" in the next octave.
         const pitchValue = noteArg + kOffset;
         const pitchIndex = ((pitchValue % octaveLength) + octaveLength) % octaveLength;
 
-        if (pitchValue < 0) {
-            octave += Math.floor(pitchValue / octaveLength);
-        }
+        octave += Math.floor(pitchValue / octaveLength);
         if (octaveLength === 12) {
             if (getSharpFlatPreference(keySignature) === "sharp") {
                 noteArg = PITCHES2[pitchIndex];

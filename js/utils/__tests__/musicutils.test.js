@@ -3724,10 +3724,30 @@ describe("getNote additional paths", () => {
             0
         ]);
     });
-    it("handles positive pitch numbers", () => {
+    it("normalizes positive pitch numbers across octave boundaries", () => {
         expect(getNote(1, 4, 0, "C major", false)).toEqual(["D♭", 4, 0]);
         expect(getNote(6, 4, 0, "C major", false)).toEqual(["G♭", 4, 0]);
         expect(getNote(11, 4, 0, "C major", false)).toEqual(["B", 4, 0]);
+        expect(getNote(12, 4, 0, "C major", false)).toEqual(["C", 5, 0]);
+        expect(getNote(13, 4, 0, "C major", false)).toEqual(["D♭", 5, 0]);
+        expect(getNote(24, 4, 0, "C major", false)).toEqual(["C", 6, 0]);
+        expect(getNote(25, 4, 0, "C major", false)).toEqual(["D♭", 6, 0]);
+
+        expect(getNote("13", 4, 0, "C major", false)).toEqual(["D♭", 5, 0]);
+
+        expect(getNote(5, 4, 0, "G major", true)).toEqual(["C", 5, 0]);
+        expect(getNote(13, 4, 0, "G major", true)).toEqual(["G♯", 5, 0]);
+
+        expect(getNote(19, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C",
+            5,
+            0
+        ]);
+        expect(getNote(20, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C♯",
+            5,
+            0
+        ]);
     });
     it("returns rests before attempting pitch conversion", () => {
         expect(getNote("rest", 4, 7, "C major", false)).toEqual(["R", "", 0]);
