@@ -535,6 +535,32 @@ describe("ProgramBlocks", () => {
             expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
         });
 
+        test("treats English and translated status keys the same in another language", () => {
+            const blk = 10;
+            const turtle = 0;
+            const targetTurtleIndex = 5;
+            logo.turtleDicts[turtle] = {};
+            global.getTargetTurtle.mockReturnValue(targetTurtleIndex);
+
+            activity.blocks.blockList[blk] = {
+                connections: [null, null, 20]
+            };
+            activity.blocks.blockList[20] = {
+                name: "loadFile",
+                value: ["filename", '{"pen size": 3, "tamaño de la pluma": 4, "custom": 1}']
+            };
+
+            const english = global._;
+            global._ = s => (s === "pen size" ? "tamaño de la pluma" : s);
+            try {
+                getBlock("loadDict").flow(["turtle5", [null, null]], logo, turtle, blk);
+            } finally {
+                global._ = english;
+            }
+
+            expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: 1 });
+        });
+
         test("rejects non-object JSON array when loading from file", () => {
             const blk = 10;
             const turtle = 0;

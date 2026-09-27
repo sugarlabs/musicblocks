@@ -44,12 +44,46 @@
 
 /* exported setupDictActions */
 
+// English names of the internal turtle dictionary keys handled by _GetDict.
+const TURTLEKEYS = [
+    "color",
+    "shade",
+    "grey",
+    "pen size",
+    "font",
+    "heading",
+    "x",
+    "y",
+    "notes played",
+    "note value",
+    "current pitch",
+    "pitch number"
+];
+
 /**
  * Sets up all the methods related to different actions for each block in Dictionary palette.
  * @returns {void}
  */
 function setupDictActions(activity) {
     Turtle.DictActions = class {
+        /**
+         * Utility function to get the English name of an internal turtle dictionary key.
+         * Text blocks keep their English value and only translate their label, so a key
+         * matches either its English name or its translation in the current language.
+         *
+         * @static
+         * @param {String} key - key
+         * @returns {String|null} English key name, or null if key is not an internal key
+         */
+        static TurtleKey(key) {
+            for (const name of TURTLEKEYS) {
+                if (key === name || key === _(name)) {
+                    return name;
+                }
+            }
+            return null;
+        }
+
         /**
          * Utility function to check whether a key is one of the internal turtle dictionary keys
          * handled by _GetDict.
@@ -59,20 +93,7 @@ function setupDictActions(activity) {
          * @returns {Boolean}
          */
         static IsTurtleKey(key) {
-            return (
-                key === _("color") ||
-                key === _("shade") ||
-                key === _("grey") ||
-                key === _("pen size") ||
-                key === _("font") ||
-                key === _("heading") ||
-                key === "x" ||
-                key === "y" ||
-                key === _("notes played") ||
-                key === _("note value") ||
-                key === _("current pitch") ||
-                key === _("pitch number")
-            );
+            return Turtle.DictActions.TurtleKey(key) !== null;
         }
 
         /**
@@ -87,34 +108,35 @@ function setupDictActions(activity) {
          */
         static _GetDict(target, turtle, key, blk) {
             const targetTur = activity.turtles.ithTurtle(target);
+            const name = Turtle.DictActions.TurtleKey(key);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            if (key === _("color")) {
+            if (name === "color") {
                 return targetTur.painter.color;
-            } else if (key === _("shade")) {
+            } else if (name === "shade") {
                 return targetTur.painter.value;
-            } else if (key === _("grey")) {
+            } else if (name === "grey") {
                 return targetTur.painter.chroma;
-            } else if (key === _("pen size")) {
+            } else if (name === "pen size") {
                 return targetTur.painter.stroke;
-            } else if (key === _("font")) {
+            } else if (name === "font") {
                 return targetTur.painter.font;
-            } else if (key === _("heading")) {
+            } else if (name === "heading") {
                 return targetTur.painter.turtle.orientation;
-            } else if (key === "x") {
+            } else if (name === "x") {
                 return activity.turtles.screenX2turtleX(targetTur.container.x);
-            } else if (key === "y") {
+            } else if (name === "y") {
                 return activity.turtles.screenY2turtleY(targetTur.container.y);
-            } else if (key === _("notes played")) {
+            } else if (name === "notes played") {
                 return targetTur.singer.notesPlayed[0] / targetTur.singer.notesPlayed[1];
-            } else if (key === _("note value")) {
+            } else if (name === "note value") {
                 return Singer.RhythmActions.getNoteValue(target);
-            } else if (key === _("current pitch")) {
+            } else if (name === "current pitch") {
                 if (targetTur.singer.lastNotePlayed === null) {
                     return "G4";
                 }
                 return targetTur.singer.lastNotePlayed[0];
-            } else if (key === _("pitch number")) {
+            } else if (name === "pitch number") {
                 let obj;
                 if (targetTur.singer.lastNotePlayed !== null) {
                     const len = targetTur.singer.lastNotePlayed[0].length;
@@ -163,31 +185,32 @@ function setupDictActions(activity) {
          */
         static SetDictValue(target, turtle, key, value) {
             const targetTur = activity.turtles.ithTurtle(target);
+            const name = Turtle.DictActions.TurtleKey(key);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            if (key === _("color")) {
+            if (name === "color") {
                 targetTur.painter.doSetColor(value);
-            } else if (key === _("shade")) {
+            } else if (name === "shade") {
                 targetTur.painter.doSetValue(value);
-            } else if (key === _("grey")) {
+            } else if (name === "grey") {
                 targetTur.painter.doSetChroma(value);
-            } else if (key === _("pen size")) {
+            } else if (name === "pen size") {
                 targetTur.painter.doSetPensize(value);
-            } else if (key === _("font")) {
+            } else if (name === "font") {
                 targetTur.painter.doSetFont(value);
-            } else if (key === _("heading")) {
+            } else if (name === "heading") {
                 targetTur.painter.doSetHeading(value);
-            } else if (key === "y") {
+            } else if (name === "y") {
                 const x = activity.turtles.screenX2turtleX(targetTur.container.x);
                 targetTur.painter.doSetXY(x, value);
-            } else if (key === "x") {
+            } else if (name === "x") {
                 const y = activity.turtles.screenY2turtleY(targetTur.container.y);
                 targetTur.painter.doSetXY(value, y);
             } else if (
-                key === _("notes played") ||
-                key === _("note value") ||
-                key === _("current pitch") ||
-                key === _("pitch number")
+                name === "notes played" ||
+                name === "note value" ||
+                name === "current pitch" ||
+                name === "pitch number"
             ) {
                 activity.errorMsg(_("Cannot set read-only key: %s").replace(/%s/g, () => key));
             }

@@ -508,4 +508,54 @@ describe("setupDictActions", () => {
             expect(result).toBe("Key with this name does not exist in target");
         });
     });
+
+    // Text blocks keep their English value and only translate their label, so in another
+    // language a key can arrive either in English or translated.
+    describe("in another language", () => {
+        const spanish = {
+            "pen size": "tamaño de la pluma",
+            "heading": "rumbo",
+            "notes played": "notas tocadas"
+        };
+
+        beforeEach(() => {
+            global._.mockImplementation(key => spanish[key] || key);
+        });
+
+        afterEach(() => {
+            global._.mockImplementation(key => key);
+        });
+
+        test.each([
+            ["pen size", 2],
+            ["tamaño de la pluma", 2],
+            ["heading", 90],
+            ["rumbo", 90],
+            ["notes played", 0.5],
+            ["notas tocadas", 0.5]
+        ])("should get the turtle's %s", (key, expected) => {
+            expect(Turtle.DictActions.getValue("target", key, turtle, 3)).toBe(expected);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test.each(["pen size", "tamaño de la pluma"])("should set the turtle's %s", key => {
+            Turtle.DictActions.setValue("target", key, 7, turtle);
+            expect(targetTurtle.painter.doSetPensize).toHaveBeenCalledWith(7);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
+        });
+
+        test.each(["notes played", "notas tocadas"])(
+            "should report %s as read-only and not store it",
+            key => {
+                Turtle.DictActions.setValue("target", key, 7, turtle);
+                expect(activity.errorMsg).toHaveBeenCalledWith("Cannot set read-only key: " + key);
+                expect(activity.logo.turtleDicts[turtle]).toEqual({});
+            }
+        );
+
+        it("should still report an unknown key", () => {
+            expect(Turtle.DictActions._GetDict(0, turtle, "tamaño", 3)).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: tamaño", 3);
+        });
+    });
 });
