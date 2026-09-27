@@ -602,6 +602,76 @@ describe("clampNumber", () => {
         expect(result.errors.join(" ")).toMatch(/spawn processes or threads/);
     });
 
+    it("rejects child_process required through a template literal", () => {
+        const result = validateGeneratedTest(
+            withUtilsLogic(
+                'describe("x", () => { it("y", () => { require(`child_process`).execSync("ls"); expect(clampNumber(1,0,2)).toBe(1); }); });'
+            ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/spawn processes or threads/);
+    });
+
+    it("rejects fs required through a template literal and its unsafe calls", () => {
+        const result = validateGeneratedTest(
+            "const fs = require(`fs`);\n" +
+                withUtilsLogic(
+                    'describe("x", () => { it("y", () => { fs.writeFileSync("x", "y"); expect(clampNumber(1,0,2)).toBe(1); }); });'
+                ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/filesystem module \("fs"\)/);
+        expect(result.errors.join(" ")).toMatch(/unsafe filesystem operation: writeFileSync/);
+    });
+
+    it("rejects a dynamic import() of a template-literal process module", () => {
+        const result = validateGeneratedTest(
+            withUtilsLogic(
+                'describe("x", () => { it("y", async () => { await import(`child_process`); expect(clampNumber(1,0,2)).toBe(1); }); });'
+            ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/spawn processes or threads/);
+    });
+
+    it("rejects fs loaded through module.require", () => {
+        const result = validateGeneratedTest(
+            'const fs = module.require("fs");\n' +
+                withUtilsLogic(
+                    'describe("x", () => { it("y", () => { fs.rmSync("x"); expect(clampNumber(1,0,2)).toBe(1); }); });'
+                ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/filesystem module \("fs"\)/);
+        expect(result.errors.join(" ")).toMatch(/unsafe filesystem operation: rmSync/);
+    });
+
+    it("rejects jest.mock of the module under test through a template literal", () => {
+        const result = validateGeneratedTest(
+            "jest.mock(`../utils-logic`);\n" +
+                withUtilsLogic(
+                    'describe("x", () => { it("y", () => { expect(clampNumber(9, 0, 3)).toBe(3); }); });'
+                ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/mocks the module under test/);
+    });
+
+    it("still accepts a template-literal require of the module under test", () => {
+        const result = validateGeneratedTest(
+            "const { clampNumber } = require(`../utils-logic`);\n" +
+                'describe("x", () => { it("y", () => { expect(clampNumber(9, 0, 3)).toBe(3); }); });\n',
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.errors).toEqual([]);
+        expect(result.valid).toBe(true);
+    });
+
     it("rejects an unrelated static ESM import", () => {
         const result = validateGeneratedTest(
             'import { normalizeLanguageCode } from "../language-utils";\n' +

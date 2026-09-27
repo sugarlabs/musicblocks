@@ -394,10 +394,27 @@ function testDirFor(modulePath) {
 }
 
 /**
+ * The string a specifier node always evaluates to: a string literal, or a
+ * template literal with no `${}` substitutions (`require(\`fs\`)` names a module
+ * as statically as `require("fs")`). `null` for anything computed.
+ *
+ * @param {object} node - an argument / source node.
+ * @returns {string|null}
+ */
+function staticString(node) {
+    if (!node) return null;
+    if (node.type === "Literal" && typeof node.value === "string") return node.value;
+    if (node.type === "TemplateLiteral" && node.expressions.length === 0) {
+        return node.quasis[0].value.cooked;
+    }
+    return null;
+}
+
+/**
  * Reads the module specifier from any node that pulls in another module - a
- * `require("x")` call, a `jest.mock("x", ...)` call, a static ESM
- * `import`/`export ... from`, or a dynamic `import("x")` - or `null` when the
- * node is not one of those.
+ * `require("x")` / `module.require("x")` call, a `jest.mock("x", ...)` call, a
+ * static ESM `import`/`export ... from`, or a dynamic `import("x")` - or `null`
+ * when the node is not one of those.
  *
  * @param {object} node - any AST node.
  * @returns {{ kind: string, spec: string, node: object } | null}
@@ -416,20 +433,25 @@ function readModuleCall(node) {
     }
     // dynamic `import("x")` (acorn emits ImportExpression at ecmaVersion 2020)
     if (node.type === "ImportExpression") {
-        const arg = node.source;
-        return arg && arg.type === "Literal" && typeof arg.value === "string"
-            ? { kind: "import", spec: arg.value, node }
-            : null;
+        const spec = staticString(node.source);
+        return spec !== null ? { kind: "import", spec, node } : null;
     }
     if (node.type !== "CallExpression") return null;
     const callee = node.callee;
-    const firstArg = node.arguments && node.arguments[0];
-    const spec =
-        firstArg && firstArg.type === "Literal" && typeof firstArg.value === "string"
-            ? firstArg.value
-            : null;
+    const spec = staticString(node.arguments && node.arguments[0]);
 
     if (callee.type === "Identifier" && callee.name === "require" && spec !== null) {
+        return { kind: "require", spec, node };
+    }
+    if (
+        callee.type === "MemberExpression" &&
+        !callee.computed &&
+        callee.object.type === "Identifier" &&
+        callee.object.name === "module" &&
+        callee.property.type === "Identifier" &&
+        callee.property.name === "require" &&
+        spec !== null
+    ) {
         return { kind: "require", spec, node };
     }
     if (callee.type === "Identifier" && callee.name === "import" && spec !== null) {
