@@ -54,6 +54,8 @@
  *     are not rejected.
  */
 
+const path = require("path");
+
 const { parseSource } = require("./extract-module");
 const { normalizePlan } = require("./generation-request");
 
@@ -380,6 +382,18 @@ function basenameNoExt(spec) {
 }
 
 /**
+ * The directory a module's generated test lives in, which is what a relative
+ * specifier inside that test resolves against:
+ * `js/utils/utils-logic.js` -> `js/utils/__tests__`.
+ *
+ * @param {string} modulePath - repo-relative path of the module under test.
+ * @returns {string}
+ */
+function testDirFor(modulePath) {
+    return path.posix.join(path.posix.dirname(modulePath), "__tests__");
+}
+
+/**
  * Reads the module specifier from any node that pulls in another module - a
  * `require("x")` call, a `jest.mock("x", ...)` call, a static ESM
  * `import`/`export ... from`, or a dynamic `import("x")` - or `null` when the
@@ -683,13 +697,20 @@ function validateGeneratedTest(source, options = {}) {
         return { valid: false, errors, warnings, modulePath };
     }
 
+    const moduleNoExt = modulePath ? modulePath.replace(/\.js$/, "") : null;
+    const testDir = modulePath ? testDirFor(modulePath) : null;
+    const targetSpec = modulePath ? path.posix.relative(testDir, moduleNoExt) : null;
     const isTargetSpec = spec => {
         if (!moduleBase) return false;
         if (basenameNoExt(spec) !== moduleBase) return false;
-        // a bare specifier like "utils-logic" is a package lookup, not our file
-        return (
-            spec.startsWith(".") || spec === modulePath || spec === modulePath.replace(/\.js$/, "")
-        );
+        // Only a relative specifier can reach the module from the generated
+        // test. A bare "utils-logic" and a repo-style "js/utils/utils-logic" are
+        // both package lookups, which is not how the module is reachable.
+        if (!spec.startsWith(".")) return false;
+        // It also has to resolve to the module from the test's own directory.
+        // Sharing a basename is not enough: "./utils-logic" names a sibling of
+        // the test, and a deeper "../.." climbs out of the repo.
+        return path.posix.join(testDir, spec).replace(/\.js$/, "") === moduleNoExt;
     };
 
     // ---- gather module calls, assertions, titles, identifiers ------------
@@ -881,6 +902,16 @@ function validateGeneratedTest(source, options = {}) {
         if (allowedModules.has(c.spec)) continue;
         const isRelative = c.spec.startsWith(".") || c.spec.startsWith("/");
         if (isRelative && !moduleBase) continue; // cannot tell if it is the target
+        if (basenameNoExt(c.spec) === moduleBase) {
+            // Right basename, wrong path: usually the wrong number of `../` steps
+            // out of __tests__/, or a repo-style "js/utils/utils-logic" that Jest
+            // resolves as a package. Either way it only fails once Jest runs.
+            errors.push(
+                `imports "${c.spec}", which does not resolve to the module under test from ` +
+                    `${testDir}/; require "${targetSpec}" instead`
+            );
+            continue;
+        }
         errors.push(
             isRelative
                 ? `imports "${c.spec}", which is not the module under test ("${moduleBase}"); ` +
