@@ -88,8 +88,7 @@ function setupDictActions(activity) {
                 if (targetTur.singer.lastNotePlayed !== null) {
                     return targetTur.singer.lastNotePlayed[0];
                 } else {
-                    activity.errorMsg(INVALIDPITCH, blk);
-                    return "G";
+                    return "G4";
                 }
             } else if (key === _("pitch number")) {
                 let obj;
