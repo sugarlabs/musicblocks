@@ -848,9 +848,10 @@ class ProjectManager {
         return JSON.stringify(data);
     }
 
-    saveLocally() {
+    saveLocally(options = {}) {
         const activity = this.activity;
         const data = this.prepareExport();
+        const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
 
         if (activity.storage.currentProject === undefined) {
             try {
@@ -858,6 +859,7 @@ class ProjectManager {
                 activity.storage.allProjects = JSON.stringify(["My Project"]);
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
+                if (rejectOnProjectSaveError) throw e;
             }
         }
 
@@ -871,6 +873,7 @@ class ProjectManager {
             // (IndexedDB) handles large payloads.
             console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
+            if (rejectOnProjectSaveError) throw e;
         }
 
         const img = new Image();
@@ -1020,6 +1023,30 @@ class ProjectManager {
             return extensionIndex === -1 ? file.name : file.name.slice(0, extensionIndex);
         };
 
+        const initialiseLocalImportedProject = async file => {
+            const baseName = getProjectName(file) || _("My Project");
+            let projectName = baseName;
+            let suffix = 2;
+            const projectExists = async name => {
+                if (
+                    name === that.storage.currentProject ||
+                    that.storage["SESSION" + name] !== undefined
+                ) {
+                    return true;
+                }
+                return Boolean(
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.loadSession === "function" &&
+                    (await that.sessionStorageManager.loadSession("SESSION" + name))
+                );
+            };
+            while (await projectExists(projectName)) {
+                projectName = `${baseName} ${suffix}`;
+                suffix += 1;
+            }
+            that.storage.currentProject = projectName;
+        };
+
         const saveImportedProject = async () => {
             try {
                 await (typeof that.saveLocally === "function"
@@ -1075,6 +1102,17 @@ class ProjectManager {
                     return;
                 }
                 that.planet.closePlanet();
+            } else {
+                try {
+                    if (typeof that.saveLocally === "function") {
+                        await that.saveLocally({ rejectOnProjectSaveError: true });
+                    }
+                    await initialiseLocalImportedProject(file);
+                } catch (error) {
+                    ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
+                    finishLoading();
+                    return;
+                }
             }
 
             const trashComplete = new Promise(resolve => {
