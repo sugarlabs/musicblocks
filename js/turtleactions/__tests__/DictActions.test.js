@@ -374,6 +374,24 @@ describe("setupDictActions", () => {
             );
         });
 
+        it("should return localized error message if key does not exist", () => {
+            const originalI18n = global._;
+            global._ = jest.fn(msg => {
+                if (msg === "Key with this name does not exist in %s") {
+                    return "No existe una clave con este nombre en %s";
+                }
+                return msg;
+            });
+            activity.logo.turtleDicts[turtle] = { testDict: {} };
+            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "No existe una clave con este nombre en testDict",
+                123
+            );
+            global._ = originalI18n;
+        });
+
         it("should initialize turtleDicts if it does not exist for the turtle", () => {
             delete activity.logo.turtleDicts[turtle];
             const result = Turtle.DictActions.getValue("testDict", "key", turtle, 123);
