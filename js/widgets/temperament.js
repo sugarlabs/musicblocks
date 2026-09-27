@@ -19,14 +19,14 @@
 /*
    global
 
-   _, addTemperamentToDictionary, buildScale,
-   deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-   getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber,
-   ManagedTimer
- */
+    _, addTemperamentToDictionary, buildScale,
+    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
+    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
+    isCustomTemperament, isUnsafeObjectKey, last, normalizeNoteAccidentals, parseNoteString,
+    pitchToFrequency, platformColor, PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction,
+   setOctaveRatio, SHARP, Singer, slicePath, TuningFormats, updateTemperaments, wheelnav,
+   frequencyToPitch, clampNumber, ManagedTimer, readTextFile
+*/
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
 
@@ -88,6 +88,21 @@ const overDivisionCap = (activity, count) => {
     if (count <= MAX_DIVISIONS) return false;
     activity.errorMsg(_("Maximum 57 divisions. For larger, use a dedicated tool."), 3000);
     return true;
+};
+
+/**
+ * Builds the slug used in export file names: lowercased name with every run
+ * of non-alphanumerics replaced by "-", leading/trailing "-" stripped;
+ * an empty slug falls back to "custom".
+ * @param {string} name - The temperament name.
+ * @returns {string} The slug.
+ */
+const temperamentSlug = name => {
+    const slug = String(name)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    return slug === "" ? "custom" : slug;
 };
 
 function TemperamentWidget() {
@@ -1378,6 +1393,9 @@ function TemperamentWidget() {
             that._visualizerView();
         };
 
+        // Expose on the widget instance so import can apply a registered temperament
+        that._loadTemperament = _loadTemperament;
+
         let dragIndex = -1;
         let dragMoved = false;
         let lockedDrag = false;
@@ -2603,6 +2621,293 @@ function TemperamentWidget() {
     };
 
     /**
+     * Collects the current widget state into the export data format. Reads
+     * live state, so unsaved edits are reflected in the export.
+     * @returns {object|null} The export data, or null (after an error
+     * message) when the widget has no complete set of ratios to export.
+     */
+    this._temperamentExportData = function () {
+        const ratios = [];
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            const ratio = Number(this.ratios[i]);
+            if (!isFinite(ratio)) {
+                this.activity.errorMsg(_("No temperament to export."), 3000);
+                return null;
+            }
+            ratios.push(ratio);
+        }
+
+        const interval = [];
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            if (typeof this.intervals[i] === "string") {
+                interval.push(this.intervals[i]);
+            } else if (Array.isArray(this.notes[i])) {
+                interval.push(this.notes[i][0]);
+            } else if (typeof this.notes[i] === "string") {
+                interval.push(parseNoteString(_stripCents(this.notes[i]))[0]);
+            } else {
+                interval.push("");
+            }
+        }
+
+        return {
+            name: this.inTemperament,
+            pitchNumber: this.pitchNumber,
+            referencePitch: this._logo.synth.startingPitch,
+            interval: interval,
+            ratios: ratios
+        };
+    };
+
+    /**
+     * Exports the current temperament as a pretty-printed JSON file.
+     * @returns {void}
+     */
+    this._exportJson = function () {
+        const data = this._temperamentExportData();
+        if (data === null) {
+            return;
+        }
+
+        this._downloadScl(
+            JSON.stringify(data, null, 2),
+            "temperament-" + temperamentSlug(data.name) + ".json"
+        );
+    };
+
+    /**
+     * Exports the current temperament as a Scala (.scl) file: a header, the
+     * temperament name, the pitch count, and one cents line per ratio above
+     * unison, measured against the exported period.
+     * @returns {void}
+     */
+    this._exportScl = function () {
+        const data = this._temperamentExportData();
+        if (data === null) {
+            return;
+        }
+
+        const period = data.ratios[data.pitchNumber];
+        const lines = ["! temperament.scl", "!", data.name, String(data.pitchNumber)];
+        for (let i = 1; i <= data.pitchNumber; i++) {
+            lines.push(ratioToCents(data.ratios[i], period).toFixed(2));
+        }
+
+        this._downloadScl(
+            lines.join("\n") + "\n",
+            "temperament-" + temperamentSlug(data.name) + ".scl"
+        );
+    };
+
+    /**
+     * Downloads text content as a file via a blob URL and a synthetic anchor
+     * click, revoking the URL afterwards.
+     * @param {string} content - The file content.
+     * @param {string} filename - The download file name.
+     * @returns {void}
+     */
+    this._downloadScl = function (content, filename) {
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    /**
+     * Imports a .json or .scl temperament file: parses and validates it,
+     * then registers the temperament in the dictionary and applies it.
+     * @returns {void}
+     */
+    this._importFile = function () {
+        readTextFile("myModeSclFile", (err, data) => {
+            if (err) {
+                this.activity.errorMsg(err.message);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            const ext = (data.file.name || "").toLowerCase();
+            let name;
+            let pitchNumber;
+            let ratios;
+
+            if (ext.endsWith(".json")) {
+                let def;
+                try {
+                    def = TuningFormats.parseTemperamentJson(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading JSON file: ") + e.message);
+                    return;
+                }
+                pitchNumber = def.pitchNumber;
+                ratios = def.ratios;
+                name = def.name || data.file.name.replace(/\.json$/i, "") || "custom";
+            } else if (ext.endsWith(".scl")) {
+                let result;
+                try {
+                    result = TuningFormats.parseSclFile(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading .scl file: ") + e.message);
+                    return;
+                }
+                pitchNumber = result.pitchCount;
+                ratios = [1].concat(result.pitches.map(p => p.ratio));
+                for (let i = 1; i < ratios.length; i++) {
+                    if (!(ratios[i] > ratios[i - 1])) {
+                        this.activity.errorMsg(
+                            _("Invalid .scl file: pitches must be strictly ascending above 1/1.")
+                        );
+                        return;
+                    }
+                }
+                name = result.description || data.file.name.replace(/\.scl$/i, "") || "custom";
+            } else {
+                this.activity.errorMsg(_("Unsupported file type. Use .json or .scl."));
+                return;
+            }
+
+            if (overDivisionCap(this.activity, pitchNumber)) {
+                return;
+            }
+
+            this._registerImportedTemperament(name, pitchNumber, ratios);
+        });
+    };
+
+    /**
+     * Registers an imported temperament in the TEMPERAMENT dictionary and
+     * applies it to the widget.
+     * @param {string} name - The temperament name.
+     * @param {number} pitchNumber - The number of pitches per period.
+     * @param {number} ratios - Length pitchNumber + 1, with ratios[0] the
+     * unison and ratios[pitchNumber] the period.
+     * @returns {boolean} True when the temperament was registered.
+     */
+    this._registerImportedTemperament = function (name, pitchNumber, ratios) {
+        if (isUnsafeObjectKey(name)) {
+            this.activity.errorMsg(_("Invalid temperament name."), 3000);
+            return false;
+        }
+
+        if (getTemperament(name) !== undefined && !isCustomTemperament(name)) {
+            name = name + " (imported)";
+        }
+
+        const startHz = Number(this.frequencies[0]);
+        if (!isFinite(startHz) || startHz <= 0) {
+            this.activity.errorMsg(_("Cannot import: no reference frequency."), 3000);
+            return false;
+        }
+
+        const period = ratios[pitchNumber];
+        if (!Number.isFinite(period) || period <= 1 || period > 1e6) {
+            this.activity.errorMsg(_("Invalid temperament: octave ratio out of range."), 3000);
+            return false;
+        }
+
+        const entry = { pitchNumber: pitchNumber };
+        for (let i = 0; i < pitchNumber; i++) {
+            const pitch = frequencyToPitch(ratios[i] * startHz);
+            entry["" + i] = [ratios[i], pitch[0], pitch[1]];
+        }
+
+        addTemperamentToDictionary(name, entry);
+        updateTemperaments();
+        Singer.clearPitchToFrequencyCache();
+        setOctaveRatio(ratios[pitchNumber]);
+
+        this._logo.customTemperamentDefined = true;
+        this.activity.blocks.protoBlockDict["custompitch"].hidden = false;
+        this.activity.blocks.palettes.updatePalettes("pitch");
+
+        this._loadTemperament(name);
+
+        this.activity.errorMsg(_("Temperament imported: ") + name, 3000);
+        return true;
+    };
+
+    /**
+     * Builds the export/import popup anchored to a toolbar button. Clicking
+     * the button again, choosing an item, or clicking outside closes it.
+     * @param {HTMLElement} anchor - The Share button the popup is anchored to.
+     * @returns {void}
+     */
+    this._createSharePopup = function (anchor) {
+        const existing = document.getElementById("temperamentSharePopup");
+        if (existing) {
+            if (existing._closeHandler) {
+                document.removeEventListener("mousedown", existing._closeHandler);
+            }
+            existing.remove();
+            return;
+        }
+
+        const popup = document.createElement("div");
+        popup.id = "temperamentSharePopup";
+        popup.style.cssText =
+            "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
+            "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
+            "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
+            "min-width:140px;";
+        const rect = anchor.getBoundingClientRect();
+        popup.style.top = rect.bottom + 4 + "px";
+        popup.style.left = rect.left + "px";
+
+        const addItem = (label, handler) => {
+            const item = document.createElement("div");
+            item.textContent = label;
+            item.setAttribute("role", "button");
+            item.setAttribute("tabindex", "0");
+            item.style.cssText = "padding:6px 16px;cursor:pointer;";
+            item.onmouseenter = () => {
+                item.style.background = "var(--color-bg-tertiary)";
+            };
+            item.onmouseleave = () => {
+                item.style.background = "";
+            };
+            item.onclick = () => {
+                cleanup();
+                handler();
+            };
+            item.onkeydown = e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    cleanup();
+                    handler();
+                }
+            };
+            return item;
+        };
+
+        popup.appendChild(addItem(_("Export .scl"), () => this._exportScl()));
+        popup.appendChild(addItem(_("Export JSON"), () => this._exportJson()));
+        popup.appendChild(addItem(_("Import"), () => this._importFile()));
+        document.body.appendChild(popup);
+
+        const cleanup = () => {
+            popup.remove();
+            document.removeEventListener("mousedown", closeHandler);
+        };
+
+        const closeHandler = e => {
+            if (!popup.contains(e.target)) {
+                cleanup();
+            }
+        };
+        popup._closeHandler = closeHandler;
+        setTimeout(() => {
+            document.addEventListener("mousedown", closeHandler);
+        }, 0);
+    };
+
+    /**
      * Saves the modifications made to the temperament.
      * @returns {void}
      */
@@ -3016,6 +3321,11 @@ function TemperamentWidget() {
         );
         widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = function () {
             that._save();
+        };
+
+        const shareBtn = widgetWindow.addButton("share.svg", ICONSIZE, _("Share"));
+        shareBtn.onclick = () => {
+            that._createSharePopup(shareBtn);
         };
 
         const addPitchAfterBtn = widgetWindow.addButton(

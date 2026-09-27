@@ -18,7 +18,7 @@
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
-    isUnsafeObjectKey, ManagedTimer
+    isUnsafeObjectKey, ManagedTimer, readTextFile
  */
 
 /*
@@ -1520,38 +1520,6 @@ class ModeWidget {
         URL.revokeObjectURL(url);
     }
 
-    _readSclFile(inputId, callback) {
-        const fileInput = docById(inputId);
-        if (!fileInput) {
-            callback(new Error(_("File input not found.")));
-            return;
-        }
-
-        fileInput.value = "";
-        fileInput.onchange = function () {
-            const file = fileInput.files[0];
-            if (!file) {
-                return;
-            }
-
-            const MAX_IMPORT_SIZE = 1024 * 1024;
-            if (file.size > MAX_IMPORT_SIZE) {
-                callback(new Error(_("File too large. Maximum is 1 MB.")));
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                callback(null, { text: e.target.result, file });
-            };
-            reader.onerror = function () {
-                callback(new Error(_("Failed to read file.")));
-            };
-            reader.readAsText(file);
-        };
-        fileInput.click();
-    }
-
     _findEdoSteps(pitches) {
         for (let edo = TuningFormats.EDO_MAX; edo >= TuningFormats.EDO_MIN; edo--) {
             const step = 1200 / edo;
@@ -1704,7 +1672,7 @@ class ModeWidget {
     }
 
     _importFile() {
-        this._readSclFile("myModeSclFile", (err, data) => {
+        readTextFile("myModeSclFile", (err, data) => {
             if (err) {
                 this.errorMsg(err.message);
                 return;

@@ -17,7 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { parseSclFile, parseModeJson, EDO_MIN, EDO_MAX } = require("../tuningformats");
+const {
+    parseSclFile,
+    parseModeJson,
+    parseTemperamentJson,
+    EDO_MIN,
+    EDO_MAX
+} = require("../tuningformats");
 
 describe("parseSclFile", () => {
     it("parses a .scl file with mixed ratios and cents", () => {
@@ -111,5 +117,68 @@ describe("parseModeJson", () => {
 
     it("rejects array as root", () => {
         expect(() => parseModeJson(JSON.stringify([1, 2, 3]))).toThrow("expected an object");
+    });
+});
+
+describe("parseTemperamentJson", () => {
+    it("parses a valid temperament JSON with all fields", () => {
+        const pitchNumber = 12;
+        const ratios = Array.from({ length: 13 }, (_, i) => Math.pow(2, i / 12));
+        const interval = [
+            "perfect 1",
+            "minor 2",
+            "major 2",
+            "minor 3",
+            "major 3",
+            "perfect 4",
+            "augmented 4",
+            "perfect 5",
+            "minor 6",
+            "major 6",
+            "minor 7",
+            "major 7",
+            "perfect 8"
+        ];
+        const json = JSON.stringify(
+            { name: "custom1", pitchNumber, referencePitch: "C4", interval, ratios },
+            null,
+            2
+        );
+        const def = parseTemperamentJson(json);
+        expect(def).toEqual({
+            name: "custom1",
+            pitchNumber,
+            referencePitch: "C4",
+            interval,
+            ratios
+        });
+    });
+
+    it("throws on invalid JSON text", () => {
+        expect(() => parseTemperamentJson("not json")).toThrow("Invalid JSON file:");
+    });
+
+    it("rejects ratios whose length is not pitchNumber + 1", () => {
+        const json = JSON.stringify({ pitchNumber: 12, ratios: [1, 2] });
+        expect(() => parseTemperamentJson(json)).toThrow("invalid ratios");
+    });
+
+    it("rejects non-numeric, non-positive, or non-ascending ratios", () => {
+        const mk = ratios => JSON.stringify({ pitchNumber: 2, ratios });
+        expect(() => parseTemperamentJson(mk([1, "1.25", 2]))).toThrow("invalid ratios");
+        expect(() => parseTemperamentJson(mk([1, 0, 2]))).toThrow("invalid ratios");
+        expect(() => parseTemperamentJson(mk([1, 1.5, 1.25]))).toThrow("invalid ratios");
+    });
+
+    it("rejects interval that is not a string array of length pitchNumber + 1", () => {
+        const base = { pitchNumber: 2, ratios: [1, 1.25, 2] };
+        expect(() =>
+            parseTemperamentJson(
+                JSON.stringify({ ...base, interval: ["perfect 1", 2, "perfect 8"] })
+            )
+        ).toThrow("invalid interval");
+        expect(() =>
+            parseTemperamentJson(JSON.stringify({ ...base, interval: ["perfect 1", "perfect 8"] }))
+        ).toThrow("invalid interval");
     });
 });

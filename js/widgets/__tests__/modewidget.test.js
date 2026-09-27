@@ -734,7 +734,7 @@ describe("ModeWidget", () => {
         MUSICALMODES["major"] = [2, 2, 1, 2, 2, 2, 1];
         global.TuningFormats.parseModeJson = jest.fn(text => JSON.parse(text));
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: JSON.stringify({ name: "major", edo: 31, pattern: [3, 4, 2, 3, 4, 3, 3] }),
                 file: { name: "mode.json", size: 100 }
@@ -755,7 +755,7 @@ describe("ModeWidget", () => {
 
     test("should import a JSON mode and apply it", () => {
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: JSON.stringify({ name: "dorian", edo: 12, pattern: [2, 1, 2, 2, 2, 1, 2] }),
                 file: { name: "dorian.json", size: 100 }
@@ -775,7 +775,7 @@ describe("ModeWidget", () => {
 
     test("should import a .scl file and detect EDO", () => {
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             const content = [
                 "! major.scl",
                 "!",
@@ -893,7 +893,7 @@ describe("ModeWidget", () => {
     });
 
     test("_importFile shows error for unsupported file type", () => {
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: "some data",
                 file: { name: "mode.txt", size: 100 }
@@ -907,7 +907,7 @@ describe("ModeWidget", () => {
     });
 
     test("_importFile shows error for bad JSON", () => {
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: "not json",
                 file: { name: "bad.json", size: 100 }
@@ -921,7 +921,7 @@ describe("ModeWidget", () => {
     });
 
     test("_importFile shows error for bad .scl content", () => {
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: "not a scl file",
                 file: { name: "bad.scl", size: 100 }

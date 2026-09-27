@@ -21,9 +21,11 @@
  * assigned to window globals, matching the utils-logic.js pattern.
  */
 
+/* global _ */
+
 /* exported
    closeWidgets, displayMsg, docByClass, docById, docByName, docBySelector,
-   docByTagName, hideDOMLabel, makeKeyboardAccessible
+   docByTagName, hideDOMLabel, makeKeyboardAccessible, readTextFile
 */
 
 const keyboardAccessibleHandlers = new WeakMap();
@@ -175,6 +177,46 @@ function closeWidgets() {
     }
 }
 
+/**
+ * Reads a file through a hidden file input, enforcing the 1 MB import
+ * size cap, and hands the text content and File object to the callback.
+ * @param {string} inputId - The hidden file input element id.
+ * @param {function} callback - Called with (err, data), where data is
+ * { text, file }.
+ * @returns {void}
+ */
+function readTextFile(inputId, callback) {
+    const fileInput = docById(inputId);
+    if (!fileInput) {
+        callback(new Error(_("File input not found.")));
+        return;
+    }
+
+    fileInput.value = "";
+    fileInput.onchange = function () {
+        const file = fileInput.files[0];
+        if (!file) {
+            return;
+        }
+
+        const MAX_IMPORT_SIZE = 1024 * 1024;
+        if (file.size > MAX_IMPORT_SIZE) {
+            callback(new Error(_("File too large. Maximum is 1 MB.")));
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            callback(null, { text: e.target.result, file });
+        };
+        reader.onerror = function () {
+            callback(new Error(_("Failed to read file.")));
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
 var DomHelpers = {
     docByClass,
     docByTagName,
@@ -184,7 +226,8 @@ var DomHelpers = {
     hideDOMLabel,
     displayMsg,
     closeWidgets,
-    makeKeyboardAccessible
+    makeKeyboardAccessible,
+    readTextFile
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -208,4 +251,5 @@ if (typeof window !== "undefined" && (typeof module === "undefined" || !module.e
     window.displayMsg = displayMsg;
     window.closeWidgets = closeWidgets;
     window.makeKeyboardAccessible = makeKeyboardAccessible;
+    window.readTextFile = readTextFile;
 }

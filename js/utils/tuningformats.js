@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* exported parseSclFile, parseModeJson, EDO_MIN, EDO_MAX, TuningFormats */
+/* exported parseSclFile, parseModeJson, parseTemperamentJson, EDO_MIN, EDO_MAX, TuningFormats */
 
 const EDO_MIN = 5;
 const EDO_MAX = 55;
@@ -148,9 +148,53 @@ const parseModeJson = text => {
     return { name: typeof obj.name === "string" ? obj.name : "", edo, pattern };
 };
 
+const parseTemperamentJson = text => {
+    let obj;
+    try {
+        obj = JSON.parse(text);
+    } catch (e) {
+        throw new Error("Invalid JSON file: " + e.message);
+    }
+    if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
+        throw new Error("Invalid temperament JSON: expected an object");
+    }
+    const { pitchNumber, ratios, interval, referencePitch } = obj;
+    if (!Number.isInteger(pitchNumber) || pitchNumber < 1 || pitchNumber > 500) {
+        throw new Error("Invalid temperament JSON: invalid pitch count");
+    }
+    if (
+        !Array.isArray(ratios) ||
+        ratios.length !== pitchNumber + 1 ||
+        !ratios.every(r => typeof r === "number" && isFinite(r) && r > 0) ||
+        Math.abs(ratios[0] - 1) > 1e-6 ||
+        !ratios.every((r, i) => i === 0 || r > ratios[i - 1])
+    ) {
+        throw new Error("Invalid temperament JSON: invalid ratios");
+    }
+    if (
+        interval !== undefined &&
+        (!Array.isArray(interval) ||
+            interval.length !== pitchNumber + 1 ||
+            !interval.every(s => typeof s === "string"))
+    ) {
+        throw new Error("Invalid temperament JSON: invalid interval");
+    }
+    if (referencePitch !== undefined && typeof referencePitch !== "string") {
+        throw new Error("Invalid temperament JSON: invalid referencePitch");
+    }
+    return {
+        name: typeof obj.name === "string" ? obj.name : "",
+        pitchNumber,
+        referencePitch,
+        interval,
+        ratios
+    };
+};
+
 const TuningFormats = {
     parseSclFile,
     parseModeJson,
+    parseTemperamentJson,
     EDO_MIN,
     EDO_MAX
 };
