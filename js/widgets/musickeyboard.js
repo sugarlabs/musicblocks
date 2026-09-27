@@ -1475,7 +1475,7 @@ function MusicKeyboard(activity) {
             } else {
                 sortableList.push({
                     frequency: noteToFrequency(
-                        this.noteNames[i] + this.octaves[i],
+                        convertFromSolfege(this.noteNames[i]) + this.octaves[i],
                         this.activity.turtles.ithTurtle(0).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
@@ -2534,7 +2534,7 @@ function MusicKeyboard(activity) {
                 aValue = a.noteOctave;
             } else {
                 aValue = noteToFrequency(
-                    a.noteName + a.noteOctave,
+                    convertFromSolfege(a.noteName) + a.noteOctave,
                     this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }
@@ -2543,7 +2543,7 @@ function MusicKeyboard(activity) {
                 bValue = b.noteOctave;
             } else {
                 bValue = noteToFrequency(
-                    b.noteName + b.noteOctave,
+                    convertFromSolfege(b.noteName) + b.noteOctave,
                     this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }

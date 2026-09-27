@@ -1001,8 +1001,9 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         const constants = require("../../utils/musicutils-constants.js");
         const { FIXEDSOLFEGE1 } = require("../../utils/musicutils-i18n.js");
 
-        const initKeyboard = noteNames => {
+        const initKeyboard = (noteNames, keySignature = "C major") => {
             document.body.innerHTML = "";
+            mockActivity.turtles.ithTurtle(0).singer.keySignature = keySignature;
             global.PITCHES = constants.PITCHES;
             global.PITCHES2 = constants.PITCHES2;
             global.FIXEDSOLFEGE1 = FIXEDSOLFEGE1;
@@ -1053,6 +1054,32 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             initKeyboard(["re♯", "sol"]);
 
             expect(keyLabelFor(44)).toContain("D♯4");
+        });
+
+        test("orders fixed-Do accidentals by pitch in a minor key", () => {
+            const keyboard = initKeyboard(["la♭", "sol"], "C minor");
+            const keyNames = () => keyboard.displayLayout.map(k => k.noteName + k.noteOctave);
+            const expected = [
+                "C4",
+                "C♯4",
+                "D4",
+                "D♯4",
+                "E4",
+                "F4",
+                "F♯4",
+                "G4",
+                "A♭4",
+                "A4",
+                "A♯4",
+                "B4",
+                "C5"
+            ];
+
+            expect(keyNames()).toEqual(expected);
+
+            keyboard._sortLayout();
+
+            expect(keyNames()).toEqual(expected);
         });
     });
 });
