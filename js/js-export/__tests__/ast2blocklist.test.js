@@ -22,6 +22,7 @@
 
 const acorn = require("../../../lib/acorn.min");
 const { AST2BlockList } = require("../ast2blocklist");
+const MathUtility = require("../../utils/mathutils");
 const fs = require("fs");
 const path = require("path");
 
@@ -165,6 +166,581 @@ describe("AST2BlockList Class", () => {
         }
     });
 
+    // A for loop only becomes a Repeat block when the block would run it the
+    // same number of times (#8910).
+    describe("Repeat and for loops", () => {
+        const wrap = loop => `
+        new Mouse(async mouse => {
+            ${loop}
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        test("should convert an exported Repeat back to the same block", () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(ASTUtils._getForLoopAST([["divide", [7, 2]]], [], 0));
+            } finally {
+                delete global.JSInterface;
+            }
+            expect(loop).toBe(
+                "for (let i0 = 0, limit0 = MathUtility.doRepeatCount(7 / 2); i0 < limit0; i0++) {}"
+            );
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "divide", 0, 0, [1, 3, 4]],
+                [3, ["number", { value: 7 }], 0, 0, [2]],
+                [4, ["number", { value: 2 }], 0, 0, [2]]
+            ]);
+        });
+
+        test.each([4, 0, -2, 3.5, "box_n"])(
+            "should convert the exported loop for Repeat %p back to a Repeat block",
+            count => {
+                const ASTUtils = require("../ASTutils");
+                const astring = require("../../../lib/astring.min");
+                global.JSInterface = require("../interface");
+                let loop;
+                try {
+                    loop = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+                } finally {
+                    delete global.JSInterface;
+                }
+                const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+                expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+            }
+        );
+
+        // A box can have any valid name, including the one the exporter would
+        // give the loop limit, so the limit must not shadow it.
+        test("should not let the loop limit shadow a box with the same name", async () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(
+                    ASTUtils._getForLoopAST(["box_limit0"], [["print", ["box_limit0"]]], 0)
+                );
+            } finally {
+                delete global.JSInterface;
+            }
+
+            const printed = [];
+            const mouse = { print: async value => printed.push(value) };
+            await new Function(
+                "MathUtility",
+                "mouse",
+                `return (async () => {
+                let limit0 = 3;
+                ${loop}
+            })();`
+            )(MathUtility, mouse);
+            expect(printed).toEqual([3, 3, 3]);
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+        });
+
+        test("should convert a plain counting loop to a Repeat block", () => {
+            const AST = acorn.parse(wrap("for (let i = 0; i < 4; i++) {}"), {
+                ecmaVersion: 2020
+            });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, ["number", { value: 4 }], 0, 0, [1]]
+            ]);
+        });
+
+        test.each([
+            "for (let i = 0; i <= 5; i++) {}",
+            "for (let i = 0; i < 10; i += 2) {}",
+            "for (let i = 5; i < 10; i++) {}",
+            "for (let i = 10; i > 0; i--) {}",
+            "for (i = 0; i < 4; i++) {}",
+            "for (;;) {}",
+            "for (let i = 0; i < 2.5; i++) {}",
+            "for (let i = 0; i < n; i++) {}",
+            "for (let i = 0; i < MathUtility.doRandom(1, 5); i++) {}",
+            "for (let i = 0; j < 5; i++) {}",
+            "for (let i = 0; i < 5; j++) {}",
+            "for (let i = 0, n = 5; i < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); j < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); i < i; i++) {}"
+        ])("should reject %s instead of converting it to a Repeat block", loop => {
+            const code = wrap(loop);
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            let error;
+            try {
+                AST2BlockList.toBlockList(AST, config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix + code.substring(error.start, error.end)).toBe(
+                "Unsupported statement: " + loop
+            );
+        });
+    });
+
+    // The Stop block ends the loop around it once the current iteration has
+    // finished (Logo.doBreak), and ends the stack when there is no loop.
+    // A bare `break` did neither, and was a syntax error outside a loop (#8929).
+    describe("Stop block", () => {
+        const ASTUtils = require("../ASTutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = require("../interface");
+            global.last = array => array[array.length - 1];
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+            delete global.last;
+        });
+
+        const exportAction = tree => astring.generate(ASTUtils.getMethodAST("demo", tree));
+        const exportStart = tree => astring.generate(ASTUtils.getMouseAST(tree));
+
+        // Runs an exported action with a mouse that records what it prints.
+        const runAction = async (tree, setup = "") => {
+            const printed = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                print: async value => {
+                    if (printed.length > 20) throw new Error("the loop did not stop");
+                    printed.push(value);
+                },
+                playNote: async (value, flow) => flow()
+            };
+            const result = await new Function(
+                "mouse",
+                `${setup}\n${exportAction(tree)}\nreturn demo(mouse);`
+            )(mouse);
+            return { printed, result };
+        };
+
+        const blockNames = code =>
+            AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config)
+                .map(block => (Array.isArray(block[1]) ? block[1][0] : block[1]))
+                .filter(name => name !== "vspace");
+
+        test("finishes the iteration, then ends the loop", async () => {
+            const { printed } = await runAction([
+                [
+                    "repeat",
+                    [3],
+                    [
+                        ["print", ["a"]],
+                        ["newnote", [["divide", [1, 4]]], [["print", ["n"]], ["break"]]],
+                        ["print", ["b"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["a", "n", "b"]);
+        });
+
+        test("ends the loop, not just the switch, from inside a case", async () => {
+            const { printed } = await runAction([
+                [
+                    "forever",
+                    null,
+                    [
+                        ["switch", [1], [["case", [1], [["print", ["c"]], ["break"]]]]],
+                        ["print", ["d"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["c", "d"]);
+        });
+
+        test("only ends the innermost loop", async () => {
+            const { printed } = await runAction([
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["repeat", [3], [["print", ["i"]], ["break"]]],
+                        ["print", ["o"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["i", "o", "i", "o"]);
+        });
+
+        const note = flow => ["newnote", [["divide", [1, 4]]], flow];
+
+        // With no loop, Logo.doBreak drops the next pending continuation: the
+        // rest of the stack one level above the Stop's clamp is skipped, and
+        // the program carries on after that.
+        test.each([
+            ["inside a note", [note([["print", ["n"]], ["break"]]), ["print", ["x"]]], ["n"]],
+            [
+                "inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside an if inside a note",
+                [
+                    note([
+                        ["if", ["bool_true"], [["break"]]],
+                        ["print", ["w"]]
+                    ]),
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ]
+        ])("skips the rest of the stack above a Stop %s", async (_, tree, expected) => {
+            const { printed } = await runAction(tree);
+            expect(printed).toEqual(expected);
+        });
+
+        test("ends the stack when there is no loop", async () => {
+            const { printed, result } = await runAction([
+                ["if", ["bool_true"], [["break"]]],
+                ["print", ["x"]]
+            ]);
+            expect(printed).toEqual([]);
+            expect(result).toBe("ENDFLOW");
+        });
+
+        // A project shaped like the ones JSGenerate.generateCode exports: a Stop after a
+        // note at the end of an action, called from a Repeat. On master the action got a
+        // bare `break`, a syntax error for the whole file.
+        test("exports valid code for a Stop at the end of an action called from a loop", async () => {
+            const pitchNote = name => ["newnote", [["divide", [1, 4]]], [["pitch", [name, 4]]]];
+            const action = [["print", ["RE"]], pitchNote("re"), ["break", null]];
+            const start = [
+                [
+                    "repeat",
+                    [4],
+                    [
+                        ["print", ["DO"]],
+                        pitchNote("do"),
+                        ["nameddo_action", null],
+                        ["print", ["MI"]],
+                        pitchNote("mi")
+                    ]
+                ]
+            ];
+            const code =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+
+            expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+            expect(code).not.toMatch(/\bbreak;/);
+
+            const printed = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value),
+                playNote: async (value, flow) => flow(),
+                playPitch: async () => {}
+            };
+            let run;
+            await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                run = flow(mouse);
+            });
+            await run;
+            // The Stop ends the action. Ending the Repeat it was called from, as Music
+            // Blocks does, isn't exported yet (#9004), so the Repeat keeps going.
+            expect(printed.slice(0, 3)).toEqual(["DO", "RE", "MI"]);
+        });
+
+        // The importer only undoes the flags and labels the exporter writes;
+        // the same shapes in hand-written code must not turn into Stop blocks.
+        test.each([
+            [
+                "a hand-written flag set in a clamp",
+                `let done = false;
+                await mouse.playNote(1 / 4, async () => {
+                    done = true;
+                    return mouse.ENDFLOW;
+                });
+                if (done) return mouse.ENDMOUSE;`,
+                "done = true;"
+            ],
+            [
+                "a hand-written loop flag",
+                `{
+                    var stopLoop = false;
+                    while (1000) {
+                        stopLoop = true;
+                        if (stopLoop) break;
+                    }
+                }`,
+                "{"
+            ],
+            [
+                "a hand-written label",
+                `if (true) outer: {
+                    await mouse.print("w");
+                }`,
+                "outer:"
+            ]
+        ])("leaves %s alone", (_, body, unsupported) => {
+            const code = `
+            new Mouse(async mouse => {
+                ${body}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toBe("Unsupported statement: ");
+            expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
+        });
+
+        test("leaves the AST alone, so converting it twice gives the same blocks", () => {
+            const AST = acorn.parse(
+                exportStart([["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]]),
+                { ecmaVersion: 2020 }
+            );
+            const before = JSON.stringify(AST);
+            const first = AST2BlockList.toBlockList(AST, config);
+            const second = AST2BlockList.toBlockList(AST, config);
+            expect(second).toEqual(first);
+            expect(first.some(block => block[1] === "break")).toBe(true);
+            expect(JSON.stringify(AST)).toBe(before);
+        });
+
+        test("exports valid code for a Stop in Start and in an action", () => {
+            const start = exportStart([["print", ["x"]], ["break"]]);
+            const action = exportAction([["print", ["x"]], ["break"]]);
+            expect(() => acorn.parse(start, { ecmaVersion: 2020 })).not.toThrow();
+            expect(() => acorn.parse(`${action};`, { ecmaVersion: 2020 })).not.toThrow();
+            expect(start).toContain("return mouse.ENDMOUSE;");
+        });
+
+        test("doesn't let the loop flag shadow a box with the same name", async () => {
+            const { printed } = await runAction(
+                [["repeat", [2], [["print", ["box_stopLoop"]], ["break"]]]],
+                'let stopLoop = "box value";'
+            );
+            expect(printed).toEqual(["box value"]);
+        });
+
+        test.each([
+            [
+                "a Stop inside a note inside a loop",
+                [
+                    [
+                        "repeat",
+                        [3],
+                        [["newnote", [["divide", [1, 4]]], [["print", ["n"]], ["break"]]]]
+                    ]
+                ],
+                [
+                    "start",
+                    "repeat",
+                    "number",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break"
+                ]
+            ],
+            [
+                "a Stop inside a case inside a loop",
+                [["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]],
+                ["start", "forever", "switch", "number", "case", "number", "break"]
+            ],
+            [
+                "a Stop with no loop",
+                [["print", ["x"]], ["break"]],
+                ["start", "print", "text", "break"]
+            ],
+            [
+                "a Stop inside a note with no loop",
+                [note([["print", ["n"]], ["break"]]), ["print", ["x"]]],
+                [
+                    "start",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "if",
+                    "boolean",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a switch with no Stop in it",
+                [["switch", [1], [["case", [1], [["print", ["x"]]]]]]],
+                ["start", "switch", "number", "case", "number", "print", "text"]
+            ]
+        ])("converts %s back to the same blocks", (_, tree, names) => {
+            expect(blockNames(exportStart(tree))).toEqual(names);
+        });
+    });
+
+    // The Int block computes MathUtility.doInt, so the exported code has to
+    // call that same function and convert back to an Int block (#8894).
+    describe("Int block export and import", () => {
+        const ASTUtils = require("../ASTutils");
+        const JSInterface = require("../interface");
+        const MathUtility = require("../../utils/mathutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = JSInterface;
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+        });
+
+        const exportArg = arg => astring.generate(ASTUtils._getArgsAST([arg])[0]);
+
+        test.each([2.7, 3.5, -1.5, -2.5, -0.4, 0.49999999999999994, 4503599627370497])(
+            "exported int(%p) computes the same value as the Int block",
+            x => {
+                const code = exportArg(["int", [x]]);
+                const exported = new Function("MathUtility", `return ${code};`)(MathUtility);
+                expect(exported).toBe(MathUtility.doInt(x));
+            }
+        );
+
+        test("should convert exported int back to an int block", () => {
+            expect(exportArg(["int", [["divide", [7, 2]]]])).toBe("MathUtility.doInt(7 / 2)");
+
+            // Repeat [Int(7 / 2)], exactly as the exporter writes it.
+            const loop = astring.generate(
+                ASTUtils._getForLoopAST([["int", [["divide", [7, 2]]]]], [], 0)
+            );
+            const code = `
+            new Mouse(async mouse => {
+                ${loop}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+
+            const expectedBlockList = [
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "int", 0, 0, [1, 3]],
+                [3, "divide", 0, 0, [2, 4, 5]],
+                [4, ["number", { value: 7 }], 0, 0, [3]],
+                [5, ["number", { value: 2 }], 0, 0, [3]]
+            ];
+
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+        });
+
+        // Neither call computes exactly what the Int block does, so converting
+        // either one to an Int block would change the program's values.
+        test.each(["floor", "round"])(
+            "should reject Math.%s instead of making an int block",
+            fn => {
+                const code = `
+            new Mouse(async mouse => {
+                await mouse.print(Math.${fn}(7 / 2));
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+
+                const AST = acorn.parse(code, { ecmaVersion: 2020 });
+                let error;
+                try {
+                    AST2BlockList.toBlockList(AST, config);
+                } catch (e) {
+                    error = e;
+                }
+                expect(error).toBeDefined();
+                expect(error.prefix + code.substring(error.start, error.end)).toEqual(
+                    `Unsupported operator ${fn}: Math.${fn}(7 / 2)`
+                );
+            }
+        );
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
@@ -249,7 +825,7 @@ describe("AST2BlockList Class", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("clarinet", async () => {
-                for (let i0 = 0; i0 < MathUtility.doRandom(1, 5); i0++) {
+                for (let i0 = 0, limit0 = MathUtility.doRepeatCount(MathUtility.doRandom(1, 5)); i0 < limit0; i0++) {
                     await mouse.playNote(1 / 4, async () => {
                         await mouse.playPitch("fa", 2 * 2);
                         return mouse.ENDFLOW;
@@ -1086,7 +1662,7 @@ describe("AST2BlockList Class", () => {
             [72, ["number", { value: 4 }], 0, 0, [70]],
             [73, "switch", 0, 0, [62, 74, 75, null]],
             [74, ["number", { value: 1 }], 0, 0, [73]],
-            [75, "case", 0, 0, [73, 76, 77, 88]],
+            [75, "case", 0, 0, [73, 76, 77, 87]],
             [76, ["number", { value: 1 }], 0, 0, [75]],
             [77, "newnote", 0, 0, [75, 78, 81, 85]],
             [78, "divide", 0, 0, [77, 79, 80]],
@@ -1097,17 +1673,16 @@ describe("AST2BlockList Class", () => {
             [83, ["solfege", { value: "sol" }], 0, 0, [82]],
             [84, ["number", { value: 4 }], 0, 0, [82]],
             [85, "break", 0, 0, [77, 86]],
-            [86, "break", 0, 0, [85, 87]],
-            [87, "break", 0, 0, [86, null]],
-            [88, "defaultcase", 0, 0, [75, 89, null]],
-            [89, "newnote", 0, 0, [88, 90, 93, null]],
-            [90, "divide", 0, 0, [89, 91, 92]],
-            [91, ["number", { value: 1 }], 0, 0, [90]],
-            [92, ["number", { value: 4 }], 0, 0, [90]],
-            [93, "vspace", 0, 0, [89, 94]],
-            [94, "pitch", 0, 0, [93, 95, 96, null]],
-            [95, ["solfege", { value: "5" }], 0, 0, [94]],
-            [96, ["number", { value: 4 }], 0, 0, [94]]
+            [86, "break", 0, 0, [85, null]],
+            [87, "defaultcase", 0, 0, [75, 88, null]],
+            [88, "newnote", 0, 0, [87, 89, 92, null]],
+            [89, "divide", 0, 0, [88, 90, 91]],
+            [90, ["number", { value: 1 }], 0, 0, [89]],
+            [91, ["number", { value: 4 }], 0, 0, [89]],
+            [92, "vspace", 0, 0, [88, 93]],
+            [93, "pitch", 0, 0, [92, 94, 95, null]],
+            [94, ["solfege", { value: "5" }], 0, 0, [93]],
+            [95, ["number", { value: 4 }], 0, 0, [93]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });

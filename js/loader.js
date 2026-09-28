@@ -77,6 +77,12 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/plugin-utils": {
+            exports: "PluginUtils"
+        },
+        "utils/macro-utils": {
+            exports: "MacroUtils"
+        },
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
@@ -95,7 +101,9 @@ requirejs.config({
                 "utils/utils-logic",
                 "utils/dom-helpers",
                 "utils/browser-utils",
-                "utils/http-utils"
+                "utils/http-utils",
+                "utils/plugin-utils",
+                "utils/macro-utils"
             ],
             exports: "_"
         },
@@ -156,6 +164,50 @@ requirejs.config({
         "activity/notation": {
             exports: "Notation"
         },
+        "utils/musicutils-constants": {
+            exports: "MusicUtilsConstants"
+        },
+        "utils/musicutils-i18n": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsI18n"
+        },
+        "utils/musicutils-temperament": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsTemperament"
+        },
+        "utils/musicutils-pitch": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament"
+            ],
+            exports: "MusicUtilsPitch"
+        },
+        "utils/musicutils-lookups": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsLookups"
+        },
+        "utils/musicutils-rhythm": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsRhythm"
+        },
+        "utils/musicutils-solfege": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsSolfege"
+        },
+        "utils/musicutils": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-lookups",
+                "utils/musicutils-rhythm",
+                "utils/musicutils-solfege"
+            ]
+        },
         "utils/synthutils": {
             deps: ["utils/utils", "activity/activity-context"],
             exports: "Synth"
@@ -207,6 +259,7 @@ requirejs.config({
                 "activity/alert-renderer",
                 "palette/palette-loader",
                 "activity/search-controller",
+                "activity/clear-confirmation",
                 "activity/workspace-layout-controller",
                 "activity/block-scale-controller",
                 "search-ui",
@@ -248,21 +301,28 @@ requirejs.config({
             deps: ["utils/utils", "utils/dom-helpers", "activity/focus-cycle-manager"],
             exports: "ToolbarUI"
         },
+        "widgets/widgetWindows": {
+            deps: ["utils/utils", "utils/dom-helpers"],
+            exports: "widgetWindows"
+        },
+        "widgets/help": {
+            deps: ["utils/utils", "utils/dom-helpers", "widgets/widgetWindows"],
+            exports: "HelpWidget"
+        },
         // The chat widgets read createWidgetLifecycle off window, so the helper
         // must be evaluated before they are. These are plain scripts, which
         // RequireJS would otherwise fetch and evaluate in any order.
         "utils/ai-widget-lifecycle": {
             exports: "createWidgetLifecycle"
         },
+        "utils/tuningformats": {
+            exports: "TuningFormats"
+        },
         "widgets/reflection": {
             deps: ["utils/ai-widget-lifecycle"]
         },
         "widgets/aidebugger": {
             deps: ["utils/ai-widget-lifecycle"]
-        },
-        "widgets/widgetWindows": {
-            deps: ["utils/dom-helpers"],
-            exports: "widgetWindows"
         }
     },
     paths: {
@@ -281,6 +341,7 @@ requirejs.config({
         "activity/alert-renderer": "js/activity/alert-renderer",
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
+        "activity/clear-confirmation": "js/activity/clear-confirmation",
         "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
         "activity/selection-controller": "js/activity/selection-controller",
         "activity/block-scale-controller": "js/activity/block-scale-controller",
@@ -598,8 +659,11 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "easeljs.min",
                 "tweenjs.min",
                 "utils/platformstyle",
+                "utils/dom-helpers",
                 "utils/utils",
                 "utils/camera-utils",
+                "utils/plugin-utils",
+                "utils/macro-utils",
                 "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",

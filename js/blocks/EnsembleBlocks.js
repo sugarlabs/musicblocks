@@ -438,6 +438,11 @@ function setupEnsembleBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
+            if (args[0] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -495,6 +500,11 @@ function setupEnsembleBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+            if (args[0] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle !== null) {
                 logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
@@ -953,6 +963,8 @@ function setupEnsembleBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            // parseArg has already reported the empty slot.
+            if (targetTurtle === null) return false;
             return getTargetTurtle(activity.turtles, targetTurtle) !== null;
         }
     }
@@ -993,6 +1005,8 @@ function setupEnsembleBlocks(activity) {
         flow(args, logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const turtleName = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            // parseArg has already reported the empty slot.
+            if (turtleName === null) return;
 
             if (getTargetTurtle(activity.turtles, turtleName) === null) {
                 const blockNumber = activity.blocks.blockList.length;

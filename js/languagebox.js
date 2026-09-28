@@ -203,6 +203,15 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    az_onclick() {
+        this._language = "az";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
     ayc_onclick() {
         this._language = "ayc";
         this.hide();
@@ -329,6 +338,7 @@ class LanguageBox {
             ta: "உங்கள் மொழி விருப்பத்தை மாற்ற உலாவியை புதுப்பிக்கவும்.",
             te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
             tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
+            az: "dil seçiminizi dəyişmək üçün brauzerinizi yeniləyin",
             ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
             ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",

@@ -375,6 +375,30 @@ describe("JSEditor", () => {
                 expect(countLinks()).toBe(baseline);
             }
         });
+
+        test("onclose removes tooltip elements from document.body", () => {
+            const beforeCount = document.body.children.length;
+            const editor = createEditor();
+
+            // 6 tooltips were added to document.body
+            expect(document.body.children.length).toBe(beforeCount + 6);
+
+            editor.widgetWindow.onclose();
+
+            // After close, all 6 tooltips should be removed from document.body
+            expect(document.body.children.length).toBe(beforeCount);
+        });
+
+        test("repeated open/close cycles do not leak tooltip containers into document.body", () => {
+            const baseline = document.body.children.length;
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(document.body.children.length).toBe(baseline + 6);
+                editor.widgetWindow.onclose();
+                expect(document.body.children.length).toBe(baseline);
+            }
+        });
     });
 
     describe("code editing functions", () => {
@@ -561,15 +585,69 @@ describe("JSEditor", () => {
             expect(editorEl.innerHTML).toContain("defg");
         });
 
-        test("_addDebuggerToLine inserts debugger statement", () => {
+        test("_addDebuggerToLine inserts debugger statement after specified 0-based line", () => {
             const editor = createEditor();
-
             editor._code = "const x = 1;\nconst y = 2;\nconst z = 3;";
 
-            // lineNumber is 1-based (insertIndex = lineNumber - 1)
-            editor._addDebuggerToLine(1);
+            editor._addDebuggerToLine(0);
 
-            expect(editor._code).toContain("debugger;");
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("const x = 1;");
+            expect(lines[1].trim()).toBe("debugger;");
+            expect(lines[2]).toBe("const y = 2;");
+        });
+
+        test("_addDebuggerToLine inserts debugger after line ending with brace and indents", () => {
+            const editor = createEditor();
+            editor._code = "function test() {\n    return 1;\n}";
+
+            editor._addDebuggerToLine(0);
+
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("function test() {");
+            expect(lines[1]).toBe("\tdebugger;");
+        });
+
+        test("_addDebuggerToLine does not crash when lineNumber is out of bounds", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._addDebuggerToLine(-1)).not.toThrow();
+            expect(() => editor._addDebuggerToLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_addDebuggerToLine rejects line not ending with semicolon or brace", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1\nconst y = 2;";
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe("const x = 1\nconst y = 2;");
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    "Breakpoints can only be added after lines ending with '{' or ';'"
+                ),
+                "red"
+            );
+            logSpy.mockRestore();
+        });
+
+        test("_addDebuggerToLine prevents adjacent breakpoints", () => {
+            const editor = createEditor();
+            const initialCode = "const x = 1;\ndebugger;\nconst y = 2;";
+            editor._code = initialCode;
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe(initialCode);
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining("already a breakpoint on an adjacent line"),
+                "red"
+            );
+            logSpy.mockRestore();
         });
 
         test("_removeDebuggerFromLine removes debugger statement", () => {
@@ -580,6 +658,35 @@ describe("JSEditor", () => {
             editor._removeDebuggerFromLine(1);
 
             expect(editor._code).not.toContain("debugger;");
+        });
+
+        test("_removeDebuggerFromLine does not crash on out of bounds line", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+
+            expect(() => editor._removeDebuggerFromLine(-1)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+            expect(logSpy).not.toHaveBeenCalled();
+
+            expect(() => editor._removeDebuggerFromLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+            expect(logSpy).not.toHaveBeenCalled();
+
+            logSpy.mockRestore();
+        });
+
+        test("_removeDebuggerFromLine ignores line that is not a debugger statement", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;\nconst y = 2;";
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+
+            editor._removeDebuggerFromLine(0);
+
+            expect(editor._code).toBe("const x = 1;\nconst y = 2;");
+            expect(logSpy).not.toHaveBeenCalled();
+
+            logSpy.mockRestore();
         });
     });
 
@@ -708,11 +815,16 @@ describe("JSEditor", () => {
             expect(consoleEl.textContent).not.toContain("previous output");
         });
 
-        test("_runCode calls _codeToBlocks securely on valid code", async () => {
+        test("_runCode calls _codeToBlocks securely on valid code and clicks playNativeBtn if present", async () => {
             const editor = createEditor();
-            const consoleEl = document.createElement("div");
-            consoleEl.id = "editorConsole";
-            document.body.appendChild(consoleEl);
+
+            const consoleEl = document.getElementById("editorConsole");
+            expect(consoleEl).not.toBeNull();
+
+            const playNativeBtn = document.createElement("button");
+            playNativeBtn.id = "play";
+            document.body.appendChild(playNativeBtn);
+            const playSpy = jest.spyOn(playNativeBtn, "click");
 
             editor._code = "const a = 1;";
             acorn.parse.mockImplementation(() => ({}));
@@ -723,6 +835,33 @@ describe("JSEditor", () => {
             await editor._runCode();
 
             expect(editor._codeToBlocks).toHaveBeenCalled();
+            expect(playSpy).toHaveBeenCalled();
+            expect(consoleEl.textContent).toContain("Code executed successfully!");
+
+            playSpy.mockRestore();
+            playNativeBtn.remove();
+        });
+
+        test("_runCode logs sandbox error on _codeToBlocks failure", async () => {
+            const editor = createEditor();
+
+            const consoleEl = document.getElementById("editorConsole");
+            expect(consoleEl).not.toBeNull();
+
+            editor._code = "const a = 1;";
+            acorn.parse.mockImplementation(() => ({}));
+
+            // Mock _codeToBlocks to throw
+            const error = new Error("Mock sandbox error");
+            error.stack = "Mock stack trace";
+            jest.spyOn(editor, "_codeToBlocks").mockRejectedValue(error);
+
+            await editor._runCode();
+
+            expect(consoleEl.textContent).toContain("Sandbox Error:");
+            expect(consoleEl.textContent).toContain("Mock sandbox error");
+            expect(consoleEl.textContent).toContain("Stack trace:");
+            expect(consoleEl.textContent).toContain("Mock stack trace");
         });
 
         test("_runCode logs syntax error on parse failure", async () => {
@@ -1124,6 +1263,103 @@ describe("JSEditor", () => {
                 // Full text content should be preserved
                 expect(el.textContent).toBe("var = 1;");
                 expect(el.querySelector(".hljs-keyword .error")).toBe(errorSpan);
+            });
+        });
+        describe("debugger and status window coverage", () => {
+            let editor;
+            beforeEach(() => {
+                editor = createEditor();
+                JSEditor.logConsole = jest.fn();
+            });
+
+            test("_triggerStatusWindow opens status window", () => {
+                global.window.widgetWindows = {
+                    isOpen: jest.fn().mockReturnValue(false),
+                    show: jest.fn()
+                };
+                global.StatusMatrix = jest.fn().mockImplementation(() => ({
+                    init: jest.fn()
+                }));
+                editor._triggerStatusWindow();
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Status window opened"),
+                    "green"
+                );
+
+                global.window.widgetWindows.isOpen.mockReturnValue(true);
+                editor._triggerStatusWindow();
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Status window is already open"),
+                    "blue"
+                );
+            });
+
+            test("_addDebuggerToLine handles edge cases", () => {
+                editor._code = "let x = 1;\nlet y = 2;";
+                JSEditor.logConsole.mockClear();
+
+                editor._addDebuggerToLine(-1); // out of bounds
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                editor._addDebuggerToLine(2); // out of bounds
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                // valid line but no semicolon
+                editor._code = "let x = 1\nlet y = 2";
+                editor._addDebuggerToLine(0);
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Cannot add breakpoint"),
+                    "red"
+                );
+                expect(editor._code).toBe("let x = 1\nlet y = 2");
+
+                // adjacent breakpoint
+                JSEditor.logConsole.mockClear();
+                editor._code = "let x = 1;\ndebugger;\nlet y = 2;";
+                editor._addDebuggerToLine(0);
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("already a breakpoint on an adjacent line"),
+                    "red"
+                );
+                expect(editor._code).toBe("let x = 1;\ndebugger;\nlet y = 2;");
+
+                // success
+                JSEditor.logConsole.mockClear();
+                editor._code = "let x = 1;\nlet y = 2;";
+                editor._addDebuggerToLine(0);
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Debugger added to line"),
+                    "green"
+                );
+            });
+
+            test("_removeDebuggerFromLine handles edge cases", () => {
+                editor._code = "let x = 1;\ndebugger;\nlet y = 2;";
+                JSEditor.logConsole.mockClear();
+
+                editor._removeDebuggerFromLine(-1);
+                expect(editor._code).toBe("let x = 1;\ndebugger;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                editor._removeDebuggerFromLine(3);
+                expect(editor._code).toBe("let x = 1;\ndebugger;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+                editor._removeDebuggerFromLine(1);
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).toHaveBeenCalledWith(
+                    expect.stringContaining("Debugger removed from line"),
+                    "orange"
+                );
+
+                // Not a debugger line
+                JSEditor.logConsole.mockClear();
+                editor._code = "let x = 1;\nlet y = 2;";
+                editor._removeDebuggerFromLine(0);
+                expect(editor._code).toBe("let x = 1;\nlet y = 2;");
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
             });
         });
     });

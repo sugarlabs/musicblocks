@@ -98,6 +98,16 @@
       "via": "UtilsLogic"
     },
     {
+      "name": "isInt",
+      "kind": "function",
+      "params": [
+        "value"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
       "name": "isSafeUrl",
       "kind": "function",
       "params": [
@@ -275,6 +285,16 @@
       "via": "UtilsLogic"
     },
     {
+      "name": "toFraction",
+      "kind": "function",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
       "name": "toTitleCase",
       "kind": "function",
       "params": [
@@ -417,6 +437,19 @@
       "returns": 4,
       "throws": 0,
       "branches": 3
+    },
+    {
+      "name": "isInt",
+      "params": [
+        "value"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 1
     },
     {
       "name": "isSafeUrl",
@@ -647,6 +680,19 @@
       "branches": 2
     },
     {
+      "name": "toFraction",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 4
+    },
+    {
       "name": "toTitleCase",
       "params": [
         "str"
@@ -691,6 +737,7 @@
     "isFinite",
     "isNaN",
     "module",
+    "parseFloat",
     "parseInt",
     "window"
   ],
@@ -782,6 +829,24 @@
       "target": "hexToRGB",
       "description": "Converts a hexadecimal color code to RGB values.",
       "tags": []
+    },
+    {
+      "target": "isInt",
+      "description": "Check if a value is an integer.",
+      "tags": [
+        {
+          "tag": "function",
+          "text": ""
+        },
+        {
+          "tag": "param",
+          "text": "{*} value - The value to check."
+        },
+        {
+          "tag": "returns",
+          "text": "{boolean} True if the value is an integer, false otherwise."
+        }
+      ]
     },
     {
       "target": "isSafeUrl",
@@ -905,6 +970,24 @@
       "tags": []
     },
     {
+      "target": "toFraction",
+      "description": "Convert a floating-point number to its approximate fractional representation.",
+      "tags": [
+        {
+          "tag": "function",
+          "text": ""
+        },
+        {
+          "tag": "param",
+          "text": "{number} d - The floating-point number."
+        },
+        {
+          "tag": "returns",
+          "text": "{Array} An array containing the numerator and denominator of the fraction."
+        }
+      ]
+    },
+    {
       "target": "toTitleCase",
       "description": "Converts a string to Title Case.",
       "tags": []
@@ -921,8 +1004,8 @@
     }
   ],
   "totals": {
-    "branches": 196,
-    "returns": 105,
+    "branches": 201,
+    "returns": 107,
     "throws": 0
   }
 }

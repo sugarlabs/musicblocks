@@ -788,6 +788,16 @@ describe("Logo initTurtle", () => {
         expect(logo.returns[0]).toEqual([]);
         expect(logo.returns[1]).toEqual([]);
     });
+
+    test("delegates turtle-owned initialization to Turtle.initTurtle", () => {
+        const turtleInit = jest.fn();
+        mockActivity.turtles.ithTurtle.mockReturnValue({ initTurtle: turtleInit });
+
+        logo.initTurtle(3);
+
+        expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(3);
+        expect(turtleInit).toHaveBeenCalledWith(false);
+    });
 });
 
 // ─── Logo step ───────────────────────────────────────────────────────────────
@@ -1302,6 +1312,29 @@ describe("Logo runLogoCommands", () => {
             expect(trackerRequestedFor("?performance=false")).toBe(false);
             expect(trackerRequestedFor("")).toBe(false);
         });
+    });
+
+    test("a turtle added because every turtle is in the trash gets its synth set up", () => {
+        // With the start block trashed, clicking a lone stack adds a fresh
+        // turtle. It must exist before prepSynths() runs, or its first note
+        // has no instrument to play on.
+        const newTurtle = createMockTurtle();
+        const seenByPrepSynths = [];
+        mockActivity.turtles.turtleCount = jest.fn(() => 0);
+        mockActivity.turtles.addTurtle = jest.fn(() => {
+            mockActivity.turtles.turtleList.push(newTurtle);
+        });
+        logo.prepSynths = jest.fn(() => {
+            seenByPrepSynths.push(...mockActivity.turtles.turtleList);
+        });
+        logo._restoreConnections = jest.fn();
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [{ name: "newnote", trash: false, connections: [null] }];
+
+        logo.runLogoCommands(0, null);
+
+        expect(mockActivity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(seenByPrepSynths).toContain(newTurtle);
     });
 
     describe("the Stop button is shown however a project is started", () => {

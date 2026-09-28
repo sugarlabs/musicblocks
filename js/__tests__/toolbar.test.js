@@ -104,14 +104,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(104); // was 102, +2 for recordDropdownArrow
+        expect(global._).toHaveBeenCalledTimes(106);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(86); // was 84, +2 for recordDropdownArrow
+        expect(global._).toHaveBeenCalledTimes(91);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -653,6 +653,36 @@ describe("Toolbar Class", () => {
         toolbar.updateRecordButton(jest.fn());
         expect(recordButton.classList.add).toHaveBeenCalledWith("hide");
         expect(recordButton.style.display).toBe("");
+    });
+
+    test("updateRecordButton configures record button state when fnBrowserDetect is undefined", () => {
+        const recordButton = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" }
+        };
+        const recordDropdownArrow = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            appendChild: jest.fn(),
+            addEventListener: jest.fn(),
+            querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" }))
+        };
+        global.docById.mockImplementation(id => {
+            if (id === "record") return recordButton;
+            if (id === "recordDropdownArrow") return recordDropdownArrow;
+            return null;
+        });
+        toolbar.activity = { beginnerMode: false };
+        const originalFnBrowserDetect = global.fnBrowserDetect;
+        delete global.fnBrowserDetect;
+
+        expect(() => toolbar.updateRecordButton(jest.fn())).not.toThrow();
+        expect(recordButton.style.display).toBe("block");
+        expect(typeof recordButton.onclick).toBe("function");
+
+        if (originalFnBrowserDetect) {
+            global.fnBrowserDetect = originalFnBrowserDetect;
+        }
     });
 
     test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {

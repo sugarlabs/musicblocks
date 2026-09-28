@@ -78,6 +78,14 @@ class PlanetInterface {
             const buttonContainerBottom = docById("buttoncontainerBOTTOM");
             if (buttonContainerBottom) buttonContainerBottom.style.display = "block";
             docById("buttoncontainerTOP").style.display = "block";
+
+            if (
+                this.activity &&
+                this.activity.gitDropdownUI &&
+                typeof this.activity.gitDropdownUI._syncMenuState === "function"
+            ) {
+                this.activity.gitDropdownUI._syncMenuState();
+            }
         };
 
         /**

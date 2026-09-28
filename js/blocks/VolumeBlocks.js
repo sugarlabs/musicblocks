@@ -449,11 +449,11 @@ function setupVolumeBlocks(activity) {
                 if (logo?.synth?.loadSynth) {
                     logo.synth.loadSynth(turtle, synth);
                 }
+            }
 
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
+            if (tur.singer.synthVolume[synth] === undefined) {
+                tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
             }
 
             tur.singer.synthVolume[synth].push(arg1);

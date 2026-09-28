@@ -112,41 +112,55 @@ describe("ServerInterface", () => {
 
         it("should fetch and cache when metadata is missing", async () => {
             mockCacheManager.getMetadata.mockResolvedValue(null);
-            const serverResponse = { success: true, data: { name: "New Project" } };
+            const serverResponse = {
+                repoName: "123",
+                projectName: "New Project",
+                description: "desc"
+            };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
             const callback = jest.fn();
 
-            server.getProjectDetails("123", callback);
+            await server.getProjectDetails("123", callback);
 
-            await new Promise(process.nextTick);
-            const ajaxInstance = jQuery.ajax.mock.results[0].value;
-            ajaxInstance._done(serverResponse);
-
-            await new Promise(process.nextTick);
-
-            expect(callback).toHaveBeenCalledWith(serverResponse);
-            expect(mockCacheManager.cacheMetadata).toHaveBeenCalledWith("123", serverResponse.data);
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: server._normaliseProjectRow(serverResponse)
+            });
+            expect(mockCacheManager.cacheMetadata).toHaveBeenCalledWith(
+                "123",
+                server._normaliseProjectRow(serverResponse)
+            );
         });
     });
 
     describe("request handling", () => {
-        it("should append the API Key to every request", () => {
+        it("should call _get for getTagManifest", async () => {
+            const manifest = { music: { TagName: "Music" } };
+            jest.spyOn(server, "_get").mockResolvedValue({ success: true, data: manifest });
             const callback = jest.fn();
-            server.getTagManifest(callback);
-
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData["api-key"]).toBe(window.MB_PLANET_API_KEY);
-            expect(sentData.action).toBe("getTagManifest");
+            await server.getTagManifest(callback);
+            expect(server._get).toHaveBeenCalledWith("/tagManifest");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: manifest });
         });
 
-        it("should use throttled requests for read operations", () => {
-            server.getTagManifest(jest.fn());
+        it("should use throttled requests for convertFile", () => {
+            server.convertFile("abc", "mid", "DATA", jest.fn());
             expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
         });
 
-        it("should send likes without throttling", () => {
-            server.likeProject("123", true, jest.fn());
+        it("should send likes without throttling", async () => {
+            jest.spyOn(server, "_post").mockResolvedValue({ success: true, likes: 1 });
+            const callback = jest.fn();
+            await server.likeProject("123", true, callback);
             expect(mockRequestManager.throttledRequest).not.toHaveBeenCalled();
-            expect(jQuery.ajax).toHaveBeenCalled();
+            expect(server._post).toHaveBeenCalledWith(
+                "/like",
+                expect.objectContaining({
+                    repoName: "123",
+                    like: true
+                })
+            );
+            expect(callback).toHaveBeenCalledWith({ success: true, likes: 1 });
         });
     });
 
@@ -222,45 +236,64 @@ describe("ServerInterface", () => {
         it("should fetch from network and cache project when not cached", async () => {
             mockCacheManager.getProject.mockResolvedValueOnce(null);
             const callback = jest.fn();
-            const serverResponse = { success: true, data: { blocks: [1] } };
+            const serverResponse = { content: '[[0,"start",100,100,[null]]]' };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
 
-            server.downloadProject("p1", callback);
-            await new Promise(process.nextTick);
+            await server.downloadProject("p1", callback);
 
-            const ajaxInstance = jQuery.ajax.mock.results[0].value;
-            ajaxInstance._done(serverResponse);
-
-            await new Promise(process.nextTick);
-
-            expect(callback).toHaveBeenCalledWith(serverResponse);
-            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith("p1", serverResponse.data);
+            expect(server._get).toHaveBeenCalledWith("/getProjectData?repoName=p1");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: serverResponse.content });
+            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith(
+                "p1",
+                serverResponse.content
+            );
         });
     });
 
     describe("endpoint methods", () => {
-        it("should call addProject using a direct request", () => {
+        it("should call addProject using POST /create", async () => {
             const callback = jest.fn();
-            server.addProject("{}", callback);
+            const projectData = { ProjectName: "Test", ProjectData: "{}" };
+            jest.spyOn(server, "_post").mockResolvedValue({
+                success: true,
+                repository: "test-org/test",
+                key: "key-123"
+            });
+            await server.addProject(JSON.stringify(projectData), callback);
 
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData.action).toBe("addProject");
-            expect(sentData.ProjectJSON).toBe("{}");
-            expect(sentData["api-key"]).toBe(server.APIKey);
+            expect(server._post).toHaveBeenCalledWith(
+                "/create",
+                expect.objectContaining({
+                    projectName: "Test"
+                })
+            );
+            expect(callback).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    success: true,
+                    repository: "test-org/test"
+                })
+            );
         });
 
-        it("should call reportProject using a direct request", () => {
+        it("should call reportProject using POST /report", async () => {
             const callback = jest.fn();
-            server.reportProject("p1", "spam", callback);
+            jest.spyOn(server, "_post").mockResolvedValue({ success: true });
+            await server.reportProject("p1", "spam", callback);
 
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData.action).toBe("reportProject");
-            expect(sentData.ProjectID).toBe("p1");
-            expect(sentData.Description).toBe("spam");
+            expect(server._post).toHaveBeenCalledWith("/report", {
+                repoName: "p1",
+                description: "spam"
+            });
+            expect(callback).toHaveBeenCalledWith({ success: true });
         });
 
-        it("should use throttledRequest for searchProjects", () => {
-            server.searchProjects("q", "recent", 0, 10, jest.fn());
-            expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
+        it("should search projects using GET /search", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.searchProjects("q", "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(expect.stringContaining("/search?q=q"));
+            expect(callback).toHaveBeenCalled();
         });
 
         it("should use throttledRequest for convertFile", () => {
@@ -268,10 +301,15 @@ describe("ServerInterface", () => {
             expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
         });
 
-        it("should send correct action for downloadProjectList", () => {
-            server.downloadProjectList(["tag"], "recent", 0, 10, jest.fn());
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData.action).toBe("downloadProjectList");
+        it("should fetch project list using GET /allRepos", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList(["tag"], "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10")
+            );
+            expect(callback).toHaveBeenCalled();
         });
     });
 

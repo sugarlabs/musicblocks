@@ -192,8 +192,8 @@ describe("setupDictActions", () => {
             expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
         });
 
-        it("should handle unsupported key gracefully without doing anything", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+        it("should handle read-only key by showing an error message", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "notes played", "value");
             const painterMethods = [
                 "doSetColor",
                 "doSetValue",
@@ -206,6 +206,37 @@ describe("setupDictActions", () => {
             painterMethods.forEach(method => {
                 expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
             });
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot set read-only key: notes played"
+            );
+        });
+
+        it("should ignore unsupported custom keys without errors", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should handle localized read-only keys by showing a localized error message", () => {
+            const originalI18n = global._;
+            // Mock translation for Spanish: "notes played" -> "notas tocadas", format string -> "Cannot set read-only key: %s" (assuming format string not translated yet)
+            global._ = jest.fn(msg => {
+                if (msg === "notes played") return "notas tocadas";
+                if (msg === "Cannot set read-only key: %s")
+                    return "No se puede configurar la clave de solo lectura: %s";
+                return msg;
+            });
+
+            try {
+                // The user types the localized string in the UI
+                Turtle.DictActions.SetDictValue(0, turtle, "notas tocadas", "value");
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "No se puede configurar la clave de solo lectura: notas tocadas"
+                );
+            } finally {
+                // Restore original mock
+                global._ = originalI18n;
+            }
         });
 
         it("should support lowercase setDictValue alias", () => {
@@ -215,6 +246,22 @@ describe("setupDictActions", () => {
     });
 
     describe("SerializeDict", () => {
+        it("should not crash when turtleDicts[turtle] is undefined", () => {
+            delete activity.logo.turtleDicts[turtle];
+            const serialized = Turtle.DictActions.SerializeDict(0, turtle);
+            const expected = JSON.stringify({
+                "color": "red",
+                "shade": 10,
+                "grey": 0.5,
+                "pen size": 2,
+                "font": "Arial",
+                "heading": 90,
+                "y": 200,
+                "x": 100
+            });
+            expect(serialized).toBe(expected);
+        });
+
         it("should serialize the turtle dictionary correctly", () => {
             activity.logo.turtleDicts[turtle] = {}; // 0 not in turtleDicts[turtle]
             const serialized = Turtle.DictActions.SerializeDict(0, turtle);
@@ -354,22 +401,52 @@ describe("setupDictActions", () => {
 
         it("should return error message if dictionary does not exist", () => {
             activity.logo.turtleDicts[turtle] = {};
-            const result = Turtle.DictActions.getValue("nonexistentDict", "key", turtle);
-            expect(result).toBe("Dictionary with this name does not exist");
+            const result = Turtle.DictActions.getValue("nonexistentDict", "key", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Dictionary with this name does not exist",
+                123
+            );
         });
 
         it("should return error message if key does not exist in dictionary", () => {
             activity.logo.turtleDicts[turtle] = {
                 testDict: { existingKey: "value" }
             };
-            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle);
-            expect(result).toBe("Key with this name does not exist in testDict");
+            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in testDict",
+                123
+            );
+        });
+
+        it("should return localized error message if key does not exist", () => {
+            const originalI18n = global._;
+            global._ = jest.fn(msg => {
+                if (msg === "Key with this name does not exist in %s") {
+                    return "No existe una clave con este nombre en %s";
+                }
+                return msg;
+            });
+            activity.logo.turtleDicts[turtle] = { testDict: {} };
+            const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "No existe una clave con este nombre en testDict",
+                123
+            );
+            global._ = originalI18n;
         });
 
         it("should initialize turtleDicts if it does not exist for the turtle", () => {
             delete activity.logo.turtleDicts[turtle];
-            const result = Turtle.DictActions.getValue("testDict", "key", turtle);
-            expect(result).toBe("Dictionary with this name does not exist");
+            const result = Turtle.DictActions.getValue("testDict", "key", turtle, 123);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Dictionary with this name does not exist",
+                123
+            );
             expect(activity.logo.turtleDicts[turtle]).toEqual({});
         });
     });

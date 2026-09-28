@@ -155,6 +155,13 @@ function setupDictActions(activity) {
             } else if (key === "x") {
                 const y = activity.turtles.screenY2turtleY(targetTur.container.y);
                 targetTur.painter.doSetXY(value, y);
+            } else if (
+                key === _("notes played") ||
+                key === _("note value") ||
+                key === _("current pitch") ||
+                key === _("pitch number")
+            ) {
+                activity.errorMsg(_("Cannot set read-only key: %s").replace(/%s/g, () => key));
             }
         }
 
@@ -194,7 +201,10 @@ function setupDictActions(activity) {
             this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
             this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
 
-            if (target in activity.logo.turtleDicts[turtle]) {
+            if (
+                turtle in activity.logo.turtleDicts &&
+                target in activity.logo.turtleDicts[turtle]
+            ) {
                 for (const key in activity.logo.turtleDicts[turtle][target]) {
                     this_dict[key] = activity.logo.turtleDicts[turtle][target][key];
                 }
@@ -275,10 +285,12 @@ function setupDictActions(activity) {
             }
             if (!(dict in activity.logo.turtleDicts[turtle])) {
                 const msg = _("Dictionary with this name does not exist");
-                return msg;
+                activity.errorMsg(msg, blk);
+                return 0;
             } else if (!(key in activity.logo.turtleDicts[turtle][dict])) {
                 const msg = _("Key with this name does not exist in %s").replace(/%s/g, dict);
-                return msg;
+                activity.errorMsg(msg, blk);
+                return 0;
             }
 
             return activity.logo.turtleDicts[turtle][dict][key];

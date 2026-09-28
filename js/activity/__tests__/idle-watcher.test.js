@@ -343,6 +343,38 @@ describe("setupActivityIdleWatcher", () => {
             expect(mockActivity.saveLocally).not.toHaveBeenCalled();
         });
 
+        it("does not save while a project load is still in progress", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.blocks = { _loadInProgress: true, _lastLoadFailed: false };
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(15 * 1000);
+
+            expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+        });
+
+        it("does not save right after a project load has failed partway (issue #8855)", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.blocks = { _loadInProgress: false, _lastLoadFailed: true };
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(15 * 1000);
+
+            expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+        });
+
+        it("saves normally once a load has completed successfully", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.blocks = { _loadInProgress: false, _lastLoadFailed: false };
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(15 * 1000);
+
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalledTimes(1);
+        });
+
         it("catches errors and calls ErrorHandler.recoverable", () => {
             setupActivityIdleWatcher(mockActivity);
             mockActivity.saveSessionAsync = undefined;

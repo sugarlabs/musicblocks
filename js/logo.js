@@ -92,6 +92,10 @@ class Queue {
     }
 }
 
+/**
+ * @classdesc Logo owns global execution, scheduling, widget and session context, notation and
+ * export, synth and transport, camera and shared resources, and orchestration state.
+ */
 class Logo {
     /**
      * @constructor
@@ -868,7 +872,7 @@ class Logo {
         const requiredTurtle = this.turtles.getTurtle(turtle);
         if (typeof arg1 === "string") {
             const len = arg1.length;
-            if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
+            if (len === 14 && arg1.slice(0, 14) === CAMERAVALUE) {
                 if (this.deps.utils.doUseCamera) {
                     this.deps.utils.doUseCamera(
                         [arg0],
@@ -880,7 +884,7 @@ class Logo {
                         (msg, blk) => this.deps.errorHandler(msg, blk)
                     );
                 }
-            } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
+            } else if (len === 13 && arg1.slice(0, 13) === VIDEOVALUE) {
                 if (this.deps.utils.doUseCamera) {
                     this.deps.utils.doUseCamera(
                         [arg0],
@@ -892,13 +896,13 @@ class Logo {
                         (msg, blk) => this.deps.errorHandler(msg, blk)
                     );
                 }
-            } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
+            } else if (len > 10 && arg1.slice(0, 10) === "data:image") {
                 requiredTurtle.doShowImage(arg0, arg1);
-            } else if (len > 8 && arg1.substr(0, 8) === "https://") {
+            } else if (len > 8 && arg1.slice(0, 8) === "https://") {
                 requiredTurtle.doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "http://") {
+            } else if (len > 7 && arg1.slice(0, 7) === "http://") {
                 requiredTurtle.doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "file://") {
+            } else if (len > 7 && arg1.slice(0, 7) === "file://") {
                 requiredTurtle.doShowURL(arg0, arg1);
             } else {
                 requiredTurtle.doShowText(arg0, arg1);
@@ -1699,9 +1703,11 @@ class Logo {
         this.firstNoteTime = null;
         this.firstNoteAudioTime = null;
 
-        // Ensure we have at least one turtle.
-        if (this.turtles.getTurtleCount() === 0) {
-            this.turtles.add(null);
+        // Ensure we have at least one turtle that is not in the trash. This
+        // has to happen before prepSynths() and initTurtle() below, or a
+        // turtle added here gets no synth and no notation state.
+        if (this.turtles.turtleCount() === 0) {
+            this.turtles.addTurtle(null);
         }
 
         this.deps.Singer.masterBPM = TARGETBPM;
@@ -1855,11 +1861,6 @@ class Logo {
         }
 
         this.onRunTurtle();
-
-        // Make sure that there is atleast one turtle.
-        if (this.turtles.turtleCount() === 0) {
-            this.turtles.addTurtle(null);
-        }
 
         // Mark all turtles as not running.
         for (const turtle in this.turtles.turtleList) {

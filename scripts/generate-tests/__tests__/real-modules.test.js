@@ -58,7 +58,7 @@ describe("real modules: committed expected plans", () => {
         const plan = extractFile("js/utils/utils-logic.js");
         const names = plan.exports.map(e => e.name);
 
-        expect(plan.exports).toHaveLength(28);
+        expect(plan.exports).toHaveLength(30);
         expect(plan.exports.every(e => e.kind === "function")).toBe(true);
         expect(plan.exports.every(e => e.via === "UtilsLogic")).toBe(true);
         expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));

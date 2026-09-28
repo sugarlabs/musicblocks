@@ -930,6 +930,8 @@ describe("AIDebuggerWidget", () => {
             expect(indicator.textContent).toBe("Debugger is typing..");
 
             debuggerWidget._hideTypingIndicator();
+            expect(jest.getTimerCount()).toBe(0);
+            jest.useRealTimers();
         });
     });
 
@@ -1155,6 +1157,93 @@ describe("AIDebuggerWidget", () => {
             await Promise.resolve();
 
             expect(debuggerWidget.chatLog.querySelectorAll(".typing-indicator").length).toBe(1);
+        });
+
+        test("_addMessageToUI returns early if widget is not active", () => {
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.widgetWindow = null;
+            debuggerWidget._lifecycle.isMounted = false;
+            debuggerWidget._addMessageToUI({ type: "user", content: "test" });
+            expect(debuggerWidget.chatLog.children.length).toBe(0);
+        });
+
+        test("_showTypingIndicator returns null if widget is not active", () => {
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.widgetWindow = null;
+            debuggerWidget._lifecycle.isMounted = false;
+            expect(debuggerWidget._showTypingIndicator()).toBeNull();
+        });
+
+        test("_hideTypingIndicator and _removeTypingIndicator return early if chatLog is missing", () => {
+            debuggerWidget.chatLog = null;
+            expect(() => debuggerWidget._hideTypingIndicator()).not.toThrow();
+            expect(() => debuggerWidget._removeTypingIndicator(null)).not.toThrow();
+        });
+
+        test("_removeTypingIndicator preserves other indicators when removing a specific one", () => {
+            debuggerWidget.chatLog = document.createElement("div");
+            const ind1 = document.createElement("div");
+            ind1.className = "typing-indicator";
+            const ind2 = document.createElement("div");
+            ind2.className = "typing-indicator";
+            debuggerWidget.chatLog.appendChild(ind1);
+            debuggerWidget.chatLog.appendChild(ind2);
+
+            debuggerWidget._removeTypingIndicator(ind1);
+            expect(debuggerWidget.chatLog.contains(ind1)).toBe(false);
+            expect(debuggerWidget.chatLog.contains(ind2)).toBe(true);
+        });
+
+        test("_sendToBackend ignores network error when widget is unmounted", async () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget._lifecycle.mount();
+
+            let rejectFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise((_, reject) => {
+                        rejectFetch = reject;
+                    })
+            );
+
+            debuggerWidget._sendToBackend("prompt");
+            debuggerWidget._lifecycle.unmount();
+
+            rejectFetch(new Error("Network failed"));
+
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(debuggerWidget.chatHistory).toEqual([]);
+        });
+
+        test("_initializeBackendWithProject ignores error when widget is unmounted", async () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget._lifecycle.mount();
+
+            let rejectFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise((_, reject) => {
+                        rejectFetch = reject;
+                    })
+            );
+
+            debuggerWidget._initializeBackendWithProject("[]");
+            debuggerWidget._lifecycle.unmount();
+
+            rejectFetch(new Error("Init failed"));
+
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(debuggerWidget.chatHistory).toEqual([]);
         });
     });
 

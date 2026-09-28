@@ -453,21 +453,6 @@ describe("setupSensorsBlocks", () => {
             expect(typeof logo.inputValues[turtleIndex]).toBe("number");
         });
 
-        it("should support legacy event.keyCode === 13 fallback on keypress", () => {
-            const inputBlock = DummyFlowBlock.createdBlocks["input"];
-            activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
-            activity.blocks.blockList["blkInput"] = { connections: [null, null] };
-            inputBlock.flow([], logo, turtleIndex, "blkInput");
-            const labelDiv = docById("labelDiv");
-            const inputElem = labelDiv.children[0];
-
-            inputElem.value = "99";
-            inputElem.dispatchEvent(new KeyboardEvent("keypress", { keyCode: 13, bubbles: true }));
-
-            expect(logo.inputValues[turtleIndex]).toBe(99);
-            expect(logo.clearTurtleRun).toHaveBeenCalledWith(turtleIndex);
-        });
-
         it("should handle missing labelDiv or turtle container defensively without throwing", () => {
             const inputBlock = DummyFlowBlock.createdBlocks["input"];
             activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();

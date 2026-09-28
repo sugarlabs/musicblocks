@@ -6737,12 +6737,12 @@ const interpColor = (hex1, hex2, p) => {
     } else if (p === 1) {
         return hex1;
     } else {
-        const r1 = parseInt(hex1.substr(1, 2), 16);
-        const g1 = parseInt(hex1.substr(3, 2), 16);
-        const b1 = parseInt(hex1.substr(5, 2), 16);
-        const r2 = parseInt(hex2.substr(1, 2), 16);
-        const g2 = parseInt(hex2.substr(3, 2), 16);
-        const b2 = parseInt(hex2.substr(5, 2), 16);
+        const r1 = parseInt(hex1.slice(1, 3), 16);
+        const g1 = parseInt(hex1.slice(3, 5), 16);
+        const b1 = parseInt(hex1.slice(5, 7), 16);
+        const r2 = parseInt(hex2.slice(1, 3), 16);
+        const g2 = parseInt(hex2.slice(3, 5), 16);
+        const b2 = parseInt(hex2.slice(5, 7), 16);
 
         const nr = Math.floor(r1 * p + r2 * (1 - p));
         const ng = Math.floor(g1 * p + g2 * (1 - p));
@@ -6849,9 +6849,9 @@ const parseColorToRGB = color => {
 
     if (color.charAt(0) === "#") {
         return [
-            parseInt(color.substr(1, 2), 16),
-            parseInt(color.substr(3, 2), 16),
-            parseInt(color.substr(5, 2), 16)
+            parseInt(color.slice(1, 3), 16),
+            parseInt(color.slice(3, 5), 16),
+            parseInt(color.slice(5, 7), 16)
         ];
     }
 
@@ -6896,9 +6896,9 @@ if (typeof module !== "undefined" && module.exports) {
 //     let distance = 10000000;
 //     for (let i = 0; i < MUNSELL.length; i++) {
 //         const color = MUNSELL[i];
-//         const r1 = parseInt(color.substr(1, 2), 16);
-//         const g1 = parseInt(color.substr(3, 2), 16);
-//         const b1 = parseInt(color.substr(5, 2), 16);
+//         const r1 = parseInt(color.slice(1, 3), 16);
+//         const g1 = parseInt(color.slice(3, 5), 16);
+//         const b1 = parseInt(color.slice(5, 7), 16);
 //         const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
 //         if (distSquared < distance) {
 //             distance = distSquared;

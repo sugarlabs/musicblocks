@@ -125,6 +125,21 @@ describe("Turtle", () => {
         turtle = new Turtle(mockActivity, 0, "turtle1", {}, null);
     });
 
+    describe("component ownership", () => {
+        test("gives each turtle independent Singer and Painter instances", () => {
+            const secondTurtle = new Turtle(mockActivity, 1, "turtle2", {}, null);
+
+            expect(turtle.singer).not.toBe(secondTurtle.singer);
+            expect(turtle.painter).not.toBe(secondTurtle.painter);
+
+            turtle.singer.currentOctave = 7;
+            turtle.painter.cp1x = 42;
+
+            expect(secondTurtle.singer.currentOctave).toBe(4);
+            expect(secondTurtle.painter.cp1x).toBe(0);
+        });
+    });
+
     describe("blinking()", () => {
         it("should return false when _blinkFinished is true", () => {
             turtle._blinkFinished = true;
@@ -178,6 +193,46 @@ describe("Turtle", () => {
             turtle.inSetTimbre = true;
             turtle.initTurtle(false);
             expect(turtle.inSetTimbre).toBe(false);
+        });
+
+        it("should reset representative Singer state groups", () => {
+            turtle.singer.currentOctave = 7;
+            turtle.singer.beatFactor = 3;
+            turtle.singer.instrumentNames = ["piano"];
+            turtle.singer.vibratoRate = [12];
+            turtle.singer.transposition = 4;
+            turtle.singer.intervals = [2];
+            turtle.singer.swing = [0.5];
+            turtle.singer.staccato = [0.25];
+            turtle.singer.tie = true;
+            turtle.singer.justCounting = [1];
+
+            turtle.initTurtle(false);
+
+            expect(turtle.singer.currentOctave).toBe(4);
+            expect(turtle.singer.beatFactor).toBe(1);
+            expect(turtle.singer.instrumentNames).toEqual([DEFAULTVOICE]);
+            expect(turtle.singer.vibratoRate).toEqual([]);
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.intervals).toEqual([]);
+            expect(turtle.singer.swing).toEqual([]);
+            expect(turtle.singer.staccato).toEqual([]);
+            expect(turtle.singer.tie).toBe(false);
+            expect(turtle.singer.justCounting).toEqual([]);
+        });
+
+        it("should reset Painter control-point state", () => {
+            turtle.painter.cp1x = 42;
+            turtle.painter.cp1y = 43;
+            turtle.painter.cp2x = 44;
+            turtle.painter.cp2y = 45;
+
+            turtle.initTurtle(false);
+
+            expect(turtle.painter.cp1x).toBe(0);
+            expect(turtle.painter.cp1y).toBe(100);
+            expect(turtle.painter.cp2x).toBe(100);
+            expect(turtle.painter.cp2y).toBe(100);
         });
 
         it("should reset singer.scalarTransposition to 0", () => {

@@ -207,6 +207,20 @@ describe("Singer Class", () => {
         expect(singer.currentOctave).toBe(4);
     });
 
+    test("keeps representative music state isolated between turtles", () => {
+        const secondSinger = new Singer(createTurtleMock());
+
+        singer.currentOctave = 7;
+        singer.swing = [0.5];
+        singer.vibratoRate = [12];
+        singer.suppressOutput = true;
+
+        expect(secondSinger.currentOctave).toBe(4);
+        expect(secondSinger.swing).toEqual([]);
+        expect(secondSinger.vibratoRate).toEqual([]);
+        expect(secondSinger.suppressOutput).toBe(false);
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);
@@ -1407,6 +1421,47 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
     });
 });
 
+describe("processPitch music keyboard with movable Do", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    test.each([
+        // [key, typed solfege, expected fixed-do name, expected octave]
+        ["E in", "fa", "la", 4],
+        ["G major", "do", "sol", 3],
+        ["A aeolian", "la", "la", 4]
+    ])("in %s, %s is stored as the fixed-do pitch the keyboard shows", (key, solf, name, oct) => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = key;
+        turtleMock.singer.movable = true;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        activityMock.logo.musicKeyboard = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+
+        Singer.processPitch(activityMock, solf, 4, 0, 0, "blk");
+
+        expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
+        expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
+    });
+});
+
 describe("processPitch internal addPitch behavior", () => {
     let turtleMock;
     let activityMock;
@@ -1772,5 +1827,30 @@ describe("Singer.processNote tuplet and legoWidget handling", () => {
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
 
         expect(activityMock.logo.phraseMaker.addColBlock).toHaveBeenCalledWith("mockBlk", 1);
+    });
+
+    it("should store note cells under the phrase maker block when it is block 0", () => {
+        const PhraseMakerGrid = require("../widgets/PhraseMakerGrid");
+        activityMock.logo.inMatrix = true;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.pitchBlocks = ["pb1"];
+        activityMock.logo.drumBlocks = ["db1"];
+        const phraseMaker = {
+            _blockMap: {},
+            blockNo: 0,
+            addColBlock: jest.fn(),
+            addNode: (rowBlock, rhythmBlock, n, blk) =>
+                PhraseMakerGrid.addNode(phraseMaker, rowBlock, rhythmBlock, n, blk)
+        };
+        activityMock.logo.phraseMaker = phraseMaker;
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(phraseMaker._blockMap[0]).toEqual([
+            ["pb1", ["mockBlk", 0], 0],
+            ["db1", ["mockBlk", 0], 0]
+        ]);
+        expect(phraseMaker._blockMap[-1]).toBeUndefined();
     });
 });

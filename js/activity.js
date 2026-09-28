@@ -39,10 +39,11 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
+   requestClear,
    setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   DEFAULTDELAY, define, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
@@ -62,7 +63,7 @@ try {
    MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
  */
 
 /*
@@ -102,9 +103,13 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/dom-helpers",
+    "utils/browser-utils",
     "utils/http-utils",
     "utils/utils",
     "utils/camera-utils",
+    "utils/plugin-utils",
+    "utils/macro-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -147,6 +152,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "activity/clear-confirmation",
     "activity/workspace-layout-controller",
     "activity/trash-controller",
     "activity/help-controller",
@@ -155,9 +161,17 @@ let MYDEFINES = [
     "search-ui",
     "activity/keyboard-controller",
     "widgets/plugin-dialog",
+    "utils/musicutils-constants",
+    "utils/musicutils-i18n",
+    "utils/musicutils-temperament",
+    "utils/musicutils-pitch",
+    "utils/musicutils-lookups",
+    "utils/musicutils-rhythm",
+    "utils/musicutils-solfege",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/tuningformats",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -615,6 +629,8 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
+                        let frameErrored = false;
+                        this.stageDirty = false;
                         try {
                             // Recompute culling when container moved.
                             if (
@@ -634,11 +650,27 @@ class Activity {
                             // with no frame queued, and _startRenderLoop() refuses to
                             // restart on that flag, so the canvas stopped repainting for
                             // the rest of the session. Report the frame and keep going.
+                            frameErrored = true;
+                            this.stageDirty = true;
                             console.error("Music Blocks: render frame failed", err);
-                        } finally {
-                            this.stageDirty = false;
-                            // Continue the loop if there's work or ongoing interaction
+                        }
+
+                        // On error: always keep the loop alive (prevents canvas freeze).
+                        // On success: continue only if there is still outstanding work.
+                        // Clearing stageDirty before stage.update() catches the edge case
+                        // where stage.update() itself synchronously re-dirtied the stage.
+                        if (
+                            frameErrored ||
+                            this.stageDirty ||
+                            hasActiveTweens ||
+                            hasActiveGifs ||
+                            isInteracting
+                        ) {
                             this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        } else {
+                            // Nothing to render — let the loop go idle
+                            this._renderLoopRunning = false;
+                            this._renderLoopRafId = null;
                         }
                     } else {
                         // Nothing to render — let the loop go idle
@@ -746,57 +778,6 @@ class Activity {
         /*
          * Clears "canvas"
          */
-        const renderClearConfirmation = clearCanvasAction => {
-            if (document.getElementById("clear-confirm")) return;
-            // Create a custom modal for confirmation
-            const modal = document.createElement("div");
-            modal.classList.add("modalBox");
-            modal.id = "clear-confirm";
-            const title = document.createElement("h2");
-            title.textContent = _("Clear workspace");
-            title.classList.add("modal-title");
-
-            modal.appendChild(title);
-            const message = document.createElement("p");
-            message.textContent = _("Are you sure you want to clear the workspace?");
-            message.classList.add("modal-message");
-            modal.appendChild(message);
-
-            const buttonContainer = document.createElement("div");
-            buttonContainer.classList.add("clear-button-container");
-
-            const confirmBtn = document.createElement("button");
-            confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = _("Confirm");
-            confirmBtn.style.border = "none";
-            confirmBtn.style.borderRadius = "4px";
-            confirmBtn.style.padding = "8px 16px";
-            confirmBtn.style.fontWeight = "bold";
-            confirmBtn.style.cursor = "pointer";
-            confirmBtn.style.marginRight = "16px";
-            this.addEventListener(confirmBtn, "click", () => {
-                document.body.removeChild(modal);
-                clearCanvasAction();
-            });
-
-            const cancelBtn = document.createElement("button");
-            cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = _("Cancel");
-            cancelBtn.style.border = "none";
-            cancelBtn.style.borderRadius = "4px";
-            cancelBtn.style.padding = "8px 16px";
-            cancelBtn.style.fontWeight = "bold";
-            cancelBtn.style.cursor = "pointer";
-            this.addEventListener(cancelBtn, "click", () => {
-                document.body.removeChild(modal);
-            });
-
-            buttonContainer.appendChild(confirmBtn);
-            buttonContainer.appendChild(cancelBtn);
-            modal.appendChild(buttonContainer);
-            document.body.appendChild(modal);
-        };
-
         this._allClear = (noErase, skipConfirmation = false) => {
             const clearCanvasAction = () => {
                 this.blocks.activeBlock = null;
@@ -854,11 +835,7 @@ class Activity {
                 }
             };
 
-            if (skipConfirmation) {
-                clearCanvasAction();
-            } else {
-                renderClearConfirmation(clearCanvasAction);
-            }
+            requestClear(this, skipConfirmation, clearCanvasAction);
         };
         /**
          * Sets up play button functionality; runs Music Blocks.
@@ -890,16 +867,13 @@ class Activity {
             this.toolbarController.runFast(env, currentDelay);
 
             // Keep DOM queries, colors, and block visibilities in activity.js
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-
-                    this.logo.tempo.resume();
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+
+                this.logo.tempo.resume();
             }
 
             if (!this.turtles.running()) {
@@ -992,13 +966,10 @@ class Activity {
 
             this.toolbar.resetStop();
 
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
             }
         };
@@ -2188,7 +2159,7 @@ class Activity {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
             // Announce program stop to screen readers
-            this.textMsg && this.textMsg(_("Program stopped."));
+            announceToScreenReader(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -2208,7 +2179,7 @@ class Activity {
 
             // TODO: plugin support
             // Announce program start to screen readers
-            this.textMsg && this.textMsg(_("Program running."));
+            announceToScreenReader(_("Program running."));
         };
 
         /*
@@ -2814,7 +2785,15 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
+            // Initialise the Git dropdown ("My Project") after the planet
+            // is ready so activity.prepareExport() is available.
+            if (typeof GitDropdownUI !== "undefined") {
+                this.gitDropdownUI = new GitDropdownUI();
+                this.gitDropdownUI.init(this);
+                this.toolbar.renderGitDropdownIcon(this.gitDropdownUI);
+            }
             this.toolbar.renderMenuIcon(this.showHideAuxMenu);
+
             this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
@@ -2846,6 +2825,17 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
+
+            // Keep the Git dirty-check hash up to date after every local save.
+            if (this.gitDropdownUI) {
+                const _origSaveLocally = this.saveLocally;
+                this.saveLocally = (...args) => {
+                    const result = _origSaveLocally.apply(this, args);
+                    this.gitDropdownUI.onSaveLocally();
+                    return result;
+                };
+                window.saveLocally = this.saveLocally;
+            }
 
             // Auto-save live workspace every 5 minutes to guard against
             // data loss from browser crashes (see issue #2994).

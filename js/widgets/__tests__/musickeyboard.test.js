@@ -996,6 +996,92 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         expect(c5Item).toBeDefined();
         expect(c5Item.voice).toBe("guitar");
     });
+
+    describe("accidentals with the real pitch tables", () => {
+        const constants = require("../../utils/musicutils-constants.js");
+        const { FIXEDSOLFEGE1 } = require("../../utils/musicutils-i18n.js");
+
+        const initKeyboard = (noteNames, keySignature = "C major") => {
+            document.body.innerHTML = "";
+            mockActivity.turtles.ithTurtle(0).singer.keySignature = keySignature;
+            global.PITCHES = constants.PITCHES;
+            global.PITCHES2 = constants.PITCHES2;
+            global.FIXEDSOLFEGE1 = FIXEDSOLFEGE1;
+            global.convertFromSolfege = musicutils.convertFromSolfege;
+            global.noteToFrequency = musicutils.noteToFrequency;
+
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.noteNames = noteNames;
+            keyboard.octaves = noteNames.map(() => 4);
+            keyboard._rowBlocks = noteNames.map((_, i) => 44 + i * 3);
+            keyboard.instruments = noteNames.map(() => "guitar");
+
+            const blockList = {};
+            noteNames.forEach((name, i) => {
+                const b = 44 + i * 3;
+                blockList[b] = { name: "pitch", connections: [null, b + 1, b + 2, null] };
+                blockList[b + 1] = { value: name };
+                blockList[b + 2] = { value: 4 };
+            });
+            mockActivity.blocks = {
+                blockList,
+                adjustDocks: jest.fn(),
+                clampBlocksToCheck: [],
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn()
+            };
+
+            keyboard.init();
+            return keyboard;
+        };
+
+        const keyLabelFor = blockNumber => {
+            const cell = [...document.querySelectorAll("td")].find(td =>
+                td.getAttribute("alt")?.endsWith("__" + blockNumber)
+            );
+            return cell ? cell.textContent : undefined;
+        };
+
+        test("keeps a flat lowest note (E♭4 in C minor) on its key", () => {
+            const keyboard = initKeyboard(["mi♭", "sol"]);
+
+            const eFlat = keyboard.layout.find(k => k.blockNumber === 44);
+            expect(eFlat).toMatchObject({ noteName: "mi♭", noteOctave: 4 });
+            expect(keyLabelFor(44)).toContain("E♭4");
+        });
+
+        test("labels sharp keys with their note name", () => {
+            initKeyboard(["re♯", "sol"]);
+
+            expect(keyLabelFor(44)).toContain("D♯4");
+        });
+
+        test("orders fixed-Do accidentals by pitch in a minor key", () => {
+            const keyboard = initKeyboard(["la♭", "sol"], "C minor");
+            const keyNames = () => keyboard.displayLayout.map(k => k.noteName + k.noteOctave);
+            const expected = [
+                "C4",
+                "C♯4",
+                "D4",
+                "D♯4",
+                "E4",
+                "F4",
+                "F♯4",
+                "G4",
+                "A♭4",
+                "A4",
+                "A♯4",
+                "B4",
+                "C5"
+            ];
+
+            expect(keyNames()).toEqual(expected);
+
+            keyboard._sortLayout();
+
+            expect(keyNames()).toEqual(expected);
+        });
+    });
 });
 
 describe("MusicKeyboard core logic", () => {
@@ -1577,6 +1663,30 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
 
         keyboard._clearWidgetTimers();
         expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+    });
+
+    test("_playChord schedules and triggers every note of a chord larger than four", () => {
+        jest.useFakeTimers();
+        try {
+            const trigger = jest.fn();
+            const keyboard = new MusicKeyboard({});
+            keyboard.activity = { logo: { synth: { trigger } } };
+
+            const notes = ["C", "E", "G", "B", "D", "F"];
+            const instruments = notes.map(() => "piano");
+            keyboard._playChord(notes, [1], instruments);
+
+            // One scheduled timeout per note, not capped at four.
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(notes.length);
+
+            jest.advanceTimersByTime(1);
+
+            expect(trigger).toHaveBeenCalledTimes(notes.length);
+            expect(trigger).toHaveBeenCalledWith(0, "D", 1, "piano", null, null);
+            expect(trigger).toHaveBeenCalledWith(0, "F", 1, "piano", null, null);
+        } finally {
+            jest.useRealTimers();
+        }
     });
 
     test("_clearPlaybackTimers clears playback timeouts while preserving other widget timers", () => {

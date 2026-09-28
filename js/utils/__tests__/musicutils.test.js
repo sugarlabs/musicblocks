@@ -23,10 +23,11 @@ const vm = require("vm");
 const { TextEncoder } = require("util");
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
+global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
+global.TuningFormats = require("../tuningformats");
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
-
 const {
     scaleDegreeToPitchMapping,
     buildScale,
@@ -140,7 +141,9 @@ const {
     getModeSliceColors,
     updateModeWheelItems,
     getModeGroupTitleFont,
-    temperamentHasRatios
+    temperamentHasRatios,
+    parseSclFile,
+    parseModeJson
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -149,6 +152,31 @@ const DOUBLEFLAT = "\ud834\udd2b";
 describe("musicutils", () => {
     describe("getNonEDOFrequency browser runtime", () => {
         it("returns a ratio-temperament preview frequency without Node global", () => {
+            const constants = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-constants.js"),
+                "utf8"
+            );
+            const i18n = fs.readFileSync(path.join(__dirname, "..", "musicutils-i18n.js"), "utf8");
+            const temperament = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-temperament.js"),
+                "utf8"
+            );
+            const pitch = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitch.js"),
+                "utf8"
+            );
+            const lookups = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-lookups.js"),
+                "utf8"
+            );
+            const rhythm = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-rhythm.js"),
+                "utf8"
+            );
+            const solfege = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-solfege.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -158,6 +186,13 @@ describe("musicutils", () => {
             };
 
             vm.createContext(sandbox);
+            vm.runInContext(constants, sandbox);
+            vm.runInContext(i18n, sandbox);
+            vm.runInContext(temperament, sandbox);
+            vm.runInContext(pitch, sandbox);
+            vm.runInContext(lookups, sandbox);
+            vm.runInContext(rhythm, sandbox);
+            vm.runInContext(solfege, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
@@ -616,10 +651,10 @@ describe("getDrum", () => {
     beforeEach(() => {
         DRUMNAMES = [
             ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "drum"],
-            ["kick drum", "kick drum", "images/kick.svg", "hh", "drum"],
+            ["kick drum", "kick drum", "images/kick.svg", "bd", "drum"],
             ["tom tom", "tom tom", "images/tom.svg", "tomml", "drum"],
             ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "drum"],
-            ["bass drum", "bass drum", "images/kick.svg", "tomfl", "drum"],
+            ["bass drum", "bass drum", "images/kick.svg", "bd", "drum"],
             ["hi hat", "hi hat", "images/hihat.svg", "hh", "bell"]
         ];
         DEFAULTDRUM = "kick drum";
@@ -653,10 +688,11 @@ describe("getDrum", () => {
             if (name === "") return "hh";
 
             for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-                if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+                if (
+                    DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() ||
+                    DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()
+                ) {
                     return DRUMNAMES[drum][3];
-                } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-                    return "hh";
                 }
             }
 
@@ -719,7 +755,8 @@ describe("getDrum", () => {
     describe("getDrumSymbol", () => {
         it("should return the correct symbol for a valid drum name", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
-            expect(getDrumSymbol("kick drum")).toBe("hh");
+            expect(getDrumSymbol("kick drum")).toBe("bd");
+            expect(getDrumSymbol("bass drum")).toBe("bd");
             expect(getDrumSymbol("floor tom")).toBe("tomfl");
         });
 
@@ -731,14 +768,14 @@ describe("getDrum", () => {
             expect(getDrumSymbol("invalid drum")).toBe("hh");
         });
 
-        it('should return "hh" for a name matching the second element of DRUMNAMES', () => {
+        it("should return the symbol for a name matching the second element of DRUMNAMES", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
-            expect(getDrumSymbol("kick drum")).toBe("hh"); // As per logic
+            expect(getDrumSymbol("kick drum")).toBe("bd");
         });
 
         it("should ignore case sensitivity when matching drum names", () => {
             expect(getDrumSymbol("SNARE DRUM")).toBe("sn");
-            expect(getDrumSymbol("KICK DRUM")).toBe("hh");
+            expect(getDrumSymbol("KICK DRUM")).toBe("bd");
         });
     });
 });
@@ -1745,6 +1782,22 @@ describe("GetNotesForInterval", () => {
             octave: 0
         });
     });
+    it("should fall back to C when not inside a note block", () => {
+        // Clicking current interval on its own: the singer has a notePitches
+        // map but inNoteBlock is empty, so there is no pitch list to read.
+        const tur = {
+            singer: {
+                noteStatus: null,
+                notePitches: {},
+                inNoteBlock: []
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+    });
     it("should handle empty tur object", () => {
         const tur = {
             singer: {}
@@ -2367,28 +2420,32 @@ describe("durationToNoteValue", () => {
     global.POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
     it("should correctly convert a duration to a note value with no dots", () => {
-        const result = durationToNoteValue(1); // Expect a whole note
-        expect(result).toEqual([1, 0, null]);
+        expect(durationToNoteValue(1)).toEqual([1, 0, null]);
+        expect(durationToNoteValue(2)).toEqual([2, 0, null]);
+        expect(durationToNoteValue(4)).toEqual([4, 0, null]);
     });
 
     it("should correctly convert a duration to a note value with one dot", () => {
-        const result = durationToNoteValue(1.5); // 1.5 = whole note + dotted
-        expect(result).toEqual([1, 0, [3, 0.5], 1]);
+        expect(durationToNoteValue(1 / 1.5)).toEqual([1, 1, null]);
+        expect(durationToNoteValue(2 / 1.5)).toEqual([2, 1, null]);
+        expect(durationToNoteValue(4 / 1.5)).toEqual([4, 1, null]);
+        expect(durationToNoteValue(8 / 1.5)).toEqual([8, 1, null]);
     });
 
     it("should correctly convert a duration to a note value with two dots", () => {
-        const result = durationToNoteValue(1.75);
-        expect(result).toEqual([1, 0, [3.5, 0.5], 1]);
+        expect(durationToNoteValue(1 / 1.75)).toEqual([1, 2, null]);
+        expect(durationToNoteValue(2 / 1.75)).toEqual([2, 2, null]);
+        expect(durationToNoteValue(4 / 1.75)).toEqual([4, 2, null]);
+    });
+
+    it("should handle tuplet durations that do not match power-of-two note values", () => {
+        expect(durationToNoteValue(1.5)).toEqual([1, 0, [3, 0.5], 1]);
+        expect(durationToNoteValue(1.75)).toEqual([1, 0, [3.5, 0.5], 1]);
     });
 
     it("should round down durations that do not match exact note values in POWER2", () => {
         const result = durationToNoteValue(0.3);
         expect(result).toEqual([1, 0, [0.6, 0.5], 1]);
-    });
-
-    it("should correctly return the note value for durations in POWER2", () => {
-        const result = durationToNoteValue(2);
-        expect(result).toEqual([2, 0, null]);
     });
 
     it("should return the default rounded value for durations without an exact tuplet factor", () => {
@@ -3418,12 +3475,44 @@ describe("getPitchInfo", () => {
     it("returns color", () => {
         const color = getPitchInfo(activity, "pitch to color", "C4", tur);
         expect(typeof color).toBe("number");
+
+        const turFlat = { singer: { keySignature: "F major", movable: false } };
+        const flatColor = getPitchInfo(activity, "pitch to color", "Bb4", turFlat);
+        expect(typeof flatColor).toBe("number");
+
+        const unknownColor = getPitchInfo(activity, "pitch to color", "X4", tur);
+        expect(unknownColor).toBe(0);
+    });
+
+    it("handles errors during getPitchInfo smoothly", () => {
+        // Mock _getFrequency to throw an error so the try/catch inside getPitchInfo is hit
+        activity.logo.synth._getFrequency.mockImplementationOnce(() => {
+            throw new Error("Mock error");
+        });
+        getPitchInfo(activity, "pitch in hertz", "C4", tur);
+        // The error should be caught and logged (or at least not crash the test)
     });
 
     it("returns shade", () => {
         // octave * 12.5 -> 4 * 12.5 = 50
         const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
         expect(shade).toBe(50);
+    });
+
+    it("handles solfege class with accidental", () => {
+        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("re");
+    });
+
+    it("returns pitch number", () => {
+        const pNum = getPitchInfo(activity, "pitch number", "C4", tur);
+        expect(typeof pNum).toBe("number");
+    });
+
+    it("handles equivalent sharps mapping", () => {
+        // "Db" translates to "D♭". In C major, "D♭" is not in the scale.
+        // It should look it up in EQUIVALENTSHARPS and convert to "C♯".
+        const pitch = getPitchInfo(activity, "alphabet", "Db4", tur);
+        expect(pitch).toBe("C♯");
     });
 
     it("handles invalid type", () => {
@@ -3689,7 +3778,47 @@ describe("getNote additional paths", () => {
         expect(getNote("1#", 4, 0, "C major", false)).toEqual(["D", 4, 0]);
         expect(getNote("1b", 4, 0, "C major", false)).toEqual(["C", 4, 0]);
     });
+    it("normalizes negative pitch numbers across octave boundaries", () => {
+        expect(getNote(-1, 4, 0, "C major", false)).toEqual(["B", 3, 0]);
+        expect(getNote(-12, 4, 0, "C major", false)).toEqual(["C", 3, 0]);
+        expect(getNote(-13, 4, 0, "C major", false)).toEqual(["B", 2, 0]);
 
+        expect(getNote("-1", 4, 0, "C major", false)).toEqual(["B", 3, 0]);
+
+        expect(getNote(-1, 4, 0, "G major", true)).toEqual(["F♯", 4, 0]);
+        expect(getNote(-8, 4, 0, "G major", true)).toEqual(["B", 3, 0]);
+
+        expect(getNote(-1, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "B♯",
+            3,
+            0
+        ]);
+    });
+    it("normalizes positive pitch numbers across octave boundaries", () => {
+        expect(getNote(1, 4, 0, "C major", false)).toEqual(["D♭", 4, 0]);
+        expect(getNote(6, 4, 0, "C major", false)).toEqual(["G♭", 4, 0]);
+        expect(getNote(11, 4, 0, "C major", false)).toEqual(["B", 4, 0]);
+        expect(getNote(12, 4, 0, "C major", false)).toEqual(["C", 5, 0]);
+        expect(getNote(13, 4, 0, "C major", false)).toEqual(["D♭", 5, 0]);
+        expect(getNote(24, 4, 0, "C major", false)).toEqual(["C", 6, 0]);
+        expect(getNote(25, 4, 0, "C major", false)).toEqual(["D♭", 6, 0]);
+
+        expect(getNote("13", 4, 0, "C major", false)).toEqual(["D♭", 5, 0]);
+
+        expect(getNote(5, 4, 0, "G major", true)).toEqual(["C", 5, 0]);
+        expect(getNote(13, 4, 0, "G major", true)).toEqual(["G♯", 5, 0]);
+
+        expect(getNote(19, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C",
+            5,
+            0
+        ]);
+        expect(getNote(20, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C♯",
+            5,
+            0
+        ]);
+    });
     it("returns rests before attempting pitch conversion", () => {
         expect(getNote("rest", 4, 7, "C major", false)).toEqual(["R", "", 0]);
         expect(getNote("r", 4, 7, "C major", false)).toEqual(["R", "", 0]);
@@ -3792,6 +3921,29 @@ describe("getNote additional paths", () => {
         ]);
     });
 
+    it("resolves custom temperament notes with microtonal prefixes and cents", () => {
+        TEMPERAMENT["custom"] = {
+            pitchNumber: 12,
+            0: [1, "vvC", 4],
+            1: [1.88, "^B", 4]
+        };
+        try {
+            expect(
+                getNote("vvC(+0¢)", 4, 0, "C major", false, undefined, undefined, "custom")
+            ).toEqual(["vvC", 4, 0]);
+            expect(
+                getNote("^B(+0¢)", 4, 0, "C major", false, undefined, undefined, "custom")
+            ).toEqual(["^B", 4, 0]);
+            expect(getNote("vvC", 4, 0, "C major", false, undefined, undefined, "custom")).toEqual([
+                "vvC",
+                4,
+                0
+            ]);
+        } finally {
+            delete TEMPERAMENT["custom"];
+        }
+    });
+
     it("preserves accidentals for non-predefined temperament systems", () => {
         addTemperamentToDictionary("nonstrict", {
             pitchNumber: 12,
@@ -3826,6 +3978,90 @@ describe("scaleDegreeToPitchMapping extended modes", () => {
             "7",
             FLAT
         ]);
+    });
+
+    it("keeps degrees aligned when a tritone is skipped (minor blues)", () => {
+        // C minor blues: C E♭ F G♭ G B♭; G♭ is a passing tone, not degree 5
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d =>
+                scaleDegreeToPitchMapping("C minor blues", d, false, null)
+            )
+        ).toEqual(["C", "D", "E" + FLAT, "F", "G", "A", "B" + FLAT]);
+    });
+
+    it("maps each degree to its own note when two notes share a degree", () => {
+        // Fibonacci C D♭ D E G: D♭ and D both fall on degree 2
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d => scaleDegreeToPitchMapping("C fibonacci", d, false, null))
+        ).toEqual(["C", "D" + FLAT, "E", "F", "G", "A", "B"]);
+        // Major blues C D E♭ E G A: E♭ and E both fall on degree 3
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d =>
+                scaleDegreeToPitchMapping("C major blues", d, false, null)
+            )
+        ).toEqual(["C", "D", "E" + FLAT, "F", "G", "A", "B"]);
+    });
+
+    it("counts skipped degrees in the In mode (Sakura, #2050)", () => {
+        // E In: E F A B C, so A and B are degrees 4 and 5
+        expect(scaleDegreeToPitchMapping("E in", 4, false, null)).toBe("A");
+        expect(scaleDegreeToPitchMapping("E in", 5, false, null)).toBe("B");
+    });
+});
+
+describe("getSolfege movable do matches getNote", () => {
+    it("matches the solfege that getNote resolves in E In", () => {
+        const notes = ["E", "F", "A", "B", "C"];
+        expect(notes.map(n => getSolfege(n, "E in", true, "equal"))).toEqual([
+            "do",
+            "re",
+            "fa",
+            "sol",
+            "la"
+        ]);
+    });
+
+    it("uses la as the tonic in aeolian, as getNote does (#2050)", () => {
+        const notes = ["A", "B", "C", "D", "E", "F", "G"];
+        expect(notes.map(n => getSolfege(n, "A aeolian", true, "equal"))).toEqual([
+            "la",
+            "ti",
+            "do",
+            "re",
+            "mi",
+            "fa",
+            "sol"
+        ]);
+    });
+
+    it("round-trips every note of the rotated church modes through getNote", () => {
+        const modes = ["dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        for (const mode of modes) {
+            for (const key of ["C", "E", "G", "B" + FLAT]) {
+                const keySignature = key + " " + mode;
+                const scale = buildScale(keySignature)[0].slice(0, -1);
+                for (const note of scale) {
+                    const solfege = getSolfege(note, keySignature, true, "equal");
+                    const [back] = getNote(solfege, 4, 0, keySignature, true, null, jest.fn());
+                    expect(pitchToNumber(back, 4, keySignature) % 12).toBe(
+                        pitchToNumber(note, 4, keySignature) % 12
+                    );
+                }
+            }
+        }
+    });
+
+    it("round-trips every pentatonic scale note through getNote", () => {
+        for (const keySignature of ["C major pentatonic", "A minor pentatonic", "D hirajoshi"]) {
+            const scale = buildScale(keySignature)[0].slice(0, -1);
+            for (const note of scale) {
+                const solfege = getSolfege(note, keySignature, true, "equal");
+                const [back] = getNote(solfege, 4, 0, keySignature, true, null, jest.fn());
+                expect(pitchToNumber(back, 4, keySignature) % 12).toBe(
+                    pitchToNumber(note, 4, keySignature) % 12
+                );
+            }
+        }
     });
 });
 
@@ -3972,8 +4208,9 @@ describe("actual drum lookup helpers", () => {
     beforeEach(() => {
         global.DRUMNAMES = [
             ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "snare"],
-            ["kick drum", "kick drum", "images/kick.svg", "hh", "kick"],
-            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"]
+            ["kick drum", "kick drum", "images/kick.svg", "bd", "kick"],
+            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"],
+            ["キックドラム", "taiko", "images/tom.svg", "tomml", "taiko"]
         ];
     });
 
@@ -3988,7 +4225,14 @@ describe("actual drum lookup helpers", () => {
     it("returns drum symbols with default and fallback handling", () => {
         expect(actualMusicUtils.getDrumSymbol("")).toBe("hh");
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
+        expect(actualMusicUtils.getDrumSymbol("kick drum")).toBe("bd");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
+    });
+
+    it("resolves the canonical name to the drum's own symbol when localized names differ", () => {
+        // DRUMNAMES[3][0] is a localized label that does not equal "taiko";
+        // the canonical DRUMNAMES[3][1] must still reach that row's symbol.
+        expect(actualMusicUtils.getDrumSymbol("taiko")).toBe("tomml");
     });
 
     describe("_parse_pitch_string", () => {

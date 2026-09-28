@@ -62,16 +62,10 @@ const MAX_ARC_ANGLE = 45000;
  * Class pertaining to visual actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Painter for each Turtle component. It is responsible
- * for the visual actions and artworks of the Turtle. It is mostly view specific and communicates
- * with methods of Turtle and Turtles objects. An action may require updating the state of the
- * Turtle or the Turtles object.
- *
- * @todo move visual artwork related states from logo.js to here eventually.
- * As of now, some state variables are present in logo.js. To ensure modularity and independence of
- * components, Logo should contain members only related to execution of blocks while the logic of
- * execution of blocks should be present in respective files in blocks/ directory, which should
- * eventually use members of this file and turtle-singer.js to proceed.
+ * @classdesc This is the prototype of the Painter for each Turtle component. It owns the
+ * per-turtle drawing state and actions. It is mostly view specific and communicates with methods
+ * of Turtle and Turtles objects. An action may require updating the state of the Turtle or the
+ * Turtles object.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.

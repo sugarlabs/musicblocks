@@ -33,7 +33,11 @@ function setupProgramBlocks(activity) {
             key === _("font") ||
             key === _("heading") ||
             key === "x" ||
-            key === "y"
+            key === "y" ||
+            key === _("notes played") ||
+            key === _("note value") ||
+            key === _("current pitch") ||
+            key === _("pitch number")
         );
     }
     /**

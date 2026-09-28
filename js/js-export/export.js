@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE, ManagedTimer */
 
 /**
  * @class
@@ -104,6 +104,7 @@ class MusicBlocks {
         this.turIndex = globalActivity.turtles.getIndexOfTurtle(this.turtle);
 
         this.listeners = [];
+        this._executionTimeout = null;
 
         if (MusicBlocks._blockNo === -1) {
             MusicBlocks._blockNo = 0;
@@ -192,6 +193,11 @@ class MusicBlocks {
         } else {
             MusicBlocks.isRun = false;
             MusicBlocks._methodList = {};
+            for (const mouse of Mouse.MouseList) {
+                if (mouse && mouse.MB) {
+                    mouse.MB.clearExecutionTimers();
+                }
+            }
         }
 
         for (const turtle of Mouse.AddedTurtles) {
@@ -218,8 +224,11 @@ class MusicBlocks {
      * @returns {void}
      */
     static run() {
-        // Remove any listeners that might be still active
+        // Remove any listeners and pending timers that might be still active
         for (const mouse of Mouse.MouseList) {
+            if (mouse && mouse.MB) {
+                mouse.MB.clearExecutionTimers();
+            }
             for (const listener in mouse.turtle.listeners) {
                 if (
                     globalActivity.logo.stage &&
@@ -239,6 +248,93 @@ class MusicBlocks {
         globalActivity.logo.firstNoteTime = null;
 
         Mouse.MouseList.forEach(mouse => mouse.run());
+    }
+
+    /**
+     * Retrieves or initializes the ManagedTimer instance for execution timers.
+     * @private
+     * @returns {Object|null}
+     */
+    _getTimerManager() {
+        if (
+            typeof globalActivity !== "undefined" &&
+            globalActivity &&
+            globalActivity.logo &&
+            globalActivity.logo._timerManager
+        ) {
+            return globalActivity.logo._timerManager;
+        }
+        if (typeof ManagedTimer !== "undefined") {
+            if (!this._timerManager) {
+                this._timerManager = new ManagedTimer();
+            }
+            return this._timerManager;
+        }
+        if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                if (!this._timerManager) {
+                    this._timerManager = new ManagedTimerCtor();
+                }
+                return this._timerManager;
+            } catch (e) {
+                // Ignore fallback error
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Schedules a callback with delay via ManagedTimer if available, falling back to setTimeout.
+     * @private
+     * @param {Function} callback
+     * @param {number} delay
+     * @returns {number|Object}
+     */
+    _setExecutionTimeout(callback, delay) {
+        if (this._executionTimeout !== null && this._executionTimeout !== undefined) {
+            this._clearExecutionTimeout(this._executionTimeout);
+            this._executionTimeout = null;
+        }
+        const timerManager = this._getTimerManager();
+        if (timerManager) {
+            return timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    /**
+     * Clears an execution timer scheduled via _setExecutionTimeout.
+     * @private
+     * @param {number|Object} id
+     * @returns {void}
+     */
+    _clearExecutionTimeout(id) {
+        if (id === null || id === undefined) {
+            return;
+        }
+        const timerManager = this._getTimerManager();
+        if (timerManager && typeof timerManager.clearTimeout === "function") {
+            const cleared = timerManager.clearTimeout(id);
+            if (cleared) {
+                return;
+            }
+        }
+        clearTimeout(id);
+    }
+
+    /**
+     * Clears any active execution timers for this MusicBlocks instance.
+     * @returns {void}
+     */
+    clearExecutionTimers() {
+        if (this._executionTimeout !== null && this._executionTimeout !== undefined) {
+            this._clearExecutionTimeout(this._executionTimeout);
+            this._executionTimeout = null;
+        }
+        if (this._timerManager) {
+            this._timerManager.clearAll();
+        }
     }
 
     /**
@@ -286,7 +382,10 @@ class MusicBlocks {
 
             const delay = this.turtle.waitTime;
             this.turtle.doWait(0);
-            setTimeout(() => resolve(returnVal), delay);
+            this._executionTimeout = this._setExecutionTimeout(() => {
+                this._executionTimeout = null;
+                resolve(returnVal);
+            }, delay);
         });
     }
 
@@ -312,7 +411,10 @@ class MusicBlocks {
 
             const delay = this.turtle.waitTime;
             this.turtle.doWait(0);
-            setTimeout(resolve, delay);
+            this._executionTimeout = this._setExecutionTimeout(() => {
+                this._executionTimeout = null;
+                resolve();
+            }, delay);
         });
     }
 
@@ -322,6 +424,7 @@ class MusicBlocks {
      */
     get ENDMOUSE() {
         return new Promise(resolve => {
+            this.clearExecutionTimers();
             Mouse.MouseList.splice(Mouse.MouseList.indexOf(this.mouse), 1);
             if (Mouse.MouseList.length === 0) MusicBlocks.init(false);
 
