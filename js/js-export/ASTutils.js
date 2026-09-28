@@ -34,6 +34,106 @@ class ASTUtils {
     }
 
     /**
+     * Returns a valid JavaScript identifier for an action name.
+     *
+     * Action names are free text ("chorus 2", "1st verse"), but an action is exported as a
+     * `let` binding that its calls refer to, so the name has to be an identifier and there is
+     * no string form to fall back to the way boxes fall back to setBox. Characters that can't
+     * appear in an identifier become "_", and names that would still not parse, or would
+     * shadow what the generated code itself uses (mouse, actionArgs, Math, ...), get a leading
+     * "_". Letters outside ASCII are kept, so non-English action names read the same.
+     *
+     * @static
+     * @param {String} name - action name
+     * @returns {String} identifier
+     */
+    static _getActionIdentifier(name) {
+        return ASTUtils._actionIdentifiers.get(name) ?? ASTUtils._toIdentifier(name);
+    }
+
+    /**
+     * Converts free text to an identifier, without regard to what else is in the program.
+     *
+     * @static
+     * @param {String} name - action name
+     * @returns {String} identifier
+     */
+    static _toIdentifier(name) {
+        // U+200C and U+200D are allowed after the first character (ECMAScript IdentifierPart).
+        let id = String(name).replace(/[^\p{ID_Continue}$\u200C\u200D]/gu, "_");
+        if (!/^[\p{ID_Start}_$]/u.test(id) || ASTUtils._RESERVED_NAMES.has(id)) {
+            id = "_" + id;
+        }
+        return id;
+    }
+
+    /**
+     * Assigns every action in the program its identifier up front, so two names that convert
+     * to the same identifier ("chorus-2" and "chorus_2") don't produce two `let chorus_2`.
+     * Names that are already identifiers keep them; a converted name that is taken gets a
+     * numeric suffix. Definitions and calls both read this map, so they always agree.
+     *
+     * Converted names also avoid the program's box variables: a box whose name is an identifier
+     * is exported as a `var` in its flow, which would shadow an action of the same name there.
+     *
+     * @static
+     * @param {String[]} names - every action name in the program
+     * @param {String[]} [boxNames] - every box the program stores into, see getBoxNames
+     * @returns {void}
+     */
+    static setActionNames(names, boxNames = []) {
+        const identifiers = new Map();
+        const taken = new Set(boxNames.filter(ASTUtils._isValidIdentifier));
+        for (const name of names) {
+            const id = ASTUtils._toIdentifier(name);
+            if (id === name && !taken.has(id)) {
+                identifiers.set(name, id);
+                taken.add(id);
+            }
+        }
+        for (const name of names) {
+            if (identifiers.has(name)) continue;
+            const base = ASTUtils._toIdentifier(name);
+            let id = base;
+            for (let n = 2; taken.has(id); n++) id = `${base}_${n}`;
+            identifiers.set(name, id);
+            taken.add(id);
+        }
+        ASTUtils._actionIdentifiers = identifiers;
+    }
+
+    /**
+     * Returns the name of every box the given stack trees store into.
+     *
+     * @static
+     * @param {Object[]} trees - stack trees, as built by JSGenerate
+     * @returns {String[]} box names
+     */
+    static getBoxNames(trees) {
+        const names = [];
+        const walk = node => {
+            if (!Array.isArray(node)) return;
+            if (typeof node[0] === "string") {
+                if (node[0].startsWith("storein2_")) {
+                    names.push(node[0].slice("storein2_".length));
+                } else if (
+                    node[0] === "storein" &&
+                    Array.isArray(node[1]) &&
+                    typeof node[1][0] === "string"
+                ) {
+                    names.push(node[1][0]);
+                }
+            }
+            node.forEach(walk);
+        };
+        trees.forEach(walk);
+        return names;
+    }
+
+    /** Action name → identifier for the program being generated; see setActionNames. */
+    static _actionIdentifiers = new Map();
+
+    /**
      * Returns the names of every identifier used in the given ASTs.
      *
      * @static
@@ -72,6 +172,18 @@ class ASTUtils {
             arguments: args
         };
     }
+
+    /**
+     * Names an exported action can't take: reserved words, plus the names the generated code
+     * relies on (a top-level `let Math` would break every Math.floor in the program).
+     */
+    static _RESERVED_NAMES = new Set(
+        `await break case catch class const continue debugger default delete do else enum export
+        extends false finally for function if implements import in instanceof interface let new
+        null package private protected public return static super switch this throw true try
+        typeof var void while with yield arguments eval undefined NaN Infinity
+        mouse actionArgs Mouse MusicBlocks Math MathUtility`.split(/\s+/)
+    );
 
     /**
      * @static
@@ -450,7 +562,7 @@ class ASTUtils {
                     type: "VariableDeclarator",
                     id: {
                         type: "Identifier",
-                        name: `${methodName}`
+                        name: ASTUtils._getActionIdentifier(methodName)
                     },
                     init: {
                         type: "ArrowFunctionExpression",
@@ -543,7 +655,7 @@ class ASTUtils {
             if (props.action) {
                 AST["expression"]["argument"]["callee"] = {
                     type: "Identifier",
-                    name: `${methodName}`
+                    name: ASTUtils._getActionIdentifier(methodName)
                 };
                 AST["expression"]["argument"]["arguments"] = [
                     {

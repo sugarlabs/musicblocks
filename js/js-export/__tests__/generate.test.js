@@ -35,7 +35,9 @@ global.console = {
 const ASTUtils = {
     BAREBONE_AST: { type: "Program", body: [] },
     getMethodAST: jest.fn(),
-    getMouseAST: jest.fn()
+    getMouseAST: jest.fn(),
+    setActionNames: jest.fn(),
+    getBoxNames: jest.fn(() => [])
 };
 const astring = {
     generate: jest.fn()
@@ -211,6 +213,7 @@ describe("JSGenerate Class", () => {
 
             JSGenerate.generateCode();
 
+            expect(ASTUtils.setActionNames).toHaveBeenCalledWith(["first", "second"], []);
             expect(ASTUtils.getMethodAST).toHaveBeenCalledTimes(2);
             expect(JSGenerate.generateFailed).toBe(false);
         });
