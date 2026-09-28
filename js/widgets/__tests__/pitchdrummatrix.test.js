@@ -257,16 +257,13 @@ describe("PitchDrumMatrix Widget", () => {
             expect(pdm._blockMap).toEqual([[0, 1]]);
         });
 
-        test("removeNode marks a matching intersection as removed", () => {
+        test("removeNode removes a matching intersection", () => {
             pdm.addNode(0, 1);
             pdm.addNode(1, 0);
 
             pdm.removeNode(0, 1);
 
-            expect(pdm._blockMap).toEqual([
-                [-1, -1],
-                [1, 0]
-            ]);
+            expect(pdm._blockMap).toEqual([[1, 0]]);
         });
 
         test("removeNode leaves the map unchanged when nothing matches", () => {
@@ -1115,10 +1112,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._setCellPitchDrum(1, 0, true);
 
             expect(cell0.style.backgroundColor).toBe(platformColor.selectorBackground);
-            expect(pdm._blockMap).toEqual([
-                [-1, -1],
-                [10, 200]
-            ]);
+            expect(pdm._blockMap).toEqual([[10, 200]]);
         });
 
         test("_save creates and loads action stack when grid has selections", () => {

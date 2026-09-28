@@ -376,6 +376,8 @@ class PitchDrumMatrix {
                 widgetWindow.getWidgetBody().style.left = "0px";
                 widgetWindow.getWidgetBody().style.height = "400px";
                 widgetWindow.getWidgetBody().style.width = "500px";
+                outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+                outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
                 const innerDiv = docById("pdmInnerDiv");
                 innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
                 innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
@@ -447,10 +449,10 @@ class PitchDrumMatrix {
      */
     removeNode(pitchBlock, drumBlock) {
         let obj;
-        for (let i = 0; i < this._blockMap.length; i++) {
+        for (let i = this._blockMap.length - 1; i >= 0; i--) {
             obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1] === drumBlock) {
-                this._blockMap[i] = [-1, -1]; // Mark as removed
+                this._blockMap.splice(i, 1);
             }
         }
     }
@@ -484,7 +486,7 @@ class PitchDrumMatrix {
             cell = row.insertCell();
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.width = PitchDrumMatrix.DRUMNAMEWIDTH;
-            cell.style.width = cell.width;
+            cell.style.width = PitchDrumMatrix.DRUMNAMEWIDTH + "px";
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.backgroundColor = platformColor.selectorBackground;
@@ -510,7 +512,7 @@ class PitchDrumMatrix {
         cell = row.insertCell();
         cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
         cell.width = PitchDrumMatrix.DRUMNAMEWIDTH;
-        cell.style.width = cell.width;
+        cell.style.width = PitchDrumMatrix.DRUMNAMEWIDTH + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
