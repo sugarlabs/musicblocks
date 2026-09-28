@@ -22,6 +22,9 @@
 
 const PitchDrumMatrix = require("../pitchdrummatrix.js");
 
+// The real jsdom document, for the DOM suite at the end.
+const jsdomDocument = global.document;
+
 // --- Global Mocks ---
 global._ = msg => msg;
 global.platformColor = {
@@ -257,16 +260,13 @@ describe("PitchDrumMatrix Widget", () => {
             expect(pdm._blockMap).toEqual([[0, 1]]);
         });
 
-        test("removeNode marks a matching intersection as removed", () => {
+        test("removeNode removes a matching intersection", () => {
             pdm.addNode(0, 1);
             pdm.addNode(1, 0);
 
             pdm.removeNode(0, 1);
 
-            expect(pdm._blockMap).toEqual([
-                [-1, -1],
-                [1, 0]
-            ]);
+            expect(pdm._blockMap).toEqual([[1, 0]]);
         });
 
         test("removeNode leaves the map unchanged when nothing matches", () => {
@@ -451,7 +451,7 @@ describe("PitchDrumMatrix Widget", () => {
             // We mock _setPairCell because it's called internally
             pdm._setPairCell = jest.fn();
 
-            pdm._playPitchDrum(0, [[0, 0]]);
+            pdm._playPitchDrum(0, [[0, 0]], pdm._playRun);
 
             expect(pdm._setPairCell).toHaveBeenCalled();
         });
@@ -469,18 +469,34 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._pdmCellTables = [{ rows: [{ cells: [{}, {}] }] }, { rows: [{ cells: [{}, {}] }] }];
             pdm._setPairCell = jest.fn();
 
-            pdm._playPitchDrum(0, [
-                [0, 0],
-                [1, 0]
-            ]);
+            pdm._playPitchDrum(
+                0,
+                [
+                    [0, 0],
+                    [1, 0]
+                ],
+                pdm._playRun
+            );
 
             expect(pdm._setPairCell).toHaveBeenCalledTimes(1);
-            expect(pdm._setPairCell).toHaveBeenCalledWith(0, 0, expect.anything(), true);
+            expect(pdm._setPairCell).toHaveBeenCalledWith(
+                0,
+                0,
+                expect.anything(),
+                true,
+                pdm._playRun
+            );
 
             jest.advanceTimersByTime(1000);
 
             expect(pdm._setPairCell).toHaveBeenCalledTimes(2);
-            expect(pdm._setPairCell).toHaveBeenCalledWith(1, 0, expect.anything(), true);
+            expect(pdm._setPairCell).toHaveBeenCalledWith(
+                1,
+                0,
+                expect.anything(),
+                true,
+                pdm._playRun
+            );
 
             jest.useRealTimers();
         });
@@ -515,7 +531,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._pdmCellTables = [mockTable];
             pdm._setPairCell = jest.fn();
 
-            pdm._playPitchDrum(0, [[0, 0]]);
+            pdm._playPitchDrum(0, [[0, 0]], pdm._playRun);
 
             rowsAccessSpy.mockClear();
             pdm._playing = false;
@@ -700,9 +716,13 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm._getBackgroundColor = jest.fn(() => "white");
             pdm._setCellPitchDrum = jest.fn();
+            pdm._playAll = jest.fn();
 
             pdm._clear();
 
+            // Clearing stops playback so the old mapping doesn't keep sounding.
+            expect(pdm._playing).toBe(false);
+            expect(pdm._playAll).toHaveBeenCalled();
             expect(cell00.style.backgroundColor).toBe(platformColor.selectorBackground);
             expect(pdm._setCellPitchDrum).toHaveBeenCalled();
         });
@@ -954,9 +974,9 @@ describe("PitchDrumMatrix Widget", () => {
             expect(buttons["Save"]).toBeDefined();
             expect(buttons["Clear"]).toBeDefined();
 
-            // Test Play button click handler
+            // Nothing is selected, so Play shows the hint and stays stopped.
             buttons["Play"].onclick();
-            expect(pdm._playing).toBe(true);
+            expect(pdm._playing).toBe(false);
 
             buttons["Play"].onclick();
             expect(pdm._playing).toBe(false);
@@ -1107,10 +1127,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._setCellPitchDrum(1, 0, true);
 
             expect(cell0.style.backgroundColor).toBe(platformColor.selectorBackground);
-            expect(pdm._blockMap).toEqual([
-                [-1, -1],
-                [10, 200]
-            ]);
+            expect(pdm._blockMap).toEqual([[10, 200]]);
         });
 
         test("_save creates and loads action stack when grid has selections", () => {
@@ -1211,6 +1228,343 @@ describe("PitchDrumMatrix Widget", () => {
             expect(svgElement.style.pointerEvents).toBe("auto");
 
             jest.useRealTimers();
+        });
+    });
+});
+
+// Runs the widget against the real jsdom document instead of the mocks above,
+// with only audio and blocks mocked. Covers #9038.
+describe("PitchDrumMatrix with a real DOM", () => {
+    const labelColor = "rgb(144, 193, 0)";
+    const selectorBackground = "rgb(100, 181, 246)";
+    const DRUMS = ["kick drum", "snare drum"];
+    const domGlobals = {
+        document: jsdomDocument,
+        _: s => s,
+        platformColor: {
+            labelColor,
+            selectorBackground,
+            selectorSelected: "rgb(208, 208, 208)"
+        },
+        docById: id => jsdomDocument.getElementById(id),
+        getNote: (note, octave) => [note, octave],
+        getDrumName: name => (DRUMS.includes(name) ? name : null),
+        getDrumIcon: () => "icon.svg",
+        getDrumSynthName: name => name,
+        SOLFEGECONVERSIONTABLE: { C: "do", D: "re", E: "mi" },
+        Singer: { defaultBPMFactor: 1 },
+        normalizeNoteAccidentals: note => note
+    };
+    const saved = {};
+    // Tests above patch methods like createElement straight onto the real
+    // document, so set those aside and use jsdom's own.
+    const documentPatches = {};
+
+    beforeAll(() => {
+        for (const name of Object.getOwnPropertyNames(jsdomDocument)) {
+            if (typeof jsdomDocument[name] === "function") {
+                documentPatches[name] = jsdomDocument[name];
+                delete jsdomDocument[name];
+            }
+        }
+        saved.widgetWindows = window.widgetWindows;
+        for (const name of Object.keys(domGlobals)) {
+            saved[name] = global[name];
+            global[name] = domGlobals[name];
+        }
+    });
+
+    afterAll(() => {
+        Object.assign(global, saved);
+        Object.assign(jsdomDocument, documentPatches);
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    let widgetWindow;
+
+    const build = ({ labels, args, rowBlocks, drums, colBlocks, blockMap = [] }) => {
+        jsdomDocument.body.innerHTML = "";
+        const body = jsdomDocument.createElement("div");
+        jsdomDocument.body.appendChild(body);
+        widgetWindow = {
+            clear() {},
+            show() {},
+            destroy() {},
+            addButton: () => jsdomDocument.createElement("div"),
+            getWidgetBody: () => body,
+            timerManager: { setTimeout: (callback, delay) => setTimeout(callback, delay) }
+        };
+        window.widgetWindows = { windowFor: () => widgetWindow };
+        const activity = {
+            logo: { synth: { stop: jest.fn(), trigger: jest.fn() } },
+            turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) },
+            textMsg: jest.fn(),
+            errorMsg: jest.fn(),
+            hideMsgs: jest.fn(),
+            refreshCanvas: jest.fn(),
+            blocks: { palettes: { dict: {} }, loadNewBlocks: jest.fn() }
+        };
+
+        const pdm = new PitchDrumMatrix();
+        pdm.rowLabels = labels;
+        pdm.rowArgs = args;
+        pdm.drums = drums;
+        pdm.clearBlocks();
+        rowBlocks.forEach(blk => pdm.addRowBlock(blk));
+        colBlocks.forEach(blk => pdm.addColBlock(blk));
+        pdm._blockMap = blockMap;
+        pdm.init(activity);
+        pdm.makeClickable();
+        return { pdm, activity };
+    };
+
+    const click = (row, col) => jsdomDocument.getElementById(row + "," + col).click();
+    const labels = pdm => [...pdm._pdmTable.rows].slice(0, -1).map(row => row.cells[0]);
+    const threeRows = () =>
+        build({
+            labels: ["C", "D", "E"],
+            args: [4, 4, 4],
+            rowBlocks: [20, 21, 22],
+            drums: ["kick drum"],
+            colBlocks: [30]
+        });
+
+    describe("rows and columns stay tied to their blocks", () => {
+        test("a rest doesn't shift the row labels after it", () => {
+            const { pdm } = build({
+                labels: ["C", "rest", "D", "E"],
+                args: [4, "", 4, 4],
+                rowBlocks: [20, 21, 22],
+                drums: ["kick drum"],
+                colBlocks: [30]
+            });
+
+            expect(labels(pdm).map(cell => cell.dataset.noteArg)).toEqual(["C", "D", "E"]);
+            expect(labels(pdm).map(cell => cell.textContent)).toEqual(["C4", "D4", "E4"]);
+        });
+
+        test("a rest written as R is skipped too", () => {
+            const { pdm } = build({
+                labels: ["R", "C"],
+                args: ["", 4],
+                rowBlocks: [20],
+                drums: ["kick drum"],
+                colBlocks: [30]
+            });
+
+            expect(labels(pdm).map(cell => cell.dataset.noteArg)).toEqual(["C"]);
+        });
+
+        test("a rest is skipped when its translation isn't lower case", () => {
+            global._ = s => (s === "rest" ? "Zurücksetzen" : s);
+            try {
+                const { pdm } = build({
+                    labels: ["Zurücksetzen", "C"],
+                    args: ["", 4],
+                    rowBlocks: [20],
+                    drums: ["kick drum"],
+                    colBlocks: [30]
+                });
+
+                expect(labels(pdm).map(cell => cell.dataset.noteArg)).toEqual(["C"]);
+                click(0, 0);
+                expect(pdm._blockMap).toEqual([[20, 30]]);
+            } finally {
+                global._ = s => s;
+            }
+        });
+
+        test("reopening skips a mapping whose pitch block is gone", () => {
+            let pdm;
+            expect(() => {
+                ({ pdm } = build({
+                    labels: ["C"],
+                    args: [4],
+                    rowBlocks: [21],
+                    drums: ["kick drum"],
+                    colBlocks: [30],
+                    blockMap: [[20, 30]]
+                }));
+            }).not.toThrow();
+            expect(jsdomDocument.getElementById("0,0").style.backgroundColor).toBe(
+                selectorBackground
+            );
+            expect(typeof jsdomDocument.getElementById("0,0").onclick).toBe("function");
+            expect(pdm._blockMap).toEqual([[20, 30]]);
+        });
+
+        test("picking another drum in a row replaces the old one without throwing", () => {
+            const { pdm } = build({
+                labels: ["C"],
+                args: [4],
+                rowBlocks: [20],
+                drums: ["kick drum", "snare drum"],
+                colBlocks: [30, 31]
+            });
+
+            click(0, 1);
+            expect(() => pdm._setCellPitchDrum(0, 0, true)).not.toThrow();
+
+            expect(pdm._blockMap).toEqual([[20, 30]]);
+            expect(jsdomDocument.getElementById("0,1").style.backgroundColor).toBe(
+                selectorBackground
+            );
+        });
+    });
+
+    describe("playback", () => {
+        test("clears the row highlights when it finishes", () => {
+            jest.useFakeTimers();
+            const { pdm } = threeRows();
+            click(0, 0);
+            click(1, 0);
+            click(2, 0);
+
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(1500);
+            expect(labels(pdm).map(cell => cell.style.backgroundColor)).toEqual([
+                labelColor,
+                selectorBackground,
+                labelColor
+            ]);
+
+            jest.advanceTimersByTime(3000);
+            expect(pdm._playing).toBe(false);
+            labels(pdm).forEach(cell => expect(cell.style.backgroundColor).toBe(labelColor));
+        });
+
+        test("clears the row highlights and stops the sound when stopped", () => {
+            jest.useFakeTimers();
+            const { pdm, activity } = threeRows();
+            click(0, 0);
+            click(1, 0);
+
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(1500);
+            activity.logo.synth.stop.mockClear();
+            pdm.playButton.onclick();
+
+            labels(pdm).forEach(cell => expect(cell.style.backgroundColor).toBe(labelColor));
+            expect(activity.logo.synth.stop).toHaveBeenCalled();
+        });
+
+        test("with nothing selected, stays stopped so the next Play starts", () => {
+            jest.useFakeTimers();
+            const { pdm, activity } = threeRows();
+
+            pdm.playButton.onclick();
+            expect(pdm._playing).toBe(false);
+
+            click(0, 0);
+            activity.logo.synth.trigger.mockClear();
+            pdm.playButton.onclick();
+            expect(pdm._playing).toBe(true);
+            expect(activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                0.125,
+                "default",
+                null,
+                null
+            );
+        });
+
+        test("restarting doesn't overlap the earlier run or end early", () => {
+            jest.useFakeTimers();
+            const { pdm, activity } = threeRows();
+            click(0, 0);
+            click(1, 0);
+            click(2, 0);
+
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(500);
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(100);
+            activity.logo.synth.trigger.mockClear();
+            pdm.playButton.onclick();
+
+            jest.advanceTimersByTime(2900);
+            expect(pdm._playing).toBe(true);
+            jest.advanceTimersByTime(200);
+            expect(pdm._playing).toBe(false);
+
+            const pitches = activity.logo.synth.trigger.mock.calls
+                .filter(call => call[3] === "default")
+                .map(call => call[1]);
+            expect(pitches).toEqual(["C4", "D4", "E4"]);
+        });
+
+        test("a stopped run doesn't play its delayed drum", () => {
+            jest.useFakeTimers();
+            const { pdm, activity } = threeRows();
+            click(0, 0);
+            // Let the click's own preview finish first.
+            jest.advanceTimersByTime(500);
+            activity.logo.synth.trigger.mockClear();
+
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(100);
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(1000);
+
+            const drums = activity.logo.synth.trigger.mock.calls.filter(
+                call => call[3] === "kick drum"
+            );
+            expect(drums).toEqual([]);
+        });
+
+        test("Clear stops the old mapping from playing", () => {
+            jest.useFakeTimers();
+            const { pdm, activity } = threeRows();
+            click(0, 0);
+            click(1, 0);
+            click(2, 0);
+
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(500);
+            pdm._clear();
+            activity.logo.synth.trigger.mockClear();
+            jest.advanceTimersByTime(4000);
+
+            expect(pdm._playing).toBe(false);
+            expect(activity.logo.synth.trigger).not.toHaveBeenCalled();
+            labels(pdm).forEach(cell => expect(cell.style.backgroundColor).toBe(labelColor));
+        });
+    });
+
+    describe("layout and state", () => {
+        test("restoring from full screen puts the outer div back", () => {
+            threeRows();
+            widgetWindow._maximized = true;
+            widgetWindow.onmaximize();
+            widgetWindow._maximized = false;
+            widgetWindow.onmaximize();
+
+            const outer = jsdomDocument.getElementById("pdmOuterDiv");
+            expect(outer.style.height).toBe("400px");
+            expect(outer.style.width).toBe("500px");
+        });
+
+        test("drum columns get a width in pixels", () => {
+            const { pdm } = threeRows();
+
+            expect(jsdomDocument.getElementById("0,0").style.width).toBe("50px");
+            expect(pdm._pdmDrumTable.rows[0].cells[0].style.width).toBe("50px");
+        });
+
+        test("toggling a cell off removes its mapping", () => {
+            const { pdm } = threeRows();
+            for (let i = 0; i < 5; i++) {
+                click(0, 0);
+                click(0, 0);
+            }
+            expect(pdm._blockMap).toEqual([]);
+
+            click(0, 0);
+            expect(pdm._blockMap).toEqual([[20, 30]]);
         });
     });
 });
