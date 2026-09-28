@@ -209,6 +209,18 @@ requirejs.config({
             ],
             exports: "MusicUtilsModeCore"
         },
+        "utils/musicutils-pitchscale": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modecore"
+            ],
+            exports: "MusicUtilsPitchScale"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
@@ -220,7 +232,8 @@ requirejs.config({
                 "utils/musicutils-rhythm",
                 "utils/musicutils-solfege",
                 "utils/musicutils-modewheel",
-                "utils/musicutils-modecore"
+                "utils/musicutils-modecore",
+                "utils/musicutils-pitchscale"
             ]
         },
         "utils/synthutils": {
