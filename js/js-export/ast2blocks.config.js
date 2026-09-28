@@ -24,6 +24,7 @@ window.ast2blocklist_config = {
                 "/": "divide",
                 "%": "mod",
                 "==": "equal",
+                "===": "equal",
                 "!=": "not_equal_to",
                 "<": "less",
                 ">": "greater",
@@ -120,7 +121,8 @@ window.ast2blocklist_config = {
                 doCalculateDistance: "distance",
                 doInt: "int",
                 doOneOf: "oneOf",
-                doRandom: "random"
+                doRandom: "random",
+                doXor: "xor"
             }
         },
         {

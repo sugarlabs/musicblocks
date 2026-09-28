@@ -630,6 +630,7 @@ class ASTUtils {
             greater: ["binexp", ">"],
             or: ["binexp", "||"],
             and: ["binexp", "&&"],
+            xor: ["method", "MathUtility.doXor"],
             not: ["unexp", "!"],
             neg: ["unexp", "-"],
             abs: ["method", "Math.abs"],
@@ -666,21 +667,6 @@ class ASTUtils {
                     name: `${methodName}`
                 },
                 arguments: ASTUtils._getArgsAST(args)
-            };
-        }
-
-        if (methodName === "xor") {
-            const [a, b] = ASTUtils._getArgsAST(args);
-            return {
-                type: "ConditionalExpression",
-                test: a,
-                consequent: {
-                    type: "UnaryExpression",
-                    operator: "!",
-                    argument: b,
-                    prefix: true
-                },
-                alternate: b
             };
         }
 

@@ -545,7 +545,7 @@ describe("ASTUtils", () => {
         it("should preserve XOR results when compared with Equal", () => {
             const compare = (left, right, expected) => {
                 const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
-                return new Function(`return ${astring.generate(ast)}`)();
+                return new Function("MathUtility", `return ${astring.generate(ast)}`)(MathUtility);
             };
 
             expect(compare("bool_true", "bool_false", "bool_true")).toBe(true);

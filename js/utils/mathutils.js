@@ -366,6 +366,18 @@ class MathUtility {
     }
 
     /**
+     * Matches the value returned by the XOR block.
+     *
+     * @static
+     * @param {*} a
+     * @param {*} b
+     * @returns {*}
+     */
+    static doXor(a, b) {
+        return a ? !b : b;
+    }
+
+    /**
      * Returns how many times a Repeat block runs its body for count a (see
      * RepeatBlock.flow): the count rounded down, or 0 when it is below 1 or
      * not a number. Exported JavaScript uses it as the for-loop bound, since

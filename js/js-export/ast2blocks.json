@@ -40,6 +40,7 @@
                 "/": "divide",
                 "%": "mod",
                 "==": "equal",
+                "===": "equal",
                 "!=": "not_equal_to",
                 "<": "less",
                 ">": "greater",
@@ -239,7 +240,8 @@
                 "doCalculateDistance": "distance",
                 "doInt": "int",
                 "doOneOf": "oneOf",
-                "doRandom": "random"
+                "doRandom": "random",
+                "doXor": "xor"
             }
         },
         {
