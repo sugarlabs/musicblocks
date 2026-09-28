@@ -129,11 +129,13 @@ If formatting fails, run `npx prettier --write .` to fix it.
 - Do not delete `package-lock.json` or add it to `.gitignore`.
 - Use `npm ci` for a clean install that matches the lockfile.
 - If your PR adds, removes, or updates a dependency in `package.json`, run `npm install` and commit the updated `package-lock.json` in the same PR.
-- If your PR does not change dependencies, it should not modify `package-lock.json`. Revert any unrelated changes before opening the PR:
+- If your PR does not change dependencies, it should not modify `package-lock.json`. To discard uncommitted lockfile changes, run:
 
 ```bash
-git checkout upstream/master -- package-lock.json
+git restore --staged --worktree package-lock.json
 ```
+
+If the change is already committed, restore the file from the `master` branch of `sugarlabs/musicblocks` (for example, `git checkout upstream/master -- package-lock.json`, using whichever remote points to the main repository) and commit the result.
 
 ### Developer Certificate of Origin (DCO)
 
