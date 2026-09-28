@@ -2122,6 +2122,7 @@ describe("TemperamentWidget import tests", () => {
 
         expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("mytuning", {
             pitchNumber: 2,
+            octaveRatio: 2,
             0: [1, "C", 4],
             1: [1.25, "C", 4]
         });

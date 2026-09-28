@@ -1305,7 +1305,7 @@ function TemperamentWidget() {
                 : that.scale;
             that.scaleNotes = buildScale(that.scale);
             that.scaleNotes = that.scaleNotes[0];
-            that.powerBase = 2;
+            that.powerBase = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
 
             const startingPitch = that._logo.synth.startingPitch;
             that.notes = [];
@@ -2629,7 +2629,11 @@ function TemperamentWidget() {
     this._temperamentExportData = function () {
         const ratios = [];
         for (let i = 0; i <= this.pitchNumber; i++) {
-            const ratio = Number(this.ratios[i]);
+            let raw = this.ratios[i];
+            if (i === this.pitchNumber && !isFinite(Number(raw))) {
+                raw = this.powerBase;
+            }
+            const ratio = Number(raw);
             if (!isFinite(ratio)) {
                 this.activity.errorMsg(_("No temperament to export."), 3000);
                 return null;
@@ -2737,6 +2741,7 @@ function TemperamentWidget() {
             let name;
             let pitchNumber;
             let ratios;
+            let referenceFrequency;
 
             if (ext.endsWith(".json")) {
                 let def;
@@ -2749,6 +2754,39 @@ function TemperamentWidget() {
                 pitchNumber = def.pitchNumber;
                 ratios = def.ratios;
                 name = def.name || data.file.name.replace(/\.json$/i, "") || "custom";
+                if (typeof def.referencePitch === "string" && def.referencePitch !== "") {
+                    try {
+                        const parsed = parseNoteString(def.referencePitch);
+                        if (parsed && Number.isFinite(Number(parsed[1]))) {
+                            let resolved;
+                            if (
+                                this._logo &&
+                                this._logo.synth &&
+                                typeof this._logo.synth._getFrequency === "function"
+                            ) {
+                                resolved = this._logo.synth._getFrequency(
+                                    def.referencePitch,
+                                    false,
+                                    this.inTemperament
+                                );
+                            }
+                            if (!Number.isFinite(Number(resolved))) {
+                                resolved = pitchToFrequency(
+                                    parsed[0],
+                                    Number(parsed[1]),
+                                    0,
+                                    "c major",
+                                    this.inTemperament
+                                );
+                            }
+                            if (Number.isFinite(Number(resolved)) && Number(resolved) > 0) {
+                                referenceFrequency = Number(resolved);
+                            }
+                        }
+                    } catch (e) {
+                        // Fall through to the widget's current reference frequency.
+                    }
+                }
             } else if (ext.endsWith(".scl")) {
                 let result;
                 try {
@@ -2777,7 +2815,7 @@ function TemperamentWidget() {
                 return;
             }
 
-            this._registerImportedTemperament(name, pitchNumber, ratios);
+            this._registerImportedTemperament(name, pitchNumber, ratios, referenceFrequency);
         });
     };
 
@@ -2788,20 +2826,25 @@ function TemperamentWidget() {
      * @param {number} pitchNumber - The number of pitches per period.
      * @param {number} ratios - Length pitchNumber + 1, with ratios[0] the
      * unison and ratios[pitchNumber] the period.
+     * @param {number} [startHz] - Reference frequency for pitch labels;
+     * falls back to the widget's current first frequency.
      * @returns {boolean} True when the temperament was registered.
      */
-    this._registerImportedTemperament = function (name, pitchNumber, ratios) {
+    this._registerImportedTemperament = function (name, pitchNumber, ratios, startHz) {
         if (isUnsafeObjectKey(name)) {
             this.activity.errorMsg(_("Invalid temperament name."), 3000);
             return false;
         }
 
-        if (getTemperament(name) !== undefined && !isCustomTemperament(name)) {
+        while (getTemperament(name) !== undefined) {
             name = name + " (imported)";
         }
 
-        const startHz = Number(this.frequencies[0]);
-        if (!isFinite(startHz) || startHz <= 0) {
+        const resolvedHz =
+            Number.isFinite(Number(startHz)) && Number(startHz) > 0
+                ? Number(startHz)
+                : Number(this.frequencies[0]);
+        if (!isFinite(resolvedHz) || resolvedHz <= 0) {
             this.activity.errorMsg(_("Cannot import: no reference frequency."), 3000);
             return false;
         }
@@ -2812,9 +2855,9 @@ function TemperamentWidget() {
             return false;
         }
 
-        const entry = { pitchNumber: pitchNumber };
+        const entry = { pitchNumber: pitchNumber, octaveRatio: period };
         for (let i = 0; i < pitchNumber; i++) {
-            const pitch = frequencyToPitch(ratios[i] * startHz);
+            const pitch = frequencyToPitch(ratios[i] * resolvedHz);
             entry["" + i] = [ratios[i], pitch[0], pitch[1]];
         }
 
