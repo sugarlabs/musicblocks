@@ -897,7 +897,8 @@ class Singer {
                 tur.singer.lastPitch.push(pitchNumber);
             }
         } else if (activity.logo.inPitchDrumMatrix) {
-            if (note.toLowerCase() !== "rest") {
+            // A pitch inside Set Drum becomes a drum column, not a row.
+            if (note.toLowerCase() !== "rest" && tur.singer.drumStyle.length === 0) {
                 activity.logo.pitchDrumMatrix.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
                     activity.logo.pitchBlocks.push(blk);
@@ -938,6 +939,7 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    activity.logo.pitchDrumMatrix.addColBlock(blk);
                 } else {
                     activity.logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
                     activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);

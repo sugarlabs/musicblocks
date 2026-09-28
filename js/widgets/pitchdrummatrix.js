@@ -237,7 +237,7 @@ class PitchDrumMatrix {
         let pdmRow;
         let pdmCellTable;
         for (let i = 0; i < this.rowLabels.length; i++) {
-            if (this.rowLabels[i].toLowerCase() === _("rest")) {
+            if (this.rowLabels[i].toLowerCase() === _("rest").toLowerCase()) {
                 // In case there are rest notes included.
                 this._rests += 1;
                 continue;
@@ -262,12 +262,12 @@ class PitchDrumMatrix {
             labelCell.style.minWidth = 0;
             labelCell.style.maxWidth = 0;
             labelCell.className = "headcol";
-            labelCell.textContent = this.rowLabels[j];
+            labelCell.textContent = this.rowLabels[i];
             const sub = document.createElement("sub");
-            sub.textContent = this.rowArgs[j].toString();
+            sub.textContent = this.rowArgs[i].toString();
             labelCell.appendChild(sub);
-            labelCell.dataset.noteArg = this.rowLabels[j];
-            labelCell.dataset.octave = this.rowArgs[j].toString();
+            labelCell.dataset.noteArg = this.rowLabels[i];
+            labelCell.dataset.octave = this.rowArgs[i].toString();
             labelCell.style.position = "sticky";
             labelCell.style.left = "0";
             labelCell.style.top = "0";
@@ -591,7 +591,7 @@ class PitchDrumMatrix {
                     }
                 }
 
-                if (col === -1) {
+                if (row === -1 || col === -1) {
                     continue;
                 }
 
@@ -804,7 +804,6 @@ class PitchDrumMatrix {
         let drumBlock;
         let cell;
         if (playNote) {
-            let obj;
             for (let i = 0; i < row.cells.length; i++) {
                 if (i === coli) {
                     continue;
@@ -816,8 +815,6 @@ class PitchDrumMatrix {
                     drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
                     cell.style.backgroundColor = platformColor.selectorBackground;
-                    obj = cell.id.split(","); // row,column
-                    this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
                 }
             }
         }

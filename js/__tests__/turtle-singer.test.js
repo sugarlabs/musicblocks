@@ -1462,6 +1462,64 @@ describe("processPitch music keyboard with movable Do", () => {
     });
 });
 
+describe("processPitch in the pitch-drum matrix", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    const setup = drumStyle => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.drumStyle = drumStyle;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inPitchDrumMatrix = true;
+        activityMock.logo.pitchBlocks = [];
+        activityMock.logo.pitchDrumMatrix = {
+            rowLabels: [],
+            rowArgs: [],
+            drums: [],
+            addRowBlock: jest.fn(),
+            addColBlock: jest.fn()
+        };
+        return activityMock;
+    };
+
+    test("a pitch becomes a row tied to its block", () => {
+        const activityMock = setup([]);
+
+        Singer.processPitch(activityMock, "sol", 4, 0, 0, "blk");
+
+        const pdm = activityMock.logo.pitchDrumMatrix;
+        expect(pdm.rowLabels).toEqual(["sol"]);
+        expect(pdm.addRowBlock).toHaveBeenCalledWith("blk");
+        expect(pdm.addColBlock).not.toHaveBeenCalled();
+    });
+
+    // A pitch inside Set Drum is a drum column, so it must not add a row block
+    // (the rows would shift) and must add a column block (the columns would).
+    test("a pitch inside Set Drum becomes a column tied to its block", () => {
+        const activityMock = setup(["snare drum"]);
+
+        Singer.processPitch(activityMock, "sol", 4, 0, 0, "blk");
+
+        const pdm = activityMock.logo.pitchDrumMatrix;
+        expect(pdm.drums).toEqual(["snare drum"]);
+        expect(pdm.rowLabels).toEqual([]);
+        expect(pdm.addColBlock).toHaveBeenCalledWith("blk");
+        expect(pdm.addRowBlock).not.toHaveBeenCalled();
+    });
+});
+
 describe("processPitch internal addPitch behavior", () => {
     let turtleMock;
     let activityMock;
