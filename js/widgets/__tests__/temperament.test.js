@@ -33,6 +33,7 @@ const seedImportState = widget => {
     widget._logo = { customTemperamentDefined: false, synth: { startingPitch: "C4" } };
     widget.activity = {
         errorMsg: jest.fn(),
+        textMsg: jest.fn(),
         blocks: {
             protoBlockDict: { custompitch: { hidden: true } },
             palettes: { updatePalettes: jest.fn() }
@@ -2046,7 +2047,7 @@ describe("TemperamentWidget import tests", () => {
         expect(widget.activity.blocks.palettes.updatePalettes).toHaveBeenCalledWith("pitch");
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
         expect(widget._loadTemperament).toHaveBeenCalledWith("mytuning");
-        expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+        expect(widget.activity.textMsg).toHaveBeenCalledWith(
             expect.stringContaining("Temperament imported: mytuning"),
             3000
         );

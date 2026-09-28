@@ -2844,7 +2844,7 @@ function TemperamentWidget() {
 
         this._loadTemperament(name);
 
-        this.activity.errorMsg(_("Temperament imported: ") + name, 3000);
+        this.activity.textMsg(_("Temperament imported: ") + name, 3000);
         return true;
     };
 

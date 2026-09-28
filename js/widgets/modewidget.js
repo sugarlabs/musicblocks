@@ -1592,7 +1592,7 @@ class ModeWidget {
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
         this._selectedModeName = name;
-        this.errorMsg(_("Mode imported: ") + name);
+        this.textMsg(_("Mode imported: ") + name, 3000);
         this._updateModeDisplay(name);
         if (this._modeBlock !== null) {
             const modeBlock = this.blocks.blockList[this._modeBlock];
