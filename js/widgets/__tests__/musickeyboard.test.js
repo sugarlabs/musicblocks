@@ -1583,26 +1583,14 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
     test("triggers shiftOctave on Shift+ArrowUp and Shift+ArrowDown keydown events", () => {
         const keyboard = new MusicKeyboard({});
         keyboard.shiftOctave = jest.fn();
-
-        const __keyboarddown = event => {
-            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
-                event.preventDefault();
-                keyboard.shiftOctave(1);
-                return;
-            }
-            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
-                event.preventDefault();
-                keyboard.shiftOctave(-1);
-                return;
-            }
-        };
+        keyboard.addKeyboardShortcuts();
 
         const eventUp = {
             shiftKey: true,
             key: "ArrowUp",
             preventDefault: jest.fn()
         };
-        __keyboarddown(eventUp);
+        document.onkeydown(eventUp);
         expect(keyboard.shiftOctave).toHaveBeenCalledWith(1);
         expect(eventUp.preventDefault).toHaveBeenCalled();
 
@@ -1611,9 +1599,37 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
             key: "ArrowDown",
             preventDefault: jest.fn()
         };
-        __keyboarddown(eventDown);
+        document.onkeydown(eventDown);
         expect(keyboard.shiftOctave).toHaveBeenCalledWith(-1);
         expect(eventDown.preventDefault).toHaveBeenCalled();
+    });
+
+    test("does not intercept keyboard input while editing text", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.shiftOctave = jest.fn();
+        keyboard.addKeyboardShortcuts();
+
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        input.focus();
+        const event = {
+            shiftKey: true,
+            key: "ArrowUp",
+            keyCode: 38,
+            preventDefault: jest.fn()
+        };
+
+        document.onkeydown(event);
+        document.onkeyup(event);
+
+        expect(keyboard.shiftOctave).not.toHaveBeenCalled();
+        expect(event.preventDefault).not.toHaveBeenCalled();
+
+        const noteEvent = { key: "s", keyCode: 83 };
+        document.onkeydown(noteEvent);
+        document.onkeyup(noteEvent);
+
+        expect(keyboard._notesPlayed).toEqual([]);
     });
 
     test("shiftOctave updates DOM elements attributes and text nodes", () => {
