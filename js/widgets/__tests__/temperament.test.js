@@ -1,6 +1,52 @@
 const ManagedTimer = require("../../utils/ManagedTimer");
 global.ManagedTimer = ManagedTimer;
 const TemperamentWidget = require("../temperament");
+global.TuningFormats = require("../../utils/tuningformats");
+global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
+const DomHelpers = require("../../utils/dom-helpers");
+global.downloadTextFile = DomHelpers.downloadTextFile;
+global.createSharePopup = DomHelpers.createSharePopup;
+global.closeSharePopup = DomHelpers.closeSharePopup;
+
+const setupImportGlobals = () => {
+    global._ = jest.fn(text => text);
+    global.getTemperament = jest.fn(() => undefined);
+    global.isCustomTemperament = jest.fn(() => false);
+    global.addTemperamentToDictionary = jest.fn();
+    global.updateTemperaments = jest.fn();
+    global.setOctaveRatio = jest.fn();
+    global.frequencyToPitch = jest.fn(() => ["C", 4]);
+    global.pitchToFrequency = jest.fn(() => 440);
+    global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
+    global.Singer = { clearPitchToFrequencyCache: jest.fn() };
+};
+
+const seedImportState = widget => {
+    widget.inTemperament = "mytuning";
+    widget.pitchNumber = 5;
+    widget.ratios = [1, 1.2, 1.4, 1.6, 1.8, 2];
+    widget.intervals = [];
+    for (let i = 0; i <= 5; i++) {
+        widget.intervals.push("perfect " + (i + 1));
+    }
+    widget.frequencies = [440];
+    widget._logo = { customTemperamentDefined: false, synth: { startingPitch: "C4" } };
+    widget.activity = {
+        errorMsg: jest.fn(),
+        textMsg: jest.fn(),
+        blocks: {
+            protoBlockDict: { custompitch: { hidden: true } },
+            palettes: { updatePalettes: jest.fn() }
+        }
+    };
+    widget._loadTemperament = jest.fn();
+};
+
+const feedFile = (widget, name, text) => {
+    global.readTextFile = jest.fn((_inputId, cb) => {
+        cb(null, { text: text, file: { name: name, size: text.length } });
+    });
+};
 describe("TemperamentWidget basic tests", () => {
     let widget;
     const createMockElement = id => ({
@@ -902,6 +948,7 @@ describe("TemperamentWidget basic tests", () => {
             }
         };
 
+        widget.activity.textMsg = jest.fn();
         widget._save();
 
         // saving a redefined custom temperament under the same name must
@@ -911,6 +958,7 @@ describe("TemperamentWidget basic tests", () => {
         // since _save recomputes note/ratio entries from this.ratios.
         expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("custom1", {
             pitchNumber: 2,
+            octaveRatio: 2,
             0: [1, "C", 4],
             1: [2, "C", 4]
         });
@@ -966,6 +1014,7 @@ describe("TemperamentWidget basic tests", () => {
         // Redefine "custom1" with a different tuning, then save under the
         // same name.
         global.pitchToFrequency = jest.fn(() => 466.16);
+        widget.activity.textMsg = jest.fn();
         widget._save();
 
         // The same pitch, under the same temperament name, must now recompute
@@ -1204,6 +1253,7 @@ describe("TemperamentWidget basic tests", () => {
                 addButton: jest.fn(() => ({
                     onclick: null,
                     style: {},
+                    getBoundingClientRect: jest.fn(() => ({ left: 0, bottom: 0 })),
                     getElementsByTagName: jest.fn(() => [createMockElement("img")])
                 })),
                 sendToCenter: jest.fn(),
@@ -1250,6 +1300,13 @@ describe("TemperamentWidget basic tests", () => {
         });
 
         afterEach(() => {
+            const popup = document.getElementById("temperamentSharePopup");
+            if (popup) {
+                if (popup._closeHandler) {
+                    document.removeEventListener("mousedown", popup._closeHandler);
+                }
+                popup.remove();
+            }
             if (widgetBody && widgetBody.parentNode) {
                 widgetBody.parentNode.removeChild(widgetBody);
             }
@@ -1865,5 +1922,170 @@ describe("TemperamentWidget basic tests", () => {
 
             expect(widget._playAll).toHaveBeenCalledTimes(1);
         });
+    });
+});
+
+describe("TemperamentWidget export tests", () => {
+    let widget;
+
+    const seedExportState = () => {
+        widget.inTemperament = "custom1";
+        widget.pitchNumber = 12;
+        widget.ratios = [1];
+        for (let i = 1; i <= 12; i++) {
+            widget.ratios.push(Math.pow(2, i / 12));
+        }
+        widget.intervals = [];
+        for (let i = 0; i <= 12; i++) {
+            widget.intervals.push("perfect " + (i + 1));
+        }
+        widget.notes = [];
+        for (let i = 0; i <= 12; i++) {
+            widget.notes.push(["C", 4]);
+        }
+        widget._logo = { synth: { startingPitch: "C4" } };
+        widget.activity = { errorMsg: jest.fn() };
+    };
+
+    beforeEach(() => {
+        widget = new TemperamentWidget();
+        global._ = jest.fn(text => text);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("_temperamentExportData returns null and errors when ratios are missing", () => {
+        seedExportState();
+        delete widget.ratios[5];
+
+        const data = widget._temperamentExportData();
+
+        expect(data).toBeNull();
+        expect(widget.activity.errorMsg).toHaveBeenCalledWith("No temperament to export.", 3000);
+    });
+
+    test("_exportJson downloads JSON with exact schema fields", () => {
+        seedExportState();
+        const downloadSpy = jest.spyOn(global, "downloadTextFile").mockImplementation(() => {});
+
+        widget._exportJson();
+
+        expect(downloadSpy).toHaveBeenCalledTimes(1);
+        expect(downloadSpy.mock.calls[0][1]).toBe("temperament-custom1.json");
+        const parsed = JSON.parse(downloadSpy.mock.calls[0][0]);
+        expect(parsed).toEqual({
+            name: "custom1",
+            pitchNumber: 12,
+            referencePitch: "C4",
+            interval: widget.intervals,
+            ratios: widget.ratios
+        });
+        expect(Object.keys(parsed).sort()).toEqual([
+            "interval",
+            "name",
+            "pitchNumber",
+            "ratios",
+            "referencePitch"
+        ]);
+    });
+
+    test("_exportScl writes absolute cents independent of the tuning period", () => {
+        widget.inTemperament = "custom3";
+        widget.pitchNumber = 2;
+        widget.ratios = [1, 1.5, 3];
+        widget.intervals = ["perfect 1", "perfect 2", "perfect 3"];
+        widget.notes = [
+            ["C", 4],
+            ["C", 4],
+            ["C", 4]
+        ];
+        widget._logo = { synth: { startingPitch: "C4" } };
+        widget.activity = { errorMsg: jest.fn() };
+        const downloadSpy = jest.spyOn(global, "downloadTextFile").mockImplementation(() => {});
+
+        widget._exportScl();
+
+        const lines = downloadSpy.mock.calls[0][0].split("\n");
+        expect(lines[3]).toBe("2");
+        expect(lines.slice(4, 6)).toEqual([
+            (1200 * Math.log2(1.5)).toFixed(2),
+            (1200 * Math.log2(3)).toFixed(2)
+        ]);
+    });
+});
+
+describe("TemperamentWidget import tests", () => {
+    let widget;
+
+    beforeEach(() => {
+        widget = new TemperamentWidget();
+        setupImportGlobals();
+    });
+
+    test("_importFile registers an imported .json temperament and applies it", () => {
+        seedImportState(widget);
+        feedFile(
+            widget,
+            "mytuning.json",
+            JSON.stringify({ name: "mytuning", pitchNumber: 2, ratios: [1, 1.25, 2] })
+        );
+
+        widget._importFile();
+
+        expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("mytuning", {
+            pitchNumber: 2,
+            octaveRatio: 2,
+            0: [1, "C", 4],
+            1: [1.25, "C", 4]
+        });
+        expect(global.updateTemperaments).toHaveBeenCalled();
+        expect(global.setOctaveRatio).toHaveBeenCalledWith(2);
+        expect(widget._logo.customTemperamentDefined).toBe(true);
+        expect(widget.activity.blocks.protoBlockDict.custompitch.hidden).toBe(false);
+        expect(widget.activity.blocks.palettes.updatePalettes).toHaveBeenCalledWith("pitch");
+        expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
+        expect(widget._loadTemperament).toHaveBeenCalledWith("mytuning");
+        expect(widget.activity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Temperament imported: mytuning"),
+            3000
+        );
+    });
+
+    test("_importFile resolves referencePitch against equal temperament regardless of selection", () => {
+        seedImportState(widget);
+        widget.inTemperament = "just intonation";
+        feedFile(
+            widget,
+            "mytuning.json",
+            JSON.stringify({
+                name: "mytuning",
+                pitchNumber: 2,
+                ratios: [1, 1.25, 2],
+                referencePitch: "A4"
+            })
+        );
+
+        widget._importFile();
+
+        expect(global.pitchToFrequency).toHaveBeenCalledWith("A", 4, 0, "c major", "equal");
+    });
+
+    test("_importFile rejects unsafe temperament names", () => {
+        seedImportState(widget);
+        feedFile(
+            widget,
+            "__proto__.json",
+            JSON.stringify({ name: "__proto__", pitchNumber: 2, ratios: [1, 1.25, 2] })
+        );
+
+        widget._importFile();
+
+        expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Invalid temperament name."),
+            3000
+        );
+        expect(global.addTemperamentToDictionary).not.toHaveBeenCalled();
     });
 });
