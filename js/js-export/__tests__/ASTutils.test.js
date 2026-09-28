@@ -993,7 +993,8 @@ describe("ASTUtils", () => {
             ["do", "_do"],
             ["delete", "_delete"],
             ["mouse", "_mouse"],
-            ["Math", "_Math"]
+            ["Math", "_Math"],
+            ["", "_"]
         ])("exports %p as %p, defined and called the same way", (name, identifier) => {
             const { defined, called } = exportAction(name);
             expect(defined).toBe(identifier);
