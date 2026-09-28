@@ -531,6 +531,28 @@ describe("ASTUtils", () => {
             });
         });
 
+        it("should preserve strict equality semantics in exported code", () => {
+            const result = ASTUtils._getArgExpAST("equal", [1, "1"]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 1 },
+                right: { type: "Literal", value: "1" },
+                operator: "==="
+            });
+        });
+
+        it("should preserve XOR results when compared with Equal", () => {
+            const compare = (left, right, expected) => {
+                const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
+                return new Function("MathUtility", `return ${astring.generate(ast)}`)(MathUtility);
+            };
+
+            expect(compare("bool_true", "bool_false", "bool_true")).toBe(true);
+            expect(compare(1, 2, "bool_false")).toBe(true);
+            expect(compare(0, 2, 2)).toBe(true);
+        });
+
         it("should return the AST for a unary expression", () => {
             const methodName = "not";
             const args = ["arg1"];

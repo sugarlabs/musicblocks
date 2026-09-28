@@ -166,6 +166,35 @@ describe("AST2BlockList Class", () => {
         }
     });
 
+    test.each([
+        [
+            "xor",
+            ["bool_true", "bool_false"],
+            ["start", "print", "xor", "boolean", "boolean", "vspace"]
+        ],
+        ["equal", [1, "1"], ["start", "print", "equal", "number", "text", "vspace"]]
+    ])("should convert exported %s back to blocks", (methodName, args, expected) => {
+        const ASTUtils = require("../ASTutils");
+        const astring = require("../../../lib/astring.min");
+        global.JSInterface = require("../interface");
+        let expression;
+        try {
+            expression = astring.generate(ASTUtils._getArgExpAST(methodName, args));
+        } finally {
+            delete global.JSInterface;
+        }
+
+        const code = `new Mouse(async mouse => {
+            await mouse.print(${expression});
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const blocks = AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+        expect(blocks.map(([, block]) => (Array.isArray(block) ? block[0] : block))).toEqual(
+            expected
+        );
+    });
+
     // A for loop only becomes a Repeat block when the block would run it the
     // same number of times (#8910).
     describe("Repeat and for loops", () => {
