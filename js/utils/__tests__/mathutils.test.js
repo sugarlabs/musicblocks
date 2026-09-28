@@ -602,20 +602,32 @@ describe("MathUtility", () => {
             expect(MathUtility.doInt(4.4)).toBe(4);
         });
 
-        test("rounds up for .5", () => {
+        test("rounds up for .5 (positive half-point)", () => {
             expect(MathUtility.doInt(4.5)).toBe(5);
+            expect(MathUtility.doInt(2.5)).toBe(3);
         });
 
         test("handles already integer value", () => {
             expect(MathUtility.doInt(5)).toBe(5);
         });
 
-        test("handles negative with rounding up (towards zero)", () => {
+        test("handles negative with rounding up (towards zero) for .4", () => {
             expect(MathUtility.doInt(-4.4)).toBe(-4);
         });
 
-        test("handles negative with rounding down (away from zero)", () => {
+        test("handles negative with rounding down (away from zero) for .6", () => {
             expect(MathUtility.doInt(-4.6)).toBe(-5);
+        });
+
+        // Regression: half-point negatives must round away from zero (symmetric)
+        // Old formula `Math.floor(n + 0.5)` gave -2 for -2.5 and 0 for -0.5,
+        // which is asymmetric with the positive behaviour (2.5 → 3, 0.5 → 1).
+        test("rounds -2.5 away from zero to -3 (symmetric with +2.5 → 3)", () => {
+            expect(MathUtility.doInt(-2.5)).toBe(-3);
+        });
+
+        test("rounds -0.5 away from zero to -1 (symmetric with +0.5 → 1)", () => {
+            expect(MathUtility.doInt(-0.5)).toBe(-1);
         });
 
         test("handles zero", () => {
