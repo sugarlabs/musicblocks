@@ -1507,7 +1507,16 @@ function MusicKeyboard(activity) {
                 return true;
             }
 
-            this.remove.push(item.blockNumber);
+            if (
+                item.blockNumber !== undefined &&
+                item.blockNumber !== null &&
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.blockList &&
+                this.activity.blocks.blockList[item.blockNumber]
+            ) {
+                this.remove.push(item.blockNumber);
+            }
             return false;
         });
 
@@ -2637,29 +2646,55 @@ function MusicKeyboard(activity) {
      * @param {number} blockNo - The block number of the pitch block to be removed.
      */
     this._removePitchBlock = function (blockNo) {
-        const c0 = this.activity.blocks.blockList[blockNo].connections[0];
-        const c1 = last(this.activity.blocks.blockList[blockNo].connections);
-        if (this.activity.blocks.blockList[c0].name === "musickeyboard") {
-            this.activity.blocks.blockList[c0].connections[1] = c1;
-        } else {
-            this.activity.blocks.blockList[c0].connections[
-                this.activity.blocks.blockList[c0].connections.length - 1
-            ] = c1;
+        if (
+            blockNo === undefined ||
+            blockNo === null ||
+            !this.activity ||
+            !this.activity.blocks ||
+            !this.activity.blocks.blockList
+        ) {
+            return;
         }
 
-        if (c1) {
-            this.activity.blocks.blockList[c1].connections[0] = c0;
+        const block = this.activity.blocks.blockList[blockNo];
+        if (!block || !Array.isArray(block.connections) || block.connections.length === 0) {
+            return;
         }
 
-        this.activity.blocks.blockList[blockNo].connections[
-            this.activity.blocks.blockList[blockNo].connections.length - 1
-        ] = null;
-        this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
+        const c0 = block.connections[0];
+        const c1 = last(block.connections);
+        if (c0 !== null && c0 !== undefined && this.activity.blocks.blockList[c0]) {
+            const parentBlock = this.activity.blocks.blockList[c0];
+            if (parentBlock.name === "musickeyboard") {
+                parentBlock.connections[1] = c1;
+            } else if (
+                Array.isArray(parentBlock.connections) &&
+                parentBlock.connections.length > 0
+            ) {
+                parentBlock.connections[parentBlock.connections.length - 1] = c1;
+            }
+        }
+
+        if (c1 !== null && c1 !== undefined && this.activity.blocks.blockList[c1]) {
+            const childBlock = this.activity.blocks.blockList[c1];
+            if (Array.isArray(childBlock.connections) && childBlock.connections.length > 0) {
+                childBlock.connections[0] = c0;
+            }
+        }
+
+        block.connections[block.connections.length - 1] = null;
+        this.activity.blocks.sendStackToTrash(block);
         if (this.blockNo !== undefined && this.blockNo !== null) {
-            this.activity.blocks.adjustDocks(this.blockNo, true);
-            this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+            if (typeof this.activity.blocks.adjustDocks === "function") {
+                this.activity.blocks.adjustDocks(this.blockNo, true);
+            }
+            if (Array.isArray(this.activity.blocks.clampBlocksToCheck)) {
+                this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+            }
         }
-        this.activity.refreshCanvas();
+        if (typeof this.activity.refreshCanvas === "function") {
+            this.activity.refreshCanvas();
+        }
     };
 
     /**

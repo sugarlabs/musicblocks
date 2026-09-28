@@ -1316,6 +1316,66 @@ describe("MusicKeyboard core logic", () => {
             expect(keyboard.activity.blocks.clampBlocksToCheck).toEqual([[2, 0]]);
             expect(refreshCanvas).toHaveBeenCalled();
         });
+
+        test("safely ignores undefined, null, or missing block without throwing", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            keyboard.activity = {
+                blocks: {
+                    blockList: {},
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            expect(() => keyboard._removePitchBlock(undefined)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(null)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(1000005)).not.toThrow();
+            expect(sendStackToTrash).not.toHaveBeenCalled();
+        });
+
+        test("safely ignores block with invalid or empty connections", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            keyboard.activity = {
+                blocks: {
+                    blockList: {
+                        5: { connections: [] },
+                        6: { connections: null }
+                    },
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            expect(() => keyboard._removePitchBlock(5)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(6)).not.toThrow();
+            expect(sendStackToTrash).not.toHaveBeenCalled();
+        });
+
+        test("safely handles non-existent parent or child block connections", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            const blockList = {
+                10: { connections: [999, 888] }
+            };
+            keyboard.activity = {
+                blocks: {
+                    blockList,
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            expect(() => keyboard._removePitchBlock(10)).not.toThrow();
+            expect(sendStackToTrash).toHaveBeenCalledWith(blockList[10]);
+        });
     });
 
     describe("_roundNoteDuration", () => {
