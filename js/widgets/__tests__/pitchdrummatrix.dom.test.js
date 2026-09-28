@@ -112,6 +112,18 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(labels(pdm).map(cell => cell.textContent)).toEqual(["C4", "D4", "E4"]);
         });
 
+        test("a rest written as R is skipped too", () => {
+            const { pdm } = build({
+                labels: ["R", "C"],
+                args: ["", 4],
+                rowBlocks: [20],
+                drums: ["kick drum"],
+                colBlocks: [30]
+            });
+
+            expect(labels(pdm).map(cell => cell.dataset.noteArg)).toEqual(["C"]);
+        });
+
         test("a rest is skipped when its translation isn't lower case", () => {
             global._ = s => (s === "rest" ? "Zurücksetzen" : s);
             try {
@@ -243,6 +255,25 @@ describe("PitchDrumMatrix with a real DOM", () => {
                 .filter(call => call[3] === "default")
                 .map(call => call[1]);
             expect(pitches).toEqual(["C4", "D4", "E4"]);
+        });
+
+        test("a stopped run doesn't play its delayed drum", () => {
+            jest.useFakeTimers();
+            const { pdm, activity } = threeRows();
+            click(0, 0);
+            // Let the click's own preview finish first.
+            jest.advanceTimersByTime(500);
+            activity.logo.synth.trigger.mockClear();
+
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(100);
+            pdm.playButton.onclick();
+            jest.advanceTimersByTime(1000);
+
+            const drums = activity.logo.synth.trigger.mock.calls.filter(
+                call => call[3] === "kick drum"
+            );
+            expect(drums).toEqual([]);
         });
 
         test("Clear stops the old mapping from playing", () => {

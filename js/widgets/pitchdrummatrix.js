@@ -240,7 +240,10 @@ class PitchDrumMatrix {
         let pdmRow;
         let pdmCellTable;
         for (let i = 0; i < this.rowLabels.length; i++) {
-            if (this.rowLabels[i].toLowerCase() === _("rest").toLowerCase()) {
+            // getNote turns both "rest" and "r" into a rest, and the label can be
+            // translated.
+            const label = this.rowLabels[i].toLowerCase();
+            if (label === _("rest").toLowerCase() || label === "rest" || label === "r") {
                 // In case there are rest notes included.
                 this._rests += 1;
                 continue;
@@ -768,7 +771,7 @@ class PitchDrumMatrix {
 
         if (pairs[i][1] !== -1) {
             const cell = this._pdmCellTables[i].rows[0].cells[pairs[i][1]];
-            this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
+            this._setPairCell(pairs[i][0], pairs[i][1], cell, true, run);
         }
 
         if (i < pairs.length - 1) {
@@ -847,9 +850,11 @@ class PitchDrumMatrix {
      * @param {number} colIndex - The column index of the cell.
      * @param {HTMLElement} cell - The HTML element representing the matrix cell.
      * @param {boolean} playNote - A flag indicating whether to play the note or not.
+     * @param {number|null} [run] - The playback run when called from playback, so a stopped
+     *     run doesn't play its delayed drum. Omitted for clicks in the grid.
      * @returns {void}
      */
-    _setPairCell(rowIndex, colIndex, cell, playNote) {
+    _setPairCell(rowIndex, colIndex, cell, playNote, run = null) {
         const pdmTable = this._pdmTable;
         let row = pdmTable.rows[rowIndex];
         const noteArg = row.cells[0].dataset.noteArg;
@@ -883,6 +888,9 @@ class PitchDrumMatrix {
             );
 
             this.widgetWindow.timerManager.setTimeout(() => {
+                if (run !== null && (!this._playing || run !== this._playRun)) {
+                    return;
+                }
                 this.activity.logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
         }

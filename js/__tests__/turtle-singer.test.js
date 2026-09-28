@@ -1505,6 +1505,14 @@ describe("processPitch in the pitch-drum matrix", () => {
         expect(pdm.addColBlock).not.toHaveBeenCalled();
     });
 
+    test("a rest written as R doesn't add a row block", () => {
+        const activityMock = setup([]);
+
+        Singer.processPitch(activityMock, "R", 4, 0, 0, "blk");
+
+        expect(activityMock.logo.pitchDrumMatrix.addRowBlock).not.toHaveBeenCalled();
+    });
+
     // A pitch inside Set Drum is a drum column, so it must not add a row block
     // (the rows would shift) and must add a column block (the columns would).
     test("a pitch inside Set Drum becomes a column tied to its block", () => {

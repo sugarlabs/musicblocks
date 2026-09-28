@@ -476,12 +476,24 @@ describe("PitchDrumMatrix Widget", () => {
             );
 
             expect(pdm._setPairCell).toHaveBeenCalledTimes(1);
-            expect(pdm._setPairCell).toHaveBeenCalledWith(0, 0, expect.anything(), true);
+            expect(pdm._setPairCell).toHaveBeenCalledWith(
+                0,
+                0,
+                expect.anything(),
+                true,
+                pdm._playRun
+            );
 
             jest.advanceTimersByTime(1000);
 
             expect(pdm._setPairCell).toHaveBeenCalledTimes(2);
-            expect(pdm._setPairCell).toHaveBeenCalledWith(1, 0, expect.anything(), true);
+            expect(pdm._setPairCell).toHaveBeenCalledWith(
+                1,
+                0,
+                expect.anything(),
+                true,
+                pdm._playRun
+            );
 
             jest.useRealTimers();
         });
