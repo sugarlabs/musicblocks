@@ -200,6 +200,15 @@ requirejs.config({
             deps: ["utils/utils", "utils/musicutils-constants"],
             exports: "MusicUtilsModeWheel"
         },
+        "utils/musicutils-modecore": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch"
+            ],
+            exports: "MusicUtilsModeCore"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
@@ -210,7 +219,8 @@ requirejs.config({
                 "utils/musicutils-lookups",
                 "utils/musicutils-rhythm",
                 "utils/musicutils-solfege",
-                "utils/musicutils-modewheel"
+                "utils/musicutils-modewheel",
+                "utils/musicutils-modecore"
             ]
         },
         "utils/synthutils": {

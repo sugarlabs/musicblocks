@@ -142,6 +142,7 @@ describe("musicutils-lookups", () => {
             "musicutils-rhythm.js",
             "musicutils-solfege.js",
             "musicutils-modewheel.js",
+            "musicutils-modecore.js",
             "musicutils.js"
         ];
         const load = files => {
