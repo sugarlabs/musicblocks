@@ -498,6 +498,16 @@ function MusicKeyboard(activity) {
         let extraNoteCount = 0;
         let startTimeNotes = 0;
 
+        const isTextEntryActive = () => {
+            const activeElement = document.activeElement;
+            return (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            );
+        };
+
         /**
          * Gets the ID of the musical note associated with a keyboard event.
          * @param {KeyboardEvent} event - The keyboard event.
@@ -597,6 +607,8 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
          */
         const __keyboarddown = event => {
+            if (isTextEntryActive()) return;
+
             if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
                 event.preventDefault();
                 this.shiftOctave(1);
@@ -696,6 +708,8 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __keyboardup = function (event) {
+            if (isTextEntryActive() && !current.has(event.keyCode)) return;
+
             current.delete(event.keyCode);
             __endNote(event);
         };
