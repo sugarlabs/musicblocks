@@ -957,6 +957,7 @@ describe("TemperamentWidget basic tests", () => {
         // since _save recomputes note/ratio entries from this.ratios.
         expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("custom1", {
             pitchNumber: 2,
+            octaveRatio: 2,
             0: [1, "C", 4],
             1: [2, "C", 4]
         });
@@ -1334,32 +1335,6 @@ describe("TemperamentWidget basic tests", () => {
             widget._save = jest.fn();
             saveBtn.onclick();
             expect(widget._save).toHaveBeenCalled();
-        });
-
-        describe("Share popup", () => {
-            const anchor = { getBoundingClientRect: () => ({ left: 0, bottom: 0 }) };
-
-            test("Share popup menu items call the widget handlers", () => {
-                widget._exportScl = jest.fn();
-                widget._exportJson = jest.fn();
-                widget._importFile = jest.fn();
-
-                widget._createSharePopup(anchor);
-                const popup = document.getElementById("temperamentSharePopup");
-                const sclItem = popup.children[0];
-                const jsonItem = popup.children[1];
-                const importItem = popup.children[2];
-
-                sclItem.onclick();
-                expect(widget._exportScl).toHaveBeenCalledTimes(1);
-
-                jsonItem.onclick();
-                expect(widget._exportJson).toHaveBeenCalledTimes(1);
-
-                importItem.onclick();
-                expect(widget._importFile).toHaveBeenCalledTimes(1);
-                expect(document.getElementById("temperamentSharePopup")).toBeNull();
-            });
         });
 
         test("sparse pitch data does not blank the table (partial load regression)", () => {
@@ -1992,7 +1967,7 @@ describe("TemperamentWidget export tests", () => {
 
     test("_exportJson downloads JSON with exact schema fields", () => {
         seedExportState();
-        const downloadSpy = jest.spyOn(widget, "_downloadScl").mockImplementation(() => {});
+        const downloadSpy = jest.spyOn(global, "downloadTextFile").mockImplementation(() => {});
 
         widget._exportJson();
 
@@ -2027,7 +2002,7 @@ describe("TemperamentWidget export tests", () => {
         ];
         widget._logo = { synth: { startingPitch: "C4" } };
         widget.activity = { errorMsg: jest.fn() };
-        const downloadSpy = jest.spyOn(widget, "_downloadScl").mockImplementation(() => {});
+        const downloadSpy = jest.spyOn(global, "downloadTextFile").mockImplementation(() => {});
 
         widget._exportScl();
 

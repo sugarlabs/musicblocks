@@ -126,9 +126,7 @@ class ModeWidget {
         this.widgetWindow.onclose = () => {
             this._clearWidgetTimers();
             this._playing = false;
-            if (typeof closeSharePopup === "function") {
-                closeSharePopup("sclSharePopup");
-            }
+            closeSharePopup("sclSharePopup");
             if (this.logo && this.logo.synth) {
                 this.logo.synth.stop();
             }
@@ -1456,10 +1454,6 @@ class ModeWidget {
         );
     }
 
-    _downloadScl(content, filename) {
-        downloadTextFile(content, filename);
-    }
-
     _findEdoSteps(pitches) {
         for (let edo = TuningFormats.EDO_MAX; edo >= TuningFormats.EDO_MIN; edo--) {
             const step = 1200 / edo;
@@ -1515,7 +1509,7 @@ class ModeWidget {
         }
 
         const content = lines.join("\n") + "\n";
-        this._downloadScl(content, "mode-" + edo + "edo.scl");
+        downloadTextFile(content, "mode-" + edo + "edo.scl");
     }
 
     _exportJson() {
@@ -1525,7 +1519,7 @@ class ModeWidget {
 
         const name = this._findModeNameForPattern(pattern) || "custom";
         const content = JSON.stringify({ name, edo, pattern }, null, 2);
-        this._downloadScl(content, "mode-" + edo + "edo.json");
+        downloadTextFile(content, "mode-" + edo + "edo.json");
     }
 
     _resolveBuiltInCollision(name, edo) {

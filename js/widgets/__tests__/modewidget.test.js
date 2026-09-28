@@ -64,6 +64,7 @@ global.docById = jest.fn().mockImplementation(id => ({
 }));
 
 global.getNote = jest.fn().mockReturnValue(["C", "4"]);
+global.closeSharePopup = jest.fn();
 global.keySignatureToMode = jest.fn().mockReturnValue(["C", "ionian"]);
 global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
@@ -831,7 +832,7 @@ describe("ModeWidget", () => {
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
         modeWidget._selectedModeName = "major";
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -849,7 +850,7 @@ describe("ModeWidget", () => {
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("ionian");
         modeWidget._selectedModeName = "41EDO";
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -867,7 +868,7 @@ describe("ModeWidget", () => {
         });
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -883,7 +884,7 @@ describe("ModeWidget", () => {
         });
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue(null);
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 

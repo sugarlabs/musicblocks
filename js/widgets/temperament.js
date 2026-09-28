@@ -2674,7 +2674,7 @@ function TemperamentWidget() {
             return;
         }
 
-        this._downloadScl(
+        downloadTextFile(
             JSON.stringify(data, null, 2),
             "temperament-" + temperamentSlug(data.name) + ".json"
         );
@@ -2698,21 +2698,10 @@ function TemperamentWidget() {
             lines.push(ratioToCents(data.ratios[i], 2).toFixed(2));
         }
 
-        this._downloadScl(
+        downloadTextFile(
             lines.join("\n") + "\n",
             "temperament-" + temperamentSlug(data.name) + ".scl"
         );
-    };
-
-    /**
-     * Downloads text content as a file via a blob URL and a synthetic anchor
-     * click, revoking the URL afterwards.
-     * @param {string} content - The file content.
-     * @param {string} filename - The download file name.
-     * @returns {void}
-     */
-    this._downloadScl = function (content, filename) {
-        downloadTextFile(content, filename);
     };
 
     /**
@@ -2749,21 +2738,19 @@ function TemperamentWidget() {
                 name = def.name || data.file.name.replace(/\.json$/i, "") || "custom";
                 if (typeof def.referencePitch === "string" && def.referencePitch !== "") {
                     try {
+                        // Fixed equal-temperament reference: importing the
+                        // same JSON must yield the same frequency no
+                        // matter which temperament is selected.
                         const parsed = parseNoteString(def.referencePitch);
-                        if (parsed && Number.isFinite(Number(parsed[1]))) {
-                            // Fixed equal-temperament reference: importing the
-                            // same JSON must yield the same frequency no
-                            // matter which temperament is selected.
-                            const resolved = pitchToFrequency(
-                                parsed[0],
-                                Number(parsed[1]),
-                                0,
-                                "c major",
-                                "equal"
-                            );
-                            if (Number.isFinite(Number(resolved)) && Number(resolved) > 0) {
-                                referenceFrequency = Number(resolved);
-                            }
+                        const resolved = pitchToFrequency(
+                            parsed[0],
+                            Number(parsed[1]),
+                            0,
+                            "c major",
+                            "equal"
+                        );
+                        if (Number.isFinite(resolved) && resolved > 0) {
+                            referenceFrequency = Number(resolved);
                         }
                     } catch (e) {
                         // Fall through to the widget's current reference frequency.
@@ -3132,7 +3119,10 @@ function TemperamentWidget() {
 
         if (isCustomTemperament(this.inTemperament)) {
             deleteTemperamentFromList(this.inTemperament);
-            const newTemperament = { pitchNumber: this.pitchNumber };
+            const newTemperament = {
+                pitchNumber: this.pitchNumber,
+                octaveRatio: this.powerBase
+            };
             for (let i = 0; i < this.pitchNumber; i++) {
                 const number = "" + i;
                 const cleanName = _stripCents(this.notes[i]);
@@ -3263,9 +3253,7 @@ function TemperamentWidget() {
             that._playing = false;
             that._playAllTimer = null;
             that._playAllRunning = false;
-            if (typeof closeSharePopup === "function") {
-                closeSharePopup("temperamentSharePopup");
-            }
+            closeSharePopup("temperamentSharePopup");
             if (that._vizMenu && that._vizMenu.parentNode) {
                 that._vizMenu.parentNode.removeChild(that._vizMenu);
                 that._vizMenu = null;
@@ -3339,7 +3327,7 @@ function TemperamentWidget() {
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
+        this.powerBase = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
         const startingPitch = this._logo.synth.startingPitch;
         const str = [];
         const note = [];

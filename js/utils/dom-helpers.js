@@ -247,12 +247,8 @@ function downloadTextFile(content, filename) {
  * @returns {HTMLElement|null} The popup, or null when toggling closed.
  */
 function createSharePopup(popupId, items, anchor) {
-    const existing = docById(popupId);
-    if (existing) {
-        if (existing._closeHandler) {
-            document.removeEventListener("mousedown", existing._closeHandler);
-        }
-        existing.remove();
+    if (docById(popupId)) {
+        closeSharePopup(popupId);
         return null;
     }
 
@@ -309,12 +305,7 @@ function createSharePopup(popupId, items, anchor) {
         }
     };
     popup._closeHandler = closeHandler;
-    setTimeout(() => {
-        if (!popup.isConnected) {
-            return;
-        }
-        document.addEventListener("mousedown", closeHandler);
-    }, 0);
+    document.addEventListener("mousedown", closeHandler);
     return popup;
 }
 
