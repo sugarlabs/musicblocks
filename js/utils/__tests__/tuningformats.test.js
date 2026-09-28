@@ -154,23 +154,15 @@ describe("parseTemperamentJson", () => {
         });
     });
 
-    it("throws on invalid JSON text", () => {
+    it("rejects invalid JSON, ratios, and interval", () => {
         expect(() => parseTemperamentJson("not json")).toThrow("Invalid JSON file:");
-    });
-
-    it("rejects ratios whose length is not pitchNumber + 1", () => {
-        const json = JSON.stringify({ pitchNumber: 12, ratios: [1, 2] });
-        expect(() => parseTemperamentJson(json)).toThrow("invalid ratios");
-    });
-
-    it("rejects non-numeric, non-positive, or non-ascending ratios", () => {
+        expect(() =>
+            parseTemperamentJson(JSON.stringify({ pitchNumber: 12, ratios: [1, 2] }))
+        ).toThrow("invalid ratios");
         const mk = ratios => JSON.stringify({ pitchNumber: 2, ratios });
         expect(() => parseTemperamentJson(mk([1, "1.25", 2]))).toThrow("invalid ratios");
         expect(() => parseTemperamentJson(mk([1, 0, 2]))).toThrow("invalid ratios");
         expect(() => parseTemperamentJson(mk([1, 1.5, 1.25]))).toThrow("invalid ratios");
-    });
-
-    it("rejects interval that is not a string array of length pitchNumber + 1", () => {
         const base = { pitchNumber: 2, ratios: [1, 1.25, 2] };
         expect(() =>
             parseTemperamentJson(

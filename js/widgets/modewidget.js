@@ -18,7 +18,8 @@
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
-    isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup
+    isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
  */
 
 /*
@@ -125,6 +126,9 @@ class ModeWidget {
         this.widgetWindow.onclose = () => {
             this._clearWidgetTimers();
             this._playing = false;
+            if (typeof closeSharePopup === "function") {
+                closeSharePopup("sclSharePopup");
+            }
             if (this.logo && this.logo.synth) {
                 this.logo.synth.stop();
             }

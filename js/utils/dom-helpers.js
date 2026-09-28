@@ -26,7 +26,7 @@
 /* exported
    closeWidgets, displayMsg, docByClass, docById, docByName, docBySelector,
    docByTagName, hideDOMLabel, makeKeyboardAccessible, readTextFile,
-   downloadTextFile, createSharePopup
+   downloadTextFile, createSharePopup, closeSharePopup
 */
 
 const keyboardAccessibleHandlers = new WeakMap();
@@ -310,9 +310,30 @@ function createSharePopup(popupId, items, anchor) {
     };
     popup._closeHandler = closeHandler;
     setTimeout(() => {
+        if (!popup.isConnected) {
+            return;
+        }
         document.addEventListener("mousedown", closeHandler);
     }, 0);
     return popup;
+}
+
+/**
+ * Closes a share popup opened by createSharePopup: removes it from the
+ * DOM and unregisters its document mousedown listener. No-op when no
+ * popup with that id exists (e.g. widget teardown with popup closed).
+ * @param {string} popupId - The DOM id of the popup element.
+ * @returns {void}
+ */
+function closeSharePopup(popupId) {
+    const existing = docById(popupId);
+    if (!existing) {
+        return;
+    }
+    if (existing._closeHandler) {
+        document.removeEventListener("mousedown", existing._closeHandler);
+    }
+    existing.remove();
 }
 
 var DomHelpers = {
@@ -327,7 +348,8 @@ var DomHelpers = {
     makeKeyboardAccessible,
     readTextFile,
     downloadTextFile,
-    createSharePopup
+    createSharePopup,
+    closeSharePopup
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -354,4 +376,5 @@ if (typeof window !== "undefined" && (typeof module === "undefined" || !module.e
     window.readTextFile = readTextFile;
     window.downloadTextFile = downloadTextFile;
     window.createSharePopup = createSharePopup;
+    window.closeSharePopup = closeSharePopup;
 }

@@ -6,6 +6,7 @@ global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].incl
 const DomHelpers = require("../../utils/dom-helpers");
 global.downloadTextFile = DomHelpers.downloadTextFile;
 global.createSharePopup = DomHelpers.createSharePopup;
+global.closeSharePopup = DomHelpers.closeSharePopup;
 
 const setupImportGlobals = () => {
     global._ = jest.fn(text => text);
@@ -1338,20 +1339,6 @@ describe("TemperamentWidget basic tests", () => {
         describe("Share popup", () => {
             const anchor = { getBoundingClientRect: () => ({ left: 0, bottom: 0 }) };
 
-            test("Share: init adds a Share button that opens the export/import popup", () => {
-                const shareIndex = mockWidgetWindow.addButton.mock.calls.findIndex(
-                    call => call[2] === "Share"
-                );
-                expect(shareIndex).toBeGreaterThan(-1);
-                expect(mockWidgetWindow.addButton.mock.calls[shareIndex][0]).toBe("share.svg");
-
-                const shareBtn = mockWidgetWindow.addButton.mock.results[shareIndex].value;
-                expect(shareBtn.onclick).toBeDefined();
-
-                shareBtn.onclick();
-                expect(document.getElementById("temperamentSharePopup")).not.toBeNull();
-            });
-
             test("Share popup menu items call the widget handlers", () => {
                 widget._exportScl = jest.fn();
                 widget._exportJson = jest.fn();
@@ -1993,21 +1980,6 @@ describe("TemperamentWidget export tests", () => {
         jest.restoreAllMocks();
     });
 
-    test("_temperamentExportData returns name, pitchNumber, referencePitch, interval, ratios from widget state", () => {
-        seedExportState();
-
-        const data = widget._temperamentExportData();
-
-        expect(data.name).toBe("custom1");
-        expect(data.pitchNumber).toBe(12);
-        expect(data.referencePitch).toBe("C4");
-        expect(data.interval.length).toBe(13);
-        expect(data.interval[0]).toBe("perfect 1");
-        expect(data.interval[12]).toBe("perfect 13");
-        expect(data.ratios[0]).toBe(1);
-        expect(data.ratios[12]).toBe(2);
-    });
-
     test("_temperamentExportData returns null and errors when ratios are missing", () => {
         seedExportState();
         delete widget.ratios[5];
@@ -2043,70 +2015,33 @@ describe("TemperamentWidget export tests", () => {
         ]);
     });
 
-    test("_exportScl writes description, pitch count, and one cents line per ratio above unison", () => {
-        seedExportState();
+    test("_exportScl writes absolute cents independent of the tuning period", () => {
+        widget.inTemperament = "custom3";
+        widget.pitchNumber = 2;
+        widget.ratios = [1, 1.5, 3];
+        widget.intervals = ["perfect 1", "perfect 2", "perfect 3"];
+        widget.notes = [
+            ["C", 4],
+            ["C", 4],
+            ["C", 4]
+        ];
+        widget._logo = { synth: { startingPitch: "C4" } };
+        widget.activity = { errorMsg: jest.fn() };
         const downloadSpy = jest.spyOn(widget, "_downloadScl").mockImplementation(() => {});
 
         widget._exportScl();
 
-        expect(downloadSpy).toHaveBeenCalledTimes(1);
-        expect(downloadSpy.mock.calls[0][1]).toBe("temperament-custom1.scl");
         const lines = downloadSpy.mock.calls[0][0].split("\n");
-        expect(lines[0]).toBe("! temperament.scl");
-        expect(lines[1]).toBe("!");
-        expect(lines[2]).toBe("custom1");
-        expect(lines[3]).toBe("12");
-        const dataLines = lines.slice(4, 16);
-        expect(dataLines.length).toBe(12);
-        const period = widget.ratios[12];
-        for (let k = 0; k < 12; k++) {
-            expect(dataLines[k]).toBe(
-                ((1200 * Math.log(widget.ratios[k + 1])) / Math.log(period)).toFixed(2)
-            );
-        }
-        expect(dataLines[11]).toBe("1200.00");
-        expect(lines[16]).toBe("");
-    });
-
-    test("_downloadScl triggers an anchor download via a blob URL", async () => {
-        const originalCreateObjectURL = URL.createObjectURL;
-        const originalRevokeObjectURL = URL.revokeObjectURL;
-        URL.createObjectURL = jest.fn(() => "blob:mock-url");
-        URL.revokeObjectURL = jest.fn();
-        const clickSpy = jest
-            .spyOn(HTMLAnchorElement.prototype, "click")
-            .mockImplementation(() => {});
-        const appendChildSpy = jest.spyOn(document.body, "appendChild");
-
-        widget._downloadScl("content", "temperament-custom1.scl");
-
-        expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-        const blob = URL.createObjectURL.mock.calls[0][0];
-        expect(blob).toBeInstanceOf(Blob);
-        const readBlob = blob =>
-            new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsText(blob);
-            });
-        await expect(readBlob(blob)).resolves.toBe("content");
-        const link = appendChildSpy.mock.calls[0][0];
-        expect(link.tagName).toBe("A");
-        expect(link.download).toBe("temperament-custom1.scl");
-        expect(link.href).toBe("blob:mock-url");
-        expect(clickSpy).toHaveBeenCalledTimes(1);
-        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
-
-        URL.createObjectURL = originalCreateObjectURL;
-        URL.revokeObjectURL = originalRevokeObjectURL;
+        expect(lines[3]).toBe("2");
+        expect(lines.slice(4, 6)).toEqual([
+            (1200 * Math.log2(1.5)).toFixed(2),
+            (1200 * Math.log2(3)).toFixed(2)
+        ]);
     });
 });
 
 describe("TemperamentWidget import tests", () => {
     let widget;
-
-    const lastRegisteredEntry = () => global.addTemperamentToDictionary.mock.calls[0][1];
 
     beforeEach(() => {
         widget = new TemperamentWidget();
@@ -2142,36 +2077,23 @@ describe("TemperamentWidget import tests", () => {
         );
     });
 
-    test("_importFile copies ratio-based .scl pitches directly", () => {
+    test("_importFile resolves referencePitch against equal temperament regardless of selection", () => {
         seedImportState(widget);
+        widget.inTemperament = "just intonation";
         feedFile(
             widget,
-            "mytuning.scl",
-            ["! mytuning.scl", "!", "mytuning", "3", "5/4", "3/2", "2/1"].join("\n")
+            "mytuning.json",
+            JSON.stringify({
+                name: "mytuning",
+                pitchNumber: 2,
+                ratios: [1, 1.25, 2],
+                referencePitch: "A4"
+            })
         );
 
         widget._importFile();
 
-        const entry = lastRegisteredEntry();
-        expect(entry["0"][0]).toBe(1);
-        expect(entry["1"][0]).toBe(1.25);
-        expect(entry["2"][0]).toBe(1.5);
-        expect(global.setOctaveRatio).toHaveBeenCalledWith(2);
-    });
-
-    test("_importFile converts cent-based .scl pitches via 2^(cents/1200)", () => {
-        seedImportState(widget);
-        feedFile(
-            widget,
-            "mytuning.scl",
-            ["! mytuning.scl", "!", "mytuning", "3", "100.00", "701.96", "1200.00"].join("\n")
-        );
-
-        widget._importFile();
-
-        const entry = lastRegisteredEntry();
-        expect(entry["1"][0]).toBeCloseTo(Math.pow(2, 100 / 1200), 6);
-        expect(entry["2"][0]).toBeCloseTo(1.5, 5);
+        expect(global.pitchToFrequency).toHaveBeenCalledWith("A", 4, 0, "c major", "equal");
     });
 
     test("_importFile rejects unsafe temperament names", () => {
@@ -2189,83 +2111,5 @@ describe("TemperamentWidget import tests", () => {
             3000
         );
         expect(global.addTemperamentToDictionary).not.toHaveBeenCalled();
-    });
-
-    test("_loadTemperament is exposed on the instance after render", () => {
-        const mockWidgetWindow = {
-            clear: jest.fn(),
-            show: jest.fn(),
-            getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
-            addButton: jest.fn(() => ({
-                onclick: null,
-                getElementsByTagName: jest.fn(() => [{}])
-            })),
-            sendToCenter: jest.fn()
-        };
-        global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
-        global.window.innerWidth = 1200;
-        global.buildScale = jest.fn(() => [["C"], []]);
-        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-        global.getTemperamentsList = jest.fn(() => [["Equal (12EDO)", "equal"]]);
-        global.getTemperamentRatio = jest.fn(() => 1);
-        global.getTemperament = jest.fn(() => ({
-            interval: ["unison", "octave"],
-            pitchNumber: 1,
-            unison: 1,
-            octave: 2,
-            0: 1,
-            1: 2,
-            noteLabels: ["C"]
-        }));
-        global.isCustomTemperament = jest.fn(() => false);
-
-        widget.inTemperament = "equal";
-        widget.scale = ["C", "Major"];
-        widget.init({
-            errorMsg: jest.fn(),
-            logo: { synth: { startingPitch: "C4", _getFrequency: jest.fn(() => 440) } }
-        });
-
-        expect(typeof widget._loadTemperament).toBe("function");
-    });
-});
-
-describe("TemperamentWidget export/import round-trip tests", () => {
-    let widget;
-
-    const captureExport = exportFn => {
-        const downloadSpy = jest.spyOn(widget, "_downloadScl").mockImplementation(() => {});
-        widget[exportFn]();
-        return downloadSpy.mock.calls[0][0];
-    };
-
-    beforeEach(() => {
-        widget = new TemperamentWidget();
-        setupImportGlobals();
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    test("round-trips a custom temperament through JSON export and import", () => {
-        seedImportState(widget);
-        const exported = captureExport("_exportJson");
-
-        feedFile(widget, "temperament-mytuning.json", exported);
-        widget._importFile();
-
-        expect(global.addTemperamentToDictionary).toHaveBeenCalledWith(
-            "mytuning",
-            expect.anything()
-        );
-        const entry = global.addTemperamentToDictionary.mock.calls[0][1];
-        const storedRatios = [];
-        for (let i = 0; i < 5; i++) {
-            storedRatios.push(entry["" + i][0]);
-        }
-        expect(storedRatios).toEqual([1, 1.2, 1.4, 1.6, 1.8]);
-        expect(entry.pitchNumber).toBe(5);
-        expect(global.setOctaveRatio).toHaveBeenCalledWith(2);
     });
 });

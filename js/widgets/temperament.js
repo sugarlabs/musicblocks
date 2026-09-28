@@ -25,7 +25,8 @@
     isCustomTemperament, isUnsafeObjectKey, last, normalizeNoteAccidentals, parseNoteString,
     pitchToFrequency, platformColor, PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction,
    setOctaveRatio, SHARP, Singer, slicePath, TuningFormats, updateTemperaments, wheelnav,
-   frequencyToPitch, clampNumber, ManagedTimer, readTextFile, downloadTextFile, createSharePopup
+    frequencyToPitch, clampNumber, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
 */
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
@@ -2681,8 +2682,9 @@ function TemperamentWidget() {
 
     /**
      * Exports the current temperament as a Scala (.scl) file: a header, the
-     * temperament name, the pitch count, and one cents line per ratio above
-     * unison, measured against the exported period.
+     * temperament name, the pitch count, and one absolute cents line per
+     * ratio above unison (1200 cents per octave, independent of the
+     * exported period).
      * @returns {void}
      */
     this._exportScl = function () {
@@ -2691,10 +2693,9 @@ function TemperamentWidget() {
             return;
         }
 
-        const period = data.ratios[data.pitchNumber];
         const lines = ["! temperament.scl", "!", data.name, String(data.pitchNumber)];
         for (let i = 1; i <= data.pitchNumber; i++) {
-            lines.push(ratioToCents(data.ratios[i], period).toFixed(2));
+            lines.push(ratioToCents(data.ratios[i], 2).toFixed(2));
         }
 
         this._downloadScl(
@@ -2750,12 +2751,15 @@ function TemperamentWidget() {
                     try {
                         const parsed = parseNoteString(def.referencePitch);
                         if (parsed && Number.isFinite(Number(parsed[1]))) {
+                            // Fixed equal-temperament reference: importing the
+                            // same JSON must yield the same frequency no
+                            // matter which temperament is selected.
                             const resolved = pitchToFrequency(
                                 parsed[0],
                                 Number(parsed[1]),
                                 0,
                                 "c major",
-                                this.inTemperament
+                                "equal"
                             );
                             if (Number.isFinite(Number(resolved)) && Number(resolved) > 0) {
                                 referenceFrequency = Number(resolved);
@@ -2814,7 +2818,10 @@ function TemperamentWidget() {
             return false;
         }
 
-        while (getTemperament(name) !== undefined) {
+        // Re-importing under an existing custom name refreshes that entry
+        // in place (mirroring the mode widget); only built-in collisions
+        // are renamed, looping until the suffixed name is unused.
+        while (getTemperament(name) !== undefined && !isCustomTemperament(name)) {
             name = name + " (imported)";
         }
 
@@ -3256,6 +3263,9 @@ function TemperamentWidget() {
             that._playing = false;
             that._playAllTimer = null;
             that._playAllRunning = false;
+            if (typeof closeSharePopup === "function") {
+                closeSharePopup("temperamentSharePopup");
+            }
             if (that._vizMenu && that._vizMenu.parentNode) {
                 that._vizMenu.parentNode.removeChild(that._vizMenu);
                 that._vizMenu = null;
