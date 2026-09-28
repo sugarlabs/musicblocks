@@ -177,6 +177,10 @@ describe("musicutils", () => {
                 path.join(__dirname, "..", "musicutils-solfege.js"),
                 "utf8"
             );
+            const modewheel = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-modewheel.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -193,6 +197,7 @@ describe("musicutils", () => {
             vm.runInContext(lookups, sandbox);
             vm.runInContext(rhythm, sandbox);
             vm.runInContext(solfege, sandbox);
+            vm.runInContext(modewheel, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(

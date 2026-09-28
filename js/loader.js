@@ -196,6 +196,10 @@ requirejs.config({
             deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
             exports: "MusicUtilsSolfege"
         },
+        "utils/musicutils-modewheel": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsModeWheel"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
@@ -205,7 +209,8 @@ requirejs.config({
                 "utils/musicutils-pitch",
                 "utils/musicutils-lookups",
                 "utils/musicutils-rhythm",
-                "utils/musicutils-solfege"
+                "utils/musicutils-solfege",
+                "utils/musicutils-modewheel"
             ]
         },
         "utils/synthutils": {

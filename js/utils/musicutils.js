@@ -72,7 +72,6 @@ if (typeof module !== "undefined" && module.exports) {
         ACCIDENTALNAMES,
         ACCIDENTALVALUES,
         INTERVALVALUES,
-        MODE_PIE_MENUS,
         MODEPIEMENU_GROUP_RING,
         MODEPIEMENU_NAME_RING,
         PITCH_COLLECTIONS,
@@ -163,10 +162,6 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-rhythm") : {});
     var { reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor } =
         MusicUtilsRhythm;
-    var UtilsLogic =
-        (typeof window !== "undefined" && window.UtilsLogic) ||
-        (typeof require !== "undefined" ? require("./utils-logic") : {});
-    var { toFraction, isInt } = UtilsLogic;
     var MusicUtilsSolfege =
         (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
         (typeof require !== "undefined" ? require("./musicutils-solfege") : {});
@@ -178,6 +173,24 @@ if (typeof module !== "undefined" && module.exports) {
         splitScaleDegree,
         convertFromSolfege
     } = MusicUtilsSolfege;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { toFraction, isInt } = UtilsLogic;
+    var MusicUtilsModeWheel =
+        (typeof window !== "undefined" && window.MusicUtilsModeWheel) ||
+        (typeof require !== "undefined" ? require("./musicutils-modewheel") : {});
+    var {
+        getSavedCustomModes,
+        getModeNamesForGroup,
+        getModeLabel,
+        getModeNameFromLabel,
+        getModeSliceColors,
+        updateModeWheelItems,
+        getModeGroupTitleFont,
+        getModeSliceFont,
+        configureWheel
+    } = MusicUtilsModeWheel;
 }
 const _b64Cache = new Map();
 
@@ -408,130 +421,6 @@ const CHORDVALUES = [
  */
 const setCustomChord = chord => {
     CHORDVALUES[CHORDVALUES.length - 1] = chord;
-};
-
-/** Custom modes saved by the mode widget; corrupt data yields []. */
-const getSavedCustomModes = () => {
-    try {
-        const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
-        return Array.isArray(customModes)
-            ? customModes.filter(m => m && typeof m.name === "string")
-            : [];
-    } catch (e) {
-        return [];
-    }
-};
-
-/**
- * Builds the fixed 12-slot mode-name list for a group ("custom" padded with blanks).
- * @param {string} grp
- * @param {Array} [customModeNames]
- * @returns {Array}
- */
-const getModeNamesForGroup = (grp, customModeNames = []) => {
-    if (grp !== "custom") {
-        return MODE_PIE_MENUS[grp].slice();
-    }
-    const names = customModeNames.slice(0, 12);
-    while (names.length < 12) {
-        names.push(" ");
-    }
-    return names;
-};
-
-/** Display label for a mode (major/ionian and minor/aeolian pairs translated). */
-const getModeLabel = modename => {
-    switch (modename) {
-        case "ionian":
-        case "major":
-            return `${_("major")} / ${_("ionian")}`;
-        case "aeolian":
-        case "minor":
-            return `${_("minor")} / ${_("aeolian")}`;
-        default:
-            return modename === " " ? " " : _(modename);
-    }
-};
-
-/** Inverse of getModeLabel; falls back to the label itself. */
-const getModeNameFromLabel = (label, modes) => {
-    if (label === `${_("major")} / ${_("ionian")}`) {
-        return "major";
-    }
-    if (label === `${_("minor")} / ${_("aeolian")}`) {
-        return "aeolian";
-    }
-    for (const m of modes) {
-        if (_(m) === label) {
-            return m;
-        }
-    }
-    return label;
-};
-
-/** Per-slice colors: blank slots get emptyColor, real modes filledColor. */
-const getModeSliceColors = (modes, colors) =>
-    modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
-
-/** Re-renders a mode-name wheel in place with new labels/colors. */
-const updateModeWheelItems = (wheel, labels, colors) => {
-    for (let i = 0; i < wheel.navItems.length; i++) {
-        const item = wheel.navItems[i];
-        item.title = labels[i];
-        item.basicNavTitleMax.title = labels[i];
-        item.basicNavTitleMin.title = labels[i];
-        item.hoverNavTitleMax.title = labels[i];
-        item.hoverNavTitleMin.title = labels[i];
-        item.selectedNavTitleMax.title = labels[i];
-        item.selectedNavTitleMin.title = labels[i];
-        item.initNavTitle.title = labels[i];
-        item.fillAttr = colors[i];
-        item.sliceHoverAttr.fill = colors[i];
-        item.slicePathAttr.fill = colors[i];
-        item.sliceSelectedAttr.fill = colors[i];
-        // refreshWheel() never rewrites text content, so push the label directly.
-        if (item.navTitle && typeof item.navTitle.attr === "function") {
-            item.navTitle.attr({ text: labels[i] });
-        }
-    }
-    wheel.refreshWheel();
-};
-
-/** Group-ring title font, scaled to wheel radius. */
-const getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
-
-/** Name-ring label font sized to fit its slice arc. */
-const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
-    const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
-    const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
-    const minSize = Math.round(0.06 * wheelRadius);
-    const maxSize = Math.round(0.12 * wheelRadius);
-    const clamped = Math.min(maxSize, Math.max(minSize, size));
-    return `100 ${clamped}px sans-serif`;
-};
-
-/** Applies shared donut-slice config to a wheelnav instance. */
-const configureWheel = (wheel, opts) => {
-    wheel.colors = opts.colors;
-    wheel.slicePathFunction = slicePath().DonutSlice;
-    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
-    wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
-    if (opts.clickModeRotate !== undefined) {
-        wheel.clickModeRotate = opts.clickModeRotate;
-    }
-    if (opts.selectionPaths) {
-        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-        wheel.sliceInitPathCustom = wheel.slicePathCustom;
-    }
-    wheel.navAngle = -90;
-    wheel.animatetime = 0;
-    if (opts.titleRotateAngle !== undefined) {
-        wheel.titleRotateAngle = opts.titleRotateAngle;
-    }
-    if (opts.titleFont !== undefined) {
-        wheel.titleFont = opts.titleFont;
-    }
 };
 
 // The table contains the intervals that define the modes.
