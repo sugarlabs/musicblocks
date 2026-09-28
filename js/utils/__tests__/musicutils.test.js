@@ -3377,11 +3377,11 @@ describe("getPitchInfo", () => {
 
         // Unicode double accidentals
         // F𝄪5 (F double-sharp) → same pitch as G5 = 79
-        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
+        const infoDoubleSharp = getPitchInfo("F𝄪5");
         expect(infoDoubleSharp.pitchNumber).toBe(79);
 
         // Bb𝄫5 (B double-flat) → same pitch as A5 = 81
-        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
+        const infoDoubleFlat = getPitchInfo("B𝄫5");
         expect(infoDoubleFlat.pitchNumber).toBe(81);
     });
 
@@ -3405,7 +3405,7 @@ describe("getPitchInfo", () => {
         // Gb-1
         expect(getPitchInfo("Gb-1").pitchNumber).toBe(6);
         // D𝄫-1
-        expect(getPitchInfo("D\u{1D12B}-1").pitchNumber).toBe(0);
+        expect(getPitchInfo("D𝄫-1").pitchNumber).toBe(0);
         // E##4
         expect(getPitchInfo("E##4").pitchNumber).toBe(66);
     });
@@ -4864,11 +4864,11 @@ describe("parseNoteString", () => {
     });
 
     it("parses the Unicode double-sharp (𝄪)", () => {
-        expect(parseNoteString("E\u{1D12A}4")).toEqual(["E\u{1D12A}", 4]);
+        expect(parseNoteString("E𝄪4")).toEqual(["E𝄪", 4]);
     });
 
     it("parses the Unicode double-flat (𝄫)", () => {
-        expect(parseNoteString("F\u{1D12B}4")).toEqual(["F\u{1D12B}", 4]);
+        expect(parseNoteString("F𝄫4")).toEqual(["F𝄫", 4]);
     });
 
     it("parses the Unicode natural sign (♮)", () => {
