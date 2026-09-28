@@ -1919,4 +1919,21 @@ describe("Singer.processNote tuplet and legoWidget handling", () => {
         ]);
         expect(phraseMaker._blockMap[-1]).toBeUndefined();
     });
+
+    it("should restore volume for each synth using its own voice name when crescendo ends", () => {
+        turtleMock.singer.inCrescendo = [true];
+        turtleMock.singer.crescendoDelta = [];
+        turtleMock.singer.synthVolume = {
+            piano: [80],
+            flute: [30]
+        };
+        const setSynthVolumeSpy = jest.spyOn(Singer, "setSynthVolume");
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(turtleMock.singer.inCrescendo).toHaveLength(0);
+        expect(setSynthVolumeSpy).toHaveBeenCalledWith(activityMock.logo, 0, "piano", 80);
+        expect(setSynthVolumeSpy).toHaveBeenCalledWith(activityMock.logo, 0, "flute", 30);
+        setSynthVolumeSpy.mockRestore();
+    });
 });

@@ -1620,7 +1620,7 @@ class Singer {
                 Singer.setSynthVolume(
                     activity.logo,
                     turtle,
-                    DEFAULTVOICE,
+                    synth,
                     last(tur.singer.synthVolume[synth])
                 );
             }

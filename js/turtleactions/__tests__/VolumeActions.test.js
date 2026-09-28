@@ -281,7 +281,7 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume.piano).toEqual([50]);
         });
 
-        it("listener restores synthVolume to the pre-crescendo value and pops crescendoInitialVolume", () => {
+        it("listener restores synthVolume to the pre-crescendo value, pops synthVolume stack, and resets audio", () => {
             targetTurtle.singer.synthVolume = { default: [50] };
             targetTurtle.singer.crescendoInitialVolume = { default: [50] };
 
@@ -293,8 +293,50 @@ describe("setupVolumeActions", () => {
 
             listener();
 
-            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 50]);
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50]);
             expect(targetTurtle.singer.crescendoInitialVolume.default).toEqual([50]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 50);
+        });
+
+        it("restores volume and pops synthVolume stack across nested crescendos", () => {
+            targetTurtle.singer.synthVolume = { default: [50] };
+            targetTurtle.singer.crescendoInitialVolume = { default: [50] };
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            const outerListener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+            targetTurtle.singer.synthVolume.default[1] = 60;
+
+            Singer.VolumeActions.doCrescendo("crescendo", 5, 0, 2);
+            const innerListener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+            targetTurtle.singer.synthVolume.default[2] = 65;
+
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 60, 65]);
+
+            innerListener();
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 60]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 60);
+
+            outerListener();
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 50);
+        });
+
+        it("restores volume for all active synths without corrupting other instruments", () => {
+            targetTurtle.singer.synthVolume = { piano: [80], violin: [40] };
+            targetTurtle.singer.crescendoInitialVolume = { piano: [80], violin: [40] };
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            const listener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+
+            targetTurtle.singer.synthVolume.piano[1] = 90;
+            targetTurtle.singer.synthVolume.violin[1] = 50;
+
+            listener();
+
+            expect(targetTurtle.singer.synthVolume.piano).toEqual([80]);
+            expect(targetTurtle.singer.synthVolume.violin).toEqual([40]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "piano", 80);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "violin", 40);
         });
     });
 
