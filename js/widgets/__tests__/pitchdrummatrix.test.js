@@ -451,7 +451,7 @@ describe("PitchDrumMatrix Widget", () => {
             // We mock _setPairCell because it's called internally
             pdm._setPairCell = jest.fn();
 
-            pdm._playPitchDrum(0, [[0, 0]]);
+            pdm._playPitchDrum(0, [[0, 0]], pdm._playRun);
 
             expect(pdm._setPairCell).toHaveBeenCalled();
         });
@@ -469,10 +469,14 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._pdmCellTables = [{ rows: [{ cells: [{}, {}] }] }, { rows: [{ cells: [{}, {}] }] }];
             pdm._setPairCell = jest.fn();
 
-            pdm._playPitchDrum(0, [
-                [0, 0],
-                [1, 0]
-            ]);
+            pdm._playPitchDrum(
+                0,
+                [
+                    [0, 0],
+                    [1, 0]
+                ],
+                pdm._playRun
+            );
 
             expect(pdm._setPairCell).toHaveBeenCalledTimes(1);
             expect(pdm._setPairCell).toHaveBeenCalledWith(0, 0, expect.anything(), true);
@@ -515,7 +519,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._pdmCellTables = [mockTable];
             pdm._setPairCell = jest.fn();
 
-            pdm._playPitchDrum(0, [[0, 0]]);
+            pdm._playPitchDrum(0, [[0, 0]], pdm._playRun);
 
             rowsAccessSpy.mockClear();
             pdm._playing = false;
@@ -700,9 +704,13 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm._getBackgroundColor = jest.fn(() => "white");
             pdm._setCellPitchDrum = jest.fn();
+            pdm._playAll = jest.fn();
 
             pdm._clear();
 
+            // Clearing stops playback so the old mapping doesn't keep sounding.
+            expect(pdm._playing).toBe(false);
+            expect(pdm._playAll).toHaveBeenCalled();
             expect(cell00.style.backgroundColor).toBe(platformColor.selectorBackground);
             expect(pdm._setCellPitchDrum).toHaveBeenCalled();
         });
@@ -954,9 +962,9 @@ describe("PitchDrumMatrix Widget", () => {
             expect(buttons["Save"]).toBeDefined();
             expect(buttons["Clear"]).toBeDefined();
 
-            // Test Play button click handler
+            // Nothing is selected, so Play shows the hint and stays stopped.
             buttons["Play"].onclick();
-            expect(pdm._playing).toBe(true);
+            expect(pdm._playing).toBe(false);
 
             buttons["Play"].onclick();
             expect(pdm._playing).toBe(false);

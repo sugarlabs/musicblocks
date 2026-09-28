@@ -92,6 +92,9 @@ class PitchDrumMatrix {
         this.drums = [];
         this._rests = 0;
         this._playing = false;
+        // Incremented whenever playback starts or stops, so timeouts from an
+        // earlier run can tell they are stale.
+        this._playRun = 0;
         // The pitch-block number associated with a row; a drum block is
         // associated with a column. We need to keep track of which
         // intersections in the grid are populated.  The blockMap is a
@@ -670,11 +673,12 @@ class PitchDrumMatrix {
      */
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
+        this._playRun += 1;
         if (this._playing) {
             this._setPlayButtonIcon("stop");
         } else {
             this._setPlayButtonIcon("play");
-            this._playing = false;
+            this._resetRowHighlights();
             return;
         }
         this.activity.logo.synth.stop();
@@ -710,22 +714,35 @@ class PitchDrumMatrix {
             }
         }
         if (!isEmpty) {
-            const ii = 0;
-            if (ii < pairs.length) {
-                this._playPitchDrum(ii, pairs);
-            }
+            const run = this._playRun;
+            this._playPitchDrum(0, pairs, run);
             this.widgetWindow.timerManager.setTimeout(() => {
-                if (!this._playing) {
+                if (!this._playing || run !== this._playRun) {
                     return;
                 }
                 this._playing = false;
                 this._setPlayButtonIcon("play");
+                this._resetRowHighlights();
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
                 this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
+            this._playing = false;
             this._setPlayButtonIcon("play");
+        }
+    }
+
+    /**
+     * Puts every pitch label back to its normal color after playback.
+     *
+     * @private
+     * @returns {void}
+     */
+    _resetRowHighlights() {
+        const pdmTable = this._pdmTable;
+        for (let i = 0; i < pdmTable.rows.length - 1; i++) {
+            pdmTable.rows[i].cells[0].style.backgroundColor = platformColor.labelColor;
         }
     }
 
@@ -735,44 +752,26 @@ class PitchDrumMatrix {
      * @private
      * @param {number} i - The index indicating which pair of pitch and drum to play.
      * @param {Array<Array<number>>} pairs - An array containing pairs of pitch and drum indices.
+     * @param {number} run - The playback run this call belongs to.
      * @returns {void}
      */
-    _playPitchDrum(i, pairs) {
-        if (!this._playing) {
+    _playPitchDrum(i, pairs, run) {
+        if (!this._playing || run !== this._playRun) {
             return;
         }
 
-        // Find the drum cell
-        let pdmTable = this._pdmTable;
-        const drumTable = this._pdmDrumTable;
-        let row = drumTable.rows[0];
-        // const drumCell = row.cells[i];
-        const table = this._pdmCellTables[i];
-        row = table.rows[0];
-        const cell = row.cells[i];
-
-        pdmTable = this._pdmTable;
-        const pdmTableRow = pdmTable.rows[i];
-        const pitchCell = pdmTableRow.cells[0];
-        pitchCell.style.backgroundColor = platformColor.selectorBackground;
+        // Highlight only the pitch being played.
+        this._resetRowHighlights();
+        this._pdmTable.rows[i].cells[0].style.backgroundColor = platformColor.selectorBackground;
 
         if (pairs[i][1] !== -1) {
+            const cell = this._pdmCellTables[i].rows[0].cells[pairs[i][1]];
             this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
         }
 
         if (i < pairs.length - 1) {
             this.widgetWindow.timerManager.setTimeout(() => {
-                const ii = i + 1;
-                this._playPitchDrum(ii, pairs);
-            }, 1000);
-        } else {
-            this.widgetWindow.timerManager.setTimeout(() => {
-                if (!this._playing) {
-                    return;
-                }
-                for (let ii = 0; ii < pdmTable.rows.length - 1; ii++) {
-                    pdmTable.rows[ii].cells[0].style.backgroundColor = platformColor.labelColor;
-                }
+                this._playPitchDrum(i + 1, pairs, run);
             }, 1000);
         }
     }
@@ -894,6 +893,12 @@ class PitchDrumMatrix {
      * @returns {void}
      */
     _clear() {
+        // Stop any playback so the cleared mapping doesn't keep sounding.
+        if (this._playing) {
+            this._playing = false;
+            this._playAll();
+        }
+
         // "Unclick" every entry in the matrix.
         const pdmTable = this._pdmTable;
         let table;
