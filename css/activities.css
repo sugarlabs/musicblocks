@@ -723,20 +723,270 @@ nav {
     color: white;
 }
 
-/* Auxiliary (secondary) toolbar opened by the 3-dot menu.
-   Its icon groups (ul.aux.left / ul.aux.right) are floated, and the toolbar
-   otherwise inherits the fixed 64px nav height, so when the icons wrap to a
-   second row (e.g. in advanced mode at some browser-zoom widths) that row
-   spilled below the blue background into the workspace. Contain the floated
-   rows and let the blue band grow to cover them, while keeping a single 64px
-   row when the icons fit. */
-#aux-toolbar,
-#aux-toolbar .nav-wrapper {
-    height: auto;
-    min-height: 64px;
+/* ==========================================================================
+   Modernized Toolbar Styles (Layout, Grouping, and Theming)
+   ========================================================================== */
+
+#toolbars {
+    height: 64px;
+    background-color: var(--color-brand-primary, #2196f3);
+    transition:
+        background-color 0.25s ease,
+        box-shadow 0.25s ease;
 }
-#aux-toolbar .nav-wrapper {
-    display: flow-root;
+
+body.dark #toolbars {
+    background-color: var(--color-bg-secondary, #1f2937);
+    border-bottom: 1px solid var(--color-border-primary, #374151);
+}
+
+#toolbars .main-nav-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 64px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* Zone sections */
+.toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-section.left-section {
+    flex-shrink: 0;
+}
+
+.toolbar-section.center-section {
+    flex: 1;
+    min-width: 16px;
+    justify-content: center;
+}
+
+.toolbar-section.right-section {
+    flex-shrink: 0;
+    gap: 10px;
+}
+
+/* Pill container groups */
+.toolbar-pill-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: var(--radius-lg, 8px) !important;
+    padding: 3px 6px !important;
+    margin: 0 !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+body.dark .toolbar-pill-group {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* List items inside pill groups */
+.toolbar-pill-group li {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    line-height: normal !important;
+}
+
+/* Buttons inside pill groups */
+.toolbar-pill-group li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 6px !important;
+    border-radius: var(--radius-md, 6px) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease,
+        color 0.15s ease !important;
+    text-decoration: none !important;
+    line-height: normal !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+.toolbar-pill-group li > a:hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+body.dark .toolbar-pill-group li > a:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.toolbar-pill-group li > a:active {
+    transform: scale(0.94) !important;
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.toolbar-pill-group li > a:focus-visible,
+.toolbar-pill-group li > a.toolbar-btn-focused {
+    outline: 2px solid #ffffff !important;
+    outline-offset: 2px !important;
+}
+
+/* Icons inside toolbar */
+.toolbar-pill-group .material-icons {
+    font-size: 26px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: auto !important;
+    width: auto !important;
+}
+
+.toolbar-pill-group .material-icons.md-48 {
+    font-size: 26px !important;
+}
+
+/* Play button prominence */
+#play .material-icons {
+    font-size: 30px !important;
+}
+
+#stop .material-icons {
+    font-size: 28px !important;
+}
+
+/* Record dropdown arrow alignment */
+#recordDropdownArrow {
+    min-width: 18px !important;
+    padding: 0 2px !important;
+    margin-left: -4px !important;
+    font-size: 22px !important;
+}
+
+/* Auxiliary (secondary) toolbar */
+#aux-toolbar {
+    height: auto !important;
+    min-height: 48px !important;
+    background-color: var(--color-brand-primary-hover, #1976d2) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+    padding: 6px 12px !important;
+    box-sizing: border-box !important;
+}
+
+body.dark #aux-toolbar {
+    background-color: var(--color-bg-tertiary, #374151) !important;
+    border-top-color: var(--color-border-primary, #4b5563) !important;
+}
+
+#aux-toolbar .aux-nav-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 38px !important;
+    background: transparent !important;
+}
+
+#aux-toolbar .aux-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: var(--radius-md, 6px) !important;
+    padding: 2px 4px !important;
+    margin: 0 !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+body.dark #aux-toolbar .aux-group {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#aux-toolbar .aux-group li {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    line-height: normal !important;
+}
+
+#aux-toolbar .aux-group li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 4px !important;
+    border-radius: var(--radius-sm, 4px) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease !important;
+    text-decoration: none !important;
+    line-height: normal !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+#aux-toolbar .aux-group li > a:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark #aux-toolbar .aux-group li > a:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#aux-toolbar .aux-group .material-icons {
+    font-size: 22px !important;
+    line-height: 1 !important;
+}
+
+#aux-toolbar .aux-group .material-icons.md-48 {
+    font-size: 22px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #toolbars .main-nav-container {
+        padding: 0 6px !important;
+    }
+    .toolbar-pill-group {
+        padding: 2px 4px !important;
+        gap: 1px !important;
+    }
+    .toolbar-pill-group li > a {
+        height: 36px !important;
+        min-width: 36px !important;
+        padding: 0 4px !important;
+    }
+    .toolbar-pill-group .material-icons,
+    .toolbar-pill-group .material-icons.md-48 {
+        font-size: 22px !important;
+    }
+    .toolbar-section.right-section {
+        gap: 6px;
+    }
 }
 
 nav .nav-container {

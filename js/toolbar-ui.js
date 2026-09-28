@@ -1867,9 +1867,9 @@ class ToolbarUI {
         const getNavigableButtons = () => {
             // Main toolbar button selectors
             const mainSelectors =
-                "#play, #stop, #record, #recordDropdownArrow, #FullScreen, #newFile, #load, " +
-                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon, " +
-                "#installButton";
+                "#play, #stop, #record, #recordDropdownArrow, #gitProjectBtn, #newFile, #load, " +
+                "#saveButton, #saveButtonAdvanced, #planetIcon, #FullScreen, #helpIcon, " +
+                "#installButton, #toggleAuxBtn";
 
             // Aux toolbar button selectors
             const auxSelectors =
