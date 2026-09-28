@@ -423,7 +423,7 @@ sure to include a license header as per below:
 
 ```js
 /**
- * MusicBlocks v3.6.2 (ADD THE UP-TO-DATE VERSION)
+ * MusicBlocks v3.8.0 (ADD THE UP-TO-DATE VERSION)
  *
  * @author Walter Bender (MODIFY THE AUTHOR AS NEEDED)
  *
