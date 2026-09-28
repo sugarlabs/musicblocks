@@ -5075,47 +5075,46 @@ describe("parseNoteString", () => {
     // ── Microtonal prefix stripping ──────────────────────────────────────────
     // NOTE: parseNoteString does NOT strip microtonal prefixes itself — that
     // is the responsibility of normalizeNoteAccidentals/stripMicrotonalPrefix
-    // which callers invoke before parseNoteString.  The regex requires the
-    // note to start with a letter group, so a leading ^ / v will cause the
-    // regex to miss and fall back to the legacy path.
+    // which callers invoke before parseNoteString. The regex's optional
+    // leading [\^v]* group does match a leading ^ / v though, so this still
+    // goes through the regex path, not the unparseable fallback below.
 
-    it("falls back gracefully for a note with a leading microtonal prefix (^C4)", () => {
-        // The regex won't match "^C4", so the legacy path runs:
-        // lastChar = "4" → octave = 4, rest = "^C"
+    it("parses a note with a leading microtonal prefix (^C4)", () => {
         const [name, oct] = parseNoteString("^C4");
         expect(oct).toBe(4);
         expect(name).toBe("^C");
     });
 
-    // ── Legacy fallback path ─────────────────────────────────────────────────
+    // ── Unparseable input ─────────────────────────────────────────────────────
+    // (#9045 removed the legacy last-character-as-octave guess: an input the
+    // regex above doesn't recognize is returned unchanged with a NaN octave,
+    // rather than silently chopping off what might not be an octave digit at
+    // all. noteToPitchOctave/noteToFrequency below rely on this directly.)
 
-    it("falls back when input doesn't match the regex — returns last char as octave", () => {
-        // An unusual string that ends with a single digit but has no valid prefix
+    it("returns the whole string unchanged when it doesn't match the regex", () => {
         const [name, oct] = parseNoteString("?X5");
-        expect(oct).toBe(5);
-        expect(name).toBe("?X");
+        expect(Number.isNaN(oct)).toBe(true);
+        expect(name).toBe("?X5");
     });
 
-    it("falls back when last char is non-numeric — octave is NaN", () => {
+    it("returns the whole string unchanged when the last char isn't a digit either", () => {
         const [name, oct] = parseNoteString("?XY");
         expect(Number.isNaN(oct)).toBe(true);
-        expect(name).toBe("?X");
+        expect(name).toBe("?XY");
     });
 
     // ── Empty / degenerate inputs ────────────────────────────────────────────
 
     it("handles an empty string without throwing", () => {
-        // Empty string: len = 0, lastChar = "", octave = NaN, name = ""
         const [name, oct] = parseNoteString("");
         expect(typeof name).toBe("string");
         expect(Number.isNaN(oct)).toBe(true);
     });
 
     it("handles a single-character string without throwing", () => {
-        // "C" → lastChar = "C", non-numeric → octave = NaN, name = ""
         const [name, oct] = parseNoteString("C");
         expect(Number.isNaN(oct)).toBe(true);
-        expect(name).toBe("");
+        expect(name).toBe("C");
     });
 
     // ── Return type invariant ────────────────────────────────────────────────
