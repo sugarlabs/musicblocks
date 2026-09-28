@@ -131,6 +131,12 @@ describe("setupDictActions", () => {
             expect(currentPitch).toBe("C4");
         });
 
+        it("should return G4 when current pitch is queried with no note played", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            const result = Turtle.DictActions._GetDict(0, turtle, "current pitch", 7);
+            expect(result).toBe("G4");
+        });
+
         it("should get the pitch number correctly with lastNotePlayed", () => {
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number");
             expect(pitchNumber).toBe(60);
