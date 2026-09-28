@@ -6219,6 +6219,7 @@ class Blocks {
                     case "accidentalname":
                     case "intervalname":
                     case "grid":
+                    case "turtlekey":
                     case "boolean":
                         postProcess = args => {
                             const thisBlock = args[0];

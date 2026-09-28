@@ -87,6 +87,7 @@ class StubProtoBlock {
     constructor(name) {
         dictBlocks[name] = this;
     }
+    setCapability() {}
     setPalette() {}
     beginnerBlock() {}
     setHelpString() {}
@@ -95,6 +96,7 @@ class StubProtoBlock {
 }
 global.FlowBlock = StubProtoBlock;
 global.LeftBlock = StubProtoBlock;
+global.ValueBlock = StubProtoBlock;
 const { setupDictBlocks } = require("../blocks/DictBlocks");
 
 function createTurtle() {
@@ -108,7 +110,7 @@ function createTurtle() {
             suppressOutput: true,
             justCounting: []
         },
-        painter: { closeSVG: jest.fn() },
+        painter: { closeSVG: jest.fn(), stroke: 5 },
         queue: [],
         parentFlowQueue: [],
         listeners: {},
@@ -286,5 +288,35 @@ describe("Logo dispatch drives the real Turtle.DictActions.setValue/getValue", (
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
         expect(readBackValue).toBe(3);
+    });
+
+    test("a turtle key block reads the turtle's pen size in any language", () => {
+        setupDictBlocks(activity);
+        // The turtle key block stores the English key; in Spanish only its label changes.
+        const english = global._;
+        global._ = key => (key === "pen size" ? "tamaño de la pluma" : key);
+        activity.blocks.blockList[5] = {
+            name: "getDict2",
+            connections: [null, 6],
+            protoblock: dictBlocks.getDict2,
+            isValueBlock: () => false,
+            isArgBlock: () => true
+        };
+        activity.blocks.blockList[6] = {
+            name: "turtlekey",
+            value: "pen size",
+            connections: [5],
+            protoblock: dictBlocks.turtlekey,
+            isValueBlock: () => true,
+            isArgBlock: () => false
+        };
+
+        try {
+            logo.runFromBlockNow(logo, 0, 0, 1, null);
+        } finally {
+            global._ = english;
+        }
+
+        expect(readBackValue).toBe(5);
     });
 });

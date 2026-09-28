@@ -115,6 +115,9 @@ class SearchController {
                             case "wrapmode":
                                 label = _("wrap mode");
                                 break;
+                            case "turtlekey":
+                                label = _("turtle key");
+                                break;
                             case "loadFile":
                                 label = _("load file");
                                 break;

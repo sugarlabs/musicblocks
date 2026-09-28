@@ -48,6 +48,27 @@ global.LeftBlock = class LeftBlock {
     setup() {}
 };
 
+global.ValueBlock = class ValueBlock {
+    constructor(type) {
+        this.type = type;
+        this.capabilities = [];
+    }
+    setCapability(name) {
+        this.capabilities.push(name);
+    }
+    setPalette(palette) {
+        this.palette = palette;
+    }
+    beginnerBlock() {
+        return true;
+    }
+    setHelpString() {}
+    formBlock(config) {
+        this.config = config;
+    }
+    setup() {}
+};
+
 global.NOINPUTERRORMSG = "No input error message";
 
 global.Turtle = {
@@ -812,5 +833,29 @@ describe("setupDictBlocks", () => {
                 turtle
             );
         });
+    });
+
+    test("registers a turtle key block that picks a key from a menu", () => {
+        const instances = {};
+        const origValueBlock = global.ValueBlock;
+        global.ValueBlock = class extends origValueBlock {
+            constructor(type) {
+                super(type);
+                instances[type] = this;
+            }
+        };
+        try {
+            setupDictBlocks(activity);
+        } finally {
+            global.ValueBlock = origValueBlock;
+        }
+
+        const block = instances["turtlekey"];
+        expect(block).toBeDefined();
+        expect(block.palette).toBe("dictionary");
+        expect(block.capabilities).toEqual(
+            expect.arrayContaining(["valueDrivenLabel", "discreteChoice"])
+        );
+        expect(block.config).toEqual({ outType: "anyout" });
     });
 });
