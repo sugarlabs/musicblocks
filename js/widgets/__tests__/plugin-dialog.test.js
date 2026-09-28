@@ -148,14 +148,14 @@ describe("PluginDialog", () => {
     });
 
     describe("openPlugin", () => {
-        it("calls closeAuxToolbar with showHideAuxMenu if closeAuxToolbar is a function", () => {
+        it("does not call closeAuxToolbar so auxiliary toolbar stays open for repeated actions", () => {
             const closeAuxToolbar = jest.fn();
             const showHideAuxMenu = jest.fn();
             const dialog = new PluginDialog({ closeAuxToolbar, showHideAuxMenu });
 
             dialog.openPlugin();
 
-            expect(closeAuxToolbar).toHaveBeenCalledWith(showHideAuxMenu);
+            expect(closeAuxToolbar).not.toHaveBeenCalled();
         });
 
         it("creates a DOM modal with backdrop, select, and buttons", () => {
@@ -257,6 +257,17 @@ describe("PluginDialog", () => {
     });
 
     describe("deletePlugin", () => {
+        it("does not call closeAuxToolbar so auxiliary toolbar stays open for repeated actions", () => {
+            const closeAuxToolbar = jest.fn();
+            const showHideAuxMenu = jest.fn();
+            const getLoadedPlugins = jest.fn().mockReturnValue(["maths"]);
+            const dialog = new PluginDialog({ closeAuxToolbar, showHideAuxMenu, getLoadedPlugins });
+
+            dialog.deletePlugin();
+
+            expect(closeAuxToolbar).not.toHaveBeenCalled();
+        });
+
         it("creates a DOM modal with backdrop, select, and buttons", () => {
             const getLoadedPlugins = jest.fn().mockReturnValue(["maths", "rodi"]);
             const dialog = new PluginDialog({ getLoadedPlugins });
