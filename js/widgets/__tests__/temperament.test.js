@@ -3,6 +3,9 @@ global.ManagedTimer = ManagedTimer;
 const TemperamentWidget = require("../temperament");
 global.TuningFormats = require("../../utils/tuningformats");
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
+const DomHelpers = require("../../utils/dom-helpers");
+global.downloadTextFile = DomHelpers.downloadTextFile;
+global.createSharePopup = DomHelpers.createSharePopup;
 
 const setupImportGlobals = () => {
     global._ = jest.fn(text => text);

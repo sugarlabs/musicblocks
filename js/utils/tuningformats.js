@@ -165,9 +165,13 @@ const parseTemperamentJson = text => {
     if (
         !Array.isArray(ratios) ||
         ratios.length !== pitchNumber + 1 ||
-        !ratios.every(r => typeof r === "number" && isFinite(r) && r > 0) ||
-        Math.abs(ratios[0] - 1) > 1e-6 ||
-        !ratios.every((r, i) => i === 0 || r > ratios[i - 1])
+        !ratios.every(
+            (r, i) =>
+                typeof r === "number" &&
+                isFinite(r) &&
+                r > 0 &&
+                (i === 0 ? Math.abs(r - 1) <= 1e-6 : r > ratios[i - 1])
+        )
     ) {
         throw new Error("Invalid temperament JSON: invalid ratios");
     }

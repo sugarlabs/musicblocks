@@ -25,7 +25,7 @@
     isCustomTemperament, isUnsafeObjectKey, last, normalizeNoteAccidentals, parseNoteString,
     pitchToFrequency, platformColor, PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction,
    setOctaveRatio, SHARP, Singer, slicePath, TuningFormats, updateTemperaments, wheelnav,
-   frequencyToPitch, clampNumber, ManagedTimer, readTextFile
+   frequencyToPitch, clampNumber, ManagedTimer, readTextFile, downloadTextFile, createSharePopup
 */
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
@@ -2711,15 +2711,7 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._downloadScl = function (content, filename) {
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        downloadTextFile(content, filename);
     };
 
     /**
@@ -2758,27 +2750,13 @@ function TemperamentWidget() {
                     try {
                         const parsed = parseNoteString(def.referencePitch);
                         if (parsed && Number.isFinite(Number(parsed[1]))) {
-                            let resolved;
-                            if (
-                                this._logo &&
-                                this._logo.synth &&
-                                typeof this._logo.synth._getFrequency === "function"
-                            ) {
-                                resolved = this._logo.synth._getFrequency(
-                                    def.referencePitch,
-                                    false,
-                                    this.inTemperament
-                                );
-                            }
-                            if (!Number.isFinite(Number(resolved))) {
-                                resolved = pitchToFrequency(
-                                    parsed[0],
-                                    Number(parsed[1]),
-                                    0,
-                                    "c major",
-                                    this.inTemperament
-                                );
-                            }
+                            const resolved = pitchToFrequency(
+                                parsed[0],
+                                Number(parsed[1]),
+                                0,
+                                "c major",
+                                this.inTemperament
+                            );
                             if (Number.isFinite(Number(resolved)) && Number(resolved) > 0) {
                                 referenceFrequency = Number(resolved);
                             }
@@ -2883,71 +2861,15 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._createSharePopup = function (anchor) {
-        const existing = document.getElementById("temperamentSharePopup");
-        if (existing) {
-            if (existing._closeHandler) {
-                document.removeEventListener("mousedown", existing._closeHandler);
-            }
-            existing.remove();
-            return;
-        }
-
-        const popup = document.createElement("div");
-        popup.id = "temperamentSharePopup";
-        popup.style.cssText =
-            "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
-            "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
-            "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
-            "min-width:140px;";
-        const rect = anchor.getBoundingClientRect();
-        popup.style.top = rect.bottom + 4 + "px";
-        popup.style.left = rect.left + "px";
-
-        const addItem = (label, handler) => {
-            const item = document.createElement("div");
-            item.textContent = label;
-            item.setAttribute("role", "button");
-            item.setAttribute("tabindex", "0");
-            item.style.cssText = "padding:6px 16px;cursor:pointer;";
-            item.onmouseenter = () => {
-                item.style.background = "var(--color-bg-tertiary)";
-            };
-            item.onmouseleave = () => {
-                item.style.background = "";
-            };
-            item.onclick = () => {
-                cleanup();
-                handler();
-            };
-            item.onkeydown = e => {
-                if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    cleanup();
-                    handler();
-                }
-            };
-            return item;
-        };
-
-        popup.appendChild(addItem(_("Export .scl"), () => this._exportScl()));
-        popup.appendChild(addItem(_("Export JSON"), () => this._exportJson()));
-        popup.appendChild(addItem(_("Import"), () => this._importFile()));
-        document.body.appendChild(popup);
-
-        const cleanup = () => {
-            popup.remove();
-            document.removeEventListener("mousedown", closeHandler);
-        };
-
-        const closeHandler = e => {
-            if (!popup.contains(e.target)) {
-                cleanup();
-            }
-        };
-        popup._closeHandler = closeHandler;
-        setTimeout(() => {
-            document.addEventListener("mousedown", closeHandler);
-        }, 0);
+        createSharePopup(
+            "temperamentSharePopup",
+            [
+                [_("Export .scl"), () => this._exportScl()],
+                [_("Export JSON"), () => this._exportJson()],
+                [_("Import"), () => this._importFile()]
+            ],
+            anchor
+        );
     };
 
     /**

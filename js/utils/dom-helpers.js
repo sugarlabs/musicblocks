@@ -25,7 +25,8 @@
 
 /* exported
    closeWidgets, displayMsg, docByClass, docById, docByName, docBySelector,
-   docByTagName, hideDOMLabel, makeKeyboardAccessible, readTextFile
+   docByTagName, hideDOMLabel, makeKeyboardAccessible, readTextFile,
+   downloadTextFile, createSharePopup
 */
 
 const keyboardAccessibleHandlers = new WeakMap();
@@ -217,6 +218,103 @@ function readTextFile(inputId, callback) {
     fileInput.click();
 }
 
+/**
+ * Downloads text content as a file via a blob URL and a synthetic anchor
+ * click, revoking the URL afterwards.
+ * @param {string} content - The file content.
+ * @param {string} filename - The download file name.
+ * @returns {void}
+ */
+function downloadTextFile(content, filename) {
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+/**
+ * Builds an export/import popup anchored to a toolbar button. Clicking
+ * the button again (existing popup found), choosing an item, or clicking
+ * outside closes it.
+ * @param {string} popupId - The DOM id for the popup element.
+ * @param {Array} items - [label, handler] pairs, one per menu item.
+ * @param {HTMLElement} anchor - The button the popup is anchored to.
+ * @returns {HTMLElement|null} The popup, or null when toggling closed.
+ */
+function createSharePopup(popupId, items, anchor) {
+    const existing = docById(popupId);
+    if (existing) {
+        if (existing._closeHandler) {
+            document.removeEventListener("mousedown", existing._closeHandler);
+        }
+        existing.remove();
+        return null;
+    }
+
+    const popup = document.createElement("div");
+    popup.id = popupId;
+    popup.style.cssText =
+        "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
+        "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
+        "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
+        "min-width:140px;";
+    const rect = anchor.getBoundingClientRect();
+    popup.style.top = rect.bottom + 4 + "px";
+    popup.style.left = rect.left + "px";
+
+    const addItem = (label, handler) => {
+        const item = document.createElement("div");
+        item.textContent = label;
+        item.setAttribute("role", "button");
+        item.setAttribute("tabindex", "0");
+        item.style.cssText = "padding:6px 16px;cursor:pointer;";
+        item.onmouseenter = () => {
+            item.style.background = "var(--color-bg-tertiary)";
+        };
+        item.onmouseleave = () => {
+            item.style.background = "";
+        };
+        item.onclick = () => {
+            cleanup();
+            handler();
+        };
+        item.onkeydown = e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                cleanup();
+                handler();
+            }
+        };
+        return item;
+    };
+
+    for (const [label, handler] of items) {
+        popup.appendChild(addItem(label, handler));
+    }
+    document.body.appendChild(popup);
+
+    const cleanup = () => {
+        popup.remove();
+        document.removeEventListener("mousedown", closeHandler);
+    };
+
+    const closeHandler = e => {
+        if (!popup.contains(e.target)) {
+            cleanup();
+        }
+    };
+    popup._closeHandler = closeHandler;
+    setTimeout(() => {
+        document.addEventListener("mousedown", closeHandler);
+    }, 0);
+    return popup;
+}
+
 var DomHelpers = {
     docByClass,
     docByTagName,
@@ -227,7 +325,9 @@ var DomHelpers = {
     displayMsg,
     closeWidgets,
     makeKeyboardAccessible,
-    readTextFile
+    readTextFile,
+    downloadTextFile,
+    createSharePopup
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -252,4 +352,6 @@ if (typeof window !== "undefined" && (typeof module === "undefined" || !module.e
     window.closeWidgets = closeWidgets;
     window.makeKeyboardAccessible = makeKeyboardAccessible;
     window.readTextFile = readTextFile;
+    window.downloadTextFile = downloadTextFile;
+    window.createSharePopup = createSharePopup;
 }
