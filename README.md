@@ -89,7 +89,7 @@ To run from the most recent master branch (experimental), visit
 
 Turtle Blocks shares the same codebase as Music Blocks. To access it,
 simply append ?turtle=true to the URL. We also maintain a link to
-[_turtle.sugarlabs.org_](turtle.sugarlabs.org) that redirects to
+[_turtle.sugarlabs.org_](https://turtle.sugarlabs.org) that redirects to
 [_musicblocks.sugarlabs.org?turtle=true_](https://musicblocks.sugarlabs.org?turtle=true)
 for your convenience.
 
