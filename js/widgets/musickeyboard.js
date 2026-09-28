@@ -2657,29 +2657,43 @@ function MusicKeyboard(activity) {
         }
 
         const block = this.activity.blocks.blockList[blockNo];
-        if (!block || !Array.isArray(block.connections) || block.connections.length === 0) {
+        if (!block || !Array.isArray(block.connections) || block.connections.length < 2) {
             return;
         }
 
         const c0 = block.connections[0];
         const c1 = last(block.connections);
-        if (c0 !== null && c0 !== undefined && this.activity.blocks.blockList[c0]) {
-            const parentBlock = this.activity.blocks.blockList[c0];
-            if (parentBlock.name === "musickeyboard") {
-                parentBlock.connections[1] = c1;
-            } else if (
-                Array.isArray(parentBlock.connections) &&
-                parentBlock.connections.length > 0
-            ) {
-                parentBlock.connections[parentBlock.connections.length - 1] = c1;
+
+        const parentBlock =
+            c0 !== null && c0 !== undefined && this.activity.blocks.blockList[c0]
+                ? this.activity.blocks.blockList[c0]
+                : null;
+        const childBlock =
+            c1 !== null && c1 !== undefined && this.activity.blocks.blockList[c1]
+                ? this.activity.blocks.blockList[c1]
+                : null;
+
+        const nextChildId = childBlock ? c1 : null;
+        const nextParentId = parentBlock ? c0 : null;
+
+        if (
+            parentBlock &&
+            Array.isArray(parentBlock.connections) &&
+            parentBlock.connections.length > 0
+        ) {
+            if (parentBlock.name === "musickeyboard" && parentBlock.connections.length > 1) {
+                parentBlock.connections[1] = nextChildId;
+            } else {
+                parentBlock.connections[parentBlock.connections.length - 1] = nextChildId;
             }
         }
 
-        if (c1 !== null && c1 !== undefined && this.activity.blocks.blockList[c1]) {
-            const childBlock = this.activity.blocks.blockList[c1];
-            if (Array.isArray(childBlock.connections) && childBlock.connections.length > 0) {
-                childBlock.connections[0] = c0;
-            }
+        if (
+            childBlock &&
+            Array.isArray(childBlock.connections) &&
+            childBlock.connections.length > 0
+        ) {
+            childBlock.connections[0] = nextParentId;
         }
 
         block.connections[block.connections.length - 1] = null;
