@@ -17,12 +17,7 @@
     "dependencyDashboard": true,
     "dependencyDashboardTitle": "🔄 Renovate Dependency Dashboard",
 
-    "onboarding": false,
-    "requireConfig": "optional",
-
     "timezone": "Asia/Kolkata",
-
-    "schedule": ["before 6am on monday"],
 
     "labels": ["dependencies", "renovate"],
 
@@ -37,19 +32,21 @@
 
     "packageRules": [
         {
-            "description": "Group all patch and minor devDependency updates together",
+            "description": "Group all patch and minor devDependency updates – open PRs on Monday mornings only",
             "matchDepTypes": ["devDependencies"],
             "matchUpdateTypes": ["patch", "minor"],
             "groupName": "devDependencies (non-major)",
             "automerge": false,
+            "schedule": ["before 6am on monday"],
             "labels": ["dependencies", "renovate", "dev-dependencies"]
         },
         {
-            "description": "Group all patch and minor production dependency updates together",
+            "description": "Group all patch and minor production dependency updates – open PRs on Monday mornings only",
             "matchDepTypes": ["dependencies"],
             "matchUpdateTypes": ["patch", "minor"],
             "groupName": "dependencies (non-major)",
             "automerge": false,
+            "schedule": ["before 6am on monday"],
             "labels": ["dependencies", "renovate"]
         },
         {
@@ -64,6 +61,12 @@
             "pinDigests": true,
             "groupName": "GitHub Actions",
             "labels": ["dependencies", "renovate", "github-actions"]
+        },
+        {
+            "description": "Schedule GitHub Actions digest-only updates to Monday mornings – major/minor updates are not delayed",
+            "matchManagers": ["github-actions"],
+            "matchUpdateTypes": ["pinDigest", "digest"],
+            "schedule": ["before 6am on monday"]
         },
         {
             "description": "Electron is pinned – only raise a PR on major bumps",
