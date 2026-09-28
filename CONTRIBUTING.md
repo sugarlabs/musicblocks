@@ -122,6 +122,19 @@ NOTE: Only run `prettier` on the files you have modified.
 
 If formatting fails, run `npx prettier --write .` to fix it.
 
+### Dependencies and `package-lock.json`
+
+`package-lock.json` is committed to the repository so that every contributor and every CI run installs the same dependency versions. Please follow these guidelines:
+
+- Do not delete `package-lock.json` or add it to `.gitignore`.
+- Use `npm ci` for a clean install that matches the lockfile.
+- If your PR adds, removes, or updates a dependency in `package.json`, run `npm install` and commit the updated `package-lock.json` in the same PR.
+- If your PR does not change dependencies, it should not modify `package-lock.json`. Revert any unrelated changes before opening the PR:
+
+```bash
+git checkout upstream/master -- package-lock.json
+```
+
 ### Developer Certificate of Origin (DCO)
 
 Every commit must include a `Signed-off-by` trailer certifying you wrote the
