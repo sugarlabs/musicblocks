@@ -135,7 +135,13 @@ If formatting fails, run `npx prettier --write .` to fix it.
 git restore --staged --worktree package-lock.json
 ```
 
-If the change is already committed, restore the file from the `master` branch of `sugarlabs/musicblocks` (for example, `git checkout upstream/master -- package-lock.json`, using whichever remote points to the main repository) and commit the result.
+If the change is already committed, restore the file from the `master` branch of `sugarlabs/musicblocks` and commit the result. The following commands work regardless of how your remotes are named:
+
+```bash
+git fetch https://github.com/sugarlabs/musicblocks.git master
+git checkout FETCH_HEAD -- package-lock.json
+git commit -s -m "chore: revert unrelated package-lock.json changes"
+```
 
 ### Developer Certificate of Origin (DCO)
 
