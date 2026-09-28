@@ -1103,7 +1103,7 @@ class Singer {
 
                         tur.singer.arpeggioIndex += 1;
                     }
-                    if (tur.singer.arpeggioIndex === alen) {
+                    if (tur.singer.arpeggioIndex >= alen) {
                         tur.singer.arpeggioIndex = 0;
                     }
                 }
