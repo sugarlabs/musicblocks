@@ -262,6 +262,8 @@ class Turtle {
         this.singer.turtleTime = 0;
         this.singer.pushedNote = false;
         this.singer.duplicateFactor = 1;
+        this.singer.arpeggio = [];
+        this.singer.arpeggioIndex = 0;
         this.singer.inDuplicate = false;
         this.singer.skipFactor = 1;
         this.singer.skipIndex = 0;
