@@ -2482,7 +2482,7 @@ describe("noteToPitchOctave", () => {
 
     it("should handle multi-character note names with no octave", () => {
         const result = noteToPitchOctave("B#");
-        expect(result).toEqual(["B", NaN]); // No octave, returns NaN for octave
+        expect(result).toEqual(["B#", NaN]); // No octave, returns NaN for octave
     });
 
     it("should correctly extract pitch and octave from a note string with multi-digit octave", () => {
@@ -2512,9 +2512,9 @@ describe("noteToPitchOctave", () => {
         expect(noteToPitchOctave("do#7")).toEqual(["do#", 7]);
     });
 
-    it("should correctly handle fallback cases for multi-digit digits", () => {
-        expect(noteToPitchOctave("hello10")).toEqual(["hello1", 0]);
-        expect(noteToPitchOctave("xyz123")).toEqual(["xyz12", 3]);
+    it("should safely return NaN octave for unparseable strings ending in digits", () => {
+        expect(noteToPitchOctave("hello10")).toEqual(["hello10", NaN]);
+        expect(noteToPitchOctave("xyz123")).toEqual(["xyz123", NaN]);
     });
 
     it("should correctly handle Carnatic note strings with octave", () => {
@@ -2523,12 +2523,12 @@ describe("noteToPitchOctave", () => {
         expect(noteToPitchOctave("ma#5")).toEqual(["ma#", 5]);
     });
 
-    it("should not match adversarial non-note words and fall back to fallback behavior", () => {
-        expect(noteToPitchOctave("away5")).toEqual(["away", 5]);
-        expect(noteToPitchOctave("regard4")).toEqual(["regard", 4]);
-        expect(noteToPitchOctave("hi4")).toEqual(["hi", 4]);
-        expect(noteToPitchOctave("random9")).toEqual(["random", 9]);
-        expect(noteToPitchOctave("banana2")).toEqual(["banana", 2]);
+    it("should safely return NaN octave for adversarial non-note words", () => {
+        expect(noteToPitchOctave("away5")).toEqual(["away5", NaN]);
+        expect(noteToPitchOctave("regard4")).toEqual(["regard4", NaN]);
+        expect(noteToPitchOctave("hi4")).toEqual(["hi4", NaN]);
+        expect(noteToPitchOctave("random9")).toEqual(["random9", NaN]);
+        expect(noteToPitchOctave("banana2")).toEqual(["banana2", NaN]);
     });
 });
 
@@ -2599,7 +2599,7 @@ describe("noteToFrequency", () => {
     });
 
     it("handles invalid note input gracefully", () => {
-        expect(noteToFrequency("X9", "C")).toBe(A0 * Math.pow(TWELTHROOT2, 99));
+        expect(noteToFrequency("X9", "C")).toBeNaN();
     });
 });
 
