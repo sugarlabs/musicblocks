@@ -107,6 +107,16 @@ function setupMeterActions(activity) {
         }
 
         static setBPM(bpm, beatValue, turtle, blk) {
+            // Guard: reject non-finite and non-positive BPM values before any
+            // arithmetic. A NaN or zero _bpm would cause every subsequent
+            // setTimeout delay to be NaN or 0 ms, hanging the audio scheduler
+            // silently. Negative values produce a negative delay with the same
+            // effect. Infinity would set an impossibly fast tempo.
+            if (!Number.isFinite(bpm) || bpm <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
+
             let _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
             if (_bpm < 30) {

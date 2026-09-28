@@ -175,6 +175,24 @@ describe("setupMeterActions", () => {
             }
             expect(targetTurtle.singer.bpm).toContain(expected);
         });
+
+        // --- NaN / zero / negative / Infinity guard ---
+        // These inputs must be rejected before any arithmetic so that a zero
+        // or NaN value never enters singer.bpm and hangs the audio scheduler.
+        test.each([
+            ["NaN", NaN],
+            ["zero", 0],
+            ["negative", -60],
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity]
+        ])("setBPM(%s) shows an error and does not push to bpm", (label, badBpm) => {
+            activity.errorMsg.mockClear();
+            const bpmBefore = [...targetTurtle.singer.bpm];
+            Singer.MeterActions.setBPM(badBpm, 0.25, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
+            // bpm stack must be unchanged — no bad value was stored
+            expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
+        });
     });
 
     describe("master BPM settings", () => {
