@@ -19,26 +19,13 @@
 
 function setupProgramBlocks(activity) {
     /**
-     * Determines whether a dictionary key is a built-in turtle status property.
+     * Determines whether a dictionary key is a built-in turtle status property, in any language.
      *
      * @param {string} key - The dictionary key to check.
      * @returns {boolean} True if the key represents a turtle status property, false otherwise.
      */
     function isTurtleStatusKey(key) {
-        return (
-            key === _("color") ||
-            key === _("shade") ||
-            key === _("grey") ||
-            key === _("pen size") ||
-            key === _("font") ||
-            key === _("heading") ||
-            key === "x" ||
-            key === "y" ||
-            key === _("notes played") ||
-            key === _("note value") ||
-            key === _("current pitch") ||
-            key === _("pitch number")
-        );
+        return Turtle.DictActions.IsTurtleKey(key);
     }
     /**
      * Represents a block that loads the heap from a web page in the logo programming language.

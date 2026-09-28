@@ -1311,6 +1311,9 @@ class PaletteModel {
             case "grid":
                 label = _("Grid").toLowerCase();
                 break;
+            case "turtlekey":
+                label = _("pen size");
+                break;
             case "text":
                 label = _("text");
                 break;

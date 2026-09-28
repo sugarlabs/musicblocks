@@ -131,6 +131,12 @@ describe("setupDictActions", () => {
             expect(currentPitch).toBe("C4");
         });
 
+        it("should return G4 for the current pitch before any note is played", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            expect(Turtle.DictActions._GetDict(0, turtle, "current pitch")).toBe("G4");
+            expect(Turtle.DictActions.getValue("target", "current pitch", turtle, 3)).toBe("G4");
+        });
+
         it("should get the pitch number correctly with lastNotePlayed", () => {
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number");
             expect(pitchNumber).toBe(60);
@@ -388,6 +394,31 @@ describe("setupDictActions", () => {
             expect(activity.logo.turtleDicts[turtle].existingDict.oldKey).toBe("oldValue");
             expect(activity.logo.turtleDicts[turtle].existingDict.newKey).toBe("newValue");
         });
+
+        test.each([
+            ["color", "blue", "doSetColor", ["blue"]],
+            ["pen size", 5, "doSetPensize", [5]],
+            ["heading", 180, "doSetHeading", [180]],
+            ["x", 150, "doSetXY", [150, 200]]
+        ])(
+            "should apply %s to the turtle when dict is a turtle name",
+            (key, value, method, args) => {
+                Turtle.DictActions.setValue("target", key, value, turtle);
+                expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
+                expect(activity.logo.turtleDicts[turtle]).toEqual({});
+            }
+        );
+
+        it("should not store read-only turtle keys when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "notes played", 3, turtle);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
+        });
+
+        it("should store other keys under the turtle index when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "score", 7, turtle);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({ 0: { score: 7 } });
+            expect(JSON.parse(Turtle.DictActions.getDict("target", turtle)).score).toBe(7);
+        });
     });
 
     describe("getValue", () => {
@@ -448,6 +479,117 @@ describe("setupDictActions", () => {
                 123
             );
             expect(activity.logo.turtleDicts[turtle]).toEqual({});
+        });
+
+        test.each([
+            ["x", 100],
+            ["heading", 90],
+            ["pen size", 2],
+            ["notes played", 0.5],
+            ["current pitch", "C4"]
+        ])("should return the turtle's %s when dict is a turtle name", (key, expected) => {
+            expect(Turtle.DictActions.getValue("target", key, turtle, 3)).toBe(expected);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should return a stored key when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "score", 7, turtle);
+            expect(Turtle.DictActions.getValue("target", "score", turtle, 3)).toBe(7);
+        });
+
+        it("should report a missing key and return 0 when dict is a turtle name", () => {
+            const result = Turtle.DictActions.getValue("target", "score", turtle, 3);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in target",
+                3
+            );
+        });
+
+        it("should not return inherited properties as stored keys when dict is a turtle name", () => {
+            Turtle.DictActions.setValue("target", "score", 7, turtle);
+            const result = Turtle.DictActions.getValue("target", "toString", turtle, 3);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in target",
+                3
+            );
+        });
+    });
+
+    // Text blocks keep their English value and only translate their label, so in another
+    // language a key can arrive either in English or translated.
+    describe("in another language", () => {
+        const spanish = {
+            "pen size": "tamaño de la pluma",
+            "heading": "rumbo",
+            "notes played": "notas tocadas"
+        };
+
+        beforeEach(() => {
+            global._.mockImplementation(key => spanish[key] || key);
+        });
+
+        afterEach(() => {
+            global._.mockImplementation(key => key);
+        });
+
+        test.each([
+            ["pen size", 2],
+            ["tamaño de la pluma", 2],
+            ["heading", 90],
+            ["rumbo", 90],
+            ["notes played", 0.5],
+            ["notas tocadas", 0.5]
+        ])("should get the turtle's %s", (key, expected) => {
+            expect(Turtle.DictActions.getValue("target", key, turtle, 3)).toBe(expected);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test.each(["pen size", "tamaño de la pluma"])("should set the turtle's %s", key => {
+            Turtle.DictActions.setValue("target", key, 7, turtle);
+            expect(targetTurtle.painter.doSetPensize).toHaveBeenCalledWith(7);
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
+        });
+
+        test.each(["notes played", "notas tocadas"])(
+            "should report %s as read-only and not store it",
+            key => {
+                Turtle.DictActions.setValue("target", key, 7, turtle);
+                expect(activity.errorMsg).toHaveBeenCalledWith("Cannot set read-only key: " + key);
+                expect(activity.logo.turtleDicts[turtle]).toEqual({});
+            }
+        );
+
+        it("should still report an unknown key", () => {
+            expect(Turtle.DictActions._GetDict(0, turtle, "tamaño", 3)).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: tamaño", 3);
+        });
+    });
+
+    describe("TurtleKeys", () => {
+        it("should list every key _GetDict handles, in English", () => {
+            const keys = Turtle.DictActions.TurtleKeys();
+            expect(keys).toEqual([
+                "color",
+                "shade",
+                "grey",
+                "pen size",
+                "font",
+                "heading",
+                "x",
+                "y",
+                "notes played",
+                "note value",
+                "current pitch",
+                "pitch number"
+            ]);
+            keys.forEach(key => expect(Turtle.DictActions.IsTurtleKey(key)).toBe(true));
+        });
+
+        it("should return a copy", () => {
+            Turtle.DictActions.TurtleKeys().pop();
+            expect(Turtle.DictActions.TurtleKeys()).toHaveLength(12);
         });
     });
 });
