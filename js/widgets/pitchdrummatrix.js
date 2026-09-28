@@ -684,6 +684,7 @@ class PitchDrumMatrix {
         } else {
             this._setPlayButtonIcon("play");
             this._resetRowHighlights();
+            this.activity.logo.synth.stop();
             return;
         }
         this.activity.logo.synth.stop();

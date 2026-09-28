@@ -198,17 +198,19 @@ describe("PitchDrumMatrix with a real DOM", () => {
             labels(pdm).forEach(cell => expect(cell.style.backgroundColor).toBe(labelColor));
         });
 
-        test("clears the row highlights when stopped", () => {
+        test("clears the row highlights and stops the sound when stopped", () => {
             jest.useFakeTimers();
-            const { pdm } = threeRows();
+            const { pdm, activity } = threeRows();
             click(0, 0);
             click(1, 0);
 
             pdm.playButton.onclick();
             jest.advanceTimersByTime(1500);
+            activity.logo.synth.stop.mockClear();
             pdm.playButton.onclick();
 
             labels(pdm).forEach(cell => expect(cell.style.backgroundColor).toBe(labelColor));
+            expect(activity.logo.synth.stop).toHaveBeenCalled();
         });
 
         test("with nothing selected, stays stopped so the next Play starts", () => {
