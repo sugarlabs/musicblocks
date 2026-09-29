@@ -1983,7 +1983,7 @@ describe("AST2BlockList Class", () => {
             [11, ["number", { value: 12 }], 0, 0, [9]],
             [12, "semitoneinterval", 0, 0, [6, 13, null, 18]],
             [13, "plus", 0, 0, [12, 14, 15]],
-            [14, ["text", { value: "major 3" }], 0, 0, [13]],
+            [14, ["intervalname", { value: "major 3" }], 0, 0, [13]],
             [15, "multiply", 0, 0, [13, 16, 17]],
             [16, ["number", { value: 0 }], 0, 0, [15]],
             [17, ["number", { value: 12 }], 0, 0, [15]],

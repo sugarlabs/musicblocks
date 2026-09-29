@@ -2407,7 +2407,7 @@
             "comment": "Set semitone interval block",
             "arguments": [
                 {
-                    "type": "NumberExpression"
+                    "type": "IntervalExpression"
                 }
             ],
             "ast": {
