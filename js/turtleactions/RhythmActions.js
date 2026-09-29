@@ -332,6 +332,11 @@ function setupRhythmActions(activity) {
                     tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
                     tur.singer.embeddedGraphics[saveBlk] = []; // graphics will have already been rendered
 
+                    // The carried-over note was counted when it was first played,
+                    // so don't count it again when it is replayed.
+                    const saveNoteCount = tur.singer.notesPlayed;
+                    const saveTallyNotes = tur.singer.tallyNotes;
+
                     Singer.processNote(
                         activity,
                         tur.singer.tieNoteExtras[7], // rawDurationValue
@@ -339,6 +344,9 @@ function setupRhythmActions(activity) {
                         saveBlk,
                         turtle
                     );
+
+                    tur.singer.notesPlayed = saveNoteCount;
+                    tur.singer.tallyNotes = saveTallyNotes;
 
                     // compute bpmFactor locally (same logic as Singer.processNote)
                     const bpmFactor =
