@@ -2378,5 +2378,31 @@ describe("AST2BlockList Class", () => {
         const restBlock = blockList.find(b => b[1] === "rest2");
         expect(restBlock).toBeDefined();
     });
+
+    test("should handle if-then-else when the first branch contains only EmptyStatement nodes", () => {
+        const code = `
+        new Mouse(async mouse => {
+            if (true) {
+                // Not exported (no JavaScript equivalent): "setturtlename2"
+                ;
+            } else {
+                await mouse.playRest();
+            }
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList.length).toBeGreaterThan(0);
+        const ifElseBlock = blockList.find(b => b[1] === "ifthenelse");
+        expect(ifElseBlock).toBeDefined();
+        // Connection 2 (first child) is null since first branch had no statement blocks
+        expect(ifElseBlock[4][2]).toBeNull();
+        // Connection 3 (second child) points to the rest block in else branch
+        const restBlock = blockList.find(b => b[1] === "rest2");
+        expect(restBlock).toBeDefined();
+        expect(ifElseBlock[4][3]).toBe(restBlock[0]);
+    });
 });
 
