@@ -343,8 +343,8 @@ class TimbreWidget {
                 updateParams[2] = n + 1; // Numerator block
 
                 const __blockRefresher = () => {
-                    this.activity.blocks.blockList[last(this.vibratoEffect)].connections[2] = n;
-                    this.activity.blocks.blockList[n].connections[0] = last(this.vibratoEffect);
+                    this.activity.blocks.blockList[this.vibratoEffect[i]].connections[2] = n;
+                    this.activity.blocks.blockList[n].connections[0] = this.vibratoEffect[i];
                     this.activity.blocks.blockList[divBlock].connections[0] = null;
                     this.activity.blocks.clampBlocksToCheck.push([n, 0]);
                     this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
@@ -2181,7 +2181,7 @@ class TimbreWidget {
 
             if (targetId.startsWith("sel") && event.type === "change") {
                 filterButtonCell.style.backgroundColor = "#C8C8C0";
-                const m = targetId.slice(-1);
+                const m = Number(targetId.slice("sel".length));
                 instrumentsFilters[0][this.instrumentName][m]["filterType"] = target.value;
                 this._update(m, target.value, 0);
 
@@ -2203,7 +2203,7 @@ class TimbreWidget {
                 (event.type === "change" || event.type === "input")
             ) {
                 filterButtonCell.style.backgroundColor = "#C8C0C8";
-                const m = targetId.slice(-1);
+                const m = Number(targetId.slice("myRangeF".length));
                 const spanElement = docById("myspanF" + m);
                 if (spanElement) {
                     spanElement.textContent = target.value;
