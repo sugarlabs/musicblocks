@@ -242,8 +242,12 @@ the project.
 ### First-Time Contributors
 
 If you are a first-time contributor, create and publish/share a MusicBlocks project before opening your first pull request.
-Then paste the generated share link into the **MusicBlocks Project Link** field and attach a screenshot of the project in the **MusicBlocks Project Screenshot** field.
-Both are checked by CI and your PR will not be merged until they are present.
+
+We've added this requirement because we want you to have experienced MusicBlocks from the perspective of a user before making changes to the code.
+
+Then paste the generated share link into the **MusicBlocks Project Link** field and attach a screenshot or a screen-recording of the project in the **MusicBlocks Project Screenshot or Screen-Recording** field.
+
+Both are checked by CI and your PR will not be merged unless they are present.
 
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 

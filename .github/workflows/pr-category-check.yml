@@ -72,15 +72,15 @@ jobs:
 
               // Check that the MusicBlocks Project Screenshot section has content.
               // Strip the heading itself and all HTML comments, then require non-empty text.
-              const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
+              const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot or Screen-Recording\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
               const screenshotRaw = screenshotMatch ? screenshotMatch[1] : '';
               const screenshotContent = screenshotRaw.replace(/<!--[\s\S]*?-->/g, '').trim();
 
               if (!screenshotContent) {
                 core.setFailed(
-                  '## First-Time Contributor MusicBlocks Project Screenshot Required\n\n' +
-                  'Welcome to Music Blocks! As a first-time contributor, please attach a screenshot of your MusicBlocks project ' +
-                  'under the **MusicBlocks Project Screenshot** section of the PR description.'
+                  '## First-Time Contributor MusicBlocks Project Screenshot or Screen-Recording Required\n\n' +
+                  'Welcome to Music Blocks! As a first-time contributor, please attach a screenshot or a screen-recording of your MusicBlocks project ' +
+                  'under the **MusicBlocks Project Screenshot or Screen-Recording** section of the PR description.'
                 );
                 return;
               }

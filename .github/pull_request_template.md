@@ -23,9 +23,9 @@ Please complete the sections below to help us review your changes efficiently.
 
 ---
 
-## MusicBlocks Project Screenshot
+## MusicBlocks Project Screenshot or Screen-Recording
 
-<!-- First-time contributors (CI enforced): attach a screenshot of your published MusicBlocks project here. Existing contributors can leave this blank. -->
+<!-- First-time contributors (CI enforced): attach a screenshot or a screen-recording of your published MusicBlocks project here. Existing contributors can leave this blank. -->
 
 ---
 
