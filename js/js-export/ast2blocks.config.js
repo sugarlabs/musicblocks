@@ -153,14 +153,16 @@ window.ast2blocklist_config = {
                 BOTTOMPOS: "bottompos",
                 CAMERA: "camera",
                 BEATCOUNT: "beatvalue",
-                MEASURECOUNT: "nopValueBlock",
+                MEASURECOUNT: "measurevalue",
                 BPM: "bpmfactor",
                 CURRENTMETER: "currentmeter",
                 HEADING: "heading",
                 WHOLENOTESPLAYED: "elapsednotes",
                 BEATFACTOR: "beatfactor",
-                NOTEVALUE: "notevalue",
-                MASTERVOLUME: "notevolumefactor"
+                NOTEVALUE: "mynotevalue",
+                MASTERVOLUME: "notevolumefactor",
+                SCALARSTEPUP: "consonantstepsizeup",
+                SCALARSTEPDOWN: "consonantstepsizedown"
             }
         },
         {

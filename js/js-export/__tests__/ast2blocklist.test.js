@@ -1772,7 +1772,7 @@ describe("AST2BlockList Class", () => {
             [28, "beatvalue", 0, 0, [27]],
             [29, ["text", { value: "action" }], 0, 0, [27]],
             [30, "onbeatdo", 0, 0, [27, 31, 32, 33]],
-            [31, "nopValueBlock", 0, 0, [30]],
+            [31, "measurevalue", 0, 0, [30]],
             [32, ["text", { value: "action" }], 0, 0, [30]],
             [33, "onbeatdo", 0, 0, [30, 34, 35, 36]],
             [34, "bpmfactor", 0, 0, [33]],
@@ -1807,6 +1807,33 @@ describe("AST2BlockList Class", () => {
             [1, "onbeatdo", 0, 0, [0, 2, 3, null]],
             [2, "currentmeter", 0, 0, [1]],
             [3, ["text", { value: "action" }], 0, 0, [1]]
+        ]);
+    });
+
+    test("should convert note value and scalar step getters", () => {
+        const code = `
+    new Mouse(async mouse => {
+        await mouse.onStrongBeatDo(mouse.NOTEVALUE, "action");
+        await mouse.onStrongBeatDo(mouse.SCALARSTEPUP, "action");
+        await mouse.onStrongBeatDo(mouse.SCALARSTEPDOWN, "action");
+        return mouse.ENDMOUSE;
+    });
+    MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, 4]],
+            [2, "mynotevalue", 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]],
+            [4, "onbeatdo", 0, 0, [1, 5, 6, 7]],
+            [5, "consonantstepsizeup", 0, 0, [4]],
+            [6, ["text", { value: "action" }], 0, 0, [4]],
+            [7, "onbeatdo", 0, 0, [4, 8, 9, null]],
+            [8, "consonantstepsizedown", 0, 0, [7]],
+            [9, ["text", { value: "action" }], 0, 0, [7]]
         ]);
     });
 
