@@ -33,8 +33,9 @@ jobs:
         name: Stamp the development version and package the site
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        # Forks have no Pages environment to deploy to.
-        if: github.repository == 'sugarlabs/musicblocks'
+        # Forks have no Pages environment to deploy to, and a manual run from
+        # another branch must not publish that branch.
+        if: github.repository == 'sugarlabs/musicblocks' && github.ref == 'refs/heads/master'
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
