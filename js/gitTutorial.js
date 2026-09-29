@@ -578,7 +578,7 @@ const GitTutorial = (() => {
     inset: 0;
     z-index: 15000;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     overflow: auto;
     background: rgba(0,0,0,0.45);
