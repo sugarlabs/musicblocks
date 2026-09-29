@@ -1269,10 +1269,14 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow = jest.fn();
         });
 
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
         it("closes matching widget by name", () => {
             const mockElement = { textContent: "TestWidget", id: "" };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
@@ -1349,18 +1353,18 @@ describe("widgetWindows", () => {
 
             window.widgetWindows.openWindows = {
                 "slider": { close: jest.fn() },
-                "music keyboard": { close: jest.fn() },
                 "pitch staircase": { close: jest.fn() },
                 "status": { close: jest.fn() },
                 "sampler": { close: jest.fn() }
             };
+            windowFor({ blockNo: 7 }, "music keyboard");
 
             try {
                 window.widgetWindows.closeBlkWidgets("control deslizante de tono");
                 expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
 
                 window.widgetWindows.closeBlkWidgets("teclado musical");
-                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("music keyboard");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("7");
 
                 window.widgetWindows.closeBlkWidgets("escalera de tono");
                 expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
@@ -1381,7 +1385,7 @@ describe("widgetWindows", () => {
                 id: "custom modeWidgetID"
             };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("custom mode");
 
@@ -1389,7 +1393,7 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([
                 { textContent: "OtherWidget", id: "" }
             ]);
 
