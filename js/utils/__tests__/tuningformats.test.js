@@ -101,6 +101,13 @@ describe("parseSclFile", () => {
         expect(result.pitches[3].ratio).toBeCloseTo(2, 10);
     });
 
+    it("rejects a cents unit on a number without a decimal point", () => {
+        const content = ["! unit.scl", "!", "Unit", "1", "2cents"].join("\n");
+        expect(() => parseSclFile(content)).toThrow(
+            "Invalid .scl file: invalid cents value: 2cents"
+        );
+    });
+
     it("still accepts a trailing cents unit", () => {
         const content = [
             "! unit.scl",

@@ -69,8 +69,14 @@ const parseSclFile = content => {
 
         // Per the Scala spec, anything after a valid pitch value is ignored
         // (e.g. "100.0 C#" or "5/4   E\"), and a "cents" suffix written
-        // straight after the number is dropped too.
-        const cleaned = line.split(/\s+/, 1)[0].replace(/cents?$/i, "");
+        // straight after the number is dropped too. A decimal point is what
+        // marks cents, so "2cents" is rejected rather than read as the ratio 2/1.
+        const token = line.split(/\s+/, 1)[0];
+        const unit = token.match(/cents?$/i);
+        const cleaned = unit ? token.slice(0, unit.index) : token;
+        if (unit && !cleaned.includes(".")) {
+            throw new Error("Invalid .scl file: invalid cents value: " + token);
+        }
 
         let ratio, cents;
         if (cleaned.includes(".")) {
