@@ -174,6 +174,7 @@ const createLogoMock = activityMock => ({
     activity: activityMock,
     synth: {
         setMasterVolume: jest.fn(),
+        resetMasterVolume: jest.fn(),
         setVolume: jest.fn(),
         rampTo: jest.fn(),
         getFrequency: jest.fn(),
@@ -764,10 +765,22 @@ describe("resetMasterVolume", () => {
         expect(Singer.masterVolume).toEqual([100]);
     });
 
-    test("should apply the default volume to the synth", () => {
+    test("should put the output back to its fresh load level", () => {
         Singer.masterVolume.push(0);
         Singer.resetMasterVolume(logoMock);
-        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(100);
+        expect(logoMock.synth.resetMasterVolume).toHaveBeenCalled();
+    });
+
+    test("should leave the output alone rather than ramping it to the default level", () => {
+        Singer.masterVolume.push(10);
+        Singer.resetMasterVolume(logoMock);
+        expect(logoMock.synth.setMasterVolume).not.toHaveBeenCalled();
+    });
+
+    test("should return each synth to the default level", () => {
+        turtleMock.singer.synthVolume = { "electronic synth": [100, 10] };
+        Singer.resetMasterVolume(logoMock);
+        expect(turtleMock.singer.synthVolume["electronic synth"]).toEqual([100, 100]);
     });
 });
 

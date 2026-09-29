@@ -788,6 +788,10 @@ class Singer {
      * leaves the level behind, and loadSynth() hands each new instrument last(masterVolume).
      * Without this the level survives into the next run and into whatever project is loaded after.
      *
+     * The output itself goes back to its fresh-load level rather than through setMasterVolume():
+     * feeding DEFAULTVOLUME to the gain curve would land on -6 dB and quieten every project that
+     * never sets a volume of its own.
+     *
      * @static
      * @param {Object} logo
      * @returns {void}
@@ -795,7 +799,23 @@ class Singer {
     static resetMasterVolume(logo) {
         Singer.masterVolume.length = 1;
         Singer.masterVolume[0] = DEFAULTVOLUME;
-        Singer.setMasterVolume(logo, DEFAULTVOLUME);
+
+        const turtleList = logo.activity.turtles.turtleList;
+        for (let i = 0, turtleCount = turtleList.length; i < turtleCount; i++) {
+            const synthVolume = turtleList[i].singer.synthVolume;
+            const synthKeys = Object.keys(synthVolume);
+
+            for (let j = 0, synthCount = synthKeys.length; j < synthCount; j++) {
+                const arr = synthVolume[synthKeys[j]];
+                if (arr.length > 0) {
+                    arr[arr.length - 1] = DEFAULTVOLUME;
+                } else {
+                    arr.push(DEFAULTVOLUME);
+                }
+            }
+        }
+
+        logo.synth.resetMasterVolume();
     }
 
     /**
