@@ -164,9 +164,13 @@ window.widgetWindows = {
 
         // Handle Escape (Close)
         if (e.key === "Escape") {
-            // An open widget pie menu takes Escape first (see piemenus.js).
-            const pieMenu = docById("wheelDivptm");
-            if (pieMenu && pieMenu.style.display !== "none") return;
+            // An open pie menu takes Escape first (see piemenus.js). Widgets open
+            // theirs in #wheelDivptm, and the Mode widget uses #wheelDiv.
+            const isPieMenuOpen = ["wheelDivptm", "wheelDiv"].some(id => {
+                const pieMenu = docById(id);
+                return pieMenu && pieMenu.style.display !== "none";
+            });
+            if (isPieMenuOpen) return;
 
             focused.onclose();
             e.preventDefault();

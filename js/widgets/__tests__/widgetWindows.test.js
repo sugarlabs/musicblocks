@@ -1101,6 +1101,32 @@ describe("widgetWindows", () => {
             }
         });
 
+        test("Escape leaves the focused window open while the Mode widget pie menu is showing", () => {
+            const wheelDiv = document.createElement("div");
+            wheelDiv.id = "wheelDiv";
+            document.body.appendChild(wheelDiv);
+
+            try {
+                const win = createTestWindow("Window 1");
+                const closeSpy = jest.spyOn(win, "onclose");
+
+                const escape = () =>
+                    document.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                    );
+
+                wheelDiv.style.display = "";
+                escape();
+                expect(closeSpy).not.toHaveBeenCalled();
+
+                wheelDiv.style.display = "none";
+                escape();
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                wheelDiv.remove();
+            }
+        });
+
         test("Escape key closes only the currently focused window", () => {
             const win1 = createTestWindow("Window 1");
             const win2 = createTestWindow("Window 2");
