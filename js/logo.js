@@ -526,16 +526,23 @@ class Logo {
                     }
                 }
 
+                const currentMasterVolume =
+                    typeof Singer !== "undefined" &&
+                    Singer.masterVolume &&
+                    Singer.masterVolume.length > 0
+                        ? last(Singer.masterVolume)
+                        : DEFAULTVOLUME;
+
                 tur.singer.synthVolume = {
-                    "electronic synth": [DEFAULTVOLUME],
-                    "noise1": [DEFAULTVOLUME],
-                    "noise2": [DEFAULTVOLUME],
-                    "noise3": [DEFAULTVOLUME]
+                    "electronic synth": [currentMasterVolume],
+                    "noise1": [currentMasterVolume],
+                    "noise2": [currentMasterVolume],
+                    "noise3": [currentMasterVolume]
                 };
-                tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
+                tur.singer.synthVolume[DEFAULTVOICE] = [currentMasterVolume];
 
                 for (const synth in tur.singer.synthVolume) {
-                    this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+                    this.deps.Singer.setSynthVolume(this, turtle, synth, currentMasterVolume);
                 }
             }
             return;
