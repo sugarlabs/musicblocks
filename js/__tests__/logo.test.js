@@ -983,7 +983,12 @@ describe("Logo synth lifecycle", () => {
         expect(global.instrumentsFilters[1].flute).toEqual(["lp"]);
         expect(global.instrumentsEffects[1].flute).toEqual({ reverb: 0.5 });
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
-        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
+    });
+
+    test("prepSynths leaves the master volume alone so a mid-project call cannot reset it", () => {
+        logo.prepSynths();
+
+        expect(Singer.resetMasterVolume).not.toHaveBeenCalled();
     });
 
     test("prepSynths re-initialization uses current masterVolume for new turtles", () => {
@@ -1494,6 +1499,26 @@ describe("Logo runLogoCommands", () => {
             oldListener,
             false
         );
+    });
+
+    test("resets the master volume on every run", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
+    });
+
+    test("resets the master volume on a restart with no stop in between", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+        // prepSynths() bails out early in this state, so the reset cannot live in there.
+        logo._synthsInitialized = true;
+
+        logo.runLogoCommands(null, null);
+
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
     });
 
     test("drum block is included in startBlocks", () => {
