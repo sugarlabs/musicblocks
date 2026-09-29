@@ -382,7 +382,11 @@ class GitDropdownUI {
         const fullDesc = description || `${displayName} — a Music Blocks project`;
 
         try {
-            await this.activity.saveLocally();
+            const saveResult = await this.activity.saveLocally();
+            if (saveResult === false || saveResult === null) {
+                this._showToast("Could not save your project. Please try again.", "error");
+                return;
+            }
         } catch (_) {
             this._showToast("Could not save your project. Please try again.", "error");
             return;

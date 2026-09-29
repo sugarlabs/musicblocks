@@ -356,6 +356,20 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 "error"
             );
         });
+
+        test("does not queue when local storage reports a failed save", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            const showToast = jest.spyOn(gitDropdown, "_showToast");
+            mockActivity.saveLocally.mockResolvedValue(false);
+
+            await gitDropdown._doCreate("failed-track", "Failed Track", "Made offline");
+
+            expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+            expect(showToast).toHaveBeenCalledWith(
+                "Could not save your project. Please try again.",
+                "error"
+            );
+        });
     });
 
     // ── 3. Save a Moment Flow (Online & Offline) ────────────────────────────
