@@ -411,10 +411,24 @@ describe("Tuner Widget", () => {
                 expect(display.cents).toBe(0);
             });
 
+            test("initializes with default rawCents and displayedCents", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                expect(display.rawCents).toBe(0);
+                expect(display.displayedCents).toBe(0);
+            });
+
             test("initializes with default frequency 440", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
 
                 expect(display.frequency).toBe(440);
+            });
+        });
+
+        describe("constants", () => {
+            test("defines smoothing and snap constants", () => {
+                expect(TunerDisplay.SMOOTHING_FACTOR).toBe(0.35);
+                expect(TunerDisplay.SNAP_THRESHOLD_CENTS).toBe(15);
             });
         });
 
@@ -466,6 +480,58 @@ describe("Tuner Widget", () => {
                 display.update("C#", 0, 277.18);
 
                 expect(display.note).toBe("C#");
+            });
+
+            test("stores raw cents in rawCents", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", 10, 440);
+
+                expect(display.rawCents).toBe(10);
+            });
+
+            test("applies exponential smoothing when note is unchanged and delta is small", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", 10, 440);
+                expect(display.displayedCents).toBeCloseTo(3.5, 4);
+                expect(display.cents).toBeCloseTo(3.5, 4);
+
+                display.update("A", 10, 440);
+                expect(display.displayedCents).toBeCloseTo(5.775, 4);
+                expect(display.cents).toBeCloseTo(5.775, 4);
+            });
+
+            test("snaps immediately to raw cents when note changes", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("C", 8, 261.63);
+
+                expect(display.displayedCents).toBe(8);
+                expect(display.cents).toBe(8);
+            });
+
+            test("snaps immediately when cents shift exceeds snap threshold", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", 20, 445);
+
+                expect(display.displayedCents).toBe(20);
+                expect(display.cents).toBe(20);
+            });
+
+            test("handles non-finite or non-number cents gracefully", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", NaN, 440);
+                expect(display.rawCents).toBe(0);
+                expect(display.displayedCents).toBe(0);
+                expect(display.cents).toBe(0);
+
+                display.update("A", null, 440);
+                expect(display.rawCents).toBe(0);
+                expect(display.displayedCents).toBe(0);
+                expect(display.cents).toBe(0);
             });
         });
 

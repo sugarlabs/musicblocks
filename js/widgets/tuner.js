@@ -9,6 +9,8 @@ function TunerDisplay(canvas, width, height) {
     this.ctx = canvas.getContext("2d");
     this.note = "A";
     this.cents = 0;
+    this.rawCents = 0;
+    this.displayedCents = 0;
     this.frequency = 440;
     this._cachedTheme = null;
     this._selectorBg = null;
@@ -55,6 +57,16 @@ TunerDisplay.prototype._getCanvasColors = function () {
 TunerDisplay.IN_TUNE_CENTS = 5;
 
 /**
+ * Smoothing factor for exponential moving average (damping micro-jitter).
+ */
+TunerDisplay.SMOOTHING_FACTOR = 0.35;
+
+/**
+ * Threshold (in cents) beyond which needle snaps immediately to prevent latency.
+ */
+TunerDisplay.SNAP_THRESHOLD_CENTS = 15;
+
+/**
  * Needle color for the current cents offset. Green when in tune, red otherwise.
  *
  * @param {number} cents
@@ -69,15 +81,30 @@ TunerDisplay.prototype._indicatorColor = function (cents, colors) {
 };
 
 /**
- * Updates the tuner display with new pitch information
+ * Updates the tuner display with new pitch information, applying adaptive
+ * smoothing to reduce needle jitter from microphone noise.
  * @param {string} note - The detected note
  * @param {number} cents - The cents deviation from the note
  * @param {number} frequency - The detected frequency
  */
 TunerDisplay.prototype.update = function (note, cents, frequency) {
+    const raw = typeof cents === "number" && Number.isFinite(cents) ? cents : 0;
+    const noteChanged = this.note !== note;
     this.note = note;
-    this.cents = cents;
+    this.rawCents = raw;
     this.frequency = frequency;
+
+    const currentDisplayed = Number.isFinite(this.displayedCents) ? this.displayedCents : 0;
+    const delta = Math.abs(raw - currentDisplayed);
+
+    if (noteChanged || delta > TunerDisplay.SNAP_THRESHOLD_CENTS) {
+        this.displayedCents = raw;
+    } else {
+        this.displayedCents =
+            currentDisplayed + (raw - currentDisplayed) * TunerDisplay.SMOOTHING_FACTOR;
+    }
+
+    this.cents = this.displayedCents;
     this.draw();
 };
 
