@@ -35,8 +35,19 @@ jobs:
             if (authorAssociation === 'FIRST_TIME_CONTRIBUTOR') {
               core.info('Author is a first-time contributor. Checking for MusicBlocks project link in PR description...');
 
-              // Expected format: https://musicblocks.sugarlabs.org/index.html?repo=<numeric-id>&run=True
-              const projectUrlPattern = /https:\/\/musicblocks\.sugarlabs\.org\/index\.html\?(?:repo|id)=\d+&(?:amp;)?run=true\b/i;
+              // Expected format: https://musicblocks.sugarlabs.org/index.html?<params>
+              // Params required: repo=<value> (or id=<value>) AND run=True.
+              // The repo/id value may be numeric or a slug; it must be non-empty.
+              // Parameters may appear in any order; additional query parameters are allowed.
+              // &amp; is accepted in place of & to handle HTML-encoded URLs.
+              const SEP = "(?:[&?](?:amp;)?)";
+              const projectUrlPattern = new RegExp(
+                "https://musicblocks\\.sugarlabs\\.org/index\\.html\\?" +
+                  "(?=(?:.*" + SEP + ")?(?:repo|id)=[^&?#\\s]+(?:" + SEP + "|$|#))" +
+                  "(?=(?:.*" + SEP + ")?run=true(?:" + SEP + "|$|#))" +
+                  "[^\\s]*",
+                "i"
+              );
 
               if (!projectUrlPattern.test(prBody)) {
                 const message = [
@@ -47,10 +58,10 @@ jobs:
                   'Please edit your PR description to include a link to your published project under the **MusicBlocks Project Link** section.',
                   '',
                   '**Expected URL format:**',
-                  '`https://musicblocks.sugarlabs.org/index.html?repo=<numeric-id>&run=True`',
+                  '`https://musicblocks.sugarlabs.org/index.html?repo=<value>&run=True`',
                   '',
                   '**Example:**',
-                  '`https://musicblocks.sugarlabs.org/index.html?repo=12345&run=True`',
+                  '`https://musicblocks.sugarlabs.org/index.html?repo=my-project-from-production-3&run=True`',
                 ].join('\n');
 
                 core.setFailed(message);
@@ -58,6 +69,23 @@ jobs:
               }
 
               core.info('Valid MusicBlocks project link found in PR description.');
+
+              // Check that the MusicBlocks Project Screenshot section has content.
+              // Strip the heading itself and all HTML comments, then require non-empty text.
+              const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
+              const screenshotRaw = screenshotMatch ? screenshotMatch[1] : '';
+              const screenshotContent = screenshotRaw.replace(/<!--[\s\S]*?-->/g, '').trim();
+
+              if (!screenshotContent) {
+                core.setFailed(
+                  '## First-Time Contributor MusicBlocks Project Screenshot Required\n\n' +
+                  'Welcome to Music Blocks! As a first-time contributor, please attach a screenshot of your MusicBlocks project ' +
+                  'under the **MusicBlocks Project Screenshot** section of the PR description.'
+                );
+                return;
+              }
+
+              core.info('MusicBlocks project screenshot section has content.');
             }
 
             // Category checkboxes mapped to their GitHub label names, colors, and descriptions
