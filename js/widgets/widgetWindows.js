@@ -45,7 +45,11 @@ window.widgetWindows = {
         "oscilloscope": "oscilloscope",
         "temperament": "temperament",
         "meter": "meter",
-        "LEGO Bricks": "LEGO BRICKS"
+        "LEGO Bricks": "LEGO BRICKS",
+        "pitch slider": "slider",
+        "pitch staircase": "pitch staircase",
+        "music keyboard": "music keyboard",
+        "status": "status"
     },
 
     /**
