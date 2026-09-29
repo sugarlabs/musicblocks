@@ -1115,6 +1115,14 @@ body.highcontrast #aux-toolbar .aux-group > li > a.toolbar-btn-focused {
 #aux-toolbar .aux-group > li:has(> a[style*="display:none"]),
 #aux-toolbar .aux-group > li:has(> a.hidden),
 #aux-toolbar .aux-group > li:has(> a.hide),
+#themedropdown li[style*="display: none"],
+#themedropdown li[style*="display:none"],
+#themedropdown li.hidden,
+#themedropdown li.hide,
+#themedropdown li:has(> a[style*="display: none"]),
+#themedropdown li:has(> a[style*="display:none"]),
+#themedropdown li:has(> a.hidden),
+#themedropdown li:has(> a.hide),
 .toolbar-pill-group > li > a[style*="display: none"],
 .toolbar-pill-group > li > a[style*="display:none"],
 .toolbar-pill-group > li > a.hidden,
@@ -1122,7 +1130,11 @@ body.highcontrast #aux-toolbar .aux-group > li > a.toolbar-btn-focused {
 #aux-toolbar .aux-group > li > a[style*="display: none"],
 #aux-toolbar .aux-group > li > a[style*="display:none"],
 #aux-toolbar .aux-group > li > a.hidden,
-#aux-toolbar .aux-group > li > a.hide {
+#aux-toolbar .aux-group > li > a.hide,
+#themedropdown li > a[style*="display: none"],
+#themedropdown li > a[style*="display:none"],
+#themedropdown li > a.hidden,
+#themedropdown li > a.hide {
     display: none !important;
 }
 
@@ -1227,7 +1239,6 @@ body.highcontrast #themedropdown[style*="display: block"] {
 }
 
 #themedropdown li {
-    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     width: 32px !important;
@@ -1241,6 +1252,25 @@ body.highcontrast #themedropdown[style*="display: block"] {
     background: transparent !important;
     float: none !important;
     box-sizing: border-box !important;
+}
+
+#themedropdown li:not([style*="display: none"]):not([style*="display:none"]) {
+    display: inline-flex !important;
+}
+
+#themedropdown li[style*="display: none"],
+#themedropdown li[style*="display:none"],
+#themedropdown li.hidden,
+#themedropdown li.hide,
+#themedropdown li:has(> a[style*="display: none"]),
+#themedropdown li:has(> a[style*="display:none"]),
+#themedropdown li:has(> a.hidden),
+#themedropdown li:has(> a.hide),
+#themedropdown li > a[style*="display: none"],
+#themedropdown li > a[style*="display:none"],
+#themedropdown li > a.hidden,
+#themedropdown li > a.hide {
+    display: none !important;
 }
 
 #themedropdown li > a {

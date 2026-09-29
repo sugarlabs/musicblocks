@@ -854,6 +854,7 @@ class ToolbarUI {
             };
         });
 
+        updateThemeOptions();
         icon.onclick = updateThemeOptions;
     }
 
