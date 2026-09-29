@@ -168,6 +168,7 @@ let MYDEFINES = [
     "utils/musicutils-lookups",
     "utils/musicutils-rhythm",
     "utils/musicutils-solfege",
+    "utils/piemenu",
     "utils/musicutils-modewheel",
     "utils/musicutils-modecore",
     "utils/musicutils",

@@ -197,7 +197,7 @@ requirejs.config({
             exports: "MusicUtilsSolfege"
         },
         "utils/musicutils-modewheel": {
-            deps: ["utils/utils", "utils/musicutils-constants"],
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/piemenu"],
             exports: "MusicUtilsModeWheel"
         },
         "utils/musicutils-modecore": {
@@ -332,6 +332,9 @@ requirejs.config({
         },
         "utils/tuningformats": {
             exports: "TuningFormats"
+        },
+        "utils/piemenu": {
+            exports: "PieMenuUtils"
         },
         "widgets/reflection": {
             deps: ["utils/ai-widget-lifecycle"]

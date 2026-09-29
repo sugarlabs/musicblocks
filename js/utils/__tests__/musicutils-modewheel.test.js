@@ -99,6 +99,7 @@ describe("musicutils-modewheel", () => {
 
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
+            "piemenu.js",
             "musicutils-constants.js",
             "musicutils-i18n.js",
             "musicutils-temperament.js",

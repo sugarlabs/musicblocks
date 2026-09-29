@@ -175,7 +175,8 @@ global.getModeNameFromLabel = (label, modes) => {
 };
 global.getModeSliceColors = (modes, colors) =>
     modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
-global.updateModeWheelItems = jest.fn();
+global.updateWheelItems = jest.fn();
+global.updateModeWheelItems = global.updateWheelItems;
 global.getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 global.getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
@@ -743,8 +744,10 @@ describe("piemenus behavioral tests", () => {
 
         test("selecting a group in the inner ring repaints the outer mode-name ring", () => {
             // global is mocked in this file; use the real implementation here.
-            const realUpdate = require("../utils/musicutils.js").updateModeWheelItems;
-            const prevUpdate = global.updateModeWheelItems;
+            const realUpdate = require("../utils/piemenu.js").updateWheelItems;
+            const prevWheelUpdate = global.updateWheelItems;
+            const prevModeUpdate = global.updateModeWheelItems;
+            global.updateWheelItems = realUpdate;
             global.updateModeWheelItems = realUpdate;
 
             const savedModes = global.MODE_PIE_MENUS;
@@ -788,7 +791,8 @@ describe("piemenus behavioral tests", () => {
                 });
             }
 
-            global.updateModeWheelItems = prevUpdate;
+            global.updateWheelItems = prevWheelUpdate;
+            global.updateModeWheelItems = prevModeUpdate;
             global.MODE_PIE_MENUS = savedModes;
         });
     });
