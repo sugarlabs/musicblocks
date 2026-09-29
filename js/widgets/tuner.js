@@ -75,6 +75,9 @@ TunerDisplay.SNAP_THRESHOLD_CENTS = 15;
  */
 TunerDisplay.prototype._indicatorColor = function (cents, colors) {
     const palette = colors || this._getCanvasColors();
+    if (typeof cents !== "number" || !Number.isFinite(cents)) {
+        return palette.errorColor;
+    }
     return Math.abs(cents) <= TunerDisplay.IN_TUNE_CENTS
         ? palette.successColor
         : palette.errorColor;
@@ -88,16 +91,28 @@ TunerDisplay.prototype._indicatorColor = function (cents, colors) {
  * @param {number} frequency - The detected frequency
  */
 TunerDisplay.prototype.update = function (note, cents, frequency) {
-    const raw = typeof cents === "number" && Number.isFinite(cents) ? cents : 0;
+    const isValidCents = typeof cents === "number" && Number.isFinite(cents);
     const noteChanged = this.note !== note;
     this.note = note;
-    this.rawCents = raw;
     this.frequency = frequency;
 
-    const currentDisplayed = Number.isFinite(this.displayedCents) ? this.displayedCents : 0;
-    const delta = Math.abs(raw - currentDisplayed);
+    if (!isValidCents) {
+        this.rawCents = null;
+        this.displayedCents = null;
+        this.cents = null;
+        this.draw();
+        return;
+    }
 
-    if (noteChanged || delta > TunerDisplay.SNAP_THRESHOLD_CENTS) {
+    const raw = cents;
+    const prevRaw = Number.isFinite(this.rawCents) ? this.rawCents : null;
+    const currentDisplayed = Number.isFinite(this.displayedCents) ? this.displayedCents : null;
+
+    this.rawCents = raw;
+
+    const rawShift = prevRaw !== null ? Math.abs(raw - prevRaw) : Infinity;
+
+    if (noteChanged || currentDisplayed === null || rawShift > TunerDisplay.SNAP_THRESHOLD_CENTS) {
         this.displayedCents = raw;
     } else {
         this.displayedCents =
@@ -134,10 +149,13 @@ TunerDisplay.prototype.draw = function () {
     ctx.fillStyle = textColor;
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
-    // Draw the indicator
-    const indicatorX = meterX + meterWidth / 2 + (this.cents / 50) * (meterWidth / 2);
-    ctx.fillStyle = this._indicatorColor(this.cents, { successColor, errorColor });
-    ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
+    // Draw the indicator only if cents measurement is valid
+    const hasValidCents = typeof this.cents === "number" && Number.isFinite(this.cents);
+    if (hasValidCents) {
+        const indicatorX = meterX + meterWidth / 2 + (this.cents / 50) * (meterWidth / 2);
+        ctx.fillStyle = this._indicatorColor(this.cents, { successColor, errorColor });
+        ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
+    }
 
     // Position text much lower in the canvas
     // Draw the note
@@ -149,14 +167,18 @@ TunerDisplay.prototype.draw = function () {
     // Draw the cents deviation
     ctx.font = "24px Arial";
     ctx.fillText(
-        (this.cents >= 0 ? "+" : "") + Math.round(this.cents) + "¢",
+        hasValidCents ? (this.cents >= 0 ? "+" : "") + Math.round(this.cents) + "¢" : "--",
         width / 2,
         height - 160
     ); // Much lower position
 
     // Draw the frequency
     ctx.font = "18px Arial";
-    ctx.fillText(this.frequency.toFixed(1) + " Hz", width / 2, height - 40); // Near bottom
+    const freqText =
+        typeof this.frequency === "number" && Number.isFinite(this.frequency)
+            ? this.frequency.toFixed(1) + " Hz"
+            : "-- Hz";
+    ctx.fillText(freqText, width / 2, height - 40); // Near bottom
 };
 
 /**
