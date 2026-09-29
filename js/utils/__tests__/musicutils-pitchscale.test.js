@@ -28,13 +28,8 @@ global.CUSTOMSAMPLES = [];
 global.slicePath = slicePath;
 global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
-// This module is a strongly-connected group: getNote, numberToPitch, getNoteFromInterval,
-// getNoteFromSolfege, pitchToNumber, keySignatureToMode, getScaleAndHalfSteps and
-// getSharpFlatPreference all call each other, so unlike the earlier splits, it moved as one
-// unit rather than one function at a time. musicutils.test.js already has thousands of lines
-// exercising getNote/pitchToNumber/etc through real musical scenarios; the tests here are
-// deliberately about the module boundary (what still resolves, what's still global, what's
-// still reachable through musicutils.js), not re-proving music theory those tests already cover.
+// These tests cover the module boundary (exports, globals, reachability through musicutils.js);
+// musicutils.test.js already covers the music-theory behavior of these functions.
 
 const pitchscale = require("../musicutils-pitchscale");
 const musicutils = require("../musicutils");
