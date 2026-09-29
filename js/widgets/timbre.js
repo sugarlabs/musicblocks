@@ -618,7 +618,7 @@ class TimbreWidget {
         // Just save a set timbre block with the current instrument name.
         const obj = [
             [0, "settimbre", 100 + this._delta, 100 + this._delta, [null, 1, null, 2]],
-            [1, ["text", { value: "custom" }], 0, 0, [0]],
+            [1, ["text", { value: this.instrumentName }], 0, 0, [0]],
             [2, "hidden", 0, 0, [0, null]]
         ];
         this.activity.blocks.loadNewBlocks(obj);
@@ -726,6 +726,8 @@ class TimbreWidget {
             }
 
             docById("selOsc1").value = DEFAULTOSCILLATORTYPE;
+            this.oscParams[0] = DEFAULTOSCILLATORTYPE;
+            this.oscParams[1] = 6;
             this._update(blockValue, DEFAULTOSCILLATORTYPE, 0);
             docById("myRangeO0").value = parseFloat(6);
             docById("myspanO0").textContent = "6";
@@ -1199,12 +1201,15 @@ class TimbreWidget {
         let lastBlk = 0;
         if (this.AMSynthesizer.length !== 0 && synthChosen !== "AMSynth") {
             lastBlk = this.AMSynthesizer.pop();
+            this.AMSynthParams = [];
             this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.FMSynthesizer.length !== 0 && synthChosen !== "FMSynth") {
             lastBlk = this.FMSynthesizer.pop();
+            this.FMSynthParams = [];
             this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.duoSynthesizer.length !== 0 && synthChosen !== "DuoSynth") {
             lastBlk = this.duoSynthesizer.pop();
+            this.duoSynthParams = [];
             this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (synthChosen === "FMSynth" || synthChosen === "AMSynth") {
             this._setWidgetTimeout(() => this.blockConnection(2, bottomOfClamp), 500);
@@ -1585,6 +1590,7 @@ class TimbreWidget {
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
                         this.fmSynthParamvals["modulationIndex"] = parseFloat(elem.value);
+                        this.FMSynthParams[0] = elem.value;
                         this._update(blockValue, elem.value, 0);
                         this.activity.logo.synth.createSynth(
                             0,
