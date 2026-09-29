@@ -34,7 +34,7 @@
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
-   widgetWindows, Turtle
+   widgetWindows, Turtle, ManagedTimer
  */
 
 /*
@@ -3285,6 +3285,21 @@ class Block {
          */
         this.container.on("click", event => {
             that.activity.closeHelpfulWheel();
+            const _scheduleDelayedRun = topBlock => {
+                const runCmd = () => {
+                    that.activity.logo.runLogoCommands(topBlock);
+                    that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
+                };
+                const timerManager =
+                    that.activity && that.activity.logo && that.activity.logo._timerManager;
+                if (timerManager && typeof timerManager.setTimeout === "function") {
+                    timerManager.setTimeout(runCmd, 250);
+                } else if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                    that.blocks.setTimeout(runCmd, 250);
+                } else {
+                    setTimeout(runCmd, 250);
+                }
+            };
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
@@ -3302,10 +3317,7 @@ class Block {
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
-                        setTimeout(() => {
-                            that.activity.logo.runLogoCommands(topBlock);
-                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                        }, 250);
+                        _scheduleDelayedRun(topBlock);
                     } else {
                         that.activity.logo.runLogoCommands(topBlock);
                         that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
@@ -3327,9 +3339,15 @@ class Block {
             }
 
             locked = true;
-            setTimeout(() => {
-                locked = false;
-            }, 500);
+            if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                that.blocks.setTimeout(() => {
+                    locked = false;
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    locked = false;
+                }, 500);
+            }
 
             hideDOMLabel();
             that._checkWidgets(false);
@@ -3360,10 +3378,7 @@ class Block {
                         if (that.activity.turtles.running()) {
                             that.activity.logo.doStopTurtles();
 
-                            setTimeout(() => {
-                                that.activity.logo.runLogoCommands(topBlk);
-                                that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                            }, 250);
+                            _scheduleDelayedRun(topBlk);
                         } else {
                             that.activity.logo.runLogoCommands(topBlk);
                             that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
@@ -3380,10 +3395,7 @@ class Block {
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
-                        setTimeout(() => {
-                            that.activity.logo.runLogoCommands(topBlk);
-                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                        }, 250);
+                        _scheduleDelayedRun(topBlk);
                     } else {
                         that.activity.logo.runLogoCommands(topBlk);
                         that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
@@ -3411,11 +3423,16 @@ class Block {
             that.blocks.dragStartX = that.container.x;
             that.blocks.dragStartY = that.container.y;
 
-            that.blocks.longPressTimeout = setTimeout(() => {
+            const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
-            }, LONGPRESSTIME);
+            };
+            if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                that.blocks.longPressTimeout = that.blocks.setTimeout(onLongPress, LONGPRESSTIME);
+            } else {
+                that.blocks.longPressTimeout = setTimeout(onLongPress, LONGPRESSTIME);
+            }
 
             //hide the trash when block is being collapse or expand
             const hasColExpBtns = this.collapseButtonBitmap && this.expandButtonBitmap;
@@ -3542,7 +3559,7 @@ class Block {
                 }
             } else {
                 // Make it easier to select text on mobile.
-                setTimeout(() => {
+                const checkMoved = () => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
                             Math.abs(
@@ -3550,7 +3567,12 @@ class Block {
                             ) >
                             20 && !window.hasMouse;
                     getInput = !moved;
-                }, 200);
+                };
+                if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                    that.blocks.setTimeout(checkMoved, 200);
+                } else {
+                    setTimeout(checkMoved, 200);
+                }
             }
 
             const oldX = that.container.x;
@@ -3591,7 +3613,11 @@ class Block {
             }
 
             if (that.blocks.longPressTimeout !== null) {
-                clearTimeout(that.blocks.longPressTimeout);
+                if (typeof that.blocks.clearTimeout === "function") {
+                    that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                } else {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
@@ -3683,7 +3709,11 @@ class Block {
             if (that._dragPointerDown) {
                 // eslint-disable-next-line eqeqeq
                 if (that.blocks.longPressTimeout != null) {
-                    clearTimeout(that.blocks.longPressTimeout);
+                    if (typeof that.blocks.clearTimeout === "function") {
+                        that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                    } else {
+                        clearTimeout(that.blocks.longPressTimeout);
+                    }
                     that.blocks.longPressTimeout = null;
                 }
                 that.blocks.clearLongPress();
@@ -3697,7 +3727,11 @@ class Block {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
-                clearTimeout(that.blocks.longPressTimeout);
+                if (typeof that.blocks.clearTimeout === "function") {
+                    that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                } else {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
@@ -3732,7 +3766,11 @@ class Block {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
             } else {
-                clearTimeout(that.blocks.longPressTimeout);
+                if (typeof that.blocks.clearTimeout === "function") {
+                    that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                } else {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
@@ -3791,7 +3829,11 @@ class Block {
         }
 
         if (this.blocks.longPressTimeout !== null) {
-            clearTimeout(this.blocks.longPressTimeout);
+            if (typeof this.blocks.clearTimeout === "function") {
+                this.blocks.clearTimeout(this.blocks.longPressTimeout);
+            } else {
+                clearTimeout(this.blocks.longPressTimeout);
+            }
             this.blocks.longPressTimeout = null;
             this.blocks.clearLongPress();
         }
@@ -4789,11 +4831,16 @@ class Block {
             }
 
             // Firefox fix
-            setTimeout(() => {
+            const focusLabel = () => {
                 that.label.style.display = "";
                 that.label.focus();
                 focused = true;
-            }, 100);
+            };
+            if (this.blocks && typeof this.blocks.setTimeout === "function") {
+                this.blocks.setTimeout(focusLabel, 100);
+            } else {
+                setTimeout(focusLabel, 100);
+            }
         }
     }
 
