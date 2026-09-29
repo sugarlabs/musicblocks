@@ -178,6 +178,54 @@ describe("JSGenerate Class", () => {
         expect(console.log).toHaveBeenCalledWith("generated code");
     });
 
+    describe("generateCode reporting of skipped blocks", () => {
+        test("warns with the skipped block names when generation otherwise succeeded", () => {
+            JSGenerate.actionTrees = [];
+            JSGenerate.actionNames = [];
+            JSGenerate.startTrees = [[["start", null, null]]];
+            astring.generate.mockReturnValue("code");
+            // generateCode clears the set first, so the names have to arrive while the
+            // ASTs are built, which is what _getBlockAST does in the real run.
+            ASTUtils.getMouseAST.mockImplementation(() => {
+                ASTUtils.skippedBlocks.add("zebra");
+                ASTUtils.skippedBlocks.add("apple");
+                return { type: "EmptyStatement" };
+            });
+
+            JSGenerate.generateCode();
+
+            expect(JSGenerate.generateFailed).toBe(false);
+            expect(console.warn).toHaveBeenCalledWith(
+                "JAVASCRIPT EXPORT IS INCOMPLETE\nNo mapping for: apple, zebra"
+            );
+        });
+
+        test("does not warn when every block was exported", () => {
+            JSGenerate.actionTrees = [];
+            JSGenerate.actionNames = [];
+            JSGenerate.startTrees = [[["start", null, null]]];
+            ASTUtils.getMouseAST.mockReturnValue({ type: "EmptyStatement" });
+            astring.generate.mockReturnValue("code");
+            ASTUtils.skippedBlocks = new Set();
+
+            JSGenerate.generateCode();
+
+            expect(console.warn).not.toHaveBeenCalled();
+        });
+
+        test("clears names recorded by an earlier run", () => {
+            ASTUtils.skippedBlocks = new Set(["leftover"]);
+            JSGenerate.actionTrees = [];
+            JSGenerate.actionNames = [];
+            JSGenerate.startTrees = [];
+            astring.generate.mockReturnValue("code");
+
+            JSGenerate.generateCode();
+
+            expect(ASTUtils.skippedBlocks.size).toBe(0);
+        });
+    });
+
     describe("generateCode edge cases", () => {
         beforeEach(() => {
             jest.clearAllMocks();

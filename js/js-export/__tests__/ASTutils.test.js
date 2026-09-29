@@ -90,6 +90,33 @@ describe("ASTUtils", () => {
             ]);
         });
 
+        it("keeps the blocks inside an unsupported clamp", () => {
+            JSInterface.isSetter.mockImplementation(name => name === "setKey");
+            JSInterface.getSetterName.mockImplementation(name => name);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            // An unsupported clamp holds its inner flow in flow[2], the same slot the
+            // mapped clamps use. The notes a user put inside it should still export.
+            const result = ASTUtils._getBlockAST(
+                [
+                    [
+                        "clampWithNoMapping",
+                        [],
+                        [
+                            ["setKey", ["C"]],
+                            ["setKey", ["G"]]
+                        ]
+                    ]
+                ],
+                1
+            );
+
+            expect(result).toHaveLength(2);
+            expect(result[0]).toEqual(ASTUtils._getSetAST("setKey", ["C"]));
+            expect(result[1]).toEqual(ASTUtils._getSetAST("setKey", ["G"]));
+            expect([...ASTUtils.skippedBlocks]).toEqual(["clampWithNoMapping"]);
+        });
+
         it("does not throw", () => {
             JSInterface.isSetter.mockReturnValue(false);
             JSInterface.isMethod.mockReturnValue(false);

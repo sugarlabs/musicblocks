@@ -1340,6 +1340,12 @@ class ASTUtils {
                     // the export; throwing here used to discard every other block as well.
                     // The name is reported once the run finishes.
                     ASTUtils.skippedBlocks.add(String(flow[0]));
+                    // A clamp holds its inner flow in flow[2], the same slot the mapped clamps
+                    // above read. Exporting that flow keeps the blocks the user put inside an
+                    // unsupported clamp, which would otherwise go with it.
+                    if (Array.isArray(flow[2])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[2], iterMax));
+                    }
                     continue;
                 }
             }
