@@ -11,7 +11,13 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
-/* global _, escapeHTML, isSafeUrl, DOMPurify */
+/* global _, escapeHTML, isSafeUrl, DOMPurify, ManagedTimer */
+
+/*
+   Globals location
+    - js/utils/ManagedTimer.js
+        ManagedTimer
+*/
 
 if (typeof module !== "undefined" && module.exports) {
     // Under Jest the shared helper resolves through CommonJS. In the browser it
@@ -92,6 +98,28 @@ class ReflectionMatrix {
         this.summarizedUpTo = 0;
 
         this.startChatTypingTimeout = null;
+        this.dotsInterval = null;
+
+        /**
+         * Centralized timer management instance for tracking/cancelling timers.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
+
+        /**
+         * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeIntervals = new Set();
 
         /**
          * User messages waiting to be sent to the backend
@@ -123,6 +151,129 @@ class ReflectionMatrix {
     }
 
     /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    _setWidgetInterval(callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    }
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    _clearWidgetInterval(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        if (this.startChatTypingTimeout !== null) {
+            this._clearWidgetTimeout(this.startChatTypingTimeout);
+            this.startChatTypingTimeout = null;
+        }
+
+        if (this.dotsInterval !== null && this.dotsInterval !== undefined) {
+            this._clearWidgetInterval(this.dotsInterval);
+            this.dotsInterval = null;
+        }
+
+        return count;
+    }
+
+    /**
      * Initializes the reflection widget.
      */
 
@@ -146,6 +297,7 @@ class ReflectionMatrix {
             this._lifecycle.unmount();
             this.activity.isInputON = false;
             this.hideTypingIndicator();
+            this._clearWidgetTimers();
             this._lifecycle.abortPendingRequests();
             this.pendingMessages = [];
             this.isProcessingPendingMessage = false;
@@ -278,7 +430,7 @@ class ReflectionMatrix {
         // Start animation
         let dotCount = 0;
         const maxDots = 3;
-        this.dotsInterval = setInterval(() => {
+        this.dotsInterval = this._setWidgetInterval(() => {
             dotCount = (dotCount + 1) % (maxDots + 1);
             this.dotsContainer.textContent = ".".repeat(dotCount);
         }, 500);
@@ -289,13 +441,17 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
-        if (this.startChatTypingTimeout) {
-            clearTimeout(this.startChatTypingTimeout);
+        if (this.startChatTypingTimeout !== null) {
+            this._clearWidgetTimeout(this.startChatTypingTimeout);
             this.startChatTypingTimeout = null;
         }
 
+        if (this.dotsInterval !== null) {
+            this._clearWidgetInterval(this.dotsInterval);
+            this.dotsInterval = null;
+        }
+
         if (this.typingDiv) {
-            clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
         }
@@ -481,7 +637,7 @@ class ReflectionMatrix {
         // Reset summarization state for a fresh session
         this.conversationSummary = "";
         this.summarizedUpTo = 0;
-        this.startChatTypingTimeout = setTimeout(() => {
+        this.startChatTypingTimeout = this._setWidgetTimeout(() => {
             this.startChatTypingTimeout = null;
             if (this.isOpen) {
                 this.showTypingIndicator("Reading code");

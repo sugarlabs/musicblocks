@@ -24,6 +24,9 @@ const { escapeHTML, isSafeUrl } = require("../../utils/utils");
 global.escapeHTML = escapeHTML;
 global.isSafeUrl = isSafeUrl;
 
+const ManagedTimer = require("../../utils/ManagedTimer.js");
+global.ManagedTimer = ManagedTimer;
+
 const ReflectionMatrix = require("../reflection");
 
 // Mock globals
@@ -985,6 +988,212 @@ describe("ReflectionMatrix", () => {
             // XSS script tags should be escaped, so they appear as text, not tags
             expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
             expect(html).not.toContain("<script>");
+        });
+    });
+
+    describe("timer fallback without ManagedTimer", () => {
+        let reflection;
+        let timeouts;
+        let intervals;
+
+        beforeEach(() => {
+            timeouts = new Map();
+            intervals = new Map();
+            let nextTimeoutId = 1;
+            let nextIntervalId = 1;
+
+            jest.spyOn(global, "setTimeout").mockImplementation(cb => {
+                const id = nextTimeoutId++;
+                timeouts.set(id, cb);
+                return id;
+            });
+            jest.spyOn(global, "clearTimeout").mockImplementation(id => {
+                timeouts.delete(id);
+            });
+
+            jest.spyOn(global, "setInterval").mockImplementation(cb => {
+                const id = nextIntervalId++;
+                intervals.set(id, cb);
+                return id;
+            });
+            jest.spyOn(global, "clearInterval").mockImplementation(id => {
+                intervals.delete(id);
+            });
+
+            reflection = new ReflectionMatrix();
+            reflection._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("_setWidgetTimeout tracks timeout and executes callback, then un-tracks", () => {
+            const callback = jest.fn();
+            const id = reflection._setWidgetTimeout(callback, 500);
+
+            expect(reflection._activeTimeouts.has(id)).toBe(true);
+            expect(timeouts.has(id)).toBe(true);
+
+            timeouts.get(id)();
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(reflection._activeTimeouts.has(id)).toBe(false);
+        });
+
+        it("_clearWidgetTimeout returns false for null, undefined, or untracked ids", () => {
+            expect(reflection._clearWidgetTimeout(null)).toBe(false);
+            expect(reflection._clearWidgetTimeout(undefined)).toBe(false);
+            expect(reflection._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        it("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = reflection._setWidgetTimeout(callback, 500);
+
+            expect(reflection._clearWidgetTimeout(id)).toBe(true);
+            expect(reflection._activeTimeouts.has(id)).toBe(false);
+            expect(timeouts.has(id)).toBe(false);
+        });
+
+        it("_setWidgetInterval tracks interval and executes callback", () => {
+            const callback = jest.fn();
+            const id = reflection._setWidgetInterval(callback, 500);
+
+            expect(reflection._activeIntervals.has(id)).toBe(true);
+            expect(intervals.has(id)).toBe(true);
+
+            intervals.get(id)();
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(reflection._activeIntervals.has(id)).toBe(true);
+        });
+
+        it("_clearWidgetInterval returns false for null, undefined, or untracked ids", () => {
+            expect(reflection._clearWidgetInterval(null)).toBe(false);
+            expect(reflection._clearWidgetInterval(undefined)).toBe(false);
+            expect(reflection._clearWidgetInterval(999999)).toBe(false);
+        });
+
+        it("_clearWidgetInterval cancels a tracked interval", () => {
+            const callback = jest.fn();
+            const id = reflection._setWidgetInterval(callback, 500);
+
+            expect(reflection._clearWidgetInterval(id)).toBe(true);
+            expect(reflection._activeIntervals.has(id)).toBe(false);
+            expect(intervals.has(id)).toBe(false);
+        });
+
+        it("_clearWidgetTimers cancels tracked timeouts/intervals, clears properties, and returns count", () => {
+            reflection._setWidgetTimeout(jest.fn(), 500);
+            reflection._setWidgetTimeout(jest.fn(), 700);
+            reflection.startChatTypingTimeout = reflection._setWidgetTimeout(jest.fn(), 1000);
+            reflection.dotsInterval = reflection._setWidgetInterval(jest.fn(), 500);
+
+            const count = reflection._clearWidgetTimers();
+
+            expect(count).toBe(4);
+            expect(reflection._activeTimeouts.size).toBe(0);
+            expect(reflection._activeIntervals.size).toBe(0);
+            expect(reflection.startChatTypingTimeout).toBeNull();
+            expect(reflection.dotsInterval).toBeNull();
+        });
+
+        it("onclose invokes _clearWidgetTimers and cancels active timers", () => {
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+            reflection.init(mockActivity);
+
+            reflection._setWidgetTimeout(jest.fn(), 500);
+            reflection._setWidgetInterval(jest.fn(), 500);
+
+            mockWidgetWindow.onclose();
+
+            expect(reflection._activeTimeouts.size).toBe(0);
+            expect(reflection._activeIntervals.size).toBe(0);
+            expect(mockWidgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        let reflection;
+
+        beforeEach(() => {
+            reflection = new ReflectionMatrix();
+        });
+
+        afterEach(() => {
+            reflection._clearWidgetTimers();
+        });
+
+        it("initializes with ManagedTimer when available", () => {
+            expect(reflection._timerManager).toBeInstanceOf(ManagedTimer);
+        });
+
+        it("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            reflection._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(reflection._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(reflection._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        it("_clearWidgetTimeout delegates to the timer manager", () => {
+            reflection._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(reflection._clearWidgetTimeout(42)).toBe(true);
+            expect(reflection._timerManager.clearTimeout).toHaveBeenCalledWith(42);
+        });
+
+        it("_setWidgetInterval delegates to the timer manager", () => {
+            const callback = jest.fn();
+            reflection._timerManager = {
+                setInterval: jest.fn().mockReturnValue(99),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(reflection._setWidgetInterval(callback, 300)).toBe(99);
+            expect(reflection._timerManager.setInterval).toHaveBeenCalledWith(callback, 300);
+        });
+
+        it("_clearWidgetInterval delegates to the timer manager", () => {
+            reflection._timerManager = {
+                clearInterval: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(reflection._clearWidgetInterval(99)).toBe(true);
+            expect(reflection._timerManager.clearInterval).toHaveBeenCalledWith(99);
+        });
+
+        it("_clearWidgetTimers delegates to timer manager clearAll and returns total cleared", () => {
+            reflection._timerManager = {
+                clearAll: jest.fn().mockReturnValue(3)
+            };
+
+            expect(reflection._clearWidgetTimers()).toBe(3);
+            expect(reflection._timerManager.clearAll).toHaveBeenCalledTimes(1);
+        });
+
+        it("cleans up active indicator timers on hideTypingIndicator", () => {
+            reflection.showTypingIndicator = ReflectionMatrix.prototype.showTypingIndicator;
+            reflection.hideTypingIndicator = ReflectionMatrix.prototype.hideTypingIndicator;
+
+            reflection.chatLog = document.createElement("div");
+            document.body.appendChild(reflection.chatLog);
+            reflection._lifecycle.isMounted = true;
+            reflection.isOpen = true;
+
+            reflection.showTypingIndicator("Testing");
+            expect(reflection.dotsInterval).not.toBeNull();
+
+            reflection.hideTypingIndicator();
+            expect(reflection.dotsInterval).toBeNull();
+            expect(reflection.typingDiv).toBeNull();
         });
     });
 });
