@@ -676,7 +676,7 @@ function SampleWidget() {
         this.isMoving = false;
         this.drawVisualIDs = {};
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "sampler", "Sampler");
+        const widgetWindow = window.widgetWindows.windowFor(this, "sampler", "sampler");
         const that = this;
 
         // For the widget buttons

@@ -1299,6 +1299,82 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
 
+        it("closes pitch slider using mapped key 'slider'", () => {
+            window.widgetWindows.openWindows = {
+                slider: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch slider");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+        });
+
+        it("closes music keyboard, pitch staircase, and status using mapped keys", () => {
+            window.widgetWindows.openWindows = {
+                "music keyboard": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("music keyboard");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("music keyboard");
+
+            window.widgetWindows.closeBlkWidgets("pitch staircase");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+            window.widgetWindows.closeBlkWidgets("status");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+        });
+
+        it("closes sampler using mapped key 'sampler'", () => {
+            window.widgetWindows.openWindows = {
+                sampler: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("sampler");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes widgets when receiving localized block titles", () => {
+            const originalI18n = global._;
+            const translations = {
+                "pitch slider": "control deslizante de tono",
+                "music keyboard": "teclado musical",
+                "pitch staircase": "escalera de tono",
+                "status": "estado",
+                "sampler": "muestreador"
+            };
+            global._ = jest.fn(str => translations[str] || str);
+
+            window.widgetWindows.openWindows = {
+                "slider": { close: jest.fn() },
+                "music keyboard": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() },
+                "sampler": { close: jest.fn() }
+            };
+
+            try {
+                window.widgetWindows.closeBlkWidgets("control deslizante de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+
+                window.widgetWindows.closeBlkWidgets("teclado musical");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("music keyboard");
+
+                window.widgetWindows.closeBlkWidgets("escalera de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+                window.widgetWindows.closeBlkWidgets("estado");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+
+                window.widgetWindows.closeBlkWidgets("muestreador");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+            } finally {
+                global._ = originalI18n;
+            }
+        });
+
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
                 textContent: "C MAJOR",

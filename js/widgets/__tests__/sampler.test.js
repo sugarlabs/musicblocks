@@ -833,6 +833,11 @@ describe("Sampler Widget", () => {
             widget._playReferencePitch = jest.fn();
 
             widget.init(mockActivity, 1);
+            expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
+                widget,
+                "sampler",
+                "sampler"
+            );
 
             widget.sampleName = "test";
             widget.playBtn.onclick();
