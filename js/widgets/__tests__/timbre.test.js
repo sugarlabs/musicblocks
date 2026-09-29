@@ -2381,7 +2381,14 @@ describe("TimbreWidget with a real DOM", () => {
     });
 
     beforeEach(() => {
-        for (const name of ["document", "docById", "docByName", "delayExecution"]) {
+        for (const name of [
+            "document",
+            "docById",
+            "docByName",
+            "delayExecution",
+            "instrumentsEffects",
+            "instrumentsFilters"
+        ]) {
             saved[name] = global[name];
         }
         global.document = jsdomDocument;
