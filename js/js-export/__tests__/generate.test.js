@@ -37,7 +37,8 @@ const ASTUtils = {
     getMethodAST: jest.fn(),
     getMouseAST: jest.fn(),
     setActionNames: jest.fn(),
-    getBoxNames: jest.fn(() => [])
+    getBoxNames: jest.fn(() => []),
+    skippedBlocks: new Set()
 };
 const astring = {
     generate: jest.fn()

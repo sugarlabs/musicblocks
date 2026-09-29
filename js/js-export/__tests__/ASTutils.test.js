@@ -47,6 +47,57 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("_getBlockAST with an unsupported block", () => {
+        beforeEach(() => {
+            ASTUtils.skippedBlocks.clear();
+        });
+
+        it("keeps the surrounding blocks instead of discarding the whole program", () => {
+            JSInterface.isSetter.mockImplementation(name => name === "setKey");
+            JSInterface.getSetterName.mockImplementation(name => name);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            const result = ASTUtils._getBlockAST(
+                [
+                    ["setKey", ["C"]],
+                    ["blockWithNoMapping", []],
+                    ["setKey", ["G"]]
+                ],
+                1
+            );
+
+            // The unsupported block contributes nothing; both setters survive.
+            expect(result).toHaveLength(2);
+            expect(result[0]).toEqual(ASTUtils._getSetAST("setKey", ["C"]));
+            expect(result[1]).toEqual(ASTUtils._getSetAST("setKey", ["G"]));
+        });
+
+        it("records the name so the export can be reported as incomplete", () => {
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            ASTUtils._getBlockAST(
+                [
+                    ["blockWithNoMapping", []],
+                    ["anotherUnknown", []]
+                ],
+                1
+            );
+
+            expect([...ASTUtils.skippedBlocks].sort()).toEqual([
+                "anotherUnknown",
+                "blockWithNoMapping"
+            ]);
+        });
+
+        it("does not throw", () => {
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            expect(() => ASTUtils._getBlockAST([["blockWithNoMapping", []]], 1)).not.toThrow();
+        });
+    });
+
     describe("_getSetAST", () => {
         it("should return the AST for a setter statement", () => {
             const identifier = "testIdentifier";

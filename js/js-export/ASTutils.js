@@ -134,6 +134,13 @@ class ASTUtils {
     static _actionIdentifiers = new Map();
 
     /**
+     * Names of blocks the exporter has no mapping for, collected while building the current
+     * program's ASTs. Reset by JSGenerate.generateCode before each run, and reported once the
+     * run finishes so the user knows the export is partial rather than complete.
+     */
+    static skippedBlocks = new Set();
+
+    /**
      * Returns the names of every identifier used in the given ASTs.
      *
      * @static
@@ -1329,7 +1336,11 @@ class ASTUtils {
                         ASTs.push(ASTUtils._getMethodCallAST(...flow));
                     }
                 } else {
-                    throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
+                    // No mapping for this block. Skipping it keeps the rest of the program in
+                    // the export; throwing here used to discard every other block as well.
+                    // The name is reported once the run finishes.
+                    ASTUtils.skippedBlocks.add(String(flow[0]));
+                    continue;
                 }
             }
         }
