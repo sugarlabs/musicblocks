@@ -382,6 +382,8 @@ class GitDropdownUI {
         const thumbnail = this._getThumbnail();
         const fullDesc = description || `${displayName} — a Music Blocks project`;
 
+        await this.activity.saveLocally();
+
         // ── Instant offline pre-check ─────────────────────────────────────────
         // Same pattern as _doCommit: if the device has no network right now,
         // skip the fetch entirely and queue the repo creation locally.

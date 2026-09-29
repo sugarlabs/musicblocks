@@ -108,6 +108,7 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             planet: {
                 getCurrentProjectName: jest.fn(() => "")
             },
+            saveLocally: jest.fn().mockResolvedValue(undefined),
             prepareExport: jest.fn(() => JSON.stringify({ blocks: ["note1"] })),
             turtles: {
                 running: jest.fn(() => false)
@@ -301,6 +302,24 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
             expect(localStorage.getItem("mbGitRepoName")).toBe("offline-track-456");
             expect(localStorage.getItem("mbGitDisplayName")).toBe("Offline Track");
+        });
+
+        test("saves a fresh project before queuing offline tracking", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            let finishSave;
+            mockActivity.saveLocally = jest.fn(
+                () => new Promise(resolve => (finishSave = resolve))
+            );
+
+            const create = gitDropdown._doCreate("first-track", "First Track", "Made offline");
+            await Promise.resolve();
+
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+            expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+
+            finishSave();
+            await create;
+            expect(localStorage.getItem("mbGitRepoName")).toBe("first-track");
         });
     });
 
