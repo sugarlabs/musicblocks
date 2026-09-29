@@ -252,6 +252,7 @@ describe("musicutils", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
         expect(octaveR).toBe(4);
+        setOctaveRatio(2);
     });
 });
 
@@ -1283,14 +1284,14 @@ describe("cents calculations", () => {
         it("handles non-zero cents with 19-EDO", () => {
             // A4 in 19-EDO = pitchNumber 76 (4 * 19)
             const result = pitchToFrequency("A", 4, 50, "C", "equal19");
-            const expected = A0 * Math.pow(2, 1 / (19 * 100)) ** (76 * 100 + 50);
+            const expected = A0 * Math.pow(2, 76 / 19) * Math.pow(2, 50 / 1200);
             expect(result).toBeCloseTo(expected, 4);
         });
 
         it("handles non-zero cents with 31-EDO", () => {
             // A4 in 31-EDO = pitchNumber 124 (4 * 31)
             const result = pitchToFrequency("A", 4, 50, "C", "equal31");
-            const expected = A0 * Math.pow(2, 1 / (31 * 100)) ** (124 * 100 + 50);
+            const expected = A0 * Math.pow(2, 124 / 31) * Math.pow(2, 50 / 1200);
             expect(result).toBeCloseTo(expected, 4);
         });
 
@@ -2601,6 +2602,43 @@ describe("pitchToFrequency", () => {
         global.TEMPERAMENT = {};
         const result = pitchToFrequency("A", 4, 0, "C", undefined);
         expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+    });
+
+    it("uses the configured octave ratio only for the active custom temperament", () => {
+        setOctaveRatio(3);
+        TEMPERAMENT["customOctaveRatio"] = { pitchNumber: 12 };
+        try {
+            const equalC4 = pitchToFrequency("C", 4, 0, "C", "equal");
+            const equalC5 = pitchToFrequency("C", 5, 0, "C", "equal");
+            const customC4 = pitchToFrequency("C", 4, 0, "C", "customOctaveRatio");
+            const customC5 = pitchToFrequency("C", 5, 0, "C", "customOctaveRatio");
+            const customC4With1200Cents = pitchToFrequency("C", 4, 1200, "C", "customOctaveRatio");
+
+            expect(equalC5 / equalC4).toBeCloseTo(2, 10);
+            expect(customC5 / customC4).toBeCloseTo(3, 10);
+            expect(customC4With1200Cents / customC4).toBeCloseTo(2, 10);
+        } finally {
+            delete TEMPERAMENT["customOctaveRatio"];
+            setOctaveRatio(2);
+        }
+    });
+
+    it("uses base-2 cents for a ratio-based custom temperament", () => {
+        setOctaveRatio(3);
+        TEMPERAMENT["customRatioTemperament"] = {
+            isEDO: false,
+            noteLabels: ["C", "A"],
+            ratios: [1, Math.pow(2, 9 / 12)]
+        };
+        try {
+            const c4 = pitchToFrequency("C", 4, 0, "C", "customRatioTemperament");
+            const c4With1200Cents = pitchToFrequency("C", 4, 1200, "C", "customRatioTemperament");
+
+            expect(c4With1200Cents / c4).toBeCloseTo(2, 10);
+        } finally {
+            delete TEMPERAMENT["customRatioTemperament"];
+            setOctaveRatio(2);
+        }
     });
 
     it("plays just intonation intervals at their true ratios (non-EDO accuracy)", () => {
