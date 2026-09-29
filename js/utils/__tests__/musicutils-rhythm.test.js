@@ -82,6 +82,7 @@ describe("musicutils-rhythm", () => {
             "musicutils-modewheel.js",
             "musicutils-modecore.js",
             "musicutils-pitchscale.js",
+            "musicutils-buildscale.js",
             "musicutils.js"
         ];
         const load = files => {

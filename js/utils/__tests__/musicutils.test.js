@@ -191,6 +191,10 @@ describe("musicutils", () => {
                 path.join(__dirname, "..", "musicutils-pitchscale.js"),
                 "utf8"
             );
+            const buildscale = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-buildscale.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -210,6 +214,7 @@ describe("musicutils", () => {
             vm.runInContext(modewheel, sandbox);
             vm.runInContext(modecore, sandbox);
             vm.runInContext(pitchscale, sandbox);
+            vm.runInContext(buildscale, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
