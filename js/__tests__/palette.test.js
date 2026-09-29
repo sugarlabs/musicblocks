@@ -1574,7 +1574,8 @@ describe("Palettes Class", () => {
 
             palette.showMenu(true);
 
-            expect(paletteItems.style.height).toBe("720px");
+            expect(paletteItems.style.height).toBe("calc(100vh - 180px)");
+            expect(paletteItems.style.maxHeight).toBe("calc(100vh - 180px)");
             expect(paletteItems.style.overflow).toBe("auto");
             expect(paletteItems.style.overflowX).toBe("hidden");
         });

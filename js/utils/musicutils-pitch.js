@@ -420,19 +420,24 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
  * @returns {Array} An array containing [noteName, octave].
  */
 var parseNoteString = note => {
-    // Regex to match note name and octave (one or more digits, optional negative sign)
-    // Matches valid note prefixes (Western, Solfege, Carnatic) and optional accidentals followed by octave
+    if (!note) return ["", NaN];
+
+    // Regex to match note name and octave:
+    // 1. Optional microtonal prefixes (^ or v)
+    // 2. Base note name (Western, Solfege, Carnatic)
+    // 3. Optional accidentals
+    // 4. Octave (one or more digits, optional negative sign)
     const match = note.match(
-        /^((?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
+        /^([\^v]*(?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
     );
+
     if (match) {
         return [match[1], Number(match[2])];
     }
-    // Fallback to original behavior if regex doesn't match (for edge cases)
-    const len = note.length;
-    const lastChar = note.charAt(len - 1);
-    const octave = lastChar && !isNaN(lastChar) ? Number(lastChar) : NaN;
-    return [note.substring(0, len - 1), octave];
+
+    // If completely unparseable, return the whole string as the note with NaN octave.
+    // This is safer than silently chopping off the last character.
+    return [note, NaN];
 };
 
 /**

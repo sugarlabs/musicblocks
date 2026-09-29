@@ -25,6 +25,8 @@ const {
     GCD,
     rationalSum,
     LCD,
+    toFraction,
+    isInt,
     clampNumber,
     rgbToHex,
     hexToRGB,
@@ -670,6 +672,38 @@ describe("Utility Logic Functions", () => {
             ]) {
                 expect(GCD(a, b) * LCD(a, b)).toBe(Math.abs(a * b));
             }
+        });
+    });
+
+    describe("toFraction()", () => {
+        // Moved from js/utils/musicutils-rhythm.js: pure math with no MusicBlocks-specific
+        // meaning, unlike its neighbors there (convertFactor, durationToNoteValue) which map
+        // note durations to display strings.
+        it("converts a decimal below one to a numerator/denominator pair", () => {
+            expect(toFraction(0.25)).toEqual([1, 4]);
+            expect(toFraction(0.5)).toEqual([1, 2]);
+        });
+
+        it("converts a decimal above one by inverting and swapping back", () => {
+            expect(toFraction(1.5)).toEqual([3, 2]);
+        });
+    });
+
+    describe("isInt()", () => {
+        // Moved from js/utils/musicutils-rhythm.js alongside toFraction; see the note there.
+        it("accepts a number or numeric string that is a whole number", () => {
+            expect(isInt(4)).toBe(true);
+            expect(isInt("4")).toBe(true);
+        });
+
+        it("rejects a non-integer number or numeric string", () => {
+            expect(isInt(4.5)).toBe(false);
+            expect(isInt("4.5")).toBe(false);
+        });
+
+        it("rejects values parseFloat cannot read as a number", () => {
+            expect(isInt(null)).toBe(false);
+            expect(isInt("")).toBe(false);
         });
     });
 

@@ -411,5 +411,103 @@ describe("rubrics.js test suite", () => {
             expect(stats.pitchNames.has("Cff")).toBe(true);
             expect(stats.pitches).toContain(261.6);
         });
+
+        it("resolves custom note names when getTemperament returns a dictionary object", () => {
+            isCustomTemperament.mockReturnValueOnce(true);
+            getTemperament.mockReturnValueOnce({
+                pitchNumber: 12,
+                0: ["idx", "Cff", "ratio", "C"]
+            });
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4]]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "custom_dict",
+                        getCustomFrequency: jest.fn(() => 261.6),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(activity.logo.synth.getCustomFrequency).toHaveBeenCalled();
+            expect(stats.pitchNames.has("Cff")).toBe(true);
+            expect(stats.pitches).toContain(261.6);
+        });
+
+        it("handles undefined return from getTemperament gracefully", () => {
+            isCustomTemperament.mockReturnValueOnce(true);
+            getTemperament.mockReturnValueOnce(undefined);
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4]]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "unknown_custom",
+                        getCustomFrequency: jest.fn(() => 261.6),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.pitchNames.has("C")).toBe(true);
+            expect(stats.pitches).toContain(261.6);
+        });
+
+        it("resolves custom note names with 3-element entries and calculates lowest/highest notes", () => {
+            isCustomTemperament.mockReturnValue(true);
+            getTemperament.mockReturnValue({
+                pitchNumber: 12,
+                0: [1, "vvC", 4],
+                1: [1.88, "^B", 4]
+            });
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [
+                                [["vvC4"], 4],
+                                [["^B4"], 4]
+                            ]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "custom",
+                        getCustomFrequency: jest.fn(note => (note === "vvC4" ? 261.63 : 493.88)),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            try {
+                const stats = getStatsFromNotation(activity);
+
+                expect(stats.pitchNames.has("vvC")).toBe(true);
+                expect(stats.pitchNames.has("^B")).toBe(true);
+                expect(stats.pitches).toContain(261.63);
+                expect(stats.pitches).toContain(493.88);
+                expect(stats.lowestNote).toEqual(["vvC4", 0, 261.63]);
+                expect(stats.highestNote).toEqual(["^B4", 1, 493.88]);
+            } finally {
+                isCustomTemperament.mockReturnValue(false);
+                getTemperament.mockReturnValue([]);
+            }
+        });
     });
 });

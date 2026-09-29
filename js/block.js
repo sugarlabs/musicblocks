@@ -34,7 +34,7 @@
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
-   widgetWindows
+   widgetWindows, Turtle
  */
 
 /*
@@ -1509,6 +1509,9 @@ class Block {
                         break;
                     case "wrapmode":
                         this.value = "on";
+                        break;
+                    case "turtlekey":
+                        this.value = "pen size";
                 }
             }
 
@@ -4537,6 +4540,14 @@ class Block {
                 wrapValues.push(WRAPMODES[i][1]);
             }
             piemenuBasic(this, wrapLabels, wrapValues, selectedWrap);
+        } else if (this.name === "turtlekey") {
+            const keys = Turtle.DictActions.TurtleKeys();
+            piemenuBasic(
+                this,
+                keys.map(key => _(key)),
+                keys,
+                this.value !== null ? this.value : "pen size"
+            );
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.

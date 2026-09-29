@@ -18,7 +18,8 @@
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
-    isUnsafeObjectKey, ManagedTimer
+    isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
  */
 
 /*
@@ -125,6 +126,7 @@ class ModeWidget {
         this.widgetWindow.onclose = () => {
             this._clearWidgetTimers();
             this._playing = false;
+            closeSharePopup("sclSharePopup");
             if (this.logo && this.logo.synth) {
                 this.logo.synth.stop();
             }
@@ -1441,115 +1443,15 @@ class ModeWidget {
     }
 
     _createSclSharePopup(anchor) {
-        const existing = document.getElementById("sclSharePopup");
-        if (existing) {
-            if (existing._closeHandler) {
-                document.removeEventListener("mousedown", existing._closeHandler);
-            }
-            existing.remove();
-            return;
-        }
-
-        const popup = document.createElement("div");
-        popup.id = "sclSharePopup";
-        popup.style.cssText =
-            "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
-            "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
-            "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
-            "min-width:140px;";
-        const rect = anchor.getBoundingClientRect();
-        popup.style.top = rect.bottom + 4 + "px";
-        popup.style.left = rect.left + "px";
-
-        const addItem = (label, handler) => {
-            const item = document.createElement("div");
-            item.textContent = label;
-            item.setAttribute("role", "button");
-            item.setAttribute("tabindex", "0");
-            item.style.cssText = "padding:6px 16px;cursor:pointer;";
-            item.onmouseenter = () => {
-                item.style.background = "var(--color-bg-tertiary)";
-            };
-            item.onmouseleave = () => {
-                item.style.background = "";
-            };
-            item.onclick = () => {
-                cleanup();
-                handler();
-            };
-            item.onkeydown = e => {
-                if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    cleanup();
-                    handler();
-                }
-            };
-            return item;
-        };
-
-        popup.appendChild(addItem(_("Export .scl"), () => this._exportScl()));
-        popup.appendChild(addItem(_("Export JSON"), () => this._exportJson()));
-        popup.appendChild(addItem(_("Import"), () => this._importFile()));
-        document.body.appendChild(popup);
-
-        const cleanup = () => {
-            popup.remove();
-            document.removeEventListener("mousedown", closeHandler);
-        };
-
-        const closeHandler = e => {
-            if (!popup.contains(e.target)) {
-                cleanup();
-            }
-        };
-        popup._closeHandler = closeHandler;
-        setTimeout(() => {
-            document.addEventListener("mousedown", closeHandler);
-        }, 0);
-    }
-
-    _downloadScl(content, filename) {
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-
-    _readSclFile(inputId, callback) {
-        const fileInput = docById(inputId);
-        if (!fileInput) {
-            callback(new Error(_("File input not found.")));
-            return;
-        }
-
-        fileInput.value = "";
-        fileInput.onchange = function () {
-            const file = fileInput.files[0];
-            if (!file) {
-                return;
-            }
-
-            const MAX_IMPORT_SIZE = 1024 * 1024;
-            if (file.size > MAX_IMPORT_SIZE) {
-                callback(new Error(_("File too large. Maximum is 1 MB.")));
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                callback(null, { text: e.target.result, file });
-            };
-            reader.onerror = function () {
-                callback(new Error(_("Failed to read file.")));
-            };
-            reader.readAsText(file);
-        };
-        fileInput.click();
+        createSharePopup(
+            "sclSharePopup",
+            [
+                [_("Export .scl"), () => this._exportScl()],
+                [_("Export JSON"), () => this._exportJson()],
+                [_("Import"), () => this._importFile()]
+            ],
+            anchor
+        );
     }
 
     _findEdoSteps(pitches) {
@@ -1607,7 +1509,7 @@ class ModeWidget {
         }
 
         const content = lines.join("\n") + "\n";
-        this._downloadScl(content, "mode-" + edo + "edo.scl");
+        downloadTextFile(content, "mode-" + edo + "edo.scl");
     }
 
     _exportJson() {
@@ -1617,7 +1519,7 @@ class ModeWidget {
 
         const name = this._findModeNameForPattern(pattern) || "custom";
         const content = JSON.stringify({ name, edo, pattern }, null, 2);
-        this._downloadScl(content, "mode-" + edo + "edo.json");
+        downloadTextFile(content, "mode-" + edo + "edo.json");
     }
 
     _resolveBuiltInCollision(name, edo) {
@@ -1690,7 +1592,7 @@ class ModeWidget {
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
         this._selectedModeName = name;
-        this.errorMsg(_("Mode imported: ") + name);
+        this.textMsg(_("Mode imported: ") + name, 3000);
         this._updateModeDisplay(name);
         if (this._modeBlock !== null) {
             const modeBlock = this.blocks.blockList[this._modeBlock];
@@ -1704,7 +1606,7 @@ class ModeWidget {
     }
 
     _importFile() {
-        this._readSclFile("myModeSclFile", (err, data) => {
+        readTextFile("myModeSclFile", (err, data) => {
             if (err) {
                 this.errorMsg(err.message);
                 return;

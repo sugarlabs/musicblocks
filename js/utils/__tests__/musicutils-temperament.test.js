@@ -138,6 +138,10 @@ describe("musicutils-temperament", () => {
             "musicutils-temperament.js",
             "musicutils-pitch.js",
             "musicutils-lookups.js",
+            "musicutils-rhythm.js",
+            "musicutils-solfege.js",
+            "musicutils-modewheel.js",
+            "musicutils-modecore.js",
             "musicutils.js"
         ];
         const load = files => {

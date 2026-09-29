@@ -794,6 +794,7 @@ function setupIntervalsBlocks(activity) {
 
             tur.singer.duplicateFactor *= factor;
             tur.singer.arpeggio = [];
+            tur.singer.arpeggioIndex = 0;
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
                 tur.singer.arpeggio.push(CHORDVALUES[i][ii]);
             }
@@ -822,6 +823,7 @@ function setupIntervalsBlocks(activity) {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
+                tur.singer.arpeggioIndex = 0;
 
                 logo.connectionStoreLock = true;
 

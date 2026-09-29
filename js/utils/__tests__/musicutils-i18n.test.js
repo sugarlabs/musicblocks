@@ -82,6 +82,10 @@ describe("musicutils-i18n", () => {
             "musicutils-temperament.js",
             "musicutils-pitch.js",
             "musicutils-lookups.js",
+            "musicutils-rhythm.js",
+            "musicutils-solfege.js",
+            "musicutils-modewheel.js",
+            "musicutils-modecore.js",
             "musicutils.js"
         ];
 

@@ -258,6 +258,29 @@ describe("DomHelpers module structure", () => {
     });
 });
 
+describe("closeSharePopup()", () => {
+    const anchor = { getBoundingClientRect: () => ({ left: 0, bottom: 0 }) };
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+        jest.restoreAllMocks();
+    });
+
+    it("removes an open popup and unregisters its mousedown listener", () => {
+        const { createSharePopup, closeSharePopup } = DomHelpers;
+        createSharePopup("testSharePopup", [["Item", jest.fn()]], anchor);
+        const popup = document.getElementById("testSharePopup");
+        expect(popup).not.toBeNull();
+        const handler = popup._closeHandler;
+        const removeSpy = jest.spyOn(document, "removeEventListener");
+
+        closeSharePopup("testSharePopup");
+
+        expect(document.getElementById("testSharePopup")).toBeNull();
+        expect(removeSpy).toHaveBeenCalledWith("mousedown", handler);
+    });
+});
+
 describe("compatibility export via utils.js", () => {
     // utils.js re-exports these helpers (`...DomHelpers` in its own
     // module.exports) so existing `require("../utils")` consumers keep

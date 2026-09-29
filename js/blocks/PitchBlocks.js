@@ -959,7 +959,9 @@ function setupPitchBlocks(activity) {
         static _parseCents(value) {
             if (typeof value !== "string") return [value, 0];
             const match = value.match(
-                new RegExp(`^([A-Ga-g](?:[#b♯♭]|𝄪|𝄫)?)(\\(([+-]\\d+)${CENTSSYMBOL}\\))?$`)
+                new RegExp(
+                    `^([v^]{0,2}[A-Ga-g](?:[#b♯♭]{1,2}|𝄪|𝄫)?)(\\(([+-]?\\d+)(?:${CENTSSYMBOL}|c)?\\))?$`
+                )
             );
             if (match) {
                 return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];

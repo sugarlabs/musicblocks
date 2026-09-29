@@ -897,7 +897,9 @@ class Singer {
                 tur.singer.lastPitch.push(pitchNumber);
             }
         } else if (activity.logo.inPitchDrumMatrix) {
-            if (note.toLowerCase() !== "rest") {
+            // A rest ("rest" or "r") is not a row, and a pitch inside Set Drum
+            // becomes a drum column instead.
+            if (!["rest", "r"].includes(note.toLowerCase()) && tur.singer.drumStyle.length === 0) {
                 activity.logo.pitchDrumMatrix.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
                     activity.logo.pitchBlocks.push(blk);
@@ -930,7 +932,7 @@ class Singer {
                     ? getSolfege(
                           nnote[0],
                           tur.singer.keySignature,
-                          tur.singer.movable,
+                          false, // getNote already applied movable Do; widgets use fixed Do
                           activity.logo.synth.inTemperament,
                           edo
                       )
@@ -938,6 +940,7 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    activity.logo.pitchDrumMatrix.addColBlock(blk);
                 } else {
                     activity.logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
                     activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
@@ -1103,7 +1106,7 @@ class Singer {
 
                         tur.singer.arpeggioIndex += 1;
                     }
-                    if (tur.singer.arpeggioIndex === alen) {
+                    if (tur.singer.arpeggioIndex >= alen) {
                         tur.singer.arpeggioIndex = 0;
                     }
                 }
@@ -1338,7 +1341,7 @@ class Singer {
                 ? getSolfege(
                       nnote[0],
                       tur.singer.keySignature,
-                      tur.singer.movable,
+                      false, // getNote already applied movable Do; widgets use fixed Do
                       activity.logo.synth.inTemperament,
                       edo
                   )
@@ -1617,7 +1620,7 @@ class Singer {
                 Singer.setSynthVolume(
                     activity.logo,
                     turtle,
-                    DEFAULTVOICE,
+                    synth,
                     last(tur.singer.synthVolume[synth])
                 );
             }

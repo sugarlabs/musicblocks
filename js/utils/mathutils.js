@@ -354,15 +354,33 @@ class MathUtility {
     }
 
     /**
-     * Returns integer value.
+     * Returns integer value, rounding half away from zero (symmetric rounding).
+     *
+     * `Math.floor(n + 0.5)` is the classic "round half up" formula, which
+     * is asymmetric: `doInt(-2.5)` would give `-2` instead of `-3`.
+     * Using `Math.sign(n) * Math.round(Math.abs(n))` keeps both sides of
+     * zero consistent — positives and negatives mirror each other.
      *
      * @static
      * @param {*} a
-     * @returns {number} - Integer value of a.
+     * @returns {number} - Integer value of a, rounded half away from zero.
      */
     static doInt(a) {
         const n = Number(a);
-        return Number.isNaN(n) ? NaN : Math.floor(n + 0.5);
+        if (Number.isNaN(n)) return NaN;
+        return Math.sign(n) * Math.round(Math.abs(n));
+    }
+
+    /**
+     * Matches the value returned by the XOR block.
+     *
+     * @static
+     * @param {*} a
+     * @param {*} b
+     * @returns {*}
+     */
+    static doXor(a, b) {
+        return a ? !b : b;
     }
 
     /**

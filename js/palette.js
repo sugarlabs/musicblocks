@@ -1311,6 +1311,9 @@ class PaletteModel {
             case "grid":
                 label = _("Grid").toLowerCase();
                 break;
+            case "turtlekey":
+                label = _("pen size");
+                break;
             case "text":
                 label = _("text");
                 break;
@@ -1672,7 +1675,9 @@ class Palette {
             return;
         }
         const paletteItems = docById("PaletteBody_items");
-        paletteItems.style.height = `${window.innerHeight - paletteItems.getBoundingClientRect().top}px`;
+        const height = `calc(100vh - ${paletteItems.getBoundingClientRect().top}px)`;
+        paletteItems.style.height = height;
+        paletteItems.style.maxHeight = height;
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener

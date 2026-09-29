@@ -24,6 +24,7 @@ window.ast2blocklist_config = {
                 "/": "divide",
                 "%": "mod",
                 "==": "equal",
+                "===": "equal",
                 "!=": "not_equal_to",
                 "<": "less",
                 ">": "greater",
@@ -102,7 +103,7 @@ window.ast2blocklist_config = {
                 name_property: "callee.property.name",
                 arguments_property: "arguments"
             },
-            name_map: { abs: "abs", floor: "int", pow: "power", sqrt: "sqrt" }
+            name_map: { abs: "abs", pow: "power", sqrt: "sqrt" }
         },
         {
             comment: "Math utility operators such as distance or random",
@@ -116,7 +117,13 @@ window.ast2blocklist_config = {
                 name_property: "callee.property.name",
                 arguments_property: "arguments"
             },
-            name_map: { doCalculateDistance: "distance", doOneOf: "oneOf", doRandom: "random" }
+            name_map: {
+                doCalculateDistance: "distance",
+                doInt: "int",
+                doOneOf: "oneOf",
+                doRandom: "random",
+                doXor: "xor"
+            }
         },
         {
             comment: "Singular argument mouse blocks",

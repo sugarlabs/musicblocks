@@ -1421,6 +1421,113 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
     });
 });
 
+describe("processPitch music keyboard with movable Do", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    test.each([
+        // [key, typed solfege, expected fixed-do name, expected octave]
+        ["E in", "fa", "la", 4],
+        ["G major", "do", "sol", 3],
+        ["A aeolian", "la", "la", 4]
+    ])("in %s, %s is stored as the fixed-do pitch the keyboard shows", (key, solf, name, oct) => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = key;
+        turtleMock.singer.movable = true;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        activityMock.logo.musicKeyboard = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+
+        Singer.processPitch(activityMock, solf, 4, 0, 0, "blk");
+
+        expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
+        expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
+    });
+});
+
+describe("processPitch in the pitch-drum matrix", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    const setup = drumStyle => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.drumStyle = drumStyle;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inPitchDrumMatrix = true;
+        activityMock.logo.pitchBlocks = [];
+        activityMock.logo.pitchDrumMatrix = {
+            rowLabels: [],
+            rowArgs: [],
+            drums: [],
+            addRowBlock: jest.fn(),
+            addColBlock: jest.fn()
+        };
+        return activityMock;
+    };
+
+    test("a pitch becomes a row tied to its block", () => {
+        const activityMock = setup([]);
+
+        Singer.processPitch(activityMock, "sol", 4, 0, 0, "blk");
+
+        const pdm = activityMock.logo.pitchDrumMatrix;
+        expect(pdm.rowLabels).toEqual(["sol"]);
+        expect(pdm.addRowBlock).toHaveBeenCalledWith("blk");
+        expect(pdm.addColBlock).not.toHaveBeenCalled();
+    });
+
+    test("a rest written as R doesn't add a row block", () => {
+        const activityMock = setup([]);
+
+        Singer.processPitch(activityMock, "R", 4, 0, 0, "blk");
+
+        expect(activityMock.logo.pitchDrumMatrix.addRowBlock).not.toHaveBeenCalled();
+    });
+
+    // A pitch inside Set Drum is a drum column, so it must not add a row block
+    // (the rows would shift) and must add a column block (the columns would).
+    test("a pitch inside Set Drum becomes a column tied to its block", () => {
+        const activityMock = setup(["snare drum"]);
+
+        Singer.processPitch(activityMock, "sol", 4, 0, 0, "blk");
+
+        const pdm = activityMock.logo.pitchDrumMatrix;
+        expect(pdm.drums).toEqual(["snare drum"]);
+        expect(pdm.rowLabels).toEqual([]);
+        expect(pdm.addColBlock).toHaveBeenCalledWith("blk");
+        expect(pdm.addRowBlock).not.toHaveBeenCalled();
+    });
+});
+
 describe("processPitch internal addPitch behavior", () => {
     let turtleMock;
     let activityMock;
@@ -1811,5 +1918,22 @@ describe("Singer.processNote tuplet and legoWidget handling", () => {
             ["db1", ["mockBlk", 0], 0]
         ]);
         expect(phraseMaker._blockMap[-1]).toBeUndefined();
+    });
+
+    it("should restore volume for each synth using its own voice name when crescendo ends", () => {
+        turtleMock.singer.inCrescendo = [true];
+        turtleMock.singer.crescendoDelta = [];
+        turtleMock.singer.synthVolume = {
+            piano: [80],
+            flute: [30]
+        };
+        const setSynthVolumeSpy = jest.spyOn(Singer, "setSynthVolume");
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(turtleMock.singer.inCrescendo).toHaveLength(0);
+        expect(setSynthVolumeSpy).toHaveBeenCalledWith(activityMock.logo, 0, "piano", 80);
+        expect(setSynthVolumeSpy).toHaveBeenCalledWith(activityMock.logo, 0, "flute", 30);
+        setSynthVolumeSpy.mockRestore();
     });
 });

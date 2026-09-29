@@ -21,20 +21,12 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof window !== "undefined" && window.MusicUtilsConstants) ||
         (typeof require !== "undefined" ? require("./musicutils-constants") : {});
     var {
-        WHOLENOTE,
-        HALFNOTE,
-        QUARTERNOTE,
-        EIGHTHNOTE,
-        SIXTEENTHNOTE,
-        THIRTYSECONDNOTE,
-        SIXTYFOURTHNOTE,
         SHARP,
         FLAT,
         CENTSSYMBOL,
         NATURAL,
         DOUBLESHARP,
         DOUBLEFLAT,
-        NSYMBOLS,
         BTOFLAT,
         STOSHARP,
         CHROMATIC_SOLFEGE,
@@ -67,18 +59,14 @@ if (typeof module !== "undefined" && module.exports) {
         SOLFNOTES,
         SCALENOTES,
         SEMITONES,
-        POWER2,
         A0,
         YSTAFFNOTEHEIGHT,
         YSTAFFOCTAVEHEIGHT,
         ACCIDENTALNAMES,
         ACCIDENTALVALUES,
         INTERVALVALUES,
-        MODE_PIE_MENUS,
         MODEPIEMENU_GROUP_RING,
         MODEPIEMENU_NAME_RING,
-        PITCH_COLLECTIONS,
-        PITCH_COLLECTION_ALIASES,
         MAQAMTABLE,
         DEFAULTINVERT,
         DEFAULTMODE,
@@ -160,10 +148,66 @@ if (typeof module !== "undefined" && module.exports) {
         getVoiceIcon,
         getVoiceSynthName
     } = MusicUtilsLookups;
+    var MusicUtilsRhythm =
+        (typeof window !== "undefined" && window.MusicUtilsRhythm) ||
+        (typeof require !== "undefined" ? require("./musicutils-rhythm") : {});
+    var { reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor } =
+        MusicUtilsRhythm;
+    var MusicUtilsSolfege =
+        (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
+        (typeof require !== "undefined" ? require("./musicutils-solfege") : {});
+    var {
+        noteIsSolfege,
+        splitSolfege,
+        splitI18nSolfege,
+        i18nSolfege,
+        splitScaleDegree,
+        convertFromSolfege
+    } = MusicUtilsSolfege;
+    var MusicUtilsModeWheel =
+        (typeof window !== "undefined" && window.MusicUtilsModeWheel) ||
+        (typeof require !== "undefined" ? require("./musicutils-modewheel") : {});
+    var {
+        getSavedCustomModes,
+        getModeNamesForGroup,
+        getModeLabel,
+        getModeNameFromLabel,
+        getModeSliceColors,
+        updateModeWheelItems,
+        getModeGroupTitleFont,
+        getModeSliceFont,
+        configureWheel
+    } = MusicUtilsModeWheel;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { toFraction, isInt } = UtilsLogic;
+    var MusicUtilsModeCore =
+        (typeof window !== "undefined" && window.MusicUtilsModeCore) ||
+        (typeof require !== "undefined" ? require("./musicutils-modecore") : {});
+    var {
+        wholeNoteImg,
+        halfNoteImg,
+        quarterNoteImg,
+        eighthNoteImg,
+        sixteenthNoteImg,
+        thirtysecondNoteImg,
+        sixtyfourthNoteImg,
+        MUSICALMODES,
+        customMode,
+        getModeNumbers,
+        getNonEDOModeSteps,
+        getArticulation,
+        modeMapper,
+        getCustomNote,
+        GetNotesForInterval,
+        base64Encode,
+        MOVABLE_TONIC_DEGREE,
+        scalePatternToEDO,
+        PITCH_COLLECTIONS_EDO_OVERRIDES,
+        getModePattern
+    } = MusicUtilsModeCore;
 }
-
-const _b64Cache = new Map();
-
 /*
    Global Locations
     js/utils/utils.js
@@ -232,20 +276,6 @@ const _b64Cache = new Map();
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
 
 /**
- * Image URL for a whole note.
- * @constant {string}
- */
-const wholeNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(WHOLENOTE));
-const halfNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(HALFNOTE));
-const quarterNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(QUARTERNOTE));
-const eighthNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(EIGHTHNOTE));
-const sixteenthNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(SIXTEENTHNOTE));
-const thirtysecondNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(THIRTYSECONDNOTE));
-const sixtyfourthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(SIXTYFOURTHNOTE));
-
-/**
  * Map from note duration to corresponding note symbols.
  * @constant {Object.<number, string>}
  */
@@ -258,385 +288,6 @@ const NOTESYMBOLS = {
     16: sixteenthNoteImg,
     32: thirtysecondNoteImg,
     64: sixtyfourthNoteImg
-};
-
-/**
- * Numeric values representing the intervals in different chords.
- * @constant {Array<Array<Array<number>>>}
- */
-const CHORDVALUES = [
-    //scalar
-    [
-        [0, 0],
-        [2, 0],
-        [4, 0]
-    ],
-    [
-        [2, 0],
-        [4, 0],
-        [7, 0]
-    ],
-    [
-        [-3, 0],
-        [0, 0],
-        [2, 0]
-    ],
-    [
-        [0, 0],
-        [2, 0],
-        [4, 0],
-        [6, 0]
-    ],
-    [
-        [2, 0],
-        [4, 0],
-        [6, 0],
-        [7, 0]
-    ],
-    [
-        [-3, 0],
-        [-1, 0],
-        [0, 0],
-        [2, 0]
-    ],
-    [
-        [-1, 0],
-        [0, 0],
-        [2, 0],
-        [4, 0]
-    ],
-    [
-        [0, 0],
-        [2, 0],
-        [4, 0],
-        [6, 0],
-        [8, 0]
-    ],
-    [
-        [0, 0],
-        [2, 0],
-        [4, 0],
-        [6, 0],
-        [12, 0]
-    ],
-    //semitone
-    [
-        [0, 0],
-        [0, 4],
-        [0, 7]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 7]
-    ],
-    [
-        [0, 0],
-        [0, 4],
-        [0, 8]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 6]
-    ],
-    [
-        [0, 0],
-        [0, 4],
-        [0, 7],
-        [0, 11]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 7],
-        [0, 10]
-    ],
-    [
-        [0, 0],
-        [0, 4],
-        [0, 7],
-        [0, 10]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 7],
-        [0, 11]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 6],
-        [0, 9]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 6],
-        [0, 10]
-    ],
-    // custom is always at the end of the list
-    [
-        [0, 0],
-        [0, 4],
-        [0, 7]
-    ]
-];
-
-/**
- * Set a custom chord.
- * @function
- * @param {Array<Array<number>>} chord - Custom chord values.
- */
-const setCustomChord = chord => {
-    CHORDVALUES[CHORDVALUES.length - 1] = chord;
-};
-
-/** Custom modes saved by the mode widget; corrupt data yields []. */
-const getSavedCustomModes = () => {
-    try {
-        const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
-        return Array.isArray(customModes)
-            ? customModes.filter(m => m && typeof m.name === "string")
-            : [];
-    } catch (e) {
-        return [];
-    }
-};
-
-/**
- * Builds the fixed 12-slot mode-name list for a group ("custom" padded with blanks).
- * @param {string} grp
- * @param {Array} [customModeNames]
- * @returns {Array}
- */
-const getModeNamesForGroup = (grp, customModeNames = []) => {
-    if (grp !== "custom") {
-        return MODE_PIE_MENUS[grp].slice();
-    }
-    const names = customModeNames.slice(0, 12);
-    while (names.length < 12) {
-        names.push(" ");
-    }
-    return names;
-};
-
-/** Display label for a mode (major/ionian and minor/aeolian pairs translated). */
-const getModeLabel = modename => {
-    switch (modename) {
-        case "ionian":
-        case "major":
-            return `${_("major")} / ${_("ionian")}`;
-        case "aeolian":
-        case "minor":
-            return `${_("minor")} / ${_("aeolian")}`;
-        default:
-            return modename === " " ? " " : _(modename);
-    }
-};
-
-/** Inverse of getModeLabel; falls back to the label itself. */
-const getModeNameFromLabel = (label, modes) => {
-    if (label === `${_("major")} / ${_("ionian")}`) {
-        return "major";
-    }
-    if (label === `${_("minor")} / ${_("aeolian")}`) {
-        return "aeolian";
-    }
-    for (const m of modes) {
-        if (_(m) === label) {
-            return m;
-        }
-    }
-    return label;
-};
-
-/** Per-slice colors: blank slots get emptyColor, real modes filledColor. */
-const getModeSliceColors = (modes, colors) =>
-    modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
-
-/** Re-renders a mode-name wheel in place with new labels/colors. */
-const updateModeWheelItems = (wheel, labels, colors) => {
-    for (let i = 0; i < wheel.navItems.length; i++) {
-        const item = wheel.navItems[i];
-        item.title = labels[i];
-        item.basicNavTitleMax.title = labels[i];
-        item.basicNavTitleMin.title = labels[i];
-        item.hoverNavTitleMax.title = labels[i];
-        item.hoverNavTitleMin.title = labels[i];
-        item.selectedNavTitleMax.title = labels[i];
-        item.selectedNavTitleMin.title = labels[i];
-        item.initNavTitle.title = labels[i];
-        item.fillAttr = colors[i];
-        item.sliceHoverAttr.fill = colors[i];
-        item.slicePathAttr.fill = colors[i];
-        item.sliceSelectedAttr.fill = colors[i];
-        // refreshWheel() never rewrites text content, so push the label directly.
-        if (item.navTitle && typeof item.navTitle.attr === "function") {
-            item.navTitle.attr({ text: labels[i] });
-        }
-    }
-    wheel.refreshWheel();
-};
-
-/** Group-ring title font, scaled to wheel radius. */
-const getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
-
-/** Name-ring label font sized to fit its slice arc. */
-const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
-    const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
-    const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
-    const minSize = Math.round(0.06 * wheelRadius);
-    const maxSize = Math.round(0.12 * wheelRadius);
-    const clamped = Math.min(maxSize, Math.max(minSize, size));
-    return `100 ${clamped}px sans-serif`;
-};
-
-/** Applies shared donut-slice config to a wheelnav instance. */
-const configureWheel = (wheel, opts) => {
-    wheel.colors = opts.colors;
-    wheel.slicePathFunction = slicePath().DonutSlice;
-    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
-    wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
-    if (opts.clickModeRotate !== undefined) {
-        wheel.clickModeRotate = opts.clickModeRotate;
-    }
-    if (opts.selectionPaths) {
-        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-        wheel.sliceInitPathCustom = wheel.slicePathCustom;
-    }
-    wheel.navAngle = -90;
-    wheel.animatetime = 0;
-    if (opts.titleRotateAngle !== undefined) {
-        wheel.titleRotateAngle = opts.titleRotateAngle;
-    }
-    if (opts.titleFont !== undefined) {
-        wheel.titleFont = opts.titleFont;
-    }
-};
-
-// The table contains the intervals that define the modes.
-// All of these modes assume 12 semitones per octave.
-// See http://www.pianoscales.org <== this is in no way definitive
-
-const MUSICALMODES = {};
-for (const count in PITCH_COLLECTIONS) {
-    const collections = PITCH_COLLECTIONS[count];
-    for (const name in collections) {
-        MUSICALMODES[name] = collections[name];
-    }
-}
-
-for (const alias in PITCH_COLLECTION_ALIASES) {
-    MUSICALMODES[alias] = MUSICALMODES[PITCH_COLLECTION_ALIASES[alias]];
-}
-
-// User definition overrides this constant.
-MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-
-/**
- * Custom mode from the musical modes dictionary.
- * @constant {Object}
- */
-const customMode = MUSICALMODES["custom"];
-
-/**
- * Get the mode numbers for a specific mode name.
- * @function
- * @param {string} name - The name of the mode.
- * @returns {string} The mode numbers.
- */
-const getModeNumbers = name => {
-    const __convert = obj => {
-        let n = 0;
-        let m = "";
-        for (let i = 0; i < obj.length; i++) {
-            m += n.toString();
-            if (i < obj.length - 1) {
-                m += " ";
-            }
-
-            n += obj[i];
-        }
-
-        return m;
-    };
-
-    const lowercaseName = name.toLowerCase();
-    for (const mode in MUSICALMODES) {
-        if (mode.toLowerCase() === lowercaseName) {
-            return __convert(MUSICALMODES[mode]);
-        }
-    }
-
-    // console.debug(name + " not found in MUSICALMODES");
-    return "";
-};
-
-/**
- * Integer step pattern for a mode under a non-EDO temperament: each
- * cumulative semitone offset of the 12-EDO mode pattern is mapped to the
- * index of the nearest ratio, then positions are differenced. This gives
- * the builder wheel unequal-temperament geometry (e.g. meantone major is
- * not the proportional rescale of 12-EDO semitones).
- * @function
- * @param {string} mode - mode name in MUSICALMODES
- * @param {string} temperament - temperament key in TEMPERAMENT
- * @returns {Array|null} step counts, or null when impossible
- */
-const getNonEDOModeSteps = (mode, temperament) => {
-    const pattern = MUSICALMODES[mode];
-    const t = getTemperament(temperament);
-    if (!pattern || !t || !Array.isArray(t.ratios) || t.ratios.length === 0) {
-        return null;
-    }
-    const n = t.pitchNumber || t.ratios.length;
-    const positions = [0];
-    let cum = 0;
-    for (let k = 0; k < pattern.length - 1; k++) {
-        cum += pattern[k];
-        const target = Math.pow(2, cum / 12);
-        let best = 0;
-        let bestDiff = Infinity;
-        for (let r = 1; r < n; r++) {
-            const ratio = Number(t.ratios[r]);
-            if (!isFinite(ratio) || ratio <= 0) {
-                continue;
-            }
-            const diff = Math.abs(Math.log2(ratio / target));
-            if (diff < bestDiff) {
-                bestDiff = diff;
-                best = r;
-            }
-        }
-        // Keep positions monotonically increasing; if the nearest ratio
-        // falls at or before the previous degree, bump forward by 1 to
-        // avoid collapsing two degrees onto the same pitch. This can
-        // produce a step of 1 that doesn't correspond to a real ratio
-        // interval — acceptable for typical ratio tables (12+ entries)
-        // where this path is rarely hit.
-        if (best <= positions[positions.length - 1]) {
-            best = positions[positions.length - 1] + 1;
-        }
-        if (best >= n) {
-            return null;
-        }
-        positions.push(best);
-    }
-    const steps = [];
-    for (let p = 1; p < positions.length; p++) {
-        steps.push(positions[p] - positions[p - 1]);
-    }
-    // Close back to the octave: the ratios table holds no octave entry, so
-    // the final mode step spans from the last mapped degree to pitchNumber.
-    const last = positions[positions.length - 1];
-    if (last >= n) {
-        return null;
-    }
-    steps.push(n - last);
-    return steps;
 };
 
 /**
@@ -663,26 +314,6 @@ const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
     const octave = baseOctave + Math.floor(note / labels.length);
     const freq = pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
     return { freq, noteName: labels[idx], octave };
-};
-
-/**
- * Get the articulation (accidental/direction) suffix from a note string by
- * stripping the leading note-name prefix.
- *
- * Valid prefixes are the seven solfege syllables (do, re, mi, fa, sol, la, ti)
- * and the seven letter note names (A–G). The prefix is matched only at the
- * start of the string so that custom note names that happen to contain these
- * letters elsewhere are not mangled.
- *
- * @function
- * @param {string} note - The note string (e.g. "C♯", "sol♭", "A^^").
- * @returns {string} Whatever follows the note-name prefix (the articulation),
- *     or the full string unchanged if no recognised prefix is found.
- */
-const getArticulation = note => {
-    const stripped = stripMicrotonalPrefix(note);
-    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
-    return match ? match[1] : stripped;
 };
 
 /**
@@ -860,347 +491,6 @@ const getScaleAndHalfSteps = (keySignature, edo = 12) => {
 };
 
 /**
- * Map common modes into their major/minor equivalent.
- * @function
- * @param {string} key - The key of the mode.
- * @param {string} mode - The mode to map.
- * @returns {Array} An array containing the mapped key and mode.
- */
-const modeMapper = (key, mode) => {
-    // map common modes into their major/minor equivalent
-    // console.debug(key + ' ' + mode + ' >>');
-    key = key.toLowerCase();
-    mode = mode.toLowerCase();
-
-    switch (mode) {
-        case "ionian":
-            mode = "major";
-            break;
-        case "dorian":
-            mode = "major";
-            switch (key) {
-                case "c":
-                    key = "a" + SHARP;
-                    break;
-                case "d":
-                    key = "c";
-                    break;
-                case "e":
-                    key = "d";
-                    break;
-                case "f":
-                    key = "c";
-                    mode = "minor";
-                    break;
-                case "g":
-                    key = "f";
-                    break;
-                case "a":
-                    key = "g";
-                    break;
-                case "b":
-                    key = "a";
-                    break;
-                case "c" + SHARP:
-                    key = "b";
-                    break;
-                case "d" + SHARP:
-                    key = "c" + SHARP;
-                    break;
-                case "f" + SHARP:
-                    key = "e";
-                    break;
-                case "g" + SHARP:
-                    key = "f" + SHARP;
-                    break;
-                case "a" + SHARP:
-                    key = "g" + SHARP;
-                    break;
-                case "d" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "e" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "g" + FLAT:
-                    key = "d";
-                    mode = "minor";
-                    break;
-                case "a" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "b" + FLAT:
-                    key = "f";
-                    mode = "minor";
-                    break;
-            }
-            break;
-        case "phrygian":
-            mode = "major";
-            switch (key) {
-                case "c":
-                    key = "g" + SHARP;
-                    break;
-                case "d":
-                    key = "a" + SHARP;
-                    break;
-                case "e":
-                    key = "c";
-                    break;
-                case "f":
-                    key = "d" + FLAT;
-                    break;
-                case "g":
-                    key = "c";
-                    mode = "minor";
-                    break;
-                case "a":
-                    key = "f";
-                    break;
-                case "b":
-                    key = "g";
-                    break;
-                case "c" + SHARP:
-                    key = "a";
-                    break;
-                case "d" + SHARP:
-                    key = "b";
-                    break;
-                case "f" + SHARP:
-                    key = "d";
-                    break;
-                case "g" + SHARP:
-                    key = "e";
-                    break;
-                case "a" + SHARP:
-                    key = "b";
-                    break;
-                case "d" + FLAT:
-                    key = "g" + FLAT;
-                    mode = "minor";
-                    break;
-                case "e" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "g" + FLAT:
-                    key = "d";
-                    break;
-                case "a" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
-                    break;
-                case "b" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-            }
-            break;
-        case "lydian":
-            mode = "major";
-            switch (key) {
-                case "c":
-                    key = "g";
-                    break;
-                case "d":
-                    key = "a";
-                    break;
-                case "e":
-                    key = "b";
-                    break;
-                case "f":
-                    key = "c";
-                    break;
-                case "g":
-                    key = "d";
-                    break;
-                case "a":
-                    key = "e";
-                    break;
-                case "b":
-                    key = "b";
-                    break;
-                case "c" + SHARP:
-                    key = "g" + SHARP;
-                    break;
-                case "d" + SHARP:
-                    key = "a" + SHARP;
-                    break;
-                case "f" + SHARP:
-                    key = "b";
-                    break;
-                case "g" + SHARP:
-                    key = "c";
-                    mode = "minor";
-                    break;
-                case "a" + SHARP:
-                    key = "f";
-                    break;
-                case "d" + FLAT:
-                    key = "f";
-                    mode = "minor";
-                    break;
-                case "e" + FLAT:
-                    key = "g";
-                    mode = "minor";
-                    break;
-                case "g" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
-                    break;
-                case "a" + FLAT:
-                    key = "c";
-                    mode = "minor";
-                    break;
-                case "b" + FLAT:
-                    key = "d";
-                    mode = "minor";
-                    break;
-            }
-            break;
-        case "mixolydian":
-            mode = "major";
-            switch (key) {
-                case "c":
-                    key = "f";
-                    break;
-                case "d":
-                    key = "g";
-                    break;
-                case "e":
-                    key = "a";
-                    break;
-                case "f":
-                    key = "a" + SHARP;
-                    break;
-                case "g":
-                    key = "c";
-                    break;
-                case "a":
-                    key = "d";
-                    break;
-                case "b":
-                    key = "e";
-                    break;
-                case "c" + SHARP:
-                    key = "f" + SHARP;
-                    break;
-                case "d" + SHARP:
-                    key = "g" + SHARP;
-                    break;
-                case "f" + SHARP:
-                    key = "b";
-                    break;
-                case "g" + SHARP:
-                    key = "c" + SHARP;
-                    break;
-                case "a" + SHARP:
-                    key = "c";
-                    mode = "minor";
-                    break;
-                case "d" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "e" + FLAT:
-                    key = "f";
-                    mode = "minor";
-                    break;
-                case "g" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "a" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
-                    break;
-                case "b" + FLAT:
-                    key = "c";
-                    mode = "minor";
-                    break;
-            }
-            break;
-        case "locrian":
-            mode = "major";
-            switch (key) {
-                case "c":
-                    key = "b";
-                    break;
-                case "d":
-                    key = "c";
-                    mode = "minor";
-                    break;
-                case "e":
-                    key = "f";
-                    break;
-                case "f":
-                    key = "g" + FLAT;
-                    break;
-                case "g":
-                    key = "g" + SHARP;
-                    break;
-                case "a":
-                    key = "a" + SHARP;
-                    break;
-                case "b":
-                    key = "c";
-                    break;
-                case "c" + SHARP:
-                    key = "d";
-                    break;
-                case "d" + SHARP:
-                    key = "e";
-                    break;
-                case "f" + SHARP:
-                    key = "g";
-                    break;
-                case "g" + SHARP:
-                    key = "a";
-                    break;
-                case "a" + SHARP:
-                    key = "b";
-                    break;
-                case "d" + FLAT:
-                    key = "d";
-                    break;
-                case "e" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
-                    break;
-                case "g" + FLAT:
-                    key = "f";
-                    mode = "minor";
-                    break;
-                case "a" + FLAT:
-                    key = "g" + FLAT;
-                    mode = "minor";
-                    break;
-                case "b" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
-                    break;
-            }
-            break;
-        case "aeolian":
-            mode = "minor";
-            break;
-        case "natural minor":
-            mode = "minor";
-            break;
-        case "major":
-        case "minor":
-        default:
-            break;
-    }
-
-    // console.debug('>> ' + key + ' ' + mode);
-    return [key, mode];
-};
-
-/**
  * Get the preference for using sharp, flat, or natural based on the key signature.
  * @function
  * @param {string} keySignature - The key signature.
@@ -1218,53 +508,6 @@ const getSharpFlatPreference = keySignature => {
     } else {
         return "natural";
     }
-};
-
-/**
- * Get the custom note representation for a given note in a custom temperament.
- * @function
- * @param {string|Array} note - The note or an array representing the note and its attributes.
- * @returns {string} The custom note representation.
- */
-const getCustomNote = note => {
-    // For custom temperament note
-    if (note instanceof Array) {
-        note = note[0];
-    }
-
-    let centsInfo = "";
-    if (note.includes("(")) {
-        centsInfo = note.substring(note.indexOf("("), note.length);
-    }
-
-    note = note.replace(centsInfo, "");
-    const articulation = getArticulation(note);
-    note = note.replace(articulation, "");
-
-    switch (articulation) {
-        case "bb":
-        case DOUBLEFLAT:
-            note = note + "𝄫" + centsInfo;
-            break;
-        case "b":
-        case FLAT:
-            note = note + "♭" + centsInfo;
-            break;
-        case "##":
-        case "*":
-        case "x":
-        case DOUBLESHARP:
-            note = note + "𝄪" + centsInfo;
-            break;
-        case "#":
-        case SHARP:
-            note = note + "♯" + centsInfo;
-            break;
-        default:
-            note = note + articulation + centsInfo;
-            break;
-    }
-    return note;
 };
 
 /**
@@ -1840,68 +1083,6 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
  * @returns {Object} - An object containing the firstNote, secondNote, and octave.
  */
 
-const GetNotesForInterval = tur => {
-    const noteStatus = tur.singer.noteStatus;
-    const notePitches = tur.singer.notePitches;
-    const intervals = tur.singer.intervals;
-    const noteOctave = tur.singer.noteOctaves;
-    let firstNote = "C",
-        secondNote = "C",
-        octave = 0;
-    if (noteStatus && noteStatus[0]) {
-        firstNote = noteStatus[0][0].replace(/\d/g, ""); //removing all numbers like '1'
-        if (!noteStatus[0][1]) {
-            return { firstNote, secondNote: firstNote, octave };
-        }
-        secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
-        octave = octaveb - octavea;
-    } else if (notePitches && notePitches[last(tur.singer.inNoteBlock)]?.length) {
-        // Outside a note block there is no pitch list to read from, so keep
-        // the C to C default instead of indexing into undefined.
-        const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
-        firstNote = pitchBlk[0];
-        secondNote = pitchBlk[pitchBlk.length - 1];
-    }
-
-    if (intervals && intervals.length) {
-        octave = Math.floor(intervals[0] / 7);
-    } else if (noteOctave && noteOctave[last(tur.singer.inNoteBlock)]) {
-        const octaveblk = noteOctave[last(tur.singer.inNoteBlock)];
-        octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
-    }
-
-    firstNote = normalizeNoteAccidentals(firstNote);
-    secondNote = normalizeNoteAccidentals(secondNote);
-
-    return { firstNote, secondNote, octave };
-};
-
-/**
- * Encodes a string to Base64 format.
- * @param {string} str - The string to encode.
- * @returns {string} - The Base64 encoded string.
- */
-function base64Encode(str) {
-    if (_b64Cache.has(str)) {
-        return _b64Cache.get(str);
-    }
-    const encoder = new TextEncoder();
-    const uint8Array = encoder.encode(str);
-    // String.fromCharCode(...uint8Array) throws RangeError for inputs > ~128KB.
-    // Use a loop instead — identical output, no argument-count limit.
-    let binaryString = "";
-    for (let i = 0; i < uint8Array.length; i++) {
-        binaryString += String.fromCharCode(uint8Array[i]);
-    }
-    if (_b64Cache.size > 1000) {
-        _b64Cache.clear();
-    }
-    _b64Cache.set(str, binaryString);
-    return binaryString;
-}
-
 /**
  * Resolve a solfege note argument (e.g. "do", "re♯") to a note name for the
  * given key signature and octave length. Shared by the 12-EDO and microtonal
@@ -2004,94 +1185,19 @@ const getNoteFromSolfege = (
         }
     }
 
-    if (movable) {
-        let i;
-        switch (mode) {
-            case "dorian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 0) {
-                    transpositionFloor += octaveLength;
-                }
-
-                transpositionFloor -= octaveLength;
-                i += 6;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "phrygian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 1) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 5;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "lydian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 2) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 4;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "mixolydian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 3) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 3;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "minor":
-            case "aeolian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 4) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 2;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "locrian":
-                i = SOLFEGENAMES.indexOf(solfegePart);
-                if (i > 5) {
-                    transpositionFloor += octaveLength;
-                }
-
-                i += 1;
-                if (i > 6) {
-                    i -= 7;
-                }
-
-                solfegePart = SOLFEGENAMES[i];
-                break;
-            case "major":
-            case "ionian":
-            default:
-                break;
+    if (movable && Object.prototype.hasOwnProperty.call(MOVABLE_TONIC_DEGREE, mode)) {
+        // Rotate so the tonic takes its syllable (e.g. la in minor).
+        const tonicDegree = MOVABLE_TONIC_DEGREE[mode];
+        const i = SOLFEGENAMES.indexOf(solfegePart);
+        if (i >= tonicDegree) {
+            transpositionFloor += octaveLength;
         }
+
+        if (mode === "dorian") {
+            transpositionFloor -= octaveLength;
+        }
+
+        solfegePart = SOLFEGENAMES[(i + 7 - tonicDegree) % 7];
     }
 
     let index;
@@ -2516,19 +1622,26 @@ function getNote(
         }
     } else if (isCustomTemperament(temperament)) {
         note = getCustomNote(noteArg);
+        const cleanNote = typeof note === "string" ? note.replace(/\(.*?\)/g, "") : note;
         let pitchNumber = null;
         // Ensure the temperament exists before accessing it
         if (TEMPERAMENT[temperament]) {
             for (const number in TEMPERAMENT[temperament]) {
                 if (number !== "pitchNumber" && number !== "interval") {
-                    if (note === TEMPERAMENT[temperament][number][3]) {
-                        if (typeof number === "string") {
-                            pitchNumber = Number(number);
-                        } else {
-                            pitchNumber = number;
-                        }
-                        break;
-                    } else if (note === TEMPERAMENT[temperament][number][1]) {
+                    const ele = TEMPERAMENT[temperament][number];
+                    if (!ele) continue;
+                    const n3 = ele[3];
+                    const n1 = ele[1];
+                    const cleanN3 = typeof n3 === "string" ? n3.replace(/\(.*?\)/g, "") : n3;
+                    const cleanN1 = typeof n1 === "string" ? n1.replace(/\(.*?\)/g, "") : n1;
+                    if (
+                        note === n3 ||
+                        (cleanNote && cleanNote === cleanN3) ||
+                        (cleanNote && cleanNote === n3) ||
+                        note === n1 ||
+                        (cleanNote && cleanNote === cleanN1) ||
+                        (cleanNote && cleanNote === n1)
+                    ) {
                         if (typeof number === "string") {
                             pitchNumber = Number(number);
                         } else {
@@ -2670,87 +1783,6 @@ function getNote(
         return [note, octave, transpositionCents];
     }
 }
-
-/**
- * Convert a step pattern from its native EDO to steps in the given EDO.
- *
- * Uses cumulative positions (not per-interval rounding) so the total interval
- * sum is preserved as closely as possible. Each step is at least 1 so stepping
- * never gets stuck on a repeated note. When the pattern's steps already sum to
- * the requested EDO this is the identity.
- * @function
- * @param {Array} pattern - The source step pattern (e.g. major [2, 2, 1, 2, 2, 2, 1]).
- * @param {number} edo - Number of steps per octave.
- * @returns {Array} The converted step pattern in the target EDO.
- */
-const scalePatternToEDO = (pattern, edo) => {
-    const srcSum = pattern.reduce((a, b) => a + b, 0);
-    if (srcSum === edo) {
-        return pattern.slice();
-    }
-    const result = [];
-    let cumSrc = 0;
-    let cumDst = 0;
-    for (let i = 0; i < pattern.length; i++) {
-        cumSrc += pattern[i];
-        const newCumPos = Math.round((cumSrc * edo) / srcSum);
-        let step = newCumPos - cumDst;
-        // When EDO < scale degrees (e.g. 5-EDO major), cumulative rounding
-        // can produce 0-length intervals. Ensure minimum step of 1 so that
-        // stepping never gets stuck on a repeated note.
-        if (step < 1) {
-            step = 1;
-        }
-        result.push(step);
-        cumDst += step;
-    }
-    return result;
-};
-
-/**
- * Optional per-EDO overrides for the standard 12-EDO mode patterns.
- *
- * Keyed by edo, then by mode name. When an override exists it takes priority
- * over the naive scalePatternToEDO conversion of MUSICALMODES.
- * @constant
- * @type {Object}
- */
-const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
-
-/**
- * Get the step pattern for a mode in the given EDO (or temperament).
- *
- * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
- * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
- * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
- * returns a full EDO-length step-1 pattern.
- *
- * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
- * EDO step model does not apply, so the returned array is a list of per-step
- * CENTS (the actual interval size between consecutive scale degrees derived
- * from the temperament's ratios). Consumers that render proportional slices or
- * compute active tabs should use these cents directly.
- * @function
- * @param {string} mode - The mode name (e.g. "major").
- * @param {number} edo - Number of steps per octave.
- * @returns {Array} Integer step pattern.
- */
-const getModePattern = (mode, edo = 12) => {
-    const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
-    if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
-        return overrides[mode].slice();
-    }
-    if (mode.toLowerCase() === "custom") {
-        if (edo === 12) {
-            return customMode.slice();
-        }
-        return new Array(edo).fill(1);
-    }
-    if (mode in MUSICALMODES) {
-        return scalePatternToEDO(MUSICALMODES[mode], edo);
-    }
-    return scalePatternToEDO(MUSICALMODES.major, edo);
-};
 
 /**
  * Build the scale based on the given key signature.
@@ -3298,8 +2330,11 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, ed
                     case 6:
                         if (definedScaleDegree[definedScaleDegree.length - 1] !== 4) {
                             definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModeScale[i] !== 7) {
+                        } else if (semitones[i] + chosenModePattern[i] !== 7) {
                             definedScaleDegree.push(5);
+                        } else {
+                            // Keep indices aligned with chosenModeScale
+                            definedScaleDegree.push(null);
                         }
                         break;
                     case 7:
@@ -3322,11 +2357,10 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, ed
 
             // For scale degrees which are defined --> Use choosen Mode's notes
             // For scale degrees which are undefined --> Use fallback notes
-            let k = 0;
             for (let i = 0; i < 7; i++) {
-                if (definedScaleDegree.includes(i + 1)) {
+                const k = definedScaleDegree.indexOf(i + 1);
+                if (k !== -1) {
                     finalScale.push(chosenModeScale[k]);
-                    k++;
                 } else {
                     finalScale.push(majorScale[i]);
                 }
@@ -3652,179 +2686,6 @@ const getInterval = (interval, keySignature, pitch, edo) => {
 };
 
 /**
- * Get the reduced fraction representation of a fraction.
- * @function
- * @param {number} a - The numerator.
- * @param {number} b - The denominator.
- * @returns {string} The reduced fraction as a string.
- */
-const reducedFraction = (a, b) => {
-    const greatestCommonMultiple = (a, b) => {
-        return b === 0 ? a : greatestCommonMultiple(b, a % b);
-    };
-
-    const gcm = greatestCommonMultiple(a, b);
-
-    if ([1, 2, 4, 8, 16].includes(b / gcm)) {
-        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" + NSYMBOLS[b / gcm];
-    } else {
-        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
-    }
-};
-
-/**
- * Convert a floating-point number to its approximate fractional representation.
- * @function
- * @param {number} d - The floating-point number.
- * @returns {Array} An array containing the numerator and denominator of the fraction.
- */
-const toFraction = d => {
-    // Convert float to its approximate fractional representation.
-    let flip = false;
-    if (d > 1) {
-        flip = true;
-        d = 1 / d;
-    }
-
-    let df = 1.0;
-    let top = 1;
-    let bot = 1;
-
-    let iterGuard = 0;
-    while (Math.abs(df - d) > 0.00000001) {
-        if (iterGuard++ > 10000) {
-            break;
-        }
-        if (df < d) {
-            top += 1;
-        } else {
-            bot += 1;
-            top = parseInt(d * bot, 10);
-        }
-        df = top / bot;
-    }
-
-    if (flip) {
-        const tmp = top;
-        top = bot;
-        bot = tmp;
-    }
-
-    return [top, bot];
-};
-
-/**
- * Calculate the note value to display based on numerator and denominator.
- * @function
- * @param {number} a - The numerator.
- * @param {number} b - The denominator.
- * @returns {string} The note value to display.
- */
-const calcNoteValueToDisplay = (a, b) => {
-    const noteValue = a / b;
-    let noteValueToDisplay = null;
-
-    if (noteValue in NSYMBOLS) {
-        noteValueToDisplay =
-            "1<br>&mdash;<br>" + noteValue.toString() + "<br>" + NSYMBOLS[noteValue];
-    } else {
-        noteValueToDisplay = reducedFraction(b, a);
-    }
-
-    let value;
-    let obj;
-    let d0, d1;
-    if (parseInt(noteValue, 10) < noteValue) {
-        noteValueToDisplay = parseInt(noteValue * 1.5, 10);
-        if (noteValueToDisplay in NSYMBOLS) {
-            value = b / a; // * noteValueToDisplay;
-            obj = toFraction(value);
-            Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
-            Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
-            noteValueToDisplay =
-                // value.toFixed(2) +
-                obj[0].toFixed(d0) +
-                "<br>&mdash;<br>" +
-                // noteValueToDisplay.toString() +
-                obj[1].toFixed(d1) +
-                "<br>" +
-                NSYMBOLS[noteValueToDisplay] +
-                ".";
-        } else {
-            noteValueToDisplay = parseInt(noteValue * 1.75, 10);
-            if (noteValueToDisplay in NSYMBOLS) {
-                value = b / a; // * noteValueToDisplay;
-                obj = toFraction(value);
-                Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
-                Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
-                noteValueToDisplay =
-                    // value.toFixed(2) +
-                    obj[0].toFixed(d0) +
-                    "<br>&mdash;<br>" +
-                    // noteValueToDisplay.toString() +
-                    obj[1].toFixed(d1) +
-                    "<br>" +
-                    NSYMBOLS[noteValueToDisplay] +
-                    "..";
-            } else {
-                noteValueToDisplay = reducedFraction(b, a);
-            }
-        }
-    }
-
-    return noteValueToDisplay;
-};
-
-/**
- * Convert a duration value to its note value representation.
- * @function
- * @param {number} duration - The duration value.
- * @returns {Array} An array containing the note value, number of dots, and tuplet factor.
- */
-const durationToNoteValue = duration => {
-    // returns [note value, no. of dots, tuplet factor]
-
-    let currentDotFactor;
-    let d;
-    // Try to find a match or a dotted match.
-    for (let dotCount = 0; dotCount < 3; dotCount++) {
-        currentDotFactor = 2 - 1 / Math.pow(2, dotCount);
-        d = duration * currentDotFactor;
-        if (POWER2.includes(d)) {
-            return [d, dotCount, null];
-        }
-    }
-
-    // First, round down.
-    let roundDown = duration;
-    for (let i = 1; i < POWER2.length; i++) {
-        // Rounding down
-        if (roundDown < POWER2[i]) {
-            roundDown = POWER2[i - 1];
-            break;
-        }
-    }
-
-    if (!POWER2.includes(roundDown)) {
-        roundDown = 128;
-    }
-
-    // Convert duration into parts based on POW2 factors
-    // e.g., 1 / 6 ==> [3, 2], 1 / 12 ==> [3, 4]
-    let j = 1;
-    while (Math.floor(duration / j) * j === duration) {
-        j = j * 2;
-        if (j > duration / 2) {
-            break;
-        }
-    }
-
-    j = j / 2;
-
-    return [1, 0, [duration / j, j], roundDown];
-};
-
-/**
  * Calculate the frequency based on pitch, octave, cents, and key signature.
  * @function
  * @param {string} pitch - The pitch of the note.
@@ -3912,24 +2773,6 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * Check if a note string is in solfege.
- * @function
- * @param {string} note - The note string.
- * @returns {boolean} True if the note is in solfege, false otherwise.
- */
-const noteIsSolfege = note => {
-    if (SOLFEGECONVERSIONTABLE[note] !== undefined) {
-        return false;
-    }
-    // Check normalized version (ASCII to Unicode)
-    const altNote = note.replace("#", SHARP).replace("b", FLAT);
-    if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
-        return false;
-    }
-    return true;
-};
-
-/**
  * Convert a note to its solfege representation.
  * @function
  * @param {string} note - The note to convert.
@@ -3972,20 +2815,27 @@ const getSolfege = (note, keySignature, movable, temperament, edo) => {
             index = scale.indexOf(altNote);
         }
 
-        const isMinor = Array.isArray(keySignature)
-            ? keySignature[1].toLowerCase() === "minor"
-            : keySignature.toLowerCase().includes("minor");
+        // Modes with fewer than 7 notes: use the same solfege that
+        // getNoteFromSolfege resolves, so display and input agree.
+        if (index !== -1 && currentEDO === 12 && scale.length - 1 < 7) {
+            const halfSteps = scaleResult[1];
+            let offset = 0;
+            for (let i = 0; i < index; i++) {
+                offset += halfSteps[i];
+            }
+            return getScaleAndHalfSteps(keySignature)[1][offset];
+        }
+
+        const mode = Array.isArray(keySignature)
+            ? keySignature[1].toLowerCase()
+            : keySignatureToMode(keySignature)[1];
+        const tonicDegree = Object.prototype.hasOwnProperty.call(MOVABLE_TONIC_DEGREE, mode)
+            ? MOVABLE_TONIC_DEGREE[mode]
+            : 0;
 
         // diatonic note
         if (index !== -1 && index < SOLFEGENAMES.length) {
-            let solfegeIndex = index;
-
-            // minor movable-do → la-based
-            if (isMinor) {
-                solfegeIndex = (index + 5) % 7;
-            }
-
-            return SOLFEGENAMES[solfegeIndex].toLowerCase();
+            return SOLFEGENAMES[(index + tonicDegree) % 7].toLowerCase();
         }
 
         // 3) chromatic fallback (interval based)
@@ -3996,10 +2846,11 @@ const getSolfege = (note, keySignature, movable, temperament, edo) => {
         // semitones from tonic (EDO-aware)
         let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;
 
-        if (isMinor) {
-            // For minor, relative major is 3 semitones up in 12-EDO terms.
-            // Map to the current EDO and compute la-based offset.
-            const relativeMajorSteps = Math.round((3 * currentEDO) / 12);
+        if (tonicDegree > 0) {
+            // Shift so the tonic lands on its syllable (e.g. la for minor);
+            // the relative major is (12 - tonicSemitones) up in 12-EDO terms.
+            const tonicSemitones = [0, 2, 4, 5, 7, 9, 11][tonicDegree];
+            const relativeMajorSteps = Math.round(((12 - tonicSemitones) * currentEDO) / 12);
             semitones = (semitones + currentEDO - relativeMajorSteps) % currentEDO;
         }
 
@@ -4010,203 +2861,6 @@ const getSolfege = (note, keySignature, movable, temperament, edo) => {
     }
 
     return SOLFEGECONVERSIONTABLE[note];
-};
-
-/**
- * Split a solfege value into pitch and attributes.
- * @function
- * @param {string} value - The solfege value.
- * @returns {Array} An array containing pitch and attributes.
- */
-const splitSolfege = value => {
-    // Separate the pitch from any attributes, e.g., # or b
-    if (value !== null && typeof value === "string") {
-        let note, attr;
-        if (SOLFNOTES.includes(value)) {
-            note = value;
-            attr = "";
-        } else if (value.slice(0, 3) === "sol") {
-            note = "sol";
-            if (value.length === 4) {
-                attr = value[3];
-            } else {
-                attr = value[3] + value[4];
-            }
-        } else {
-            note = value.slice(0, 2);
-            if (value.length === 3) {
-                attr = value[2];
-            } else {
-                attr = value[2] + value[3];
-            }
-        }
-
-        return [note, attr];
-    }
-
-    return ["sol", ""];
-};
-
-const getI18nSolfNotes = () => {
-    //.TRANS: the note names must be separated by single spaces
-    const solfnotes = _("ti la sol fa mi re do");
-    if (typeof solfnotes !== "string") {
-        return SOLFNOTES;
-    }
-
-    const translated = solfnotes.trim().split(/\s+/);
-    if (translated.length !== SOLFNOTES.length || translated.some(note => note.length === 0)) {
-        return SOLFNOTES;
-    }
-
-    return translated;
-};
-
-const splitI18nSolfege = value => {
-    if (value !== null && typeof value === "string") {
-        const solfnotes = getI18nSolfNotes();
-        const lowerValue = value.toLowerCase();
-        const matches = solfnotes
-            .map((note, i) => ({ note, i }))
-            .sort((a, b) => b.note.length - a.note.length);
-
-        for (const match of matches) {
-            const lowerNote = match.note.toLowerCase();
-            if (lowerValue === lowerNote || lowerValue.startsWith(lowerNote)) {
-                return [SOLFNOTES[match.i], value.slice(match.note.length)];
-            }
-        }
-    }
-
-    return splitSolfege(value);
-};
-
-/**
- * Internationalize a solfege note using i18n.
- * @function
- * @param {string} note - The solfege note.
- * @returns {string} The internationalized solfege note.
- */
-const i18nSolfege = note => {
-    // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = getI18nSolfNotes();
-    const sourceObj = splitSolfege(note);
-    const obj = splitI18nSolfege(note);
-
-    if (!SOLFNOTES.includes(sourceObj[0]) && SOLFNOTES.includes(obj[0])) {
-        return obj[0] + obj[1];
-    }
-
-    const i = SOLFNOTES.indexOf(obj[0]);
-    if (i !== -1) {
-        return solfnotes_[i] + obj[1];
-    } else {
-        // Check if the note is in a different language.
-        const i = Object.values(solfnotes_).indexOf(obj[0]);
-        if (i !== -1) {
-            return SOLFNOTES[i] + obj[1];
-        }
-    }
-    // Wasn't solfege so it doesn't need translation.
-    return note;
-};
-
-/**
- * Split a scale degree value into note and attributes.
- * @function
- * @param {string} value - The scale degree value.
- * @returns {Array} An array containing note and attributes.
- */
-const splitScaleDegree = value => {
-    if (!value) {
-        return [5, NATURAL];
-    }
-
-    const note = value.slice(0, 1);
-    const attr = value.slice(1);
-    return [note, attr];
-};
-
-/**
- * Check if a value is an integer.
- * @function
- * @param {*} value - The value to check.
- * @returns {boolean} True if the value is an integer, false otherwise.
- */
-const isInt = value => {
-    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
-};
-
-/**
- * Convert a solfege note to a common letter class.
- * @function
- * @param {string} note - The solfege note.
- * @returns {string} The converted note.
- */
-const convertFromSolfege = note => {
-    if (typeof note === "string") {
-        const unicodeNote = note.replace("#", SHARP).replace("b", FLAT);
-        if (unicodeNote in FIXEDSOLFEGE1) {
-            note = FIXEDSOLFEGE1[unicodeNote];
-        }
-    }
-    // Convert to common letter class
-    if (note in FIXEDSOLFEGE1) {
-        note = FIXEDSOLFEGE1[note];
-    }
-    if (note in EQUIVALENTNATURALS) {
-        note = EQUIVALENTNATURALS[note];
-    }
-    return note;
-};
-
-/**
- * Convert a duration factor to a string representation.
- * @function
- * @param {number} factor - The duration factor to convert.
- * @returns {string|null} The string representation of the duration factor.
- */
-const convertFactor = factor => {
-    switch (factor) {
-        case 0.0625: // 1/16
-            return "16";
-        case 0.125: // 1/8
-            return "8";
-        case 0.09375: // 3/32
-            return "16.";
-        case 0.1875: // 3/16
-            return "8.";
-        case 0.21875: // 7/32
-            return "8..";
-        case 0.25: // 1/4
-            return "4";
-        case 0.3125: // 5/16
-            return "4 16";
-        case 0.375: // 3/8
-            return "4.";
-        case 0.4375: // 7/16
-            return "4..";
-        case 0.5: // 1/2
-            return "2";
-        case 0.5625: // 9/16
-            return "2 16";
-        case 0.625: // 5/8
-            return "2 8";
-        case 0.6875: // 11/16
-            return "2 8 16";
-        case 0.75: // 3/4
-            return "2.";
-        case 0.8125: // 13/16
-            return "2 4 16";
-        case 0.875: // 7/8
-            return "2..";
-        case 0.9375: // 15/16
-            return "2 4 8 16";
-        case 1: // 1/1
-            return "1";
-        default:
-            return null;
-    }
 };
 
 /**

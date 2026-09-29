@@ -188,6 +188,27 @@ requirejs.config({
             deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
             exports: "MusicUtilsLookups"
         },
+        "utils/musicutils-rhythm": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsRhythm"
+        },
+        "utils/musicutils-solfege": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsSolfege"
+        },
+        "utils/musicutils-modewheel": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsModeWheel"
+        },
+        "utils/musicutils-modecore": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch"
+            ],
+            exports: "MusicUtilsModeCore"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
@@ -195,7 +216,11 @@ requirejs.config({
                 "utils/musicutils-i18n",
                 "utils/musicutils-temperament",
                 "utils/musicutils-pitch",
-                "utils/musicutils-lookups"
+                "utils/musicutils-lookups",
+                "utils/musicutils-rhythm",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modewheel",
+                "utils/musicutils-modecore"
             ]
         },
         "utils/synthutils": {

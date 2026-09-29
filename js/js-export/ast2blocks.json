@@ -40,6 +40,7 @@
                 "/": "divide",
                 "%": "mod",
                 "==": "equal",
+                "===": "equal",
                 "!=": "not_equal_to",
                 "<": "less",
                 ">": "greater",
@@ -207,7 +208,6 @@
             },
             "name_map": {
                 "abs": "abs",
-                "floor": "int",
                 "pow": "power",
                 "sqrt": "sqrt"
             }
@@ -238,8 +238,10 @@
             },
             "name_map": {
                 "doCalculateDistance": "distance",
+                "doInt": "int",
                 "doOneOf": "oneOf",
-                "doRandom": "random"
+                "doRandom": "random",
+                "doXor": "xor"
             }
         },
         {

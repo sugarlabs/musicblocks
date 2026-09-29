@@ -111,6 +111,10 @@ describe("Utility Functions (logic-only)", () => {
             "../musicutils-temperament.js",
             "../musicutils-pitch.js",
             "../musicutils-lookups.js",
+            "../musicutils-rhythm.js",
+            "../musicutils-solfege.js",
+            "../musicutils-modewheel.js",
+            "../musicutils-modecore.js",
             "../musicutils.js",
             "../../logo.js",
             "../../turtle-singer.js"

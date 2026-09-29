@@ -351,7 +351,10 @@ class Notation {
      * @returns {void}
      */
     __notationHarmonic(turtle) {
-        this._notationStaging.push("harmonic");
+        if (this._notationStaging[turtle] === undefined) {
+            this._notationStaging[turtle] = [];
+        }
+        this._notationStaging[turtle].push("harmonic");
         this._pickupPoint[turtle] = null;
     }
 

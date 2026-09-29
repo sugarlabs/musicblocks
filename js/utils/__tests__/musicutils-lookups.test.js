@@ -52,6 +52,22 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceSynthName("electronic synth")).toBe("electronic synth");
     });
 
+    it("handles non-string inputs safely without throwing", () => {
+        expect(lookups.getDrumName(undefined)).toBeNull();
+        expect(lookups.getDrumIndex(123)).toBe(-1);
+        expect(lookups.getDrumSymbol(null)).toBe("hh");
+        expect(lookups.getDrumIcon({})).toBe("images/drum.svg");
+        expect(lookups.getDrumSynthName(undefined)).toBeNull();
+
+        expect(lookups.getNoiseName(123)).toBe("noise1");
+        expect(lookups.getNoiseIcon({})).toBe("images/synth.svg");
+        expect(lookups.getNoiseSynthName(undefined)).toBeNull();
+
+        expect(lookups.getVoiceName(123)).toBe("electronic synth");
+        expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
+        expect(lookups.getVoiceSynthName(undefined)).toBeNull();
+    });
+
     it("looks up invert modes, intervals, filters and oscillators", () => {
         expect(lookups.getInvertMode("even")).toBe("even");
         expect(lookups.getIntervalNumber("perfect 5")).toBe(7);
@@ -123,6 +139,10 @@ describe("musicutils-lookups", () => {
             "musicutils-temperament.js",
             "musicutils-pitch.js",
             "musicutils-lookups.js",
+            "musicutils-rhythm.js",
+            "musicutils-solfege.js",
+            "musicutils-modewheel.js",
+            "musicutils-modecore.js",
             "musicutils.js"
         ];
         const load = files => {

@@ -30,6 +30,207 @@
  */
 class AST2BlockList {
     /**
+     * Returns a deep copy of an AST. Regular expression literal values are
+     * shared, since nothing here changes them.
+     *
+     * @param {*} node - Acorn-generated AST (or part of one)
+     * @returns {*} copy of node
+     */
+    static _copyAST(node) {
+        if (Array.isArray(node)) return node.map(AST2BlockList._copyAST);
+        if (node === null || typeof node !== "object" || node instanceof RegExp) return node;
+        const copy = {};
+        for (const [key, value] of Object.entries(node)) {
+            copy[key] = AST2BlockList._copyAST(value);
+        }
+        return copy;
+    }
+
+    /**
+     * Rewrites, in place, the code JSGenerate writes for Stop blocks back to
+     * plain `break` statements, which the config maps to the Stop block:
+     * - `{ let f = false; loop { ...; f = true; ...; if (f) break; } }` becomes
+     *   the loop, with `break` for each `f = true`;
+     * - `return mouse.ENDFLOW` / `return mouse.ENDMOUSE` that is not the last
+     *   statement of a function (a Stop with no loop around it) becomes `break`;
+     * - `let f = false; <clamp>; if (f) <leave>` drops the flag and the check,
+     *   with `break` for each `f = true` inside the clamp;
+     * - a labeled block (`stop0: { ... }`) becomes the plain block, and its
+     *   labeled `break` stays a Stop block;
+     * - the `break` that ends every switch case is dropped, since cases don't
+     *   fall through and it isn't a Stop block.
+     *
+     * @param {Object} node - Acorn-generated AST (or part of one)
+     * @param {Boolean} [isFunctionBody=false] - whether node is a function body
+     * @returns {void}
+     */
+    static _normalizeStops(node, isFunctionBody = false) {
+        if (node === null || typeof node !== "object") return;
+
+        // Only the names ASTUtils generates for Stop blocks (and `let`, which
+        // exported boxes don't use), so hand-written flags and labels are
+        // left alone.
+        const isStopLabel = label => /^stop\d+$/.test(label.name);
+        const isStopFlag = declaration =>
+            declaration.kind === "let" &&
+            /^(?:_*stopLoop|stop\d+)$/.test(declaration.declarations[0].id.name);
+
+        const isFunction = ["ArrowFunctionExpression", "FunctionExpression"].includes(node.type);
+        for (const [key, value] of Object.entries(node)) {
+            if (Array.isArray(value)) {
+                value.forEach(child => AST2BlockList._normalizeStops(child));
+            } else {
+                AST2BlockList._normalizeStops(value, isFunction && key === "body");
+            }
+        }
+
+        let list = null;
+        if (node.type === "Program" || node.type === "BlockStatement") {
+            list = node.body;
+        } else if (node.type === "SwitchCase") {
+            list = node.consequent;
+            const lastStatement = list[list.length - 1];
+            if (lastStatement && lastStatement.type === "BreakStatement" && !lastStatement.label) {
+                list.pop();
+            }
+        }
+        if (node.type === "IfStatement") {
+            for (const key of ["consequent", "alternate"]) {
+                const branch = node[key];
+                if (branch && branch.type === "LabeledStatement") {
+                    // Any other label here would reach the if mapping, which
+                    // expects a block, so report it like other unsupported code.
+                    if (!isStopLabel(branch.label) || branch.body.type !== "BlockStatement") {
+                        throw {
+                            prefix: "Unsupported statement: ",
+                            start: branch.start,
+                            end: branch.end
+                        };
+                    }
+                    node[key] = branch.body;
+                }
+            }
+        }
+        if (list === null) return;
+
+        const toBreak = statement => ({
+            type: "BreakStatement",
+            label: null,
+            start: statement.start,
+            end: statement.end
+        });
+
+        // Labeled blocks that only exist so a Stop can leave them.
+        for (let i = list.length - 1; i >= 0; i--) {
+            const statement = list[i];
+            if (
+                statement.type === "LabeledStatement" &&
+                isStopLabel(statement.label) &&
+                statement.body.type === "BlockStatement"
+            ) {
+                if (node.type === "SwitchCase") {
+                    list.splice(i, 1, ...statement.body.body);
+                } else {
+                    list[i] = statement.body;
+                }
+            }
+        }
+
+        // `f = true` statements for flag f, anywhere inside node, become break.
+        const replaceFlagSets = (inside, flag) => {
+            const setsFlag = child =>
+                child.type === "ExpressionStatement" &&
+                child.expression.type === "AssignmentExpression" &&
+                child.expression.operator === "=" &&
+                child.expression.left.type === "Identifier" &&
+                child.expression.left.name === flag &&
+                child.expression.right.value === true;
+            const visit = child => {
+                if (Array.isArray(child)) {
+                    child.forEach((item, j) => {
+                        if (item && typeof item === "object" && setsFlag(item)) {
+                            child[j] = toBreak(item);
+                        } else {
+                            visit(item);
+                        }
+                    });
+                } else if (child !== null && typeof child === "object") {
+                    Object.values(child).forEach(visit);
+                }
+            };
+            visit(inside);
+        };
+        const falseFlag = statement =>
+            statement.type === "VariableDeclaration" &&
+            statement.declarations.length === 1 &&
+            statement.declarations[0].id.type === "Identifier" &&
+            statement.declarations[0].init !== null &&
+            statement.declarations[0].init.value === false &&
+            isStopFlag(statement)
+                ? statement.declarations[0].id.name
+                : null;
+
+        // let f = false; <clamp>; if (f) return mouse.END... / break label;
+        for (let i = list.length - 3; i >= 0; i--) {
+            const flag = falseFlag(list[i]);
+            const check = list[i + 2];
+            if (
+                flag !== null &&
+                check.type === "IfStatement" &&
+                check.test.type === "Identifier" &&
+                check.test.name === flag &&
+                !check.alternate &&
+                ["ReturnStatement", "BreakStatement"].includes(check.consequent.type)
+            ) {
+                replaceFlagSets(list[i + 1], flag);
+                list.splice(i + 2, 1);
+                list.splice(i, 1);
+            }
+        }
+
+        list.forEach((statement, i) => {
+            const returnsEnd =
+                statement.type === "ReturnStatement" &&
+                statement.argument &&
+                statement.argument.type === "MemberExpression" &&
+                statement.argument.object.name === "mouse" &&
+                ["ENDFLOW", "ENDMOUSE"].includes(statement.argument.property.name);
+            if (returnsEnd && !(isFunctionBody && i === list.length - 1)) {
+                list[i] = toBreak(statement);
+                return;
+            }
+
+            // { let f = false; loop { ...; if (f) break; } }
+            if (statement.type !== "BlockStatement" || statement.body.length !== 2) return;
+            const [declaration, loop] = statement.body;
+            const flag = falseFlag(declaration);
+            if (
+                flag === null ||
+                !["ForStatement", "WhileStatement", "DoWhileStatement"].includes(loop.type) ||
+                loop.body.type !== "BlockStatement"
+            ) {
+                return;
+            }
+            const check = loop.body.body[loop.body.body.length - 1];
+            if (
+                !check ||
+                check.type !== "IfStatement" ||
+                check.test.type !== "Identifier" ||
+                check.test.name !== flag ||
+                check.consequent.type !== "BreakStatement" ||
+                check.consequent.label ||
+                check.alternate
+            ) {
+                return;
+            }
+
+            loop.body.body.pop();
+            replaceFlagSets(loop.body, flag);
+            list[i] = loop;
+        });
+    }
+
+    /**
      * Converts a JavaScript AST into an array of block specifications for Music Blocks.
      *
      * @param {Object} AST - Acorn-generated AST object representing the JavaScript code
@@ -37,6 +238,10 @@ class AST2BlockList {
      * @returns {Array} List of block specifications ready to be loaded via loadNewBlocks
      */
     static toBlockList(AST, config) {
+        // Normalize a copy, so the caller's AST is untouched and converting it
+        // again gives the same blocks.
+        AST = AST2BlockList._copyAST(AST);
+        AST2BlockList._normalizeStops(AST);
         let trees = _astToTree(AST, config);
         return _treeToBlockList(trees, config);
 

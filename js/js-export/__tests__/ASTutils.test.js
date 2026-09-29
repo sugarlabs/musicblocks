@@ -531,6 +531,28 @@ describe("ASTUtils", () => {
             });
         });
 
+        it("should preserve strict equality semantics in exported code", () => {
+            const result = ASTUtils._getArgExpAST("equal", [1, "1"]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 1 },
+                right: { type: "Literal", value: "1" },
+                operator: "==="
+            });
+        });
+
+        it("should preserve XOR results when compared with Equal", () => {
+            const compare = (left, right, expected) => {
+                const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
+                return new Function("MathUtility", `return ${astring.generate(ast)}`)(MathUtility);
+            };
+
+            expect(compare("bool_true", "bool_false", "bool_true")).toBe(true);
+            expect(compare(1, 2, "bool_false")).toBe(true);
+            expect(compare(0, 2, 2)).toBe(true);
+        });
+
         it("should return the AST for a unary expression", () => {
             const methodName = "not";
             const args = ["arg1"];
@@ -746,15 +768,21 @@ describe("ASTUtils", () => {
             ]);
         });
 
-        it("should return the AST for a break block", () => {
+        it("should return a Stop block marker for a break block", () => {
             const flows = [["break"]];
             const result = ASTUtils._getBlockAST(flows);
             expect(result).toEqual([
                 {
                     type: "BreakStatement",
-                    label: null
+                    label: null,
+                    stopBlock: true
                 }
             ]);
+        });
+
+        it("should leave a loop without a Stop block as it is", () => {
+            const loop = { type: "WhileStatement", body: { type: "BlockStatement", body: [] } };
+            expect(ASTUtils._getStoppableLoopAST(loop)).toBe(loop);
         });
 
         it("should return the AST for a switch block", () => {
@@ -925,6 +953,87 @@ describe("ASTUtils", () => {
                         }
                     }
                 ]
+            });
+        });
+    });
+
+    describe("action names", () => {
+        const acorn = require("../../../lib/acorn.min");
+
+        // Exports an action with this name plus a call to it, and parses the result back.
+        const exportAction = name => {
+            const program = {
+                type: "Program",
+                sourceType: "script",
+                body: [
+                    ASTUtils.getMethodAST(name, []),
+                    ASTUtils._getBlockAST([["nameddo_" + name, null, null]])[0]
+                ]
+            };
+            const code = astring.generate(program);
+            const parsed = acorn.parse(`(async () => { ${code} })`, { ecmaVersion: 2020 });
+            const body = parsed.body[0].expression.body.body;
+            return {
+                code,
+                defined: body[0].declarations[0].id.name,
+                called: body[1].expression.argument.callee.name
+            };
+        };
+
+        it("keeps names that are already identifiers", () => {
+            for (const name of ["action", "chorus2", "verse_1", "ドレミ"]) {
+                expect(exportAction(name).defined).toBe(name);
+            }
+        });
+
+        it.each([
+            ["La Marseilles1", "La_Marseilles1"],
+            ["1st verse", "_1st_verse"],
+            ["chorus-2", "chorus_2"],
+            ["do", "_do"],
+            ["delete", "_delete"],
+            ["mouse", "_mouse"],
+            ["Math", "_Math"],
+            ["", "_"]
+        ])("exports %p as %p, defined and called the same way", (name, identifier) => {
+            const { defined, called } = exportAction(name);
+            expect(defined).toBe(identifier);
+            expect(called).toBe(identifier);
+        });
+
+        it("keeps join controls, which are valid after the first character", () => {
+            expect(exportAction("a\u200Cb").defined).toBe("a\u200Cb");
+            expect(exportAction("\u200Cb").defined).toBe("_\u200Cb");
+        });
+
+        describe("when two names convert to the same identifier", () => {
+            afterEach(() => ASTUtils.setActionNames([]));
+
+            it("keeps the name that is already an identifier and suffixes the other", () => {
+                ASTUtils.setActionNames(["chorus-2", "chorus_2", "chorus 2"]);
+                expect(exportAction("chorus_2").defined).toBe("chorus_2");
+                expect(exportAction("chorus-2").defined).toBe("chorus_2_2");
+                const { defined, called } = exportAction("chorus 2");
+                expect(defined).toBe("chorus_2_3");
+                expect(called).toBe("chorus_2_3");
+            });
+
+            it("does not convert a name onto a box variable", () => {
+                ASTUtils.setActionNames(["chorus-2"], ["chorus_2", "not a name"]);
+                expect(exportAction("chorus-2").defined).toBe("chorus_2_2");
+            });
+        });
+
+        describe("getBoxNames", () => {
+            it("finds storein and storein2 boxes at any depth", () => {
+                const trees = [
+                    [
+                        ["storein", ["pitch", 5]],
+                        ["repeat", [2], [["storein2_count", [1]]]]
+                    ],
+                    [["print", ["storein"]]]
+                ];
+                expect(ASTUtils.getBoxNames(trees)).toEqual(["pitch", "count"]);
             });
         });
     });
