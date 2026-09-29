@@ -384,7 +384,6 @@ describe("Meter Widget", () => {
         expect(meterWidget._strongBeats[2]).toBe(false);
     });
 
-<<<<<<< HEAD
     test("handles null c2 connection gracefully during initialization without throwing", () => {
         mockActivity.logo._meterBlock = 1;
         mockActivity.blocks.blockList = {
@@ -501,24 +500,21 @@ describe("Meter Widget", () => {
         expect(meterWidget._timerManager.activeTimeoutCount).toBe(0);
 
         jest.useRealTimers();
-=======
+    });
+
     test("creates inputs with distinct IDs and accessible labels", () => {
-        const inputCalls = document.createElement.mock.results.filter(
-            r => r.value && (r.value.id === "beatCount" || r.value.id === "beatValue")
-        );
-        const beatCountInput = inputCalls.find(r => r.value.id === "beatCount");
-        const beatValueInput = inputCalls.find(r => r.value.id === "beatValue");
+        const widgetWindow = window.widgetWindows.windowFor();
+        const toolbarCalls = widgetWindow._toolbar.appendChild.mock.calls;
+        const inputs = toolbarCalls
+            .map(call => call[0] && call[0].querySelector && call[0].querySelector("input"))
+            .filter(Boolean);
+
+        const beatCountInput = inputs.find(input => input.id === "beatCount");
+        const beatValueInput = inputs.find(input => input.id === "beatValue");
 
         expect(beatCountInput).toBeDefined();
         expect(beatValueInput).toBeDefined();
-        expect(beatCountInput.value.setAttribute).toHaveBeenCalledWith(
-            "aria-label",
-            "Number of beats"
-        );
-        expect(beatValueInput.value.setAttribute).toHaveBeenCalledWith(
-            "aria-label",
-            "Beat note value"
-        );
->>>>>>> a9a243d62 (fix(a11y): resolve duplicate DOM ID and add accessible labels in MeterWidget)
+        expect(beatCountInput.getAttribute("aria-label")).toBe("Number of beats");
+        expect(beatValueInput.getAttribute("aria-label")).toBe("Beat note value");
     });
 });
