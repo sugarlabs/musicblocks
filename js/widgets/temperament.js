@@ -19,14 +19,15 @@
 /*
    global
 
-   _, addTemperamentToDictionary, buildScale,
-   deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-   getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME,   ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber,
-   ManagedTimer
- */
+    _, addTemperamentToDictionary, buildScale,
+    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
+    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
+    isCustomTemperament, isUnsafeObjectKey, last, normalizeNoteAccidentals, parseNoteString,
+    pitchToFrequency, platformColor, PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction,
+   setOctaveRatio, SHARP, Singer, slicePath, TuningFormats, updateTemperaments, wheelnav,
+    frequencyToPitch, clampNumber, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
+*/
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
 
@@ -90,6 +91,21 @@ const overDivisionCap = (activity, count) => {
     return true;
 };
 
+/**
+ * Builds the slug used in export file names: lowercased name with every run
+ * of non-alphanumerics replaced by "-", leading/trailing "-" stripped;
+ * an empty slug falls back to "custom".
+ * @param {string} name - The temperament name.
+ * @returns {string} The slug.
+ */
+const temperamentSlug = name => {
+    const slug = String(name)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    return slug === "" ? "custom" : slug;
+};
+
 function TemperamentWidget() {
     // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
@@ -127,35 +143,86 @@ function TemperamentWidget() {
      */
     this.inTemperament = null;
     this._playTimeout = null;
-    if (typeof ManagedTimer !== "undefined") {
-        this._timerManager = new ManagedTimer();
-    } else if (typeof require !== "undefined") {
-        try {
-            const ManagedTimerCtor = require("../utils/ManagedTimer");
-            this._timerManager = new ManagedTimerCtor();
-        } catch (e) {
-            this._timerManager = null;
-        }
-    } else {
-        this._timerManager = null;
-    }
 
+    /**
+     * Timer manager for managing all widget timeouts safely.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
     this._setWidgetTimeout = function (callback, delay) {
         if (this._timerManager !== null) {
             return this._timerManager.setTimeout(callback, delay);
         }
-        return setTimeout(callback, delay);
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
     };
 
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
     this._clearWidgetTimeout = function (id) {
         if (id === null || id === undefined) {
             return false;
         }
-        if (this._timerManager !== null) {
-            return this._timerManager.clearTimeout(id);
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
         }
-        clearTimeout(id);
-        return true;
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+        this._playTimeout = null;
+
+        return count;
     };
 
     /**
@@ -531,43 +598,43 @@ function TemperamentWidget() {
                 that._playAllRunning = false;
                 flashDot = -1;
                 _drawCircle();
+                _updateRemoveButton();
                 return;
             }
+            if (that._vizMenu) _removeMenu();
+            dragIndex = -1;
+            lockedDrag = false;
+            highlightDot = -1;
+            _highlightTableRow(-1);
             that._playAllRunning = true;
+            _updateRemoveButton();
+            // Play up the scale, the octave exactly once, then back down.
+            // frequencies[] may or may not carry an octave entry at
+            // pitchNumber, so only iterate the pitches within the octave
+            // and synthesize the octave explicitly. The octave sits at the
+            // same position on the circle as the tonic, so highlight dot 0.
+            const n = Math.min(that.pitchNumber, that.frequencies.length);
+            const sequence = [];
+            for (let k = 0; k < n; k++) sequence.push([k]);
+            sequence.push([0, Number(that.frequencies[0]) * that.powerBase]);
+            for (let k = n - 1; k >= 0; k--) sequence.push([k]);
             let i = 0;
-            let forward = true;
-            let octaveWrap = false;
             const step = function () {
                 if (!that._playAllRunning) {
                     flashDot = -1;
                     _drawCircle();
                     return;
                 }
-                // Guard: only play valid indices
-                if (octaveWrap) {
-                    _playNote(0, that.frequencies[0] * that.powerBase);
-                    octaveWrap = false;
-                    forward = false;
-                    i = that.frequencies.length;
-                } else if (i >= 0 && i < that.frequencies.length) {
-                    _playNote(i);
-                }
-                // Advance
-                if (forward) {
-                    i++;
-                    if (i >= that.frequencies.length) {
-                        octaveWrap = true;
-                    }
-                } else {
-                    i--;
-                    if (i < 0) {
-                        that._playAllRunning = false;
-                        that._setWidgetTimeout(function () {
-                            flashDot = -1;
-                            _drawCircle();
-                        }, 200);
-                        return;
-                    }
+                _playNote(sequence[i][0], sequence[i][1]);
+                i++;
+                if (i >= sequence.length) {
+                    that._playAllRunning = false;
+                    _updateRemoveButton();
+                    that._setWidgetTimeout(function () {
+                        flashDot = -1;
+                        _drawCircle();
+                    }, 200);
+                    return;
                 }
                 // Pace the run by the project tempo factor (matches the
                 // Singer.defaultBPMFactor pattern used for note durations).
@@ -583,6 +650,7 @@ function TemperamentWidget() {
         that._playAll = _playAll;
 
         const _addPitch = function (dir) {
+            if (that._playAllRunning) return;
             const base = that.cents.slice(0, that.pitchNumber);
             const nGaps = base.length;
             const s = highlightDot >= 0 && highlightDot < that.cents.length ? highlightDot : -1;
@@ -618,11 +686,22 @@ function TemperamentWidget() {
         const _updateRemoveButton = () => {
             if (!that._vizToolbar) return;
             const btn = that._vizToolbar.removePitchBtn;
-            if (!btn || !btn.style) return;
-            const locked = highlightDot >= 0 && _isLocked(highlightDot);
-            btn.style.opacity = locked ? "0.4" : "1";
-            btn.style.pointerEvents = locked ? "none" : "auto";
-            btn.style.cursor = locked ? "not-allowed" : "pointer";
+            if (btn && btn.style) {
+                const locked =
+                    that._playAllRunning || (highlightDot >= 0 && _isLocked(highlightDot));
+                btn.style.opacity = locked ? "0.4" : "1";
+                btn.style.pointerEvents = locked ? "none" : "auto";
+                btn.style.cursor = locked ? "not-allowed" : "pointer";
+            }
+            const addAfter = that._vizToolbar.addPitchAfterBtn;
+            const addBefore = that._vizToolbar.addPitchBeforeBtn;
+            for (const addBtn of [addAfter, addBefore]) {
+                if (addBtn && addBtn.style) {
+                    addBtn.style.opacity = that._playAllRunning ? "0.4" : "1";
+                    addBtn.style.pointerEvents = that._playAllRunning ? "none" : "auto";
+                    addBtn.style.cursor = that._playAllRunning ? "not-allowed" : "pointer";
+                }
+            }
         };
 
         // ── Canvas ──
@@ -702,6 +781,7 @@ function TemperamentWidget() {
         };
 
         canvas.onkeydown = function (e) {
+            if (that._playAllRunning) return;
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
                 focusedDot = (focusedDot + 1) % that.pitchNumber;
@@ -782,7 +862,7 @@ function TemperamentWidget() {
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                if (i === highlightDot || i === flashDot) {
+                if (i === flashDot || (!that._playAllRunning && i === highlightDot)) {
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#ffeb3b";
@@ -881,7 +961,7 @@ function TemperamentWidget() {
             td.style.cursor = _isLocked(i) ? "default" : "text";
             td.ondblclick = ev => {
                 ev.stopPropagation();
-                if (_isLocked(i)) return;
+                if (_isLocked(i) || that._playAllRunning) return;
                 const prev = getPrev(i);
                 const next = getNext(i);
                 const cur = getCur(i);
@@ -904,6 +984,10 @@ function TemperamentWidget() {
                 input.focus();
                 input.select();
                 const commit = () => {
+                    if (that._playAllRunning) {
+                        _updateTableRow(i);
+                        return;
+                    }
                     let v = parseFloat(input.value);
                     if (isNaN(v)) {
                         _updateTableRow(i);
@@ -987,6 +1071,7 @@ function TemperamentWidget() {
                             : bgColor;
                 };
                 tr.onclick = function () {
+                    if (that._playAllRunning) return;
                     highlightDot = i;
                     _drawCircle();
                     _highlightTableRow(i);
@@ -1154,7 +1239,7 @@ function TemperamentWidget() {
         };
 
         const _removePitch = function (index) {
-            if (that.pitchNumber <= 1) return;
+            if (that._playAllRunning || that.pitchNumber <= 1) return;
             if (index < 0 || index >= that.pitchNumber) return;
             if (_isLocked(index)) return;
             that.cents.splice(index, 1);
@@ -1221,7 +1306,7 @@ function TemperamentWidget() {
                 : that.scale;
             that.scaleNotes = buildScale(that.scale);
             that.scaleNotes = that.scaleNotes[0];
-            that.powerBase = 2;
+            that.powerBase = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
 
             const startingPitch = that._logo.synth.startingPitch;
             that.notes = [];
@@ -1309,13 +1394,16 @@ function TemperamentWidget() {
             that._visualizerView();
         };
 
+        // Expose on the widget instance so import can apply a registered temperament
+        that._loadTemperament = _loadTemperament;
+
         let dragIndex = -1;
         let dragMoved = false;
         let lockedDrag = false;
         let longPressTimer = null;
         const _clearLongPress = () => {
             if (longPressTimer) {
-                clearTimeout(longPressTimer);
+                that._clearWidgetTimeout(longPressTimer);
                 longPressTimer = null;
             }
         };
@@ -1339,6 +1427,7 @@ function TemperamentWidget() {
         };
 
         const _showMenu = function (e, index) {
+            if (that._playAllRunning) return;
             e.preventDefault();
             _removeMenu();
             const menu = document.createElement("div");
@@ -1411,7 +1500,7 @@ function TemperamentWidget() {
             document.body.appendChild(menu);
             that._vizMenu = menu;
             that._vizMenuClose = _closeMenu;
-            setTimeout(function () {
+            that._setWidgetTimeout(function () {
                 if (that._vizMenu) document.addEventListener("mousedown", _closeMenu);
             }, 0);
         };
@@ -1445,7 +1534,7 @@ function TemperamentWidget() {
         };
 
         canvas.onmousedown = function (e) {
-            if (e.button !== 0) return;
+            if (that._playAllRunning || e.button !== 0) return;
             const [x, y] = _canvasCoords(e, canvas);
             const hit = _findNearest(x, y, dotR + 8);
             if (hit !== null) {
@@ -1468,6 +1557,10 @@ function TemperamentWidget() {
         };
 
         canvas.onmousemove = function (e) {
+            if (that._playAllRunning) {
+                canvas.style.cursor = "default";
+                return;
+            }
             const [x, y] = _canvasCoords(e, canvas);
             if (dragIndex >= 0 && !lockedDrag) {
                 dragMoved = true;
@@ -1485,6 +1578,7 @@ function TemperamentWidget() {
         canvas.onmouseup = _endDrag;
 
         canvas.ontouchstart = function (e) {
+            if (that._playAllRunning) return;
             const [x, y] = _canvasCoords(e.touches[0], canvas);
             const hit = _findNearest(x, y, dotR + 16);
             if (hit !== null) {
@@ -1502,7 +1596,7 @@ function TemperamentWidget() {
                 _clearLongPress();
                 const tx = e.touches[0].clientX;
                 const ty = e.touches[0].clientY;
-                longPressTimer = setTimeout(() => {
+                longPressTimer = that._setWidgetTimeout(() => {
                     if (!dragMoved && dragIndex === hit) {
                         _showMenu({ clientX: tx, clientY: ty, preventDefault: () => {} }, hit);
                         dragIndex = -1;
@@ -1921,22 +2015,25 @@ function TemperamentWidget() {
             const ratio = [];
             const frequency = [];
             const ratioDifference = [];
-            const index = [];
             const compareRatios = [];
             that.tempRatios = that.ratios.slice();
 
+            /**
+             * Recursively calculates ratios to ensure they fit within the octave space.
+             * Inserts the resulting ratio into the sorted tempRatios array.
+             *
+             * @param {number} i - The current iteration index.
+             */
             const calculateRatios = function (i) {
                 if (frequency[i] < that.frequencies[len - 1]) {
                     for (let j = 0; j < that.tempRatios.length; j++) {
                         ratioDifference[j] = ratio[i] - that.tempRatios[j];
                         if (ratioDifference[j] < 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 0, ratio[i]);
+                            that.tempRatios.splice(j, 0, ratio[i]);
                             break;
                         }
                         if (ratioDifference[j] === 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 1, ratio[i]);
+                            that.tempRatios.splice(j, 1, ratio[i]);
                             break;
                         }
                     }
@@ -2525,6 +2622,251 @@ function TemperamentWidget() {
     };
 
     /**
+     * Collects the current widget state into the export data format. Reads
+     * live state, so unsaved edits are reflected in the export.
+     * @returns {object|null} The export data, or null (after an error
+     * message) when the widget has no complete set of ratios to export.
+     */
+    this._temperamentExportData = function () {
+        const ratios = [];
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            let raw = this.ratios[i];
+            if (i === this.pitchNumber && !isFinite(Number(raw))) {
+                raw = this.powerBase;
+            }
+            const ratio = Number(raw);
+            if (!isFinite(ratio)) {
+                this.activity.errorMsg(_("No temperament to export."), 3000);
+                return null;
+            }
+            ratios.push(ratio);
+        }
+
+        const interval = [];
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            if (typeof this.intervals[i] === "string") {
+                interval.push(this.intervals[i]);
+            } else if (Array.isArray(this.notes[i])) {
+                interval.push(this.notes[i][0]);
+            } else if (typeof this.notes[i] === "string") {
+                interval.push(parseNoteString(_stripCents(this.notes[i]))[0]);
+            } else {
+                interval.push("");
+            }
+        }
+
+        return {
+            name: this.inTemperament,
+            pitchNumber: this.pitchNumber,
+            referencePitch: this._logo.synth.startingPitch,
+            interval: interval,
+            ratios: ratios
+        };
+    };
+
+    /**
+     * Exports the current temperament as a pretty-printed JSON file.
+     * @returns {void}
+     */
+    this._exportJson = function () {
+        const data = this._temperamentExportData();
+        if (data === null) {
+            return;
+        }
+
+        downloadTextFile(
+            JSON.stringify(data, null, 2),
+            "temperament-" + temperamentSlug(data.name) + ".json"
+        );
+    };
+
+    /**
+     * Exports the current temperament as a Scala (.scl) file: a header, the
+     * temperament name, the pitch count, and one absolute cents line per
+     * ratio above unison (1200 cents per octave, independent of the
+     * exported period).
+     * @returns {void}
+     */
+    this._exportScl = function () {
+        const data = this._temperamentExportData();
+        if (data === null) {
+            return;
+        }
+
+        const lines = ["! temperament.scl", "!", data.name, String(data.pitchNumber)];
+        for (let i = 1; i <= data.pitchNumber; i++) {
+            lines.push(ratioToCents(data.ratios[i], 2).toFixed(2));
+        }
+
+        downloadTextFile(
+            lines.join("\n") + "\n",
+            "temperament-" + temperamentSlug(data.name) + ".scl"
+        );
+    };
+
+    /**
+     * Imports a .json or .scl temperament file: parses and validates it,
+     * then registers the temperament in the dictionary and applies it.
+     * @returns {void}
+     */
+    this._importFile = function () {
+        readTextFile("myModeSclFile", (err, data) => {
+            if (err) {
+                this.activity.errorMsg(err.message);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            const ext = (data.file.name || "").toLowerCase();
+            let name;
+            let pitchNumber;
+            let ratios;
+            let referenceFrequency;
+
+            if (ext.endsWith(".json")) {
+                let def;
+                try {
+                    def = TuningFormats.parseTemperamentJson(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading JSON file: ") + e.message);
+                    return;
+                }
+                pitchNumber = def.pitchNumber;
+                ratios = def.ratios;
+                name = def.name || data.file.name.replace(/\.json$/i, "") || "custom";
+                if (typeof def.referencePitch === "string" && def.referencePitch !== "") {
+                    try {
+                        // Fixed equal-temperament reference: importing the
+                        // same JSON must yield the same frequency no
+                        // matter which temperament is selected.
+                        const parsed = parseNoteString(def.referencePitch);
+                        const resolved = pitchToFrequency(
+                            parsed[0],
+                            Number(parsed[1]),
+                            0,
+                            "c major",
+                            "equal"
+                        );
+                        if (Number.isFinite(resolved) && resolved > 0) {
+                            referenceFrequency = Number(resolved);
+                        }
+                    } catch (e) {
+                        // Fall through to the widget's current reference frequency.
+                    }
+                }
+            } else if (ext.endsWith(".scl")) {
+                let result;
+                try {
+                    result = TuningFormats.parseSclFile(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading .scl file: ") + e.message);
+                    return;
+                }
+                pitchNumber = result.pitchCount;
+                ratios = [1].concat(result.pitches.map(p => p.ratio));
+                for (let i = 1; i < ratios.length; i++) {
+                    if (!(ratios[i] > ratios[i - 1])) {
+                        this.activity.errorMsg(
+                            _("Invalid .scl file: pitches must be strictly ascending above 1/1.")
+                        );
+                        return;
+                    }
+                }
+                name = result.description || data.file.name.replace(/\.scl$/i, "") || "custom";
+            } else {
+                this.activity.errorMsg(_("Unsupported file type. Use .json or .scl."));
+                return;
+            }
+
+            if (overDivisionCap(this.activity, pitchNumber)) {
+                return;
+            }
+
+            this._registerImportedTemperament(name, pitchNumber, ratios, referenceFrequency);
+        });
+    };
+
+    /**
+     * Registers an imported temperament in the TEMPERAMENT dictionary and
+     * applies it to the widget.
+     * @param {string} name - The temperament name.
+     * @param {number} pitchNumber - The number of pitches per period.
+     * @param {number} ratios - Length pitchNumber + 1, with ratios[0] the
+     * unison and ratios[pitchNumber] the period.
+     * @param {number} [startHz] - Reference frequency for pitch labels;
+     * falls back to the widget's current first frequency.
+     * @returns {boolean} True when the temperament was registered.
+     */
+    this._registerImportedTemperament = function (name, pitchNumber, ratios, startHz) {
+        if (isUnsafeObjectKey(name)) {
+            this.activity.errorMsg(_("Invalid temperament name."), 3000);
+            return false;
+        }
+
+        // Re-importing under an existing custom name refreshes that entry
+        // in place (mirroring the mode widget); only built-in collisions
+        // are renamed, looping until the suffixed name is unused.
+        while (getTemperament(name) !== undefined && !isCustomTemperament(name)) {
+            name = name + " (imported)";
+        }
+
+        const resolvedHz =
+            Number.isFinite(Number(startHz)) && Number(startHz) > 0
+                ? Number(startHz)
+                : Number(this.frequencies[0]);
+        if (!isFinite(resolvedHz) || resolvedHz <= 0) {
+            this.activity.errorMsg(_("Cannot import: no reference frequency."), 3000);
+            return false;
+        }
+
+        const period = ratios[pitchNumber];
+        if (!Number.isFinite(period) || period <= 1 || period > 1e6) {
+            this.activity.errorMsg(_("Invalid temperament: octave ratio out of range."), 3000);
+            return false;
+        }
+
+        const entry = { pitchNumber: pitchNumber, octaveRatio: period };
+        for (let i = 0; i < pitchNumber; i++) {
+            const pitch = frequencyToPitch(ratios[i] * resolvedHz);
+            entry["" + i] = [ratios[i], pitch[0], pitch[1]];
+        }
+
+        addTemperamentToDictionary(name, entry);
+        updateTemperaments();
+        Singer.clearPitchToFrequencyCache();
+        setOctaveRatio(ratios[pitchNumber]);
+
+        this._logo.customTemperamentDefined = true;
+        this.activity.blocks.protoBlockDict["custompitch"].hidden = false;
+        this.activity.blocks.palettes.updatePalettes("pitch");
+
+        this._loadTemperament(name);
+
+        this.activity.textMsg(_("Temperament imported: ") + name, 3000);
+        return true;
+    };
+
+    /**
+     * Builds the export/import popup anchored to a toolbar button. Clicking
+     * the button again, choosing an item, or clicking outside closes it.
+     * @param {HTMLElement} anchor - The Share button the popup is anchored to.
+     * @returns {void}
+     */
+    this._createSharePopup = function (anchor) {
+        createSharePopup(
+            "temperamentSharePopup",
+            [
+                [_("Export .scl"), () => this._exportScl()],
+                [_("Export JSON"), () => this._exportJson()],
+                [_("Import"), () => this._importFile()]
+            ],
+            anchor
+        );
+    };
+
+    /**
      * Saves the modifications made to the temperament.
      * @returns {void}
      */
@@ -2777,7 +3119,10 @@ function TemperamentWidget() {
 
         if (isCustomTemperament(this.inTemperament)) {
             deleteTemperamentFromList(this.inTemperament);
-            const newTemperament = { pitchNumber: this.pitchNumber };
+            const newTemperament = {
+                pitchNumber: this.pitchNumber,
+                octaveRatio: this.powerBase
+            };
             for (let i = 0; i < this.pitchNumber; i++) {
                 const number = "" + i;
                 const cleanName = _stripCents(this.notes[i]);
@@ -2786,6 +3131,11 @@ function TemperamentWidget() {
             }
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
+            // The redefined temperament keeps its old name, so any frequency
+            // already cached under that name (see Singer.getCachedPitchToFrequency)
+            // would otherwise keep playing at the pre-edit tuning until the
+            // project is stopped and restarted.
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (isCustomTemperament(this.inTemperament)) {
@@ -2899,11 +3249,11 @@ function TemperamentWidget() {
         const that = this;
 
         widgetWindow.onclose = function () {
-            if (that._playAllTimer) {
-                that._clearWidgetTimeout(that._playAllTimer);
-                that._playAllTimer = null;
-            }
+            that._clearWidgetTimers();
+            that._playing = false;
+            that._playAllTimer = null;
             that._playAllRunning = false;
+            closeSharePopup("temperamentSharePopup");
             if (that._vizMenu && that._vizMenu.parentNode) {
                 that._vizMenu.parentNode.removeChild(that._vizMenu);
                 that._vizMenu = null;
@@ -2911,13 +3261,6 @@ function TemperamentWidget() {
             if (that._vizMenuClose) {
                 document.removeEventListener("mousedown", that._vizMenuClose);
                 that._vizMenuClose = null;
-            }
-            if (that._playTimeout) {
-                that._clearWidgetTimeout(that._playTimeout);
-                that._playTimeout = null;
-            }
-            if (that._timerManager !== null) {
-                that._timerManager.clearAll();
             }
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));
@@ -2941,6 +3284,11 @@ function TemperamentWidget() {
         );
         widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = function () {
             that._save();
+        };
+
+        const shareBtn = widgetWindow.addButton("share.svg", ICONSIZE, _("Share"));
+        shareBtn.onclick = () => {
+            that._createSharePopup(shareBtn);
         };
 
         const addPitchAfterBtn = widgetWindow.addButton(
@@ -2979,7 +3327,7 @@ function TemperamentWidget() {
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
+        this.powerBase = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
         const startingPitch = this._logo.synth.startingPitch;
         const str = [];
         const note = [];

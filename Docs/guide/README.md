@@ -2418,86 +2418,69 @@ temperament* block in order to play the notes in selected temperament
 system. *Starting Pitch* is the argument of pitch block inside
 temperament block. In the above example, starting pitch is `C4`.
 
-![widget](./temperament2.svg "the Temperament widget")
+![widget](./temperament-visualizer.svg "the Temperament visualizer")
 
-In the above example, selected temperament is *Just Intonation*. Notes
-within an octave can be viewed in the form of circle. These circles
-represent *pitch numbers*. Note that the pitches that are closer
-together in selected temperament system are visually closer and
-pitches that are farther apart looks farther.
+The visualizer compares the active temperament (inner dots) against a
+12-EDO reference (outer ring with 12 ticks). Each pitch has a spoke to
+its nearest 12-EDO step. Color shows the deviation: green (dashed) is
+in tune (within `±1` cent), orange is sharp (`+` cents), red is flat
+(`-` cents). The center shows the selected note, its deviation, and
+its frequency; otherwise it shows `<temperament> vs 12-EDO`. A legend
+below the circle explains the colors.
 
-The information regarding any note can be viewed by clicking on the
-respective circle. In the above example, circle (pitch number) `2` is
-`D4`. The frequency of note can be changed through edit button (left
-hand side corner of note information popup).
+Click a dot to select it and hear its pitch; the selected dot gets a
+yellow ring and its table row is highlighted. Drag a dot around the
+circle to retune it (clamped between its neighbors). Right-click
+(or long-press) a dot or row for `Set cents` and `Reset to 12-EDO`.
+The tonic (`Step 0`) is locked and cannot be dragged, edited, or
+removed.
 
-![widget](./temperament3.svg "the Temperament widget")
+To enter an exact value, double-click a cell in the table's
+*Frequency (Hz)*, *Cents dev. from 12-EDO*, or *Ratio* column. An
+input field opens, bounded by the neighboring pitches; press `Enter`
+to confirm or `Escape` to cancel.
 
-Information regarding notes can also be viewed in the form of a
-*table* as shown in the above example. The table will show all the
-information about pitches that lie within an octave. This information
-includes *pitch number*, *interval*, *ratio*, *note*, *frequency* and
-*mode*.
+When the circle has keyboard focus, the arrow keys step through the
+pitches starting from `Step 0` and play each one; `Enter` or `Space`
+replays the last keyboard-played pitch. This is separate from the
+click selection (yellow ring).
 
-The frequency of any note is calculated by `Starting Pitch Frequency`
-x `Ratio`.
+![widget](./temperament-visualizer-table.svg "temperament pitch table")
+
+The table below the circle lists every pitch, highest first. Columns
+are *Pitch* (note name with `^`/`v` deviation arrows), *Step*,
+*Frequency (Hz)*, *Cents dev. from 12-EDO*, and *Ratio*. The frequency
+of any note is `Starting Pitch Frequency` x `Ratio`.
+
+![widget](./temperament-visualizer-17edo.svg "17-EDO in the visualizer")
+
+The temperament selector (menu icon next to the name) switches systems
+— for example Equal `5`, `17`, `19`, `31`-EDO, *Just Intonation*,
+*Pythagorean*, or meantone — and redraws the circle and table. Edited
+built-in temperaments are marked `modified` and saved as `custom`.
 
 The widget controls are as follows:
 
-The *Clear* button at the bottom of the widget will clear all pitches
-except for a single `0` from which the user may add pitches.
+*Play all pitches*, which plays the scale up one octave and back down;
 
-The *Play all* button will play through all the pitches in an octave
-and then it will play backwards down the pitches.
+*Save*, which saves the temperament and creates a *set temperament*
+block that tunes the notes attached to it;
 
-The *Save* button will save custom temperament for use in your
-program. It will create a *set temperament* block. This block will
-tune the notes attached to it according to the selected temperament.
+*Share*, which exports (`.scl`, JSON) or imports a temperament;
 
-The *Table* button is used to toggle between circular and tabular
-representation of notes.
+*Add pitch after* / *Add pitch before*, which insert a new pitch
+midway between the selected pitch and its clockwise (after) or
+counter-clockwise (before) neighbor, or into the largest gap when
+nothing is selected;
 
-The *Add* button is used to edit notes through different tools:
+*Remove selected pitch*, which deletes the selected pitch — or the
+last pitch when nothing is selected — except the tonic, which cannot
+be removed;
 
-![widget](./temperament4.svg "Equal Edit tool")
+*Create new temperament*, which opens the advanced Equal, Ratio,
+Arbitrary, and Octave-Space editors; and
 
-![widget](./temperament4a.svg "Temperament widget with new element")
-
-The `Equal` edit tool is used to make *equal divisions* between two
-pitch numbers.  In the above example, two equal divisions are made
-between pitch numbers `0` and `1` and the resultant number of notes
-within an octave are changed from 12 to 13.
-
-![widget](./temperament5.svg "Ratio Edit tool")
-
-![widget](./temperament5a.svg "Temperament widget with new element")
-
-The `Ratio` tool is used to add notes of specified ratios in such a
-way that the resultant pitches wrap inside a single octave. Recursion
-represents the number of times notes ratio calculation is repeated. In
-the above example, 2 notes are added in pitch space and the resultant
-number of notes within an octave are changed from 12 to 14. Frequency
-of first pitch is (Starting Pitch Frequency) * (16/13) and second
-pitch is (Starting Pitch Frequency) * (16/13)².
-
-![widget](./temperament6.svg "Arbitrary Edit tool")
-
-The `Arbitrary` edit tool is used to add a note in an arbitrary
-position. In this panel, whenever the user hovers over the outer
-circle, a frequency-slider window pops up, allowing the user to add a
-note according to a chosen frequency. In the above example, a new note
-will be added somewhere between pitch numbers `2` and `3` by adjusting
-the frequency slider.
-
-![widget](./temperament7.svg "Octave Space Edit tool")
-
-The `Octave Space` tool is used to edit the octave ratio. The standard
-octave space is 2:1. In the above example, octave space will be
-changed to 3:1 after clicking on `Done`.
-
-The *Drag* button will drag the widget.
-
-The *Close* button will close the widget.
+*Close*, which closes the widget.
 
 ###  <a name="oscilloscope">4.13 The Oscilloscope</a>
 
@@ -2510,6 +2493,8 @@ plays.
 
 A separate wave will be displayed for each mouse.
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725883406989554&run=True)
+
+You can pause the live waveform for detailed visual analysis by clicking the **Pause** button in the widget toolbar (or by pressing `Space` when the widget is active). While paused, you can use the **Zoom In** and **Zoom Out** buttons to inspect the waveform. Click the **Resume** button (or press `Space` again) to resume live monitoring.
 
 ###  <a name="sampler">4.14 The Sampler</a>
 

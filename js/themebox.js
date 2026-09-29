@@ -254,7 +254,10 @@ class ThemeBox {
         if (themeSelectIcon) {
             const currentThemeElement = document.getElementById(this._theme);
             if (currentThemeElement) {
-                themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
+                themeSelectIcon.textContent = "";
+                currentThemeElement.childNodes.forEach(child => {
+                    themeSelectIcon.appendChild(child.cloneNode(true));
+                });
             }
         }
     }

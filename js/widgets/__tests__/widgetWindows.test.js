@@ -93,6 +93,7 @@ beforeEach(() => {
             window.widgetWindows._boundHandleGlobalMouseDown,
             true
         );
+        window.removeEventListener("resize", window.widgetWindows._boundHandleResize);
     }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
@@ -554,6 +555,75 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("viewport resize", () => {
+        test("keeps open windows within the viewport without moving windows that still fit", () => {
+            const offscreen = createTestWindow("Offscreen");
+            offscreen.setPosition(338, 141);
+            offscreen._frame.getBoundingClientRect = () => ({
+                left: 338,
+                top: 141,
+                width: 616,
+                height: 500
+            });
+
+            const fitting = createTestWindow("Fitting");
+            fitting.setPosition(100, 150);
+            fitting._frame.getBoundingClientRect = () => ({
+                left: 100,
+                top: 150,
+                width: 300,
+                height: 300
+            });
+
+            const originalWidth = window.innerWidth;
+            const originalHeight = window.innerHeight;
+            window.innerWidth = 900;
+            window.innerHeight = 700;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(offscreen._frame.style.left).toBe("284px");
+                expect(offscreen._frame.style.top).toBe("141px");
+                expect(fitting._frame.style.left).toBe("100px");
+                expect(fitting._frame.style.top).toBe("150px");
+            } finally {
+                window.innerWidth = originalWidth;
+                window.innerHeight = originalHeight;
+            }
+        });
+
+        test("repositions hidden windows when they are shown after a resize", () => {
+            const single = createTestWindow("Single");
+            const all = createTestWindow("All");
+            for (const win of [single, all]) {
+                win.setPosition(338, 141);
+                win._frame.getBoundingClientRect = () => ({
+                    left: parseFloat(win._frame.style.left),
+                    top: 141,
+                    width: 616,
+                    height: 500
+                });
+            }
+            window.widgetWindows.hideAllWindows();
+
+            const originalWidth = window.innerWidth;
+            window.innerWidth = 900;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(single._frame.style.left).toBe("338px");
+                expect(all._frame.style.left).toBe("338px");
+
+                single.show();
+                expect(single._frame.style.left).toBe("284px");
+                expect(all._frame.style.left).toBe("338px");
+
+                window.widgetWindows.showWindows();
+                expect(all._frame.style.left).toBe("284px");
+            } finally {
+                window.innerWidth = originalWidth;
+            }
+        });
+    });
+
     describe("_maximize and _restore", () => {
         test("_maximize sets _maximized to true", () => {
             const win = createTestWindow();
@@ -889,8 +959,8 @@ describe("widgetWindows", () => {
             expect(isOpen(902)).toBeTruthy();
         });
 
-        test("isOpen returns empty string for non-existent windows", () => {
-            expect(isOpen("nonexistent")).toBe("");
+        test("isOpen returns false for non-existent windows", () => {
+            expect(isOpen("nonexistent")).toBe(false);
         });
 
         test("windowFor uses saveAs as key when blockNo is missing", () => {

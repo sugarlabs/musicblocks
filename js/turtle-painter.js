@@ -62,16 +62,10 @@ const MAX_ARC_ANGLE = 45000;
  * Class pertaining to visual actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Painter for each Turtle component. It is responsible
- * for the visual actions and artworks of the Turtle. It is mostly view specific and communicates
- * with methods of Turtle and Turtles objects. An action may require updating the state of the
- * Turtle or the Turtles object.
- *
- * @todo move visual artwork related states from logo.js to here eventually.
- * As of now, some state variables are present in logo.js. To ensure modularity and independence of
- * components, Logo should contain members only related to execution of blocks while the logic of
- * execution of blocks should be present in respective files in blocks/ directory, which should
- * eventually use members of this file and turtle-singer.js to proceed.
+ * @classdesc This is the prototype of the Painter for each Turtle component. It owns the
+ * per-turtle drawing state and actions. It is mostly view specific and communicates with methods
+ * of Turtle and Turtles objects. An action may require updating the state of the Turtle or the
+ * Turtles object.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -90,21 +84,17 @@ class Painter {
         this.turtles = turtle.turtles;
         this.activity = turtle.activity;
 
-        // Things used for what the turtle draws
         this._svgOutput = "";
-        this._svgPath = false; // are we currently drawing a path?
+        this._svgPath = false;
+
+        // Reset control points and close open SVG path if any
+        this.reset();
 
         this._color = DEFAULTCOLOR;
         this._value = DEFAULTVALUE;
         this._chroma = DEFAULTCHROMA;
         this._stroke = DEFAULTSTROKE;
         this._font = DEFAULTFONT;
-
-        // Control points for bezier curves
-        this.cp1x = 0;
-        this.cp1y = 100;
-        this.cp2x = 100;
-        this.cp2y = 100;
 
         // Kept as a Munsell hex string: _processColor() converts it on every
         // stroke, and converting an already-converted rgba string yields black.
@@ -121,6 +111,23 @@ class Painter {
         this._cachedCanvasHeight = 0;
         this._pendingCanvasUpdate = false;
         this._rafId = null;
+    }
+
+    /**
+     * Resets transient bezier control-point state for consecutive runs.
+     * Closes any open SVG path while preserving accumulated SVG output
+     * and persistent pen styling attributes (color, value, chroma, stroke, font).
+     *
+     * @returns {void}
+     */
+    reset() {
+        if (typeof this.closeSVG === "function") {
+            this.closeSVG();
+        }
+        this.cp1x = 0;
+        this.cp1y = 100;
+        this.cp2x = 100;
+        this.cp2y = 100;
     }
 
     // ========= Setters, Getters =============================================

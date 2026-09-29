@@ -2311,7 +2311,7 @@ class PhraseMaker {
                     for (let i = 0; i < accidentals.length; i++) {
                         if (noteValue.includes(accidentals[i])) {
                             accidentalsValue = i;
-                            noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                            noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                             break;
                         }
                     }
@@ -3066,7 +3066,7 @@ class PhraseMaker {
             newNote = this._deps.SOLFEGECONVERSIONTABLE[note[0]];
         } else {
             octave = note[2];
-            newNote = this._deps.SOLFEGECONVERSIONTABLE[note.substr(0, 2)];
+            newNote = this._deps.SOLFEGECONVERSIONTABLE[note.slice(0, 2)];
         }
         this.rowLabels[index] = newNote;
         this.rowArgs[index] = octave;
@@ -3914,12 +3914,23 @@ class PhraseMaker {
         noteToDivide = parseInt(noteToDivide, 10);
         oldTupletValue = parseInt(oldTupletValue, 10);
         newTupletValue = parseInt(newTupletValue, 10);
+        if (
+            !this.activity ||
+            !this.activity.logo ||
+            !Array.isArray(this.activity.logo.tupletRhythms) ||
+            isNaN(noteToDivide) ||
+            noteToDivide < 0 ||
+            noteToDivide >= this.activity.logo.tupletRhythms.length ||
+            !this.activity.logo.tupletRhythms[noteToDivide]
+        ) {
+            return;
+        }
         this._blockMapHelper = [];
 
         let k = 0;
         let l;
         if (oldTupletValue < newTupletValue) {
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -3955,7 +3966,7 @@ class PhraseMaker {
             }
         } else {
             k = 0;
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -4605,7 +4616,7 @@ class PhraseMaker {
             graphicsBlock = false;
             graphicNote = note.split(": ");
             if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 &&
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 ||
                 PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) !== -1
             ) {
                 graphicsBlock = true;

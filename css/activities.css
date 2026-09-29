@@ -33,6 +33,20 @@ body:not(.dark):not(.highcontrast) .ui-autocomplete li:hover {
     background-color: var(--color-bg-tertiary) !important;
 }
 
+.ui-autocomplete .search-no-results,
+.ui-autocomplete .search-no-results:hover,
+.ui-autocomplete .search-no-results.ui-state-focus,
+.ui-autocomplete .search-no-results.ui-state-active {
+    cursor: default;
+    font-style: italic;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+body:not(.dark):not(.highcontrast) .ui-autocomplete .search-no-results:hover {
+    background-color: var(--color-bg-primary) !important;
+}
+
 body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-bg-secondary) !important;
 }
@@ -62,6 +76,20 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     width: 400px;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+    #newdropdown {
+        position: fixed !important;
+        left: 50% !important;
+        transform: translateX(-50%);
+        max-width: calc(100vw - 32px);
+        box-sizing: border-box;
+    }
+
+    #confirmation-message {
+        white-space: normal;
+    }
 }
 
 #newdropdown li {
@@ -125,7 +153,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .clear-button-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
+    gap: 8px;
 }
 
 .confirm-button {
@@ -136,7 +166,6 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     cursor: pointer;
     background-color: var(--color-brand-primary);
     color: var(--color-text-inverse);
-    margin-right: 16px;
     transition: background-color 0.2s ease;
 }
 
@@ -405,7 +434,29 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     justify-content: center;
     width: 48px;
     height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
     cursor: pointer;
+}
+
+#restoreLastIcon:hover,
+#restoreAllIcon:hover,
+#restoreLastIcon:focus-visible,
+#restoreAllIcon:focus-visible {
+    background-color: var(--color-brand-primary-hover);
+    outline: 2px solid var(--color-text-inverse);
+    outline-offset: -2px;
+}
+
+.highcontrast #restoreLastIcon:hover .material-icons,
+.highcontrast #restoreAllIcon:hover .material-icons,
+.highcontrast #restoreLastIcon:focus-visible .material-icons,
+.highcontrast #restoreAllIcon:focus-visible .material-icons {
+    color: var(--color-text-inverse) !important;
 }
 
 .material-icons.md-48 {

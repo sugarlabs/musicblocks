@@ -498,6 +498,16 @@ function MusicKeyboard(activity) {
         let extraNoteCount = 0;
         let startTimeNotes = 0;
 
+        const isTextEntryActive = () => {
+            const activeElement = document.activeElement;
+            return (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            );
+        };
+
         /**
          * Gets the ID of the musical note associated with a keyboard event.
          * @param {KeyboardEvent} event - The keyboard event.
@@ -597,6 +607,8 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
          */
         const __keyboarddown = event => {
+            if (isTextEntryActive()) return;
+
             if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
                 event.preventDefault();
                 this.shiftOctave(1);
@@ -696,6 +708,8 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __keyboardup = function (event) {
+            if (isTextEntryActive() && !current.has(event.keyCode)) return;
+
             current.delete(event.keyCode);
             __endNote(event);
         };
@@ -1269,58 +1283,19 @@ function MusicKeyboard(activity) {
             return;
         }
 
-        const id0 = this._setWidgetTimeout(() => {
-            this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
-        }, 1);
-        if (id0) {
-            this._chordTimeouts.push(id0);
-        }
-
-        if (notes.length > 1) {
-            const id1 = this._setWidgetTimeout(() => {
+        for (let i = 0; i < notes.length; i++) {
+            const id = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
-                    notes[1],
+                    notes[i],
                     noteValue[0],
-                    instruments[1],
+                    instruments[i],
                     null,
                     null
                 );
             }, 1);
-            if (id1) {
-                this._chordTimeouts.push(id1);
-            }
-        }
-
-        if (notes.length > 2) {
-            const id2 = this._setWidgetTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[2],
-                    noteValue[0],
-                    instruments[2],
-                    null,
-                    null
-                );
-            }, 1);
-            if (id2) {
-                this._chordTimeouts.push(id2);
-            }
-        }
-
-        if (notes.length > 3) {
-            const id3 = this._setWidgetTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[3],
-                    noteValue[0],
-                    instruments[3],
-                    null,
-                    null
-                );
-            }, 1);
-            if (id3) {
-                this._chordTimeouts.push(id3);
+            if (id) {
+                this._chordTimeouts.push(id);
             }
         }
     };
@@ -1365,15 +1340,15 @@ function MusicKeyboard(activity) {
         if (obj[0] !== "C") {
             // Pad the left side.
             for (let i = 0; i < PITCHES2.length; i++) {
+                const isFirstNote = PITCHES2[i] === obj[0] || PITCHES[i] === obj[0];
                 newList.push({
-                    noteName: PITCHES2[i],
+                    noteName: isFirstNote ? obj[0] : PITCHES2[i],
                     noteOctave: obj[1],
                     blockNumber: noteList[0].blockNumber,
                     voice: noteList[0].voice
                 });
                 j = i;
-                if (PITCHES2[i] === obj[0]) break;
-                if (PITCHES[i] === obj[0]) break;
+                if (isFirstNote) break;
                 newList[i].blockNumber = fakeBlockNumber;
                 fakeBlockNumber += 1;
             }
@@ -1514,7 +1489,7 @@ function MusicKeyboard(activity) {
             } else {
                 sortableList.push({
                     frequency: noteToFrequency(
-                        this.noteNames[i] + this.octaves[i],
+                        convertFromSolfege(this.noteNames[i]) + this.octaves[i],
                         this.activity.turtles.ithTurtle(0).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
@@ -1546,7 +1521,16 @@ function MusicKeyboard(activity) {
                 return true;
             }
 
-            this.remove.push(item.blockNumber);
+            if (
+                item.blockNumber !== undefined &&
+                item.blockNumber !== null &&
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.blockList &&
+                this.activity.blocks.blockList[item.blockNumber]
+            ) {
+                this.remove.push(item.blockNumber);
+            }
             return false;
         });
 
@@ -2573,7 +2557,7 @@ function MusicKeyboard(activity) {
                 aValue = a.noteOctave;
             } else {
                 aValue = noteToFrequency(
-                    a.noteName + a.noteOctave,
+                    convertFromSolfege(a.noteName) + a.noteOctave,
                     this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }
@@ -2582,7 +2566,7 @@ function MusicKeyboard(activity) {
                 bValue = b.noteOctave;
             } else {
                 bValue = noteToFrequency(
-                    b.noteName + b.noteOctave,
+                    convertFromSolfege(b.noteName) + b.noteOctave,
                     this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }
@@ -2676,29 +2660,69 @@ function MusicKeyboard(activity) {
      * @param {number} blockNo - The block number of the pitch block to be removed.
      */
     this._removePitchBlock = function (blockNo) {
-        const c0 = this.activity.blocks.blockList[blockNo].connections[0];
-        const c1 = last(this.activity.blocks.blockList[blockNo].connections);
-        if (this.activity.blocks.blockList[c0].name === "musickeyboard") {
-            this.activity.blocks.blockList[c0].connections[1] = c1;
-        } else {
-            this.activity.blocks.blockList[c0].connections[
-                this.activity.blocks.blockList[c0].connections.length - 1
-            ] = c1;
+        if (
+            blockNo === undefined ||
+            blockNo === null ||
+            !this.activity ||
+            !this.activity.blocks ||
+            !this.activity.blocks.blockList
+        ) {
+            return;
         }
 
-        if (c1) {
-            this.activity.blocks.blockList[c1].connections[0] = c0;
+        const block = this.activity.blocks.blockList[blockNo];
+        if (!block || !Array.isArray(block.connections) || block.connections.length < 2) {
+            return;
         }
 
-        this.activity.blocks.blockList[blockNo].connections[
-            this.activity.blocks.blockList[blockNo].connections.length - 1
-        ] = null;
-        this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
+        const c0 = block.connections[0];
+        const c1 = last(block.connections);
+
+        const parentBlock =
+            c0 !== null && c0 !== undefined && this.activity.blocks.blockList[c0]
+                ? this.activity.blocks.blockList[c0]
+                : null;
+        const childBlock =
+            c1 !== null && c1 !== undefined && this.activity.blocks.blockList[c1]
+                ? this.activity.blocks.blockList[c1]
+                : null;
+
+        const nextChildId = childBlock ? c1 : null;
+        const nextParentId = parentBlock ? c0 : null;
+
+        if (
+            parentBlock &&
+            Array.isArray(parentBlock.connections) &&
+            parentBlock.connections.length > 0
+        ) {
+            if (parentBlock.name === "musickeyboard" && parentBlock.connections.length > 1) {
+                parentBlock.connections[1] = nextChildId;
+            } else {
+                parentBlock.connections[parentBlock.connections.length - 1] = nextChildId;
+            }
+        }
+
+        if (
+            childBlock &&
+            Array.isArray(childBlock.connections) &&
+            childBlock.connections.length > 0
+        ) {
+            childBlock.connections[0] = nextParentId;
+        }
+
+        block.connections[block.connections.length - 1] = null;
+        this.activity.blocks.sendStackToTrash(block);
         if (this.blockNo !== undefined && this.blockNo !== null) {
-            this.activity.blocks.adjustDocks(this.blockNo, true);
-            this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+            if (typeof this.activity.blocks.adjustDocks === "function") {
+                this.activity.blocks.adjustDocks(this.blockNo, true);
+            }
+            if (Array.isArray(this.activity.blocks.clampBlocksToCheck)) {
+                this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+            }
         }
-        this.activity.refreshCanvas();
+        if (typeof this.activity.refreshCanvas === "function") {
+            this.activity.refreshCanvas();
+        }
     };
 
     /**
@@ -2894,7 +2918,7 @@ function MusicKeyboard(activity) {
             for (let i = 0; i < accidentals.length; i++) {
                 if (noteValue.includes(accidentals[i])) {
                     accidentalsValue = i;
-                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                    noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                     break;
                 }
             }
@@ -3269,6 +3293,24 @@ function MusicKeyboard(activity) {
                         newel2,
                         "",
                         "",
+                        myrow2Id < BLACKKEYS.length
+                            ? String.fromCharCode(BLACKKEYS[myrow2Id])
+                            : null
+                    );
+                } else if (SOLFEGENAMES.includes(nname)) {
+                    setKeyboardCellLabel(
+                        newel2,
+                        `${i18nSolfege(nname)}${SHARP}`,
+                        this.displayLayout[p].noteOctave,
+                        myrow2Id < BLACKKEYS.length
+                            ? String.fromCharCode(BLACKKEYS[myrow2Id])
+                            : null
+                    );
+                } else {
+                    setKeyboardCellLabel(
+                        newel2,
+                        this.displayLayout[p].noteName,
+                        this.displayLayout[p].noteOctave,
                         myrow2Id < BLACKKEYS.length
                             ? String.fromCharCode(BLACKKEYS[myrow2Id])
                             : null

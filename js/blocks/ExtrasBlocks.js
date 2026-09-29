@@ -732,7 +732,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPTwoArgMathBlock.
          */
         constructor() {
-            super("nopOneArgMathBlock", _("unknown"));
+            super("nopTwoArgMathBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({

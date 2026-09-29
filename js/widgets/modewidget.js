@@ -16,8 +16,10 @@
     getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-    getSavedCustomModes, configureWheel,
-    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes
+    getSavedCustomModes, configureWheel, TuningFormats,
+    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
+    isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
  */
 
 /*
@@ -89,7 +91,19 @@ class ModeWidget {
         this.widgetWindow.clear();
         this.widgetWindow.show();
 
-        this._timeouts = [];
+        /**
+         * Timer manager for managing all widget timeouts safely.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
 
         // Layout: pie wheel + mode table (label row) + bottom control bar
         this.modeTableDiv = document.createElement("div");
@@ -110,11 +124,9 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
-            if (this._timeouts) {
-                this._timeouts.forEach(id => clearTimeout(id));
-                this._timeouts = [];
-            }
+            this._clearWidgetTimers();
             this._playing = false;
+            closeSharePopup("sclSharePopup");
             if (this.logo && this.logo.synth) {
                 this.logo.synth.stop();
             }
@@ -176,6 +188,11 @@ class ModeWidget {
         this.widgetWindow.addButton("restore-button.svg", ModeWidget.ICONSIZE, _("Undo")).onclick =
             this._undo.bind(this);
 
+        const shareBtn = this.widgetWindow.addButton("share.svg", ModeWidget.ICONSIZE, _("Share"));
+        shareBtn.onclick = () => {
+            this._createSclSharePopup(shareBtn);
+        };
+
         this._piemenuMode();
 
         const table = docById("modeTable");
@@ -215,24 +232,90 @@ class ModeWidget {
         window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
     }
 
-    // ── Timeout helper ────────────────────────────────────────────
+    // ── Timeout helpers ───────────────────────────────────────────
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        if (Array.isArray(this._timeouts)) {
+            for (const id of this._timeouts) {
+                clearTimeout(id);
+                count++;
+            }
+            this._timeouts = [];
+        }
+
+        return count;
+    }
 
     _setTimeout(fn, delay) {
-        const id = setTimeout(() => {
-            this._timeouts = this._timeouts.filter(t => t !== id);
-            fn();
-        }, delay);
-        this._timeouts.push(id);
-        return id;
+        return this._setWidgetTimeout(fn, delay);
     }
 
     _cancelAnimations() {
         // Clear stale rotate/invert/play callbacks before rebuilding for a
         // new EDO; they reference old navItem indexes.
-        if (this._timeouts) {
-            this._timeouts.forEach(id => clearTimeout(id));
-            this._timeouts = [];
-        }
+        this._clearWidgetTimers();
         this._locked = false;
         this._playing = false;
         this._newPattern = null;
@@ -510,7 +593,15 @@ class ModeWidget {
         }
     }
 
-    _saveCustomMode(name, pattern) {
+    _saveCustomMode(name, pattern, edo = this._activeEDO) {
+        if (!Number.isInteger(edo)) {
+            this.errorMsg(_("Invalid EDO for mode."));
+            return false;
+        }
+        if (isUnsafeObjectKey(name)) {
+            this.errorMsg(_("Invalid mode name."));
+            return false;
+        }
         const modes = getSavedCustomModes();
         const existing = modes.findIndex(m => m.name === name);
         // Refuse to overwrite a built-in mode; only registered customs may be updated.
@@ -527,7 +618,7 @@ class ModeWidget {
                 return false;
             }
         }
-        const entry = { name, pattern, edo: this._activeEDO };
+        const entry = { name, pattern, edo };
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
@@ -1192,12 +1283,8 @@ class ModeWidget {
         return currentMode;
     }
 
-    _setModeName() {
-        const currentMode = this._calculateMode();
-        const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
-        const patternKey = currentMode.join(",");
-
-        let matchedMode = null;
+    _findModeNameForPattern(pattern) {
+        const patternKey = pattern.join(",");
 
         // Check custom modes first — they take priority over built-in modes
         // when patterns match, since they are EDO-specific.
@@ -1205,26 +1292,30 @@ class ModeWidget {
             if (!(mode in MUSICALMODES)) {
                 continue;
             }
-            const pattern = this._modeStepPattern(mode, null);
-            if (pattern && pattern.join(",") === patternKey) {
-                matchedMode = mode;
-                break;
+            const modePattern = this._modeStepPattern(mode, null);
+            if (modePattern && modePattern.join(",") === patternKey) {
+                return mode;
             }
         }
 
         // If no custom mode matched, check built-in modes.
-        if (!matchedMode) {
-            for (const mode in MUSICALMODES) {
-                if (this._customModeNames.has(mode)) {
-                    continue;
-                }
-                const pattern = this._modeStepPattern(mode, null);
-                if (pattern && pattern.join(",") === patternKey) {
-                    matchedMode = mode;
-                    break;
-                }
+        for (const mode in MUSICALMODES) {
+            if (this._customModeNames.has(mode)) {
+                continue;
+            }
+            const modePattern = this._modeStepPattern(mode, null);
+            if (modePattern && modePattern.join(",") === patternKey) {
+                return mode;
             }
         }
+
+        return null;
+    }
+
+    _setModeName() {
+        const currentMode = this._calculateMode();
+        const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
+        const matchedMode = this._findModeNameForPattern(currentMode);
 
         if (matchedMode) {
             this._selectedModeName = matchedMode;
@@ -1320,7 +1411,6 @@ class ModeWidget {
             12: "equal",
             17: "equal17",
             19: "equal19",
-            21: "1/4 comma meantone",
             31: "equal31"
         };
         if (map[edo]) {
@@ -1350,6 +1440,186 @@ class ModeWidget {
             return [edoNames[nameIndex], Math.floor((j + aIndex) / this._activeEDO) + 4];
         }
         return [name, octave + 4];
+    }
+
+    _createSclSharePopup(anchor) {
+        createSharePopup(
+            "sclSharePopup",
+            [
+                [_("Export .scl"), () => this._exportScl()],
+                [_("Export JSON"), () => this._exportJson()],
+                [_("Import"), () => this._importFile()]
+            ],
+            anchor
+        );
+    }
+
+    _findEdoSteps(pitches) {
+        for (let edo = TuningFormats.EDO_MAX; edo >= TuningFormats.EDO_MIN; edo--) {
+            const step = 1200 / edo;
+            const steps = [];
+            let prevStepCount = 0;
+            let valid = true;
+            for (let i = 0; i < pitches.length; i++) {
+                const stepCount = Math.round(pitches[i].cents / step);
+                if (Math.abs(pitches[i].cents - stepCount * step) > 0.5) {
+                    valid = false;
+                    break;
+                }
+                if (stepCount <= prevStepCount) {
+                    valid = false;
+                    break;
+                }
+                steps.push(stepCount - prevStepCount);
+                prevStepCount = stepCount;
+            }
+            if (valid && steps.length === pitches.length && prevStepCount === edo) {
+                return { edo, pattern: steps };
+            }
+        }
+        return null;
+    }
+
+    _modeExportData() {
+        const pattern = this._calculateMode();
+        const edo = this._activeEDO;
+        if (!pattern || pattern.length === 0) {
+            this.errorMsg(_("No mode to export."));
+            return null;
+        }
+        return { pattern, edo };
+    }
+
+    _exportScl() {
+        const data = this._modeExportData();
+        if (!data) return;
+        const { pattern, edo } = data;
+
+        const name = this._findModeNameForPattern(pattern) || "custom";
+        const lines = [];
+        lines.push("! mode.scl");
+        lines.push("!");
+        lines.push(name);
+        lines.push(String(pattern.length));
+
+        let cumulativeCents = 0;
+        for (let i = 0; i < pattern.length; i++) {
+            cumulativeCents += pattern[i] * (1200 / edo);
+            lines.push(cumulativeCents.toFixed(2));
+        }
+
+        const content = lines.join("\n") + "\n";
+        downloadTextFile(content, "mode-" + edo + "edo.scl");
+    }
+
+    _exportJson() {
+        const data = this._modeExportData();
+        if (!data) return;
+        const { pattern, edo } = data;
+
+        const name = this._findModeNameForPattern(pattern) || "custom";
+        const content = JSON.stringify({ name, edo, pattern }, null, 2);
+        downloadTextFile(content, "mode-" + edo + "edo.json");
+    }
+
+    _resolveBuiltInCollision(name, edo) {
+        const customLower = new Set(getSavedCustomModes().map(m => m.name.toLowerCase()));
+        if (
+            Object.keys(MUSICALMODES).some(
+                k => k.toLowerCase() === name.toLowerCase() && !customLower.has(k.toLowerCase())
+            )
+        ) {
+            return name + " (" + edo + " EDO)";
+        }
+        return name;
+    }
+
+    _parseImportText(parseFn, text, errorPrefix) {
+        try {
+            return parseFn(text);
+        } catch (e) {
+            this.errorMsg(errorPrefix + e.message);
+            return null;
+        }
+    }
+
+    _parseImportFile(data) {
+        const ext = (data.file.name || "").toLowerCase();
+        if (ext.endsWith(".json")) {
+            const def = this._parseImportText(
+                TuningFormats.parseModeJson,
+                data.text,
+                _("Error reading JSON file: ")
+            );
+            if (!def) return null;
+            return {
+                edo: def.edo,
+                pattern: def.pattern,
+                name: def.name || data.file.name.replace(/\.json$/i, "")
+            };
+        }
+        if (ext.endsWith(".scl")) {
+            const result = this._parseImportText(
+                TuningFormats.parseSclFile,
+                data.text,
+                _("Error reading .scl file: ")
+            );
+            if (!result) return null;
+            const edoResult = this._findEdoSteps(result.pitches);
+            if (!edoResult) {
+                this.errorMsg(
+                    _(
+                        "Not a valid EDO mode. Import requires a mode that fits an equal division of the octave."
+                    )
+                );
+                return null;
+            }
+            return {
+                edo: edoResult.edo,
+                pattern: edoResult.pattern,
+                name: result.description || data.file.name.replace(/\.scl$/i, "")
+            };
+        }
+        this.errorMsg(_("Unsupported file type. Use .json or .scl."));
+        return null;
+    }
+
+    _applyImportedMode(foundEdo, foundPattern, name) {
+        const key = this._temperamentKeyForEDO(foundEdo);
+        this._cacheState(this._activeEDO);
+        this.logo.synth.inTemperament = key;
+        this._activeTemperamentKey = key;
+        this._rebuildWheel(foundEdo);
+        this._applyModePattern(foundPattern);
+        this._selectedModeName = name;
+        this.textMsg(_("Mode imported: ") + name, 3000);
+        this._updateModeDisplay(name);
+        if (this._modeBlock !== null) {
+            const modeBlock = this.blocks.blockList[this._modeBlock];
+            if (modeBlock && modeBlock.name === "modename") {
+                modeBlock.value = name;
+                modeBlock.text.text = _(name);
+                modeBlock.updateCache();
+            }
+            this.refreshCanvas();
+        }
+    }
+
+    _importFile() {
+        readTextFile("myModeSclFile", (err, data) => {
+            if (err) {
+                this.errorMsg(err.message);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+            const parsed = this._parseImportFile(data);
+            if (!parsed) return;
+            const name = this._resolveBuiltInCollision(parsed.name, parsed.edo);
+            if (!this._saveCustomMode(name, parsed.pattern, parsed.edo)) return;
+            this._applyImportedMode(parsed.edo, parsed.pattern, name);
+        });
     }
 
     _save() {

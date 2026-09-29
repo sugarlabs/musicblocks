@@ -56,4 +56,23 @@ describe("Floating Widget Windows E2E Lifecycle", () => {
             .first()
             .should("have.attr", "src", "header-icons/icon-expand.svg");
     });
+
+    it("keeps the maximize icon visible in High Contrast mode", () => {
+        cy.window().then(win => {
+            win.widgetWindows.windowFor({}, "status", "status", true);
+        });
+
+        cy.get(".windowFrame .wftButton.wftMaxmin img", { timeout: 30000 })
+            .first()
+            .should("have.css", "filter", "none");
+
+        cy.window().then(win => {
+            win.ActivityContext.getActivity().themeBox.highcontrast_onclick();
+        });
+
+        cy.get("body").should("have.class", "highcontrast");
+        cy.get(".windowFrame .wftButton.wftMaxmin img")
+            .first()
+            .should("have.css", "filter", "invert(1)");
+    });
 });

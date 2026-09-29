@@ -187,6 +187,21 @@ window.widgetWindows = {
             }
         }
     },
+    _handleResize() {
+        if (window.innerWidth <= 600) return;
+
+        for (const win of Object.values(this.openWindows)) {
+            if (!win || win._maximized || win._frame.style.display === "none") continue;
+
+            const rect = win._frame.getBoundingClientRect();
+            const x = Math.min(Math.max(rect.left, 0), Math.max(0, window.innerWidth - rect.width));
+            const y = Math.min(
+                Math.max(rect.top, 64),
+                Math.max(64, window.innerHeight - rect.height)
+            );
+            if (x !== rect.left || y !== rect.top) win.setPosition(x, y);
+        }
+    },
     _initGlobalListeners() {
         if (this._globalListenersInitialized) return;
 
@@ -194,6 +209,7 @@ window.widgetWindows = {
         this._boundHandleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
         this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
         this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
+        this._boundHandleResize = this._handleResize.bind(this);
 
         document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
         document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
@@ -201,6 +217,7 @@ window.widgetWindows = {
         // Use capture phase (true) to handle keyboard shortcuts before individual
         // widgets can intercept them via stopPropagation().
         document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
+        window.addEventListener("resize", this._boundHandleResize);
 
         this._globalListenersInitialized = true;
     },
@@ -356,7 +373,7 @@ class WidgetWindow {
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
-        this._nonclose.justifyContent = "space-between";
+        this._nonclose.style.justifyContent = "space-between";
         this._nonclose.style.width = "100%";
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
@@ -657,10 +674,12 @@ class WidgetWindow {
     takeFocus() {
         window.widgetWindows.focused = this;
         const windows = docById("floatingWindows");
-        const siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0.7";
+        if (windows && windows.children) {
+            const siblings = windows.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.zIndex = "0";
+                siblings[i].style.opacity = "0.7";
+            }
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -696,6 +715,10 @@ class WidgetWindow {
      */
     sendToCenter() {
         const canvas = docById("myCanvas");
+        if (!canvas) {
+            this.setPosition(200, 140);
+            return this;
+        }
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 
@@ -833,6 +856,7 @@ class WidgetWindow {
      */
     show() {
         this._frame.style.display = "block";
+        window.widgetWindows._handleResize();
     }
 
     /**
@@ -943,7 +967,7 @@ window.widgetWindows.clear = name => {
  * @returns {boolean}
  */
 window.widgetWindows.isOpen = name => {
-    return window.widgetWindows.openWindows[name] ? true : "";
+    return !!window.widgetWindows.openWindows[name];
 };
 
 /**
@@ -989,4 +1013,5 @@ window.widgetWindows.showWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "block";
     });
+    window.widgetWindows._handleResize();
 };

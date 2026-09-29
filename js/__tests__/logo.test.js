@@ -98,7 +98,8 @@ global.Singer = {
     setMasterVolume: jest.fn(),
     clearPitchToFrequencyCache: jest.fn(),
     masterBPM: 90,
-    defaultBPMFactor: 1
+    defaultBPMFactor: 1,
+    masterVolume: [50]
 };
 global.instruments = {};
 global.instrumentsFilters = {};
@@ -788,6 +789,16 @@ describe("Logo initTurtle", () => {
         expect(logo.returns[0]).toEqual([]);
         expect(logo.returns[1]).toEqual([]);
     });
+
+    test("delegates turtle-owned initialization to Turtle.initTurtle", () => {
+        const turtleInit = jest.fn();
+        mockActivity.turtles.ithTurtle.mockReturnValue({ initTurtle: turtleInit });
+
+        logo.initTurtle(3);
+
+        expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(3);
+        expect(turtleInit).toHaveBeenCalledWith(false);
+    });
 });
 
 // ─── Logo step ───────────────────────────────────────────────────────────────
@@ -971,6 +982,37 @@ describe("Logo synth lifecycle", () => {
         expect(global.instrumentsFilters[1].flute).toEqual(["lp"]);
         expect(global.instrumentsEffects[1].flute).toEqual({ reverb: 0.5 });
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
+    });
+
+    test("prepSynths re-initialization uses current masterVolume for new turtles", () => {
+        logo.prepSynths();
+        jest.clearAllMocks();
+
+        Singer.masterVolume = [80];
+
+        const newTurtle = createMockTurtle();
+        mockActivity.turtles.turtleList.push(newTurtle);
+        mockActivity.turtles.ithTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtleCount = jest.fn(() => 3);
+        mockActivity.turtles.turtleCount = jest.fn(() => 3);
+
+        logo.prepSynths();
+
+        expect(newTurtle.singer.synthVolume["electronic synth"]).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise1).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise2).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise3).toEqual([80]);
+        expect(newTurtle.singer.synthVolume[DEFAULTVOICE]).toEqual([80]);
+        expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "2", "electronic synth", 80);
     });
 
     test("resetSynth creates default synth, resets volumes, and starts synth engine", () => {
@@ -1302,6 +1344,29 @@ describe("Logo runLogoCommands", () => {
             expect(trackerRequestedFor("?performance=false")).toBe(false);
             expect(trackerRequestedFor("")).toBe(false);
         });
+    });
+
+    test("a turtle added because every turtle is in the trash gets its synth set up", () => {
+        // With the start block trashed, clicking a lone stack adds a fresh
+        // turtle. It must exist before prepSynths() runs, or its first note
+        // has no instrument to play on.
+        const newTurtle = createMockTurtle();
+        const seenByPrepSynths = [];
+        mockActivity.turtles.turtleCount = jest.fn(() => 0);
+        mockActivity.turtles.addTurtle = jest.fn(() => {
+            mockActivity.turtles.turtleList.push(newTurtle);
+        });
+        logo.prepSynths = jest.fn(() => {
+            seenByPrepSynths.push(...mockActivity.turtles.turtleList);
+        });
+        logo._restoreConnections = jest.fn();
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [{ name: "newnote", trash: false, connections: [null] }];
+
+        logo.runLogoCommands(0, null);
+
+        expect(mockActivity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(seenByPrepSynths).toContain(newTurtle);
     });
 
     describe("the Stop button is shown however a project is started", () => {
@@ -2597,6 +2662,20 @@ describe("Logo parseArg", () => {
             logo.parseArg(logo, 0, 0, null, null);
 
             expect(getIntervalNumber).toHaveBeenCalledWith("fifth");
+        });
+
+        test("handles non-string interval name blocks safely", () => {
+            logo.blockList = [
+                {
+                    name: "intervalname",
+                    value: null,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => false
+                }
+            ];
+
+            const result = logo.parseArg(logo, 0, 0, null, null);
+            expect(result).toBe(0);
         });
     });
 

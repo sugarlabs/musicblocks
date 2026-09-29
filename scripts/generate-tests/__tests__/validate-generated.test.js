@@ -162,6 +162,37 @@ describe("clampNumber", () => {
         }
     );
 
+    it.each([
+        "./utils-logic",
+        "./utils-logic.js",
+        "../../utils-logic",
+        "../../../../../../tmp/evil/utils-logic",
+        "js/utils/utils-logic",
+        "js/utils/utils-logic.js",
+        "utils-logic"
+    ])("rejects %p, which shares the basename but resolves somewhere else", spec => {
+        const source =
+            `const { clampNumber } = require("${spec}");\n` +
+            'describe("clampNumber", () => {\n' +
+            '    it("clamps", () => { expect(clampNumber(9, 0, 3)).toBe(3); });\n' +
+            "});\n";
+        const result = validateGeneratedTest(source, { plan: utilsLogicPlan() });
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(
+            /does not resolve to the module under test from js\/utils\/__tests__\/; require "\.\.\/utils-logic" instead/
+        );
+    });
+
+    it("does not let a wrong-depth require stand in for the module import", () => {
+        const source =
+            'const { clampNumber } = require("./utils-logic");\n' +
+            'describe("clampNumber", () => {\n' +
+            '    it("clamps", () => { expect(clampNumber(9, 0, 3)).toBe(3); });\n' +
+            "});\n";
+        const result = validateGeneratedTest(source, { plan: utilsLogicPlan() });
+        expect(result.errors.join(" ")).toMatch(/does not import the module under test/);
+    });
+
     it("does not accept a look-alike module whose basename only shares a prefix", () => {
         const source =
             'const x = require("../utils-logic-extra");\n' +
@@ -441,6 +472,47 @@ describe("clampNumber", () => {
         );
         expect(result.valid).toBe(false);
         expect(result.errors.join(" ")).toMatch(/spawn processes/);
+    });
+
+    it("rejects child_process loaded through jest.requireActual", () => {
+        const result = validateGeneratedTest(
+            'const cp = jest.requireActual("child_process");\n' +
+                withUtilsLogic(
+                    'describe("x", () => { it("y", () => { cp.execSync("ls"); expect(clampNumber(1,0,2)).toBe(1); }); });'
+                ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/spawn processes/);
+    });
+
+    it("rejects fs loaded through jest.requireActual and its unsafe calls", () => {
+        const result = validateGeneratedTest(
+            'const fs = jest.requireActual("fs");\n' +
+                withUtilsLogic(`
+describe("clampNumber", () => {
+    it("writes a file", () => {
+        fs.writeFileSync("x.txt", "boom");
+        expect(clampNumber(1, 0, 2)).toBe(1);
+    });
+});`),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(/filesystem module/);
+        expect(result.errors.join(" ")).toMatch(/unsafe filesystem operation: writeFileSync/);
+    });
+
+    it("still accepts jest.requireActual of the module under test", () => {
+        const result = validateGeneratedTest(
+            'const actual = jest.requireActual("../utils-logic");\n' +
+                withUtilsLogic(
+                    'describe("x", () => { it("y", () => { expect(actual.clampNumber(9, 0, 3)).toBe(3); }); });'
+                ),
+            { plan: utilsLogicPlan() }
+        );
+        expect(result.errors).toEqual([]);
+        expect(result.valid).toBe(true);
     });
 
     it("does NOT treat a same-named method on an arbitrary receiver as an fs op", () => {

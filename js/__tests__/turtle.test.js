@@ -2,7 +2,7 @@ require("../turtle");
 const Turtle = global.Turtle;
 // Mock all external dependencies
 global.importMembers = jest.fn();
-global.Singer = jest.fn().mockImplementation(() => ({
+const defaultSingerState = () => ({
     attack: [],
     decay: [],
     sustain: [],
@@ -48,7 +48,7 @@ global.Singer = jest.fn().mockImplementation(() => ({
     inDuplicate: false,
     skipFactor: 1,
     skipIndex: 0,
-    instrumentNames: [],
+    instrumentNames: [global.DEFAULTVOICE || "electronic synth"],
     inCrescendo: [],
     crescendoDelta: [],
     crescendoInitialVolume: {},
@@ -90,7 +90,7 @@ global.Singer = jest.fn().mockImplementation(() => ({
     invertList: [],
     beatList: [],
     factorList: [],
-    keySignature: "",
+    keySignature: "C major",
     pitchDrumTable: {},
     defaultStrongBeats: false,
     pickup: 0,
@@ -105,13 +105,33 @@ global.Singer = jest.fn().mockImplementation(() => ({
     suppressOutput: false,
     dispatchFactor: 1,
     runningFromEvent: false
-}));
-global.Painter = jest.fn().mockImplementation(() => ({
-    cp1x: 0,
-    cp1y: 100,
-    cp2x: 100,
-    cp2y: 100
-}));
+});
+
+global.Singer = jest.fn().mockImplementation(() => {
+    const instance = defaultSingerState();
+    instance.reset = jest.fn(function (suppressOutput = false) {
+        Object.assign(this, defaultSingerState());
+        this.suppressOutput = suppressOutput;
+    });
+    instance.killAllVoices = jest.fn();
+    return instance;
+});
+
+global.Painter = jest.fn().mockImplementation(() => {
+    const instance = {
+        cp1x: 0,
+        cp1y: 100,
+        cp2x: 100,
+        cp2y: 100
+    };
+    instance.reset = jest.fn(function () {
+        this.cp1x = 0;
+        this.cp1y = 100;
+        this.cp2x = 100;
+        this.cp2y = 100;
+    });
+    return instance;
+});
 global.delayExecution = jest.fn();
 global.DEFAULTVOICE = "electronic synth";
 global.DEFAULTVOLUME = 50;
@@ -123,6 +143,21 @@ describe("Turtle", () => {
     beforeEach(() => {
         mockActivity = { refreshCanvas: jest.fn() };
         turtle = new Turtle(mockActivity, 0, "turtle1", {}, null);
+    });
+
+    describe("component ownership", () => {
+        test("gives each turtle independent Singer and Painter instances", () => {
+            const secondTurtle = new Turtle(mockActivity, 1, "turtle2", {}, null);
+
+            expect(turtle.singer).not.toBe(secondTurtle.singer);
+            expect(turtle.painter).not.toBe(secondTurtle.painter);
+
+            turtle.singer.currentOctave = 7;
+            turtle.painter.cp1x = 42;
+
+            expect(secondTurtle.singer.currentOctave).toBe(4);
+            expect(secondTurtle.painter.cp1x).toBe(0);
+        });
     });
 
     describe("blinking()", () => {
@@ -178,6 +213,46 @@ describe("Turtle", () => {
             turtle.inSetTimbre = true;
             turtle.initTurtle(false);
             expect(turtle.inSetTimbre).toBe(false);
+        });
+
+        it("should reset representative Singer state groups", () => {
+            turtle.singer.currentOctave = 7;
+            turtle.singer.beatFactor = 3;
+            turtle.singer.instrumentNames = ["piano"];
+            turtle.singer.vibratoRate = [12];
+            turtle.singer.transposition = 4;
+            turtle.singer.intervals = [2];
+            turtle.singer.swing = [0.5];
+            turtle.singer.staccato = [0.25];
+            turtle.singer.tie = true;
+            turtle.singer.justCounting = [1];
+
+            turtle.initTurtle(false);
+
+            expect(turtle.singer.currentOctave).toBe(4);
+            expect(turtle.singer.beatFactor).toBe(1);
+            expect(turtle.singer.instrumentNames).toEqual([DEFAULTVOICE]);
+            expect(turtle.singer.vibratoRate).toEqual([]);
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.intervals).toEqual([]);
+            expect(turtle.singer.swing).toEqual([]);
+            expect(turtle.singer.staccato).toEqual([]);
+            expect(turtle.singer.tie).toBe(false);
+            expect(turtle.singer.justCounting).toEqual([]);
+        });
+
+        it("should reset Painter control-point state", () => {
+            turtle.painter.cp1x = 42;
+            turtle.painter.cp1y = 43;
+            turtle.painter.cp2x = 44;
+            turtle.painter.cp2y = 45;
+
+            turtle.initTurtle(false);
+
+            expect(turtle.painter.cp1x).toBe(0);
+            expect(turtle.painter.cp1y).toBe(100);
+            expect(turtle.painter.cp2x).toBe(100);
+            expect(turtle.painter.cp2y).toBe(100);
         });
 
         it("should reset singer.scalarTransposition to 0", () => {
@@ -249,6 +324,34 @@ describe("Turtle", () => {
         it("should initialize butNotThese as empty object", () => {
             turtle.initTurtle(false);
             expect(turtle.butNotThese).toEqual({});
+        });
+
+        it("should delegate to painter.reset() and singer.reset(suppressOutput)", () => {
+            turtle.initTurtle(true);
+            expect(turtle.painter.reset).toHaveBeenCalled();
+            expect(turtle.singer.reset).toHaveBeenCalledWith(true);
+        });
+
+        it("should invoke singer.killAllVoices() and clean up pending unhighlight timers and delayTimeout", () => {
+            turtle.delayTimeout = 999;
+            const clearTimeoutSpy = jest.fn();
+            turtle.activity = {
+                logo: {
+                    _timerManager: {
+                        clearTimeout: clearTimeoutSpy
+                    }
+                }
+            };
+            turtle.singer._unhighlightTimers = { blk1: 101, blk2: 102 };
+
+            turtle.initTurtle(false);
+
+            expect(turtle.singer.killAllVoices).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(999);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(101);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(102);
+            expect(turtle.delayTimeout).toBeNull();
+            expect(turtle.singer._unhighlightTimers).toEqual({});
         });
     });
 

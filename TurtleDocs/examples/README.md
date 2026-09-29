@@ -140,7 +140,7 @@ There is more information about the Turtle Confusion projects [here](../guide/Co
 | bezier.tb | draw bezier curves |
 | dice.tb | simulate rolling dice plot |
 | dragon-curve.tb | colorful dragon curve |
-| Dragon-Curve.tb | fractal dragon curve |
+| fractal-dragon-curve.tb | fractal dragon curve |
 | expected-value.tb | Calculate the expected value for flipping coins with three heads or tails in a row. |
 | factors.tb | Animate the factors of the integers between 2 and 100.|
 | flashingSpirals.tb | Move the mouse in a spiral over a flashing screen. |

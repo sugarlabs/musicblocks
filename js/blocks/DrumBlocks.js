@@ -550,7 +550,7 @@ function setupDrumBlocks(activity) {
                 arg = DEFAULTDRUM;
             }
 
-            let drumname = Singer.DrumActions.GetDrumname(args[0]);
+            let drumname = Singer.DrumActions.GetDrumname(arg);
 
             const tur = activity.turtles.ithTurtle(turtle);
 
@@ -594,10 +594,10 @@ function setupDrumBlocks(activity) {
                     last(activity.blocks.blockList[blk].connections) === null)
             ) {
                 // Handle other contexts
-                Singer.DrumActions.playDrum(args[0], turtle, blk);
+                Singer.DrumActions.playDrum(arg, turtle, blk);
             } else {
                 // Runtime playback: in-note or stand-alone under Start / flow
-                Singer.DrumActions.playDrum(args[0], turtle, blk);
+                Singer.DrumActions.playDrum(arg, turtle, blk);
             }
 
             /**

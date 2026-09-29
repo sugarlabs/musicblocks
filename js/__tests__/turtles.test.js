@@ -751,6 +751,100 @@ describe("aux toolbar collapse and expand", () => {
             }
         }
     });
+
+    test("Escape key on canvas buttons exits keyboard navigation", () => {
+        const listeners = [];
+        const originalCreateElement = document.createElement;
+        document.createElement = function (tag) {
+            const el = originalCreateElement.call(document, tag);
+            const originalAddEventListener = el.addEventListener;
+            el.addEventListener = function (event, handler) {
+                if (event === "keydown") listeners.push(handler);
+                originalAddEventListener.call(this, event, handler);
+            };
+            return el;
+        };
+
+        const originalJQuery = window.jQuery;
+        const mockJQuery = jest.fn(() => ({
+            tooltip: jest.fn(),
+            each: jest.fn(function (cb) {
+                cb.call(document.createElement("div"));
+                return this;
+            })
+        }));
+        mockJQuery.noConflict = jest.fn(() => mockJQuery);
+        window.jQuery = mockJQuery;
+        global.jQuery = mockJQuery;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        global.makeKeyboardAccessible = jest.fn();
+
+        const originalImage = global.Image;
+        global.Image = function () {
+            const img = document.createElement("img");
+            const originalSetAttribute = img.setAttribute;
+            img.setAttribute = jest.fn(function (name, value) {
+                return originalSetAttribute.call(img, name, value);
+            });
+            Object.defineProperty(img, "src", {
+                set: function (val) {
+                    this.setAttribute("src", val);
+                    if (typeof this.onload === "function") {
+                        this.onload();
+                    }
+                },
+                get: function () {
+                    return this.getAttribute("src");
+                }
+            });
+            return img;
+        };
+
+        const activityMock = {
+            toolbarHeight: 0,
+            loading: false,
+            getCanvasPadding: jest.fn(() => ({ paddingTop: 0, paddingLeft: 0 })),
+            refreshCanvas: jest.fn()
+        };
+        const turtles = new Turtles(activityMock);
+        mixinPrototypes(turtles);
+        turtles.activity = activityMock; // Manually assign activity just in case importMembers is mocked
+        turtles._borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
+        turtles._canvas = { style: {}, getContext: jest.fn(), width: 1200, height: 900 };
+        turtles.stage = { addChild: jest.fn() };
+        turtles._backgroundColor = "white"; // Add to prevent crash
+        turtles._expandedBoundary = null;
+        turtles._collapsedBoundary = null;
+        turtles._expandButton = null;
+        turtles._collapseButton = null;
+        turtles.gridButton = null;
+        turtles._clearButton = null;
+
+        window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
+
+        turtles.makeBackground();
+
+        expect(listeners.length).toBeGreaterThan(0);
+
+        const handler = listeners[0];
+
+        handler({ key: "A", preventDefault: jest.fn(), stopPropagation: jest.fn() });
+        expect(window._focusCycleManager.exitKeyboardNavigation).not.toHaveBeenCalled();
+
+        const preventDefault = jest.fn();
+        const stopPropagation = jest.fn();
+        handler({ key: "Escape", preventDefault, stopPropagation });
+
+        expect(preventDefault).toHaveBeenCalled();
+        expect(stopPropagation).toHaveBeenCalled();
+        expect(window._focusCycleManager.exitKeyboardNavigation).toHaveBeenCalled();
+
+        document.createElement = originalCreateElement;
+        window.jQuery = originalJQuery;
+        global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        global.Image = originalImage;
+        delete window._focusCycleManager;
+    });
 });
 
 describe("TurtlesModel doGrid initialization order", () => {
@@ -981,5 +1075,110 @@ describe("TurtlesModel.removeTurtle", () => {
 
         expect(model._turtleList).toEqual([turtle]);
         expect(stage.removeChild).not.toHaveBeenCalled();
+    });
+});
+
+describe("Turtle hover scaling and lifecycle", () => {
+    let activityMock;
+    let turtles;
+    let eventListeners;
+    let mockTurtle;
+
+    beforeEach(() => {
+        eventListeners = {};
+        mockTurtle = {
+            id: 1,
+            name: "start",
+            running: false,
+            container: {
+                scaleX: 1,
+                scaleY: 1,
+                scale: 1,
+                on: jest.fn((event, handler) => {
+                    eventListeners[event] = handler;
+                }),
+                removeAllEventListeners: jest.fn()
+            }
+        };
+
+        activityMock = {
+            stage: {
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                dispatchEvent: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            turtleContainer: new createjs.Container(),
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+            closeHelpfulWheel
+        };
+
+        global.Turtle = jest.fn().mockImplementation(() => mockTurtle);
+
+        turtles = new Turtles(activityMock);
+        turtles.activity = activityMock;
+        turtles.getTurtleCount = jest.fn().mockReturnValue(0);
+        turtles.pushTurtle = jest.fn();
+        turtles.addTurtleStageProps = jest.fn();
+        turtles.createArtwork = jest.fn();
+        turtles.createHitArea = jest.fn();
+        turtles.addTurtleGraphicProps = jest.fn();
+        turtles.isShrunk = jest.fn().mockReturnValue(false);
+
+        document.body.innerHTML = '<div id="loader"></div>';
+        turtles.add({ name: "start", value: 0 }, { id: 1, name: "start" });
+    });
+
+    test("scales up turtle container by 1.2 on mouseover and restores on mouseout", () => {
+        expect(eventListeners.mouseover).toBeDefined();
+        expect(eventListeners.mouseout).toBeDefined();
+
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1.2);
+        expect(mockTurtle._isHovered).toBe(true);
+
+        eventListeners.mouseout();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1);
+        expect(mockTurtle._isHovered).toBe(false);
+    });
+
+    test("does not compound scale on duplicate mouseover events", () => {
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1.2);
+
+        // Second mouseover while still hovered should be ignored
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1.2);
+    });
+
+    test("restores original scale on mouseout even if turtle is running", () => {
+        mockTurtle.container.scaleX = 4;
+        mockTurtle.container.scaleY = 4;
+        mockTurtle.container.scale = 4;
+
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(4 * 1.2);
+        expect(mockTurtle.container.scaleY).toBeCloseTo(4 * 1.2);
+        expect(mockTurtle.container.scale).toBeCloseTo(4 * 1.2);
+
+        // Turtle starts running while hovered
+        mockTurtle.running = true;
+
+        // Mouse leaves while running
+        eventListeners.mouseout();
+
+        // Scale should be restored to base values across all dimensions
+        expect(mockTurtle.container.scaleX).toBeCloseTo(4);
+        expect(mockTurtle.container.scaleY).toBeCloseTo(4);
+        expect(mockTurtle.container.scale).toBeCloseTo(4);
+        expect(mockTurtle._isHovered).toBe(false);
+    });
+
+    test("ignores mouseout if turtle was not hovered", () => {
+        mockTurtle.container.scaleX = 1;
+        eventListeners.mouseout();
+        expect(mockTurtle.container.scaleX).toBe(1);
     });
 });

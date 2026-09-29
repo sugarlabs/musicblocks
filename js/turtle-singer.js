@@ -90,15 +90,9 @@ const getOctaveInterval = activity => {
  * Class pertaining to music related actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Singer for each Turtle component. It is responsible
- * for the music related actions of the Turtle, including playing them while using utility functions
- * in utils/musicutils.js.
- *
- * @todo move music related states from logo.js to here eventually.
- * As of now, the state variables are completely present in logo.js. To ensure modularity and
- * independence of components, Logo should contain members only related to execution of blocks while
- * the logic of execution of blocks should be present in respective files in blocks/ directory,
- * which should eventually use members of this file and turtle-painter.js to proceed.
+ * @classdesc This is the prototype of the Singer for each Turtle component. It owns the
+ * per-turtle music state and actions, including playing music with utility functions in
+ * utils/musicutils.js.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -111,7 +105,29 @@ class Singer {
      */
     constructor(turtle) {
         this.turtle = turtle;
-        this.turtles = turtle.turtles;
+        this.turtles = turtle && turtle.turtles ? turtle.turtles : null;
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+        this.synthVolume = {};
+        this.panner = null;
+
+        this.reset();
+    }
+
+    /**
+     * Resets all musical and audio runtime state to clean initial defaults.
+     * Ensures consistent state across consecutive project runs.
+     *
+     * @param {boolean} [suppressOutput=false] - Whether to suppress audio output (e.g. during notation export).
+     * @returns {void}
+     */
+    reset(suppressOutput = false) {
+        if (this.activeVoices && typeof this.activeVoices.clear === "function") {
+            this.activeVoices.clear();
+        } else {
+            this.activeVoices = new Set();
+        }
+        this._unhighlightTimers = {};
 
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
@@ -196,7 +212,6 @@ class Singer {
         this.tieNoteExtras = [];
         this.tieCarryOver = 0;
         this.tieFirstDrums = [];
-        this.synthVolume = {};
         this.drift = 0;
         // Maximum fraction of note duration that can be used for lag correction per note.
         // This prevents notes from being rushed when catching up to the master clock.
@@ -222,7 +237,6 @@ class Singer {
         this.neighborArgNote2 = [];
         this.neighborArgBeat = [];
         this.neighborArgCurrentBeat = [];
-        this.panner = null;
 
         this.inNoteBlock = [];
         this.multipleVoices = false;
@@ -248,12 +262,10 @@ class Singer {
         this.justMeasuring = [];
         this.firstPitch = [];
         this.lastPitch = [];
-        this.suppressOutput = false;
+        this.suppressOutput = Boolean(suppressOutput);
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
-
-        // Voice Manager: Track active audio sources for proper cleanup
-        this.activeVoices = new Set();
+        this.runningFromEvent = false;
     }
 
     /**
@@ -400,7 +412,6 @@ class Singer {
                           );
                 // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
                 // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
-                // ponytail: linear 12/modeEdo rescale, per-ratio lookup if cents drift matters
                 const stepSemis = (stepCount * 12) / modeEdo;
                 noteObj = getNote(
                     noteObj[0],
@@ -904,7 +915,9 @@ class Singer {
                 tur.singer.lastPitch.push(pitchNumber);
             }
         } else if (activity.logo.inPitchDrumMatrix) {
-            if (note.toLowerCase() !== "rest") {
+            // A rest ("rest" or "r") is not a row, and a pitch inside Set Drum
+            // becomes a drum column instead.
+            if (!["rest", "r"].includes(note.toLowerCase()) && tur.singer.drumStyle.length === 0) {
                 activity.logo.pitchDrumMatrix.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
                     activity.logo.pitchBlocks.push(blk);
@@ -937,7 +950,7 @@ class Singer {
                     ? getSolfege(
                           nnote[0],
                           tur.singer.keySignature,
-                          tur.singer.movable,
+                          false, // getNote already applied movable Do; widgets use fixed Do
                           activity.logo.synth.inTemperament,
                           edo
                       )
@@ -945,6 +958,7 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    activity.logo.pitchDrumMatrix.addColBlock(blk);
                 } else {
                     activity.logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
                     activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
@@ -1110,7 +1124,7 @@ class Singer {
 
                         tur.singer.arpeggioIndex += 1;
                     }
-                    if (tur.singer.arpeggioIndex === alen) {
+                    if (tur.singer.arpeggioIndex >= alen) {
                         tur.singer.arpeggioIndex = 0;
                     }
                 }
@@ -1345,7 +1359,7 @@ class Singer {
                 ? getSolfege(
                       nnote[0],
                       tur.singer.keySignature,
-                      tur.singer.movable,
+                      false, // getNote already applied movable Do; widgets use fixed Do
                       activity.logo.synth.inTemperament,
                       edo
                   )
@@ -1624,7 +1638,7 @@ class Singer {
                 Singer.setSynthVolume(
                     activity.logo,
                     turtle,
-                    DEFAULTVOICE,
+                    synth,
                     last(tur.singer.synthVolume[synth])
                 );
             }
@@ -1774,7 +1788,7 @@ class Singer {
                 activity.logo.phraseMaker.addColBlock(blk, 1);
 
                 // block ID of parent "matrix" block
-                const mat_block = activity.logo.phraseMaker.blockNo || -1;
+                const mat_block = activity.logo.phraseMaker.blockNo ?? -1;
 
                 for (let i = 0; i < activity.logo.pitchBlocks.length; i++) {
                     activity.logo.phraseMaker.addNode(
@@ -2271,13 +2285,6 @@ class Singer {
                             }
 
                             notes.push(note);
-                            console.log(
-                                i +
-                                    "]=" +
-                                    note +
-                                    " temperament=" +
-                                    activity.logo.synth.inTemperament
-                            );
                         }
 
                         if (duration > 0) {
@@ -2791,6 +2798,10 @@ class Singer {
         pitchToFrequencyCache.clear();
     }
 }
+
+// Exposed for tests that need to exercise the real cache alongside
+// clearPitchToFrequencyCache(), rather than mocking the class methods.
+Singer.getCachedPitchToFrequency = getCachedPitchToFrequency;
 
 // Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {

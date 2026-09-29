@@ -1105,6 +1105,10 @@ class HelpWidget {
     }
 }
 
+if (typeof window !== "undefined") {
+    window.HelpWidget = HelpWidget;
+}
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = HelpWidget;
 }
