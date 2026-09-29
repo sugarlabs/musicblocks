@@ -331,7 +331,10 @@ describe("MusicKeyboard add-row submenu", () => {
         ]);
     });
 
+    // Only checks which pitch block Add Note creates. The row insertion it
+    // schedules for 500 ms later is cancelled so it can't run after the test.
     const addPitchToLayout = layout => {
+        jest.useFakeTimers();
         const loadNewBlocks = jest.fn();
         const keyboard = new MusicKeyboard({
             canvas: { width: 800, height: 600 },
@@ -339,10 +342,17 @@ describe("MusicKeyboard add-row submenu", () => {
             errorMsg: jest.fn(),
             blocks: { blockList: [], loadNewBlocks }
         });
-        keyboard.layout = layout;
-        keyboard._createAddRowPieSubmenu();
-        keyboard._menuWheel.selectedNavItemIndex = 0;
-        keyboard._menuWheel.navItems[0].navigateFunction();
+        try {
+            keyboard.layout = layout;
+            keyboard._createAddRowPieSubmenu();
+            keyboard._menuWheel.selectedNavItemIndex = 0;
+            keyboard._menuWheel.navItems[0].navigateFunction();
+            keyboard._clearWidgetTimers();
+            expect(jest.getTimerCount()).toBe(0);
+        } finally {
+            keyboard._clearWidgetTimers();
+            jest.useRealTimers();
+        }
         return { keyboard, loadNewBlocks };
     };
 
