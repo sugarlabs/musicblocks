@@ -571,11 +571,18 @@
 	    below the circle explains the colors.</p>
 	  <p>Click a dot to select it and hear its pitch; the selected dot gets a
 	    yellow ring and its table row is highlighted. Drag a dot around the
-	    circle to retune it (clamped between its neighbors). Double-click a
-	    Frequency, Cents, or Ratio cell to type an exact value. Right-click
+	    circle to retune it (clamped between its neighbors). Right-click
 	    (or long-press) a dot or row for <code>Set cents</code> and <code>Reset to 12-EDO</code>.
-	    Arrow keys move the selection; Enter or Space plays it. The tonic
-	    (<code>Step 0</code>) is locked and cannot be dragged, edited, or removed.</p>
+	    The tonic (<code>Step 0</code>) is locked and cannot be dragged, edited, or
+	    removed.</p>
+	  <p>To enter an exact value, double-click a cell in the table's
+	    <em>Frequency (Hz)</em>, <em>Cents dev. from 12-EDO</em>, or <em>Ratio</em> column. An
+	    input field opens, bounded by the neighboring pitches; press <code>Enter</code>
+	    to confirm or <code>Escape</code> to cancel.</p>
+	  <p>When the circle has keyboard focus, the arrow keys step through the
+	    pitches starting from <code>Step 0</code> and play each one; <code>Enter</code> or
+	    <code>Space</code> replays the last keyboard-played pitch. This is separate from the
+	    click selection (yellow ring).</p>
 	  <p><img alt="widget" src="./temperament-visualizer-table.svg" title="temperament pitch table" /></p>
 	  <p>The table below the circle lists every pitch, highest first. Columns
 	    are <em>Pitch</em> (note name with <code>^</code>/<code>v</code> deviation arrows), <em>Step</em>,
@@ -596,8 +603,9 @@
 	    midway between the selected pitch and its clockwise (after) or
 	    counter-clockwise (before) neighbor, or into the largest gap when
 	    nothing is selected;</p>
-	  <p><em>Remove selected pitch</em>, which deletes the selected pitch (except the
-	    tonic);</p>
+	  <p><em>Remove selected pitch</em>, which deletes the selected pitch &mdash; or the
+	    last pitch when nothing is selected &mdash; except the tonic, which cannot
+	    be removed;</p>
 	  <p><em>Create new temperament</em>, which opens the advanced Equal, Ratio,
 	    Arbitrary, and Octave-Space editors; and</p>
 	  <p><em>Close</em>, which closes the widget.</p>

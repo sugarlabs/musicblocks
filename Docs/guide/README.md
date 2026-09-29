@@ -2430,11 +2430,20 @@ below the circle explains the colors.
 
 Click a dot to select it and hear its pitch; the selected dot gets a
 yellow ring and its table row is highlighted. Drag a dot around the
-circle to retune it (clamped between its neighbors). Double-click a
-Frequency, Cents, or Ratio cell to type an exact value. Right-click
+circle to retune it (clamped between its neighbors). Right-click
 (or long-press) a dot or row for `Set cents` and `Reset to 12-EDO`.
-Arrow keys move the selection; Enter or Space plays it. The tonic
-(`Step 0`) is locked and cannot be dragged, edited, or removed.
+The tonic (`Step 0`) is locked and cannot be dragged, edited, or
+removed.
+
+To enter an exact value, double-click a cell in the table's
+*Frequency (Hz)*, *Cents dev. from 12-EDO*, or *Ratio* column. An
+input field opens, bounded by the neighboring pitches; press `Enter`
+to confirm or `Escape` to cancel.
+
+When the circle has keyboard focus, the arrow keys step through the
+pitches starting from `Step 0` and play each one; `Enter` or `Space`
+replays the last keyboard-played pitch. This is separate from the
+click selection (yellow ring).
 
 ![widget](./temperament-visualizer-table.svg "temperament pitch table")
 
@@ -2464,8 +2473,9 @@ midway between the selected pitch and its clockwise (after) or
 counter-clockwise (before) neighbor, or into the largest gap when
 nothing is selected;
 
-*Remove selected pitch*, which deletes the selected pitch (except the
-tonic);
+*Remove selected pitch*, which deletes the selected pitch — or the
+last pitch when nothing is selected — except the tonic, which cannot
+be removed;
 
 *Create new temperament*, which opens the advanced Equal, Ratio,
 Arbitrary, and Octave-Space editors; and
