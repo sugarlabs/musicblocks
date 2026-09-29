@@ -31,65 +31,78 @@ global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 // These tests cover the module boundary (exports, globals, reachability through musicutils.js);
 // musicutils.test.js already covers the music-theory behavior of these functions.
 
-const pitchscale = require("../musicutils-pitchscale");
+const buildscale = require("../musicutils-buildscale");
 const musicutils = require("../musicutils");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
-describe("musicutils-pitchscale", () => {
-    it("still resolves a pitch, a scale degree number, and a key signature's mode", () => {
-        expect(pitchscale.getNote("F", 4, 0, "G major")).toEqual(["F", 4, 0]);
-        expect(pitchscale.pitchToNumber("C", 4, "C major", "equal")).toBe(39);
-        expect(pitchscale.numberToPitch(60, "equal")).toEqual(["A", 5]);
-        expect(pitchscale.keySignatureToMode("G major")).toEqual(["G", "major"]);
-        expect(pitchscale.getSharpFlatPreference("G major")).toBe("sharp");
+describe("musicutils-buildscale", () => {
+    it("still builds a scale and resolves frequencies", () => {
+        expect(buildscale.buildScale("C major", 12)[0].slice(0, 3)).toEqual(["C", "D", "E"]);
+        expect(buildscale.pitchToFrequency("A", 4, 0, "C major", "equal")).toBeCloseTo(440, 5);
+        expect(buildscale.noteToFrequency("A4", "C major", "equal")).toBeCloseTo(440, 5);
+        expect(buildscale.getNonEDOFrequency(0, 4, "just intonation", "C major")).toEqual({
+            freq: 264,
+            noteName: "C",
+            octave: 4
+        });
     });
 
-    it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
-        expect(pitchscale.getNoteFromSolfege("sol", "C major", true, 12, 4, 0)).toEqual([
-            "G",
-            4,
-            0
-        ]);
-        expect(pitchscale.getNoteFromSolfege("xyz", "C major", true, 12, 4, 0)).toBeNull();
+    it("still resolves scale degrees, step sizes and intervals", () => {
+        expect(buildscale.getModeLength("C major")).toBe(7);
+        expect(buildscale.scaleDegreeToPitchMapping("C major", 2, false, null)).toBe("D");
+        expect(buildscale.scaleDegreeToPitchMapping("C major", 1, true, null)).toBe("C");
+        expect(buildscale.nthDegreeToPitch("C major", 3)).toEqual(["E", 0]);
+        expect(buildscale._getStepSize("C major", "C", "up", 0, "equal")).toBe(2);
+        expect(buildscale._getStepSize("C major", "D", "down", 0, "equal")).toBe(-2);
+        expect(buildscale._getStepSize("C major", "C♯", "up", 0, "equal")).toBe(1);
+        expect(buildscale._getStepSize("C major", "C♯", "down", 0, "equal")).toBe(-1);
+        expect(buildscale._getStepSize("C major", "C", "up", 0, "equal19", 19)).toBe(3);
+        expect(buildscale.getInterval(4, "C major", "C")).toBe(7);
+        expect(buildscale.getInterval(-2, "C major", "C")).toBe(-3);
     });
 
-    it("gives a key signature's scale, solfege slots, tonic and mode together", () => {
-        const [scale, solfege, tonic, mode] = pitchscale.getScaleAndHalfSteps("C major");
-        expect(scale).toHaveLength(12);
-        expect(solfege).toHaveLength(12);
-        expect(tonic).toBe("C");
-        expect(mode).toBe("major");
+    it("still resolves a minor key signature's scale and solfege", () => {
+        expect(buildscale.buildScale("A minor", 12)[0].slice(0, 3)).toEqual(["A", "B", "C"]);
+        expect(buildscale.getSolfege("A", "A minor", false, "equal")).toBe("la");
+    });
+
+    it("still resolves solfege for a key signature", () => {
+        expect(buildscale.getSolfege("C", "C major", true, "equal")).toBe("do");
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
-            "keySignatureToMode",
-            "getScaleAndHalfSteps",
-            "getSharpFlatPreference",
-            "pitchToNumber",
-            "getNoteFromInterval",
-            "numberToPitch",
-            "getNote"
+            "buildScale",
+            "pitchToFrequency",
+            "getNonEDOFrequency",
+            "getModeLength",
+            "scaleDegreeToPitchMapping",
+            "nthDegreeToPitch",
+            "_getStepSize",
+            "getInterval",
+            "noteToFrequency",
+            "computeTargetPitchFrequency",
+            "getSolfege"
         ]) {
-            expect(musicutils[name]).toBe(pitchscale[name]);
+            expect(musicutils[name]).toBe(buildscale[name]);
         }
     });
 
-    it("exports every function and table the file declares", () => {
-        const source = readSource("musicutils-pitchscale.js");
+    it("exports every function the file declares", () => {
+        const source = readSource("musicutils-buildscale.js");
         const declared = [
             ...source.matchAll(/^var (\w+) =/gm),
             ...source.matchAll(/^function (\w+)\(/gm)
         ]
             .map(match => match[1])
-            .filter(name => name !== "MusicUtilsPitchScale");
-        expect(Object.keys(pitchscale).sort()).toEqual(declared.sort());
+            .filter(name => name !== "MusicUtilsBuildScale");
+        expect(Object.keys(buildscale).sort()).toEqual(declared.sort());
     });
 
     it("does not define anything that musicutils.js also defines", () => {
         const remaining = readSource("musicutils.js");
-        for (const name of Object.keys(pitchscale)) {
+        for (const name of Object.keys(buildscale)) {
             expect(remaining).not.toMatch(new RegExp(`^(const|let|var|function) ${name}\\b`, "m"));
         }
     });
@@ -128,25 +141,23 @@ describe("musicutils-pitchscale", () => {
             return sandbox;
         };
 
-        it("loads between the mode/chord core module and musicutils.js without errors", () => {
+        it("loads after the pitch/scale cycle and before musicutils.js without errors", () => {
             expect(() => load(order)).not.toThrow();
         });
 
         it("leaves every declared name visible as a bare global", () => {
             const sandbox = load(order);
-            for (const name of Object.keys(pitchscale)) {
-                if (name === "MusicUtilsPitchScale") continue;
+            for (const name of Object.keys(buildscale)) {
+                if (name === "MusicUtilsBuildScale") continue;
                 expect(vm.runInContext(`typeof ${name}`, sandbox)).not.toBe("undefined");
             }
         });
 
         it("publishes the module object for the RequireJS shim", () => {
             const sandbox = load(order);
-            expect(sandbox.window.MusicUtilsPitchScale.getNote("F", 4, 0, "G major")).toEqual([
-                "F",
-                4,
-                0
-            ]);
+            expect(
+                sandbox.window.MusicUtilsBuildScale.buildScale("C major", 12)[0].slice(0, 3)
+            ).toEqual(["C", "D", "E"]);
         });
     });
 });
