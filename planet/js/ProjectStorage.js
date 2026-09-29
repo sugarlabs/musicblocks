@@ -289,14 +289,26 @@ class ProjectStorage {
     }
 
     /**
-     * Drops the drafts that have already been pushed to GitHub, keeping pending ones.
+     * Drops the synced drafts that the given commits already represent, keeping pending drafts
+     * and any synced draft with no matching commit. Synced drafts have no sha (PUT /edit returns
+     * none), so each commit is matched to the newest synced draft with the same message.
      * @param {string} id  project ID
+     * @param {Array<{message: string}>} commits  commits already stored in the history cache
      * @returns {Promise<void>}
      */
-    async removeSyncedDrafts(id) {
+    async removeSyncedDrafts(id, commits) {
         const drafts = this.data.Projects[id]?.commitDrafts;
-        if (!Array.isArray(drafts) || !drafts.some(d => d.status === "synced")) return;
-        this.data.Projects[id].commitDrafts = drafts.filter(d => d.status !== "synced");
+        if (!Array.isArray(drafts) || !Array.isArray(commits) || commits.length === 0) return;
+        const synced = drafts
+            .filter(d => d.status === "synced")
+            .sort((a, b) => b.timestamp - a.timestamp);
+        const remove = new Set();
+        for (const commit of commits) {
+            const match = synced.find(d => !remove.has(d) && d.message === commit.message);
+            if (match) remove.add(match);
+        }
+        if (remove.size === 0) return;
+        this.data.Projects[id].commitDrafts = drafts.filter(d => !remove.has(d));
         await this.save();
     }
 

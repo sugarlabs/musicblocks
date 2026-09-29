@@ -23,6 +23,7 @@ class MockNetworkMonitor {
 global.NetworkMonitor = MockNetworkMonitor;
 
 const OfflineCommitManager = require("../OfflineCommitManager");
+const ProjectStorage = require("../ProjectStorage");
 
 describe("OfflineCommitManager", () => {
     let storage;
@@ -95,10 +96,10 @@ describe("OfflineCommitManager", () => {
                     if (sha) draft.sha = sha;
                 }
             }),
-            removeSyncedDrafts: jest.fn(async id => {
-                const proj = storage.data.Projects[id];
-                if (proj) proj.commitDrafts = proj.commitDrafts.filter(d => d.status !== "synced");
-            })
+            removeSyncedDrafts: jest.fn(async (id, commits) =>
+                ProjectStorage.prototype.removeSyncedDrafts.call(storage, id, commits)
+            ),
+            save: jest.fn(async () => {})
         };
 
         server = {
@@ -490,6 +491,49 @@ describe("OfflineCommitManager", () => {
             await manager.refreshCache("p1", "my-jazz-project-12345678");
 
             expect(storage.data.Projects.p1.commitDrafts.map(d => d.id)).toEqual(["d2"]);
+        });
+
+        test("refreshCache keeps synced drafts the cached history doesn't cover", async () => {
+            storage.data.Projects.p1.commitDrafts = [1, 2, 3, 4, 5].map(i => ({
+                id: `d${i}`,
+                message: `Save ${i}`,
+                timestamp: i * 1000,
+                status: "synced",
+                sha: null
+            }));
+            server.getCommitHistory.mockImplementation((repo, cb) => {
+                cb({
+                    success: true,
+                    data: [5, 4, 3].map(i => ({
+                        sha: `s${i}`,
+                        message: `Save ${i}`,
+                        date: "2026-08-01"
+                    }))
+                });
+            });
+
+            await manager.refreshCache("p1", "my-jazz-project-12345678");
+
+            expect(storage.data.Projects.p1.commitDrafts.map(d => d.id)).toEqual(["d1", "d2"]);
+            expect(
+                manager
+                    .getLocalHistory("p1")
+                    .map(c => c.message)
+                    .sort()
+            ).toEqual(["Save 1", "Save 2", "Save 3", "Save 4", "Save 5"]);
+        });
+
+        test("refreshCache keeps synced drafts when the history is empty", async () => {
+            storage.data.Projects.p1.commitDrafts = [
+                { id: "d1", message: "Added chords", timestamp: 1000, status: "synced", sha: null }
+            ];
+            server.getCommitHistory.mockImplementation((repo, cb) => {
+                cb({ success: true, data: [] });
+            });
+
+            await manager.refreshCache("p1", "my-jazz-project-12345678");
+
+            expect(storage.data.Projects.p1.commitDrafts.length).toBe(1);
         });
 
         test("refreshCache caps commit cache to 3 entries", async () => {

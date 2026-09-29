@@ -552,25 +552,37 @@ describe("ProjectStorage", () => {
             expect(storage.getCurrentProjectID()).toBe("proj1");
         });
 
-        it("removeSyncedDrafts should keep only pending drafts", async () => {
+        it("removeSyncedDrafts should drop only synced drafts matched by a commit", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             storage.data.Projects.proj1.commitDrafts = [
-                { id: "d1", status: "synced" },
-                { id: "d2", status: "pending" },
-                { id: "d3", status: "synced" }
+                { id: "d1", message: "A", timestamp: 1, status: "synced" },
+                { id: "d2", message: "B", timestamp: 2, status: "pending" },
+                { id: "d3", message: "B", timestamp: 3, status: "synced" },
+                { id: "d4", message: "C", timestamp: 4, status: "synced" }
             ];
-            await storage.removeSyncedDrafts("proj1");
-            expect(storage.data.Projects.proj1.commitDrafts).toEqual([
-                { id: "d2", status: "pending" }
-            ]);
+            await storage.removeSyncedDrafts("proj1", [{ message: "B" }, { message: "C" }]);
+            expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d1", "d2"]);
             expect(saveSpy).toHaveBeenCalled();
         });
 
-        it("removeSyncedDrafts should not save when nothing was synced", async () => {
+        it("removeSyncedDrafts should match each commit to one draft, newest first", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.Projects.proj1.commitDrafts = [
+                { id: "d1", message: "Save", timestamp: 1, status: "synced" },
+                { id: "d2", message: "Save", timestamp: 2, status: "synced" }
+            ];
+            await storage.removeSyncedDrafts("proj1", [{ message: "Save" }]);
+            expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d1"]);
+        });
+
+        it("removeSyncedDrafts should not save when no draft matches", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
-            storage.data.Projects.proj1.commitDrafts = [{ id: "d2", status: "pending" }];
-            await storage.removeSyncedDrafts("proj1");
-            await storage.removeSyncedDrafts("nonexistent");
+            storage.data.Projects.proj1.commitDrafts = [
+                { id: "d1", message: "A", timestamp: 1, status: "pending" }
+            ];
+            await storage.removeSyncedDrafts("proj1", [{ message: "A" }]);
+            await storage.removeSyncedDrafts("proj1", []);
+            await storage.removeSyncedDrafts("nonexistent", [{ message: "A" }]);
             expect(storage.data.Projects.proj1.commitDrafts.length).toBe(1);
             expect(saveSpy).not.toHaveBeenCalled();
         });
