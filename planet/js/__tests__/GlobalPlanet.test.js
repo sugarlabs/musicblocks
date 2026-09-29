@@ -401,6 +401,26 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("initTagList", () => {
+        it("loads the default tag's projects once", () => {
+            const loadAll = jest.fn();
+            mockPlanet.TagsManifest = {};
+            GlobalTag.mockImplementationOnce(() => {
+                const tag = { select: jest.fn(), unselect: jest.fn(), selected: false };
+                tag.init = obj => {
+                    tag.specialTag = true;
+                    tag.func = obj.func;
+                };
+                return tag;
+            });
+            gp.specialTags = [{ name: "All Projects", func: loadAll, defaultTag: true }];
+
+            gp.initTagList();
+
+            expect(loadAll).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("selectSpecialTag / unselectSpecialTags", () => {
         it("should unselect all tags then select the given one", () => {
             const mockTag1 = {

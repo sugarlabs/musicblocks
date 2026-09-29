@@ -79,8 +79,7 @@ class GlobalPlanet {
 
         this.sortBy = document.getElementById("sort-select").value;
 
-        if (this.defaultTag !== false) this.selectSpecialTag(this.defaultTag);
-
+        // No tag starts selected, so this selects the default tag and loads its projects once.
         this.refreshTagList();
     }
 
