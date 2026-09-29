@@ -1647,7 +1647,7 @@ class GitDropdownUI {
 
     _getThumbnail() {
         try {
-            const canvas = document.getElementById("overlayCanvas");
+            const canvas = this.activity && this.activity.canvas;
             return canvas ? canvas.toDataURL("image/png") : null;
         } catch (_) {
             return null;

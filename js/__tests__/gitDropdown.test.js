@@ -22,7 +22,6 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
     let mockItemHistory;
     let mockTooltipEl;
     let mockTooltipSpan;
-    let mockOverlayCanvas;
     let iframeMessages;
     let mockIframe;
 
@@ -51,9 +50,6 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
         mockItemHistory = { id: "git-item-history", style: {} };
 
         mockTooltipSpan = { textContent: "" };
-        mockOverlayCanvas = {
-            toDataURL: jest.fn(() => "data:image/png;base64,abc")
-        };
         mockTooltipEl = {
             id: "tooltip-123",
             querySelector: jest.fn(selector => {
@@ -105,7 +101,6 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             if (id === "git-item-history") return mockItemHistory;
             if (id === "tooltip-123") return mockTooltipEl;
             if (id === "planet-iframe") return mockIframe;
-            if (id === "overlayCanvas") return mockOverlayCanvas;
             return null;
         });
 
@@ -114,6 +109,9 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 getCurrentProjectName: jest.fn(() => "")
             },
             saveLocally: jest.fn().mockResolvedValue(undefined),
+            canvas: {
+                toDataURL: jest.fn(() => "data:image/png;base64,abc")
+            },
             prepareExport: jest.fn(() => JSON.stringify({ blocks: ["note1"] })),
             turtles: {
                 running: jest.fn(() => false)
@@ -337,11 +335,11 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
             expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
             expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
-            expect(mockOverlayCanvas.toDataURL).not.toHaveBeenCalled();
+            expect(mockActivity.canvas.toDataURL).not.toHaveBeenCalled();
 
             finishSave();
             await create;
-            expect(mockOverlayCanvas.toDataURL).toHaveBeenCalledWith("image/png");
+            expect(mockActivity.canvas.toDataURL).toHaveBeenCalledWith("image/png");
             expect(localStorage.getItem("mbGitRepoName")).toBe("first-track");
         });
 
