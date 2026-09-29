@@ -73,6 +73,9 @@ class ServerInterface {
 
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
 
+        // A GET that hasn't answered by then is treated as a connection failure.
+        this.RequestTimeout = 20000;
+
         // Per-request rate limiting / retry (reuse existing RequestManager)
         this.requestManager = new RequestManager({
             minDelay: 300,
@@ -179,10 +182,13 @@ class ServerInterface {
      * @returns {Promise<any|null>}
      */
     async _get(path) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), this.RequestTimeout);
         try {
             const res = await fetch(this.BaseURL + path, {
                 method: "GET",
-                headers: { Accept: "application/json" }
+                headers: { Accept: "application/json" },
+                signal: controller.signal
             });
             if (!res.ok) {
                 console.warn(`[ServerInterface] GET ${path} → HTTP ${res.status}`);
@@ -192,6 +198,8 @@ class ServerInterface {
         } catch (err) {
             console.error(`[ServerInterface] GET ${path} failed:`, err);
             return null;
+        } finally {
+            clearTimeout(timer);
         }
     }
 

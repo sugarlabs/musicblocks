@@ -428,4 +428,40 @@ describe("ServerInterface", () => {
             expect(names(callback)).toEqual(range(24, 49));
         });
     });
+
+    describe("_get timeout", () => {
+        afterEach(() => {
+            jest.useRealTimers();
+            delete global.fetch;
+        });
+
+        it("gives up on a request that never answers", async () => {
+            jest.useFakeTimers();
+            // A server that accepts the connection and then goes quiet.
+            global.fetch = jest.fn(
+                (url, { signal }) =>
+                    new Promise((resolve, reject) => {
+                        signal.addEventListener("abort", () =>
+                            reject(new DOMException("aborted", "AbortError"))
+                        );
+                    })
+            );
+
+            const pending = server._get("/allRepos?page=1&limit=25");
+            jest.advanceTimersByTime(server.RequestTimeout);
+
+            await expect(pending).resolves.toBeNull();
+        });
+
+        it("clears the timer once the request answers", async () => {
+            jest.useFakeTimers();
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ data: [] })
+            });
+
+            await expect(server._get("/allRepos?page=1&limit=25")).resolves.toEqual({ data: [] });
+            expect(jest.getTimerCount()).toBe(0);
+        });
+    });
 });
