@@ -61,6 +61,31 @@ const MusicKeyboardEditing = {
     install(deps) {
         const { FAKEBLOCKNUMBER, beginnerMode, resolveSynthNoteName, fillChromaticGaps } = deps;
 
+        // Semitones for the pitch rows Add Note can create: C1 to B8.
+        const LOWESTSTEP = 1 * 12;
+        const HIGHESTSTEP = 8 * 12 + 11;
+        const LETTERSTEPS = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        const ACCIDENTALSTEPS = { "♯": 1, "#": 1, "♭": -1, "b": -1, "𝄪": 2, "𝄫": -2 };
+
+        /**
+         * Returns a pitch as a count of semitones (octave * 12 + semitone), whether
+         * the row is named in solfege (`sol♯`) or with a letter (`G♯`).
+         * @param {string} noteName
+         * @param {number|string} octave
+         * @returns {number} NaN if the name isn't a pitch.
+         */
+        const semitoneStep = (noteName, octave) => {
+            const name = convertFromSolfege(String(noteName));
+            let step = LETTERSTEPS[name.charAt(0)];
+            if (step === undefined) {
+                return NaN;
+            }
+            for (const accidental of name.slice(1)) {
+                step += ACCIDENTALSTEPS[accidental] || 0;
+            }
+            return Number(octave) * 12 + step;
+        };
+
         /**
          * Creates and configures a wheelnav "exit" (close) wheel sharing the given
          * Raphael canvas. Does not call createWheel() or attach a navigateFunction;
@@ -471,53 +496,39 @@ const MusicKeyboardEditing = {
                 const newBlock = this.activity.blocks.blockList.length;
 
                 if (label === "pitch") {
-                    let i = -1;
-                    let lastNote = null,
-                        c = this.layout.length - 1;
-                    while (c > -1) {
-                        if (this.layout[c] && this.layout[c].noteName !== "hertz") {
-                            lastNote = this.layout[c].noteName;
-                            break;
-                        }
-                        c--;
-                    }
+                    // The chromatic gap-fill adds padding rows with letter names and
+                    // block numbers at or above FAKEBLOCKNUMBER. Only the real pitch
+                    // rows count, compared by pitch rather than by name, and the new
+                    // note is the next semitone above the highest one.
+                    const taken = new Set(
+                        this.layout
+                            .filter(
+                                note =>
+                                    note.noteName !== "hertz" &&
+                                    note.noteName !== "drum" &&
+                                    note.blockNumber < FAKEBLOCKNUMBER
+                            )
+                            .map(note => semitoneStep(note.noteName, note.noteOctave))
+                            .filter(step => !isNaN(step))
+                    );
 
-                    if (lastNote !== null) {
-                        for (let idx = 0; idx < pitchLabels.length; idx++) {
-                            if (
-                                pitchLabels[idx].includes(lastNote) ||
-                                lastNote.includes(pitchLabels[idx])
-                            ) {
-                                i = idx;
-                                break;
-                            }
+                    let step = taken.size > 0 ? Math.max(...taken) + 1 : 4 * 12;
+                    if (step > HIGHESTSTEP) {
+                        // Nothing above the top note: use the lowest free one.
+                        step = LOWESTSTEP;
+                        while (step <= HIGHESTSTEP && taken.has(step)) {
+                            step++;
                         }
-                    }
-
-                    let iterations = 0;
-                    do {
-                        rLabel = pitchLabels[(i + 1) % pitchLabels.length];
-                        i = (i + 1) % pitchLabels.length;
-                        iterations++;
-                        if (iterations > pitchLabels.length) {
+                        if (step > HIGHESTSTEP) {
                             this.activity.errorMsg(
                                 _("All 12 pitches are already in the keyboard. Adding duplicate.")
                             );
-                            break;
+                            step = HIGHESTSTEP;
                         }
-                    } while (this.layout.some(note => note.noteName === rLabel));
+                    }
 
-                    rArg = 4;
-                    for (let j = this.layout.length; j > 0; j--) {
-                        const oct = Number(this.layout[j - 1].noteOctave);
-                        if (!isNaN(oct) && oct >= 1 && oct <= 8) {
-                            rArg = oct;
-                            break;
-                        }
-                    }
-                    if (lastNote !== null && i === 0 && rArg < 8) {
-                        rArg += 1;
-                    }
+                    rLabel = pitchLabels[step % 12];
+                    rArg = Math.floor(step / 12);
                 } else {
                     rLabel = "hertz";
                     rArg = 392;
@@ -713,7 +724,9 @@ const MusicKeyboardEditing = {
         this._syncLayouts = function () {
             const originalLayout = this.layout.filter(note => note.blockNumber < FAKEBLOCKNUMBER);
 
-            this.displayLayout = this.layout.map(note => {
+            // Gap-fill from the real rows only. The padding rows are rebuilt here,
+            // and keeping the old ones would duplicate a row added on top of one.
+            this.displayLayout = originalLayout.map(note => {
                 return { ...note, noteName: convertFromSolfege(note.noteName) };
             });
 

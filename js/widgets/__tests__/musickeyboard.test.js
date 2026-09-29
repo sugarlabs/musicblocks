@@ -190,9 +190,11 @@ describe("MusicKeyboard add-row submenu", () => {
             }
         });
 
+        // Real rows have real block numbers; only gap-fill padding rows are
+        // numbered at or above FAKEBLOCKNUMBER (100000).
         keyboard.layout = [
-            { noteName: "do", noteOctave: 5, blockNumber: 100001 },
-            { noteName: "hertz", noteOctave: 440, blockNumber: 100002 }
+            { noteName: "do", noteOctave: 5, blockNumber: 7 },
+            { noteName: "hertz", noteOctave: 440, blockNumber: 8 }
         ];
 
         keyboard._createAddRowPieSubmenu();
@@ -218,7 +220,7 @@ describe("MusicKeyboard add-row submenu", () => {
         });
 
         // 'ti' is the 12th / last pitch label in default solfege scale
-        keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 100001 }];
+        keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 7 }];
 
         keyboard._createAddRowPieSubmenu();
 
@@ -263,6 +265,78 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(global.debugLog).toHaveBeenCalledWith(
             "Could not find anywhere to insert new block."
         );
+    });
+
+    // With the chromatic gap-fill the layout mixes real rows (solfege names)
+    // with padding rows (letter names, block numbers >= FAKEBLOCKNUMBER). Add
+    // Note has to add the next semitone above the highest real row, once.
+    const addPitchRow = (noteNames, octaves) => {
+        jest.useFakeTimers();
+        const blockList = Array.from({ length: 30 }, () => ({}));
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            errorMsg: jest.fn(),
+            turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) },
+            blocks: {
+                blockList,
+                loadNewBlocks: jest.fn(stack => stack.forEach(() => blockList.push({})))
+            }
+        });
+        keyboard.noteNames = noteNames;
+        keyboard.octaves = octaves;
+        keyboard._rowBlocks = noteNames.map((_, i) => 10 + i);
+        keyboard.instruments = noteNames.map(() => "electronic synth");
+        keyboard._keysLayout();
+        keyboard._addNotesBlockBetween = jest.fn();
+        keyboard._createKeyboard = jest.fn();
+        keyboard._createTable = jest.fn();
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.selectedNavItemIndex = 0;
+        keyboard._menuWheel.navItems[0].navigateFunction();
+        jest.advanceTimersByTime(500);
+        jest.useRealTimers();
+
+        const added = keyboard.activity.blocks.loadNewBlocks.mock.calls[0][0];
+        return {
+            added: [added[1][1][1].value, added[2][1][1].value],
+            rows: keyboard.layout.map(note => note.noteName + note.noteOctave)
+        };
+    };
+
+    test("Add Note adds the next semitone above the highest real row, in its octave", () => {
+        const { added, rows } = addPitchRow(["sol", "mi", "re"], [4, 4, 4]);
+
+        expect(added).toEqual(["sol♯", 4]);
+        // The new row takes the place of the G♯4 padding row: no duplicate,
+        // and no jump past the padded range.
+        expect(rows).toEqual([
+            "C4",
+            "C♯4",
+            "re4",
+            "D♯4",
+            "mi4",
+            "F4",
+            "F♯4",
+            "sol4",
+            "sol♯4",
+            "A4",
+            "A♯4",
+            "B4",
+            "C5"
+        ]);
+    });
+
+    test("Add Note after ti adds do in the next octave, over the padding row", () => {
+        const { added, rows } = addPitchRow(
+            ["do", "re", "mi", "fa", "sol", "la", "ti"],
+            [4, 4, 4, 4, 4, 4, 4]
+        );
+
+        expect(added).toEqual(["do", 5]);
+        expect(rows.filter(row => row === "do5" || row === "C5")).toEqual(["do5"]);
+        expect(rows).toHaveLength(13);
     });
 
     test("initializes noteToKeyMap and safely updates when inserting a new note block via pie menu", () => {

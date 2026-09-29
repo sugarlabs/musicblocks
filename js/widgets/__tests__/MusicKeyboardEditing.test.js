@@ -156,10 +156,10 @@ describe("MusicKeyboardEditing", () => {
             expect(advanced._notesPlayed).toHaveLength(4);
         });
 
-        test("_syncLayouts gap-fills with fillChromaticGaps and only keeps real blocks", () => {
+        test("_syncLayouts rebuilds the padding from the real rows only", () => {
             const fillChromaticGaps = jest.fn(list => [
                 ...list,
-                { noteName: "D", noteOctave: 4, blockNumber: 50 }
+                { noteName: "D", noteOctave: 4, blockNumber: 51 }
             ]);
             const keyboard = makeKeyboard({ FAKEBLOCKNUMBER: 50, fillChromaticGaps });
             keyboard.layout = [
@@ -170,17 +170,14 @@ describe("MusicKeyboardEditing", () => {
 
             keyboard._syncLayouts();
 
-            // Hertz rows are kept out of the chromatic gap-fill.
+            // Block 60 is at or above FAKEBLOCKNUMBER (50), so it's an old padding
+            // row: it isn't fed back into the gap-fill, and hertz rows never are.
             expect(fillChromaticGaps).toHaveBeenCalledWith([
-                { noteName: "C", noteOctave: 4, blockNumber: 7 },
-                { noteName: "E", noteOctave: 4, blockNumber: 60 }
+                { noteName: "C", noteOctave: 4, blockNumber: 7 }
             ]);
-            // Block 60 is at or above FAKEBLOCKNUMBER (50), so it is padding,
-            // not a real block, and keeps the gap-filled entry.
             expect(keyboard.layout.map(note => [note.noteName, note.blockNumber])).toEqual([
                 ["C", 7],
-                ["E", 60],
-                ["D", 50],
+                ["D", 51],
                 ["hertz", 8]
             ]);
         });
