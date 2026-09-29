@@ -591,6 +591,10 @@ class Logo {
             tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
+        // Unlike synthVolume above, masterVolume is static, so a level left on it by an earlier
+        // run would otherwise still be in force here.
+        this.deps.Singer.resetMasterVolume(this);
+
         for (const turtle in this.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(turtle);
@@ -612,7 +616,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this.deps.Singer.setMasterVolume(this, DEFAULTVOLUME);
+        this.deps.Singer.resetMasterVolume(this);
         for (const t in this.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);

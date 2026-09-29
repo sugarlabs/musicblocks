@@ -96,6 +96,7 @@ const createTransportMock = () => ({
 global.Singer = {
     setSynthVolume: jest.fn(),
     setMasterVolume: jest.fn(),
+    resetMasterVolume: jest.fn(),
     clearPitchToFrequencyCache: jest.fn(),
     masterBPM: 90,
     defaultBPMFactor: 1,
@@ -982,6 +983,7 @@ describe("Logo synth lifecycle", () => {
         expect(global.instrumentsFilters[1].flute).toEqual(["lp"]);
         expect(global.instrumentsEffects[1].flute).toEqual({ reverb: 0.5 });
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
     });
 
     test("prepSynths re-initialization uses current masterVolume for new turtles", () => {
@@ -1022,7 +1024,7 @@ describe("Logo synth lifecycle", () => {
         logo.resetSynth(0);
 
         expect(logo.synth.createDefaultSynth).toHaveBeenCalledWith(0);
-        expect(Singer.setMasterVolume).toHaveBeenCalledWith(logo, 50);
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "flute", 50);
         expect(logo.synth.start).toHaveBeenCalled();

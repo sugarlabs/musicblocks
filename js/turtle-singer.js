@@ -781,6 +781,24 @@ class Singer {
     }
 
     /**
+     * Restores the master volume to its default level.
+     *
+     * masterVolume is a stack shared by every turtle and every run. The set master volume clamp
+     * pushes a level and pops it when the clamp ends, so stopping a project inside that clamp
+     * leaves the level behind, and loadSynth() hands each new instrument last(masterVolume).
+     * Without this the level survives into the next run and into whatever project is loaded after.
+     *
+     * @static
+     * @param {Object} logo
+     * @returns {void}
+     */
+    static resetMasterVolume(logo) {
+        Singer.masterVolume.length = 1;
+        Singer.masterVolume[0] = DEFAULTVOLUME;
+        Singer.setMasterVolume(logo, DEFAULTVOLUME);
+    }
+
+    /**
      * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
      *
      * @static

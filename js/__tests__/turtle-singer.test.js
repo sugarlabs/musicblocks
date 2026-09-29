@@ -734,6 +734,43 @@ describe("setMasterVolume edge cases", () => {
     });
 });
 
+describe("resetMasterVolume", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+    });
+
+    test("should discard a level left behind by an interrupted clamp", () => {
+        Singer.masterVolume.push(10);
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should discard every level when several were left behind", () => {
+        Singer.masterVolume.push(30, 10);
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should restore the base level when it was overwritten in place", () => {
+        Singer.masterVolume[0] = 10;
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should apply the default volume to the synth", () => {
+        Singer.masterVolume.push(0);
+        Singer.resetMasterVolume(logoMock);
+        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(100);
+    });
+});
+
 describe("setSynthVolume edge cases", () => {
     let turtleMock;
     let logoMock;
