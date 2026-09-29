@@ -2378,3 +2378,208 @@ describe("TimbreWidget", () => {
         });
     });
 });
+
+// Runs the widget against the real jsdom document for the #9043 fixes.
+describe("TimbreWidget with a real DOM", () => {
+    let timbre;
+    let blockList;
+    const saved = {};
+
+    const makeBlock = (name, value, connections) => ({
+        name,
+        value,
+        connections,
+        text: { text: "" },
+        updateCache: jest.fn(),
+        isClampBlock: () => false
+    });
+
+    beforeEach(() => {
+        for (const name of [
+            "document",
+            "docById",
+            "docByName",
+            "delayExecution",
+            "instrumentsEffects",
+            "instrumentsFilters"
+        ]) {
+            saved[name] = global[name];
+        }
+        global.document = jsdomDocument;
+        global.docById = id => jsdomDocument.getElementById(id);
+        global.docByName = name => jsdomDocument.getElementsByName(name);
+        global.delayExecution = jest.fn(() => Promise.resolve());
+        global.instrumentsEffects = [{ custom: {} }];
+        global.instrumentsFilters = [{ custom: [] }];
+        jsdomDocument.body.textContent = "";
+
+        blockList = [makeBlock("timbre", undefined, [null, null, null, null])];
+        const blocks = {
+            blockList,
+            clampBlocksToCheck: [],
+            findBottomBlock: blk => blk,
+            adjustDocks: jest.fn(),
+            adjustExpandableClampBlock: jest.fn(),
+            sendStackToTrash: jest.fn(),
+            loadNewBlocks: jest.fn(stack => {
+                const offset = blockList.length;
+                for (const [, spec, , , connections] of stack) {
+                    const name = Array.isArray(spec) ? spec[0] : spec;
+                    const value = Array.isArray(spec) ? spec[1].value : undefined;
+                    blockList.push(
+                        makeBlock(
+                            name,
+                            value,
+                            connections.map(c => (c === null ? null : c + offset))
+                        )
+                    );
+                }
+            })
+        };
+
+        timbre = new TimbreWidget();
+        timbre.blockNo = 0;
+        timbre._playNote = jest.fn();
+        timbre.activity = {
+            blocks,
+            logo: { synth: { createSynth: jest.fn() }, parseArg: () => 0.25 },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn(),
+            errorMsg: jest.fn()
+        };
+        timbre._delta = 0;
+        timbre.timbreTableDiv = jsdomDocument.createElement("div");
+        jsdomDocument.body.appendChild(timbre.timbreTableDiv);
+        // The toolbar buttons the panels highlight.
+        for (const name of ["synth", "oscillator", "envelope", "effects", "filter"]) {
+            const button = jsdomDocument.createElement("div");
+            button.id = name + "ButtonCell";
+            jsdomDocument.body.appendChild(button);
+        }
+    });
+
+    afterEach(() => {
+        jsdomDocument.body.textContent = "";
+        Object.assign(global, saved);
+    });
+
+    const pick = (name, value) => {
+        const radio = jsdomDocument.querySelector(`input[name="${name}"][value="${value}"]`);
+        return radio.onclick({ target: radio });
+    };
+
+    const slide = (id, value, type = "change") => {
+        const input = jsdomDocument.getElementById(id);
+        input.value = value;
+        input.dispatchEvent(new Event(type, { bubbles: true }));
+    };
+
+    test("a new chorus previews with a 0-1 depth", async () => {
+        timbre._effects();
+        await pick("effectsName", "Chorus");
+
+        expect(instrumentsEffects[0].custom.chorusDepth).toBe(0.7);
+    });
+
+    test("reopening chorus and phaser keeps the existing blocks' values", async () => {
+        blockList.push(makeBlock("chorus", undefined, [0, null, null, null, null, null]));
+        timbre.chorusEffect = [1];
+        timbre.chorusParams = [1, 2, 30];
+        timbre.phaserEffect = [1];
+        timbre.phaserParams = [2, 5, 300];
+        const effects = {
+            chorusRate: 1,
+            delayTime: 2,
+            chorusDepth: 0.3,
+            rate: 2,
+            octaves: 5,
+            baseFrequency: 300
+        };
+        Object.assign(instrumentsEffects[0].custom, effects);
+
+        timbre._effects();
+        await pick("effectsName", "Chorus");
+        await pick("effectsName", "Phaser");
+
+        expect(instrumentsEffects[0].custom).toMatchObject(effects);
+    });
+
+    test("Save makes a Set Timbre block for this instrument", () => {
+        timbre.instrumentName = "mysound";
+        timbre._save();
+
+        const stack = timbre.activity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(stack[1][1]).toEqual(["text", { value: "mysound" }]);
+    });
+
+    test("switching synths back and forth starts the new synth from its block", () => {
+        timbre._synth();
+        pick("synthsName", "AMSynth");
+        slide("myRangeS0", "5");
+        pick("synthsName", "FMSynth");
+        pick("synthsName", "AMSynth");
+
+        expect(timbre.AMSynthParams).toEqual([1]);
+        expect(timbre.amSynthParamvals.harmonicity).toBe(1);
+        expect(jsdomDocument.getElementById("myRangeS0").value).toBe("1");
+    });
+
+    test("FM slider changes are kept", () => {
+        timbre._synth();
+        pick("synthsName", "FMSynth");
+        slide("myRangeS0", "40");
+
+        expect(timbre.FMSynthParams).toEqual(["40"]);
+    });
+
+    test("oscillator Undo resets the sound along with the block", () => {
+        blockList.push(makeBlock("oscillator", undefined, [0, 2, 3, null]));
+        blockList.push(makeBlock("oscillatortype", "square", [1]));
+        blockList.push(makeBlock("number", 6, [1]));
+        timbre.osc = [1];
+        timbre.oscParams = ["square", 6];
+        timbre._setActiveExclusive("oscillator");
+        timbre._oscillator(false);
+        timbre.activity.logo.synth.createSynth.mockClear();
+
+        timbre._undo();
+
+        expect(blockList[2].value).toBe(DEFAULTOSCILLATORTYPE);
+        expect(timbre.oscParams).toEqual([DEFAULTOSCILLATORTYPE, 6]);
+        expect(timbre.activity.logo.synth.createSynth.mock.calls[0][2]).toBe(DEFAULTOSCILLATORTYPE);
+    });
+
+    test("editing a vibrato rate rewires that vibrato block, not the last one", async () => {
+        blockList.push(makeBlock("vibrato", undefined, [0, 3, 4, null, null])); // 1
+        blockList.push(makeBlock("vibrato", undefined, [0, 5, 6, null, null])); // 2
+        blockList.push(makeBlock("number", 5, [1]), makeBlock("number", 0.25, [1])); // 3, 4
+        blockList.push(makeBlock("number", 5, [2]), makeBlock("number", 0.5, [2])); // 5, 6
+        timbre.vibratoEffect = [1, 2];
+        timbre._setActiveExclusive("vibrato");
+
+        await timbre._update(0, 8, 1);
+
+        expect(blockList[blockList[1].connections[2]].name).toBe("divide");
+        expect(blockList[2].connections[2]).toBe(6);
+    });
+
+    test("the 11th filter's controls edit the 11th filter", () => {
+        for (let f = 0; f < 11; f++) {
+            blockList.push(makeBlock("filter", undefined, [0, null, null, null, null]));
+            timbre.fil.push(blockList.length - 1);
+            timbre.filterParams.push(DEFAULTFILTERTYPE, -12, 392);
+            instrumentsFilters[0].custom.push({
+                filterType: DEFAULTFILTERTYPE,
+                filterRolloff: -12,
+                filterFrequency: 392
+            });
+        }
+        timbre._setActiveExclusive("filter");
+        timbre._filter();
+
+        slide("myRangeF10", "1000", "input");
+
+        expect(instrumentsFilters[0].custom[10].filterFrequency).toBe(1000);
+        expect(instrumentsFilters[0].custom[0].filterFrequency).toBe(392);
+    });
+});
