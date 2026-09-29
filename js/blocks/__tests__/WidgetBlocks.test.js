@@ -146,7 +146,7 @@ global.TemperamentWidget = jest.fn(() => ({
 global.TemperamentWidget.dependencies = ["widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
-global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+global.MusicKeyboard.dependencies = ["widgets/MusicKeyboardEditing", "widgets/musickeyboard"];
 global.PhraseMaker = jest.fn();
 global.PhraseMaker.dependencies = [
     "widgets/PhraseMakerUtils",
