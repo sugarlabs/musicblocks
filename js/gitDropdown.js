@@ -382,7 +382,12 @@ class GitDropdownUI {
         const thumbnail = this._getThumbnail();
         const fullDesc = description || `${displayName} — a Music Blocks project`;
 
-        await this.activity.saveLocally();
+        try {
+            await this.activity.saveLocally();
+        } catch (_) {
+            this._showToast("Could not save your project. Please try again.", "error");
+            return;
+        }
 
         // ── Instant offline pre-check ─────────────────────────────────────────
         // Same pattern as _doCommit: if the device has no network right now,
@@ -405,6 +410,7 @@ class GitDropdownUI {
                     projectName: displayName,
                     description: fullDesc,
                     creatorName: "anonymous",
+                    thumbnail,
                     tags: [],
                     projectId: null
                 },
@@ -545,6 +551,7 @@ class GitDropdownUI {
                         projectName: displayName,
                         description: fullDesc,
                         creatorName: "anonymous",
+                        thumbnail,
                         tags: [],
                         projectId: null
                     },

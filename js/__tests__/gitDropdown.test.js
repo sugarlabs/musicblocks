@@ -287,6 +287,8 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
         test("queues repo creation offline via MB_OFFLINE_CREATE when offline", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            mockActivity.currentSession = 1;
+            mockActivity.storage = { SESSIONIMAGE1: "data:image/png;base64,abc" };
 
             await gitDropdown._doCreate("offline-track-456", "Offline Track", "Made offline");
 
@@ -295,13 +297,31 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 expect.objectContaining({
                     type: "MB_OFFLINE_CREATE",
                     repoName: "offline-track-456",
-                    projectName: "Offline Track"
+                    projectName: "Offline Track",
+                    thumbnail: "data:image/png;base64,abc"
                 }),
                 "*"
             );
 
             expect(localStorage.getItem("mbGitRepoName")).toBe("offline-track-456");
             expect(localStorage.getItem("mbGitDisplayName")).toBe("Offline Track");
+        });
+
+        test("preserves the thumbnail when creation falls back offline", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            mockActivity.currentSession = 1;
+            mockActivity.storage = { SESSIONIMAGE1: "data:image/png;base64,abc" };
+            global.fetch.mockRejectedValueOnce(new TypeError("Network failed"));
+
+            await gitDropdown._doCreate("fallback-track", "Fallback Track", "Made offline");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "MB_OFFLINE_CREATE",
+                    thumbnail: "data:image/png;base64,abc"
+                }),
+                "*"
+            );
         });
 
         test("saves a fresh project before queuing offline tracking", async () => {
@@ -320,6 +340,20 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             finishSave();
             await create;
             expect(localStorage.getItem("mbGitRepoName")).toBe("first-track");
+        });
+
+        test("reports a failed save without queuing offline tracking", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            const showToast = jest.spyOn(gitDropdown, "_showToast");
+            mockActivity.saveLocally.mockRejectedValue(new Error("Storage unavailable"));
+
+            await gitDropdown._doCreate("failed-track", "Failed Track", "Made offline");
+
+            expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+            expect(showToast).toHaveBeenCalledWith(
+                "Could not save your project. Please try again.",
+                "error"
+            );
         });
     });
 
