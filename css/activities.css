@@ -566,7 +566,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #record.recording .dot {
-    color: red;
+    color: red !important;
     animation: blink-animation 1.5s infinite;
 }
 
@@ -890,8 +890,8 @@ body.highcontrast .toolbar-pill-group > li > a.toolbar-btn-focused {
 }
 
 /* Icons inside toolbar */
-.toolbar-pill-group > li > a > .material-icons,
-.toolbar-pill-group > li > .material-icons {
+.toolbar-pill-group > li > a > .material-icons:not(.dot),
+.toolbar-pill-group > li > .material-icons:not(.dot) {
     font-size: 26px !important;
     line-height: 1 !important;
     display: flex !important;
@@ -918,6 +918,25 @@ body.highcontrast .toolbar-pill-group > li > a.toolbar-btn-focused {
 
 #stop .material-icons {
     font-size: 28px !important;
+}
+
+/* Record button and concentric dot positioning */
+#record {
+    position: relative !important;
+}
+
+#record .ring {
+    position: relative !important;
+}
+
+#record .dot {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.5) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
 }
 
 /* Record dropdown arrow alignment */
