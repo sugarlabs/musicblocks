@@ -1791,6 +1791,33 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should keep microtonal note names as note names", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch("^C", 4);
+            await mouse.playPitch("vvD♭", 4);
+            await mouse.playPitch("^sol", 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["notename", { value: "^C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 6, 7]],
+            [5, ["notename", { value: "vvD♭" }], 0, 0, [4]],
+            [6, ["number", { value: 4 }], 0, 0, [4]],
+            [7, "pitch", 0, 0, [4, 8, 9, null]],
+            [8, ["solfege", { value: "^sol" }], 0, 0, [7]],
+            [9, ["number", { value: 4 }], 0, 0, [7]]
+        ]);
+    });
+
     test("should convert a pitch that isn't a note name literal", () => {
         const code = `
         new Mouse(async mouse => {

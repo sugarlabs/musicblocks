@@ -45,6 +45,24 @@ class AST2BlockList {
     }
 
     /**
+     * Returns whether a pitch name is solfege (sol, ti♭, ...) rather than a note name (G, B♭, ...),
+     * using the same test as the rest of Music Blocks. Microtonal prefixes (e.g. "^C", "vvD♭")
+     * are stripped first, so a note name keeps its block.
+     *
+     * @param {String} note - pitch name
+     * @returns {Boolean} whether note is solfege
+     */
+    static _isSolfege(note) {
+        const solfege =
+            (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
+            require("../utils/musicutils-solfege");
+        const pitch =
+            (typeof window !== "undefined" && window.MusicUtilsPitch) ||
+            require("../utils/musicutils-pitch");
+        return solfege.noteIsSolfege(pitch.stripMicrotonalPrefix(note));
+    }
+
+    /**
      * Returns a deep copy of an AST. Regular expression literal values are
      * shared, since nothing here changes them.
      *
@@ -837,9 +855,11 @@ class AST2BlockList {
                     if (argConfig.type === "note_or_solfege" && typeof arg === "string") {
                         // Handle pitch notes (solfege or note names). A pitch read from a box
                         // or computed is handled below like any other value.
-                        const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
                         vspaces += _addNthArgToBlockList(
-                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { value: arg }],
+                            [
+                                AST2BlockList._isSolfege(arg) ? "solfege" : "notename",
+                                { value: arg }
+                            ],
                             i + 1,
                             blockList,
                             parentBlockNumber
