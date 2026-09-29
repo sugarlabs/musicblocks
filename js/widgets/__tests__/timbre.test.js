@@ -1754,10 +1754,24 @@ describe("TimbreWidget", () => {
                     { filterType: "lowpass", filterRolloff: -12, filterFrequency: 100 }
                 ];
 
+                // Manually simulate Materialize CSS .thumb structure
+                const slider = document.getElementById("myRangeF0");
+                const thumb = document.createElement("span");
+                thumb.className = "thumb";
+                const valSpan = document.createElement("span");
+                valSpan.className = "value";
+                thumb.appendChild(valSpan);
+                if (slider && slider.parentNode) {
+                    slider.parentNode.insertBefore(thumb, slider.nextSibling);
+                }
+
                 timbre._undo();
                 expect(global.instrumentsFilters[0]["custom"][0]["filterType"]).toBe("highpass");
                 expect(global.instrumentsFilters[0]["custom"][0]["filterRolloff"]).toBe(-24);
                 expect(global.instrumentsFilters[0]["custom"][0]["filterFrequency"]).toBe(500);
+                if (slider && slider.parentNode) {
+                    expect(valSpan.textContent).toBe("500");
+                }
             });
 
             test("_undo for tremolo, vibrato, phaser, chorus, and distortion", async () => {

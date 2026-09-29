@@ -826,6 +826,26 @@ class TimbreWidget {
             this._update(blockValue, this.distortionParams[0], 0);
         }
 
+        // Materialize CSS uses to update the .thumb tooltips. Manually sync them.
+        const timbreTable = docById("timbreTable");
+        if (timbreTable) {
+            const sliders = timbreTable.querySelectorAll("input[type=range]");
+            for (let k = 0; k < sliders.length; k++) {
+                const slider = sliders[k];
+                let sibling = slider.nextElementSibling;
+                while (sibling) {
+                    if (sibling.classList.contains("thumb")) {
+                        const valSpan = sibling.querySelector(".value");
+                        if (valSpan) {
+                            valSpan.textContent = slider.value;
+                        }
+                        break;
+                    }
+                    sibling = sibling.nextElementSibling;
+                }
+            }
+        }
+
         this._playNote("G4", 1 / 8);
     }
 
