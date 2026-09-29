@@ -9419,6 +9419,22 @@ msgid "Complete a practice level and Captain Cadence will share the first page."
 msgstr ""
 
 #: js/practiceLessons/practiceUI.js
+msgid "Next Lesson"
+msgstr ""
+
+#: js/practiceLessons/practiceUI.js
+msgid "Lesson Complete"
+msgstr ""
+
+#: js/practiceLessons/practiceUI.js
+msgid "My Note"
+msgstr ""
+
+#: js/practiceLessons/practiceUI.js
+msgid "Save Edit"
+msgstr ""
+
+#: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Close Explorer Journal prompt"
 msgstr ""

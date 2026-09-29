@@ -784,6 +784,14 @@ describe("ExplorerJournalUI completion prompt", () => {
         expect(PracticeManager.getJournalPage(1)).not.toBeNull();
     });
 
+    test("names the close button for screen readers", () => {
+        ExplorerJournalUI.showCompletionPrompt(PracticeProblems[0]);
+
+        expect(document.getElementById("close-journal-prompt").getAttribute("aria-label")).toBe(
+            "Close Explorer Journal prompt"
+        );
+    });
+
     test("saves what the learner wrote", () => {
         ExplorerJournalUI.showCompletionPrompt(PracticeProblems[0]);
         document.getElementById("journal-prompt-note").value = "The bridge sang";

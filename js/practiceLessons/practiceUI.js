@@ -681,7 +681,7 @@ const PracticeUI = {
         }
 
         this.showQuestNotice(
-            problem.journal?.completeTitle || "Lesson Complete",
+            problem.journal?.completeTitle || _("Lesson Complete"),
             messages.join(" "),
             "success"
         );
@@ -894,7 +894,7 @@ const ExplorerJournalUI = {
         const noteCount = notePage.artifacts.notes.length;
         return `
       <button class="journal-open-page journal-open-general" data-note-id="${this.escapeHTML(notePage.id)}">
-        <span class="journal-page-number">My Note</span>
+        <span class="journal-page-number">${_("My Note")}</span>
         <span class="journal-open-title">${this.escapeHTML(notePage.title)}</span>
         <span class="journal-open-meta">
           ${_("Entries")}: ${noteCount}
@@ -908,7 +908,7 @@ const ExplorerJournalUI = {
         if (!container) return;
 
         container.innerHTML = `
-      <button id="back-to-journal-index">&larr; My Explorer Book</button>
+      <button id="back-to-journal-index">&larr; ${_("My Explorer Book")}</button>
       <section class="journal-page-card journal-page-card-open">
         <h4>${_("New Note")}</h4>
         <label class="journal-note-label" for="journal-general-title">${_("Title")}</label>
@@ -963,10 +963,10 @@ const ExplorerJournalUI = {
         }
 
         container.innerHTML = `
-      <button id="back-to-journal-index">&larr; My Explorer Book</button>
+      <button id="back-to-journal-index">&larr; ${_("My Explorer Book")}</button>
       <section class="journal-page-card journal-page-card-open journal-general-page">
         <div class="journal-page-top">
-          <span class="journal-page-number">My Note</span>
+          <span class="journal-page-number">${_("My Note")}</span>
           <span class="journal-page-island">${this.formatDate(page.updatedAt)}</span>
         </div>
         <label class="journal-note-label" for="journal-general-page-title">${_("Title")}</label>
@@ -1035,10 +1035,10 @@ const ExplorerJournalUI = {
         const page = PracticeManager.ensureJournalPage(problem);
 
         container.innerHTML = `
-      <button id="back-to-journal-index">&larr; My Explorer Book</button>
+      <button id="back-to-journal-index">&larr; ${_("My Explorer Book")}</button>
       <section class="journal-page-card journal-page-card-open">
         <div class="journal-page-top">
-          <span class="journal-page-number">Level ${page.level}</span>
+          <span class="journal-page-number">${_("Level")} ${page.level}</span>
           <span class="journal-page-island">${this.escapeHTML(page.island)}</span>
         </div>
         <h4>${this.escapeHTML(page.title)}</h4>
@@ -1201,10 +1201,10 @@ const ExplorerJournalUI = {
             maxlength="280">${this.escapeHTML(note.text)}</textarea>
           <div class="journal-note-actions">
             <button class="journal-update-note" data-note-id="${this.escapeHTML(note.id)}">
-              Save Edit
+              ${_("Save Edit")}
             </button>
             <button class="journal-delete-note" data-note-id="${this.escapeHTML(note.id)}">
-              Delete
+              ${_("Delete")}
             </button>
           </div>
         </section>
@@ -1230,7 +1230,7 @@ const ExplorerJournalUI = {
         prompt.id = "explorer-journal-prompt";
         prompt.innerHTML = `
       <section class="journal-prompt-book" role="dialog" aria-live="polite">
-        <button id="close-journal-prompt" aria-label=_("Close Explorer Journal prompt")>X</button>
+        <button id="close-journal-prompt" aria-label="${_("Close Explorer Journal prompt")}">X</button>
         <span class="journal-prompt-kicker">${_("Captain's Journal")}</span>
         <h3>${this.escapeHTML(problem.journal?.title || problem.title)}</h3>
         <p>

@@ -165,55 +165,55 @@ These are the criteria `hasBadgeEvidence()` understands.
 
 Completion criteria, which mean the lesson itself is finished:
 
-| Criterion                    | Proves                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| `completePattern`            | The chunk sequence matches `expected.pattern`.                           |
-| `completeRhythmWorkflow`     | The Rhythm Maker workflow was carried out.                               |
-| `completePhraseWorkflow`     | The Phrase Maker workflow was carried out.                               |
-| `completeBasicShapeSet`      | Triangle, square, and pentagon programs all exist.                       |
-| `completeAnimatedPolyrhythm` | Duplet and triplet rhythms with an avatar and a note action.             |
-| `completeCircularRhythmRing` | A conductor plus at least four drum mice, wired by broadcast.            |
-| `completeTwinkleForm`        | The Twinkle sections appear in the order A1 A2 B B A1 A2.                |
-| `completeMetronome`          | A loop holds at least two different drum sounds.                         |
-| `completePianoKeys`          | Two or more mice answer a click by running an action that makes a sound. |
+| Criterion                    | Proves                                                                                                         |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `completePattern`            | The chunk sequence matches `expected.pattern`.                                                                 |
+| `completeRhythmWorkflow`     | The Rhythm Maker workflow was carried out.                                                                     |
+| `completePhraseWorkflow`     | The Phrase Maker workflow was carried out.                                                                     |
+| `completeBasicShapeSet`      | Triangle, square, and pentagon programs all exist.                                                             |
+| `completeAnimatedPolyrhythm` | Duplet and triplet rhythms with an avatar and a note action.                                                   |
+| `completeCircularRhythmRing` | A broadcast with a built name, an `arc` in a loop, a `mod`, and an action that listens and moves with `setxy`. |
+| `completeTwinkleForm`        | The Twinkle sections appear in the order A1 A2 B B A1 A2.                                                      |
+| `completeMetronome`          | A loop holds at least two different drum sounds.                                                               |
+| `completePianoKeys`          | Two or more mice answer a click by running an action that makes a sound.                                       |
 
 Hidden discovery criteria, awarded by the background monitor as the learner experiments:
 
-| Criterion                       | Looks for                                                              |
-| ------------------------------- | ---------------------------------------------------------------------- |
-| `renamedChunks`                 | Action names other than those in `expected.chunkNames`.                |
-| `changedOctave`                 | Pitch octaves other than those in `expected.octaves`.                  |
-| `usedTranspose`                 | `settransposition`, `setscalartransposition`, `setratio`, or `octave`. |
-| `createdVariation`              | A sequence that differs from `expected.pattern`.                       |
-| `usedRepeatLoop`                | A connected `repeat`.                                                  |
-| `changedRhythmLength`           | The rhythm length was edited.                                          |
-| `changedDrumSound`              | A different drum was selected.                                         |
-| `savedDrumMachine`              | The drum machine was saved as an action.                               |
-| `changedPhraseDrums`            | The Phrase Maker drums were changed.                                   |
-| `createdPhraseVariation`        | An extra phrase beyond the required ones.                              |
-| `completedTwoPartForm`          | A two-part form was built.                                             |
-| `usedGeometryDivision`          | A connected `divide`.                                                  |
-| `usedBoxVariable`               | `namedbox`, `storein`, `storein2`, `box`, `box1`, or `box2`.           |
-| `readBoxValue`                  | `namedbox`, `box`, `box1`, or `box2`.                                  |
-| `changedShapeColor`             | `setcolor`, `sethue`, `setshade`, or `setgrey`.                        |
-| `createdExtraPolygon`           | A polygon with a side count outside 3, 4, and 5.                       |
-| `usedDupletTripletRhythms`      | Rhythm divisors 2 and 3.                                               |
-| `createdExtraPolyrhythmDivisor` | A divisor beyond 2 and 3.                                              |
-| `usedAvatarAnimation`           | `turtleshell`.                                                         |
-| `usedEveryNoteAction`           | `everybeatdo`.                                                         |
-| `usedNoteValueMotion`           | `turtlenote`, `turtlenote2`, `turtleelapsednotes`, or `elapsednotes`.  |
-| `createdPitchPolyrhythm`        | `pitch` or `settimbre`.                                                |
-| `changedAnimationTurn`          | `right`, `left`, or `setheading`.                                      |
-| `usedOneMinusToggle`            | A stored value toggled with one-minus.                                 |
-| `playedRingDrum`                | `playdrum` or `setdrum`.                                               |
-| `builtMouseRing`                | At least four `start` blocks.                                          |
-| `addedHarmonyVoice`             | At least two `start` blocks.                                           |
-| `swungThePendulum`              | `setheading`.                                                          |
-| `changedTempo`                  | `setmasterbpm`, `setmasterbpm2`, `setbpm`, `setbpm2`, or `setbpm3`.    |
-| `setTheMeter`                   | `meter`.                                                               |
-| `paintedTheBeat`                | `beatvalue`.                                                           |
-| `spacedTheKeys`                 | `setxy` or `setxyturtle`.                                              |
-| `namedTheKeys`                  | `setturtlename`, `setturtlename2`, or `turtlename`.                    |
+| Criterion                       | Looks for                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `renamedChunks`                 | Action names other than those in `expected.chunkNames`.                                                                                                                  |
+| `changedOctave`                 | Pitch octaves other than those in `expected.octaves`.                                                                                                                    |
+| `usedTranspose`                 | `settransposition`, `setscalartransposition`, `setratio`, `octave`, `invert`, or `invert1`.                                                                              |
+| `createdVariation`              | A sequence that differs from `expected.pattern`.                                                                                                                         |
+| `usedRepeatLoop`                | A connected `repeat`.                                                                                                                                                    |
+| `changedRhythmLength`           | The rhythm length was edited.                                                                                                                                            |
+| `changedDrumSound`              | A different drum was selected.                                                                                                                                           |
+| `savedDrumMachine`              | The drum machine was saved as an action.                                                                                                                                 |
+| `changedPhraseDrums`            | The Phrase Maker drums were changed.                                                                                                                                     |
+| `createdPhraseVariation`        | An extra phrase beyond the required ones.                                                                                                                                |
+| `completedTwoPartForm`          | A two-part form was built.                                                                                                                                               |
+| `usedGeometryDivision`          | A connected `divide`.                                                                                                                                                    |
+| `usedBoxVariable`               | `namedbox`, `storein`, `storein2`, `box`, `box1`, or `box2`.                                                                                                             |
+| `readBoxValue`                  | `namedbox`, `box`, `box1`, or `box2`.                                                                                                                                    |
+| `changedShapeColor`             | `setcolor`, `sethue`, `setshade`, or `setgrey`.                                                                                                                          |
+| `createdExtraPolygon`           | A polygon with a side count outside 3, 4, and 5.                                                                                                                         |
+| `usedDupletTripletRhythms`      | Rhythm divisors 2 and 3.                                                                                                                                                 |
+| `createdExtraPolyrhythmDivisor` | A divisor beyond 2 and 3.                                                                                                                                                |
+| `usedAvatarAnimation`           | `turtleshell`.                                                                                                                                                           |
+| `usedEveryNoteAction`           | `everybeatdo` or `everybeatdonew`.                                                                                                                                       |
+| `usedNoteValueMotion`           | `mynotevalue`, `turtlenote2`, `turtleelapsednotes`, `turtlelapsednotes`, `elapsednotes`, `elapsednotes2`, `notecounter`, `notecounter2`, `beatvalue`, or `measurevalue`. |
+| `createdPitchPolyrhythm`        | `pitch`, `settimbre`, `notename`, `scaledegree2`, `nthmodalpitch`, `hertz`, or `steppitch`.                                                                              |
+| `changedAnimationTurn`          | `right`, `left`, `setheading`, or `arc`.                                                                                                                                 |
+| `usedOneMinusToggle`            | A stored value toggled with one-minus or modulo two.                                                                                                                     |
+| `playedRingDrum`                | `playdrum`, `setdrum`, or `playnoise`.                                                                                                                                   |
+| `builtMouseRing`                | At least three `start` blocks.                                                                                                                                           |
+| `addedHarmonyVoice`             | At least two `start` blocks.                                                                                                                                             |
+| `swungThePendulum`              | `setheading`.                                                                                                                                                            |
+| `changedTempo`                  | `setmasterbpm`, `setmasterbpm2`, `setbpm`, `setbpm2`, or `setbpm3`.                                                                                                      |
+| `setTheMeter`                   | `meter`.                                                                                                                                                                 |
+| `paintedTheBeat`                | `beatvalue`.                                                                                                                                                             |
+| `spacedTheKeys`                 | `setxy` or `setxyturtle`.                                                                                                                                                |
+| `namedTheKeys`                  | `setturtlename`, `setturtlename2`, or `turtlename`.                                                                                                                      |
 
 An unrecognised criterion returns `false`, so a typo shows up as a badge that can never be earned.
 

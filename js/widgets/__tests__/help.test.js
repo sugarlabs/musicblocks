@@ -886,6 +886,21 @@ describe("HelpWidget", () => {
 
             expect(activity.textMsg).not.toHaveBeenCalled();
         });
+
+        test("a card closed before its first frame is never drawn", () => {
+            const activity = createMockActivity();
+            const setupSpy = jest.spyOn(HelpWidget.prototype, "_setupCustomCard");
+            HelpWidget.showCard(activity, {
+                title: "Change octave",
+                description: "Change one pitch octave."
+            });
+
+            mockWidgetWindow.onclose();
+            jest.runAllTimers();
+
+            expect(setupSpy).not.toHaveBeenCalled();
+            setupSpy.mockRestore();
+        });
     });
 
     describe("static properties", () => {

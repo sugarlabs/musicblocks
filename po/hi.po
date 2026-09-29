@@ -10080,7 +10080,7 @@ msgstr "खोज के इनाम"
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Discoveries"
-msgstr "खोजें"
+msgstr "खोज"
 
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
@@ -10366,6 +10366,18 @@ msgstr "तुम्हारी किताब इंतज़ार कर �
 #: js/practiceLessons/practiceManager.js
 msgid "Complete a practice level and Captain Cadence will share the first page."
 msgstr "कोई अभ्यास स्तर पूरा करो और कैप्टन कैडेंस पहला पन्ना देंगे।"
+
+#: js/practiceLessons/practiceUI.js
+msgid "Lesson Complete"
+msgstr "पाठ पूरा हुआ"
+
+#: js/practiceLessons/practiceUI.js
+msgid "My Note"
+msgstr "मेरा नोट"
+
+#: js/practiceLessons/practiceUI.js
+msgid "Save Edit"
+msgstr "बदलाव सहेजें"
 
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js

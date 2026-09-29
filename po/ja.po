@@ -13139,10 +13139,6 @@ msgstr "低"
 #~ msgid "Record canvas and toolbars"
 #~ msgstr "キャンバスとツールバーを録画"
 
-#~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
-#~msgstr "<a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">シュガー・ラボ "
-
-
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Collapse Lesson Plans"
@@ -13245,7 +13241,7 @@ msgstr "橋はまだねむっています"
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work."
-msgstr "ビートにはこだまが少し聞こえますが、石のいたは A A B A を待っています。もう一度橋の歌をためして、できたかチェックをおしてください。"
+msgstr "ビートにはこだまが少し聞こえますが、石の板は A A B A を待っています。もう一度橋の歌をためして、できたかチェックをおしてください。"
 
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
@@ -13493,6 +13489,18 @@ msgid "Complete a practice level and Captain Cadence will share the first page."
 msgstr "れんしゅうのレベルをクリアすると、ケイデンス船長が最初のページをくれます。"
 
 #: js/practiceLessons/practiceUI.js
+msgid "Lesson Complete"
+msgstr "レッスンかんりょう"
+
+#: js/practiceLessons/practiceUI.js
+msgid "My Note"
+msgstr "わたしのメモ"
+
+#: js/practiceLessons/practiceUI.js
+msgid "Save Edit"
+msgstr "へんこうを保存する"
+
+#: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Close Explorer Journal prompt"
 msgstr "たんけん日記のメッセージをとじる"
@@ -13505,7 +13513,7 @@ msgstr "船長の日記"
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Every explorer notices something different. Before you sail onward, save one tiny memory from today."
-msgstr "たんけん家はそれぞれちがうことに気づきます。つぎへ出発する前に、きょうの小さな思い出をひとつ残しましょう。"
+msgstr "たんけんかはそれぞれちがうことに気づきます。つぎへ出発する前に、きょうの小さな思い出をひとつ残しましょう。"
 
 #: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js

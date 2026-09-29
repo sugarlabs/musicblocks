@@ -83,6 +83,9 @@ class HelpWidget {
 
         // Give the DOM time to create the div.
         window.requestAnimationFrame(() => {
+            if (!this.isOpen) {
+                return;
+            }
             if (blockHelpName) {
                 this._showBlockHelp(blockHelpName);
             } else if (customCard) {
