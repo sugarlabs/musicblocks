@@ -59,7 +59,21 @@ class AST2BlockList {
         const pitch =
             (typeof window !== "undefined" && window.MusicUtilsPitch) ||
             require("../utils/musicutils-pitch");
-        return solfege.noteIsSolfege(pitch.stripMicrotonalPrefix(note));
+        const constants =
+            (typeof window !== "undefined" && window.MusicUtilsConstants) ||
+            require("../utils/musicutils-constants");
+        const stripped = pitch.stripMicrotonalPrefix(note);
+        // noteIsSolfege only knows the spellings in SOLFEGECONVERSIONTABLE, so check every note
+        // spelling first (E♯, F♭, C𝄪, ...), in the ASCII form ALLNOTENAMES uses.
+        const ascii = stripped
+            .replace(constants.DOUBLESHARP, "x")
+            .replace(constants.DOUBLEFLAT, "bb")
+            .replace(constants.SHARP, "#")
+            .replace(constants.FLAT, "b");
+        if (constants.ALLNOTENAMES.includes(ascii)) {
+            return false;
+        }
+        return solfege.noteIsSolfege(stripped);
     }
 
     /**
