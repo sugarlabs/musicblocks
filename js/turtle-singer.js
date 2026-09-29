@@ -105,7 +105,29 @@ class Singer {
      */
     constructor(turtle) {
         this.turtle = turtle;
-        this.turtles = turtle.turtles;
+        this.turtles = turtle && turtle.turtles ? turtle.turtles : null;
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+        this.synthVolume = {};
+        this.panner = null;
+
+        this.reset();
+    }
+
+    /**
+     * Resets all musical and audio runtime state to clean initial defaults.
+     * Ensures consistent state across consecutive project runs.
+     *
+     * @param {boolean} [suppressOutput=false] - Whether to suppress audio output (e.g. during notation export).
+     * @returns {void}
+     */
+    reset(suppressOutput = false) {
+        if (this.activeVoices && typeof this.activeVoices.clear === "function") {
+            this.activeVoices.clear();
+        } else {
+            this.activeVoices = new Set();
+        }
+        this._unhighlightTimers = {};
 
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
@@ -190,7 +212,6 @@ class Singer {
         this.tieNoteExtras = [];
         this.tieCarryOver = 0;
         this.tieFirstDrums = [];
-        this.synthVolume = {};
         this.drift = 0;
         // Maximum fraction of note duration that can be used for lag correction per note.
         // This prevents notes from being rushed when catching up to the master clock.
@@ -216,7 +237,6 @@ class Singer {
         this.neighborArgNote2 = [];
         this.neighborArgBeat = [];
         this.neighborArgCurrentBeat = [];
-        this.panner = null;
 
         this.inNoteBlock = [];
         this.multipleVoices = false;
@@ -242,12 +262,10 @@ class Singer {
         this.justMeasuring = [];
         this.firstPitch = [];
         this.lastPitch = [];
-        this.suppressOutput = false;
+        this.suppressOutput = Boolean(suppressOutput);
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
-
-        // Voice Manager: Track active audio sources for proper cleanup
-        this.activeVoices = new Set();
+        this.runningFromEvent = false;
     }
 
     /**

@@ -221,6 +221,66 @@ describe("Singer Class", () => {
         expect(secondSinger.suppressOutput).toBe(false);
     });
 
+    describe("reset()", () => {
+        test("should restore all musical runtime state to canonical defaults", () => {
+            singer.register = 3;
+            singer.currentOctave = 7;
+            singer.beatFactor = 4;
+            singer.swing = [0.5];
+            singer.tie = true;
+            singer.staccato = [0.25];
+            singer.instrumentNames = ["piano", "drum"];
+            singer.inCrescendo = [true];
+            singer.notesPlayed = [5, 10];
+            singer.activeVoices.add("piano");
+
+            singer.reset(false);
+
+            expect(singer.register).toBe(0);
+            expect(singer.currentOctave).toBe(4);
+            expect(singer.beatFactor).toBe(1);
+            expect(singer.swing).toEqual([]);
+            expect(singer.tie).toBe(false);
+            expect(singer.staccato).toEqual([]);
+            expect(singer.instrumentNames).toEqual([]);
+            expect(singer.inCrescendo).toEqual([]);
+            expect(singer.notesPlayed).toEqual([0, 1]);
+            expect(singer.activeVoices.size).toBe(0);
+            expect(singer.suppressOutput).toBe(false);
+        });
+
+        test("should respect suppressOutput parameter when passed true", () => {
+            singer.reset(true);
+            expect(singer.suppressOutput).toBe(true);
+
+            singer.reset(false);
+            expect(singer.suppressOutput).toBe(false);
+        });
+
+        test("re-calling reset() produces isolated reference structures", () => {
+            singer.reset(false);
+            const notes1 = singer.notesPlayed;
+            const instruments1 = singer.instrumentNames;
+
+            singer.reset(false);
+            expect(singer.notesPlayed).not.toBe(notes1);
+            expect(singer.instrumentNames).not.toBe(instruments1);
+            expect(singer.notesPlayed).toEqual([0, 1]);
+        });
+
+        test("should not invoke killAllVoices() during pure state reset", () => {
+            singer.killAllVoices = jest.fn();
+            singer.reset(false);
+            expect(singer.killAllVoices).not.toHaveBeenCalled();
+        });
+
+        test("should preserve pre-configured synthVolume across reset()", () => {
+            singer.synthVolume = { "guitar": [100], "electronic synth": [80] };
+            singer.reset(false);
+            expect(singer.synthVolume).toEqual({ "guitar": [100], "electronic synth": [80] });
+        });
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);
