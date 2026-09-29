@@ -98,7 +98,8 @@ global.Singer = {
     setMasterVolume: jest.fn(),
     clearPitchToFrequencyCache: jest.fn(),
     masterBPM: 90,
-    defaultBPMFactor: 1
+    defaultBPMFactor: 1,
+    masterVolume: [50]
 };
 global.instruments = {};
 global.instrumentsFilters = {};
@@ -981,6 +982,37 @@ describe("Logo synth lifecycle", () => {
         expect(global.instrumentsFilters[1].flute).toEqual(["lp"]);
         expect(global.instrumentsEffects[1].flute).toEqual({ reverb: 0.5 });
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
+    });
+
+    test("prepSynths re-initialization uses current masterVolume for new turtles", () => {
+        logo.prepSynths();
+        jest.clearAllMocks();
+
+        Singer.masterVolume = [80];
+
+        const newTurtle = createMockTurtle();
+        mockActivity.turtles.turtleList.push(newTurtle);
+        mockActivity.turtles.ithTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtleCount = jest.fn(() => 3);
+        mockActivity.turtles.turtleCount = jest.fn(() => 3);
+
+        logo.prepSynths();
+
+        expect(newTurtle.singer.synthVolume["electronic synth"]).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise1).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise2).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise3).toEqual([80]);
+        expect(newTurtle.singer.synthVolume[DEFAULTVOICE]).toEqual([80]);
+        expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "2", "electronic synth", 80);
     });
 
     test("resetSynth creates default synth, resets volumes, and starts synth engine", () => {
