@@ -37,7 +37,7 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain("<instrument-name>snare drum</instrument-name>");
         expect(output).toContain("<midi-unpitched>39</midi-unpitched>");
         expect(output).toMatch(
-            /<unpitched\/>\s*<duration>8<\/duration>\s*<instrument id="D1-X1"\/>/
+            /<\/unpitched>\s*<duration>8<\/duration>\s*<instrument id="D1-X1"\/>/
         );
     });
 
@@ -58,10 +58,10 @@ describe("saveMxmlOutput", () => {
         const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
 
         expect(percussion).toMatch(
-            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="start"\/>\s*<instrument id="D1-X1"\/>/
+            /<\/unpitched>\s*<duration>16<\/duration>\s*<tie type="start"\/>\s*<instrument id="D1-X1"\/>/
         );
         expect(percussion).toMatch(
-            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="stop"\/>\s*<instrument id="D1-X1"\/>/
+            /<\/unpitched>\s*<duration>16<\/duration>\s*<tie type="stop"\/>\s*<instrument id="D1-X1"\/>/
         );
         expect(percussion).toContain('<measure number="2">');
     });
@@ -82,8 +82,8 @@ describe("saveMxmlOutput", () => {
         const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
         expect(pitched).toContain("<step>C</step>");
         expect(pitched).toContain("<step>D</step>");
-        expect(pitched).not.toContain("<unpitched/>");
-        expect(percussion.match(/<unpitched\/>/g)).toHaveLength(2);
+        expect(pitched).not.toContain("<unpitched>");
+        expect(percussion.match(/<unpitched>/g)).toHaveLength(2);
         expect(percussion).toContain('<instrument id="D1-X1"/>');
         expect(percussion).toContain('<instrument id="D1-X2"/>');
         expect(output).toContain("<midi-unpitched>37</midi-unpitched>");
@@ -106,7 +106,7 @@ describe("saveMxmlOutput", () => {
         const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
 
         expect(percussion).toMatch(/<rest\/>\s*<duration>8<\/duration>/);
-        expect(percussion).toMatch(/<unpitched\/>\s*<duration>8<\/duration>/);
+        expect(percussion).toMatch(/<\/unpitched>\s*<duration>8<\/duration>/);
     });
 
     it("exports an unmapped custom drum without an invalid MIDI assignment", () => {
@@ -118,7 +118,7 @@ describe("saveMxmlOutput", () => {
             }
         });
 
-        expect(output).toContain("<unpitched/>");
+        expect(output).toContain("<unpitched>");
         expect(output).toContain("<instrument-name>Percussion</instrument-name>");
         expect(output).not.toContain("<midi-unpitched>");
         expect(output).not.toContain("example.org");
@@ -1236,5 +1236,33 @@ describe("saveMxmlOutput notation markers", () => {
         expect(doc.getElementsByTagName("score-part")).toHaveLength(1);
         expect(doc.getElementsByTagName("part")).toHaveLength(1);
         expect(measuresOf(doc).length).toBeGreaterThan(0);
+    });
+});
+
+describe("saveMxmlOutput - unpitched notes carry a staff position", () => {
+    const drumNote = drum => [["R"], 4, 0, null, null, false, false, drum];
+
+    it("gives every unpitched note a display step and octave", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: [drumNote("snare drum"), drumNote("kick drum")] }
+            }
+        });
+
+        const unpitched = output.match(/<unpitched>[\s\S]*?<\/unpitched>/g);
+        expect(unpitched).toHaveLength(2);
+        unpitched.forEach(element => {
+            expect(element).toMatch(/<display-step>[A-G]<\/display-step>/);
+            expect(element).toMatch(/<display-octave>\d<\/display-octave>/);
+        });
+    });
+
+    it("never writes an empty unpitched element", () => {
+        const output = saveMxmlOutput({
+            notation: { notationStaging: { 0: [drumNote("snare drum")] } }
+        });
+
+        expect(output).not.toContain("<unpitched/>");
+        expect(output).not.toMatch(/<unpitched>\s*<\/unpitched>/);
     });
 });
