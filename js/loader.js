@@ -234,6 +234,18 @@ requirejs.config({
             ],
             exports: "MusicUtilsBuildScale"
         },
+        "utils/musicutils-pitchinfo": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-buildscale"
+            ],
+            exports: "MusicUtilsPitchInfo"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
@@ -247,7 +259,8 @@ requirejs.config({
                 "utils/musicutils-modewheel",
                 "utils/musicutils-modecore",
                 "utils/musicutils-pitchscale",
-                "utils/musicutils-buildscale"
+                "utils/musicutils-buildscale",
+                "utils/musicutils-pitchinfo"
             ]
         },
         "utils/synthutils": {
