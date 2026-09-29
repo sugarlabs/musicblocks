@@ -2631,6 +2631,20 @@ describe("Logo parseArg", () => {
 
             expect(getIntervalNumber).toHaveBeenCalledWith("fifth");
         });
+
+        test("handles non-string interval name blocks safely", () => {
+            logo.blockList = [
+                {
+                    name: "intervalname",
+                    value: null,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => false
+                }
+            ];
+
+            const result = logo.parseArg(logo, 0, 0, null, null);
+            expect(result).toBe(0);
+        });
     });
 
     describe("block type branches", () => {
