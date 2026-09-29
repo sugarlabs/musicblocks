@@ -561,63 +561,46 @@
 	      temperament</em> block in order to play the notes in selected temperament
 	    system. <em>Starting Pitch</em> is the argument of pitch block inside
 	    temperament block. In the above example, starting pitch is <code>C4</code>.</p>
-	  <p><img alt="widget" src="./temperament2.svg" title="the Temperament widget" /></p>
-	  <p>In the above example, selected temperament is <em>Just Intonation</em>. Notes
-	    within an octave can be viewed in the form of circle. These circles
-	    represent <em>pitch numbers</em>. Note that the pitches that are closer
-	    together in selected temperament system are visually closer and
-	    pitches that are farther apart looks farther.</p>
-	  <p>The information regarding any note can be viewed by clicking on the
-	    respective circle. In the above example, circle (pitch number) <code>2</code> is
-	    <code>D4</code>. The frequency of note can be changed through edit button (left
-	    hand side corner of note information popup).</p>
-	  <p><img alt="widget" src="./temperament3.svg" title="the Temperament widget" /></p>
-	  <p>Information regarding notes can also be viewed in the form of a
-	    <em>table</em> as shown in the above example. The table will show all the
-	    information about pitches that lie within an octave. This information
-	    includes <em>pitch number</em>, <em>interval</em>, <em>ratio</em>, <em>note</em>, <em>frequency</em> and
-	    <em>mode</em>.</p>
+	  <p><img alt="widget" src="./temperament-visualizer.svg" title="the Temperament visualizer" /></p>
+	  <p>The visualizer compares the active temperament (inner dots) against a
+	    12-EDO reference (outer ring with 12 ticks). Each pitch has a spoke to
+	    its nearest 12-EDO step. Color shows the deviation: green (dashed) is
+	    in tune (within <code>±1</code> cent), orange is sharp (<code>+</code> cents), red is flat
+	    (<code>-</code> cents). The center shows the selected note, its deviation, and
+	    its frequency; otherwise it shows <code>&lt;temperament&gt; vs 12-EDO</code>. A legend
+	    below the circle explains the colors.</p>
+	  <p>Click a dot to select it and hear its pitch; the selected dot gets a
+	    yellow ring and its table row is highlighted. Drag a dot around the
+	    circle to retune it (clamped between its neighbors). Double-click a
+	    Frequency, Cents, or Ratio cell to type an exact value. Right-click
+	    (or long-press) a dot or row for <code>Set cents</code> and <code>Reset to 12-EDO</code>.
+	    Arrow keys move the selection; Enter or Space plays it. The tonic
+	    (<code>Step 0</code>) is locked and cannot be dragged, edited, or removed.</p>
+	  <p><img alt="widget" src="./temperament-visualizer-table.svg" title="temperament pitch table" /></p>
+	  <p>The table below the circle lists every pitch, highest first. Columns
+	    are <em>Pitch</em> (note name with <code>^</code>/<code>v</code> deviation arrows), <em>Step</em>,
+	    <em>Frequency (Hz)</em>, <em>Cents dev. from 12-EDO</em>, and <em>Ratio</em>.</p>
+	  <p><img alt="widget" src="./temperament-visualizer-17edo.svg" title="17-EDO in the visualizer" /></p>
+	  <p>The temperament selector (menu icon next to the name) switches systems
+	    &mdash; for example Equal <code>5</code>, <code>17</code>, <code>19</code>, <code>31</code>-EDO, <em>Just Intonation</em>,
+	    <em>Pythagorean</em>, or meantone &mdash; and redraws the circle and table. Edited
+	    built-in temperaments are marked <em>modified</em> and saved as <em>custom</em>.</p>
 	  <p>The frequency of any note is calculated by <code>Starting Pitch Frequency</code>
 	    x <code>Ratio</code>.</p>
 	  <p>The widget controls are as follows:</p>
-	  <p>The <em>Clear</em> button at the bottom of the widget will clear all pitches
-	    except for a single <code>0</code> from which the user may add pitches.</p>
-	  <p>The <em>Play all</em> button will play through all the pitches in an octave
-	    and then it will play backwards down the pitches.</p>
-	  <p>The <em>Save</em> button will save custom temperament for use in your
-	    program. It will create a <em>set temperament</em> block. This block will
-	    tune the notes attached to it according to the selected temperament.</p>
-	  <p>The <em>Table</em> button is used to toggle between circular and tabular
-	    representation of notes.</p>
-	  <p>The <em>Add</em> button is used to edit notes through different tools:</p>
-	  <p><img alt="widget" src="./temperament4.svg" title="Equal Edit tool" /></p>
-	  <p><img alt="widget" src="./temperament4a.svg" title="Temperament widget with new element" /></p>
-	  <p>The <code>Equal</code> edit tool is used to make <em>equal divisions</em> between two
-	    pitch numbers.  In the above example, two equal divisions are made
-	    between pitch numbers <code>0</code> and <code>1</code> and the resultant number of notes
-	    within an octave are changed from 12 to 13.</p>
-	  <p><img alt="widget" src="./temperament5.svg" title="Ratio Edit tool" /></p>
-	  <p><img alt="widget" src="./temperament5a.svg" title="Temperament widget with new element" /></p>
-	  <p>The <code>Ratio</code> tool is used to add notes of specified ratios in such a
-	    way that the resultant pitches wrap inside a single octave. Recursion
-	    represents the number of times notes ratio calculation is repeated. In
-	    the above example, 2 notes are added in pitch space and the resultant
-	    number of notes within an octave are changed from 12 to 14. Frequency
-	    of first pitch is (Starting Pitch Frequency) * (16/13) and second
-	    pitch is (Starting Pitch Frequency) * (16/13)².</p>
-	  <p><img alt="widget" src="./temperament6.svg" title="Arbitrary Edit tool" /></p>
-	  <p>The <code>Arbitrary</code> edit tool is used to add a note in an arbitrary
-	    position. In this panel, whenever the user hovers over the outer
-	    circle, a frequency-slider window pops up, allowing the user to add a
-	    note according to a chosen frequency. In the above example, a new note
-	    will be added somewhere between pitch numbers <code>2</code> and <code>3</code> by adjusting
-	    the frequency slider.</p>
-	  <p><img alt="widget" src="./temperament7.svg" title="Octave Space Edit tool" /></p>
-	  <p>The <code>Octave Space</code> tool is used to edit the octave ratio. The standard
-	    octave space is 2:1. In the above example, octave space will be
-	    changed to 3:1 after clicking on <code>Done</code>.</p>
-	  <p>The <em>Drag</em> button will drag the widget.</p>
-	  <p>The <em>Close</em> button will close the widget.</p>
+	  <p><em>Play all pitches</em>, which plays the scale up one octave and back down;</p>
+	  <p><em>Save</em>, which saves the temperament and creates a <em>set temperament</em>
+	    block that tunes the notes attached to it;</p>
+	  <p><em>Share</em>, which exports (<code>.scl</code>, JSON) or imports a temperament;</p>
+	  <p><em>Add pitch after</em> / <em>Add pitch before</em>, which insert a new pitch
+	    midway between the selected pitch and its clockwise (after) or
+	    counter-clockwise (before) neighbor, or into the largest gap when
+	    nothing is selected;</p>
+	  <p><em>Remove selected pitch</em>, which deletes the selected pitch (except the
+	    tonic);</p>
+	  <p><em>Create new temperament</em>, which opens the advanced Equal, Ratio,
+	    Arbitrary, and Octave-Space editors; and</p>
+	  <p><em>Close</em>, which closes the widget.</p>
 	  <h3><a name="oscilloscope">4.13 The Oscilloscope</a></h3>
 	  <p>Music Blocks has an Oscilloscope Widget to visualize the music as it
 	    plays.</p>
