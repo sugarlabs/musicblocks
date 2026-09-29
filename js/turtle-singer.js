@@ -808,7 +808,10 @@ class Singer {
             for (let j = 0, synthCount = synthKeys.length; j < synthCount; j++) {
                 const arr = synthVolume[synthKeys[j]];
                 if (arr.length > 0) {
-                    arr[arr.length - 1] = DEFAULTVOLUME;
+                    // Every entry, not just the top one: resetSynth() leaves a clamp's listener
+                    // attached, so a pop after this point would otherwise bring back a stale
+                    // level. The depth stays as it is for those pending pops to unwind.
+                    arr.fill(DEFAULTVOLUME);
                 } else {
                     arr.push(DEFAULTVOLUME);
                 }

@@ -778,9 +778,15 @@ describe("resetMasterVolume", () => {
     });
 
     test("should return each synth to the default level", () => {
-        turtleMock.singer.synthVolume = { "electronic synth": [100, 10] };
+        turtleMock.singer.synthVolume = { "electronic synth": [30, 10] };
         Singer.resetMasterVolume(logoMock);
         expect(turtleMock.singer.synthVolume["electronic synth"]).toEqual([100, 100]);
+    });
+
+    test("should keep the synth stack depth so a pending clamp can still unwind", () => {
+        turtleMock.singer.synthVolume = { "electronic synth": [30, 20, 10] };
+        Singer.resetMasterVolume(logoMock);
+        expect(turtleMock.singer.synthVolume["electronic synth"]).toHaveLength(3);
     });
 });
 
