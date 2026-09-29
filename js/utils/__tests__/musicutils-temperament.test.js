@@ -142,6 +142,7 @@ describe("musicutils-temperament", () => {
             "musicutils-solfege.js",
             "musicutils-modewheel.js",
             "musicutils-modecore.js",
+            "musicutils-pitchscale.js",
             "musicutils.js"
         ];
         const load = files => {

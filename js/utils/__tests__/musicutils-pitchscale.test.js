@@ -20,6 +20,7 @@ const slicePath = () => ({ DonutSlice: "donut", DonutSliceCustomization: () => (
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
 global.isUnsafeObjectKey = isUnsafeObjectKey;
+global.INVALIDPITCH = ["INVALIDPITCH"];
 global.DRUMNAMES = [];
 global.NOISENAMES = [];
 global.VOICENAMES = [];
@@ -27,85 +28,68 @@ global.CUSTOMSAMPLES = [];
 global.slicePath = slicePath;
 global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
-// require("../musicutils") first so MUSICALMODES is filled from PITCH_COLLECTIONS the way the
-// real app fills it, before this file's own require of musicutils-modecore reads the same object.
+// These tests cover the module boundary (exports, globals, reachability through musicutils.js);
+// musicutils.test.js already covers the music-theory behavior of these functions.
+
+const pitchscale = require("../musicutils-pitchscale");
 const musicutils = require("../musicutils");
-const modecore = require("../musicutils-modecore");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
-describe("musicutils-modecore", () => {
-    it("round-trips a base64 string", () => {
-        expect(modecore.base64Encode("hi")).toBe("hi");
+describe("musicutils-pitchscale", () => {
+    it("still resolves a pitch, a scale degree number, and a key signature's mode", () => {
+        expect(pitchscale.getNote("F", 4, 0, "G major")).toEqual(["F", 4, 0]);
+        expect(pitchscale.pitchToNumber("C", 4, "C major", "equal")).toBe(39);
+        expect(pitchscale.numberToPitch(60, "equal")).toEqual(["A", 5]);
+        expect(pitchscale.keySignatureToMode("G major")).toEqual(["G", "major"]);
+        expect(pitchscale.getSharpFlatPreference("G major")).toBe("sharp");
     });
 
-    it("gives a mode's semitone numbers and a scale pattern in a non-12-EDO tuning", () => {
-        expect(modecore.getModeNumbers("major")).toBe("0 2 4 5 7 9 11");
-        expect(modecore.getNonEDOModeSteps("major", "equal")).toEqual([2, 2, 1, 2, 2, 2, 1]);
-        expect(modecore.scalePatternToEDO([2, 2, 1, 2, 2, 2, 1], 19)).toEqual([
-            3, 3, 2, 3, 3, 3, 2
+    it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
+        expect(pitchscale.getNoteFromSolfege("sol", "C major", true, 12, 4, 0)).toEqual([
+            "G",
+            4,
+            0
         ]);
+        expect(pitchscale.getNoteFromSolfege("xyz", "C major", true, 12, 4, 0)).toBeNull();
     });
 
-    it("fills MUSICALMODES from the pitch collections, major included", () => {
-        expect(modecore.MUSICALMODES.major).toEqual([2, 2, 1, 2, 2, 2, 1]);
-        expect(modecore.getModePattern("major")).toEqual([2, 2, 1, 2, 2, 2, 1]);
-    });
-
-    it("captures customMode after MUSICALMODES.custom is set, not before", () => {
-        // customMode = MUSICALMODES["custom"] is a one-time read, not a live reference, so the
-        // assignment that fills MUSICALMODES.custom has to run first in this same file.
-        expect(modecore.customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-        expect(modecore.MUSICALMODES.custom).toBe(modecore.customMode);
-    });
-
-    it("has 20 chord definitions and a movable-tonic-degree table", () => {
-        expect(modecore.CHORDVALUES).toHaveLength(20);
-        expect(modecore.CHORDVALUES[0]).toEqual([
-            [0, 0],
-            [2, 0],
-            [4, 0]
-        ]);
-        expect(Object.keys(modecore.MOVABLE_TONIC_DEGREE)).toContain("dorian");
-    });
-
-    it("encodes the note-graphic constants as base64 data URIs", () => {
-        expect(modecore.wholeNoteImg).toMatch(/^data:image\/svg\+xml;base64,/);
+    it("gives a key signature's scale, solfege slots, tonic and mode together", () => {
+        const [scale, solfege, tonic, mode] = pitchscale.getScaleAndHalfSteps("C major");
+        expect(scale).toHaveLength(12);
+        expect(solfege).toHaveLength(12);
+        expect(tonic).toBe("C");
+        expect(mode).toBe("major");
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
-            "MUSICALMODES",
-            "customMode",
-            "getModeNumbers",
-            "getNonEDOModeSteps",
-            "getArticulation",
-            "modeMapper",
-            "getCustomNote",
-            "GetNotesForInterval",
-            "base64Encode",
-            "scalePatternToEDO",
-            "PITCH_COLLECTIONS_EDO_OVERRIDES",
-            "getModePattern"
+            "keySignatureToMode",
+            "getScaleAndHalfSteps",
+            "getSharpFlatPreference",
+            "pitchToNumber",
+            "getNoteFromInterval",
+            "numberToPitch",
+            "getNote"
         ]) {
-            expect(musicutils[name]).toBe(modecore[name]);
+            expect(musicutils[name]).toBe(pitchscale[name]);
         }
     });
 
     it("exports every function and table the file declares", () => {
-        const source = readSource("musicutils-modecore.js");
+        const source = readSource("musicutils-pitchscale.js");
         const declared = [
             ...source.matchAll(/^var (\w+) =/gm),
             ...source.matchAll(/^function (\w+)\(/gm)
         ]
             .map(match => match[1])
-            .filter(name => name !== "MusicUtilsModeCore");
-        expect(Object.keys(modecore).sort()).toEqual(declared.sort());
+            .filter(name => name !== "MusicUtilsPitchScale");
+        expect(Object.keys(pitchscale).sort()).toEqual(declared.sort());
     });
 
     it("does not define anything that musicutils.js also defines", () => {
         const remaining = readSource("musicutils.js");
-        for (const name of Object.keys(modecore)) {
+        for (const name of Object.keys(pitchscale)) {
             expect(remaining).not.toMatch(new RegExp(`^(const|let|var|function) ${name}\\b`, "m"));
         }
     });
@@ -130,6 +114,7 @@ describe("musicutils-modecore", () => {
                 _: value => value,
                 isUnsafeObjectKey,
                 slicePath,
+                INVALIDPITCH: ["INVALIDPITCH"],
                 DRUMNAMES: [],
                 NOISENAMES: [],
                 VOICENAMES: [],
@@ -142,23 +127,25 @@ describe("musicutils-modecore", () => {
             return sandbox;
         };
 
-        it("loads between the mode wheel module and musicutils.js without errors", () => {
+        it("loads between the mode/chord core module and musicutils.js without errors", () => {
             expect(() => load(order)).not.toThrow();
         });
 
         it("leaves every declared name visible as a bare global", () => {
             const sandbox = load(order);
-            for (const name of Object.keys(modecore)) {
-                if (name === "MusicUtilsModeCore") continue;
+            for (const name of Object.keys(pitchscale)) {
+                if (name === "MusicUtilsPitchScale") continue;
                 expect(vm.runInContext(`typeof ${name}`, sandbox)).not.toBe("undefined");
             }
         });
 
         it("publishes the module object for the RequireJS shim", () => {
             const sandbox = load(order);
-            expect(sandbox.window.MusicUtilsModeCore.getModeNumbers("major")).toBe(
-                "0 2 4 5 7 9 11"
-            );
+            expect(sandbox.window.MusicUtilsPitchScale.getNote("F", 4, 0, "G major")).toEqual([
+                "F",
+                4,
+                0
+            ]);
         });
     });
 });
