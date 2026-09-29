@@ -164,6 +164,10 @@ window.widgetWindows = {
 
         // Handle Escape (Close)
         if (e.key === "Escape") {
+            // An open widget pie menu takes Escape first (see piemenus.js).
+            const pieMenu = docById("wheelDivptm");
+            if (pieMenu && pieMenu.style.display !== "none") return;
+
             focused.onclose();
             e.preventDefault();
             e.stopPropagation();
@@ -240,7 +244,12 @@ window.widgetWindows = {
                 e.target.closest(".dropdown-content") ||
                 e.target.closest(".dropdown-trigger"));
 
-        if (isToolbarInteraction) {
+        // Widget pie menus (Music Keyboard, Phrase Maker, Sampler) open in
+        // #wheelDivptm, outside the widget frame, so a click on one must not
+        // take focus away from the widget that opened it.
+        const isWidgetPieMenuInteraction = e.target?.closest && e.target.closest("#wheelDivptm");
+
+        if (isToolbarInteraction || isWidgetPieMenuInteraction) {
             return;
         }
 

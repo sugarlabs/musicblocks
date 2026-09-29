@@ -1050,6 +1050,57 @@ describe("widgetWindows", () => {
             }
         });
 
+        test("preserves focus when clicking a widget pie menu", () => {
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "wheelDivptm";
+            const slice = document.createElement("span");
+            pieMenu.appendChild(slice);
+            document.body.appendChild(pieMenu);
+
+            try {
+                const win1 = createTestWindow("Window 1");
+                const win2 = createTestWindow("Window 2");
+
+                win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+                expect(window.widgetWindows.focused).toBe(win1);
+
+                slice.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+                expect(window.widgetWindows.focused).toBe(win1);
+                expect(win1._frame.style.opacity).toBe("1");
+                expect(win1._frame.style.zIndex).toBe("10000");
+                expect(win2._frame.style.opacity).toBe("0.7");
+            } finally {
+                pieMenu.remove();
+            }
+        });
+
+        test("Escape leaves the focused window open while its pie menu is showing", () => {
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "wheelDivptm";
+            document.body.appendChild(pieMenu);
+
+            try {
+                const win = createTestWindow("Window 1");
+                const closeSpy = jest.spyOn(win, "onclose");
+
+                const escape = () =>
+                    document.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                    );
+
+                pieMenu.style.display = "";
+                escape();
+                expect(closeSpy).not.toHaveBeenCalled();
+
+                pieMenu.style.display = "none";
+                escape();
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                pieMenu.remove();
+            }
+        });
+
         test("Escape key closes only the currently focused window", () => {
             const win1 = createTestWindow("Window 1");
             const win2 = createTestWindow("Window 2");
