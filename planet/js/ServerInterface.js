@@ -196,6 +196,37 @@ class ServerInterface {
     }
 
     /**
+     * Fetches rows [start, end) from a list endpoint that pages by page number
+     * and limit. GlobalPlanet asks for windows that don't start on a page
+     * boundary (Load More advances by 24 but asks for 25), so a window can span
+     * two pages: fetch each and keep only the requested rows.
+     *
+     * @param {Function} pathFor  (page, limit) => request path
+     * @param {number}   start    zero-based start index
+     * @param {number}   end      exclusive end index
+     * @returns {Promise<Object|null>}  { data: [...] }, or the failed response
+     */
+    async _getWindow(pathFor, start, end) {
+        const limit = end - start;
+        if (limit <= 0) return { data: [] };
+
+        const firstPage = Math.floor(start / limit) + 1;
+        const lastPage = Math.floor((end - 1) / limit) + 1;
+        const rows = [];
+
+        for (let page = firstPage; page <= lastPage; page++) {
+            const response = await this._get(pathFor(page, limit));
+            if (!response || !Array.isArray(response.data)) return response;
+            rows.push(...response.data);
+            // A short page is the last one, so there is nothing after it.
+            if (response.data.length < limit) break;
+        }
+
+        const skip = start - (firstPage - 1) * limit;
+        return { data: rows.slice(skip, skip + limit) };
+    }
+
+    /**
      * Low-level POST / PUT — returns parsed JSON or null on network error.
      * @param {string}         path
      * @param {Object}         body
@@ -432,9 +463,6 @@ class ServerInterface {
      */
     async downloadProjectList(tags, sort, start, end, callback) {
         try {
-            const limit = end - start;
-            const page = Math.floor(start / limit) + 1;
-
             const sortMap = {
                 RECENT: "createdAt",
                 LIKED: "likes",
@@ -462,8 +490,11 @@ class ServerInterface {
                 return;
             }
 
-            const response = await this._get(
-                `/allRepos?page=${page}&limit=${limit}&sort=${sortParam}${topicParam}`
+            const response = await this._getWindow(
+                (page, limit) =>
+                    `/allRepos?page=${page}&limit=${limit}&sort=${sortParam}${topicParam}`,
+                start,
+                end
             );
 
             callback(this._normaliseProjectList(response));
@@ -512,11 +543,11 @@ class ServerInterface {
         }
 
         try {
-            const limit = end - start;
-            const page = Math.floor(start / limit) + 1;
-
-            const response = await this._get(
-                `/search?q=${encodeURIComponent(query.trim())}&page=${page}&limit=${limit}`
+            const q = encodeURIComponent(query.trim());
+            const response = await this._getWindow(
+                (page, limit) => `/search?q=${q}&page=${page}&limit=${limit}`,
+                start,
+                end
             );
 
             callback(this._normaliseProjectList(response));
