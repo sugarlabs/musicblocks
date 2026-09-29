@@ -612,7 +612,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this.deps.Singer.setMasterVolume(this, DEFAULTVOLUME);
+        this.deps.Singer.resetMasterVolume(this);
         for (const t in this.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
@@ -1729,6 +1729,13 @@ class Logo {
             turtle.embeddedGraphicsPending = 0;
             turtle.embeddedGraphicsGeneration += 1;
         }
+
+        // masterVolume is static, so a level left behind by an earlier run would still be in
+        // force here. This belongs on the run boundary rather than in prepSynths(): prepSynths()
+        // skips its setup when the synths are already up (a restart with no stop in between) and
+        // it also runs mid-project when onEveryBeatDo adds a companion turtle, where resetting
+        // would pull the rug out from a project that set its own level.
+        this.deps.Singer.resetMasterVolume(this);
 
         this.prepSynths();
 

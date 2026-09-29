@@ -174,6 +174,7 @@ const createLogoMock = activityMock => ({
     activity: activityMock,
     synth: {
         setMasterVolume: jest.fn(),
+        resetMasterVolume: jest.fn(),
         setVolume: jest.fn(),
         rampTo: jest.fn(),
         getFrequency: jest.fn(),
@@ -731,6 +732,61 @@ describe("setMasterVolume edge cases", () => {
         turtleMock.singer.synthVolume = { DEFAULTVOICE: [100] };
         Singer.setMasterVolume(logoMock, 75);
         expect(turtleMock.singer.synthVolume.DEFAULTVOICE).toContain(75);
+    });
+});
+
+describe("resetMasterVolume", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+    });
+
+    test("should discard a level left behind by an interrupted clamp", () => {
+        Singer.masterVolume.push(10);
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should discard every level when several were left behind", () => {
+        Singer.masterVolume.push(30, 10);
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should restore the base level when it was overwritten in place", () => {
+        Singer.masterVolume[0] = 10;
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should put the output back to its fresh load level", () => {
+        Singer.masterVolume.push(0);
+        Singer.resetMasterVolume(logoMock);
+        expect(logoMock.synth.resetMasterVolume).toHaveBeenCalled();
+    });
+
+    test("should leave the output alone rather than ramping it to the default level", () => {
+        Singer.masterVolume.push(10);
+        Singer.resetMasterVolume(logoMock);
+        expect(logoMock.synth.setMasterVolume).not.toHaveBeenCalled();
+    });
+
+    test("should return each synth to the default level", () => {
+        turtleMock.singer.synthVolume = { "electronic synth": [30, 10] };
+        Singer.resetMasterVolume(logoMock);
+        expect(turtleMock.singer.synthVolume["electronic synth"]).toEqual([100, 100]);
+    });
+
+    test("should keep the synth stack depth so a pending clamp can still unwind", () => {
+        turtleMock.singer.synthVolume = { "electronic synth": [30, 20, 10] };
+        Singer.resetMasterVolume(logoMock);
+        expect(turtleMock.singer.synthVolume["electronic synth"]).toHaveLength(3);
     });
 });
 

@@ -2661,6 +2661,22 @@ function Synth() {
     };
 
     /**
+     * Returns the output to the level it sits at on a fresh load.
+     *
+     * DEFAULTVOLUME is the resting value of the master volume stack but it is not the resting
+     * value of the output: running it through the gain curve above lands on -6 dB whereas an
+     * untouched destination is at 0 dB. A project that never sets a volume has to sound the same
+     * after a reset as it does on a fresh load so the level is restored directly.
+     *
+     * @function
+     * @memberof Synth
+     * @returns {void}
+     */
+    this.resetMasterVolume = () => {
+        Tone.Destination.volume.rampTo(0, 0.01);
+    };
+
+    /**
      * Starts Recording
      * @function
      * @memberof Synth

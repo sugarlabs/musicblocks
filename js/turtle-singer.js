@@ -781,6 +781,47 @@ class Singer {
     }
 
     /**
+     * Restores the master volume to its default level.
+     *
+     * masterVolume is a stack shared by every turtle and every run. The set master volume clamp
+     * pushes a level and pops it when the clamp ends, so stopping a project inside that clamp
+     * leaves the level behind, and loadSynth() hands each new instrument last(masterVolume).
+     * Without this the level survives into the next run and into whatever project is loaded after.
+     *
+     * The output itself goes back to its fresh-load level rather than through setMasterVolume():
+     * feeding DEFAULTVOLUME to the gain curve would land on -6 dB and quieten every project that
+     * never sets a volume of its own.
+     *
+     * @static
+     * @param {Object} logo
+     * @returns {void}
+     */
+    static resetMasterVolume(logo) {
+        Singer.masterVolume.length = 1;
+        Singer.masterVolume[0] = DEFAULTVOLUME;
+
+        const turtleList = logo.activity.turtles.turtleList;
+        for (let i = 0, turtleCount = turtleList.length; i < turtleCount; i++) {
+            const synthVolume = turtleList[i].singer.synthVolume;
+            const synthKeys = Object.keys(synthVolume);
+
+            for (let j = 0, synthCount = synthKeys.length; j < synthCount; j++) {
+                const arr = synthVolume[synthKeys[j]];
+                if (arr.length > 0) {
+                    // Every entry, not just the top one: resetSynth() leaves a clamp's listener
+                    // attached, so a pop after this point would otherwise bring back a stale
+                    // level. The depth stays as it is for those pending pops to unwind.
+                    arr.fill(DEFAULTVOLUME);
+                } else {
+                    arr.push(DEFAULTVOLUME);
+                }
+            }
+        }
+
+        logo.synth.resetMasterVolume();
+    }
+
+    /**
      * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
      *
      * @static
