@@ -296,7 +296,7 @@ class AST2BlockList {
             const argConfigs = config.argument_blocks;
 
             // Implementation of toTrees(AST).
-            let root = {};
+            let root = { children: [] };
             for (let body of AST.body) {
                 _createNodeAndAddToTree(body, root);
             }
