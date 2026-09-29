@@ -2570,7 +2570,10 @@ class Blocks {
             }
 
             if (thisBlock !== null) {
-                this.blockList[thisBlock].unhighlight();
+                const block = this.blockList[thisBlock];
+                if (block && typeof block.unhighlight === "function") {
+                    block.unhighlight();
+                }
             }
 
             if (this.highlightedBlock === thisBlock) {
