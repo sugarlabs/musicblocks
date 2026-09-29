@@ -1352,6 +1352,53 @@ describe("Block Foundation", () => {
             expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(block);
         });
 
+        describe("trash visibility when a drag ends", () => {
+            const makeDraggedBlock = overTrash => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.blockIndex = 0;
+                block._setDragGroupTrashHoverScale = jest.fn();
+                block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+                block.activity.logo.runningLilypond = false;
+                block.activity.getStageScale = jest.fn().mockReturnValue(1);
+                block.activity.textMsg = jest.fn();
+                block.activity.trashcan = {
+                    hide: jest.fn(),
+                    overTrashcan: jest.fn().mockReturnValue(overTrash)
+                };
+                mockBlocks.longPressTimeout = null;
+                mockBlocks.sendStackToTrash = jest.fn();
+                mockBlocks.blockMoved = jest.fn();
+                mockBlocks.adjustDocks = jest.fn();
+                return block;
+            };
+
+            it("hides the trash after a block is dropped in it", () => {
+                const block = makeDraggedBlock(true);
+
+                block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true);
+
+                expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(block);
+                expect(block.activity.trashcan.hide).toHaveBeenCalled();
+            });
+
+            it("hides the trash after a block is dropped elsewhere", () => {
+                const block = makeDraggedBlock(false);
+
+                block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true);
+
+                expect(mockBlocks.blockMoved).toHaveBeenCalledWith(0);
+                expect(block.activity.trashcan.hide).toHaveBeenCalled();
+            });
+
+            it("keeps the trash shown on a mouseout while the block has moved", () => {
+                const block = makeDraggedBlock(false);
+
+                block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, false);
+
+                expect(block.activity.trashcan.hide).not.toHaveBeenCalled();
+            });
+        });
+
         it("does not reconcile a clean grid", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
             block.blockIndex = 0;

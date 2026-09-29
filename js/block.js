@@ -3786,7 +3786,7 @@ class Block {
         }
 
         // Always hide the trash when there is no block selected.
-        if (!moved) {
+        if (!moved || dragEnded) {
             this.activity.trashcan.hide();
         }
 
