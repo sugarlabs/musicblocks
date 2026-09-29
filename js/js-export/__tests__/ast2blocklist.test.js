@@ -2349,4 +2349,24 @@ describe("AST2BlockList Class", () => {
         expect(restBlock).toBeDefined();
         expect(ifElseBlock[4][3]).toBe(restBlock[0]);
     });
+
+    test("should return an empty block list for programs containing only comments and semicolons", () => {
+        const code = `
+        // Just a comment
+        ;
+        ;
+        `;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual([]);
+    });
+
+    test("should return an empty block list for an empty program", () => {
+        const code = "";
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual([]);
+    });
 });
