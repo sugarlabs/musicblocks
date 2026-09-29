@@ -412,6 +412,8 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
     return (parseInt(octave, 10) + 1) * currentEDO + pitchIndex - applyOffset;
 }
 
+const parseNoteCache = new Map();
+
 /**
  * Parse a note string into note name and octave.
  * This function correctly handles multi-digit octaves by using regex.
@@ -422,6 +424,11 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
 var parseNoteString = note => {
     if (!note) return ["", NaN];
 
+    if (parseNoteCache.has(note)) {
+        const cached = parseNoteCache.get(note);
+        return [cached[0], cached[1]]; // Return a copy to prevent mutation
+    }
+
     // Regex to match note name and octave:
     // 1. Optional microtonal prefixes (^ or v)
     // 2. Base note name (Western, Solfege, Carnatic)
@@ -431,13 +438,22 @@ var parseNoteString = note => {
         /^([\^v]*(?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
     );
 
+    let result;
     if (match) {
-        return [match[1], Number(match[2])];
+        result = [match[1], Number(match[2])];
+    } else {
+        // If completely unparseable, return the whole string as the note with NaN octave.
+        // This is safer than silently chopping off the last character.
+        result = [note, NaN];
     }
 
-    // If completely unparseable, return the whole string as the note with NaN octave.
-    // This is safer than silently chopping off the last character.
-    return [note, NaN];
+    // Limit cache size to prevent memory leaks with unbounded dynamically generated notes
+    if (parseNoteCache.size > 2000) {
+        parseNoteCache.clear();
+    }
+    parseNoteCache.set(note, result);
+
+    return [result[0], result[1]];
 };
 
 /**
