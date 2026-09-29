@@ -669,6 +669,14 @@ class AST2BlockList {
                 return null;
             }
 
+            /**
+             * Matches an AST statement node against block configurations, creates a tree node,
+             * and attaches it to the parent.
+             *
+             * @param {Object} bodyAST - AST statement node to process
+             * @param {Object} parent - Parent tree node to attach children to
+             * @returns {void}
+             */
             function _createNodeAndAddToTree(bodyAST, parent) {
                 if (bodyAST.type === "EmptyStatement") {
                     return;
@@ -733,6 +741,7 @@ class AST2BlockList {
                 }
                 // Set children
                 if (pair.ast.children_properties !== undefined) {
+                    node["children"] = [];
                     for (const child of _getPropertyValue(
                         bodyAST,
                         pair.ast.children_properties[0]
@@ -960,7 +969,10 @@ class AST2BlockList {
                     vspaces += ret.vspaces;
 
                     // Set child-parent connection for first group
-                    if (property.connections.child !== undefined) {
+                    if (
+                        property.connections.child !== undefined &&
+                        ret.firstChildBlockNumber !== undefined
+                    ) {
                         connections[property.connections.child] = ret.firstChildBlockNumber;
                         let childBlock = blockList[ret.firstChildBlockNumber];
                         let childProperty = _propertyOf(childBlock);
@@ -974,7 +986,10 @@ class AST2BlockList {
                         let ret = _processChildren(secondGroup, 0, blockList);
                         vspaces += ret.vspaces;
                         // Set child-parent connection for second group
-                        if (property.connections.second_child !== undefined) {
+                        if (
+                            property.connections.second_child !== undefined &&
+                            ret.firstChildBlockNumber !== undefined
+                        ) {
                             connections[property.connections.second_child] =
                                 ret.firstChildBlockNumber;
                             let childBlock = blockList[ret.firstChildBlockNumber];
@@ -989,7 +1004,14 @@ class AST2BlockList {
                 return { blockNumber: blockNumber, vspaces: vspaces };
             }
 
-            // Helper to process a group of children (create and establish connections between them)
+            /**
+             * Helper to process a group of children (create and establish connections between them).
+             *
+             * @param {Array} children - Group of child tree nodes
+             * @param {Number} padding - Vertical spacing offset
+             * @param {Array} blockList - Target list of block specifications
+             * @returns {Object} Object with firstChildBlockNumber and vertical spaces
+             */
             function _processChildren(children, padding, blockList) {
                 let childBlockNumbers = [];
                 let vspaces = 0;
