@@ -32,13 +32,16 @@ jobs:
     build:
         name: Stamp the development version and package the site
         runs-on: ubuntu-latest
-        timeout-minutes: 15
+        timeout-minutes: 30
         # Forks have no Pages environment to deploy to, and a manual run from
         # another branch must not publish that branch.
         if: github.repository == 'sugarlabs/musicblocks' && github.ref == 'refs/heads/master'
         steps:
+            # The legacy build also serves the user manual submodule.
             - name: Checkout code
               uses: actions/checkout@v4
+              with:
+                  submodules: true
 
             # Rewrites `const VERSION = "X.Y.Z";` to `"X.Y.Z-dev+<short sha>"`
             # and fails if the line was not found, so a change to the line's
@@ -52,12 +55,17 @@ jobs:
             - name: Configure Pages
               uses: actions/configure-pages@v5
 
-            # The site is the repository itself, served as plain files, which is
-            # what the legacy branch build publishes today.
+            # The same Jekyll build the legacy branch build runs, so README-only
+            # folders (Docs/FAQ, TurtleDocs, ...) are still rendered as pages.
+            # It copies .js files as they are, so the stamp above survives.
+            - name: Build with Jekyll
+              uses: actions/jekyll-build-pages@v1
+              with:
+                  source: ./
+                  destination: ./_site
+
             - name: Upload the site
               uses: actions/upload-pages-artifact@v3
-              with:
-                  path: .
 
     deploy:
         name: Deploy to GitHub Pages
