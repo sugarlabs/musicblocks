@@ -290,6 +290,22 @@ describe("JSGenerate Class", () => {
         expect(JSGenerate.code).toBe("fallback code");
     });
 
+    test("passes comments: true to astring.generate", () => {
+        JSGenerate.actionTrees = [];
+        JSGenerate.startTrees = [[["start", null, null]]];
+
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockReturnValueOnce("generated code");
+
+        JSGenerate.generateCode();
+
+        expect(JSGenerate.generateFailed).toBe(false);
+        expect(astring.generate).toHaveBeenCalledWith(expect.any(Object), {
+            indent: "    ",
+            comments: true
+        });
+    });
+
     test("should generate action tree for valid action block with connections", () => {
         globalActivity.blocks.stackList = [1];
         globalActivity.blocks.blockList = {
