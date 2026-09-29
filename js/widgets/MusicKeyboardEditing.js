@@ -520,10 +520,12 @@ const MusicKeyboardEditing = {
                             step++;
                         }
                         if (step > HIGHESTSTEP) {
+                            // Every pitch from C1 to B8 is already a row, and a
+                            // duplicate would just be removed again by _sortLayout.
                             this.activity.errorMsg(
-                                _("All 12 pitches are already in the keyboard. Adding duplicate.")
+                                _("There is no free pitch left to add to the keyboard.")
                             );
-                            step = HIGHESTSTEP;
+                            return;
                         }
                     }
 

@@ -292,11 +292,14 @@ describe("MusicKeyboard add-row submenu", () => {
         keyboard._createKeyboard = jest.fn();
         keyboard._createTable = jest.fn();
 
-        keyboard._createAddRowPieSubmenu();
-        keyboard._menuWheel.selectedNavItemIndex = 0;
-        keyboard._menuWheel.navItems[0].navigateFunction();
-        jest.advanceTimersByTime(500);
-        jest.useRealTimers();
+        try {
+            keyboard._createAddRowPieSubmenu();
+            keyboard._menuWheel.selectedNavItemIndex = 0;
+            keyboard._menuWheel.navItems[0].navigateFunction();
+            jest.advanceTimersByTime(500);
+        } finally {
+            jest.useRealTimers();
+        }
 
         const added = keyboard.activity.blocks.loadNewBlocks.mock.calls[0][0];
         return {
@@ -326,6 +329,63 @@ describe("MusicKeyboard add-row submenu", () => {
             "B4",
             "C5"
         ]);
+    });
+
+    const addPitchToLayout = layout => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            errorMsg: jest.fn(),
+            blocks: { blockList: [], loadNewBlocks }
+        });
+        keyboard.layout = layout;
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.selectedNavItemIndex = 0;
+        keyboard._menuWheel.navItems[0].navigateFunction();
+        return { keyboard, loadNewBlocks };
+    };
+
+    test("Add Note wraps to the lowest free pitch when the top row is ti8", () => {
+        const { loadNewBlocks } = addPitchToLayout([
+            { noteName: "re", noteOctave: 4, blockNumber: 7 },
+            { noteName: "ti", noteOctave: 8, blockNumber: 8 }
+        ]);
+
+        expect(loadNewBlocks.mock.calls[0][0].slice(1)).toEqual([
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 1 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("Add Note adds nothing when every pitch from C1 to B8 is taken", () => {
+        const solfege = [
+            "do",
+            "do♯",
+            "re",
+            "re♯",
+            "mi",
+            "fa",
+            "fa♯",
+            "sol",
+            "sol♯",
+            "la",
+            "la♯",
+            "ti"
+        ];
+        const layout = [];
+        for (let octave = 1; octave <= 8; octave++) {
+            solfege.forEach(name => {
+                layout.push({ noteName: name, noteOctave: octave, blockNumber: layout.length });
+            });
+        }
+
+        const { keyboard, loadNewBlocks } = addPitchToLayout(layout);
+
+        expect(keyboard.activity.errorMsg).toHaveBeenCalledWith(
+            "There is no free pitch left to add to the keyboard."
+        );
+        expect(loadNewBlocks).not.toHaveBeenCalled();
     });
 
     test("Add Note after ti adds do in the next octave, over the padding row", () => {
