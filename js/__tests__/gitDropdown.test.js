@@ -22,6 +22,7 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
     let mockItemHistory;
     let mockTooltipEl;
     let mockTooltipSpan;
+    let mockOverlayCanvas;
     let iframeMessages;
     let mockIframe;
 
@@ -50,6 +51,9 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
         mockItemHistory = { id: "git-item-history", style: {} };
 
         mockTooltipSpan = { textContent: "" };
+        mockOverlayCanvas = {
+            toDataURL: jest.fn(() => "data:image/png;base64,abc")
+        };
         mockTooltipEl = {
             id: "tooltip-123",
             querySelector: jest.fn(selector => {
@@ -101,6 +105,7 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             if (id === "git-item-history") return mockItemHistory;
             if (id === "tooltip-123") return mockTooltipEl;
             if (id === "planet-iframe") return mockIframe;
+            if (id === "overlayCanvas") return mockOverlayCanvas;
             return null;
         });
 
@@ -287,8 +292,6 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
         test("queues repo creation offline via MB_OFFLINE_CREATE when offline", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
-            mockActivity.currentSession = 1;
-            mockActivity.storage = { SESSIONIMAGE1: "data:image/png;base64,abc" };
 
             await gitDropdown._doCreate("offline-track-456", "Offline Track", "Made offline");
 
@@ -309,8 +312,6 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
         test("preserves the thumbnail when creation falls back offline", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
-            mockActivity.currentSession = 1;
-            mockActivity.storage = { SESSIONIMAGE1: "data:image/png;base64,abc" };
             global.fetch.mockRejectedValueOnce(new TypeError("Network failed"));
 
             await gitDropdown._doCreate("fallback-track", "Fallback Track", "Made offline");
@@ -336,9 +337,11 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
             expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
             expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+            expect(mockOverlayCanvas.toDataURL).not.toHaveBeenCalled();
 
             finishSave();
             await create;
+            expect(mockOverlayCanvas.toDataURL).toHaveBeenCalledWith("image/png");
             expect(localStorage.getItem("mbGitRepoName")).toBe("first-track");
         });
 
