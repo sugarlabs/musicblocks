@@ -1871,13 +1871,12 @@ class ToolbarUI {
                 "#saveButton, #saveButtonAdvanced, #planetIcon, #FullScreen, #helpIcon, " +
                 "#installButton, #toggleAuxBtn";
 
-            // Aux toolbar button selectors
+            // Aux toolbar button selectors (Option A: Playback & Inspection, Workspace & Tools, Preferences & Modes)
             const auxSelectors =
-                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, " +
-                "#loadPluginIcon, #delPluginIcon, #enableHorizScrollIcon, " +
-                "#disableHorizScrollIcon, #themeSelectIcon, #mergeWithCurrentIcon, " +
-                "#wrapTurtle, #chooseKeyIcon, #toggleJavaScriptIcon, #restoreIcon, " +
-                "#beginnerMode, #advancedMode, #languageSelectIcon";
+                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, #toggleJavaScriptIcon, " +
+                "#wrapTurtle, #enableHorizScrollIcon, #disableHorizScrollIcon, #restoreIcon, " +
+                "#chooseKeyIcon, #mergeWithCurrentIcon, #loadPluginIcon, #delPluginIcon, " +
+                "#beginnerMode, #advancedMode, #themeSelectIcon, #languageSelectIcon";
 
             const isVisible = btn => {
                 const style = window.getComputedStyle(btn);

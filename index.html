@@ -797,8 +797,8 @@
                             tabindex="-1"
                         >
                             <div class="blue darken-1 nav-wrapper aux-nav-container" tabindex="-1">
-                                <!-- Aux Group 1: Execution & Debug -->
-                                <ul class="aux left aux-group execution-group">
+                                <!-- Aux Group 1: Playback & Inspection -->
+                                <ul class="aux left aux-group playback-group">
                                     <li>
                                         <a
                                             id="runSlowlyIcon"
@@ -846,7 +846,7 @@
                                     </li>
                                 </ul>
 
-                                <!-- Aux Group 2: Canvas & Workspace -->
+                                <!-- Aux Group 2: Workspace & Tools -->
                                 <ul class="aux aux-group workspace-group">
                                     <li>
                                         <a
@@ -881,6 +881,20 @@
                                     </li>
                                     <li>
                                         <a
+                                            id="restoreIcon"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            data-tooltip="Restore"
+                                            ><i class="material-icons md-48"
+                                                >restore_from_trash</i
+                                            ></a
+                                        >
+                                        <div id="trashList"></div>
+                                    </li>
+                                    <li>
+                                        <a
                                             id="chooseKeyIcon"
                                             class="tooltipped"
                                             data-position="bottom"
@@ -889,10 +903,6 @@
                                             ><i class="material-icons md-48">music_note</i></a
                                         >
                                     </li>
-                                </ul>
-
-                                <!-- Aux Group 3: Project Tools & Plugins -->
-                                <ul class="aux aux-group project-tools-group">
                                     <li>
                                         <a
                                             id="mergeWithCurrentIcon"
@@ -925,23 +935,9 @@
                                             ><i class="material-icons md-48">remove_circle</i></a
                                         >
                                     </li>
-                                    <li>
-                                        <a
-                                            id="restoreIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            role="button"
-                                            tabindex="0"
-                                            data-tooltip="Restore"
-                                            ><i class="material-icons md-48"
-                                                >restore_from_trash</i
-                                            ></a
-                                        >
-                                        <div id="trashList"></div>
-                                    </li>
                                 </ul>
 
-                                <!-- Aux Group 4: Preferences & Modes -->
+                                <!-- Aux Group 3: Preferences & Modes -->
                                 <ul class="aux right aux-group preferences-group">
                                     <li>
                                         <a
