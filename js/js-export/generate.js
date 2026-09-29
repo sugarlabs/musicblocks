@@ -355,7 +355,10 @@ class JSGenerate {
 
         if (!JSGenerate.generateFailed) {
             try {
-                JSGenerate.code = astring.generate(JSGenerate.AST, { indent: "    " });
+                JSGenerate.code = astring.generate(JSGenerate.AST, {
+                    indent: "    ",
+                    comments: true
+                });
             } catch (e) {
                 JSGenerate.generateFailed = true;
                 console.error("CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE");

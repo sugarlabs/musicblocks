@@ -433,6 +433,9 @@ class AST2BlockList {
             }
 
             function _createNodeAndAddToTree(bodyAST, parent) {
+                if (bodyAST.type === "EmptyStatement") {
+                    return;
+                }
                 let pair = _matchBody(bodyAST);
                 if (pair === null) {
                     throw {

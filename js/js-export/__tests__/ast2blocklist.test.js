@@ -2359,4 +2359,24 @@ describe("AST2BlockList Class", () => {
             ["text", { value: "piano" }]
         ]);
     });
+
+    test("should ignore EmptyStatement and comments from skipped unsupported blocks without throwing", () => {
+        const code = `
+        new Mouse(async mouse => {
+            // Not exported (no JavaScript equivalent): "setturtlename2"
+            ;
+            // Not exported (no JavaScript equivalent): "duplicatenotes"
+            ;
+            await mouse.playRest();
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList.length).toBeGreaterThan(0);
+        const restBlock = blockList.find(b => b[1] === "rest2");
+        expect(restBlock).toBeDefined();
+    });
 });
+
