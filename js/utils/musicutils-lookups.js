@@ -45,7 +45,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsI18n =
         (typeof window !== "undefined" && window.MusicUtilsI18n) ||
         (typeof require !== "undefined" ? require("./musicutils-i18n") : {});
-    var { INVERTMODES, FILTERTYPES, OSCTYPES } = MusicUtilsI18n;
+    var { INVERTMODES, FILTERTYPES, OSCTYPES, INTERVALS } = MusicUtilsI18n;
 }
 
 /**
@@ -99,6 +99,39 @@ var getInvertMode = name => {
     return name;
 };
 
+const resolveIntervalKey = name => {
+    if (typeof name !== "string" || !name) {
+        return null;
+    }
+    const trimmed = name.trim();
+    if (typeof INTERVALVALUES !== "undefined" && INTERVALVALUES) {
+        if (Object.prototype.hasOwnProperty.call(INTERVALVALUES, trimmed)) {
+            return trimmed;
+        }
+        const lower = trimmed.toLowerCase();
+        if (Object.prototype.hasOwnProperty.call(INTERVALVALUES, lower)) {
+            return lower;
+        }
+        if (typeof INTERVALS !== "undefined" && Array.isArray(INTERVALS)) {
+            for (let i = 0; i < INTERVALS.length; i++) {
+                const entry = INTERVALS[i];
+                const localized = entry[0];
+                const english = entry[1];
+                if (localized && english && localized !== english) {
+                    const locLower = localized.toLowerCase();
+                    if (lower.startsWith(locLower + " ")) {
+                        const candidate = english + lower.slice(locLower.length);
+                        if (Object.prototype.hasOwnProperty.call(INTERVALVALUES, candidate)) {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return null;
+};
+
 /**
  * Get the number of semi-tones for a specific interval.
  * @function
@@ -106,7 +139,8 @@ var getInvertMode = name => {
  * @returns {number} The number of semi-tones for the interval.
  */
 var getIntervalNumber = name => {
-    return INTERVALVALUES[name][0];
+    const key = resolveIntervalKey(name);
+    return key !== null ? INTERVALVALUES[key][0] : 0;
 };
 
 /**
@@ -116,7 +150,8 @@ var getIntervalNumber = name => {
  * @returns {number} The direction of the interval.
  */
 var getIntervalDirection = name => {
-    return INTERVALVALUES[name][1];
+    const key = resolveIntervalKey(name);
+    return key !== null ? INTERVALVALUES[key][1] : 0;
 };
 
 /**
@@ -126,7 +161,8 @@ var getIntervalDirection = name => {
  * @returns {number} The ratio for the interval.
  */
 var getIntervalRatio = name => {
-    return INTERVALVALUES[name][2];
+    const key = resolveIntervalKey(name);
+    return key !== null ? INTERVALVALUES[key][2] : 1;
 };
 
 /**

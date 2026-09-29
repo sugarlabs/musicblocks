@@ -581,6 +581,13 @@ describe("getIntervalNumber", () => {
         expect(getIntervalNumber("perfect 5")).toBe(7);
         expect(getIntervalNumber("major 3")).toBe(4);
     });
+
+    it("should return 0 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalNumber("invalid")).toBe(0);
+        expect(getIntervalNumber("")).toBe(0);
+        expect(getIntervalNumber(null)).toBe(0);
+        expect(getIntervalNumber(undefined)).toBe(0);
+    });
 });
 
 describe("getIntervalDirection", () => {
@@ -588,12 +595,26 @@ describe("getIntervalDirection", () => {
         expect(getIntervalDirection("diminished 6")).toBe(-1);
         expect(getIntervalDirection("minor 3")).toBe(-1);
     });
+
+    it("should return 0 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalDirection("invalid")).toBe(0);
+        expect(getIntervalDirection("")).toBe(0);
+        expect(getIntervalDirection(null)).toBe(0);
+        expect(getIntervalDirection(undefined)).toBe(0);
+    });
 });
 
 describe("getIntervalRatio", () => {
     it("should return the ratio for a given interval", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
+    });
+
+    it("should return 1 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalRatio("invalid")).toBe(1);
+        expect(getIntervalRatio("")).toBe(1);
+        expect(getIntervalRatio(null)).toBe(1);
+        expect(getIntervalRatio(undefined)).toBe(1);
     });
 
     it("should return the just diminished seventh for diminished 7", () => {
