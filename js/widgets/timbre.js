@@ -2646,17 +2646,14 @@ class TimbreWidget {
                     docById("sFx0").textContent = _("rate");
                     docById("myRangeFx0").value = 2;
                     docById("myspanFx0").textContent = "2";
-                    instrumentsEffects[0][this.instrumentName]["chorusRate"] = 2;
 
                     docById("sFx1").textContent = _("delay (MS)");
                     docById("myRangeFx1").value = 4;
                     docById("myspanFx1").textContent = "4";
-                    instrumentsEffects[0][this.instrumentName]["delayTime"] = 4;
 
                     docById("sFx2").textContent = _("depth");
                     docById("myRangeFx2").value = 70;
                     docById("myspanFx2").textContent = "70";
-                    instrumentsEffects[0][this.instrumentName]["chorusDepth"] = 4;
 
                     if (this.chorusEffect.length !== 0) {
                         blockValue = this.chorusEffect.length - 1;
@@ -2696,6 +2693,11 @@ class TimbreWidget {
                         this.chorusParams.push(2);
                         this.chorusParams.push(4);
                         this.chorusParams.push(70);
+                        // Only a new block starts from the defaults; an existing
+                        // one keeps the values it set when the timbre ran.
+                        instrumentsEffects[0][this.instrumentName]["chorusRate"] = 2;
+                        instrumentsEffects[0][this.instrumentName]["delayTime"] = 4;
+                        instrumentsEffects[0][this.instrumentName]["chorusDepth"] = 0.7;
 
                         await delayExecution(500);
                         this.clampConnection(n, 4, topOfClamp);
@@ -2752,11 +2754,6 @@ class TimbreWidget {
 
                     instrumentsEffects[0][this.instrumentName]["phaserActive"] = true;
 
-                    // Default values
-                    instrumentsEffects[0][this.instrumentName]["rate"] = 5;
-                    instrumentsEffects[0][this.instrumentName]["octaves"] = 3;
-                    instrumentsEffects[0][this.instrumentName]["baseFrequency"] = 100;
-
                     buildSliders(3, 1000);
                     docById("myRangeFx0").min = 0;
                     docById("myRangeFx0").max = 100;
@@ -2812,6 +2809,9 @@ class TimbreWidget {
                         this.phaserParams.push(3);
                         // Keep base frequency aligned with UI/default block value to avoid state drift.
                         this.phaserParams.push(100);
+                        instrumentsEffects[0][this.instrumentName]["rate"] = 5;
+                        instrumentsEffects[0][this.instrumentName]["octaves"] = 3;
+                        instrumentsEffects[0][this.instrumentName]["baseFrequency"] = 100;
 
                         await delayExecution(500);
                         this.clampConnection(n, 4, topOfClamp);
