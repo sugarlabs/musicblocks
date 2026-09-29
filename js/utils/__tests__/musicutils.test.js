@@ -1212,14 +1212,14 @@ describe("cents calculations", () => {
         it("handles non-zero cents with 19-EDO", () => {
             // A4 in 19-EDO = pitchNumber 76 (4 * 19)
             const result = pitchToFrequency("A", 4, 50, "C", "equal19");
-            const expected = A0 * Math.pow(2, 1 / (19 * 100)) ** (76 * 100 + 50);
+            const expected = A0 * Math.pow(2, 76 / 19) * Math.pow(2, 50 / 1200);
             expect(result).toBeCloseTo(expected, 4);
         });
 
         it("handles non-zero cents with 31-EDO", () => {
             // A4 in 31-EDO = pitchNumber 124 (4 * 31)
             const result = pitchToFrequency("A", 4, 50, "C", "equal31");
-            const expected = A0 * Math.pow(2, 1 / (31 * 100)) ** (124 * 100 + 50);
+            const expected = A0 * Math.pow(2, 124 / 31) * Math.pow(2, 50 / 1200);
             expect(result).toBeCloseTo(expected, 4);
         });
 
@@ -2540,9 +2540,27 @@ describe("pitchToFrequency", () => {
 
             expect(equalC5 / equalC4).toBeCloseTo(2, 10);
             expect(customC5 / customC4).toBeCloseTo(3, 10);
-            expect(customC4With1200Cents / customC4).toBeCloseTo(3, 10);
+            expect(customC4With1200Cents / customC4).toBeCloseTo(2, 10);
         } finally {
             delete TEMPERAMENT["customOctaveRatio"];
+            setOctaveRatio(2);
+        }
+    });
+
+    it("uses base-2 cents for a ratio-based custom temperament", () => {
+        setOctaveRatio(3);
+        TEMPERAMENT["customRatioTemperament"] = {
+            isEDO: false,
+            noteLabels: ["C", "A"],
+            ratios: [1, Math.pow(2, 9 / 12)]
+        };
+        try {
+            const c4 = pitchToFrequency("C", 4, 0, "C", "customRatioTemperament");
+            const c4With1200Cents = pitchToFrequency("C", 4, 1200, "C", "customRatioTemperament");
+
+            expect(c4With1200Cents / c4).toBeCloseTo(2, 10);
+        } finally {
+            delete TEMPERAMENT["customRatioTemperament"];
             setOctaveRatio(2);
         }
     });

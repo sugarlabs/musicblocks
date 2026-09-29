@@ -7406,7 +7406,7 @@ const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
             const baseRefFreq = A0 / t.ratios[aIdx];
             let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(octaveBase, octave);
             if (cents !== 0) {
-                freq *= Math.pow(octaveBase, cents / 1200);
+                freq *= Math.pow(2, cents / 1200);
             }
             return freq;
         }
@@ -7414,15 +7414,18 @@ const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
-    // Frequency = A0 * octaveBase^(pitchNumber / currentEDO)
-    // With cents offset: Frequency = A0 * octaveBase^((pitchNumber * 100 + cents) / (currentEDO * 100))
-    // This works because 1 semitone is 100 cents and 1200 cents span the configured octave.
-    // Example: 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
-    // Example: 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
+    // Frequency = A0 * octaveBase^(pitchNumber / currentEDO).
+    // Cents are a base-2 unit: a 1200-cent offset always doubles the frequency,
+    // independently of the temperament's octave ratio or EDO step count.
+    // Example: 19-EDO, A4 (pitchNumber=76), 0 cents → 27.5 * 2^(76/19) = 440 Hz.
+    // Example: 19-EDO, A4 + 50 cents → 440 * 2^(50/1200) ≈ 452.9 Hz.
     if (cents === 0) {
         return A0 * Math.pow(octaveBase, 1 / currentEDO) ** pitchNumber;
+    } else if (octaveBase === 2 && currentEDO === 12) {
+        // Preserve the existing 12-EDO calculation and its exact results.
+        return A0 * Math.pow(2, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
     } else {
-        return A0 * Math.pow(octaveBase, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
+        return A0 * Math.pow(octaveBase, 1 / currentEDO) ** pitchNumber * Math.pow(2, cents / 1200);
     }
 };
 
