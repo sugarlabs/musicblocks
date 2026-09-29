@@ -88,6 +88,7 @@ describe("musicutils-i18n", () => {
             "musicutils-modecore.js",
             "musicutils-pitchscale.js",
             "musicutils-buildscale.js",
+            "musicutils-pitchinfo.js",
             "musicutils.js"
         ];
 

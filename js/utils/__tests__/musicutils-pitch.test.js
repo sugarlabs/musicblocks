@@ -104,6 +104,7 @@ describe("musicutils-pitch", () => {
             "musicutils-modecore.js",
             "musicutils-pitchscale.js",
             "musicutils-buildscale.js",
+            "musicutils-pitchinfo.js",
             "musicutils.js"
         ];
         const load = files => {
