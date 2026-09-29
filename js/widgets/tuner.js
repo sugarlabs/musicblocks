@@ -9,8 +9,8 @@ function TunerDisplay(canvas, width, height) {
     this.ctx = canvas.getContext("2d");
     this.note = "A";
     this.cents = 0;
-    this.rawCents = 0;
-    this.displayedCents = 0;
+    this.rawCents = null;
+    this.displayedCents = null;
     this.frequency = 440;
     this._cachedTheme = null;
     this._selectorBg = null;

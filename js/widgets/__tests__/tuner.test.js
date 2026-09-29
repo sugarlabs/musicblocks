@@ -411,11 +411,11 @@ describe("Tuner Widget", () => {
                 expect(display.cents).toBe(0);
             });
 
-            test("initializes with default rawCents and displayedCents", () => {
+            test("initializes with default rawCents and displayedCents as null", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
 
-                expect(display.rawCents).toBe(0);
-                expect(display.displayedCents).toBe(0);
+                expect(display.rawCents).toBeNull();
+                expect(display.displayedCents).toBeNull();
             });
 
             test("initializes with default frequency 440", () => {
@@ -490,16 +490,35 @@ describe("Tuner Widget", () => {
                 expect(display.rawCents).toBe(10);
             });
 
-            test("applies exponential smoothing when note is unchanged and delta is small", () => {
+            test("snaps first valid reading directly without smoothing against unmeasured zero", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
 
                 display.update("A", 10, 440);
-                expect(display.displayedCents).toBeCloseTo(3.5, 4);
-                expect(display.cents).toBeCloseTo(3.5, 4);
 
+                expect(display.rawCents).toBe(10);
+                expect(display.displayedCents).toBe(10);
+                expect(display.cents).toBe(10);
+            });
+
+            test("applies exponential smoothing when note is unchanged and delta is small", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                // Frame 1: First reading snaps directly to measured value
                 display.update("A", 10, 440);
-                expect(display.displayedCents).toBeCloseTo(5.775, 4);
-                expect(display.cents).toBeCloseTo(5.775, 4);
+                expect(display.displayedCents).toBe(10);
+                expect(display.cents).toBe(10);
+
+                // Frame 2: delta = 14 - 10 = 4 <= 15
+                // displayedCents = 10 + (14 - 10) * 0.35 = 11.4
+                display.update("A", 14, 440);
+                expect(display.displayedCents).toBeCloseTo(11.4, 4);
+                expect(display.cents).toBeCloseTo(11.4, 4);
+
+                // Frame 3: delta = 14 - 11.4 = 2.6 <= 15
+                // displayedCents = 11.4 + (14 - 11.4) * 0.35 = 12.31
+                display.update("A", 14, 440);
+                expect(display.displayedCents).toBeCloseTo(12.31, 4);
+                expect(display.cents).toBeCloseTo(12.31, 4);
             });
 
             test("snaps immediately to raw cents when note changes", () => {
@@ -523,12 +542,11 @@ describe("Tuner Widget", () => {
             test("snaps immediately when consecutive raw readings jump past snap threshold even if display lag is small", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
 
-                // Frame 1: raw 10, displayed smoothed to 3.5
+                // Frame 1: first reading snaps to 10
                 display.update("A", 10, 440);
-                expect(display.displayedCents).toBeCloseTo(3.5, 4);
+                expect(display.displayedCents).toBe(10);
 
-                // Frame 2: raw -6 (consecutive raw jump is |-6 - 10| = 16 > 15 cents)
-                // Note: distance to smoothed display is only |-6 - 3.5| = 9.5, but raw shift must trigger snap
+                // Frame 2: raw jumps from 10 to -6 (shift = |-6 - 10| = 16 > 15) -> snaps to -6
                 display.update("A", -6, 440);
                 expect(display.displayedCents).toBe(-6);
                 expect(display.cents).toBe(-6);
