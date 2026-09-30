@@ -1769,23 +1769,24 @@ class Palette {
                     img.style.top = pageY - halfH + "px";
                 };
 
+                let rAFId = null;
                 let ticking = false;
+                let lastX, lastY;
                 const onMouseMove = e => {
                     e.preventDefault();
+                    if (e.type === "touchmove") {
+                        lastX = e.touches[0].clientX;
+                        lastY = e.touches[0].clientY;
+                    } else {
+                        lastX = e.pageX;
+                        lastY = e.pageY;
+                    }
                     if (!ticking) {
-                        let x, y;
-                        if (e.type === "touchmove") {
-                            x = e.touches[0].clientX;
-                            y = e.touches[0].clientY;
-                        } else {
-                            x = e.pageX;
-                            y = e.pageY;
-                        }
-                        window.requestAnimationFrame(() => {
-                            moveAt(x, y);
+                        ticking = true;
+                        rAFId = window.requestAnimationFrame(() => {
+                            moveAt(lastX, lastY);
                             ticking = false;
                         });
-                        ticking = true;
                     }
                 };
                 onMouseMove(event);
@@ -1800,6 +1801,13 @@ class Palette {
                     document.removeEventListener("touchmove", onMouseMove);
                     img.onmouseup = null;
                     img.ontouchend = null;
+
+                    if (rAFId) {
+                        window.cancelAnimationFrame(rAFId);
+                        rAFId = null;
+                        ticking = false;
+                        moveAt(lastX, lastY);
+                    }
 
                     const x = parseInt(img.style.left, 10);
                     const y = parseInt(img.style.top, 10);

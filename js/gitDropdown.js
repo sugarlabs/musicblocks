@@ -1778,6 +1778,7 @@ class GitDropdownUI {
             if (rAFId) {
                 window.cancelAnimationFrame(rAFId);
                 rAFId = null;
+                ticking = false;
                 const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
                 const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
                 frame.style.left = `${Math.min(Math.max(lastX - dx, 8), maxL)}px`;

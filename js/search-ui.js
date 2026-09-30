@@ -617,6 +617,7 @@ class SearchUI {
                 if (rAFId) {
                     window.cancelAnimationFrame(rAFId);
                     rAFId = null;
+                    ticking = false;
                     moveAt(lastX, lastY);
                 }
 
