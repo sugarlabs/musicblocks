@@ -372,6 +372,31 @@ class MathUtility {
     }
 
     /**
+     * Clamps a number between a minimum and maximum value.
+     *
+     * @static
+     * @param {number} a - The value to clamp.
+     * @param {number} min - The minimum bound.
+     * @param {number} max - The maximum bound.
+     * @returns {number} - The clamped value.
+     * @throws {string} NanError if the arguments are not valid numbers.
+     */
+    static doClamp(a, min, max) {
+        if (
+            !MathUtility._isNumber(a) ||
+            !MathUtility._isNumber(min) ||
+            !MathUtility._isNumber(max)
+        ) {
+            throw new Error("NanError");
+        }
+
+        const lower = Math.min(min, max);
+        const upper = Math.max(min, max);
+
+        return Math.max(lower, Math.min(a, upper));
+    }
+
+    /**
      * Matches the value returned by the XOR block.
      *
      * @static
