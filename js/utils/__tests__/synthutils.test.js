@@ -3134,6 +3134,31 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             }
         });
 
+        test("updatePitch keeps running when the note display is not in the page", async () => {
+            await synthInstance.startTuner();
+            document.getElementById("noteDisplayContainer").remove();
+
+            const errors = [];
+            const onError = event => {
+                errors.push(event.error);
+                event.preventDefault();
+            };
+            window.addEventListener("error", onError);
+            try {
+                synthInstance.tunerAnalyser.getValue = jest
+                    .fn()
+                    .mockReturnValue(bufferForFrequency(440));
+                await new Promise(resolve => setTimeout(resolve, 20));
+            } finally {
+                window.removeEventListener("error", onError);
+            }
+
+            expect(errors).toEqual([]);
+            expect(synthInstance._tunerActive).toBe(true);
+            const segments = tunerContainer.querySelectorAll("svg path");
+            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
+        });
+
         test("startTuner and updatePitch in target pitch mode with mode switching and pie menu", async () => {
             await synthInstance.startTuner();
 

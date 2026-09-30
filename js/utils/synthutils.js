@@ -3549,6 +3549,7 @@ function Synth() {
                 }
 
                 // Update displays if they exist
+                const noteDisplayContainer = document.getElementById("noteDisplayContainer");
                 if (noteDisplayContainer) {
                     const noteText = document.getElementById("noteText");
                     const centsText = document.getElementById("centsText");
