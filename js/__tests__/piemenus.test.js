@@ -1339,3 +1339,65 @@ describe("piemenuBasic and temperament wheel readability and positioning", () =>
         expect(mockBlock._basicWheel.removeWheel).toHaveBeenCalled();
     });
 });
+
+describe("selected wheel item hover guard", () => {
+    let originalHoverEffect;
+
+    beforeEach(() => {
+        originalHoverEffect = jest.fn(() => "redrawn");
+        global.wheelnavItem = function () {};
+        global.wheelnavItem.prototype.hoverEffect = originalHoverEffect;
+    });
+
+    afterEach(() => {
+        delete global.wheelnavItem;
+    });
+
+    const makeItem = selected => {
+        const item = Object.create(global.wheelnavItem.prototype);
+        item.selected = selected;
+        return item;
+    };
+
+    test("configureExitWheel stops the selected item from redrawing on hover", () => {
+        require("../piemenus");
+        window.configureExitWheel(null);
+
+        const selectedItem = makeItem(true);
+        selectedItem.hoverEffect(0, true);
+        selectedItem.hoverEffect(0, false);
+
+        expect(originalHoverEffect).not.toHaveBeenCalled();
+    });
+
+    test("other items still get their hover effect, with the same this and arguments", () => {
+        require("../piemenus");
+        window.configureExitWheel(null);
+
+        const item = makeItem(false);
+        expect(item.hoverEffect(3, true)).toBe("redrawn");
+
+        expect(originalHoverEffect).toHaveBeenCalledTimes(1);
+        expect(originalHoverEffect).toHaveBeenCalledWith(3, true);
+        expect(originalHoverEffect.mock.instances[0]).toBe(item);
+    });
+
+    test("the prototype is only wrapped once", () => {
+        require("../piemenus");
+        window.configureExitWheel(null);
+        const guarded = global.wheelnavItem.prototype.hoverEffect;
+
+        window.configureExitWheel(null);
+
+        expect(global.wheelnavItem.prototype.hoverEffect).toBe(guarded);
+        makeItem(false).hoverEffect(0, true);
+        expect(originalHoverEffect).toHaveBeenCalledTimes(1);
+    });
+
+    test("does nothing before wheelnav has loaded", () => {
+        delete global.wheelnavItem;
+        require("../piemenus");
+
+        expect(() => window.configureExitWheel(null)).not.toThrow();
+    });
+});

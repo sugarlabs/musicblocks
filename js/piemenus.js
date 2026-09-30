@@ -13,7 +13,7 @@
 /*
    global
 
-    platformColor, docById, Singer, slicePath, wheelnav,
+    platformColor, docById, Singer, slicePath, wheelnav, wheelnavItem,
     DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
     PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
     getSavedCustomModes, getModeNamesForGroup, getModeLabel,
@@ -32,7 +32,7 @@
 /*
      Globals location
      - lib/wheelnav
-        slicePath, wheelnav
+        slicePath, wheelnav, wheelnavItem
      - js/utils/musicutils.js
         FLAT, SHARP, DEFAULTVOICE, getDrumName, getNote, MODE_PIE_MENUS, MUSICALMODES, INTERVALVALUES,
         INTERVALS, getDrumSynthName, getVoiceSynthName, frequencyToPitch, DOUBLESHARP, NATURAL,
@@ -345,8 +345,40 @@ const enableWheelScroll = (wheel, itemCount) => {
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
 };
 
+/**
+ * wheelnav redraws a wheel's selected item on every mouseover, moving the item's
+ * nodes to the front. The move fires another mouseover on the same item, so while
+ * the pointer rests on the selected item its nodes keep being re-inserted, and a
+ * press on it is reported on the bare <svg>. handleOutsideClick then closes the
+ * menu as an outside click and the item is never chosen (for example Add Row >
+ * pitch in the Phrase Maker). Redrawing a selected item only re-applies its
+ * selected look, so skip it. This patches the loaded prototype once; the vendored
+ * lib/wheelnav.js file is left as it is.
+ */
+const guardSelectedItemHover = () => {
+    if (typeof wheelnavItem === "undefined" || !wheelnavItem.prototype) {
+        return;
+    }
+    const hoverEffect = wheelnavItem.prototype.hoverEffect;
+    if (typeof hoverEffect !== "function" || hoverEffect.skipsSelectedItem) {
+        return;
+    }
+    const guardedHoverEffect = function (hovered, isEnter) {
+        if (this.selected) {
+            return;
+        }
+        return hoverEffect.call(this, hovered, isEnter);
+    };
+    guardedHoverEffect.skipsSelectedItem = true;
+    wheelnavItem.prototype.hoverEffect = guardedHoverEffect;
+};
+
 // Ensure exit wheels behave like stateless buttons (no sticky selection)
 const configureExitWheel = exitWheel => {
+    // Every menu that closes on an outside click comes through here, and those
+    // are the menus where a moving selected item turns a click into a close.
+    guardSelectedItemHover();
+
     if (!exitWheel || !exitWheel.navItems) {
         return;
     }
