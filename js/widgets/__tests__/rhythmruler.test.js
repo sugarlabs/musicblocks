@@ -397,6 +397,52 @@ describe("RhythmRuler Widget", () => {
         });
     });
 
+    describe("Per-drum play controls", () => {
+        test.each([
+            [false, true],
+            ["false", true],
+            [true, false],
+            ["true", false]
+        ])("shows controls only in advanced mode (beginnerMode=%s)", (mode, showPlay) => {
+            mockActivity.beginnerMode = mode;
+            // The toolbar element used to be exposed as the global beginnerMode.
+            // It must not override the current Activity mode.
+            global.beginnerMode = { id: "beginnerMode" };
+            rhythmRuler.Rulers = [[[4], []]];
+            jest.spyOn(rhythmRuler, "__setNoteValueDisplay").mockImplementation();
+            jest.spyOn(rhythmRuler, "__addCellEventHandlers").mockImplementation();
+            jest.spyOn(rhythmRuler, "_setButtonIcon").mockImplementation();
+            const rows = [];
+            const createTable = () => ({
+                style: {},
+                insertRow: () => {
+                    const row = {
+                        cells: [],
+                        style: {},
+                        setAttribute: jest.fn(),
+                        insertCell: jest.fn(() => {
+                            const cell = {
+                                style: {},
+                                appendChild: jest.fn(),
+                                replaceChildren: jest.fn()
+                            };
+                            row.cells.push(cell);
+                            return cell;
+                        })
+                    };
+                    rows.push(row);
+                    return row;
+                }
+            });
+            jest.spyOn(document, "createElement").mockImplementation(tag =>
+                tag === "table" ? createTable() : { style: {} }
+            );
+            rhythmRuler._buildRulerTable({ getWidgetBody: () => ({ append: jest.fn() }) });
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalledTimes(showPlay ? 1 : 0);
+            expect(rows[0].cells).toHaveLength(showPlay ? 2 : 1);
+        });
+    });
+
     // =========================================================================
     // RULER AND DRUM MANAGEMENT TESTS
     // =========================================================================
