@@ -876,6 +876,25 @@ describe("piemenuNumber wheel configuration", () => {
         );
     });
 
+    test.each([
+        [10, 0.2, 0.6], // exactly 10: not > 10, falls into the short tier
+        [11, 0.5, 0.9], // exactly 11: > 10, not > 16, medium tier
+        [16, 0.5, 0.9], // exactly 16: not > 16, stays in the medium tier
+        [17, 0.6, 1.0] // exactly 17: > 16, long tier
+    ])(
+        "configures the radius tier at the exact boundary of %i values (min=%f, max=%f)",
+        (length, minRadius, maxRadius) => {
+            mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+            const values = Array.from({ length }, (_, i) => i);
+            piemenuNumber(mockBlock, values, 5);
+
+            expect(global.configureWheel).toHaveBeenCalledWith(
+                mockBlock._numberWheel,
+                expect.objectContaining({ minRadius, maxRadius })
+            );
+        }
+    );
+
     test("sets navAngle to -90 for a setheading block", () => {
         mockBlock.blocks.blockList["mock-id"].name = "setheading";
         piemenuNumber(mockBlock, [0, 90, 180, 270], 90);
