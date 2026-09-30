@@ -297,4 +297,23 @@ describe("platformstyle", () => {
         expect(clonedTheme.paletteColors).not.toBe(originalTheme.paletteColors);
         expect(clonedTheme.paletteColors.action).not.toBe(originalTheme.paletteColors.action);
     });
+
+    it("clonePlatformTheme falls back to JSON clone when deepClone is not a function", () => {
+        const { clonePlatformTheme, platformThemes } = require("../platformstyle");
+        const originalDeepClone = global.deepClone;
+        const originalWindowDeepClone = global.window ? global.window.deepClone : undefined;
+        try {
+            delete global.deepClone;
+            if (global.window) delete global.window.deepClone;
+            const originalTheme = platformThemes.dark;
+            const clonedTheme = clonePlatformTheme(originalTheme);
+            expect(clonedTheme).toEqual(originalTheme);
+            expect(clonedTheme).not.toBe(originalTheme);
+        } finally {
+            if (originalDeepClone !== undefined) global.deepClone = originalDeepClone;
+            if (global.window && originalWindowDeepClone !== undefined) {
+                global.window.deepClone = originalWindowDeepClone;
+            }
+        }
+    });
 });
