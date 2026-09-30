@@ -134,6 +134,15 @@ class Publisher {
                 minLength: 1
             }
         });
+
+        const tagInput = document.querySelector("#tagsadd input");
+        const tagLabel = document.getElementById("publish-tags-label");
+
+        if (tagInput && tagLabel) {
+            tagInput.id = "publish-tags-input";
+            tagInput.name = "publish-tags";
+            tagLabel.htmlFor = "publish-tags-input";
+        }
     }
 
     setTags(arr) {

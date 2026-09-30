@@ -191,6 +191,31 @@ describe("Publisher", () => {
         });
     });
 
+    describe("setTagInput", () => {
+        it("should associate the publish tags label with the generated input", () => {
+            document.body.innerHTML += `
+                <div class="chips chips-initial" id="tagsadd">
+                    <input class="input" />
+                </div>
+                <label id="publish-tags-label"></label>
+            `;
+
+            publisher.ChipTags = {
+                Music: "1",
+                Art: "2"
+            };
+
+            publisher.setTagInput([]);
+
+            const input = document.querySelector("#tagsadd input");
+            const label = document.getElementById("publish-tags-label");
+
+            expect(input.id).toBe("publish-tags-input");
+            expect(input.name).toBe("publish-tags");
+            expect(label.htmlFor).toBe("publish-tags-input");
+        });
+    });
+
     describe("parseProject", () => {
         it("should extract block names from project JSON", () => {
             const tb = '[[0,"start",100,100,[null,1,null]],[1,"newnote",0,0,[0,2,3,null]]]';
