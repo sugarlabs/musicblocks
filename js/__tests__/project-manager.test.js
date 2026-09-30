@@ -1476,8 +1476,39 @@ describe("start() URL parameter parsing", () => {
 
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        expect(global.fetch).toHaveBeenCalledWith("https://example.org/env.json");
+        expect(global.fetch).toHaveBeenCalledWith(
+            "https://example.org/env.json",
+            expect.any(Object)
+        );
         expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), [7]);
+    });
+
+    it("gives up on an inurl that never answers and still loads the project", async () => {
+        setURL("/?id=proj&inurl=https%3A%2F%2Fexample.org%2Fenv.json");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn(
+            (url, request) =>
+                new Promise((resolve, reject) => {
+                    request.signal.addEventListener("abort", () =>
+                        reject(new DOMException("Aborted", "AbortError"))
+                    );
+                })
+        );
+
+        pm.start();
+        await jest.advanceTimersByTimeAsync(10000);
+
+        expect(global.fetch.mock.calls[0][1].signal.aborted).toBe(true);
+
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), []);
     });
 
     it("refuses an unsafe inurl and still loads the project", async () => {

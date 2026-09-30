@@ -70,6 +70,10 @@ const _KNOWN_URL_PARAMS = new Set([
     "turtle"
 ]);
 
+// How long startup will wait on the document named by "inurl" before giving
+// up on it and loading the project without an initial argument.
+const _ENV_ARG_TIMEOUT = 10000;
+
 class ProjectManager {
     constructor(activity) {
         this.activity = activity;
@@ -1309,8 +1313,20 @@ class ProjectManager {
             return null;
         }
 
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        let timeoutId = null;
+
         try {
-            const response = await fetch(url);
+            const request = {};
+            if (controller) {
+                request.signal = controller.signal;
+                // Aborting tears the body stream down too, so a server that
+                // stalls part way through the JSON cannot hold up the load
+                // any more than one that never answers at all.
+                timeoutId = setTimeout(() => controller.abort(), _ENV_ARG_TIMEOUT);
+            }
+
+            const response = await fetch(url, request);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
@@ -1321,6 +1337,10 @@ class ProjectManager {
             ErrorHandler.recoverable(e, { operation: "readEnvArg" });
             this.activity.errorMsg(_("Something went wrong reading JSON-encoded project data."));
             return null;
+        } finally {
+            if (timeoutId !== null) {
+                clearTimeout(timeoutId);
+            }
         }
     }
 
