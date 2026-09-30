@@ -5,6 +5,8 @@
     box-shadow: none;
     display: flex;
     transform: translateX(-25%) !important;
+    min-width: 150px !important;
+    overflow: visible !important;
 }
 
 #themedropdown a {

@@ -271,10 +271,12 @@ class ThemeBox {
         // Refresh palette if it exists
         if (this.activity.palettes) {
             try {
-                // Update palette selector border color
+                // Update palette selector border color and background color
                 const paletteElement = document.getElementById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
+                    paletteElement.childNodes[0].style.backgroundColor =
+                        platformColor.paletteLabelBackground;
                 }
 
                 const paletteToggle = document.getElementById("paletteToggle");
@@ -337,11 +339,23 @@ class ThemeBox {
                     }
                 }
 
-                // Refresh the currently open palette menu so block artwork
-                // SVGs are regenerated with the updated blockText color.
+                // We need to invalidate all palettes so they re-render completely with
+                // the new theme colors (background, text color, SVG icons).
+                for (const name in this.activity.palettes.dict) {
+                    const palette = this.activity.palettes.dict[name];
+                    if (palette && palette.isRendered) {
+                        // Remove the existing DOM container so it can be rebuilt
+                        if (palette.menuContainer && palette.menuContainer.parentNode) {
+                            palette.menuContainer.parentNode.removeChild(palette.menuContainer);
+                        }
+                        palette.menuContainer = null;
+                        palette.isRendered = false;
+                    }
+                }
+
+                // If a palette was currently open, re-open it to trigger renderMenu()
                 const activeName = this.activity.palettes.activePalette;
                 if (activeName && this.activity.palettes.dict[activeName]) {
-                    this.activity.palettes.dict[activeName].hideMenu();
                     this.activity.palettes.showPalette(activeName);
                 }
             } catch (e) {

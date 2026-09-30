@@ -315,4 +315,41 @@ describe("ThemeBox", () => {
         themeBox.refreshUIComponents();
         expect(mockActivity.trashcan.refresh).toHaveBeenCalledTimes(1);
     });
+    test("refreshUIComponents invalidates rendered palettes and reopens active palette", () => {
+        const mockParent = {
+            removeChild: jest.fn()
+        };
+        const mockMenuContainer = {
+            parentNode: mockParent
+        };
+        const mockPalette1 = {
+            isRendered: true,
+            menuContainer: mockMenuContainer
+        };
+        const mockPalette2 = {
+            isRendered: false,
+            menuContainer: null
+        };
+        mockActivity.palettes = {
+            dict: {
+                palette1: mockPalette1,
+                palette2: mockPalette2
+            },
+            activePalette: "palette1",
+            showPalette: jest.fn()
+        };
+
+        themeBox.refreshUIComponents();
+
+        // Should remove the DOM node and reset properties on rendered palettes
+        expect(mockParent.removeChild).toHaveBeenCalledWith(mockMenuContainer);
+        expect(mockPalette1.menuContainer).toBeNull();
+        expect(mockPalette1.isRendered).toBe(false);
+
+        // Should ignore unrendered palettes
+        expect(mockPalette2.isRendered).toBe(false);
+
+        // Should reopen the previously active palette to trigger full re-render
+        expect(mockActivity.palettes.showPalette).toHaveBeenCalledWith("palette1");
+    });
 });
