@@ -254,6 +254,8 @@ class Singer {
         this.pickup = 0;
         this.beatsPerMeasure = 4;
         this.noteValuePerBeat = 4;
+        // Where the latest meter change started counting measures (see getMeterAnchor)
+        this.meterAnchor = null;
         this.currentBeat = 0;
         this.currentMeasure = 0;
 

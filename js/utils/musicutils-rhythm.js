@@ -12,7 +12,8 @@
 /*
    exported
 
-   reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor, MusicUtilsRhythm
+   reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor,
+   getMeasurePosition, getMeterAnchor, MusicUtilsRhythm
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -206,11 +207,64 @@ var convertFactor = factor => {
     }
 };
 
+/**
+ * Where a moment in a turtle's music falls in the meter.
+ *
+ * The position is counted from the latest meter change (singer.meterAnchor),
+ * or from the end of the pickup if the meter has not changed since.
+ * @function
+ * @param {Object} singer - A turtle's singer.
+ * @param {number} wholeNotes - The moment, in whole notes from the start.
+ * @returns {{beat: number, measure: number, timeLeftInMeasure: number}} beat and
+ *   measure count from 1 (both 0 during the pickup); timeLeftInMeasure is in whole notes.
+ */
+var getMeasurePosition = (singer, wholeNotes) => {
+    if (wholeNotes < singer.pickup) {
+        return { beat: 0, measure: 0, timeLeftInMeasure: singer.pickup - wholeNotes };
+    }
+
+    const anchor =
+        singer.meterAnchor && singer.meterAnchor.wholeNotes > singer.pickup
+            ? singer.meterAnchor
+            : { wholeNotes: singer.pickup, measures: 0 };
+    let beats = (wholeNotes - anchor.wholeNotes) * singer.noteValuePerBeat;
+    // Keep float error in note durations from being read as a sliver of a beat.
+    if (Math.abs(beats - Math.round(beats)) < 1e-9) {
+        beats = Math.round(beats);
+    }
+    const beatInMeasure = beats % singer.beatsPerMeasure;
+    return {
+        beat: 1 + beatInMeasure,
+        measure: anchor.measures + 1 + Math.floor(beats / singer.beatsPerMeasure),
+        timeLeftInMeasure: (singer.beatsPerMeasure - beatInMeasure) / singer.noteValuePerBeat
+    };
+};
+
+/**
+ * The anchor a meter change starts counting from: the moment of the change and
+ * the measures before it. A meter change starts a new measure, so a measure it
+ * cuts short still counts.
+ * @function
+ * @param {Object} singer - A turtle's singer, still in the old meter.
+ * @returns {{wholeNotes: number, measures: number}|null} null before the pickup ends.
+ */
+var getMeterAnchor = singer => {
+    const wholeNotes = singer.notesPlayed[0] / singer.notesPlayed[1];
+    if (wholeNotes <= singer.pickup) {
+        return null;
+    }
+
+    const { beat, measure } = getMeasurePosition(singer, wholeNotes);
+    return { wholeNotes, measures: beat > 1 ? measure : measure - 1 };
+};
+
 var MusicUtilsRhythm = {
     reducedFraction,
     calcNoteValueToDisplay,
     durationToNoteValue,
-    convertFactor
+    convertFactor,
+    getMeasurePosition,
+    getMeterAnchor
 };
 
 if (typeof module !== "undefined" && module.exports) {

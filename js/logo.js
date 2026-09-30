@@ -1199,15 +1199,10 @@ class Logo {
 
         // Check to see if this note straddles a measure boundary
         const durationTime = 1 / duration;
-        const beatsIntoMeasure =
-            ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                tur.singer.pickup -
-                durationTime) *
-                tur.singer.noteValuePerBeat) %
-            tur.singer.beatsPerMeasure;
-        const timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
-        const timeLeftInMeasure =
-            tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
+        const { timeLeftInMeasure } = this.deps.utils.getMeasurePosition(
+            tur.singer,
+            tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - durationTime
+        );
 
         if (split && durationTime > timeLeftInMeasure) {
             // overflowTime: the portion of the note that extends past all

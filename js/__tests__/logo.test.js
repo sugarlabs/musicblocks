@@ -112,6 +112,7 @@ global.getIntervalDirection = jest.fn(() => 1);
 global.getIntervalNumber = jest.fn(() => 5);
 global.mixedNumber = jest.fn(n => n.toString());
 global.rationalToFraction = jest.fn(n => [1, Math.round(1 / n)]);
+global.getMeasurePosition = require("../utils/musicutils-rhythm").getMeasurePosition;
 global.doStopVideoCam = jest.fn();
 global.CAMERAVALUE = "camera:";
 global.VIDEOVALUE = "video:";
@@ -3116,6 +3117,24 @@ describe("Logo updateNotation", () => {
         logo.updateNotation(["C4"], 0.5, 0, false, null, true);
         expect(logo.notation.notationInsertTie).toHaveBeenCalledWith(0);
         expect(logo.notation.doUpdateNotation).toHaveBeenCalled();
+    });
+
+    test("finds barlines from the latest meter change", () => {
+        const singer = mockActivity.turtles.ithTurtle().singer;
+        logo.notation.notationDrumStaging[0] = [];
+        // Three beats of 3/4, then a whole note starting on the downbeat of 4/4.
+        Object.assign(singer, {
+            notesPlayed: [7, 4],
+            pickup: 0,
+            noteValuePerBeat: 4,
+            beatsPerMeasure: 4,
+            meterAnchor: { wholeNotes: 0.75, measures: 1 }
+        });
+
+        logo.updateNotation(["C4"], 1, 0, false, null, true);
+
+        expect(logo.notation.notationInsertTie).not.toHaveBeenCalled();
+        expect(logo.notation.doUpdateNotation).toHaveBeenCalledTimes(1);
     });
 });
 
