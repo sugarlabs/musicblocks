@@ -554,6 +554,116 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
     });
 
+    test("renders normal item and handles drag and drop with requestAnimationFrame correctly", () => {
+        const previousRaf = window.requestAnimationFrame;
+        const previousCancelRaf = window.cancelAnimationFrame;
+
+        let rafCallback = null;
+        window.requestAnimationFrame = jest.fn(cb => {
+            rafCallback = cb;
+            return 456;
+        });
+        window.cancelAnimationFrame = jest.fn();
+
+        try {
+            const instance = { _renderItem: null };
+            $elem = makeJQueryElem(false, instance);
+            global.window.jQuery = jest.fn(() => $elem);
+
+            const protoBlock = makeProtoBlock("drum", "drum beat");
+            const activity = makeActivity({ drum: protoBlock });
+            setupSearchController(activity);
+            const sc = activity.searchController;
+            sc.prepSearchWidget();
+
+            activity.searchWidget.idInput_custom = "";
+            activity.searchWidget.value = "";
+            sc.doSearch();
+
+            const ul = { css: jest.fn(), append: jest.fn() };
+            const liEl = {
+                addEventListener: jest.fn(),
+                append: jest.fn(() => liEl),
+                0: { addEventListener: jest.fn() }
+            };
+            liEl.appendTo = jest.fn(() => liEl);
+            const mockA = { text: jest.fn(() => mockA) };
+            const mockSearch = { autocomplete: jest.fn() };
+            global.window.jQuery.mockImplementation(selector => {
+                if (selector === "<a>") return mockA;
+                if (selector === "#search") return mockSearch;
+                return liEl;
+            });
+
+            const originalCreateElement = document.createElement.bind(document);
+            document.createElement = jest.fn(tag => {
+                if (tag === "img") {
+                    const mockImg = originalCreateElement("img");
+                    Object.defineProperty(mockImg, "offsetWidth", { value: 20 });
+                    Object.defineProperty(mockImg, "offsetHeight", { value: 20 });
+                    return mockImg;
+                }
+                return originalCreateElement(tag);
+            });
+
+            const item = {
+                isEmptyState: false,
+                label: "drum",
+                value: "drum",
+                specialDict: protoBlock
+            };
+
+            jest.spyOn(document, "addEventListener");
+            jest.spyOn(document, "removeEventListener");
+
+            instance._renderItem(ul, item);
+
+            // Mousedown
+            const downHandler = liEl[0].addEventListener.mock.calls.find(
+                c => c[0] === "mousedown"
+            )[1];
+            downHandler({
+                stopPropagation: jest.fn(),
+                stopImmediatePropagation: jest.fn(),
+                preventDefault: jest.fn(),
+                pageX: 100,
+                pageY: 200,
+                type: "mousedown"
+            });
+
+            // Mousemove
+            const moveHandler = document.addEventListener.mock.calls.find(
+                c => c[0] === "mousemove"
+            )[1];
+            moveHandler({
+                preventDefault: jest.fn(),
+                pageX: 150,
+                pageY: 260,
+                type: "mousemove"
+            });
+
+            expect(window.requestAnimationFrame).toHaveBeenCalled();
+            expect(rafCallback).not.toBeNull();
+
+            // Mouseup before RAF fires
+            const upHandler = document.addEventListener.mock.calls.find(c => c[0] === "mouseup")[1];
+            upHandler();
+
+            expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
+
+            expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+
+            const makeBlockCb =
+                activity.palettes.dict["test-palette"].makeBlockFromSearch.mock.calls[0][2];
+            const newBlock = {};
+            makeBlockCb(newBlock);
+            expect(activity.blocks.moveBlock).toHaveBeenCalledWith(newBlock, 140, 250);
+        } finally {
+            window.requestAnimationFrame = previousRaf;
+            window.cancelAnimationFrame = previousCancelRaf;
+        }
+    });
+
     test("select callback does not place a block for the empty-state row", () => {
         const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
         setupSearchController(activity);

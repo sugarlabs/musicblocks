@@ -503,4 +503,50 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(prefetchSpy).toHaveBeenCalled();
         });
     });
+
+    describe("_makeDraggable", () => {
+        test("handles drag and drop correctly with requestAnimationFrame", () => {
+            const previousRaf = window.requestAnimationFrame;
+            const previousCancelRaf = window.cancelAnimationFrame;
+
+            let rafCallback = null;
+            window.requestAnimationFrame = jest.fn(cb => {
+                rafCallback = cb;
+                return 456;
+            });
+            window.cancelAnimationFrame = jest.fn();
+
+            try {
+                const frame = document.createElement("div");
+                frame.getBoundingClientRect = () => ({ left: 10, top: 20 });
+                Object.defineProperty(frame, "offsetWidth", { value: 100 });
+                Object.defineProperty(frame, "offsetHeight", { value: 100 });
+                frame.style.left = "0px";
+                frame.style.top = "0px";
+                const handle = document.createElement("div");
+
+                gitDropdown._makeDraggable(frame, handle);
+
+                const mousedown = new MouseEvent("mousedown", { clientX: 50, clientY: 60 });
+                handle.dispatchEvent(mousedown);
+
+                const mousemove = new MouseEvent("mousemove", { clientX: 100, clientY: 120 });
+                document.dispatchEvent(mousemove);
+
+                expect(window.requestAnimationFrame).toHaveBeenCalled();
+                expect(rafCallback).not.toBeNull();
+
+                const mouseup = new MouseEvent("mouseup");
+                document.dispatchEvent(mouseup);
+
+                expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
+
+                expect(frame.style.left).toBe("60px");
+                expect(frame.style.top).toBe("80px");
+            } finally {
+                window.requestAnimationFrame = previousRaf;
+                window.cancelAnimationFrame = previousCancelRaf;
+            }
+        });
+    });
 });
