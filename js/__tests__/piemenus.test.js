@@ -794,6 +794,105 @@ describe("piemenus behavioral tests", () => {
     });
 });
 
+describe("piemenuNumber wheel configuration", () => {
+    let mockBlock;
+
+    beforeEach(() => {
+        global.platformColor.numberWheelcolors = ["#555555"];
+        global.platformColor.exitWheelcolors2 = ["#666666"];
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "labelDiv") {
+                return {
+                    replaceChildren: jest.fn(),
+                    classList: { add: jest.fn(), remove: jest.fn() }
+                };
+            }
+            return {
+                style: {},
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+            };
+        });
+        global.document.getElementById = global.docById;
+        global.document.createElement = jest.fn().mockReturnValue({ style: {} });
+
+        mockBlock = {
+            container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: { _canvas: { width: 1000, height: 1000 } },
+                blockList: { "mock-id": { name: "mock-block" } }
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1)
+            },
+            connections: ["mock-id"],
+            protoblock: { scale: 1 },
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: 5,
+            _exitKeyPressed: jest.fn(),
+            _usePieNumberC1: jest.fn().mockReturnValue(false)
+        };
+        jest.clearAllMocks();
+    });
+
+    test("configures the radius tier for a short value list and leaves navAngle untouched", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+        piemenuNumber(mockBlock, [1, 2, 3], 2);
+
+        expect(global.configureWheel).toHaveBeenCalledWith(
+            mockBlock._numberWheel,
+            expect.objectContaining({ minRadius: 0.2, maxRadius: 0.6, selectionPaths: true })
+        );
+        expect(mockBlock._numberWheel.navAngle).toBeUndefined();
+        expect(mockBlock._numberWheel.titleRotateAngle).toBeUndefined();
+    });
+
+    test("configures the radius tier for a long value list (>16)", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+        const values = Array.from({ length: 20 }, (_, i) => i);
+        piemenuNumber(mockBlock, values, 5);
+
+        expect(global.configureWheel).toHaveBeenCalledWith(
+            mockBlock._numberWheel,
+            expect.objectContaining({ minRadius: 0.6, maxRadius: 1.0 })
+        );
+    });
+
+    test("configures the radius tier for a medium value list (>10)", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+        const values = Array.from({ length: 12 }, (_, i) => i);
+        piemenuNumber(mockBlock, values, 5);
+
+        expect(global.configureWheel).toHaveBeenCalledWith(
+            mockBlock._numberWheel,
+            expect.objectContaining({ minRadius: 0.5, maxRadius: 0.9 })
+        );
+    });
+
+    test("sets navAngle to -90 for a setheading block", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "setheading";
+        piemenuNumber(mockBlock, [0, 90, 180, 270], 90);
+
+        expect(mockBlock._numberWheel.navAngle).toBe(-90);
+        expect(mockBlock._numberWheel.titleRotateAngle).toBeUndefined();
+    });
+
+    test("sets titleRotateAngle to 0 for a setbpm3 block and leaves navAngle untouched", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "setbpm3";
+        piemenuNumber(mockBlock, [40, 60, 90, 120], 90);
+
+        expect(mockBlock._numberWheel.titleRotateAngle).toBe(0);
+        expect(mockBlock._numberWheel.navAngle).toBeUndefined();
+    });
+});
+
 describe("piemenuKey behavioral tests", () => {
     let mockActivity;
 
