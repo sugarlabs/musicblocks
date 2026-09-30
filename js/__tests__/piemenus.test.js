@@ -11,12 +11,22 @@
 
 const {
     piemenuPitches,
+    piemenuAccidentals,
+    piemenuCustomNotes,
+    piemenuChords,
+    piemenuNoteValue,
     piemenuIntervals,
     piemenuKey,
     piemenuNumber,
+    piemenuColor,
+    piemenuBoolean,
     piemenuModes,
-    piemenuNoteValue,
-    piemenuColor
+    piemenuVoices,
+    piemenuBasic,
+    piemenuDissectNumber,
+    getTemperamentSliceFont,
+    getWheelSafeBounds,
+    positionWheelDiv
 } = require("../piemenus");
 const Block = require("../block");
 
@@ -35,6 +45,9 @@ global.DEFAULTVOLUME = 0.5;
 global.SHARP = "#";
 global.FLAT = "b";
 global.Singer = { setSynthVolume: jest.fn() };
+global.numberToPitch = jest.fn().mockReturnValue("C4");
+global.frequencyToPitch = jest.fn().mockReturnValue(["A", 4]);
+global.getMunsellColor = jest.fn().mockReturnValue("#ff0000");
 global.docById = jest.fn().mockReturnValue({
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
@@ -1636,5 +1649,517 @@ describe("pie-menu exit key listener reference regression coverage", () => {
         test("removes the exact registered handler reference on Tab", () => {
             testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Tab");
         });
+    });
+});
+
+describe("shared wheel safe positioning", () => {
+    let wheelDivMock;
+    let toolbarsMock;
+    let paletteMock;
+    let previousWidth;
+    let previousHeight;
+
+    const makeBlock = (x, y, canvas = { width: 1000, height: 1000 }) => ({
+        container: { x, y, setChildIndex: jest.fn(), children: [] },
+        blocks: {
+            stageClick: false,
+            blockScale: 1,
+            turtles: { _canvas: canvas },
+            findPitchOctave: jest.fn().mockReturnValue(4),
+            setPitchOctave: jest.fn(),
+            blockList: { "mock-id": { name: "mock-block", connections: [null] } }
+        },
+        activity: {
+            canvas: { offsetLeft: 0, offsetTop: 0, width: canvas.width, height: canvas.height },
+            blocksContainer: { x: 0, y: 0 },
+            getStageScale: jest.fn().mockReturnValue(1),
+            KeySignatureEnv: ["C", "major", false],
+            logo: { synth: new global.Synth(), errorMsg: jest.fn(), blocks: { blockScale: 1 } },
+            turtles: {
+                ithTurtle: jest.fn().mockReturnValue({
+                    singer: { instrumentNames: ["default"] }
+                })
+            }
+        },
+        connections: ["mock-id"],
+        updateCache: jest.fn(),
+        text: { text: "" },
+        value: "",
+        name: "notename",
+        label: { style: {}, focus: jest.fn() },
+        protoblock: { scale: 1 },
+        _exitKeyPressed: jest.fn(),
+        _labelChanged: jest.fn(),
+        _usePieNumberC1: jest.fn().mockReturnValue(true)
+    });
+
+    beforeEach(() => {
+        previousWidth = window.innerWidth;
+        previousHeight = window.innerHeight;
+        window.innerWidth = 1400;
+        window.innerHeight = 900;
+
+        wheelDivMock = {
+            style: {
+                display: "",
+                opacity: "",
+                position: "",
+                left: "",
+                top: "",
+                width: "",
+                height: ""
+            },
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0, width: 0, height: 0 })
+        };
+        toolbarsMock = {
+            style: { display: "", visibility: "" },
+            offsetHeight: 64,
+            offsetTop: 0,
+            getBoundingClientRect: jest.fn().mockReturnValue({ bottom: 70, top: 0, height: 70 })
+        };
+        paletteMock = {
+            style: { display: "", visibility: "", transform: "" },
+            offsetWidth: 160,
+            offsetLeft: 0,
+            getBoundingClientRect: jest.fn().mockReturnValue({ right: 180, left: 0, width: 180 })
+        };
+
+        global.docById = jest.fn(id => {
+            if (id === "wheelDiv") return wheelDivMock;
+            if (id === "toolbars") return toolbarsMock;
+            if (id === "palette") return paletteMock;
+            return {
+                style: {},
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                replaceChildren: jest.fn(),
+                focus: jest.fn(),
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() }
+            };
+        });
+        global.document.getElementById = global.docById;
+    });
+
+    afterEach(() => {
+        window.innerWidth = previousWidth;
+        window.innerHeight = previousHeight;
+    });
+
+    const placedBox = () => {
+        const left = parseInt(wheelDivMock.style.left, 10);
+        const top = parseInt(wheelDivMock.style.top, 10);
+        const size = parseInt(wheelDivMock.style.width, 10);
+        return { left, top, size };
+    };
+
+    const expectInsideSafeRect = block => {
+        const bounds = getWheelSafeBounds(block);
+        const { left, top, size } = placedBox();
+        expect(left).toBeGreaterThanOrEqual(bounds.safeLeft);
+        expect(top).toBeGreaterThanOrEqual(bounds.safeTop);
+        expect(left + size).toBeLessThanOrEqual(bounds.rightBound - 8);
+        expect(top + size).toBeLessThanOrEqual(bounds.bottomBound - 8);
+    };
+
+    test("getWheelSafeBounds clears the toolbar and palette", () => {
+        const bounds = getWheelSafeBounds(makeBlock(0, 0));
+        expect(bounds.safeTop).toBe(78);
+        expect(bounds.safeLeft).toBe(188);
+    });
+
+    test("getWheelSafeBounds ignores a collapsed palette", () => {
+        paletteMock.style.transform = "translateX(-100%)";
+        const bounds = getWheelSafeBounds(makeBlock(0, 0));
+        expect(bounds.safeLeft).toBe(8);
+    });
+
+    test("getWheelSafeBounds uses the tighter of viewport and canvas", () => {
+        window.innerWidth = 1600;
+        window.innerHeight = 1200;
+        const bounds = getWheelSafeBounds(makeBlock(0, 0, { width: 800, height: 700 }));
+        expect(bounds.rightBound).toBe(800);
+        expect(bounds.bottomBound).toBe(700);
+    });
+
+    test("getWheelSafeBounds handles DOM fallback measurements and activity properties", () => {
+        // Toolbar with 0 bottom from getBoundingClientRect falls back to offsetTop + offsetHeight
+        toolbarsMock.getBoundingClientRect = jest.fn().mockReturnValue({ bottom: 0 });
+        toolbarsMock.offsetTop = 10;
+        toolbarsMock.offsetHeight = 50;
+
+        // Palette with 0 right from getBoundingClientRect falls back to offsetLeft + offsetWidth
+        paletteMock.getBoundingClientRect = jest.fn().mockReturnValue({ right: 0 });
+        paletteMock.offsetLeft = 5;
+        paletteMock.offsetWidth = 120;
+
+        const block = makeBlock(0, 0);
+        block.activity.toolbarHeight = 65;
+        block.activity.palettes = { collapsed: false, paletteWidth: 150 };
+        block.activity.canvas = { offsetLeft: 160, offsetTop: 70, width: 900, height: 800 };
+        delete block.blocks.turtles._canvas;
+
+        const bounds = getWheelSafeBounds(block);
+        expect(bounds.safeTop).toBe(70 + 8);
+        expect(bounds.safeLeft).toBe(160 + 8);
+        expect(bounds.rightBound).toBe(160 + 900);
+        expect(bounds.bottomBound).toBe(70 + 800);
+    });
+
+    test("getWheelSafeBounds handles null block and fallback dimensions", () => {
+        const bounds = getWheelSafeBounds(null);
+        expect(bounds.safeTop).toBe(78);
+        expect(bounds.safeLeft).toBe(188);
+        expect(bounds.rightBound).toBe(1200);
+        expect(bounds.bottomBound).toBe(900);
+    });
+
+    test("positionWheelDiv handles missing wheelDiv gracefully", () => {
+        global.docById = jest.fn().mockReturnValue(null);
+        global.document.getElementById = global.docById;
+        const placed = positionWheelDiv(null, 400, 300, 200);
+        expect(placed.left).toBe(300);
+        expect(placed.top).toBe(200);
+    });
+
+    test("positionWheelDiv places at caller desired position when inside safe bounds (normal placement)", () => {
+        const block = makeBlock(500, 500);
+        const placed = positionWheelDiv(block, 400, 300, 200);
+        expect(placed.size).toBe(400);
+        expect(parseInt(wheelDivMock.style.width, 10)).toBe(400);
+        expect(placed.left).toBe(300);
+        expect(placed.top).toBe(200);
+        expect(wheelDivMock.style.left).toBe("300px");
+        expect(wheelDivMock.style.top).toBe("200px");
+    });
+
+    test("positionWheelDiv clamps desired position near left boundary", () => {
+        const block = makeBlock(0, 500);
+        const placed = positionWheelDiv(block, 400, 50, 300);
+        expect(placed.left).toBe(188);
+        expect(placed.top).toBe(300);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(188);
+    });
+
+    test("positionWheelDiv clamps desired position near right boundary", () => {
+        const block = makeBlock(950, 500);
+        const bounds = getWheelSafeBounds(block);
+        const placed = positionWheelDiv(block, 400, 950, 300);
+        expect(placed.left).toBe(bounds.rightBound - 400 - 8);
+        expect(placed.top).toBe(300);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(bounds.rightBound - 400 - 8);
+    });
+
+    test("positionWheelDiv clamps desired position near top boundary", () => {
+        const block = makeBlock(500, 0);
+        const placed = positionWheelDiv(block, 400, 300, 10);
+        expect(placed.left).toBe(300);
+        expect(placed.top).toBe(78);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(78);
+    });
+
+    test("positionWheelDiv clamps desired position near bottom boundary", () => {
+        const block = makeBlock(500, 950);
+        const bounds = getWheelSafeBounds(block);
+        const placed = positionWheelDiv(block, 400, 300, 950);
+        expect(placed.left).toBe(300);
+        expect(placed.top).toBe(bounds.bottomBound - 400 - 8);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(bounds.bottomBound - 400 - 8);
+    });
+
+    test("positionWheelDiv clamps all 4 corner and extreme out-of-bounds positions", () => {
+        const block = makeBlock(500, 500);
+        const bounds = getWheelSafeBounds(block);
+        const maxLeft = bounds.rightBound - 400 - 8;
+        const maxTop = bounds.bottomBound - 400 - 8;
+
+        // Top-Left corner / negative position
+        const tl = positionWheelDiv(block, 400, -100, -100);
+        expect(tl.left).toBe(bounds.safeLeft);
+        expect(tl.top).toBe(bounds.safeTop);
+
+        // Top-Right corner
+        const tr = positionWheelDiv(block, 400, 2000, -100);
+        expect(tr.left).toBe(maxLeft);
+        expect(tr.top).toBe(bounds.safeTop);
+
+        // Bottom-Left corner
+        const bl = positionWheelDiv(block, 400, -100, 2000);
+        expect(bl.left).toBe(bounds.safeLeft);
+        expect(bl.top).toBe(maxTop);
+
+        // Bottom-Right corner
+        const br = positionWheelDiv(block, 400, 2000, 2000);
+        expect(br.left).toBe(maxLeft);
+        expect(br.top).toBe(maxTop);
+    });
+
+    test("positionWheelDiv uses the width setWheelSize applied on a narrower screen", () => {
+        window.innerWidth = 800;
+        const block = makeBlock(900, 900);
+        const placed = positionWheelDiv(block, 400, 900, 900);
+        expect(placed.size).toBe(350);
+        expect(parseInt(wheelDivMock.style.width, 10)).toBe(350);
+        const bounds = getWheelSafeBounds(block);
+        expect(placed.left).toBeLessThanOrEqual(bounds.rightBound - 350 - 8);
+        expect(placed.top).toBeLessThanOrEqual(bounds.bottomBound - 350 - 8);
+    });
+
+    test("unrelated pie menus preserve their preferred anchor positions", () => {
+        const block = makeBlock(400, 300);
+
+        // piemenuPitches
+        piemenuPitches(
+            block,
+            ["C", "D", "E", "F", "G", "A", "B"],
+            ["C", "D", "E", "F", "G", "A", "B"],
+            ["♯", "♭"],
+            "C",
+            ""
+        );
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(400 + 28 - 200);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(300 + 6 - 200);
+
+        // piemenuAccidentals
+        block.name = "accidentalname";
+        piemenuAccidentals(
+            block,
+            ["double sharp 𝄪", "sharp ♯", "natural ♮", "flat ♭", "double flat 𝄫"],
+            ["ds", "s", "n", "f", "df"],
+            "n"
+        );
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(400 + 28 - 200);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(300 + 6 - 200);
+
+        // piemenuChords
+        global.CHORDNAMES = ["major", "minor"];
+        block.name = "chordname";
+        piemenuChords(block, "major");
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(400 + 28 - 200);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(300 + 6 - 200);
+        expect(block._chordWheel.navItems[0].titleAttr.font).toBe("32 32px sans-serif");
+    });
+
+    test("pie menus clamp safely away from toolbar and palette when block is in top-left corner", () => {
+        const cornerBlock = makeBlock(0, 0);
+
+        // piemenuPitches
+        piemenuPitches(
+            cornerBlock,
+            ["C", "D", "E", "F", "G", "A", "B"],
+            ["C", "D", "E", "F", "G", "A", "B"],
+            ["♯", "♭"],
+            "C",
+            ""
+        );
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+
+        // piemenuAccidentals
+        cornerBlock.name = "accidentalname";
+        piemenuAccidentals(
+            cornerBlock,
+            ["double sharp 𝄪", "sharp ♯", "natural ♮", "flat ♭", "double flat 𝄫"],
+            ["ds", "s", "n", "f", "df"],
+            "n"
+        );
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+
+        // piemenuNumber
+        cornerBlock.name = "number";
+        cornerBlock.label = { style: {} };
+        cornerBlock.protoblock = { scale: 1 };
+        piemenuNumber(cornerBlock, [1, 2, 3, 4], 1);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+    });
+
+    test("piemenuNoteValue positions above block when space permits and flips below when near top toolbar", () => {
+        // Space above block
+        const midBlock = makeBlock(400, 500);
+        piemenuNoteValue(midBlock, "1");
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(500 + 6 - 300); // 206
+        expectInsideSafeRect(midBlock);
+
+        // Near top toolbar: flips below block and is clamped to safeTop
+        const topBlock = makeBlock(400, 20);
+        piemenuNoteValue(topBlock, "1");
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(78);
+        expectInsideSafeRect(topBlock);
+
+        // Near bottom-right edge
+        const brBlock = makeBlock(950, 950);
+        piemenuNoteValue(brBlock, "1");
+        expectInsideSafeRect(brBlock);
+    });
+
+    test("piemenuNumber positions above block or below when near top and handles sound preview triggers", () => {
+        const midBlock = makeBlock(400, 500);
+        midBlock.name = "number";
+        midBlock._usePieNumberC1 = jest.fn().mockReturnValue(true);
+        midBlock.blocks.blockList["pitch-parent"] = { name: "pitchnumber" };
+        midBlock.connections = ["pitch-parent"];
+
+        piemenuNumber(midBlock, [1, 2, 3, 4], 1);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(500 + 6 - 300);
+        expectInsideSafeRect(midBlock);
+
+        // Trigger pitch number preview navigation
+        midBlock._numberWheel.navItems[0].navigateFunction();
+
+        // Hertz block preview trigger
+        midBlock.blocks.blockList["hertz-parent"] = { name: "hertz" };
+        midBlock.connections = ["hertz-parent"];
+        piemenuNumber(midBlock, [100, 200, 440], 440);
+        midBlock._numberWheel.navItems[0].navigateFunction();
+        expectInsideSafeRect(midBlock);
+
+        // Near top toolbar
+        const topBlock = makeBlock(400, 10);
+        topBlock.name = "number";
+        piemenuNumber(topBlock, [1, 2, 3], 2);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+        expectInsideSafeRect(topBlock);
+    });
+
+    test("piemenuColor positions above block or flips below near top toolbar and bounds safely", () => {
+        const midBlock = makeBlock(400, 500);
+        midBlock.name = "color";
+        piemenuColor(midBlock, [0, 10, 20], 0, "color");
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(500 + 6 - 300);
+        expectInsideSafeRect(midBlock);
+
+        const topBlock = makeBlock(400, 10);
+        topBlock.name = "color";
+        piemenuColor(topBlock, [0, 10, 20], 0, "color");
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+        expectInsideSafeRect(topBlock);
+
+        const brBlock = makeBlock(950, 950);
+        brBlock.name = "color";
+        piemenuColor(brBlock, [0, 10, 20], 0, "color");
+        expectInsideSafeRect(brBlock);
+    });
+
+    test("piemenuCustomNotes clamps safely across workspace edges", () => {
+        const noteLabels = {
+            C: { pitchNumber: 1 },
+            D: { pitchNumber: 2 },
+            E: { pitchNumber: 3 },
+            custom1: { pitchNumber: 1 },
+            custom2: { pitchNumber: 2 }
+        };
+
+        const midBlock = makeBlock(400, 400);
+        piemenuCustomNotes(midBlock, noteLabels, ["custom1", "custom2"], "custom1", "C");
+        expectInsideSafeRect(midBlock);
+
+        const cornerBlock = makeBlock(0, 0);
+        piemenuCustomNotes(cornerBlock, noteLabels, ["custom1", "custom2"], "custom1", "C");
+        expectInsideSafeRect(cornerBlock);
+
+        const brBlock = makeBlock(950, 950);
+        piemenuCustomNotes(brBlock, noteLabels, ["custom1", "custom2"], "custom1", "C");
+        expectInsideSafeRect(brBlock);
+    });
+
+    test("piemenuBoolean, piemenuVoices, and non-temperament piemenuBasic clamp safely", () => {
+        // piemenuBoolean
+        const boolBlock = makeBlock(0, 0);
+        boolBlock.name = "boolean";
+        piemenuBoolean(boolBlock, ["true", "false"], [true, false], true);
+        expectInsideSafeRect(boolBlock);
+
+        const boolBrBlock = makeBlock(950, 950);
+        boolBrBlock.name = "boolean";
+        piemenuBoolean(boolBrBlock, ["true", "false"], [true, false], true);
+        expectInsideSafeRect(boolBrBlock);
+
+        // piemenuVoices
+        const voiceBlock = makeBlock(0, 0);
+        voiceBlock.name = "voice";
+        piemenuVoices(voiceBlock, ["piano", "guitar"], ["piano", "guitar"], [], "piano", 0);
+        expectInsideSafeRect(voiceBlock);
+
+        const voiceBrBlock = makeBlock(950, 950);
+        voiceBrBlock.name = "voice";
+        piemenuVoices(voiceBrBlock, ["piano", "guitar"], ["piano", "guitar"], [], "piano", 0);
+        expectInsideSafeRect(voiceBrBlock);
+
+        // Non-temperament piemenuBasic
+        const basicBlock = makeBlock(0, 0);
+        basicBlock.name = "basic";
+        piemenuBasic(basicBlock, ["option1", "option2"], ["1", "2"], "1");
+        expectInsideSafeRect(basicBlock);
+
+        const basicBrBlock = makeBlock(950, 950);
+        basicBrBlock.name = "basic";
+        piemenuBasic(basicBrBlock, ["option1", "option2"], ["1", "2"], "1");
+        expectInsideSafeRect(basicBrBlock);
+    });
+
+    test("piemenuIntervals and piemenuModes clamp safely across workspace boundaries", () => {
+        // piemenuIntervals
+        const intervalBlock = makeBlock(0, 0);
+        intervalBlock.name = "interval";
+        piemenuIntervals(intervalBlock, "perfect 1");
+        expectInsideSafeRect(intervalBlock);
+
+        const intervalBr = makeBlock(950, 950);
+        intervalBr.name = "interval";
+        piemenuIntervals(intervalBr, "perfect 1");
+        expectInsideSafeRect(intervalBr);
+
+        // piemenuModes
+        const modeBlock = makeBlock(0, 0);
+        modeBlock.name = "mode";
+        piemenuModes(modeBlock, "major");
+        expectInsideSafeRect(modeBlock);
+
+        const modeBr = makeBlock(950, 950);
+        modeBr.name = "mode";
+        piemenuModes(modeBr, "major");
+        expectInsideSafeRect(modeBr);
+    });
+
+    test("piemenuDissectNumber clamps safely when button is near boundaries or in normal space", () => {
+        const makeWidget = (btnLeft, btnTop) => ({
+            _dissectNumber: {
+                value: 2,
+                getBoundingClientRect: jest.fn().mockReturnValue({
+                    left: btnLeft,
+                    top: btnTop,
+                    height: 30,
+                    width: 60
+                })
+            },
+            activity: {
+                beginnerMode: false,
+                canvas: { offsetLeft: 0, offsetTop: 0, width: 1000, height: 1000 },
+                logo: {
+                    blocks: { blockScale: 1, turtles: { _canvas: { width: 1000, height: 1000 } } }
+                }
+            }
+        });
+
+        // Normal placement
+        const normalWidget = makeWidget(700, 500);
+        piemenuDissectNumber(normalWidget);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(700 - 28 - 300 - 10);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(500 - 6 + 15 - 150);
+
+        // Near top-left corner
+        const cornerWidget = makeWidget(50, 50);
+        piemenuDissectNumber(cornerWidget);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+
+        // Near bottom-right edge
+        const brWidget = makeWidget(990, 990);
+        piemenuDissectNumber(brWidget);
+        expect(parseInt(wheelDivMock.style.left, 10) + 300).toBeLessThanOrEqual(1000 - 8);
+        expect(parseInt(wheelDivMock.style.top, 10) + 300).toBeLessThanOrEqual(1000 - 8);
     });
 });
