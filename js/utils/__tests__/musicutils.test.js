@@ -143,7 +143,9 @@ const {
     getModeGroupTitleFont,
     temperamentHasRatios,
     parseSclFile,
-    parseModeJson
+    parseModeJson,
+    parseNoteString,
+    stripMicrotonalPrefix
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -152,6 +154,51 @@ const DOUBLEFLAT = "\ud834\udd2b";
 describe("musicutils", () => {
     describe("getNonEDOFrequency browser runtime", () => {
         it("returns a ratio-temperament preview frequency without Node global", () => {
+            const constants = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-constants.js"),
+                "utf8"
+            );
+            const i18n = fs.readFileSync(path.join(__dirname, "..", "musicutils-i18n.js"), "utf8");
+            const temperament = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-temperament.js"),
+                "utf8"
+            );
+            const pitch = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitch.js"),
+                "utf8"
+            );
+            const lookups = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-lookups.js"),
+                "utf8"
+            );
+            const rhythm = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-rhythm.js"),
+                "utf8"
+            );
+            const solfege = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-solfege.js"),
+                "utf8"
+            );
+            const modewheel = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-modewheel.js"),
+                "utf8"
+            );
+            const modecore = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-modecore.js"),
+                "utf8"
+            );
+            const pitchscale = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitchscale.js"),
+                "utf8"
+            );
+            const buildscale = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-buildscale.js"),
+                "utf8"
+            );
+            const pitchinfo = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitchinfo.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -161,6 +208,18 @@ describe("musicutils", () => {
             };
 
             vm.createContext(sandbox);
+            vm.runInContext(constants, sandbox);
+            vm.runInContext(i18n, sandbox);
+            vm.runInContext(temperament, sandbox);
+            vm.runInContext(pitch, sandbox);
+            vm.runInContext(lookups, sandbox);
+            vm.runInContext(rhythm, sandbox);
+            vm.runInContext(solfege, sandbox);
+            vm.runInContext(modewheel, sandbox);
+            vm.runInContext(modecore, sandbox);
+            vm.runInContext(pitchscale, sandbox);
+            vm.runInContext(buildscale, sandbox);
+            vm.runInContext(pitchinfo, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
@@ -537,6 +596,13 @@ describe("getIntervalNumber", () => {
         expect(getIntervalNumber("perfect 5")).toBe(7);
         expect(getIntervalNumber("major 3")).toBe(4);
     });
+
+    it("should return 0 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalNumber("invalid")).toBe(0);
+        expect(getIntervalNumber("")).toBe(0);
+        expect(getIntervalNumber(null)).toBe(0);
+        expect(getIntervalNumber(undefined)).toBe(0);
+    });
 });
 
 describe("getIntervalDirection", () => {
@@ -544,12 +610,26 @@ describe("getIntervalDirection", () => {
         expect(getIntervalDirection("diminished 6")).toBe(-1);
         expect(getIntervalDirection("minor 3")).toBe(-1);
     });
+
+    it("should return 0 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalDirection("invalid")).toBe(0);
+        expect(getIntervalDirection("")).toBe(0);
+        expect(getIntervalDirection(null)).toBe(0);
+        expect(getIntervalDirection(undefined)).toBe(0);
+    });
 });
 
 describe("getIntervalRatio", () => {
     it("should return the ratio for a given interval", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
+    });
+
+    it("should return 1 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalRatio("invalid")).toBe(1);
+        expect(getIntervalRatio("")).toBe(1);
+        expect(getIntervalRatio(null)).toBe(1);
+        expect(getIntervalRatio(undefined)).toBe(1);
     });
 
     it("should return the just diminished seventh for diminished 7", () => {
@@ -656,10 +736,11 @@ describe("getDrum", () => {
             if (name === "") return "hh";
 
             for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-                if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+                if (
+                    DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() ||
+                    DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()
+                ) {
                     return DRUMNAMES[drum][3];
-                } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-                    return "hh";
                 }
             }
 
@@ -723,6 +804,7 @@ describe("getDrum", () => {
         it("should return the correct symbol for a valid drum name", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
             expect(getDrumSymbol("kick drum")).toBe("bd");
+            expect(getDrumSymbol("bass drum")).toBe("bd");
             expect(getDrumSymbol("floor tom")).toBe("tomfl");
         });
 
@@ -734,9 +816,9 @@ describe("getDrum", () => {
             expect(getDrumSymbol("invalid drum")).toBe("hh");
         });
 
-        it('should return "hh" for a name matching the second element of DRUMNAMES', () => {
+        it("should return the symbol for a name matching the second element of DRUMNAMES", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
-            expect(getDrumSymbol("kick drum")).toBe("bd"); // As per logic
+            expect(getDrumSymbol("kick drum")).toBe("bd");
         });
 
         it("should ignore case sensitivity when matching drum names", () => {
@@ -2386,28 +2468,32 @@ describe("durationToNoteValue", () => {
     global.POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
     it("should correctly convert a duration to a note value with no dots", () => {
-        const result = durationToNoteValue(1); // Expect a whole note
-        expect(result).toEqual([1, 0, null]);
+        expect(durationToNoteValue(1)).toEqual([1, 0, null]);
+        expect(durationToNoteValue(2)).toEqual([2, 0, null]);
+        expect(durationToNoteValue(4)).toEqual([4, 0, null]);
     });
 
     it("should correctly convert a duration to a note value with one dot", () => {
-        const result = durationToNoteValue(1.5); // 1.5 = whole note + dotted
-        expect(result).toEqual([1, 0, [3, 0.5], 1]);
+        expect(durationToNoteValue(1 / 1.5)).toEqual([1, 1, null]);
+        expect(durationToNoteValue(2 / 1.5)).toEqual([2, 1, null]);
+        expect(durationToNoteValue(4 / 1.5)).toEqual([4, 1, null]);
+        expect(durationToNoteValue(8 / 1.5)).toEqual([8, 1, null]);
     });
 
     it("should correctly convert a duration to a note value with two dots", () => {
-        const result = durationToNoteValue(1.75);
-        expect(result).toEqual([1, 0, [3.5, 0.5], 1]);
+        expect(durationToNoteValue(1 / 1.75)).toEqual([1, 2, null]);
+        expect(durationToNoteValue(2 / 1.75)).toEqual([2, 2, null]);
+        expect(durationToNoteValue(4 / 1.75)).toEqual([4, 2, null]);
+    });
+
+    it("should handle tuplet durations that do not match power-of-two note values", () => {
+        expect(durationToNoteValue(1.5)).toEqual([1, 0, [3, 0.5], 1]);
+        expect(durationToNoteValue(1.75)).toEqual([1, 0, [3.5, 0.5], 1]);
     });
 
     it("should round down durations that do not match exact note values in POWER2", () => {
         const result = durationToNoteValue(0.3);
         expect(result).toEqual([1, 0, [0.6, 0.5], 1]);
-    });
-
-    it("should correctly return the note value for durations in POWER2", () => {
-        const result = durationToNoteValue(2);
-        expect(result).toEqual([2, 0, null]);
     });
 
     it("should return the default rounded value for durations without an exact tuplet factor", () => {
@@ -2439,7 +2525,7 @@ describe("noteToPitchOctave", () => {
 
     it("should handle multi-character note names with no octave", () => {
         const result = noteToPitchOctave("B#");
-        expect(result).toEqual(["B", NaN]); // No octave, returns NaN for octave
+        expect(result).toEqual(["B#", NaN]); // No octave, returns NaN for octave
     });
 
     it("should correctly extract pitch and octave from a note string with multi-digit octave", () => {
@@ -2469,9 +2555,9 @@ describe("noteToPitchOctave", () => {
         expect(noteToPitchOctave("do#7")).toEqual(["do#", 7]);
     });
 
-    it("should correctly handle fallback cases for multi-digit digits", () => {
-        expect(noteToPitchOctave("hello10")).toEqual(["hello1", 0]);
-        expect(noteToPitchOctave("xyz123")).toEqual(["xyz12", 3]);
+    it("should safely return NaN octave for unparseable strings ending in digits", () => {
+        expect(noteToPitchOctave("hello10")).toEqual(["hello10", NaN]);
+        expect(noteToPitchOctave("xyz123")).toEqual(["xyz123", NaN]);
     });
 
     it("should correctly handle Carnatic note strings with octave", () => {
@@ -2480,12 +2566,12 @@ describe("noteToPitchOctave", () => {
         expect(noteToPitchOctave("ma#5")).toEqual(["ma#", 5]);
     });
 
-    it("should not match adversarial non-note words and fall back to fallback behavior", () => {
-        expect(noteToPitchOctave("away5")).toEqual(["away", 5]);
-        expect(noteToPitchOctave("regard4")).toEqual(["regard", 4]);
-        expect(noteToPitchOctave("hi4")).toEqual(["hi", 4]);
-        expect(noteToPitchOctave("random9")).toEqual(["random", 9]);
-        expect(noteToPitchOctave("banana2")).toEqual(["banana", 2]);
+    it("should safely return NaN octave for adversarial non-note words", () => {
+        expect(noteToPitchOctave("away5")).toEqual(["away5", NaN]);
+        expect(noteToPitchOctave("regard4")).toEqual(["regard4", NaN]);
+        expect(noteToPitchOctave("hi4")).toEqual(["hi4", NaN]);
+        expect(noteToPitchOctave("random9")).toEqual(["random9", NaN]);
+        expect(noteToPitchOctave("banana2")).toEqual(["banana2", NaN]);
     });
 });
 
@@ -2556,7 +2642,7 @@ describe("noteToFrequency", () => {
     });
 
     it("handles invalid note input gracefully", () => {
-        expect(noteToFrequency("X9", "C")).toBe(A0 * Math.pow(TWELTHROOT2, 99));
+        expect(noteToFrequency("X9", "C")).toBeNaN();
     });
 });
 
@@ -3351,11 +3437,11 @@ describe("getPitchInfo", () => {
 
         // Unicode double accidentals
         // F𝄪5 (F double-sharp) → same pitch as G5 = 79
-        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
+        const infoDoubleSharp = getPitchInfo("F𝄪5");
         expect(infoDoubleSharp.pitchNumber).toBe(79);
 
         // Bb𝄫5 (B double-flat) → same pitch as A5 = 81
-        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
+        const infoDoubleFlat = getPitchInfo("B𝄫5");
         expect(infoDoubleFlat.pitchNumber).toBe(81);
     });
 
@@ -3379,7 +3465,7 @@ describe("getPitchInfo", () => {
         // Gb-1
         expect(getPitchInfo("Gb-1").pitchNumber).toBe(6);
         // D𝄫-1
-        expect(getPitchInfo("D\u{1D12B}-1").pitchNumber).toBe(0);
+        expect(getPitchInfo("D𝄫-1").pitchNumber).toBe(0);
         // E##4
         expect(getPitchInfo("E##4").pitchNumber).toBe(66);
     });
@@ -3437,12 +3523,44 @@ describe("getPitchInfo", () => {
     it("returns color", () => {
         const color = getPitchInfo(activity, "pitch to color", "C4", tur);
         expect(typeof color).toBe("number");
+
+        const turFlat = { singer: { keySignature: "F major", movable: false } };
+        const flatColor = getPitchInfo(activity, "pitch to color", "Bb4", turFlat);
+        expect(typeof flatColor).toBe("number");
+
+        const unknownColor = getPitchInfo(activity, "pitch to color", "X4", tur);
+        expect(unknownColor).toBe(0);
+    });
+
+    it("handles errors during getPitchInfo smoothly", () => {
+        // Mock _getFrequency to throw an error so the try/catch inside getPitchInfo is hit
+        activity.logo.synth._getFrequency.mockImplementationOnce(() => {
+            throw new Error("Mock error");
+        });
+        getPitchInfo(activity, "pitch in hertz", "C4", tur);
+        // The error should be caught and logged (or at least not crash the test)
     });
 
     it("returns shade", () => {
         // octave * 12.5 -> 4 * 12.5 = 50
         const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
         expect(shade).toBe(50);
+    });
+
+    it("handles solfege class with accidental", () => {
+        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("re");
+    });
+
+    it("returns pitch number", () => {
+        const pNum = getPitchInfo(activity, "pitch number", "C4", tur);
+        expect(typeof pNum).toBe("number");
+    });
+
+    it("handles equivalent sharps mapping", () => {
+        // "Db" translates to "D♭". In C major, "D♭" is not in the scale.
+        // It should look it up in EQUIVALENTSHARPS and convert to "C♯".
+        const pitch = getPitchInfo(activity, "alphabet", "Db4", tur);
+        expect(pitch).toBe("C♯");
     });
 
     it("handles invalid type", () => {
@@ -3708,7 +3826,47 @@ describe("getNote additional paths", () => {
         expect(getNote("1#", 4, 0, "C major", false)).toEqual(["D", 4, 0]);
         expect(getNote("1b", 4, 0, "C major", false)).toEqual(["C", 4, 0]);
     });
+    it("normalizes negative pitch numbers across octave boundaries", () => {
+        expect(getNote(-1, 4, 0, "C major", false)).toEqual(["B", 3, 0]);
+        expect(getNote(-12, 4, 0, "C major", false)).toEqual(["C", 3, 0]);
+        expect(getNote(-13, 4, 0, "C major", false)).toEqual(["B", 2, 0]);
 
+        expect(getNote("-1", 4, 0, "C major", false)).toEqual(["B", 3, 0]);
+
+        expect(getNote(-1, 4, 0, "G major", true)).toEqual(["F♯", 4, 0]);
+        expect(getNote(-8, 4, 0, "G major", true)).toEqual(["B", 3, 0]);
+
+        expect(getNote(-1, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "B♯",
+            3,
+            0
+        ]);
+    });
+    it("normalizes positive pitch numbers across octave boundaries", () => {
+        expect(getNote(1, 4, 0, "C major", false)).toEqual(["D♭", 4, 0]);
+        expect(getNote(6, 4, 0, "C major", false)).toEqual(["G♭", 4, 0]);
+        expect(getNote(11, 4, 0, "C major", false)).toEqual(["B", 4, 0]);
+        expect(getNote(12, 4, 0, "C major", false)).toEqual(["C", 5, 0]);
+        expect(getNote(13, 4, 0, "C major", false)).toEqual(["D♭", 5, 0]);
+        expect(getNote(24, 4, 0, "C major", false)).toEqual(["C", 6, 0]);
+        expect(getNote(25, 4, 0, "C major", false)).toEqual(["D♭", 6, 0]);
+
+        expect(getNote("13", 4, 0, "C major", false)).toEqual(["D♭", 5, 0]);
+
+        expect(getNote(5, 4, 0, "G major", true)).toEqual(["C", 5, 0]);
+        expect(getNote(13, 4, 0, "G major", true)).toEqual(["G♯", 5, 0]);
+
+        expect(getNote(19, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C",
+            5,
+            0
+        ]);
+        expect(getNote(20, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C♯",
+            5,
+            0
+        ]);
+    });
     it("returns rests before attempting pitch conversion", () => {
         expect(getNote("rest", 4, 7, "C major", false)).toEqual(["R", "", 0]);
         expect(getNote("r", 4, 7, "C major", false)).toEqual(["R", "", 0]);
@@ -3811,6 +3969,29 @@ describe("getNote additional paths", () => {
         ]);
     });
 
+    it("resolves custom temperament notes with microtonal prefixes and cents", () => {
+        TEMPERAMENT["custom"] = {
+            pitchNumber: 12,
+            0: [1, "vvC", 4],
+            1: [1.88, "^B", 4]
+        };
+        try {
+            expect(
+                getNote("vvC(+0¢)", 4, 0, "C major", false, undefined, undefined, "custom")
+            ).toEqual(["vvC", 4, 0]);
+            expect(
+                getNote("^B(+0¢)", 4, 0, "C major", false, undefined, undefined, "custom")
+            ).toEqual(["^B", 4, 0]);
+            expect(getNote("vvC", 4, 0, "C major", false, undefined, undefined, "custom")).toEqual([
+                "vvC",
+                4,
+                0
+            ]);
+        } finally {
+            delete TEMPERAMENT["custom"];
+        }
+    });
+
     it("preserves accidentals for non-predefined temperament systems", () => {
         addTemperamentToDictionary("nonstrict", {
             pitchNumber: 12,
@@ -3845,6 +4026,90 @@ describe("scaleDegreeToPitchMapping extended modes", () => {
             "7",
             FLAT
         ]);
+    });
+
+    it("keeps degrees aligned when a tritone is skipped (minor blues)", () => {
+        // C minor blues: C E♭ F G♭ G B♭; G♭ is a passing tone, not degree 5
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d =>
+                scaleDegreeToPitchMapping("C minor blues", d, false, null)
+            )
+        ).toEqual(["C", "D", "E" + FLAT, "F", "G", "A", "B" + FLAT]);
+    });
+
+    it("maps each degree to its own note when two notes share a degree", () => {
+        // Fibonacci C D♭ D E G: D♭ and D both fall on degree 2
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d => scaleDegreeToPitchMapping("C fibonacci", d, false, null))
+        ).toEqual(["C", "D" + FLAT, "E", "F", "G", "A", "B"]);
+        // Major blues C D E♭ E G A: E♭ and E both fall on degree 3
+        expect(
+            [1, 2, 3, 4, 5, 6, 7].map(d =>
+                scaleDegreeToPitchMapping("C major blues", d, false, null)
+            )
+        ).toEqual(["C", "D", "E" + FLAT, "F", "G", "A", "B"]);
+    });
+
+    it("counts skipped degrees in the In mode (Sakura, #2050)", () => {
+        // E In: E F A B C, so A and B are degrees 4 and 5
+        expect(scaleDegreeToPitchMapping("E in", 4, false, null)).toBe("A");
+        expect(scaleDegreeToPitchMapping("E in", 5, false, null)).toBe("B");
+    });
+});
+
+describe("getSolfege movable do matches getNote", () => {
+    it("matches the solfege that getNote resolves in E In", () => {
+        const notes = ["E", "F", "A", "B", "C"];
+        expect(notes.map(n => getSolfege(n, "E in", true, "equal"))).toEqual([
+            "do",
+            "re",
+            "fa",
+            "sol",
+            "la"
+        ]);
+    });
+
+    it("uses la as the tonic in aeolian, as getNote does (#2050)", () => {
+        const notes = ["A", "B", "C", "D", "E", "F", "G"];
+        expect(notes.map(n => getSolfege(n, "A aeolian", true, "equal"))).toEqual([
+            "la",
+            "ti",
+            "do",
+            "re",
+            "mi",
+            "fa",
+            "sol"
+        ]);
+    });
+
+    it("round-trips every note of the rotated church modes through getNote", () => {
+        const modes = ["dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        for (const mode of modes) {
+            for (const key of ["C", "E", "G", "B" + FLAT]) {
+                const keySignature = key + " " + mode;
+                const scale = buildScale(keySignature)[0].slice(0, -1);
+                for (const note of scale) {
+                    const solfege = getSolfege(note, keySignature, true, "equal");
+                    const [back] = getNote(solfege, 4, 0, keySignature, true, null, jest.fn());
+                    expect(pitchToNumber(back, 4, keySignature) % 12).toBe(
+                        pitchToNumber(note, 4, keySignature) % 12
+                    );
+                }
+            }
+        }
+    });
+
+    it("round-trips every pentatonic scale note through getNote", () => {
+        for (const keySignature of ["C major pentatonic", "A minor pentatonic", "D hirajoshi"]) {
+            const scale = buildScale(keySignature)[0].slice(0, -1);
+            for (const note of scale) {
+                const solfege = getSolfege(note, keySignature, true, "equal");
+                const [back] = getNote(solfege, 4, 0, keySignature, true, null, jest.fn());
+                expect(pitchToNumber(back, 4, keySignature) % 12).toBe(
+                    pitchToNumber(note, 4, keySignature) % 12
+                );
+            }
+        }
     });
 });
 
@@ -3991,8 +4256,9 @@ describe("actual drum lookup helpers", () => {
     beforeEach(() => {
         global.DRUMNAMES = [
             ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "snare"],
-            ["kick drum", "kick drum", "images/kick.svg", "hh", "kick"],
-            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"]
+            ["kick drum", "kick drum", "images/kick.svg", "bd", "kick"],
+            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"],
+            ["キックドラム", "taiko", "images/tom.svg", "tomml", "taiko"]
         ];
     });
 
@@ -4007,7 +4273,14 @@ describe("actual drum lookup helpers", () => {
     it("returns drum symbols with default and fallback handling", () => {
         expect(actualMusicUtils.getDrumSymbol("")).toBe("hh");
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
+        expect(actualMusicUtils.getDrumSymbol("kick drum")).toBe("bd");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
+    });
+
+    it("resolves the canonical name to the drum's own symbol when localized names differ", () => {
+        // DRUMNAMES[3][0] is a localized label that does not equal "taiko";
+        // the canonical DRUMNAMES[3][1] must still reach that row's symbol.
+        expect(actualMusicUtils.getDrumSymbol("taiko")).toBe("tomml");
     });
 
     describe("_parse_pitch_string", () => {
@@ -4687,5 +4960,253 @@ describe("generateNoteNames EDO length contract", () => {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
         }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// parseNoteString
+// ---------------------------------------------------------------------------
+describe("parseNoteString", () => {
+    // ── Happy-path: regex fast-path ─────────────────────────────────────────
+
+    it("parses a plain Western note (C4)", () => {
+        expect(parseNoteString("C4")).toEqual(["C", 4]);
+    });
+
+    it("parses every natural Western letter with a mid-range octave", () => {
+        for (const letter of ["C", "D", "E", "F", "G", "A", "B"]) {
+            const result = parseNoteString(`${letter}4`);
+            expect(result).toEqual([letter, 4]);
+        }
+    });
+
+    // ── Accidentals ─────────────────────────────────────────────────────────
+
+    it("parses a sharp accidental (#)", () => {
+        expect(parseNoteString("C#4")).toEqual(["C#", 4]);
+    });
+
+    it("parses a flat accidental (b)", () => {
+        expect(parseNoteString("Db4")).toEqual(["Db", 4]);
+    });
+
+    it("parses the double-sharp ASCII alias (x)", () => {
+        // e.g. E double-sharp is written 'Ex' in MusicBlocks
+        expect(parseNoteString("Ex4")).toEqual(["Ex", 4]);
+    });
+
+    it("parses a double-flat ASCII alias (bb)", () => {
+        expect(parseNoteString("Fbb4")).toEqual(["Fbb", 4]);
+    });
+
+    it("parses the Unicode sharp (♯)", () => {
+        expect(parseNoteString("C♯4")).toEqual(["C♯", 4]);
+    });
+
+    it("parses the Unicode flat (♭)", () => {
+        expect(parseNoteString("D♭4")).toEqual(["D♭", 4]);
+    });
+
+    it("parses the Unicode double-sharp (𝄪)", () => {
+        expect(parseNoteString("E𝄪4")).toEqual(["E𝄪", 4]);
+    });
+
+    it("parses the Unicode double-flat (𝄫)", () => {
+        expect(parseNoteString("F𝄫4")).toEqual(["F𝄫", 4]);
+    });
+
+    it("parses the Unicode natural sign (♮)", () => {
+        expect(parseNoteString("C♮4")).toEqual(["C♮", 4]);
+    });
+
+    // ── Octave edge cases ────────────────────────────────────────────────────
+
+    it("handles octave 0 (lowest standard piano octave)", () => {
+        expect(parseNoteString("A0")).toEqual(["A", 0]);
+    });
+
+    it("handles octave 8", () => {
+        expect(parseNoteString("C8")).toEqual(["C", 8]);
+    });
+
+    it("handles a multi-digit octave (C10) via the regex path", () => {
+        // The legacy single-char fallback would return ["C1", 0] — wrong.
+        // The regex path must handle this correctly.
+        expect(parseNoteString("C#10")).toEqual(["C#", 10]);
+    });
+
+    it("handles a negative octave (C-1)", () => {
+        // Sub-zero octaves appear in generated microtonal projects.
+        expect(parseNoteString("C-1")).toEqual(["C", -1]);
+    });
+
+    it("handles a negative octave with accidental (Db-1)", () => {
+        expect(parseNoteString("Db-1")).toEqual(["Db", -1]);
+    });
+
+    // ── Solfege note names ───────────────────────────────────────────────────
+
+    it("parses 'do' (solfege)", () => {
+        expect(parseNoteString("do4")).toEqual(["do", 4]);
+    });
+
+    it("parses 're' (solfege)", () => {
+        expect(parseNoteString("re4")).toEqual(["re", 4]);
+    });
+
+    it("parses 'mi' (solfege)", () => {
+        expect(parseNoteString("mi4")).toEqual(["mi", 4]);
+    });
+
+    it("parses 'fa' (solfege)", () => {
+        expect(parseNoteString("fa4")).toEqual(["fa", 4]);
+    });
+
+    it("parses 'sol' (solfege)", () => {
+        expect(parseNoteString("sol4")).toEqual(["sol", 4]);
+    });
+
+    it("parses 'la' (solfege)", () => {
+        expect(parseNoteString("la4")).toEqual(["la", 4]);
+    });
+
+    it("parses 'ti' (solfege)", () => {
+        expect(parseNoteString("ti4")).toEqual(["ti", 4]);
+    });
+
+    it("parses 'si' (solfege alias for 'ti')", () => {
+        expect(parseNoteString("si4")).toEqual(["si", 4]);
+    });
+
+    it("parses 'ut' (historic solfege alias for 'do')", () => {
+        expect(parseNoteString("ut4")).toEqual(["ut", 4]);
+    });
+
+    // ── Carnatic note names ──────────────────────────────────────────────────
+
+    it("parses 'sa' (Carnatic)", () => {
+        expect(parseNoteString("sa4")).toEqual(["sa", 4]);
+    });
+
+    it("parses 'ga' (Carnatic)", () => {
+        expect(parseNoteString("ga4")).toEqual(["ga", 4]);
+    });
+
+    it("parses 'ma' (Carnatic)", () => {
+        expect(parseNoteString("ma4")).toEqual(["ma", 4]);
+    });
+
+    it("parses 'pa' (Carnatic)", () => {
+        expect(parseNoteString("pa4")).toEqual(["pa", 4]);
+    });
+
+    it("parses 'dha' (Carnatic)", () => {
+        expect(parseNoteString("dha4")).toEqual(["dha", 4]);
+    });
+
+    it("parses 'ni' (Carnatic)", () => {
+        expect(parseNoteString("ni4")).toEqual(["ni", 4]);
+    });
+
+    // ── Microtonal prefix stripping ──────────────────────────────────────────
+    // NOTE: parseNoteString does NOT strip microtonal prefixes itself — that
+    // is the responsibility of normalizeNoteAccidentals/stripMicrotonalPrefix
+    // which callers invoke before parseNoteString. The regex's optional
+    // leading [\^v]* group does match a leading ^ / v though, so this still
+    // goes through the regex path, not the unparseable fallback below.
+
+    it("parses a note with a leading microtonal prefix (^C4)", () => {
+        const [name, oct] = parseNoteString("^C4");
+        expect(oct).toBe(4);
+        expect(name).toBe("^C");
+    });
+
+    // ── Unparseable input ─────────────────────────────────────────────────────
+    // (#9045 removed the legacy last-character-as-octave guess: an input the
+    // regex above doesn't recognize is returned unchanged with a NaN octave,
+    // rather than silently chopping off what might not be an octave digit at
+    // all. noteToPitchOctave/noteToFrequency below rely on this directly.)
+
+    it("returns the whole string unchanged when it doesn't match the regex", () => {
+        const [name, oct] = parseNoteString("?X5");
+        expect(Number.isNaN(oct)).toBe(true);
+        expect(name).toBe("?X5");
+    });
+
+    it("returns the whole string unchanged when the last char isn't a digit either", () => {
+        const [name, oct] = parseNoteString("?XY");
+        expect(Number.isNaN(oct)).toBe(true);
+        expect(name).toBe("?XY");
+    });
+
+    // ── Empty / degenerate inputs ────────────────────────────────────────────
+
+    it("handles an empty string without throwing", () => {
+        const [name, oct] = parseNoteString("");
+        expect(typeof name).toBe("string");
+        expect(Number.isNaN(oct)).toBe(true);
+    });
+
+    it("handles a single-character string without throwing", () => {
+        const [name, oct] = parseNoteString("C");
+        expect(Number.isNaN(oct)).toBe(true);
+        expect(name).toBe("C");
+    });
+
+    // ── Return type invariant ────────────────────────────────────────────────
+
+    it("always returns a two-element array", () => {
+        for (const input of ["C4", "do4", "sa4", "C#10", "C-1", "", "??"]) {
+            const result = parseNoteString(input);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result).toHaveLength(2);
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// stripMicrotonalPrefix
+// ---------------------------------------------------------------------------
+describe("stripMicrotonalPrefix", () => {
+    it("strips a single leading ^ (up-prefix)", () => {
+        expect(stripMicrotonalPrefix("^C4")).toBe("C4");
+    });
+
+    it("strips a single leading v (down-prefix)", () => {
+        expect(stripMicrotonalPrefix("vD4")).toBe("D4");
+    });
+
+    it("strips exactly two leading ^ characters", () => {
+        expect(stripMicrotonalPrefix("^^C4")).toBe("C4");
+    });
+
+    it("strips exactly two leading v characters", () => {
+        expect(stripMicrotonalPrefix("vvD4")).toBe("D4");
+    });
+
+    it("strips a mixed pair (^v)", () => {
+        expect(stripMicrotonalPrefix("^vC4")).toBe("C4");
+    });
+
+    it("strips at most two — three carets leaves one behind", () => {
+        // ^^^C4 → regex /^[v^]{1,2}/ removes the first two, leaving "^C4"
+        expect(stripMicrotonalPrefix("^^^C4")).toBe("^C4");
+    });
+
+    it("does not strip anything from a plain note string", () => {
+        expect(stripMicrotonalPrefix("C4")).toBe("C4");
+    });
+
+    it("does not alter a string starting with a letter", () => {
+        expect(stripMicrotonalPrefix("Db4")).toBe("Db4");
+    });
+
+    it("returns an empty string unchanged", () => {
+        expect(stripMicrotonalPrefix("")).toBe("");
+    });
+
+    it("returns a string of only carets with the first two removed", () => {
+        // "^^^" → strips first 2, returns "^"
+        expect(stripMicrotonalPrefix("^^^")).toBe("^");
     });
 });

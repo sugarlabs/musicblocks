@@ -322,7 +322,12 @@ describe("setupPitchBlocks", () => {
             ["C(+0" + CENTSSYMBOL + ")", "C", 0],
             ["D" + SHARP, "D" + SHARP, 0],
             ["F𝄪(+42" + CENTSSYMBOL + ")", "F𝄪", 42],
-            ["D𝄫(+42" + CENTSSYMBOL + ")", "D𝄫", 42]
+            ["D𝄫(+42" + CENTSSYMBOL + ")", "D𝄫", 42],
+            ["vvC(+0" + CENTSSYMBOL + ")", "vvC", 0],
+            ["^B(+0" + CENTSSYMBOL + ")", "^B", 0],
+            ["vD(-15" + CENTSSYMBOL + ")", "vD", -15],
+            ["^^G#(+25" + CENTSSYMBOL + ")", "^^G#", 25],
+            ["C(+0c)", "C", 0]
         ];
 
         it("flow", () => {
@@ -805,6 +810,12 @@ describe("setupPitchBlocks", () => {
             if (cpBlock instanceof DummyFlowBlock) return;
             cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
+
+            cpBlock.flow(["vvC(+0" + CENTSSYMBOL + ")", 4], logo, 0, 11);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("vvC", 4, 0, 0, 11);
+
+            cpBlock.flow(["^B(+0" + CENTSSYMBOL + ")", 4], logo, 0, 12);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("^B", 4, 0, 0, 12);
         });
 
         it("pitch numbers >12 are scale degrees (not Hz) when EDO >12", () => {

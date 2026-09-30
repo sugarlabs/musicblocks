@@ -18,7 +18,8 @@
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
-    isUnsafeObjectKey
+    isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
  */
 
 /*
@@ -90,7 +91,19 @@ class ModeWidget {
         this.widgetWindow.clear();
         this.widgetWindow.show();
 
-        this._timeouts = [];
+        /**
+         * Timer manager for managing all widget timeouts safely.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
 
         // Layout: pie wheel + mode table (label row) + bottom control bar
         this.modeTableDiv = document.createElement("div");
@@ -111,11 +124,9 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
-            if (this._timeouts) {
-                this._timeouts.forEach(id => clearTimeout(id));
-                this._timeouts = [];
-            }
+            this._clearWidgetTimers();
             this._playing = false;
+            closeSharePopup("sclSharePopup");
             if (this.logo && this.logo.synth) {
                 this.logo.synth.stop();
             }
@@ -221,24 +232,90 @@ class ModeWidget {
         window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
     }
 
-    // ── Timeout helper ────────────────────────────────────────────
+    // ── Timeout helpers ───────────────────────────────────────────
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        if (Array.isArray(this._timeouts)) {
+            for (const id of this._timeouts) {
+                clearTimeout(id);
+                count++;
+            }
+            this._timeouts = [];
+        }
+
+        return count;
+    }
 
     _setTimeout(fn, delay) {
-        const id = setTimeout(() => {
-            this._timeouts = this._timeouts.filter(t => t !== id);
-            fn();
-        }, delay);
-        this._timeouts.push(id);
-        return id;
+        return this._setWidgetTimeout(fn, delay);
     }
 
     _cancelAnimations() {
         // Clear stale rotate/invert/play callbacks before rebuilding for a
         // new EDO; they reference old navItem indexes.
-        if (this._timeouts) {
-            this._timeouts.forEach(id => clearTimeout(id));
-            this._timeouts = [];
-        }
+        this._clearWidgetTimers();
         this._locked = false;
         this._playing = false;
         this._newPattern = null;
@@ -1334,7 +1411,6 @@ class ModeWidget {
             12: "equal",
             17: "equal17",
             19: "equal19",
-            21: "1/4 comma meantone",
             31: "equal31"
         };
         if (map[edo]) {
@@ -1367,115 +1443,15 @@ class ModeWidget {
     }
 
     _createSclSharePopup(anchor) {
-        const existing = document.getElementById("sclSharePopup");
-        if (existing) {
-            if (existing._closeHandler) {
-                document.removeEventListener("mousedown", existing._closeHandler);
-            }
-            existing.remove();
-            return;
-        }
-
-        const popup = document.createElement("div");
-        popup.id = "sclSharePopup";
-        popup.style.cssText =
-            "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
-            "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
-            "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
-            "min-width:140px;";
-        const rect = anchor.getBoundingClientRect();
-        popup.style.top = rect.bottom + 4 + "px";
-        popup.style.left = rect.left + "px";
-
-        const addItem = (label, handler) => {
-            const item = document.createElement("div");
-            item.textContent = label;
-            item.setAttribute("role", "button");
-            item.setAttribute("tabindex", "0");
-            item.style.cssText = "padding:6px 16px;cursor:pointer;";
-            item.onmouseenter = () => {
-                item.style.background = "var(--color-bg-tertiary)";
-            };
-            item.onmouseleave = () => {
-                item.style.background = "";
-            };
-            item.onclick = () => {
-                cleanup();
-                handler();
-            };
-            item.onkeydown = e => {
-                if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    cleanup();
-                    handler();
-                }
-            };
-            return item;
-        };
-
-        popup.appendChild(addItem(_("Export .scl"), () => this._exportScl()));
-        popup.appendChild(addItem(_("Export JSON"), () => this._exportJson()));
-        popup.appendChild(addItem(_("Import"), () => this._importFile()));
-        document.body.appendChild(popup);
-
-        const cleanup = () => {
-            popup.remove();
-            document.removeEventListener("mousedown", closeHandler);
-        };
-
-        const closeHandler = e => {
-            if (!popup.contains(e.target)) {
-                cleanup();
-            }
-        };
-        popup._closeHandler = closeHandler;
-        setTimeout(() => {
-            document.addEventListener("mousedown", closeHandler);
-        }, 0);
-    }
-
-    _downloadScl(content, filename) {
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-
-    _readSclFile(inputId, callback) {
-        const fileInput = docById(inputId);
-        if (!fileInput) {
-            callback(new Error(_("File input not found.")));
-            return;
-        }
-
-        fileInput.value = "";
-        fileInput.onchange = function () {
-            const file = fileInput.files[0];
-            if (!file) {
-                return;
-            }
-
-            const MAX_IMPORT_SIZE = 1024 * 1024;
-            if (file.size > MAX_IMPORT_SIZE) {
-                callback(new Error(_("File too large. Maximum is 1 MB.")));
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                callback(null, { text: e.target.result, file });
-            };
-            reader.onerror = function () {
-                callback(new Error(_("Failed to read file.")));
-            };
-            reader.readAsText(file);
-        };
-        fileInput.click();
+        createSharePopup(
+            "sclSharePopup",
+            [
+                [_("Export .scl"), () => this._exportScl()],
+                [_("Export JSON"), () => this._exportJson()],
+                [_("Import"), () => this._importFile()]
+            ],
+            anchor
+        );
     }
 
     _findEdoSteps(pitches) {
@@ -1533,7 +1509,7 @@ class ModeWidget {
         }
 
         const content = lines.join("\n") + "\n";
-        this._downloadScl(content, "mode-" + edo + "edo.scl");
+        downloadTextFile(content, "mode-" + edo + "edo.scl");
     }
 
     _exportJson() {
@@ -1543,7 +1519,7 @@ class ModeWidget {
 
         const name = this._findModeNameForPattern(pattern) || "custom";
         const content = JSON.stringify({ name, edo, pattern }, null, 2);
-        this._downloadScl(content, "mode-" + edo + "edo.json");
+        downloadTextFile(content, "mode-" + edo + "edo.json");
     }
 
     _resolveBuiltInCollision(name, edo) {
@@ -1616,7 +1592,7 @@ class ModeWidget {
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
         this._selectedModeName = name;
-        this.errorMsg(_("Mode imported: ") + name);
+        this.textMsg(_("Mode imported: ") + name, 3000);
         this._updateModeDisplay(name);
         if (this._modeBlock !== null) {
             const modeBlock = this.blocks.blockList[this._modeBlock];
@@ -1630,7 +1606,7 @@ class ModeWidget {
     }
 
     _importFile() {
-        this._readSclFile("myModeSclFile", (err, data) => {
+        readTextFile("myModeSclFile", (err, data) => {
             if (err) {
                 this.errorMsg(err.message);
                 return;

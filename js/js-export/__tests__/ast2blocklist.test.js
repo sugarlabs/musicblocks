@@ -22,6 +22,7 @@
 
 const acorn = require("../../../lib/acorn.min");
 const { AST2BlockList } = require("../ast2blocklist");
+const MathUtility = require("../../utils/mathutils");
 const fs = require("fs");
 const path = require("path");
 
@@ -165,6 +166,610 @@ describe("AST2BlockList Class", () => {
         }
     });
 
+    test.each([
+        [
+            "xor",
+            ["bool_true", "bool_false"],
+            ["start", "print", "xor", "boolean", "boolean", "vspace"]
+        ],
+        ["equal", [1, "1"], ["start", "print", "equal", "number", "text", "vspace"]]
+    ])("should convert exported %s back to blocks", (methodName, args, expected) => {
+        const ASTUtils = require("../ASTutils");
+        const astring = require("../../../lib/astring.min");
+        global.JSInterface = require("../interface");
+        let expression;
+        try {
+            expression = astring.generate(ASTUtils._getArgExpAST(methodName, args));
+        } finally {
+            delete global.JSInterface;
+        }
+
+        const code = `new Mouse(async mouse => {
+            await mouse.print(${expression});
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const blocks = AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+        expect(blocks.map(([, block]) => (Array.isArray(block) ? block[0] : block))).toEqual(
+            expected
+        );
+    });
+
+    // A for loop only becomes a Repeat block when the block would run it the
+    // same number of times (#8910).
+    describe("Repeat and for loops", () => {
+        const wrap = loop => `
+        new Mouse(async mouse => {
+            ${loop}
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        test("should convert an exported Repeat back to the same block", () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(ASTUtils._getForLoopAST([["divide", [7, 2]]], [], 0));
+            } finally {
+                delete global.JSInterface;
+            }
+            expect(loop).toBe(
+                "for (let i0 = 0, limit0 = MathUtility.doRepeatCount(7 / 2); i0 < limit0; i0++) {}"
+            );
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "divide", 0, 0, [1, 3, 4]],
+                [3, ["number", { value: 7 }], 0, 0, [2]],
+                [4, ["number", { value: 2 }], 0, 0, [2]]
+            ]);
+        });
+
+        test.each([4, 0, -2, 3.5, "box_n"])(
+            "should convert the exported loop for Repeat %p back to a Repeat block",
+            count => {
+                const ASTUtils = require("../ASTutils");
+                const astring = require("../../../lib/astring.min");
+                global.JSInterface = require("../interface");
+                let loop;
+                try {
+                    loop = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+                } finally {
+                    delete global.JSInterface;
+                }
+                const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+                expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+            }
+        );
+
+        // A box can have any valid name, including the one the exporter would
+        // give the loop limit, so the limit must not shadow it.
+        test("should not let the loop limit shadow a box with the same name", async () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(
+                    ASTUtils._getForLoopAST(["box_limit0"], [["print", ["box_limit0"]]], 0)
+                );
+            } finally {
+                delete global.JSInterface;
+            }
+
+            const printed = [];
+            const mouse = { print: async value => printed.push(value) };
+            await new Function(
+                "MathUtility",
+                "mouse",
+                `return (async () => {
+                let limit0 = 3;
+                ${loop}
+            })();`
+            )(MathUtility, mouse);
+            expect(printed).toEqual([3, 3, 3]);
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+        });
+
+        test("should convert a plain counting loop to a Repeat block", () => {
+            const AST = acorn.parse(wrap("for (let i = 0; i < 4; i++) {}"), {
+                ecmaVersion: 2020
+            });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, ["number", { value: 4 }], 0, 0, [1]]
+            ]);
+        });
+
+        test.each([
+            "for (let i = 0; i <= 5; i++) {}",
+            "for (let i = 0; i < 10; i += 2) {}",
+            "for (let i = 5; i < 10; i++) {}",
+            "for (let i = 10; i > 0; i--) {}",
+            "for (i = 0; i < 4; i++) {}",
+            "for (;;) {}",
+            "for (let i = 0; i < 2.5; i++) {}",
+            "for (let i = 0; i < n; i++) {}",
+            "for (let i = 0; i < MathUtility.doRandom(1, 5); i++) {}",
+            "for (let i = 0; j < 5; i++) {}",
+            "for (let i = 0; i < 5; j++) {}",
+            "for (let i = 0, n = 5; i < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); j < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); i < i; i++) {}"
+        ])("should reject %s instead of converting it to a Repeat block", loop => {
+            const code = wrap(loop);
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            let error;
+            try {
+                AST2BlockList.toBlockList(AST, config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix + code.substring(error.start, error.end)).toBe(
+                "Unsupported statement: " + loop
+            );
+        });
+    });
+
+    // The Stop block ends the loop around it once the current iteration has
+    // finished (Logo.doBreak), and ends the stack when there is no loop.
+    // A bare `break` did neither, and was a syntax error outside a loop (#8929).
+    describe("Stop block", () => {
+        const ASTUtils = require("../ASTutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = require("../interface");
+            global.last = array => array[array.length - 1];
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+            delete global.last;
+        });
+
+        const exportAction = tree => astring.generate(ASTUtils.getMethodAST("demo", tree));
+        const exportStart = tree => astring.generate(ASTUtils.getMouseAST(tree));
+
+        // Runs an exported action with a mouse that records what it prints.
+        const runAction = async (tree, setup = "") => {
+            const printed = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                print: async value => {
+                    if (printed.length > 20) throw new Error("the loop did not stop");
+                    printed.push(value);
+                },
+                playNote: async (value, flow) => flow()
+            };
+            const result = await new Function(
+                "mouse",
+                `${setup}\n${exportAction(tree)}\nreturn demo(mouse);`
+            )(mouse);
+            return { printed, result };
+        };
+
+        const blockNames = code =>
+            AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config)
+                .map(block => (Array.isArray(block[1]) ? block[1][0] : block[1]))
+                .filter(name => name !== "vspace");
+
+        test("finishes the iteration, then ends the loop", async () => {
+            const { printed } = await runAction([
+                [
+                    "repeat",
+                    [3],
+                    [
+                        ["print", ["a"]],
+                        ["newnote", [["divide", [1, 4]]], [["print", ["n"]], ["break"]]],
+                        ["print", ["b"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["a", "n", "b"]);
+        });
+
+        test("ends the loop, not just the switch, from inside a case", async () => {
+            const { printed } = await runAction([
+                [
+                    "forever",
+                    null,
+                    [
+                        ["switch", [1], [["case", [1], [["print", ["c"]], ["break"]]]]],
+                        ["print", ["d"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["c", "d"]);
+        });
+
+        test("only ends the innermost loop", async () => {
+            const { printed } = await runAction([
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["repeat", [3], [["print", ["i"]], ["break"]]],
+                        ["print", ["o"]]
+                    ]
+                ]
+            ]);
+            expect(printed).toEqual(["i", "o", "i", "o"]);
+        });
+
+        const note = flow => ["newnote", [["divide", [1, 4]]], flow];
+
+        // With no loop, Logo.doBreak drops the next pending continuation: the
+        // rest of the stack one level above the Stop's clamp is skipped, and
+        // the program carries on after that.
+        test.each([
+            ["inside a note", [note([["print", ["n"]], ["break"]]), ["print", ["x"]]], ["n"]],
+            [
+                "inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside an if inside a note",
+                [
+                    note([
+                        ["if", ["bool_true"], [["break"]]],
+                        ["print", ["w"]]
+                    ]),
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ]
+        ])("skips the rest of the stack above a Stop %s", async (_, tree, expected) => {
+            const { printed } = await runAction(tree);
+            expect(printed).toEqual(expected);
+        });
+
+        test("ends the stack when there is no loop", async () => {
+            const { printed, result } = await runAction([
+                ["if", ["bool_true"], [["break"]]],
+                ["print", ["x"]]
+            ]);
+            expect(printed).toEqual([]);
+            expect(result).toBe("ENDFLOW");
+        });
+
+        // A project shaped like the ones JSGenerate.generateCode exports: a Stop after a
+        // note at the end of an action, called from a Repeat. On master the action got a
+        // bare `break`, a syntax error for the whole file.
+        test("exports valid code for a Stop at the end of an action called from a loop", async () => {
+            const pitchNote = name => ["newnote", [["divide", [1, 4]]], [["pitch", [name, 4]]]];
+            const action = [["print", ["RE"]], pitchNote("re"), ["break", null]];
+            const start = [
+                [
+                    "repeat",
+                    [4],
+                    [
+                        ["print", ["DO"]],
+                        pitchNote("do"),
+                        ["nameddo_action", null],
+                        ["print", ["MI"]],
+                        pitchNote("mi")
+                    ]
+                ]
+            ];
+            const code =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+
+            expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+            expect(code).not.toMatch(/\bbreak;/);
+
+            const printed = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value),
+                playNote: async (value, flow) => flow(),
+                playPitch: async () => {}
+            };
+            let run;
+            await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                run = flow(mouse);
+            });
+            await run;
+            // The Stop ends the action. Ending the Repeat it was called from, as Music
+            // Blocks does, isn't exported yet (#9004), so the Repeat keeps going.
+            expect(printed.slice(0, 3)).toEqual(["DO", "RE", "MI"]);
+        });
+
+        // The importer only undoes the flags and labels the exporter writes;
+        // the same shapes in hand-written code must not turn into Stop blocks.
+        test.each([
+            [
+                "a hand-written flag set in a clamp",
+                `let done = false;
+                await mouse.playNote(1 / 4, async () => {
+                    done = true;
+                    return mouse.ENDFLOW;
+                });
+                if (done) return mouse.ENDMOUSE;`,
+                "done = true;"
+            ],
+            [
+                "a hand-written loop flag",
+                `{
+                    var stopLoop = false;
+                    while (1000) {
+                        stopLoop = true;
+                        if (stopLoop) break;
+                    }
+                }`,
+                "{"
+            ],
+            [
+                "a hand-written label",
+                `if (true) outer: {
+                    await mouse.print("w");
+                }`,
+                "outer:"
+            ]
+        ])("leaves %s alone", (_, body, unsupported) => {
+            const code = `
+            new Mouse(async mouse => {
+                ${body}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toBe("Unsupported statement: ");
+            expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
+        });
+
+        test("leaves the AST alone, so converting it twice gives the same blocks", () => {
+            const AST = acorn.parse(
+                exportStart([["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]]),
+                { ecmaVersion: 2020 }
+            );
+            const before = JSON.stringify(AST);
+            const first = AST2BlockList.toBlockList(AST, config);
+            const second = AST2BlockList.toBlockList(AST, config);
+            expect(second).toEqual(first);
+            expect(first.some(block => block[1] === "break")).toBe(true);
+            expect(JSON.stringify(AST)).toBe(before);
+        });
+
+        test("exports valid code for a Stop in Start and in an action", () => {
+            const start = exportStart([["print", ["x"]], ["break"]]);
+            const action = exportAction([["print", ["x"]], ["break"]]);
+            expect(() => acorn.parse(start, { ecmaVersion: 2020 })).not.toThrow();
+            expect(() => acorn.parse(`${action};`, { ecmaVersion: 2020 })).not.toThrow();
+            expect(start).toContain("return mouse.ENDMOUSE;");
+        });
+
+        test("doesn't let the loop flag shadow a box with the same name", async () => {
+            const { printed } = await runAction(
+                [["repeat", [2], [["print", ["box_stopLoop"]], ["break"]]]],
+                'let stopLoop = "box value";'
+            );
+            expect(printed).toEqual(["box value"]);
+        });
+
+        test.each([
+            [
+                "a Stop inside a note inside a loop",
+                [
+                    [
+                        "repeat",
+                        [3],
+                        [["newnote", [["divide", [1, 4]]], [["print", ["n"]], ["break"]]]]
+                    ]
+                ],
+                [
+                    "start",
+                    "repeat",
+                    "number",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break"
+                ]
+            ],
+            [
+                "a Stop inside a case inside a loop",
+                [["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]],
+                ["start", "forever", "switch", "number", "case", "number", "break"]
+            ],
+            [
+                "a Stop with no loop",
+                [["print", ["x"]], ["break"]],
+                ["start", "print", "text", "break"]
+            ],
+            [
+                "a Stop inside a note with no loop",
+                [note([["print", ["n"]], ["break"]]), ["print", ["x"]]],
+                [
+                    "start",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "if",
+                    "boolean",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a switch with no Stop in it",
+                [["switch", [1], [["case", [1], [["print", ["x"]]]]]]],
+                ["start", "switch", "number", "case", "number", "print", "text"]
+            ]
+        ])("converts %s back to the same blocks", (_, tree, names) => {
+            expect(blockNames(exportStart(tree))).toEqual(names);
+        });
+    });
+
+    // The Int block computes MathUtility.doInt, so the exported code has to
+    // call that same function and convert back to an Int block (#8894).
+    describe("Int block export and import", () => {
+        const ASTUtils = require("../ASTutils");
+        const JSInterface = require("../interface");
+        const MathUtility = require("../../utils/mathutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = JSInterface;
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+        });
+
+        const exportArg = arg => astring.generate(ASTUtils._getArgsAST([arg])[0]);
+
+        test.each([2.7, 3.5, -1.5, -2.5, -0.4, 0.49999999999999994, 4503599627370497])(
+            "exported int(%p) computes the same value as the Int block",
+            x => {
+                const code = exportArg(["int", [x]]);
+                const exported = new Function("MathUtility", `return ${code};`)(MathUtility);
+                expect(exported).toBe(MathUtility.doInt(x));
+            }
+        );
+
+        test("should convert exported int back to an int block", () => {
+            expect(exportArg(["int", [["divide", [7, 2]]]])).toBe("MathUtility.doInt(7 / 2)");
+
+            // Repeat [Int(7 / 2)], exactly as the exporter writes it.
+            const loop = astring.generate(
+                ASTUtils._getForLoopAST([["int", [["divide", [7, 2]]]]], [], 0)
+            );
+            const code = `
+            new Mouse(async mouse => {
+                ${loop}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+
+            const expectedBlockList = [
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "int", 0, 0, [1, 3]],
+                [3, "divide", 0, 0, [2, 4, 5]],
+                [4, ["number", { value: 7 }], 0, 0, [3]],
+                [5, ["number", { value: 2 }], 0, 0, [3]]
+            ];
+
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+        });
+
+        // Neither call computes exactly what the Int block does, so converting
+        // either one to an Int block would change the program's values.
+        test.each(["floor", "round"])(
+            "should reject Math.%s instead of making an int block",
+            fn => {
+                const code = `
+            new Mouse(async mouse => {
+                await mouse.print(Math.${fn}(7 / 2));
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+
+                const AST = acorn.parse(code, { ecmaVersion: 2020 });
+                let error;
+                try {
+                    AST2BlockList.toBlockList(AST, config);
+                } catch (e) {
+                    error = e;
+                }
+                expect(error).toBeDefined();
+                expect(error.prefix + code.substring(error.start, error.end)).toEqual(
+                    `Unsupported operator ${fn}: Math.${fn}(7 / 2)`
+                );
+            }
+        );
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
@@ -249,7 +854,7 @@ describe("AST2BlockList Class", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("clarinet", async () => {
-                for (let i0 = 0; i0 < MathUtility.doRandom(1, 5); i0++) {
+                for (let i0 = 0, limit0 = MathUtility.doRepeatCount(MathUtility.doRandom(1, 5)); i0 < limit0; i0++) {
                     await mouse.playNote(1 / 4, async () => {
                         await mouse.playPitch("fa", 2 * 2);
                         return mouse.ENDFLOW;
@@ -1085,7 +1690,7 @@ describe("AST2BlockList Class", () => {
             [71, ["number", { value: 4 }], 0, 0, [69]],
             [72, "switch", 0, 0, [62, 73, 74, null]],
             [73, ["number", { value: 1 }], 0, 0, [72]],
-            [74, "case", 0, 0, [72, 75, 76, 87]],
+            [74, "case", 0, 0, [72, 75, 76, 86]],
             [75, ["number", { value: 1 }], 0, 0, [74]],
             [76, "newnote", 0, 0, [74, 77, 80, 84]],
             [77, "divide", 0, 0, [76, 78, 79]],
@@ -1096,17 +1701,16 @@ describe("AST2BlockList Class", () => {
             [82, ["solfege", { value: "sol" }], 0, 0, [81]],
             [83, ["number", { value: 4 }], 0, 0, [81]],
             [84, "break", 0, 0, [76, 85]],
-            [85, "break", 0, 0, [84, 86]],
-            [86, "break", 0, 0, [85, null]],
-            [87, "defaultcase", 0, 0, [74, 88, null]],
-            [88, "newnote", 0, 0, [87, 89, 92, null]],
-            [89, "divide", 0, 0, [88, 90, 91]],
-            [90, ["number", { value: 1 }], 0, 0, [89]],
-            [91, ["number", { value: 4 }], 0, 0, [89]],
-            [92, "vspace", 0, 0, [88, 93]],
-            [93, "pitch", 0, 0, [92, 94, 95, null]],
-            [94, ["solfege", { value: "5" }], 0, 0, [93]],
-            [95, ["number", { value: 4 }], 0, 0, [93]]
+            [85, "break", 0, 0, [84, null]],
+            [86, "defaultcase", 0, 0, [74, 87, null]],
+            [87, "newnote", 0, 0, [86, 88, 91, null]],
+            [88, "divide", 0, 0, [87, 89, 90]],
+            [89, ["number", { value: 1 }], 0, 0, [88]],
+            [90, ["number", { value: 4 }], 0, 0, [88]],
+            [91, "vspace", 0, 0, [87, 92]],
+            [92, "pitch", 0, 0, [91, 93, 94, null]],
+            [93, ["solfege", { value: "5" }], 0, 0, [92]],
+            [94, ["number", { value: 4 }], 0, 0, [92]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
@@ -1300,40 +1904,44 @@ describe("AST2BlockList Class", () => {
             [23, ["number", { value: 4 }], 0, 0, [21]],
             [24, "hertz", 0, 0, [14, 25, 26]],
             [25, ["number", { value: 392 }], 0, 0, [24]],
-            [26, "setscalartransposition", 0, 0, [24, 27, null, 28]],
-            [27, ["modelength", {}], 0, 0, [26]],
-            [28, "settransposition", 0, 0, [26, 29, null, 34]],
-            [29, "plus", 0, 0, [28, 30, 31]],
-            [30, ["number", { value: 1 }], 0, 0, [29]],
-            [31, "multiply", 0, 0, [29, 32, 33]],
-            [32, ["number", { value: 0 }], 0, 0, [31]],
-            [33, ["number", { value: 12 }], 0, 0, [31]],
-            [34, "settransposition", 0, 0, [28, 35, 38, 47]],
-            [35, "divide", 0, 0, [34, 36, 37]],
-            [36, ["number", { value: 50 }], 0, 0, [35]],
-            [37, ["number", { value: 100 }], 0, 0, [35]],
-            [38, "vspace", 0, 0, [34, 39]],
-            [39, "newnote", 0, 0, [38, 40, 43, null]],
-            [40, "divide", 0, 0, [39, 41, 42]],
-            [41, ["number", { value: 1 }], 0, 0, [40]],
-            [42, ["number", { value: 4 }], 0, 0, [40]],
-            [43, "vspace", 0, 0, [39, 44]],
-            [44, "pitch", 0, 0, [43, 45, 46, null]],
-            [45, ["solfege", { value: "sol" }], 0, 0, [44]],
+            [26, "setscalartransposition", 0, 0, [24, 27, null, 32]],
+            [27, "plus", 0, 0, [26, 28, 29]],
+            [28, ["number", { value: 0 }], 0, 0, [27]],
+            [29, "multiply", 0, 0, [27, 30, 31]],
+            [30, ["number", { value: 0 }], 0, 0, [29]],
+            [31, "modelength", 0, 0, [29]],
+            [32, "settransposition", 0, 0, [26, 33, null, 38]],
+            [33, "plus", 0, 0, [32, 34, 35]],
+            [34, ["number", { value: 1 }], 0, 0, [33]],
+            [35, "multiply", 0, 0, [33, 36, 37]],
+            [36, ["number", { value: 0 }], 0, 0, [35]],
+            [37, ["number", { value: 12 }], 0, 0, [35]],
+            [38, "settransposition", 0, 0, [32, 39, 42, 51]],
+            [39, "divide", 0, 0, [38, 40, 41]],
+            [40, ["number", { value: 50 }], 0, 0, [39]],
+            [41, ["number", { value: 100 }], 0, 0, [39]],
+            [42, "vspace", 0, 0, [38, 43]],
+            [43, "newnote", 0, 0, [42, 44, 47, null]],
+            [44, "divide", 0, 0, [43, 45, 46]],
+            [45, ["number", { value: 1 }], 0, 0, [44]],
             [46, ["number", { value: 4 }], 0, 0, [44]],
-            [47, "register", 0, 0, [34, 48, 49]],
-            [48, ["number", { value: 0 }], 0, 0, [47]],
-            [49, "invert1", 0, 0, [47, 50, 51, 52, 53, null]],
-            [50, ["solfege", { value: "sol" }], 0, 0, [49]],
-            [51, ["number", { value: 4 }], 0, 0, [49]],
-            [52, ["text", { value: "even" }], 0, 0, [49]],
-            [53, "setpitchnumberoffset", 0, 0, [49, 54, 55, 56]],
-            [54, ["notename", { value: "C" }], 0, 0, [53]],
+            [47, "vspace", 0, 0, [43, 48]],
+            [48, "pitch", 0, 0, [47, 49, 50, null]],
+            [49, ["solfege", { value: "sol" }], 0, 0, [48]],
+            [50, ["number", { value: 4 }], 0, 0, [48]],
+            [51, "register", 0, 0, [38, 52, 53]],
+            [52, ["number", { value: 0 }], 0, 0, [51]],
+            [53, "invert1", 0, 0, [51, 54, 55, 56, 57, null]],
+            [54, ["solfege", { value: "sol" }], 0, 0, [53]],
             [55, ["number", { value: 4 }], 0, 0, [53]],
-            [56, "setpitchnumberoffset", 0, 0, [53, 57, 58, null]],
-            [57, ["notename", { value: "C" }], 0, 0, [56]],
-            [58, "neg", 0, 0, [56, 59]],
-            [59, ["number", { value: 1 }], 0, 0, [58]]
+            [56, ["text", { value: "even" }], 0, 0, [53]],
+            [57, "setpitchnumberoffset", 0, 0, [53, 58, 59, 60]],
+            [58, ["notename", { value: "C" }], 0, 0, [57]],
+            [59, ["number", { value: 4 }], 0, 0, [57]],
+            [60, "setpitchnumberoffset", 0, 0, [57, 61, 62, null]],
+            [61, ["notename", { value: "C" }], 0, 0, [60]],
+            [62, "neg", 0, 0, [60, 63]],
+            [63, ["number", { value: 1 }], 0, 0, [62]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
@@ -1367,14 +1975,22 @@ describe("AST2BlockList Class", () => {
             [3, ["modename", { value: "major" }], 0, 0, [1]],
             [4, "interval", 0, 0, [1, 5, null, 6]],
             [5, ["number", { value: 5 }], 0, 0, [4]],
-            [6, "semitoneinterval", 0, 0, [4, 7, null, 8]],
-            [7, ["intervalname", {}], 0, 0, [6]],
-            [8, "semitoneinterval", 0, 0, [6, 9, null, 10]],
-            [9, ["intervalname", {}], 0, 0, [8]],
-            [10, "settemperament", 0, 0, [8, 11, 12, 13, null]],
-            [11, ["temperamentname", { value: "equal" }], 0, 0, [10]],
-            [12, ["notename", { value: "C" }], 0, 0, [10]],
-            [13, ["number", { value: 4 }], 0, 0, [10]]
+            [6, "semitoneinterval", 0, 0, [4, 7, null, 12]],
+            [7, "plus", 0, 0, [6, 8, 9]],
+            [8, ["number", { value: 4 }], 0, 0, [7]],
+            [9, "multiply", 0, 0, [7, 10, 11]],
+            [10, ["number", { value: 0 }], 0, 0, [9]],
+            [11, ["number", { value: 12 }], 0, 0, [9]],
+            [12, "semitoneinterval", 0, 0, [6, 13, null, 18]],
+            [13, "plus", 0, 0, [12, 14, 15]],
+            [14, ["intervalname", { value: "major 3" }], 0, 0, [13]],
+            [15, "multiply", 0, 0, [13, 16, 17]],
+            [16, ["number", { value: 0 }], 0, 0, [15]],
+            [17, ["number", { value: 12 }], 0, 0, [15]],
+            [18, "settemperament", 0, 0, [12, 19, 20, 21, null]],
+            [19, ["temperamentname", { value: "equal" }], 0, 0, [18]],
+            [20, ["notename", { value: "C" }], 0, 0, [18]],
+            [21, ["number", { value: 4 }], 0, 0, [18]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
@@ -1584,20 +2200,20 @@ describe("AST2BlockList Class", () => {
             [25, ["number", { value: 100 }], 0, 0, [23]],
             [26, "clear", 0, 0, [23, 27]],
             [27, "scrollxy", 0, 0, [26, 28, 29, 30]],
-            [28, ["x", { value: 100 }], 0, 0, [27]],
-            [29, ["y", { value: 0 }], 0, 0, [27]],
+            [28, ["number", { value: 100 }], 0, 0, [27]],
+            [29, ["number", { value: 0 }], 0, 0, [27]],
             [30, "setcolor", 0, 0, [27, 31, 32]],
             [31, ["number", { value: 0 }], 0, 0, [30]],
             [32, "setgrey", 0, 0, [30, 33, 34]],
-            [33, ["grey", { value: 100 }], 0, 0, [32]],
+            [33, ["number", { value: 100 }], 0, 0, [32]],
             [34, "setshade", 0, 0, [32, 35, 36]],
-            [35, ["shade", { value: 50 }], 0, 0, [34]],
+            [35, ["number", { value: 50 }], 0, 0, [34]],
             [36, "sethue", 0, 0, [34, 37, 38]],
-            [37, ["color", { value: 80 }], 0, 0, [36]],
+            [37, ["number", { value: 80 }], 0, 0, [36]],
             [38, "settranslucency", 0, 0, [36, 39, 40]],
             [39, ["number", { value: 50 }], 0, 0, [38]],
             [40, "setpensize", 0, 0, [38, 41, 42]],
-            [41, ["pensize", { value: 5 }], 0, 0, [40]],
+            [41, ["number", { value: 5 }], 0, 0, [40]],
             [42, "penup", 0, 0, [40, 43]],
             [43, "pendown", 0, 0, [42, 44]],
             [44, "background", 0, 0, [43, 45]],

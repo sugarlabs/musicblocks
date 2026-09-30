@@ -582,4 +582,20 @@ describe("Meter Widget", () => {
             jest.useRealTimers();
         });
     });
+
+    test("creates inputs with distinct IDs and accessible labels", () => {
+        const widgetWindow = window.widgetWindows.windowFor();
+        const toolbarCalls = widgetWindow._toolbar.appendChild.mock.calls;
+        const inputs = toolbarCalls
+            .map(call => call[0] && call[0].querySelector && call[0].querySelector("input"))
+            .filter(Boolean);
+
+        const beatCountInput = inputs.find(input => input.id === "beatCount");
+        const beatValueInput = inputs.find(input => input.id === "beatValue");
+
+        expect(beatCountInput).toBeDefined();
+        expect(beatValueInput).toBeDefined();
+        expect(beatCountInput.getAttribute("aria-label")).toBe("Number of beats");
+        expect(beatValueInput.getAttribute("aria-label")).toBe("Beat note value");
+    });
 });

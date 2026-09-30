@@ -792,9 +792,29 @@ if (typeof module !== "undefined" && module.exports) {
         hideButtonHighlight,
         hidePaletteNameDisplay,
         COLLAPSEBUTTONXOFF,
+        COLLAPSEBUTTONYOFF,
         STANDARDBLOCKHEIGHT,
+        DEFAULTBLOCKSCALE,
         FILLCOLORS,
-        TURTLESVG
+        STROKECOLORS,
+        TEXTX,
+        TEXTY,
+        VALUETEXTX,
+        COLLAPSETEXTX,
+        COLLAPSETEXTY,
+        MEDIASAFEAREA,
+        MENUWIDTH,
+        PALETTECOLORS,
+        PALETTECOLORS0,
+        TURTLESVG,
+        DRUMSVG,
+        MSGBLOCK,
+        BOUNDARY,
+        MBOUNDARY,
+        BORDER,
+        METRONOMESVG,
+        BACKGROUND,
+        FULLSCREENBUTTON
     };
 }
 

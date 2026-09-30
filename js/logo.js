@@ -526,16 +526,23 @@ class Logo {
                     }
                 }
 
+                const currentMasterVolume =
+                    typeof Singer !== "undefined" &&
+                    Singer.masterVolume &&
+                    Singer.masterVolume.length > 0
+                        ? last(Singer.masterVolume)
+                        : DEFAULTVOLUME;
+
                 tur.singer.synthVolume = {
-                    "electronic synth": [DEFAULTVOLUME],
-                    "noise1": [DEFAULTVOLUME],
-                    "noise2": [DEFAULTVOLUME],
-                    "noise3": [DEFAULTVOLUME]
+                    "electronic synth": [currentMasterVolume],
+                    "noise1": [currentMasterVolume],
+                    "noise2": [currentMasterVolume],
+                    "noise3": [currentMasterVolume]
                 };
-                tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
+                tur.singer.synthVolume[DEFAULTVOICE] = [currentMasterVolume];
 
                 for (const synth in tur.singer.synthVolume) {
-                    this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+                    this.deps.Singer.setSynthVolume(this, turtle, synth, currentMasterVolume);
                 }
             }
             return;
@@ -605,7 +612,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this.deps.Singer.setMasterVolume(this, DEFAULTVOLUME);
+        this.deps.Singer.resetMasterVolume(this);
         for (const t in this.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
@@ -872,7 +879,7 @@ class Logo {
         const requiredTurtle = this.turtles.getTurtle(turtle);
         if (typeof arg1 === "string") {
             const len = arg1.length;
-            if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
+            if (len === 14 && arg1.slice(0, 14) === CAMERAVALUE) {
                 if (this.deps.utils.doUseCamera) {
                     this.deps.utils.doUseCamera(
                         [arg0],
@@ -884,7 +891,7 @@ class Logo {
                         (msg, blk) => this.deps.errorHandler(msg, blk)
                     );
                 }
-            } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
+            } else if (len === 13 && arg1.slice(0, 13) === VIDEOVALUE) {
                 if (this.deps.utils.doUseCamera) {
                     this.deps.utils.doUseCamera(
                         [arg0],
@@ -896,13 +903,13 @@ class Logo {
                         (msg, blk) => this.deps.errorHandler(msg, blk)
                     );
                 }
-            } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
+            } else if (len > 10 && arg1.slice(0, 10) === "data:image") {
                 requiredTurtle.doShowImage(arg0, arg1);
-            } else if (len > 8 && arg1.substr(0, 8) === "https://") {
+            } else if (len > 8 && arg1.slice(0, 8) === "https://") {
                 requiredTurtle.doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "http://") {
+            } else if (len > 7 && arg1.slice(0, 7) === "http://") {
                 requiredTurtle.doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "file://") {
+            } else if (len > 7 && arg1.slice(0, 7) === "file://") {
                 requiredTurtle.doShowURL(arg0, arg1);
             } else {
                 requiredTurtle.doShowText(arg0, arg1);
@@ -1722,6 +1729,13 @@ class Logo {
             turtle.embeddedGraphicsPending = 0;
             turtle.embeddedGraphicsGeneration += 1;
         }
+
+        // masterVolume is static, so a level left behind by an earlier run would still be in
+        // force here. This belongs on the run boundary rather than in prepSynths(): prepSynths()
+        // skips its setup when the synths are already up (a restart with no stop in between) and
+        // it also runs mid-project when onEveryBeatDo adds a companion turtle, where resetting
+        // would pull the rug out from a project that set its own level.
+        this.deps.Singer.resetMasterVolume(this);
 
         this.prepSynths();
 

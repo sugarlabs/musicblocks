@@ -14,7 +14,7 @@
 
    TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
-   saveLilypondOutput, saveMxmlOutput, getMidiInstrument, getMidiDrum,
+   saveLilypondOutput, escapeLilypondString, saveMxmlOutput, getMidiInstrument, getMidiDrum,
    Midi, activity, normalizeNoteAccidentals
  */
 
@@ -814,14 +814,15 @@ class SaveInterface {
             }
         }
 
-        const mapLilypondObj = {
-            "My Music Blocks Creation": projectTitle,
-            "Mr. Mouse": projectAuthor
-        };
-
         // Lazy-load lilypond module before using LILYPONDHEADER
 
         _lazyRequire(["activity/lilypond"], () => {
+            // Both values land inside double-quoted header strings.
+            const mapLilypondObj = {
+                "My Music Blocks Creation": escapeLilypondString(projectTitle),
+                "Mr. Mouse": escapeLilypondString(projectAuthor)
+            };
+
             const lyheader = LILYPONDHEADER.replace(
                 /My Music Blocks Creation|Mr. Mouse/gi,
                 matched => mapLilypondObj[matched]

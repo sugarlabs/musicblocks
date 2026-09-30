@@ -200,10 +200,11 @@ const convertDuration = function (duration, dotCount = 0) {
 };
 
 class AbcExporter {
-    constructor(logo, turtle, keySignature) {
+    constructor(logo, turtle, keySignature, voiceId = "") {
         this.logo = logo;
         this.turtle = turtle;
         this.keySignature = keySignature;
+        this.voiceId = voiceId;
         this.staging = logo.notation.notationStaging[turtle] || [];
 
         this.parts = [];
@@ -213,12 +214,29 @@ class AbcExporter {
         this.lastNoteStart = null;
         this.pendingAnnotations = [];
         this.prefixStart = null;
+        this.queueSlur = 0;
 
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
         this.keyAlterations = keyAlterations;
         this.accidentalsInForce = {};
         this.pitchesInDoubt = new Set();
+    }
+
+    /**
+     * A note block inside a note block sounds a second voice. Those voices
+     * belong to this turtle, so their ids are built from the turtle's own, and
+     * 0 is the turtle's main voice. Without an id, the bare numbers are used.
+     *
+     * @param {number} n - the staged voice, or 0 to return to the main one.
+     * @returns {string} an inline ABC voice field.
+     */
+    __voiceField(n) {
+        if (this.voiceId === "") {
+            return "[V:" + (n === 0 ? 1 : n) + "]";
+        }
+
+        return "[V:" + this.voiceId + (n === 0 ? "" : "v" + n) + "]";
     }
 
     __voiceChanged() {
@@ -304,6 +322,10 @@ class AbcExporter {
     __beginNote() {
         this.lastNoteStart = this.parts.length;
         this.prefixStart = null;
+        if (this.queueSlur > 0) {
+            this.parts.push("(".repeat(this.queueSlur));
+            this.queueSlur = 0;
+        }
         this.parts.push(...this.pendingAnnotations);
         this.pendingAnnotations = [];
     }
@@ -366,16 +388,23 @@ class AbcExporter {
                 this.__pushPrefix("!>)!");
                 break;
             case "begin slur":
-                if (this.lastNoteStart !== null) {
-                    this.parts.splice(this.lastNoteStart, 0, "(");
-                    if (this.prefixStart !== null) this.prefixStart++;
-                }
+                this.queueSlur++;
                 break;
             case "end slur":
-                this.parts.push(")");
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                    const last = this.parts[this.parts.length - 1];
+                    this.parts[this.parts.length - 1] = last.slice(0, -1) + ") ";
+                } else {
+                    this.parts.push(")");
+                }
                 break;
             case "tie":
-                this.parts.push("-");
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                    const last = this.parts[this.parts.length - 1];
+                    this.parts[this.parts.length - 1] = last.slice(0, -1) + "- ";
+                } else {
+                    this.parts.push("-");
+                }
                 break;
             case "meter":
                 if (Number(this.staging[i + 1]) > 0 && Number(this.staging[i + 2]) > 0) {
@@ -427,23 +456,23 @@ class AbcExporter {
                 this.pendingAnnotations.push(abcAnnotation("swing", "^"));
                 break;
             case "voice one":
-                this.__pushField("[V:1]");
+                this.__pushField(this.__voiceField(1));
                 this.__voiceChanged();
                 break;
             case "voice two":
-                this.__pushField("[V:2]");
+                this.__pushField(this.__voiceField(2));
                 this.__voiceChanged();
                 break;
             case "voice three":
-                this.__pushField("[V:3]");
+                this.__pushField(this.__voiceField(3));
                 this.__voiceChanged();
                 break;
             case "voice four":
-                this.__pushField("[V:4]");
+                this.__pushField(this.__voiceField(4));
                 this.__voiceChanged();
                 break;
             case "one voice":
-                this.__pushField("[V:1]");
+                this.__pushField(this.__voiceField(0));
                 this.__voiceChanged();
                 break;
             default:
@@ -501,7 +530,9 @@ class AbcExporter {
         if (this.counter % 8 === 0 && this.counter > 0 && !inChordContinuation) {
             this.parts.push("\n");
         }
-        this.counter += 1;
+        if (!inChordContinuation) {
+            this.counter += 1;
+        }
 
         let notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
         if (notes.length === 0) {
@@ -625,9 +656,11 @@ class AbcExporter {
  * @param {string} turtle - The identifier for the turtle.
  * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
  *   pitches are absolute, so this is what the accidentals are written against.
+ * @param {string} [voiceId] - the ABC voice these notes belong to. Staged voice
+ *   changes are written inside it, so they cannot move notes to another turtle.
  */
-const processABCNotes = function (logo, turtle, keySignature = "C major") {
-    new AbcExporter(logo, turtle, keySignature).process();
+const processABCNotes = function (logo, turtle, keySignature = "C major", voiceId = "") {
+    new AbcExporter(logo, turtle, keySignature, voiceId).process();
 };
 
 /**
@@ -637,12 +670,31 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
  */
 const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
+    let atLineStart = true;
+    let voice = 0;
 
     for (const t in activity.logo.notation.notationStaging) {
+        // A turtle that staged only fields, a meter say, has notation to write
+        // but no music, and an empty voice is worse than none.
+        const staged = activity.logo.notation.notationStaging[t] || [];
+        if (!staged.some(entry => Array.isArray(entry))) {
+            continue;
+        }
+
         const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
+        voice += 1;
+        const voiceId = "t" + voice;
+        processABCNotes(activity.logo, t, keySignature, voiceId);
+        const notes = activity.logo.notationNotes[t];
+        // A V: or K: field is only a field at the start of a line.
+        if (!atLineStart) {
+            outputParts.push("\n");
+        }
+        // Without a V: field every turtle lands in one voice, one after another.
+        outputParts.push("V:" + voiceId + "\n");
         outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
-        processABCNotes(activity.logo, t, keySignature);
-        outputParts.push(activity.logo.notationNotes[t]);
+        outputParts.push(notes);
+        atLineStart = notes === "" || notes.endsWith("\n");
     }
 
     outputParts.push("\n");

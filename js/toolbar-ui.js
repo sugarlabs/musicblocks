@@ -137,12 +137,15 @@ class ToolbarUI {
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
                 ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["planetIcon", _("Git Planet")],
+                ["planetIconDisabled", _("Offline. Git Planet is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
-                ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["helpGuideItem", _("Help"), true],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
+                ["practiceLessonsItem", _("Practice levels"), true],
+                ["explorerJournalItem", _("Explorer Journal"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -161,44 +164,44 @@ class ToolbarUI {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-midi", _("Save project as MIDI"), "innerHTML"],
-                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-wav", _("Save music as WAV"), "innerHTML"],
-                ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
-                ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
-                ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", "English (United States)", "innerHTML"],
-                ["enUK", "English (United Kingdom)", "innerHTML"],
-                ["ja", "日本語", "innerHTML"],
-                ["ko", "한국인", "innerHTML"],
-                ["es", "español", "innerHTML"],
-                ["fr", "français", "innerHTML"],
-                ["de", "Deutsch", "innerHTML"],
-                ["it", "italiana", "innerHTML"],
-                ["pt", "português", "innerHTML"],
-                ["kana", "にほんご", "innerHTML"],
-                ["zhCN", "中文", "innerHTML"],
-                ["th", "ภาษาไทย", "innerHTML"],
-                ["tr", "Türkçe", "innerHTML"],
-                ["az", "azərbaycanca", "innerHTML"],
-                ["ayc", "aymara", "innerHTML"],
-                ["quz", "quechua", "innerHTML"],
-                ["gug", "guarani", "innerHTML"],
-                ["hi", "हिंदी", "innerHTML"],
-                ["ta", "தமிழ்", "innerHTML"],
-                ["ibo", "igbo", "innerHTML"],
-                ["ar", "عربى", "innerHTML"],
-                ["te", "తెలుగు", "innerHTML"],
-                ["bn", "বাংলা", "innerHTML"],
-                ["he", "עִברִית", "innerHTML"],
-                ["ur", "اردو", "innerHTML"]
+                ["save-html-beg", _("Save project as HTML"), true],
+                ["save-png-beg", _("Save mouse artwork as PNG"), true],
+                ["save-html", _("Save project as HTML"), true],
+                ["save-midi", _("Save project as MIDI"), true],
+                ["save-svg", _("Save mouse artwork as SVG"), true],
+                ["save-png", _("Save mouse artwork as PNG"), true],
+                ["save-wav", _("Save music as WAV"), true],
+                ["save-abc", _("Save sheet music as ABC"), true],
+                ["save-ly", _("Save sheet music as Lilypond"), true],
+                ["save-mxml", _("Save sheet music as MusicXML"), true],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["new-project", _("Confirm"), true],
+                ["enUS", "English (United States)", true],
+                ["enUK", "English (United Kingdom)", true],
+                ["ja", "日本語", true],
+                ["ko", "한국인", true],
+                ["es", "español", true],
+                ["fr", "français", true],
+                ["de", "Deutsch", true],
+                ["it", "italiana", true],
+                ["pt", "português", true],
+                ["kana", "にほんご", true],
+                ["zhCN", "中文", true],
+                ["th", "ภาษาไทย", true],
+                ["tr", "Türkçe", true],
+                ["az", "azərbaycanca", true],
+                ["ayc", "aymara", true],
+                ["quz", "quechua", true],
+                ["gug", "guarani", true],
+                ["hi", "हिंदी", true],
+                ["ta", "தமிழ்", true],
+                ["ibo", "igbo", true],
+                ["ar", "عربى", true],
+                ["te", "తెలుగు", true],
+                ["bn", "বাংলা", true],
+                ["he", "עִברִית", true],
+                ["ur", "اردو", true]
             ];
 
             // Workaround for FF
@@ -215,8 +218,9 @@ class ToolbarUI {
                 _("Load project from file"),
                 _("Save project"),
                 _("Save project"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
+                _("Git Planet"),
+                _("Offline. Git Planet is unavailable"),
+                _("My Project"),
                 _("Auxiliary menu"),
                 _("Help and shortcuts"),
                 _("Help"),
@@ -273,12 +277,15 @@ class ToolbarUI {
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
                 ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["planetIcon", _("Git Planet")],
+                ["planetIconDisabled", _("Offline. Git Planet is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
-                ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["helpGuideItem", _("Help"), true],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
+                ["practiceLessonsItem", _("Practice levels"), true],
+                ["explorerJournalItem", _("Explorer Journal"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -296,39 +303,42 @@ class ToolbarUI {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save turtle artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-svg", _("Save turtle artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", "English (United States)", "innerHTML"],
-                ["enUK", "English (United Kingdom)", "innerHTML"],
-                ["ja", "日本語", "innerHTML"],
-                ["ko", "한국인", "innerHTML"],
-                ["es", "español", "innerHTML"],
-                ["fr", "français", "innerHTML"],
-                ["de", "Deutsch", "innerHTML"],
-                ["it", "italiana", "innerHTML"],
-                ["pt", "português", "innerHTML"],
-                ["kana", "にほんご", "innerHTML"],
-                ["zhCN", "中文", "innerHTML"],
-                ["th", "ภาษาไทย", "innerHTML"],
-                ["tr", "Türkçe", "innerHTML"],
-                ["az", "azərbaycanca", "innerHTML"],
-                ["ayc", "aymara", "innerHTML"],
-                ["quz", "quechua", "innerHTML"],
-                ["gug", "guarani", "innerHTML"],
-                ["hi", "हिंदी", "innerHTML"],
-                ["ta", "தமிழ்", "innerHTML"],
-                ["ibo", "igbo", "innerHTML"],
-                ["ar", "عربى", "innerHTML"],
-                ["te", "తెలుగు", "innerHTML"],
-                ["bn", "বাংলা", "innerHTML"],
-                ["he", "עִברִית", "innerHTML"],
-                ["ur", "اردو", "innerHTML"]
+                ["save-html-beg", _("Save project as HTML"), true],
+                ["save-png-beg", _("Save turtle artwork as PNG"), true],
+                ["save-html", _("Save project as HTML"), true],
+                ["save-svg", _("Save turtle artwork as SVG"), true],
+                ["save-png", _("Save turtle artwork as PNG"), true],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["git-create", _("Track my project"), true],
+                ["git-commit", _("Mark this moment"), true],
+                ["git-history", _("Time travel"), true],
+                ["new-project", _("Confirm"), true],
+                ["enUS", "English (United States)", true],
+                ["enUK", "English (United Kingdom)", true],
+                ["ja", "日本語", true],
+                ["ko", "한국인", true],
+                ["es", "español", true],
+                ["fr", "français", true],
+                ["de", "Deutsch", true],
+                ["it", "italiana", true],
+                ["pt", "português", true],
+                ["kana", "にほんご", true],
+                ["zhCN", "中文", true],
+                ["th", "ภาษาไทย", true],
+                ["tr", "Türkçe", true],
+                ["az", "azərbaycanca", true],
+                ["ayc", "aymara", true],
+                ["quz", "quechua", true],
+                ["gug", "guarani", true],
+                ["hi", "हिंदी", true],
+                ["ta", "தமிழ்", true],
+                ["ibo", "igbo", true],
+                ["ar", "عربى", true],
+                ["te", "తెలుగు", true],
+                ["bn", "বাংলা", true],
+                ["he", "עִברִית", true],
+                ["ur", "اردو", true]
             ];
 
             // Workaround for FF
@@ -345,8 +355,9 @@ class ToolbarUI {
                 _("Load project from file"),
                 _("Save project"),
                 _("Save project as HTML"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
+                _("Git Planet"),
+                _("Offline. Git Planet is unavailable"),
+                _("My Project"),
                 _("Auxiliary menu"),
                 _("Help and shortcuts"),
                 _("Help"),
@@ -402,7 +413,7 @@ class ToolbarUI {
             const obj = strings[i];
             const trans = strings_[i];
             const elem = docById(obj[0]);
-            if (strings[i].length === 3) {
+            if (strings[i][2]) {
                 if (elem !== undefined && elem !== null) {
                     elem.textContent = obj[1];
                 }
@@ -1317,7 +1328,13 @@ class ToolbarUI {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const practiceLessonsItem = docById("practiceLessonsItem");
+        const explorerJournalItem = docById("explorerJournalItem");
+        const hasDropdownMenu =
+            !!helpGuideItem ||
+            !!shortcutsGuideItem ||
+            !!practiceLessonsItem ||
+            !!explorerJournalItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1338,6 +1355,41 @@ class ToolbarUI {
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
                 }
+            };
+        }
+
+        if (practiceLessonsItem) {
+            practiceLessonsItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.startPracticeMode === "function") {
+                    window.startPracticeMode();
+                }
+            };
+        }
+
+        if (explorerJournalItem) {
+            explorerJournalItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.openExplorerJournal === "function") {
+                    window.openExplorerJournal();
+                }
+            };
+        }
+
+        const gitTutorialItem = docById("gitTutorialItem");
+        if (gitTutorialItem && typeof GitTutorial !== "undefined") {
+            gitTutorialItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                GitTutorial.open(this.activity);
             };
         }
 
@@ -2481,6 +2533,29 @@ class ToolbarUI {
             if (btn) btn.style.color = color;
             this._dimTimeout = null;
         }, 500);
+    }
+
+    /**
+     * Renders the "My Project" Git dropdown icon and wires up the Materialize
+     * dropdown trigger. The menu item visibility is managed by GitDropdownUI.
+     *
+     * @public
+     * @param {GitDropdownUI} gitDropdownUI - The GitDropdownUI instance.
+     * @returns {void}
+     */
+    renderGitDropdownIcon(gitDropdownUI) {
+        const btn = docById("gitProjectBtn");
+        if (!btn) return;
+
+        const sync = () => {
+            if (gitDropdownUI && typeof gitDropdownUI._syncMenuState === "function") {
+                gitDropdownUI._syncMenuState();
+            }
+        };
+
+        btn.addEventListener("click", sync);
+        btn.addEventListener("mouseenter", sync);
+        btn.addEventListener("focus", sync);
     }
 }
 

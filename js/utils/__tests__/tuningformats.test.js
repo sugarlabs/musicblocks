@@ -17,7 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { parseSclFile, parseModeJson, EDO_MIN, EDO_MAX } = require("../tuningformats");
+const {
+    parseSclFile,
+    parseModeJson,
+    parseTemperamentJson,
+    EDO_MIN,
+    EDO_MAX
+} = require("../tuningformats");
 
 describe("parseSclFile", () => {
     it("parses a .scl file with mixed ratios and cents", () => {
@@ -75,6 +81,58 @@ describe("parseSclFile", () => {
         expect(result.pitches[0].ratio).toBeCloseTo(2, 10);
         expect(result.pitches[0].cents).toBeCloseTo(1200, 6);
     });
+
+    it("ignores text after a valid pitch value per the Scala spec", () => {
+        const content = [
+            "! labels.scl",
+            "!",
+            "Labelled",
+            "4",
+            " 100.0 C#",
+            " 5/4   E\\",
+            "3/2\tG",
+            "2 octave"
+        ].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(4);
+        expect(result.pitches[0].cents).toBeCloseTo(100, 6);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 10);
+        expect(result.pitches[2].ratio).toBeCloseTo(1.5, 10);
+        expect(result.pitches[3].ratio).toBeCloseTo(2, 10);
+    });
+
+    it("rejects a cents unit on a number without a decimal point", () => {
+        const content = ["! unit.scl", "!", "Unit", "1", "2cents"].join("\n");
+        expect(() => parseSclFile(content)).toThrow(
+            "Invalid .scl file: invalid cents value: 2cents"
+        );
+    });
+
+    it("still accepts a trailing cents unit", () => {
+        const content = [
+            "! unit.scl",
+            "!",
+            "Unit",
+            "3",
+            "100.0 cents",
+            "200.0cents",
+            "300.0cents D#"
+        ].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitches[0].cents).toBeCloseTo(100, 6);
+        expect(result.pitches[1].cents).toBeCloseTo(200, 6);
+        expect(result.pitches[2].cents).toBeCloseTo(300, 6);
+    });
+
+    it("still rejects an invalid pitch value followed by text", () => {
+        const content = ["! bad.scl", "!", "Bad", "1", "abc 100.0"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("invalid pitch value: abc");
+    });
+
+    it("still rejects a negative ratio followed by text", () => {
+        const content = ["! neg.scl", "!", "Neg", "1", "-3/2 G"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("invalid ratio: -3/2");
+    });
 });
 
 describe("parseModeJson", () => {
@@ -111,5 +169,60 @@ describe("parseModeJson", () => {
 
     it("rejects array as root", () => {
         expect(() => parseModeJson(JSON.stringify([1, 2, 3]))).toThrow("expected an object");
+    });
+});
+
+describe("parseTemperamentJson", () => {
+    it("parses a valid temperament JSON with all fields", () => {
+        const pitchNumber = 12;
+        const ratios = Array.from({ length: 13 }, (_, i) => Math.pow(2, i / 12));
+        const interval = [
+            "perfect 1",
+            "minor 2",
+            "major 2",
+            "minor 3",
+            "major 3",
+            "perfect 4",
+            "augmented 4",
+            "perfect 5",
+            "minor 6",
+            "major 6",
+            "minor 7",
+            "major 7",
+            "perfect 8"
+        ];
+        const json = JSON.stringify(
+            { name: "custom1", pitchNumber, referencePitch: "C4", interval, ratios },
+            null,
+            2
+        );
+        const def = parseTemperamentJson(json);
+        expect(def).toEqual({
+            name: "custom1",
+            pitchNumber,
+            referencePitch: "C4",
+            interval,
+            ratios
+        });
+    });
+
+    it("rejects invalid JSON, ratios, and interval", () => {
+        expect(() => parseTemperamentJson("not json")).toThrow("Invalid JSON file:");
+        expect(() =>
+            parseTemperamentJson(JSON.stringify({ pitchNumber: 12, ratios: [1, 2] }))
+        ).toThrow("invalid ratios");
+        const mk = ratios => JSON.stringify({ pitchNumber: 2, ratios });
+        expect(() => parseTemperamentJson(mk([1, "1.25", 2]))).toThrow("invalid ratios");
+        expect(() => parseTemperamentJson(mk([1, 0, 2]))).toThrow("invalid ratios");
+        expect(() => parseTemperamentJson(mk([1, 1.5, 1.25]))).toThrow("invalid ratios");
+        const base = { pitchNumber: 2, ratios: [1, 1.25, 2] };
+        expect(() =>
+            parseTemperamentJson(
+                JSON.stringify({ ...base, interval: ["perfect 1", 2, "perfect 8"] })
+            )
+        ).toThrow("invalid interval");
+        expect(() =>
+            parseTemperamentJson(JSON.stringify({ ...base, interval: ["perfect 1", "perfect 8"] }))
+        ).toThrow("invalid interval");
     });
 });

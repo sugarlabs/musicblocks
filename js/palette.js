@@ -1311,6 +1311,9 @@ class PaletteModel {
             case "grid":
                 label = _("Grid").toLowerCase();
                 break;
+            case "turtlekey":
+                label = _("pen size");
+                break;
             case "text":
                 label = _("text");
                 break;
@@ -1416,7 +1419,7 @@ class PaletteModel {
             label != null
         ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                label = label.substr(0, STRINGLEN) + "...";
+                label = label.slice(0, STRINGLEN) + "...";
             }
         }
 
@@ -1587,12 +1590,19 @@ class Palette {
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
 
-        // palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+        tbody.id = "PaletteBody_items";
+        tbody.className = "PalScrol";
+        tbody.style.display = "block";
+        tbody.style.width = "100%";
+        tbody.style.height = "auto";
+        tbody.style.maxHeight = `${palBodyHeight}px`;
+        tbody.style.overflow = "auto";
+        tbody.style.overflowX = "hidden";
 
-        palBody.insertAdjacentHTML(
-            "afterbegin",
-            `<thead></thead><tbody style = "display: block;   width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
-        );
+        palBody.appendChild(thead);
+        palBody.appendChild(tbody);
 
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
@@ -1665,7 +1675,9 @@ class Palette {
             return;
         }
         const paletteItems = docById("PaletteBody_items");
-        paletteItems.style.height = `${window.innerHeight - paletteItems.getBoundingClientRect().top}px`;
+        const height = `calc(100vh - ${paletteItems.getBoundingClientRect().top}px)`;
+        paletteItems.style.height = height;
+        paletteItems.style.maxHeight = height;
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener

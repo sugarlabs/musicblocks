@@ -5,7 +5,7 @@
 /*
    global
 
-   _, piemenuVoices, docById, platformColor, noteToFrequency
+   _, piemenuVoices, docById, platformColor, noteToFrequency, ManagedTimer
 */
 
 /** AMD module dependencies for lazy loading. */
@@ -123,6 +123,91 @@ function LegoWidget() {
     this._resolvePolyphonicWait = null;
     this._playingNotes = new Set();
     this._polyphonicPlaybackId = 0;
+
+    /**
+     * Timer manager for managing all widget timeouts safely.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        if (this._polyphonicTimeout !== null) {
+            this._clearWidgetTimeout(this._polyphonicTimeout);
+            this._polyphonicTimeout = null;
+        }
+
+        return count;
+    };
 
     // Eye dropper and background color properties
     this.eyeDropperMode = false;
@@ -325,6 +410,7 @@ function LegoWidget() {
 
         widgetWindow.onclose = () => {
             this._stopPlayback();
+            this._clearWidgetTimers();
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
             this._cleanupDragListeners(); // Clean up drag event listeners
@@ -1982,13 +2068,6 @@ function LegoWidget() {
      * @param {HTMLElement} mediaElement - The image or video element
      * @returns {object|null} Color family object or null if should continue with normal sampling
      */
-    /**
-     * Checks if a canvas row is within the actual image bounds and returns appropriate color
-     * @private
-     * @param {object} line - The scanning line object
-     * @param {HTMLElement} mediaElement - The image or video element
-     * @returns {object|null} Color family object or null if should continue with normal sampling
-     */
     this._getColorForCanvasRow = function (line, mediaElement) {
         // Get the actual image display area
         const imageRect = mediaElement.getBoundingClientRect();
@@ -2065,7 +2144,7 @@ function LegoWidget() {
         this.verticalSpacing = parseFloat(this.spacingSlider.value);
         this.spacingValue.textContent = this.verticalSpacing + "px";
 
-        setTimeout(() => this._drawGridLines(), 50);
+        this._setWidgetTimeout(() => this._drawGridLines(), 50);
     };
 
     /**
@@ -2284,7 +2363,7 @@ function LegoWidget() {
             this.imageWrapper.style.width = "100%";
             this.imageWrapper.style.height = "100%";
 
-            setTimeout(() => this._drawGridLines(), 50);
+            this._setWidgetTimeout(() => this._drawGridLines(), 50);
         }
     };
 
@@ -2351,7 +2430,7 @@ function LegoWidget() {
      */
     this._scale = function () {
         // Redraw grid lines after scaling
-        setTimeout(() => this._drawGridLines(), 300);
+        this._setWidgetTimeout(() => this._drawGridLines(), 300);
     };
 
     /**
@@ -2593,7 +2672,7 @@ function LegoWidget() {
     this._stopPolyphonicPlayback = function () {
         this._polyphonicPlaybackId++;
         if (this._polyphonicTimeout) {
-            clearTimeout(this._polyphonicTimeout);
+            this._clearWidgetTimeout(this._polyphonicTimeout);
             this._polyphonicTimeout = null;
         }
         if (typeof this._resolvePolyphonicWait === "function") {
@@ -2658,7 +2737,7 @@ function LegoWidget() {
                 this._mergeConsecutiveColorSegments();
 
                 this.hasGeneratedVisualization = true; // Set flag to prevent double generation
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this._generateColorVisualization();
                     this._drawColumnLinesOnCanvas(); // Draw column lines on the overlay
                 }, 100); // Small delay to ensure all data is processed
@@ -3294,7 +3373,7 @@ function LegoWidget() {
                 // Wait for the time until the next event
                 await new Promise(resolve => {
                     this._resolvePolyphonicWait = resolve;
-                    this._polyphonicTimeout = setTimeout(() => {
+                    this._polyphonicTimeout = this._setWidgetTimeout(() => {
                         this._polyphonicTimeout = null;
                         this._resolvePolyphonicWait = null;
                         resolve();

@@ -338,6 +338,7 @@
                 });
 
                 input.addEventListener("keydown", event => {
+                    event.stopPropagation();
                     if (event.key === "Enter") {
                         event.preventDefault();
                         if (dialog && dialog.okButton) {
@@ -347,6 +348,8 @@
                         }
                     }
                 });
+                input.addEventListener("keyup", event => event.stopPropagation());
+                input.addEventListener("keypress", event => event.stopPropagation());
                 input.focus();
                 input.select();
             });

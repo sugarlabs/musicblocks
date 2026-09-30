@@ -1473,7 +1473,7 @@ describe("Palettes Class", () => {
                 parentNode: { appendChild: jest.fn() }
             };
             const paletteBody = {
-                insertAdjacentHTML: jest.fn(),
+                appendChild: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, { style: {} }],
                 children: [
@@ -1526,7 +1526,7 @@ describe("Palettes Class", () => {
                 getBoundingClientRect: jest.fn(() => ({ top: 180 }))
             };
             const paletteBody = {
-                insertAdjacentHTML: jest.fn(),
+                appendChild: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, paletteItems],
                 children: [
@@ -1549,17 +1549,17 @@ describe("Palettes Class", () => {
                 parentNode: paletteParent
             };
 
-            global.document.createElement = jest.fn(tag =>
-                tag === "table"
-                    ? paletteBody
-                    : {
-                          style: {},
-                          children: [],
-                          appendChild: jest.fn(),
-                          removeAttribute: jest.fn(),
-                          setAttribute: jest.fn()
-                      }
-            );
+            global.document.createElement = jest.fn(tag => {
+                if (tag === "table") return paletteBody;
+                if (tag === "tbody") return paletteItems;
+                return {
+                    style: {},
+                    children: [],
+                    appendChild: jest.fn(),
+                    removeAttribute: jest.fn(),
+                    setAttribute: jest.fn()
+                };
+            });
             global.docById = jest.fn(id => {
                 if (id === "palette") return palDiv;
                 if (id === "PaletteBody") return null;
@@ -1574,10 +1574,10 @@ describe("Palettes Class", () => {
 
             palette.showMenu(true);
 
-            expect(paletteItems.style.height).toBe("720px");
-            const insertedMarkup = paletteBody.insertAdjacentHTML.mock.calls[0][1];
-            expect(insertedMarkup).toContain("overflow: auto");
-            expect(insertedMarkup).toContain("overflow-x: hidden");
+            expect(paletteItems.style.height).toBe("calc(100vh - 180px)");
+            expect(paletteItems.style.maxHeight).toBe("calc(100vh - 180px)");
+            expect(paletteItems.style.overflow).toBe("auto");
+            expect(paletteItems.style.overflowX).toBe("hidden");
         });
 
         test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {

@@ -244,6 +244,7 @@ class MusicBlocks {
             mouse.turtle.listeners = {};
         }
 
+        Singer.resetMasterVolume(globalActivity.logo);
         globalActivity.logo.prepSynths();
         globalActivity.logo.firstNoteTime = null;
 

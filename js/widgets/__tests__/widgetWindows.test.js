@@ -93,6 +93,7 @@ beforeEach(() => {
             window.widgetWindows._boundHandleGlobalMouseDown,
             true
         );
+        window.removeEventListener("resize", window.widgetWindows._boundHandleResize);
     }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
@@ -554,6 +555,75 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("viewport resize", () => {
+        test("keeps open windows within the viewport without moving windows that still fit", () => {
+            const offscreen = createTestWindow("Offscreen");
+            offscreen.setPosition(338, 141);
+            offscreen._frame.getBoundingClientRect = () => ({
+                left: 338,
+                top: 141,
+                width: 616,
+                height: 500
+            });
+
+            const fitting = createTestWindow("Fitting");
+            fitting.setPosition(100, 150);
+            fitting._frame.getBoundingClientRect = () => ({
+                left: 100,
+                top: 150,
+                width: 300,
+                height: 300
+            });
+
+            const originalWidth = window.innerWidth;
+            const originalHeight = window.innerHeight;
+            window.innerWidth = 900;
+            window.innerHeight = 700;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(offscreen._frame.style.left).toBe("284px");
+                expect(offscreen._frame.style.top).toBe("141px");
+                expect(fitting._frame.style.left).toBe("100px");
+                expect(fitting._frame.style.top).toBe("150px");
+            } finally {
+                window.innerWidth = originalWidth;
+                window.innerHeight = originalHeight;
+            }
+        });
+
+        test("repositions hidden windows when they are shown after a resize", () => {
+            const single = createTestWindow("Single");
+            const all = createTestWindow("All");
+            for (const win of [single, all]) {
+                win.setPosition(338, 141);
+                win._frame.getBoundingClientRect = () => ({
+                    left: parseFloat(win._frame.style.left),
+                    top: 141,
+                    width: 616,
+                    height: 500
+                });
+            }
+            window.widgetWindows.hideAllWindows();
+
+            const originalWidth = window.innerWidth;
+            window.innerWidth = 900;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(single._frame.style.left).toBe("338px");
+                expect(all._frame.style.left).toBe("338px");
+
+                single.show();
+                expect(single._frame.style.left).toBe("284px");
+                expect(all._frame.style.left).toBe("338px");
+
+                window.widgetWindows.showWindows();
+                expect(all._frame.style.left).toBe("284px");
+            } finally {
+                window.innerWidth = originalWidth;
+            }
+        });
+    });
+
     describe("_maximize and _restore", () => {
         test("_maximize sets _maximized to true", () => {
             const win = createTestWindow();
@@ -889,8 +959,8 @@ describe("widgetWindows", () => {
             expect(isOpen(902)).toBeTruthy();
         });
 
-        test("isOpen returns empty string for non-existent windows", () => {
-            expect(isOpen("nonexistent")).toBe("");
+        test("isOpen returns false for non-existent windows", () => {
+            expect(isOpen("nonexistent")).toBe(false);
         });
 
         test("windowFor uses saveAs as key when blockNo is missing", () => {
@@ -1199,10 +1269,14 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow = jest.fn();
         });
 
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
         it("closes matching widget by name", () => {
             const mockElement = { textContent: "TestWidget", id: "" };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
@@ -1229,13 +1303,89 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
 
+        it("closes pitch slider using mapped key 'slider'", () => {
+            window.widgetWindows.openWindows = {
+                slider: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch slider");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+        });
+
+        it("closes music keyboard, pitch staircase, and status using mapped keys", () => {
+            window.widgetWindows.openWindows = {
+                "music keyboard": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("music keyboard");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("music keyboard");
+
+            window.widgetWindows.closeBlkWidgets("pitch staircase");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+            window.widgetWindows.closeBlkWidgets("status");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+        });
+
+        it("closes sampler using mapped key 'sampler'", () => {
+            window.widgetWindows.openWindows = {
+                sampler: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("sampler");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes widgets when receiving localized block titles", () => {
+            const originalI18n = global._;
+            const translations = {
+                "pitch slider": "control deslizante de tono",
+                "music keyboard": "teclado musical",
+                "pitch staircase": "escalera de tono",
+                "status": "estado",
+                "sampler": "muestreador"
+            };
+            global._ = jest.fn(str => translations[str] || str);
+
+            window.widgetWindows.openWindows = {
+                "slider": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() },
+                "sampler": { close: jest.fn() }
+            };
+            windowFor({ blockNo: 7 }, "music keyboard");
+
+            try {
+                window.widgetWindows.closeBlkWidgets("control deslizante de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+
+                window.widgetWindows.closeBlkWidgets("teclado musical");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("7");
+
+                window.widgetWindows.closeBlkWidgets("escalera de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+                window.widgetWindows.closeBlkWidgets("estado");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+
+                window.widgetWindows.closeBlkWidgets("muestreador");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+            } finally {
+                global._ = originalI18n;
+            }
+        });
+
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
                 textContent: "C MAJOR",
                 id: "custom modeWidgetID"
             };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("custom mode");
 
@@ -1243,7 +1393,7 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([
                 { textContent: "OtherWidget", id: "" }
             ]);
 

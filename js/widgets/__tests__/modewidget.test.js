@@ -25,6 +25,8 @@
  */
 
 const ModeWidget = require("../modewidget.js");
+const ManagedTimer = require("../../utils/ManagedTimer.js");
+global.ManagedTimer = ManagedTimer;
 
 // --- 1. Global Mocks ---
 global._ = msg => msg;
@@ -62,6 +64,7 @@ global.docById = jest.fn().mockImplementation(id => ({
 }));
 
 global.getNote = jest.fn().mockReturnValue(["C", "4"]);
+global.closeSharePopup = jest.fn();
 global.keySignatureToMode = jest.fn().mockReturnValue(["C", "ionian"]);
 global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
@@ -732,7 +735,7 @@ describe("ModeWidget", () => {
         MUSICALMODES["major"] = [2, 2, 1, 2, 2, 2, 1];
         global.TuningFormats.parseModeJson = jest.fn(text => JSON.parse(text));
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: JSON.stringify({ name: "major", edo: 31, pattern: [3, 4, 2, 3, 4, 3, 3] }),
                 file: { name: "mode.json", size: 100 }
@@ -753,7 +756,7 @@ describe("ModeWidget", () => {
 
     test("should import a JSON mode and apply it", () => {
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: JSON.stringify({ name: "dorian", edo: 12, pattern: [2, 1, 2, 2, 2, 1, 2] }),
                 file: { name: "dorian.json", size: 100 }
@@ -773,7 +776,7 @@ describe("ModeWidget", () => {
 
     test("should import a .scl file and detect EDO", () => {
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             const content = [
                 "! major.scl",
                 "!",
@@ -807,6 +810,20 @@ describe("ModeWidget", () => {
         saveSpy.mockRestore();
     });
 
+    test("should preserve equal temperament when importing a 21-EDO mode", () => {
+        delete TEMPERAMENT.equal21;
+
+        const key = modeWidget._temperamentKeyForEDO(21);
+
+        expect(key).toBe("equal21");
+        expect(TEMPERAMENT.equal21).toMatchObject({
+            isEDO: true,
+            edo: 21,
+            pitchNumber: 21
+        });
+        delete TEMPERAMENT.equal21;
+    });
+
     test("_exportJson produces valid JSON with name, edo, pattern", () => {
         jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
             pattern: [2, 2, 1, 2, 2, 2, 1],
@@ -815,7 +832,7 @@ describe("ModeWidget", () => {
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
         modeWidget._selectedModeName = "major";
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -833,7 +850,7 @@ describe("ModeWidget", () => {
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("ionian");
         modeWidget._selectedModeName = "41EDO";
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -851,7 +868,7 @@ describe("ModeWidget", () => {
         });
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -867,7 +884,7 @@ describe("ModeWidget", () => {
         });
         jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue(null);
         let downloadedContent;
-        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+        global.downloadTextFile = jest.fn(content => {
             downloadedContent = content;
         });
 
@@ -877,7 +894,7 @@ describe("ModeWidget", () => {
     });
 
     test("_importFile shows error for unsupported file type", () => {
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: "some data",
                 file: { name: "mode.txt", size: 100 }
@@ -891,7 +908,7 @@ describe("ModeWidget", () => {
     });
 
     test("_importFile shows error for bad JSON", () => {
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: "not json",
                 file: { name: "bad.json", size: 100 }
@@ -905,7 +922,7 @@ describe("ModeWidget", () => {
     });
 
     test("_importFile shows error for bad .scl content", () => {
-        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
             cb(null, {
                 text: "not a scl file",
                 file: { name: "bad.scl", size: 100 }
@@ -951,6 +968,8 @@ describe("ModeWidget", () => {
         modeWidget._locked = true;
         modeWidget._playing = true;
         modeWidget._timeouts = [123, 456];
+        modeWidget._setWidgetTimeout(jest.fn(), 500);
+        expect(modeWidget._timerManager.activeTimeoutCount).toBe(1);
         modeWidget._newPattern = [true, false];
         modeWidget._notesToPlay = [0, 2];
 
@@ -959,6 +978,8 @@ describe("ModeWidget", () => {
         expect(modeWidget._locked).toBe(false);
         expect(modeWidget._playing).toBe(false);
         expect(modeWidget._timeouts).toEqual([]);
+        expect(modeWidget._timerManager.activeTimeoutCount).toBe(0);
+        expect(modeWidget._activeTimeouts.size).toBe(0);
         expect(modeWidget._newPattern).toBeNull();
         expect(modeWidget._notesToPlay).toBeNull();
     });
@@ -1115,6 +1136,166 @@ describe("ModeWidget", () => {
             // Test: svg element is null
             modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
             expect(() => modeWidget._scale()).not.toThrow();
+        });
+    });
+
+    describe("timer fallback without ManagedTimer", () => {
+        let widget;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            widget = new ModeWidget(mockActivity);
+            widget._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("_setWidgetTimeout tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = widget._setWidgetTimeout(callback, 500);
+            expect(widget._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout returns false for null, undefined, or untracked ids", () => {
+            expect(widget._clearWidgetTimeout(null)).toBe(false);
+            expect(widget._clearWidgetTimeout(undefined)).toBe(false);
+            expect(widget._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = widget._setWidgetTimeout(callback, 500);
+
+            expect(widget._clearWidgetTimeout(id)).toBe(true);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        test("_clearWidgetTimers cancels tracked timeouts and returns count", () => {
+            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._setWidgetTimeout(jest.fn(), 700);
+
+            const count = widget._clearWidgetTimers();
+
+            expect(count).toBe(2);
+            expect(widget._activeTimeouts.size).toBe(0);
+        });
+
+        test("_cancelAnimations clears tracked timeouts and resets playing/locked flags", () => {
+            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._locked = true;
+            widget._playing = true;
+            widget._newPattern = [2, 2, 1];
+            widget._notesToPlay = [0, 2, 4];
+
+            widget._cancelAnimations();
+
+            expect(widget._activeTimeouts.size).toBe(0);
+            expect(widget._locked).toBe(false);
+            expect(widget._playing).toBe(false);
+            expect(widget._newPattern).toBeNull();
+            expect(widget._notesToPlay).toBeNull();
+        });
+
+        test("widgetWindow.onclose invokes _clearWidgetTimers and stops synth", () => {
+            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._playing = true;
+            widget._locked = true;
+
+            widget.widgetWindow.onclose();
+
+            expect(widget._activeTimeouts.size).toBe(0);
+            expect(widget._playing).toBe(false);
+            expect(widget._locked).toBe(false);
+            expect(widget.logo.synth.stop).toHaveBeenCalled();
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        let widget;
+
+        beforeEach(() => {
+            widget = new ModeWidget(mockActivity);
+        });
+
+        afterEach(() => {
+            widget._clearWidgetTimers();
+        });
+
+        test("initializes with ManagedTimer when available", () => {
+            expect(widget._timerManager).toBeInstanceOf(ManagedTimer);
+        });
+
+        test("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            widget._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(widget._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        test("_clearWidgetTimeout delegates to the timer manager", () => {
+            widget._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._clearWidgetTimeout(5)).toBe(true);
+            expect(widget._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+        });
+
+        test("_clearWidgetTimers delegates to the timer manager clearAll", () => {
+            widget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(3)
+            };
+
+            const count = widget._clearWidgetTimers();
+
+            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(count).toBe(3);
+        });
+
+        test("_cancelAnimations delegates to timer manager clearAll and resets state", () => {
+            widget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(2)
+            };
+            widget._locked = true;
+            widget._playing = true;
+            widget._newPattern = [2, 2, 1];
+            widget._notesToPlay = [0, 2, 4];
+
+            widget._cancelAnimations();
+
+            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(widget._locked).toBe(false);
+            expect(widget._playing).toBe(false);
+            expect(widget._newPattern).toBeNull();
+            expect(widget._notesToPlay).toBeNull();
+        });
+
+        test("widgetWindow.onclose delegates to timer manager clearAll", () => {
+            widget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(1)
+            };
+            widget._playing = true;
+
+            widget.widgetWindow.onclose();
+
+            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(widget._playing).toBe(false);
         });
     });
 });

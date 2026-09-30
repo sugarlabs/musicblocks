@@ -1077,3 +1077,108 @@ describe("TurtlesModel.removeTurtle", () => {
         expect(stage.removeChild).not.toHaveBeenCalled();
     });
 });
+
+describe("Turtle hover scaling and lifecycle", () => {
+    let activityMock;
+    let turtles;
+    let eventListeners;
+    let mockTurtle;
+
+    beforeEach(() => {
+        eventListeners = {};
+        mockTurtle = {
+            id: 1,
+            name: "start",
+            running: false,
+            container: {
+                scaleX: 1,
+                scaleY: 1,
+                scale: 1,
+                on: jest.fn((event, handler) => {
+                    eventListeners[event] = handler;
+                }),
+                removeAllEventListeners: jest.fn()
+            }
+        };
+
+        activityMock = {
+            stage: {
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                dispatchEvent: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            turtleContainer: new createjs.Container(),
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+            closeHelpfulWheel
+        };
+
+        global.Turtle = jest.fn().mockImplementation(() => mockTurtle);
+
+        turtles = new Turtles(activityMock);
+        turtles.activity = activityMock;
+        turtles.getTurtleCount = jest.fn().mockReturnValue(0);
+        turtles.pushTurtle = jest.fn();
+        turtles.addTurtleStageProps = jest.fn();
+        turtles.createArtwork = jest.fn();
+        turtles.createHitArea = jest.fn();
+        turtles.addTurtleGraphicProps = jest.fn();
+        turtles.isShrunk = jest.fn().mockReturnValue(false);
+
+        document.body.innerHTML = '<div id="loader"></div>';
+        turtles.add({ name: "start", value: 0 }, { id: 1, name: "start" });
+    });
+
+    test("scales up turtle container by 1.2 on mouseover and restores on mouseout", () => {
+        expect(eventListeners.mouseover).toBeDefined();
+        expect(eventListeners.mouseout).toBeDefined();
+
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1.2);
+        expect(mockTurtle._isHovered).toBe(true);
+
+        eventListeners.mouseout();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1);
+        expect(mockTurtle._isHovered).toBe(false);
+    });
+
+    test("does not compound scale on duplicate mouseover events", () => {
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1.2);
+
+        // Second mouseover while still hovered should be ignored
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(1.2);
+    });
+
+    test("restores original scale on mouseout even if turtle is running", () => {
+        mockTurtle.container.scaleX = 4;
+        mockTurtle.container.scaleY = 4;
+        mockTurtle.container.scale = 4;
+
+        eventListeners.mouseover();
+        expect(mockTurtle.container.scaleX).toBeCloseTo(4 * 1.2);
+        expect(mockTurtle.container.scaleY).toBeCloseTo(4 * 1.2);
+        expect(mockTurtle.container.scale).toBeCloseTo(4 * 1.2);
+
+        // Turtle starts running while hovered
+        mockTurtle.running = true;
+
+        // Mouse leaves while running
+        eventListeners.mouseout();
+
+        // Scale should be restored to base values across all dimensions
+        expect(mockTurtle.container.scaleX).toBeCloseTo(4);
+        expect(mockTurtle.container.scaleY).toBeCloseTo(4);
+        expect(mockTurtle.container.scale).toBeCloseTo(4);
+        expect(mockTurtle._isHovered).toBe(false);
+    });
+
+    test("ignores mouseout if turtle was not hovered", () => {
+        mockTurtle.container.scaleX = 1;
+        eventListeners.mouseout();
+        expect(mockTurtle.container.scaleX).toBe(1);
+    });
+});

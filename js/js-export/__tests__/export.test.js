@@ -59,6 +59,7 @@ const globalActivity = {
 };
 global.globalActivity = globalActivity;
 global.Singer = {
+    resetMasterVolume: jest.fn(),
     RhythmActions: {
         getNoteValue: jest.fn()
     },

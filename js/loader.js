@@ -164,6 +164,105 @@ requirejs.config({
         "activity/notation": {
             exports: "Notation"
         },
+        "utils/musicutils-constants": {
+            exports: "MusicUtilsConstants"
+        },
+        "utils/musicutils-i18n": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsI18n"
+        },
+        "utils/musicutils-temperament": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsTemperament"
+        },
+        "utils/musicutils-pitch": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament"
+            ],
+            exports: "MusicUtilsPitch"
+        },
+        "utils/musicutils-lookups": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsLookups"
+        },
+        "utils/musicutils-rhythm": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsRhythm"
+        },
+        "utils/musicutils-solfege": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
+            exports: "MusicUtilsSolfege"
+        },
+        "utils/musicutils-modewheel": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsModeWheel"
+        },
+        "utils/musicutils-modecore": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch"
+            ],
+            exports: "MusicUtilsModeCore"
+        },
+        "utils/musicutils-pitchscale": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modecore"
+            ],
+            exports: "MusicUtilsPitchScale"
+        },
+        "utils/musicutils-buildscale": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modecore"
+            ],
+            exports: "MusicUtilsBuildScale"
+        },
+        "utils/musicutils-pitchinfo": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-buildscale"
+            ],
+            exports: "MusicUtilsPitchInfo"
+        },
+        "utils/musicutils": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-lookups",
+                "utils/musicutils-rhythm",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modewheel",
+                "utils/musicutils-modecore",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-buildscale",
+                "utils/musicutils-pitchinfo"
+            ]
+        },
         "utils/synthutils": {
             deps: ["utils/utils", "activity/activity-context"],
             exports: "Synth"
@@ -215,6 +314,7 @@ requirejs.config({
                 "activity/alert-renderer",
                 "palette/palette-loader",
                 "activity/search-controller",
+                "activity/clear-confirmation",
                 "activity/workspace-layout-controller",
                 "activity/block-scale-controller",
                 "search-ui",
@@ -296,6 +396,7 @@ requirejs.config({
         "activity/alert-renderer": "js/activity/alert-renderer",
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
+        "activity/clear-confirmation": "js/activity/clear-confirmation",
         "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
         "activity/selection-controller": "js/activity/selection-controller",
         "activity/block-scale-controller": "js/activity/block-scale-controller",

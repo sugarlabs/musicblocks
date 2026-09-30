@@ -60,7 +60,7 @@
    piemenuIntervals, piemenuVoices, piemenuBoolean,
    piemenuBasic, piemenuColor, piemenuNumber,
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
-   piemenuDissectNumber
+   piemenuDissectNumber, getTemperamentSliceFont
 */
 
 /**
@@ -69,9 +69,19 @@
  * @param diameter Base diameter of the wheel in pixels
  * @returns void
  */
+let lastWheelSize = 400;
+
+/**
+ * Sets the dimensions of the pie menu container (`#wheelDiv`)
+ * based on the provided diameter and current screen breakpoint.
+ *
+ * @param {number} [i=400] Base diameter in pixels
+ * @returns void
+ */
 const setWheelSize = (i = 400) => {
+    lastWheelSize = i;
     const wheelDiv = document.getElementById("wheelDiv");
-    const screenWidth = window.innerWidth;
+    const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
 
     if (!wheelDiv) return;
 
@@ -109,14 +119,14 @@ let wheelResizeListenerAttached = false;
 let activeExitWheel = null;
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
-    wheelResizeTimeout = setTimeout(setWheelSize, 150);
+    wheelResizeTimeout = setTimeout(() => setWheelSize(lastWheelSize), 150);
 };
 
 const enableWheelResizeHandling = () => {
     if (wheelResizeListenerAttached) return;
     wheelResizeListenerAttached = true;
     window.addEventListener("resize", debouncedSetWheelSize);
-    setWheelSize();
+    setWheelSize(lastWheelSize);
 };
 
 const disableWheelResizeHandling = () => {
@@ -638,9 +648,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             scale[scale.length - 1 - i][0] === FIXEDSOLFEGE[note] ||
             scale[scale.length - 1 - i][0] === note
         ) {
-            accidental = scale[scale.length - 1 - i].substr(1);
+            accidental = scale[scale.length - 1 - i].slice(1);
         } else {
-            accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].substr(1);
+            accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].slice(1);
         }
         block.value = block.value
             .replace(SHARP, "")
@@ -891,9 +901,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     scale[i][0] === FIXEDSOLFEGE[that.value] ||
                     scale[i][0] === selection["note"]
                 ) {
-                    selection["attr"] = scale[i].substr(1);
+                    selection["attr"] = scale[i].slice(1);
                 } else {
-                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].slice(1);
                 }
             }
             switch (selection["attr"]) {
@@ -2404,6 +2414,24 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 };
 
 /**
+ * Calculates a proportional font size for basic / temperament pie menu slices
+ * to fit labels comfortably within slice arcs without clipping.
+ *
+ * @param {number} wheelRadius - The radius of the wheel in coordinate units.
+ * @param {number} sliceCount - The number of slices in the wheel.
+ * @param {number} labelLen - The character length of the label.
+ * @returns {string} Font CSS specification string.
+ */
+const getTemperamentSliceFont = (wheelRadius, sliceCount, labelLen) => {
+    const arcPx = (2 * Math.PI * 0.62 * wheelRadius) / Math.max(sliceCount, 1);
+    const size = Math.floor((arcPx * 1.15) / Math.max(labelLen * 0.42, 1));
+    const minSize = Math.round(0.062 * wheelRadius);
+    const maxSize = Math.round(0.1 * wheelRadius);
+    const clamped = Math.min(maxSize, Math.max(minSize, size));
+    return `bold ${clamped}px sans-serif`;
+};
+
+/**
  * Builds a generic pie menu with arbitrary labels and values.
  *
  * @param {Object} block Block instance invoking the menu
@@ -2462,6 +2490,19 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     }
     block._basicWheel.createWheel(labels);
 
+    if (block.name === "temperamentname" || labels.length >= 6) {
+        for (let j = 0; j < block._basicWheel.navItems.length; j++) {
+            const font = getTemperamentSliceFont(
+                block._basicWheel.wheelRadius,
+                labels.length,
+                labels[j] ? labels[j].length : 1
+            );
+            block._basicWheel.navItems[j].titleAttr.font = font;
+            block._basicWheel.navItems[j].titleHoverAttr.font = font;
+            block._basicWheel.navItems[j].titleSelectedAttr.font = font;
+        }
+    }
+
     block._exitWheel.colors = platformColor.exitWheelcolors;
     block._exitWheel.slicePathFunction = slicePath().DonutSlice;
     block._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -2511,29 +2552,143 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 300,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 350,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+
+    // Determine top toolbar exclusion bar height
+    let topBarBottom = 0;
+    if (typeof document !== "undefined") {
+        const toolbars = document.getElementById("toolbars");
+        if (
+            toolbars &&
+            toolbars.style.display !== "none" &&
+            toolbars.style.visibility !== "hidden"
+        ) {
+            const tbRect =
+                typeof toolbars.getBoundingClientRect === "function"
+                    ? toolbars.getBoundingClientRect()
+                    : null;
+            if (tbRect && tbRect.bottom > 0) {
+                topBarBottom = Math.max(topBarBottom, tbRect.bottom);
+            } else if (toolbars.offsetHeight > 0) {
+                topBarBottom = Math.max(
+                    topBarBottom,
+                    (toolbars.offsetTop || 0) + toolbars.offsetHeight
+                );
+            }
+        }
+    }
+    if (block.activity) {
+        if (block.activity.toolbarHeight) {
+            topBarBottom = Math.max(topBarBottom, block.activity.toolbarHeight);
+        }
+        if (block.activity.canvas && block.activity.canvas.offsetTop) {
+            topBarBottom = Math.max(topBarBottom, block.activity.canvas.offsetTop);
+        }
+    }
+
+    // Determine left palette bar exclusion width
+    let leftBarRight = 0;
+    if (typeof document !== "undefined") {
+        const palette = document.getElementById("palette");
+        if (
+            palette &&
+            palette.style.display !== "none" &&
+            palette.style.visibility !== "hidden" &&
+            (!palette.style.transform || !palette.style.transform.includes("-100%"))
+        ) {
+            const pRect =
+                typeof palette.getBoundingClientRect === "function"
+                    ? palette.getBoundingClientRect()
+                    : null;
+            if (pRect && pRect.right > 0) {
+                leftBarRight = Math.max(leftBarRight, pRect.right);
+            } else if (palette.offsetWidth > 0) {
+                leftBarRight = Math.max(
+                    leftBarRight,
+                    (palette.offsetLeft || 0) + palette.offsetWidth
+                );
+            }
+        }
+    }
+    if (block.activity) {
+        if (
+            block.activity.palettes &&
+            !block.activity.palettes.collapsed &&
+            block.activity.palettes.paletteWidth
+        ) {
+            leftBarRight = Math.max(leftBarRight, block.activity.palettes.paletteWidth);
+        }
+        if (block.activity.canvas && block.activity.canvas.offsetLeft) {
+            leftBarRight = Math.max(leftBarRight, block.activity.canvas.offsetLeft);
+        }
+    }
+
+    const safeTop = topBarBottom > 0 ? topBarBottom + 8 : 8;
+    const safeLeft = leftBarRight > 0 ? leftBarRight + 8 : 8;
+
+    const viewportWidth =
+        (typeof window !== "undefined" && window.innerWidth) ||
+        block.blocks.turtles._canvas.width ||
+        1200;
+    const viewportHeight =
+        (typeof window !== "undefined" && window.innerHeight) ||
+        block.blocks.turtles._canvas.height ||
+        900;
+
+    const canvasLeftEdge =
+        (block.activity && block.activity.canvas && block.activity.canvas.offsetLeft) || 0;
+    const canvasTopEdge =
+        (block.activity && block.activity.canvas && block.activity.canvas.offsetTop) || 0;
+
+    const rightBound = Math.min(
+        viewportWidth,
+        canvasLeftEdge + (block.blocks.turtles._canvas.width || viewportWidth)
+    );
+    const bottomBound = Math.min(
+        viewportHeight,
+        canvasTopEdge + (block.blocks.turtles._canvas.height || viewportHeight)
+    );
+
+    let displaySize = 300;
+    if (block.name === "temperamentname") {
+        const availableW = Math.max(160, rightBound - safeLeft - 8);
+        const availableH = Math.max(160, bottomBound - safeTop - 8);
+        const maxAvailable = Math.min(availableW, availableH);
+        const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
+        if (screenWidth >= 1200) {
+            displaySize = Math.min(410, Math.floor(maxAvailable * 0.7));
+        } else if (screenWidth >= 768) {
+            displaySize = Math.min(360, Math.floor(maxAvailable * 0.7));
+        } else {
+            displaySize = Math.min(310, Math.floor(maxAvailable * 0.8));
+        }
+        displaySize = Math.min(displaySize, maxAvailable);
+        displaySize = Math.max(160, displaySize);
+    } else if (block.name === "outputtools" || block.name === "grid") {
+        displaySize = 400;
+    }
+
+    setWheelSize(displaySize);
+
+    const actualDisplaySize = parseInt(docById("wheelDiv").style.width, 10) || displaySize;
+    const halfWheelSize = Math.round(actualDisplaySize / 2);
+
+    const blockCenterX = Math.round(
+        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+    );
+    const blockCenterY = Math.round(
+        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+    );
+
+    const minLeft = safeLeft;
+    const maxLeft = Math.max(minLeft, rightBound - actualDisplaySize - 8);
+    const minTop = safeTop;
+    const maxTop = Math.max(minTop, bottomBound - actualDisplaySize - 8);
+
+    const left = Math.min(maxLeft, Math.max(minLeft, blockCenterX - halfWheelSize));
+    const top = Math.min(maxTop, Math.max(minTop, blockCenterY - halfWheelSize));
+
+    docById("wheelDiv").style.left = left + "px";
+    docById("wheelDiv").style.top = top + "px";
 
     // Navigate to the current selectedValue value.
     let i = menuValues.indexOf(selectedValue);
@@ -4313,6 +4468,8 @@ if (typeof module !== "undefined" && module.exports) {
         piemenuNumber,
         piemenuModes,
         piemenuVoices,
+        piemenuBasic,
+        getTemperamentSliceFont,
         handleEscapeKey,
         dismissActivePieMenu,
         showWheelDiv,

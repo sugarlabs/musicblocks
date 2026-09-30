@@ -96,9 +96,11 @@ const createTransportMock = () => ({
 global.Singer = {
     setSynthVolume: jest.fn(),
     setMasterVolume: jest.fn(),
+    resetMasterVolume: jest.fn(),
     clearPitchToFrequencyCache: jest.fn(),
     masterBPM: 90,
-    defaultBPMFactor: 1
+    defaultBPMFactor: 1,
+    masterVolume: [50]
 };
 global.instruments = {};
 global.instrumentsFilters = {};
@@ -983,6 +985,43 @@ describe("Logo synth lifecycle", () => {
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
     });
 
+    test("prepSynths leaves the master volume alone so a mid-project call cannot reset it", () => {
+        logo.prepSynths();
+
+        expect(Singer.resetMasterVolume).not.toHaveBeenCalled();
+    });
+
+    test("prepSynths re-initialization uses current masterVolume for new turtles", () => {
+        logo.prepSynths();
+        jest.clearAllMocks();
+
+        Singer.masterVolume = [80];
+
+        const newTurtle = createMockTurtle();
+        mockActivity.turtles.turtleList.push(newTurtle);
+        mockActivity.turtles.ithTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtleCount = jest.fn(() => 3);
+        mockActivity.turtles.turtleCount = jest.fn(() => 3);
+
+        logo.prepSynths();
+
+        expect(newTurtle.singer.synthVolume["electronic synth"]).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise1).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise2).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise3).toEqual([80]);
+        expect(newTurtle.singer.synthVolume[DEFAULTVOICE]).toEqual([80]);
+        expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "2", "electronic synth", 80);
+    });
+
     test("resetSynth creates default synth, resets volumes, and starts synth engine", () => {
         turtle0.singer.synthVolume = { "electronic synth": [40], "flute": [22] };
         turtle1.singer.synthVolume = { "electronic synth": [50] };
@@ -990,7 +1029,7 @@ describe("Logo synth lifecycle", () => {
         logo.resetSynth(0);
 
         expect(logo.synth.createDefaultSynth).toHaveBeenCalledWith(0);
-        expect(Singer.setMasterVolume).toHaveBeenCalledWith(logo, 50);
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "flute", 50);
         expect(logo.synth.start).toHaveBeenCalled();
@@ -1460,6 +1499,26 @@ describe("Logo runLogoCommands", () => {
             oldListener,
             false
         );
+    });
+
+    test("resets the master volume on every run", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
+    });
+
+    test("resets the master volume on a restart with no stop in between", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+        // prepSynths() bails out early in this state, so the reset cannot live in there.
+        logo._synthsInitialized = true;
+
+        logo.runLogoCommands(null, null);
+
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
     });
 
     test("drum block is included in startBlocks", () => {
@@ -2630,6 +2689,20 @@ describe("Logo parseArg", () => {
             logo.parseArg(logo, 0, 0, null, null);
 
             expect(getIntervalNumber).toHaveBeenCalledWith("fifth");
+        });
+
+        test("handles non-string interval name blocks safely", () => {
+            logo.blockList = [
+                {
+                    name: "intervalname",
+                    value: null,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => false
+                }
+            ];
+
+            const result = logo.parseArg(logo, 0, 0, null, null);
+            expect(result).toBe(0);
         });
     });
 

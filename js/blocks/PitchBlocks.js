@@ -959,7 +959,9 @@ function setupPitchBlocks(activity) {
         static _parseCents(value) {
             if (typeof value !== "string") return [value, 0];
             const match = value.match(
-                new RegExp(`^([A-Ga-g](?:[#b♯♭]|𝄪|𝄫)?)(\\(([+-]\\d+)${CENTSSYMBOL}\\))?$`)
+                new RegExp(
+                    `^([v^]{0,2}[A-Ga-g](?:[#b♯♭]{1,2}|𝄪|𝄫)?)(\\(([+-]?\\d+)(?:${CENTSSYMBOL}|c)?\\))?$`
+                )
             );
             if (match) {
                 return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];
@@ -1947,7 +1949,11 @@ function setupPitchBlocks(activity) {
             this.setHelpString([
                 _(
                     "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
-                ),
+                ) +
+                    " " +
+                    _(
+                        "Changing the octave number keeps the pitch name but makes the note sound higher or lower."
+                    ),
                 "documentation",
                 null,
                 "note1"
@@ -2017,10 +2023,10 @@ function setupPitchBlocks(activity) {
                     }
                     scaledegree = Math.abs(scaledegree);
 
-                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                    if (obj[0].substr(1) === FLAT) {
+                    let ref = NOTESTEP[obj[0].slice(0, 1)] - 1;
+                    if (obj[0].slice(1) === FLAT) {
                         ref--;
-                    } else if (obj[0].substr(1) === SHARP) {
+                    } else if (obj[0].slice(1) === SHARP) {
                         ref++;
                     }
                     note = scaleDegreeToPitchMapping(
@@ -2127,7 +2133,7 @@ function setupPitchBlocks(activity) {
                     if (![SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(accSym)) {
                         accSym = NATURAL;
                     } else {
-                        arg0 = arg0.substr(0, arg0.length - 1);
+                        arg0 = arg0.slice(0, arg0.length - 1);
                     }
                     note = NOTENAMES.includes(arg0.toUpperCase())
                         ? SOLFEGECONVERSIONTABLE[arg0.toUpperCase()]

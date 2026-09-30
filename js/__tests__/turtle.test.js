@@ -2,7 +2,7 @@ require("../turtle");
 const Turtle = global.Turtle;
 // Mock all external dependencies
 global.importMembers = jest.fn();
-global.Singer = jest.fn().mockImplementation(() => ({
+const defaultSingerState = () => ({
     attack: [],
     decay: [],
     sustain: [],
@@ -48,7 +48,7 @@ global.Singer = jest.fn().mockImplementation(() => ({
     inDuplicate: false,
     skipFactor: 1,
     skipIndex: 0,
-    instrumentNames: [],
+    instrumentNames: [global.DEFAULTVOICE || "electronic synth"],
     inCrescendo: [],
     crescendoDelta: [],
     crescendoInitialVolume: {},
@@ -90,7 +90,7 @@ global.Singer = jest.fn().mockImplementation(() => ({
     invertList: [],
     beatList: [],
     factorList: [],
-    keySignature: "",
+    keySignature: "C major",
     pitchDrumTable: {},
     defaultStrongBeats: false,
     pickup: 0,
@@ -105,13 +105,33 @@ global.Singer = jest.fn().mockImplementation(() => ({
     suppressOutput: false,
     dispatchFactor: 1,
     runningFromEvent: false
-}));
-global.Painter = jest.fn().mockImplementation(() => ({
-    cp1x: 0,
-    cp1y: 100,
-    cp2x: 100,
-    cp2y: 100
-}));
+});
+
+global.Singer = jest.fn().mockImplementation(() => {
+    const instance = defaultSingerState();
+    instance.reset = jest.fn(function (suppressOutput = false) {
+        Object.assign(this, defaultSingerState());
+        this.suppressOutput = suppressOutput;
+    });
+    instance.killAllVoices = jest.fn();
+    return instance;
+});
+
+global.Painter = jest.fn().mockImplementation(() => {
+    const instance = {
+        cp1x: 0,
+        cp1y: 100,
+        cp2x: 100,
+        cp2y: 100
+    };
+    instance.reset = jest.fn(function () {
+        this.cp1x = 0;
+        this.cp1y = 100;
+        this.cp2x = 100;
+        this.cp2y = 100;
+    });
+    return instance;
+});
 global.delayExecution = jest.fn();
 global.DEFAULTVOICE = "electronic synth";
 global.DEFAULTVOLUME = 50;
@@ -304,6 +324,34 @@ describe("Turtle", () => {
         it("should initialize butNotThese as empty object", () => {
             turtle.initTurtle(false);
             expect(turtle.butNotThese).toEqual({});
+        });
+
+        it("should delegate to painter.reset() and singer.reset(suppressOutput)", () => {
+            turtle.initTurtle(true);
+            expect(turtle.painter.reset).toHaveBeenCalled();
+            expect(turtle.singer.reset).toHaveBeenCalledWith(true);
+        });
+
+        it("should invoke singer.killAllVoices() and clean up pending unhighlight timers and delayTimeout", () => {
+            turtle.delayTimeout = 999;
+            const clearTimeoutSpy = jest.fn();
+            turtle.activity = {
+                logo: {
+                    _timerManager: {
+                        clearTimeout: clearTimeoutSpy
+                    }
+                }
+            };
+            turtle.singer._unhighlightTimers = { blk1: 101, blk2: 102 };
+
+            turtle.initTurtle(false);
+
+            expect(turtle.singer.killAllVoices).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(999);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(101);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(102);
+            expect(turtle.delayTimeout).toBeNull();
+            expect(turtle.singer._unhighlightTimers).toEqual({});
         });
     });
 

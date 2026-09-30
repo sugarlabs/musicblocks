@@ -24,6 +24,7 @@ window.ast2blocklist_config = {
                 "/": "divide",
                 "%": "mod",
                 "==": "equal",
+                "===": "equal",
                 "!=": "not_equal_to",
                 "<": "less",
                 ">": "greater",
@@ -102,7 +103,7 @@ window.ast2blocklist_config = {
                 name_property: "callee.property.name",
                 arguments_property: "arguments"
             },
-            name_map: { abs: "abs", floor: "int", pow: "power", sqrt: "sqrt" }
+            name_map: { abs: "abs", pow: "power", sqrt: "sqrt" }
         },
         {
             comment: "Math utility operators such as distance or random",
@@ -116,7 +117,13 @@ window.ast2blocklist_config = {
                 name_property: "callee.property.name",
                 arguments_property: "arguments"
             },
-            name_map: { doCalculateDistance: "distance", doOneOf: "oneOf", doRandom: "random" }
+            name_map: {
+                doCalculateDistance: "distance",
+                doInt: "int",
+                doOneOf: "oneOf",
+                doRandom: "random",
+                doXor: "xor"
+            }
         },
         {
             comment: "Singular argument mouse blocks",
@@ -502,10 +509,48 @@ window.ast2blocklist_config = {
         },
         {
             name: "repeat",
-            comment: "Repeat block in the Flow palette",
+            comment:
+                "Repeat block as exported: for (let i0 = 0, limit0 = MathUtility.doRepeatCount(n); i0 < limit0; i0++)",
             arguments: [{ type: "NumberExpression" }],
             ast: {
-                identifiers: [{ property: "type", value: "ForStatement" }],
+                identifiers: [
+                    { property: "type", value: "ForStatement" },
+                    { property: "init.declarations.length", value: 2 },
+                    { property: "init.declarations[0].init.value", value: 0 },
+                    {
+                        property: "init.declarations[1].init.callee.object.name",
+                        value: "MathUtility"
+                    },
+                    {
+                        property: "init.declarations[1].init.callee.property.name",
+                        value: "doRepeatCount"
+                    },
+                    { property: "test.operator", value: "<" },
+                    { property: "test.left.name", same_as: "init.declarations[0].id.name" },
+                    { property: "test.right.name", same_as: "init.declarations[1].id.name" },
+                    { property: "update.operator", value: "++" },
+                    { property: "update.argument.name", same_as: "init.declarations[0].id.name" }
+                ],
+                argument_properties: ["init.declarations[1].init.arguments[0]"],
+                children_properties: ["body.body"]
+            },
+            default_vspaces: { argument: 1 }
+        },
+        {
+            name: "repeat",
+            comment: "Repeat block in the Flow palette: for (let i = 0; i < 4; i++)",
+            arguments: [{ type: "NumberExpression" }],
+            ast: {
+                identifiers: [
+                    { property: "type", value: "ForStatement" },
+                    { property: "init.declarations.length", value: 1 },
+                    { property: "init.declarations[0].init.value", value: 0 },
+                    { property: "test.operator", value: "<" },
+                    { property: "test.left.name", same_as: "init.declarations[0].id.name" },
+                    { property: "test.right.value", integer: true },
+                    { property: "update.operator", value: "++" },
+                    { property: "update.argument.name", same_as: "init.declarations[0].id.name" }
+                ],
                 argument_properties: ["test.right"],
                 children_properties: ["body.body"]
             },
@@ -945,7 +990,7 @@ window.ast2blocklist_config = {
         {
             name: "setscalartransposition",
             comment: "Set scalar transposition block",
-            arguments: [{ type: "modelength" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1100,7 +1145,7 @@ window.ast2blocklist_config = {
         {
             name: "semitoneinterval",
             comment: "Set semitone interval block",
-            arguments: [{ type: "intervalname" }],
+            arguments: [{ type: "IntervalExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1692,7 +1737,7 @@ window.ast2blocklist_config = {
         {
             name: "scrollxy",
             comment: "Scroll XY block",
-            arguments: [{ type: "x" }, { type: "y" }],
+            arguments: [{ type: "NumberExpression" }, { type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1733,7 +1778,7 @@ window.ast2blocklist_config = {
         {
             name: "setgrey",
             comment: "Set grey block",
-            arguments: [{ type: "grey" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1749,7 +1794,7 @@ window.ast2blocklist_config = {
         {
             name: "setshade",
             comment: "Set shade block",
-            arguments: [{ type: "shade" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1765,7 +1810,7 @@ window.ast2blocklist_config = {
         {
             name: "sethue",
             comment: "Set hue block",
-            arguments: [{ type: "color" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1800,7 +1845,7 @@ window.ast2blocklist_config = {
         {
             name: "setpensize",
             comment: "Set pen size block",
-            arguments: [{ type: "pensize" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },

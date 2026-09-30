@@ -105,7 +105,29 @@ class Singer {
      */
     constructor(turtle) {
         this.turtle = turtle;
-        this.turtles = turtle.turtles;
+        this.turtles = turtle && turtle.turtles ? turtle.turtles : null;
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+        this.synthVolume = {};
+        this.panner = null;
+
+        this.reset();
+    }
+
+    /**
+     * Resets all musical and audio runtime state to clean initial defaults.
+     * Ensures consistent state across consecutive project runs.
+     *
+     * @param {boolean} [suppressOutput=false] - Whether to suppress audio output (e.g. during notation export).
+     * @returns {void}
+     */
+    reset(suppressOutput = false) {
+        if (this.activeVoices && typeof this.activeVoices.clear === "function") {
+            this.activeVoices.clear();
+        } else {
+            this.activeVoices = new Set();
+        }
+        this._unhighlightTimers = {};
 
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
@@ -190,7 +212,6 @@ class Singer {
         this.tieNoteExtras = [];
         this.tieCarryOver = 0;
         this.tieFirstDrums = [];
-        this.synthVolume = {};
         this.drift = 0;
         // Maximum fraction of note duration that can be used for lag correction per note.
         // This prevents notes from being rushed when catching up to the master clock.
@@ -216,7 +237,6 @@ class Singer {
         this.neighborArgNote2 = [];
         this.neighborArgBeat = [];
         this.neighborArgCurrentBeat = [];
-        this.panner = null;
 
         this.inNoteBlock = [];
         this.multipleVoices = false;
@@ -242,12 +262,10 @@ class Singer {
         this.justMeasuring = [];
         this.firstPitch = [];
         this.lastPitch = [];
-        this.suppressOutput = false;
+        this.suppressOutput = Boolean(suppressOutput);
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
-
-        // Voice Manager: Track active audio sources for proper cleanup
-        this.activeVoices = new Set();
+        this.runningFromEvent = false;
     }
 
     /**
@@ -763,6 +781,47 @@ class Singer {
     }
 
     /**
+     * Restores the master volume to its default level.
+     *
+     * masterVolume is a stack shared by every turtle and every run. The set master volume clamp
+     * pushes a level and pops it when the clamp ends, so stopping a project inside that clamp
+     * leaves the level behind, and loadSynth() hands each new instrument last(masterVolume).
+     * Without this the level survives into the next run and into whatever project is loaded after.
+     *
+     * The output itself goes back to its fresh-load level rather than through setMasterVolume():
+     * feeding DEFAULTVOLUME to the gain curve would land on -6 dB and quieten every project that
+     * never sets a volume of its own.
+     *
+     * @static
+     * @param {Object} logo
+     * @returns {void}
+     */
+    static resetMasterVolume(logo) {
+        Singer.masterVolume.length = 1;
+        Singer.masterVolume[0] = DEFAULTVOLUME;
+
+        const turtleList = logo.activity.turtles.turtleList;
+        for (let i = 0, turtleCount = turtleList.length; i < turtleCount; i++) {
+            const synthVolume = turtleList[i].singer.synthVolume;
+            const synthKeys = Object.keys(synthVolume);
+
+            for (let j = 0, synthCount = synthKeys.length; j < synthCount; j++) {
+                const arr = synthVolume[synthKeys[j]];
+                if (arr.length > 0) {
+                    // Every entry, not just the top one: resetSynth() leaves a clamp's listener
+                    // attached, so a pop after this point would otherwise bring back a stale
+                    // level. The depth stays as it is for those pending pops to unwind.
+                    arr.fill(DEFAULTVOLUME);
+                } else {
+                    arr.push(DEFAULTVOLUME);
+                }
+            }
+        }
+
+        logo.synth.resetMasterVolume();
+    }
+
+    /**
      * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
      *
      * @static
@@ -897,7 +956,9 @@ class Singer {
                 tur.singer.lastPitch.push(pitchNumber);
             }
         } else if (activity.logo.inPitchDrumMatrix) {
-            if (note.toLowerCase() !== "rest") {
+            // A rest ("rest" or "r") is not a row, and a pitch inside Set Drum
+            // becomes a drum column instead.
+            if (!["rest", "r"].includes(note.toLowerCase()) && tur.singer.drumStyle.length === 0) {
                 activity.logo.pitchDrumMatrix.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
                     activity.logo.pitchBlocks.push(blk);
@@ -930,7 +991,7 @@ class Singer {
                     ? getSolfege(
                           nnote[0],
                           tur.singer.keySignature,
-                          tur.singer.movable,
+                          false, // getNote already applied movable Do; widgets use fixed Do
                           activity.logo.synth.inTemperament,
                           edo
                       )
@@ -938,6 +999,7 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    activity.logo.pitchDrumMatrix.addColBlock(blk);
                 } else {
                     activity.logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
                     activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
@@ -1103,7 +1165,7 @@ class Singer {
 
                         tur.singer.arpeggioIndex += 1;
                     }
-                    if (tur.singer.arpeggioIndex === alen) {
+                    if (tur.singer.arpeggioIndex >= alen) {
                         tur.singer.arpeggioIndex = 0;
                     }
                 }
@@ -1338,7 +1400,7 @@ class Singer {
                 ? getSolfege(
                       nnote[0],
                       tur.singer.keySignature,
-                      tur.singer.movable,
+                      false, // getNote already applied movable Do; widgets use fixed Do
                       activity.logo.synth.inTemperament,
                       edo
                   )
@@ -1617,7 +1679,7 @@ class Singer {
                 Singer.setSynthVolume(
                     activity.logo,
                     turtle,
-                    DEFAULTVOICE,
+                    synth,
                     last(tur.singer.synthVolume[synth])
                 );
             }
@@ -1767,7 +1829,7 @@ class Singer {
                 activity.logo.phraseMaker.addColBlock(blk, 1);
 
                 // block ID of parent "matrix" block
-                const mat_block = activity.logo.phraseMaker.blockNo || -1;
+                const mat_block = activity.logo.phraseMaker.blockNo ?? -1;
 
                 for (let i = 0; i < activity.logo.pitchBlocks.length; i++) {
                     activity.logo.phraseMaker.addNode(

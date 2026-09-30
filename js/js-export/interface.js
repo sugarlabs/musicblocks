@@ -217,6 +217,7 @@ class JSInterface {
         random: "MathUtility.doRandom",
         oneOf: "MathUtility.doOneOf",
         distance: "MathUtility.doCalculateDistance",
+        int: "MathUtility.doInt",
         // Graphics blocks
         forward: "goForward",
         back: "goBackward",
