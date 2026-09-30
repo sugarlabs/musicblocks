@@ -1322,7 +1322,11 @@ function setupWidgetBlocks(activity) {
                 "musicKeyboard",
                 _getWidgetDependencies(
                     typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    ["widgets/MusicKeyboardEditing", "widgets/musickeyboard"]
+                    [
+                        "widgets/MusicKeyboardEditing",
+                        "widgets/MusicKeyboardRendering",
+                        "widgets/musickeyboard"
+                    ]
                 ),
                 () => new MusicKeyboard(activity),
                 turtle,
