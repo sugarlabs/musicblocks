@@ -1714,10 +1714,6 @@ class Palette {
     }
 
     _hideMenuItems() {
-        if (this._resizeListener) {
-            window.removeEventListener("resize", this._resizeListener);
-            this._resizeListener = null;
-        }
         if (this.name === "search" && this.activity.hideSearchWidget !== null) {
             this.activity.hideSearchWidget(true);
         }

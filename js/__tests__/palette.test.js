@@ -1606,6 +1606,94 @@ describe("Palettes Class", () => {
             expect(paletteItems.style.maxHeight).toBe("calc(100vh - 220px)");
         });
 
+        test("showMenu cleans up prior resize listener if already present", () => {
+            const paletteItems = {
+                style: {},
+                getBoundingClientRect: jest.fn(() => ({ top: 180 }))
+            };
+            const paletteBody = {
+                appendChild: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, paletteItems],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    }
+                ]
+            };
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
+            };
+
+            global.document.createElement = jest.fn(tag => {
+                if (tag === "table") return paletteBody;
+                if (tag === "tbody") return paletteItems;
+                return {
+                    style: {},
+                    children: [],
+                    appendChild: jest.fn(),
+                    removeAttribute: jest.fn(),
+                    setAttribute: jest.fn()
+                };
+            });
+            global.docById = jest.fn(id => {
+                if (id === "palette") return palDiv;
+                if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteItems;
+                return null;
+            });
+
+            palettes.add("test_cleanup");
+            const palette = palettes.dict.test_cleanup;
+            palette._showMenuItems = jest.fn();
+
+            const oldListener = jest.fn();
+            palette._resizeListener = oldListener;
+            const removeSpy = jest.spyOn(window, "removeEventListener");
+
+            palette.showMenu(true);
+
+            expect(removeSpy).toHaveBeenCalledWith("resize", oldListener);
+            expect(palette._resizeListener).not.toBe(oldListener);
+            expect(typeof palette._resizeListener).toBe("function");
+        });
+
+        test("_updateMenuHeight handles mobile mode and missing elements safely", () => {
+            palettes.add("test_update_height");
+            const palette = palettes.dict.test_update_height;
+
+            // When mobile is true, returns early without modifying styles
+            palette.palettes.mobile = true;
+            palette._updateMenuHeight();
+
+            // When mobile is false but PaletteBody_items is missing
+            palette.palettes.mobile = false;
+            global.docById = jest.fn(() => null);
+            expect(() => palette._updateMenuHeight()).not.toThrow();
+
+            // When PaletteBody_items exists but has no getBoundingClientRect
+            global.docById = jest.fn(() => ({ style: {} }));
+            expect(() => palette._updateMenuHeight()).not.toThrow();
+
+            // When getBoundingClientRect returns undefined top
+            const itemsWithoutTop = {
+                style: {},
+                getBoundingClientRect: jest.fn(() => ({}))
+            };
+            global.docById = jest.fn(() => itemsWithoutTop);
+            palette._updateMenuHeight();
+            expect(itemsWithoutTop.style.height).toBeUndefined();
+        });
+
         test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
             const paletteItems = { scrollTop: 0 };
             global.docById = jest.fn(id => (id === "PaletteBody_items" ? paletteItems : null));
