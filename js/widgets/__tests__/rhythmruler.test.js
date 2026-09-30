@@ -398,6 +398,20 @@ describe("RhythmRuler Widget", () => {
     });
 
     describe("Per-drum play controls", () => {
+        let originalBeginnerMode;
+
+        beforeEach(() => {
+            originalBeginnerMode = Object.getOwnPropertyDescriptor(global, "beginnerMode");
+        });
+
+        afterEach(() => {
+            if (originalBeginnerMode) {
+                Object.defineProperty(global, "beginnerMode", originalBeginnerMode);
+            } else {
+                delete global.beginnerMode;
+            }
+        });
+
         test.each([
             [false, true],
             ["false", true],
