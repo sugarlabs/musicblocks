@@ -1671,9 +1671,20 @@ describe("Palettes Class", () => {
             palettes.add("test_update_height");
             const palette = palettes.dict.test_update_height;
 
-            // When mobile is true, returns early without modifying styles
+            // When mobile is true, returns early without modifying styles or querying docById
+            const mobileItems = {
+                style: { height: "500px", maxHeight: "500px" },
+                getBoundingClientRect: jest.fn(() => ({ top: 100 }))
+            };
+            const docByIdSpy = jest.fn(() => mobileItems);
+            global.docById = docByIdSpy;
+
             palette.palettes.mobile = true;
             palette._updateMenuHeight();
+
+            expect(docByIdSpy).not.toHaveBeenCalled();
+            expect(mobileItems.style.height).toBe("500px");
+            expect(mobileItems.style.maxHeight).toBe("500px");
 
             // When mobile is false but PaletteBody_items is missing
             palette.palettes.mobile = false;
@@ -1681,8 +1692,11 @@ describe("Palettes Class", () => {
             expect(() => palette._updateMenuHeight()).not.toThrow();
 
             // When PaletteBody_items exists but has no getBoundingClientRect
-            global.docById = jest.fn(() => ({ style: {} }));
-            expect(() => palette._updateMenuHeight()).not.toThrow();
+            const itemsNoRect = { style: {} };
+            global.docById = jest.fn(() => itemsNoRect);
+            palette._updateMenuHeight();
+            expect(itemsNoRect.style.height).toBeUndefined();
+            expect(itemsNoRect.style.maxHeight).toBeUndefined();
 
             // When getBoundingClientRect returns undefined top
             const itemsWithoutTop = {
@@ -1692,6 +1706,7 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(() => itemsWithoutTop);
             palette._updateMenuHeight();
             expect(itemsWithoutTop.style.height).toBeUndefined();
+            expect(itemsWithoutTop.style.maxHeight).toBeUndefined();
         });
 
         test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
