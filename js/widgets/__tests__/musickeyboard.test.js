@@ -1726,15 +1726,18 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
     });
 
-    test("handles timer calls safely when ManagedTimer is null without raw fallbacks", () => {
+    test("handles timer calls safely when ManagedTimer is null with native fallbacks", () => {
         const keyboard = new MusicKeyboard({});
         keyboard._timerManager = null;
 
         const callback = jest.fn();
-        expect(keyboard._setWidgetInterval(callback, 500)).toBe(false);
-        expect(keyboard._clearWidgetInterval(123)).toBe(false);
-        expect(keyboard._setWidgetTimeout(callback, 500)).toBe(false);
-        expect(keyboard._clearWidgetTimeout(123)).toBe(false);
+        const intervalId = keyboard._setWidgetInterval(callback, 500);
+        expect(typeof intervalId).toBe("number");
+        expect(keyboard._clearWidgetInterval(intervalId)).toBe(true);
+
+        const timeoutId = keyboard._setWidgetTimeout(callback, 500);
+        expect(typeof timeoutId).toBe("number");
+        expect(keyboard._clearWidgetTimeout(timeoutId)).toBe(true);
     });
 
     test("tracks widget timeouts and chords through ManagedTimer", () => {
