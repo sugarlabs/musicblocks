@@ -346,13 +346,21 @@ const enableWheelScroll = (wheel, itemCount) => {
 };
 
 /**
+ * Raphael papers of the menus that close on an outside click. configureExitWheel
+ * adds the paper its exit wheel draws on, which is the one every wheel of that
+ * menu shares.
+ */
+const outsideClickPapers = new WeakSet();
+
+/**
  * wheelnav redraws a wheel's selected item on every mouseover, moving the item's
  * nodes to the front. The move fires another mouseover on the same item, so while
  * the pointer rests on the selected item its nodes keep being re-inserted, and a
  * press on it is reported on the bare <svg>. handleOutsideClick then closes the
  * menu as an outside click and the item is never chosen (for example Add Row >
  * pitch in the Phrase Maker). Redrawing a selected item only re-applies its
- * selected look, so skip it. This patches the loaded prototype once; the vendored
+ * selected look, so skip it, but only for wheels drawn on one of those papers.
+ * Every other wheel gets wheelnav's own hoverEffect, unchanged. The vendored
  * lib/wheelnav.js file is left as it is.
  */
 const guardSelectedItemHover = () => {
@@ -364,7 +372,7 @@ const guardSelectedItemHover = () => {
         return;
     }
     const guardedHoverEffect = function (hovered, isEnter) {
-        if (this.selected) {
+        if (this.selected && this.wheelnav && outsideClickPapers.has(this.wheelnav.raphael)) {
             return;
         }
         return hoverEffect.call(this, hovered, isEnter);
@@ -375,12 +383,16 @@ const guardSelectedItemHover = () => {
 
 // Ensure exit wheels behave like stateless buttons (no sticky selection)
 const configureExitWheel = exitWheel => {
-    // Every menu that closes on an outside click comes through here, and those
-    // are the menus where a moving selected item turns a click into a close.
-    guardSelectedItemHover();
-
     if (!exitWheel || !exitWheel.navItems) {
         return;
+    }
+
+    // Every menu that closes on an outside click comes through here. Its wheels
+    // share the exit wheel's paper, so a moving selected item can't turn a click
+    // on any of them into a close, whichever order they were built in.
+    guardSelectedItemHover();
+    if (exitWheel.raphael) {
+        outsideClickPapers.add(exitWheel.raphael);
     }
     activeExitWheel = exitWheel;
 
