@@ -1266,3 +1266,44 @@ describe("saveMxmlOutput - unpitched notes carry a staff position", () => {
         expect(output).not.toMatch(/<unpitched>\s*<\/unpitched>/);
     });
 });
+
+describe("saveMxmlOutput - key signature", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, false, false, null];
+    const fifthsIn = staging =>
+        (saveMxmlOutput({ notation: { notationStaging: { 0: staging } } }).match(
+            /<fifths>(-?\d+)<\/fifths>/
+        ) || [])[1];
+
+    it.each([
+        ["C", "major", "0"],
+        ["G", "major", "1"],
+        ["D", "major", "2"],
+        ["F", "major", "-1"],
+        ["Bb", "major", "-2"],
+        ["A", "minor", "0"],
+        ["E", "minor", "1"],
+        ["D", "dorian", "0"],
+        ["G", "mixolydian", "0"],
+        ["F", "lydian", "0"],
+        ["G#", "minor", "5"],
+        ["A#", "minor", "7"]
+    ])("writes %s %s as fifths %s", (key, mode, expected) => {
+        expect(fifthsIn(["key", key, mode, note("C4")])).toBe(expected);
+    });
+
+    it("reads a flat written as a sign", () => {
+        expect(fifthsIn(["key", "B♭", "major", note("C4")])).toBe("-2");
+    });
+
+    it("stays where it was for a mode with no signature of its own", () => {
+        expect(fifthsIn(["key", "C", "harmonic minor", note("C4")])).toBe("0");
+    });
+
+    it("stays where it was for a key that cannot be written without double accidentals", () => {
+        expect(fifthsIn(["key", "G#", "major", note("C4")])).toBe("0");
+    });
+
+    it("defaults to C when nothing staged a key", () => {
+        expect(fifthsIn([note("C4")])).toBe("0");
+    });
+});
