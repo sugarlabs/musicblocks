@@ -353,23 +353,22 @@ class SearchController {
                             img.style.top = pageY - img.offsetHeight / 2 + "px";
                         };
 
-                        let ticking = false;
+                        let rAFId = null;
+                        let lastX, lastY;
                         const onMouseMove = e => {
                             e.preventDefault();
-                            if (!ticking) {
-                                let x, y;
-                                if (e.type === "touchmove") {
-                                    x = e.touches[0].clientX;
-                                    y = e.touches[0].clientY;
-                                } else {
-                                    x = e.pageX;
-                                    y = e.pageY;
-                                }
-                                window.requestAnimationFrame(() => {
-                                    moveAt(x, y);
-                                    ticking = false;
+                            if (e.type === "touchmove") {
+                                lastX = e.touches[0].clientX;
+                                lastY = e.touches[0].clientY;
+                            } else {
+                                lastX = e.pageX;
+                                lastY = e.pageY;
+                            }
+                            if (!rAFId) {
+                                rAFId = window.requestAnimationFrame(() => {
+                                    moveAt(lastX, lastY);
+                                    rAFId = null;
                                 });
-                                ticking = true;
                             }
                         };
                         onMouseMove(event);
@@ -381,6 +380,11 @@ class SearchController {
                             document.body.style.cursor = "default";
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
+                            if (rAFId) {
+                                window.cancelAnimationFrame(rAFId);
+                                rAFId = null;
+                                moveAt(lastX, lastY);
+                            }
 
                             const x = parseInt(img.style.left, 10);
                             const y = parseInt(img.style.top, 10);

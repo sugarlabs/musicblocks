@@ -561,7 +561,7 @@ class Palettes {
         this._clearKeyboardFocus();
 
         if (closeMenus) {
-            for (const name in this.dict) {
+            for (const name of Object.keys(this.dict)) {
                 if (this.dict[name] && typeof this.dict[name].hideMenu === "function") {
                     this.dict[name].hideMenu();
                 }
@@ -1058,7 +1058,7 @@ class Palettes {
     }
 
     getInfo() {
-        for (const key in this.dict) {
+        for (const key of Object.keys(this.dict)) {
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -1096,7 +1096,7 @@ class Palettes {
 
     reinitialize(palettes) {
         // First hide all palettes
-        for (const name in this.dict) {
+        for (const name of Object.keys(this.dict)) {
             if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                 const palette = this.dict[name];
                 if (palette && typeof palette.hideMenu === "function") {
@@ -1215,7 +1215,7 @@ class PaletteModel {
 
     update() {
         this.blocks = [];
-        for (let blk = 0; blk < this.palette.protoList.length; blk++) {
+        for (const blk of Object.keys(this.palette.protoList)) {
             const block = this.palette.protoList[blk];
             // Don't show hidden blocks on the menus
             // But we still make them.
@@ -1871,7 +1871,7 @@ class Palette {
 
     getInfo() {
         let returnString = this.name + " palette:";
-        for (let thisBlock = 0; thisBlock < this.protoList.length; thisBlock++) {
+        for (const thisBlock of Object.keys(this.protoList)) {
             returnString += " " + this.protoList[thisBlock].name;
         }
         return returnString;

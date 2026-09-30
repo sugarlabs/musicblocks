@@ -1306,6 +1306,14 @@ describe("SearchUI.positionHelpfulSearchDiv", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchUI._renderMainItem", () => {
+    const originalRaf = window.requestAnimationFrame;
+    beforeAll(() => {
+        window.requestAnimationFrame = jest.fn(cb => cb());
+    });
+    afterAll(() => {
+        window.requestAnimationFrame = originalRaf;
+    });
+
     let $j, ul, liEl, liProxy;
 
     beforeEach(() => {

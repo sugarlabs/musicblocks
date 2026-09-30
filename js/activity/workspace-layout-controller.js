@@ -204,7 +204,7 @@ class WorkspaceLayoutController {
             activity.blocks._beginDeferCheckBounds();
 
             // Position "start" blocks first
-            for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
+            for (const blk of Object.keys(activity.blocks.blockList)) {
                 if (activity.blocks.blockList[blk] && !activity.blocks.blockList[blk].trash) {
                     const myBlock = activity.blocks.blockList[blk];
                     if (myBlock.name !== "start") {
@@ -240,7 +240,7 @@ class WorkspaceLayoutController {
             }
 
             // Position other blocks
-            for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
+            for (const blk of Object.keys(activity.blocks.blockList)) {
                 if (activity.blocks.blockList[blk] && !activity.blocks.blockList[blk].trash) {
                     const myBlock = activity.blocks.blockList[blk];
                     if (myBlock.name === "start") {
@@ -312,7 +312,7 @@ class WorkspaceLayoutController {
             // Defer checkBounds during bulk block moves (see first-click path).
             activity.blocks._beginDeferCheckBounds();
 
-            for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
+            for (const blk of Object.keys(activity.blocks.blockList)) {
                 if (activity.blocks.blockList[blk] && !activity.blocks.blockList[blk].trash) {
                     const myBlock = activity.blocks.blockList[blk];
                     if (myBlock.connections[0] === null) {
