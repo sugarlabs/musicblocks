@@ -20,7 +20,9 @@
 const ASTUtils = require("../ASTutils");
 const MathUtility = require("../../utils/mathutils");
 const astring = require("../../../lib/astring.min");
+const { deepClone } = require("../../utils/utils-logic");
 
+global.deepClone = deepClone;
 global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
     isSetter: jest.fn(),
@@ -44,6 +46,15 @@ describe("ASTUtils", () => {
         it("should return the barebone AST", () => {
             const result = ASTUtils.BAREBONE_AST;
             expect(result).toEqual(ASTUtils._bareboneAST);
+        });
+
+        it("should return a new deep clone instance on each call", () => {
+            const ast1 = ASTUtils.BAREBONE_AST;
+            const ast2 = ASTUtils.BAREBONE_AST;
+            expect(ast1).not.toBe(ast2);
+            expect(ast1).not.toBe(ASTUtils._bareboneAST);
+            ast1.body.push({ type: "EmptyStatement" });
+            expect(ast2.body).not.toContainEqual({ type: "EmptyStatement" });
         });
     });
 
@@ -1093,6 +1104,13 @@ describe("ASTUtils", () => {
                     ]
                 }
             });
+        });
+
+        it("should return a new deep clone instance independent of _mouseAST", () => {
+            const mouseAst1 = ASTUtils.getMouseAST([]);
+            const mouseAst2 = ASTUtils.getMouseAST([]);
+            expect(mouseAst1).not.toBe(mouseAst2);
+            expect(mouseAst1).not.toBe(ASTUtils._mouseAST);
         });
     });
 });
