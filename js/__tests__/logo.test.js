@@ -3136,6 +3136,52 @@ describe("Logo updateNotation", () => {
         expect(logo.notation.notationInsertTie).not.toHaveBeenCalled();
         expect(logo.notation.doUpdateNotation).toHaveBeenCalledTimes(1);
     });
+
+    describe("notes longer than the rest of the measure", () => {
+        const { rationalToFraction } = require("../utils/utils-logic");
+        let singer;
+
+        // Plays a note of `wholeNotes` starting at `start` and returns the staged pieces
+        // (in whole notes) and the number of ties.
+        const stage = (note, start, wholeNotes) => {
+            singer.notesPlayed = [start + wholeNotes, 1];
+            logo.updateNotation(note, 1 / wholeNotes, 0, false, null, true);
+            return {
+                pieces: logo.notation.doUpdateNotation.mock.calls.map(call => 1 / call[1]),
+                ties: logo.notation.notationInsertTie.mock.calls.length
+            };
+        };
+
+        beforeEach(() => {
+            logo.deps.utils.rationalToFraction = rationalToFraction;
+            logo.notation.notationDrumStaging[0] = [];
+            singer = mockActivity.turtles.ithTurtle().singer;
+            Object.assign(singer, { pickup: 0, meterAnchor: null });
+        });
+
+        test("splits at every barline the note crosses", () => {
+            // 2/4, a whole note starting on beat 2
+            Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 2 });
+        });
+
+        test("splits after a pickup", () => {
+            // 3/4 with a 1/8 pickup, a whole note from the start
+            Object.assign(singer, { beatsPerMeasure: 3, noteValuePerBeat: 4, pickup: 0.125 });
+            expect(stage(["C4"], 0, 1)).toEqual({ pieces: [0.125, 0.75, 0.125], ties: 2 });
+        });
+
+        test("writes one full measure per measure spanned", () => {
+            // 4/4, a note of two whole notes from a downbeat
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 1, 2)).toEqual({ pieces: [1, 1], ties: 1 });
+        });
+
+        test("does not tie rests", () => {
+            Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
+            expect(stage(["R"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 0 });
+        });
+    });
 });
 
 describe("Logo notationMIDI", () => {
