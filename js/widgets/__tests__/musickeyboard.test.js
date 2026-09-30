@@ -170,6 +170,8 @@ describe("MusicKeyboard add-row submenu", () => {
         ];
 
         keyboard._createAddRowPieSubmenu();
+        // wheelnav selects the clicked item before calling its navigateFunction.
+        keyboard._menuWheel.selectedNavItemIndex = 0;
 
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         expect(loadNewBlocks).toHaveBeenCalledWith([
@@ -198,6 +200,8 @@ describe("MusicKeyboard add-row submenu", () => {
         ];
 
         keyboard._createAddRowPieSubmenu();
+        // wheelnav selects the clicked item before calling its navigateFunction.
+        keyboard._menuWheel.selectedNavItemIndex = 0;
 
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         // After 'do', next pitch in chromatic solfege is 'do♯', and octave 5 is inherited from previous pitch
@@ -223,6 +227,8 @@ describe("MusicKeyboard add-row submenu", () => {
         keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 7 }];
 
         keyboard._createAddRowPieSubmenu();
+        // wheelnav selects the clicked item before calling its navigateFunction.
+        keyboard._menuWheel.selectedNavItemIndex = 0;
 
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         // When rolling over after 'ti', next is 'do' and octave increments from 4 to 5
@@ -230,6 +236,41 @@ describe("MusicKeyboard add-row submenu", () => {
             [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
             [1, ["solfege", { value: "do" }], 0, 0, [0]],
             [2, ["number", { value: 5 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("keeps no item selected in the Add Note wheel, before and after a pick", () => {
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks: jest.fn()
+            }
+        });
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+
+        // A selected item is redrawn on every mouseover, which moves it out from
+        // under the pointer and turns a real click into an outside click.
+        const wheel = keyboard._menuWheel;
+        expect(wheel.selectedNavItemIndex).toBeNull();
+        expect(wheel.navItems.some(item => item.selected)).toBe(false);
+
+        wheel.raphael = { canvas: {} };
+        wheel.refreshWheel = jest.fn();
+        wheel.selectedNavItemIndex = 0;
+        wheel.navItems[0].selected = true;
+        wheel.navItems[0].navigateFunction();
+
+        expect(wheel.selectedNavItemIndex).toBeNull();
+        expect(wheel.navItems.some(item => item.selected)).toBe(false);
+        expect(wheel.refreshWheel).toHaveBeenCalledWith(true);
+        expect(keyboard.activity.blocks.loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
     });
 

@@ -116,6 +116,24 @@ const MusicKeyboardEditing = {
         };
 
         /**
+         * Leaves no item selected in a wheel. wheelnav redraws its selected item
+         * on every mouseover, moving the nodes under the pointer, so a real click
+         * on that item lands on the bare svg and piemenus.js closes the menu as an
+         * outside click. The exit wheels are kept unselected for the same reason.
+         * @param {Object} wheel - The wheelnav instance.
+         */
+        this._clearWheelSelection = wheel => {
+            wheel.selectedNavItemIndex = null;
+            for (let i = 0; i < wheel.navItems.length; i++) {
+                wheel.navItems[i].selected = false;
+                wheel.navItems[i].hovered = false;
+            }
+            if (typeof wheel.refreshWheel === "function" && wheel.raphael && wheel.raphael.canvas) {
+                wheel.refreshWheel(true);
+            }
+        };
+
+        /**
          * Creates a pie submenu based on the cell's attributes.
          * @param {string} cellId - The ID of the cell triggering the submenu.
          * @param {string} start - The start attribute of the cell.
@@ -450,6 +468,7 @@ const MusicKeyboardEditing = {
             this._menuWheel.createWheel(valueLabel);
             this._menuWheel.navItems[0].setTooltip(_("pitch"));
             this._menuWheel.navItems[1].setTooltip(_("hertz"));
+            this._clearWheelSelection(this._menuWheel);
 
             this._exitWheel.createWheel(["×", " "]);
             this._exitWheel.navItems[1].enabled = false;
@@ -488,11 +507,12 @@ const MusicKeyboardEditing = {
             let rArg;
 
             const __selectionChanged = () => {
+                const label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
+                this._clearWheelSelection(this._menuWheel);
                 if (creatingNewNote) {
                     // Debounce
                     return;
                 }
-                const label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
                 const newBlock = this.activity.blocks.blockList.length;
 
                 if (label === "pitch") {
