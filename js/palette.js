@@ -1527,6 +1527,7 @@ class Palette {
         this.fadedDownButton = null;
         this.count = 0;
         this._outsideClickListener = null;
+        this._resizeListener = null;
         this._paletteImageMap = null;
     }
 
@@ -1551,6 +1552,10 @@ class Palette {
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
+        }
+        if (this._resizeListener) {
+            window.removeEventListener("resize", this._resizeListener);
+            this._resizeListener = null;
         }
         this._hideMenuItems();
     }
@@ -1674,10 +1679,17 @@ class Palette {
         if (this.palettes.mobile) {
             return;
         }
-        const paletteItems = docById("PaletteBody_items");
-        const height = `calc(100vh - ${paletteItems.getBoundingClientRect().top}px)`;
-        paletteItems.style.height = height;
-        paletteItems.style.maxHeight = height;
+        this._updateMenuHeight();
+
+        if (this._resizeListener) {
+            window.removeEventListener("resize", this._resizeListener);
+            this._resizeListener = null;
+        }
+
+        this._resizeListener = () => {
+            this._updateMenuHeight();
+        };
+        window.addEventListener("resize", this._resizeListener);
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener
@@ -1702,10 +1714,29 @@ class Palette {
     }
 
     _hideMenuItems() {
+        if (this._resizeListener) {
+            window.removeEventListener("resize", this._resizeListener);
+            this._resizeListener = null;
+        }
         if (this.name === "search" && this.activity.hideSearchWidget !== null) {
             this.activity.hideSearchWidget(true);
         }
         if (docById("PaletteBody")) docById("PaletteBody").remove();
+    }
+
+    _updateMenuHeight() {
+        if (this.palettes.mobile) {
+            return;
+        }
+        const paletteItems = docById("PaletteBody_items");
+        if (paletteItems && typeof paletteItems.getBoundingClientRect === "function") {
+            const rect = paletteItems.getBoundingClientRect();
+            if (rect && rect.top !== undefined) {
+                const height = `calc(100vh - ${rect.top}px)`;
+                paletteItems.style.height = height;
+                paletteItems.style.maxHeight = height;
+            }
+        }
     }
 
     _showMenuItems() {

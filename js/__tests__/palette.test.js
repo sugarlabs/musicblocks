@@ -1463,6 +1463,25 @@ describe("Palettes Class", () => {
             expect(removeListenerSpy).toHaveBeenCalledWith("click", outsideListener);
         });
 
+        test("hideMenu removes window resize listener", () => {
+            const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
+            global.docById = jest.fn(id => {
+                if (id === "palette") return palDiv;
+                return null;
+            });
+
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            const resizeListener = jest.fn();
+            palette._resizeListener = resizeListener;
+            const removeListenerSpy = jest.spyOn(window, "removeEventListener");
+
+            palette.hideMenu();
+
+            expect(removeListenerSpy).toHaveBeenCalledWith("resize", resizeListener);
+            expect(palette._resizeListener).toBeNull();
+        });
+
         test("showMenu creates header and menu container", () => {
             const palDiv = {
                 childNodes: [{ style: {} }],
@@ -1578,6 +1597,13 @@ describe("Palettes Class", () => {
             expect(paletteItems.style.maxHeight).toBe("calc(100vh - 180px)");
             expect(paletteItems.style.overflow).toBe("auto");
             expect(paletteItems.style.overflowX).toBe("hidden");
+
+            // Recalculates height when window is resized
+            paletteItems.getBoundingClientRect = jest.fn(() => ({ top: 220 }));
+            window.dispatchEvent(new Event("resize"));
+
+            expect(paletteItems.style.height).toBe("calc(100vh - 220px)");
+            expect(paletteItems.style.maxHeight).toBe("calc(100vh - 220px)");
         });
 
         test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
