@@ -203,7 +203,7 @@ class ThemeBox {
 
         // Refresh all blocks to update their colors
         if (this.activity.blocks) {
-            for (const blockId in this.activity.blocks.blockList) {
+            for (let blockId = 0; blockId < this.activity.blocks.blockList.length; blockId++) {
                 const block = this.activity.blocks.blockList[blockId];
                 if (block && block.protoblock && block.protoblock.palette) {
                     // Redraw block to update other colors

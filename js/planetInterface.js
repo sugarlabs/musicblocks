@@ -469,7 +469,7 @@ class PlanetInterface {
                 const palettes = this.activity.blocks.palettes;
                 const nameMap = {};
                 for (const palette in palettes.dict) {
-                    for (const blk in palettes.dict[palette].protoList) {
+                    for (let blk = 0; blk < palettes.dict[palette].protoList.length; blk++) {
                         const proto = palettes.dict[palette].protoList[blk];
                         if (proto.name && proto.staticLabels && proto.staticLabels[0]) {
                             nameMap[proto.name] = proto.staticLabels[0];

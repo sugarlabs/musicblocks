@@ -1755,12 +1755,21 @@ class GitDropdownUI {
             e.preventDefault();
         });
 
+        let ticking = false;
         const onMove = e => {
-            if (!dragging) return;
-            const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
-            const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
-            frame.style.left = `${Math.min(Math.max(e.clientX - dx, 8), maxL)}px`;
-            frame.style.top = `${Math.min(Math.max(e.clientY - dy, 64), maxT)}px`;
+            if (!dragging || ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                if (!dragging) {
+                    ticking = false;
+                    return;
+                }
+                const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
+                const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
+                frame.style.left = `${Math.min(Math.max(e.clientX - dx, 8), maxL)}px`;
+                frame.style.top = `${Math.min(Math.max(e.clientY - dy, 64), maxT)}px`;
+                ticking = false;
+            });
         };
 
         const onUp = () => {

@@ -2010,7 +2010,7 @@ class Activity {
             // which scans all blocks, so N moves × N blocks = O(N²).
             this.blocks._beginDeferCheckBounds();
 
-            for (const blk in this.blocks.blockList) {
+            for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
                 if (!myBlock) continue;
 

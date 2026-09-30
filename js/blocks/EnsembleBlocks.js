@@ -29,7 +29,7 @@ function getTargetTurtle(turtles, targetTurtle) {
     // We'll compare the names as strings so convert to "string" if "number".
     targetTurtle = targetTurtle.toString();
 
-    for (const i in turtles.turtleList) {
+    for (let i = 0; i < turtles.turtleList.length; i++) {
         const turtle = turtles.ithTurtle(i);
         if (!turtle.inTrash) {
             // Convert to string incase of type "number".

@@ -536,7 +536,7 @@ class Blocks {
             }
 
             this.findStacks();
-            for (const stack in this.stackList) {
+            for (let stack = 0; stack < this.stackList.length; stack++) {
                 this.adjustDocks(this.stackList[stack], true);
             }
 
@@ -550,7 +550,11 @@ class Blocks {
             /** We reset the protoblock scale on the palettes, but don't */
             /** modify the palettes themselves. */
             for (palette in this.activity.palettes.dict) {
-                for (const blk in this.activity.palettes.dict[palette].protoList) {
+                for (
+                    let blk = 0;
+                    blk < this.activity.palettes.dict[palette].protoList.length;
+                    blk++
+                ) {
                     this.activity.palettes.dict[palette].protoList[blk].scale = scale;
                 }
             }
@@ -3786,7 +3790,7 @@ class Blocks {
             const namedBlocks = new Set(["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"]);
 
             /** Update the blocks, do->oldName should be do->newName */
-            for (const blk in this.blockList) {
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (this.blockList[blk].trash) {
                     continue;
                 }
@@ -4238,7 +4242,7 @@ class Blocks {
          */
         this.findBlockInstance = blkName => {
             /** Returns true if block of name blkName is loaded. */
-            for (const blk in this.blockList) {
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -4989,7 +4993,7 @@ class Blocks {
          * @returns boolean
          */
         this.findBlockInstance = blkName => {
-            for (const blk in this.blockList) {
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -6737,7 +6741,7 @@ class Blocks {
 
                 /** Do a final check on the action and boxes palettes. */
                 let updatePalettes = false;
-                for (const blk in this.blockList) {
+                for (let blk = 0; blk < this.blockList.length; blk++) {
                     if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
@@ -6765,7 +6769,7 @@ class Blocks {
                 }
 
                 updatePalettes = false;
-                for (const blk in this.blockList) {
+                for (let blk = 0; blk < this.blockList.length; blk++) {
                     if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
@@ -6930,7 +6934,7 @@ class Blocks {
             if (actionArg) {
                 const actionName = actionArg.value;
                 /** Look for any "orphan" action blocks. */
-                for (const blk in this.blockList) {
+                for (let blk = 0; blk < this.blockList.length; blk++) {
                     const thisBlock = this.blockList[blk];
                     if (thisBlock.trash) continue;
 
@@ -7419,7 +7423,7 @@ class Blocks {
          * @returns {void}
          */
         this.clearParameterBlocks = () => {
-            for (const blk in this.blockList) {
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
                     /** The audiofile block label is handled in block.js */
                     if (this.blockList[blk].name === "audiofile") {

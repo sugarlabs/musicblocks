@@ -585,17 +585,24 @@ class SearchUI {
                 img.style.top = pageY - img.offsetHeight / 2 + "px";
             };
 
+            let ticking = false;
             const onMouseMove = e => {
                 e.preventDefault();
-                let x, y;
-                if (e.type === "touchmove") {
-                    x = e.touches[0].clientX;
-                    y = e.touches[0].clientY;
-                } else {
-                    x = e.pageX;
-                    y = e.pageY;
+                if (!ticking) {
+                    let x, y;
+                    if (e.type === "touchmove") {
+                        x = e.touches[0].clientX;
+                        y = e.touches[0].clientY;
+                    } else {
+                        x = e.pageX;
+                        y = e.pageY;
+                    }
+                    window.requestAnimationFrame(() => {
+                        moveAt(x, y);
+                        ticking = false;
+                    });
+                    ticking = true;
                 }
-                moveAt(x, y);
             };
             onMouseMove(event);
 

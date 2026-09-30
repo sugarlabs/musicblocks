@@ -1215,7 +1215,7 @@ class PaletteModel {
 
     update() {
         this.blocks = [];
-        for (const blk in this.palette.protoList) {
+        for (let blk = 0; blk < this.palette.protoList.length; blk++) {
             const block = this.palette.protoList[blk];
             // Don't show hidden blocks on the menus
             // But we still make them.
@@ -1769,17 +1769,24 @@ class Palette {
                     img.style.top = pageY - halfH + "px";
                 };
 
+                let ticking = false;
                 const onMouseMove = e => {
                     e.preventDefault();
-                    let x, y;
-                    if (e.type === "touchmove") {
-                        x = e.touches[0].clientX;
-                        y = e.touches[0].clientY;
-                    } else {
-                        x = e.pageX;
-                        y = e.pageY;
+                    if (!ticking) {
+                        let x, y;
+                        if (e.type === "touchmove") {
+                            x = e.touches[0].clientX;
+                            y = e.touches[0].clientY;
+                        } else {
+                            x = e.pageX;
+                            y = e.pageY;
+                        }
+                        window.requestAnimationFrame(() => {
+                            moveAt(x, y);
+                            ticking = false;
+                        });
+                        ticking = true;
                     }
-                    moveAt(x, y);
                 };
                 onMouseMove(event);
 
@@ -1864,7 +1871,7 @@ class Palette {
 
     getInfo() {
         let returnString = this.name + " palette:";
-        for (const thisBlock in this.protoList) {
+        for (let thisBlock = 0; thisBlock < this.protoList.length; thisBlock++) {
             returnString += " " + this.protoList[thisBlock].name;
         }
         return returnString;

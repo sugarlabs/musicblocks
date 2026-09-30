@@ -56,7 +56,7 @@ describe("EnsembleBlocks._blockFindTurtle null pointer bug", () => {
         // Reconstruct getTargetTurtle function (from EnsembleBlocks.js lines 28-43)
         const getTargetTurtle = (turtles, targetTurtle) => {
             targetTurtle = targetTurtle.toString();
-            for (const i in turtles.turtleList) {
+            for (let i = 0; i < turtles.turtleList.length; i++) {
                 const turtle = turtles.ithTurtle(i);
                 if (turtle && !turtle.inTrash) {
                     const turtleName = turtle.name.toString();
@@ -132,7 +132,7 @@ describe("EnsembleBlocks._blockFindTurtle null pointer bug", () => {
         // Verify that getTargetTurtle returns null for non-existent turtle
         const getTargetTurtle = (turtles, targetTurtle) => {
             targetTurtle = targetTurtle.toString();
-            for (const i in turtles.turtleList) {
+            for (let i = 0; i < turtles.turtleList.length; i++) {
                 const turtle = turtles.ithTurtle(i);
                 if (turtle && !turtle.inTrash) {
                     const turtleName = turtle.name.toString();
