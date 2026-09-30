@@ -18,8 +18,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// These tests run the real vendored Raphael and wheelnav, so they exercise the
-// hover redraw that moves a selected item's nodes, not a stand-in for it.
+// Integration tests for piemenus.js with the real vendored Raphael and wheelnav,
+// so they exercise the hover redraw that moves a selected item's nodes, not a
+// stand-in for it. They live apart from piemenus.test.js because that suite
+// replaces window, document and wheelnav with mocks for every test.
 
 const fs = require("fs");
 const path = require("path");
