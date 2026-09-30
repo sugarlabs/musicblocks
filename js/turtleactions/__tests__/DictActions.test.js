@@ -188,7 +188,7 @@ describe("setupDictActions", () => {
             expect(() => {
                 Turtle.DictActions._GetDict(0, turtle, "pitch number");
             }).not.toThrow();
-            expect(frequencyToPitch).toHaveBeenCalledWith(440, "equal");
+            expect(frequencyToPitch).toHaveBeenCalledWith(440);
         });
 
         it("should parse multi-digit and negative octaves correctly from lastNotePlayed", () => {

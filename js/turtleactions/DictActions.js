@@ -151,10 +151,7 @@ function setupDictActions(activity) {
                 let obj;
                 if (targetTur.singer.lastNotePlayed !== null) {
                     if (typeof targetTur.singer.lastNotePlayed[0] === "number") {
-                        obj = frequencyToPitch(
-                            targetTur.singer.lastNotePlayed[0],
-                            activity.logo.synth.inTemperament
-                        );
+                        obj = frequencyToPitch(targetTur.singer.lastNotePlayed[0]);
                     } else {
                         obj = noteToObj(targetTur.singer.lastNotePlayed[0]);
                     }
