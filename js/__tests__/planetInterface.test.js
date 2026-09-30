@@ -509,9 +509,10 @@ describe("PlanetInterface", () => {
             ProjectStorage: { saveLocally: jest.fn().mockRejectedValue(new Error("boom")) }
         };
 
-        await planetInterface.saveLocally();
+        const result = await planetInterface.saveLocally();
 
         expect(mockActivity.textMsg).toHaveBeenCalledWith("Could not save your project.");
+        expect(result).toBe(false);
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
         consoleSpy.mockRestore();
         global._ = saved_;

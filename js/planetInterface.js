@@ -228,6 +228,7 @@ class PlanetInterface {
         /**
          * Function to save the current project locally.
          * Prepares project data for export, generates SVG data, and saves the project data locally.
+         * Returns false if the project data could not be saved.
          */
         this.saveLocally = () => {
             if (!this.planet || !this.planet.ProjectStorage) {
@@ -262,6 +263,7 @@ class PlanetInterface {
                     console.error(e);
                     this.activity.textMsg(_("Could not save your project."));
                 }
+                return false;
             };
             try {
                 if (svgData === null || svgData === undefined || svgData === "") {
@@ -300,13 +302,14 @@ class PlanetInterface {
                 if (
                     e.code === DOMException.QUOTA_EXCEEDED_ERR ||
                     e.message === "Not enough space to save locally"
-                )
+                ) {
                     this.activity.textMsg(
                         _(
                             "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
                         )
                     );
-                else {
+                    return false;
+                } else {
                     console.error(e);
                     throw e;
                 }
