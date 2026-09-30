@@ -17,7 +17,7 @@
     DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
     PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
     getSavedCustomModes, getModeNamesForGroup, getModeLabel,
-    getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
+    getModeNameFromLabel, getModeSliceColors, updateWheelItems,
     getModeGroupTitleFont, getModeSliceFont, configureWheel,
     INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
     getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
@@ -3588,7 +3588,7 @@ const piemenuModes = (block, selectedMode, onSelect) => {
         if (newWheel) {
             that._modeNameWheel.createWheel(labels);
         } else {
-            updateModeWheelItems(that._modeNameWheel, labels, colors);
+            updateWheelItems(that._modeNameWheel, labels, colors);
         }
 
         // Size each label to fit its own slice arc; the 12 slots are fixed,
