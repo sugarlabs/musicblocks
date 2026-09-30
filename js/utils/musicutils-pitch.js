@@ -179,14 +179,14 @@ var frequencyToPitch = (hz, temperament) => {
  * @returns {Array} An array containing the pitch and octave.
  */
 var numberToPitchSharp = (i, temperament) => {
+    if (typeof i !== "number" || !Number.isFinite(i)) {
+        return ["A", 0];
+    }
     const currentEDO = getCurrentEDO(temperament);
     if (currentEDO === 12) {
         if (i < 0) {
-            let n = 0;
-            while (i < 0) {
-                i += 12;
-                n += 1;
-            }
+            const n = Math.ceil(-i / 12);
+            i += n * 12;
             const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12) - n;
             const nameIndex = Math.round(((i % 12) / 12) * 12);
             return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
@@ -202,11 +202,8 @@ var numberToPitchSharp = (i, temperament) => {
         aIndex = Math.round((9 / 12) * currentEDO);
     }
     if (i < 0) {
-        let n = 0;
-        while (i < 0) {
-            i += currentEDO;
-            n += 1;
-        }
+        const n = Math.ceil(-i / currentEDO);
+        i += n * currentEDO;
         const octave = Math.floor((i + aIndex) / currentEDO) - n;
         const nameIndex = (i + aIndex) % currentEDO;
         return [edoNames[nameIndex], octave];

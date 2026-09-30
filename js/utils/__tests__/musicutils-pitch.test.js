@@ -56,6 +56,9 @@ describe("musicutils-pitch", () => {
         expect(pitch.numberToPitchSharp(6, "equal19")).toEqual(["C♯", 1]);
         expect(pitch.numberToPitchSharp(19, "equal19")).toEqual(["A", 1]);
         expect(pitch.numberToPitchSharp(-1, "equal19")).toEqual(["A♭", 0]);
+        expect(pitch.numberToPitchSharp(-Infinity, "equal")).toEqual(["A", 0]);
+        expect(pitch.numberToPitchSharp(NaN, "equal")).toEqual(["A", 0]);
+        expect(pitch.numberToPitchSharp(-1200, "equal")).toEqual(["A", -100]);
     });
 
     it("strips at most two microtonal prefix characters from the start of a note", () => {
