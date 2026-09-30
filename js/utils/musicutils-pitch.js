@@ -184,34 +184,20 @@ var numberToPitchSharp = (i, temperament) => {
     }
     const currentEDO = getCurrentEDO(temperament);
     if (currentEDO === 12) {
-        if (i < 0) {
-            const n = Math.ceil(-i / 12);
-            i += n * 12;
-            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12) - n;
-            const nameIndex = Math.round(((i % 12) / 12) * 12);
-            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
-        } else {
-            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12);
-            const nameIndex = Math.round(((i % 12) / 12) * 12);
-            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
-        }
+        const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12);
+        const stepIndex = ((i % 12) + 12) % 12;
+        const nameIndex = Math.round((stepIndex / 12) * 12);
+        return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
     }
     const edoNames = generateNoteNames(currentEDO);
     let aIndex = edoNames.indexOf("A");
     if (aIndex === -1) {
         aIndex = Math.round((9 / 12) * currentEDO);
     }
-    if (i < 0) {
-        const n = Math.ceil(-i / currentEDO);
-        i += n * currentEDO;
-        const octave = Math.floor((i + aIndex) / currentEDO) - n;
-        const nameIndex = (i + aIndex) % currentEDO;
-        return [edoNames[nameIndex], octave];
-    } else {
-        const octave = Math.floor((i + aIndex) / currentEDO);
-        const nameIndex = (i + aIndex) % currentEDO;
-        return [edoNames[nameIndex], octave];
-    }
+    const octave = Math.floor((i + aIndex) / currentEDO);
+    const stepIndex = ((i % currentEDO) + currentEDO) % currentEDO;
+    const nameIndex = Math.round((stepIndex / currentEDO) * currentEDO);
+    return [edoNames[(nameIndex + aIndex) % currentEDO], octave];
 };
 
 /**
