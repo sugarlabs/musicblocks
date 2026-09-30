@@ -586,6 +586,7 @@ class SearchUI {
             };
 
             let rAFId = null;
+            let ticking = false;
             let lastX, lastY;
             const onMouseMove = e => {
                 e.preventDefault();
@@ -596,10 +597,11 @@ class SearchUI {
                     lastX = e.pageX;
                     lastY = e.pageY;
                 }
-                if (!rAFId) {
+                if (!ticking) {
+                    ticking = true;
                     rAFId = window.requestAnimationFrame(() => {
                         moveAt(lastX, lastY);
-                        rAFId = null;
+                        ticking = false;
                     });
                 }
             };

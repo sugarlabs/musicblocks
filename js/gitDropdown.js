@@ -1756,18 +1756,20 @@ class GitDropdownUI {
         });
 
         let rAFId = null;
+        let ticking = false;
         let lastX, lastY;
         const onMove = e => {
             if (!dragging) return;
             lastX = e.clientX;
             lastY = e.clientY;
-            if (!rAFId) {
+            if (!ticking) {
+                ticking = true;
                 rAFId = window.requestAnimationFrame(() => {
                     const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
                     const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
                     frame.style.left = `${Math.min(Math.max(lastX - dx, 8), maxL)}px`;
                     frame.style.top = `${Math.min(Math.max(lastY - dy, 64), maxT)}px`;
-                    rAFId = null;
+                    ticking = false;
                 });
             }
         };
