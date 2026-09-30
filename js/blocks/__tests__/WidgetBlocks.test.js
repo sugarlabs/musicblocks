@@ -164,7 +164,15 @@ global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
 global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
-global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
+global.RhythmRuler.dependencies = [
+    "widgets/RhythmRulerLayout",
+    "widgets/RhythmRulerHistory",
+    "widgets/RhythmRulerEditing",
+    "widgets/RhythmRulerPlayback",
+    "widgets/RhythmRulerSave",
+    "widgets/RhythmRulerCircular",
+    "widgets/rhythmruler"
+];
 global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
