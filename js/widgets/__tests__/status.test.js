@@ -1034,7 +1034,13 @@ describe("StatusMatrix Widget", () => {
             };
             mockActivity.logo.statusFields = [[0, "outputtools"]];
 
-            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            statusMatrix.init(mockActivity);
+
+            const boldElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "b");
+
+            expect(boldElements[0].textContent).toBe("Synth");
         });
 
         test("resolves empty label for arithmetic statusFields", () => {
@@ -1043,7 +1049,13 @@ describe("StatusMatrix Widget", () => {
             };
             mockActivity.logo.statusFields = [[0, "plus"]];
 
-            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            statusMatrix.init(mockActivity);
+
+            const boldElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "b");
+
+            expect(boldElements[0].textContent).toBe("");
         });
     });
 
@@ -1052,10 +1064,16 @@ describe("StatusMatrix Widget", () => {
 
         beforeEach(() => {
             global.localStorage = { languagePreference: "ja" };
+            if (global.window) {
+                global.window.localStorage = global.localStorage;
+            }
         });
 
         afterEach(() => {
             global.localStorage = originalLocalStorage;
+            if (global.window) {
+                global.window.localStorage = originalLocalStorage;
+            }
         });
 
         test("uses beats per minute2 label when languagePreference is ja", () => {
@@ -1064,7 +1082,13 @@ describe("StatusMatrix Widget", () => {
             };
             mockActivity.logo.statusFields = [[0, "bpm"]];
 
-            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            statusMatrix.init(mockActivity);
+
+            const boldElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "b");
+
+            expect(boldElements[0].textContent).toBe("Beats per minute2");
         });
     });
 
@@ -1081,7 +1105,12 @@ describe("StatusMatrix Widget", () => {
 
         test("initializes table with turtle button icon instead of mouse icon", () => {
             statusMatrix.init(mockActivity);
-            expect(global.document.createElement).toHaveBeenCalledWith("img");
+
+            const imgElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "img");
+
+            expect(imgElements[0].src).toBe("header-icons/turtle-button.svg");
         });
     });
 
@@ -1128,8 +1157,8 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
             const noteCell = statusMatrix._statusTable.rows[1].cells[1];
-            expect(noteCell.textContent).toContain("C4");
-            expect(noteCell.textContent).toContain("440.00Hz");
+            expect(noteCell.textContent.match(/C4/g) || []).toHaveLength(1);
+            expect(noteCell.textContent).toBe("C4 440.00Hz 1/4");
         });
     });
 });
