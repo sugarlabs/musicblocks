@@ -25,6 +25,7 @@
 /* global jest, describe, it, expect, beforeEach */
 
 const Block = require("../block");
+const ManagedTimer = require("../utils/ManagedTimer");
 
 // --- MOCK SETUP ---
 
@@ -56,6 +57,11 @@ global.createjs = {
             removeAllEventListeners: jest.fn(),
             setChildIndex: jest.fn(),
             getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 100, height: 100 }),
+            on: jest.fn(function (event, handler) {
+                this._listeners = this._listeners || {};
+                this._listeners[event] = handler;
+                return handler;
+            }),
             cache: jest.fn(),
             updateCache: jest.fn(),
             uncache: jest.fn()
@@ -1865,6 +1871,122 @@ describe("Block Foundation", () => {
             block._changeLabel();
             expect(global.piemenuVoices).toHaveBeenCalled();
             expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["noise1..."]);
+        });
+    });
+
+    describe("ManagedTimer Integration in Block", () => {
+        let testBlock;
+        let testActivity;
+        let testBlocks;
+        let timerManager;
+        let originalDocById;
+        let originalHasMouse;
+
+        beforeEach(() => {
+            originalDocById = global.docById;
+            originalHasMouse = window.hasMouse;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+            window.hasMouse = true;
+            global.hideDOMLabel = jest.fn();
+            global.platformColor = { stopIconcolor: "red" };
+            timerManager = new ManagedTimer();
+            testActivity = {
+                turtles: { running: jest.fn().mockReturnValue(true) },
+                trashcan: { show: jest.fn(), hide: jest.fn() },
+                logo: {
+                    _timerManager: timerManager,
+                    doStopTurtles: jest.fn(() => {
+                        timerManager.clearAll();
+                        testActivity.logo.stopTurtle = true;
+                    }),
+                    runLogoCommands: jest.fn(),
+                    stopTurtle: false,
+                    synth: { resume: jest.fn() }
+                },
+                toolbar: { highlightStop: jest.fn() },
+                closeHelpfulWheel: jest.fn(),
+                getStageScale: jest.fn().mockReturnValue(1),
+                blocksContainer: { x: 0, y: 0 }
+            };
+            testBlocks = {
+                activity: testActivity,
+                blockList: [],
+                findTopBlock: jest.fn().mockReturnValue(0),
+                getLongPressStatus: jest.fn().mockReturnValue(false),
+                stageClick: false,
+                raiseStackToTop: jest.fn(),
+                clearCachedDragGroup: jest.fn(),
+                cacheDragGroup: jest.fn(),
+                invalidateTopBlockCache: jest.fn(),
+                unhighlight: jest.fn(),
+                setTimeout: jest.fn((cb, d) => timerManager.setTimeout(cb, d)),
+                clearTimeout: jest.fn(id => timerManager.clearTimeout(id)),
+                triggerLongPress: jest.fn(),
+                clearLongPress: jest.fn()
+            };
+            testBlock = new Block(mockProtoBlock, testBlocks);
+            testBlock.activity = testActivity;
+            testBlocks.blockList = [testBlock];
+            testBlock.blockIndex = 0;
+            testBlock.container = new global.createjs.Container();
+            testBlock.container.x = 0;
+            testBlock.container.y = 0;
+            testBlock._calculateBlockHitArea = jest.fn();
+            testBlock._loadEventHandlers();
+        });
+
+        afterEach(() => {
+            global.docById = originalDocById;
+            window.hasMouse = originalHasMouse;
+        });
+
+        it("routes delayed run through logo._timerManager when running on click", () => {
+            jest.useFakeTimers();
+            testBlock.isCollapsible = jest.fn().mockReturnValue(false);
+            testBlock.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+
+            const clickHandler = testBlock.container._listeners["click"];
+            expect(clickHandler).toBeDefined();
+
+            clickHandler({ stageX: 100, stageY: 100 });
+            expect(testActivity.logo.doStopTurtles).toHaveBeenCalled();
+            expect(testActivity.logo._timerManager.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(250);
+            expect(testActivity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            expect(testActivity.logo._timerManager.activeTimeoutCount).toBe(0);
+            jest.useRealTimers();
+        });
+
+        it("cancels delayed run when doStopTurtles is called before timeout fires", () => {
+            jest.useFakeTimers();
+            testBlock.isCollapsible = jest.fn().mockReturnValue(false);
+            testBlock.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+
+            const clickHandler = testBlock.container._listeners["click"];
+            clickHandler({ stageX: 100, stageY: 100 });
+            expect(testActivity.logo._timerManager.activeTimeoutCount).toBe(1);
+
+            // User clicks Stop during the 250ms window
+            testActivity.logo.doStopTurtles();
+            expect(testActivity.logo._timerManager.activeTimeoutCount).toBe(0);
+
+            jest.advanceTimersByTime(250);
+            expect(testActivity.logo.runLogoCommands).not.toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        it("routes longPressTimeout through blocks.setTimeout when available", () => {
+            const mousedownHandler = testBlock.container._listeners["mousedown"];
+            expect(mousedownHandler).toBeDefined();
+
+            mousedownHandler({ stageX: 50, stageY: 50 });
+            expect(testBlocks.setTimeout).toHaveBeenCalled();
+            expect(timerManager.activeTimeoutCount).toBe(1);
+
+            testBlock.container._listeners["pressup"]({});
+            expect(testBlocks.clearTimeout).toHaveBeenCalled();
+            expect(timerManager.activeTimeoutCount).toBe(0);
         });
     });
 });

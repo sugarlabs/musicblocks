@@ -96,6 +96,14 @@ describe("artwork.js Test Suite", () => {
             jest.useRealTimers();
         });
 
+        test("hideButtonHighlight delegates to timerManager when provided", () => {
+            const mockTimer = { setTimeout: jest.fn().mockReturnValue(99) };
+            const circles = { highlight: {}, active: {} };
+            const id = hideButtonHighlight(circles, mockStage, mockTimer);
+            expect(mockTimer.setTimeout).toHaveBeenCalledWith(expect.any(Function), 410);
+            expect(id).toBe(99);
+        });
+
         test("hidePaletteNameDisplay removes palette text after delay", () => {
             jest.useFakeTimers();
             const paletteText = {};
@@ -103,6 +111,14 @@ describe("artwork.js Test Suite", () => {
             jest.runAllTimers();
             expect(mockStage.removeChild).toHaveBeenCalledWith(paletteText);
             jest.useRealTimers();
+        });
+
+        test("hidePaletteNameDisplay delegates to timerManager when provided", () => {
+            const mockTimer = { setTimeout: jest.fn().mockReturnValue(101) };
+            const paletteText = {};
+            const id = hidePaletteNameDisplay(paletteText, mockStage, mockTimer);
+            expect(mockTimer.setTimeout).toHaveBeenCalledWith(expect.any(Function), 150);
+            expect(id).toBe(101);
         });
     });
 

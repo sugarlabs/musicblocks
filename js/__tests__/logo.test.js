@@ -1086,6 +1086,17 @@ describe("Logo doStopTurtles", () => {
         expect(logo.stepQueue).toEqual({});
     });
 
+    test("clears blocks long-press timeout if available", () => {
+        logo.blocks = {
+            clearLongPressTimeout: jest.fn(),
+            bringToTop: jest.fn()
+        };
+
+        logo.doStopTurtles();
+
+        expect(logo.blocks.clearLongPressTimeout).toHaveBeenCalledTimes(1);
+    });
+
     test("executes ONSTOP plugin hooks", () => {
         logo.evalOnStopList = {
             firstHook: "code-first",

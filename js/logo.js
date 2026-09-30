@@ -1519,6 +1519,9 @@ class Logo {
 
         // Cancel all pending timers to prevent zombie graphics and sounds.
         const cancelledTimers = this._timerManager.clearAll();
+        if (this.blocks && typeof this.blocks.clearLongPressTimeout === "function") {
+            this.blocks.clearLongPressTimeout();
+        }
         if (cancelledTimers > 0) {
             console.debug(
                 "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"

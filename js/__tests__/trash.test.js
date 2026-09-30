@@ -18,6 +18,7 @@
  */
 
 const Trashcan = require("../trash");
+const ManagedTimer = require("../utils/ManagedTimer");
 
 // Mocks
 const mockActivity = {
@@ -140,6 +141,21 @@ describe("Trashcan Class", () => {
 
         updateContainerPositionSpy.mockRestore();
         addEventListenerSpy.mockRestore();
+    });
+
+    it("tracks debounced resize through ManagedTimer when available", () => {
+        const testTrashcan = new Trashcan(mockActivity);
+        expect(testTrashcan._timerManager).toBeInstanceOf(ManagedTimer);
+
+        testTrashcan._handleResize();
+        expect(testTrashcan._timerManager.activeTimeoutCount).toBe(1);
+
+        // A second immediate resize clears the previous timer
+        testTrashcan._handleResize();
+        expect(testTrashcan._timerManager.activeTimeoutCount).toBe(1);
+
+        jest.advanceTimersByTime(300);
+        expect(testTrashcan._timerManager.activeTimeoutCount).toBe(0);
     });
 
     it("should hide the trashcan using animation", () => {
