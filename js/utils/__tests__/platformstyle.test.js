@@ -286,4 +286,15 @@ describe("platformstyle", () => {
         expect(global.window.platformColor.header).toBe("#00FFFF");
         expect(global.window.platformColor.background).toBe("#000000");
     });
+
+    it("clonePlatformTheme creates independent deep clones using deepClone", () => {
+        const { clonePlatformTheme, platformThemes } = require("../platformstyle");
+        const originalTheme = platformThemes.light;
+        const clonedTheme = clonePlatformTheme(originalTheme);
+
+        expect(clonedTheme).toEqual(originalTheme);
+        expect(clonedTheme).not.toBe(originalTheme);
+        expect(clonedTheme.paletteColors).not.toBe(originalTheme.paletteColors);
+        expect(clonedTheme.paletteColors.action).not.toBe(originalTheme.paletteColors.action);
+    });
 });
