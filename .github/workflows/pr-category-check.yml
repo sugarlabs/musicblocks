@@ -41,11 +41,13 @@ jobs:
               // Parameters may appear in any order; additional query parameters are allowed.
               // &amp; is accepted in place of & to handle HTML-encoded URLs.
               const SEP = "(?:[&?](?:amp;)?)";
+              const QCHAR = "[^#\\s<>\`\"'\\[\\]()]";
+              const PARAM_END = "(?:&(?:amp;)?|[#\\s<>\`\"'\\[\\]()]|[.,;:](?=[\\s<>\`\"'\\[\\]()]|$)|$)";
               const projectUrlPattern = new RegExp(
-                "https://musicblocks\\.sugarlabs\\.org/index\\.html\\?" +
-                  "(?=(?:.*" + SEP + ")?(?:repo|id)=[^&?#\\s]+(?:" + SEP + "|$|#))" +
-                  "(?=(?:.*" + SEP + ")?run=true(?:" + SEP + "|$|#))" +
-                  "[^\\s]*",
+                "https?://musicblocks\\.sugarlabs\\.org/index\\.html\\?" +
+                  "(?=(?:" + QCHAR + "*" + SEP + ")?(?:repo|id)=[^&?#\\s<>\`\"'\\[\\]()]+)" +
+                  "(?=(?:" + QCHAR + "*" + SEP + ")?run=true(?=" + PARAM_END + "))" +
+                  QCHAR + "*",
                 "i"
               );
 
