@@ -75,8 +75,8 @@ jobs:
 
               core.info('Valid MusicBlocks project link found in PR description.');
 
-              // Check that the MusicBlocks Project Screenshot section has content.
-              // Strip the heading itself, HTML comments, and template separators (e.g. ---), then require non-empty text.
+              // Check that the MusicBlocks Project Screenshot section has an actual image or screen-recording attachment.
+              // Strip the heading itself, HTML comments, and template separators (e.g. ---).
               const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot or Screen-Recording\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
               const screenshotRaw = screenshotMatch ? screenshotMatch[1] : '';
               const screenshotContent = screenshotRaw
@@ -84,7 +84,9 @@ jobs:
                 .replace(/---/g, '')
                 .trim();
 
-              if (!screenshotContent) {
+              const mediaPattern = /!\[[\s\S]*?\]\([^\s)]+\)|https?:\/\/(?:github\.com\/user-attachments\/assets\/|user-images\.githubusercontent\.com\/)[^\s<>"'`()\[\]]+|<\s*(?:img|video)\b[^>]*>|https?:\/\/[^\s<>"'`()\[\]]+\.(?:png|jpe?g|gif|webp|svg|mp4|webm|mov)\b/i;
+
+              if (!mediaPattern.test(screenshotContent)) {
                 core.setFailed(
                   '## First-Time Contributor MusicBlocks Project Screenshot or Screen-Recording Required\n\n' +
                   'Welcome to Music Blocks! As a first-time contributor, please attach a screenshot or a screen-recording of your MusicBlocks project ' +
