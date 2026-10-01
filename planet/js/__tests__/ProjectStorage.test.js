@@ -555,12 +555,15 @@ describe("ProjectStorage", () => {
         it("removeSyncedDrafts should drop only synced drafts matched by a commit", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             storage.data.Projects.proj1.commitDrafts = [
-                { id: "d1", message: "A", timestamp: 1, status: "synced" },
-                { id: "d2", message: "B", timestamp: 2, status: "pending" },
-                { id: "d3", message: "B", timestamp: 3, status: "synced" },
-                { id: "d4", message: "C", timestamp: 4, status: "synced" }
+                { id: "d1", message: "A", timestamp: 1000, status: "synced" },
+                { id: "d2", message: "B", timestamp: 2000, status: "pending" },
+                { id: "d3", message: "B", timestamp: 3000, status: "synced" },
+                { id: "d4", message: "C", timestamp: 4000, status: "synced" }
             ];
-            await storage.removeSyncedDrafts("proj1", [{ message: "B" }, { message: "C" }]);
+            await storage.removeSyncedDrafts("proj1", [
+                { message: "C", date: new Date(4500).toISOString() },
+                { message: "B", date: new Date(3500).toISOString() }
+            ]);
             expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d1", "d2"]);
             expect(saveSpy).toHaveBeenCalled();
         });
@@ -568,22 +571,76 @@ describe("ProjectStorage", () => {
         it("removeSyncedDrafts should match each commit to one draft, newest first", async () => {
             jest.spyOn(storage, "save").mockResolvedValue();
             storage.data.Projects.proj1.commitDrafts = [
-                { id: "d1", message: "Save", timestamp: 1, status: "synced" },
-                { id: "d2", message: "Save", timestamp: 2, status: "synced" }
+                { id: "d1", message: "Save", timestamp: 1000, status: "synced" },
+                { id: "d2", message: "Save", timestamp: 2000, status: "synced" }
             ];
-            await storage.removeSyncedDrafts("proj1", [{ message: "Save" }]);
+            await storage.removeSyncedDrafts("proj1", [
+                { message: "Save", date: new Date(2500).toISOString() }
+            ]);
             expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d1"]);
+        });
+
+        it("removeSyncedDrafts should keep repeated-message drafts the cache does not cover", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            // Five drafts synced in one batch, all with the default message; the cache holds
+            // only the newest three commits.
+            storage.data.Projects.proj1.commitDrafts = [1, 2, 3, 4, 5].map(n => ({
+                id: `d${n}`,
+                message: "Offline save",
+                timestamp: n * 1000,
+                status: "synced"
+            }));
+            await storage.removeSyncedDrafts(
+                "proj1",
+                [9000, 8000, 7000].map(t => ({
+                    message: "Offline save",
+                    date: new Date(t).toISOString()
+                }))
+            );
+            expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d1", "d2"]);
+        });
+
+        it("removeSyncedDrafts should not match a draft made after the commit", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            // An older online save with the same message is not this draft's commit.
+            storage.data.Projects.proj1.commitDrafts = [
+                { id: "d1", message: "Save", timestamp: 5000, status: "synced" }
+            ];
+            await storage.removeSyncedDrafts("proj1", [
+                { message: "Save", date: new Date(4000).toISOString() }
+            ]);
+            expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d1"]);
+        });
+
+        it("removeSyncedDrafts should keep commit order when matching drafts", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            // Commits are newest first, so each match must be older than the previous one.
+            storage.data.Projects.proj1.commitDrafts = [
+                { id: "d1", message: "A", timestamp: 1000, status: "synced" },
+                { id: "d2", message: "B", timestamp: 2000, status: "synced" },
+                { id: "d3", message: "A", timestamp: 3000, status: "synced" }
+            ];
+            await storage.removeSyncedDrafts("proj1", [
+                { message: "B", date: new Date(9000).toISOString() },
+                { message: "A", date: new Date(8000).toISOString() }
+            ]);
+            // "B" matches d2; "A" must be older than d2, so it takes d1 and d3 stays.
+            expect(storage.data.Projects.proj1.commitDrafts.map(d => d.id)).toEqual(["d3"]);
         });
 
         it("removeSyncedDrafts should not save when no draft matches", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             storage.data.Projects.proj1.commitDrafts = [
-                { id: "d1", message: "A", timestamp: 1, status: "pending" }
+                { id: "d1", message: "A", timestamp: 1000, status: "pending" },
+                { id: "d2", message: "B", timestamp: 1000, status: "synced" }
             ];
-            await storage.removeSyncedDrafts("proj1", [{ message: "A" }]);
+            await storage.removeSyncedDrafts("proj1", [
+                { message: "A", date: new Date(2000).toISOString() }
+            ]);
+            await storage.removeSyncedDrafts("proj1", [{ message: "B", date: "not a date" }]);
             await storage.removeSyncedDrafts("proj1", []);
             await storage.removeSyncedDrafts("nonexistent", [{ message: "A" }]);
-            expect(storage.data.Projects.proj1.commitDrafts.length).toBe(1);
+            expect(storage.data.Projects.proj1.commitDrafts.length).toBe(2);
             expect(saveSpy).not.toHaveBeenCalled();
         });
 

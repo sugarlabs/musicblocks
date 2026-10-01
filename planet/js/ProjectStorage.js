@@ -291,9 +291,12 @@ class ProjectStorage {
     /**
      * Drops the synced drafts that the given commits already represent, keeping pending drafts
      * and any synced draft with no matching commit. Synced drafts have no sha (PUT /edit returns
-     * none), so each commit is matched to the newest synced draft with the same message.
+     * none), so a commit is matched to a synced draft with the same message, made no later than
+     * the commit, and older than the draft matched to the next newer commit. Commit messages
+     * repeat ("Offline save"), so the date and the order are what tie a commit to one draft; a
+     * commit without a readable date matches nothing.
      * @param {string} id  project ID
-     * @param {Array<{message: string}>} commits  commits already stored in the history cache
+     * @param {Array<{message: string, date: string}>} commits  cached commits, newest first
      * @returns {Promise<void>}
      */
     async removeSyncedDrafts(id, commits) {
@@ -303,9 +306,18 @@ class ProjectStorage {
             .filter(d => d.status === "synced")
             .sort((a, b) => b.timestamp - a.timestamp);
         const remove = new Set();
+        let before = Infinity;
         for (const commit of commits) {
-            const match = synced.find(d => !remove.has(d) && d.message === commit.message);
-            if (match) remove.add(match);
+            const committed = Date.parse(commit.date);
+            if (Number.isNaN(committed)) continue;
+            const match = synced.find(
+                d =>
+                    d.timestamp < before && d.timestamp <= committed && d.message === commit.message
+            );
+            if (match) {
+                remove.add(match);
+                before = match.timestamp;
+            }
         }
         if (remove.size === 0) return;
         this.data.Projects[id].commitDrafts = drafts.filter(d => !remove.has(d));
