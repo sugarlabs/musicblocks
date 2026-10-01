@@ -36,6 +36,16 @@ const COMPLETION_CRITERIA = [
     "completePianoKeys"
 ];
 
+// Shared HTML attribute escape helper available to both PracticeUI and ExplorerJournalUI.
+const _escapeAttribute = value =>
+    String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/`/g, "&#96;");
+
 const PracticeUI = {
     badgeCheckTimer: null,
     noticeTimer: null,
@@ -782,11 +792,7 @@ const PracticeUI = {
     },
 
     escapeAttribute(value) {
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/"/g, "&quot;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
+        return _escapeAttribute(value);
     }
 };
 
@@ -893,7 +899,7 @@ const ExplorerJournalUI = {
     renderGeneralNoteButton(notePage) {
         const noteCount = notePage.artifacts.notes.length;
         return `
-      <button class="journal-open-page journal-open-general" data-note-id="${this.escapeHTML(notePage.id)}">
+      <button class="journal-open-page journal-open-general" data-note-id="${this.escapeAttribute(notePage.id)}">
         <span class="journal-page-number">${_("My Note")}</span>
         <span class="journal-open-title">${this.escapeHTML(notePage.title)}</span>
         <span class="journal-open-meta">
@@ -988,10 +994,10 @@ const ExplorerJournalUI = {
             maxlength="280"
             placeholder="${_("Write more here...")}"></textarea>
           <div class="journal-note-actions">
-            <button class="journal-add-note" data-note-page-id="${this.escapeHTML(page.id)}">
+            <button class="journal-add-note" data-note-page-id="${this.escapeAttribute(page.id)}">
               ${_("Add Entry")}
             </button>
-            <button class="journal-delete-page" data-note-page-id="${this.escapeHTML(page.id)}">
+            <button class="journal-delete-page" data-note-page-id="${this.escapeAttribute(page.id)}">
               ${_("Delete Note")}
             </button>
           </div>
@@ -1197,13 +1203,13 @@ const ExplorerJournalUI = {
         <section class="journal-note-card">
           <div class="journal-note-date">${this.formatDate(note.createdAt)}</div>
           <textarea
-            data-note-id="${this.escapeHTML(note.id)}"
+            data-note-id="${this.escapeAttribute(note.id)}"
             maxlength="280">${this.escapeHTML(note.text)}</textarea>
           <div class="journal-note-actions">
-            <button class="journal-update-note" data-note-id="${this.escapeHTML(note.id)}">
+            <button class="journal-update-note" data-note-id="${this.escapeAttribute(note.id)}">
               ${_("Save Edit")}
             </button>
-            <button class="journal-delete-note" data-note-id="${this.escapeHTML(note.id)}">
+            <button class="journal-delete-note" data-note-id="${this.escapeAttribute(note.id)}">
               ${_("Delete")}
             </button>
           </div>
@@ -1317,7 +1323,7 @@ const ExplorerJournalUI = {
     },
 
     escapeAttribute(value) {
-        return this.escapeHTML(value);
+        return _escapeAttribute(value);
     }
 };
 

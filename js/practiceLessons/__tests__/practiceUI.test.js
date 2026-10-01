@@ -170,6 +170,11 @@ describe("PracticeUI canvas inspection", () => {
 describe("PracticeUI small helpers", () => {
     test("escapes the characters that would break out of an attribute", () => {
         expect(PracticeUI.escapeAttribute('a & "b" <c>')).toBe("a &amp; &quot;b&quot; &lt;c&gt;");
+        expect(PracticeUI.escapeAttribute("`backtick` and 'single'")).toBe(
+            "&#96;backtick&#96; and &#39;single&#39;"
+        );
+        expect(PracticeUI.escapeAttribute(null)).toBe("");
+        expect(PracticeUI.escapeAttribute(undefined)).toBe("");
     });
 
     test("builds a badge tooltip from its label and message", () => {
@@ -686,6 +691,14 @@ describe("ExplorerJournalUI formatting", () => {
         );
     });
 
+    test("escapes attribute values including backticks and quotes", () => {
+        expect(ExplorerJournalUI.escapeAttribute("a & \"b\" <c> 'd' `e`")).toBe(
+            "a &amp; &quot;b&quot; &lt;c&gt; &#39;d&#39; &#96;e&#96;"
+        );
+        expect(ExplorerJournalUI.escapeAttribute(null)).toBe("");
+        expect(ExplorerJournalUI.escapeAttribute(undefined)).toBe("");
+    });
+
     test("treats a missing value as an empty string", () => {
         expect(ExplorerJournalUI.escapeHTML(null)).toBe("");
     });
@@ -902,6 +915,15 @@ describe("ExplorerJournalUI general note page", () => {
 
         expect(container.querySelector("#journal-general-page-title").value).toBe("Ideas");
         expect(container.textContent).toContain("first");
+    });
+
+    test("escapes title containing HTML breakout characters in input attribute value", () => {
+        const maliciousTitle = '"><script>alert(1)</script><input test="`';
+        const { container } = openNote(maliciousTitle, "note");
+
+        expect(container.querySelector("script")).toBeNull();
+        expect(container.querySelectorAll("input")).toHaveLength(1);
+        expect(container.querySelector("#journal-general-page-title").value).toBe(maliciousTitle);
     });
 
     test("adds another entry", () => {
