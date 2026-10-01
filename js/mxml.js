@@ -88,6 +88,49 @@ const _markersUntilNextNote = (notes, start) => {
 const _escapeWords = text =>
     String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+const TONIC_FIFTHS = { F: -1, C: 0, G: 1, D: 2, A: 3, E: 4, B: 5 };
+const MODE_FIFTHS = {
+    "lydian": 1,
+    "major": 0,
+    "ionian": 0,
+    "mixolydian": -1,
+    "dorian": -2,
+    "m": -3,
+    "minor": -3,
+    "natural minor": -3,
+    "aeolian": -3,
+    "ethiopian": -3,
+    "geez": -3,
+    "phrygian": -4,
+    "locrian": -5
+};
+
+/**
+ * Calculates the circle of fifths value for a given tonic and mode.
+ * @param {string} tonic - e.g. "C", "G", "F#", "B♭".
+ * @param {string} mode - e.g. "major", "minor", "dorian".
+ * @returns {number} fifths (sharps positive, flats negative).
+ */
+const _getFifths = (tonic, mode) => {
+    const text = String(tonic ?? "").trim();
+    const match = /^([A-Ga-g])\s*([#bx*♯♭♮𝄪𝄫]*)/u.exec(text);
+    if (!match) return 0;
+
+    let fifths = TONIC_FIFTHS[match[1].toUpperCase()] ?? 0;
+    for (const acc of match[2]) {
+        if (acc === "#" || acc === "♯") fifths += 7;
+        else if (acc === "b" || acc === "♭") fifths -= 7;
+        else if (acc === "x" || acc === "*" || acc === "𝄪") fifths += 14;
+        else if (acc === "𝄫") fifths -= 14;
+    }
+
+    const modeStr = String(mode ?? "")
+        .trim()
+        .toLowerCase();
+    const modeShift = MODE_FIFTHS[modeStr] ?? (modeStr.includes("minor") ? -3 : 0);
+    return fifths + modeShift;
+};
+
 /**
  * Reduces a tuplet note's staging fields to a MusicXML actual-notes/normal-notes pair.
  * @param {[number, number]} tupletRatio - obj[MXML_TUPLETVALUE]: an
@@ -184,11 +227,19 @@ class MusicXMLExporter {
         this.add("</direction>");
     }
 
-    addMeasureAttributes(measure, div, beats, beatType, implicit = false, isPercussion = false) {
+    addMeasureAttributes(
+        measure,
+        div,
+        fifths = 0,
+        beats = 4,
+        beatType = 4,
+        implicit = false,
+        isPercussion = false
+    ) {
         this.add(
             isPercussion
                 ? `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
-                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>0</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
+                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
     }
 
@@ -303,7 +354,7 @@ class MusicXMLExporter {
             this.indent++;
             this.add('<part id="P1">');
             this.indent++;
-            this.addMeasureAttributes(1, DIVISIONS_PER_WHOLE_NOTE / 4, 4, 4);
+            this.addMeasureAttributes(1, DIVISIONS_PER_WHOLE_NOTE / 4, 0, 4, 4);
             this.indent++;
             this.add("<barline>");
             this.indent++;
@@ -331,11 +382,14 @@ class MusicXMLExporter {
                 let currMeasure = 1,
                     divisions = divisionsPerWholeNote,
                     beats = 4,
-                    beatType = 4;
+                    beatType = 4,
+                    currentFifths = 0;
                 let beatsChanged = false,
+                    keyChanged = false,
                     newDivisions = -1,
                     newBeats = -1,
-                    newBeatType = -1;
+                    newBeatType = -1,
+                    newFifths = 0;
                 let openedMeasureTag = false,
                     firstMeasure = true;
                 // Length of the pickup in divisions, or 0 when the first measure is a full one.
@@ -365,7 +419,11 @@ class MusicXMLExporter {
                         continue;
 
                     if (obj === "key") {
+                        newFifths = _getFifths(notes[i + 1], notes[i + 2]);
                         i += 2;
+                        if (newFifths !== currentFifths) {
+                            keyChanged = true;
+                        }
                         continue;
                     }
 
@@ -546,7 +604,10 @@ class MusicXMLExporter {
                                     divisions = newDivisions;
                                     divisionsLeft = divisions;
                                 }
-                                if (firstMeasure || beatsChanged) {
+                                if (keyChanged) {
+                                    currentFifths = newFifths;
+                                }
+                                if (firstMeasure || beatsChanged || keyChanged) {
                                     // A pickup shorter than a full measure becomes implicit
                                     // measure 0, so the first full measure is still numbered 1.
                                     const isPickup =
@@ -560,6 +621,7 @@ class MusicXMLExporter {
                                     this.addMeasureAttributes(
                                         currMeasure,
                                         divisionsPerQuarterNote,
+                                        currentFifths,
                                         beats,
                                         beatType,
                                         isPickup,
@@ -567,10 +629,19 @@ class MusicXMLExporter {
                                     );
                                     firstMeasure = false;
                                     beatsChanged = false;
+                                    keyChanged = false;
                                 } else {
                                     this.add(`<measure number="${currMeasure}">`);
                                 }
                                 openedMeasureTag = true;
+                            } else if (keyChanged) {
+                                currentFifths = newFifths;
+                                if (!part.isPercussion) {
+                                    this.add(
+                                        `<attributes> <key> <fifths>${currentFifths}</fifths> </key> </attributes>`
+                                    );
+                                }
+                                keyChanged = false;
                             }
                             divisionsLeft -= preciseDur;
                         }
@@ -709,6 +780,8 @@ class MusicXMLExporter {
 saveMxmlOutput = logo => {
     return new MusicXMLExporter(logo).export();
 };
+
+saveMxmlOutput._getFifths = _getFifths;
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = saveMxmlOutput;
