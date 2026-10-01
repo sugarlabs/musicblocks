@@ -51,7 +51,10 @@ jobs:
                 "i"
               );
 
-              if (!projectUrlPattern.test(prBody)) {
+              // Strip HTML comments before validating project URL to avoid matching template examples.
+              const cleanBody = prBody.replace(/<!--[\s\S]*?-->/g, '');
+
+              if (!projectUrlPattern.test(cleanBody)) {
                 const message = [
                   '## First-Time Contributor MusicBlocks Project Link Required',
                   '',
@@ -73,10 +76,13 @@ jobs:
               core.info('Valid MusicBlocks project link found in PR description.');
 
               // Check that the MusicBlocks Project Screenshot section has content.
-              // Strip the heading itself and all HTML comments, then require non-empty text.
+              // Strip the heading itself, HTML comments, and template separators (e.g. ---), then require non-empty text.
               const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot or Screen-Recording\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
               const screenshotRaw = screenshotMatch ? screenshotMatch[1] : '';
-              const screenshotContent = screenshotRaw.replace(/<!--[\s\S]*?-->/g, '').trim();
+              const screenshotContent = screenshotRaw
+                .replace(/<!--[\s\S]*?-->/g, '')
+                .replace(/---/g, '')
+                .trim();
 
               if (!screenshotContent) {
                 core.setFailed(
