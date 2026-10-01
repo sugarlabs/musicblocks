@@ -78,10 +78,11 @@ INTENT_PATTERNS = (
 )
 
 # Text references an open PR may use in its title or description. The issue
-# number must end at a non-digit so that #12 never matches #123.
+# number must end at a non-digit so that #12 never matches #123. Optional bold
+# around the colon covers the PR template's "**Fixes:** #N".
 TEXT_REFERENCE_PATTERN = re.compile(
     r"\b(?:fix(?:es|ed)?|close[sd]?|resolve[sd]?|related\s+to|partially\s+address(?:es|ed)?)"
-    r"\s*:?\s+#(\d+)(?!\d)",
+    r"(?:\*\*)?\s*:?\s*(?:\*\*)?\s+#(\d+)(?!\d)",
     re.IGNORECASE,
 )
 

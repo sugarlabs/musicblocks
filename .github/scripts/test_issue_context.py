@@ -523,6 +523,23 @@ class IssueContextTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertEqual(issue_context.referenced_issue_numbers(f"Body. {phrase}."), {8})
 
+    def test_pr_template_emphasized_references_match(self):
+        for phrase in ("**Fixes:** #123", "**Related to:** #123", "**Fixes** #123", "**Closes:** #123"):
+            with self.subTest(phrase=phrase):
+                self.assertEqual(issue_context.referenced_issue_numbers(f"## Related Issue\n\n{phrase}\n"), {123})
+        self.assertEqual(issue_context.referenced_issue_numbers("Fixes #123"), {123})
+        self.assertEqual(issue_context.referenced_issue_numbers("**Fixes:** #1234"), {1234})
+        index = issue_context.build_text_reference_index([scanned_pr(50, body="**Fixes:** #123")])
+        self.assertEqual(sorted(index), [123])
+        for ignored in ("<!-- **Fixes:** #123 -->", "> **Fixes:** #123", "```\n**Fixes:** #123\n```"):
+            with self.subTest(ignored=ignored):
+                self.assertEqual(issue_context.referenced_issue_numbers(ignored), set())
+
+    def test_unfilled_pr_template_reference_does_not_match(self):
+        for body in ("**Fixes:** #", "**Fixes:** #\n\n---", "**Related to:** #\n"):
+            with self.subTest(body=body):
+                self.assertEqual(issue_context.referenced_issue_numbers(body), set())
+
     def test_text_reference_requires_exact_issue_number_boundary(self):
         self.assertEqual(issue_context.referenced_issue_numbers("Fixes #123"), {123})
         scan = scan_of(scanned_pr(50, body="Fixes #123"))
