@@ -343,9 +343,9 @@ class ThemeBox {
                 // the new theme colors (background, text color, SVG icons).
                 for (const name in this.activity.palettes.dict) {
                     const palette = this.activity.palettes.dict[name];
-                    if (palette && palette.isRendered) {
+                    if (palette && palette.menuContainer) {
                         // Remove the existing DOM container so it can be rebuilt
-                        if (palette.menuContainer && palette.menuContainer.parentNode) {
+                        if (palette.menuContainer.parentNode) {
                             palette.menuContainer.parentNode.removeChild(palette.menuContainer);
                         }
                         palette.menuContainer = null;
