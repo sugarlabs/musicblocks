@@ -60,11 +60,10 @@ describe("piemenu", () => {
         expect(wheel.slicePathFunction).toBe("donut");
         expect(wheel.slicePathCustom.minRadiusPercent).toBe(10);
         expect(wheel.slicePathCustom.maxRadiusPercent).toBe(90);
-        expect(wheel.animatetime).toBe(0);
         expect(wheel.colors).toEqual(["a", "b"]);
     });
 
-    it("applies the optional rotate/selection-path/title/navAngle options only when given", () => {
+    it("applies the optional rotate/selection-path/title/navAngle/animatetime options only when given", () => {
         const wheel = makeWheel();
         piemenu.configureWheel(wheel, {
             colors: [],
@@ -74,7 +73,8 @@ describe("piemenu", () => {
             selectionPaths: true,
             titleRotateAngle: 0,
             titleFont: "10px sans-serif",
-            navAngle: -90
+            navAngle: -90,
+            animatetime: 0
         });
         expect(wheel.clickModeRotate).toBe(false);
         expect(wheel.sliceSelectedPathCustom).toBe(wheel.slicePathCustom);
@@ -82,9 +82,10 @@ describe("piemenu", () => {
         expect(wheel.titleRotateAngle).toBe(0);
         expect(wheel.titleFont).toBe("10px sans-serif");
         expect(wheel.navAngle).toBe(-90);
+        expect(wheel.animatetime).toBe(0);
     });
 
-    it("leaves the optional options, including navAngle, untouched when omitted", () => {
+    it("leaves the optional options, including navAngle and animatetime, untouched when omitted", () => {
         const wheel = makeWheel();
         piemenu.configureWheel(wheel, { colors: [], minRadius: 5, maxRadius: 95 });
         expect(wheel.clickModeRotate).toBeUndefined();
@@ -92,12 +93,19 @@ describe("piemenu", () => {
         expect(wheel.titleRotateAngle).toBeUndefined();
         expect(wheel.titleFont).toBeUndefined();
         expect(wheel.navAngle).toBeNull();
+        expect(wheel.animatetime).toBeNull();
     });
 
     it("accepts a navAngle other than -90, for wheels that need a computed rotation", () => {
         const wheel = makeWheel();
         piemenu.configureWheel(wheel, { colors: [], minRadius: 0, maxRadius: 1, navAngle: -7.45 });
         expect(wheel.navAngle).toBe(-7.45);
+    });
+
+    it("accepts a non-zero animatetime, for wheels that want an animated transition", () => {
+        const wheel = makeWheel();
+        piemenu.configureWheel(wheel, { colors: [], minRadius: 0, maxRadius: 1, animatetime: 300 });
+        expect(wheel.animatetime).toBe(300);
     });
 
     it("updates every label/color slot on a wheel and refreshes it", () => {
