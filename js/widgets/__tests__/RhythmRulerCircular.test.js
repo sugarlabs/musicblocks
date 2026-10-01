@@ -76,4 +76,97 @@ describe("RhythmRulerCircular", () => {
             expect(geometry(500, 0).ringThickness).toBe(185);
         });
     });
+
+    describe("pointer handling", () => {
+        // A widget whose hit test returns the given targets in order: the press,
+        // then the release.
+        const makeWidget = (...hits) => {
+            const cells = [{}, {}, {}];
+            return {
+                _playing: false,
+                _rulers: [{ cells }, { cells: [{}] }],
+                _dissectNumber: { value: "" },
+                _hitTestCircular: jest.fn(() => hits.shift() || null),
+                _tieCircular: jest.fn(),
+                __dissectByNumber: jest.fn(),
+                saveDissectHistory: jest.fn(),
+                _drawCircularView: jest.fn()
+            };
+        };
+
+        const pressAndRelease = widget => {
+            RhythmRulerCircular.prototype._onCircularMouseDown.call(widget, {});
+            RhythmRulerCircular.prototype._onCircularMouseUp.call(widget, {});
+        };
+
+        test("dragging across cells of one ruler ties them", () => {
+            const widget = makeWidget(
+                { rulerIndex: 0, cellIndex: 0 },
+                { rulerIndex: 0, cellIndex: 2 }
+            );
+
+            pressAndRelease(widget);
+
+            expect(widget._tieCircular).toHaveBeenCalledWith(0, 0, 2);
+            expect(widget.__dissectByNumber).not.toHaveBeenCalled();
+        });
+
+        test("a click on one cell dissects it, in two by default", () => {
+            const widget = makeWidget(
+                { rulerIndex: 0, cellIndex: 1 },
+                { rulerIndex: 0, cellIndex: 1 }
+            );
+
+            pressAndRelease(widget);
+
+            expect(widget.__dissectByNumber).toHaveBeenCalledWith(
+                widget._rulers[0].cells[1],
+                2,
+                true
+            );
+            expect(widget._rulerSelected).toBe(0);
+            expect(widget.saveDissectHistory).toHaveBeenCalled();
+            expect(widget._tieCircular).not.toHaveBeenCalled();
+        });
+
+        test("uses the dissect number box when it has a value", () => {
+            const widget = makeWidget(
+                { rulerIndex: 0, cellIndex: 0 },
+                { rulerIndex: 0, cellIndex: 0 }
+            );
+            widget._dissectNumber.value = "3";
+
+            pressAndRelease(widget);
+
+            expect(widget.__dissectByNumber.mock.calls[0][1]).toBe(3);
+        });
+
+        test("a drag that ends on another ruler dissects where it started", () => {
+            const widget = makeWidget(
+                { rulerIndex: 0, cellIndex: 2 },
+                { rulerIndex: 1, cellIndex: 0 }
+            );
+
+            pressAndRelease(widget);
+
+            expect(widget._tieCircular).not.toHaveBeenCalled();
+            expect(widget.__dissectByNumber).toHaveBeenCalledWith(
+                widget._rulers[0].cells[2],
+                2,
+                true
+            );
+        });
+
+        test("ignores the pointer while playing, and presses outside the rings", () => {
+            const playing = makeWidget({ rulerIndex: 0, cellIndex: 0 });
+            playing._playing = true;
+            pressAndRelease(playing);
+            expect(playing._hitTestCircular).not.toHaveBeenCalled();
+
+            const outside = makeWidget(null, { rulerIndex: 0, cellIndex: 0 });
+            pressAndRelease(outside);
+            expect(outside._tieCircular).not.toHaveBeenCalled();
+            expect(outside.__dissectByNumber).not.toHaveBeenCalled();
+        });
+    });
 });
