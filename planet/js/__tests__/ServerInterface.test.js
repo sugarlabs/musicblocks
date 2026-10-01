@@ -131,6 +131,26 @@ describe("ServerInterface", () => {
                 server._normaliseProjectRow(serverResponse)
             );
         });
+
+        it("should bypass cache when skipCache is true", async () => {
+            const cachedData = { name: "Old Cached Project" };
+            mockCacheManager.getMetadata.mockResolvedValue(cachedData);
+            const serverResponse = {
+                repoName: "123",
+                projectName: "Fresh Project",
+                description: "fresh desc"
+            };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).not.toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: server._normaliseProjectRow(serverResponse)
+            });
+        });
     });
 
     describe("request handling", () => {
@@ -248,6 +268,35 @@ describe("ServerInterface", () => {
                 serverResponse.content
             );
         });
+
+        it("should validate against expectedUpdatedAt when downloading", async () => {
+            const cachedProject = { blocks: [] };
+            mockCacheManager.getProject.mockResolvedValueOnce(cachedProject);
+            const callback = jest.fn();
+
+            await server.downloadProject("p1", callback, "2026-10-01T12:00:00Z");
+
+            expect(mockCacheManager.getProject).toHaveBeenCalledWith("p1", "2026-10-01T12:00:00Z");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: cachedProject });
+        });
+
+        it("should fetch fresh and cache with updatedAt when cache misses for version", async () => {
+            mockCacheManager.getProject.mockResolvedValueOnce(null);
+            const callback = jest.fn();
+            const serverResponse = { content: '[[0,"start",100,100,[null]]]' };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
+
+            await server.downloadProject("p1", callback, "2026-10-01T12:00:00Z");
+
+            expect(mockCacheManager.getProject).toHaveBeenCalledWith("p1", "2026-10-01T12:00:00Z");
+            expect(server._get).toHaveBeenCalledWith("/getProjectData?repoName=p1");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: serverResponse.content });
+            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith(
+                "p1",
+                serverResponse.content,
+                "2026-10-01T12:00:00Z"
+            );
+        });
     });
 
     describe("endpoint methods", () => {
@@ -310,6 +359,63 @@ describe("ServerInterface", () => {
                 expect.stringContaining("/allRepos?page=1&limit=10")
             );
             expect(callback).toHaveBeenCalled();
+        });
+
+        it("should pre-populate GlobalPlanet.cache and overwrite when updatedAt changes", () => {
+            const mockGlobalPlanet = {
+                cache: {
+                    "existing-repo": {
+                        repoName: "existing-repo",
+                        ProjectName: "Old Title",
+                        ProjectLastUpdated: "2026-10-01T10:00:00Z"
+                    },
+                    "unchanged-repo": {
+                        repoName: "unchanged-repo",
+                        ProjectName: "Unchanged Title",
+                        ProjectLastUpdated: "2026-10-01T10:00:00Z",
+                        ProjectData: { preserved: true }
+                    }
+                }
+            };
+            server.Planet = { GlobalPlanet: mockGlobalPlanet };
+
+            const apiResponse = {
+                data: [
+                    {
+                        repoName: "existing-repo",
+                        projectName: "Updated Title",
+                        updatedAt: "2026-10-01T12:00:00Z"
+                    },
+                    {
+                        repoName: "unchanged-repo",
+                        projectName: "Unchanged Title",
+                        updatedAt: "2026-10-01T10:00:00Z"
+                    },
+                    {
+                        repoName: "new-repo",
+                        projectName: "New Title",
+                        updatedAt: "2026-10-01T12:00:00Z"
+                    }
+                ]
+            };
+
+            const result = server._normaliseProjectList(apiResponse);
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual([
+                ["existing-repo", "2026-10-01T12:00:00Z"],
+                ["unchanged-repo", "2026-10-01T10:00:00Z"],
+                ["new-repo", "2026-10-01T12:00:00Z"]
+            ]);
+            expect(mockGlobalPlanet.cache["existing-repo"].ProjectName).toBe("Updated Title");
+            expect(mockGlobalPlanet.cache["existing-repo"].ProjectLastUpdated).toBe(
+                "2026-10-01T12:00:00Z"
+            );
+            expect(mockGlobalPlanet.cache["existing-repo"].ProjectData).toBeNull();
+            expect(mockGlobalPlanet.cache["unchanged-repo"].ProjectData).toEqual({
+                preserved: true
+            });
+            expect(mockGlobalPlanet.cache["new-repo"].ProjectName).toBe("New Title");
         });
     });
 

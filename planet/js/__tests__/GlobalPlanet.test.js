@@ -501,4 +501,47 @@ describe("GlobalPlanet", () => {
             expect(gp.listenerRefs.length).toBe(countAfterFirstInit);
         });
     });
+
+    describe("cache freshness and versioning", () => {
+        it("forceAddToCache should call getProjectDetails with skipCache = true", () => {
+            const cb = jest.fn();
+            gp.forceAddToCache("repo-1", cb);
+
+            expect(mockPlanet.ServerInterface.getProjectDetails).toHaveBeenCalledWith(
+                "repo-1",
+                expect.any(Function),
+                true
+            );
+        });
+
+        it("downloadDataToCache should pass expectedUpdatedAt from cache to downloadProject", () => {
+            gp.cache["repo-1"] = {
+                ProjectLastUpdated: "2026-10-01T12:00:00Z"
+            };
+            const cb = jest.fn();
+
+            gp.downloadDataToCache("repo-1", cb);
+
+            expect(mockPlanet.ServerInterface.downloadProject).toHaveBeenCalledWith(
+                "repo-1",
+                expect.any(Function),
+                "2026-10-01T12:00:00Z"
+            );
+        });
+
+        it("downloadProjectsToCache should skip cache if expectedUpdatedAt differs from cache", () => {
+            gp.cache["repo-1"] = {
+                ProjectLastUpdated: "2026-10-01T10:00:00Z"
+            };
+            const cb = jest.fn();
+
+            gp.downloadProjectsToCache([["repo-1", "2026-10-01T12:00:00Z"]], cb);
+
+            expect(mockPlanet.ServerInterface.getProjectDetails).toHaveBeenCalledWith(
+                "repo-1",
+                expect.any(Function),
+                true
+            );
+        });
+    });
 });
