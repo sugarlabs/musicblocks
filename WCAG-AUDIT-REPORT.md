@@ -104,7 +104,7 @@ application (toolbar, palettes, widgets, modals) is audited.
   only suppressed when focus is on the canvas/body; real DOM elements
   receive normal Tab navigation. _(WCAG 2.1.2 No Keyboard Trap)_
 - **Focus indicator suppressed on `#search` input** in
-  `css/activities.css` — **Fixed** (PR [#9151](https://github.com/sugarlabs/musicblocks/issues/9151)). Removed
+  `css/activities.css` — **Fixed** (PR [#9153](https://github.com/sugarlabs/musicblocks/pull/9153)). Removed
   `outline: none` on `#search:focus` and added visible focus indicator
   via `#search:focus-visible`. _(WCAG 2.4.7 Focus Visible)_
 
