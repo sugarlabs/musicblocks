@@ -1417,7 +1417,7 @@ table {
 
 .help-widget-frame > .wfTopBar {
     min-height: 44px;
-    background: var(--color-brand-primary) !important;
+    background: var(--color-widget-titlebar-bg) !important;
     border-bottom: 0 !important;
     color: var(--color-text-inverse);
 }
