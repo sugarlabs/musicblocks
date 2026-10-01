@@ -84,7 +84,8 @@ jobs:
                 .replace(/---/g, '')
                 .trim();
 
-              const mediaPattern = /!\[[\s\S]*?\]\([^\s)]+\)|https?:\/\/(?:github\.com\/user-attachments\/assets\/|user-images\.githubusercontent\.com\/)[^\s<>"'`()\[\]]+|<\s*(?:img|video)\b[^>]*>|https?:\/\/[^\s<>"'`()\[\]]+\.(?:png|jpe?g|gif|webp|svg|mp4|webm|mov)\b/i;
+              const mediaPattern =
+                /!\[[\s\S]*?\]\([^\s)]+\)|https?:\/\/(?:github\.com\/user-attachments\/assets\/|user-images\.githubusercontent\.com\/)[^\s<>"'`()\[\]]+|<\s*(?:img|video)\b[^>]*\bsrc\s*=\s*(?:"[^"\s>]+"|'[^'\s>]+'|[^"'\s>]+)[^>]*>|<\s*video\b[\s\S]*?<\s*source\b[^>]*\bsrc\s*=\s*(?:"[^"\s>]+"|'[^'\s>]+'|[^"'\s>]+)|https?:\/\/[^\s<>"'`()\[\]]+\.(?:png|jpe?g|gif|webp|svg|mp4|webm|mov)\b/i;
 
               if (!mediaPattern.test(screenshotContent)) {
                 core.setFailed(
