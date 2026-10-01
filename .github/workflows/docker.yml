@@ -37,11 +37,6 @@ on:
             - "package-lock.json"
             - "index.js"
             - ".github/workflows/docker.yml"
-    # The dockerfile builds FROM node:20-slim, a tag Docker Hub points at a new image whenever
-    # Node 20 or the Debian base gets a patch. That can break the image with no file here
-    # changing, so the paths above never fire; a manual run checks the current base, e.g.
-    # before a release.
-    workflow_dispatch:
 
 # One in-flight run per PR / ref; newer pushes cancel older runs.
 concurrency:
