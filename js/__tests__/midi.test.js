@@ -69,6 +69,47 @@ describe("getClosestStandardNoteValue", () => {
         expect(getClosestStandardNoteValue(1)).toEqual([1, 1]);
         expect(getClosestStandardNoteValue(0.0078125)).toEqual([1, 128]);
     });
+
+    // The whole-note through 1/128-note family is the standard set of
+    // powers-of-two note durations used throughout Western music notation.
+    // Feeding each exact duration back in must return that same duration.
+    it.each([
+        [1, [1, 1]],
+        [0.5, [1, 2]],
+        [0.25, [1, 4]],
+        [0.125, [1, 8]],
+        [0.0625, [1, 16]],
+        [0.03125, [1, 32]],
+        [0.015625, [1, 64]],
+        [0.0078125, [1, 128]]
+    ])(
+        "returns the exact match [%s -> %j] for every standard note duration",
+        (duration, expected) => {
+            expect(getClosestStandardNoteValue(duration)).toEqual(expected);
+        }
+    );
+
+    it("snaps a duration to the standard value it is numerically nearer to", () => {
+        // 0.2 is 0.05 away from 1/4 (0.25) but 0.075 away from 1/8 (0.125),
+        // so 1/4 is the unambiguously closer standard duration.
+        expect(getClosestStandardNoteValue(0.2)).toEqual([1, 4]);
+        // 0.1 is 0.025 away from 1/8 (0.125) but 0.0375 away from 1/16 (0.0625),
+        // so 1/8 is the unambiguously closer standard duration.
+        expect(getClosestStandardNoteValue(0.1)).toEqual([1, 8]);
+    });
+
+    it("snaps durations at or beyond the largest standard value to the whole note", () => {
+        expect(getClosestStandardNoteValue(1)).toEqual([1, 1]);
+        expect(getClosestStandardNoteValue(2)).toEqual([1, 1]);
+        expect(getClosestStandardNoteValue(1000)).toEqual([1, 1]);
+    });
+
+    it("snaps zero and negative durations to the smallest standard value", () => {
+        // Every standard duration is positive, so the smallest one (1/128)
+        // is always nearest to zero and to any negative duration.
+        expect(getClosestStandardNoteValue(0)).toEqual([1, 128]);
+        expect(getClosestStandardNoteValue(-5)).toEqual([1, 128]);
+    });
 });
 
 describe("transcribeMidi", () => {
