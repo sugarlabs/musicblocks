@@ -206,6 +206,25 @@ describe("Activity Event Listener Management", () => {
 
         expect(activity._listeners).toHaveLength(0);
     });
+    test("should register Activity resize listeners during initialization", () => {
+        activity._handleRepositionBlocksOnResize = jest.fn();
+        activity._handleWindowResize = jest.fn();
+
+        activity.setupResizeListeners();
+
+        const resizeListeners = activity._listeners.filter(
+            l => l.target === window && l.type === "resize"
+        );
+
+        expect(resizeListeners).toHaveLength(2);
+
+        expect(resizeListeners.map(l => l.listener)).toEqual(
+            expect.arrayContaining([
+                activity._handleRepositionBlocksOnResize,
+                activity._handleWindowResize
+            ])
+        );
+    });
 
     test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {
         activity._setupBlocksContainerEvents();
