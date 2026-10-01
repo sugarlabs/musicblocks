@@ -90,18 +90,22 @@ describe("getClosestStandardNoteValue", () => {
     );
 
     it("snaps a duration to the standard value it is numerically nearer to", () => {
-        // 0.2 is 0.05 away from 1/4 (0.25) but 0.075 away from 1/8 (0.125),
-        // so 1/4 is the unambiguously closer standard duration.
-        expect(getClosestStandardNoteValue(0.2)).toEqual([1, 4]);
-        // 0.1 is 0.025 away from 1/8 (0.125) but 0.0375 away from 1/16 (0.0625),
-        // so 1/8 is the unambiguously closer standard duration.
-        expect(getClosestStandardNoteValue(0.1)).toEqual([1, 8]);
+        expect(getClosestStandardNoteValue(0.24)).toEqual([1, 4]);
+        expect(getClosestStandardNoteValue(0.12)).toEqual([1, 8]);
+        // Dotted values are closer to these inputs than the plain note values.
+        expect(getClosestStandardNoteValue(0.2)).toEqual([3, 16]);
+        expect(getClosestStandardNoteValue(0.1)).toEqual([3, 32]);
+        expect(getClosestStandardNoteValue(0.16)).toEqual([1, 6]);
     });
 
-    it("snaps durations at or beyond the largest standard value to the whole note", () => {
-        expect(getClosestStandardNoteValue(1)).toEqual([1, 1]);
-        expect(getClosestStandardNoteValue(2)).toEqual([1, 1]);
-        expect(getClosestStandardNoteValue(1000)).toEqual([1, 1]);
+    it("prefers a plain note when equally close to a dotted note", () => {
+        expect(getClosestStandardNoteValue(0.21875)).toEqual([1, 4]);
+    });
+
+    it("snaps durations at or beyond the largest value to the dotted whole note", () => {
+        expect(getClosestStandardNoteValue(1.5)).toEqual([3, 2]);
+        expect(getClosestStandardNoteValue(2)).toEqual([3, 2]);
+        expect(getClosestStandardNoteValue(1000)).toEqual([3, 2]);
     });
 
     it("snaps zero and negative durations to the smallest standard value", () => {
