@@ -2776,6 +2776,10 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     // the boolean selector
     const wheelSize = getPieMenuSize(block);
     block._booleanWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
+    guardSelectedItemHover();
+    if (block._booleanWheel.raphael) {
+        outsideClickPapers.add(block._booleanWheel.raphael);
+    }
 
     const labels = [];
     for (let i = 0; i < booleanLabels.length; i++) {
