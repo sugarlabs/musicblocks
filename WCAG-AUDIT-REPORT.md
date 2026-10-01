@@ -14,19 +14,20 @@ application (toolbar, palettes, widgets, modals) is audited.
 
 ## Summary
 
-| Severity | Original | Remaining |
-|----------|----------|-----------|
-| Critical | 14       | 0         |
-| Serious  | 2        | 1         |
-| Moderate | 0        | 0         |
-| Minor    | 0        | 0         |
-| **Total** | **16**  | **1**     |
+| Severity  | Original | Remaining |
+| --------- | -------- | --------- |
+| Critical  | 14       | 0         |
+| Serious   | 2        | 1         |
+| Moderate  | 0        | 0         |
+| Minor     | 0        | 0         |
+| **Total** | **16**   | **1**     |
 
 ---
 
 ## Findings
 
 ### 1. Insufficient color contrast on tour/help tooltip text
+
 - **Status:** ⚠️ Open — known remaining issue
 - **Severity:** Serious (1 instance)
 - **WCAG criterion:** 1.4.3 Contrast (Minimum) — AA
@@ -45,6 +46,7 @@ application (toolbar, palettes, widgets, modals) is audited.
 ---
 
 ### 2. Palette category icons missing accessible names
+
 - **Status:** ✅ Fixed (PR [#7564](https://github.com/sugarlabs/musicblocks/pull/7564))
 - **Severity:** Critical (13 instances)
 - **WCAG criterion:** 1.1.1 Non-text Content — A (blocks AA compliance)
@@ -56,6 +58,7 @@ application (toolbar, palettes, widgets, modals) is audited.
 ---
 
 ### 3. Paste input button has no discernible text
+
 - **Status:** ✅ Fixed
 - **Severity:** Critical (1 instance)
 - **WCAG criterion:** 4.1.2 Name, Role, Value — A (blocks AA compliance)
@@ -66,6 +69,7 @@ application (toolbar, palettes, widgets, modals) is audited.
 ---
 
 ### 4. Scrollable help/tour region not keyboard accessible
+
 - **Status:** ✅ Fixed (branch `fix/remaining-axe-violations`)
 - **Severity:** Serious (2 instances)
 - **WCAG criterion:** 2.1.1 Keyboard — A (blocks AA compliance)
@@ -79,6 +83,7 @@ application (toolbar, palettes, widgets, modals) is audited.
 ---
 
 ### 5. Persistent notification banner insufficient contrast
+
 - **Status:** ✅ Fixed (PR [#7896](https://github.com/sugarlabs/musicblocks/pull/7896), tokens hardened on `fix/remaining-axe-violations`)
 - **Severity:** Serious
 - **WCAG criterion:** 1.4.3 Contrast (Minimum) — AA
@@ -97,11 +102,11 @@ application (toolbar, palettes, widgets, modals) is audited.
 - **TAB key trap** in `js/activity.js` (~line 3812) — **Fixed** (PR
   [#7563](https://github.com/sugarlabs/musicblocks/pull/7563)). Tab is now
   only suppressed when focus is on the canvas/body; real DOM elements
-  receive normal Tab navigation. *(WCAG 2.1.2 No Keyboard Trap)*
+  receive normal Tab navigation. _(WCAG 2.1.2 No Keyboard Trap)_
 - **Focus indicator suppressed on `#search` input** in
-  `css/activities.css` — `outline: none` on `#search:focus` removes the
-  visible focus ring for keyboard users. *(WCAG 2.4.7 Focus Visible)*
-  Still open — not yet re-scanned.
+  `css/activities.css` — **Fixed** (PR [#9151](https://github.com/sugarlabs/musicblocks/issues/9151)). Removed
+  `outline: none` on `#search:focus` and added visible focus indicator
+  via `#search:focus-visible`. _(WCAG 2.4.7 Focus Visible)_
 
 ---
 
@@ -111,7 +116,7 @@ application (toolbar, palettes, widgets, modals) is audited.
       contrast, help scroll region keyboard access.
 - [ ] Identify and fix the runtime-set `#helpWidgetID` background contrast
       issue (1 remaining violation).
-- [ ] Re-check `#search:focus` outline suppression.
+- [x] Re-check `#search:focus` outline suppression.
 - [ ] Audit the toolbar (play/stop/save/etc.) and modal dialogs
       (`#clear-modal-container`, `#cleardropdown`) for missing
       `aria-label`/`role`.
