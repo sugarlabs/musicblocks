@@ -417,6 +417,19 @@ describe("setupVolumeActions", () => {
             }
         });
 
+        it("should return early without processing if volume is NaN or Infinity", () => {
+            targetTurtle.singer.synthVolume = { default: [50] };
+
+            Singer.VolumeActions.setRelativeVolume(NaN, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+
+            Singer.VolumeActions.setRelativeVolume(Infinity, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+
+            Singer.VolumeActions.setRelativeVolume(-Infinity, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+        });
+
         it("should call notationBeginArticulation when justCounting is empty", () => {
             Singer.VolumeActions.setRelativeVolume(20, 0, 1);
 
