@@ -698,8 +698,10 @@ class MusicXMLExporter {
                                     keyChanged = false;
                                 } else {
                                     this.add(`<measure number="${currMeasure}">`);
-                                    if (keyChanged && !part.isPercussion) {
-                                        this.addKeyAttributes(currentFifths);
+                                    if (keyChanged) {
+                                        if (!part.isPercussion) {
+                                            this.addKeyAttributes(currentFifths);
+                                        }
                                         keyChanged = false;
                                     }
                                 }
