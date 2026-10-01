@@ -285,12 +285,19 @@ class GlobalPlanet {
         for (let i = 0; i < data.length; i++) {
             (function () {
                 const id = data[i][0];
+                const expectedUpdatedAt = data[i][1];
+                const shouldSkipCache = Boolean(
+                    expectedUpdatedAt &&
+                    this.cache[id] &&
+                    this.cache[id].ProjectLastUpdated !== expectedUpdatedAt
+                );
                 Planet.ServerInterface.getProjectDetails(
                     id,
                     function (d) {
                         const tempid = id;
                         this.addProjectToCache(tempid, d, callback);
-                    }.bind(this)
+                    }.bind(this),
+                    shouldSkipCache
                 );
             }).bind(this)();
         }
@@ -313,7 +320,8 @@ class GlobalPlanet {
             id,
             function (d) {
                 this.addProjectToCache(id, d, callback);
-            }.bind(this)
+            }.bind(this),
+            true
         );
     }
 
@@ -336,11 +344,14 @@ class GlobalPlanet {
     downloadDataToCache(id, callback, error) {
         if (error === undefined) error = null;
 
+        const expectedUpdatedAt = this.cache[id]?.ProjectLastUpdated || null;
+
         this.Planet.ServerInterface.downloadProject(
             id,
             function (data) {
                 this.afterDownloadData(id, data, callback, error);
-            }.bind(this)
+            }.bind(this),
+            expectedUpdatedAt
         );
     }
 
