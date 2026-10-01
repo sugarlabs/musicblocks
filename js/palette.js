@@ -1799,8 +1799,8 @@ class Palette {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
-                    img.onmouseup = null;
-                    img.ontouchend = null;
+                    document.removeEventListener("mouseup", up);
+                    document.removeEventListener("touchend", up);
 
                     if (rAFId) {
                         window.cancelAnimationFrame(rAFId);
@@ -1831,8 +1831,8 @@ class Palette {
                     );
                 };
 
-                img.ontouchend = up;
-                img.onmouseup = up;
+                document.addEventListener("mouseup", up);
+                document.addEventListener("touchend", up);
             };
 
             img.ontouchstart = down;

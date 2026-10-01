@@ -1760,7 +1760,10 @@ describe("Palettes Class", () => {
                     preventDefault: jest.fn()
                 });
 
-                img.onmouseup({});
+                const mouseUpHandler = document.addEventListener.mock.calls.find(
+                    call => call[0] === "mouseup"
+                )[1];
+                mouseUpHandler({});
                 expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
             } finally {
                 window.requestAnimationFrame = previousRaf;
@@ -1863,7 +1866,10 @@ describe("Palettes Class", () => {
                     preventDefault: jest.fn()
                 });
 
-                img.ontouchend({});
+                const touchEndHandler = document.addEventListener.mock.calls.find(
+                    call => call[0] === "touchend"
+                )[1];
+                touchEndHandler({});
                 expect(window.cancelAnimationFrame).toHaveBeenCalledWith(789);
             } finally {
                 window.requestAnimationFrame = previousRaf;

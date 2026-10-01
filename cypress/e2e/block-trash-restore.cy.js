@@ -96,7 +96,7 @@ describe("Block trash and restore", () => {
                                 pageY: (startY + endY) / 2
                             });
                             cy.document().trigger("mousemove", { pageX: endX, pageY: endY });
-                            cy.wrap($draggedImg).trigger("mouseup", {
+                            cy.document().trigger("mouseup", {
                                 which: 1,
                                 clientX: clientX,
                                 clientY: clientY,
