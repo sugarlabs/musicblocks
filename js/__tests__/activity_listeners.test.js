@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createInstrumenter } = require("istanbul-lib-instrument");
 
 describe("Activity Event Listener Management", () => {
     let Activity;
@@ -96,6 +97,11 @@ describe("Activity Event Listener Management", () => {
 
         // Expose Activity class to sandbox
         code += "\n this.Activity = Activity;";
+
+        const instrumenter = createInstrumenter();
+        code = instrumenter.instrumentSync(code, activityPath);
+
+        sandbox.__coverage__ = global.__coverage__ || (global.__coverage__ = {});
 
         vm.createContext(sandbox);
         try {

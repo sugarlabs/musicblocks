@@ -2663,6 +2663,7 @@ class Activity {
 
             this.setupWindowBlurHandler(doHardStopButton);
 
+            /* istanbul ignore next -- init lifecycle is browser-only; resize listener behavior is tested directly */
             this.setupResizeListeners();
 
             this.stage = new createjs.Stage(this.canvas);
