@@ -90,6 +90,7 @@ const _escapeWords = text =>
 
 const TONIC_FIFTHS = { F: -1, C: 0, G: 1, D: 2, A: 3, E: 4, B: 5 };
 const MODE_FIFTHS = {
+    // Diatonic modes
     "lydian": 1,
     "major": 0,
     "ionian": 0,
@@ -99,17 +100,83 @@ const MODE_FIFTHS = {
     "minor": -3,
     "natural minor": -3,
     "aeolian": -3,
+    "phrygian": -4,
+    "locrian": -5,
+
+    // Minor variants and aliases
+    "harmonic minor": -3,
+    "melodic minor": -3,
+    "jazz minor": -3,
     "ethiopian": -3,
     "geez": -3,
-    "phrygian": -4,
-    "locrian": -5
+
+    // Pentatonics and aliases
+    "major pentatonic": 0,
+    "minor pentatonic": -3,
+    "minyo": -3,
+    "chinese": 0,
+    "egyptian": 0,
+    "hirajoshi": -3,
+    "in": -3,
+    "alt pentatonic": 0,
+    "fibonacci": 0,
+
+    // Blues & whole tone
+    "major blues": 0,
+    "minor blues": -3,
+    "whole tone": 0,
+
+    // 7-tone & 8-tone world / synthetic modes
+    "harmonic major": 0,
+    "spanish gypsy": -4,
+    "hindu": -1, // Mixolydian b6 (Aeolian dominant), nearest diatonic mode is Mixolydian
+    "romanian minor": -2, // Ukrainian Dorian (Dorian #4), nearest diatonic mode is Dorian
+    "arabic": 0,
+    "byzantine": 0,
+    "maqam": 0,
+    "hungarian": -3,
+    "enigmatic": 0,
+    "algerian": -3,
+    "diminished": 0,
+    "octatonic": 0,
+    "spanish": -4,
+    "bebop": 0,
+    "chromatic": 0,
+    "custom": 0
+};
+
+/**
+ * Resolves the circle-of-fifths shift for a mode.
+ * @param {string} mode - Mode name.
+ * @returns {number} Offset relative to the major key circle of fifths.
+ */
+const _getModeShift = mode => {
+    const modeStr = String(mode ?? "")
+        .trim()
+        .toLowerCase();
+    if (Object.hasOwn(MODE_FIFTHS, modeStr)) {
+        return MODE_FIFTHS[modeStr];
+    }
+    return modeStr.includes("minor") ? -3 : 0;
+};
+
+/**
+ * Wraps a fifths value into the standard MusicXML range [-7, 7].
+ * @param {number} fifths
+ * @returns {number}
+ */
+const _wrapFifths = fifths => {
+    let wrapped = fifths;
+    while (wrapped > 7) wrapped -= 12;
+    while (wrapped < -7) wrapped += 12;
+    return wrapped;
 };
 
 /**
  * Calculates the circle of fifths value for a given tonic and mode.
  * @param {string} tonic - e.g. "C", "G", "F#", "B♭".
  * @param {string} mode - e.g. "major", "minor", "dorian".
- * @returns {number} fifths (sharps positive, flats negative).
+ * @returns {number} fifths (sharps positive, flats negative) in [-7, 7].
  */
 const _getFifths = (tonic, mode) => {
     const text = String(tonic ?? "").trim();
@@ -124,11 +191,8 @@ const _getFifths = (tonic, mode) => {
         else if (acc === "𝄫") fifths -= 14;
     }
 
-    const modeStr = String(mode ?? "")
-        .trim()
-        .toLowerCase();
-    const modeShift = MODE_FIFTHS[modeStr] ?? (modeStr.includes("minor") ? -3 : 0);
-    return fifths + modeShift;
+    fifths += _getModeShift(mode);
+    return _wrapFifths(fifths);
 };
 
 /**
@@ -225,6 +289,10 @@ class MusicXMLExporter {
         this.add("</direction-type>");
         this.indent--;
         this.add("</direction>");
+    }
+
+    addKeyAttributes(fifths) {
+        this.add(`<attributes> <key> <fifths>${fifths}</fifths> </key> </attributes>`);
     }
 
     addMeasureAttributes(
@@ -421,9 +489,7 @@ class MusicXMLExporter {
                     if (obj === "key") {
                         newFifths = _getFifths(notes[i + 1], notes[i + 2]);
                         i += 2;
-                        if (newFifths !== currentFifths) {
-                            keyChanged = true;
-                        }
+                        keyChanged = newFifths !== currentFifths;
                         continue;
                     }
 
@@ -607,7 +673,7 @@ class MusicXMLExporter {
                                 if (keyChanged) {
                                     currentFifths = newFifths;
                                 }
-                                if (firstMeasure || beatsChanged || keyChanged) {
+                                if (firstMeasure || beatsChanged) {
                                     // A pickup shorter than a full measure becomes implicit
                                     // measure 0, so the first full measure is still numbered 1.
                                     const isPickup =
@@ -632,14 +698,16 @@ class MusicXMLExporter {
                                     keyChanged = false;
                                 } else {
                                     this.add(`<measure number="${currMeasure}">`);
+                                    if (keyChanged && !part.isPercussion) {
+                                        this.addKeyAttributes(currentFifths);
+                                        keyChanged = false;
+                                    }
                                 }
                                 openedMeasureTag = true;
                             } else if (keyChanged) {
                                 currentFifths = newFifths;
                                 if (!part.isPercussion) {
-                                    this.add(
-                                        `<attributes> <key> <fifths>${currentFifths}</fifths> </key> </attributes>`
-                                    );
+                                    this.addKeyAttributes(currentFifths);
                                 }
                                 keyChanged = false;
                             }
@@ -782,6 +850,8 @@ saveMxmlOutput = logo => {
 };
 
 saveMxmlOutput._getFifths = _getFifths;
+saveMxmlOutput._getModeShift = _getModeShift;
+saveMxmlOutput._wrapFifths = _wrapFifths;
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = saveMxmlOutput;

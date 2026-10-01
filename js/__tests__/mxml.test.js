@@ -18,7 +18,7 @@
  */
 
 const saveMxmlOutput = require("../mxml");
-const { frequencyToPitch } = require("../utils/musicutils");
+const { frequencyToPitch, MUSICALMODES } = require("../utils/musicutils");
 global.frequencyToPitch = frequencyToPitch;
 global.getMidiDrum = () => ({ "snare drum": 38, "kick drum": 36 });
 
@@ -976,9 +976,52 @@ describe("saveMxmlOutput notation markers", () => {
             ["Db", "major", -5],
             ["Ab", "major", -4],
             ["Eb", "major", -3],
+            // Enharmonic wrapping to -7..7
+            ["G#", "major", -4],
+            ["D#", "major", -3],
+            ["Fb", "major", 4],
+            ["A#", "major", -2],
+            // Specific review modes
+            ["E", "spanish gypsy", 0],
+            ["C", "hindu", -1],
+            ["C", "romanian minor", -2],
             [undefined, undefined, 0]
         ])("calculates fifths for %s %s as %i", (tonic, mode, expected) => {
             expect(saveMxmlOutput._getFifths(tonic, mode)).toBe(expected);
+        });
+
+        it("gives minyo and minor pentatonic the same fifths", () => {
+            expect(saveMxmlOutput._getFifths("A", "minyo")).toBe(0);
+            expect(saveMxmlOutput._getFifths("A", "minor pentatonic")).toBe(0);
+            expect(saveMxmlOutput._getFifths("C", "minyo")).toBe(-3);
+            expect(saveMxmlOutput._getFifths("C", "minor pentatonic")).toBe(-3);
+        });
+
+        it("safely handles a mode named 'constructor' without resolving Object.prototype", () => {
+            const fifths = saveMxmlOutput._getFifths("C", "constructor");
+            expect(typeof fifths).toBe("number");
+            expect(fifths).toBe(0);
+
+            const xml = exportVoice(["key", "C", "constructor", note("C4")]);
+            expect(xml).toContain("<fifths>0</fifths>");
+            expect(xml).not.toContain("function");
+            expect(xml).not.toContain("Object");
+        });
+
+        it("keeps keys already in range (-7..7) without modifying them", () => {
+            expect(saveMxmlOutput._getFifths("F#", "major")).toBe(6);
+            expect(saveMxmlOutput._getFifths("Gb", "major")).toBe(-6);
+            expect(saveMxmlOutput._getFifths("C#", "major")).toBe(7);
+            expect(saveMxmlOutput._getFifths("Cb", "major")).toBe(-7);
+        });
+
+        it("asserts every mode in MUSICALMODES produces an integer fifths within -7..7", () => {
+            for (const mode of Object.keys(MUSICALMODES)) {
+                const fifths = saveMxmlOutput._getFifths("C", mode);
+                expect(Number.isInteger(fifths)).toBe(true);
+                expect(fifths).toBeGreaterThanOrEqual(-7);
+                expect(fifths).toBeLessThanOrEqual(7);
+            }
         });
 
         it("exports a project in G major with fifths = 1", () => {
@@ -1013,23 +1056,55 @@ describe("saveMxmlOutput notation markers", () => {
             expect(fifths[0].textContent).toBe("0");
         });
 
-        it("updates key signature on key change across measures", () => {
-            const doc = parseScore(
-                exportVoice([
-                    "key",
-                    "C",
-                    "major",
-                    note("C4", 1),
-                    "key",
-                    "G",
-                    "major",
-                    note("G4", 1)
-                ])
-            );
+        it("writes only key attributes on key change across measure boundary without repeating time or clef", () => {
+            const xml = exportVoice([
+                "key",
+                "C",
+                "major",
+                note("C4", 1),
+                "key",
+                "G",
+                "major",
+                note("G4", 1)
+            ]);
+            const doc = parseScore(xml);
             const measures = measuresOf(doc);
 
             expect(measures).toHaveLength(2);
+            // Measure 1 has full attributes (divisions, key, time, clef)
+            expect(measures[0].getElementsByTagName("divisions")).toHaveLength(1);
+            expect(measures[0].getElementsByTagName("time")).toHaveLength(1);
+            expect(measures[0].getElementsByTagName("clef")).toHaveLength(1);
             expect(measures[0].getElementsByTagName("fifths")[0].textContent).toBe("0");
+
+            // Measure 2 has key attributes only
+            expect(measures[1].getElementsByTagName("fifths")).toHaveLength(1);
+            expect(measures[1].getElementsByTagName("fifths")[0].textContent).toBe("1");
+            expect(measures[1].getElementsByTagName("time")).toHaveLength(0);
+            expect(measures[1].getElementsByTagName("clef")).toHaveLength(0);
+            expect(measures[1].getElementsByTagName("divisions")).toHaveLength(0);
+        });
+
+        it("writes full attributes when meter changes across measure boundary even if key also changes", () => {
+            const xml = exportVoice([
+                "key",
+                "C",
+                "major",
+                note("C4", 1),
+                "meter",
+                3,
+                4,
+                "key",
+                "G",
+                "major",
+                note("G4", 4)
+            ]);
+            const doc = parseScore(xml);
+            const measures = measuresOf(doc);
+
+            expect(measures[1].getElementsByTagName("time")).toHaveLength(1);
+            expect(measures[1].getElementsByTagName("clef")).toHaveLength(1);
+            expect(measures[1].getElementsByTagName("divisions")).toHaveLength(1);
             expect(measures[1].getElementsByTagName("fifths")[0].textContent).toBe("1");
         });
 
@@ -1052,6 +1127,28 @@ describe("saveMxmlOutput notation markers", () => {
             expect(fifthsElements).toHaveLength(2);
             expect(fifthsElements[0].textContent).toBe("0");
             expect(fifthsElements[1].textContent).toBe("1");
+        });
+
+        it("writes no extra fifths block when key changes round-trip before the next note", () => {
+            const xml = exportVoice([
+                "key",
+                "C",
+                "major",
+                note("C4", 4),
+                "key",
+                "G",
+                "major",
+                "key",
+                "C",
+                "major",
+                note("D4", 4)
+            ]);
+            const doc = parseScore(xml);
+            const [measure] = measuresOf(doc);
+            const fifthsElements = Array.from(measure.getElementsByTagName("fifths"));
+
+            expect(fifthsElements).toHaveLength(1);
+            expect(fifthsElements[0].textContent).toBe("0");
         });
 
         it("does not emit key signature for percussion parts even if key is staged", () => {
