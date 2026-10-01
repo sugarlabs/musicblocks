@@ -307,9 +307,10 @@ class MeterWidget {
         input1.style.cssFloat = "left";
         input1.value = v1;
         input1.type = "number";
-        input1.id = "beatValue";
+        input1.id = "beatCount";
         input1.setAttribute("min", "1");
         input1.setAttribute("max", "16");
+        input1.setAttribute("aria-label", _("Number of beats"));
         divInput.appendChild(input1);
 
         const divInput2 = document.createElement("div");
@@ -321,6 +322,7 @@ class MeterWidget {
         input2.id = "beatValue";
         input2.setAttribute("min", "1");
         input2.setAttribute("max", "35");
+        input2.setAttribute("aria-label", _("Beat note value"));
         divInput2.appendChild(input2);
 
         widgetWindow._toolbar.appendChild(divInput);

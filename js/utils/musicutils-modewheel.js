@@ -12,15 +12,15 @@
 /*
    global
 
-   _, slicePath
+   _
  */
 
 /*
    exported
 
    getSavedCustomModes, getModeNamesForGroup, getModeLabel,
-   getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
-   getModeGroupTitleFont, getModeSliceFont, configureWheel,
+   getModeNameFromLabel, getModeSliceColors,
+   getModeGroupTitleFont, getModeSliceFont,
    MusicUtilsModeWheel
  */
 
@@ -96,30 +96,6 @@ var getModeNameFromLabel = (label, modes) => {
 var getModeSliceColors = (modes, colors) =>
     modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
 
-/** Re-renders a mode-name wheel in place with new labels/colors. */
-var updateModeWheelItems = (wheel, labels, colors) => {
-    for (let i = 0; i < wheel.navItems.length; i++) {
-        const item = wheel.navItems[i];
-        item.title = labels[i];
-        item.basicNavTitleMax.title = labels[i];
-        item.basicNavTitleMin.title = labels[i];
-        item.hoverNavTitleMax.title = labels[i];
-        item.hoverNavTitleMin.title = labels[i];
-        item.selectedNavTitleMax.title = labels[i];
-        item.selectedNavTitleMin.title = labels[i];
-        item.initNavTitle.title = labels[i];
-        item.fillAttr = colors[i];
-        item.sliceHoverAttr.fill = colors[i];
-        item.slicePathAttr.fill = colors[i];
-        item.sliceSelectedAttr.fill = colors[i];
-        // refreshWheel() never rewrites text content, so push the label directly.
-        if (item.navTitle && typeof item.navTitle.attr === "function") {
-            item.navTitle.attr({ text: labels[i] });
-        }
-    }
-    wheel.refreshWheel();
-};
-
 /** Group-ring title font, scaled to wheel radius. */
 var getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 
@@ -133,40 +109,14 @@ var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     return `100 ${clamped}px sans-serif`;
 };
 
-/** Applies shared donut-slice config to a wheelnav instance. */
-var configureWheel = (wheel, opts) => {
-    wheel.colors = opts.colors;
-    wheel.slicePathFunction = slicePath().DonutSlice;
-    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
-    wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
-    if (opts.clickModeRotate !== undefined) {
-        wheel.clickModeRotate = opts.clickModeRotate;
-    }
-    if (opts.selectionPaths) {
-        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-        wheel.sliceInitPathCustom = wheel.slicePathCustom;
-    }
-    wheel.navAngle = -90;
-    wheel.animatetime = 0;
-    if (opts.titleRotateAngle !== undefined) {
-        wheel.titleRotateAngle = opts.titleRotateAngle;
-    }
-    if (opts.titleFont !== undefined) {
-        wheel.titleFont = opts.titleFont;
-    }
-};
-
 var MusicUtilsModeWheel = {
     getSavedCustomModes,
     getModeNamesForGroup,
     getModeLabel,
     getModeNameFromLabel,
     getModeSliceColors,
-    updateModeWheelItems,
     getModeGroupTitleFont,
-    getModeSliceFont,
-    configureWheel
+    getModeSliceFont
 };
 
 if (typeof module !== "undefined" && module.exports) {

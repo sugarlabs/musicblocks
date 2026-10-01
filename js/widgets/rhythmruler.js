@@ -18,7 +18,7 @@
    global
 
    TONEBPM, Singer, _, delayExecution, deepClone, docById, ManagedTimer,
-   calcNoteValueToDisplay, platformColor, beginnerMode, last,
+   calcNoteValueToDisplay, platformColor, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
    VOICENAMES, EFFECTSNAMES, clampNumber, announceToScreenReader
 */
@@ -905,7 +905,7 @@ class RhythmRuler {
         for (let i = 0; i < this.Rulers.length; i++) {
             const rhythmRulerTableRow = rhythmRulerTable.insertRow();
 
-            if (beginnerMode) {
+            if (this.activity.beginnerMode === true || this.activity.beginnerMode === "true") {
                 let w = 0;
                 for (let r = 0; r < this.Rulers[i][0].length; r++) {
                     w += 580 / this.Rulers[i][0][r];

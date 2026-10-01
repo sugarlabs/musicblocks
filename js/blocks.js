@@ -31,7 +31,7 @@
     announceToScreenReader
 */
 
-/* global showZoomOverlay */
+/* global showZoomOverlay, ManagedTimer */
 
 /*
    Global locations
@@ -182,6 +182,43 @@ class Blocks {
         /** Track the time with mouse down. */
         this.mouseDownTime = 0;
         this.longPressTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+
+        this.setTimeout = (callback, delay) => {
+            if (this._timerManager !== null) {
+                return this._timerManager.setTimeout(callback, delay);
+            }
+            return setTimeout(callback, delay);
+        };
+
+        this.clearTimeout = id => {
+            if (id === null || id === undefined) {
+                return false;
+            }
+            if (this._timerManager !== null) {
+                return this._timerManager.clearTimeout(id);
+            }
+            clearTimeout(id);
+            return true;
+        };
+
+        this.clearLongPressTimeout = () => {
+            if (this.longPressTimeout !== null) {
+                this.clearTimeout(this.longPressTimeout);
+                this.longPressTimeout = null;
+            }
+        };
 
         /** Paste offset is used to ensure pasted blocks don't overlap. */
         this.pasteDx = 0;
@@ -1381,7 +1418,7 @@ class Blocks {
                                     protoblock.name === "nameddo" &&
                                     protoblock.defaults[0] === that.blockList[oldBlock].value
                                 ) {
-                                    setTimeout(() => {
+                                    that.setTimeout(() => {
                                         blockPalette.remove(
                                             protoblock,
                                             that.blockList[oldBlock].value
@@ -2570,7 +2607,10 @@ class Blocks {
             }
 
             if (thisBlock !== null) {
-                this.blockList[thisBlock].unhighlight();
+                const block = this.blockList[thisBlock];
+                if (block && typeof block.unhighlight === "function") {
+                    block.unhighlight();
+                }
             }
 
             if (this.highlightedBlock === thisBlock) {
@@ -4728,10 +4768,7 @@ class Blocks {
          * @returns {void}
          */
         this.triggerLongPress = () => {
-            if (this.longPressTimeout !== null) {
-                clearTimeout(this.longPressTimeout);
-                this.longPressTimeout = null;
-            }
+            this.clearLongPressTimeout();
 
             this.inLongPress = true;
             piemenuBlockContext(this.blockList[this.activeBlock]);
@@ -5768,7 +5805,7 @@ class Blocks {
                         // surface the failure the same way a real browser would),
                         // tell any listener synchronously via pubsub, the same
                         // channel "finishedLoading" already uses for success.
-                        setTimeout(() => {
+                        this.setTimeout(() => {
                             try {
                                 processChunk();
                             } catch (e) {

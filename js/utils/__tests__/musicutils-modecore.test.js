@@ -121,6 +121,9 @@ describe("musicutils-modecore", () => {
             "musicutils-solfege.js",
             "musicutils-modewheel.js",
             "musicutils-modecore.js",
+            "musicutils-pitchscale.js",
+            "musicutils-buildscale.js",
+            "musicutils-pitchinfo.js",
             "musicutils.js"
         ];
         const load = files => {

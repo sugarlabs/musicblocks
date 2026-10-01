@@ -138,6 +138,28 @@ describe("Painter Class", () => {
             expect(secondPainter.penState).toBe(true);
         });
 
+        test("reset() resets control points and closes open SVG path without wiping accumulated SVG output or pen styling", () => {
+            painter.cp1x = 10;
+            painter.cp1y = 20;
+            painter.cp2x = 30;
+            painter.cp2y = 40;
+            painter._svgPath = "M 0 0 ";
+            painter._svgOutput = '<path d="M 0 0 ';
+            painter.color = 75;
+            painter.stroke = 12;
+
+            painter.reset();
+
+            expect(painter.cp1x).toBe(0);
+            expect(painter.cp1y).toBe(100);
+            expect(painter.cp2x).toBe(100);
+            expect(painter.cp2y).toBe(100);
+            expect(painter._svgPath).toBe(false);
+            expect(painter._svgOutput).toContain('<path d="M 0 0 ');
+            expect(painter.color).toBe(75);
+            expect(painter.stroke).toBe(12);
+        });
+
         test("should initialize value to DEFAULTVALUE (50)", () => {
             expect(painter._value).toBe(50);
         });

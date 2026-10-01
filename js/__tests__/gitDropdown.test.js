@@ -108,6 +108,10 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             planet: {
                 getCurrentProjectName: jest.fn(() => "")
             },
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            canvas: {
+                toDataURL: jest.fn(() => "data:image/png;base64,abc")
+            },
             prepareExport: jest.fn(() => JSON.stringify({ blocks: ["note1"] })),
             turtles: {
                 running: jest.fn(() => false)
@@ -294,13 +298,77 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 expect.objectContaining({
                     type: "MB_OFFLINE_CREATE",
                     repoName: "offline-track-456",
-                    projectName: "Offline Track"
+                    projectName: "Offline Track",
+                    thumbnail: "data:image/png;base64,abc"
                 }),
                 "*"
             );
 
             expect(localStorage.getItem("mbGitRepoName")).toBe("offline-track-456");
             expect(localStorage.getItem("mbGitDisplayName")).toBe("Offline Track");
+        });
+
+        test("preserves the thumbnail when creation falls back offline", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockRejectedValueOnce(new TypeError("Network failed"));
+
+            await gitDropdown._doCreate("fallback-track", "Fallback Track", "Made offline");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "MB_OFFLINE_CREATE",
+                    thumbnail: "data:image/png;base64,abc"
+                }),
+                "*"
+            );
+        });
+
+        test("saves a fresh project before queuing offline tracking", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            let finishSave;
+            mockActivity.saveLocally = jest.fn(
+                () => new Promise(resolve => (finishSave = resolve))
+            );
+
+            const create = gitDropdown._doCreate("first-track", "First Track", "Made offline");
+            await Promise.resolve();
+
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+            expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+            expect(mockActivity.canvas.toDataURL).not.toHaveBeenCalled();
+
+            finishSave();
+            await create;
+            expect(mockActivity.canvas.toDataURL).toHaveBeenCalledWith("image/png");
+            expect(localStorage.getItem("mbGitRepoName")).toBe("first-track");
+        });
+
+        test("reports a failed save without queuing offline tracking", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            const showToast = jest.spyOn(gitDropdown, "_showToast");
+            mockActivity.saveLocally.mockRejectedValue(new Error("Storage unavailable"));
+
+            await gitDropdown._doCreate("failed-track", "Failed Track", "Made offline");
+
+            expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+            expect(showToast).toHaveBeenCalledWith(
+                "Could not save your project. Please try again.",
+                "error"
+            );
+        });
+
+        test("does not queue when local storage reports a failed save", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            const showToast = jest.spyOn(gitDropdown, "_showToast");
+            mockActivity.saveLocally.mockResolvedValue(false);
+
+            await gitDropdown._doCreate("failed-track", "Failed Track", "Made offline");
+
+            expect(mockIframe.contentWindow.postMessage).not.toHaveBeenCalled();
+            expect(showToast).toHaveBeenCalledWith(
+                "Could not save your project. Please try again.",
+                "error"
+            );
         });
     });
 

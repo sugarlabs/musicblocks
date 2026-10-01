@@ -66,6 +66,36 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceName(123)).toBe("electronic synth");
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
+
+        expect(lookups.getIntervalNumber(undefined)).toBe(0);
+        expect(lookups.getIntervalNumber(null)).toBe(0);
+        expect(lookups.getIntervalNumber(123)).toBe(0);
+        expect(lookups.getIntervalNumber({})).toBe(0);
+        expect(lookups.getIntervalDirection(undefined)).toBe(0);
+        expect(lookups.getIntervalDirection(null)).toBe(0);
+        expect(lookups.getIntervalRatio(undefined)).toBe(1);
+        expect(lookups.getIntervalRatio(null)).toBe(1);
+    });
+
+    it("guards interval lookups against invalid, missing, case-varying and localized keys", () => {
+        expect(lookups.getIntervalNumber("nonexistent")).toBe(0);
+        expect(lookups.getIntervalDirection("nonexistent")).toBe(0);
+        expect(lookups.getIntervalRatio("nonexistent")).toBe(1);
+
+        expect(lookups.getIntervalNumber("")).toBe(0);
+        expect(lookups.getIntervalDirection("")).toBe(0);
+        expect(lookups.getIntervalRatio("")).toBe(1);
+
+        expect(lookups.getIntervalNumber("toString")).toBe(0);
+        expect(lookups.getIntervalDirection("constructor")).toBe(0);
+        expect(lookups.getIntervalRatio("prototype")).toBe(1);
+
+        expect(lookups.getIntervalNumber("Major 3")).toBe(4);
+        expect(lookups.getIntervalDirection("Major 3")).toBe(1);
+        expect(lookups.getIntervalRatio("Major 3")).toBe(1.25);
+
+        expect(lookups.getIntervalNumber("  perfect 5  ")).toBe(7);
+        expect(lookups.getIntervalDirection("  diminished 6  ")).toBe(-1);
     });
 
     it("looks up invert modes, intervals, filters and oscillators", () => {
@@ -143,6 +173,9 @@ describe("musicutils-lookups", () => {
             "musicutils-solfege.js",
             "musicutils-modewheel.js",
             "musicutils-modecore.js",
+            "musicutils-pitchscale.js",
+            "musicutils-buildscale.js",
+            "musicutils-pitchinfo.js",
             "musicutils.js"
         ];
         const load = files => {

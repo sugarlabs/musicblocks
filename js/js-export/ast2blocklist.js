@@ -30,6 +30,21 @@
  */
 class AST2BlockList {
     /**
+     * Returns whether a string names an interval (e.g. "major 3"), which the
+     * intervalname block turns into a number of semitones.
+     *
+     * @param {String} name - candidate interval name
+     * @returns {Boolean} whether name is an interval name
+     */
+    static _isIntervalName(name) {
+        const intervals =
+            (typeof window !== "undefined" && window.INTERVALVALUES) ||
+            (typeof INTERVALVALUES !== "undefined" && INTERVALVALUES) ||
+            require("../utils/musicutils-constants").INTERVALVALUES;
+        return Object.prototype.hasOwnProperty.call(intervals, name);
+    }
+
+    /**
      * Returns a deep copy of an AST. Regular expression literal values are
      * shared, since nothing here changes them.
      *
@@ -838,14 +853,18 @@ class AST2BlockList {
                         );
                     } else if (
                         argConfig.type === "NumberExpression" ||
-                        argConfig.type === "BooleanExpression"
+                        argConfig.type === "BooleanExpression" ||
+                        argConfig.type === "IntervalExpression"
                     ) {
-                        // Handle number/boolean expressions
+                        // Handle number/boolean expressions. In an interval expression, a string
+                        // naming an interval (as the exporter writes an intervalname block) becomes
+                        // an intervalname block again.
                         vspaces += _addNthValueArgToBlockList(
                             arg,
                             i + 1,
                             blockList,
-                            parentBlockNumber
+                            parentBlockNumber,
+                            argConfig.type === "IntervalExpression"
                         );
                     } else {
                         vspaces += _addNthArgToBlockList(
@@ -900,20 +919,21 @@ class AST2BlockList {
              * @param {Array} blockList - the blockList to which the new argument blocks will be added
              * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
              */
-            function _addValueArgsToBlockList(args, blockList, parentBlockNumber) {
+            function _addValueArgsToBlockList(args, blockList, parentBlockNumber, intervals) {
                 let vspaces = 0;
                 for (let i = 0; i < args.length; i++) {
                     vspaces += _addNthValueArgToBlockList(
                         args[i],
                         i + 1,
                         blockList,
-                        parentBlockNumber
+                        parentBlockNumber,
+                        intervals
                     );
                 }
                 return vspaces;
             }
 
-            function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber) {
+            function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber, intervals) {
                 let vspaces = 0;
                 let block = [];
                 let blockNumber = blockList.length;
@@ -921,12 +941,14 @@ class AST2BlockList {
                 blockList.push(block);
                 let type = typeof arg;
                 if (type === "string") {
-                    type = "text";
+                    type =
+                        intervals && AST2BlockList._isIntervalName(arg) ? "intervalname" : "text";
                 }
                 if (
                     type === "number" ||
                     type === "boolean" ||
                     type === "text" ||
+                    type === "intervalname" ||
                     (type === "object" && arg.identifier !== undefined)
                 ) {
                     // variables can be in number or boolean expressions
@@ -947,7 +969,12 @@ class AST2BlockList {
                     let connections = new Array(1 + arg.arguments.length).fill(null);
                     connections[0] = parentBlockNumber;
                     block.push(connections);
-                    vspaces = _addValueArgsToBlockList(arg.arguments, blockList, blockNumber);
+                    vspaces = _addValueArgsToBlockList(
+                        arg.arguments,
+                        blockList,
+                        blockNumber,
+                        intervals
+                    );
                     if (arg.arguments.length === 0) {
                         vspaces += 1;
                     }

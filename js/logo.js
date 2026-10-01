@@ -526,16 +526,23 @@ class Logo {
                     }
                 }
 
+                const currentMasterVolume =
+                    typeof Singer !== "undefined" &&
+                    Singer.masterVolume &&
+                    Singer.masterVolume.length > 0
+                        ? last(Singer.masterVolume)
+                        : DEFAULTVOLUME;
+
                 tur.singer.synthVolume = {
-                    "electronic synth": [DEFAULTVOLUME],
-                    "noise1": [DEFAULTVOLUME],
-                    "noise2": [DEFAULTVOLUME],
-                    "noise3": [DEFAULTVOLUME]
+                    "electronic synth": [currentMasterVolume],
+                    "noise1": [currentMasterVolume],
+                    "noise2": [currentMasterVolume],
+                    "noise3": [currentMasterVolume]
                 };
-                tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
+                tur.singer.synthVolume[DEFAULTVOICE] = [currentMasterVolume];
 
                 for (const synth in tur.singer.synthVolume) {
-                    this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+                    this.deps.Singer.setSynthVolume(this, turtle, synth, currentMasterVolume);
                 }
             }
             return;
@@ -605,7 +612,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this.deps.Singer.setMasterVolume(this, DEFAULTVOLUME);
+        this.deps.Singer.resetMasterVolume(this);
         for (const t in this.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
@@ -1512,6 +1519,9 @@ class Logo {
 
         // Cancel all pending timers to prevent zombie graphics and sounds.
         const cancelledTimers = this._timerManager.clearAll();
+        if (this.blocks && typeof this.blocks.clearLongPressTimeout === "function") {
+            this.blocks.clearLongPressTimeout();
+        }
         if (cancelledTimers > 0) {
             console.debug(
                 "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
@@ -1722,6 +1732,13 @@ class Logo {
             turtle.embeddedGraphicsPending = 0;
             turtle.embeddedGraphicsGeneration += 1;
         }
+
+        // masterVolume is static, so a level left behind by an earlier run would still be in
+        // force here. This belongs on the run boundary rather than in prepSynths(): prepSynths()
+        // skips its setup when the synths are already up (a restart with no stop in between) and
+        // it also runs mid-project when onEveryBeatDo adds a companion turtle, where resetting
+        // would pull the rug out from a project that set its own level.
+        this.deps.Singer.resetMasterVolume(this);
 
         this.prepSynths();
 

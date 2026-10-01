@@ -77,7 +77,7 @@ Subdirectories with additional utilities
 * utils -- additional general-purpose utilities
 	<!-- * `detectIE.js` -- check if Music Blocks is being run in Internet Explorer -->
 	* `munsell.js` -- Munsell color system used for mice and widgets
-	* `musicutils.js` -- related to musical notations
+	* `musicutils.js` -- aggregates the `musicutils-*.js` files below; see [utils/musicutils-README.md](utils/musicutils-README.md) for what each one contains
 	* `platformstyle.js` -- checking platform that Music Blocks is run in
 	* `synthutils.js` -- related to defining synths in tone.js
 	* `utils.js` -- general utility functions

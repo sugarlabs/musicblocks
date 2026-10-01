@@ -17,6 +17,7 @@
 /* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
+const ManagedTimer = require("../utils/ManagedTimer");
 
 // blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
 // bare globals at runtime. In the browser they're provided by loader.js's RequireJS shim
@@ -3805,5 +3806,54 @@ describe("noteValueValue", () => {
 
         expect(() => blocks.noteValueValue(2)).not.toThrow();
         expect(blocks.noteValueValue(2)).toBe(1);
+    });
+});
+
+describe("ManagedTimer Integration", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("initializes an instance of ManagedTimer", () => {
+        expect(blocks._timerManager).toBeInstanceOf(ManagedTimer);
+    });
+
+    it("tracks and cancels timeouts through blocks.setTimeout and blocks.clearTimeout", () => {
+        const cb = jest.fn();
+        const id = blocks.setTimeout(cb, 100);
+        expect(blocks._timerManager.activeTimeoutCount).toBe(1);
+
+        const cleared = blocks.clearTimeout(id);
+        expect(cleared).toBe(true);
+        expect(blocks._timerManager.activeTimeoutCount).toBe(0);
+    });
+
+    it("clears longPressTimeout cleanly via clearLongPressTimeout", () => {
+        const cb = jest.fn();
+        blocks.longPressTimeout = blocks.setTimeout(cb, 600);
+        expect(blocks._timerManager.activeTimeoutCount).toBe(1);
+
+        blocks.clearLongPressTimeout();
+        expect(blocks.longPressTimeout).toBeNull();
+        expect(blocks._timerManager.activeTimeoutCount).toBe(0);
     });
 });

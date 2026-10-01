@@ -603,7 +603,16 @@ class MusicXMLExporter {
                         if (part.isPercussion ? !obj[MXML_DRUM] : p[0] === "R") {
                             this.add("<rest/>");
                         } else if (part.isPercussion) {
-                            this.add("<unpitched/>");
+                            // A notehead needs a line to sit on. Readers do not
+                            // agree on where an empty unpitched belongs, and
+                            // Lilypond's importer stops on one. Which drum it is
+                            // is carried by the instrument element below.
+                            this.add("<unpitched>");
+                            this.indent++;
+                            this.add("<display-step>C</display-step>");
+                            this.add("<display-octave>5</display-octave>");
+                            this.indent--;
+                            this.add("</unpitched>");
                         } else {
                             this.add("<pitch>");
                             this.indent++;

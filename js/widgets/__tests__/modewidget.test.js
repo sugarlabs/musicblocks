@@ -93,10 +93,8 @@ const {
     getModeLabel,
     getModeNameFromLabel,
     getModeSliceColors,
-    updateModeWheelItems,
     getModeGroupTitleFont,
     getModeSliceFont,
-    configureWheel,
     scalePatternToEDO,
     isNonEDO,
     getNonEDOModeSteps,
@@ -104,12 +102,13 @@ const {
     isEquallyTempered,
     pitchToFrequency
 } = require("../../utils/musicutils.js");
+const { configureWheel, updateWheelItems } = require("../../utils/piemenu.js");
 global.getSavedCustomModes = getSavedCustomModes;
 global.getModeNamesForGroup = getModeNamesForGroup;
 global.getModeLabel = getModeLabel;
 global.getModeNameFromLabel = getModeNameFromLabel;
 global.getModeSliceColors = getModeSliceColors;
-global.updateModeWheelItems = updateModeWheelItems;
+global.updateWheelItems = updateWheelItems;
 global.getModeGroupTitleFont = getModeGroupTitleFont;
 global.getModeSliceFont = getModeSliceFont;
 global.configureWheel = configureWheel;

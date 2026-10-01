@@ -45,7 +45,11 @@ window.widgetWindows = {
         "oscilloscope": "oscilloscope",
         "temperament": "temperament",
         "meter": "meter",
-        "LEGO Bricks": "LEGO BRICKS"
+        "LEGO Bricks": "LEGO BRICKS",
+        "pitch slider": "slider",
+        "pitch staircase": "pitch staircase",
+        "music keyboard": "music keyboard",
+        "status": "status"
     },
 
     /**
@@ -164,6 +168,14 @@ window.widgetWindows = {
 
         // Handle Escape (Close)
         if (e.key === "Escape") {
+            // An open pie menu takes Escape first (see piemenus.js). Widgets open
+            // theirs in #wheelDivptm, and the Mode widget uses #wheelDiv.
+            const isPieMenuOpen = ["wheelDivptm", "wheelDiv"].some(id => {
+                const pieMenu = docById(id);
+                return pieMenu && pieMenu.style.display !== "none";
+            });
+            if (isPieMenuOpen) return;
+
             focused.onclose();
             e.preventDefault();
             e.stopPropagation();
@@ -240,7 +252,12 @@ window.widgetWindows = {
                 e.target.closest(".dropdown-content") ||
                 e.target.closest(".dropdown-trigger"));
 
-        if (isToolbarInteraction) {
+        // Widget pie menus (Music Keyboard, Phrase Maker, Sampler) open in
+        // #wheelDivptm, outside the widget frame, so a click on one must not
+        // take focus away from the widget that opened it.
+        const isWidgetPieMenuInteraction = e.target?.closest && e.target.closest("#wheelDivptm");
+
+        if (isToolbarInteraction || isWidgetPieMenuInteraction) {
             return;
         }
 

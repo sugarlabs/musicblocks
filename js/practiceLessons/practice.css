@@ -1,0 +1,2298 @@
+/**
+ * MusicBlocks v3.6.2
+ *
+ * @author Stuti Jain
+ *
+ * @copyright 2026 Stuti Jain
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#practice-panel,
+#explorer-journal-panel {
+    position: fixed;
+    top: 64px; /* below top toolbar */
+    right: 0;
+    width: 360px;
+    max-width: calc(100vw - 16px);
+    height: min(760px, calc(100% - 80px));
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    font-family: "Arial Rounded MT Bold", "Segoe UI", sans-serif;
+    overflow: visible;
+    resize: none;
+    transition:
+        top 0.25s ease,
+        transform 0.25s ease;
+}
+
+.practice-panel-frame {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    background: var(--color-panel-bg);
+    border: 2px solid var(--color-border-primary);
+    border-radius: 8px;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    resize: both;
+}
+
+.practice-panel-collapse-toggle {
+    position: absolute;
+    top: 50%;
+    left: -24px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    background: var(--color-brand-primary);
+    border-radius: 30px 0 0 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    touch-action: manipulation;
+}
+
+.practice-panel-collapse-toggle:hover {
+    filter: brightness(1.08);
+}
+
+#practice-panel.practice-panel-collapsed,
+#explorer-journal-panel.practice-panel-collapsed {
+    width: 0;
+    height: 52px;
+    min-height: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+#practice-panel.practice-panel-collapsed .practice-panel-frame,
+#explorer-journal-panel.practice-panel-collapsed .practice-panel-frame {
+    display: none;
+}
+
+#practice-panel.practice-panel-collapsed .practice-panel-collapse-toggle,
+#explorer-journal-panel.practice-panel-collapsed .practice-panel-collapse-toggle {
+    top: 0;
+    transform: none;
+    pointer-events: auto;
+}
+
+/* === HEADER === */
+.practice-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--color-brand-primary);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.practice-draggable-header {
+    cursor: move;
+    touch-action: none;
+}
+
+#practice-panel.dragging,
+#explorer-journal-panel.dragging {
+    opacity: 0.96;
+    transition: none;
+}
+
+#practice-panel.dragging .practice-panel-frame,
+#explorer-journal-panel.dragging .practice-panel-frame {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+#close-practice,
+#close-explorer-journal {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#close-practice:hover,
+#close-explorer-journal:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* === CONTENT AREA === */
+#practice-content,
+#explorer-journal-content {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}
+
+.journal-header {
+    background: var(--color-brand-primary);
+}
+
+.quest-title {
+    padding: 4px 2px 10px;
+}
+
+.quest-title h3 {
+    margin: 0;
+    color: #1b4965;
+    font-size: 20px;
+}
+
+.quest-title p {
+    margin: 4px 0 0;
+    color: #5c677d;
+    font-size: 13px;
+}
+
+.story-card,
+.mission-card,
+.reward-card,
+.badge-card {
+    margin: 10px 0;
+    padding: 12px;
+    background: white;
+    border: 1px solid #d8e2dc;
+    border-radius: 8px;
+}
+
+.story-card h4,
+.mission-card h4,
+.reward-card h4,
+.badge-card h4 {
+    margin: 0 0 8px;
+    color: #264653;
+}
+
+.character-row {
+    display: flex;
+    gap: 10px;
+}
+
+.character-token {
+    flex: 1;
+}
+
+.character-token {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 54px;
+    padding: 8px 10px 8px 42px;
+    border-radius: 8px;
+    background: #eef8ff;
+    border: 1px solid #b7d8e8;
+    color: #1b4965;
+}
+
+.character-token strong {
+    font-size: 15px;
+    line-height: 1.1;
+}
+
+.character-token small {
+    font-size: 11px;
+    font-weight: 500;
+    color: #5c677d;
+    line-height: 1;
+}
+
+.character-name {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.character-role {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* CSS-only character tokens keep the practice story lightweight and asset-free. */
+.character-token::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd166, #f4a261);
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+}
+
+.beat-token::before {
+    border-radius: 6px;
+    background:
+        radial-gradient(circle at 35% 42%, #1b4965 0 8%, transparent 9%),
+        radial-gradient(circle at 65% 42%, #1b4965 0 8%, transparent 9%),
+        linear-gradient(135deg, #ffffff, #a8dadc);
+    border: 2px solid #1b4965;
+}
+
+/* CSS-only bridge art avoids image files while preserving the Level 1 story cue. */
+.bridge-map {
+    position: relative;
+    min-height: 112px;
+    margin: 2px 0 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(#dff6ff 0 54%, #8fd3f4 55% 100%);
+    border: 1px solid #b7d8e8;
+}
+
+.bridge-gate {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 44px;
+    height: 34px;
+    transform: translateX(-50%);
+    border: 5px solid #ffffff;
+    border-bottom: none;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 0 0 2px #1b4965;
+}
+
+.bridge-gate::before,
+.bridge-gate::after {
+    content: "";
+    position: absolute;
+    bottom: 4px;
+    width: 10px;
+    height: 12px;
+    border: 3px solid #1b4965;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+}
+
+.bridge-gate::before {
+    left: 6px;
+}
+
+.bridge-gate::after {
+    right: 6px;
+}
+
+.bridge-letters {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 28px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+    align-items: end;
+}
+
+.bridge-letters span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border-radius: 8px 8px 4px 4px;
+    background: #ffffff;
+    border: 3px solid #1b4965;
+    color: #1b4965;
+    font-size: 28px;
+    font-weight: 900;
+    box-shadow: 0 5px 0 #90caf9;
+}
+
+.bridge-waves {
+    position: absolute;
+    left: 52px;
+    right: 38px;
+    bottom: 10px;
+    height: 28px;
+    background:
+        radial-gradient(60px 18px at 30px 4px, transparent 48%, #ffffff 50% 56%, transparent 58%),
+        radial-gradient(70px 20px at 82px 12px, transparent 48%, #3867ff 50% 56%, transparent 58%),
+        radial-gradient(72px 20px at 138px 8px, transparent 48%, #ffffff 50% 56%, transparent 58%);
+}
+
+/* CSS-only Sakura grove art gives Level 2 a distinct scene without external assets. */
+.sakura-grove {
+    position: relative;
+    min-height: 128px;
+    margin: 2px 0 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(#f7fbff 0 58%, #dbeac5 59% 100%);
+    border: 1px solid #c9ddc4;
+}
+
+.sakura-grove::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 34px;
+    height: 18px;
+    background:
+        radial-gradient(50px 18px at 30px 12px, #f8c8dc 0 38%, transparent 40%),
+        radial-gradient(62px 20px at 120px 8px, #f4a7c6 0 36%, transparent 38%),
+        radial-gradient(62px 20px at 210px 12px, #f8c8dc 0 36%, transparent 38%);
+    opacity: 0.85;
+}
+
+.sakura-tree {
+    position: absolute;
+    bottom: 28px;
+    width: 54px;
+    height: 76px;
+}
+
+.sakura-tree::before {
+    content: "";
+    position: absolute;
+    left: 24px;
+    bottom: 0;
+    width: 8px;
+    height: 46px;
+    border-radius: 5px;
+    background: #7a4f2a;
+}
+
+.sakura-tree span {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #f8b6d2;
+    box-shadow: inset -4px -5px 0 rgba(255, 255, 255, 0.32);
+}
+
+.sakura-tree span:nth-child(1) {
+    left: 2px;
+    top: 12px;
+}
+
+.sakura-tree span:nth-child(2) {
+    left: 17px;
+    top: 0;
+    background: #f5a3c5;
+}
+
+.sakura-tree span:nth-child(3) {
+    right: 0;
+    top: 17px;
+}
+
+.sakura-tree-left {
+    left: 18px;
+}
+
+.sakura-tree-right {
+    right: 18px;
+    transform: scale(0.9);
+}
+
+.journal-page {
+    position: absolute;
+    left: 50%;
+    bottom: 38px;
+    width: 38px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%) rotate(-5deg);
+    border-radius: 4px;
+    background: #fff8dc;
+    border: 2px solid #d6a84f;
+    color: #8a5a00;
+    font-size: 16px;
+    font-weight: 900;
+    box-shadow: 0 5px 0 rgba(138, 90, 0, 0.16);
+}
+
+.sakura-sky-note {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    width: 14px;
+    height: 34px;
+    border-radius: 8px 8px 0 0;
+    background: #457b9d;
+    transform: translateX(-50%);
+}
+
+.sakura-sky-note::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    bottom: -7px;
+    width: 20px;
+    height: 16px;
+    border-radius: 50%;
+    background: #457b9d;
+}
+
+.petal {
+    position: absolute;
+    width: 16px;
+    height: 10px;
+    border-radius: 12px 12px 12px 2px;
+    background: #ffcad4;
+    border: 1px solid #e58ead;
+}
+
+.petal-one {
+    left: 84px;
+    top: 30px;
+    transform: rotate(20deg);
+}
+
+.petal-two {
+    right: 92px;
+    top: 42px;
+    transform: rotate(-22deg);
+}
+
+.petal-three {
+    left: 54%;
+    bottom: 26px;
+    transform: rotate(12deg);
+}
+
+.petal-song-map,
+.beat-map {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 8px 0;
+}
+
+.rhythm-cave {
+    position: relative;
+    min-height: 150px;
+    overflow: hidden;
+    border: 1px solid #9bd7f5;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.92) 0 16%, transparent 17%),
+        linear-gradient(180deg, #dff4ff 0%, #9bd7f5 62%, #5fb9d6 63% 100%);
+}
+
+.cave-mouth {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    width: 118px;
+    height: 78px;
+    transform: translateX(-50%);
+    border-radius: 60px 60px 18px 18px;
+    background: #17415c;
+    box-shadow:
+        inset 0 0 0 10px #2a6f8f,
+        0 8px 0 rgba(23, 65, 92, 0.18);
+}
+
+.pulse-lights {
+    position: absolute;
+    left: 50%;
+    top: 24px;
+    display: flex;
+    gap: 12px;
+    transform: translateX(-50%);
+}
+
+.pulse-lights span {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffd166;
+    border: 2px solid #b7791f;
+    box-shadow: 0 0 14px rgba(255, 209, 102, 0.72);
+}
+
+.pulse-lights span:nth-child(2),
+.pulse-lights span:nth-child(4) {
+    transform: translateY(12px);
+    background: #f4978e;
+    border-color: #b94b47;
+}
+
+.rhythm-river {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 34px;
+    background: #53b6d8;
+}
+
+.rhythm-river span {
+    position: absolute;
+    top: -9px;
+    width: 58px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.rhythm-river span:nth-child(1) {
+    left: 18px;
+}
+
+.rhythm-river span:nth-child(2) {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.rhythm-river span:nth-child(3) {
+    right: 18px;
+}
+
+.rhythm-journal-page {
+    right: 18px;
+    left: auto;
+    bottom: 46px;
+    transform: rotate(7deg);
+}
+
+.body-beat-cove {
+    position: relative;
+    min-height: 152px;
+    overflow: hidden;
+    border: 1px solid #9bd7f5;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #dff7ff 0 52%, #f8dc9b 53% 100%), #f8dc9b;
+}
+
+.cove-sun {
+    position: absolute;
+    right: 18px;
+    top: 16px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffd166;
+    box-shadow: 0 0 0 8px rgba(255, 209, 102, 0.25);
+}
+
+.body-beat-row {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 34px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.body-beat-row span {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1f5f82;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #123047;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 5px 0 rgba(31, 95, 130, 0.18);
+}
+
+.body-beat-grid {
+    position: absolute;
+    left: 18px;
+    right: 72px;
+    bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.body-beat-grid span {
+    height: 22px;
+    border-radius: 5px;
+    background: #39c6d1;
+    border: 2px solid #178995;
+}
+
+.body-beat-grid span:nth-child(3n) {
+    background: #ffca3a;
+    border-color: #b7791f;
+}
+
+.body-beat-grid span:nth-child(5n) {
+    background: #f4978e;
+    border-color: #b94b47;
+}
+
+.body-beat-journal-page {
+    right: 18px;
+    left: auto;
+    bottom: 18px;
+    transform: rotate(-8deg);
+}
+
+/* CSS-only geometry reef art keeps Level 5 visual without adding image assets. */
+.geometry-reef {
+    position: relative;
+    min-height: 152px;
+    overflow: hidden;
+    border: 1px solid #b4d6c1;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.72) 0 26%, transparent 27%),
+        linear-gradient(180deg, #dff7ff 0 48%, #b7e4c7 49% 100%);
+}
+
+.geometry-orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 112px;
+    height: 112px;
+    transform: translate(-50%, -50%);
+    border: 4px dashed #2a9d8f;
+    border-radius: 50%;
+}
+
+.geometry-shape {
+    position: absolute;
+}
+
+.geometry-triangle {
+    left: 26px;
+    bottom: 32px;
+    width: 0;
+    height: 0;
+    border-right: 28px solid transparent;
+    border-bottom: 48px solid #ffb703;
+    border-left: 28px solid transparent;
+}
+
+.geometry-square {
+    left: 50%;
+    bottom: 34px;
+    width: 50px;
+    height: 50px;
+    transform: translateX(-50%) rotate(8deg);
+    border: 5px solid #457b9d;
+    background: rgba(69, 123, 157, 0.18);
+}
+
+.geometry-pentagon {
+    right: 26px;
+    bottom: 34px;
+    width: 56px;
+    height: 54px;
+    background: #f4978e;
+    clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+    box-shadow: inset 0 0 0 5px rgba(138, 49, 44, 0.2);
+}
+
+.geometry-journal-page {
+    left: 50%;
+    bottom: 94px;
+    transform: translateX(-50%) rotate(-4deg);
+}
+
+/* CSS-only lagoon art keeps Level 6 animation story lightweight and themeable. */
+.polyrhythm-lagoon {
+    position: relative;
+    min-height: 164px;
+    overflow: hidden;
+    border: 1px solid #a9c7de;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.7) 0 16%, transparent 17%),
+        radial-gradient(circle at 34% 48%, rgba(77, 171, 247, 0.22) 0 24%, transparent 25%),
+        radial-gradient(circle at 65% 48%, rgba(42, 157, 143, 0.22) 0 28%, transparent 29%),
+        linear-gradient(180deg, #eaf8ff 0 42%, #bde0fe 43% 100%);
+}
+
+.lagoon-ring {
+    position: absolute;
+    top: 48%;
+    width: 86px;
+    height: 86px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.lagoon-ring span {
+    position: relative;
+    z-index: 1;
+}
+
+.lagoon-ring-two {
+    left: 38px;
+    border: 5px solid #457b9d;
+    color: #234b63;
+}
+
+.lagoon-ring-three {
+    right: 38px;
+    border: 5px dashed #2a9d8f;
+    color: #126b61;
+}
+
+.avatar-orb {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 35%, #fff6cf 0 18%, transparent 19%),
+        linear-gradient(135deg, #ffca3a, #f4978e);
+    border: 4px solid rgba(98, 68, 18, 0.28);
+    box-shadow: 0 5px 14px rgba(28, 72, 91, 0.22);
+}
+
+.lagoon-journal-page {
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%) rotate(4deg);
+}
+
+/* CSS-only ring art keeps the Level 7 broadcast story lightweight and themeable. */
+.signal-ring {
+    position: relative;
+    min-height: 178px;
+    overflow: hidden;
+    border: 1px solid #c3b0dd;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.72) 0 13%, transparent 14%),
+        linear-gradient(180deg, #f4edff 0 46%, #d9c9f6 47% 100%);
+}
+
+.signal-ring-track {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    box-sizing: border-box;
+    width: 131px;
+    height: 131px;
+    transform: translate(-50%, -50%);
+    border: 3px dashed #7b5ea7;
+    border-radius: 50%;
+}
+
+.ring-drum {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd166, #ef8354);
+    border: 2px solid rgba(87, 54, 12, 0.35);
+    /* Each drum is rotated onto the ring, then pushed out to the track radius. */
+    transform: rotate(var(--ring-angle, 0deg)) translateY(-64px);
+}
+
+.ring-drum:nth-of-type(1) {
+    --ring-angle: 0deg;
+}
+
+.ring-drum:nth-of-type(2) {
+    --ring-angle: 30deg;
+}
+
+.ring-drum:nth-of-type(3) {
+    --ring-angle: 60deg;
+}
+
+.ring-drum:nth-of-type(4) {
+    --ring-angle: 90deg;
+}
+
+.ring-drum:nth-of-type(5) {
+    --ring-angle: 120deg;
+}
+
+.ring-drum:nth-of-type(6) {
+    --ring-angle: 150deg;
+}
+
+.ring-drum:nth-of-type(7) {
+    --ring-angle: 180deg;
+}
+
+.ring-drum:nth-of-type(8) {
+    --ring-angle: 210deg;
+}
+
+.ring-drum:nth-of-type(9) {
+    --ring-angle: 240deg;
+}
+
+.ring-drum:nth-of-type(10) {
+    --ring-angle: 270deg;
+}
+
+.ring-drum:nth-of-type(11) {
+    --ring-angle: 300deg;
+}
+
+.ring-drum:nth-of-type(12) {
+    --ring-angle: 330deg;
+}
+
+.ring-drum-active {
+    background: linear-gradient(135deg, #fff3b0, #ffb703);
+    box-shadow: 0 0 0 4px rgba(255, 183, 3, 0.35);
+}
+
+.ring-conductor {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: 42px;
+    height: 42px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 34%, #fff6cf 0 19%, transparent 20%),
+        linear-gradient(135deg, #a3c4f3, #5390d9);
+    border: 3px solid rgba(30, 61, 89, 0.35);
+    box-shadow: 0 5px 14px rgba(58, 40, 92, 0.24);
+}
+
+.ring-conductor::after {
+    content: "";
+    position: absolute;
+    inset: -13px;
+    border-radius: 50%;
+    border: 2px solid rgba(83, 144, 217, 0.45);
+}
+
+.ring-journal-page {
+    left: auto;
+    right: 14px;
+    bottom: 12px;
+    transform: rotate(5deg);
+}
+
+/* The Level 8 sky doubles as the lesson's handout: pitch on the vertical axis, time across. */
+.star-sky {
+    position: relative;
+    padding: 12px 12px 64px;
+    border: 1px solid #4b478f;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 14% 22%, rgba(255, 244, 190, 0.9) 0 1.5px, transparent 2px),
+        radial-gradient(circle at 86% 16%, rgba(255, 244, 190, 0.75) 0 1.5px, transparent 2px),
+        radial-gradient(circle at 72% 88%, rgba(255, 244, 190, 0.6) 0 1.5px, transparent 2px),
+        linear-gradient(180deg, #33306e 0 55%, #4d4590 56% 100%);
+}
+
+.star-graph {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 6px;
+    height: 108px;
+}
+
+.star-graph-labels {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    align-items: center;
+    color: #ffeaa7;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: right;
+}
+
+.star-graph-plot {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    border-left: 2px solid rgba(255, 234, 167, 0.55);
+    border-bottom: 2px solid rgba(255, 234, 167, 0.55);
+    background: repeating-linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.16) 0 1px,
+        transparent 1px calc(100% / 6)
+    );
+}
+
+.star-note {
+    place-self: center;
+    width: 17px;
+    height: 17px;
+    background: radial-gradient(circle at 50% 42%, #fffbe6 0 28%, #ffd93d 29% 100%);
+    clip-path: polygon(
+        50% 0,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+}
+
+.star-beat-1 {
+    grid-column: 1;
+}
+
+.star-beat-2 {
+    grid-column: 2;
+}
+
+.star-beat-3 {
+    grid-column: 3;
+}
+
+.star-beat-4 {
+    grid-column: 4;
+}
+
+.star-beat-5 {
+    grid-column: 5;
+}
+
+.star-beat-6 {
+    grid-column: 6;
+}
+
+.star-beat-7 {
+    grid-column: 7;
+}
+
+.star-pitch-la {
+    grid-row: 1;
+}
+
+.star-pitch-sol {
+    grid-row: 2;
+}
+
+.star-pitch-fa {
+    grid-row: 3;
+}
+
+.star-pitch-mi {
+    grid-row: 4;
+}
+
+.star-pitch-re {
+    grid-row: 5;
+}
+
+.star-pitch-do {
+    grid-row: 6;
+}
+
+.star-journal-page {
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%) rotate(-4deg);
+}
+
+.petal-song-map span,
+.beat-map span {
+    position: relative;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 18px 18px 18px 5px;
+    background: #ffe1ec;
+    border: 1px solid #e9a1bd;
+    color: #6d214f;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.petal-song-map span:nth-child(2n),
+.beat-map span:nth-child(2n) {
+    background: #eef7d2;
+    border-color: #b7d17c;
+    color: #3f5f21;
+}
+
+.sound-chip-row,
+.explore-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+}
+
+.sound-chip,
+.explore-grid button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: #fff3b0;
+    border: 1px solid #e9c46a;
+    color: #5f4b00;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.bridge-order {
+    background: #e9f7f4;
+    border-color: #2a9d8f;
+    color: #1b4332;
+}
+
+.explore-grid button {
+    background: #f8f9fa;
+    border-color: #a8dadc;
+    color: #34495e;
+}
+
+.tablet-code {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #fff3b0;
+    color: #5f4b00;
+}
+
+/* === EXPLORER JOURNAL === */
+.journal-cover,
+.journal-page-card,
+.journal-empty-card {
+    margin: 10px 0;
+    padding: 14px;
+    background: var(--color-panel-bg);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(88, 61, 18, 0.08);
+}
+
+/* CSS-only book cover keeps Explorer Journal themeable across light, dark, and high contrast. */
+.journal-cover {
+    position: relative;
+    min-height: 112px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 88% 18%, rgba(255, 209, 102, 0.32) 0 10%, transparent 11%),
+        var(--color-panel-bg);
+}
+
+.journal-cover::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    width: 74px;
+    height: 48px;
+    border-radius: 8px 8px 6px 6px;
+    background:
+        linear-gradient(
+            90deg,
+            transparent 48%,
+            color-mix(in srgb, var(--color-text-primary) 24%, transparent) 49% 51%,
+            transparent 52%
+        ),
+        linear-gradient(
+            var(--color-panel-bg),
+            color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-panel-bg))
+        );
+    border: 2px solid var(--color-brand-primary);
+    transform: rotate(-4deg);
+}
+
+.journal-cover h3 {
+    margin: 0;
+    color: var(--color-brand-primary);
+    font-size: 21px;
+}
+
+.journal-cover p,
+.journal-empty-card p {
+    max-width: 210px;
+    margin: 6px 0 0;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.journal-cover-icon {
+    width: 42px;
+    height: 36px;
+    margin-bottom: 8px;
+    border-radius: 6px 6px 5px 5px;
+    background:
+        linear-gradient(90deg, transparent 47%, rgba(255, 255, 255, 0.5) 48% 52%, transparent 53%),
+        linear-gradient(var(--color-brand-primary), var(--color-brand-primary));
+    border: 2px solid var(--color-border-primary);
+}
+
+.journal-page-list {
+    display: grid;
+    gap: 10px;
+}
+
+.journal-open-page {
+    width: 100%;
+    display: grid;
+    gap: 4px;
+    min-height: 84px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 8px;
+    background: var(--color-panel-bg);
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-left: 6px solid var(--color-brand-primary);
+}
+
+.journal-open-page:hover,
+.journal-open-page:focus {
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    border-color: var(--color-brand-primary);
+}
+
+.journal-open-title {
+    color: var(--color-text-primary);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.journal-open-meta {
+    color: var(--color-text-primary);
+    font-size: 12px;
+    opacity: 0.82;
+}
+
+.journal-level-1 {
+    border-left-color: var(--color-brand-primary);
+}
+
+.journal-level-2 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 68%, #e91e63);
+}
+
+.journal-level-3 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 64%, #00a676);
+}
+
+.journal-level-4 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 58%, #ffca3a);
+}
+
+.journal-level-5 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 54%, #2a9d8f);
+}
+
+.journal-level-6 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 50%, #4dabf7);
+}
+
+.journal-level-7 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 46%, #7b5ea7);
+}
+
+.journal-level-8 {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 42%, #ffd93d);
+}
+
+.journal-page-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.journal-page-number {
+    color: var(--color-brand-primary);
+}
+
+.journal-page-card h4,
+.journal-empty-card h4 {
+    margin: 0 0 10px;
+    color: var(--color-text-primary);
+    font-size: 18px;
+}
+
+.journal-learned {
+    margin: 10px 0;
+}
+
+.journal-learned strong,
+.journal-note-label,
+.journal-prompt-book label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-text-primary);
+    font-size: 13px;
+}
+
+.journal-learned div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.journal-learned span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-panel-bg));
+    border: 1px solid var(--color-brand-primary);
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.journal-learned span::before {
+    content: "\2713";
+    margin-right: 5px;
+    color: var(--color-brand-primary);
+    font-weight: 900;
+}
+
+.journal-page-card textarea,
+.journal-prompt-book textarea {
+    width: 100%;
+    min-height: 78px;
+    resize: vertical;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font:
+        14px "Segoe UI",
+        sans-serif;
+    line-height: 1.35;
+}
+
+.journal-page-card textarea:focus,
+.journal-prompt-book textarea:focus {
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    border-color: var(--color-brand-primary);
+}
+
+.journal-add-note,
+.journal-update-note,
+.journal-delete-note,
+.journal-delete-page,
+#journal-save-general-note,
+#save-journal-prompt {
+    min-height: 38px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-brand-primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.journal-note-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.journal-note-actions .journal-add-note,
+.journal-note-actions .journal-update-note,
+.journal-note-actions .journal-delete-note,
+.journal-note-actions .journal-delete-page {
+    margin-top: 0;
+}
+
+.journal-delete-note,
+.journal-delete-page {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+}
+
+.journal-delete-note:hover,
+.journal-delete-page:hover {
+    filter: brightness(0.95);
+}
+
+.journal-add-note:hover,
+.journal-update-note:hover,
+#save-journal-prompt:hover,
+#journal-save-general-note:hover {
+    filter: brightness(0.92);
+}
+
+.journal-note-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.journal-note-card {
+    padding: 10px;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 8px;
+    background: var(--color-bg-primary);
+}
+
+.journal-note-card.empty {
+    color: var(--color-text-primary);
+}
+
+.journal-note-card.empty span {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    opacity: 0.78;
+}
+
+.journal-note-date {
+    margin-bottom: 6px;
+    color: var(--color-brand-primary);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.journal-new-note {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border-primary);
+}
+
+.journal-section {
+    margin: 14px 0 0;
+}
+
+.journal-section-title {
+    margin: 0 0 8px;
+    color: var(--color-brand-primary);
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.journal-general-section {
+    padding-top: 4px;
+}
+
+.journal-general-empty {
+    margin: 0 0 8px;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.journal-open-general {
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 42%, #ffb703);
+}
+
+.journal-fab-add {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border: 2px dashed var(--color-brand-primary);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-panel-bg));
+    color: var(--color-brand-primary);
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        filter 0.2s ease;
+}
+
+.journal-fab-add:hover,
+.journal-fab-add:focus {
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    filter: brightness(0.97);
+}
+
+.journal-page-card input[type="text"],
+.journal-general-page input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font:
+        14px "Segoe UI",
+        sans-serif;
+    line-height: 1.35;
+}
+
+.journal-page-card input[type="text"]:focus,
+.journal-general-page input[type="text"]:focus {
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    border-color: var(--color-brand-primary);
+}
+
+#explorer-journal-prompt {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 9500;
+    width: min(360px, calc(100% - 24px));
+    transform: translate(-50%, -50%);
+}
+
+.journal-prompt-book {
+    position: relative;
+    padding: 18px;
+    border-radius: 10px;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--color-brand-primary) 18%, transparent) 0 14px,
+            transparent 15px
+        ),
+        var(--color-panel-bg);
+    border: 2px solid var(--color-brand-primary);
+    box-shadow: 0 12px 32px rgba(33, 37, 41, 0.22);
+    color: var(--color-text-primary);
+}
+
+#close-journal-prompt {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.journal-prompt-kicker {
+    display: inline-block;
+    margin-bottom: 4px;
+    color: var(--color-brand-primary);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.journal-prompt-book h3 {
+    margin: 0 28px 8px 0;
+    color: var(--color-brand-primary);
+    font-size: 20px;
+}
+
+.journal-prompt-book p {
+    margin: 0 0 12px;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.journal-prompt-actions {
+    display: flex;
+    gap: 8px;
+}
+
+#skip-journal-prompt {
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#skip-journal-prompt:hover {
+    filter: brightness(0.95);
+}
+
+@media (max-width: 780px) {
+    #explorer-journal-prompt {
+        width: calc(100% - 24px);
+    }
+}
+
+/* === LEVEL BUTTONS === */
+.level-btn {
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: none;
+    background: white;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 8px;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.level-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.level-btn small {
+    grid-column: 2;
+    color: #5c677d;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.level-btn::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e3f2fd;
+    border: 2px solid #90caf9;
+}
+
+/* Completed level */
+.level-btn.done {
+    background: linear-gradient(135deg, #81c784, #66bb6a);
+    color: white;
+}
+
+.level-btn.done small {
+    color: white;
+}
+
+.level-badge-strip {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 2px;
+}
+
+.level-badge {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 50%, #fff4be 0 36%, transparent 37%),
+        repeating-conic-gradient(
+            from 0deg,
+            #d9a526 0deg 10deg,
+            #f3c75c 10deg 20deg,
+            #b9851f 20deg 30deg
+        );
+    color: #65440f;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.4;
+    box-shadow:
+        inset 0 0 0 1px rgba(116, 75, 10, 0.25),
+        0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.level-badge::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border-radius: 50%;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.5), transparent 45%),
+        radial-gradient(circle at 50% 50%, #f7d878 0 55%, #c99528 56% 100%);
+    border: 1px solid rgba(116, 75, 10, 0.3);
+}
+
+.level-badge::after {
+    position: relative;
+    z-index: 1;
+}
+
+.level-badge-bridge::after {
+    content: "BR";
+}
+
+.level-badge-blossom::after {
+    content: "SA";
+}
+
+.level-badge-name::after {
+    content: "A";
+}
+
+.level-badge-sky::after {
+    content: "^";
+}
+
+.level-badge-shift::after {
+    content: "~";
+}
+
+.level-badge-coin::after {
+    content: "$";
+}
+
+.level-badge-rhythm::after {
+    content: "Rh";
+}
+
+.level-badge-beat::after {
+    content: "Bt";
+}
+
+.level-badge-drum::after {
+    content: "Dr";
+}
+
+.level-badge-machine::after {
+    content: "Dm";
+}
+
+.level-badge-body::after {
+    content: "Bo";
+}
+
+.level-badge-parts::after {
+    content: "2P";
+}
+
+.level-badge-loop::after {
+    content: "Lp";
+}
+
+.level-badge-sound::after {
+    content: "So";
+}
+
+.level-badge-remix::after {
+    content: "Rx";
+}
+
+.level-badge-shape::after {
+    content: "Sh";
+}
+
+.level-badge-divide::after {
+    content: "360";
+    font-size: 10px;
+}
+
+.level-badge-box::after {
+    content: "Bx";
+}
+
+.level-badge-color::after {
+    content: "Co";
+}
+
+.level-badge-polygon::after {
+    content: "Pg";
+}
+
+.level-badge-polyrhythm::after {
+    content: "2:3";
+    font-size: 10px;
+}
+
+.level-badge-sync::after {
+    content: "Sy";
+}
+
+.level-badge-avatar::after {
+    content: "Av";
+}
+
+.level-badge-motion::after {
+    content: "Mo";
+}
+
+.level-badge-voice::after {
+    content: "Vo";
+}
+
+.level-badge-spin::after {
+    content: "Sp";
+}
+
+.level-badge-ring::after {
+    content: "Rg";
+}
+
+.level-badge-toggle::after {
+    content: "1-0";
+    font-size: 9px;
+}
+
+.level-badge-mice::after {
+    content: "12";
+}
+
+.level-badge-star::after {
+    content: "St";
+}
+
+.level-badge-discovery::after {
+    content: "*";
+}
+
+.big-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 12px;
+}
+
+.big-badge {
+    position: relative;
+    min-height: 38px;
+    padding: 8px 10px 8px 52px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1b4965, #2a9d8f);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+}
+
+.big-badge::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 50%, #fff4be 0 34%, transparent 35%),
+        repeating-conic-gradient(
+            from 0deg,
+            #d9a526 0deg 10deg,
+            #f3c75c 10deg 20deg,
+            #b9851f 20deg 30deg
+        );
+    box-shadow:
+        inset 0 0 0 1px rgba(116, 75, 10, 0.25),
+        0 1px 3px rgba(0, 0, 0, 0.16);
+}
+
+.big-badge::after {
+    content: "*";
+    position: absolute;
+    left: 21px;
+    top: 14px;
+    color: #65440f;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.level-btn.done::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2e7d32;
+    border-color: #2e7d32;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+/* === BACK BUTTON === */
+#back-to-levels,
+#back-to-journal-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-panel-bg);
+    color: var(--color-brand-primary);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+#back-to-levels:hover,
+#back-to-journal-index:hover,
+#back-to-levels:focus,
+#back-to-journal-index:focus {
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 26%, transparent);
+    border-color: var(--color-brand-primary);
+}
+
+/* === LEVEL CONTENT === */
+.practice-sidebar h2 {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    font-size: 22px;
+    color: #1e88e5;
+}
+
+.practice-sidebar h4 {
+    margin: 6px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.practice-sidebar p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #444;
+}
+
+.practice-description p,
+.practice-description li,
+.reward-card li {
+    font-size: 14px;
+    line-height: 1.45;
+    color: #444;
+}
+
+.practice-description ul,
+.practice-description ol,
+.reward-card ul {
+    margin: 8px 0 0;
+    padding-left: 22px;
+}
+
+.badge-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.badge-chip {
+    padding: 6px 8px;
+    border: 1px dashed #a8dadc;
+    border-radius: 999px;
+    background: #f8f9fa;
+    color: #5c677d;
+    font-size: 12px;
+}
+
+.badge-chip.earned {
+    border-style: solid;
+    border-color: #2a9d8f;
+    background: #e9f7f4;
+    color: #1b4332;
+    font-weight: 700;
+}
+
+.practice-quest-notice {
+    position: fixed;
+    top: 84px;
+    left: 24px;
+    right: 384px;
+    max-width: 480px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid #a8dadc;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    visibility: hidden;
+    z-index: 9200;
+}
+
+.practice-quest-notice.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    animation: practiceNoticeIn 0.22s ease-out;
+}
+
+.practice-quest-notice strong,
+.practice-quest-notice span {
+    display: block;
+}
+
+.practice-quest-notice strong {
+    margin-bottom: 4px;
+    color: #1b4965;
+}
+
+.practice-quest-notice span {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #34495e;
+}
+
+.practice-quest-notice.success {
+    border-color: #2a9d8f;
+    background: #e9f7f4;
+}
+
+.practice-quest-notice.badge {
+    border-color: #f4a261;
+    background: #fff7e6;
+}
+
+.practice-quest-notice.hint {
+    border-color: #90caf9;
+    background: #e3f2fd;
+}
+
+@keyframes practiceNoticeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 760px) {
+    .practice-quest-notice {
+        left: 14px;
+        right: 14px;
+        max-width: none;
+    }
+}
+
+/* === REFERENCE IMAGE === */
+.practice-ref {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 14px;
+    border: 2px solid #d0d7de;
+    margin: 12px 0;
+    background: white;
+}
+
+/* CSS-only lighthouse metronome keeps Level 9 asset-free like the other scenes. */
+.metronome-scene {
+    position: relative;
+    min-height: 128px;
+    margin: 2px 0 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1b4965;
+    background: linear-gradient(#12314a 0 58%, #14496b 59% 100%);
+}
+
+.metronome-beam {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-left: 56px solid transparent;
+    border-right: 56px solid transparent;
+    border-bottom: 46px solid rgba(255, 209, 102, 0.3);
+}
+
+.metronome-body {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    width: 72px;
+    height: 82px;
+    transform: translateX(-50%);
+    border: 3px solid #1b4965;
+    border-radius: 26px 26px 6px 6px;
+    background: linear-gradient(#fdfefe 0 46%, #e63946 47% 100%);
+}
+
+.metronome-arm {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 4px;
+    height: 60px;
+    border-radius: 2px;
+    background: #1b4965;
+    transform-origin: bottom center;
+    transform: rotate(-16deg);
+}
+
+.metronome-weight {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    width: 20px;
+    height: 10px;
+    margin-left: -10px;
+    border-radius: 2px;
+    background: #ffd166;
+    border: 2px solid #1b4965;
+}
+
+.metronome-tick {
+    position: absolute;
+    bottom: 34px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.metronome-tick-left {
+    left: 28px;
+}
+
+.metronome-tick-right {
+    right: 28px;
+}
+
+/* CSS-only singing stones keep Level 10 asset-free like the other scenes. */
+.piano-scene {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    min-height: 128px;
+    margin: 2px 0 12px;
+    padding-bottom: 22px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #b08968;
+    background: linear-gradient(#cfe8f5 0 58%, #e8d5b7 59% 100%);
+}
+
+.piano-key {
+    width: 26px;
+    border-radius: 6px 6px 3px 3px;
+    border: 2px solid #6d6875;
+    background: linear-gradient(#fdfefe, #d8e2dc);
+    box-shadow: 0 3px 0 rgba(109, 104, 117, 0.35);
+}
+
+.piano-key-1 {
+    height: 58px;
+}
+
+.piano-key-2 {
+    height: 74px;
+}
+
+.piano-key-3 {
+    height: 66px;
+}
+
+.piano-key-4 {
+    height: 50px;
+}
+
+.piano-hand {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2px solid #6d6875;
+    background: #ffd166;
+}
+
+/* The rhythm a learner reads and copies into Phrase Maker: one box per beat. */
+.rhythm-chart {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #b7d8e8;
+    background: #f3fbff;
+}
+
+.rhythm-chart h5 {
+    margin: 9px 0 5px;
+    color: #1f5f82;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.rhythm-chart h5:first-child {
+    margin-top: 0;
+}
+
+.rhythm-bar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.rhythm-bar span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 3px 2px;
+    border-radius: 6px;
+    border: 2px solid #178995;
+    background: #d6f4f7;
+    color: #0f3d43;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.rhythm-bar .beat-snap {
+    background: #fff3c4;
+    border-color: #b7791f;
+    color: #6b4b06;
+}
+
+.rhythm-bar .beat-clap {
+    background: #ffe0dc;
+    border-color: #b94b47;
+    color: #7a2723;
+}
+
+/* Two sounds squeezed into one beat, drawn as one box split in half. */
+.rhythm-bar .beat-quick {
+    gap: 3px;
+    padding: 3px;
+}
+
+.rhythm-bar .beat-quick i {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.65);
+    font-size: 9px;
+    font-style: normal;
+    overflow: hidden;
+}
+
+/* === CHECK BUTTON === */
+#check-level {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, #42a5f5, #1e88e5);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+#check-level:hover {
+    background: linear-gradient(135deg, #1e88e5, #1565c0);
+}
+
+/* === NEXT LESSON BUTTON === */
+#next-level {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 8px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, #ffa726, #fb8c00);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+#next-level:hover {
+    background: linear-gradient(135deg, #fb8c00, #ef6c00);
+}
+
+#next-level small {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* === SUCCESS MESSAGE === */
+.success {
+    margin-top: 10px;
+    padding: 8px;
+    background: #e8f5e9;
+    border-radius: 10px;
+    color: #2e7d32;
+    font-weight: 600;
+    text-align: center;
+}

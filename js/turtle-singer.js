@@ -105,7 +105,29 @@ class Singer {
      */
     constructor(turtle) {
         this.turtle = turtle;
-        this.turtles = turtle.turtles;
+        this.turtles = turtle && turtle.turtles ? turtle.turtles : null;
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+        this.synthVolume = {};
+        this.panner = null;
+
+        this.reset();
+    }
+
+    /**
+     * Resets all musical and audio runtime state to clean initial defaults.
+     * Ensures consistent state across consecutive project runs.
+     *
+     * @param {boolean} [suppressOutput=false] - Whether to suppress audio output (e.g. during notation export).
+     * @returns {void}
+     */
+    reset(suppressOutput = false) {
+        if (this.activeVoices && typeof this.activeVoices.clear === "function") {
+            this.activeVoices.clear();
+        } else {
+            this.activeVoices = new Set();
+        }
+        this._unhighlightTimers = {};
 
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
@@ -190,7 +212,6 @@ class Singer {
         this.tieNoteExtras = [];
         this.tieCarryOver = 0;
         this.tieFirstDrums = [];
-        this.synthVolume = {};
         this.drift = 0;
         // Maximum fraction of note duration that can be used for lag correction per note.
         // This prevents notes from being rushed when catching up to the master clock.
@@ -216,7 +237,6 @@ class Singer {
         this.neighborArgNote2 = [];
         this.neighborArgBeat = [];
         this.neighborArgCurrentBeat = [];
-        this.panner = null;
 
         this.inNoteBlock = [];
         this.multipleVoices = false;
@@ -242,12 +262,10 @@ class Singer {
         this.justMeasuring = [];
         this.firstPitch = [];
         this.lastPitch = [];
-        this.suppressOutput = false;
+        this.suppressOutput = Boolean(suppressOutput);
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
-
-        // Voice Manager: Track active audio sources for proper cleanup
-        this.activeVoices = new Set();
+        this.runningFromEvent = false;
     }
 
     /**
@@ -760,6 +778,47 @@ class Singer {
                 }
             }
         }
+    }
+
+    /**
+     * Restores the master volume to its default level.
+     *
+     * masterVolume is a stack shared by every turtle and every run. The set master volume clamp
+     * pushes a level and pops it when the clamp ends, so stopping a project inside that clamp
+     * leaves the level behind, and loadSynth() hands each new instrument last(masterVolume).
+     * Without this the level survives into the next run and into whatever project is loaded after.
+     *
+     * The output itself goes back to its fresh-load level rather than through setMasterVolume():
+     * feeding DEFAULTVOLUME to the gain curve would land on -6 dB and quieten every project that
+     * never sets a volume of its own.
+     *
+     * @static
+     * @param {Object} logo
+     * @returns {void}
+     */
+    static resetMasterVolume(logo) {
+        Singer.masterVolume.length = 1;
+        Singer.masterVolume[0] = DEFAULTVOLUME;
+
+        const turtleList = logo.activity.turtles.turtleList;
+        for (let i = 0, turtleCount = turtleList.length; i < turtleCount; i++) {
+            const synthVolume = turtleList[i].singer.synthVolume;
+            const synthKeys = Object.keys(synthVolume);
+
+            for (let j = 0, synthCount = synthKeys.length; j < synthCount; j++) {
+                const arr = synthVolume[synthKeys[j]];
+                if (arr.length > 0) {
+                    // Every entry, not just the top one: resetSynth() leaves a clamp's listener
+                    // attached, so a pop after this point would otherwise bring back a stale
+                    // level. The depth stays as it is for those pending pops to unwind.
+                    arr.fill(DEFAULTVOLUME);
+                } else {
+                    arr.push(DEFAULTVOLUME);
+                }
+            }
+        }
+
+        logo.synth.resetMasterVolume();
     }
 
     /**
