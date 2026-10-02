@@ -2609,7 +2609,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     }
     block._basicWheel.createWheel(labels);
 
-    if (block.name === "temperamentname") {
+    if (block.name === "temperamentname" || labels.length >= 6) {
         for (let j = 0; j < block._basicWheel.navItems.length; j++) {
             const font = getTemperamentSliceFont(
                 block._basicWheel.wheelRadius,
@@ -2670,13 +2670,14 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
+    let displaySize = 300;
+    let bounds = null;
     if (block.name === "temperamentname") {
-        const bounds = getWheelSafeBounds(block);
+        bounds = getWheelSafeBounds(block);
         const availableW = Math.max(160, bounds.rightBound - bounds.safeLeft - 8);
         const availableH = Math.max(160, bounds.bottomBound - bounds.safeTop - 8);
         const maxAvailable = Math.min(availableW, availableH);
         const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
-        let displaySize;
         if (screenWidth >= 1200) {
             displaySize = Math.min(410, Math.floor(maxAvailable * 0.7));
         } else if (screenWidth >= 768) {
@@ -2686,30 +2687,21 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
         }
         displaySize = Math.min(displaySize, maxAvailable);
         displaySize = Math.max(160, displaySize);
-
-        const half = Math.round(displaySize / 2);
-        const blockCenterX = Math.round(
-            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
-        );
-        const blockCenterY = Math.round(
-            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
-        );
-        const desiredLeft = blockCenterX - half;
-        const desiredTop = blockCenterY - half;
-
-        positionWheelDiv(block, displaySize, desiredLeft, desiredTop, bounds);
-    } else {
-        const desiredLeft =
-            Math.round(
-                (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
-            ) - 200;
-        const desiredTop =
-            Math.round(
-                (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
-            ) - 200;
-
-        positionWheelDiv(block, 300, desiredLeft, desiredTop);
+    } else if (block.name === "outputtools" || block.name === "grid") {
+        displaySize = 400;
     }
+
+    const half = Math.round(displaySize / 2);
+    const blockCenterX = Math.round(
+        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+    );
+    const blockCenterY = Math.round(
+        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+    );
+    const desiredLeft = blockCenterX - half;
+    const desiredTop = blockCenterY - half;
+
+    positionWheelDiv(block, displaySize, desiredLeft, desiredTop, bounds);
 
     // Navigate to the current selectedValue value.
     let i = menuValues.indexOf(selectedValue);
