@@ -883,8 +883,16 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     let isSyncingAccidental = false;
 
     const __selectionChangedSolfege = () => {
-        that.manualAccidental = null;
-        selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const selectedPitchIndex = that._pitchWheel.selectedNavItemIndex;
+        const pitchChanged = selectedPitchIndex !== prevPitch;
+        if (pitchChanged) {
+            that.manualAccidental = null;
+            selection["attr"] = "";
+        } else if (that.manualAccidental !== null) {
+            selection["attr"] = that.manualAccidental;
+        }
+
+        selection["note"] = that._pitchWheel.navItems[selectedPitchIndex].title;
         const i = noteLabels.indexOf(selection["note"]);
         that.value = noteValues[i];
 
@@ -898,50 +906,52 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             (that.name === "notename" &&
                 !["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]]?.name))
         ) {
-            let i = scale.indexOf(selection["note"]);
-            if (i === -1) {
-                i = scale.indexOf(that.value);
-            }
-            if (i === -1) {
-                i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
-            }
-            if (i === -1) {
-                i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
-            }
-            if (i !== -1) {
-                if (
-                    NOTENAMES.includes(selection["note"]) ||
-                    scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
-                    scale[i][0] === FIXEDSOLFEGE[that.value] ||
-                    scale[i][0] === selection["note"]
-                ) {
-                    selection["attr"] = scale[i].slice(1);
-                } else {
-                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].slice(1);
+            if (pitchChanged || that.manualAccidental === null) {
+                let scaleIdx = scale.indexOf(selection["note"]);
+                if (scaleIdx === -1) {
+                    scaleIdx = scale.indexOf(that.value);
                 }
+                if (scaleIdx === -1) {
+                    scaleIdx = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
+                }
+                if (scaleIdx === -1) {
+                    scaleIdx = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
+                }
+                if (scaleIdx !== -1) {
+                    if (
+                        NOTENAMES.includes(selection["note"]) ||
+                        scale[scaleIdx][0] === FIXEDSOLFEGE[selection["note"]] ||
+                        scale[scaleIdx][0] === FIXEDSOLFEGE[that.value] ||
+                        scale[scaleIdx][0] === selection["note"]
+                    ) {
+                        selection["attr"] = scale[scaleIdx].slice(1);
+                    } else {
+                        selection["attr"] = EQUIVALENTACCIDENTALS[scale[scaleIdx]].slice(1);
+                    }
+                }
+                isSyncingAccidental = true;
+                switch (selection["attr"]) {
+                    case DOUBLEFLAT:
+                        that._accidentalsWheel.navigateWheel(4);
+                        break;
+                    case FLAT:
+                        that._accidentalsWheel.navigateWheel(3);
+                        break;
+                    case NATURAL:
+                        that._accidentalsWheel.navigateWheel(2);
+                        break;
+                    case SHARP:
+                        that._accidentalsWheel.navigateWheel(1);
+                        break;
+                    case DOUBLESHARP:
+                        that._accidentalsWheel.navigateWheel(0);
+                        break;
+                    default:
+                        that._accidentalsWheel.navigateWheel(2);
+                        break;
+                }
+                isSyncingAccidental = false;
             }
-            isSyncingAccidental = true;
-            switch (selection["attr"]) {
-                case DOUBLEFLAT:
-                    that._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    that._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    that._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    that._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    that._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    that._accidentalsWheel.navigateWheel(2);
-                    break;
-            }
-            isSyncingAccidental = false;
         }
         if (selection["attr"] && selection["attr"] !== "♮") {
             that.value = noteValues[i] + selection["attr"];
