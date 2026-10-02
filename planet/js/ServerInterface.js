@@ -590,6 +590,13 @@ class ServerInterface {
             const response = await this._get(`/project/${encodeURIComponent(repoName)}`);
 
             if (!response || response.error) {
+                if (skipCache) {
+                    const fallback = await this.cacheManager.getMetadata(repoName);
+                    if (fallback) {
+                        callback({ success: true, data: fallback });
+                        return;
+                    }
+                }
                 callback(this.ConnectionFailureData);
                 return;
             }
@@ -600,6 +607,17 @@ class ServerInterface {
             callback({ success: true, data: normalised });
         } catch (err) {
             console.error("[ServerInterface] getProjectDetails error:", err);
+            if (skipCache) {
+                try {
+                    const fallback = await this.cacheManager.getMetadata(repoName);
+                    if (fallback) {
+                        callback({ success: true, data: fallback });
+                        return;
+                    }
+                } catch {
+                    // Ignore fallback error and return connection failure
+                }
+            }
             callback(this.ConnectionFailureData);
         }
     }

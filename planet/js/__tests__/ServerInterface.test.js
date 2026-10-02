@@ -151,6 +151,47 @@ describe("ServerInterface", () => {
                 data: server._normaliseProjectRow(serverResponse)
             });
         });
+
+        it("should fall back to cached metadata when skipCache is true and network returns null or error", async () => {
+            const cachedData = { name: "Fallback Cached Project" };
+            mockCacheManager.getMetadata.mockResolvedValue(cachedData);
+            jest.spyOn(server, "_get").mockResolvedValue(null);
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: cachedData
+            });
+        });
+
+        it("should fall back to cached metadata when skipCache is true and network throws an error", async () => {
+            const cachedData = { name: "Fallback Cached Project" };
+            mockCacheManager.getMetadata.mockResolvedValue(cachedData);
+            jest.spyOn(server, "_get").mockRejectedValue(new Error("Network offline"));
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: cachedData
+            });
+        });
+
+        it("should return ConnectionFailureData when skipCache is true, network fails, and cache is empty", async () => {
+            mockCacheManager.getMetadata.mockResolvedValue(null);
+            jest.spyOn(server, "_get").mockResolvedValue(null);
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
+            expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
+        });
     });
 
     describe("request handling", () => {

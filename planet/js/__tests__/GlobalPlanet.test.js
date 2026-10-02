@@ -399,6 +399,23 @@ describe("GlobalPlanet", () => {
                 gp.afterDownloadData("proj1", { success: false }, callback, null);
             }).not.toThrow();
         });
+
+        it("should not overwrite cache if row was replaced by refresh while download was in flight", () => {
+            const staleEntry = { ProjectData: null, ProjectLastUpdated: "v1" };
+            const freshEntry = { ProjectData: null, ProjectLastUpdated: "v2" };
+            gp.cache["proj1"] = freshEntry;
+            const callback = jest.fn();
+            gp.afterDownloadData(
+                "proj1",
+                { success: true, data: "oldData" },
+                callback,
+                null,
+                staleEntry
+            );
+
+            expect(gp.cache["proj1"].ProjectData).toBeNull();
+            expect(callback).toHaveBeenCalledWith("oldData");
+        });
     });
 
     describe("initTagList", () => {
@@ -529,18 +546,14 @@ describe("GlobalPlanet", () => {
             );
         });
 
-        it("downloadProjectsToCache should skip cache if expectedUpdatedAt differs from cache", () => {
-            gp.cache["repo-1"] = {
-                ProjectLastUpdated: "2026-10-01T10:00:00Z"
-            };
+        it("downloadProjectsToCache should fetch details for projects", () => {
             const cb = jest.fn();
 
             gp.downloadProjectsToCache([["repo-1", "2026-10-01T12:00:00Z"]], cb);
 
             expect(mockPlanet.ServerInterface.getProjectDetails).toHaveBeenCalledWith(
                 "repo-1",
-                expect.any(Function),
-                true
+                expect.any(Function)
             );
         });
     });
