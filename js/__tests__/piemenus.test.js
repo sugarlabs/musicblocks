@@ -505,6 +505,54 @@ describe("piemenus behavioral tests", () => {
             expect(mockBlock.manualAccidental).toBeNull();
         });
 
+        test("preserves block.manualAccidental when clicking the already-selected pitch on pitch wheel", async () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+            mockBlock.manualAccidental = "♮";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "♮");
+            expect(mockBlock.manualAccidental).toBe("♮");
+
+            // Click the already-selected slice (F at index 3)
+            mockBlock._pitchWheel.selectedNavItemIndex = 3;
+            mockBlock._pitchWheel.navItems[3].title = "F";
+
+            await mockBlock._pitchWheel.navItems[3].navigateFunction();
+
+            // Clicking the active slice should preserve the manual accidental override
+            expect(mockBlock.manualAccidental).toBe("♮");
+            expect(mockBlock.value).toBe("F");
+        });
+
+        test("scaledegree2 preserves manual accidental when re-clicking same degree and resets on degree change", async () => {
+            mockBlock.activity.KeySignatureEnv = ["C", "major", false];
+            mockBlock.name = "scaledegree2";
+            mockBlock.value = 1;
+            mockBlock.manualAccidental = "♯";
+
+            const degreeLabels = ["1", "2", "3", "4", "5", "6", "7"];
+            const degreeValues = [1, 2, 3, 4, 5, 6, 7];
+
+            piemenuPitches(mockBlock, degreeLabels, degreeValues, accidentals, 1, "♯");
+
+            // Re-click degree 1 (index 0)
+            mockBlock._pitchWheel.selectedNavItemIndex = 0;
+            mockBlock._pitchWheel.navItems[0].title = "1";
+            await mockBlock._pitchWheel.navItems[0].navigateFunction();
+
+            expect(mockBlock.manualAccidental).toBe("♯");
+            expect(mockBlock.value).toBe("1♯");
+
+            // Change to degree 2 (index 1)
+            mockBlock._pitchWheel.selectedNavItemIndex = 1;
+            mockBlock._pitchWheel.navItems[1].title = "2";
+            await mockBlock._pitchWheel.navItems[1].navigateFunction();
+
+            expect(mockBlock.manualAccidental).toBeNull();
+            expect(mockBlock.value).toBe(2);
+        });
+
         test("preserves intentional natural for solfege blocks in G Major", () => {
             mockBlock.activity.KeySignatureEnv = ["G", "major", false];
             mockBlock.name = "solfege";
