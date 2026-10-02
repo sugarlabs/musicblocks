@@ -66,6 +66,10 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceName(123)).toBe("electronic synth");
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
+        expect(lookups.getFilterTypes(null)).toBe("highpass");
+        expect(lookups.getFilterTypes({})).toBe("highpass");
+        expect(lookups.getOscillatorTypes(undefined)).toBeNull();
+        expect(lookups.getOscillatorTypes([])).toBeNull();
 
         expect(lookups.getIntervalNumber(undefined)).toBe(0);
         expect(lookups.getIntervalNumber(null)).toBe(0);

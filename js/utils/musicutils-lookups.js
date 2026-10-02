@@ -251,7 +251,9 @@ var getDrumSymbol = name => {
  * @returns {string} The filter type, or the default filter type if not found.
  */
 var getFilterTypes = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return DEFAULTFILTERTYPE;
+    } else if (name === "") {
         name = DEFAULTFILTERTYPE;
     }
 
@@ -274,7 +276,9 @@ var getFilterTypes = name => {
  * @returns {string|null} The oscillator type, or null if not found.
  */
 var getOscillatorTypes = name => {
-    if (name === "") {
+    if (typeof name !== "string") {
+        return null;
+    } else if (name === "") {
         name = null; // DEFAULTOSCILLATORTYPE;
     }
 
