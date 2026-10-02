@@ -933,6 +933,25 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["number", { value: 42 }]);
     });
 
+    it("exports a value block with manualAccidental if set (Issue #9003)", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            {
+                name: "notename",
+                trash: false,
+                value: "F",
+                manualAccidental: "♮",
+                collapsed: false,
+                container: { x: 0, y: 0 },
+                connections: [null],
+                isValueBlock: () => true
+            }
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
+    });
+
     it("exports namedbox with privateData", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
