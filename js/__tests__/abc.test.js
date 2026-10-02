@@ -774,6 +774,63 @@ describe("processABCNotes - notation markers", () => {
         expect(notes[1].decoration).toContain("crescendo(");
     });
 
+    it("ends a crescendo on the last note it covers", () => {
+        const body = exportBody([
+            "begin crescendo",
+            note("C4"),
+            note("D4"),
+            "end crescendo",
+            note("E4")
+        ]);
+
+        const notes = parseNotes(body);
+        expect(notes).toHaveLength(3);
+        expect(decorationsOf(notes[0])).toContain("crescendo(");
+        expect(decorationsOf(notes[1])).toContain("crescendo)");
+        // The note after the clamp is outside the hairpin.
+        expect(decorationsOf(notes[2])).toEqual([]);
+    });
+
+    it("ends a decrescendo on the last note it covers", () => {
+        const body = exportBody([
+            "begin decrescendo",
+            note("C4"),
+            note("D4"),
+            "end decrescendo",
+            note("E4")
+        ]);
+
+        const notes = parseNotes(body);
+        expect(decorationsOf(notes[1])).toContain("diminuendo)");
+        expect(decorationsOf(notes[2])).toEqual([]);
+    });
+
+    it("ends a crescendo on its only note", () => {
+        const body = exportBody(["begin crescendo", note("C4"), "end crescendo", note("D4")]);
+
+        const notes = parseNotes(body);
+        expect(decorationsOf(notes[0])).toEqual(
+            expect.arrayContaining(["crescendo(", "crescendo)"])
+        );
+        expect(decorationsOf(notes[1])).toEqual([]);
+    });
+
+    it("ends a crescendo on a note that is also the end of a slur", () => {
+        const body = exportBody([
+            "begin crescendo",
+            "begin slur",
+            note("C4"),
+            note("D4"),
+            "end slur",
+            "end crescendo",
+            note("E4")
+        ]);
+
+        const notes = parseNotes(body);
+        expect(decorationsOf(notes[1])).toContain("crescendo)");
+        expect(decorationsOf(notes[2])).toEqual([]);
+    });
+
     it("writes no field for a pickup, since the exporter writes no bar lines", () => {
         const body = exportBody(["pickup", "8", note("C4"), note("D4")]);
 
