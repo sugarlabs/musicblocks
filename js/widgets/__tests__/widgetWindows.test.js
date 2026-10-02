@@ -1174,6 +1174,7 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1._frame.style.zIndex).toBe("10");
             expect(win1._overlayframe.style.zIndex).toBe("-1");
             expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
             expect(window.widgetWindows.focused).toBeNull();
