@@ -400,12 +400,9 @@ function setupWidgetBlocks(activity) {
             logo.synth.temperamentChanged(args[0], logo.synth.startingPitch);
             const scale = [];
 
-            if (
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]].name ===
-                "pitch"
-            ) {
-                const pitchBlock =
-                    activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
+            const pitchBlock =
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
+            if (pitchBlock && pitchBlock.name === "pitch") {
                 const note = activity.blocks.blockList[pitchBlock.connections[1]].value;
                 const octave = activity.blocks.blockList[pitchBlock.connections[2]].value;
                 const setKey = activity.blocks.blockList[pitchBlock.connections[3]];

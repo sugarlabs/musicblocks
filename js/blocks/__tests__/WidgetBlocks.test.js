@@ -580,6 +580,28 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
+    describe("TemperamentBlock", () => {
+        let temperament;
+
+        beforeEach(() => {
+            temperament = getBlock("temperament");
+            logo.temperament = { inTemperament: null, scale: null, init: jest.fn() };
+            logo.synth.temperamentChanged = jest.fn();
+        });
+
+        it("does not throw when the pitch arg has been removed", () => {
+            // connections[2] is where the pitch block docks; a user can drag it
+            // out of the clamp, leaving the slot empty.
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", null, "hiddenBlk"]
+            };
+            expect(() =>
+                temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received")
+            ).not.toThrow();
+            expect(logo.temperament.scale).toBeNull();
+        });
+    });
+
     describe("StatusBlock", () => {
         it("defines its default macro with all monitors and print wrappers", () => {
             const status = getBlock("status");
