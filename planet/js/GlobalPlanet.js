@@ -285,19 +285,12 @@ class GlobalPlanet {
         for (let i = 0; i < data.length; i++) {
             (function () {
                 const id = data[i][0];
-                const expectedUpdatedAt = data[i][1];
-                const shouldSkipCache = Boolean(
-                    expectedUpdatedAt &&
-                    this.cache[id] &&
-                    this.cache[id].ProjectLastUpdated !== expectedUpdatedAt
-                );
                 Planet.ServerInterface.getProjectDetails(
                     id,
                     function (d) {
                         const tempid = id;
                         this.addProjectToCache(tempid, d, callback);
-                    }.bind(this),
-                    shouldSkipCache
+                    }.bind(this)
                 );
             }).bind(this)();
         }
@@ -344,27 +337,31 @@ class GlobalPlanet {
     downloadDataToCache(id, callback, error) {
         if (error === undefined) error = null;
 
+        const cacheEntry = this.cache[id] ?? null;
         const expectedUpdatedAt = this.cache[id]?.ProjectLastUpdated || null;
 
         this.Planet.ServerInterface.downloadProject(
             id,
             function (data) {
-                this.afterDownloadData(id, data, callback, error);
+                this.afterDownloadData(id, data, callback, error, cacheEntry);
             }.bind(this),
             expectedUpdatedAt
         );
     }
 
-    afterDownloadData(id, data, callback, error) {
+    afterDownloadData(id, data, callback, error, cacheEntry = this.cache[id]) {
         const Planet = this.Planet;
 
         if (error === undefined) error = null;
 
         if (data.success) {
+            const projectData = Planet.ProjectStorage.decodeTB(data.data);
             if (id in this.cache) {
-                this.cache[id].ProjectData = Planet.ProjectStorage.decodeTB(data.data);
-                callback(this.cache[id].ProjectData);
-            } else callback(Planet.ProjectStorage.decodeTB(data.data));
+                if (this.cache[id] === cacheEntry) {
+                    this.cache[id].ProjectData = projectData;
+                }
+                callback(projectData);
+            } else callback(projectData);
         } else {
             if (error !== null) error();
         }
