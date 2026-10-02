@@ -26,7 +26,7 @@
     top: 64px; /* below top toolbar */
     right: 0;
     width: 360px;
-    max-width: calc(100vw - 16px);
+    max-width: calc(100vw - 24px);
     height: min(760px, calc(100% - 80px));
     z-index: 9000;
     display: flex;
@@ -40,6 +40,8 @@
 }
 
 .practice-panel-frame {
+    box-sizing: border-box;
+    max-width: calc(100vw - 24px);
     display: flex;
     flex-direction: column;
     flex: 1;
