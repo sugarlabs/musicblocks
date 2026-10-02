@@ -1168,10 +1168,14 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Win 2");
             window.widgetWindows.focused = win1;
 
+            win1._overlay(true);
+
             window.widgetWindows.hideAllWindows();
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1._overlayframe.style.zIndex).toBe("-1");
+            expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
             expect(window.widgetWindows.focused).toBeNull();
         });
 

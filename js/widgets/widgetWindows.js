@@ -976,7 +976,10 @@ window.widgetWindows.isOpen = name => {
  */
 window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        if (win !== undefined) win._frame.style.display = "none";
+        if (win !== undefined) {
+            win._frame.style.display = "none";
+            win._overlay(false);
+        }
     });
     window.widgetWindows.focused = null;
 };
