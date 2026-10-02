@@ -57,6 +57,12 @@ const openModeWidget = () => {
     cy.get(".windowFrame .wftTitle", { timeout: 30000 })
         .should("be.visible")
         .and("contain.text", "custom mode");
+
+    // Wait for the SVG wheel to be visible before proceeding to ensure
+    // the widget is fully initialized and rendered.
+    cy.get('.windowFrame[aria-label="custom mode"] #modeWidgetWheelDiv svg', {
+        timeout: 30000
+    }).should("be.visible");
 };
 
 // Scoped selector for all assertions after the widget is confirmed open.
