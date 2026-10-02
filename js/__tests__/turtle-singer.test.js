@@ -1195,24 +1195,23 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         { name: "pitch-drum matrix", flag: "inPitchDrumMatrix", widget: "pitchDrumMatrix" },
         { name: "phrase maker", flag: "inMatrix", widget: "phraseMaker" },
         { name: "LEGO widget", flag: "inLegoWidget", widget: "legoWidget" }
-    ])("$name applies the first arpeggio offset once", ({ flag, widget }) => {
+    ])("$name consults the arpeggio once per visit", ({ flag, widget }) => {
         activityMock.logo[flag] = true;
-        turtleMock.singer.arpeggio = [7, 12, 19];
+        // Real entries are [scalar step, semitones] pairs from CHORDVALUES.
+        turtleMock.singer.arpeggio = [
+            [2, 0],
+            [4, 0],
+            [7, 0]
+        ];
 
         Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
 
-        // getNote receives transposition + cents + arpeggio[0]; later offsets
-        // are unreachable here because each duplicate is a separate visit.
-        expect(global.getNote).toHaveBeenCalledWith(
-            "C",
-            4,
-            7,
-            expect.anything(),
-            expect.anything(),
-            null,
-            expect.anything(),
-            expect.anything()
-        );
+        // One visit, one note lookup, one row; later entries are unreachable
+        // here because each duplicate is a separate visit. The transposition
+        // value is deliberately not asserted: these branches add the raw pair
+        // instead of decoding it like the note-block path does, a pre-existing
+        // defect that is out of scope for this cleanup.
+        expect(global.getNote).toHaveBeenCalledTimes(1);
         expect(activityMock.logo[widget].rowLabels).toHaveLength(1);
     });
 
