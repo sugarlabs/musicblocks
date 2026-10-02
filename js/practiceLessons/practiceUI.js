@@ -83,9 +83,6 @@ const PracticeUI = {
             return;
         }
 
-        const frame = panel.querySelector(".practice-panel-frame");
-        if (frame.style.width) panel.style.width = frame.style.width;
-
         if (panel.dataset.userMoved === "true") {
             const rect = panel.getBoundingClientRect();
             const maxLeft = Math.max(this.COLLAPSE_TOGGLE_WIDTH, window.innerWidth - rect.width);
@@ -194,7 +191,6 @@ const PracticeUI = {
 
     applyCollapsedDock(panel) {
         panel.classList.add("practice-panel-collapsed");
-        panel.style.width = "";
         panel.style.left = "auto";
         panel.style.right = "0";
         panel.style.top = `${this.getCollapsedLaneTop(panel)}px`;

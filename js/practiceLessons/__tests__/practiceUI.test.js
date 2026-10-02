@@ -1112,7 +1112,6 @@ describe("PracticeUI panel viewport", () => {
 
     test.each([
         [1440, 360, "376px"],
-        [700, 360, "316px"],
         [390, 360, "6px"],
         [320, 296, "0px"]
     ])("docks Journal within a %ipx viewport", (width, panelWidth, right) => {
@@ -1146,21 +1145,6 @@ describe("PracticeUI panel viewport", () => {
         expect(journalPanel.style.right).toBe("auto");
     });
 
-    test("collapses a resized panel and restores its width when expanded", () => {
-        const frame = journalPanel.querySelector(".practice-panel-frame");
-        frame.style.width = "500px";
-        PracticeUI.keepPanelInViewport(journalPanel);
-        PracticeUI.togglePanelCollapse(journalPanel);
-        PracticeUI.keepPanelInViewport(journalPanel);
-
-        expect(journalPanel.style.width).toBe("");
-        expect(journalPanel.style.right).toBe("0px");
-
-        PracticeUI.togglePanelCollapse(journalPanel);
-
-        expect(journalPanel.style.width).toBe("500px");
-    });
-
     test("updates Journal's docking when the browser window shrinks", () => {
         jest.replaceProperty(window, "innerWidth", 390);
         window.dispatchEvent(new window.Event("resize"));
@@ -1185,7 +1169,6 @@ describe("PracticeUI panel viewport", () => {
         onResize();
 
         expect(observe).toHaveBeenCalledWith(frame);
-        expect(practicePanel.style.width).toBe("500px");
         expect(journalPanel.style.right).toBe("516px");
     });
 });
