@@ -1127,7 +1127,13 @@ describe("processPitch widget-row definition adds one row per visit", () => {
                 inPitchDrumMatrix: false,
                 inMatrix: false,
                 inLegoWidget: false,
-                pitchDrumMatrix: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [], drums: [] },
+                pitchDrumMatrix: {
+                    addRowBlock: jest.fn(),
+                    addColBlock: jest.fn(),
+                    rowLabels: [],
+                    rowArgs: [],
+                    drums: []
+                },
                 phraseMaker: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] },
                 legoWidget: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] }
             }
@@ -1176,6 +1182,15 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         expect(activityMock.logo.legoWidget.rowArgs).toHaveLength(1);
     });
 
+    test("LEGO widget row count stays at one for a fractional duplicateFactor", () => {
+        activityMock.logo.inLegoWidget = true;
+        turtleMock.singer.duplicateFactor = 0.5;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toHaveLength(1);
+    });
+
     test.each([
         { name: "pitch-drum matrix", flag: "inPitchDrumMatrix", widget: "pitchDrumMatrix" },
         { name: "phrase maker", flag: "inMatrix", widget: "phraseMaker" },
@@ -1208,6 +1223,7 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
 
         expect(activityMock.logo.pitchDrumMatrix.drums).toEqual(["kick drum"]);
+        expect(activityMock.logo.pitchDrumMatrix.addColBlock).toHaveBeenCalledWith(123);
         expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(0);
     });
 
