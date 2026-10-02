@@ -508,7 +508,7 @@ class WidgetWindow {
         });
     }
 
-    _overlay(add) {
+    _overlay(add, resetFrameZIndex = true) {
         if (add) {
             this._frame.style.zIndex = "10";
             this._overlayframe.style.left = "0";
@@ -519,7 +519,7 @@ class WidgetWindow {
             this._overlayframe.style.border = "0.25vw solid black";
             this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
-            this._frame.style.zIndex = "10000";
+            if (resetFrameZIndex) this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
             this._overlayframe.style.zIndex = "-1";
             this._overlayframe.style.backgroundColor = "transparent";
@@ -978,7 +978,7 @@ window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) {
             win._frame.style.display = "none";
-            win._overlay(false);
+            win._overlay(false, false);
         }
     });
     window.widgetWindows.focused = null;
