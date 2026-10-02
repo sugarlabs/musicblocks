@@ -624,6 +624,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             break;
         }
     }
+    if (key === undefined) {
+        key = block.activity.KeySignatureEnv[0] || "C";
+    }
     let scale = buildScale(key + " major")[0];
     scale = scale.splice(0, scale.length - 1);
 
@@ -633,8 +636,14 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
     // Auto-selection of sharps and flats in fixed solfege handles the
     // case of opening the pie-menu, not whilst in the pie-menu.
-    // Skip auto-selection if user already has a non-natural accidental (Issue #4886).
-    const pitchHasAccidental = accidental !== "" && accidental !== NATURAL;
+    // Skip auto-selection if user already has a non-natural accidental (Issue #4886)
+    // or if a manual accidental/natural was explicitly selected (Issue #9003).
+    const hasManualAccidental =
+        block.manualAccidental !== undefined && block.manualAccidental !== null;
+    if (hasManualAccidental) {
+        accidental = block.manualAccidental;
+    }
+    const pitchHasAccidental = hasManualAccidental || (accidental !== "" && accidental !== NATURAL);
     if (
         !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
@@ -649,8 +658,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             scale[scale.length - 1 - i][0] === note
         ) {
             accidental = scale[scale.length - 1 - i].slice(1);
-        } else {
+        } else if (EQUIVALENTACCIDENTALS && EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]]) {
             accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].slice(1);
+        } else {
+            accidental = "";
         }
         block.value = block.value
             .replace(SHARP, "")
@@ -869,7 +880,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         }
     };
 
+    let isSyncingAccidental = false;
+
     const __selectionChangedSolfege = () => {
+        that.manualAccidental = null;
         selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(selection["note"]);
         that.value = noteValues[i];
@@ -906,6 +920,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].slice(1);
                 }
             }
+            isSyncingAccidental = true;
             switch (selection["attr"]) {
                 case DOUBLEFLAT:
                     that._accidentalsWheel.navigateWheel(4);
@@ -926,10 +941,14 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     that._accidentalsWheel.navigateWheel(2);
                     break;
             }
+            isSyncingAccidental = false;
         }
-        that.text.text = selection["note"];
-        if (selection["attr"] !== "♮") {
-            that.text.text += selection["attr"];
+        if (selection["attr"] && selection["attr"] !== "♮") {
+            that.value = noteValues[i] + selection["attr"];
+            that.text.text = selection["note"] + selection["attr"];
+        } else {
+            that.value = noteValues[i];
+            that.text.text = selection["note"];
         }
 
         // Make sure text is on top.
@@ -966,12 +985,17 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 
     const __selectionChangedAccidental = () => {
+        if (isSyncingAccidental) {
+            return;
+        }
         const i = that._pitchWheel.selectedNavItemIndex;
         selection["note"] = noteLabels[i];
         const selectedNoteValue = noteValues[i];
 
         selection["attr"] =
             that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+
+        that.manualAccidental = selection["attr"];
 
         if (selection["attr"] === "♮") {
             that.value = selectedNoteValue;

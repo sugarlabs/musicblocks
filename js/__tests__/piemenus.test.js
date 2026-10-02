@@ -203,9 +203,24 @@ global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
 
 global.DEFAULTVOLUME = 0.5;
-global.Singer = { setSynthVolume: jest.fn() };
 global.SHARP = "♯";
 global.FLAT = "♭";
+global.NATURAL = "♮";
+global.DOUBLESHARP = "𝄪";
+global.DOUBLEFLAT = "𝄫";
+global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", ti: "B" };
+global.EQUIVALENTACCIDENTALS = {
+    "F": "E♯",
+    "C": "B♯",
+    "B": "C♭",
+    "E": "F♭",
+    "G": "F𝄪",
+    "D": "C𝄪",
+    "A": "G𝄪",
+    "F♯": "F♯",
+    "F#": "F♯"
+};
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
@@ -421,6 +436,88 @@ describe("piemenus behavioral tests", () => {
             mockBlock._exitWheel.navItems[0].navigateFunction();
 
             expect(refreshRowForBlock).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("manual accidental persistence (Issue #9003)", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        beforeEach(() => {
+            global.buildScale = jest.fn(scaleName => {
+                if (scaleName && scaleName.startsWith("G")) {
+                    return [["G", "A", "B", "C", "D", "E", "F♯", "G"], []];
+                }
+                return [["C", "D", "E", "F", "G", "A", "B", "C"], []];
+            });
+        });
+
+        const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
+
+        test("preserves intentional natural when reopening pitch pie menu in G Major", () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+            mockBlock.manualAccidental = "♮";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "♮");
+
+            // Does not overwrite intentional natural with key's F#
+            expect(mockBlock.value).toBe("F");
+            // Navigates the accidental wheel to natural (index 2)
+            expect(mockBlock._accidentalsWheel.navigateWheel).toHaveBeenCalledWith(2);
+        });
+
+        test("sets block.manualAccidental when accidental is picked on accidental wheel", async () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "");
+
+            // Simulate selecting natural (index 2) on accidental wheel
+            mockBlock._pitchWheel.selectedNavItemIndex = 3; // F
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._accidentalsWheel.navItems[2].title = "♮";
+
+            await mockBlock._accidentalsWheel.navItems[2].navigateFunction();
+
+            expect(mockBlock.manualAccidental).toBe("♮");
+            expect(mockBlock.value).toBe("F");
+        });
+
+        test("clears block.manualAccidental when pitch is changed on pitch wheel", async () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+            mockBlock.manualAccidental = "♮";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "♮");
+            expect(mockBlock.manualAccidental).toBe("♮");
+
+            // Turn wheel to G (index 4)
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._pitchWheel.navItems[4].title = "G";
+
+            await mockBlock._pitchWheel.navItems[4].navigateFunction();
+
+            // When note changes, manual accidental override is cleared to follow key
+            expect(mockBlock.manualAccidental).toBeNull();
+        });
+
+        test("preserves intentional natural for solfege blocks in G Major", () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "solfege";
+            mockBlock.value = "fa";
+            mockBlock.manualAccidental = "♮";
+
+            const solfLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+            const solfValues = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+
+            piemenuPitches(mockBlock, solfLabels, solfValues, accidentals, "fa", "");
+
+            expect(mockBlock.value).toBe("fa");
+            expect(mockBlock._accidentalsWheel.navigateWheel).toHaveBeenCalledWith(2);
         });
     });
 
