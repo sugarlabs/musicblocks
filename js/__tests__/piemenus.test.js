@@ -1791,16 +1791,85 @@ describe("shared wheel safe positioning", () => {
         piemenuVoices(voiceBrBlock, ["piano", "guitar"], ["piano", "guitar"], [], "piano", 0);
         expectInsideSafeRect(voiceBrBlock);
 
-        // Non-temperament piemenuBasic
-        const basicBlock = makeBlock(0, 0);
-        basicBlock.name = "basic";
-        piemenuBasic(basicBlock, ["option1", "option2"], ["1", "2"], "1");
+        // Non-temperament piemenuBasic (generic 2-option menu: 300px centered)
+        const basicBlock = makeBlock(400, 400);
+        basicBlock.name = "wrapmode";
+        piemenuBasic(basicBlock, ["on", "off"], ["on", "off"], "on");
+        expect(parseInt(wheelDivMock.style.width, 10)).toBe(300);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(400 + 28 - 150);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(400 + 6 - 150);
         expectInsideSafeRect(basicBlock);
 
+        const basicCornerBlock = makeBlock(0, 0);
+        basicCornerBlock.name = "wrapmode";
+        piemenuBasic(basicCornerBlock, ["on", "off"], ["on", "off"], "on");
+        expectInsideSafeRect(basicCornerBlock);
+
         const basicBrBlock = makeBlock(950, 950);
-        basicBrBlock.name = "basic";
-        piemenuBasic(basicBrBlock, ["option1", "option2"], ["1", "2"], "1");
+        basicBrBlock.name = "wrapmode";
+        piemenuBasic(basicBrBlock, ["on", "off"], ["on", "off"], "on");
         expectInsideSafeRect(basicBrBlock);
+
+        // Grid menu: retains 400px size, centered anchor, and bold proportional slice font
+        const gridBlock = makeBlock(500, 500);
+        gridBlock.name = "grid";
+        const gridLabels = [
+            "none",
+            "Cartesian",
+            "Cartesian/Polar",
+            "polar",
+            "treble",
+            "grand staff"
+        ];
+        piemenuBasic(gridBlock, gridLabels, [0, 1, 2, 3, 4, 5], 0);
+        expect(parseInt(wheelDivMock.style.width, 10)).toBe(400);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(500 + 28 - 200);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(500 + 6 - 200);
+        expect(gridBlock._basicWheel.navItems[0].titleAttr.font).toMatch(/bold \d+px sans-serif/);
+        expectInsideSafeRect(gridBlock);
+
+        // Grid near top-left toolbar/palette
+        const gridCorner = makeBlock(0, 0);
+        gridCorner.name = "grid";
+        piemenuBasic(gridCorner, gridLabels, [0, 1, 2, 3, 4, 5], 0);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+        expectInsideSafeRect(gridCorner);
+
+        // Pitch Converter (outputtools): retains 400px size, centered anchor, and bold proportional slice font
+        const converterBlock = makeBlock(500, 500);
+        converterBlock.name = "outputtools";
+        const converterLabels = [
+            "pitch number",
+            "pitch in hertz",
+            "alphabet",
+            "letter class",
+            "solfege class",
+            "staff y",
+            "solfege syllable",
+            "pitch class",
+            "scalar class",
+            "scale degree",
+            "nth degree",
+            "pitch to shade",
+            "pitch to color"
+        ];
+        piemenuBasic(converterBlock, converterLabels, converterLabels, "letter class");
+        expect(parseInt(wheelDivMock.style.width, 10)).toBe(400);
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(500 + 28 - 200);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(500 + 6 - 200);
+        expect(converterBlock._basicWheel.navItems[0].titleAttr.font).toMatch(
+            /bold \d+px sans-serif/
+        );
+        expectInsideSafeRect(converterBlock);
+
+        // Pitch Converter near top-left toolbar/palette
+        const converterCorner = makeBlock(0, 0);
+        converterCorner.name = "outputtools";
+        piemenuBasic(converterCorner, converterLabels, converterLabels, "letter class");
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+        expectInsideSafeRect(converterCorner);
     });
 
     test("piemenuIntervals and piemenuModes clamp safely across workspace boundaries", () => {
