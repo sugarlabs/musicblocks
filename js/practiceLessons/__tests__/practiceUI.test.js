@@ -1084,6 +1084,112 @@ describe("PracticeUI panel lifecycle", () => {
     });
 });
 
+describe("PracticeUI panel viewport", () => {
+    let practicePanel;
+    let journalPanel;
+    let practiceWidth;
+    let journalWidth;
+    let listeners;
+
+    beforeEach(async () => {
+        jest.replaceProperty(window, "innerWidth", 1440);
+        jest.replaceProperty(window, "innerHeight", 900);
+        listeners = jest.spyOn(window, "addEventListener");
+        await PracticeUI.open();
+        await ExplorerJournalUI.open();
+        practicePanel = document.getElementById("practice-panel");
+        journalPanel = document.getElementById("explorer-journal-panel");
+        practiceWidth = jest.spyOn(practicePanel, "offsetWidth", "get").mockReturnValue(360);
+        journalWidth = jest.spyOn(journalPanel, "offsetWidth", "get").mockReturnValue(360);
+    });
+
+    afterEach(() => {
+        listeners.mock.calls.forEach(([type, listener]) => {
+            if (type === "resize") window.removeEventListener(type, listener);
+        });
+        delete window.ResizeObserver;
+    });
+
+    test.each([
+        [1440, 360, "376px"],
+        [700, 360, "316px"],
+        [390, 360, "6px"],
+        [320, 296, "0px"]
+    ])("docks Journal within a %ipx viewport", (width, panelWidth, right) => {
+        jest.replaceProperty(window, "innerWidth", width);
+        journalWidth.mockReturnValue(panelWidth);
+
+        expect(PracticeUI.getJournalDefaultRight()).toBe(right);
+    });
+
+    test.each([
+        [-100, -100, "24px", "64px"],
+        [1000, 900, "30px", "80px"]
+    ])("keeps a drag to (%i, %i) within the viewport", (x, y, left, top) => {
+        jest.replaceProperty(window, "innerWidth", 390);
+        jest.replaceProperty(window, "innerHeight", 500);
+        jest.spyOn(journalPanel, "getBoundingClientRect").mockImplementation(() => ({
+            left: parseFloat(journalPanel.style.left) || 0,
+            top: parseFloat(journalPanel.style.top) || 64,
+            width: 360,
+            height: 420
+        }));
+        const handle = journalPanel.querySelector(".practice-menu-header");
+        handle.setPointerCapture = jest.fn();
+        handle.releasePointerCapture = jest.fn();
+        handle.onpointerdown({ target: handle, clientX: 0, clientY: 64, pointerId: 1 });
+        handle.onpointermove({ clientX: x, clientY: y });
+        handle.onpointerup({ pointerId: 1 });
+
+        expect(journalPanel.style.left).toBe(left);
+        expect(journalPanel.style.top).toBe(top);
+        expect(journalPanel.style.right).toBe("auto");
+    });
+
+    test("collapses a resized panel and restores its width when expanded", () => {
+        const frame = journalPanel.querySelector(".practice-panel-frame");
+        frame.style.width = "500px";
+        PracticeUI.keepPanelInViewport(journalPanel);
+        PracticeUI.togglePanelCollapse(journalPanel);
+        PracticeUI.keepPanelInViewport(journalPanel);
+
+        expect(journalPanel.style.width).toBe("");
+        expect(journalPanel.style.right).toBe("0px");
+
+        PracticeUI.togglePanelCollapse(journalPanel);
+
+        expect(journalPanel.style.width).toBe("500px");
+    });
+
+    test("updates Journal's docking when the browser window shrinks", () => {
+        jest.replaceProperty(window, "innerWidth", 390);
+        window.dispatchEvent(new window.Event("resize"));
+
+        expect(journalPanel.style.right).toBe("6px");
+    });
+
+    test("updates panel widths and docking when a frame is resized", () => {
+        let onResize;
+        const observe = jest.fn();
+        window.ResizeObserver = jest.fn(callback => {
+            onResize = callback;
+            return { observe };
+        });
+        const frame = practicePanel.querySelector(".practice-panel-frame");
+        PracticeUI.makePanelDraggable(
+            practicePanel,
+            practicePanel.querySelector(".practice-menu-header")
+        );
+        frame.style.width = "500px";
+        practiceWidth.mockReturnValue(500);
+        onResize();
+
+        expect(observe).toHaveBeenCalledWith(frame);
+        expect(practicePanel.style.width).toBe("500px");
+        expect(journalPanel.style.right).toBe("516px");
+    });
+});
+
 describe("ExplorerJournalUI panel lifecycle", () => {
     test("opening builds the journal panel and shows the index", async () => {
         await ExplorerJournalUI.open();

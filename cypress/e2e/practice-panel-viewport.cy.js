@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global Cypress, cy, describe, beforeEach, it, expect */
+/* global cy, describe, beforeEach, it, expect */
 
 const panels = ["#practice-panel", "#explorer-journal-panel"];
 
@@ -33,10 +33,9 @@ const assertInViewport = selector => {
 describe("Practice panel viewport", () => {
     beforeEach(() => {
         cy.viewport(1440, 900);
-        cy.visit(Cypress.config("baseUrl") || "http://127.0.0.1:3000", {
+        cy.visit("http://127.0.0.1:3000", {
             onBeforeLoad(win) {
                 win.localStorage.clear();
-                win.localStorage.setItem("themePreference", "light");
             }
         });
         cy.waitForAppReady();
@@ -60,7 +59,9 @@ describe("Practice panel viewport", () => {
             );
         });
         cy.get("#practice-panel > .practice-panel-collapse-toggle").click();
-        cy.get("#explorer-journal-panel").should("have.css", "right", "0px");
+        cy.get("#explorer-journal-panel").should($journal => {
+            expect($journal[0].getBoundingClientRect().right).to.equal(1440);
+        });
         cy.get("#explorer-journal-content .journal-general-empty").click();
         cy.get("#practice-panel > .practice-panel-collapse-toggle").click();
         panels.forEach(assertInViewport);
