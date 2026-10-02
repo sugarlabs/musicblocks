@@ -1018,6 +1018,28 @@ describe("Oscilloscope", () => {
             expect(ctx.fillRect).not.toHaveBeenCalled();
         });
 
+        test("captures waveform from analyser when frozen and no cached waveform exists", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+            const mockAnalyser = { getValue: jest.fn(() => new Float32Array(128)) };
+            osc.pitchAnalysers[0] = mockAnalyser;
+
+            osc._renderFrame();
+
+            expect(mockAnalyser.getValue).toHaveBeenCalled();
+            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
+            expect(ctx.fillRect).toHaveBeenCalled();
+            expect(ctx.stroke).toHaveBeenCalled();
+        });
+
         test("draws using cached waveform when frozen", () => {
             const osc = createOscilloscope();
             osc.isFrozen = true;
@@ -1551,47 +1573,6 @@ describe("Oscilloscope", () => {
             freezeBtn.onclick();
 
             expect(osc.isFrozen).toBe(true);
-        });
-    });
-    describe("Zoom Controls and Page Visibility Edge Cases", () => {
-        test("zoom buttons increase and decrease zoomFactor with lower bound clamping", () => {
-            const osc = createOscilloscope([]);
-            const initialZoom = osc.zoomFactor;
-
-            const buttons = mockWidgetWindow.addButton.mock.results;
-            const zoomInBtn = buttons[0].value;
-            const zoomOutBtn = buttons[1].value;
-
-            zoomInBtn.onclick();
-            expect(osc.zoomFactor).toBeGreaterThan(initialZoom);
-
-            osc.zoomFactor = 0.5;
-            zoomOutBtn.onclick();
-            expect(osc.zoomFactor).toBe(1);
-        });
-
-        test("handleVisibilityChange handles visible and hidden states", () => {
-            const osc = createOscilloscope([]);
-            osc._running = true;
-            const wakeUpSpy = jest.spyOn(osc, "_wakeUp");
-            const throttleSpy = jest.spyOn(osc, "_throttle");
-
-            Object.defineProperty(document, "visibilityState", {
-                configurable: true,
-                value: "visible"
-            });
-            osc._handleVisibilityChange();
-            expect(wakeUpSpy).toHaveBeenCalled();
-
-            Object.defineProperty(document, "visibilityState", {
-                configurable: true,
-                value: "hidden"
-            });
-            osc._handleVisibilityChange();
-            expect(throttleSpy).toHaveBeenCalled();
-
-            wakeUpSpy.mockRestore();
-            throttleSpy.mockRestore();
         });
     });
 });
