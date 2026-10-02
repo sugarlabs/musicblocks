@@ -600,6 +600,29 @@ describe("setupWidgetBlocks", () => {
             ).not.toThrow();
             expect(logo.temperament.scale).toBeNull();
         });
+
+        it("does not throw when a block under the pitch arg has been removed", () => {
+            // Pitch is still docked, but one of the blocks it reads from (here the
+            // set-key notename) has been dragged out, leaving that slot empty.
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", "pitchBlk", "hiddenBlk"]
+            };
+            activity.blocks.blockList["pitchBlk"] = {
+                name: "pitch",
+                connections: ["tempBlk", "noteBlk", "octaveBlk", "setKeyBlk"]
+            };
+            activity.blocks.blockList["noteBlk"] = { value: "C" };
+            activity.blocks.blockList["octaveBlk"] = { value: 4 };
+            activity.blocks.blockList["setKeyBlk"] = {
+                connections: ["pitchBlk", null, "modeBlk"]
+            };
+            activity.blocks.blockList["modeBlk"] = { value: "major" };
+
+            expect(() =>
+                temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received")
+            ).not.toThrow();
+            expect(logo.temperament.scale).toBeNull();
+        });
     });
 
     describe("StatusBlock", () => {
