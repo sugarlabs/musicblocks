@@ -655,7 +655,9 @@ class Block {
 
         // Always hide the non-highlighted artwork.
         this.container.visible = true;
-        this.bitmap.visible = false;
+        if (this.bitmap !== null) {
+            this.bitmap.visible = false;
+        }
         if (this.disconnectedBitmap !== null) {
             this.disconnectedBitmap.visible = false;
         }
@@ -677,24 +679,30 @@ class Block {
             }
 
             // but not the uncollapsed highlighted artwork.
-            this.highlightBitmap.visible = false;
+            if (this.highlightBitmap !== null) {
+                this.highlightBitmap.visible = false;
+            }
             if (this.disconnectedHighlightBitmap !== null) {
                 this.disconnectedHighlightBitmap.visible = false;
             }
-
-            this.highlightBitmap.visible = false;
         } else {
             // Show the highlighted artwork.
             // If the block is disconnected, use the disconnected bitmap.
             if (this.isDisconnected()) {
-                this.disconnectedHighlightBitmap.visible = true;
-                this.highlightBitmap.visible = false;
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = true;
+                }
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = false;
+                }
             } else {
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
 
-                this.highlightBitmap.visible = true;
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = true;
+                }
             }
 
             // If it is an uncollapsed collapsable, make sure the
@@ -742,7 +750,9 @@ class Block {
         }
 
         // Always hide the highlighted artwork.
-        this.highlightBitmap.visible = false;
+        if (this.highlightBitmap !== null) {
+            this.highlightBitmap.visible = false;
+        }
         if (this.disconnectedHighlightBitmap !== null) {
             this.disconnectedHighlightBitmap.visible = false;
         }
@@ -767,18 +777,26 @@ class Block {
             }
 
             // and not the uncollapsed artwork.
-            this.bitmap.visible = false;
+            if (this.bitmap !== null) {
+                this.bitmap.visible = false;
+            }
         } else {
             // If the block is disconnected, use the disconnected bitmap.
             if (this.isDisconnected()) {
-                this.disconnectedBitmap.visible = true;
-                this.bitmap.visible = false;
+                if (this.disconnectedBitmap !== null) {
+                    this.disconnectedBitmap.visible = true;
+                }
+                if (this.bitmap !== null) {
+                    this.bitmap.visible = false;
+                }
             } else {
                 if (this.disconnectedBitmap !== null) {
                     this.disconnectedBitmap.visible = false;
                 }
 
-                this.bitmap.visible = true;
+                if (this.bitmap !== null) {
+                    this.bitmap.visible = true;
+                }
             }
 
             this.container.visible = true;
@@ -808,7 +826,7 @@ class Block {
     unhighlightSelectedBlocks(blk, selection) {
         if (selection) {
             this.blocks.unhighlight(blk, true);
-            if (!this.collapsed) {
+            if (!this.collapsed && this.disconnectedBitmap !== null) {
                 this.disconnectedBitmap.visible = true;
             }
             this.updateCache();
@@ -2012,13 +2030,27 @@ class Block {
             this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
-                    this.bitmap.visible = false;
-                    this.highlightBitmap.visible = false;
-                    this.collapseBlockBitmap.visible = true;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = true;
-                    this.expandButtonBitmap.visible = true;
-                    this.collapseButtonBitmap.visible = false;
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = false;
+                    }
+                    if (this.highlightBitmap !== null) {
+                        this.highlightBitmap.visible = false;
+                    }
+                    if (this.collapseBlockBitmap !== null) {
+                        this.collapseBlockBitmap.visible = true;
+                    }
+                    if (this.highlightCollapseBlockBitmap !== null) {
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    }
+                    if (this.collapseText !== null) {
+                        this.collapseText.visible = true;
+                    }
+                    if (this.expandButtonBitmap !== null) {
+                        this.expandButtonBitmap.visible = true;
+                    }
+                    if (this.collapseButtonBitmap !== null) {
+                        this.collapseButtonBitmap.visible = false;
+                    }
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
@@ -2030,41 +2062,67 @@ class Block {
                     // If the block is disconnected, use the
                     // disconnected bitmap.
                     if (this.isDisconnected()) {
-                        this.disconnectedBitmap.visible = true;
-                        this.bitmap.visible = false;
+                        if (this.disconnectedBitmap !== null) {
+                            this.disconnectedBitmap.visible = true;
+                        }
+                        if (this.bitmap !== null) {
+                            this.bitmap.visible = false;
+                        }
                     } else {
                         if (this.disconnectedBitmap !== null) {
                             this.disconnectedBitmap.visible = false;
                         }
 
-                        this.bitmap.visible = true;
+                        if (this.bitmap !== null) {
+                            this.bitmap.visible = true;
+                        }
                     }
 
-                    this.highlightBitmap.visible = false;
+                    if (this.highlightBitmap !== null) {
+                        this.highlightBitmap.visible = false;
+                    }
                     if (this.disconnectedHighlightBitmap !== null) {
                         this.disconnectedHighlightBitmap.visible = false;
                     }
 
-                    this.collapseBlockBitmap.visible = false;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = false;
-                    this.expandButtonBitmap.visible = false;
-                    this.collapseButtonBitmap.visible = true;
+                    if (this.collapseBlockBitmap !== null) {
+                        this.collapseBlockBitmap.visible = false;
+                    }
+                    if (this.highlightCollapseBlockBitmap !== null) {
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    }
+                    if (this.collapseText !== null) {
+                        this.collapseText.visible = false;
+                    }
+                    if (this.expandButtonBitmap !== null) {
+                        this.expandButtonBitmap.visible = false;
+                    }
+                    if (this.collapseButtonBitmap !== null) {
+                        this.collapseButtonBitmap.visible = true;
+                    }
                 }
             } else {
                 // If the block is disconnected, use the disconnected bitmap.
                 if (this.isDisconnected()) {
-                    this.disconnectedBitmap.visible = true;
-                    this.bitmap.visible = false;
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = true;
+                    }
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = false;
+                    }
                 } else {
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
 
-                    this.bitmap.visible = true;
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = true;
+                    }
                 }
 
-                this.highlightBitmap.visible = false;
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = false;
+                }
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
@@ -2659,8 +2717,12 @@ class Block {
             }
         }
 
-        this.bitmap.visible = this.collapsed;
-        this.highlightBitmap.visible = false;
+        if (this.bitmap !== null) {
+            this.bitmap.visible = this.collapsed;
+        }
+        if (this.highlightBitmap !== null) {
+            this.highlightBitmap.visible = false;
+        }
         if (this.disconnectedBitmap !== null) {
             this.disconnectedBitmap.visible = false;
         }

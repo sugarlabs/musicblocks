@@ -81,6 +81,11 @@ describe("Real project playback", () => {
             expect(logo.firstNoteAudioTime).to.be.greaterThan(0);
         });
 
+        let firstRunAudioTime;
+        cy.window().then(win => {
+            firstRunAudioTime = win.ActivityContext.getActivity().logo.firstNoteAudioTime;
+        });
+
         cy.window().should(win => {
             expect(win.Tone.context.state).to.eq("running");
         });
@@ -91,6 +96,28 @@ describe("Real project playback", () => {
 
         // turtles.running() reflects real per-turtle execution state: proves
         // Stop halted the run, not just that the button was clickable.
+        cy.window().should(win => {
+            expect(win.ActivityContext.getActivity().turtles.running()).to.be.false;
+        });
+
+        // Re-run the same loaded program immediately after Stop. This exercises
+        // synth reinitialization and proves the second run dispatches a fresh note,
+        // rather than passing on the first run's stale timestamp.
+        cy.get("#play").click();
+
+        cy.window({ timeout: 20000 }).should(win => {
+            const { logo, turtles } = win.ActivityContext.getActivity();
+            expect(logo.stopTurtle, "second run clears the stopped state").to.be.false;
+            expect(logo.firstNoteAudioTime, "second run dispatches a fresh note").to.be.a("number");
+            expect(logo.firstNoteAudioTime).to.be.greaterThan(firstRunAudioTime);
+            expect(turtles.running(), "second playback is running").to.be.true;
+        });
+
+        cy.window().should(win => {
+            expect(win.Tone.context.state).to.eq("running");
+        });
+
+        cy.get("#stop").should("be.visible").click();
         cy.window().should(win => {
             expect(win.ActivityContext.getActivity().turtles.running()).to.be.false;
         });

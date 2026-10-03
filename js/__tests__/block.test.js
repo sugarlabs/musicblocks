@@ -520,6 +520,25 @@ describe("Block Foundation", () => {
                 expect(block.highlightBitmap.visible).toBe(false);
             });
 
+            it("should tolerate unhighlighting before highlight artwork has loaded", () => {
+                block.highlightBitmap = null;
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(true);
+                expect(block.container.visible).toBe(true);
+            });
+
+            it("should tolerate highlighting before highlight artwork has loaded", () => {
+                block.highlightBitmap = null;
+                block.disconnectedHighlightBitmap = null;
+                block.container.bitmapCache = null;
+
+                expect(() => block.highlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(false);
+                expect(block.container.visible).toBe(true);
+            });
+
             it("should not update a cache that has not been created yet", () => {
                 block.container.bitmapCache = null;
 
