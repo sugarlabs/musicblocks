@@ -1277,7 +1277,11 @@ class ASTUtils {
                         }
                     });
                 }
-            } else if (flow[0].split("_").length > 1) {
+            } else if (
+                flow[0].startsWith("storein2_") ||
+                flow[0].startsWith("nameddo_") ||
+                flow[0].startsWith("nameddoArg_")
+            ) {
                 const splitIndex = flow[0].indexOf("_");
                 const instruction = flow[0].slice(0, splitIndex);
                 const idName = flow[0].slice(splitIndex + 1);
@@ -1312,9 +1316,7 @@ class ASTUtils {
                             }
                         });
                     }
-                } else if (instruction === "nameddo") {
-                    ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
-                } else if (instruction === "nameddoArg") {
+                } else if (instruction === "nameddo" || instruction === "nameddoArg") {
                     ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
                 }
             } else {
@@ -1329,7 +1331,21 @@ class ASTUtils {
                         ASTs.push(ASTUtils._getMethodCallAST(...flow));
                     }
                 } else {
-                    throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
+                    ASTs.push({
+                        type: "EmptyStatement",
+                        comments: [
+                            {
+                                type: "Line",
+                                value: ` Not exported (no JavaScript equivalent): "${flow[0]}"`
+                            }
+                        ]
+                    });
+                    if (Array.isArray(flow[2])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[2], iterMax));
+                    }
+                    if (Array.isArray(flow[3])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[3], iterMax));
+                    }
                 }
             }
         }
