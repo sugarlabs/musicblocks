@@ -1032,6 +1032,51 @@ function setupFlowBlocks(activity) {
         }
     }
 
+    // Blocks that run an action stack.
+    const ACTIONCALLS = [
+        "do",
+        "nameddo",
+        "doArg",
+        "nameddoArg",
+        "calc",
+        "namedcalc",
+        "calcArg",
+        "namedcalcArg"
+    ];
+
+    /**
+     * Checks whether a Stop block can be reached from a stack, including
+     * through any action it calls. A forever that can stop is not infinite.
+     * @param {number} blk - The first block of the stack.
+     * @param {object} logo - The logo object.
+     * @returns {boolean} - True if a Stop block is reachable.
+     */
+    const canReachStop = (blk, logo) => {
+        const blockList = activity.blocks.blockList;
+        const actions = logo.actions || {};
+        const stack = [blk];
+        const seen = new Set();
+        while (stack.length > 0) {
+            const b = stack.pop();
+            if (b === null || b === undefined || seen.has(b) || !blockList[b]) continue;
+            seen.add(b);
+            const block = blockList[b];
+            if (block.name === "break") return true;
+            if (ACTIONCALLS.includes(block.name)) {
+                const arg = blockList[block.connections[1]];
+                const name = block.name.startsWith("named")
+                    ? block.privateData
+                    : arg && arg.name === "text"
+                      ? arg.value
+                      : undefined;
+                // A computed action name could be any action.
+                stack.push(...(name === undefined ? Object.values(actions) : [actions[name]]));
+            }
+            stack.push(...block.connections.slice(1));
+        }
+        return false;
+    };
+
     /**
      * Represents a block for repeating a flow forever.
      * @extends {FlowClampBlock}
@@ -1080,7 +1125,12 @@ function setupFlowBlocks(activity) {
 
             // Notate one pass as a repeat rather than unrolling the loop. Nothing
             // queued after a forever ever runs, so drop it and end the voice here.
-            if (logo.runningLilypond && tur.singer.justCounting.length === 0) {
+            // A forever that can reach a Stop is unrolled as before.
+            if (
+                logo.runningLilypond &&
+                tur.singer.justCounting.length === 0 &&
+                !canReachStop(args[0], logo)
+            ) {
                 logo.notation.notationBeginRepeat(turtle);
                 tur.queue = [];
                 return [args[0], 1];

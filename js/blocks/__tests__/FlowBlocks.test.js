@@ -598,6 +598,70 @@ describe("FlowBlocks integration", () => {
         expect(logo.notation.notationBeginRepeat).not.toHaveBeenCalled();
     });
 
+    describe("ForeverBlock with a Stop block during a Lilypond export", () => {
+        let block;
+        let turtle;
+        const queued = new Queue(50, 1, 40, null);
+
+        beforeEach(() => {
+            block = getBlock("forever");
+            turtle = activity.turtles.ithTurtle(0);
+            turtle.singer.suppressOutput = true;
+            turtle.queue = [queued];
+            logo.runningLilypond = true;
+            logo.notation = { notationBeginRepeat: jest.fn() };
+            logo.actions = {};
+        });
+
+        const expectUnrolled = () => {
+            expect(block.flow([60], logo, 0)).toEqual([60, 20]);
+            expect(logo.notation.notationBeginRepeat).not.toHaveBeenCalled();
+            expect(turtle.queue).toEqual([queued]);
+        };
+
+        test("unrolls a loop with a Stop nested in its body", () => {
+            activity.blocks.blockList = {
+                60: { name: "newnote", connections: [10, null, null, 61] },
+                61: { name: "if", connections: [60, 62, 63, null] },
+                62: { name: "boolean", connections: [61] },
+                63: { name: "break", connections: [61, null] }
+            };
+            expectUnrolled();
+        });
+
+        test("unrolls a loop that calls an action containing a Stop", () => {
+            activity.blocks.blockList = {
+                60: { name: "nameddo", privateData: "chorus", connections: [10, null] },
+                70: { name: "newnote", connections: [null, null, null, 71] },
+                71: { name: "break", connections: [70, null] }
+            };
+            logo.actions = { chorus: 70 };
+            expectUnrolled();
+        });
+
+        test("unrolls a loop that calls an action by a computed name", () => {
+            activity.blocks.blockList = {
+                60: { name: "do", connections: [10, 61, null] },
+                61: { name: "plus", connections: [60, null, null] },
+                70: { name: "break", connections: [null, null] }
+            };
+            logo.actions = { chorus: 70 };
+            expectUnrolled();
+        });
+
+        test("repeats a loop whose called action has no Stop", () => {
+            activity.blocks.blockList = {
+                60: { name: "do", connections: [10, 61, null] },
+                61: { name: "text", value: "chorus", connections: [60] },
+                70: { name: "newnote", connections: [null, null, null, null] },
+                80: { name: "break", connections: [null, null] }
+            };
+            logo.actions = { chorus: 70, ending: 80 };
+            expect(block.flow([60], logo, 0)).toEqual([60, 1]);
+            expect(logo.notation.notationBeginRepeat).toHaveBeenCalledWith(0);
+        });
+    });
+
     test("RepeatBlock validates number and repeats child", () => {
         const block = getBlock("repeat");
         expect(block.flow([0, 90], logo, 0, 9)).toEqual([null, 0]);
