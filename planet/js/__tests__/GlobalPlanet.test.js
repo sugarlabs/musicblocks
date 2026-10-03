@@ -237,6 +237,36 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("batch project offline error fix", () => {
+        it("should preserve offline error when all project details fail", () => {
+            // Provide a non-empty batch of projects
+            const mockData = [
+                ["proj1", 123],
+                ["proj2", 124]
+            ];
+
+            // Mock getProjectDetails to immediately fail (simulate offline)
+            mockPlanet.ServerInterface.getProjectDetails.mockImplementation((id, cb) => {
+                cb({ success: false });
+            });
+
+            const spyOffline = jest.spyOn(gp, "throwOfflineError");
+            const spyNoProjects = jest.spyOn(gp, "throwNoProjectsError");
+
+            gp.addProjects(mockData);
+
+            // After addProjects, it should have downloaded details and failed for all
+            expect(spyOffline).toHaveBeenCalled();
+            expect(spyNoProjects).not.toHaveBeenCalled();
+
+            // The final state of the UI should remain the offline message
+            const el = document.getElementById("global-projects");
+            expect(el.innerHTML).toContain("Feature unavailable");
+
+            spyOffline.mockRestore();
+            spyNoProjects.mockRestore();
+        });
+    });
     describe("addProjectToCache", () => {
         it("should add project data to cache on success", () => {
             const callback = jest.fn();
@@ -252,15 +282,14 @@ describe("GlobalPlanet", () => {
             expect(callback).toHaveBeenCalled();
         });
 
-        it("should call throwOfflineError on failure", () => {
-            const spy = jest.spyOn(gp, "throwOfflineError").mockImplementation(() => {});
+        it("should set batchHasOfflineError on failure", () => {
             const callback = jest.fn();
             gp.loadCount = 1;
+            gp.batchHasOfflineError = false;
             gp.addProjectToCache("proj1", { success: false }, callback);
 
-            expect(spy).toHaveBeenCalled();
+            expect(gp.batchHasOfflineError).toBe(true);
             expect(callback).toHaveBeenCalled();
-            spy.mockRestore();
         });
 
         it("should not invoke callback until loadCount reaches zero", () => {
