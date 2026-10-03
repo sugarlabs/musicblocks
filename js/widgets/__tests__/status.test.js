@@ -1000,4 +1000,136 @@ describe("StatusMatrix Widget", () => {
             expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
         });
     });
+
+    describe("Window Maximize and Responsive Layout", () => {
+        beforeEach(() => {
+            statusMatrix.init(mockActivity);
+        });
+
+        test("toggles isMaximized and applies maximized styles on header cells", () => {
+            const mockHeaderCell = createMockElement("TH");
+            statusMatrix._statusTable.querySelectorAll = jest
+                .fn()
+                .mockReturnValue([mockHeaderCell]);
+
+            expect(statusMatrix.isMaximized).toBe(false);
+            statusMatrix.widgetWindow.onmaximize();
+
+            expect(statusMatrix.isMaximized).toBe(true);
+            expect(mockHeaderCell.style.width).toBe("100vw");
+            expect(mockHeaderCell.style.paddingLeft).toBe("30px");
+
+            statusMatrix.widgetWindow.onmaximize();
+
+            expect(statusMatrix.isMaximized).toBe(false);
+            expect(mockHeaderCell.style.width).toBe("212.5px");
+            expect(mockHeaderCell.style.paddingLeft).toBe("");
+        });
+    });
+
+    describe("Outputtools and Arithmetic Status Fields", () => {
+        test("resolves label for outputtools with object privateData", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "outputtools", privateData: { value: "synth" } }
+            };
+            mockActivity.logo.statusFields = [[0, "outputtools"]];
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+        });
+
+        test("resolves empty label for arithmetic statusFields", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "plus", protoblock: { staticLabels: ["+"] } }
+            };
+            mockActivity.logo.statusFields = [[0, "plus"]];
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+        });
+    });
+
+    describe("Language Preferences", () => {
+        const originalLocalStorage = global.localStorage;
+
+        beforeEach(() => {
+            global.localStorage = { languagePreference: "ja" };
+        });
+
+        afterEach(() => {
+            global.localStorage = originalLocalStorage;
+        });
+
+        test("uses beats per minute2 label when languagePreference is ja", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "bpm", protoblock: { staticLabels: ["BPM"] } }
+            };
+            mockActivity.logo.statusFields = [[0, "bpm"]];
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+        });
+    });
+
+    describe("Turtle Blocks Mode", () => {
+        const originalMode = global._THIS_IS_MUSIC_BLOCKS_;
+
+        beforeEach(() => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+        });
+
+        afterEach(() => {
+            global._THIS_IS_MUSIC_BLOCKS_ = originalMode;
+        });
+
+        test("initializes table with turtle button icon instead of mouse icon", () => {
+            statusMatrix.init(mockActivity);
+            expect(global.document.createElement).toHaveBeenCalledWith("img");
+        });
+    });
+
+    describe("updateAll rAF Fallback", () => {
+        const originalRAF = global.requestAnimationFrame;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            delete global.requestAnimationFrame;
+            statusMatrix.init(mockActivity);
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = originalRAF;
+            jest.useRealTimers();
+        });
+
+        test("uses setTimeout when requestAnimationFrame is undefined", () => {
+            statusMatrix.updateAll();
+            expect(statusMatrix._updateQueued).toBe(true);
+
+            jest.advanceTimersByTime(100);
+            expect(statusMatrix._updateQueued).toBe(false);
+        });
+    });
+
+    describe("Note Status Deduplication and Hertz Display", () => {
+        beforeEach(() => {
+            statusMatrix.init(mockActivity);
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+        });
+
+        test("deduplicates notes and formats numeric frequency notes", () => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4", "C4", 440], 0.25]
+                }
+            });
+
+            statusMatrix.updateAll();
+            const noteCell = statusMatrix._statusTable.rows[1].cells[1];
+            expect(noteCell.textContent).toContain("C4");
+            expect(noteCell.textContent).toContain("440.00Hz");
+        });
+    });
 });
