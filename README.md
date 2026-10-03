@@ -259,7 +259,7 @@ See [DevContainer README.md](./.devcontainer/README.md) for details.
 
 ### Developer Quick Start
 
-1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
+1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && cd musicblocks && npm install`
 2. Run locally: `npm run dev`
 3. Before pushing: `npm run lint && npx prettier --check . && npm test`
 
