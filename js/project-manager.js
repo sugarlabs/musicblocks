@@ -848,9 +848,10 @@ class ProjectManager {
         return JSON.stringify(data);
     }
 
-    saveLocally() {
+    saveLocally(options = {}) {
         const activity = this.activity;
         const data = this.prepareExport();
+        const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
 
         if (activity.storage.currentProject === undefined) {
             try {
@@ -858,6 +859,7 @@ class ProjectManager {
                 activity.storage.allProjects = JSON.stringify(["My Project"]);
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
+                if (rejectOnProjectSaveError) throw e;
             }
         }
 
@@ -871,6 +873,7 @@ class ProjectManager {
             // (IndexedDB) handles large payloads.
             console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
+            if (rejectOnProjectSaveError) throw e;
         }
 
         const img = new Image();
@@ -1015,6 +1018,146 @@ class ProjectManager {
             that.stopLoadAnimation();
         };
 
+        const getProjectName = file => {
+            const extensionIndex = file.name.lastIndexOf(".");
+            return extensionIndex === -1 ? file.name : file.name.slice(0, extensionIndex);
+        };
+
+        const initialiseLocalImportedProject = async file => {
+            const baseName = getProjectName(file) || _("My Project");
+            let projectName = baseName;
+            let suffix = 2;
+            const projectExists = async name => {
+                if (
+                    name === that.storage.currentProject ||
+                    that.storage["SESSION" + name] !== undefined
+                ) {
+                    return true;
+                }
+                return Boolean(
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.loadSession === "function" &&
+                    (await that.sessionStorageManager.loadSession("SESSION" + name))
+                );
+            };
+            while (await projectExists(projectName)) {
+                projectName = `${baseName} ${suffix}`;
+                suffix += 1;
+            }
+            that.storage.currentProject = projectName;
+        };
+
+        const saveLocalSession = async () => {
+            if (that.sessionStorageManager && typeof that.saveSessionAsync === "function") {
+                await that.saveSessionAsync();
+            } else if (typeof that.saveLocally === "function") {
+                await that.saveLocally({ rejectOnProjectSaveError: true });
+            }
+        };
+
+        const saveImportedProject = async () => {
+            try {
+                if (!that.planet) {
+                    await saveLocalSession();
+                    return;
+                }
+                await (typeof that.saveLocally === "function"
+                    ? that.saveLocally({ rejectOnProjectSaveError: true })
+                    : that.planet && typeof that.planet.saveLocally === "function"
+                      ? that.planet.saveLocally({ rejectOnProjectSaveError: true })
+                      : null);
+            } catch (error) {
+                ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
+            }
+        };
+
+        const loadImportedBlocks = (obj, errorOperation) => {
+            let loadToken = null;
+            const belongsToThisLoad = payload =>
+                loadToken === null || !payload || payload.token === loadToken;
+            const stopWatching = () => {
+                pubsub.off("finishedLoading", onFinished);
+                pubsub.off("loadFailed", onFailed);
+            };
+            const onFinished = async payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                await saveImportedProject();
+                finishLoading();
+            };
+            const onFailed = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                const error = (payload && payload.error) || new Error("loadNewBlocks failed");
+                ErrorHandler.capture(error, { operation: errorOperation });
+                that.errorMsg(_("Cannot load project from the file. Please check the file type."));
+                finishLoading();
+            };
+
+            pubsub.on("finishedLoading", onFinished);
+            pubsub.on("loadFailed", onFailed);
+            try {
+                loadToken = that.blocks.loadNewBlocks(obj);
+            } catch (error) {
+                stopWatching();
+                throw error;
+            }
+        };
+
+        const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+            if (that.planet) {
+                try {
+                    await that.planet.saveLocally({ rejectOnProjectSaveError: true });
+                } catch (error) {
+                    ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
+                    finishLoading();
+                    return;
+                }
+                that.planet.closePlanet();
+            } else {
+                try {
+                    await saveLocalSession();
+                    await initialiseLocalImportedProject(file);
+                } catch (error) {
+                    ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
+                    finishLoading();
+                    return;
+                }
+            }
+
+            const trashComplete = new Promise(resolve => {
+                const onTrash = () => {
+                    that.stage.removeAllEventListeners("trashsignal");
+                    resolve();
+                };
+                that.stage.removeAllEventListeners("trashsignal");
+                that.stage.addEventListener("trashsignal", onTrash, false);
+            });
+            that.sendAllToTrash(false, true);
+            if (clearCanvas) {
+                that._allClear(false, true);
+                if (
+                    that.gitDropdownUI &&
+                    typeof that.gitDropdownUI.clearForNewProject === "function"
+                ) {
+                    that.gitDropdownUI.clearForNewProject();
+                }
+            }
+
+            try {
+                const initialization = that.planet
+                    ? that.planet.initialiseNewProject(getProjectName(file), false)
+                    : null;
+                await Promise.all([trashComplete, initialization]);
+                loadImportedBlocks(obj, errorOperation);
+            } catch (error) {
+                that.stage.removeAllEventListeners("trashsignal");
+                ErrorHandler.capture(error, { operation: errorOperation });
+                that.errorMsg(_("Cannot load project from the file. Please check the file type."));
+                finishLoading();
+            }
+        };
+
         that.fileChooser.addEventListener("click", event => {
             event.currentTarget.value = "";
         });
@@ -1030,7 +1173,7 @@ class ProjectManager {
                     document.body.style.cursor = "wait";
                     that.doLoadAnimation();
 
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         const rawData = reader.result;
                         if (rawData === null || rawData === "") {
                             that.errorMsg(
@@ -1063,60 +1206,18 @@ class ProjectManager {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 if (!that.merging) {
-                                    const __listener = () => {
-                                        try {
-                                            that.blocks.loadNewBlocks(obj);
-                                            if (that.planet) {
-                                                that.planet.saveLocally();
-                                            }
-                                        } catch (e) {
-                                            that.errorMsg(
-                                                _(
-                                                    "Cannot load project from the file. Please check the file type."
-                                                )
-                                            );
-                                            ErrorHandler.capture(e, {
-                                                operation: "loadProjectFromFile"
-                                            });
-                                            finishLoading();
-                                            return;
-                                        } finally {
-                                            that.stage.removeAllEventListeners("trashsignal");
-                                        }
-                                        if (that.planet) {
-                                            that.planet.saveLocally();
-                                        }
-                                    };
-
-                                    that.stage.addEventListener("trashsignal", __listener, false);
-                                    that.sendAllToTrash(false, false);
-                                    that._allClear(false, true);
-                                    if (
-                                        that.gitDropdownUI &&
-                                        typeof that.gitDropdownUI.clearForNewProject === "function"
-                                    ) {
-                                        that.gitDropdownUI.clearForNewProject();
-                                    }
-                                    if (that.planet) {
-                                        that.planet.closePlanet();
-                                        that.planet.initialiseNewProject(
-                                            that.fileChooser.files[0].name.lastIndexOf(".") === -1
-                                                ? that.fileChooser.files[0].name
-                                                : that.fileChooser.files[0].name.slice(
-                                                      0,
-                                                      that.fileChooser.files[0].name.lastIndexOf(
-                                                          "."
-                                                      )
-                                                  )
-                                        );
-                                    }
+                                    await replaceProjectFromFile(
+                                        obj,
+                                        that.fileChooser.files[0],
+                                        "loadProjectFromFile",
+                                        true
+                                    );
                                 } else {
                                     that.merging = false;
                                     that.blocks.loadNewBlocks(obj);
+                                    that.loading = false;
+                                    that.refreshCanvas();
                                 }
-
-                                that.loading = false;
-                                that.refreshCanvas();
                             } catch (e) {
                                 that.errorMsg(
                                     _(
@@ -1173,7 +1274,7 @@ class ProjectManager {
                 that.loading = true;
                 document.body.style.cursor = "wait";
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     const rawData = reader.result;
                     if (rawData === null || rawData === "") {
                         that.errorMsg(
@@ -1201,41 +1302,7 @@ class ProjectManager {
                                 that.palettes.dict[name].hideMenu(true);
                             }
 
-                            that.stage.removeAllEventListeners("trashsignal");
-
-                            const __afterLoad = () => {
-                                pubsub.off("finishedLoading", __afterLoad);
-                            };
-
-                            const __listener = () => {
-                                try {
-                                    that.blocks.loadNewBlocks(obj);
-                                    pubsub.on("finishedLoading", __afterLoad);
-                                } catch (e) {
-                                    ErrorHandler.capture(e, { operation: "loadFromFile" });
-                                    that.errorMsg(
-                                        _(
-                                            "Cannot load project from the file. Please check the file type."
-                                        )
-                                    );
-                                    finishLoading();
-                                } finally {
-                                    that.stage.removeAllEventListeners("trashsignal");
-                                }
-                            };
-
-                            that.stage.addEventListener("trashsignal", __listener, false);
-                            that.sendAllToTrash(false, false);
-                            if (that.planet !== undefined) {
-                                that.planet.initialiseNewProject(
-                                    files[0].name.lastIndexOf(".") === -1
-                                        ? files[0].name
-                                        : files[0].name.slice(0, files[0].name.lastIndexOf("."))
-                                );
-                            }
-
-                            that.loading = false;
-                            that.refreshCanvas();
+                            await replaceProjectFromFile(obj, files[0], "loadFromFile", false);
                         } catch (e) {
                             ErrorHandler.capture(e, { operation: "loadFromFile" });
                             that.errorMsg(
