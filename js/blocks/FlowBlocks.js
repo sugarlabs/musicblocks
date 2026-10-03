@@ -1076,11 +1076,10 @@ function setupFlowBlocks(activity) {
                 // A computed action name could be any action.
                 stack.push(...(name === undefined ? Object.values(actions) : [actions[name]]));
             }
-            stack.push(
-                ...(LOOPS.includes(block.name)
-                    ? [block.connections[block.connections.length - 1]]
-                    : block.connections.slice(1))
-            );
+            const next = block.connections.slice(1);
+            // The body is the second-to-last connection; args still run first.
+            if (LOOPS.includes(block.name)) next.splice(next.length - 2, 1);
+            stack.push(...next);
         }
         return false;
     };

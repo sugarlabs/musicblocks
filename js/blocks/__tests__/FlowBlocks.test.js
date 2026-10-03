@@ -675,6 +675,17 @@ describe("FlowBlocks integration", () => {
             expect(logo.notation.notationBeginRepeat).toHaveBeenCalledWith(0);
         });
 
+        test("unrolls a loop whose nested loop count calls an action with a Stop", () => {
+            activity.blocks.blockList = {
+                60: { name: "repeat", connections: [10, 61, 62, null] },
+                61: { name: "namedcalc", privateData: "count", connections: [60] },
+                62: { name: "newnote", connections: [60, null, null, null] },
+                70: { name: "break", connections: [null, null] }
+            };
+            logo.actions = { count: 70 };
+            expectUnrolled();
+        });
+
         test("unrolls a loop with a Stop after a nested loop", () => {
             activity.blocks.blockList = {
                 60: { name: "while", connections: [10, 61, 62, 63] },
