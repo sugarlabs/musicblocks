@@ -17,7 +17,6 @@
         <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png" />
         <link rel="manifest" href="android_chrome_manifest.json" />
 
-
         <!-- Stylesheets -->
         <link rel="stylesheet" href="css/tokens.css?v=fixed" />
         <link rel="stylesheet" href="css/themes.css?v=fixed" />
@@ -326,6 +325,12 @@
 
                     <div id="canvasContainer">
                         <canvas id="myCanvas" width="1200" height="900"></canvas>
+                        <div
+                            id="accessibleBlocks"
+                            class="visually-hidden"
+                            role="region"
+                            aria-label="Workspace Blocks"
+                        ></div>
                     </div>
                     <!--Load Animation Container-->
                     <div style="text-align: center">
@@ -586,7 +591,67 @@
                                         tabindex="0"
                                         aria-label="My Project"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="width: 38px; height: 38px; margin: 0; vertical-align: middle;"><rect width="256" height="256" fill="none"/><path d="M64,88v24a16,16,0,0,0,16,16h96a16,16,0,0,0,16-16V88" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><line x1="128" y1="128" x2="128" y2="168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="64" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="128" cy="192" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="192" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 256 256"
+                                            style="
+                                                width: 38px;
+                                                height: 38px;
+                                                margin: 0;
+                                                vertical-align: middle;
+                                            "
+                                        >
+                                            <rect width="256" height="256" fill="none" />
+                                            <path
+                                                d="M64,88v24a16,16,0,0,0,16,16h96a16,16,0,0,0,16-16V88"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="24"
+                                            />
+                                            <line
+                                                x1="128"
+                                                y1="128"
+                                                x2="128"
+                                                y2="168"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="24"
+                                            />
+                                            <circle
+                                                cx="64"
+                                                cy="64"
+                                                r="24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="24"
+                                            />
+                                            <circle
+                                                cx="128"
+                                                cy="192"
+                                                r="24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="24"
+                                            />
+                                            <circle
+                                                cx="192"
+                                                cy="64"
+                                                r="24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="24"
+                                            />
+                                        </svg>
                                     </a>
                                 </li>
                                 <li>
@@ -1202,36 +1267,36 @@
                 loadL10nSplashScreen();
 
                 requirejs(["utils/utils"], function (_) {
-                setTimeout(function () {
-                    const loadingText = document.getElementById("loadingText");
-                    const rawTexts =
-                        typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
-                            ? LOADING_TEXTS
-                            : [
-                                  "Do, Re, Mi, Fa, Sol, La, Ti, Do",
-                                  "Loading Music Blocks...",
-                                  "Reading Music..."
-                              ];
-                    let index = 0;
+                    setTimeout(function () {
+                        const loadingText = document.getElementById("loadingText");
+                        const rawTexts =
+                            typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
+                                ? LOADING_TEXTS
+                                : [
+                                      "Do, Re, Mi, Fa, Sol, La, Ti, Do",
+                                      "Loading Music Blocks...",
+                                      "Reading Music..."
+                                  ];
+                        let index = 0;
 
-                    const getTranslatedText = function (text) {
-                        if (
-                            typeof window !== "undefined" &&
-                            window.i18next &&
-                            window.i18next.isInitialized &&
-                            typeof _ === "function"
-                        ) {
-                            return _(text);
-                        }
-                        return text;
-                    };
+                        const getTranslatedText = function (text) {
+                            if (
+                                typeof window !== "undefined" &&
+                                window.i18next &&
+                                window.i18next.isInitialized &&
+                                typeof _ === "function"
+                            ) {
+                                return _(text);
+                            }
+                            return text;
+                        };
 
-                    window.intervalId = setInterval(function () {
-                        loadingText.textContent = getTranslatedText(rawTexts[index]);
-                        index = (index + 1) % rawTexts.length;
-                    }, 1500);
-                }, 3000);
-            });
+                        window.intervalId = setInterval(function () {
+                            loadingText.textContent = getTranslatedText(rawTexts[index]);
+                            index = (index + 1) % rawTexts.length;
+                        }, 1500);
+                    }, 3000);
+                });
 
                 const languageDropdown = document.getElementById("languagedropdown");
                 if (languageDropdown) {
