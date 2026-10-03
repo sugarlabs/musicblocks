@@ -1047,7 +1047,7 @@ function setupProgramBlocks(activity) {
                         activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;
-                        return;
+                        break;
                     }
                 }
             }

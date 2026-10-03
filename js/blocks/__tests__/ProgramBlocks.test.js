@@ -960,8 +960,9 @@ describe("ProgramBlocks", () => {
             ];
 
             const args = ["myBlock"];
-            block.flow(args, logo, 0, 5);
+            const flow = block.flow(args, logo, 0, 5);
             expect(args[0]).toBe(0);
+            expect(flow).toEqual([0, 1]);
         });
 
         test("reports an error instead of throwing when the slot is empty", () => {
