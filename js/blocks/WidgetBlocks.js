@@ -385,7 +385,7 @@ function setupWidgetBlocks(activity) {
                 "temperament",
                 _getWidgetDependencies(
                     typeof TemperamentWidget !== "undefined" ? TemperamentWidget : null,
-                    ["widgets/temperament"]
+                    ["widgets/TemperamentUI", "widgets/temperament"]
                 ),
                 () => new TemperamentWidget(),
                 turtle,
