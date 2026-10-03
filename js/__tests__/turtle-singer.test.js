@@ -1090,6 +1090,175 @@ describe("processPitch — note block execution path", () => {
     });
 });
 
+describe("processPitch widget-row definition adds one row per visit", () => {
+    // The Duplicate block re-queues each block in its clamp `factor` times
+    // (see DuplicateBlock.flow), so a pitch block is already visited once per
+    // duplicate. These guard against re-introducing a per-visit multiplier
+    // here, which would add factor x factor rows.
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            noteIsSolfege: global.noteIsSolfege,
+            getSolfege: global.getSolfege,
+            getNote: global.getNote
+        };
+        global.noteIsSolfege = jest.fn().mockReturnValue(false);
+        global.getSolfege = jest.fn(note => note);
+        // A fresh array per call: processPitch writes back into the returned
+        // note (noteObj[0] = ...), which would otherwise mutate a shared mock
+        // return value and leak into later suites.
+        global.getNote = jest.fn(() => ["C", 4]);
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.duplicateFactor = 3;
+
+        activityMock = {
+            turtles: { ithTurtle: jest.fn().mockReturnValue(turtleMock) },
+            errorMsg: jest.fn(),
+            logo: {
+                synth: { inTemperament: false },
+                clearNoteParams: jest.fn(),
+                pitchBlocks: [],
+                inPitchDrumMatrix: false,
+                inMatrix: false,
+                inLegoWidget: false,
+                pitchDrumMatrix: {
+                    addRowBlock: jest.fn(),
+                    addColBlock: jest.fn(),
+                    rowLabels: [],
+                    rowArgs: [],
+                    drums: []
+                },
+                phraseMaker: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] },
+                legoWidget: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] }
+            }
+        };
+    });
+
+    afterEach(() => {
+        global.noteIsSolfege = savedGlobals.noteIsSolfege;
+        global.getSolfege = savedGlobals.getSolfege;
+        global.getNote = savedGlobals.getNote;
+    });
+
+    test("pitch-drum matrix adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.pitchDrumMatrix.rowArgs).toHaveLength(1);
+    });
+
+    test("phrase maker adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inMatrix = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.phraseMaker.rowArgs).toHaveLength(1);
+    });
+
+    test("row count stays at one for a fractional duplicateFactor", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.duplicateFactor = 0.5;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toHaveLength(1);
+    });
+
+    test("LEGO widget adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inLegoWidget = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.legoWidget.rowArgs).toHaveLength(1);
+    });
+
+    test("LEGO widget row count stays at one for a fractional duplicateFactor", () => {
+        activityMock.logo.inLegoWidget = true;
+        turtleMock.singer.duplicateFactor = 0.5;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toHaveLength(1);
+    });
+
+    test.each([
+        { name: "pitch-drum matrix", flag: "inPitchDrumMatrix", widget: "pitchDrumMatrix" },
+        { name: "phrase maker", flag: "inMatrix", widget: "phraseMaker" },
+        { name: "LEGO widget", flag: "inLegoWidget", widget: "legoWidget" }
+    ])("$name consults the arpeggio once per visit", ({ flag, widget }) => {
+        activityMock.logo[flag] = true;
+        // Real entries are [scalar step, semitones] pairs from CHORDVALUES.
+        turtleMock.singer.arpeggio = [
+            [2, 0],
+            [4, 0],
+            [7, 0]
+        ];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        // One visit, one note lookup, one row; later entries are unreachable
+        // here because each duplicate is a separate visit. The transposition
+        // value is deliberately not asserted: these branches add the raw pair
+        // instead of decoding it like the note-block path does, a pre-existing
+        // defect that is out of scope for this cleanup.
+        expect(global.getNote).toHaveBeenCalledTimes(1);
+        expect(activityMock.logo[widget].rowLabels).toHaveLength(1);
+    });
+
+    test("a setdrum clamp overrides the pitch-drum matrix row", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        turtleMock.singer.drumStyle = ["kick drum"];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.pitchDrumMatrix.drums).toEqual(["kick drum"]);
+        expect(activityMock.logo.pitchDrumMatrix.addColBlock).toHaveBeenCalledWith(123);
+        expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(0);
+    });
+
+    test("a setdrum clamp overrides the phrase maker row", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.drumStyle = ["snare drum"];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toEqual(["snare drum"]);
+        expect(activityMock.logo.phraseMaker.rowArgs).toEqual([-1]);
+    });
+
+    test("a setdrum clamp overrides the LEGO widget row", () => {
+        activityMock.logo.inLegoWidget = true;
+        turtleMock.singer.drumStyle = ["hi hat"];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toEqual(["hi hat"]);
+        expect(activityMock.logo.legoWidget.rowArgs).toEqual([-1]);
+    });
+
+    test("converts the label to solfege in C major when the note is solfege", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.keySignature = ["C", "major"];
+        global.noteIsSolfege.mockReturnValue(true);
+        global.getSolfege.mockReturnValue("do");
+
+        Singer.processPitch(activityMock, "do", 4, 0, 0, 123);
+
+        expect(global.getSolfege).toHaveBeenCalled();
+        expect(activityMock.logo.phraseMaker.rowLabels).toEqual(["do"]);
+    });
+});
+
 describe("noteCounter regression behavior", () => {
     let turtleMock;
     let activityMock;
