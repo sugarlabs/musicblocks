@@ -2640,3 +2640,21 @@ table {
 .pitch-staircase-step.active {
     background-color: var(--color-selector-selected);
 }
+
+/* Global Search Suggestion Cascade using Tokens */
+body ul.ui-autocomplete {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+body ul.ui-autocomplete li.ui-menu-item,
+body ul.ui-autocomplete li.ui-menu-item .ui-menu-item-wrapper,
+body ul.ui-autocomplete li.ui-menu-item .ui-menu-item-wrapper.ui-state-active,
+body ul.ui-autocomplete li.ui-menu-item .ui-menu-item-wrapper:hover {
+    color: var(--color-text-primary) !important;
+}
+
+body ul.ui-autocomplete li.ui-menu-item .ui-menu-item-wrapper:hover,
+body ul.ui-autocomplete li.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background-color: var(--color-bg-secondary) !important;
+}

@@ -1755,15 +1755,35 @@ class GitDropdownUI {
             e.preventDefault();
         });
 
+        let rAFId = null;
+        let ticking = false;
+        let lastX, lastY;
         const onMove = e => {
             if (!dragging) return;
-            const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
-            const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
-            frame.style.left = `${Math.min(Math.max(e.clientX - dx, 8), maxL)}px`;
-            frame.style.top = `${Math.min(Math.max(e.clientY - dy, 64), maxT)}px`;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            if (!ticking) {
+                ticking = true;
+                rAFId = window.requestAnimationFrame(() => {
+                    const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
+                    const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
+                    frame.style.left = `${Math.min(Math.max(lastX - dx, 8), maxL)}px`;
+                    frame.style.top = `${Math.min(Math.max(lastY - dy, 64), maxT)}px`;
+                    ticking = false;
+                });
+            }
         };
 
         const onUp = () => {
+            if (rAFId) {
+                window.cancelAnimationFrame(rAFId);
+                rAFId = null;
+                ticking = false;
+                const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
+                const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
+                frame.style.left = `${Math.min(Math.max(lastX - dx, 8), maxL)}px`;
+                frame.style.top = `${Math.min(Math.max(lastY - dy, 64), maxT)}px`;
+            }
             dragging = false;
         };
 
