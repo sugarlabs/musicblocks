@@ -13,7 +13,7 @@
    exported
 
    reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor,
-   getMeasurePosition, getMeterAnchor, MusicUtilsRhythm
+   getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState, MusicUtilsRhythm
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -258,13 +258,42 @@ var getMeterAnchor = singer => {
     return { wholeNotes, measures: beat > 1 ? measure : measure - 1 };
 };
 
+/**
+ * A copy of the meter state a stack run can change (meter, pickup, meter anchor
+ * and default strong beats), for runs that only count or measure the stack.
+ * @function
+ * @param {Object} singer - A turtle's singer.
+ * @returns {Object} the state, for restoreMeterState.
+ */
+var saveMeterState = singer => ({
+    beatsPerMeasure: singer.beatsPerMeasure,
+    noteValuePerBeat: singer.noteValuePerBeat,
+    pickup: singer.pickup,
+    meterAnchor: singer.meterAnchor,
+    beatList: singer.beatList.slice(),
+    defaultStrongBeats: singer.defaultStrongBeats
+});
+
+/**
+ * Puts back the meter state saved by saveMeterState.
+ * @function
+ * @param {Object} singer - A turtle's singer.
+ * @param {Object} state - The state saveMeterState returned.
+ * @returns {void}
+ */
+var restoreMeterState = (singer, state) => {
+    Object.assign(singer, state, { beatList: state.beatList.slice() });
+};
+
 var MusicUtilsRhythm = {
     reducedFraction,
     calcNoteValueToDisplay,
     durationToNoteValue,
     convertFactor,
     getMeasurePosition,
-    getMeterAnchor
+    getMeterAnchor,
+    saveMeterState,
+    restoreMeterState
 };
 
 if (typeof module !== "undefined" && module.exports) {

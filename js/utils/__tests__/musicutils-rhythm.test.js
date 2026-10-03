@@ -143,6 +143,47 @@ describe("musicutils-rhythm", () => {
         });
     });
 
+    describe("saveMeterState / restoreMeterState", () => {
+        it("puts back the meter, pickup, anchor and default strong beats", () => {
+            const anchor = { wholeNotes: 0.75, measures: 1 };
+            const singer = {
+                beatsPerMeasure: 4,
+                noteValuePerBeat: 4,
+                pickup: 0,
+                meterAnchor: anchor,
+                beatList: [1, 3],
+                defaultStrongBeats: true,
+                notesPlayed: [1, 1]
+            };
+            const saved = rhythm.saveMeterState(singer);
+
+            Object.assign(singer, {
+                beatsPerMeasure: 6,
+                noteValuePerBeat: 8,
+                pickup: 0.125,
+                meterAnchor: { wholeNotes: 2, measures: 3 },
+                defaultStrongBeats: false,
+                notesPlayed: [2, 1]
+            });
+            singer.beatList.push(4);
+            rhythm.restoreMeterState(singer, saved);
+
+            expect(singer).toEqual({
+                beatsPerMeasure: 4,
+                noteValuePerBeat: 4,
+                pickup: 0,
+                meterAnchor: anchor,
+                beatList: [1, 3],
+                defaultStrongBeats: true,
+                notesPlayed: [2, 1]
+            });
+            // The saved copy survives another restore.
+            singer.beatList.push(5);
+            rhythm.restoreMeterState(singer, saved);
+            expect(singer.beatList).toEqual([1, 3]);
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of Object.keys(rhythm)) {
             if (name === "MusicUtilsRhythm") continue;

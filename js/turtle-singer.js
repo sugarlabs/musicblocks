@@ -27,7 +27,7 @@
    noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
    keySignatureToMode, getSavedCustomModes,
-   clampNumber
+   clampNumber, saveMeterState, restoreMeterState
  */
 
 /*
@@ -39,6 +39,8 @@
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
         getCurrentEDO, isEquallyTempered
+    js/utils/musicutils-rhythm.js
+        saveMeterState, restoreMeterState
     js/utils/utils.js
         rationalSum, _
     js/utils/synthutils.js
@@ -602,7 +604,7 @@ class Singer {
 
         const actionArgs = [];
         const saveNoteCount = tur.singer.notesPlayed;
-        const saveMeterAnchor = tur.singer.meterAnchor;
+        const saveMeter = saveMeterState(tur.singer);
         const saveTallyNotes = tur.singer.tallyNotes;
         tur.running = true;
 
@@ -625,7 +627,7 @@ class Singer {
             activity.errorMsg(noteCountErr);
         }
         tur.singer.notesPlayed = saveNoteCount;
-        tur.singer.meterAnchor = saveMeterAnchor;
+        restoreMeterState(tur.singer, saveMeter);
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
@@ -692,7 +694,7 @@ class Singer {
             prevTurtleTime: tur.singer.previousTurtleTime,
             turtleTime: tur.singer.turtleTime,
             noteCount: tur.singer.notesPlayed,
-            meterAnchor: tur.singer.meterAnchor,
+            meter: saveMeterState(tur.singer),
             tallyNotes: tur.singer.tallyNotes
         };
 
@@ -719,13 +721,13 @@ class Singer {
         // Restore previous state
         Object.assign(tur.singer, {
             notesPlayed: saveState.noteCount,
-            meterAnchor: saveState.meterAnchor,
             tallyNotes: saveState.tallyNotes,
             previousTurtleTime: saveState.prevTurtleTime,
             turtleTime: saveState.turtleTime,
             whichNoteToCount: saveState.whichNoteToCount,
             suppressOutput: saveState.suppressOutput
         });
+        restoreMeterState(tur.singer, saveState.meter);
 
         Object.assign(tur.painter, {
             color: saveState.color,

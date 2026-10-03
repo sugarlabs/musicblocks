@@ -148,7 +148,9 @@ if (typeof module !== "undefined" && module.exports) {
         durationToNoteValue,
         convertFactor,
         getMeasurePosition,
-        getMeterAnchor
+        getMeterAnchor,
+        saveMeterState,
+        restoreMeterState
     } = MusicUtilsRhythm;
     var MusicUtilsSolfege =
         (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
@@ -243,7 +245,8 @@ if (typeof module !== "undefined" && module.exports) {
    durationToNoteValue, noteToFrequency, computeTargetPitchFrequency, getSolfege, splitScaleDegree,
    getNumNote, calcOctave, calcOctaveInterval, isInt,
    convertFromSolfege, getPitchInfo, i18nSolfege,
-   convertFactor, getMeasurePosition, getMeterAnchor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+   convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState,
+   getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
@@ -318,6 +321,8 @@ if (typeof module !== "undefined" && module.exports) {
         convertFactor,
         getMeasurePosition,
         getMeterAnchor,
+        saveMeterState,
+        restoreMeterState,
         getPitchInfo,
         noteToFrequency,
         computeTargetPitchFrequency,

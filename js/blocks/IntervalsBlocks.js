@@ -14,7 +14,7 @@
 
    deepClone, last, _, ErrorHandler, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
-   Queue, INTERVALVALUES
+   Queue, INTERVALVALUES, saveMeterState, restoreMeterState
  */
 
 /*
@@ -27,6 +27,8 @@
     NOINPUTERRORMSG
    - js/turtle-singer.js
     Singer
+   - js/utils/musicutils-rhythm.js
+    saveMeterState, restoreMeterState
  */
 
 /* exported setupIntervalsBlocks */
@@ -458,7 +460,7 @@ function setupIntervalsBlocks(activity) {
 
             const actionArgs = [];
             const saveNoteCount = tur.singer.notesPlayed;
-            const saveMeterAnchor = tur.singer.meterAnchor;
+            const saveMeter = saveMeterState(tur.singer);
 
             let distance = 0;
             tur.running = true;
@@ -476,7 +478,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             tur.singer.notesPlayed = saveNoteCount;
-            tur.singer.meterAnchor = saveMeterAnchor;
+            restoreMeterState(tur.singer, saveMeter);
 
             // Restore previous state
             logo.boxes = saveBoxes;
@@ -579,7 +581,7 @@ function setupIntervalsBlocks(activity) {
 
             const actionArgs = [];
             const saveNoteCount = tur.singer.notesPlayed;
-            const saveMeterAnchor = tur.singer.meterAnchor;
+            const saveMeter = saveMeterState(tur.singer);
             tur.running = true;
             let distance = 0;
             logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
@@ -599,7 +601,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             tur.singer.notesPlayed = saveNoteCount;
-            tur.singer.meterAnchor = saveMeterAnchor;
+            restoreMeterState(tur.singer, saveMeter);
 
             // Restore previous state
             logo.boxes = saveBoxes;
