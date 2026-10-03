@@ -179,6 +179,51 @@ describe("ToolbarUI - Visual Helpers", () => {
         expect(mockPlayBtn.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
     });
 
+    test.each([true, false])(
+        "init keeps translated tooltips paired with their controls (music blocks: %s)",
+        isMusicBlocks => {
+            const elements = new Map();
+            global.document.getElementById = jest.fn(id => {
+                if (!elements.has(id)) elements.set(id, createMockElement(id));
+                return elements.get(id);
+            });
+            global._THIS_IS_MUSIC_BLOCKS_ = isMusicBlocks;
+            global._ = jest.fn(text => `translated: ${text}`);
+            const activity = { beginnerMode: false };
+
+            toolbar.init(activity);
+
+            const labels = {
+                runSlowlyIcon: "Run slowly",
+                runStepByStepIcon: "Run step by step",
+                displayStatsIcon: "Display statistics",
+                loadPluginIcon: "Load plugin",
+                delPluginIcon: "Delete plugin",
+                languageSelectIcon: "Select language",
+                saveButtonAdvanced: "Save project as HTML"
+            };
+            for (const [id, label] of Object.entries(labels)) {
+                expect(elements.get(id).setAttribute).toHaveBeenCalledWith(
+                    "data-tooltip",
+                    `translated: ${label}`
+                );
+                expect(elements.get(id).setAttribute).toHaveBeenCalledWith(
+                    "aria-label",
+                    `translated: ${label}`
+                );
+            }
+            expect(elements.get("practiceLessonsItem").textContent).toBe(
+                "translated: Practice levels"
+            );
+
+            const onStep = jest.fn();
+            toolbar.renderRunStepIcon(onStep);
+            elements.get("runStepByStepIcon").onclick();
+            expect(onStep).toHaveBeenCalledTimes(1);
+            expect(onStep).toHaveBeenCalledWith(activity);
+        }
+    );
+
     test("renderWrapIcon sets aria-label alongside data-tooltip, and updates both on toggle", () => {
         const mockWrapIcon = createMockElement("wrapTurtle");
         global.document.getElementById = jest.fn(id => {
