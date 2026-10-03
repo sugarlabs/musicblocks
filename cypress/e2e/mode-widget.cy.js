@@ -45,22 +45,17 @@ const loadFixtureProject = fixtureName => {
     cy.get("#errorText").should("not.be.visible");
 };
 
-// ModeWidget.init() calls window.widgetWindows.windowFor(this, "custom mode"),
-// which sets aria-label="custom mode" on the .windowFrame div.  We scope by
-// the title text for the wait and use the role+label selector for assertions.
+// The widget title and frame aria-label update to the selected key/mode (e.g.
+// "C major"), so use the stable wheel element to locate its window frame.
 const openModeWidget = () => {
     loadFixtureProject("mode-widget-minimal.tb");
     cy.get("#play").click();
-    // Wait for the title bar to contain "custom mode" -- this is the most
-    // reliable signal that the widget body has been added to the DOM, matching
-    // the pattern used by mode-persistence.cy.js's waitForProjectLoaded guard.
-    cy.get(".windowFrame .wftTitle", { timeout: 30000 })
-        .should("be.visible")
-        .and("contain.text", "custom mode");
+    modeFrame().should("be.visible");
+    modeFrame().find("#modeTable").should("exist");
 };
 
 // Scoped selector for all assertions after the widget is confirmed open.
-const modeFrame = () => cy.get('.windowFrame[aria-label="custom mode"]');
+const modeFrame = () => cy.get("#modeWidgetWheelDiv", { timeout: 30000 }).parents(".windowFrame");
 
 // ---------------------------------------------------------------------------
 // Suite
@@ -166,10 +161,7 @@ describe("Mode widget", () => {
         // DOM entirely.
         modeFrame().find('[role="button"][aria-label="Close window"]').click({ force: true });
 
-        // The widget frame must be gone.
-        cy.get('.windowFrame[aria-label="custom mode"]').should("not.exist");
-
-        // The mode wheel and table must also be gone.
+        // The wheel and table are stable identifiers for the widget frame.
         cy.get("#modeWidgetWheelDiv").should("not.exist");
         cy.get("#modeTable").should("not.exist");
     });
