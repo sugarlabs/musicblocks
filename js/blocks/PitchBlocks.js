@@ -960,7 +960,7 @@ function setupPitchBlocks(activity) {
             if (typeof value !== "string") return [value, 0];
             const match = value.match(
                 new RegExp(
-                    `^([v^]{0,2}[A-Ga-g](?:[#b♯♭]{1,2}|𝄪|𝄫)?)(\\(([+-]?\\d+)(?:${CENTSSYMBOL}|c)?\\))?$`
+                    `^((?:[\\^v_=-]+)?[A-Ga-g](?:[#b♯♭xX♮]{1,2}|𝄪|𝄫|##|bb)?)(\\(([+-]?\\d+)(?:${CENTSSYMBOL}|c)?\\))?$`
                 )
             );
             if (match) {
@@ -2145,15 +2145,20 @@ function setupPitchBlocks(activity) {
                     );
                     cents = 0;
                 } else {
+                    const [parsedNote, parsedCents] = CustomNoteBlock._parseCents(arg0);
                     octave = calcOctave(
                         tur.singer.currentOctave,
                         arg1,
                         tur.singer.lastNotePlayed,
-                        arg0
+                        parsedNote
                     );
 
                     // Octave must be an integer in [0, 9]
-                    [note, octave, cents] = [arg0, Math.floor(Math.min(9, Math.max(0, octave))), 0];
+                    [note, octave, cents] = [
+                        parsedNote,
+                        Math.floor(Math.min(9, Math.max(0, octave))),
+                        parsedCents
+                    ];
                 }
             }
 
