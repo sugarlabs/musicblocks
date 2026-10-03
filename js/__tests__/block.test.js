@@ -1989,4 +1989,230 @@ describe("Block Foundation", () => {
             expect(timerManager.activeTimeoutCount).toBe(0);
         });
     });
+
+    describe("Screen Reader Accessibility", () => {
+        let block;
+        let testBlocks;
+
+        beforeEach(() => {
+            document.body.innerHTML = `
+                <div id="canvasContainer">
+                    <canvas id="myCanvas"></canvas>
+                    <div id="accessibleBlocks" class="visually-hidden" role="region" aria-label="Workspace Blocks"></div>
+                </div>
+            `;
+            testBlocks = {
+                activity: {
+                    refreshCanvas: jest.fn(),
+                    closeHelpfulWheel: jest.fn(),
+                    getStageScale: () => 1
+                },
+                blockList: [],
+                highlight: jest.fn(),
+                findTopBlock: jest.fn().mockReturnValue(0),
+                getLongPressStatus: jest.fn().mockReturnValue(false),
+                stageClick: false,
+                selectionModeOn: false
+            };
+            block = new Block(
+                {
+                    name: "forward",
+                    staticLabels: ["forward"],
+                    image: "forward.svg",
+                    size: 1,
+                    docks: [
+                        [0, 0, 0],
+                        [0, 0, 0]
+                    ],
+                    capabilities: {}
+                },
+                testBlocks
+            );
+            block.blockIndex = 0;
+            block.container = {
+                x: 10,
+                y: 20,
+                on: jest.fn(),
+                dispatchEvent: jest.fn(),
+                children: []
+            };
+        });
+
+        afterEach(() => {
+            document.body.innerHTML = "";
+        });
+
+        it("Block.getAccessibleContainer retrieves existing accessible container", () => {
+            const existing = document.getElementById("accessibleBlocks");
+            const container = Block.getAccessibleContainer();
+            expect(container).toBe(existing);
+        });
+
+        it("Block.getAccessibleContainer creates and appends container to canvasContainer when not already present", () => {
+            document.body.innerHTML = '<div id="canvasContainer"></div>';
+            const container = Block.getAccessibleContainer();
+            expect(container).not.toBeNull();
+            expect(container.id).toBe("accessibleBlocks");
+            expect(container.className).toBe("visually-hidden");
+            expect(container.getAttribute("role")).toBe("region");
+            expect(container.getAttribute("aria-label")).toBe("Workspace Blocks");
+            expect(container.parentNode.id).toBe("canvasContainer");
+        });
+
+        it("Block.getAccessibleContainer creates and appends container to document.body when canvasContainer is absent", () => {
+            document.body.innerHTML = "";
+            const container = Block.getAccessibleContainer();
+            expect(container).not.toBeNull();
+            expect(container.id).toBe("accessibleBlocks");
+            expect(container.parentNode).toBe(document.body);
+        });
+
+        it("getAccessibleLabel returns correct descriptive label", () => {
+            expect(block.getAccessibleLabel()).toBe("forward block");
+
+            block.value = 100;
+            expect(block.getAccessibleLabel()).toBe("forward, value: 100");
+        });
+
+        it("getAccessibleLabel uses overrideName when present", () => {
+            block.overrideName = "myCustomFunction";
+            expect(block.getAccessibleLabel()).toBe("myCustomFunction block");
+
+            block.value = 42;
+            expect(block.getAccessibleLabel()).toBe("myCustomFunction, value: 42");
+        });
+
+        it("getAccessibleLabel does not announce data URLs in values", () => {
+            block.value = "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=";
+            expect(block.getAccessibleLabel()).toBe("forward block");
+        });
+
+        it("_setupAccessibleElement creates an off-screen accessible button", () => {
+            const el = block._setupAccessibleElement();
+            expect(el).not.toBeNull();
+            expect(el.getAttribute("role")).toBe("button");
+            expect(el.getAttribute("tabindex")).toBe("0");
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+            expect(el.id).toBe("accessible-block-0");
+        });
+
+        it("activate dispatches synthetic click event to container", () => {
+            block.activate();
+            expect(block.container.dispatchEvent).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "click",
+                    stageX: 60,
+                    stageY: 30
+                })
+            );
+        });
+
+        it("activate scales click coordinates using getStageScale", () => {
+            block.activity = {
+                getStageScale: jest.fn().mockReturnValue(2)
+            };
+            block.activate();
+            expect(block.container.dispatchEvent).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "click",
+                    stageX: 120,
+                    stageY: 60
+                })
+            );
+        });
+
+        it("dispose cleans up accessible element from DOM", () => {
+            block._setupAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).not.toBeNull();
+
+            block.dispose();
+            expect(document.getElementById("accessible-block-0")).toBeNull();
+            expect(block.accessibleElement).toBeNull();
+        });
+
+        it("pressing Enter or Space activates the block", () => {
+            const el = block._setupAccessibleElement();
+            const activateSpy = jest.spyOn(block, "activate");
+
+            const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+            el.dispatchEvent(enterEvent);
+            expect(activateSpy).toHaveBeenCalledTimes(1);
+
+            const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+            el.dispatchEvent(spaceEvent);
+            expect(activateSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("arrow keys navigate between sibling block elements", () => {
+            const block2 = new Block(
+                { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },
+                testBlocks
+            );
+            block2.blockIndex = 1;
+            block2.container = {
+                x: 0,
+                y: 0,
+                on: jest.fn(),
+                dispatchEvent: jest.fn(),
+                children: []
+            };
+
+            const el1 = block._setupAccessibleElement();
+            const el2 = block2._setupAccessibleElement();
+
+            const focusSpy = jest.spyOn(el2, "focus");
+            const downArrowEvent = new KeyboardEvent("keydown", {
+                key: "ArrowDown",
+                bubbles: true
+            });
+            el1.dispatchEvent(downArrowEvent);
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        it("_removeAccessibleElement removes the element from DOM", () => {
+            block._setupAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).not.toBeNull();
+
+            block._removeAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).toBeNull();
+            expect(block.accessibleElement).toBeNull();
+        });
+
+        it("_updateAccessibleElement updates aria-label and id", () => {
+            block._setupAccessibleElement();
+            block.value = 50;
+            block.blockIndex = 2;
+            block._updateAccessibleElement();
+
+            expect(block.accessibleElement.id).toBe("accessible-block-2");
+            expect(block.accessibleElement.getAttribute("aria-label")).toBe("forward, value: 50");
+        });
+
+        it("_toggle_inline adds/removes child accessibility controls on expand/collapse", () => {
+            const childBlock = new Block(
+                { name: "number", staticLabels: ["100"], image: "number.svg", docks: [] },
+                testBlocks
+            );
+            childBlock.blockIndex = 1;
+            childBlock.container = { visible: true };
+            childBlock._setupAccessibleElement = jest.fn();
+            childBlock._removeAccessibleElement = jest.fn();
+
+            testBlocks.blockList = [block, childBlock];
+            testBlocks.dragGroup = [1];
+            testBlocks.insideInlineCollapsibleBlock = jest.fn().mockReturnValue(null);
+            testBlocks.findDragGroup = jest.fn();
+            testBlocks.findNestedClampBlocks = jest.fn();
+            block.connections = [null, 1, null, null];
+            block.activity = { refreshCanvas: jest.fn() };
+
+            // Collapse: should call _removeAccessibleElement
+            block._toggle_inline(0, false);
+            expect(childBlock._removeAccessibleElement).toHaveBeenCalled();
+
+            // Expand: should call _setupAccessibleElement
+            block._toggle_inline(0, true);
+            expect(childBlock._setupAccessibleElement).toHaveBeenCalled();
+        });
+    });
 });
