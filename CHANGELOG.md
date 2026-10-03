@@ -8,6 +8,307 @@ commit messages on `master`. To get an entry here, write a Conventional
 Commit (`feat:`, `fix:`, `perf:`, `docs:`, `revert:`); see
 [CONTRIBUTING.md](CONTRIBUTING.md#releases-and-the-changelog).
 
+## 3.9.0 (2026-10-03)
+
+## What's Changed
+* Handle denied microphone permission in Sampler widget by @zealot-zew in https://github.com/sugarlabs/musicblocks/pull/6856
+* feat: announce program run/stop state via aria-live region (#6608) by @abhnish in https://github.com/sugarlabs/musicblocks/pull/7675
+* fix: guard against null popup window in PhraseMaker export by @rish106-hub in https://github.com/sugarlabs/musicblocks/pull/7721
+* fix: handle null turtle in EnsembleBlocks._blockFindTurtle by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/7736
+* docs: add missing help strings to setxyturtle and turtlenote blocks by @karankumar1106 in https://github.com/sugarlabs/musicblocks/pull/7801
+* fix(graphics-blocks): bound-check Arc block's angle argument by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8230
+* fix(intervals-actions): bound scalar interval value to prevent unbounded loop by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8248
+* fix: modernize plugin management UI and resolve scoping issues by @DivyanshuVortex in https://github.com/sugarlabs/musicblocks/pull/8291
+* fix: validate SkipNotesBlock.flow() inputs and prevent skipFactor cor… by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/8295
+* fix: prevent unsettled promises on plugin script loading errors by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8337
+* feat(musickeyboard): add Shift + Arrow key shortcuts for live octave navigation by @yush-1018 in https://github.com/sugarlabs/musicblocks/pull/8375
+* fix(rhythm): bound note counts by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8441
+* fix(pitchstaircase): validate supported frequency bounds in _dissectStair by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8564
+* fix(a11y): add missing accessible names for axe-flagged elements (#6608) by @abhnish in https://github.com/sugarlabs/musicblocks/pull/8662
+* fix(musicutils): parse multi-digit and negative octaves by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8699
+* fix: clean up circular canvas pointer event listeners in rhythm ruler by @kartikktripathi in https://github.com/sugarlabs/musicblocks/pull/8724
+* fix(intervals): correct unison and octave interval calculation (#8709) by @Diwaspant132 in https://github.com/sugarlabs/musicblocks/pull/8710
+* feat: improve theme switcher options UI by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8672
+* fix(abc-parser): handle inline accidentals, key root accidentals, and mode mapping by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8734
+* fix(aidebugger): preserve zero values in chat exports by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8738
+* feat: add undo and redo shortcuts for deleting blocks by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/7714
+* fix: improve graphics window boundary contrast by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8741
+* fix(mxml): normalize part and voice Ids during generation by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/8426
+* fix(synthutils): restore linting for the second half of the file by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/8619
+* fix(blockfactory): include the porch in the basicClamp cache key by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/8618
+* fix(mathutils): guard doPlus against null/undefined operands by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8743
+* fix(musicutils): dedupe addTemperamentToList against TEMPERAMENTS by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8731
+* fix(abc): write every staged notation marker as valid ABC by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8747
+* feat(arpeggio): add keyboard shortcuts for playback toggle and octave navigation (#8644) by @yush-1018 in https://github.com/sugarlabs/musicblocks/pull/8646
+* fix(midi): import notes and tempo at the file's own speed by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8748
+* fix(themebox): guard localStorage.getItem in setPreference() by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8736
+* fix(reflection): guard AI widget async lifecycle against stale responses by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8593
+* fix(blocks): let boolean docks bridge to anyin/anyout like every other type by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8464
+* fix(logo): keep receivedArg across WaitFor/Until/While requeues by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8697
+* fix(meter): clamp setbpm2 against computed tempo instead of raw bpm arg by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8750
+* feat: announce widget open/close to screen readers via aria-live region (#6608) by @abhnish in https://github.com/sugarlabs/musicblocks/pull/7813
+* chore: Temperement visualizer by @021nirav-blip in https://github.com/sugarlabs/musicblocks/pull/8286
+* feat(trash): add interactive lid open and delete glow affordance by @karankumar1106 in https://github.com/sugarlabs/musicblocks/pull/8745
+* fix: add missing hidden block to note by @walterbender in https://github.com/sugarlabs/musicblocks/pull/8759
+* fix(blocks): guard the empty box slot in add and add-1-to by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/8766
+* fix: prevent TypeError on detached blocks in NumberBlocks helpers by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8675
+* fix: handle hertz pitches in MusicXML export by @Abhishek-Sonje in https://github.com/sugarlabs/musicblocks/pull/8739
+* fix(mxml): export every staged notation marker as valid MusicXML by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8682
+* fix(lilypond): group guitar tablature by each turtle's own clef by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8756
+* fix: normalize screenshot casing to lowercase by @DivyanshuVortex in https://github.com/sugarlabs/musicblocks/pull/8757
+* fix(midi): import dotted notes and triplets at their own length by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8758
+* fix: keep canvas buttons visible after fullscreen resize by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8762
+* fix(jseditor): preserve hljs syntax coloring when marking errors by @Sahilbasu5101 in https://github.com/sugarlabs/musicblocks/pull/8740
+* refactor: extract camera logic to camera-utils.js by @KeerthiKumarR in https://github.com/sugarlabs/musicblocks/pull/8761
+* fix: convert remaining execution engine timers to ManagedTimer by @xtroon in https://github.com/sugarlabs/musicblocks/pull/8663
+* fix(export): write a pitchless staged note as a rest by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/8768
+* fix(widgets): improve widget reinitialization by @severe77 in https://github.com/sugarlabs/musicblocks/pull/8726
+* fix(turtle): remove a replaced gif's own _media record, not just its animator entry by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8771
+* fix(pitch): clamp calcOctave's next branch to octave 9 by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8774
+* fix: allow camera blocks to be moved to trash by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8775
+* fix: scope tuplet state per turtle to prevent race condition (Fixes #8657) by @Diwaspant132 in https://github.com/sugarlabs/musicblocks/pull/8664
+* feat: add Tap Tempo button and rolling average calculation in tempo widget by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/8713
+* fix(abc): write exported pitches against the key signature by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8778
+* chore: add turtle blocks docs by @walterbender in https://github.com/sugarlabs/musicblocks/pull/8769
+* ci: skip the PR dashboard job on forks by @vyagh in https://github.com/sugarlabs/musicblocks/pull/8785
+* fix(synth): delegate sampler tuner target frequency calculation to musicutils (#7044) by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8634
+* test(widgets): expand test suite for aidebugger to 100% line coverage by @karankumar1106 in https://github.com/sugarlabs/musicblocks/pull/8692
+* test: add unit tests for circular canvas pointer cleanup in rhythm ruler by @kartikktripathi in https://github.com/sugarlabs/musicblocks/pull/8753
+* fix(legobricks): make the column-spacing + button step by 5px by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8779
+* fix(sensors): modernize enter key detection and add null guards (#7021) by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8486
+* feat(storage): integrate SessionStorageManager for indexeddb backups and recovery by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/7678
+* fix(mxml): emit divisions per quarter note in measure attributes by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/8680
+* fix(munsell): let searchColors consider rgba-formatted candidates by @rajanpanth in https://github.com/sugarlabs/musicblocks/pull/8424
+* fix(mxml): preserve drum notes in MusicXML export by @Abhishek-Sonje in https://github.com/sugarlabs/musicblocks/pull/8711
+* fix: route widget audio-scheduling timers through ManagedTimer by @xtroon in https://github.com/sugarlabs/musicblocks/pull/8787
+* fix: correct Turtle Blocks guide link by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8791
+* test(e2e): test async stylesheet cascade across themes (#8725) by @dhruv-prajapati-23 in https://github.com/sugarlabs/musicblocks/pull/8728
+* fix(mxml): preserve double accidental pitches in MusicXML export by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8688
+* fix(logo): show the value of a clicked note counter instead of throwing by @rakshityadav1868 in https://github.com/sugarlabs/musicblocks/pull/8797
+* feat: add Renovate bot for automated dependency management by @Sumanthvu in https://github.com/sugarlabs/musicblocks/pull/8715
+* fix(logo): set up the synth for a turtle added when start is trashed by @rakshityadav1868 in https://github.com/sugarlabs/musicblocks/pull/8798
+* fix(legobricks): keep scanning lines when the grid is redrawn during playback by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8790
+* fix(loader): include browser-utils in MYDEFINES and fix widgetWindows (#8727) by @Diwaspant132 in https://github.com/sugarlabs/musicblocks/pull/8729
+* fix(legobricks): merge a short trailing segment instead of dropping it by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8802
+* Fix/sensors blocks keycode by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8807
+* Fix/themebox innerhtml refactor by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8806
+* fix: migrate keyCode to event.key in search UI (Related to #1234) by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8808
+* fix: play temperament octave once during playback by @sahiljadhav7 in https://github.com/sugarlabs/musicblocks/pull/8799
+* docs(piemenus): fix stray words in ten pie menu comments by @marekl11 in https://github.com/sugarlabs/musicblocks/pull/8830
+* refactor: extract SampleLoader class from Synth by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8793
+* fix(jseditor): fix off-by-one error and add bounds checking in debugg… by @Sahilbasu5101 in https://github.com/sugarlabs/musicblocks/pull/8803
+* fix(jseditor): remove tooltip DOM elements on close to prevent memory… by @Sahilbasu5101 in https://github.com/sugarlabs/musicblocks/pull/8804
+* fix: show widget maximize icon in high contrast by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8814
+* fix(synth): strip accidental glyph before parsing sample center note by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8827
+* fix: show New Project confirmation in High Contrast mode by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8829
+* test(js-export): catch the three ast2blocks copies drifting apart by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/8623
+* chore: extract plugin and macro subsystems out of utils.js by @KeerthiKumarR in https://github.com/sugarlabs/musicblocks/pull/8834
+* refactor(midi): extract MidiTranscriber class for cleaner state encapsulation by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8833
+* fix: disconnect synths from analysers before disposal in sampler onclose (Fixes #7976) by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8812
+* fix(rubrics): track articulation end correctly and add regression test by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8832
+* fix: guard fnBrowserDetect in toolbar-ui updateRecordButton (Related … by @codedbyanup in https://github.com/sugarlabs/musicblocks/pull/8838
+* fix(toolbar): prevent tooltips from overlapping dropdowns by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8841
+* refactor(blocks): consolidate named block type checks using Set by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/8821
+* fix(docs): rename Dragon-Curve.tb so it does not clash with dragon-curve.tb by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/8843
+* i18n: add Azerbaijani (az) locale by @jamalkamaladdin in https://github.com/sugarlabs/musicblocks/pull/8853
+* fix: support Cmd+Z undo on macOS by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8851
+* chore: remove debug console statements from turtle-singer.js by @ShivamGupta2003 in https://github.com/sugarlabs/musicblocks/pull/8822
+* fix(drum): play the default drum when the drum slot is empty by @rakshityadav1868 in https://github.com/sugarlabs/musicblocks/pull/8857
+* test: add turtle ownership contract coverage by @Chaitu7032 in https://github.com/sugarlabs/musicblocks/pull/8837
+* fix: dismiss program stopped notification by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8794
+* test: achieve 100% statement, function, and line coverage for aidebugger.js by @xtroon in https://github.com/sugarlabs/musicblocks/pull/8720
+* feat: export and import temperament/mode data as Scala (.scl) files by @021nirav-blip in https://github.com/sugarlabs/musicblocks/pull/8650
+* fix: show New Project confirmation in High Contrast mode (Related to … by @codedbyanup in https://github.com/sugarlabs/musicblocks/pull/8839
+* feat(rhythmruler): add Space shortcut for playback toggle (#8754) by @yush-1018 in https://github.com/sugarlabs/musicblocks/pull/8760
+* docs: add five Reviewers to MAINTAINERS.md by @vyagh in https://github.com/sugarlabs/musicblocks/pull/8862
+* chore: remove debug console statements from p5-adapter.js by @ShivamGupta2003 in https://github.com/sugarlabs/musicblocks/pull/8864
+* refactor: replace deprecated event.keyCode in block label handling by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8868
+* fix(blocks): register NOPTwoArgMathBlock under its own name by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/8831
+* refactor(ui): replace innerHTML with document.createElement in palette by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8866
+* fix: migrate deprecated event.keyCode in rhythmruler.js by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8865
+* fix: migrate deprecated event.keyCode in turtles.js, palette.js, context-menu-controller.js by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8863
+* fix: align restore controls with toolbar tooltips by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8836
+* refactor: extract AbcExporter class from processABCNotes by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8792
+* chore(debug): remove leftover console.log debug statements by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8867
+* perf: eliminate redundant RAF callback after clean render frames by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8655
+* fix: route JS-export execution timers through ManagedTimer by @xtroon in https://github.com/sugarlabs/musicblocks/pull/8845
+* perf: migrate Sampler widget timer lifecycle to ManagedTimer by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8722
+* fix(synth): guard against null paramsEffects when a filter is set by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8848
+* fix: prevent duplicate octave playback in temperament widget (#8795) by @Diwaspant132 in https://github.com/sugarlabs/musicblocks/pull/8805
+* docs: correct turtle ownership documentation by @Chaitu7032 in https://github.com/sugarlabs/musicblocks/pull/8872
+* fix(intervals): stop current interval throwing when clicked outside a note by @rakshityadav1868 in https://github.com/sugarlabs/musicblocks/pull/8874
+* fix(blocks): fall back to default label on empty or invalid loadFile values by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/8846
+* fix: parse microtonal sample center notes by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8878
+* fix(musicutils): remove dead-code duplicate PITCHES lookup in getNote by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8882
+* fix: use textContent in _checkWidgets to fix localization bugs by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8885
+* fix(phrasemaker): use OR instead of AND for graphics block detection … by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8881
+* fix: make tempo widget detection localization-safe by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8883
+* fix(ensemble): stop mouse blocks crashing when the name slot is empty by @rakshityadav1868 in https://github.com/sugarlabs/musicblocks/pull/8875
+* fix(release): let release-please bump the VERSION constant it does not know about by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/8870
+* fix(a11y): stop table semantics from clashing with the palette category tablist roles (#6608) by @abhnish in https://github.com/sugarlabs/musicblocks/pull/8229
+* fix: apply justifyContent to style object in widgetWindows by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8884
+* fix(temperament): clear pitch-to-frequency cache when saving a custom temperament by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8752
+* fix(tempo): skip missed beats instead of replaying them in a burst by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8810
+* fix(blocks): separate runtime updates from undoable value edits by @Abhishek-Sonje in https://github.com/sugarlabs/musicblocks/pull/8886
+* perf: migrate TemperamentWidget timer lifecycle to ManagedTimer by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8721
+* fix(project-manager): recover session load failures from any chunk by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8856
+* fix(sampler): change generic fallback console.log to console.debug by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8891
+* docs(readme): point CI badge at ci.yml by @rmz-oz in https://github.com/sugarlabs/musicblocks/pull/8892
+* feat(search): keep the dropdown open when no blocks match by @Anusha0501 in https://github.com/sugarlabs/musicblocks/pull/8824
+* fix(widgets): prevent per-frame canvas allocation in LegoWidget by @Sahilbasu5101 in https://github.com/sugarlabs/musicblocks/pull/8896
+* fix(volume): init synthVolume before push for known voices by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8901
+* fix(musickeyboard): play every note of a chord, not just the first four by @Eshiv-Pandey in https://github.com/sugarlabs/musicblocks/pull/8902
+* fix(synth): write the kick drum and the bass drum as bd in Lilypond by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/8903
+* feat(widgets): add freeze to oscilloscope and fix flat line by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/8782
+* fix(abc): correctly place slurs and ties by @severe77 in https://github.com/sugarlabs/musicblocks/pull/8914
+* refactor: extract MusicXMLExporter class to encapsulate export state by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8898
+* refactor(palette): replace insertAdjacentHTML with document.createEle… by @lavjeetrai in https://github.com/sugarlabs/musicblocks/pull/8918
+* fix(musicutils): return a drum's symbol for canonical-name matches by @shiaho777 in https://github.com/sugarlabs/musicblocks/pull/8904
+* test(artwork): expand unit tests for palette color tables and SVG templates by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8920
+* refactor: remove misleading innerHTML string from toolbar strings array by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8921
+* refactor(musicutils): replace deprecated substr with slice by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8922
+* fix: stage rest on drum line for noise in lilypond (Fixes #8912) by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8925
+* fix: prevent turtle from getting stuck enlarged on hover (#8924) by @xtroon in https://github.com/sugarlabs/musicblocks/pull/8926
+* fix(js-export): keep Repeat iteration count in for-loop conversion by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8913
+* perf: migrate ModeWidget timer lifecycle to ManagedTimer by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8927
+* refactor(musicutils): move pure-data constants into their own module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8934
+* fix(keyboard): handle macOS undo redo and paste shortcuts by @severe77 in https://github.com/sugarlabs/musicblocks/pull/8941
+* feat(tuner): turn the needle green when pitch is in tune by @Anusha0501 in https://github.com/sugarlabs/musicblocks/pull/8938
+* refactor(block): remove dead touch long-press listeners (Related to #8932) by @adrish-mage in https://github.com/sugarlabs/musicblocks/pull/8933
+* chore: replace remaining substr usages by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8923
+* refactor(musicutils): move chord, mode and default tables to constants by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8951
+* perf: migrate LegoWidget timer lifecycle to ManagedTimer by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8947
+* fix(tuner): improve accessibility of mode toggle buttons by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8890
+* chore: reorder widget palette by @walterbender in https://github.com/sugarlabs/musicblocks/pull/8955
+* refactor(musicutils): move the translated tables to musicutils-i18n.js by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8956
+* fix: preserve 21-EDO mode imports by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/8942
+* fix(temperament): fix unsafe splice operation in calculateRatios by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8888
+* fix(abc): start every K: field on its own line by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/8961
+* refactor(musicutils): move temperament state and code to their own module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8964
+* fix(OrnamentActions): prevent staccato and slur listener name collision by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/8970
+* fix(blocks): add the missing hidden block after a switch on load by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8963
+* fix(actions): guard ToneActions against invalid inputs by @Sumit1080 in https://github.com/sugarlabs/musicblocks/pull/8654
+* fix: keep new project dialog visible on narrow screens by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8973
+* fix(lilypond): make exported .ly files compile and stop dropping voices and spanners by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8971
+* refactor(ui): extract the canvas-only clear confirmation by @Anusha0501 in https://github.com/sugarlabs/musicblocks/pull/8946
+* fix(phrasemaker): keep note cells when matrix is block 0 by @chiragmalik3553-tech in https://github.com/sugarlabs/musicblocks/pull/8975
+* feat(git): integrate Git backend by @zealot-zew in https://github.com/sugarlabs/musicblocks/pull/7745
+* fix(saveinterface): add alt attribute to project image for accessibility by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8958
+* fix(jseditor): localize hardcoded strings by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8960
+* fix(aidebugger): localize hardcoded strings in AI debugger UI by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8957
+* refactor(musicutils): move pitch name, number and frequency helpers by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/8987
+* fix(musicutils): normalize negative pitch index by @severe77 in https://github.com/sugarlabs/musicblocks/pull/8916
+* refactor(musicutils): move drum, voice and interval name lookups by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9000
+* refactor(widgets): remove repeated docstring in LegoWidget by @Sahilbasu5101 in https://github.com/sugarlabs/musicblocks/pull/8936
+* fix(lilypond): number drum staves by how many there are by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/9001
+* fix(rubrics): handle custom temperament lookup in getStatsFromNotation by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/8953
+* fix(generate-tests): reject fs/child_process via jest.requireActual by @Himanshu2649 in https://github.com/sugarlabs/musicblocks/pull/8995
+* fix(generate-tests): resolve module specifiers before trusting them by @chiragmalik3553-tech in https://github.com/sugarlabs/musicblocks/pull/8989
+* docs: add three more Reviewers by @vyagh in https://github.com/sugarlabs/musicblocks/pull/9007
+* docs: fix typos and broken URL in README.md by @Kunal241207 in https://github.com/sugarlabs/musicblocks/pull/9009
+* fix: return 0 from getSynthVolume instead of undefined by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8993
+* fix: report error instead of returning error string in getValue by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8990
+* fix: guard against missing turtleDicts[turtle] in SerializeDict by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8991
+* fix: report error when setting an unsupported key in SetDictValue by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/8992
+* fix(js-export): export the Stop block with the block's own semantics by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8930
+* chore(deps-dev): bump js-yaml from 3.14.2 to 3.15.2 by @dependabot[bot] in https://github.com/sugarlabs/musicblocks/pull/8613
+* fix(js-export): export Int as MathUtility.doInt to match the block by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8895
+* fix(abc): give each turtle its own voice by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/8967
+* fix: keep palette blocks reachable after browser resize by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/9015
+* fix: keep floating windows visible after browser resize by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/9021
+* refactor(musicutils): move fraction, duration and rhythm helpers by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9018
+* fix: add type check for drum/voice lookups by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/9026
+* fix: add string type check before slicing drum name by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/9025
+* fix: scope harmonic notation staging to turtle by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/9024
+* fix: return boolean false from isOpen when window is not open by @sreeram5555 in https://github.com/sugarlabs/musicblocks/pull/9023
+* refactor(musicutils): move solfege name helpers to their own module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9030
+* fix: align movable solfege in widgets and getSolfege (Related to #2050) by @sahiljadhav7 in https://github.com/sugarlabs/musicblocks/pull/9019
+* test(musicutils): correct dotted note inputs and assertions in durationToNoteValue by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/8954
+* test(basicblocks): expand unit tests for basicblocks.js by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/8919
+* refactor(musicutils): move mode pie-menu wheel helpers to their own m… by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9031
+* fix(mathutils): use symmetric rounding in doInt for negative numbers by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/9032
+* fix(renovate): move schedule into packageRules to unblock dependency dashboard by @Sumanthvu in https://github.com/sugarlabs/musicblocks/pull/9033
+* fix(MeterActions): guard setBPM against NaN, zero, and negative inputs by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/9034
+* fix(js-export): preserve strict equality semantics by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/8950
+* fix(arpeggio): reset arpeggio state between runs by @chiragmalik3553-tech in https://github.com/sugarlabs/musicblocks/pull/9036
+* fix(dict): route turtle names back to the turtle dictionary by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8997
+* fix(musickeyboard): guard against undefined block in _removePitchBlock by @ChirayuPoddar in https://github.com/sugarlabs/musicblocks/pull/9037
+* docs: fix HTTPS links and update license header template version by @Kunal241207 in https://github.com/sugarlabs/musicblocks/pull/9042
+* fix(pitchdrummatrix): keep rows tied to blocks and fix playback state by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/9041
+* feat: add JSON and .scl export/import to the temperament widget by @021nirav-blip in https://github.com/sugarlabs/musicblocks/pull/9029
+* fix(js-export): export action names as valid identifiers by @Abhist17 in https://github.com/sugarlabs/musicblocks/pull/8979
+* test(musicutils): add parseNoteString and stripMicrotonalPrefix test … by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/9022
+* refactor(musicutils): remove legacy string slicing from parseNoteString by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/9045
+* fix: preserve text selection in Music Keyboard by @gouravj25551-afk in https://github.com/sugarlabs/musicblocks/pull/9044
+* fix(volume): pop synthVolume stack and restore audio volume on crescendo completion by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/9017
+* docs: clarify package-lock.json policy (from Discussion #2890) by @UtkarshAnandd in https://github.com/sugarlabs/musicblocks/pull/9046
+* fix: keep auxiliary menu open when opening plugin dialogs by @sanyamgarg023-dev in https://github.com/sugarlabs/musicblocks/pull/9047
+* refactor(musicutils): move mode/chord core to its own module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9048
+* fix(phrasemaker): prevent out-of-bounds tuplet rhythm access by @dhruvpatil972 in https://github.com/sugarlabs/musicblocks/pull/8937
+* fix: sync materialize thumb tooltip on undo in timbre by @KeerthiKumarR in https://github.com/sugarlabs/musicblocks/pull/9057
+* fix: don't count a replayed tied note twice by @aakarshitv in https://github.com/sugarlabs/musicblocks/pull/9061
+* fix(musicutils): guard interval lookup functions against invalid inputs by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/9065
+* refactor: encapsulate Singer and Painter reset lifecycle in Turtle by @Chaitu7032 in https://github.com/sugarlabs/musicblocks/pull/9066
+* docs: add comprehensive Security Policy (.github/SECURITY.md) by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/9050
+* fix: hide the trash when a block drag ends by @aakarshitv in https://github.com/sugarlabs/musicblocks/pull/9060
+* docs: update temperament guide for canvas visualizer by @021nirav-blip in https://github.com/sugarlabs/musicblocks/pull/9067
+* ci(pages): publish master with a -dev+<sha> version by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/9052
+* fix: new turtles inherit current master volume in prepSynths() by @Kunal241207 in https://github.com/sugarlabs/musicblocks/pull/9077
+* fix(mxml): give unpitched notes a staff position by @iamtanishqjain in https://github.com/sugarlabs/musicblocks/pull/9074
+* fix(js-import): keep graphics, pen and semitone interval arguments when converting to blocks by @Abhist17 in https://github.com/sugarlabs/musicblocks/pull/8977
+* fix(js-export): export the do block when it names its action with text by @Abhist17 in https://github.com/sugarlabs/musicblocks/pull/8981
+* refactor(musicutils): move the pitch/scale cycle to its own module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9051
+* fix(git): keep tutorial controls reachable in short viewports by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/9063
+* fix: reset master volume at the start of each run by @chiragmalik3553-tech in https://github.com/sugarlabs/musicblocks/pull/9082
+* feat(practice): add a story-driven lesson plan framework by @stutijain2006 in https://github.com/sugarlabs/musicblocks/pull/7587
+* fix(a11y): resolve duplicate DOM ID and add accessible labels in MeterWidget by @Sumit1080 in https://github.com/sugarlabs/musicblocks/pull/8949
+* fix: improve temperament wheel readability and positioning by @WKr1shna in https://github.com/sugarlabs/musicblocks/pull/9081
+* fix(widgets): close floating widgets properly when trashed by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/9086
+* fix(timbre): keep widget previews, Save, Undo and edits in sync with the blocks by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/9059
+* refactor(musicutils): move the pitch/scale layer above the cycle to its own module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9088
+* refactor(musicutils): move getPitchInfo and step-size helpers to final module by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9090
+* fix(tuningformats): ignore text after pitch value in .scl import by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/8873
+* perf: migrate Reflection widget timer lifecycle to ManagedTimer by @Jetshree in https://github.com/sugarlabs/musicblocks/pull/9091
+* docs(musicutils): add a file map for the split musicutils-*.js modules by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9092
+* fix(planet): load the next page instead of repeating the first by @kunalKumar-13 in https://github.com/sugarlabs/musicblocks/pull/9071
+* refactor(utils): extract generic pie-menu wheel mechanics from modewheel by @dolliecoder in https://github.com/sugarlabs/musicblocks/pull/9099
+* fix(git): save fresh projects before offline tracking by @macayu17 in https://github.com/sugarlabs/musicblocks/pull/9070
+* fix: route block-level timers through ManagedTimer by @xtroon in https://github.com/sugarlabs/musicblocks/pull/9069
+* fix: restore per-drum Rhythm Maker play controls in advanced mode by @h55n in https://github.com/sugarlabs/musicblocks/pull/9097
+* refactor(musickeyboard): move note editing to its own module by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/9073
+* fix: associate publish tags label with generated input by @jaydeep83721-dev in https://github.com/sugarlabs/musicblocks/pull/9087
+* test: extend AST pipeline demonstration beyond utils to midi/releaseconfig by @vanshika2720 in https://github.com/sugarlabs/musicblocks/pull/8763
+* test: align MIDI duration expectations with dotted notes by @Abhishek-Sonje in https://github.com/sugarlabs/musicblocks/pull/9156
+* test(cypress): add E2E suite for the Mode widget by @Sumanthvu in https://github.com/sugarlabs/musicblocks/pull/9162
+* fix(drag): use textContent.trim() for widget title matching by @Ayush78516 in https://github.com/sugarlabs/musicblocks/pull/9103
+* refactor(musickeyboard): move keyboard and note table drawing to its own module by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/9105
+* fix: preserve current project when importing file by @Abhishek-Sonje in https://github.com/sugarlabs/musicblocks/pull/8965
+* refactor(rhythmruler): split the Rhythm Maker into six modules by @bhuvan-somisetty in https://github.com/sugarlabs/musicblocks/pull/9139
+* feat: add /context command for contributor issue context by @UtkarshAnandd in https://github.com/sugarlabs/musicblocks/pull/8999
+* fix(project-manager): parse URL query params with URLSearchParams by @chiragmalik3553-tech in https://github.com/sugarlabs/musicblocks/pull/9131
+* fix: harden audio engine against NaN and Infinity in volume/pitch act… by @uday-2304 in https://github.com/sugarlabs/musicblocks/pull/9132
+
+## New Contributors
+* @Eshiv-Pandey made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8734
+* @sahiljadhav7 made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8799
+* @codedbyanup made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8838
+* @jamalkamaladdin made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8853
+* @rmz-oz made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8892
+* @Anusha0501 made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8824
+* @shiaho777 made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8904
+* @adrish-mage made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8933
+* @Sumit1080 made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8654
+* @chiragmalik3553-tech made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8975
+* @Himanshu2649 made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8995
+* @ChirayuPoddar made their first contribution in https://github.com/sugarlabs/musicblocks/pull/9037
+* @Abhist17 made their first contribution in https://github.com/sugarlabs/musicblocks/pull/8979
+* @sanyamgarg023-dev made their first contribution in https://github.com/sugarlabs/musicblocks/pull/9047
+* @aakarshitv made their first contribution in https://github.com/sugarlabs/musicblocks/pull/9061
+* @h55n made their first contribution in https://github.com/sugarlabs/musicblocks/pull/9097
+* @jaydeep83721-dev made their first contribution in https://github.com/sugarlabs/musicblocks/pull/9087
+
+**Full Changelog**: https://github.com/sugarlabs/musicblocks/compare/v3.8.0...v3.9.0
+
 ## 3.8.0 (2026-09-15)
 
 ## What's Changed
