@@ -411,7 +411,7 @@ class ToolbarUI {
 
         for (let i = 0; i < strings.length; i++) {
             const obj = strings[i];
-            const trans = strings_[i];
+            const trans = obj[1];
             const elem = docById(obj[0]);
             if (strings[i][2]) {
                 if (elem !== undefined && elem !== null) {

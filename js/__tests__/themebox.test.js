@@ -19,6 +19,22 @@
 
 global._ = jest.fn(str => str);
 
+global.LEADING = 10;
+global.DEFAULTPALETTE = "default";
+global.MULTIPALETTES = [
+    ["rhythm", "pitch"],
+    ["flow", "action"],
+    ["graphics", "pen"]
+];
+global.BUILTINPALETTES = [];
+global.PALETTEICONS = { rhythm: "", pitch: "" };
+global.makePaletteIcons = jest.fn(() => ({ src: "" }));
+global.base64Encode = jest.fn(() => "");
+global.btoa = jest.fn(() => "");
+window.btoa = global.btoa;
+global.CLOSEICON = "";
+global.makeKeyboardAccessible = jest.fn();
+
 // Mock global palette color variables
 global.PALETTEFILLCOLORS = {};
 global.PALETTESTROKECOLORS = {};
@@ -314,5 +330,51 @@ describe("ThemeBox", () => {
         };
         themeBox.refreshUIComponents();
         expect(mockActivity.trashcan.refresh).toHaveBeenCalledTimes(1);
+    });
+    test("refreshUIComponents invalidates rendered palettes and reopens active palette", () => {
+        const { Palettes } = require("../palette");
+
+        global.docById = id => document.getElementById(id);
+        Object.defineProperty(window, "innerHeight", { value: 900, configurable: true });
+
+        const palettes = new Palettes(mockActivity);
+        mockActivity.palettes = palettes;
+
+        palettes.add("rhythm");
+        palettes.add("pitch");
+
+        const activePalette = palettes.dict["rhythm"];
+        const unrenderedPalette = palettes.dict["pitch"];
+
+        activePalette._showMenuItems = jest.fn();
+        unrenderedPalette._showMenuItems = jest.fn();
+
+        palettes.activePalette = "rhythm";
+        activePalette.showMenu(true);
+        const oldMenuContainer = activePalette.menuContainer;
+
+        jest.spyOn(palettes, "showPalette");
+
+        window.platformColor.paletteLabelBackground = "#123456";
+
+        themeBox.refreshUIComponents();
+
+        // Should remove the old DOM node
+        expect(oldMenuContainer.parentNode).toBeNull();
+
+        // Should ignore unrendered palettes
+        expect(unrenderedPalette.menuContainer).toBeNull();
+
+        // Should reopen the previously active palette
+        expect(palettes.showPalette).toHaveBeenCalledWith("rhythm");
+
+        // Assert that rendered palette content reflects the rebuilt state
+        const newMenuContainer = activePalette.menuContainer;
+        expect(newMenuContainer).not.toBe(oldMenuContainer);
+        expect(newMenuContainer.children[0].children[0].style.backgroundColor).toBe(
+            "rgb(18, 52, 86)"
+        );
+
+        delete global.docById;
     });
 });

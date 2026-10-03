@@ -157,9 +157,11 @@ describe("ToolbarUI - Visual Helpers", () => {
     test("init sets aria-label alongside data-tooltip so toolbar buttons have an accessible name", () => {
         const mockActivity = { beginnerMode: true };
         const mockPlayBtn = createMockElement("play");
+        const mockRunSlowlyBtn = createMockElement("runSlowlyIcon");
 
         global.document.getElementById = jest.fn(id => {
             if (id === "play") return mockPlayBtn;
+            if (id === "runSlowlyIcon") return mockRunSlowlyBtn;
             if (id === "stop") return mockStopBtn;
             return createMockElement(id);
         });
@@ -177,6 +179,8 @@ describe("ToolbarUI - Visual Helpers", () => {
 
         expect(mockPlayBtn.setAttribute).toHaveBeenCalledWith("data-tooltip", "Play");
         expect(mockPlayBtn.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
+        expect(mockRunSlowlyBtn.setAttribute).toHaveBeenCalledWith("data-tooltip", "Run slowly");
+        expect(mockRunSlowlyBtn.setAttribute).toHaveBeenCalledWith("aria-label", "Run slowly");
     });
 
     test("renderWrapIcon sets aria-label alongside data-tooltip, and updates both on toggle", () => {
