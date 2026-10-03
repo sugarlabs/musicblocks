@@ -15,6 +15,20 @@ Please complete the sections below to help us review your changes efficiently.
 
 ---
 
+## MusicBlocks Project Link
+
+<!-- First-time contributors (CI enforced): create and publish/share your MusicBlocks project, then paste the generated share link here (e.g., https://musicblocks.sugarlabs.org/index.html?repo=my-project-from-production-3&run=True). Existing contributors can leave this blank. -->
+
+**Project Link:**
+
+---
+
+## MusicBlocks Project Screenshot or Screen-Recording
+
+<!-- First-time contributors (CI enforced): attach a screenshot or a screen-recording of your published MusicBlocks project here. Existing contributors can leave this blank. -->
+
+---
+
 ## Category
 
 <!-- NOTE: CI ENFORCED. You MUST check at least ONE category below or the CI will fail. -->
