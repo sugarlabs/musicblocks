@@ -1306,6 +1306,17 @@ describe("SearchUI.positionHelpfulSearchDiv", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchUI._renderMainItem", () => {
+    const originalRaf = window.requestAnimationFrame;
+    beforeAll(() => {
+        window.requestAnimationFrame = jest.fn(cb => {
+            cb();
+            return 1;
+        });
+    });
+    afterAll(() => {
+        window.requestAnimationFrame = originalRaf;
+    });
+
     let $j, ul, liEl, liProxy;
 
     beforeEach(() => {
@@ -1543,5 +1554,69 @@ describe("SearchUI._renderMainItem", () => {
         // 55 - 10 = 45
         expect(mockImg.style.left).toBe("45px");
         expect(mockImg.style.top).toBe("56px");
+    });
+
+    test("mouseup before RAF executes uses latest coordinates and cancels RAF", () => {
+        const previousRaf = window.requestAnimationFrame;
+        const previousCancelRaf = window.cancelAnimationFrame;
+
+        let rafCallback = null;
+        window.requestAnimationFrame = jest.fn(cb => {
+            rafCallback = cb;
+            return 123;
+        });
+        window.cancelAnimationFrame = jest.fn();
+
+        try {
+            const mockImg = {
+                style: { cursor: "grab", position: "", zIndex: "", left: "", top: "" },
+                src: "",
+                height: 0,
+                offsetWidth: 20,
+                offsetHeight: 20,
+                parentNode: document.body,
+                ondragstart: null
+            };
+            document.createElement = jest.fn(() => mockImg);
+
+            const ui = new SearchUI(makeActivity());
+            const dropCb = jest.fn();
+            const specialDict = { foo: "bar" };
+            const item = { label: "pitch", artwork: "", specialDict };
+
+            ui._renderMainItem($j, ul, item, dropCb);
+
+            const downHandler = liEl.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
+            downHandler({
+                stopPropagation: jest.fn(),
+                stopImmediatePropagation: jest.fn(),
+                preventDefault: jest.fn(),
+                pageX: 100,
+                pageY: 200,
+                type: "mousedown"
+            });
+
+            const moveHandler = document.addEventListener.mock.calls.find(
+                c => c[0] === "mousemove"
+            )[1];
+            moveHandler({
+                preventDefault: jest.fn(),
+                pageX: 150,
+                pageY: 260,
+                type: "mousemove"
+            });
+
+            expect(window.requestAnimationFrame).toHaveBeenCalled();
+            expect(rafCallback).not.toBeNull();
+
+            const upHandler = document.addEventListener.mock.calls.find(c => c[0] === "mouseup")[1];
+            upHandler();
+
+            expect(dropCb).toHaveBeenCalledWith(specialDict, 140, 250);
+            expect(window.cancelAnimationFrame).toHaveBeenCalledWith(123);
+        } finally {
+            window.requestAnimationFrame = previousRaf;
+            window.cancelAnimationFrame = previousCancelRaf;
+        }
     });
 });
