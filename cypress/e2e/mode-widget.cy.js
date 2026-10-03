@@ -61,11 +61,11 @@ const loadFixtureProject = fixtureName => {
 const openModeWidget = () => {
     loadFixtureProject("mode-widget-minimal.tb");
     cy.get("#play").click();
-    // Wait for the mode-wheel div, which is created once by init() and is
-    // never renamed.  This is the stable signal that the widget is open and
-    // its wheel has been rendered -- unlike the frame title/aria-label, which
-    // _setModeName() immediately overwrites with the detected mode name.
-    cy.get(".windowFrame #modeWidgetWheelDiv", { timeout: 30000 }).should("exist");
+    // Wait for the <svg> that wheelnav inserts inside #modeWidgetWheelDiv.
+    // #modeWidgetWheelDiv is created by init() before wheelnav runs, so
+    // waiting on the div alone would not prove the wheel rendered. Waiting on
+    // the inner svg confirms wheelnav has finished drawing the pie chart.
+    cy.get(".windowFrame #modeWidgetWheelDiv svg", { timeout: 30000 }).should("exist");
 };
 
 // Scope all assertions to the windowFrame that owns the mode wheel,
@@ -167,17 +167,27 @@ describe("Mode widget", () => {
     it("closes the Mode widget and cleans up the DOM", () => {
         openModeWidget();
 
-        // Confirm the wheel rendered before closing.
-        modeFrame().find("#modeWidgetWheelDiv svg").should("exist");
+        // Capture the frame element before clicking Close so we can assert
+        // that widgetWindow.destroy() physically removed it from the DOM,
+        // not just that its children disappeared.
+        modeFrame().then($frame => {
+            cy.wrap($frame)
+                .find('[role="button"][aria-label="Close window"]')
+                .click({ force: true });
 
-        // Click the close button on the widget window title bar.
-        // ModeWidget wires widgetWindow.onclose to clear timers, stop synth,
-        // and call widgetWindow.destroy() -- removing the .windowFrame from the
-        // DOM entirely.
-        modeFrame().find('[role="button"][aria-label="Close window"]').click({ force: true });
+            // Cypress.dom.isAttached() returns false once the element is
+            // detached from the document, proving .windowFrame was destroyed.
+            cy.wrap(null).should(() => {
+                expect(
+                    Cypress.dom.isAttached($frame[0]),
+                    ".windowFrame should be detached after destroy()"
+                ).to.equal(false);
+            });
 
-        // The mode wheel and table must be gone.
-        cy.get("#modeWidgetWheelDiv").should("not.exist");
-        cy.get("#modeTable").should("not.exist");
+            // Belt-and-suspenders: the wheel div and mode table must also
+            // be absent from the document.
+            cy.get("#modeWidgetWheelDiv").should("not.exist");
+            cy.get("#modeTable").should("not.exist");
+        });
     });
 });
