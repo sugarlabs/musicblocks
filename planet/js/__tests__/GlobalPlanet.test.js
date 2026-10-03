@@ -279,6 +279,17 @@ describe("GlobalPlanet", () => {
             spyOffline.mockRestore();
             spyNoProjects.mockRestore();
         });
+
+        it("should reset batch offline error when starting a new batch", () => {
+            gp.batchHasOfflineError = true;
+            jest.spyOn(gp, "addProjectToCache").mockImplementation(() => {});
+
+            gp.downloadProjectsToCache([["proj1", 123]], jest.fn());
+
+            expect(gp.batchHasOfflineError).toBe(false);
+
+            gp.addProjectToCache.mockRestore();
+        });
     });
     describe("addProjectToCache", () => {
         it("should add project data to cache on success", () => {
