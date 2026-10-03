@@ -602,6 +602,7 @@ class Singer {
 
         const actionArgs = [];
         const saveNoteCount = tur.singer.notesPlayed;
+        const saveMeterAnchor = tur.singer.meterAnchor;
         const saveTallyNotes = tur.singer.tallyNotes;
         tur.running = true;
 
@@ -624,6 +625,7 @@ class Singer {
             activity.errorMsg(noteCountErr);
         }
         tur.singer.notesPlayed = saveNoteCount;
+        tur.singer.meterAnchor = saveMeterAnchor;
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
@@ -690,6 +692,7 @@ class Singer {
             prevTurtleTime: tur.singer.previousTurtleTime,
             turtleTime: tur.singer.turtleTime,
             noteCount: tur.singer.notesPlayed,
+            meterAnchor: tur.singer.meterAnchor,
             tallyNotes: tur.singer.tallyNotes
         };
 
@@ -716,6 +719,7 @@ class Singer {
         // Restore previous state
         Object.assign(tur.singer, {
             notesPlayed: saveState.noteCount,
+            meterAnchor: saveState.meterAnchor,
             tallyNotes: saveState.tallyNotes,
             previousTurtleTime: saveState.prevTurtleTime,
             turtleTime: saveState.turtleTime,

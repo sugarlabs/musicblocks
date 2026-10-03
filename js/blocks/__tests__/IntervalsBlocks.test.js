@@ -930,6 +930,24 @@ describe("setupIntervalsBlocks", () => {
             logo.runFromBlockNow = jest.fn();
         });
 
+        it.each(["measureintervalsemitones", "measureintervalscalar"])(
+            "%s restores the meter anchor along with notesPlayed",
+            blockName => {
+                logo.turtleHeaps = { [turtleIndex]: [] };
+                logo.turtleDicts = { [turtleIndex]: {} };
+                const anchor = { wholeNotes: 0.75, measures: 1 };
+                turtleState.singer.meterAnchor = anchor;
+                // A meter change inside the measured stack moves the anchor ahead.
+                logo.runFromBlockNow = jest.fn(() => {
+                    turtleState.singer.meterAnchor = { wholeNotes: 2, measures: 3 };
+                });
+
+                createdBlocks[blockName].arg(logo, turtleIndex, "blkMeasure");
+
+                expect(turtleState.singer.meterAnchor).toBe(anchor);
+            }
+        );
+
         it("Heap absent before measurement: the heap is restored as an empty array, not an object", () => {
             logo.turtleHeaps = {};
             logo.turtleDicts = { [turtleIndex]: {} };

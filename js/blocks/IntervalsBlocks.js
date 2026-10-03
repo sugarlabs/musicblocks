@@ -458,6 +458,7 @@ function setupIntervalsBlocks(activity) {
 
             const actionArgs = [];
             const saveNoteCount = tur.singer.notesPlayed;
+            const saveMeterAnchor = tur.singer.meterAnchor;
 
             let distance = 0;
             tur.running = true;
@@ -475,6 +476,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             tur.singer.notesPlayed = saveNoteCount;
+            tur.singer.meterAnchor = saveMeterAnchor;
 
             // Restore previous state
             logo.boxes = saveBoxes;
@@ -577,6 +579,7 @@ function setupIntervalsBlocks(activity) {
 
             const actionArgs = [];
             const saveNoteCount = tur.singer.notesPlayed;
+            const saveMeterAnchor = tur.singer.meterAnchor;
             tur.running = true;
             let distance = 0;
             logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
@@ -596,6 +599,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             tur.singer.notesPlayed = saveNoteCount;
+            tur.singer.meterAnchor = saveMeterAnchor;
 
             // Restore previous state
             logo.boxes = saveBoxes;

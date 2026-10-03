@@ -1043,6 +1043,21 @@ describe("numberOfNotes — state restoration and tally logic", () => {
 
         expect(logoMock.turtleHeaps[0]).toEqual([1, 2, 3]);
     });
+
+    test("should restore the meter anchor along with notesPlayed", () => {
+        const anchor = { wholeNotes: 0.75, measures: 1 };
+        Object.assign(turtleMock.singer, { notesPlayed: [1, 1], meterAnchor: anchor });
+        // A meter change inside the counted stack moves the anchor ahead.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.notesPlayed = [2, 1];
+            turtleMock.singer.meterAnchor = { wholeNotes: 2, measures: 3 };
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(turtleMock.singer.notesPlayed).toEqual([1, 1]);
+        expect(turtleMock.singer.meterAnchor).toBe(anchor);
+    });
 });
 
 describe("processPitch — note block execution path", () => {
@@ -1175,6 +1190,28 @@ describe("noteCounter regression behavior", () => {
         Singer.noteCounter(logoMock, 0, 1);
 
         expect(logoMock.turtleHeaps[0]).toEqual([4, 5]);
+    });
+
+    test("should not leave a meter change from the counted stack behind", () => {
+        const { getMeasurePosition, getMeterAnchor } = require("../utils/musicutils-rhythm");
+        // One quarter note played in 4/4.
+        Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4, notesPlayed: [1, 4] });
+        // The counted stack: 3/4, three quarter notes, 4/4.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            singer.meterAnchor = getMeterAnchor(singer);
+            singer.beatsPerMeasure = 3;
+            singer.notesPlayed = [1, 1];
+            singer.meterAnchor = getMeterAnchor(singer);
+            singer.beatsPerMeasure = 4;
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(singer.notesPlayed).toEqual([1, 4]);
+        expect(singer.meterAnchor).toBeNull();
+        const { beat, measure } = getMeasurePosition(singer, 1 / 4);
+        expect(beat).toBe(2);
+        expect(measure).toBe(1);
     });
 });
 
