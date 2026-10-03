@@ -135,7 +135,18 @@ global.TimbreWidget = jest.fn(() => ({
 }));
 global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+global.SampleWidget.dependencies = [
+    "widgets/tuner",
+    "widgets/SamplerBlocks",
+    "widgets/SamplerPlayback",
+    "widgets/SamplerPitch",
+    "widgets/SamplerFiles",
+    "widgets/SamplerUI",
+    "widgets/SamplerPieMenu",
+    "widgets/SamplerCanvas",
+    "widgets/SamplerTuner",
+    "widgets/sampler"
+];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
