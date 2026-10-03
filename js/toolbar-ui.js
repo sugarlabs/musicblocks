@@ -2493,6 +2493,10 @@ class ToolbarUI {
      */
     highlightStop(color) {
         const stopBtn = document.getElementById("stop");
+        const playBtn = document.getElementById("play");
+        if (playBtn) {
+            playBtn.style.display = "none";
+        }
         if (stopBtn) {
             stopBtn.style.display = "inline-block";
             stopBtn.style.color = color;
@@ -2510,9 +2514,13 @@ class ToolbarUI {
             this._dimTimeout = null;
         }
         const stopBtn = document.getElementById("stop");
+        const playBtn = document.getElementById("play");
         if (stopBtn) {
             stopBtn.style.display = "none";
             stopBtn.style.color = "white";
+        }
+        if (playBtn) {
+            playBtn.style.display = "inline-block";
         }
     }
 
