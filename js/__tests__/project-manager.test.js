@@ -43,6 +43,7 @@ beforeAll(() => {
     global.ensureABCJS = jest.fn().mockResolvedValue(undefined);
     global.extractProjectDataFromHTML = jest.fn();
     global.unescapeHTML = jest.fn(x => x);
+    global.isSafeUrl = jest.fn(url => /^https?:\/\//i.test(url));
     global.doSVG = jest.fn(() => "<svg></svg>");
     global.base64Encode = jest.fn(x => x);
     global.debugLog = jest.fn();
@@ -1276,6 +1277,7 @@ describe("start() URL parameter parsing", () => {
     afterEach(() => {
         jest.useRealTimers();
         document.getElementById.mockRestore?.();
+        delete global.fetch;
     });
 
     const setURL = path => {
@@ -1386,6 +1388,147 @@ describe("start() URL parameter parsing", () => {
             expect.any(Object),
             expect.any(Array)
         );
+    });
+
+    it("leaves parameters owned by other modules alone", () => {
+        setURL("/?id=proj&music=true&debug=true&layoutProfiling=true&mbPerf=1");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.projectID).toBe("proj");
+    });
+
+    it("warns once however many parameters are unknown", () => {
+        setURL("/?id=proj&badparam=foo&worse=bar");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+    });
+
+    it("percent-decodes the project id", () => {
+        setURL("/?id=My%20Project");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.projectID).toBe("My Project");
+    });
+
+    it("matches parameter names case-insensitively", () => {
+        setURL("/?ID=proj");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.projectID).toBe("proj");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    it("forwards the run flag to _loadProject", () => {
+        setURL("/?id=proj&run=true");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+
+        pm.start();
+        jest.advanceTimersByTime(200);
+
+        expect(pm._loadProject).toHaveBeenCalledWith(
+            "proj",
+            expect.objectContaining({ run: true, show: false, collapse: false }),
+            []
+        );
+    });
+
+    it("waits for inurl and forwards its argument in env", async () => {
+        jest.useRealTimers();
+        setURL("/?id=proj&inurl=https%3A%2F%2Fexample.org%2Fenv.json");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ arg: "7" })
+        });
+
+        pm.start();
+        expect(pm._loadProject).not.toHaveBeenCalled();
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            "https://example.org/env.json",
+            expect.any(Object)
+        );
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), [7]);
+    });
+
+    it("gives up on an inurl that never answers and still loads the project", async () => {
+        setURL("/?id=proj&inurl=https%3A%2F%2Fexample.org%2Fenv.json");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn(
+            (url, request) =>
+                new Promise((resolve, reject) => {
+                    request.signal.addEventListener("abort", () =>
+                        reject(new DOMException("Aborted", "AbortError"))
+                    );
+                })
+        );
+
+        pm.start();
+        await jest.advanceTimersByTimeAsync(10000);
+
+        expect(global.fetch.mock.calls[0][1].signal.aborted).toBe(true);
+
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), []);
+    });
+
+    it("refuses an unsafe inurl and still loads the project", async () => {
+        jest.useRealTimers();
+        setURL("/?id=proj&inurl=javascript%3Aalert(1)");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn();
+
+        pm.start();
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledWith("Invalid parameters");
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), []);
     });
 });
 

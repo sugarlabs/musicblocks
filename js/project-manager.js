@@ -22,6 +22,7 @@
    ensureABCJS,
    extractProjectDataFromHTML,
    unescapeHTML,
+   isSafeUrl,
    getTemperament,
    getOctaveRatio,
    debugLog,
@@ -43,6 +44,35 @@ const _STANDARD_DURATIONS = [
     { value: "1/64", duration: 0.015625 },
     { value: "1/128", duration: 0.0078125 }
 ];
+
+// Query parameters the app answers to, lowercased so matching stays
+// case-insensitive. start() acts on id, file, run, show, collapse and inurl.
+// The rest belong to other modules -- release config (music, turtle), the
+// debug log, the performance tracker, the loader, the sampler backend and the
+// save-to-URL block -- and are listed here only so that their links do not
+// trip the unknown-parameter warning.
+const _KNOWN_URL_PARAMS = new Set([
+    "backend",
+    "backend_url",
+    "collapse",
+    "debug",
+    "file",
+    "id",
+    "inurl",
+    "kokoro",
+    "layoutprofiling",
+    "mbperf",
+    "music",
+    "outurl",
+    "performance",
+    "run",
+    "show",
+    "turtle"
+]);
+
+// How long startup will wait on the document named by "inurl" before giving
+// up on it and loading the project without an initial argument.
+const _ENV_ARG_TIMEOUT = 10000;
 
 class ProjectManager {
     constructor(activity) {
@@ -1384,112 +1414,119 @@ class ProjectManager {
     // Startup: URL params + initial load
     // -----------------------------------------------------------------------
 
+    /**
+     * Reads the initial block argument named by the "inurl" query parameter.
+     *
+     * @private
+     * @param {string} url - URL of a JSON document carrying an "arg" property.
+     * @returns {Promise<number|null>} The argument, or null if it could not be read.
+     */
+    async _readEnvArg(url) {
+        if (!isSafeUrl(url)) {
+            this.activity.errorMsg(_("Invalid parameters"));
+            return null;
+        }
+
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        let timeoutId = null;
+
+        try {
+            const request = {};
+            if (controller) {
+                request.signal = controller.signal;
+                // Aborting tears the body stream down too, so a server that
+                // stalls part way through the JSON cannot hold up the load
+                // any more than one that never answers at all.
+                timeoutId = setTimeout(() => controller.abort(), _ENV_ARG_TIMEOUT);
+            }
+
+            const response = await fetch(url, request);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const arg = parseInt((await response.json()).arg, 10);
+            return isNaN(arg) ? null : arg;
+        } catch (e) {
+            ErrorHandler.recoverable(e, { operation: "readEnvArg" });
+            this.activity.errorMsg(_("Something went wrong reading JSON-encoded project data."));
+            return null;
+        } finally {
+            if (timeoutId !== null) {
+                clearTimeout(timeoutId);
+            }
+        }
+    }
+
     start() {
         const that = this.activity;
         const pm = this;
 
         this._setupFileHandlers();
 
-        const URL = window.location.href;
-        const flags = {
-            run: false,
-            show: false,
-            collapse: false
-        };
+        // Fold the query string into a lowercase-keyed map in one pass. First
+        // value wins for a repeated key, and anything the app does not answer
+        // to is reported once rather than per parameter.
+        const params = new Map();
+        let unknownParam = false;
 
-        let urlParts;
-        const env = [];
-
-        if (URL.indexOf("?") > 0) {
-            let args, url;
-            urlParts = URL.split("?");
-            if (urlParts[1].indexOf("&") > 0) {
-                const newUrlParts = urlParts[1].split("&");
-                for (let i = 0; i < newUrlParts.length; i++) {
-                    if (newUrlParts[i].indexOf("=") > 0) {
-                        args = newUrlParts[i].split("=");
-                        switch (args[0].toLowerCase()) {
-                            case "file":
-                                break;
-                            case "id":
-                                that.projectID = args[1];
-                                break;
-                            case "run":
-                                if (args[1].toLowerCase() === "true") flags.run = true;
-                                break;
-                            case "show":
-                                if (args[1].toLowerCase() === "true") flags.show = true;
-                                break;
-                            case "collapse":
-                                if (args[1].toLowerCase() === "true") flags.collapse = true;
-                                break;
-                            case "inurl":
-                                url = args[1];
-                                // eslint-disable-next-line no-case-declarations
-                                const getJSON = u => {
-                                    return new Promise((resolve, reject) => {
-                                        const xhr = new XMLHttpRequest();
-                                        xhr.open("get", u, true);
-                                        xhr.responseType = "json";
-                                        xhr.onload = () => {
-                                            const status = xhr.status;
-                                            if (status === 200) {
-                                                resolve(xhr.response);
-                                            } else {
-                                                reject(status);
-                                            }
-                                        };
-                                        xhr.send();
-                                    });
-                                };
-
-                                getJSON(url).then(
-                                    data => {
-                                        const n = data.arg;
-                                        env.push(parseInt(n, 10));
-                                    },
-                                    () => {
-                                        alert(
-                                            _(
-                                                "Something went wrong reading JSON-encoded project data."
-                                            )
-                                        );
-                                    }
-                                );
-                                break;
-                            case "outurl":
-                                url = args[1];
-                                break;
-                            default:
-                                that.errorMsg(_("Invalid parameters"));
-                                break;
-                        }
-                    }
-                }
-            } else {
-                if (urlParts[1].indexOf("=") > 0) {
-                    args = urlParts[1].split("=");
-                    if (args[0].toLowerCase() === "id") {
-                        that.projectID = args[1];
-                    }
-                }
+        for (const [name, value] of new URLSearchParams(window.location.search)) {
+            const key = name.toLowerCase();
+            if (!_KNOWN_URL_PARAMS.has(key)) {
+                unknownParam = true;
+            } else if (!params.has(key)) {
+                params.set(key, value);
             }
         }
 
-        if (that.projectID !== null) {
-            setTimeout(() => {
-                that.loadStartWrapper(
-                    (act, pID, f, e) => pm._loadProject(pID, f, e),
-                    that.projectID,
-                    flags,
-                    env
-                );
-            }, 200);
-        } else {
-            setTimeout(() => {
-                that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
-            }, 200);
+        if (unknownParam) {
+            that.errorMsg(_("Invalid parameters"));
         }
+
+        if (params.has("id")) {
+            that.projectID = params.get("id");
+        }
+
+        const isTrue = name => (params.get(name) || "").toLowerCase() === "true";
+        const flags = {
+            run: isTrue("run"),
+            show: isTrue("show"),
+            collapse: isTrue("collapse")
+        };
+        const env = [];
+
+        const __scheduleLoad = () => {
+            if (that.projectID !== null) {
+                setTimeout(() => {
+                    that.loadStartWrapper(
+                        (act, pID, f, e) => pm._loadProject(pID, f, e),
+                        that.projectID,
+                        flags,
+                        env
+                    );
+                }, 200);
+            } else {
+                setTimeout(() => {
+                    that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
+                }, 200);
+            }
+        };
+
+        // "inurl" names the document holding the argument handed to the first
+        // block, so the load waits on it. Requesting it and scheduling the
+        // load side by side left env empty every time.
+        if (!params.has("inurl")) {
+            __scheduleLoad();
+            return;
+        }
+
+        this._readEnvArg(params.get("inurl"))
+            .then(arg => {
+                if (arg !== null) {
+                    env.push(arg);
+                }
+            })
+            .finally(__scheduleLoad);
     }
 }
 
