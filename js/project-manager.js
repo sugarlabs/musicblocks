@@ -712,6 +712,12 @@ class ProjectManager {
                         args = {
                             value: myBlock.value
                         };
+                        if (
+                            myBlock.manualAccidental !== undefined &&
+                            myBlock.manualAccidental !== null
+                        ) {
+                            args.manualAccidental = myBlock.manualAccidental;
+                        }
                 }
             } else {
                 switch (myBlock.name) {
