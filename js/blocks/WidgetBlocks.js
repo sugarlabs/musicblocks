@@ -476,6 +476,14 @@ function setupWidgetBlocks(activity) {
                 "sample",
                 _getWidgetDependencies(typeof SampleWidget !== "undefined" ? SampleWidget : null, [
                     "widgets/tuner",
+                    "widgets/SamplerBlocks",
+                    "widgets/SamplerPlayback",
+                    "widgets/SamplerPitch",
+                    "widgets/SamplerFiles",
+                    "widgets/SamplerUI",
+                    "widgets/SamplerPieMenu",
+                    "widgets/SamplerCanvas",
+                    "widgets/SamplerTuner",
                     "widgets/sampler"
                 ]),
                 () => new SampleWidget(),
