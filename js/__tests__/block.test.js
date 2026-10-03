@@ -522,6 +522,25 @@ describe("Block Foundation", () => {
                 expect(block.highlightBitmap.visible).toBe(false);
             });
 
+            it("should tolerate unhighlighting before highlight artwork has loaded", () => {
+                block.highlightBitmap = null;
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(true);
+                expect(block.container.visible).toBe(true);
+            });
+
+            it("should tolerate highlighting before highlight artwork has loaded", () => {
+                block.highlightBitmap = null;
+                block.disconnectedHighlightBitmap = null;
+                block.container.bitmapCache = null;
+
+                expect(() => block.highlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(false);
+                expect(block.container.visible).toBe(true);
+            });
+
             it("should not update a cache that has not been created yet", () => {
                 block.container.bitmapCache = null;
 
@@ -542,6 +561,40 @@ describe("Block Foundation", () => {
                 expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
                 expect(block.disconnectedBitmap.visible).toBe(true);
                 expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+
+            it("should tolerate null disconnectedBitmap when selection is true", () => {
+                mockBlocks.unhighlight = jest.fn();
+                block.disconnectedBitmap = null;
+                block.collapsed = false;
+
+                expect(() => block.unhighlightSelectedBlocks(0, true)).not.toThrow();
+                expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
+            });
+        });
+
+        describe("ignore()", () => {
+            it("should evaluate visibility safely when highlightBitmap is null", () => {
+                block.bitmap = { visible: false };
+                block.highlightBitmap = null;
+                block.collapseBlockBitmap = null;
+
+                expect(() => block.ignore()).not.toThrow();
+                expect(block.ignore()).toBe(true);
+            });
+        });
+
+        describe("collapseToggle()", () => {
+            it("should tolerate toggling collapse when optional collapse artwork is null", () => {
+                block.collapseBlockBitmap = { visible: true };
+                block.collapseButtonBitmap = null;
+                block.expandButtonBitmap = null;
+                block.highlightCollapseBlockBitmap = null;
+                block.collapseText = null;
+                mockBlocks.findDragGroup = jest.fn();
+                mockBlocks.dragGroup = [0];
+
+                expect(() => block.collapseToggle()).not.toThrow();
             });
         });
 
