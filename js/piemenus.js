@@ -13,7 +13,7 @@
 /*
    global
 
-    platformColor, docById, Singer, slicePath, wheelnav,
+    platformColor, docById, Singer, slicePath, wheelnav, wheelnavItem,
     DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
     PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
     getSavedCustomModes, getModeNamesForGroup, getModeLabel,
@@ -32,7 +32,7 @@
 /*
      Globals location
      - lib/wheelnav
-        slicePath, wheelnav
+        slicePath, wheelnav, wheelnavItem
      - js/utils/musicutils.js
         FLAT, SHARP, DEFAULTVOICE, getDrumName, getNote, MODE_PIE_MENUS, MUSICALMODES, INTERVALVALUES,
         INTERVALS, getDrumSynthName, getVoiceSynthName, frequencyToPitch, DOUBLESHARP, NATURAL,
@@ -345,10 +345,54 @@ const enableWheelScroll = (wheel, itemCount) => {
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
 };
 
+/**
+ * Raphael papers of the menus that close on an outside click. configureExitWheel
+ * adds the paper its exit wheel draws on, which is the one every wheel of that
+ * menu shares.
+ */
+const outsideClickPapers = new WeakSet();
+
+/**
+ * wheelnav redraws a wheel's selected item on every mouseover, moving the item's
+ * nodes to the front. The move fires another mouseover on the same item, so while
+ * the pointer rests on the selected item its nodes keep being re-inserted, and a
+ * press on it is reported on the bare <svg>. handleOutsideClick then closes the
+ * menu as an outside click and the item is never chosen (for example Add Row >
+ * pitch in the Phrase Maker). Redrawing a selected item only re-applies its
+ * selected look, so skip it, but only for wheels drawn on one of those papers.
+ * Every other wheel gets wheelnav's own hoverEffect, unchanged. The vendored
+ * lib/wheelnav.js file is left as it is.
+ */
+const guardSelectedItemHover = () => {
+    if (typeof wheelnavItem === "undefined" || !wheelnavItem.prototype) {
+        return;
+    }
+    const hoverEffect = wheelnavItem.prototype.hoverEffect;
+    if (typeof hoverEffect !== "function" || hoverEffect.skipsSelectedItem) {
+        return;
+    }
+    const guardedHoverEffect = function (hovered, isEnter) {
+        if (this.selected && this.wheelnav && outsideClickPapers.has(this.wheelnav.raphael)) {
+            return;
+        }
+        return hoverEffect.call(this, hovered, isEnter);
+    };
+    guardedHoverEffect.skipsSelectedItem = true;
+    wheelnavItem.prototype.hoverEffect = guardedHoverEffect;
+};
+
 // Ensure exit wheels behave like stateless buttons (no sticky selection)
 const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
         return;
+    }
+
+    // Every menu that closes on an outside click comes through here. Its wheels
+    // share the exit wheel's paper, so a moving selected item can't turn a click
+    // on any of them into a close, whichever order they were built in.
+    guardSelectedItemHover();
+    if (exitWheel.raphael) {
+        outsideClickPapers.add(exitWheel.raphael);
     }
     activeExitWheel = exitWheel;
 
@@ -2732,6 +2776,10 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     // the boolean selector
     const wheelSize = getPieMenuSize(block);
     block._booleanWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
+    guardSelectedItemHover();
+    if (block._booleanWheel.raphael) {
+        outsideClickPapers.add(block._booleanWheel.raphael);
+    }
 
     const labels = [];
     for (let i = 0; i < booleanLabels.length; i++) {
