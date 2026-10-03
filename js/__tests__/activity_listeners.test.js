@@ -10,7 +10,7 @@ describe("Activity Event Listener Management", () => {
     let listener;
     let setupBlocksContainerEventsBody;
     let setupDependenciesBody;
-    let initBody;
+    let sandbox;
 
     beforeAll(() => {
         // Load activity.js manually to bypass RequireJS/Global complexity
@@ -39,10 +39,6 @@ describe("Activity Event Listener Management", () => {
         setupDependenciesBody = new Function(
             extractAssignedFunctionBody("this.setupDependencies = () => {")
         );
-
-        const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-
-        initBody = new AsyncFunction(extractAssignedFunctionBody("this.init = async () => {"));
 
         // Strip the instantiation and require calls at the end to prevent side effects
         // We look for 'const activity = new Activity();'
@@ -75,14 +71,66 @@ describe("Activity Event Listener Management", () => {
         );
         setupBlocksContainerEventsBody = new Function(setupBody);
 
-        // Short-circuit the constructor to avoid dependencies
-        code = code.replace(
-            /constructor\s*\(\)\s*\{/,
-            "constructor() { this._listeners = []; return;"
-        );
+        // Keep the real, instrumented init() assignment while skipping the heavy
+        // constructor setup around it.
+        const constructorMarker = "constructor() {";
+        const initMarker = "this.init = async () => {";
+
+        const constructorStart = code.indexOf(constructorMarker);
+        const initStart = code.indexOf(initMarker);
+
+        if (constructorStart === -1 || initStart === -1) {
+            throw new Error("Could not locate Activity constructor or init()");
+        }
+
+        const constructorBodyStart = constructorStart + constructorMarker.length;
+
+        // Find the end of the init() function assignment.
+        let initEnd = initStart + initMarker.length;
+        let initBraceDepth = 1;
+
+        while (initBraceDepth > 0) {
+            if (code[initEnd] === "{") initBraceDepth++;
+            else if (code[initEnd] === "}") initBraceDepth--;
+            initEnd++;
+        }
+
+        // Include the semicolon after:
+        // this.init = async () => { ... };
+        if (code[initEnd] === ";") {
+            initEnd++;
+        }
+
+        // Find the closing brace of the constructor.
+        let constructorEnd = constructorBodyStart;
+        let constructorBraceDepth = 1;
+
+        while (constructorBraceDepth > 0) {
+            if (code[constructorEnd] === "{") constructorBraceDepth++;
+            else if (code[constructorEnd] === "}") constructorBraceDepth--;
+            constructorEnd++;
+        }
+
+        const constructorClosingBrace = constructorEnd - 1;
+
+        // Replace skipped sections with whitespace while preserving newlines.
+        // This keeps Istanbul's source line numbers aligned with activity.js.
+        const preserveLines = source => source.replace(/[^\n]/g, " ");
+
+        const beforeInit = preserveLines(code.slice(constructorBodyStart, initStart));
+        const afterInit = preserveLines(code.slice(initEnd, constructorClosingBrace));
+
+        code =
+            code.slice(0, constructorBodyStart) +
+            "\n            this._listeners = [];" +
+            beforeInit +
+            code.slice(initStart, initEnd) +
+            "\n            return;" +
+            afterInit +
+            code.slice(constructorClosingBrace);
 
         // Mock global environment required by activity.js
-        const sandbox = {
+        sandbox = {
             window: global.window,
             document: global.document,
             console: global.console,
@@ -159,8 +207,6 @@ describe("Activity Event Listener Management", () => {
 
         activity = new Activity();
         activity.setupDependencies = setupDependenciesBody.bind(activity);
-        activity.init = initBody.bind(activity);
-
         // Restore if needed, but for these tests we don't need them
 
         // Mock a DOM element as target
@@ -277,7 +323,7 @@ describe("Activity Event Listener Management", () => {
         activity._perfMark = jest.fn();
         activity.setupWindowBlurHandler = jest.fn();
 
-        global.doHardStopButton = jest.fn();
+        sandbox.doHardStopButton = jest.fn();
 
         const originalSetupResizeListeners = activity.setupResizeListeners.bind(activity);
 
@@ -299,7 +345,7 @@ describe("Activity Event Listener Management", () => {
             ])
         );
 
-        delete global.doHardStopButton;
+        delete sandbox.doHardStopButton;
     });
 
     test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {
