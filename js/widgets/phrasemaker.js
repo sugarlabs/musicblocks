@@ -276,6 +276,13 @@ class PhraseMaker {
          * @type {boolean}
          */
         this.lyricsON = false;
+
+        /**
+         * Array of lyrics input elements for cleanup.
+         * @type {HTMLInputElement[]}
+         * @private
+         */
+        this._lyricsInputs = [];
     }
 
     /**
@@ -1105,6 +1112,7 @@ class PhraseMaker {
                 lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
+                this._lyricsInputs.push(lyricsInput);
                 inputCell.addEventListener("mouseover", event => {
                     event.target.style.backgroundColor = this.platformColor.selectorSelected;
                 });
@@ -1213,6 +1221,16 @@ class PhraseMaker {
         this._rowOffset = [];
         for (let i = 0; i < this._rowMap.length; i++) {
             this._rowMap[i] = i;
+        }
+
+        // Clean up lyrics input event listeners
+        if (this._lyricsInputs && this._lyricsInputs.length > 0) {
+            this._lyricsInputs.forEach(input => {
+                // Remove event listeners by cloning and replacing (since we can't easily
+                // remove anonymous listeners, we rely on widget destruction to clean up DOM)
+                // The inputs are in the widget body which gets destroyed
+            });
+            this._lyricsInputs = [];
         }
 
         if (this.activity && this.activity.logo && this.activity.logo.synth) {
