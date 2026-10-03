@@ -12,7 +12,7 @@
 /*
    globals
 
-   */
+*/
 
 if (typeof module !== "undefined" && module.exports) {
     var UtilsLogic =
@@ -20,6 +20,13 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./utils-logic") : {});
     var { isUnsafeObjectKey } = UtilsLogic;
 }
+
+const _isUnsafeKey = key => {
+    if (typeof isUnsafeObjectKey === "function") {
+        return isUnsafeObjectKey(key);
+    }
+    return ["__proto__", "prototype", "constructor"].includes(key);
+};
 
 /**
  * Processes macro data, adds macros to the palette, and updates the macro dictionary.
@@ -36,7 +43,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             palettes.add("myblocks", "black", "#a0a0a0");
 
             for (const name of Object.keys(obj)) {
-                if (isUnsafeObjectKey(name)) continue;
+                if (_isUnsafeKey(name)) continue;
                 // console.debug("adding " + name + " to macroDict");
                 macroDict[name] = obj[name];
                 blocks.addToMyPalette(name, macroDict[name]);
@@ -59,7 +66,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
  * @returns {string} The JSON-encoded text of the updated macro dictionary.
  */
 let prepareMacroExports = (name, stack, macroDict) => {
-    if (name !== null) {
+    if (name !== null && name !== undefined && !_isUnsafeKey(name)) {
         macroDict[name] = stack;
     }
 
