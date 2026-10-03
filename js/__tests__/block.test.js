@@ -773,6 +773,49 @@ describe("Block Foundation", () => {
             expect(block.value).toBe("fallback-cached");
         });
 
+        it("replaces the selected thumbnail with the media placeholder when restoring an empty value", () => {
+            block.blocks.blockList[0] = block;
+            block.value = null;
+            block.name = "media";
+            block.image = "images/load-media.svg";
+            block.removeChildBitmap = Block.prototype.removeChildBitmap.bind(block);
+            const selectedThumbnail = { name: "media" };
+            block.container.addChild(selectedThumbnail);
+            block.imageBitmap = selectedThumbnail;
+
+            block.loadThumbnail(null);
+            expect(block.container.children).not.toContain(selectedThumbnail);
+            expect(block.imageBitmap).toBeNull();
+            expect(block.updateCache).toHaveBeenCalledTimes(1);
+            expect(mockImageInstance.src).toBe("images/load-media.svg");
+
+            mockImageInstance.onload();
+
+            expect(block.container.children).toHaveLength(1);
+            expect(block.container.children[0]).not.toBe(selectedThumbnail);
+            expect(block.container.children[0].name).toBe("media");
+            expect(block.imageBitmap).toBe(block.container.children[0]);
+            expect(block.updateCache).toHaveBeenCalledTimes(2);
+        });
+
+        it("clears an empty media preview when no default artwork is configured", () => {
+            block.blocks.blockList[0] = block;
+            block.value = null;
+            block.name = "media";
+            block.image = null;
+            block.removeChildBitmap = Block.prototype.removeChildBitmap.bind(block);
+            const selectedThumbnail = { name: "media" };
+            block.container.addChild(selectedThumbnail);
+            block.imageBitmap = selectedThumbnail;
+
+            block.loadThumbnail(null);
+
+            expect(block.container.children).not.toContain(selectedThumbnail);
+            expect(block.imageBitmap).toBeNull();
+            expect(block.updateCache).toHaveBeenCalledTimes(1);
+            expect(global.Image).not.toHaveBeenCalled();
+        });
+
         it("records the effective converted value for a user selection", () => {
             block.blocks.actionHistory = [];
             block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
