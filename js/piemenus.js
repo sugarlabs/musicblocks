@@ -1886,22 +1886,24 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     block._numberWheel.keynavigateEnabled = true;
 
-    block._numberWheel.colors = platformColor.numberWheelcolors;
-    block._numberWheel.slicePathFunction = slicePath().DonutSlice;
-    block._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    let minRadius, maxRadius;
     if (wheelValues.length > 16) {
-        block._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
-        block._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        minRadius = 0.6;
+        maxRadius = 1.0;
     } else if (wheelValues.length > 10) {
-        block._numberWheel.slicePathCustom.minRadiusPercent = 0.5;
-        block._numberWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        minRadius = 0.5;
+        maxRadius = 0.9;
     } else {
-        block._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-        block._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        minRadius = 0.2;
+        maxRadius = 0.6;
     }
-
-    block._numberWheel.sliceSelectedPathCustom = block._numberWheel.slicePathCustom;
-    block._numberWheel.sliceInitPathCustom = block._numberWheel.slicePathCustom;
+    configureWheel(block._numberWheel, {
+        colors: platformColor.numberWheelcolors,
+        minRadius,
+        maxRadius,
+        selectionPaths: true,
+        animatetime: 0
+    });
     if (
         block.blocks.blockList[block.connections[0]].name === "setbpm3" ||
         block.blocks.blockList[block.connections[0]].name === "setmasterbpm2"
@@ -1929,7 +1931,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         block._numberWheel.navAngle = -90;
     }
 
-    block._numberWheel.animatetime = 0; // 300;
     block._numberWheel.createWheel(wheelLabels);
 
     if (block._numberWheel.navItems.length > 20) {
@@ -3468,7 +3469,9 @@ const piemenuModes = (block, selectedMode, onSelect) => {
         minRadius: 0.85,
         maxRadius: 1,
         clickModeRotate: false,
-        selectionPaths: true
+        selectionPaths: true,
+        navAngle: -90,
+        animatetime: 0
     });
     block._modeWheel.createWheel(modeWheelLabels);
 
@@ -3478,7 +3481,9 @@ const piemenuModes = (block, selectedMode, onSelect) => {
         minRadius: 0.15,
         maxRadius: 0.3,
         titleFont: getModeGroupTitleFont(block._modeWheel.wheelRadius),
-        selectionPaths: true
+        selectionPaths: true,
+        navAngle: -90,
+        animatetime: 0
     });
 
     const xlabels = [];
@@ -3497,7 +3502,9 @@ const piemenuModes = (block, selectedMode, onSelect) => {
         minRadius: 0.0,
         maxRadius: 0.15,
         clickModeRotate: false,
-        selectionPaths: true
+        selectionPaths: true,
+        navAngle: -90,
+        animatetime: 0
     });
     block._exitWheel.initWheel(["×", "▶"]);
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
@@ -3566,7 +3573,9 @@ const piemenuModes = (block, selectedMode, onSelect) => {
                 colors: [],
                 minRadius: 0.3,
                 maxRadius: 0.85,
-                selectionPaths: true
+                selectionPaths: true,
+                navAngle: -90,
+                animatetime: 0
             });
             that._modeNameWheel.keynavigateEnabled = true;
             newWheel = true;
