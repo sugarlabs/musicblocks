@@ -122,10 +122,10 @@ describe("Activity Event Listener Management", () => {
 
         code =
             code.slice(0, constructorBodyStart) +
-            "\n            this._listeners = [];" +
+            " this._listeners = [];" +
             beforeInit +
             code.slice(initStart, initEnd) +
-            "\n            return;" +
+            " return;" +
             afterInit +
             code.slice(constructorClosingBrace);
 
