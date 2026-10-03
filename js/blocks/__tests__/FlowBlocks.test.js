@@ -660,6 +660,30 @@ describe("FlowBlocks integration", () => {
             expect(block.flow([60], logo, 0)).toEqual([60, 1]);
             expect(logo.notation.notationBeginRepeat).toHaveBeenCalledWith(0);
         });
+
+        test("repeats a loop whose Stop only exits a nested loop", () => {
+            activity.blocks.blockList = {
+                60: { name: "repeat", connections: [10, 61, 62, null] },
+                61: { name: "number", value: 4, connections: [60] },
+                62: { name: "do", connections: [60, 63, 64] },
+                63: { name: "text", value: "chorus", connections: [62] },
+                64: { name: "break", connections: [62, null] },
+                70: { name: "break", connections: [null, null] }
+            };
+            logo.actions = { chorus: 70 };
+            expect(block.flow([60], logo, 0)).toEqual([60, 1]);
+            expect(logo.notation.notationBeginRepeat).toHaveBeenCalledWith(0);
+        });
+
+        test("unrolls a loop with a Stop after a nested loop", () => {
+            activity.blocks.blockList = {
+                60: { name: "while", connections: [10, 61, 62, 63] },
+                61: { name: "boolean", connections: [60] },
+                62: { name: "newnote", connections: [60, null, null, null] },
+                63: { name: "break", connections: [60, null] }
+            };
+            expectUnrolled();
+        });
     });
 
     test("RepeatBlock validates number and repeats child", () => {

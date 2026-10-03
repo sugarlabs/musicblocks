@@ -1044,9 +1044,13 @@ function setupFlowBlocks(activity) {
         "namedcalcArg"
     ];
 
+    // Loops a Stop block breaks out of; it exits only the nearest one.
+    const LOOPS = ["forever", "repeat", "while", "until"];
+
     /**
      * Checks whether a Stop block can be reached from a stack, including
      * through any action it calls. A forever that can stop is not infinite.
+     * A Stop inside a nested loop only exits that loop, so loop bodies are skipped.
      * @param {number} blk - The first block of the stack.
      * @param {object} logo - The logo object.
      * @returns {boolean} - True if a Stop block is reachable.
@@ -1072,7 +1076,11 @@ function setupFlowBlocks(activity) {
                 // A computed action name could be any action.
                 stack.push(...(name === undefined ? Object.values(actions) : [actions[name]]));
             }
-            stack.push(...block.connections.slice(1));
+            stack.push(
+                ...(LOOPS.includes(block.name)
+                    ? [block.connections[block.connections.length - 1]]
+                    : block.connections.slice(1))
+            );
         }
         return false;
     };
