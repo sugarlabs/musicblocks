@@ -16,7 +16,7 @@
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
    instruments, slicePath, platformColor, TunerDisplay, TunerUtils,
-   ManagedTimer
+   ManagedTimer, Tuner
 */
 
 /* exported SampleWidget, resolveBackendURL */
@@ -150,6 +150,11 @@ function SampleWidget() {
     this.pitchAnalysers = {};
 
     // Add tuner related properties
+    /**
+     * The tuner: microphone input, pitch detection and the tuner display (js/widgets/tuner.js).
+     * @type {Tuner}
+     */
+    this.tuner = new Tuner();
     this.tunerEnabled = false;
     this.tunerAnalyser = null;
     this.tunerMic = null;
@@ -745,7 +750,7 @@ function SampleWidget() {
             }
 
             if (tunerOn) {
-                this.activity.logo.synth.stopTuner();
+                this.tuner.stopTuner();
                 tunerOn = false;
             }
 
@@ -821,7 +826,7 @@ function SampleWidget() {
         const stopTuner = () => {
             if (tunerOn) {
                 activity.textMsg(_("Tuner stopped."), 3000);
-                this.activity.logo.synth.stopTuner();
+                this.tuner.stopTuner();
                 tunerOn = false;
                 const tunerContainer = docById("tunerContainer");
                 if (tunerContainer) {
@@ -1264,11 +1269,11 @@ function SampleWidget() {
 
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
-                await this.activity.logo.synth.startTuner(this.pitchName);
+                await this.tuner.startTuner(this.pitchName);
                 activity.textMsg(_("Tuner started."), 3000);
             } else {
                 activity.textMsg(_("Tuner stopped."), 3000);
-                this.activity.logo.synth.stopTuner();
+                this.tuner.stopTuner();
                 tunerOn = false;
             }
         };
@@ -1301,7 +1306,7 @@ function SampleWidget() {
             const tunerContainer = docById("tunerContainer");
             if (tunerContainer) {
                 tunerContainer.remove();
-                this.activity.logo.synth.stopTuner();
+                this.tuner.stopTuner();
                 tunerOn = false;
             }
 
