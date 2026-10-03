@@ -879,7 +879,12 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            // An empty slot arrives as null, which slips past the range check.
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -956,7 +961,11 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
