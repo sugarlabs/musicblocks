@@ -55,7 +55,41 @@ describe("musicutils-pitch", () => {
         ]);
         expect(pitch.numberToPitchSharp(6, "equal19")).toEqual(["C♯", 1]);
         expect(pitch.numberToPitchSharp(19, "equal19")).toEqual(["A", 1]);
-        expect(pitch.numberToPitchSharp(-1, "equal19")).toEqual(["A♭", 0]);
+    });
+
+    describe("numberToPitchSharp edge cases and regression tests", () => {
+        it("handles invalid and non-numeric inputs safely", () => {
+            expect(pitch.numberToPitchSharp(undefined, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(null, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(NaN, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp("invalid", "equal")).toEqual(["A", 0]);
+        });
+
+        it("handles infinite bounds without hanging or crashing", () => {
+            expect(pitch.numberToPitchSharp(-Infinity, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(Infinity, "equal")).toEqual(["A", 0]);
+        });
+
+        it("handles extreme negative numbers (-Number.MAX_VALUE) without overflow", () => {
+            const [equalPitch, equalOctave] = pitch.numberToPitchSharp(-Number.MAX_VALUE, "equal");
+            expect(equalPitch).toBeDefined();
+            expect(Number.isFinite(equalOctave)).toBe(true);
+
+            const [equal19Pitch, equal19Octave] = pitch.numberToPitchSharp(
+                -Number.MAX_VALUE,
+                "equal19"
+            );
+            expect(equal19Pitch).toBeDefined();
+            expect(Number.isFinite(equal19Octave)).toBe(true);
+        });
+
+        it("preserves exact octave offset and pitch names for negative boundaries", () => {
+            expect(pitch.numberToPitchSharp(-1, "equal")).toEqual(["G♯", 0]);
+            expect(pitch.numberToPitchSharp(-12, "equal")).toEqual(["A", -1]);
+            expect(pitch.numberToPitchSharp(-13, "equal")).toEqual(["G♯", -1]);
+            expect(pitch.numberToPitchSharp(-1, "equal19")).toEqual(["A♭", 0]);
+            expect(pitch.numberToPitchSharp(-19, "equal19")).toEqual(["A", -1]);
+        });
     });
 
     it("strips at most two microtonal prefix characters from the start of a note", () => {
