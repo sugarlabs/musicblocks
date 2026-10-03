@@ -364,6 +364,35 @@ class ProjectStorage {
                     await this.set(this.BackupStorageKey, existing);
                 }
 
+                const existingData = typeof existing === "string" ? JSON.parse(existing) : existing;
+                if (existingData && existingData.Projects) {
+                    for (const [id, proj] of Object.entries(this.data?.Projects || {})) {
+                        const existingProj = existingData.Projects[id];
+                        if (existingProj && Array.isArray(existingProj.commitDrafts)) {
+                            const merged = new Map();
+                            existingProj.commitDrafts.forEach(d => {
+                                if (d && d.id) merged.set(d.id, d);
+                            });
+
+                            (proj.commitDrafts || []).forEach(localDraft => {
+                                if (!localDraft || !localDraft.id) return;
+                                const remoteDraft = merged.get(localDraft.id);
+                                if (
+                                    !remoteDraft ||
+                                    remoteDraft.status !== "synced" ||
+                                    (!remoteDraft.sha && localDraft.sha)
+                                ) {
+                                    merged.set(localDraft.id, localDraft);
+                                }
+                            });
+
+                            proj.commitDrafts = Array.from(merged.values()).sort(
+                                (a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0)
+                            );
+                        }
+                    }
+                }
+
                 await this.set(this.LocalStorageKey, this.data);
                 this.TimeLastSaved = Date.now();
             } finally {

@@ -707,4 +707,190 @@ describe("ProjectStorage", () => {
             expect(storage.data.Projects["xyz"].ProjectName).toBe("Precious Project");
         });
     });
+
+    describe("cross-tab commitDrafts preservation", () => {
+        const initialData = {
+            Projects: {
+                proj1: {
+                    ProjectName: "Shared Project",
+                    ProjectData: "blocks",
+                    commitDrafts: []
+                }
+            },
+            CurrentProject: "proj1",
+            LikedProjects: {},
+            ReportedProjects: {},
+            DefaultCreatorName: "anonymous"
+        };
+
+        it("stale tab save preserves a newer persisted draft and unrelated field changes", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+            storageA.data = JSON.parse(JSON.stringify(initialData));
+            storageB.data = JSON.parse(JSON.stringify(initialData));
+
+            await storageA.save();
+
+            // Tab A adds a draft
+            storageA.data.Projects["proj1"].commitDrafts = [{ id: "draft-A", status: "pending" }];
+            await storageA.save();
+
+            // Tab B (stale) renames project and saves
+            storageB.data.Projects["proj1"].ProjectName = "Renamed Project";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-A", status: "pending" }
+            ]);
+            expect(persistedData.Projects["proj1"].ProjectName).toEqual("Renamed Project");
+        });
+
+        it("independent draft additions from two tabs both survive", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+            storageA.data = JSON.parse(JSON.stringify(initialData));
+            storageB.data = JSON.parse(JSON.stringify(initialData));
+
+            // Tab A adds draft-A
+            storageA.data.Projects["proj1"].commitDrafts.push({
+                id: "draft-A",
+                status: "pending",
+                timestamp: 1
+            });
+            await storageA.save();
+
+            // Tab B adds draft-B (its in-memory state lacks draft-A)
+            storageB.data.Projects["proj1"].commitDrafts.push({
+                id: "draft-B",
+                status: "pending",
+                timestamp: 2
+            });
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            expect(persistedData.Projects["proj1"].commitDrafts).toHaveLength(2);
+            expect(persistedData.Projects["proj1"].commitDrafts).toContainEqual({
+                id: "draft-A",
+                status: "pending",
+                timestamp: 1
+            });
+            expect(persistedData.Projects["proj1"].commitDrafts).toContainEqual({
+                id: "draft-B",
+                status: "pending",
+                timestamp: 2
+            });
+        });
+
+        it("stale pending state cannot regress a persisted synced draft", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [{ id: "draft-A", status: "pending" }];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            await storageA.save();
+
+            // Tab A syncs draft
+            storageA.data.Projects["proj1"].commitDrafts[0].status = "synced";
+            storageA.data.Projects["proj1"].commitDrafts[0].sha = "12345";
+            await storageA.save();
+
+            // Tab B (stale memory still says pending) performs unrelated save
+            storageB.data.Projects["proj1"].ProjectName = "Changed Name";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-A", status: "synced", sha: "12345" }
+            ]);
+            expect(persistedData.Projects["proj1"].ProjectName).toEqual("Changed Name");
+        });
+
+        it("updates draft with sha when local has sha and persisted draft was synced without sha", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [
+                { id: "draft-A", status: "synced", timestamp: 10 }
+            ];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            await storageA.save();
+
+            // Tab B gets sha
+            storageB.data.Projects["proj1"].commitDrafts[0].sha = "new-sha";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-A", status: "synced", timestamp: 10, sha: "new-sha" }
+            ]);
+        });
+
+        it("sorts drafts stably even when timestamp is missing or undefined", async () => {
+            const sharedStore = createMockLocalforage();
+            const storage = new ProjectStorage(createMockPlanet());
+            storage.LocalStorage = sharedStore;
+
+            const dataWithDrafts = JSON.parse(JSON.stringify(initialData));
+            dataWithDrafts.Projects["proj1"].commitDrafts = [
+                { id: "draft-no-ts-1", status: "pending" },
+                { id: "draft-ts-2", status: "pending", timestamp: 50 }
+            ];
+            storage.data = dataWithDrafts;
+            await storage.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storage.LocalStorageKey));
+            expect(persistedData.Projects["proj1"].commitDrafts).toHaveLength(2);
+            expect(persistedData.Projects["proj1"].commitDrafts[0].id).toBe("draft-no-ts-1");
+            expect(persistedData.Projects["proj1"].commitDrafts[1].id).toBe("draft-ts-2");
+        });
+
+        it("handles missing/corrupted fields without throwing", async () => {
+            const sharedStore = createMockLocalforage();
+            const storage = new ProjectStorage(createMockPlanet());
+            storage.LocalStorage = sharedStore;
+
+            // Set existing with non-array commitDrafts
+            const corruptedExisting = {
+                Projects: {
+                    proj1: {
+                        commitDrafts: null
+                    }
+                }
+            };
+            await sharedStore.setItem(storage.LocalStorageKey, JSON.stringify(corruptedExisting));
+
+            storage.data = {
+                Projects: {
+                    proj1: {
+                        commitDrafts: [null, { id: "draft-valid", status: "pending" }]
+                    }
+                }
+            };
+
+            await expect(storage.save()).resolves.toBeUndefined();
+            const persistedData = JSON.parse(await sharedStore.getItem(storage.LocalStorageKey));
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                null,
+                { id: "draft-valid", status: "pending" }
+            ]);
+        });
+    });
 });
