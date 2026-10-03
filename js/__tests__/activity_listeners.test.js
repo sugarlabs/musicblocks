@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createInstrumenter } = require("istanbul-lib-instrument");
 
 describe("Activity Event Listener Management", () => {
     let Activity;
@@ -8,12 +9,40 @@ describe("Activity Event Listener Management", () => {
     let target;
     let listener;
     let setupBlocksContainerEventsBody;
+    let setupDependenciesBody;
+    let initBody;
 
     beforeAll(() => {
         // Load activity.js manually to bypass RequireJS/Global complexity
         const activityPath = path.resolve(__dirname, "../activity.js");
         let code = fs.readFileSync(activityPath, "utf8");
         const fullSource = code;
+        const extractAssignedFunctionBody = marker => {
+            const start = fullSource.indexOf(marker);
+
+            if (start === -1) {
+                throw new Error(`Could not find ${marker} in activity.js`);
+            }
+
+            let end = start + marker.length;
+            let braceDepth = 1;
+
+            while (braceDepth > 0) {
+                if (fullSource[end] === "{") braceDepth++;
+                else if (fullSource[end] === "}") braceDepth--;
+                end++;
+            }
+
+            return fullSource.slice(start + marker.length, end - 1);
+        };
+
+        setupDependenciesBody = new Function(
+            extractAssignedFunctionBody("this.setupDependencies = () => {")
+        );
+
+        const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+
+        initBody = new AsyncFunction(extractAssignedFunctionBody("this.init = async () => {"));
 
         // Strip the instantiation and require calls at the end to prevent side effects
         // We look for 'const activity = new Activity();'
@@ -97,6 +126,11 @@ describe("Activity Event Listener Management", () => {
         // Expose Activity class to sandbox
         code += "\n this.Activity = Activity;";
 
+        const instrumenter = createInstrumenter();
+        code = instrumenter.instrumentSync(code, activityPath);
+
+        sandbox.__coverage__ = global.__coverage__ || (global.__coverage__ = {});
+
         vm.createContext(sandbox);
         try {
             vm.runInContext(code, sandbox);
@@ -124,6 +158,8 @@ describe("Activity Event Listener Management", () => {
         Activity.prototype._createDrag = () => {};
 
         activity = new Activity();
+        activity.setupDependencies = setupDependenciesBody.bind(activity);
+        activity.init = initBody.bind(activity);
 
         // Restore if needed, but for these tests we don't need them
 
@@ -205,6 +241,65 @@ describe("Activity Event Listener Management", () => {
         activity.removeEventListener(target, "click", listener, { capture: true });
 
         expect(activity._listeners).toHaveLength(0);
+    });
+
+    test("should restore resize listeners after dependency cleanup during initialization", async () => {
+        activity._handleRepositionBlocksOnResize = jest.fn();
+        activity._handleWindowResize = jest.fn();
+
+        const getResizeListeners = () =>
+            activity._listeners.filter(l => l.target === window && l.type === "resize");
+
+        // Simulate listeners that existed before setupDependencies cleanup.
+        activity.setupResizeListeners();
+        expect(getResizeListeners()).toHaveLength(2);
+
+        // Exercise the real setupDependencies lifecycle up to listener cleanup.
+        activity._stopRenderLoop = jest.fn();
+
+        const originalCleanup = activity.cleanupEventListeners.bind(activity);
+        const stopAfterCleanup = new Error("stop after cleanup");
+
+        activity.cleanupEventListeners = jest.fn(() => {
+            originalCleanup();
+            throw stopAfterCleanup;
+        });
+
+        expect(() => activity.setupDependencies()).toThrow(stopAfterCleanup);
+        expect(getResizeListeners()).toHaveLength(0);
+
+        activity.cleanupEventListeners = originalCleanup;
+
+        // Exercise the real init lifecycle through resize registration.
+        document.body.innerHTML = '<div id="loader"></div><canvas id="myCanvas"></canvas>';
+
+        activity._initialized = false;
+        activity._perfMark = jest.fn();
+        activity.setupWindowBlurHandler = jest.fn();
+
+        global.doHardStopButton = jest.fn();
+
+        const originalSetupResizeListeners = activity.setupResizeListeners.bind(activity);
+
+        const stopAfterResizeSetup = new Error("stop after resize setup");
+
+        activity.setupResizeListeners = jest.fn(() => {
+            originalSetupResizeListeners();
+            throw stopAfterResizeSetup;
+        });
+
+        await expect(activity.init()).rejects.toThrow(stopAfterResizeSetup);
+
+        expect(getResizeListeners()).toHaveLength(2);
+
+        expect(getResizeListeners().map(l => l.listener)).toEqual(
+            expect.arrayContaining([
+                activity._handleRepositionBlocksOnResize,
+                activity._handleWindowResize
+            ])
+        );
+
+        delete global.doHardStopButton;
     });
 
     test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {
