@@ -4483,6 +4483,8 @@ if (typeof module !== "undefined" && module.exports) {
         dismissActivePieMenu,
         showWheelDiv,
         hideWheelDiv,
-        syncKeySignatureBlocks
+        syncKeySignatureBlocks,
+        piemenuNoteValue,
+        piemenuColor
     };
 }

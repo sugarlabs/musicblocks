@@ -14,8 +14,11 @@ const {
     piemenuIntervals,
     piemenuKey,
     piemenuNumber,
-    piemenuModes
+    piemenuModes,
+    piemenuNoteValue,
+    piemenuColor
 } = require("../piemenus");
+const Block = require("../block");
 
 // Mock Globals
 global.INTERVALS = [
@@ -1337,5 +1340,183 @@ describe("piemenuBasic and temperament wheel readability and positioning", () =>
         expect(mockBlock.value).toBe("valB");
         expect(mockBlock.text.text).toBe("Option B");
         expect(mockBlock._basicWheel.removeWheel).toHaveBeenCalled();
+    });
+});
+
+describe("pie-menu exit key listener reference regression coverage", () => {
+    let mockBlock;
+    let labelDivMock;
+    let numberLabelMock;
+    let originalDocById;
+    let originalCreateElement;
+
+    beforeEach(() => {
+        labelDivMock = {
+            style: { display: "", opacity: "" },
+            classList: {
+                _classes: new Set(),
+                add: jest.fn(function (c) {
+                    this._classes.add(c);
+                }),
+                remove: jest.fn(function (c) {
+                    this._classes.delete(c);
+                }),
+                contains: jest.fn(function (c) {
+                    return this._classes.has(c);
+                })
+            },
+            replaceChildren: jest.fn(),
+            getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+        };
+
+        numberLabelMock = {
+            id: "numberLabel",
+            style: { display: "", opacity: "", left: "", top: "", width: "", fontSize: "" },
+            focus: jest.fn(),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+
+        originalDocById = global.docById;
+        global.docById = jest.fn(id => {
+            if (id === "labelDiv") {
+                return labelDivMock;
+            }
+            if (id === "numberLabel") {
+                return numberLabelMock;
+            }
+            return {
+                style: {
+                    display: "",
+                    opacity: "",
+                    position: "",
+                    left: "",
+                    top: "",
+                    width: "",
+                    height: ""
+                },
+                getBoundingClientRect: jest.fn().mockReturnValue({
+                    x: 0,
+                    y: 0,
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    width: 0,
+                    height: 0
+                }),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+        });
+
+        originalCreateElement = global.document.createElement;
+        global.document.createElement = jest.fn(() => numberLabelMock);
+
+        global.COLORS40 = Array(40).fill(["#000000", "#111111", "#222222"]);
+        global.getMunsellColor = jest.fn().mockReturnValue("#123456");
+        global.platformColor.numberWheelcolors = ["#333333"];
+        global.platformColor.noteValueWheelcolors = ["#444444"];
+        global.platformColor.subNoteValueWheelcolors = ["#555555"];
+        global.platformColor.tabsWheelcolors = ["#666666"];
+
+        mockBlock = {
+            container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: { _canvas: { width: 1000, height: 1000 } },
+                findPitchOctave: jest.fn().mockReturnValue(4),
+                setPitchOctave: jest.fn(),
+                blockList: { "mock-id": { name: "mock-block", connections: [null] } },
+                meter_block_changed: jest.fn()
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1),
+                KeySignatureEnv: ["C", "major", false],
+                logo: { synth: new global.Synth(), errorMsg: jest.fn() }
+            },
+            connections: ["mock-id"],
+            protoblock: { scale: 1 },
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: "",
+            name: "number",
+            _check_meter_block: null,
+            _usePieNumberC1: jest.fn().mockReturnValue(false),
+            _labelChanged: jest.fn(),
+            _exitKeyPressed: Block.prototype._exitKeyPressed
+        };
+        mockBlock._boundExitKeyPressed = mockBlock._exitKeyPressed.bind(mockBlock);
+    });
+
+    afterEach(() => {
+        global.docById = originalDocById;
+        global.document.createElement = originalCreateElement;
+    });
+
+    const testExitCleanup = (setupFn, triggerKey) => {
+        setupFn();
+
+        expect(labelDivMock.classList.contains("hasKeyboard")).toBe(true);
+
+        const keypressCalls = numberLabelMock.addEventListener.mock.calls.filter(
+            c => c[0] === "keypress"
+        );
+        expect(keypressCalls.length).toBe(1);
+        const registeredHandler = keypressCalls[0][1];
+
+        // Verify the registered handler is the stable bound handler
+        expect(registeredHandler).toBe(mockBlock._boundExitKeyPressed);
+
+        // Simulate exit key (Enter or Tab)
+        const event = { key: triggerKey, preventDefault: jest.fn() };
+        mockBlock._exitKeyPressed(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, false);
+
+        // Verify that removeEventListener was called with the exact same handler reference
+        const removeCalls = numberLabelMock.removeEventListener.mock.calls.filter(
+            c => c[0] === "keypress"
+        );
+        expect(removeCalls.length).toBe(1);
+        const removedHandler = removeCalls[0][1];
+
+        expect(removedHandler).toBe(registeredHandler);
+        expect(removedHandler).toBe(mockBlock._boundExitKeyPressed);
+        expect(labelDivMock.classList.contains("hasKeyboard")).toBe(false);
+    };
+
+    describe("piemenuNoteValue", () => {
+        test("removes the exact registered handler reference on Enter", () => {
+            testExitCleanup(() => piemenuNoteValue(mockBlock, 4), "Enter");
+        });
+
+        test("removes the exact registered handler reference on Tab", () => {
+            testExitCleanup(() => piemenuNoteValue(mockBlock, 4), "Tab");
+        });
+    });
+
+    describe("piemenuNumber", () => {
+        test("removes the exact registered handler reference on Enter", () => {
+            testExitCleanup(() => piemenuNumber(mockBlock, [1, 2, 4, 8], 4), "Enter");
+        });
+
+        test("removes the exact registered handler reference on Tab", () => {
+            testExitCleanup(() => piemenuNumber(mockBlock, [1, 2, 4, 8], 4), "Tab");
+        });
+    });
+
+    describe("piemenuColor", () => {
+        test("removes the exact registered handler reference on Enter", () => {
+            testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Enter");
+        });
+
+        test("removes the exact registered handler reference on Tab", () => {
+            testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Tab");
+        });
     });
 });
