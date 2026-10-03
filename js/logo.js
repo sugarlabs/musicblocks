@@ -496,7 +496,7 @@ class Logo {
         if (this._synthsInitialized) {
             // Ensure any newly added turtles (e.g., companion turtles) are
             // initialized without disrupting existing turtles' runtime state.
-            for (const turtle in this.turtles.turtleList) {
+            for (const turtle of Object.keys(this.turtles.turtleList)) {
                 if (turtle in this.deps.instruments) {
                     continue;
                 }
@@ -549,7 +549,7 @@ class Logo {
         }
         this.synth.newTone();
 
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const tur = this.turtles.ithTurtle(turtle);
 
             if (!(turtle in this.deps.instruments)) {
@@ -591,7 +591,7 @@ class Logo {
             tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(turtle);
             for (const synth in tur.singer.synthVolume) {
@@ -613,7 +613,7 @@ class Logo {
         }
 
         this.deps.Singer.resetMasterVolume(this);
-        for (const t in this.turtles.turtleList) {
+        for (const t of Object.keys(this.turtles.turtleList)) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
             for (const synth in tur.singer.synthVolume) {
@@ -1416,7 +1416,7 @@ class Logo {
         this.sounds = [];
 
         // Kill all active audio voices to prevent "zombie audio"
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const tur = this.turtles.getTurtle(turtle);
             if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
                 tur.singer.killAllVoices();
@@ -1741,7 +1741,7 @@ class Logo {
         }
 
         // Each turtle needs to keep its own wait time and music states.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             this.initTurtle(turtle);
         }
 
@@ -1771,7 +1771,7 @@ class Logo {
         this.clearTurtleListeners();
 
         // Init the graphic state.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const requiredTurtle = this.turtles.getTurtle(turtle);
             requiredTurtle.container.x = this.turtles.turtleX2screenX(requiredTurtle.x);
             requiredTurtle.container.y = this.turtles.turtleY2screenY(requiredTurtle.y);
@@ -1844,7 +1844,7 @@ class Logo {
         this.onRunTurtle();
 
         // Mark all turtles as not running.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             this.turtles.getTurtle(turtle).running = false;
         }
 
