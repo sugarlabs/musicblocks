@@ -1520,6 +1520,12 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "rhythmRuler",
                 _getWidgetDependencies(typeof RhythmRuler !== "undefined" ? RhythmRuler : null, [
+                    "widgets/RhythmRulerLayout",
+                    "widgets/RhythmRulerHistory",
+                    "widgets/RhythmRulerEditing",
+                    "widgets/RhythmRulerPlayback",
+                    "widgets/RhythmRulerSave",
+                    "widgets/RhythmRulerCircular",
                     "widgets/rhythmruler"
                 ]),
                 () => new RhythmRuler(),
