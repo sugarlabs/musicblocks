@@ -83,7 +83,7 @@ class MathUtility {
                 // No whole number between them (e.g. 2.2 and 2.8).
                 return Number(n1);
             }
-            return Math.floor(Math.random() * (high - low + 1) + low);
+            return low + Math.floor(Math.random() * (high - low + 1));
         };
 
         /**

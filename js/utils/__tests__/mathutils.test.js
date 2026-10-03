@@ -105,6 +105,14 @@ describe("MathUtility", () => {
                 expect(extremes(-5, 5)).toEqual([-5, 5]);
             });
 
+            test("stays inside the range for large bounds", () => {
+                // Adding the random offset to low before flooring rounds up to 2 ** 51 + 2 here.
+                const spy = jest.spyOn(Math, "random").mockReturnValue(0.9);
+                const result = MathUtility.doRandom(2 ** 51 + 0.5, 2 ** 51 + 1.5);
+                spy.mockRestore();
+                expect(result).toBe(2 ** 51 + 1);
+            });
+
             test("never leaves the range over many draws", () => {
                 for (let i = 0; i < 2000; i++) {
                     const result = MathUtility.doRandom(0.5, 3.7);
