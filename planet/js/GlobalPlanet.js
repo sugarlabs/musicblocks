@@ -281,6 +281,7 @@ class GlobalPlanet {
     downloadProjectsToCache(data, callback) {
         const Planet = this.Planet;
         this.loadCount = data.length;
+        this.batchHasOfflineError = false;
 
         for (let i = 0; i < data.length; i++) {
             (function () {
@@ -301,7 +302,7 @@ class GlobalPlanet {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
         } else {
-            this.throwOfflineError();
+            this.batchHasOfflineError = true;
         }
 
         this.loadCount -= 1;
@@ -402,7 +403,11 @@ class GlobalPlanet {
 
         // If nothing rendered at all, show "no projects" rather than an empty grid.
         if (rendered === 0 && data.length > 0) {
-            this.throwNoProjectsError();
+            if (this.batchHasOfflineError) {
+                this.throwOfflineError();
+            } else {
+                this.throwNoProjectsError();
+            }
             return;
         }
 
