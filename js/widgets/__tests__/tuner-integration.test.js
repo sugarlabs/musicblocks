@@ -587,4 +587,16 @@ describe("Tuner with the real Synth", () => {
             tuner.stopTuner();
         });
     });
+
+    test("chromatic mode doesn't keep the text from target mode", async () => {
+        await tuner.startTuner();
+        tuner.displayText = "+1 octave";
+        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
+
+        await new Promise(resolve => setTimeout(resolve, 5));
+
+        expect(tuner.displayText).toBeNull();
+        expect(document.getElementById("centsText").textContent).toMatch(/cents/);
+        expect(document.getElementById("centsText").textContent).not.toBe("+1 octave");
+    });
 });
