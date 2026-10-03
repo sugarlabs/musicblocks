@@ -21,7 +21,7 @@
 
     _, addTemperamentToDictionary, buildScale,
     deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
+    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentsList, getTemperamentRatio,
     isCustomTemperament, isUnsafeObjectKey, last, normalizeNoteAccidentals, parseNoteString,
     pitchToFrequency, platformColor, PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction,
    setOctaveRatio, SHARP, Singer, slicePath, TuningFormats, updateTemperaments, wheelnav,
