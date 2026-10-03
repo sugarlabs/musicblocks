@@ -1791,6 +1791,71 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should keep microtonal note names as note names", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch("^C", 4);
+            await mouse.playPitch("vvD♭", 4);
+            await mouse.playPitch("^sol", 4);
+            await mouse.playPitch("E♯", 4);
+            await mouse.playPitch("C𝄪", 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["notename", { value: "^C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 6, 7]],
+            [5, ["notename", { value: "vvD♭" }], 0, 0, [4]],
+            [6, ["number", { value: 4 }], 0, 0, [4]],
+            [7, "pitch", 0, 0, [4, 8, 9, 10]],
+            [8, ["solfege", { value: "^sol" }], 0, 0, [7]],
+            [9, ["number", { value: 4 }], 0, 0, [7]],
+            [10, "pitch", 0, 0, [7, 11, 12, 13]],
+            [11, ["notename", { value: "E♯" }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]],
+            [13, "pitch", 0, 0, [10, 14, 15, null]],
+            [14, ["notename", { value: "C𝄪" }], 0, 0, [13]],
+            [15, ["number", { value: 4 }], 0, 0, [13]]
+        ]);
+    });
+
+    test("should convert a pitch that isn't a note name literal", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch(pitch, 4);
+            await mouse.playPitch(box1 + 1, 4);
+            await mouse.playPitch(5, 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["namedbox", { value: "pitch" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 8, 9]],
+            [5, "plus", 0, 0, [4, 6, 7]],
+            [6, ["namedbox", { value: "box1" }], 0, 0, [5]],
+            [7, ["number", { value: 1 }], 0, 0, [5]],
+            [8, ["number", { value: 4 }], 0, 0, [4]],
+            [9, "vspace", 0, 0, [4, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ]);
+    });
+
     test("should convert the current meter getter", () => {
         const code = `
         new Mouse(async mouse => {
