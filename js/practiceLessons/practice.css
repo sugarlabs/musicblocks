@@ -1116,11 +1116,35 @@
 
 /* CSS-only book cover keeps Explorer Journal themeable across light, dark, and high contrast. */
 .journal-cover {
+    position: relative;
     min-height: 112px;
     overflow: hidden;
     background:
         radial-gradient(circle at 88% 18%, rgba(255, 209, 102, 0.32) 0 10%, transparent 11%),
         var(--color-panel-bg);
+}
+
+.journal-cover::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    width: 74px;
+    height: 48px;
+    border-radius: 8px 8px 6px 6px;
+    background:
+        linear-gradient(
+            90deg,
+            transparent 48%,
+            color-mix(in srgb, var(--color-text-primary) 24%, transparent) 49% 51%,
+            transparent 52%
+        ),
+        linear-gradient(
+            var(--color-panel-bg),
+            color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-panel-bg))
+        );
+    border: 2px solid var(--color-brand-primary);
+    transform: rotate(-4deg);
 }
 
 .journal-cover h3 {
@@ -2273,20 +2297,4 @@
     color: #2e7d32;
     font-weight: 600;
     text-align: center;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #practice-panel,
-    #explorer-journal-panel,
-    .level-btn {
-        transition: none;
-    }
-
-    .level-btn:hover {
-        transform: none;
-    }
-
-    .practice-quest-notice.show {
-        animation: none;
-    }
 }
