@@ -61,12 +61,35 @@ const PracticeUI = {
     },
 
     getJournalDefaultRight() {
-        const practicePanel = document.getElementById("practice-panel");
-        if (practicePanel && practicePanel.style.display !== "none") {
-            return `${this.PANEL_WIDTH + this.PANEL_GAP}px`;
+        const practicePanel = this.getVisiblePanel("practice-panel");
+        if (practicePanel && !practicePanel.classList.contains("practice-panel-collapsed")) {
+            const journalPanel = document.getElementById("explorer-journal-panel");
+            const journalWidth = journalPanel?.offsetWidth || this.PANEL_WIDTH;
+            const availableRight = Math.max(
+                0,
+                window.innerWidth - journalWidth - this.COLLAPSE_TOGGLE_WIDTH
+            );
+            return `${Math.min(practicePanel.offsetWidth + this.PANEL_GAP, availableRight)}px`;
         }
 
         return "0";
+    },
+
+    keepPanelInViewport(panel) {
+        if (
+            panel.dataset.userMoved !== "true" ||
+            panel.style.display === "none" ||
+            panel.classList.contains("practice-panel-collapsed")
+        ) {
+            return;
+        }
+
+        const rect = panel.getBoundingClientRect();
+        const maxLeft = Math.max(this.COLLAPSE_TOGGLE_WIDTH, window.innerWidth - rect.width);
+        const maxTop = Math.max(64, window.innerHeight - rect.height);
+        panel.style.left = `${Math.min(Math.max(this.COLLAPSE_TOGGLE_WIDTH, rect.left), maxLeft)}px`;
+        panel.style.top = `${Math.min(Math.max(64, rect.top), maxTop)}px`;
+        panel.style.right = "auto";
     },
 
     refreshJournalPanelOffset() {
@@ -178,6 +201,7 @@ const PracticeUI = {
         panel.classList.remove("practice-panel-collapsed");
         this.restorePanelExpandState(panel);
         this.syncCollapseToggle(panel);
+        this.keepPanelInViewport(panel);
 
         if (panel.id === "explorer-journal-panel") {
             if (panel.dataset.userMoved !== "true") {
@@ -194,6 +218,7 @@ const PracticeUI = {
         [practicePanel, journalPanel].forEach(panel => {
             if (panel && panel.classList.contains("practice-panel-collapsed")) {
                 panel.style.top = `${this.getCollapsedLaneTop(panel)}px`;
+                this.bringPanelToFront(panel);
             }
         });
     },
@@ -261,14 +286,9 @@ const PracticeUI = {
         handle.onpointermove = event => {
             if (!dragging) return;
 
-            const nextLeft = startLeft + event.clientX - startX;
-            const nextTop = startTop + event.clientY - startY;
-            const maxLeft = Math.max(0, window.innerWidth - panel.offsetWidth);
-            const maxTop = Math.max(0, window.innerHeight - panel.offsetHeight);
-
-            panel.style.left = `${Math.min(Math.max(0, nextLeft), maxLeft)}px`;
-            panel.style.top = `${Math.min(Math.max(0, nextTop), maxTop)}px`;
-            panel.style.right = "auto";
+            panel.style.left = `${startLeft + event.clientX - startX}px`;
+            panel.style.top = `${startTop + event.clientY - startY}px`;
+            this.keepPanelInViewport(panel);
         };
 
         handle.onpointerup = event => {
@@ -284,12 +304,27 @@ const PracticeUI = {
         };
 
         panel.onpointerdown = () => this.bringPanelToFront(panel);
+        panel.onfocusin = () => this.bringPanelToFront(panel);
+
+        const refreshPosition = () => {
+            this.keepPanelInViewport(panel);
+            this.refreshJournalPanelOffset();
+        };
+        window.addEventListener("resize", refreshPosition);
+        if (window.ResizeObserver) {
+            new window.ResizeObserver(refreshPosition).observe(
+                panel.querySelector(".practice-panel-frame")
+            );
+        }
     },
 
     bringPanelToFront(panel) {
         const nextZ = Number(document.body.dataset.practicePanelZ || 9000) + 1;
         document.body.dataset.practicePanelZ = String(nextZ);
         panel.style.zIndex = nextZ;
+        if (!panel.classList.contains("practice-panel-collapsed")) {
+            this.refreshCollapsedLane();
+        }
     },
 
     restorePanel(panel, fallbackRight) {
@@ -298,6 +333,7 @@ const PracticeUI = {
             panel.style.left = "auto";
             panel.style.right = fallbackRight !== undefined ? fallbackRight : "0";
         }
+        this.keepPanelInViewport(panel);
         this.bringPanelToFront(panel);
     },
 
