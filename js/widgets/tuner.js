@@ -910,6 +910,8 @@ function Tuner() {
                     // Chromatic mode - use nearest note
                     note = currentNote.note;
                     cents = currentNote.cents;
+                    // Drop any text left over from target mode.
+                    this.displayText = null;
                 } else {
                     // Target pitch mode
                     // Show current note in display but calculate cents from target
