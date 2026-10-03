@@ -9,6 +9,8 @@ function TunerDisplay(canvas, width, height) {
     this.ctx = canvas.getContext("2d");
     this.note = "A";
     this.cents = 0;
+    this.rawCents = null;
+    this.displayedCents = null;
     this.frequency = 440;
     this._cachedTheme = null;
     this._selectorBg = null;
@@ -55,6 +57,16 @@ TunerDisplay.prototype._getCanvasColors = function () {
 TunerDisplay.IN_TUNE_CENTS = 5;
 
 /**
+ * Smoothing factor for exponential moving average (damping micro-jitter).
+ */
+TunerDisplay.SMOOTHING_FACTOR = 0.35;
+
+/**
+ * Threshold (in cents) beyond which needle snaps immediately to prevent latency.
+ */
+TunerDisplay.SNAP_THRESHOLD_CENTS = 15;
+
+/**
  * Needle color for the current cents offset. Green when in tune, red otherwise.
  *
  * @param {number} cents
@@ -63,21 +75,51 @@ TunerDisplay.IN_TUNE_CENTS = 5;
  */
 TunerDisplay.prototype._indicatorColor = function (cents, colors) {
     const palette = colors || this._getCanvasColors();
+    if (typeof cents !== "number" || !Number.isFinite(cents)) {
+        return palette.errorColor;
+    }
     return Math.abs(cents) <= TunerDisplay.IN_TUNE_CENTS
         ? palette.successColor
         : palette.errorColor;
 };
 
 /**
- * Updates the tuner display with new pitch information
+ * Updates the tuner display with new pitch information, applying adaptive
+ * smoothing to reduce needle jitter from microphone noise.
  * @param {string} note - The detected note
  * @param {number} cents - The cents deviation from the note
  * @param {number} frequency - The detected frequency
  */
 TunerDisplay.prototype.update = function (note, cents, frequency) {
+    const isValidCents = typeof cents === "number" && Number.isFinite(cents);
+    const noteChanged = this.note !== note;
     this.note = note;
-    this.cents = cents;
     this.frequency = frequency;
+
+    if (!isValidCents) {
+        this.rawCents = null;
+        this.displayedCents = null;
+        this.cents = null;
+        this.draw();
+        return;
+    }
+
+    const raw = cents;
+    const prevRaw = Number.isFinite(this.rawCents) ? this.rawCents : null;
+    const currentDisplayed = Number.isFinite(this.displayedCents) ? this.displayedCents : null;
+
+    this.rawCents = raw;
+
+    const rawShift = prevRaw !== null ? Math.abs(raw - prevRaw) : Infinity;
+
+    if (noteChanged || currentDisplayed === null || rawShift > TunerDisplay.SNAP_THRESHOLD_CENTS) {
+        this.displayedCents = raw;
+    } else {
+        this.displayedCents =
+            currentDisplayed + (raw - currentDisplayed) * TunerDisplay.SMOOTHING_FACTOR;
+    }
+
+    this.cents = this.displayedCents;
     this.draw();
 };
 
@@ -107,10 +149,13 @@ TunerDisplay.prototype.draw = function () {
     ctx.fillStyle = textColor;
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
-    // Draw the indicator
-    const indicatorX = meterX + meterWidth / 2 + (this.cents / 50) * (meterWidth / 2);
-    ctx.fillStyle = this._indicatorColor(this.cents, { successColor, errorColor });
-    ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
+    // Draw the indicator only if cents measurement is valid
+    const hasValidCents = typeof this.cents === "number" && Number.isFinite(this.cents);
+    if (hasValidCents) {
+        const indicatorX = meterX + meterWidth / 2 + (this.cents / 50) * (meterWidth / 2);
+        ctx.fillStyle = this._indicatorColor(this.cents, { successColor, errorColor });
+        ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
+    }
 
     // Position text much lower in the canvas
     // Draw the note
@@ -122,14 +167,18 @@ TunerDisplay.prototype.draw = function () {
     // Draw the cents deviation
     ctx.font = "24px Arial";
     ctx.fillText(
-        (this.cents >= 0 ? "+" : "") + Math.round(this.cents) + "¢",
+        hasValidCents ? (this.cents >= 0 ? "+" : "") + Math.round(this.cents) + "¢" : "--",
         width / 2,
         height - 160
     ); // Much lower position
 
     // Draw the frequency
     ctx.font = "18px Arial";
-    ctx.fillText(this.frequency.toFixed(1) + " Hz", width / 2, height - 40); // Near bottom
+    const freqText =
+        typeof this.frequency === "number" && Number.isFinite(this.frequency)
+            ? this.frequency.toFixed(1) + " Hz"
+            : "-- Hz";
+    ctx.fillText(freqText, width / 2, height - 40); // Near bottom
 };
 
 /**
