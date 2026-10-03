@@ -508,6 +508,20 @@ describe("PracticeUI quest notices", () => {
 
         expect(document.getElementById("practice-quest-notice").textContent).toContain("Named it");
     });
+
+    test("escapes HTML in title and message to prevent XSS", () => {
+        PracticeUI.showQuestNotice(
+            '<img src=x onerror="alert(1)">',
+            '<script>alert("xss")</script>',
+            "success"
+        );
+
+        const notice = document.getElementById("practice-quest-notice");
+        expect(notice.innerHTML).not.toContain("<img");
+        expect(notice.innerHTML).not.toContain("<script");
+        expect(notice.innerHTML).toContain("&lt;img");
+        expect(notice.innerHTML).toContain("&lt;script");
+    });
 });
 
 describe("PracticeUI badge monitor", () => {
