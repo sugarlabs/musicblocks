@@ -55,6 +55,7 @@ const createBaseSandbox = () => ({
     console: global.console,
     navigator: global.navigator,
     _: key => key,
+    platformColor: { stopIconcolor: "red" },
     announceToScreenReader: jest.fn(),
     define: () => {},
     require: () => {},
@@ -65,7 +66,8 @@ const createBaseSandbox = () => ({
     },
     ErrorHandler: {
         capture: jest.fn(),
-        recoverable: jest.fn()
+        recoverable: jest.fn(),
+        warn: jest.fn()
     },
     setupActivityIdleWatcher: jest.fn(),
     setupProjectManager: jest.fn(activity => {
@@ -115,6 +117,9 @@ const createBaseSandbox = () => ({
     setupBlockScaleController: jest.fn(),
     setupContextMenuController: jest.fn(),
     hideDOMLabel: jest.fn(),
+    changeImage: jest.fn(),
+    SHOWBLOCKSBUTTON: "show-blocks.svg",
+    HIDEBLOCKSFADEDBUTTON: "hide-blocks.svg",
     setupActivityRecorder: jest.fn(),
     setupActivityAbcParser: jest.fn(),
     performance: global.performance || { now: () => Date.now() }
@@ -138,6 +143,9 @@ const createBaseSandbox = () => ({
  */
 const loadActivitySandbox = ({ overrides = {}, prependCode = "" } = {}) => {
     const sandbox = { ...createBaseSandbox(), ...overrides };
+    if (sandbox.window) {
+        sandbox.window.platformColor = sandbox.platformColor;
+    }
     // Instrument the source on its own, then append the bootstrap statements.
     // Concatenating them first would hand them to the instrumenter as part of
     // activity.js, and they would be counted — and always reported as covered —
