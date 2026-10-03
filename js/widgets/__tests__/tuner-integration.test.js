@@ -469,9 +469,7 @@ describe("Tuner with the real Synth", () => {
 
         // Should fallback to chromatic mode because invalid pitch doesn't set target mode
         modeToggle = document.getElementById("modeToggle");
-        if (!modeToggle) {
-            console.log("Tuner display:", document.getElementById("tuner-display"));
-        }
+        expect(modeToggle).not.toBeNull();
         chromaticButton = modeToggle.children[0];
         expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
     });
@@ -515,5 +513,78 @@ describe("Tuner with the real Synth", () => {
         targetPitchButton.onkeydown(otherEvent);
         expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
         expect(otherEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    describe("stopping while the tuner is still starting", () => {
+        let OriginalUserMedia;
+        let mics;
+        let releaseOpen;
+
+        beforeEach(() => {
+            // Hold the microphone's open() until the test releases it, like a browser
+            // waiting on the permission prompt.
+            OriginalUserMedia = Tone.UserMedia;
+            mics = [];
+            releaseOpen = null;
+            Tone.UserMedia = function () {
+                const mic = new OriginalUserMedia();
+                mic.open = jest.fn(
+                    () =>
+                        new Promise(resolve => {
+                            releaseOpen = resolve;
+                        })
+                );
+                mics.push(mic);
+                return mic;
+            };
+        });
+
+        afterEach(() => {
+            Tone.UserMedia = OriginalUserMedia;
+        });
+
+        test("closes the microphone if stopTuner runs while it is opening", async () => {
+            const starting = tuner.startTuner();
+            while (!releaseOpen) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
+            tuner.stopTuner();
+            releaseOpen();
+            await starting;
+
+            expect(mics).toHaveLength(1);
+            expect(mics[0].close).toHaveBeenCalled();
+            expect(tuner.tunerMic).toBeNull();
+            expect(tuner.tunerAnalyser).toBeNull();
+            expect(tuner._tunerActive).toBe(false);
+        });
+
+        test("never opens the microphone if stopTuner runs before it gets there", async () => {
+            const starting = tuner.startTuner();
+            tuner.stopTuner();
+            await starting;
+
+            expect(mics).toHaveLength(0);
+            expect(tuner.tunerMic).toBeNull();
+            expect(tuner._tunerActive).toBe(false);
+        });
+
+        test("a later start still works after a stopped one", async () => {
+            const first = tuner.startTuner();
+            tuner.stopTuner();
+            await first;
+
+            const second = tuner.startTuner();
+            while (!releaseOpen) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            releaseOpen();
+            await second;
+
+            expect(tuner.tunerMic).toBe(mics[0]);
+            expect(tuner._tunerActive).toBe(true);
+            tuner.stopTuner();
+        });
     });
 });
