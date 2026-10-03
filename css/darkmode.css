@@ -139,7 +139,7 @@ body.highcontrast {
 }
 
 .dark #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar {
-    background: #1e88e5 !important;
+    background: var(--color-widget-titlebar-bg) !important;
 }
 
 .dark #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar .wftTitle {
