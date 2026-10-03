@@ -18,3 +18,5 @@ jobs:
           days-before-pr-close: 3 # Number of days after a stale PR before it is closed
           days-before-issue-stale: -1 # Not managing stale issues
           days-before-issue-close: -1 # Not managing stale issues
+          ignore-pr-updates: true # Ignore PR updates when determining staleness
+          operations-per-run: 150 # Increase the default 30-operation limit
