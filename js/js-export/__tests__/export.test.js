@@ -235,6 +235,26 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.Y).toBe(20);
     });
 
+    test("should get the screen edges and size in turtle units", () => {
+        globalActivity.turtles._canvas = { width: 1200, height: 800 };
+        globalActivity.turtles.scale = 2;
+        expect(musicBlocks.WIDTH).toBe(600);
+        expect(musicBlocks.HEIGHT).toBe(400);
+        expect(musicBlocks.RIGHTPOS).toBe(300);
+        expect(musicBlocks.LEFTPOS).toBe(-300);
+        expect(musicBlocks.TOPPOS).toBe(200);
+        expect(musicBlocks.BOTTOMPOS).toBe(-200);
+        delete globalActivity.turtles._canvas;
+        delete globalActivity.turtles.scale;
+    });
+
+    test("should get 0 for the screen edges and size before the canvas exists", () => {
+        expect(musicBlocks.WIDTH).toBe(0);
+        expect(musicBlocks.HEIGHT).toBe(0);
+        expect(musicBlocks.TOPPOS).toBe(0);
+        expect(musicBlocks.RIGHTPOS).toBe(0);
+    });
+
     test("should get HEADING", () => {
         musicBlocks.turtle.orientation = 90;
         expect(musicBlocks.HEADING).toBe(90);
