@@ -56,12 +56,19 @@ var last = myList => {
  */
 var deepClone = obj => {
     if (obj === null || typeof obj !== "object") return obj;
-    if (Array.isArray(obj)) return obj.map(item => deepClone(item));
-    const cloned = {};
-    for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            cloned[key] = deepClone(obj[key]);
+    if (Array.isArray(obj)) {
+        const len = obj.length;
+        const clonedArr = new Array(len);
+        for (let i = 0; i < len; i++) {
+            clonedArr[i] = deepClone(obj[i]);
         }
+        return clonedArr;
+    }
+    const cloned = {};
+    const keys = Object.keys(obj);
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        cloned[key] = deepClone(obj[key]);
     }
     return cloned;
 };
