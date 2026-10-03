@@ -371,6 +371,38 @@ describe("ServerInterface", () => {
         const names = callback => callback.mock.calls[0][0].data.map(row => row[0]);
         const range = (from, to) => Array.from({ length: to - from }, (_, i) => `p${from + i}`);
 
+        it("paginates USER_PROJECTS across Load More windows", async () => {
+            const ownedProjects = Array.from({ length: 26 }, (_, i) => [`p${i}`, `t${i}`]);
+            const ownedProjectsSpy = jest
+                .spyOn(server, "_getOwnedProjectList")
+                .mockReturnValue(ownedProjects);
+
+            try {
+                const windows = [
+                    [0, 25],
+                    [24, 49]
+                ];
+                const batches = [];
+
+                for (const [start, end] of windows) {
+                    const callback = jest.fn();
+                    await server.downloadProjectList(
+                        "USER_PROJECTS",
+                        "RECENT",
+                        start,
+                        end,
+                        callback
+                    );
+                    batches.push(names(callback));
+                }
+
+                expect(batches[0]).toEqual(range(0, 25));
+                expect(batches[1]).toEqual(range(24, 26));
+            } finally {
+                ownedProjectsSpy.mockRestore();
+            }
+        });
+
         // GlobalPlanet asks for index..index+25 and advances index by 24.
         it("returns the next rows on each Load More, not the first page again", async () => {
             fakeBackend();
