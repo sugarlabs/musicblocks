@@ -225,6 +225,14 @@ function Tuner() {
      * @type {NodeList|null}
      */
     this._tunerSegments = null;
+    /**
+     * Counts startTuner and stopTuner calls. startTuner waits on script loads, the
+     * audio context and the microphone permission prompt, so a stopTuner can land
+     * while it is still starting; a start whose token is no longer current stops
+     * there instead of opening (or keeping) the microphone.
+     * @type {number}
+     */
+    this._startToken = 0;
 
     /**
      * Starts the tuner by initializing microphone input
@@ -232,6 +240,9 @@ function Tuner() {
      * @returns {Promise<void>}
      */
     this.startTuner = async (initialTargetPitch = null) => {
+        const startToken = ++this._startToken;
+        const stopped = () => startToken !== this._startToken;
+
         const getSafeActivity = () => {
             try {
                 if (
@@ -277,6 +288,7 @@ function Tuner() {
             await new Promise(resolve => {
                 wheelnavScript.onload = resolve;
             });
+            if (stopped()) return;
         }
 
         // Initialize Raphael if not already done (required by wheelnav)
@@ -291,10 +303,12 @@ function Tuner() {
             await new Promise(resolve => {
                 raphaelScript.onload = resolve;
             });
+            if (stopped()) return;
         }
 
         // Start audio context
         await Tone.start();
+        if (stopped()) return;
 
         // Initialize synth for preview
         if (!instruments[0]) {
@@ -305,6 +319,7 @@ function Tuner() {
             synth.createDefaultSynth(0);
             await synth.loadSynth(0, "electronic synth");
             synth.setVolume(0, "electronic synth", 50); // Set to 50% volume
+            if (stopped()) return;
         }
 
         // Rest of the tuner initialization code
@@ -313,8 +328,18 @@ function Tuner() {
         }
 
         await Tone.start();
-        this.tunerMic = new Tone.UserMedia();
-        await this.tunerMic.open();
+        if (stopped()) return;
+        const mic = new Tone.UserMedia();
+        this.tunerMic = mic;
+        await mic.open();
+        if (stopped()) {
+            // stopTuner ran while the microphone was opening.
+            mic.close();
+            if (this.tunerMic === mic) {
+                this.tunerMic = null;
+            }
+            return;
+        }
 
         this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
         this.tunerMic.connect(this.tunerAnalyser);
@@ -1128,6 +1153,7 @@ function Tuner() {
     };
 
     this.stopTuner = () => {
+        this._startToken++;
         this._tunerActive = false;
         if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
             cancelAnimationFrame(this._tunerRafId);
