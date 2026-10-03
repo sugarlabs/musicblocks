@@ -1307,3 +1307,45 @@ describe("saveMxmlOutput - key signature", () => {
         expect(fifthsIn([note("C4")])).toBe("0");
     });
 });
+
+describe("saveMxmlOutput - a key change part way through", () => {
+    const note = (pitch, value = 4) => [[pitch], value, 0, null, null, false, false, null];
+    const exportOf = staging => saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+
+    // Every <fifths> the export writes, in order.
+    const fifthsIn = output => [...output.matchAll(/<fifths>(-?\d+)<\/fifths>/g)].map(m => m[1]);
+
+    it("writes the new signature when a key changes at a measure boundary", () => {
+        const output = exportOf([
+            "key",
+            "C",
+            "major",
+            note("C4", 1),
+            "key",
+            "G",
+            "major",
+            note("D4", 1)
+        ]);
+
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+
+    it("writes the new signature when a key changes inside a measure", () => {
+        const output = exportOf(["key", "C", "major", note("C4"), "key", "G", "major", note("D4")]);
+
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+
+    it("writes the signature once when the key does not change", () => {
+        const output = exportOf(["key", "G", "major", note("C4"), note("D4"), note("E4")]);
+
+        expect(fifthsIn(output)).toEqual(["1"]);
+    });
+
+    it("writes a key change that lands on the same measure as a meter change", () => {
+        const output = exportOf([note("C4", 1), "key", "G", "major", "meter", 3, 4, note("D4", 1)]);
+
+        // The measure attributes carry the signature, so it is not written twice.
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+});

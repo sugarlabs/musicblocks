@@ -253,6 +253,16 @@ class MusicXMLExporter {
         this.add("</direction>");
     }
 
+    /**
+     * Writes a key signature on its own, for a change that arrives when the
+     * measure attributes are not being written anyway.
+     * @param {number} fifths - sharps, or flats as a negative.
+     * @returns {void}
+     */
+    addKeyAttributes(fifths) {
+        this.add(`<attributes> <key> <fifths>${fifths}</fifths> </key> </attributes>`);
+    }
+
     addMeasureAttributes(
         measure,
         div,
@@ -424,6 +434,9 @@ class MusicXMLExporter {
                 let previousNote = -1;
                 // Sharps, or flats as a negative, for the key this voice is in.
                 let fifths = 0;
+                // A key change still waiting to be written. The meter is tracked
+                // separately, because a measure can begin without a new meter.
+                let keyChanged = false;
                 // <direction> and <sound> belong inside a <measure>, at the note they precede.
                 // Markers are staged before it's known whether that note still fits the current
                 // measure, so they're held here and written just ahead of the next note.
@@ -445,7 +458,10 @@ class MusicXMLExporter {
 
                     if (obj === "key") {
                         const staged = _keyFifths(notes[i + 1], notes[i + 2]);
-                        if (staged !== null) fifths = staged;
+                        if (staged !== null && staged !== fifths) {
+                            fifths = staged;
+                            keyChanged = true;
+                        }
                         i += 2;
                         continue;
                     }
@@ -649,11 +665,21 @@ class MusicXMLExporter {
                                     );
                                     firstMeasure = false;
                                     beatsChanged = false;
+                                    keyChanged = false;
                                 } else {
                                     this.add(`<measure number="${currMeasure}">`);
                                 }
                                 openedMeasureTag = true;
                             }
+
+                            // A measure that opened without new attributes, or one
+                            // already open, still has to carry a key change. The
+                            // percussion clef is written without a key at all.
+                            if (keyChanged) {
+                                if (!part.isPercussion) this.addKeyAttributes(fifths);
+                                keyChanged = false;
+                            }
+
                             divisionsLeft -= preciseDur;
                         }
 
