@@ -1076,7 +1076,17 @@ function setupFlowBlocks(activity) {
         flow(args, logo, turtle) {
             if (args.length !== 1) return;
 
-            return [args[0], activity.turtles.ithTurtle(turtle).singer.suppressOutput ? 20 : -1];
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            // Notate one pass as a repeat rather than unrolling the loop. Nothing
+            // queued after a forever ever runs, so drop it and end the voice here.
+            if (logo.runningLilypond && tur.singer.justCounting.length === 0) {
+                logo.notation.notationBeginRepeat(turtle);
+                tur.queue = [];
+                return [args[0], 1];
+            }
+
+            return [args[0], tur.singer.suppressOutput ? 20 : -1];
         }
     }
 
