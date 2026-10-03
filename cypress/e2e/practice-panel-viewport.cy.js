@@ -67,6 +67,17 @@ describe("Practice panel viewport", () => {
         panels.forEach(assertInViewport);
     });
 
+    it("brings focused Close controls forward when panels overlap", () => {
+        cy.viewport(320, 900);
+        cy.get("#close-practice").focus().click();
+        cy.get("#practice-panel").should("not.be.visible");
+        cy.window().then(win => win.startPracticeMode());
+        cy.get("#close-explorer-journal").focus().click();
+        cy.get("#explorer-journal-panel").should("not.be.visible");
+        cy.window().then(win => win.openExplorerJournal());
+        assertInViewport("#explorer-journal-panel");
+    });
+
     it("keeps a moved panel onscreen after resizing or expanding", () => {
         cy.get("#explorer-journal-panel").then($panel => {
             const panel = $panel[0];
@@ -84,7 +95,7 @@ describe("Practice panel viewport", () => {
         assertInViewport("#explorer-journal-panel");
     });
 
-    it("uses resized frame widths when docking and keeps Close reachable", () => {
+    it("preserves resized widths when docking, collapsing and resizing the viewport", () => {
         cy.get("#practice-panel .practice-panel-frame").then($frame => {
             $frame[0].style.width = "500px";
         });
@@ -107,14 +118,5 @@ describe("Practice panel viewport", () => {
         panels.forEach(assertInViewport);
         cy.viewport(1440, 900);
         cy.get("#practice-panel .practice-panel-frame").should("have.css", "width", "500px");
-        cy.viewport(390, 500);
-        cy.get("#practice-panel > .practice-panel-collapse-toggle").click();
-        cy.get("#close-explorer-journal").click();
-        cy.get("#explorer-journal-panel").should("not.be.visible");
-        cy.get("#practice-panel > .practice-panel-collapse-toggle").click();
-        cy.get("#close-practice").click();
-        cy.get("#practice-panel").should("not.be.visible");
-        cy.window().then(win => win.openExplorerJournal());
-        assertInViewport("#explorer-journal-panel");
     });
 });

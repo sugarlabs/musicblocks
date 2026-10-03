@@ -77,20 +77,19 @@ const PracticeUI = {
 
     keepPanelInViewport(panel) {
         if (
+            panel.dataset.userMoved !== "true" ||
             panel.style.display === "none" ||
             panel.classList.contains("practice-panel-collapsed")
         ) {
             return;
         }
 
-        if (panel.dataset.userMoved === "true") {
-            const rect = panel.getBoundingClientRect();
-            const maxLeft = Math.max(this.COLLAPSE_TOGGLE_WIDTH, window.innerWidth - rect.width);
-            const maxTop = Math.max(64, window.innerHeight - rect.height);
-            panel.style.left = `${Math.min(Math.max(this.COLLAPSE_TOGGLE_WIDTH, rect.left), maxLeft)}px`;
-            panel.style.top = `${Math.min(Math.max(64, rect.top), maxTop)}px`;
-            panel.style.right = "auto";
-        }
+        const rect = panel.getBoundingClientRect();
+        const maxLeft = Math.max(this.COLLAPSE_TOGGLE_WIDTH, window.innerWidth - rect.width);
+        const maxTop = Math.max(64, window.innerHeight - rect.height);
+        panel.style.left = `${Math.min(Math.max(this.COLLAPSE_TOGGLE_WIDTH, rect.left), maxLeft)}px`;
+        panel.style.top = `${Math.min(Math.max(64, rect.top), maxTop)}px`;
+        panel.style.right = "auto";
     },
 
     refreshJournalPanelOffset() {
@@ -123,7 +122,7 @@ const PracticeUI = {
       <div class="practice-panel-frame">
         <div class="practice-menu-header ${headerClass || ""}">
           <h3>${title}</h3>
-          <button id="${closeButtonId}">X</button>
+          <button id="${closeButtonId}" aria-label="${id === "practice-panel" ? _("Close Practice") : _("Close Explorer Journal")}">X</button>
         </div>
         <div id="${contentId}"></div>
       </div>
@@ -287,11 +286,8 @@ const PracticeUI = {
         handle.onpointermove = event => {
             if (!dragging) return;
 
-            const nextLeft = startLeft + event.clientX - startX;
-            const nextTop = startTop + event.clientY - startY;
-            panel.style.left = `${nextLeft}px`;
-            panel.style.top = `${nextTop}px`;
-            panel.style.right = "auto";
+            panel.style.left = `${startLeft + event.clientX - startX}px`;
+            panel.style.top = `${startTop + event.clientY - startY}px`;
             this.keepPanelInViewport(panel);
         };
 
@@ -308,6 +304,7 @@ const PracticeUI = {
         };
 
         panel.onpointerdown = () => this.bringPanelToFront(panel);
+        panel.onfocusin = () => this.bringPanelToFront(panel);
 
         const refreshPosition = () => {
             this.keepPanelInViewport(panel);
