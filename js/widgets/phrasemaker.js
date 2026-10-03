@@ -1819,7 +1819,7 @@ class PhraseMaker {
             leftRightLabel = ["15", "30", "45", "60", "90", "180"];
             setHeadingLabel = ["0", "45", "90", "135", "180", "225", "270", "315"];
             setPenSizeLabel = ["1", "5", "10", "25", "50"];
-            setLabel = ["0", "10", "20", "30", "40", "5n0", "60", "70", "80", "90", "100"];
+            setLabel = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"];
         }
 
         this._pitchWheel = new this.wheelnav("wheelDivptm", null, 800, 800);
