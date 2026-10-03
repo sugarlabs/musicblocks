@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, loadPracticeLessons */
+/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, escapeHTML, loadPracticeLessons */
 /* exported PracticeUI, ExplorerJournalUI */
 
 // Criteria that mean the level itself is finished, as opposed to a hidden discovery.
@@ -35,15 +35,6 @@ const COMPLETION_CRITERIA = [
     "completeMetronome",
     "completePianoKeys"
 ];
-
-// Shared HTML-escape helper available to both PracticeUI and ExplorerJournalUI.
-const _escapeHTML = value =>
-    String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
 
 const PracticeUI = {
     badgeCheckTimer: null,
@@ -791,7 +782,7 @@ const PracticeUI = {
     },
 
     escapeHTML(value) {
-        return _escapeHTML(value);
+        return escapeHTML(value || "");
     },
 
     escapeAttribute(value) {
@@ -1321,7 +1312,7 @@ const ExplorerJournalUI = {
     },
 
     escapeHTML(value) {
-        return _escapeHTML(value);
+        return escapeHTML(value || "");
     },
 
     escapeAttribute(value) {

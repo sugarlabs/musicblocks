@@ -22,6 +22,8 @@
 
 // practiceUI.js reads these as browser globals, so they exist before the panels render.
 global._ = text => text;
+const { escapeHTML } = require("../../utils/utils-logic");
+global.escapeHTML = escapeHTML;
 
 const { PracticeManager } = require("../practiceManager");
 
@@ -176,7 +178,7 @@ describe("PracticeUI small helpers", () => {
         expect(PracticeUI.escapeHTML('<script>alert("xss")</script>')).toBe(
             "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;"
         );
-        expect(PracticeUI.escapeHTML("Tom & 'Jerry'")).toBe("Tom &amp; &#39;Jerry&#39;");
+        expect(PracticeUI.escapeHTML("Tom & 'Jerry'")).toBe("Tom &amp; &#039;Jerry&#039;");
         expect(PracticeUI.escapeHTML(null)).toBe("");
         expect(PracticeUI.escapeHTML(undefined)).toBe("");
     });
