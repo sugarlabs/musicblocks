@@ -8,6 +8,9 @@ on:
     paths:
       - 'po/**/*.po'
 
+permissions:
+  contents: read
+
 jobs:
   convert-and-verify:
     runs-on: ubuntu-latest
