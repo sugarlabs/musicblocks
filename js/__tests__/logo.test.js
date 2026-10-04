@@ -2988,6 +2988,33 @@ describe("Logo safePluginExecute", () => {
         expect(logo.blockList[0].value).toBe(Math.E);
     });
 
+    test("executes whitelisted unit conversion pattern (degrees)", () => {
+        logo.blockList = [{ name: "degrees", value: null, connections: [null, 1] }];
+        logo.parseArg = jest.fn((lg, tur, cblk, parentBlk, receivedArg) => {
+            expect(receivedArg).toBe("testArg");
+            return Math.PI;
+        });
+        const code =
+            "const mathBlock = globalActivity.logo.blockList[blk];" +
+            "const conns = mathBlock.connections;" +
+            "mathBlock.value = logo.parseArg(logo, turtle, conns[1]) * (180/Math.PI);";
+        const result = logo.safePluginExecute(code, logo, 0, 0, null, "testArg");
+        expect(result).toBeCloseTo(180);
+        expect(logo.blockList[0].value).toBeCloseTo(180);
+    });
+
+    test("executes whitelisted unit conversion pattern (radians)", () => {
+        logo.blockList = [{ name: "radians", value: null, connections: [null, 1] }];
+        logo.parseArg = jest.fn(() => 180);
+        const code =
+            "const mathBlock = globalActivity.logo.blockList[blk];" +
+            "const conns = mathBlock.connections;" +
+            "mathBlock.value = logo.parseArg(logo, turtle, conns[1]) * (Math.PI/180);";
+        const result = logo.safePluginExecute(code, logo, 0, 0, null);
+        expect(result).toBeCloseTo(Math.PI);
+        expect(logo.blockList[0].value).toBeCloseTo(Math.PI);
+    });
+
     test("blocks arbitrary string code and emits console warning", () => {
         const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
         const result = logo.safePluginExecute("eval('alert(1)')", logo, 0, 0, null);
