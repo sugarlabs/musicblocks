@@ -123,6 +123,12 @@ describe("Design Tokens Single Source of Truth", () => {
         );
     });
 
+    it("keeps the floating widget close button white in dark mode", () => {
+        expect(darkmodeCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);
