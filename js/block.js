@@ -2301,10 +2301,9 @@ class Block {
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             this.removeChildBitmap("media");
             this.imageBitmap = null;
+            this.image = "images/load-media.svg";
             this.updateCache();
-            if (this.image) {
-                this._addImage();
-            }
+            this._addImage();
             return;
         }
         const image = new Image();
