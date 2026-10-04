@@ -18,7 +18,7 @@
    last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
    DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
    PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
-   MusicKeyboardRendering */
+   MusicKeyboardRendering, getCurrentEDO, generateNoteNames */
 /*
    Global Locations
     - js/utils/utils.js
@@ -30,7 +30,8 @@
     - js/utils/musicutils.js
         noteToFrequency, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
         i18nSolfege, toFraction, DEFAULTVOICE, PITCHES, PITCHES2,
-        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege
+        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege,
+        getCurrentEDO, generateNoteNames
     - js/utils/platformstyle.js
         platformColor
     - js/widgets/MusicKeyboardEditing.js
