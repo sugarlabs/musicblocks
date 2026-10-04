@@ -1902,7 +1902,16 @@ class Activity {
         }
 
         let resizeTimeout;
+        let resizeAnimationFrame;
+
         this._handleWindowResize = () => {
+            if (!resizeAnimationFrame) {
+                resizeAnimationFrame = requestAnimationFrame(() => {
+                    this._handleRepositionBlocksOnResize();
+                    resizeAnimationFrame = null;
+                });
+            }
+
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
@@ -3047,8 +3056,6 @@ class Activity {
      * Registers window resize listeners after dependency cleanup.
      */
     setupResizeListeners() {
-        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
         this.addEventListener(window, "resize", this._handleWindowResize);
     }
 

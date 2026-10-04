@@ -298,7 +298,7 @@ describe("Activity Event Listener Management", () => {
 
         // Simulate listeners that existed before setupDependencies cleanup.
         activity.setupResizeListeners();
-        expect(getResizeListeners()).toHaveLength(2);
+        expect(getResizeListeners()).toHaveLength(1);
 
         // Exercise the real setupDependencies lifecycle up to listener cleanup.
         activity._stopRenderLoop = jest.fn();
@@ -336,7 +336,7 @@ describe("Activity Event Listener Management", () => {
 
         await expect(activity.init()).rejects.toThrow(stopAfterResizeSetup);
 
-        expect(getResizeListeners()).toHaveLength(2);
+        expect(getResizeListeners()).toHaveLength(1);
 
         expect(getResizeListeners().map(l => l.listener)).toEqual(
             expect.arrayContaining([

@@ -23,6 +23,9 @@ class WorkspaceLayoutController {
 
         // Flag to track number of clicks and for alternate mode switching while clicking
         this._isFirstHomeClick = true;
+
+        this._previousCanvasWidth = undefined;
+        this._resizeSession = null;
     }
 
     /**
@@ -48,22 +51,70 @@ class WorkspaceLayoutController {
     repositionBlocks() {
         const activity = this.activity;
         const canvasWidth = window.innerWidth;
+
+        const isNarrowing =
+            this._previousCanvasWidth !== undefined && canvasWidth < this._previousCanvasWidth;
+
         const processedBlocks = new Set();
 
         //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
         const dragGroups = [];
 
-        // Identifying individual dragGroups
-        Object.values(activity.blocks.blockList).forEach(block => {
-            if (!processedBlocks.has(block.id)) {
-                activity.blocks.findDragGroup(block.id);
+        // Identifying individual dragGroups.
+        // Process root blocks first so connected stacks are handled as one group.
+        const blockEntries = Object.entries(activity.blocks.blockList);
 
-                if (activity.blocks.dragGroup.length > 0) {
-                    dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
-                    activity.blocks.dragGroup.forEach(id => processedBlocks.add(id)); // Process individual groups
-                }
+        const processDragGroup = key => {
+            const index = Number.isNaN(Number(key)) ? key : Number(key);
+
+            if (processedBlocks.has(index)) {
+                return;
             }
+
+            activity.blocks.findDragGroup(index);
+
+            if (activity.blocks.dragGroup.length > 0) {
+                dragGroups.push([...activity.blocks.dragGroup]);
+                activity.blocks.dragGroup.forEach(id => processedBlocks.add(id));
+            }
+        };
+
+        // First process root blocks so their complete descendant groups are captured.
+        blockEntries.forEach(([key, block]) => {
+            if (!block || block.connections?.[0] !== null) {
+                return;
+            }
+
+            processDragGroup(key);
         });
+
+        // Process anything left over as a fallback for standalone/orphaned blocks.
+        blockEntries.forEach(([key, block]) => {
+            if (!block) {
+                return;
+            }
+
+            processDragGroup(key);
+        });
+        // Capture the workspace layout once when a narrowing resize begins.
+        // These positions remain unchanged until the window returns to its
+        // original width.
+        if (isNarrowing && !this._resizeSession) {
+            const positions = new Map();
+
+            dragGroups.forEach(group => {
+                const left = Math.min(
+                    ...group.map(id => activity.blocks.blockList[id].container.x)
+                );
+
+                positions.set(group[0], left);
+            });
+
+            this._resizeSession = {
+                startWidth: this._previousCanvasWidth,
+                positions
+            };
+        }
 
         // Repositioning of dragGroups according to horizontal resizing
         dragGroups.forEach(group => {
@@ -92,11 +143,10 @@ class WorkspaceLayoutController {
                 referenceBlock.beforeMobilePosition
             ) {
                 const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
-                const dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
+
                 group.forEach(blockId => {
                     const block = activity.blocks.blockList[blockId];
                     block.container.x += dx;
-                    block.container.y += dy;
                 });
                 referenceBlock.beforeMobilePosition = null; // Clear stored position
                 //this prevents old groups from affecting new calculations.
@@ -111,18 +161,21 @@ class WorkspaceLayoutController {
 
             if (canvasWidth >= RESPONSIVE_BREAKPOINT_MOBILE && referenceBlock.before600pxPosition) {
                 const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
-                const dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
 
                 group.forEach(blockId => {
                     const block = activity.blocks.blockList[blockId];
                     block.container.x += dx;
-                    block.container.y += dy;
                 });
                 referenceBlock.before600pxPosition = null;
             }
 
-            // Ensure blocks stay within horizontal boundary
-            const rightmostX = Math.max(
+            // Keep groups inside the right boundary and restore them toward
+            // their pre-resize positions whenever space becomes available.
+            let currentLeftmostX = Math.min(
+                ...group.map(id => activity.blocks.blockList[id].container.x)
+            );
+
+            let currentRightmostX = Math.max(
                 ...group.map(
                     id =>
                         activity.blocks.blockList[id].container.x +
@@ -130,8 +183,27 @@ class WorkspaceLayoutController {
                 )
             );
 
-            if (rightmostX > canvasWidth) {
-                const shiftX = Math.max(10, canvasWidth - rightmostX - 10);
+            const groupWidth = currentRightmostX - currentLeftmostX;
+            const savedLeft = this._resizeSession?.positions.get(group[0]);
+
+            if (!isNarrowing && savedLeft !== undefined) {
+                const maxAllowedLeft = canvasWidth - groupWidth - 10;
+                const targetLeft = Math.min(savedLeft, maxAllowedLeft);
+
+                if (targetLeft > currentLeftmostX) {
+                    const shiftX = targetLeft - currentLeftmostX;
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+
+                    currentLeftmostX += shiftX;
+                    currentRightmostX += shiftX;
+                }
+            }
+
+            if (currentRightmostX > canvasWidth) {
+                const shiftX = canvasWidth - currentRightmostX - 10;
 
                 group.forEach(blockId => {
                     activity.blocks.blockList[blockId].container.x += shiftX;
@@ -150,8 +222,154 @@ class WorkspaceLayoutController {
                 });
             }
         });
+        if (isNarrowing) {
+            // Compress horizontally aligned groups into the available gaps
+            // before allowing them to overlap.
+            const GROUP_GAP = 20;
+            const LEFT_PADDING = 180;
 
-        this._findBlocks();
+            const groupLayouts = dragGroups
+                .map(group => {
+                    const left = Math.min(
+                        ...group.map(id => activity.blocks.blockList[id].container.x)
+                    );
+
+                    const right = Math.max(
+                        ...group.map(
+                            id =>
+                                activity.blocks.blockList[id].container.x +
+                                activity.blocks.blockList[id].width
+                        )
+                    );
+
+                    const referenceBlock = activity.blocks.blockList[group[0]];
+
+                    return {
+                        group,
+                        left,
+                        right,
+                        anchorLeft: referenceBlock.container.x,
+                        anchorRight: referenceBlock.container.x + referenceBlock.width,
+                        anchorY: referenceBlock.container.y
+                    };
+                })
+
+                .sort((a, b) => {
+                    const aOriginal = this._resizeSession?.positions.get(a.group[0]) ?? a.left;
+
+                    const bOriginal = this._resizeSession?.positions.get(b.group[0]) ?? b.left;
+
+                    return aOriginal - bOriginal;
+                });
+
+            const moveGroup = (layout, amount) => {
+                if (amount === 0) {
+                    return;
+                }
+
+                layout.group.forEach(blockId => {
+                    activity.blocks.blockList[blockId].container.x += amount;
+                });
+
+                layout.left += amount;
+                layout.right += amount;
+                layout.anchorLeft += amount;
+                layout.anchorRight += amount;
+            };
+
+            const verticallyOverlaps = (a, b) =>
+                Math.abs(a.anchorY - b.anchorY) <= STANDARDBLOCKHEIGHT * 4;
+
+            const findPreviousOverlappingIndex = index => {
+                const current = groupLayouts[index];
+
+                for (let i = index - 1; i >= 0; i--) {
+                    if (verticallyOverlaps(current, groupLayouts[i])) {
+                        return i;
+                    }
+                }
+
+                return -1;
+            };
+
+            // Work from right to left.
+            for (let i = groupLayouts.length - 1; i > 0; i--) {
+                const currentGroup = groupLayouts[i];
+
+                const middleIndex = findPreviousOverlappingIndex(i);
+
+                if (middleIndex < 0) {
+                    continue;
+                }
+
+                const middleGroup = groupLayouts[middleIndex];
+
+                const pressure = middleGroup.right + GROUP_GAP - currentGroup.left;
+
+                if (pressure <= 0) {
+                    continue;
+                }
+
+                const leftIndex = findPreviousOverlappingIndex(middleIndex);
+
+                if (leftIndex < 0) {
+                    const availableLeftSpace = Math.max(0, middleGroup.left - LEFT_PADDING);
+
+                    const movement = Math.min(pressure, availableLeftSpace);
+
+                    moveGroup(middleGroup, -movement);
+
+                    continue;
+                }
+
+                const leftGroup = groupLayouts[leftIndex];
+
+                const freeGap = middleGroup.anchorLeft - leftGroup.anchorRight - GROUP_GAP;
+                if (freeGap > 0) {
+                    // Close the remaining horizontal gap before allowing groups to overlap.
+                    const movement = Math.min(pressure, freeGap / 2);
+
+                    moveGroup(leftGroup, movement);
+                    moveGroup(middleGroup, -movement);
+
+                    continue;
+                }
+
+                // Propagate part of the resize pressure leftward so overlap develops progressively.
+                const movement = pressure / 2;
+
+                moveGroup(middleGroup, -movement);
+            }
+        }
+
+        // Once the window reaches its original width again, restore every
+        // group exactly to its pre-resize horizontal position.
+        if (this._resizeSession && canvasWidth >= this._resizeSession.startWidth) {
+            dragGroups.forEach(group => {
+                const savedLeft = this._resizeSession.positions.get(group[0]);
+
+                if (savedLeft === undefined) {
+                    return;
+                }
+
+                const currentLeft = Math.min(
+                    ...group.map(id => activity.blocks.blockList[id].container.x)
+                );
+
+                const shiftX = savedLeft - currentLeft;
+
+                group.forEach(blockId => {
+                    activity.blocks.blockList[blockId].container.x += shiftX;
+                });
+            });
+
+            this._resizeSession = null;
+        }
+
+        this._previousCanvasWidth = canvasWidth;
+
+        activity.blocks._updateViewportCulling();
+        activity.refreshCanvas();
     }
 
     /**
