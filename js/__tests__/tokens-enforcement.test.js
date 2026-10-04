@@ -117,6 +117,12 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
+    it("keeps the floating widget roll-up button white in dark mode", () => {
+        expect(darkmodeCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);
