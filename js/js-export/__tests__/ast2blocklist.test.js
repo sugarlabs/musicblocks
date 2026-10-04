@@ -2260,6 +2260,35 @@ describe("AST2BlockList Class", () => {
     });
 
     // Test duplicate name_map entries preserving initial argument configuration.
+    test("should generate the screen edge and size blocks from JS", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setXY(mouse.LEFTPOS, mouse.TOPPOS);
+            await mouse.setXY(mouse.RIGHTPOS, mouse.BOTTOMPOS);
+            await mouse.goForward(mouse.WIDTH);
+            await mouse.goForward(mouse.HEIGHT);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        const blockNames = blockList.map(block =>
+            Array.isArray(block[1]) ? block[1][0] : block[1]
+        );
+
+        expect(blockNames).toEqual(
+            expect.arrayContaining([
+                "leftpos",
+                "toppos",
+                "rightpos",
+                "bottompos",
+                "width",
+                "height"
+            ])
+        );
+    });
+
     test("should preserve initial argument configuration when duplicate name_map entries exist", () => {
         const customConfig = JSON.parse(JSON.stringify(config));
 

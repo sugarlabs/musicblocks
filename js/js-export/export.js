@@ -504,6 +504,36 @@ class MusicBlocks {
         return -1 * (canvas.height / (2.0 * scale));
     }
 
+    get TOPPOS() {
+        return this.HEIGHT / 2;
+    }
+
+    get LEFTPOS() {
+        return -1 * (this.WIDTH / 2);
+    }
+
+    get RIGHTPOS() {
+        return this.WIDTH / 2;
+    }
+
+    get WIDTH() {
+        const canvas = globalActivity.turtles._canvas;
+        const scale = globalActivity.turtles.scale;
+        if (!canvas || !canvas.width || !scale) {
+            return 0;
+        }
+        return canvas.width / scale;
+    }
+
+    get HEIGHT() {
+        const canvas = globalActivity.turtles._canvas;
+        const scale = globalActivity.turtles.scale;
+        if (!canvas || !canvas.height || !scale) {
+            return 0;
+        }
+        return canvas.height / scale;
+    }
+
     get CAMERA() {
         return CAMERAVALUE;
     }

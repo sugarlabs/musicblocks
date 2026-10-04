@@ -125,6 +125,11 @@ class JSInterface {
         heading: "HEADING",
         // Media blocks
         bottompos: "BOTTOMPOS",
+        toppos: "TOPPOS",
+        leftpos: "LEFTPOS",
+        rightpos: "RIGHTPOS",
+        width: "WIDTH",
+        height: "HEIGHT",
         camera: "CAMERA",
         // Heap blocks
         heap: "HEAP",
