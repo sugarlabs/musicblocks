@@ -4698,6 +4698,10 @@ class Blocks {
             }
 
             const c2v = this.blockList[c2].value;
+            if (!(c1v > 0 && c2v > 0)) {
+                return;
+            }
+
             for (let i = 0; i < this.blockList.length; i++) {
                 if (this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
@@ -4726,7 +4730,7 @@ class Blocks {
                     }
 
                     const b2v = this.blockList[b2].value;
-                    bnv *= ((b1v * c2v) / b2v) * c1v;
+                    bnv = (bnv * b1v * c2v) / (b2v * c1v);
 
                     this.blockList[bn].value = bnv;
                     this.updateBlockText(bn);

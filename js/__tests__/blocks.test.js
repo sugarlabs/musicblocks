@@ -3809,6 +3809,97 @@ describe("noteValueValue", () => {
     });
 });
 
+describe("meter_block_changed", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+        blocks.updateBlockText = jest.fn();
+    });
+
+    function buildMeterAndTempo(meterBeat, tempoBlock, bpm, tempoBeat) {
+        blocks.blockList = [
+            { name: "meter", connections: [null, 1, 2, 5] },
+            { name: "number", value: 4, connections: [0] },
+            { name: "divide", connections: [0, 3, 4] },
+            { name: "number", value: meterBeat[0], connections: [2] },
+            { name: "number", value: meterBeat[1], connections: [2] },
+            { name: tempoBlock, connections: [0, 6, 7, null] },
+            { name: "number", value: bpm, connections: [5] },
+            { name: "divide", connections: [5, 8, 9] },
+            { name: "number", value: tempoBeat[0], connections: [7] },
+            { name: "number", value: tempoBeat[1], connections: [7] }
+        ];
+    }
+
+    const tempo = () => ({
+        bpm: blocks.blockList[6].value,
+        beat: [blocks.blockList[8].value, blocks.blockList[9].value]
+    });
+
+    it.each([
+        [90, [1, 4], [1, 8], 180],
+        [180, [1, 8], [3, 8], 60],
+        [90, [1, 4], [3, 8], 60],
+        [120, [1, 4], [3, 4], 40],
+        [60, [3, 8], [1, 4], 90],
+        [90, [7, 8], [5, 8], 126]
+    ])("turns %i bpm at %j into the same speed at the meter beat %j", (bpm, from, to, expected) => {
+        buildMeterAndTempo(to, "setbpm3", bpm, from);
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: expected, beat: to });
+    });
+
+    it("updates the master beats per minute block the same way", () => {
+        buildMeterAndTempo([3, 8], "setmasterbpm2", 180, [1, 8]);
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: 60, beat: [3, 8] });
+    });
+
+    it("leaves the tempo alone when the meter beat is not a pair of numbers", () => {
+        buildMeterAndTempo([3, 8], "setbpm3", 180, [1, 8]);
+        blocks.blockList[3].name = "plus";
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: 180, beat: [1, 8] });
+    });
+
+    it.each([
+        [0, 8],
+        [3, 0],
+        [-1, 8]
+    ])("leaves the tempo alone when the meter beat is %i/%i", (numerator, denominator) => {
+        buildMeterAndTempo([numerator, denominator], "setbpm3", 180, [1, 8]);
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: 180, beat: [1, 8] });
+        expect(blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+});
+
 describe("ManagedTimer Integration", () => {
     let blocks;
 
