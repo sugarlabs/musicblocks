@@ -1310,6 +1310,8 @@ describe("SearchUI._renderMainItem", () => {
 
     beforeEach(() => {
         liEl = {
+            style: {},
+            querySelector: jest.fn(() => null),
             addEventListener: jest.fn()
         };
         liProxy = {
@@ -1543,5 +1545,58 @@ describe("SearchUI._renderMainItem", () => {
         // 55 - 10 = 45
         expect(mockImg.style.left).toBe("45px");
         expect(mockImg.style.top).toBe("56px");
+    });
+});
+
+// ---------------------------------------------------------------------------
+// appendSuggestionLabel
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.appendSuggestionLabel", () => {
+    beforeEach(() => {
+        // Earlier suites assign mocks to document.createElement; drop the
+        // own property so the real jsdom implementation is used again.
+        delete document.createElement;
+    });
+
+    const makeRow = () => {
+        const row = document.createElement("li");
+        row.appendChild(document.createElement("img"));
+        return { 0: row, append: node => row.appendChild(node) };
+    };
+
+    test("shows the block name with its argument names in dimmed text", () => {
+        const li = makeRow();
+        const ui = new SearchUI(makeActivity());
+        ui.appendSuggestionLabel(li, {
+            label: "neighbor (+/–)",
+            argLabels: "scalar interval, note value"
+        });
+
+        const link = li[0].querySelector("a");
+        const args = link.querySelector(".search-item-args");
+        expect(link.firstChild.textContent).toBe("neighbor (+/–)");
+        expect(args.textContent).toBe("scalar interval, note value");
+        expect(args.style.opacity).toBe("0.7");
+    });
+
+    test("leaves out the argument span when there are no argument names", () => {
+        const li = makeRow();
+        const ui = new SearchUI(makeActivity());
+        ui.appendSuggestionLabel(li, { label: "drum", argLabels: "" });
+
+        const link = li[0].querySelector("a");
+        expect(link.textContent).toBe("drum");
+        expect(link.querySelector(".search-item-args")).toBeNull();
+    });
+
+    test("lays the row out so text wraps beside the icon", () => {
+        const li = makeRow();
+        const ui = new SearchUI(makeActivity());
+        ui.appendSuggestionLabel(li, { label: "drum" });
+
+        expect(li[0].style.display).toBe("flex");
+        expect(li[0].querySelector("img").style.flexShrink).toBe("0");
+        expect(li[0].querySelector("a").style.minWidth).toBe("0");
     });
 });
