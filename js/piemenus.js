@@ -118,9 +118,28 @@ const getPieMenuSize = block => {
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
 let activeExitWheel = null;
+let activeWheelPositioning = null;
+
+const handleWheelResize = () => {
+    if (
+        activeWheelPositioning &&
+        docById("wheelDiv") &&
+        docById("wheelDiv").style.display !== "none"
+    ) {
+        positionWheelDiv(
+            activeWheelPositioning.block,
+            activeWheelPositioning.displaySize,
+            activeWheelPositioning.desiredLeft,
+            activeWheelPositioning.desiredTop
+        );
+    } else {
+        setWheelSize(lastWheelSize);
+    }
+};
+
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
-    wheelResizeTimeout = setTimeout(() => setWheelSize(lastWheelSize), 150);
+    wheelResizeTimeout = setTimeout(handleWheelResize, 150);
 };
 
 const enableWheelResizeHandling = () => {
@@ -254,6 +273,7 @@ const getWheelSafeBounds = block => {
  * @returns {{size: number, left: number, top: number, desiredLeft: number, desiredTop: number}}
  */
 const positionWheelDiv = (block, displaySize, desiredLeft, desiredTop, bounds = null) => {
+    activeWheelPositioning = { block, displaySize, desiredLeft, desiredTop };
     const safe = bounds || getWheelSafeBounds(block);
     const wheelDiv = docById("wheelDiv");
     if (wheelDiv) {
@@ -355,6 +375,7 @@ const dismissActivePieMenu = () => {
     document.removeEventListener("mousedown", handleOutsideClick);
     document.removeEventListener("keydown", handleEscapeKey, true);
     activeExitWheel = null;
+    activeWheelPositioning = null;
 };
 
 const handleOutsideClick = event => {
@@ -413,6 +434,7 @@ const hideWheelDiv = () => {
         document.removeEventListener("keydown", handleEscapeKey, true);
         activeExitWheel = null;
     }
+    activeWheelPositioning = null;
 
     return wheelDiv;
 };
@@ -4423,8 +4445,8 @@ if (typeof module !== "undefined" && module.exports) {
         dismissActivePieMenu,
         showWheelDiv,
         hideWheelDiv,
-        syncKeySignatureBlocks,
-        piemenuNoteValue,
-        piemenuColor
+        handleWheelResize,
+        debouncedSetWheelSize,
+        syncKeySignatureBlocks
     };
 }

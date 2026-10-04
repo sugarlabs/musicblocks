@@ -26,7 +26,9 @@ const {
     piemenuDissectNumber,
     getTemperamentSliceFont,
     getWheelSafeBounds,
-    positionWheelDiv
+    positionWheelDiv,
+    handleWheelResize,
+    debouncedSetWheelSize
 } = require("../piemenus");
 const Block = require("../block");
 
@@ -2230,5 +2232,88 @@ describe("shared wheel safe positioning", () => {
         piemenuDissectNumber(brWidget);
         expect(parseInt(wheelDivMock.style.left, 10) + 300).toBeLessThanOrEqual(1000 - 8);
         expect(parseInt(wheelDivMock.style.top, 10) + 300).toBeLessThanOrEqual(1000 - 8);
+    });
+
+    test("open pie menu keeps position if it still fits after resize, and repositions inside safe bounds when viewport shrinks", () => {
+        // 1. Menu that still fits after minor resize retains its exact preferred position
+        const block = makeBlock(400, 400);
+        block.name = "wrapmode";
+        piemenuBasic(block, ["on", "off"], ["on", "off"], "on");
+        const initialLeft = parseInt(wheelDivMock.style.left, 10);
+        const initialTop = parseInt(wheelDivMock.style.top, 10);
+        expect(initialLeft).toBe(400 + 28 - 150);
+        expect(initialTop).toBe(400 + 6 - 150);
+
+        // Resize window slightly where it still fits
+        window.innerWidth = 1300;
+        window.innerHeight = 950;
+        handleWheelResize();
+        expect(parseInt(wheelDivMock.style.left, 10)).toBe(initialLeft);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBe(initialTop);
+
+        // 2. Open pie menu that no longer fits after viewport shrink is repositioned inside safe bounds
+        const edgeBlock = makeBlock(700, 700);
+        edgeBlock.name = "grid";
+        piemenuBasic(edgeBlock, ["none", "Cartesian", "polar", "treble"], [0, 1, 2, 3], 0);
+        expect(parseInt(wheelDivMock.style.width, 10)).toBe(400);
+
+        // Shrink viewport to 600x600 (canvas width/height 600)
+        window.innerWidth = 600;
+        window.innerHeight = 600;
+        edgeBlock.blocks.turtles._canvas.width = 600;
+        edgeBlock.blocks.turtles._canvas.height = 600;
+        handleWheelResize();
+
+        const currentWidth = parseInt(wheelDivMock.style.width, 10);
+        const currentLeft = parseInt(wheelDivMock.style.left, 10);
+        const currentTop = parseInt(wheelDivMock.style.top, 10);
+        const bounds = getWheelSafeBounds(edgeBlock);
+
+        expect(currentLeft + currentWidth + 8).toBeLessThanOrEqual(bounds.rightBound);
+        expect(currentTop + currentWidth + 8).toBeLessThanOrEqual(bounds.bottomBound);
+        expect(currentLeft).toBeGreaterThanOrEqual(bounds.safeLeft);
+        expect(currentTop).toBeGreaterThanOrEqual(bounds.safeTop);
+
+        // 3. Near top-left toolbar/palette after resize
+        const cornerBlock = makeBlock(0, 0);
+        cornerBlock.name = "outputtools";
+        const converterLabels = ["a", "b", "c", "d", "e", "f"];
+        piemenuBasic(cornerBlock, converterLabels, converterLabels, "a");
+        handleWheelResize();
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(188);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(78);
+    });
+
+    test("debouncedSetWheelSize triggers debounced resize handling and falls back cleanly when hidden", () => {
+        jest.useFakeTimers();
+
+        const block = makeBlock(750, 750);
+        block.name = "grid";
+        piemenuBasic(block, ["none", "Cartesian", "polar", "treble"], [0, 1, 2, 3], 0);
+
+        window.innerWidth = 500;
+        window.innerHeight = 500;
+        block.blocks.turtles._canvas.width = 500;
+        block.blocks.turtles._canvas.height = 500;
+
+        debouncedSetWheelSize();
+        jest.advanceTimersByTime(150);
+
+        const currentLeft = parseInt(wheelDivMock.style.left, 10);
+        const currentTop = parseInt(wheelDivMock.style.top, 10);
+        const currentWidth = parseInt(wheelDivMock.style.width, 10);
+        const bounds = getWheelSafeBounds(block);
+
+        expect(currentLeft + currentWidth + 8).toBeLessThanOrEqual(bounds.rightBound);
+        expect(currentTop + currentWidth + 8).toBeLessThanOrEqual(bounds.bottomBound);
+
+        // Hide wheel and verify resize does not throw
+        wheelDivMock.style.display = "none";
+        expect(() => {
+            debouncedSetWheelSize();
+            jest.advanceTimersByTime(150);
+        }).not.toThrow();
+
+        jest.useRealTimers();
     });
 });
