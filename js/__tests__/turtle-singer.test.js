@@ -2053,3 +2053,82 @@ describe("Singer.processNote tuplet and legoWidget handling", () => {
         setSynthVolumeSpy.mockRestore();
     });
 });
+
+describe("processNote — custom timbre effects normalization (#9043)", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.inSetTimbre = true;
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.synth.trigger = jest.fn();
+        activityMock.logo.synth.start = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.stage = {
+            update: jest.fn()
+        };
+        singer = turtleMock.singer;
+
+        global.instrumentsEffects = {
+            0: {
+                customVoice: {
+                    vibratoActive: true,
+                    vibratoIntensity: 0.05,
+                    vibratoRate: 16,
+                    distortionActive: true,
+                    distortionAmount: 0.4,
+                    tremoloActive: true,
+                    tremoloFrequency: 10,
+                    tremoloDepth: 0.5,
+                    chorusActive: true,
+                    chorusRate: 1.5,
+                    delayTime: 3.5,
+                    chorusDepth: 0.7
+                }
+            }
+        };
+        global.instrumentsFilters = {
+            0: {}
+        };
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it("should pass normalized effect parameters from instrumentsEffects to synth.trigger", () => {
+        const blk = "mockBlk";
+        singer.inNoteBlock = [blk];
+        singer.instrumentNames = ["customVoice"];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+        const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+        const paramsEffects = callArgs[4];
+        expect(paramsEffects).toBeDefined();
+        expect(paramsEffects.vibratoIntensity).toBe(0.05);
+        expect(paramsEffects.vibratoFrequency).toBeGreaterThan(0);
+        expect(paramsEffects.distortionAmount).toBe(0.4);
+        expect(paramsEffects.tremoloDepth).toBe(0.5);
+        expect(paramsEffects.tremoloFrequency).toBe(10);
+        expect(paramsEffects.chorusDepth).toBe(0.7);
+        expect(paramsEffects.chorusRate).toBe(1.5);
+        expect(paramsEffects.delayTime).toBe(3.5);
+    });
+});
