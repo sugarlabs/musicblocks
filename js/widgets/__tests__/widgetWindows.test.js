@@ -954,6 +954,28 @@ describe("widgetWindows", () => {
             expect(win._rolled).toBe(false);
             expect(win._body.style.display).toBe("flex");
         });
+
+        test("destroy removes window elements and deletes key from openWindows", () => {
+            const win = createTestWindow("testDestroyKey");
+            const key = win._key;
+            expect(key in window.widgetWindows.openWindows).toBe(true);
+
+            win.destroy();
+
+            expect(key in window.widgetWindows.openWindows).toBe(false);
+            expect(window.widgetWindows.openWindows[key]).toBeUndefined();
+        });
+
+        test("sendToCenter falls back safely when nav is absent from DOM", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            expect(() => win.sendToCenter()).not.toThrow();
+
+            if (nav && parent) parent.appendChild(nav);
+        });
     });
 
     describe("widgetWindows global functions", () => {
@@ -1466,6 +1488,16 @@ describe("widgetWindows", () => {
             window.widgetWindows.closeBlkWidgets("sampler");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes LEGO Bricks widget using mapped key 'LEGO Bricks'", () => {
+            window.widgetWindows.openWindows = {
+                "LEGO Bricks": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("LEGO Bricks");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("LEGO Bricks");
         });
 
         it("closes widgets when receiving localized block titles", () => {
