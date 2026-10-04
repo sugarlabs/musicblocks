@@ -256,6 +256,82 @@ describe("SearchController.filterSuggestions", () => {
 });
 
 // ---------------------------------------------------------------------------
+// block name label and ranking
+// ---------------------------------------------------------------------------
+
+describe("SearchController name label and ranking", () => {
+    function withLabels(name, labels) {
+        const block = makeProtoBlock(name, labels[0]);
+        block.staticLabels = labels;
+        return block;
+    }
+
+    function buildController() {
+        // Palette order puts the argument-only matches before the Note block,
+        // and prepSearchWidget reverses it.
+        const activity = makeActivity({
+            meter: withLabels("meter", ["meter", "number of beats", "note value"]),
+            notetofrequency: withLabels("notetofrequency", ["note to frequency", "name", "octave"]),
+            neighbor: withLabels("neighbor", ["neighbor", "interval", "note value"]),
+            note: withLabels("note", ["note value", "value"]),
+            onbeat: withLabels("onbeat", ["on every note do", "action"])
+        });
+        setupSearchController(activity);
+        activity.searchController.prepSearchWidget();
+        return activity.searchController;
+    }
+
+    test("uses only the block name as the visible label", () => {
+        const sc = buildController();
+        const labels = sc.searchSuggestions.map(s => s.label);
+        expect(labels).toContain("note to frequency");
+        expect(labels).toContain("meter");
+        expect(labels).not.toContain("note to frequency name octave");
+        expect(labels).not.toContain("meter number of beats note value");
+    });
+
+    test("still finds a block by one of its argument labels", () => {
+        const sc = buildController();
+        const results = sc.filterSuggestions("octave");
+        expect(results.map(r => r.value)).toEqual(["notetofrequency"]);
+    });
+
+    test("ranks prefix matches and name matches before argument-only matches", () => {
+        const sc = buildController();
+        const values = sc.filterSuggestions("note").map(r => r.value);
+        const argumentOnly = ["meter", "neighbor"];
+        const lastNameMatch = Math.max(
+            values.indexOf("note"),
+            values.indexOf("notetofrequency"),
+            values.indexOf("onbeat")
+        );
+        argumentOnly.forEach(value => {
+            expect(values.indexOf(value)).toBeGreaterThan(lastNameMatch);
+        });
+        expect(values.indexOf("onbeat")).toBeGreaterThan(values.indexOf("note"));
+    });
+
+    test("puts an exact name match first", () => {
+        const sc = buildController();
+        sc.searchSuggestions.push({
+            label: "note",
+            value: "exactnote",
+            searchTerms: ["note"]
+        });
+        sc._searchCache = {};
+        expect(sc.filterSuggestions("note")[0].value).toBe("exactnote");
+    });
+
+    test("keeps palette order between results of the same rank", () => {
+        const sc = buildController();
+        const values = sc.filterSuggestions("note").map(r => r.value);
+        const prefix = values.filter(v => v === "note" || v === "notetofrequency");
+        const paletteOrder = sc.searchSuggestions.map(s => s.value).filter(v => prefix.includes(v));
+        expect(prefix).toEqual(paletteOrder);
+    });
+});
+
+// ---------------------------------------------------------------------------
 // hideSearchWidget
 // ---------------------------------------------------------------------------
 

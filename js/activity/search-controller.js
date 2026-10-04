@@ -54,7 +54,7 @@ class SearchController {
                 if (block.deprecated) {
                     this.deprecatedBlockNames.push(blockLabel);
                 } else {
-                    let label = blockLabel;
+                    let label = block.staticLabels[0] || "";
                     if (label.length === 0) {
                         label = _(block.name);
                         switch (block.name) {
@@ -128,6 +128,11 @@ class SearchController {
                     if (label && label.length > 0) {
                         searchTerms.push(label.toLowerCase());
                     }
+                    // The visible label is the block name only. The argument
+                    // labels stay searchable but rank below name matches.
+                    if (block.staticLabels.length > 1) {
+                        searchTerms.push(blockLabel.toLowerCase());
+                    }
                     if (block.extraSearchTerms && Array.isArray(block.extraSearchTerms)) {
                         for (let j = 0; j < block.extraSearchTerms.length; j++) {
                             const term = block.extraSearchTerms[j];
@@ -162,7 +167,7 @@ class SearchController {
             return this._searchCache[term];
         }
 
-        const results = this.searchSuggestions.filter(item => {
+        let results = this.searchSuggestions.filter(item => {
             if (!term || term.length === 0) {
                 return true;
             }
@@ -175,6 +180,26 @@ class SearchController {
                 item.label.toLowerCase().indexOf(term) !== -1
             );
         });
+
+        if (term && term.length > 0) {
+            // Exact match, prefix match, match in the block name, then
+            // anything else (argument labels and extra search terms). The
+            // sort is stable, so equal ranks keep their palette order.
+            const rank = item => {
+                const name = typeof item.label === "string" ? item.label.toLowerCase() : "";
+                if (name === term) {
+                    return 0;
+                }
+                if (name.startsWith(term)) {
+                    return 1;
+                }
+                return name.indexOf(term) !== -1 ? 2 : 3;
+            };
+            results = results
+                .map((item, index) => ({ item, index, rank: rank(item) }))
+                .sort((a, b) => a.rank - b.rank || a.index - b.index)
+                .map(entry => entry.item);
+        }
 
         this._searchCache[term] = results;
         return results;
