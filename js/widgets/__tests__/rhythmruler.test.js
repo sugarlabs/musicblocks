@@ -20,7 +20,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// The widget's methods live in these modules, and RhythmRuler copies them onto its
+// prototype, so they must be global before rhythmruler.js loads (as in the browser).
+global.RhythmRulerLayout = require("../RhythmRulerLayout.js");
+global.RhythmRulerHistory = require("../RhythmRulerHistory.js");
+global.RhythmRulerEditing = require("../RhythmRulerEditing.js");
+global.RhythmRulerPlayback = require("../RhythmRulerPlayback.js");
+global.RhythmRulerSave = require("../RhythmRulerSave.js");
+global.RhythmRulerCircular = require("../RhythmRulerCircular.js");
 const RhythmRuler = require("../rhythmruler.js");
+// In the browser RhythmRuler is a global class, and the moved methods read its
+// static constants (RhythmRuler.ICONSIZE and so on) through that global.
+global.RhythmRuler = RhythmRuler;
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 
 // --- Global Mocks (Fake the Browser Environment) ---
@@ -2642,7 +2653,15 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
 
         test("RhythmRuler.dependencies declares AMD dependencies", () => {
             expect(Array.isArray(RhythmRuler.dependencies)).toBe(true);
-            expect(RhythmRuler.dependencies).toEqual(["widgets/rhythmruler"]);
+            expect(RhythmRuler.dependencies).toEqual([
+                "widgets/RhythmRulerLayout",
+                "widgets/RhythmRulerHistory",
+                "widgets/RhythmRulerEditing",
+                "widgets/RhythmRulerPlayback",
+                "widgets/RhythmRulerSave",
+                "widgets/RhythmRulerCircular",
+                "widgets/rhythmruler"
+            ]);
         });
     });
 

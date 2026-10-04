@@ -755,10 +755,13 @@ const PracticeUI = {
         const notice = this.getQuestNotice();
 
         notice.className = `practice-quest-notice show ${type || "success"}`;
-        notice.innerHTML = `
-          <strong>${title}</strong>
-          <span>${message}</span>
-        `;
+        notice.textContent = "";
+        const strong = document.createElement("strong");
+        strong.textContent = title;
+        const span = document.createElement("span");
+        span.textContent = message;
+        notice.appendChild(strong);
+        notice.appendChild(span);
 
         clearTimeout(this.noticeTimer);
         this.noticeTimer = setTimeout(() => {

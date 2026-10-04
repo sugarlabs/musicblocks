@@ -23,7 +23,14 @@
 
 // var, not const or let: a hoisted var in a consuming file cannot redeclare a top-level const or let.
 
-/** Applies shared donut-slice config to a wheelnav instance. */
+/**
+ * Applies shared donut-slice config to a wheelnav instance.
+ * @param {Object} wheel - The wheelnav instance to configure.
+ * @param {Object} opts
+ * @param {number} [opts.navAngle] - Wheel-relative rotation of the first slice.
+ *     wheelnav's own default is 0; omit to leave it at that default (or whatever
+ *     the caller already set), rather than silently overriding it.
+ */
 var configureWheel = (wheel, opts) => {
     wheel.colors = opts.colors;
     wheel.slicePathFunction = slicePath().DonutSlice;
@@ -37,7 +44,9 @@ var configureWheel = (wheel, opts) => {
         wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
         wheel.sliceInitPathCustom = wheel.slicePathCustom;
     }
-    wheel.navAngle = -90;
+    if (opts.navAngle !== undefined) {
+        wheel.navAngle = opts.navAngle;
+    }
     wheel.animatetime = 0;
     if (opts.titleRotateAngle !== undefined) {
         wheel.titleRotateAngle = opts.titleRotateAngle;

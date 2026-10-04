@@ -14,9 +14,10 @@ Object.assign(global, musicutils);
 global.debugLog = jest.fn();
 
 const ManagedTimer = require("../../utils/ManagedTimer");
-// The editing methods live in their own module and are installed by the
-// constructor, so they must be global before a keyboard is made.
+// The editing and drawing methods live in their own modules and are installed
+// by the constructor, so they must be global before a keyboard is made.
 global.MusicKeyboardEditing = require("../MusicKeyboardEditing.js");
+global.MusicKeyboardRendering = require("../MusicKeyboardRendering.js");
 const MusicKeyboard = require("../musickeyboard.js");
 
 describe("MusicKeyboard document key handler lifecycle", () => {
