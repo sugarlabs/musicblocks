@@ -397,6 +397,103 @@ describe("OfflineCommitManager", () => {
                 "*"
             );
         });
+
+        test("does NOT emit MB_SYNC_COMPLETE and does not increment syncedCount when repo creation fails", async () => {
+            storage.data.Projects.p_fail = {
+                ProjectName: "Failing Offline Song",
+                ProjectData: { melody: [1] },
+                commitDrafts: [
+                    {
+                        id: "d_fail_1",
+                        message: "Draft 1",
+                        data: {},
+                        timestamp: 100,
+                        status: "pending"
+                    }
+                ],
+                pendingRepoCreation: {
+                    status: "pending",
+                    projectName: "Failing Offline Song",
+                    repoName: "Failing-Song-12345678"
+                },
+                GitRepoData: {
+                    repoName: "Failing-Song-12345678",
+                    hashedKey: ""
+                }
+            };
+
+            server.addProject.mockImplementation((payloadStr, cb) => {
+                cb({
+                    success: false,
+                    error: "GitHub API rate limit exceeded"
+                });
+            });
+
+            await manager._onOnline();
+
+            expect(server.addProject).toHaveBeenCalledTimes(1);
+            expect(storage.clearPendingRepoCreation).not.toHaveBeenCalledWith("p_fail");
+
+            const syncCompleteMessages = postedMessages.filter(m => m.type === "MB_SYNC_COMPLETE");
+            expect(syncCompleteMessages).toEqual([]);
+        });
+
+        test("emits MB_SYNC_COMPLETE with accurate synced count matching pushed drafts", async () => {
+            storage.data.Projects.p_multi = {
+                ProjectName: "Multi Draft Song",
+                ProjectData: { melody: [1, 2] },
+                commitDrafts: [
+                    {
+                        id: "d_multi_1",
+                        message: "Draft 1",
+                        data: { melody: [1] },
+                        timestamp: 100,
+                        status: "pending"
+                    },
+                    {
+                        id: "d_multi_2",
+                        message: "Draft 2",
+                        data: { melody: [1, 2] },
+                        timestamp: 200,
+                        status: "pending"
+                    }
+                ],
+                pendingRepoCreation: {
+                    status: "pending",
+                    projectName: "Multi Draft Song",
+                    repoName: "Multi-Song-abcdef12"
+                },
+                GitRepoData: {
+                    repoName: "Multi-Song-abcdef12",
+                    hashedKey: ""
+                }
+            };
+
+            server.addProject.mockImplementation((payloadStr, cb) => {
+                cb({
+                    success: true,
+                    repository: "Multi-Song-abcdef12",
+                    key: "secret-multi-key"
+                });
+            });
+
+            server.editProject.mockImplementation((repo, key, data, msg, cb) => {
+                cb({ success: true, sha: "sha-test" });
+            });
+
+            server.getCommitHistory.mockImplementation((repo, cb) => {
+                cb({
+                    success: true,
+                    data: [{ sha: "sha-test", message: "Draft" }]
+                });
+            });
+
+            await manager._onOnline();
+
+            const syncCompleteMessages = postedMessages.filter(m => m.type === "MB_SYNC_COMPLETE");
+            expect(syncCompleteMessages.length).toBe(1);
+            expect(syncCompleteMessages[0].synced).toBe(2);
+        });
     });
 
     describe("Local History & Cached Commits", () => {
