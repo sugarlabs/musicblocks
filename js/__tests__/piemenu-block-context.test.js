@@ -103,6 +103,7 @@ beforeEach(() => {
     computedDisplay = "none";
     bodyClickHandler = null;
     window._contextWheelClickHandler = undefined;
+    window._contextWheelIgnoreNextClick = false;
     for (const key of Object.keys(domElements)) delete domElements[key];
     originalHelpWidget = global.HelpWidget;
     delete global.HelpWidget;
@@ -364,6 +365,21 @@ describe("piemenuBlockContext", () => {
         bodyClickHandler({});
 
         expect(getDomElement("contextWheelDiv").style.display).toBe("unrelated");
+    });
+
+    test("ignores the outside click generated when a long press is released", () => {
+        const block = makeBlock();
+
+        piemenuBlockContext(block);
+        getDomElement("contextWheelDiv").style.display = "block";
+        window._contextWheelIgnoreNextClick = true;
+        computedDisplay = "block";
+
+        bodyClickHandler({ target: document.createElement("canvas") });
+
+        expect(getDomElement("contextWheelDiv").style.display).toBe("block");
+        expect(window._contextWheelIgnoreNextClick).toBe(false);
+        expect(global.document.body.removeEventListener).not.toHaveBeenCalled();
     });
 
     test("replaces the previous outside-click handler instead of accumulating listeners", () => {

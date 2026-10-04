@@ -172,6 +172,17 @@ const piemenuBlockContext = block => {
 
     window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
+        if (window._contextWheelIgnoreNextClick) {
+            const clickedInsideWheel =
+                event.target &&
+                typeof wheelElement.contains === "function" &&
+                wheelElement.contains(event.target);
+            window._contextWheelIgnoreNextClick = false;
+            if (!clickedInsideWheel) {
+                return;
+            }
+        }
+
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";

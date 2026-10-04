@@ -3315,6 +3315,19 @@ class Block {
                 }
             }
 
+            if (that._triggerLongPress) {
+                that._triggerLongPress = false;
+                if (
+                    event.nativeEvent &&
+                    typeof event.nativeEvent.stopImmediatePropagation === "function"
+                ) {
+                    event.nativeEvent.stopImmediatePropagation();
+                } else if (typeof event.stopPropagation === "function") {
+                    event.stopPropagation();
+                }
+                return;
+            }
+
             if (that.blocks.getLongPressStatus()) {
                 return;
             }
@@ -3414,6 +3427,7 @@ class Block {
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
+                window._contextWheelIgnoreNextClick = true;
                 that.blocks.triggerLongPress();
             }, LONGPRESSTIME);
 

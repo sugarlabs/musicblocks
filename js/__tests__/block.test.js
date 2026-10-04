@@ -1387,6 +1387,7 @@ describe("Block Foundation", () => {
             block._calculateBlockHitArea = jest.fn();
 
             mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.getLongPressStatus = jest.fn().mockReturnValue(false);
             block.activity.closeHelpfulWheel = jest.fn();
             block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
             block.activity.logo.runLogoCommands = jest.fn();
@@ -1425,6 +1426,20 @@ describe("Block Foundation", () => {
             } finally {
                 jest.useRealTimers();
             }
+        });
+
+        it("does not treat a released long press as a regular click", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            const stopImmediatePropagation = jest.fn();
+
+            handlers.click({
+                nativeEvent: { button: 0, stopImmediatePropagation }
+            });
+
+            expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+            expect(block._triggerLongPress).toBe(false);
+            expect(stopImmediatePropagation).toHaveBeenCalled();
         });
     });
 
