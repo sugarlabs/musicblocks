@@ -99,10 +99,8 @@ class Turtles {
      */
     add(startBlock, infoDict) {
         if (startBlock !== null) {
-            // console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.getTurtleCount()) {
                 startBlock.value = this.getTurtleCount();
-                // console.debug("turtle #" + startBlock.value);
             }
         }
 
@@ -162,7 +160,6 @@ class Turtles {
             };
 
             turtlesStage.dispatchEvent("CursorDown" + turtle.id);
-            // console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
             turtle.container.on("pressmove", event => {
@@ -179,18 +176,15 @@ class Turtles {
         });
 
         turtle.container.on("pressup", () => {
-            // console.debug("--> [CursorUp " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorUp" + turtle.id);
         });
 
         turtle.container.on("click", () => {
             // If turtles listen for clicks then they can be used as buttons
-            // console.debug("--> [click " + turtle.name + "]");
             turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
         turtle.container.on("mouseover", () => {
-            // console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
             if (turtle.running || turtle._isHovered) {
@@ -206,7 +200,6 @@ class Turtles {
         });
 
         turtle.container.on("mouseout", () => {
-            // console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
             if (!turtle._isHovered) {
