@@ -2307,12 +2307,19 @@ describe("shared wheel safe positioning", () => {
         expect(currentLeft + currentWidth + 8).toBeLessThanOrEqual(bounds.rightBound);
         expect(currentTop + currentWidth + 8).toBeLessThanOrEqual(bounds.bottomBound);
 
-        // Hide wheel and verify resize does not throw
+        // Hide wheel and verify resize does not throw, does not reposition, and keeps display hidden
         wheelDivMock.style.display = "none";
+        const hiddenLeft = wheelDivMock.style.left;
+        const hiddenTop = wheelDivMock.style.top;
+
         expect(() => {
             debouncedSetWheelSize();
             jest.advanceTimersByTime(150);
         }).not.toThrow();
+
+        expect(wheelDivMock.style.display).toBe("none");
+        expect(wheelDivMock.style.left).toBe(hiddenLeft);
+        expect(wheelDivMock.style.top).toBe(hiddenTop);
 
         jest.useRealTimers();
     });
