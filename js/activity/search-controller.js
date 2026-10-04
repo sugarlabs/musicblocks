@@ -46,11 +46,16 @@ class SearchController {
 
         for (const i in activity.blocks.protoBlockDict) {
             const block = activity.blocks.protoBlockDict[i];
-            const blockLabel = block.staticLabels.join(" ");
+            // staticLabels[0] is the block name; the rest label its arguments
+            // and flows, so they are searchable but not shown.
+            const blockLabel = block.staticLabels.length > 0 ? block.staticLabels[0] : "";
+            const argLabels = block.staticLabels
+                .slice(1)
+                .filter(argLabel => typeof argLabel === "string" && argLabel.length > 0);
             const artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)[
                 "artwork64"
             ];
-            if (blockLabel || block.extraSearchTerms !== undefined) {
+            if (blockLabel || argLabels.length > 0 || block.extraSearchTerms !== undefined) {
                 if (block.deprecated) {
                     this.deprecatedBlockNames.push(blockLabel);
                 } else {
@@ -142,18 +147,49 @@ class SearchController {
                         value: block.name,
                         specialDict: block,
                         artwork: artwork,
-                        searchTerms: searchTerms
+                        searchTerms: searchTerms,
+                        argSearchTerms: argLabels.map(argLabel => argLabel.toLowerCase())
                     });
                 }
             }
         }
+    }
 
-        this.searchSuggestions = this.searchSuggestions.reverse();
+    /**
+     * Ranks how well a suggestion matches a query term: 0 for an exact
+     * label match, 1 for a label prefix, 2 for a match elsewhere in the
+     * label or in extraSearchTerms, 3 for a match only in an argument label.
+     * @param {object} item - Entry from searchSuggestions.
+     * @param {string} term - Lowercased, trimmed search term.
+     * @returns {number} The rank, or -1 when the item does not match.
+     */
+    _matchRank(item, term) {
+        if (!term || term.length === 0) {
+            return 0;
+        }
+
+        const label = item.label && typeof item.label === "string" ? item.label.toLowerCase() : "";
+        if (label === term) {
+            return 0;
+        }
+        if (label.startsWith(term)) {
+            return 1;
+        }
+
+        const contains = terms =>
+            Array.isArray(terms) && terms.some(t => t && t.indexOf(term) !== -1);
+        if (label.indexOf(term) !== -1 || contains(item.searchTerms)) {
+            return 2;
+        }
+        if (contains(item.argSearchTerms)) {
+            return 3;
+        }
+        return -1;
     }
 
     /**
      * Filters searchSuggestions against a query term.
-     * Returns matching items, respecting the result cache.
+     * Returns matching items, best matches first, respecting the result cache.
      * @param {string} term - Lowercased, trimmed search term.
      * @returns {Array}
      */
@@ -162,19 +198,12 @@ class SearchController {
             return this._searchCache[term];
         }
 
-        const results = this.searchSuggestions.filter(item => {
-            if (!term || term.length === 0) {
-                return true;
-            }
-            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-            }
-            return (
-                item.label &&
-                typeof item.label === "string" &&
-                item.label.toLowerCase().indexOf(term) !== -1
-            );
-        });
+        // sort() is stable, so items with the same rank keep palette order.
+        const results = this.searchSuggestions
+            .map(item => ({ item: item, rank: this._matchRank(item, term) }))
+            .filter(match => match.rank !== -1)
+            .sort((a, b) => a.rank - b.rank)
+            .map(match => match.item);
 
         this._searchCache[term] = results;
         return results;
@@ -324,6 +353,7 @@ class SearchController {
                         return that.searchUI.renderEmptySearchItem($j, ul, item);
                     }
                     const li = $j("<li></li>");
+                    li.addClass("search-result-item");
 
                     const img = document.createElement("img");
                     img.src = item.artwork || "";
@@ -717,6 +747,7 @@ class SearchController {
                         return that.searchUI.renderEmptySearchItem($j, ul, item);
                     }
                     const li = $j("<li></li>");
+                    li.addClass("search-result-item");
                     const img = document.createElement("img");
                     img.src = item.artwork || "";
                     img.height = 20;

@@ -47,6 +47,22 @@ body:not(.dark):not(.highcontrast) .ui-autocomplete .search-no-results:hover {
     background-color: var(--color-bg-primary) !important;
 }
 
+/* Keep long block labels next to the icon instead of wrapping under it */
+.ui-autocomplete .search-result-item {
+    display: flex;
+    align-items: center;
+}
+
+.ui-autocomplete .search-result-item img {
+    flex-shrink: 0;
+}
+
+.ui-autocomplete .search-result-item a {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-bg-secondary) !important;
 }

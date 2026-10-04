@@ -1130,6 +1130,7 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
             if (arg === "instance") return instance;
         });
         const li = {
+            addClass: jest.fn(),
             append: jest.fn(),
             appendTo: jest.fn(function () {
                 return this;
@@ -1154,6 +1155,7 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
         const ul = { css: jest.fn(() => ul) };
         const item = { label: "drum", artwork: "" };
         instance._renderItem(ul, item);
+        expect(li.addClass).toHaveBeenCalledWith("search-result-item");
         expect(li.append).toHaveBeenCalled();
     });
 
@@ -1314,6 +1316,7 @@ describe("SearchUI._renderMainItem", () => {
         };
         liProxy = {
             0: liEl,
+            addClass: jest.fn(),
             append: jest.fn(),
             appendTo: jest.fn(function () {
                 return this;
@@ -1378,6 +1381,16 @@ describe("SearchUI._renderMainItem", () => {
         expect(mockImg.src).toBe("drum.png");
         expect(mockImg.height).toBe(20);
         expect(mockImg.style.cursor).toBe("grab");
+    });
+
+    test("marks the li as a search result row so the label stays beside the icon", () => {
+        document.createElement = jest.fn(() => ({ style: {}, src: "", height: 0 }));
+
+        const ui = new SearchUI(makeActivity());
+        const item = { label: "note to frequency", artwork: "", specialDict: {} };
+        ui._renderMainItem($j, ul, item, jest.fn());
+
+        expect(liProxy.addClass).toHaveBeenCalledWith("search-result-item");
     });
 
     test("attaches mousedown and touchstart listeners to the li element", () => {

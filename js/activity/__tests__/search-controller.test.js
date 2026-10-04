@@ -31,7 +31,7 @@ const { SearchUI } = require("../../search-ui.js");
 function makeProtoBlock(name, label, deprecated = false, extraSearchTerms = undefined) {
     const block = {
         name,
-        staticLabels: label ? [label] : [],
+        staticLabels: Array.isArray(label) ? label : label ? [label] : [],
         deprecated,
         extraSearchTerms,
         palette: {
@@ -178,6 +178,40 @@ describe("SearchController.prepSearchWidget", () => {
         expect(suggestion.searchTerms).toContain("tone");
     });
 
+    test("labels a block with its name and keeps argument labels searchable", () => {
+        const block = makeProtoBlock("notetofrequency", ["note to frequency", "name", "octave"]);
+        const activity = makeActivity({ notetofrequency: block });
+        setupSearchController(activity);
+        activity.searchController.prepSearchWidget();
+
+        const suggestion = activity.searchController.searchSuggestions[0];
+        expect(suggestion.label).toBe("note to frequency");
+        expect(suggestion.searchTerms).toEqual(["note to frequency"]);
+        expect(suggestion.argSearchTerms).toEqual(["name", "octave"]);
+    });
+
+    test("ignores empty argument labels", () => {
+        const block = makeProtoBlock("newnote", ["note", "", "value"]);
+        const activity = makeActivity({ newnote: block });
+        setupSearchController(activity);
+        activity.searchController.prepSearchWidget();
+
+        expect(activity.searchController.searchSuggestions[0].argSearchTerms).toEqual(["value"]);
+    });
+
+    test("keeps suggestions in palette order", () => {
+        const activity = makeActivity({
+            drum: makeProtoBlock("drum", "drum"),
+            pitch: makeProtoBlock("pitch", "pitch"),
+            meter: makeProtoBlock("meter", "meter")
+        });
+        setupSearchController(activity);
+        activity.searchController.prepSearchWidget();
+
+        const values = activity.searchController.searchSuggestions.map(s => s.value);
+        expect(values).toEqual(["drum", "pitch", "meter"]);
+    });
+
     test("resets cache and position on each call", () => {
         const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
         setupSearchController(activity);
@@ -252,6 +286,55 @@ describe("SearchController.filterSuggestions", () => {
         sc.searchSuggestions = [];
         const cached = sc.filterSuggestions("drum");
         expect(cached).toBe(sc._searchCache["drum"]);
+    });
+});
+
+describe("SearchController.filterSuggestions - ranking", () => {
+    let sc;
+
+    beforeEach(() => {
+        const activity = makeActivity({
+            meter: makeProtoBlock("meter", ["meter", "number of beats", "note value"]),
+            everynote: makeProtoBlock("everynote", "on every note do"),
+            notetofrequency: makeProtoBlock("notetofrequency", [
+                "note to frequency",
+                "name",
+                "octave"
+            ]),
+            newnote: makeProtoBlock("newnote", ["note", "value"]),
+            notename: makeProtoBlock("notename", "note name"),
+            drum: makeProtoBlock("drum", "drum", false, ["percussion note"])
+        });
+        setupSearchController(activity);
+        sc = activity.searchController;
+        sc.prepSearchWidget();
+    });
+
+    test("orders exact, prefix, name and argument-only matches", () => {
+        const values = sc.filterSuggestions("note").map(r => r.value);
+        expect(values).toEqual([
+            "newnote",
+            "notetofrequency",
+            "notename",
+            "everynote",
+            "drum",
+            "meter"
+        ]);
+    });
+
+    test("finds blocks by an argument label", () => {
+        const values = sc.filterSuggestions("octave").map(r => r.value);
+        expect(values).toEqual(["notetofrequency"]);
+    });
+
+    test("ranks a name match above an argument-only match", () => {
+        const values = sc.filterSuggestions("name").map(r => r.value);
+        expect(values).toEqual(["notename", "notetofrequency"]);
+    });
+
+    test("keeps palette order for matches of the same rank", () => {
+        const values = sc.filterSuggestions("value").map(r => r.value);
+        expect(values).toEqual(["meter", "newnote"]);
     });
 });
 
@@ -552,6 +635,44 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         const item = { isEmptyState: true, label: "No results found for zzz" };
         expect(instance._renderItem(ul, item)).toBe("empty-row");
         expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
+    });
+
+    test("renders a block row with the search-result-item class", () => {
+        const instance = { _renderItem: null };
+        $elem = makeJQueryElem(false, instance);
+        const li = {
+            0: { addEventListener: jest.fn() },
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        const anchor = {
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        global.window.jQuery = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>") return anchor;
+            return $elem;
+        });
+
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const ul = { css: jest.fn(() => ul) };
+        instance._renderItem(ul, { label: "drum beat", value: "drum", artwork: "" });
+
+        expect(li.addClass).toHaveBeenCalledWith("search-result-item");
+        expect(anchor.text).toHaveBeenCalledWith(" drum beat");
     });
 
     test("select callback does not place a block for the empty-state row", () => {
@@ -864,6 +985,42 @@ describe("SearchController.doHelpfulSearch - autocomplete initialization", () =>
         const item = { isEmptyState: true, label: "No results found for zzz" };
         expect(instance._renderItem(ul, item)).toBe("empty-row");
         expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
+    });
+
+    test("renders a block row with the search-result-item class", () => {
+        const instance = { _renderItem: null };
+        $elem = makeJQueryElem(false, instance);
+        const li = {
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        global.window.jQuery = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>")
+                return {
+                    text: jest.fn(function () {
+                        return this;
+                    })
+                };
+            return $elem;
+        });
+
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.helpfulSearchWidget.idInput_custom = "";
+        activity.helpfulSearchWidget.value = "";
+        sc.doHelpfulSearch();
+
+        const ul = { css: jest.fn(() => ul) };
+        instance._renderItem(ul, { label: "drum beat", value: "drum", artwork: "" });
+
+        expect(li.addClass).toHaveBeenCalledWith("search-result-item");
     });
 
     test("select callback sets helpfulSearchWidget fields and re-runs doHelpfulSearch", () => {

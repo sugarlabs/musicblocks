@@ -436,6 +436,7 @@ class SearchUI {
                     return this.renderEmptySearchItem($j, ul, item);
                 }
                 const li = $j("<li></li>");
+                li.addClass("search-result-item");
                 const img = document.createElement("img");
                 img.src = item.artwork || "";
                 img.height = 20;
@@ -558,6 +559,7 @@ class SearchUI {
         }
 
         const li = $j("<li></li>");
+        li.addClass("search-result-item");
 
         const img = document.createElement("img");
         img.src = item.artwork || "";
