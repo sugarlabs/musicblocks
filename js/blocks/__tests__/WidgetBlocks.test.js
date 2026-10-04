@@ -146,7 +146,11 @@ global.TemperamentWidget = jest.fn(() => ({
 global.TemperamentWidget.dependencies = ["widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
-global.MusicKeyboard.dependencies = ["widgets/MusicKeyboardEditing", "widgets/musickeyboard"];
+global.MusicKeyboard.dependencies = [
+    "widgets/MusicKeyboardEditing",
+    "widgets/MusicKeyboardRendering",
+    "widgets/musickeyboard"
+];
 global.PhraseMaker = jest.fn();
 global.PhraseMaker.dependencies = [
     "widgets/PhraseMakerUtils",
@@ -164,7 +168,15 @@ global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
 global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
-global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
+global.RhythmRuler.dependencies = [
+    "widgets/RhythmRulerLayout",
+    "widgets/RhythmRulerHistory",
+    "widgets/RhythmRulerEditing",
+    "widgets/RhythmRulerPlayback",
+    "widgets/RhythmRulerSave",
+    "widgets/RhythmRulerCircular",
+    "widgets/rhythmruler"
+];
 global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();

@@ -61,6 +61,41 @@ describe("releaseconfig globals", () => {
             expect(releaseconfig.resolveIsMusicBlocks(null)).toBe(true);
             expect(releaseconfig.resolveIsMusicBlocks(undefined)).toBe(true);
         });
+
+        // The module's own header comment documents the resolution order as
+        // (1) query param, then (2) hostname, then (3) the build-time default.
+        // A "music" hostname must therefore never override an explicit
+        // "?turtle" query param.
+        test("query parameter resolution takes precedence over hostname, per the documented order", () => {
+            const result = releaseconfig.resolveIsMusicBlocks({
+                search: "?turtle",
+                hostname: "musicblocks.sugarlabs.org"
+            });
+            expect(result).toBe(false);
+        });
+
+        test("hostname matching is case-insensitive", () => {
+            const result = releaseconfig.resolveIsMusicBlocks({
+                search: "",
+                hostname: "TURTLE.SUGARLABS.ORG"
+            });
+            expect(result).toBe(false);
+        });
+
+        // resolveIsMusicBlocks wraps location access in a try/catch whose
+        // comment states it must "silently fallback to default if location
+        // access throws" rather than let the exception propagate.
+        test("silently falls back to the default when location access throws", () => {
+            const throwingLoc = {
+                get search() {
+                    throw new Error("SecurityError: location access blocked");
+                },
+                hostname: "localhost"
+            };
+
+            expect(() => releaseconfig.resolveIsMusicBlocks(throwingLoc)).not.toThrow();
+            expect(releaseconfig.resolveIsMusicBlocks(throwingLoc)).toBe(true);
+        });
     });
 
     describe("Splash Screen Resolution & Localization", () => {

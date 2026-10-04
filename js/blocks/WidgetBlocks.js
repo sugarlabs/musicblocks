@@ -1322,7 +1322,11 @@ function setupWidgetBlocks(activity) {
                 "musicKeyboard",
                 _getWidgetDependencies(
                     typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    ["widgets/MusicKeyboardEditing", "widgets/musickeyboard"]
+                    [
+                        "widgets/MusicKeyboardEditing",
+                        "widgets/MusicKeyboardRendering",
+                        "widgets/musickeyboard"
+                    ]
                 ),
                 () => new MusicKeyboard(activity),
                 turtle,
@@ -1516,6 +1520,12 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "rhythmRuler",
                 _getWidgetDependencies(typeof RhythmRuler !== "undefined" ? RhythmRuler : null, [
+                    "widgets/RhythmRulerLayout",
+                    "widgets/RhythmRulerHistory",
+                    "widgets/RhythmRulerEditing",
+                    "widgets/RhythmRulerPlayback",
+                    "widgets/RhythmRulerSave",
+                    "widgets/RhythmRulerCircular",
                     "widgets/rhythmruler"
                 ]),
                 () => new RhythmRuler(),

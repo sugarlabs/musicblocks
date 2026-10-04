@@ -3036,6 +3036,32 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker.docById).toHaveBeenCalled();
         });
 
+        test("_createMatrixGraphicsPieSubmenu offers whole-number values for pen rows", () => {
+            // set color, set shade, set hue, set grey and set translucency share one
+            // value list; the chosen label becomes the block's text and parseInt value.
+            phraseMaker.activity.blocks.blockList[0].name = "setshade";
+
+            phraseMaker._createMatrixGraphicsPieSubmenu(0, "graphicsblocks", 0);
+
+            const labels = phraseMaker._pitchWheel.createWheel.mock.calls[0][0];
+            expect(labels).toEqual([
+                "0",
+                "10",
+                "20",
+                "30",
+                "40",
+                "50",
+                "60",
+                "70",
+                "80",
+                "90",
+                "100"
+            ]);
+            for (const label of labels) {
+                expect(String(parseInt(label, 10))).toBe(label);
+            }
+        });
+
         test("_createMatrixGraphics2PieSubmenu sets up secondary graphics menu", () => {
             phraseMaker._createMatrixGraphics2PieSubmenu(0, 0);
 

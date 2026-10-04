@@ -57,10 +57,10 @@ class ProjectStorage {
         return prefix + suffix;
     }
 
-    async saveLocally(data, image) {
-        if (this.data.CurrentProject === undefined) this.initialiseNewProject();
+    async saveLocally(data, image, projectId) {
+        if (this.data.CurrentProject === undefined) await this.initialiseNewProject();
 
-        const c = this.data.CurrentProject;
+        const c = projectId ?? this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             this.data.Projects[c] = {};
             this.data.Projects[c].ProjectName = this.defaultProjectName;
