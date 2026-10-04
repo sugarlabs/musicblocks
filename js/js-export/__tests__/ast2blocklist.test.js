@@ -1810,6 +1810,29 @@ describe("AST2BlockList Class", () => {
         ]);
     });
 
+    test.each([
+        ["TOPPOS", "toppos"],
+        ["LEFTPOS", "leftpos"],
+        ["RIGHTPOS", "rightpos"],
+        ["WIDTH", "width"],
+        ["HEIGHT", "height"]
+    ])("converts mouse.%s back to the %s block", (getter, block) => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.onStrongBeatDo(mouse.${getter}, "action");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, null]],
+            [2, block, 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]]
+        ]);
+    });
+
     test("should convert heading, key, and note volume getters", () => {
         const code = `
         new Mouse(async mouse => {
