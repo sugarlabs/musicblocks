@@ -1453,10 +1453,25 @@ describe("modeMapper", () => {
         ["D", "natural minor", ["d", "minor"]],
         ["E", "major", ["e", "major"]],
         ["F♯", "minor", ["f♯", "minor"]],
-        ["C", "phrygian", ["g♯", "major"]],
+        ["C", "phrygian", ["a♭", "major"]],
         ["A♯", "mixolydian", ["c", "minor"]],
-        ["C", "DORIAN", ["a♯", "major"]]
+        ["C", "DORIAN", ["b♭", "major"]]
     ])("should correctly map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
+    });
+
+    // Modes whose key signature has flats map to a flat-named key, so the
+    // sharp/flat preference lookup finds them.
+    it.each([
+        ["C", "dorian", ["b♭", "major"]],
+        ["D", "phrygian", ["b♭", "major"]],
+        ["F", "mixolydian", ["b♭", "major"]],
+        ["A", "locrian", ["b♭", "major"]],
+        ["C", "phrygian", ["a♭", "major"]],
+        ["G", "locrian", ["a♭", "major"]],
+        ["C", "locrian", ["d♭", "major"]],
+        ["G♭", "lydian", ["d♭", "major"]]
+    ])("should map %s %s to the flat key %j", (key, mode, expected) => {
         expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
@@ -3749,10 +3764,10 @@ describe("ACCIDENTALNAMES", () => {
 describe("modeMapper branch coverage", () => {
     const cases = [
         ["C", "ionian", ["c", "major"]],
-        ["C", "dorian", ["a" + SHARP, "major"]],
+        ["C", "dorian", ["b" + FLAT, "major"]],
         ["F", "dorian", ["c", "minor"]],
         ["D" + FLAT, "dorian", ["e" + FLAT, "minor"]],
-        ["C", "phrygian", ["g" + SHARP, "major"]],
+        ["C", "phrygian", ["a" + FLAT, "major"]],
         ["G", "phrygian", ["c", "minor"]],
         ["D" + FLAT, "phrygian", ["g" + FLAT, "minor"]],
         ["C", "lydian", ["g", "major"]],
@@ -3761,7 +3776,7 @@ describe("modeMapper branch coverage", () => {
         ["C", "mixolydian", ["f", "major"]],
         ["A" + SHARP, "mixolydian", ["c", "minor"]],
         ["B" + FLAT, "mixolydian", ["c", "minor"]],
-        ["C", "locrian", ["b", "major"]],
+        ["C", "locrian", ["d" + FLAT, "major"]],
         ["D", "locrian", ["c", "minor"]],
         ["E" + FLAT, "locrian", ["d" + FLAT, "minor"]],
         ["A", "aeolian", ["a", "minor"]],
