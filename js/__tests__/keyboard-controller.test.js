@@ -51,7 +51,8 @@ describe("KeyboardController - modifier precedence and runtime guard", () => {
             turtles: { running: jest.fn(() => false) },
             blocks: {
                 undoAction: jest.fn()
-            }
+            },
+            palettes: { activePalette: null, dict: {} }
         };
 
         controller = new KeyboardController(activity);
@@ -78,5 +79,11 @@ describe("KeyboardController - modifier precedence and runtime guard", () => {
 
         pressKey(90, { metaKey: true });
         expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+    });
+
+    it("records the key code for an unsupported Ctrl shortcut", () => {
+        const ctrlC = pressKey(67, { ctrlKey: true });
+        expect(ctrlC.defaultPrevented).toBe(false);
+        expect(activity.currentKeyCode).toBe(67);
     });
 });
