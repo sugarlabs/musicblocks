@@ -158,6 +158,7 @@ class PluginDialog {
         leftGroup.appendChild(uploadBtn);
 
         const rightGroup = document.createElement("div");
+        rightGroup.classList.add("plugin-modal-right-actions");
 
         const loadBtn = document.createElement("button");
         loadBtn.textContent = _("Load");
