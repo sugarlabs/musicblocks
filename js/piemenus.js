@@ -1751,7 +1751,10 @@ const piemenuNoteValue = (block, noteValue) => {
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
-    block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
+    block.label.addEventListener(
+        "keypress",
+        block._boundExitKeyPressed || block._exitKeyPressed.bind(block)
+    );
 
     block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
@@ -1996,7 +1999,10 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
-    block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
+    block.label.addEventListener(
+        "keypress",
+        block._boundExitKeyPressed || block._exitKeyPressed.bind(block)
+    );
 
     block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
@@ -2345,7 +2351,10 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
-    block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
+    block.label.addEventListener(
+        "keypress",
+        block._boundExitKeyPressed || block._exitKeyPressed.bind(block)
+    );
 
     block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
@@ -4478,6 +4487,8 @@ if (typeof module !== "undefined" && module.exports) {
         dismissActivePieMenu,
         showWheelDiv,
         hideWheelDiv,
-        syncKeySignatureBlocks
+        syncKeySignatureBlocks,
+        piemenuNoteValue,
+        piemenuColor
     };
 }

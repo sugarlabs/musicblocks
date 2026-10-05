@@ -166,6 +166,7 @@ class Block {
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
+        this._boundExitKeyPressed = this._exitKeyPressed.bind(this);
         this.text = null; // A dynamically generated text label on block itself.
         this.value = null; // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
@@ -4854,7 +4855,10 @@ class Block {
         if (["Enter", "Tab"].includes(event.key)) {
             this._labelChanged(true, false);
             event.preventDefault();
-            this.label.removeEventListener("keypress", this._exitKeyPressed);
+            this.label.removeEventListener(
+                "keypress",
+                this._boundExitKeyPressed || this._exitKeyPressed
+            );
             docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
