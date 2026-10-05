@@ -58,6 +58,9 @@ function LegoBricksMedia() {
         if (file && file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = e => {
+                // The image replaces a running webcam, so release the camera.
+                this._stopWebcam();
+                this.webcamVideo = null;
                 this.imageDisplayArea.replaceChildren();
 
                 this.imageWrapper = LegoWidget.createImageWrapper();
@@ -89,6 +92,8 @@ function LegoBricksMedia() {
      * @returns {void}
      */
     this._startWebcam = function () {
+        // Release a camera that is already running before asking for a new one.
+        this._stopWebcam();
         this.imageDisplayArea.replaceChildren();
 
         this._offscreenCanvas = null;
@@ -107,9 +112,17 @@ function LegoBricksMedia() {
         this.imageWrapper.appendChild(this.webcamVideo);
         this.imageDisplayArea.appendChild(this.imageWrapper);
 
+        const video = this.webcamVideo;
         navigator.mediaDevices
             .getUserMedia({ video: true })
             .then(stream => {
+                // The camera can take a while to open. If the widget was closed, or another
+                // webcam or image took this one's place in the meantime, release the stream.
+                if (this.webcamVideo !== video) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+
                 this.webcamVideo.srcObject = stream;
 
                 const captureBtn = document.createElement("button");
@@ -159,6 +172,7 @@ function LegoBricksMedia() {
         if (this.webcamVideo && this.webcamVideo.srcObject) {
             const tracks = this.webcamVideo.srcObject.getTracks();
             tracks.forEach(track => track.stop());
+            this.webcamVideo.srcObject = null;
         }
     };
 
