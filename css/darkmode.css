@@ -72,6 +72,13 @@ body.highcontrast {
     background-color: var(--color-widget-frame-bg) !important;
 }
 
+.dark #floatingWindows .wfTopBar .wftButton.close::before,
+.dark #floatingWindows .wfTopBar .wftButton.close::after,
+.dark #floatingWindows .wfTopBar .wftButton.rollup::before,
+.dark #floatingWindows .wfTopBar .wftButton.rollup::after {
+    background-color: var(--color-text-primary);
+}
+
 /* Fix white table header strip in floating widgets during dark mode while preserving table body colors */
 .dark #floatingWindows table thead tr:first-child td,
 .dark #floatingWindows table thead tr:first-child th {
@@ -153,4 +160,3 @@ body.dark ::-webkit-scrollbar-thumb {
 body.dark ::-webkit-scrollbar-thumb:hover {
     background: var(--color-text-tertiary) !important;
 }
-

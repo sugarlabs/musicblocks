@@ -75,4 +75,42 @@ describe("Floating Widget Windows E2E Lifecycle", () => {
             .first()
             .should("have.css", "filter", "invert(1)");
     });
+
+    it("renders close and minimize buttons with readable contrast in Dark mode", () => {
+        cy.window().then(win => {
+            win.widgetWindows.windowFor({}, "status", "status", true);
+        });
+
+        cy.window().then(win => {
+            win.ActivityContext.getActivity().themeBox.dark_onclick();
+        });
+
+        cy.get("body").should("have.class", "dark");
+        cy.window().then(win => {
+            const closeBtn = win.document.querySelector(".windowFrame .wftButton.close");
+            const rollupBtn = win.document.querySelector(".windowFrame .wftButton.rollup");
+            const expectedColor = win
+                .getComputedStyle(win.document.body)
+                .getPropertyValue("--color-text-primary")
+                .trim();
+            const probe = win.document.createElement("div");
+            probe.style.color = expectedColor;
+            win.document.body.appendChild(probe);
+            const resolvedExpectedColor = win.getComputedStyle(probe).color;
+            probe.remove();
+
+            expect(win.getComputedStyle(closeBtn, "::before").backgroundColor).to.eq(
+                resolvedExpectedColor
+            );
+            expect(win.getComputedStyle(closeBtn, "::after").backgroundColor).to.eq(
+                resolvedExpectedColor
+            );
+            expect(win.getComputedStyle(rollupBtn, "::before").backgroundColor).to.eq(
+                resolvedExpectedColor
+            );
+            expect(win.getComputedStyle(rollupBtn, "::after").backgroundColor).to.eq(
+                resolvedExpectedColor
+            );
+        });
+    });
 });
