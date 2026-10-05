@@ -263,8 +263,9 @@ class GlobalPlanet {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    this.render(data);
-                    this.showLoadMore();
+                    // throwOfflineError() hides Load More; don't put it back
+                    // under an error message that says to reload the page.
+                    if (this.render(data)) this.showLoadMore();
                 }.bind(this)
             );
         } else {
@@ -373,6 +374,13 @@ class GlobalPlanet {
         });
     }
 
+    /**
+     * Renders the cards for a page of the project list.
+     *
+     * @returns {boolean} false when nothing could be rendered and the offline
+     *   error was shown instead, so the caller knows not to put Load More
+     *   back underneath it.
+     */
     render(data) {
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
         this.cleanContainer();
@@ -392,14 +400,21 @@ class GlobalPlanet {
             }
         }
 
-        // If nothing rendered at all, show "no projects" rather than an empty grid.
+        // Nothing rendered from a non-empty list means the project list arrived
+        // but the per-project details did not: getProjectDetails() reports every
+        // failure as ERROR_CONNECTION_FAILURE, so the server is what went away.
+        // "No results found" would be wrong twice over — the search did find
+        // results, and it overwrites the offline message addProjectToCache()
+        // just put up (cleanContainer() above removes it). An empty list is
+        // handled before we get here, by the l === 0 branch in addProjects().
         if (rendered === 0 && data.length > 0) {
-            this.throwNoProjectsError();
-            return;
+            this.throwOfflineError();
+            return false;
         }
 
         jQuery(".tooltipped").tooltip({ delay: 50 });
         this.afterAddProjects();
+        return true;
     }
 
     afterAddProjects() {

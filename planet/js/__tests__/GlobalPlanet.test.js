@@ -333,6 +333,70 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("render", () => {
+        it("should keep the offline error when the details could not be downloaded", () => {
+            // The list arrived with two projects, then the server went away, so
+            // nothing reached the cache. That is a dead server, not an empty
+            // result set.
+            gp.cache = {};
+            const rendered = gp.render([
+                ["proj1", "2026-10-01"],
+                ["proj2", "2026-10-01"]
+            ]);
+
+            const el = document.getElementById("global-projects");
+            expect(el.innerHTML).toContain("Feature unavailable");
+            expect(el.innerHTML).not.toContain("No results found.");
+            expect(rendered).toBe(false);
+        });
+
+        it("should not leave Load More under the offline error", () => {
+            // Drive the real path: a full page of results (so hasMore is true
+            // and the callback would normally call showLoadMore), with every
+            // detail request failing the way a dead server answers.
+            gp.cache = {};
+            gp.page = 1;
+            mockPlanet.ServerInterface.getProjectDetails.mockImplementation((_id, cb) =>
+                cb({ success: false, error: "ERROR_CONNECTION_FAILURE" })
+            );
+            document.getElementById("load-more-projects").style.display = "block";
+
+            gp.addProjects([
+                ["proj1", "2026-10-01"],
+                ["proj2", "2026-10-01"]
+            ]);
+
+            const el = document.getElementById("global-projects");
+            expect(el.innerHTML).toContain("Feature unavailable");
+            expect(el.innerHTML).not.toContain("No results found.");
+            expect(document.getElementById("load-more-projects").style.display).toBe("none");
+        });
+
+        it('should still say "no results" when the list itself is empty', () => {
+            // The l === 0 branch in addProjects is the one case where nothing
+            // found really means nothing found.
+            gp.cache = {};
+            gp.index = 0;
+
+            gp.addProjects([]);
+
+            const el = document.getElementById("global-projects");
+            expect(el.innerHTML).toContain("No results found.");
+            expect(el.innerHTML).not.toContain("Feature unavailable");
+        });
+
+        it("should render the cards that did arrive", () => {
+            gp.cache = { proj1: { ProjectName: "One" } };
+            const rendered = gp.render([["proj1", "2026-10-01"]]);
+
+            const el = document.getElementById("global-projects");
+            expect(el.innerHTML).not.toContain("Feature unavailable");
+            expect(el.innerHTML).not.toContain("No results found.");
+            expect(rendered).toBe(true);
+            expect(gp.cards.length).toBe(1);
+        });
+    });
+
     describe("afterAddProjects", () => {
         it("should increment index by page size", () => {
             gp.index = 0;
