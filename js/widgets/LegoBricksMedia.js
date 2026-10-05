@@ -159,6 +159,18 @@ function LegoBricksMedia() {
                 this.activity.textMsg(_("Webcam started"));
             })
             .catch(err => {
+                // Drop the empty video so the placeholder comes back, unless a newer webcam
+                // or image has already replaced it.
+                if (this.webcamVideo === video) {
+                    this.webcamVideo = null;
+                    if (this.imageWrapper && this.imageWrapper.contains(video)) {
+                        this.imageWrapper.remove();
+                        this.imageWrapper = null;
+                    }
+                    if (this.imagePlaceholder) {
+                        this.imageDisplayArea.appendChild(this.imagePlaceholder);
+                    }
+                }
                 this.activity.textMsg(_("Webcam access denied: %s").replace(/%s/g, err.message));
             });
     };

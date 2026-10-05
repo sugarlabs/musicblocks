@@ -150,10 +150,11 @@ describe("LegoBricksMedia", () => {
             expect(widget.activity.textMsg).toHaveBeenCalledWith("Webcam started");
         });
 
-        test("reports a denied camera", async () => {
+        test("reports a denied camera and brings the placeholder back", async () => {
             navigator.mediaDevices = {
                 getUserMedia: jest.fn().mockRejectedValue(new Error("Permission denied"))
             };
+            widget.imagePlaceholder = document.createElement("div");
 
             widget._startWebcam();
             await flushPromises();
@@ -161,6 +162,37 @@ describe("LegoBricksMedia", () => {
             expect(widget.activity.textMsg).toHaveBeenCalledWith(
                 "Webcam access denied: Permission denied"
             );
+            expect(widget.webcamVideo).toBeNull();
+            expect(widget.imageWrapper).toBeNull();
+            expect(widget.imageDisplayArea.querySelector("video")).toBeNull();
+            expect(widget.imageDisplayArea.contains(widget.imagePlaceholder)).toBe(true);
+        });
+
+        test("a denied camera does not undo a newer webcam start", async () => {
+            const { stream } = makeStream();
+            let rejectFirst;
+            navigator.mediaDevices = {
+                getUserMedia: jest
+                    .fn()
+                    .mockImplementationOnce(
+                        () =>
+                            new Promise((resolve, reject) => {
+                                rejectFirst = reject;
+                            })
+                    )
+                    .mockResolvedValueOnce(stream)
+            };
+
+            widget._startWebcam();
+            widget._startWebcam();
+            await flushPromises();
+            const current = widget.webcamVideo;
+            rejectFirst(new Error("Permission denied"));
+            await flushPromises();
+
+            expect(widget.webcamVideo).toBe(current);
+            expect(widget.webcamVideo.srcObject).toBe(stream);
+            expect(widget.imageDisplayArea.contains(current)).toBe(true);
         });
 
         test("stops the previous stream when the webcam is started again", async () => {
