@@ -196,6 +196,26 @@ describe("setupMeterActions", () => {
             // bpm stack must be unchanged — no bad value was stored
             expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
         });
+
+        test.each([
+            ["NaN", NaN],
+            ["zero", 0],
+            ["negative", -0.5],
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity]
+        ])(
+            "setBPM with bad beatValue (%s) shows an error and does not push to bpm",
+            (label, badBeatVal) => {
+                activity.errorMsg.mockClear();
+                const bpmBefore = [...targetTurtle.singer.bpm];
+                Singer.MeterActions.setBPM(120, badBeatVal, 0, 1);
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "Beat value must be a positive number.",
+                    1
+                );
+                expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
+            }
+        );
     });
 
     describe("master BPM settings", () => {
@@ -255,6 +275,35 @@ describe("setupMeterActions", () => {
                 expect(Singer.defaultBPMFactor).toBe(factorBefore);
             }
         );
+    });
+
+    describe("setMeter handles NaN and invalid inputs gracefully", () => {
+        test.each([
+            ["NaN beatCount", NaN, 1 / 4, 4, 4],
+            ["zero beatCount", 0, 1 / 4, 4, 4],
+            ["negative beatCount", -3, 1 / 4, 4, 4],
+            ["NaN noteValue", 4, NaN, 4, 4],
+            ["zero noteValue", 4, 0, 4, 4],
+            ["negative noteValue", 4, -4, 4, 4],
+            ["both NaN", NaN, NaN, 4, 4]
+        ])("should sanitize %s: setMeter(%s, %s)", (desc, beats, noteVal, expBeats, expNoteVal) => {
+            Singer.MeterActions.setMeter(beats, noteVal, 0);
+            expect(targetTurtle.singer.beatsPerMeasure).toBe(expBeats);
+            expect(targetTurtle.singer.noteValuePerBeat).toBe(expNoteVal);
+        });
+    });
+
+    describe("setPickup handles NaN and non-finite inputs gracefully", () => {
+        test.each([
+            ["NaN", NaN, 0],
+            ["Infinity", Infinity, 0],
+            ["-Infinity", -Infinity, 0],
+            ["negative", -5, 0],
+            ["valid positive", 3, 3]
+        ])("setPickup with %s (%s) should result in pickup %i", (label, val, expected) => {
+            Singer.MeterActions.setPickup(val, 0);
+            expect(targetTurtle.singer.pickup).toBe(expected);
+        });
     });
 
     it("should set a listener for every beat", () => {
