@@ -20,7 +20,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.LegoBricksRows = require("../LegoBricksRows");
+global.LegoBricksLayout = require("../LegoBricksLayout");
+global.LegoBricksExport = require("../LegoBricksExport");
+global.LegoBricksMedia = require("../LegoBricksMedia");
+global.LegoBricksEyeDropper = require("../LegoBricksEyeDropper");
+global.LegoBricksColor = require("../LegoBricksColor");
+global.LegoBricksPlayback = require("../LegoBricksPlayback");
+global.LegoBricksVisualization = require("../LegoBricksVisualization");
 const LegoWidget = require("../legobricks");
+global.LegoWidget = LegoWidget;
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
 
