@@ -131,12 +131,37 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
     padding: 24px;
     background-color: var(--color-panel-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 10000;
     text-align: left;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+    .modalBox {
+        width: calc(100vw - 32px) !important;
+        padding: 20px 16px !important;
+        margin: 0 !important;
+    }
+
+    .modal-content {
+        width: calc(100vw - 32px) !important;
+        padding: 20px 16px !important;
+        margin: 0 !important;
+    }
+
+    .clear-button-container .confirm-button,
+    .clear-button-container .cancel-button {
+        min-width: 100px;
+        text-align: center;
+        box-sizing: border-box;
+    }
 }
 
 .modal-title {
@@ -149,6 +174,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     color: var(--color-text-primary);
     font-size: 16px;
     margin-bottom: 24px;
+    overflow-wrap: break-word;
 }
 
 .clear-button-container {
@@ -188,7 +214,8 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-border-primary);
 }
 
-/* Plugin dialog modal styles */
+/* Modal backdrop styles */
+.modal-backdrop,
 .plugin-modal-backdrop {
     position: fixed;
     top: 0;
@@ -261,12 +288,16 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
     padding: 24px;
     background-color: var(--color-bg-primary);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
     border-radius: 8px;
     z-index: 10000;
     text-align: left;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
 }
 
 .block-count-dropdown {
