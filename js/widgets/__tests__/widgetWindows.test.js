@@ -746,16 +746,21 @@ describe("widgetWindows", () => {
             expect(win._maxminButton.getAttribute("aria-label")).toBe("Maximize window");
         });
 
-        test("rollup/unroll toggle aria-expanded on the roll button", () => {
+        test("rollup/unroll toggle aria-expanded and rename the roll button", () => {
             const win = createTestWindow();
 
             expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
 
             win._rollup();
             expect(win._rollButton.getAttribute("aria-expanded")).toBe("false");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Expand window");
+            expect(win._rollButton.title).toBe("Expand");
 
             win.unroll();
             expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+            expect(win._rollButton.title).toBe("Minimize");
         });
     });
 

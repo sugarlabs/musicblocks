@@ -941,6 +941,8 @@ class WidgetWindow {
         this._body.style.display = "none";
         if (this._rollButton) {
             this._rollButton.setAttribute("aria-expanded", "false");
+            this._rollButton.setAttribute("aria-label", _("Expand window"));
+            this._rollButton.title = _("Expand");
         }
         return this;
     }
@@ -957,6 +959,8 @@ class WidgetWindow {
                 this._rollButton.classList.remove("plus");
             }
             this._rollButton.setAttribute("aria-expanded", "true");
+            this._rollButton.setAttribute("aria-label", _("Roll up window"));
+            this._rollButton.title = _("Minimize");
         }
         return this;
     }
