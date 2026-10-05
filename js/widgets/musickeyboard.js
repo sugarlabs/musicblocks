@@ -144,6 +144,8 @@ function MusicKeyboard(activity) {
     } else {
         this._timerManager = null;
     }
+    this._activeIntervals = new Set();
+    this._activeTimeouts = new Set();
     this._playOneTimeout = null;
     this._chordTimeouts = [];
 
@@ -183,16 +185,24 @@ function MusicKeyboard(activity) {
         if (this._timerManager !== null) {
             return this._timerManager.setInterval(callback, interval);
         }
-        return false;
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
     };
 
     this._clearWidgetInterval = function (id) {
-        if (id === null || id === undefined || id === false) {
+        if (id === null || id === undefined) {
             return false;
         }
 
         if (this._timerManager !== null) {
             return this._timerManager.clearInterval(id);
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
         }
 
         return false;
@@ -202,16 +212,27 @@ function MusicKeyboard(activity) {
         if (this._timerManager !== null) {
             return this._timerManager.setTimeout(callback, delay);
         }
-        return false;
+        const id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
     };
 
     this._clearWidgetTimeout = function (id) {
-        if (id === null || id === undefined || id === false) {
+        if (id === null || id === undefined) {
             return false;
         }
 
         if (this._timerManager !== null) {
             return this._timerManager.clearTimeout(id);
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
         }
 
         return false;
@@ -235,6 +256,16 @@ function MusicKeyboard(activity) {
         if (this._timerManager !== null) {
             return this._timerManager.clearAll();
         }
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+        }
+        this._activeIntervals.clear();
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+        }
+        this._activeTimeouts.clear();
 
         return 0;
     };
@@ -859,6 +890,19 @@ function MusicKeyboard(activity) {
                 myNode.replaceChildren();
             }
 
+            // Remove wheel event listeners from keyboard and table
+            if (this.keyboardDiv && this._stopPropagationHandler) {
+                this.keyboardDiv.removeEventListener("wheel", this._stopPropagationHandler);
+                this.keyboardDiv.removeEventListener(
+                    "DOMMouseScroll",
+                    this._stopPropagationHandler
+                );
+            }
+            if (this.keyTable && this._stopPropagationHandler) {
+                this.keyTable.removeEventListener("wheel", this._stopPropagationHandler);
+                this.keyTable.removeEventListener("DOMMouseScroll", this._stopPropagationHandler);
+            }
+
             this.stopMetronome();
             this._clearWidgetTimers();
 
@@ -1052,13 +1096,13 @@ function MusicKeyboard(activity) {
          */
         this.keyTable = document.createElement("div");
 
-        const stopPropagationHandler = e => {
+        this._stopPropagationHandler = e => {
             e.stopPropagation();
         };
-        this.keyboardDiv.addEventListener("wheel", stopPropagationHandler);
-        this.keyboardDiv.addEventListener("DOMMouseScroll", stopPropagationHandler);
-        this.keyTable.addEventListener("wheel", stopPropagationHandler);
-        this.keyTable.addEventListener("DOMMouseScroll", stopPropagationHandler);
+        this.keyboardDiv.addEventListener("wheel", this._stopPropagationHandler);
+        this.keyboardDiv.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
+        this.keyTable.addEventListener("wheel", this._stopPropagationHandler);
+        this.keyTable.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
 
         /**
          * Appends keyboard and table divs to the widget window body.

@@ -123,6 +123,8 @@ function LegoWidget() {
     this._resolvePolyphonicWait = null;
     this._playingNotes = new Set();
     this._polyphonicPlaybackId = 0;
+    this._fileInput = null;
+    this._animationFrameId = null;
 
     /**
      * Timer manager for managing all widget timeouts safely.
@@ -414,6 +416,16 @@ function LegoWidget() {
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
             this._cleanupDragListeners(); // Clean up drag event listeners
+            if (this._animationFrameId !== null) {
+                cancelAnimationFrame(this._animationFrameId);
+                this._animationFrameId = null;
+            }
+            if (this._fileInput !== null) {
+                if (this._fileInput.parentNode) {
+                    this._fileInput.parentNode.removeChild(this._fileInput);
+                }
+                this._fileInput = null;
+            }
             this.imageWrapper = null;
             this.webcamVideo = null;
             this._offscreenCanvas = null;
@@ -713,12 +725,12 @@ function LegoWidget() {
         this.widgetWindow.getWidgetBody().appendChild(mainContainer);
 
         // Create hidden file input
-        this.fileInput = document.createElement("input");
-        this.fileInput.type = "file";
-        this.fileInput.accept = "image/*";
-        this.fileInput.style.display = "none";
-        this.fileInput.onchange = e => this._handleImageUpload(e);
-        document.body.appendChild(this.fileInput);
+        this._fileInput = document.createElement("input");
+        this._fileInput.type = "file";
+        this._fileInput.accept = "image/*";
+        this._fileInput.style.display = "none";
+        this._fileInput.onchange = e => this._handleImageUpload(e);
+        document.body.appendChild(this._fileInput);
     };
 
     /**
@@ -1374,7 +1386,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._uploadImage = function () {
-        this.fileInput.click();
+        this._fileInput.click();
     };
 
     /**
@@ -2623,7 +2635,7 @@ function LegoWidget() {
         if (allLinesCompleted) {
             this._stopPlayback();
         } else {
-            requestAnimationFrame(() => this._animateLines());
+            this._animationFrameId = requestAnimationFrame(() => this._animateLines());
         }
     };
 
