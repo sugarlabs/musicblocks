@@ -300,9 +300,24 @@ describe("LegoWidget Core Logic", () => {
             });
         });
 
-        it("should fall back to do for a note name outside the map", () => {
+        it("should keep the flat on an enharmonic note name such as Cb", () => {
             expect(legoWidget._convertRowToPitch({ note: "Cb4" })).toEqual({
-                solfege: "do",
+                solfege: "do♭",
+                octave: 4
+            });
+        });
+
+        it("should read the ♯ and ♭ that getNote writes into the row note", () => {
+            expect(legoWidget._convertRowToPitch({ note: "F♯4" })).toEqual({
+                solfege: "fa♯",
+                octave: 4
+            });
+            expect(legoWidget._convertRowToPitch({ note: "B♭3" })).toEqual({
+                solfege: "ti♭",
+                octave: 3
+            });
+            expect(legoWidget._convertRowToPitch({ note: "E♯4" })).toEqual({
+                solfege: "mi♯",
                 octave: 4
             });
         });

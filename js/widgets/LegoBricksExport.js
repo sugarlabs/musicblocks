@@ -356,35 +356,30 @@ function LegoBricksExport() {
     this._convertRowToPitch = function (rowData) {
         if (!rowData.note) return null;
 
-        // Parse note string (e.g., "C4", "D5", etc.)
-        const noteMatch = rowData.note.match(/^([A-G][#b]?)(\d+)$/);
+        // Parse note string (e.g., "C4", "F♯4", "B♭3"). The rows come from getNote, which
+        // writes accidentals as ♯ and ♭, so accept those as well as # and b.
+        const noteMatch = rowData.note.match(/^([A-G])([#b♯♭]?)(\d+)$/);
         if (!noteMatch) return null;
 
-        const noteName = noteMatch[1];
-        const octave = parseInt(noteMatch[2], 10);
+        const octave = parseInt(noteMatch[3], 10);
 
         // Convert note name to solfege
-        const noteToSolfege = {
-            "C": "do",
-            "C#": "do♯",
-            "Db": "re♭",
-            "D": "re",
-            "D#": "re♯",
-            "Eb": "mi♭",
-            "E": "mi",
-            "F": "fa",
-            "F#": "fa♯",
-            "Gb": "sol♭",
-            "G": "sol",
-            "G#": "sol♯",
-            "Ab": "la♭",
-            "A": "la",
-            "A#": "la♯",
-            "Bb": "ti♭",
-            "B": "ti"
+        const letterToSolfege = {
+            C: "do",
+            D: "re",
+            E: "mi",
+            F: "fa",
+            G: "sol",
+            A: "la",
+            B: "ti"
         };
-
-        const solfege = noteToSolfege[noteName] || "do";
+        const accidental = noteMatch[2];
+        let solfege = letterToSolfege[noteMatch[1]];
+        if (accidental === "#" || accidental === "♯") {
+            solfege += "♯";
+        } else if (accidental === "b" || accidental === "♭") {
+            solfege += "♭";
+        }
 
         return {
             solfege: solfege,
