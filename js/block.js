@@ -2772,22 +2772,24 @@ class Block {
             this.disconnectedHighlightBitmap.visible = false;
         }
 
-        if (this.name === "action") {
-            // Label the collapsed block with the action label.
-            if (this.connections[1] !== null) {
-                let text = this.blocks.blockList[this.connections[1]].value;
-                if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
-                    text = text.slice(0, STRINGLEN) + "...";
+        if (this.collapseText !== null) {
+            if (this.name === "action") {
+                // Label the collapsed block with the action label.
+                if (this.connections[1] !== null) {
+                    let text = this.blocks.blockList[this.connections[1]].value;
+                    if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
+                        text = text.slice(0, STRINGLEN) + "...";
+                    }
+
+                    this.collapseText.text = text;
+                } else {
+                    this.collapseText.text = "";
                 }
-
-                this.collapseText.text = text;
-            } else {
-                this.collapseText.text = "";
             }
-        }
 
-        // Make sure the text is on top.
-        this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
+            // Make sure the text is on top.
+            this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
+        }
 
         if (this.isInlineCollapsible()) {
             // Only collapse the contents of the note block.

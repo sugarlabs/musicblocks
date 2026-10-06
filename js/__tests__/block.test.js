@@ -595,6 +595,7 @@ describe("Block Foundation", () => {
                 mockBlocks.dragGroup = [0];
 
                 expect(() => block.collapseToggle()).not.toThrow();
+                expect(block.collapsed).toBe(true);
             });
         });
 
