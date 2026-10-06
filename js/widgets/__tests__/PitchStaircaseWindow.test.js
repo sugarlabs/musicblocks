@@ -190,6 +190,17 @@ describe("PitchStaircaseWindow", () => {
             expect(psc._save).toHaveBeenCalledTimes(2);
         });
 
+        test("save unlocks again even if saving throws", () => {
+            psc._save = jest.fn(() => {
+                throw new Error("bad block");
+            });
+
+            expect(() => widgetWindow.buttons["Save"].onclick()).toThrow("bad block");
+            jest.advanceTimersByTime(1000);
+
+            expect(psc._get_save_lock()).toBe(false);
+        });
+
         test("undo removes one step and clear removes them all", () => {
             const steps = [1, 2, 3];
             psc._undo = jest.fn(() => steps.pop() !== undefined);

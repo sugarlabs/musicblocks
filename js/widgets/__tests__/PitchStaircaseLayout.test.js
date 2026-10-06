@@ -134,6 +134,20 @@ describe("PitchStaircaseLayout", () => {
         expect(psc._dissectStair.mock.calls[0][0].target).toBe(stepCellOf(1));
     });
 
+    test("rebuilding the table stops the stair that is playing", () => {
+        psc._makeStairs();
+        playCellOf(1).onclick();
+
+        psc._refresh();
+
+        expect(psc.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", 220);
+        expect(psc._playingRowIndex).toBeNull();
+        // The new play button plays on its first click.
+        playCellOf(1).onclick();
+        expect(psc.activity.logo.synth.trigger).toHaveBeenCalledTimes(2);
+        expect(psc._playingRowIndex).toBe(1);
+    });
+
     test("a play button plays its stair, and stops it when pressed again", () => {
         psc._makeStairs();
 

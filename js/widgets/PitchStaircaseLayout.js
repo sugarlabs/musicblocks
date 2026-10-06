@@ -125,6 +125,11 @@ class PitchStaircaseLayout {
          * the first column and a table of buttons in the second column.
          */
         const pscTable = this._pscTable;
+        // The rows are about to be replaced, so stop the stair that is playing; otherwise the new
+        // play button would take its first click as Stop.
+        if (this._playingRowIndex !== null) {
+            this._stopRow();
+        }
         pscTable.replaceChildren();
         pscTable.style.textAlign = "center";
 

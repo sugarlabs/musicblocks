@@ -127,10 +127,13 @@ class PitchStaircaseWindow {
                 // Debounce button
                 if (!this._get_save_lock()) {
                     this._save_lock = true;
-                    this._save();
-                    setTimeout(() => {
-                        this._save_lock = false;
-                    }, 1000);
+                    try {
+                        this._save();
+                    } finally {
+                        setTimeout(() => {
+                            this._save_lock = false;
+                        }, 1000);
+                    }
                 }
             };
         const wfbWidget = widgetWindow.getWidgetBody();
