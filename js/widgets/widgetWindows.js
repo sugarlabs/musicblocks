@@ -752,7 +752,7 @@ class WidgetWindow {
             return this;
         }
 
-        const navHeight = document.querySelector("nav")?.offsetHeight || 64;
+        const navHeight = document.querySelector("nav")?.offsetHeight ?? 64;
         this.setPosition(
             (cRect.width - fRect.width) / 2,
             (cRect.height - fRect.height + navHeight) / 2

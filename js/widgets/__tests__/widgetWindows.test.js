@@ -966,15 +966,55 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.openWindows[key]).toBeUndefined();
         });
 
-        test("sendToCenter falls back safely when nav is absent from DOM", () => {
+        test("sendToCenter uses the fallback height when nav is absent", () => {
             const win = createTestWindow("testCenterKey");
             const nav = document.querySelector("nav");
             const parent = nav?.parentElement;
             if (nav && parent) parent.removeChild(nav);
 
-            expect(() => win.sendToCenter()).not.toThrow();
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
 
-            if (nav && parent) parent.appendChild(nav);
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("132px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                if (nav && parent) parent.appendChild(nav);
+            }
+        });
+
+        test("sendToCenter preserves a zero nav height", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const zeroNav = document.createElement("nav");
+            Object.defineProperty(zeroNav, "offsetHeight", { value: 0 });
+            document.body.appendChild(zeroNav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("100px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                zeroNav.remove();
+                if (nav && parent) parent.appendChild(nav);
+            }
         });
     });
 
