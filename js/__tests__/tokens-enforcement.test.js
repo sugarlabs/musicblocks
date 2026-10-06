@@ -472,4 +472,22 @@ describe("Theme Switching & Inline Styles Purity", () => {
             }
         }
     });
+
+    it("ensures #search does not suppress focus outline and defines visible focus indicator", () => {
+        const activitiesCss = fs.readFileSync(path.join(CSS_DIR, "activities.css"), "utf8");
+
+        const searchFocusMatch = activitiesCss.match(/(?:^|\})\s*#search:focus\s*\{([^}]*)\}/);
+        expect(searchFocusMatch).not.toBeNull();
+        expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*none/i);
+        expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*0\b/i);
+
+        const searchFocusVisibleMatch = activitiesCss.match(
+            /(?:^|\})\s*#search:focus-visible\s*\{([^}]*)\}/
+        );
+        expect(searchFocusVisibleMatch).not.toBeNull();
+        expect(searchFocusVisibleMatch[1]).toMatch(
+            /outline\s*:\s*2px\s+solid\s+var\(--color-brand-primary\)/i
+        );
+        expect(searchFocusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
+    });
 });
