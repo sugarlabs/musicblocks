@@ -2915,60 +2915,6 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
         expect(synthRef.disposed).toBe(true);
     });
 
-    describe("Cents Slider Interface", () => {
-        let synthInstance;
-        let widgetBody;
-        let sliderBtn;
-
-        beforeEach(() => {
-            synthInstance = new SynthClass();
-            widgetBody = document.createElement("div");
-            const existingChild = document.createElement("p");
-            existingChild.textContent = "Previous content";
-            widgetBody.appendChild(existingChild);
-
-            sliderBtn = document.createElement("button");
-            const img = document.createElement("img");
-            sliderBtn.appendChild(img);
-
-            synthInstance.widgetWindow = {
-                getWidgetBody: () => widgetBody
-            };
-            synthInstance.centsSliderBtn = sliderBtn;
-            synthInstance.centsValue = 15;
-            synthInstance.applyCentsAdjustment = jest.fn();
-            synthInstance._calculateFrequency = jest.fn().mockReturnValue(440);
-            synthInstance.tunerDisplay = {
-                update: jest.fn()
-            };
-            global.TunerUtils = {
-                frequencyToPitch: jest.fn().mockReturnValue(["A", 0, 4])
-            };
-        });
-
-        test("creates and removes cents slider correctly, restoring prior content", () => {
-            synthInstance.createCentsSlider();
-            expect(synthInstance.sliderVisible).toBe(true);
-            expect(widgetBody.children.length).toBeGreaterThan(0);
-
-            const slider = widgetBody.querySelector('input[type="range"]');
-            expect(slider).not.toBeNull();
-            expect(slider.value).toBe("15");
-
-            // Trigger slider input
-            slider.value = "-20";
-            slider.oninput();
-            expect(synthInstance.centsValue).toBe(-20);
-            expect(synthInstance.applyCentsAdjustment).toHaveBeenCalled();
-            expect(synthInstance.tunerDisplay.update).toHaveBeenCalled();
-
-            // Remove slider and verify previous child restored
-            synthInstance.removeCentsSlider();
-            expect(synthInstance.sliderVisible).toBe(false);
-            expect(widgetBody.textContent).toContain("Previous content");
-        });
-    });
-
     describe("Instruments, Effects, and Filters Disposal", () => {
         test("disposeAllInstruments disposes all nodes and clears dictionaries", () => {
             const synth = new SynthClass();

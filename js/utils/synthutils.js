@@ -17,7 +17,7 @@
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
-   getArticulation, stripMicrotonalPrefix, platformColor,
+   getArticulation, stripMicrotonalPrefix,
    DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
 */
 
@@ -32,7 +32,7 @@
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
-        platform, platformColor
+        platform
 */
 
 /*
@@ -2808,167 +2808,6 @@ function Synth() {
     this.getWaveFormValues = () => {
         const values = this.analyser.getValue();
         return values;
-    };
-
-    /**
-     * Creates and displays the cents adjustment interface
-     * @returns {void}
-     */
-    this.createCentsSlider = function () {
-        const widgetBody = this.widgetWindow.getWidgetBody();
-
-        // Store the current content to restore later
-        this.previousContent = [];
-        while (widgetBody.firstChild) {
-            this.previousContent.push(widgetBody.firstChild);
-            widgetBody.removeChild(widgetBody.firstChild);
-        }
-
-        // Create the cents adjustment interface
-        const centsInterface = document.createElement("div");
-        Object.assign(centsInterface.style, {
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#A6CEFF", // Light blue header section
-            display: "flex",
-            flexDirection: "column"
-        });
-
-        // Create header section
-        const header = document.createElement("div");
-        Object.assign(header.style, {
-            width: "100%",
-            padding: "15px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxSizing: "border-box"
-        });
-
-        const title = document.createElement("div");
-        title.textContent = _("Cents Adjustment");
-        Object.assign(title.style, {
-            fontWeight: "bold",
-            fontSize: "16px"
-        });
-
-        const valueDisplay = document.createElement("div");
-        valueDisplay.textContent = (this.centsValue >= 0 ? "+" : "") + (this.centsValue || 0) + "¢";
-        Object.assign(valueDisplay.style, {
-            fontSize: "16px"
-        });
-
-        header.appendChild(title);
-        header.appendChild(valueDisplay);
-        centsInterface.appendChild(header);
-
-        // Create main content area with grey background
-        const mainContent = document.createElement("div");
-        Object.assign(mainContent.style, {
-            flex: 1,
-            backgroundColor: "#E8E8E8", // Default grey background
-            padding: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px"
-        });
-
-        // Create reference tone label
-        const referenceLabel = document.createElement("div");
-        referenceLabel.textContent = _("reference tone");
-        Object.assign(referenceLabel.style, {
-            fontSize: "14px",
-            color: "#666666"
-        });
-        mainContent.appendChild(referenceLabel);
-
-        // Create slider container
-        const sliderContainer = document.createElement("div");
-        Object.assign(sliderContainer.style, {
-            width: "100%",
-            padding: "10px 0"
-        });
-
-        // Create the slider
-        const slider = document.createElement("input");
-        Object.assign(slider, {
-            type: "range",
-            min: -50,
-            max: 50,
-            value: this.centsValue || 0,
-            step: 1
-        });
-        Object.assign(slider.style, {
-            width: "100%",
-            height: "20px",
-            margin: "10px 0",
-            backgroundColor: "#4CAF50", // Green color for the slider track
-            borderRadius: "10px",
-            appearance: "none",
-            outline: "none"
-        });
-
-        sliderContainer.appendChild(slider);
-        mainContent.appendChild(sliderContainer);
-
-        // Create sample label
-        const sampleLabel = document.createElement("div");
-        sampleLabel.textContent = _("sample");
-        Object.assign(sampleLabel.style, {
-            fontSize: "14px",
-            color: "#666666",
-            marginTop: "auto" // Push to bottom
-        });
-        mainContent.appendChild(sampleLabel);
-
-        centsInterface.appendChild(mainContent);
-        widgetBody.appendChild(centsInterface);
-
-        // Add event listener for slider changes
-        slider.oninput = () => {
-            const value = parseInt(slider.value, 10);
-            valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
-            this.centsValue = value;
-            // Update tuner display if it exists
-            if (this.tunerDisplay) {
-                const noteObj = TunerUtils.frequencyToPitch(this._calculateFrequency());
-                this.tunerDisplay.update(noteObj[0], this.centsValue, noteObj[2]);
-            }
-            // Apply the cents adjustment
-            this.applyCentsAdjustment();
-        };
-
-        this.sliderDiv = centsInterface;
-        this.sliderVisible = true;
-
-        // Update button appearance
-        this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "brightness(0) invert(1)";
-        this.centsSliderBtn.style.backgroundColor = platformColor.selectorSelected;
-    };
-
-    /**
-     * Removes the cents adjustment interface
-     * @returns {void}
-     */
-    this.removeCentsSlider = function () {
-        if (this.sliderDiv && this.sliderDiv.parentNode) {
-            const widgetBody = this.widgetWindow.getWidgetBody();
-            // Clear the slider interface by removing all child nodes
-            while (widgetBody.firstChild) {
-                widgetBody.removeChild(widgetBody.firstChild);
-            }
-
-            // Restore the previous content
-            if (Array.isArray(this.previousContent)) {
-                this.previousContent.forEach(node => {
-                    widgetBody.appendChild(node);
-                });
-            }
-            this.previousContent = null;
-        }
-        this.sliderVisible = false;
-        this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "";
-        this.centsSliderBtn.style.backgroundColor = "";
     };
 
     /**
