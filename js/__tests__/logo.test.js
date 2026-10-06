@@ -2384,7 +2384,13 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(logo._haltedTurtles["0"]).toBe(true);
 
-            logo._resetIterationBudgets();
+            // The reset belongs to the start of a run, so drive it the way the
+            // Play button does rather than calling the helper directly.
+            logo.runLogoCommands(null, null);
+
+            expect(logo._haltedTurtles).toEqual({});
+            expect(logo._iterationBudgets).toEqual({});
+
             mockActivity.errorMsg.mockClear();
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -2413,6 +2419,34 @@ describe("Logo runFromBlockNow", () => {
 
             expect(() => logo._haltTurtle(7)).not.toThrow();
             expect(logo._haltedTurtles["7"]).toBe(true);
+        });
+
+        test("keeps the run active while another turtle is still running", () => {
+            logo._resetIterationBudgets();
+            logo._MAX_ITERATIONS = 1;
+            logo.blockList = [makeFlowBlock("noop")];
+            mockActivity.turtles.running = jest.fn(() => true);
+            logo._syncCounter = 42;
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo._haltedTurtles["0"]).toBe(true);
+            expect(logo._alreadyRunning).toBe(true);
+            expect(logo._syncCounter).toBe(42);
+        });
+
+        test("clears the run state once no turtle is left running", () => {
+            logo._resetIterationBudgets();
+            logo._MAX_ITERATIONS = 1;
+            logo.blockList = [makeFlowBlock("noop")];
+            mockActivity.turtles.running = jest.fn(() => false);
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo._haltedTurtles["0"]).toBe(true);
+            expect(logo._alreadyRunning).toBe(false);
         });
     });
 
