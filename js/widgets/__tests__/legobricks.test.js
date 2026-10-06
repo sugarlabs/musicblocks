@@ -3118,3 +3118,75 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
         });
     });
 });
+
+describe("LegoWidget — a module that fails to load", () => {
+    const MODULE_NAMES = [
+        "LegoBricksRows",
+        "LegoBricksLayout",
+        "LegoBricksExport",
+        "LegoBricksMedia",
+        "LegoBricksEyeDropper",
+        "LegoBricksColor",
+        "LegoBricksPlayback",
+        "LegoBricksVisualization"
+    ];
+    const loaded = {};
+
+    beforeEach(() => {
+        for (const name of MODULE_NAMES) {
+            loaded[name] = global[name];
+        }
+    });
+
+    afterEach(() => {
+        for (const name of MODULE_NAMES) {
+            global[name] = loaded[name];
+        }
+    });
+
+    it.each(MODULE_NAMES)("throws naming %s when it is not loaded", name => {
+        delete global[name];
+        expect(() => new LegoWidget()).toThrow(
+            "LegoWidget: LEGO Bricks module not loaded: " + name
+        );
+    });
+
+    it("installs no module when one is missing", () => {
+        const spies = {};
+        for (const name of MODULE_NAMES) {
+            spies[name] = jest.fn();
+            global[name] = spies[name];
+        }
+        delete global.LegoBricksVisualization;
+
+        const widget = {};
+        expect(() => LegoWidget.installModules(widget)).toThrow("LegoBricksVisualization");
+        for (const name of MODULE_NAMES.slice(0, -1)) {
+            expect(spies[name]).not.toHaveBeenCalled();
+        }
+        expect(widget).toEqual({});
+    });
+
+    it("names every missing module", () => {
+        delete global.LegoBricksMedia;
+        global.LegoBricksColor = undefined;
+        expect(() => new LegoWidget()).toThrow(
+            "LegoWidget: LEGO Bricks module not loaded: LegoBricksMedia, LegoBricksColor"
+        );
+    });
+
+    it("treats a module that loaded as something other than a function as missing", () => {
+        global.LegoBricksPlayback = {};
+        expect(() => new LegoWidget()).toThrow("LegoBricksPlayback");
+    });
+
+    it("still builds the widget once every module is back", () => {
+        delete global.LegoBricksRows;
+        expect(() => new LegoWidget()).toThrow("LegoBricksRows");
+        global.LegoBricksRows = loaded.LegoBricksRows;
+
+        const widget = new LegoWidget();
+        expect(typeof widget.addRowBlock).toBe("function");
+        expect(typeof widget._startWebcam).toBe("function");
+    });
+});

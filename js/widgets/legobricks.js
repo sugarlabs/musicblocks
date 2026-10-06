@@ -259,24 +259,29 @@ LegoWidget.createImageWrapper = () => {
  * are always defined by the time the constructor runs.
  * @param {LegoWidget} widget - The widget being constructed.
  * @returns {void}
+ * @throws {Error} If any module is missing. The error names the missing modules, and no module
+ *     is installed, so a half-built widget is never returned.
  */
 LegoWidget.installModules = function (widget) {
-    const modules = [
-        typeof LegoBricksRows !== "undefined" ? LegoBricksRows : null,
-        typeof LegoBricksLayout !== "undefined" ? LegoBricksLayout : null,
-        typeof LegoBricksExport !== "undefined" ? LegoBricksExport : null,
-        typeof LegoBricksMedia !== "undefined" ? LegoBricksMedia : null,
-        typeof LegoBricksEyeDropper !== "undefined" ? LegoBricksEyeDropper : null,
-        typeof LegoBricksColor !== "undefined" ? LegoBricksColor : null,
-        typeof LegoBricksPlayback !== "undefined" ? LegoBricksPlayback : null,
-        typeof LegoBricksVisualization !== "undefined" ? LegoBricksVisualization : null
-    ];
-    if (modules.includes(null)) {
-        throw new Error("LegoWidget: a LEGO Bricks module is not loaded");
+    const modules = {
+        LegoBricksRows: typeof LegoBricksRows !== "undefined" ? LegoBricksRows : null,
+        LegoBricksLayout: typeof LegoBricksLayout !== "undefined" ? LegoBricksLayout : null,
+        LegoBricksExport: typeof LegoBricksExport !== "undefined" ? LegoBricksExport : null,
+        LegoBricksMedia: typeof LegoBricksMedia !== "undefined" ? LegoBricksMedia : null,
+        LegoBricksEyeDropper:
+            typeof LegoBricksEyeDropper !== "undefined" ? LegoBricksEyeDropper : null,
+        LegoBricksColor: typeof LegoBricksColor !== "undefined" ? LegoBricksColor : null,
+        LegoBricksPlayback: typeof LegoBricksPlayback !== "undefined" ? LegoBricksPlayback : null,
+        LegoBricksVisualization:
+            typeof LegoBricksVisualization !== "undefined" ? LegoBricksVisualization : null
+    };
+    const missing = Object.keys(modules).filter(name => typeof modules[name] !== "function");
+    if (missing.length > 0) {
+        throw new Error("LegoWidget: LEGO Bricks module not loaded: " + missing.join(", "));
     }
 
-    for (const install of modules) {
-        install.call(widget);
+    for (const name in modules) {
+        modules[name].call(widget);
     }
 };
 
