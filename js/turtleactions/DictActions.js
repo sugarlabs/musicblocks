@@ -23,7 +23,7 @@
    global
 
    _, Turtle, Singer, getNote, INVALIDPITCH, pitchToNumber,
-   getTargetTurtle
+   getTargetTurtle, frequencyToPitch, noteToObj
  */
 
 /*
@@ -35,7 +35,7 @@
     js/turtle-singer.js
         Singer
     js/utils/musicutils.js
-        getNote, pitchToNumber
+        getNote, pitchToNumber, frequencyToPitch, noteToObj
     js/logo.js
         INVALIDPITCH
     js/blocks/EnsembleBlocks.js
@@ -150,11 +150,11 @@ function setupDictActions(activity) {
             } else if (name === "pitch number") {
                 let obj;
                 if (targetTur.singer.lastNotePlayed !== null) {
-                    const len = targetTur.singer.lastNotePlayed[0].length;
-                    const pitch = targetTur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    const octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1), 10);
-
-                    obj = [pitch, octave];
+                    if (typeof targetTur.singer.lastNotePlayed[0] === "number") {
+                        obj = frequencyToPitch(targetTur.singer.lastNotePlayed[0]);
+                    } else {
+                        obj = noteToObj(targetTur.singer.lastNotePlayed[0]);
+                    }
                 } else if (targetTur.singer.notePitches.length > 0) {
                     obj = getNote(
                         targetTur.singer.notePitches[0],
