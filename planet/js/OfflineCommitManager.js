@@ -332,7 +332,7 @@ class OfflineCommitManager {
                     try {
                         const repoResult = await this._createPendingRepo(id, pending);
                         if (repoResult && repoResult.success) {
-                            syncedCount += repoResult.synced > 0 ? repoResult.synced : 1;
+                            syncedCount += repoResult.synced || 0;
                         }
                     } catch (err) {
                         console.error(
