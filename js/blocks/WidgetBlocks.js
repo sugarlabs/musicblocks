@@ -2204,6 +2204,14 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "legoWidget",
                 _getWidgetDependencies(typeof LegoWidget !== "undefined" ? LegoWidget : null, [
+                    "widgets/LegoBricksRows",
+                    "widgets/LegoBricksLayout",
+                    "widgets/LegoBricksExport",
+                    "widgets/LegoBricksMedia",
+                    "widgets/LegoBricksEyeDropper",
+                    "widgets/LegoBricksColor",
+                    "widgets/LegoBricksPlayback",
+                    "widgets/LegoBricksVisualization",
                     "widgets/legobricks"
                 ]),
                 () => new LegoWidget(),
