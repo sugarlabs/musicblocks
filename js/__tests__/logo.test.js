@@ -2391,6 +2391,29 @@ describe("Logo runFromBlockNow", () => {
 
             expect(mockActivity.errorMsg).not.toHaveBeenCalled();
         });
+
+        test("halting a turtle empties its step queue and clears its delay timer", () => {
+            const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+            logo.stepQueue = { 0: [11, 12] };
+            turtle0.running = true;
+            turtle0.delayTimeout = 4242;
+            turtle0.singer._unhighlightTimers = { 0: 1 };
+
+            logo._haltTurtle(0);
+
+            expect(logo.stepQueue["0"]).toEqual([]);
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(4242);
+            expect(turtle0.delayTimeout).toBeNull();
+            expect(turtle0.running).toBe(false);
+            expect(turtle0.singer._unhighlightTimers).toEqual({});
+        });
+
+        test("halting an index with no turtle behind it still records the halt", () => {
+            mockActivity.turtles.ithTurtle = jest.fn(() => undefined);
+
+            expect(() => logo._haltTurtle(7)).not.toThrow();
+            expect(logo._haltedTurtles["7"]).toBe(true);
+        });
     });
 
     describe("limits and plugin dispatch", () => {
