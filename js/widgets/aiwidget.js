@@ -808,13 +808,22 @@ function AIWidget() {
             };
 
         widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
-            function () {
-                const key = prompt(
-                    _("Enter your Groq API Key: %s").replace(
-                        /%s/g,
-                        that.activity.storage.groq_api_key || ""
-                    )
-                );
+            async function () {
+                const currentKey = that.activity.storage.groq_api_key || "";
+                let key;
+
+                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                    key = await window.MBDialog.prompt({
+                        title: _("Set API Key"),
+                        message: _("Enter your Groq API Key:"),
+                        defaultValue: currentKey,
+                        okText: _("Save"),
+                        cancelText: _("Cancel")
+                    });
+                } else {
+                    key = prompt(_("Enter your Groq API Key: %s").replace(/%s/g, currentKey));
+                }
+
                 if (key !== null) {
                     that.activity.storage.groq_api_key = key.trim();
                 }
@@ -1110,9 +1119,15 @@ function AIWidget() {
 
             const apiKey = that.activity.storage.groq_api_key;
             if (!apiKey) {
-                alert(
-                    _("Please set your Groq API Key using the settings button (wrench icon) first.")
+                const notice = _(
+                    "Please set your Groq API Key using the settings button (wrench icon) first."
                 );
+
+                if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                    window.MBDialog.alert(notice, _("Set API Key"));
+                } else {
+                    alert(notice);
+                }
                 return;
             }
 

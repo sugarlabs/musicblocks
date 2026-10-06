@@ -262,6 +262,8 @@ describe("AIWidget Instance", () => {
         if (global.window?.widgetWindows) {
             global.window.widgetWindows.windowFor = originalWindowFor;
         }
+
+        delete window.MBDialog;
         jest.restoreAllMocks();
         jest.useRealTimers();
     });
@@ -528,6 +530,93 @@ describe("AIWidget Instance", () => {
         submitButton.onclick();
         expect(global.alert).toHaveBeenCalled();
         expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    const useApiKeyWidgetWindow = capture => {
+        global.window.widgetWindows.windowFor = jest.fn(() => ({
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn(),
+            sendToCenter: jest.fn(),
+            isMaximized: jest.fn(() => false),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({ width: 800, height: 600 }))
+            })),
+            getWidgetBody: jest.fn(() => document.createElement("div")),
+            addButton: jest.fn(iconName => {
+                const button = { onclick: null };
+                if (iconName === "utility-button.svg") {
+                    capture(button);
+                }
+                return button;
+            })
+        }));
+    };
+
+    it("shows the missing API key notice through MBDialog when it is available", () => {
+        const mbAlert = jest.fn();
+        global.alert = jest.fn();
+        window.MBDialog = { alert: mbAlert };
+        aiWidget = new AIWidget();
+        mockActivity.storage = {};
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn(),
+            sendToCenter: jest.fn(),
+            isMaximized: jest.fn(() => false),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({ width: 800, height: 600 }))
+            })),
+            getWidgetBody: jest.fn(() => widgetBody),
+            addButton: jest.fn(() => ({ onclick: null }))
+        };
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        widgetBody.querySelector(".inputField").value = "generate melody";
+        global.fetch = jest.fn();
+
+        widgetBody.querySelector(".submitButton").onclick();
+
+        expect(mbAlert).toHaveBeenCalled();
+        expect(global.alert).not.toHaveBeenCalled();
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it("stores the API key entered through the MBDialog prompt", async () => {
+        let apiKeyButton;
+        mockActivity.storage = {};
+        window.MBDialog = { prompt: jest.fn().mockResolvedValue("  new-key  ") };
+        useApiKeyWidgetWindow(button => {
+            apiKeyButton = button;
+        });
+
+        aiWidget = new AIWidget();
+        aiWidget.init(mockActivity);
+        await apiKeyButton.onclick();
+
+        expect(window.MBDialog.prompt).toHaveBeenCalledWith(
+            expect.objectContaining({ defaultValue: "" })
+        );
+        expect(mockActivity.storage.groq_api_key).toBe("new-key");
+    });
+
+    it("falls back to the browser prompt for the API key without MBDialog", async () => {
+        let apiKeyButton;
+        mockActivity.storage = { groq_api_key: "old-key" };
+        global.prompt = jest.fn(() => "  fallback-key  ");
+        useApiKeyWidgetWindow(button => {
+            apiKeyButton = button;
+        });
+
+        aiWidget = new AIWidget();
+        aiWidget.init(mockActivity);
+        await apiKeyButton.onclick();
+
+        expect(global.prompt).toHaveBeenCalled();
+        expect(mockActivity.storage.groq_api_key).toBe("fallback-key");
+        delete global.prompt;
     });
 
     it("should display API error messages from Groq responses", async () => {

@@ -4033,6 +4033,81 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             await synth.trigger(testTurtle, "C4", 0.25, "electronic synth", null, null, false, 0);
             Tone.context.state = "running";
         });
+        test("watchdog notice goes through MBDialog when it is available", async () => {
+            const testTurtle = 0;
+            const savedMBDialog = window.MBDialog;
+            const savedAlert = window.alert;
+            const savedAudioWarning = window.hasShownAudioWarning;
+            const savedState = Tone.context.state;
+            const mbAlert = jest.fn();
+
+            synth.createDefaultSynth(testTurtle);
+            jest.useFakeTimers();
+            window.MBDialog = { alert: mbAlert };
+            window.alert = jest.fn();
+            window.hasShownAudioWarning = false;
+            Tone.context.state = "suspended";
+
+            try {
+                await synth.trigger(
+                    testTurtle,
+                    "C4",
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null,
+                    false,
+                    0
+                );
+                jest.advanceTimersByTime(2000);
+
+                expect(mbAlert).toHaveBeenCalled();
+                expect(window.alert).not.toHaveBeenCalled();
+            } finally {
+                jest.useRealTimers();
+                Tone.context.state = savedState;
+                window.MBDialog = savedMBDialog;
+                window.alert = savedAlert;
+                window.hasShownAudioWarning = savedAudioWarning;
+            }
+        });
+
+        test("watchdog notice falls back to a browser alert without MBDialog", async () => {
+            const testTurtle = 0;
+            const savedMBDialog = window.MBDialog;
+            const savedAlert = window.alert;
+            const savedAudioWarning = window.hasShownAudioWarning;
+            const savedState = Tone.context.state;
+
+            synth.createDefaultSynth(testTurtle);
+            jest.useFakeTimers();
+            delete window.MBDialog;
+            window.alert = jest.fn();
+            window.hasShownAudioWarning = false;
+            Tone.context.state = "suspended";
+
+            try {
+                await synth.trigger(
+                    testTurtle,
+                    "C4",
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null,
+                    false,
+                    0
+                );
+                jest.advanceTimersByTime(2000);
+
+                expect(window.alert).toHaveBeenCalled();
+            } finally {
+                jest.useRealTimers();
+                Tone.context.state = savedState;
+                window.MBDialog = savedMBDialog;
+                window.alert = savedAlert;
+                window.hasShownAudioWarning = savedAudioWarning;
+            }
+        });
 
         test("_trackVoice tracks active audio nodes on turtle singer", () => {
             const mockActiveVoices = new Set();
