@@ -479,17 +479,18 @@ describe("AST2BlockList Class", () => {
                     ]
                 ]
             ];
-            const code =
-                astring.generate(ASTUtils.getMethodAST("action", action)) +
-                "\n" +
-                exportStart(start);
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const actionCode = astring.generate(ASTUtils.getMethodAST("action", action));
+            const code = actionCode + "\n" + exportStart(start);
 
             expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
-            expect(code).not.toMatch(/\bbreak;/);
+            // The bare break, a syntax error outside a loop, isn't in the action.
+            expect(actionCode).not.toMatch(/\bbreak;/);
 
             const printed = [];
             const mouse = {
                 ENDFLOW: "ENDFLOW",
+                STOPFLOW: Promise.resolve("STOPFLOW"),
                 ENDMOUSE: "ENDMOUSE",
                 print: async value => printed.push(value),
                 playNote: async (value, flow) => flow(),
@@ -500,9 +501,69 @@ describe("AST2BlockList Class", () => {
                 run = flow(mouse);
             });
             await run;
-            // The Stop ends the action. Ending the Repeat it was called from, as Music
-            // Blocks does, isn't exported yet (#9004), so the Repeat keeps going.
-            expect(printed.slice(0, 3)).toEqual(["DO", "RE", "MI"]);
+            // As in Music Blocks, the Stop ends the Repeat the action was called from, after
+            // the rest of this round: the Repeat doesn't start a second round.
+            expect(printed).toEqual(["DO", "RE", "MI"]);
+        });
+
+        test("an action with a Stop runs to its end, then ends the loop that called it", async () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const start = [
+                [
+                    "repeat",
+                    [3],
+                    [
+                        ["nameddo_action", null],
+                        ["print", ["after"]]
+                    ]
+                ]
+            ];
+            const code =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+
+            const printed = [];
+            const mouse = {
+                ENDFLOW: Promise.resolve(),
+                STOPFLOW: Promise.resolve("STOPFLOW"),
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value)
+            };
+            let run;
+            await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                run = flow(mouse);
+            });
+            await run;
+            expect(printed).toEqual(["k", "j", "after"]);
+        });
+
+        test("an action with a Stop imports back as the same action call and Stop", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const start = [["repeat", [3], [["nameddo_action", null]]]];
+            const withStop =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+            ASTUtils.setStoppingActions([], []);
+            const plain =
+                astring.generate(
+                    ASTUtils.getMethodAST("action", [
+                        ["print", ["k"]],
+                        ["print", ["j"]]
+                    ])
+                ) +
+                "\n" +
+                exportStart(start);
+            const toBlocks = code =>
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+
+            expect(() => toBlocks(withStop)).not.toThrow();
+            // Same blocks as the code without the check at the call, plus the Stop block.
+            const stopBlocks = toBlocks(withStop).length;
+            expect(stopBlocks).toBe(toBlocks(plain).length + 1);
         });
 
         // The importer only undoes the flags and labels the exporter writes;

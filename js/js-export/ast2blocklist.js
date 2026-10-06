@@ -66,6 +66,10 @@ class AST2BlockList {
      * plain `break` statements, which the config maps to the Stop block:
      * - `{ let f = false; loop { ...; f = true; ...; if (f) break; } }` becomes
      *   the loop, with `break` for each `f = true`;
+     * - an action that reports its Stop block (`let f = false; ...; f = true; ...;
+     *   return f ? mouse.STOPFLOW : mouse.ENDFLOW`) becomes the action with `break` and
+     *   `return mouse.ENDFLOW`, and `if ((await action(mouse)) === "STOPFLOW") <Stop>`
+     *   becomes the plain action call;
      * - `return mouse.ENDFLOW` / `return mouse.ENDMOUSE` that is not the last
      *   statement of a function (a Stop with no loop around it) becomes `break`;
      * - `let f = false; <clamp>; if (f) <leave>` drops the flag and the check,
@@ -184,6 +188,47 @@ class AST2BlockList {
             isStopFlag(statement)
                 ? statement.declarations[0].id.name
                 : null;
+
+        // let f = false; ...; f = true; ...; return f ? mouse.STOPFLOW : mouse.ENDFLOW
+        // is an action with a Stop block: back to `break` and a plain return.
+        if (isFunctionBody && list.length > 1) {
+            const last = list[list.length - 1];
+            const flag = falseFlag(list[0]);
+            const value = last.type === "ReturnStatement" ? last.argument : null;
+            if (
+                flag !== null &&
+                value !== null &&
+                value.type === "ConditionalExpression" &&
+                value.test.type === "Identifier" &&
+                value.test.name === flag &&
+                value.consequent.type === "MemberExpression" &&
+                value.consequent.property.name === "STOPFLOW"
+            ) {
+                last.argument = value.alternate;
+                list.shift();
+                replaceFlagSets(list, flag);
+            }
+        }
+
+        // if ((await action(mouse)) === "STOPFLOW") <Stop>; is a plain action call, the
+        // Stop being the one inside the action.
+        list.forEach((statement, i) => {
+            if (
+                statement.type === "IfStatement" &&
+                !statement.alternate &&
+                statement.test.type === "BinaryExpression" &&
+                statement.test.operator === "===" &&
+                statement.test.left.type === "AwaitExpression" &&
+                statement.test.right.value === "STOPFLOW"
+            ) {
+                list[i] = {
+                    type: "ExpressionStatement",
+                    expression: statement.test.left,
+                    start: statement.start,
+                    end: statement.end
+                };
+            }
+        });
 
         // let f = false; <clamp>; if (f) return mouse.END... / break label;
         for (let i = list.length - 3; i >= 0; i--) {

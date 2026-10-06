@@ -133,6 +133,30 @@ class ASTUtils {
     /** Action name → identifier for the program being generated; see setActionNames. */
     static _actionIdentifiers = new Map();
 
+    /** Names of the actions that end with a Stop block in their own stack; see setStoppingActions. */
+    static _stoppingActions = new Set();
+
+    /**
+     * Records which actions have a Stop block directly in their own stack (not inside a
+     * loop or other clamp). In Music Blocks such a Stop also ends the loop the action was
+     * called from (Logo.doBreak), so these actions report it to their callers: the action
+     * returns STOPFLOW instead of ENDFLOW and each call checks for it.
+     *
+     * @static
+     * @param {String[]} names - every action name in the program
+     * @param {Object[]} trees - the stack tree of each action, in the order of names
+     * @returns {void}
+     */
+    static setStoppingActions(names, trees) {
+        ASTUtils._stoppingActions = new Set(
+            names.filter(
+                (name, i) =>
+                    Array.isArray(trees[i]) &&
+                    trees[i].some(flow => Array.isArray(flow) && flow[0] === "break")
+            )
+        );
+    }
+
     /**
      * Returns the names of every identifier used in the given ASTs.
      *
@@ -685,6 +709,36 @@ class ASTUtils {
     }
 
     /**
+     * Returns the Abstract Syntax Tree for an action call. When the action ends with a Stop
+     * block, the call also checks whether the action reported it, and then stops as a Stop
+     * block at the call would: `if ((await action(mouse)) === "STOPFLOW") { Stop }`.
+     *
+     * @static
+     * @param {String} methodName - action name
+     * @param {[*]} args - tree of arguments
+     * @returns {Object} Abstract Syntax Tree of the call
+     */
+    static _getActionCallAST(methodName, args) {
+        const call = ASTUtils._getMethodCallAST(methodName, args, { action: true });
+        if (!ASTUtils._stoppingActions.has(methodName)) return call;
+
+        return {
+            type: "IfStatement",
+            test: {
+                type: "BinaryExpression",
+                operator: "===",
+                left: call.expression,
+                right: { type: "Literal", value: "STOPFLOW" }
+            },
+            consequent: {
+                type: "BlockStatement",
+                body: [{ type: "BreakStatement", label: null, stopBlock: true }]
+            },
+            alternate: null
+        };
+    }
+
+    /**
      * Returns the Abstract Syntax Tree for a method call in arguments.
      *
      * @static
@@ -1006,15 +1060,18 @@ class ASTUtils {
      * or break can't leave, it sets a flag that is checked after the clamp.
      * A Stop directly in Start or an action just returns.
      *
-     * Not covered: in Music Blocks a Stop in an action also ends the loop the
-     * action was called from, but the exported action only returns (#9004).
+     * A Stop directly in an action that is called from a loop also ends that loop in
+     * Music Blocks (#9004), see reportStop and _getActionCallAST.
      *
      * @static
      * @param {Object} body - BlockStatement of a Start or action function
      * @param {String} end - "ENDMOUSE" or "ENDFLOW", the value the body returns
+     * @param {Boolean} [reportStop=false] - whether a Stop directly in the body is reported to
+     * the caller: it sets a flag, the rest of the body still runs (as in Logo.doBreak when a
+     * loop is above the call) and the body returns STOPFLOW instead of ENDFLOW
      * @returns {void}
      */
-    static _resolveStopBlocks(body, end) {
+    static _resolveStopBlocks(body, end, reportStop = false) {
         const used = ASTUtils._getIdentifierNames(body);
         let count = 0;
         const newName = () => {
@@ -1103,7 +1160,17 @@ class ASTUtils {
         const resolve = (stack, outer) => {
             for (const statement of [...stack.list]) {
                 if (statement.stopBlock) {
-                    if (outer === null) {
+                    if (outer === null && reportStop) {
+                        replace(statement, {
+                            type: "ExpressionStatement",
+                            expression: {
+                                type: "AssignmentExpression",
+                                operator: "=",
+                                left: identifier(reportFlag),
+                                right: { type: "Literal", value: true }
+                            }
+                        });
+                    } else if (outer === null) {
                         replace(statement, returnEnd(stack.end));
                     } else if (stack.end === null) {
                         // No function in between: leave the outer stack directly.
@@ -1150,7 +1217,32 @@ class ASTUtils {
             }
         };
 
+        const reportFlag = reportStop ? newName() : null;
         resolve({ list: body.body, end, label: null }, null);
+
+        if (reportStop) {
+            body.body.unshift({
+                type: "VariableDeclaration",
+                kind: "let",
+                declarations: [
+                    {
+                        type: "VariableDeclarator",
+                        id: identifier(reportFlag),
+                        init: { type: "Literal", value: false }
+                    }
+                ]
+            });
+            // The body ends with `return mouse.ENDFLOW`.
+            const last = body.body[body.body.length - 1];
+            if (last.type === "ReturnStatement") {
+                last.argument = {
+                    type: "ConditionalExpression",
+                    test: identifier(reportFlag),
+                    consequent: returnEnd("STOPFLOW").argument,
+                    alternate: last.argument
+                };
+            }
+        }
     }
 
     /**
@@ -1313,9 +1405,9 @@ class ASTUtils {
                         });
                     }
                 } else if (instruction === "nameddo") {
-                    ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
+                    ASTs.push(ASTUtils._getActionCallAST(idName, flow[1]));
                 } else if (instruction === "nameddoArg") {
-                    ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
+                    ASTs.push(ASTUtils._getActionCallAST(idName, flow[1]));
                 }
             } else {
                 if (JSInterface.isSetter(flow[0])) {
@@ -1352,7 +1444,11 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
         }
-        ASTUtils._resolveStopBlocks(AST["declarations"][0]["init"]["body"], "ENDFLOW");
+        ASTUtils._resolveStopBlocks(
+            AST["declarations"][0]["init"]["body"],
+            "ENDFLOW",
+            ASTUtils._stoppingActions.has(methodName)
+        );
 
         return AST;
     }
