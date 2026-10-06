@@ -112,12 +112,29 @@ const _tupletNotesRatio = (tupletRatio, roundDown) => {
  */
 const _resolveDivisionsPerWholeNote = notes => {
     let scaleFactor = 1;
+    let perWholeNote = DIVISIONS_PER_WHOLE_NOTE;
     for (const entry of notes) {
-        if (!Array.isArray(entry) || !Array.isArray(entry[MXML_TUPLETVALUE])) continue;
-        const { actualNotes } = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
-        scaleFactor = _lcm(scaleFactor, actualNotes);
+        if (!Array.isArray(entry)) continue;
+
+        if (Array.isArray(entry[MXML_TUPLETVALUE])) {
+            const { actualNotes } = _tupletNotesRatio(
+                entry[MXML_TUPLETVALUE],
+                entry[MXML_ROUNDDOWN]
+            );
+            scaleFactor = _lcm(scaleFactor, actualNotes);
+            continue;
+        }
+
+        // A note of 1/v carrying d dots is (D / v) * (2 - 2^-d) divisions, so the
+        // grid has to be a multiple of v * 2^d for that to land on a whole number.
+        // At the base of 32 a sixty-fourth note comes out as 0.5.
+        const noteValue = Number(entry[1]);
+        const dots = Number(entry[2]);
+        if (Number.isInteger(noteValue) && noteValue > 0 && Number.isInteger(dots) && dots >= 0) {
+            perWholeNote = _lcm(perWholeNote, noteValue * 2 ** dots);
+        }
     }
-    return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
+    return perWholeNote * scaleFactor;
 };
 
 const _musicXmlPitch = note => {

@@ -1349,3 +1349,49 @@ describe("saveMxmlOutput - a key change part way through", () => {
         expect(fifthsIn(output)).toEqual(["0", "1"]);
     });
 });
+
+describe("saveMxmlOutput - short notes keep whole-number durations", () => {
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato, drum]
+    const note = (value, dots = 0) => [["G4"], value, dots, null, null, false, false, null];
+
+    const durationsOf = staging => {
+        const output = saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+        return [...output.matchAll(/<duration>([^<]+)<\/duration>/g)].map(m => m[1]);
+    };
+
+    it("writes a sixty-fourth note as a whole number", () => {
+        expect(durationsOf([note(64)])).toEqual(["1"]);
+    });
+
+    it("writes a dotted thirty-second note as a whole number", () => {
+        expect(durationsOf([note(32, 1)])).toEqual(["3"]);
+    });
+
+    it("never writes a fractional duration", () => {
+        const staging = [note(4), note(8), note(16), note(32), note(64)];
+        durationsOf(staging).forEach(d => expect(d).toMatch(/^\d+$/));
+    });
+
+    it("keeps the durations in proportion", () => {
+        const [quarter, eighth, sixteenth, thirtySecond, sixtyFourth] = durationsOf([
+            note(4),
+            note(8),
+            note(16),
+            note(32),
+            note(64)
+        ]).map(Number);
+
+        expect(quarter).toBe(eighth * 2);
+        expect(eighth).toBe(sixteenth * 2);
+        expect(sixteenth).toBe(thirtySecond * 2);
+        expect(thirtySecond).toBe(sixtyFourth * 2);
+    });
+
+    it("leaves a voice of ordinary note values on the grid it already used", () => {
+        const output = saveMxmlOutput({
+            notation: { notationStaging: { 0: [note(4), note(8), note(16)] } }
+        });
+
+        expect(output).toContain("<divisions>8</divisions>");
+    });
+});
