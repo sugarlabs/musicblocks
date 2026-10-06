@@ -9,14 +9,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global jest, describe, it, expect, beforeEach */
+/* global jest, describe, it, expect, beforeEach, afterEach */
 
 const {
     AIWidget,
     adjustPitch,
     abcToStandardValue,
     createPitchBlocks,
-    searchIndexForMusicBlock
+    searchIndexForMusicBlock,
+    getGroqApiKey,
+    setGroqApiKey
 } = require("../aiwidget");
 
 // Mock globals
@@ -193,6 +195,7 @@ describe("AIWidget Instance", () => {
     let originalWindowFor;
 
     beforeEach(() => {
+        sessionStorage.clear();
         mockActivity = {
             logo: {
                 synth: {
@@ -1015,5 +1018,50 @@ describe("AIWidget Instance", () => {
         aiWidget.reconnectSynthsToAnalyser();
         expect(disconnectMock).toHaveBeenCalled();
         expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[1]);
+    });
+});
+
+describe("Groq API key storage", () => {
+    beforeEach(() => {
+        sessionStorage.clear();
+    });
+
+    afterEach(() => {
+        sessionStorage.clear();
+    });
+
+    it("should keep a new key in session storage only", () => {
+        const activity = { storage: {} };
+
+        setGroqApiKey("gsk_new");
+
+        expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_new");
+        expect(activity.storage.groq_api_key).toBeUndefined();
+        expect(getGroqApiKey(activity)).toBe("gsk_new");
+    });
+
+    it("should move a key saved by an earlier build out of the persistent store", () => {
+        const activity = { storage: { groq_api_key: "gsk_legacy" } };
+
+        expect(getGroqApiKey(activity)).toBe("gsk_legacy");
+        expect(activity.storage.groq_api_key).toBeUndefined();
+        expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_legacy");
+    });
+
+    it("should return an empty string when no key is stored", () => {
+        expect(getGroqApiKey({ storage: {} })).toBe("");
+    });
+
+    it("should not throw when session storage is unavailable", () => {
+        jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+        jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+        jest.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(() => setGroqApiKey("gsk_unavailable")).not.toThrow();
+        expect(getGroqApiKey({ storage: {} })).toBe("");
     });
 });
