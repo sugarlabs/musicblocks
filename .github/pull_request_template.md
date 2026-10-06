@@ -11,7 +11,7 @@ Please complete the sections below to help us review your changes efficiently.
 
 <!-- Reference the specific issue using #issue_number (e.g., "Fixes #123"). -->
 
-**Fixes:** #
+Fixes #
 
 ---
 

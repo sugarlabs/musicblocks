@@ -2749,10 +2749,10 @@ class Logo {
      * @returns {*} The plugin's return value, or `undefined` for void or
      *     blocked calls.
      */
-    safePluginExecute(code, logo, turtle, blk, value, ...args) {
+    safePluginExecute(code, logo, turtle, blk, value, receivedArg, ...args) {
         if (typeof code === "function") {
             try {
-                return code(logo, turtle, blk, value, ...args);
+                return code(logo, turtle, blk, value, receivedArg, ...args);
             } catch (e) {
                 console.error("Plugin function execution failed: ", e);
                 return;
@@ -2773,7 +2773,9 @@ class Logo {
                     const op = match[1];
                     const mathBlock = logo.blockList[blk];
                     const conns = mathBlock.connections;
-                    mathBlock.value = Math[op](logo.parseArg(logo, turtle, conns[1], blk));
+                    mathBlock.value = Math[op](
+                        logo.parseArg(logo, turtle, conns[1], blk, receivedArg)
+                    );
                     return mathBlock.value;
                 }
             },
@@ -2783,9 +2785,21 @@ class Logo {
                 exec: () => {
                     const mathBlock = logo.blockList[blk];
                     const conns = mathBlock.connections;
-                    const base = logo.parseArg(logo, turtle, conns[1], blk);
-                    const exp = logo.parseArg(logo, turtle, conns[2], blk);
+                    const base = logo.parseArg(logo, turtle, conns[1], blk, receivedArg);
+                    const exp = logo.parseArg(logo, turtle, conns[2], blk, receivedArg);
                     mathBlock.value = Math.pow(base, exp);
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Unit conversion operations (degrees and radians in maths.json)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;mathBlock\.value = logo\.parseArg\(logo, turtle, conns\[1\]\) \* \((180\/Math\.PI|Math\.PI\/180)\);$/,
+                exec: match => {
+                    const mathBlock = logo.blockList[blk];
+                    const conns = mathBlock.connections;
+                    const factor = match[1] === "180/Math.PI" ? 180 / Math.PI : Math.PI / 180;
+                    mathBlock.value =
+                        logo.parseArg(logo, turtle, conns[1], blk, receivedArg) * factor;
                     return mathBlock.value;
                 }
             },

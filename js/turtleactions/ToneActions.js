@@ -178,20 +178,6 @@ function setupToneActions(activity) {
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
-
-            if (activity.logo.inTimbre) {
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName]["vibratoActive"] =
-                    true;
-                activity.logo.timbre.vibratoEffect.push(blk);
-                activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoIntensity"
-                ] = tur.singer.vibratoIntensity;
-                activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoFrequency"
-                ] = rate;
-            }
         }
 
         /**

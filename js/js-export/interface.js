@@ -77,7 +77,15 @@ class JSInterface {
      * @static
      * list of methods having a return value
      */
-    static _returningMethods = ["getDict", "getDict2", "dictionary"];
+    static _returningMethods = [
+        "getDict",
+        "getDict2",
+        "dictionary",
+        "elapsednotes2",
+        "number2pitch",
+        "number2octave",
+        "synthvolumefactor"
+    ];
 
     /**
      * @static

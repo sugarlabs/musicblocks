@@ -17,7 +17,6 @@
         <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png" />
         <link rel="manifest" href="android_chrome_manifest.json" />
 
-
         <!-- Stylesheets -->
         <link rel="stylesheet" href="css/tokens.css?v=fixed" />
         <link rel="stylesheet" href="css/themes.css?v=fixed" />
@@ -521,198 +520,281 @@
                 </dialog>
                 <div class="materialize-iso" tabindex="-1">
                     <nav id="toolbars" class="nav-wrapper">
-                        <div class="blue nav-wrapper" tabindex="-1">
-                            <div
-                                id="mb-logo"
-                                class="logo left tooltipped"
-                                style="
-                                    display: flex;
-                                    align-items: center;
-                                    line-height: 0;
-                                    height: 100%;
-                                    padding-right: 0;
-                                "
-                                data-position="bottom"
-                            >
-                                <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg">
-                                </amp-img>
+                        <div class="blue nav-wrapper main-nav-container" tabindex="-1">
+                            <!-- Left Zone: Logo & Playback Controls -->
+                            <div class="toolbar-section left-section">
+                                <div
+                                    id="mb-logo"
+                                    class="logo tooltipped"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        line-height: 0;
+                                        height: 100%;
+                                        padding-right: 0;
+                                    "
+                                    data-position="bottom"
+                                >
+                                    <amp-img
+                                        alt="MusicBlocks Logo"
+                                        width="100%"
+                                        src="images/logo.svg"
+                                    >
+                                    </amp-img>
+                                </div>
+                                <ul class="main left toolbar-pill-group playback-group">
+                                    <li>
+                                        <a id="play" class="tooltipped" role="button" tabindex="0"
+                                            ><i class="material-icons main"
+                                                >play_circle_filled</i
+                                            ></a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a id="stop" class="tooltipped" role="button" tabindex="0"
+                                            ><i class="material-icons main">stop</i></a
+                                        >
+                                    </li>
+                                    <li
+                                        class="record-btn-group"
+                                        style="display: flex; align-items: center"
+                                    >
+                                        <a
+                                            id="record"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            data-tooltip="Record"
+                                            role="button"
+                                            tabindex="0"
+                                            aria-label="Record"
+                                            ><i class="material-icons main ring" aria-hidden="true"
+                                                >radio_button_unchecked</i
+                                            ><i class="material-icons main dot" aria-hidden="true"
+                                                >fiber_manual_record</i
+                                            ></a
+                                        >
+                                        <a
+                                            id="recordDropdownArrow"
+                                            class="dropdown-trigger"
+                                            data-activates="recorddropdown"
+                                            style="margin-left: -5px; padding: 0; font-size: 28px"
+                                            role="button"
+                                            tabindex="0"
+                                        ></a>
+                                    </li>
+                                </ul>
                             </div>
-                            <ul class="main left">
-                                <li>
-                                    <a id="play" class="left tooltipped" role="button" tabindex="0"
-                                        ><i class="material-icons main">play_circle_filled</i></a
-                                    >
-                                </li>
-                                <li>
-                                    <a id="stop" class="left tooltipped" role="button" tabindex="0"
-                                        ><i class="material-icons main">stop</i></a
-                                    >
-                                </li>
-                                <li style="display: flex; align-items: center">
-                                    <a
-                                        id="record"
-                                        class="left tooltipped"
-                                        data-position="bottom"
-                                        data-tooltip="Record"
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="Record"
-                                        ><i class="material-icons main ring" aria-hidden="true"
-                                            >radio_button_unchecked</i
-                                        ><i class="material-icons main dot" aria-hidden="true"
-                                            >fiber_manual_record</i
-                                        ></a
-                                    >
-                                    <a
-                                        id="recordDropdownArrow"
-                                        class="left dropdown-trigger"
-                                        data-activates="recorddropdown"
-                                        style="margin-left: -5px; padding: 0; font-size: 28px"
-                                        role="button"
-                                        tabindex="0"
-                                    ></a>
-                                </li>
-                            </ul>
 
-                            <ul class="main right">
-                                <li>
-                                    <a
-                                        id="gitProjectBtn"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="bottom"
-                                        data-tooltip="My Project"
-                                        data-activates="gitdropdown"
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="My Project"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="width: 38px; height: 38px; margin: 0; vertical-align: middle;"><rect width="256" height="256" fill="none"/><path d="M64,88v24a16,16,0,0,0,16,16h96a16,16,0,0,0,16-16V88" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><line x1="128" y1="128" x2="128" y2="168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="64" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="128" cy="192" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="192" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="FullScreen"
-                                        class="FullScreen tooltipped dropdown-trigger"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                        onclick="setIcon()"
-                                    >
-                                        <i class="material-icons" id="FullScrIcon">fullscreen</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="newFile"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                        data-activates="newdropdown"
-                                    >
-                                        <i class="material-icons md-48">note_add</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="load"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                    >
-                                        <i class="material-icons md-48">folder</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="saveButton"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                        data-activates="saveddropdownbeg"
-                                    >
-                                        <i id="save1" class="material-icons md-48">save_alt</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="saveButtonAdvanced"
-                                        style="display: none"
-                                        class="tooltipped dropdown-trigger"
-                                        role="button"
-                                        tabindex="0"
-                                        data-position="bottom"
-                                        data-activates="saveddropdown"
-                                    >
-                                        <i id="save2" class="material-icons md-48">save_alt</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="planetIcon"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                    >
-                                        <i class="material-icons md-48">public</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        style="display: none"
-                                        id="planetIconDisabled"
-                                        class="tooltipped"
-                                        role="button"
-                                        tabindex="0"
-                                        data-position="bottom"
-                                    >
-                                        <i style="color: #a5acba" class="material-icons md-48"
-                                            >public</i
+                            <!-- Center Zone: Context & Workspace Balance -->
+                            <div class="toolbar-section center-section"></div>
+
+                            <!-- Right Zone: File Operations & Utilities -->
+                            <div class="toolbar-section right-section">
+                                <ul class="main right toolbar-pill-group file-group">
+                                    <li>
+                                        <a
+                                            id="gitProjectBtn"
+                                            class="tooltipped dropdown-trigger"
+                                            data-position="bottom"
+                                            data-tooltip="My Project"
+                                            data-activates="gitdropdown"
+                                            role="button"
+                                            tabindex="0"
+                                            aria-label="My Project"
                                         >
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="toggleAuxBtn"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                    >
-                                        <i id="menu" class="animated-icon material-icons md-48"
-                                            >menu</i
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 256 256"
+                                                style="
+                                                    width: 28px;
+                                                    height: 28px;
+                                                    margin: 0;
+                                                    vertical-align: middle;
+                                                "
+                                            >
+                                                <rect width="256" height="256" fill="none" />
+                                                <path
+                                                    d="M64,88v24a16,16,0,0,0,16,16h96a16,16,0,0,0,16-16V88"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="24"
+                                                />
+                                                <line
+                                                    x1="128"
+                                                    y1="128"
+                                                    x2="128"
+                                                    y2="168"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="24"
+                                                />
+                                                <circle
+                                                    cx="64"
+                                                    cy="64"
+                                                    r="24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="24"
+                                                />
+                                                <circle
+                                                    cx="128"
+                                                    cy="192"
+                                                    r="24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="24"
+                                                />
+                                                <circle
+                                                    cx="192"
+                                                    cy="64"
+                                                    r="24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="24"
+                                                />
+                                            </svg>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="newFile"
+                                            class="tooltipped dropdown-trigger"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            data-activates="newdropdown"
                                         >
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="helpIcon"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                        data-activates="helpdropdown"
-                                    >
-                                        <i class="material-icons md-48">help</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        id="installButton"
-                                        class="tooltipped hidden"
-                                        data-position="bottom"
-                                        role="button"
-                                        tabindex="0"
-                                        data-tooltip="Install App"
-                                        aria-label="Install App"
-                                    >
-                                        <i class="material-icons md-48">file_download</i>
-                                    </a>
-                                </li>
-                            </ul>
+                                            <i class="material-icons md-48">note_add</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="load"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                        >
+                                            <i class="material-icons md-48">folder</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="saveButton"
+                                            class="tooltipped dropdown-trigger"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            data-activates="saveddropdownbeg"
+                                        >
+                                            <i id="save1" class="material-icons md-48">save_alt</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="saveButtonAdvanced"
+                                            style="display: none"
+                                            class="tooltipped dropdown-trigger"
+                                            role="button"
+                                            tabindex="0"
+                                            data-position="bottom"
+                                            data-activates="saveddropdown"
+                                        >
+                                            <i id="save2" class="material-icons md-48">save_alt</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="planetIcon"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                        >
+                                            <i class="material-icons md-48">public</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            style="display: none"
+                                            id="planetIconDisabled"
+                                            class="tooltipped"
+                                            role="button"
+                                            tabindex="0"
+                                            data-position="bottom"
+                                        >
+                                            <i style="color: #a5acba" class="material-icons md-48"
+                                                >public</i
+                                            >
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <ul class="main right toolbar-pill-group utility-group">
+                                    <li>
+                                        <a
+                                            id="FullScreen"
+                                            class="FullScreen tooltipped dropdown-trigger"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            onclick="setIcon()"
+                                        >
+                                            <i class="material-icons" id="FullScrIcon"
+                                                >fullscreen</i
+                                            >
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="helpIcon"
+                                            class="tooltipped dropdown-trigger"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            data-activates="helpdropdown"
+                                        >
+                                            <i class="material-icons md-48">help</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="installButton"
+                                            class="tooltipped hidden"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            data-tooltip="Install App"
+                                            aria-label="Install App"
+                                        >
+                                            <i class="material-icons md-48">file_download</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="toggleAuxBtn"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                        >
+                                            <i id="menu" class="animated-icon material-icons md-48"
+                                                >menu</i
+                                            >
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div
                             class="nav-wrapper"
@@ -720,8 +802,9 @@
                             style="display: none"
                             tabindex="-1"
                         >
-                            <div class="blue darken-1 nav-wrapper" tabindex="-1">
-                                <ul class="aux left">
+                            <div class="blue darken-1 nav-wrapper aux-nav-container" tabindex="-1">
+                                <!-- Aux Group 1: Playback & Inspection -->
+                                <ul class="aux left aux-group playback-group">
                                     <li>
                                         <a
                                             id="runSlowlyIcon"
@@ -746,8 +829,6 @@
                                             <i class="material-icons md-48">video_library</i>
                                         </a>
                                     </li>
-                                </ul>
-                                <ul class="aux right">
                                     <li>
                                         <a
                                             id="displayStatsIcon"
@@ -761,24 +842,26 @@
                                     </li>
                                     <li>
                                         <a
-                                            id="loadPluginIcon"
+                                            id="toggleJavaScriptIcon"
                                             class="tooltipped"
                                             data-position="bottom"
-                                            data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            ><i class="material-icons md-48">add_circle</i></a
+                                            ><i class="material-icons md-48">code</i></a
                                         >
                                     </li>
+                                </ul>
+
+                                <!-- Aux Group 2: Workspace & Tools -->
+                                <ul class="aux aux-group workspace-group">
                                     <li>
                                         <a
-                                            id="delPluginIcon"
+                                            id="wrapTurtle"
                                             class="tooltipped"
                                             data-position="bottom"
-                                            data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            ><i class="material-icons md-48">remove_circle</i></a
+                                            ><i class="material-icons md-48">wrap_text</i></a
                                         >
                                     </li>
                                     <li>
@@ -804,14 +887,26 @@
                                     </li>
                                     <li>
                                         <a
-                                            id="themeSelectIcon"
-                                            class="tooltipped dropdown-trigger"
+                                            id="restoreIcon"
+                                            class="tooltipped"
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
-                                            data-activates="themedropdown"
-                                            data-tooltip="Select Theme"
-                                            ><i class="material-icons md-48">brightness_7</i></a
+                                            data-tooltip="Restore"
+                                            ><i class="material-icons md-48"
+                                                >restore_from_trash</i
+                                            ></a
+                                        >
+                                        <div id="trashList"></div>
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="chooseKeyIcon"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            ><i class="material-icons md-48">music_note</i></a
                                         >
                                     </li>
                                     <li>
@@ -826,48 +921,30 @@
                                     </li>
                                     <li>
                                         <a
-                                            id="wrapTurtle"
+                                            id="loadPluginIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            ><i class="material-icons md-48">wrap_text</i></a
+                                            ><i class="material-icons md-48">add_circle</i></a
                                         >
                                     </li>
                                     <li>
                                         <a
-                                            id="chooseKeyIcon"
+                                            id="delPluginIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            ><i class="material-icons md-48">music_note</i></a
+                                            ><i class="material-icons md-48">remove_circle</i></a
                                         >
                                     </li>
-                                    <li>
-                                        <a
-                                            id="toggleJavaScriptIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            role="button"
-                                            tabindex="0"
-                                            ><i class="material-icons md-48">code</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            id="restoreIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            role="button"
-                                            tabindex="0"
-                                            data-tooltip="Restore"
-                                            ><i class="material-icons md-48"
-                                                >restore_from_trash</i
-                                            ></a
-                                        >
-                                        <div id="trashList"></div>
-                                    </li>
+                                </ul>
+
+                                <!-- Aux Group 3: Preferences & Modes -->
+                                <ul class="aux right aux-group preferences-group">
                                     <li>
                                         <a
                                             id="beginnerMode"
@@ -890,6 +967,18 @@
                                             ><i id="advIconText" class="material-icons md-48"
                                                 >star_border</i
                                             ></a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="themeSelectIcon"
+                                            class="tooltipped dropdown-trigger"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
+                                            data-activates="themedropdown"
+                                            data-tooltip="Select Theme"
+                                            ><i class="material-icons md-48">brightness_7</i></a
                                         >
                                     </li>
                                     <li>
@@ -1202,36 +1291,36 @@
                 loadL10nSplashScreen();
 
                 requirejs(["utils/utils"], function (_) {
-                setTimeout(function () {
-                    const loadingText = document.getElementById("loadingText");
-                    const rawTexts =
-                        typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
-                            ? LOADING_TEXTS
-                            : [
-                                  "Do, Re, Mi, Fa, Sol, La, Ti, Do",
-                                  "Loading Music Blocks...",
-                                  "Reading Music..."
-                              ];
-                    let index = 0;
+                    setTimeout(function () {
+                        const loadingText = document.getElementById("loadingText");
+                        const rawTexts =
+                            typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
+                                ? LOADING_TEXTS
+                                : [
+                                      "Do, Re, Mi, Fa, Sol, La, Ti, Do",
+                                      "Loading Music Blocks...",
+                                      "Reading Music..."
+                                  ];
+                        let index = 0;
 
-                    const getTranslatedText = function (text) {
-                        if (
-                            typeof window !== "undefined" &&
-                            window.i18next &&
-                            window.i18next.isInitialized &&
-                            typeof _ === "function"
-                        ) {
-                            return _(text);
-                        }
-                        return text;
-                    };
+                        const getTranslatedText = function (text) {
+                            if (
+                                typeof window !== "undefined" &&
+                                window.i18next &&
+                                window.i18next.isInitialized &&
+                                typeof _ === "function"
+                            ) {
+                                return _(text);
+                            }
+                            return text;
+                        };
 
-                    window.intervalId = setInterval(function () {
-                        loadingText.textContent = getTranslatedText(rawTexts[index]);
-                        index = (index + 1) % rawTexts.length;
-                    }, 1500);
-                }, 3000);
-            });
+                        window.intervalId = setInterval(function () {
+                            loadingText.textContent = getTranslatedText(rawTexts[index]);
+                            index = (index + 1) % rawTexts.length;
+                        }, 1500);
+                    }, 3000);
+                });
 
                 const languageDropdown = document.getElementById("languagedropdown");
                 if (languageDropdown) {

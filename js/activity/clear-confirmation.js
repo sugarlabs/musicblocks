@@ -69,6 +69,10 @@ function renderClearConfirmation(activity, handlers) {
     modal.setAttribute("aria-labelledby", "clear-confirm-title");
     modal.setAttribute("aria-describedby", "clear-confirm-message");
 
+    const backdrop = document.createElement("div");
+    backdrop.classList.add("modal-backdrop");
+    backdrop.id = "clear-confirm-backdrop";
+
     const title = document.createElement("h2");
     title.id = "clear-confirm-title";
     title.textContent = _("Clear workspace");
@@ -109,6 +113,10 @@ function renderClearConfirmation(activity, handlers) {
             }
         });
 
+        if (backdrop.parentNode) {
+            backdrop.parentNode.removeChild(backdrop);
+        }
+
         if (modal.parentNode) {
             modal.parentNode.removeChild(modal);
         }
@@ -121,6 +129,8 @@ function renderClearConfirmation(activity, handlers) {
             previouslyFocused.focus();
         }
     };
+
+    backdrop.addEventListener("click", closeModal);
 
     const bindClick = (target, listener) => {
         if (activity && typeof activity.addEventListener === "function") {
@@ -177,6 +187,7 @@ function renderClearConfirmation(activity, handlers) {
     buttonContainer.appendChild(confirmBtn);
     buttonContainer.appendChild(cancelBtn);
     modal.appendChild(buttonContainer);
+    document.body.appendChild(backdrop);
     document.body.appendChild(modal);
     document.addEventListener("keydown", onKeyDown, true);
     dismissActiveDialog = closeModal;
