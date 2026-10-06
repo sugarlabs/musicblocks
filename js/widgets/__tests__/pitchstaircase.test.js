@@ -20,7 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.PitchStaircaseTimers = require("../PitchStaircaseTimers.js");
+global.PitchStaircaseLayout = require("../PitchStaircaseLayout.js");
+global.PitchStaircaseSteps = require("../PitchStaircaseSteps.js");
+global.PitchStaircasePlayback = require("../PitchStaircasePlayback.js");
+global.PitchStaircaseSave = require("../PitchStaircaseSave.js");
+global.PitchStaircaseWindow = require("../PitchStaircaseWindow.js");
 const PitchStaircase = require("../pitchstaircase.js");
+global.PitchStaircase = PitchStaircase;
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 global.ManagedTimer = ManagedTimer;

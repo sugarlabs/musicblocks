@@ -1410,7 +1410,15 @@ function setupWidgetBlocks(activity) {
                 "pitchStaircase",
                 _getWidgetDependencies(
                     typeof PitchStaircase !== "undefined" ? PitchStaircase : null,
-                    ["widgets/pitchstaircase"]
+                    [
+                        "widgets/PitchStaircaseTimers",
+                        "widgets/PitchStaircaseLayout",
+                        "widgets/PitchStaircaseSteps",
+                        "widgets/PitchStaircasePlayback",
+                        "widgets/PitchStaircaseSave",
+                        "widgets/PitchStaircaseWindow",
+                        "widgets/pitchstaircase"
+                    ]
                 ),
                 () => new PitchStaircase(),
                 turtle,
