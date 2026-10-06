@@ -494,7 +494,7 @@ class ServerInterface {
 
             // MY PROJECTS: filter by keys stored in localStorage
             if (tags === "USER_PROJECTS") {
-                callback({ success: true, data: this._getOwnedProjectList() });
+                callback({ success: true, data: this._getOwnedProjectList().slice(start, end) });
                 return;
             }
 
