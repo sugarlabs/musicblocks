@@ -338,12 +338,7 @@ describe("Activity Event Listener Management", () => {
 
         expect(getResizeListeners()).toHaveLength(1);
 
-        expect(getResizeListeners().map(l => l.listener)).toEqual(
-            expect.arrayContaining([
-                activity._handleRepositionBlocksOnResize,
-                activity._handleWindowResize
-            ])
-        );
+        expect(getResizeListeners().map(l => l.listener)).toEqual([activity._handleWindowResize]);
 
         delete sandbox.doHardStopButton;
     });

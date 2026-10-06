@@ -342,6 +342,22 @@ class WorkspaceLayoutController {
             }
         }
 
+        const LEFT_BOUNDARY = 100;
+
+        dragGroups.forEach(group => {
+            const leftmostX = Math.min(
+                ...group.map(id => activity.blocks.blockList[id].container.x)
+            );
+
+            if (leftmostX < LEFT_BOUNDARY) {
+                const shiftX = LEFT_BOUNDARY - leftmostX;
+
+                group.forEach(blockId => {
+                    activity.blocks.blockList[blockId].container.x += shiftX;
+                });
+            }
+        });
+
         // Once the window reaches its original width again, restore every
         // group exactly to its pre-resize horizontal position.
         if (this._resizeSession && canvasWidth >= this._resizeSession.startWidth) {
