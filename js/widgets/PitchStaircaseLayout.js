@@ -18,7 +18,7 @@
 /*
    global
 
-   _, SYNTHSVG, base64Encode, clampNumber, DEFAULTVOICE, PitchStaircase
+   _, SYNTHSVG, base64Encode, clampNumber, PitchStaircase
 */
 /*
     Globals location
@@ -29,7 +29,7 @@
     - js/utils/utils-logic.js
         clampNumber
     - js/utils/musicutils-constants.js
-        SYNTHSVG, DEFAULTVOICE
+        SYNTHSVG
     - js/widgets/pitchstaircase.js
         PitchStaircase
 */
@@ -195,17 +195,10 @@ class PitchStaircaseLayout {
 
             playCell.onclick = () => {
                 const i = Number(playCell.getAttribute("id"));
-                const stepCell = this._stepTables[i].rows[0].cells[1];
                 if (this._playingRowIndex === i) {
-                    this._clearWidgetTimeout(this._rowStopTimeout);
-                    this._rowStopTimeout = null;
-                    stepCell.classList.remove("active");
-                    stepCell.style.backgroundColor = "";
-                    this._setButtonIcon(playCell, "play-button.svg", _("Play"));
-                    const frequency = Number(stepCell.getAttribute("id"));
-                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, frequency);
-                    this._playingRowIndex = null;
+                    this._stopRow();
                 } else {
+                    const stepCell = this._stepTables[i].rows[0].cells[1];
                     this._playOne(stepCell, playCell);
                 }
             };

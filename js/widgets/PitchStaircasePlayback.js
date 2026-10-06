@@ -18,7 +18,7 @@
 /*
    global
 
-   _, platformColor, DEFAULTVOICE, normalizeNoteAccidentals
+   _, platformColor, DEFAULTVOICE
 */
 /*
     Globals location
@@ -28,8 +28,6 @@
         platformColor
     - js/utils/musicutils-constants.js
         DEFAULTVOICE
-    - js/utils/musicutils-pitch.js
-        normalizeNoteAccidentals
 */
 
 /* exported PitchStaircasePlayback */
@@ -38,6 +36,9 @@
  * @file PitchStaircasePlayback.js
  * @description Pitch Staircase playback: playing one stair, all the stairs as a chord, and the
  * stairs as a scale down and back up, and stopping each of them.
+ *
+ * Every stair is played at its own frequency, so steps made with a ratio sound exactly as shown
+ * rather than at the nearest note.
  *
  * The methods are moved as they were from the PitchStaircase class, which copies them onto
  * PitchStaircase.prototype (see PitchStaircase.installModules), so `this` is still the widget.
@@ -51,6 +52,12 @@ class PitchStaircasePlayback {
      * @returns {void}
      */
     _playOne(stepCell, playCell) {
+        // Only one stair plays at a time; otherwise the earlier one's timeout would reset the
+        // playing row while this one is still sounding.
+        if (this._playingRowIndex !== null) {
+            this._stopRow();
+        }
+
         // The frequency is stored in the stepCell.
         stepCell.classList.add("active");
         stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
@@ -69,12 +76,37 @@ class PitchStaircasePlayback {
     }
 
     /**
+     * Stops the stair that is playing.
+     * @private
+     * @returns {void}
+     */
+    _stopRow() {
+        const i = this._playingRowIndex;
+        this._clearWidgetTimeout(this._rowStopTimeout);
+        this._rowStopTimeout = null;
+        this._playingRowIndex = null;
+
+        const stepTable = this._stepTables[i];
+        if (!stepTable || !stepTable.rows || !stepTable.rows[0]) {
+            return;
+        }
+
+        const playCell = stepTable.rows[0].cells[0];
+        const stepCell = stepTable.rows[0].cells[1];
+        stepCell.classList.remove("active");
+        stepCell.style.backgroundColor = "";
+        this._setButtonIcon(playCell, "play-button.svg", _("Play"));
+        const frequency = Number(stepCell.getAttribute("id"));
+        this.activity.logo.synth.stopSound(0, DEFAULTVOICE, frequency);
+    }
+
+    /**
      * Plays every stair together as a chord for a second.
      * @private
      * @returns {void}
      */
     _playAll() {
-        const pitchnotes = [];
+        const frequencies = [];
         this._isPlayingAll = true;
         if (this._playAllButton) {
             this._setButtonIcon(
@@ -85,11 +117,13 @@ class PitchStaircasePlayback {
         }
 
         for (let i = 0; i < this.Stairs.length; i++) {
-            const note = this.Stairs[i][0] + this.Stairs[i][1];
-            pitchnotes.push(normalizeNoteAccidentals(note));
+            frequencies.push(this.Stairs[i][2]);
             const stepCell = this._stepTables[i].rows[0].cells[1];
             stepCell.classList.add("active");
-            this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+        }
+
+        if (frequencies.length > 0) {
+            this.activity.logo.synth.trigger(0, frequencies, 1, DEFAULTVOICE, null, null);
         }
 
         this._playAllTimeout = this._setWidgetTimeout(() => {
@@ -126,19 +160,19 @@ class PitchStaircasePlayback {
      * @returns {void}
      */
     playUpAndDown() {
+        if (this.Stairs.length === 0) {
+            return;
+        }
+
         this._scaleStopped = false;
         this._isPlayingScale = true;
         if (this._playScaleButton) {
             this._setButtonIcon(this._playScaleButton, "stop-button.svg", _("Stop"));
         }
-        const pitchnotes = [];
-        const note =
-            this.Stairs[this.Stairs.length - 1][0] + this.Stairs[this.Stairs.length - 1][1];
-        pitchnotes.push(normalizeNoteAccidentals(note));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
         stepCell.classList.add("active");
-        this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+        this.activity.logo.synth.trigger(0, [this.Stairs[last][2]], 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     }
 
@@ -207,9 +241,7 @@ class PitchStaircasePlayback {
             return;
         }
 
-        const pitchnotes = [];
-        const note = this.Stairs[index][0] + this.Stairs[index][1];
-        pitchnotes.push(normalizeNoteAccidentals(note));
+        const frequencies = [this.Stairs[index][2]];
         const previousRowNumber = index - next;
         // _stepTables is a dense array; a negative index yields undefined,
         // not null, so use != null (loose) to catch both.
@@ -237,7 +269,7 @@ class PitchStaircasePlayback {
                 const stepCell = this._stepTables[index].rows[0].cells[1];
                 stepCell.classList.add("active");
             }
-            this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+            this.activity.logo.synth.trigger(0, frequencies, 1, DEFAULTVOICE, null, null);
             // Use && so playback terminates when index reaches either boundary;
             // the boundary cases (=== -1 and === Stairs.length) are already
             // handled by the early-return guards at the top of this function.

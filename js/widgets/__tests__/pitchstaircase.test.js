@@ -45,7 +45,6 @@ global.DEFAULTVOICE = "electronic synth";
 global.frequencyToPitch = jest.fn(f => ["A", "", 4]);
 global.base64Encode = jest.fn(s => s);
 global.PREVIEWVOLUME = 0.5;
-global.normalizeNoteAccidentals = jest.fn(n => n);
 global.Singer = { masterVolume: [50] };
 global.last = arr => arr[arr.length - 1];
 global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
@@ -386,7 +385,7 @@ describe("PitchStaircase Widget", () => {
     describe("_playAll", () => {
         const makeStepCell = () => ({ classList: { add: jest.fn(), remove: jest.fn() } });
 
-        test("triggers every stair note and clears the active class after the timeout", () => {
+        test("triggers the stairs once as a chord and clears the active class after the timeout", () => {
             jest.useFakeTimers();
 
             psc.Stairs = [
@@ -399,8 +398,8 @@ describe("PitchStaircase Widget", () => {
 
             psc._playAll();
 
-            expect(global.normalizeNoteAccidentals).toHaveBeenCalledTimes(2);
-            expect(psc.activity.logo.synth.trigger).toHaveBeenCalledTimes(2);
+            expect(psc.activity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            expect(psc.activity.logo.synth.trigger.mock.calls[0][1]).toEqual([220.0, 246.94]);
             cells.forEach(cell => expect(cell.classList.add).toHaveBeenCalledWith("active"));
 
             jest.advanceTimersByTime(1000);
