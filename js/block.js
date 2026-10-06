@@ -2548,7 +2548,14 @@ class Block {
      */
     _doOpenMediaFromDevice(thisBlock) {
         const that = this;
-        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
+        let fileChooser;
+        if (that.name === "media") {
+            fileChooser = docById("myMedia");
+        } else if (that.name === "audiofile") {
+            fileChooser = docById("audioInput");
+        } else {
+            fileChooser = docById("myOpenAll");
+        }
 
         const __readerAction = () => {
             window.scroll(0, 0);
