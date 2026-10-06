@@ -30,6 +30,10 @@
  * @param {number} [opts.navAngle] - Wheel-relative rotation of the first slice.
  *     wheelnav's own default is 0; omit to leave it at that default (or whatever
  *     the caller already set), rather than silently overriding it.
+ * @param {number} [opts.animatetime] - Per-item transition time in ms.
+ *     wheelnav's own default is 1500 (animated); omit to leave it at that
+ *     default (or whatever the caller already set), rather than silently
+ *     forcing instant transitions.
  */
 var configureWheel = (wheel, opts) => {
     wheel.colors = opts.colors;
@@ -47,7 +51,9 @@ var configureWheel = (wheel, opts) => {
     if (opts.navAngle !== undefined) {
         wheel.navAngle = opts.navAngle;
     }
-    wheel.animatetime = 0;
+    if (opts.animatetime !== undefined) {
+        wheel.animatetime = opts.animatetime;
+    }
     if (opts.titleRotateAngle !== undefined) {
         wheel.titleRotateAngle = opts.titleRotateAngle;
     }
