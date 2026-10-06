@@ -426,4 +426,69 @@ describe("EmbeddedGraphicsScheduler", () => {
         mockLogo._haltedTurtles = undefined;
         expect(scheduler._halted(0)).toBe(false);
     });
+
+    test("guards every delayed graphics callback the scheduler queues", async () => {
+        // Drive schedule() once per graphics block that defers work, so every
+        // guard site is exercised, including those outside the pen switch.
+        const graphicsBlocks = [
+            "setcolor",
+            "penup",
+            "pendown",
+            "clear",
+            "fill",
+            "hollowline",
+            "controlpoint1",
+            "controlpoint2",
+            "bezier",
+            "setheading",
+            "right",
+            "left",
+            "forward",
+            "back",
+            "setxy",
+            "scrollxy",
+            "show",
+            "speak",
+            "print",
+            "arc"
+        ];
+        const blockList = [null];
+        const indexes = graphicsBlocks.map(name => {
+            blockList.push({ name, connections: [null, 1, 1] });
+            return blockList.length - 1;
+        });
+
+        const guards = [];
+        mockLogo._timerManager.setGuardedTimeout = jest.fn((fn, delay, aborted) => {
+            guards.push(aborted);
+            return guards.length;
+        });
+        mockLogo._haltedTurtles = { 0: true };
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = blockList;
+        turtle0.singer.suppressOutput = false;
+        turtle0.singer.embeddedGraphics = { 9: indexes };
+
+        await scheduler.schedule(0, 0.5, 9, 0);
+
+        const shortNoteGuards = guards.length;
+        expect(shortNoteGuards).toBeGreaterThan(15);
+
+        // A long note on a single forward move is split into many steps, which
+        // reaches the "last" and "middle" guard sites that a one-step move
+        // never touches.
+        const forwardBlock = blockList.findIndex(
+            block => block !== null && block.name === "forward"
+        );
+        turtle0.singer.embeddedGraphics = { 9: [forwardBlock] };
+        await scheduler.schedule(0, 10, 9, 0);
+
+        expect(guards.length).toBeGreaterThan(shortNoteGuards);
+        guards.forEach(aborted => expect(aborted()).toBe(true));
+
+        // The same guards follow the turtle: once it is no longer halted they
+        // let its callbacks through again.
+        mockLogo._haltedTurtles = {};
+        guards.forEach(aborted => expect(aborted()).toBe(false));
+    });
 });
