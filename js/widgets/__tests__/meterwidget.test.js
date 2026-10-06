@@ -438,6 +438,48 @@ describe("Meter Widget", () => {
         }
     });
 
+    test("Reset keeps the entered beat count and beat note value instead of collapsing them to 1", () => {
+        mockActivity.logo._meterBlock = 1;
+        mockActivity.blocks.blockList = {
+            1: { connections: [null, 2, 3], value: 4 },
+            2: { connections: [null, null, 4], value: 4 },
+            3: { connections: [1, 5, 6], value: 1 / 4 },
+            4: {
+                value: 4,
+                text: { text: "" },
+                container: { children: [], setChildIndex: jest.fn() }
+            },
+            5: {
+                value: 1,
+                text: { text: "" },
+                container: { children: [], setChildIndex: jest.fn() }
+            },
+            6: {
+                value: 4,
+                text: { text: "" },
+                container: { children: [], setChildIndex: jest.fn() }
+            }
+        };
+
+        new MeterWidget(mockActivity, 1);
+
+        const toolbar = window.widgetWindows.windowFor()._toolbar;
+        const [beatInput, noteInput] = toolbar.appendChild.mock.calls
+            .slice(-2)
+            .map(call => call[0].children[0]);
+
+        const resetButton = mockAddButton.mock.results
+            .filter(res => res.value && res.value.tip === "Reset")
+            .pop().value;
+
+        beatInput.value = "7";
+        noteInput.value = "8";
+        resetButton.onclick();
+
+        expect(beatInput.value).toBe("7");
+        expect(noteInput.value).toBe("8");
+    });
+
     test("handles window onclose callback", () => {
         const widget = new MeterWidget(mockActivity, 1);
         if (widget.widgetWindow && widget.widgetWindow.onclose) {
@@ -500,5 +542,21 @@ describe("Meter Widget", () => {
         expect(meterWidget._timerManager.activeTimeoutCount).toBe(0);
 
         jest.useRealTimers();
+    });
+
+    test("creates inputs with distinct IDs and accessible labels", () => {
+        const widgetWindow = window.widgetWindows.windowFor();
+        const toolbarCalls = widgetWindow._toolbar.appendChild.mock.calls;
+        const inputs = toolbarCalls
+            .map(call => call[0] && call[0].querySelector && call[0].querySelector("input"))
+            .filter(Boolean);
+
+        const beatCountInput = inputs.find(input => input.id === "beatCount");
+        const beatValueInput = inputs.find(input => input.id === "beatValue");
+
+        expect(beatCountInput).toBeDefined();
+        expect(beatValueInput).toBeDefined();
+        expect(beatCountInput.getAttribute("aria-label")).toBe("Number of beats");
+        expect(beatValueInput.getAttribute("aria-label")).toBe("Beat note value");
     });
 });

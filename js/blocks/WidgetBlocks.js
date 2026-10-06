@@ -476,6 +476,14 @@ function setupWidgetBlocks(activity) {
                 "sample",
                 _getWidgetDependencies(typeof SampleWidget !== "undefined" ? SampleWidget : null, [
                     "widgets/tuner",
+                    "widgets/SamplerBlocks",
+                    "widgets/SamplerPlayback",
+                    "widgets/SamplerPitch",
+                    "widgets/SamplerFiles",
+                    "widgets/SamplerUI",
+                    "widgets/SamplerPieMenu",
+                    "widgets/SamplerCanvas",
+                    "widgets/SamplerTuner",
                     "widgets/sampler"
                 ]),
                 () => new SampleWidget(),
@@ -1322,7 +1330,11 @@ function setupWidgetBlocks(activity) {
                 "musicKeyboard",
                 _getWidgetDependencies(
                     typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    ["widgets/musickeyboard"]
+                    [
+                        "widgets/MusicKeyboardEditing",
+                        "widgets/MusicKeyboardRendering",
+                        "widgets/musickeyboard"
+                    ]
                 ),
                 () => new MusicKeyboard(activity),
                 turtle,
@@ -1516,6 +1528,12 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "rhythmRuler",
                 _getWidgetDependencies(typeof RhythmRuler !== "undefined" ? RhythmRuler : null, [
+                    "widgets/RhythmRulerLayout",
+                    "widgets/RhythmRulerHistory",
+                    "widgets/RhythmRulerEditing",
+                    "widgets/RhythmRulerPlayback",
+                    "widgets/RhythmRulerSave",
+                    "widgets/RhythmRulerCircular",
                     "widgets/rhythmruler"
                 ]),
                 () => new RhythmRuler(),
@@ -2194,6 +2212,14 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "legoWidget",
                 _getWidgetDependencies(typeof LegoWidget !== "undefined" ? LegoWidget : null, [
+                    "widgets/LegoBricksRows",
+                    "widgets/LegoBricksLayout",
+                    "widgets/LegoBricksExport",
+                    "widgets/LegoBricksMedia",
+                    "widgets/LegoBricksEyeDropper",
+                    "widgets/LegoBricksColor",
+                    "widgets/LegoBricksPlayback",
+                    "widgets/LegoBricksVisualization",
                     "widgets/legobricks"
                 ]),
                 () => new LegoWidget(),

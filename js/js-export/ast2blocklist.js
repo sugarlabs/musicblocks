@@ -30,6 +30,53 @@
  */
 class AST2BlockList {
     /**
+     * Returns whether a string names an interval (e.g. "major 3"), which the
+     * intervalname block turns into a number of semitones.
+     *
+     * @param {String} name - candidate interval name
+     * @returns {Boolean} whether name is an interval name
+     */
+    static _isIntervalName(name) {
+        const intervals =
+            (typeof window !== "undefined" && window.INTERVALVALUES) ||
+            (typeof INTERVALVALUES !== "undefined" && INTERVALVALUES) ||
+            require("../utils/musicutils-constants").INTERVALVALUES;
+        return Object.prototype.hasOwnProperty.call(intervals, name);
+    }
+
+    /**
+     * Returns whether a pitch name is solfege (sol, ti♭, ...) rather than a note name (G, B♭, ...),
+     * using the same test as the rest of Music Blocks. Microtonal prefixes (e.g. "^C", "vvD♭")
+     * are stripped first, so a note name keeps its block.
+     *
+     * @param {String} note - pitch name
+     * @returns {Boolean} whether note is solfege
+     */
+    static _isSolfege(note) {
+        const solfege =
+            (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
+            require("../utils/musicutils-solfege");
+        const pitch =
+            (typeof window !== "undefined" && window.MusicUtilsPitch) ||
+            require("../utils/musicutils-pitch");
+        const constants =
+            (typeof window !== "undefined" && window.MusicUtilsConstants) ||
+            require("../utils/musicutils-constants");
+        const stripped = pitch.stripMicrotonalPrefix(note);
+        // noteIsSolfege only knows the spellings in SOLFEGECONVERSIONTABLE, so check every note
+        // spelling first (E♯, F♭, C𝄪, ...), in the ASCII form ALLNOTENAMES uses.
+        const ascii = stripped
+            .replace(constants.DOUBLESHARP, "x")
+            .replace(constants.DOUBLEFLAT, "bb")
+            .replace(constants.SHARP, "#")
+            .replace(constants.FLAT, "b");
+        if (constants.ALLNOTENAMES.includes(ascii)) {
+            return false;
+        }
+        return solfege.noteIsSolfege(stripped);
+    }
+
+    /**
      * Returns a deep copy of an AST. Regular expression literal values are
      * shared, since nothing here changes them.
      *
@@ -819,11 +866,14 @@ class AST2BlockList {
                     if (!argConfig) {
                         throw new Error(`Missing argument configuration for: ${block_name}`);
                     }
-                    if (argConfig.type === "note_or_solfege") {
-                        // Handle pitch notes (solfege or note names)
-                        const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
+                    if (argConfig.type === "note_or_solfege" && typeof arg === "string") {
+                        // Handle pitch notes (solfege or note names). A pitch read from a box
+                        // or computed is handled below like any other value.
                         vspaces += _addNthArgToBlockList(
-                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { value: arg }],
+                            [
+                                AST2BlockList._isSolfege(arg) ? "solfege" : "notename",
+                                { value: arg }
+                            ],
                             i + 1,
                             blockList,
                             parentBlockNumber
@@ -837,15 +887,20 @@ class AST2BlockList {
                             parentBlockNumber
                         );
                     } else if (
+                        argConfig.type === "note_or_solfege" ||
                         argConfig.type === "NumberExpression" ||
-                        argConfig.type === "BooleanExpression"
+                        argConfig.type === "BooleanExpression" ||
+                        argConfig.type === "IntervalExpression"
                     ) {
-                        // Handle number/boolean expressions
+                        // Handle number/boolean expressions. In an interval expression, a string
+                        // naming an interval (as the exporter writes an intervalname block) becomes
+                        // an intervalname block again.
                         vspaces += _addNthValueArgToBlockList(
                             arg,
                             i + 1,
                             blockList,
-                            parentBlockNumber
+                            parentBlockNumber,
+                            argConfig.type === "IntervalExpression"
                         );
                     } else {
                         vspaces += _addNthArgToBlockList(
@@ -900,20 +955,21 @@ class AST2BlockList {
              * @param {Array} blockList - the blockList to which the new argument blocks will be added
              * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
              */
-            function _addValueArgsToBlockList(args, blockList, parentBlockNumber) {
+            function _addValueArgsToBlockList(args, blockList, parentBlockNumber, intervals) {
                 let vspaces = 0;
                 for (let i = 0; i < args.length; i++) {
                     vspaces += _addNthValueArgToBlockList(
                         args[i],
                         i + 1,
                         blockList,
-                        parentBlockNumber
+                        parentBlockNumber,
+                        intervals
                     );
                 }
                 return vspaces;
             }
 
-            function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber) {
+            function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber, intervals) {
                 let vspaces = 0;
                 let block = [];
                 let blockNumber = blockList.length;
@@ -921,12 +977,14 @@ class AST2BlockList {
                 blockList.push(block);
                 let type = typeof arg;
                 if (type === "string") {
-                    type = "text";
+                    type =
+                        intervals && AST2BlockList._isIntervalName(arg) ? "intervalname" : "text";
                 }
                 if (
                     type === "number" ||
                     type === "boolean" ||
                     type === "text" ||
+                    type === "intervalname" ||
                     (type === "object" && arg.identifier !== undefined)
                 ) {
                     // variables can be in number or boolean expressions
@@ -947,7 +1005,12 @@ class AST2BlockList {
                     let connections = new Array(1 + arg.arguments.length).fill(null);
                     connections[0] = parentBlockNumber;
                     block.push(connections);
-                    vspaces = _addValueArgsToBlockList(arg.arguments, blockList, blockNumber);
+                    vspaces = _addValueArgsToBlockList(
+                        arg.arguments,
+                        blockList,
+                        blockNumber,
+                        intervals
+                    );
                     if (arg.arguments.length === 0) {
                         vspaces += 1;
                     }

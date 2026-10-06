@@ -57,6 +57,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static doCrescendo(type, value, turtle, blk) {
+            if (!Number.isFinite(value)) return;
             value = clampNumber(value, 0, 100);
             const tur = activity.turtles.ithTurtle(turtle);
             const synthList = Object.keys(tur.singer.synthVolume);
@@ -122,6 +123,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setRelativeVolume(volume, turtle, blk) {
+            if (!Number.isFinite(volume)) return;
             const tur = activity.turtles.ithTurtle(turtle);
             const synthList = Object.keys(tur.singer.synthVolume);
 
@@ -184,6 +186,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setMasterVolume(volume, turtle, blk) {
+            if (!Number.isFinite(volume)) return;
             volume = clampNumber(volume, 0, 100);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
@@ -232,6 +235,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setSynthVolume(synthname, volume, turtle, blk) {
+            if (!Number.isFinite(volume)) return;
             let synth = null;
             let firstConnection = null;
             let lastConnection = null;

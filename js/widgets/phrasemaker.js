@@ -276,6 +276,13 @@ class PhraseMaker {
          * @type {boolean}
          */
         this.lyricsON = false;
+
+        /**
+         * Array of lyrics input elements for cleanup.
+         * @type {HTMLInputElement[]}
+         * @private
+         */
+        this._lyricsInputs = [];
     }
 
     /**
@@ -1105,6 +1112,7 @@ class PhraseMaker {
                 lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
+                this._lyricsInputs.push(lyricsInput);
                 inputCell.addEventListener("mouseover", event => {
                     event.target.style.backgroundColor = this.platformColor.selectorSelected;
                 });
@@ -1213,6 +1221,16 @@ class PhraseMaker {
         this._rowOffset = [];
         for (let i = 0; i < this._rowMap.length; i++) {
             this._rowMap[i] = i;
+        }
+
+        // Clean up lyrics input event listeners
+        if (this._lyricsInputs && this._lyricsInputs.length > 0) {
+            this._lyricsInputs.forEach(input => {
+                // Remove event listeners by cloning and replacing (since we can't easily
+                // remove anonymous listeners, we rely on widget destruction to clean up DOM)
+                // The inputs are in the widget body which gets destroyed
+            });
+            this._lyricsInputs = [];
         }
 
         if (this.activity && this.activity.logo && this.activity.logo.synth) {
@@ -1819,7 +1837,7 @@ class PhraseMaker {
             leftRightLabel = ["15", "30", "45", "60", "90", "180"];
             setHeadingLabel = ["0", "45", "90", "135", "180", "225", "270", "315"];
             setPenSizeLabel = ["1", "5", "10", "25", "50"];
-            setLabel = ["0", "10", "20", "30", "40", "5n0", "60", "70", "80", "90", "100"];
+            setLabel = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"];
         }
 
         this._pitchWheel = new this.wheelnav("wheelDivptm", null, 800, 800);
@@ -3914,12 +3932,23 @@ class PhraseMaker {
         noteToDivide = parseInt(noteToDivide, 10);
         oldTupletValue = parseInt(oldTupletValue, 10);
         newTupletValue = parseInt(newTupletValue, 10);
+        if (
+            !this.activity ||
+            !this.activity.logo ||
+            !Array.isArray(this.activity.logo.tupletRhythms) ||
+            isNaN(noteToDivide) ||
+            noteToDivide < 0 ||
+            noteToDivide >= this.activity.logo.tupletRhythms.length ||
+            !this.activity.logo.tupletRhythms[noteToDivide]
+        ) {
+            return;
+        }
         this._blockMapHelper = [];
 
         let k = 0;
         let l;
         if (oldTupletValue < newTupletValue) {
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -3955,7 +3984,7 @@ class PhraseMaker {
             }
         } else {
             k = 0;
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }

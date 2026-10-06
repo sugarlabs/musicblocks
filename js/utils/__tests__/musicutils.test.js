@@ -139,7 +139,6 @@ const {
     getModeLabel,
     getModeNameFromLabel,
     getModeSliceColors,
-    updateModeWheelItems,
     getModeGroupTitleFont,
     temperamentHasRatios,
     parseSclFile,
@@ -187,6 +186,18 @@ describe("musicutils", () => {
                 path.join(__dirname, "..", "musicutils-modecore.js"),
                 "utf8"
             );
+            const pitchscale = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitchscale.js"),
+                "utf8"
+            );
+            const buildscale = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-buildscale.js"),
+                "utf8"
+            );
+            const pitchinfo = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitchinfo.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -205,6 +216,9 @@ describe("musicutils", () => {
             vm.runInContext(solfege, sandbox);
             vm.runInContext(modewheel, sandbox);
             vm.runInContext(modecore, sandbox);
+            vm.runInContext(pitchscale, sandbox);
+            vm.runInContext(buildscale, sandbox);
+            vm.runInContext(pitchinfo, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
@@ -581,6 +595,13 @@ describe("getIntervalNumber", () => {
         expect(getIntervalNumber("perfect 5")).toBe(7);
         expect(getIntervalNumber("major 3")).toBe(4);
     });
+
+    it("should return 0 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalNumber("invalid")).toBe(0);
+        expect(getIntervalNumber("")).toBe(0);
+        expect(getIntervalNumber(null)).toBe(0);
+        expect(getIntervalNumber(undefined)).toBe(0);
+    });
 });
 
 describe("getIntervalDirection", () => {
@@ -588,12 +609,26 @@ describe("getIntervalDirection", () => {
         expect(getIntervalDirection("diminished 6")).toBe(-1);
         expect(getIntervalDirection("minor 3")).toBe(-1);
     });
+
+    it("should return 0 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalDirection("invalid")).toBe(0);
+        expect(getIntervalDirection("")).toBe(0);
+        expect(getIntervalDirection(null)).toBe(0);
+        expect(getIntervalDirection(undefined)).toBe(0);
+    });
 });
 
 describe("getIntervalRatio", () => {
     it("should return the ratio for a given interval", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
+    });
+
+    it("should return 1 for invalid, empty or non-string interval names", () => {
+        expect(getIntervalRatio("invalid")).toBe(1);
+        expect(getIntervalRatio("")).toBe(1);
+        expect(getIntervalRatio(null)).toBe(1);
+        expect(getIntervalRatio(undefined)).toBe(1);
     });
 
     it("should return the just diminished seventh for diminished 7", () => {
@@ -1418,10 +1453,25 @@ describe("modeMapper", () => {
         ["D", "natural minor", ["d", "minor"]],
         ["E", "major", ["e", "major"]],
         ["F♯", "minor", ["f♯", "minor"]],
-        ["C", "phrygian", ["g♯", "major"]],
+        ["C", "phrygian", ["a♭", "major"]],
         ["A♯", "mixolydian", ["c", "minor"]],
-        ["C", "DORIAN", ["a♯", "major"]]
+        ["C", "DORIAN", ["b♭", "major"]]
     ])("should correctly map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
+    });
+
+    // Modes whose key signature has flats map to a flat-named key, so the
+    // sharp/flat preference lookup finds them.
+    it.each([
+        ["C", "dorian", ["b♭", "major"]],
+        ["D", "phrygian", ["b♭", "major"]],
+        ["F", "mixolydian", ["b♭", "major"]],
+        ["A", "locrian", ["b♭", "major"]],
+        ["C", "phrygian", ["a♭", "major"]],
+        ["G", "locrian", ["a♭", "major"]],
+        ["C", "locrian", ["d♭", "major"]],
+        ["G♭", "lydian", ["d♭", "major"]]
+    ])("should map %s %s to the flat key %j", (key, mode, expected) => {
         expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
@@ -3714,10 +3764,10 @@ describe("ACCIDENTALNAMES", () => {
 describe("modeMapper branch coverage", () => {
     const cases = [
         ["C", "ionian", ["c", "major"]],
-        ["C", "dorian", ["a" + SHARP, "major"]],
+        ["C", "dorian", ["b" + FLAT, "major"]],
         ["F", "dorian", ["c", "minor"]],
         ["D" + FLAT, "dorian", ["e" + FLAT, "minor"]],
-        ["C", "phrygian", ["g" + SHARP, "major"]],
+        ["C", "phrygian", ["a" + FLAT, "major"]],
         ["G", "phrygian", ["c", "minor"]],
         ["D" + FLAT, "phrygian", ["g" + FLAT, "minor"]],
         ["C", "lydian", ["g", "major"]],
@@ -3726,7 +3776,7 @@ describe("modeMapper branch coverage", () => {
         ["C", "mixolydian", ["f", "major"]],
         ["A" + SHARP, "mixolydian", ["c", "minor"]],
         ["B" + FLAT, "mixolydian", ["c", "minor"]],
-        ["C", "locrian", ["b", "major"]],
+        ["C", "locrian", ["d" + FLAT, "major"]],
         ["D", "locrian", ["c", "minor"]],
         ["E" + FLAT, "locrian", ["d" + FLAT, "minor"]],
         ["A", "aeolian", ["a", "minor"]],
@@ -4663,48 +4713,6 @@ describe("mode pie menu shared helpers", () => {
                 filledColor: "filled"
             });
             expect(colors).toEqual(["empty", "filled", "empty"]);
-        });
-    });
-
-    describe("updateModeWheelItems", () => {
-        it("updates every title copy and fill attribute then refreshes", () => {
-            const refreshWheel = jest.fn();
-            const wheel = {
-                navItems: [
-                    {
-                        title: "old",
-                        basicNavTitleMax: {},
-                        basicNavTitleMin: {},
-                        hoverNavTitleMax: {},
-                        hoverNavTitleMin: {},
-                        selectedNavTitleMax: {},
-                        selectedNavTitleMin: {},
-                        initNavTitle: {},
-                        fillAttr: "old",
-                        sliceHoverAttr: {},
-                        slicePathAttr: {},
-                        sliceSelectedAttr: {}
-                    }
-                ],
-                refreshWheel
-            };
-
-            updateModeWheelItems(wheel, ["new"], ["#123456"]);
-
-            const item = wheel.navItems[0];
-            expect(item.title).toBe("new");
-            expect(item.basicNavTitleMax.title).toBe("new");
-            expect(item.basicNavTitleMin.title).toBe("new");
-            expect(item.hoverNavTitleMax.title).toBe("new");
-            expect(item.hoverNavTitleMin.title).toBe("new");
-            expect(item.selectedNavTitleMax.title).toBe("new");
-            expect(item.selectedNavTitleMin.title).toBe("new");
-            expect(item.initNavTitle.title).toBe("new");
-            expect(item.fillAttr).toBe("#123456");
-            expect(item.sliceHoverAttr.fill).toBe("#123456");
-            expect(item.slicePathAttr.fill).toBe("#123456");
-            expect(item.sliceSelectedAttr.fill).toBe("#123456");
-            expect(refreshWheel).toHaveBeenCalled();
         });
     });
 

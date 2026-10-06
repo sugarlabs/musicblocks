@@ -112,12 +112,29 @@ const _tupletNotesRatio = (tupletRatio, roundDown) => {
  */
 const _resolveDivisionsPerWholeNote = notes => {
     let scaleFactor = 1;
+    let perWholeNote = DIVISIONS_PER_WHOLE_NOTE;
     for (const entry of notes) {
-        if (!Array.isArray(entry) || !Array.isArray(entry[MXML_TUPLETVALUE])) continue;
-        const { actualNotes } = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
-        scaleFactor = _lcm(scaleFactor, actualNotes);
+        if (!Array.isArray(entry)) continue;
+
+        if (Array.isArray(entry[MXML_TUPLETVALUE])) {
+            const { actualNotes } = _tupletNotesRatio(
+                entry[MXML_TUPLETVALUE],
+                entry[MXML_ROUNDDOWN]
+            );
+            scaleFactor = _lcm(scaleFactor, actualNotes);
+            continue;
+        }
+
+        // A note of 1/v carrying d dots is (D / v) * (2 - 2^-d) divisions, so the
+        // grid has to be a multiple of v * 2^d for that to land on a whole number.
+        // At the base of 32 a sixty-fourth note comes out as 0.5.
+        const noteValue = Number(entry[1]);
+        const dots = Number(entry[2]);
+        if (Number.isInteger(noteValue) && noteValue > 0 && Number.isInteger(dots) && dots >= 0) {
+            perWholeNote = _lcm(perWholeNote, noteValue * 2 ** dots);
+        }
     }
-    return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
+    return perWholeNote * scaleFactor;
 };
 
 const _musicXmlPitch = note => {
@@ -134,6 +151,97 @@ const _musicXmlPitch = note => {
     }
 
     return { step: match[1], alter, octave: match[3] ?? "4" };
+};
+
+// Sharps in the signature of each major key, going round the circle of fifths.
+const _MAJOR_FIFTHS = new Map([
+    ["C", 0],
+    ["G", 1],
+    ["D", 2],
+    ["A", 3],
+    ["E", 4],
+    ["B", 5],
+    ["F#", 6],
+    ["C#", 7],
+    ["F", -1],
+    ["Bb", -2],
+    ["Eb", -3],
+    ["Ab", -4],
+    ["Db", -5],
+    ["Gb", -6],
+    ["Cb", -7],
+    // No one writes a major key on these, but the modes below them are ordinary:
+    // G# minor carries five sharps, A# minor seven, Fb lydian seven flats. The
+    // range check at the end throws out the majors again.
+    ["G#", 8],
+    ["D#", 9],
+    ["A#", 10],
+    ["Fb", -8]
+]);
+
+// How far each mode sits from the major key on the same tonic.
+// Modes with no standard key signature (e.g. whole tone, chromatic) are
+// omitted so _keyFifths returns null and the caller leaves the score where it was.
+const _MODE_FIFTHS = new Map([
+    // Diatonic modes
+    ["major", 0],
+    ["ionian", 0],
+    ["lydian", 1],
+    ["mixolydian", -1],
+    ["dorian", -2],
+    ["minor", -3],
+    ["m", -3],
+    ["aeolian", -3],
+    ["natural minor", -3],
+    ["phrygian", -4],
+    ["locrian", -5],
+
+    // Minor variants that share the natural-minor key signature
+    ["harmonic minor", -3],
+    ["melodic minor", -3],
+    ["jazz minor", -3],
+
+    // Pentatonics: nearest diatonic relative
+    ["major pentatonic", 0],
+    ["minor pentatonic", -3],
+    ["minyo", -3], // Japanese minyo — alias of minor pentatonic
+    ["chinese", 0], // Major pentatonic variant
+    ["egyptian", 0],
+    ["hirajoshi", -3],
+    ["in", -3], // Japanese in scale
+
+    // Blues
+    ["major blues", 0],
+    ["minor blues", -3]
+]);
+
+/**
+ * The number for a MusicXML <fifths> element: how many sharps, or how many flats
+ * as a negative, the key signature carries.
+ * @param {string} key - the tonic, e.g. "G" or "B♭".
+ * @param {string} mode - e.g. "major", "dorian".
+ * @returns {number|null} null when the mode has no signature of its own, so the
+ *   caller can leave the score where it was.
+ */
+const _keyFifths = (key, mode) => {
+    const tonic = String(key ?? "")
+        .trim()
+        .replace(/♯/g, "#")
+        .replace(/♭/g, "b");
+    const step = tonic.charAt(0).toUpperCase() + tonic.slice(1).toLowerCase();
+
+    const major = _MAJOR_FIFTHS.get(step);
+    const offset = _MODE_FIFTHS.get(
+        String(mode ?? "")
+            .trim()
+            .toLowerCase()
+    );
+    if (major === undefined || offset === undefined) return null;
+
+    const fifths = major + offset;
+    // Beyond seven the signature needs double accidentals, which MusicXML does
+    // not write in a <key> element.
+    return fifths < -7 || fifths > 7 ? null : fifths;
 };
 
 class MusicXMLExporter {
@@ -184,11 +292,29 @@ class MusicXMLExporter {
         this.add("</direction>");
     }
 
-    addMeasureAttributes(measure, div, beats, beatType, implicit = false, isPercussion = false) {
+    /**
+     * Writes a key signature on its own, for a change that arrives when the
+     * measure attributes are not being written anyway.
+     * @param {number} fifths - sharps, or flats as a negative.
+     * @returns {void}
+     */
+    addKeyAttributes(fifths) {
+        this.add(`<attributes> <key> <fifths>${fifths}</fifths> </key> </attributes>`);
+    }
+
+    addMeasureAttributes(
+        measure,
+        div,
+        beats,
+        beatType,
+        implicit = false,
+        isPercussion = false,
+        fifths = 0
+    ) {
         this.add(
             isPercussion
                 ? `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
-                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>0</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
+                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
     }
 
@@ -345,6 +471,11 @@ class MusicXMLExporter {
                     harmonicsDepth = 0;
                 // Index of the last staged note, or -1 before the first.
                 let previousNote = -1;
+                // Sharps, or flats as a negative, for the key this voice is in.
+                let fifths = 0;
+                // A key change still waiting to be written. The meter is tracked
+                // separately, because a measure can begin without a new meter.
+                let keyChanged = false;
                 // <direction> and <sound> belong inside a <measure>, at the note they precede.
                 // Markers are staged before it's known whether that note still fits the current
                 // measure, so they're held here and written just ahead of the next note.
@@ -365,6 +496,11 @@ class MusicXMLExporter {
                         continue;
 
                     if (obj === "key") {
+                        const staged = _keyFifths(notes[i + 1], notes[i + 2]);
+                        if (staged !== null && staged !== fifths) {
+                            fifths = staged;
+                            keyChanged = true;
+                        }
                         i += 2;
                         continue;
                     }
@@ -563,15 +699,26 @@ class MusicXMLExporter {
                                         beats,
                                         beatType,
                                         isPickup,
-                                        part.isPercussion
+                                        part.isPercussion,
+                                        fifths
                                     );
                                     firstMeasure = false;
                                     beatsChanged = false;
+                                    keyChanged = false;
                                 } else {
                                     this.add(`<measure number="${currMeasure}">`);
                                 }
                                 openedMeasureTag = true;
                             }
+
+                            // A measure that opened without new attributes, or one
+                            // already open, still has to carry a key change. The
+                            // percussion clef is written without a key at all.
+                            if (keyChanged) {
+                                if (!part.isPercussion) this.addKeyAttributes(fifths);
+                                keyChanged = false;
+                            }
+
                             divisionsLeft -= preciseDur;
                         }
 
@@ -603,7 +750,16 @@ class MusicXMLExporter {
                         if (part.isPercussion ? !obj[MXML_DRUM] : p[0] === "R") {
                             this.add("<rest/>");
                         } else if (part.isPercussion) {
-                            this.add("<unpitched/>");
+                            // A notehead needs a line to sit on. Readers do not
+                            // agree on where an empty unpitched belongs, and
+                            // Lilypond's importer stops on one. Which drum it is
+                            // is carried by the instrument element below.
+                            this.add("<unpitched>");
+                            this.indent++;
+                            this.add("<display-step>C</display-step>");
+                            this.add("<display-octave>5</display-octave>");
+                            this.indent--;
+                            this.add("</unpitched>");
                         } else {
                             this.add("<pitch>");
                             this.indent++;

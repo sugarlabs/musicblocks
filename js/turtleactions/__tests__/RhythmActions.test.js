@@ -18,6 +18,7 @@
  */
 
 const setupRhythmActions = require("../RhythmActions");
+const { getMeasurePosition } = require("../../utils/musicutils-rhythm");
 
 describe("setupRhythmActions", () => {
     let activity;
@@ -27,6 +28,7 @@ describe("setupRhythmActions", () => {
         global._ = msg => msg;
         global.last = arr => arr[arr.length - 1];
         global.TONEBPM = 120;
+        global.getMeasurePosition = getMeasurePosition;
 
         global.Singer = {
             processNote: jest.fn()
@@ -115,6 +117,23 @@ describe("setupRhythmActions", () => {
 
         expect(targetTurtle.singer.currentBeat).toBe(3);
         expect(targetTurtle.singer.currentMeasure).toBe(1);
+    });
+
+    it("dispatches beat events counted from the latest meter change", () => {
+        // Three beats of 3/4, then the first note of 4/4.
+        targetTurtle.singer.notesPlayed = [3, 4];
+        targetTurtle.singer.pickup = 0;
+        targetTurtle.singer.noteValuePerBeat = 4;
+        targetTurtle.singer.beatsPerMeasure = 4;
+        targetTurtle.singer.meterAnchor = { wholeNotes: 0.75, measures: 1 };
+        targetTurtle.singer.beatList = [1];
+        targetTurtle.singer.factorList = [];
+
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
+
+        expect(targetTurtle.singer.currentBeat).toBe(1);
+        expect(targetTurtle.singer.currentMeasure).toBe(2);
+        expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_1_0__");
     });
 
     it("triggers everybeat event when beatList contains 'everybeat'", () => {
@@ -1013,6 +1032,36 @@ describe("setupRhythmActions", () => {
             expect(targetTurtle.singer.tieNotePitches).toEqual([]);
             expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
             expect(targetTurtle.singer.notePitches[5]).toBeUndefined();
+        });
+
+        it("does not count the replayed carried-over note twice", () => {
+            let listener;
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                listener = cb;
+            });
+            targetTurtle.doWait = jest.fn();
+            activity.blocks.blockList[5] = { name: "note" };
+
+            Singer.RhythmActions.doTie(0, 1);
+
+            targetTurtle.singer.inNoteBlock = [];
+            targetTurtle.singer.justCounting = [];
+            targetTurtle.singer.tieCarryOver = 2;
+            targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+            targetTurtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], [], undefined, false, 2];
+            // The half note was already counted when it was first played inside the tie.
+            targetTurtle.singer.notesPlayed = [1, 2];
+            targetTurtle.singer.tallyNotes = 1;
+            // Like the real processNote, count the note again when it is replayed.
+            Singer.processNote.mockImplementationOnce(() => {
+                targetTurtle.singer.notesPlayed = [1, 1];
+                targetTurtle.singer.tallyNotes = 2;
+            });
+
+            listener();
+
+            expect(targetTurtle.singer.notesPlayed).toEqual([1, 2]);
+            expect(targetTurtle.singer.tallyNotes).toBe(1);
         });
 
         it("uses last(bpm), not masterBPM, when the bpm stack is non-empty", () => {

@@ -196,6 +196,9 @@ requirejs.config({
             deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
             exports: "MusicUtilsSolfege"
         },
+        "utils/piemenu": {
+            exports: "PieMenuUtils"
+        },
         "utils/musicutils-modewheel": {
             deps: ["utils/utils", "utils/musicutils-constants"],
             exports: "MusicUtilsModeWheel"
@@ -209,6 +212,43 @@ requirejs.config({
             ],
             exports: "MusicUtilsModeCore"
         },
+        "utils/musicutils-pitchscale": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modecore"
+            ],
+            exports: "MusicUtilsPitchScale"
+        },
+        "utils/musicutils-buildscale": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-solfege",
+                "utils/musicutils-modecore"
+            ],
+            exports: "MusicUtilsBuildScale"
+        },
+        "utils/musicutils-pitchinfo": {
+            deps: [
+                "utils/utils",
+                "utils/musicutils-constants",
+                "utils/musicutils-i18n",
+                "utils/musicutils-temperament",
+                "utils/musicutils-pitch",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-buildscale"
+            ],
+            exports: "MusicUtilsPitchInfo"
+        },
         "utils/musicutils": {
             deps: [
                 "utils/utils",
@@ -220,7 +260,10 @@ requirejs.config({
                 "utils/musicutils-rhythm",
                 "utils/musicutils-solfege",
                 "utils/musicutils-modewheel",
-                "utils/musicutils-modecore"
+                "utils/musicutils-modecore",
+                "utils/musicutils-pitchscale",
+                "utils/musicutils-buildscale",
+                "utils/musicutils-pitchinfo"
             ]
         },
         "utils/synthutils": {

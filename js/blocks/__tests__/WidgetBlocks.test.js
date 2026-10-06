@@ -135,7 +135,18 @@ global.TimbreWidget = jest.fn(() => ({
 }));
 global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+global.SampleWidget.dependencies = [
+    "widgets/tuner",
+    "widgets/SamplerBlocks",
+    "widgets/SamplerPlayback",
+    "widgets/SamplerPitch",
+    "widgets/SamplerFiles",
+    "widgets/SamplerUI",
+    "widgets/SamplerPieMenu",
+    "widgets/SamplerCanvas",
+    "widgets/SamplerTuner",
+    "widgets/sampler"
+];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
@@ -146,7 +157,11 @@ global.TemperamentWidget = jest.fn(() => ({
 global.TemperamentWidget.dependencies = ["widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
-global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+global.MusicKeyboard.dependencies = [
+    "widgets/MusicKeyboardEditing",
+    "widgets/MusicKeyboardRendering",
+    "widgets/musickeyboard"
+];
 global.PhraseMaker = jest.fn();
 global.PhraseMaker.dependencies = [
     "widgets/PhraseMakerUtils",
@@ -164,11 +179,29 @@ global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
 global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
-global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
+global.RhythmRuler.dependencies = [
+    "widgets/RhythmRulerLayout",
+    "widgets/RhythmRulerHistory",
+    "widgets/RhythmRulerEditing",
+    "widgets/RhythmRulerPlayback",
+    "widgets/RhythmRulerSave",
+    "widgets/RhythmRulerCircular",
+    "widgets/rhythmruler"
+];
 global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
-global.LegoWidget.dependencies = ["widgets/legobricks"];
+global.LegoWidget.dependencies = [
+    "widgets/LegoBricksRows",
+    "widgets/LegoBricksLayout",
+    "widgets/LegoBricksExport",
+    "widgets/LegoBricksMedia",
+    "widgets/LegoBricksEyeDropper",
+    "widgets/LegoBricksColor",
+    "widgets/LegoBricksPlayback",
+    "widgets/LegoBricksVisualization",
+    "widgets/legobricks"
+];
 global.AIWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIWidget.dependencies = ["widgets/aiwidget"];
 

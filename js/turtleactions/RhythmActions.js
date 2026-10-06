@@ -16,7 +16,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM */
+/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM, getMeasurePosition */
 
 /*
    Global Locations
@@ -26,6 +26,8 @@
         Singer
     js/logo.js
         TONEBPM
+    js/utils/musicutils-rhythm.js
+        getMeasurePosition
     js/js-export/export.js
         MusicBlocks, Mouse
 */
@@ -64,16 +66,10 @@ function setupRhythmActions(activity) {
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
-                let beatValue, measureValue;
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
-                    beatValue = measureValue = 0;
-                } else {
-                    const beat =
-                        tur.singer.noteValuePerBeat *
-                        (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup);
-                    beatValue = 1 + (beat % tur.singer.beatsPerMeasure);
-                    measureValue = 1 + Math.floor(beat / tur.singer.beatsPerMeasure);
-                }
+                const { beat: beatValue, measure: measureValue } = getMeasurePosition(
+                    tur.singer,
+                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
+                );
 
                 tur.singer.currentBeat = beatValue;
                 tur.singer.currentMeasure = measureValue;
@@ -332,6 +328,11 @@ function setupRhythmActions(activity) {
                     tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
                     tur.singer.embeddedGraphics[saveBlk] = []; // graphics will have already been rendered
 
+                    // The carried-over note was counted when it was first played,
+                    // so don't count it again when it is replayed.
+                    const saveNoteCount = tur.singer.notesPlayed;
+                    const saveTallyNotes = tur.singer.tallyNotes;
+
                     Singer.processNote(
                         activity,
                         tur.singer.tieNoteExtras[7], // rawDurationValue
@@ -339,6 +340,9 @@ function setupRhythmActions(activity) {
                         saveBlk,
                         turtle
                     );
+
+                    tur.singer.notesPlayed = saveNoteCount;
+                    tur.singer.tallyNotes = saveTallyNotes;
 
                     // compute bpmFactor locally (same logic as Singer.processNote)
                     const bpmFactor =

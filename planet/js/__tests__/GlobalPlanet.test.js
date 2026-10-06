@@ -124,6 +124,19 @@ describe("GlobalPlanet", () => {
             expect(gp.remixPrefix).toBe("Remix of");
         });
     });
+    describe("initTagList", () => {
+        it("should read the selected sort option", () => {
+            const sortSelect = document.getElementById("sort-select");
+            sortSelect.value = "RECENT";
+
+            gp.specialTags = [];
+            jest.spyOn(gp, "refreshTagList").mockImplementation(() => {});
+
+            gp.initTagList();
+
+            expect(gp.sortBy).toBe("RECENT");
+        });
+    });
 
     describe("searchAllProjects", () => {
         it("should set searchMode to ALL_PROJECTS and call refreshProjects", () => {
@@ -237,6 +250,47 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("batch project offline error fix", () => {
+        it("should preserve offline error when all project details fail", () => {
+            // Provide a non-empty batch of projects
+            const mockData = [
+                ["proj1", 123],
+                ["proj2", 124]
+            ];
+
+            // Mock getProjectDetails to immediately fail (simulate offline)
+            mockPlanet.ServerInterface.getProjectDetails.mockImplementation((id, cb) => {
+                cb({ success: false });
+            });
+
+            const spyOffline = jest.spyOn(gp, "throwOfflineError");
+            const spyNoProjects = jest.spyOn(gp, "throwNoProjectsError");
+
+            gp.addProjects(mockData);
+
+            // After addProjects, it should have downloaded details and failed for all
+            expect(spyOffline).toHaveBeenCalled();
+            expect(spyNoProjects).not.toHaveBeenCalled();
+
+            // The final state of the UI should remain the offline message
+            const el = document.getElementById("global-projects");
+            expect(el.innerHTML).toContain("Feature unavailable");
+
+            spyOffline.mockRestore();
+            spyNoProjects.mockRestore();
+        });
+
+        it("should reset batch offline error when starting a new batch", () => {
+            gp.batchHasOfflineError = true;
+            jest.spyOn(gp, "addProjectToCache").mockImplementation(() => {});
+
+            gp.downloadProjectsToCache([["proj1", 123]], jest.fn());
+
+            expect(gp.batchHasOfflineError).toBe(false);
+
+            gp.addProjectToCache.mockRestore();
+        });
+    });
     describe("addProjectToCache", () => {
         it("should add project data to cache on success", () => {
             const callback = jest.fn();
@@ -252,15 +306,14 @@ describe("GlobalPlanet", () => {
             expect(callback).toHaveBeenCalled();
         });
 
-        it("should call throwOfflineError on failure", () => {
-            const spy = jest.spyOn(gp, "throwOfflineError").mockImplementation(() => {});
+        it("should set batchHasOfflineError on failure", () => {
             const callback = jest.fn();
             gp.loadCount = 1;
+            gp.batchHasOfflineError = false;
             gp.addProjectToCache("proj1", { success: false }, callback);
 
-            expect(spy).toHaveBeenCalled();
+            expect(gp.batchHasOfflineError).toBe(true);
             expect(callback).toHaveBeenCalled();
-            spy.mockRestore();
         });
 
         it("should not invoke callback until loadCount reaches zero", () => {
@@ -399,6 +452,43 @@ describe("GlobalPlanet", () => {
                 gp.afterDownloadData("proj1", { success: false }, callback, null);
             }).not.toThrow();
         });
+
+        it("should not overwrite cache if row was replaced by refresh while download was in flight", () => {
+            const staleEntry = { ProjectData: null, ProjectLastUpdated: "v1" };
+            const freshEntry = { ProjectData: null, ProjectLastUpdated: "v2" };
+            gp.cache["proj1"] = freshEntry;
+            const callback = jest.fn();
+            gp.afterDownloadData(
+                "proj1",
+                { success: true, data: "oldData" },
+                callback,
+                null,
+                staleEntry
+            );
+
+            expect(gp.cache["proj1"].ProjectData).toBeNull();
+            expect(callback).toHaveBeenCalledWith("oldData");
+        });
+    });
+
+    describe("initTagList", () => {
+        it("loads the default tag's projects once", () => {
+            const loadAll = jest.fn();
+            mockPlanet.TagsManifest = {};
+            GlobalTag.mockImplementationOnce(() => {
+                const tag = { select: jest.fn(), unselect: jest.fn(), selected: false };
+                tag.init = obj => {
+                    tag.specialTag = true;
+                    tag.func = obj.func;
+                };
+                return tag;
+            });
+            gp.specialTags = [{ name: "All Projects", func: loadAll, defaultTag: true }];
+
+            gp.initTagList();
+
+            expect(loadAll).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("selectSpecialTag / unselectSpecialTags", () => {
@@ -479,6 +569,45 @@ describe("GlobalPlanet", () => {
             gp.init();
             // second init should register the same number of listeners not double them
             expect(gp.listenerRefs.length).toBe(countAfterFirstInit);
+        });
+    });
+
+    describe("cache freshness and versioning", () => {
+        it("forceAddToCache should call getProjectDetails with skipCache = true", () => {
+            const cb = jest.fn();
+            gp.forceAddToCache("repo-1", cb);
+
+            expect(mockPlanet.ServerInterface.getProjectDetails).toHaveBeenCalledWith(
+                "repo-1",
+                expect.any(Function),
+                true
+            );
+        });
+
+        it("downloadDataToCache should pass expectedUpdatedAt from cache to downloadProject", () => {
+            gp.cache["repo-1"] = {
+                ProjectLastUpdated: "2026-10-01T12:00:00Z"
+            };
+            const cb = jest.fn();
+
+            gp.downloadDataToCache("repo-1", cb);
+
+            expect(mockPlanet.ServerInterface.downloadProject).toHaveBeenCalledWith(
+                "repo-1",
+                expect.any(Function),
+                "2026-10-01T12:00:00Z"
+            );
+        });
+
+        it("downloadProjectsToCache should fetch details for projects", () => {
+            const cb = jest.fn();
+
+            gp.downloadProjectsToCache([["repo-1", "2026-10-01T12:00:00Z"]], cb);
+
+            expect(mockPlanet.ServerInterface.getProjectDetails).toHaveBeenCalledWith(
+                "repo-1",
+                expect.any(Function)
+            );
         });
     });
 });

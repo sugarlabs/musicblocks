@@ -1050,6 +1050,83 @@ describe("widgetWindows", () => {
             }
         });
 
+        test("preserves focus when clicking a widget pie menu", () => {
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "wheelDivptm";
+            const slice = document.createElement("span");
+            pieMenu.appendChild(slice);
+            document.body.appendChild(pieMenu);
+
+            try {
+                const win1 = createTestWindow("Window 1");
+                const win2 = createTestWindow("Window 2");
+
+                win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+                expect(window.widgetWindows.focused).toBe(win1);
+
+                slice.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+                expect(window.widgetWindows.focused).toBe(win1);
+                expect(win1._frame.style.opacity).toBe("1");
+                expect(win1._frame.style.zIndex).toBe("10000");
+                expect(win2._frame.style.opacity).toBe("0.7");
+            } finally {
+                pieMenu.remove();
+            }
+        });
+
+        test("Escape leaves the focused window open while its pie menu is showing", () => {
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "wheelDivptm";
+            document.body.appendChild(pieMenu);
+
+            try {
+                const win = createTestWindow("Window 1");
+                const closeSpy = jest.spyOn(win, "onclose");
+
+                const escape = () =>
+                    document.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                    );
+
+                pieMenu.style.display = "";
+                escape();
+                expect(closeSpy).not.toHaveBeenCalled();
+
+                pieMenu.style.display = "none";
+                escape();
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                pieMenu.remove();
+            }
+        });
+
+        test("Escape leaves the focused window open while the Mode widget pie menu is showing", () => {
+            const wheelDiv = document.createElement("div");
+            wheelDiv.id = "wheelDiv";
+            document.body.appendChild(wheelDiv);
+
+            try {
+                const win = createTestWindow("Window 1");
+                const closeSpy = jest.spyOn(win, "onclose");
+
+                const escape = () =>
+                    document.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                    );
+
+                wheelDiv.style.display = "";
+                escape();
+                expect(closeSpy).not.toHaveBeenCalled();
+
+                wheelDiv.style.display = "none";
+                escape();
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                wheelDiv.remove();
+            }
+        });
+
         test("Escape key closes only the currently focused window", () => {
             const win1 = createTestWindow("Window 1");
             const win2 = createTestWindow("Window 2");
@@ -1168,10 +1245,15 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Win 2");
             window.widgetWindows.focused = win1;
 
+            win1._overlay(true);
+
             window.widgetWindows.hideAllWindows();
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1._frame.style.zIndex).toBe("10");
+            expect(win1._overlayframe.style.zIndex).toBe("-1");
+            expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
             expect(window.widgetWindows.focused).toBeNull();
         });
 
@@ -1269,10 +1351,14 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow = jest.fn();
         });
 
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
         it("closes matching widget by name", () => {
             const mockElement = { textContent: "TestWidget", id: "" };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
@@ -1299,13 +1385,89 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
 
+        it("closes pitch slider using mapped key 'slider'", () => {
+            window.widgetWindows.openWindows = {
+                slider: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch slider");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+        });
+
+        it("closes music keyboard, pitch staircase, and status using mapped keys", () => {
+            window.widgetWindows.openWindows = {
+                "music keyboard": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("music keyboard");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("music keyboard");
+
+            window.widgetWindows.closeBlkWidgets("pitch staircase");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+            window.widgetWindows.closeBlkWidgets("status");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+        });
+
+        it("closes sampler using mapped key 'sampler'", () => {
+            window.widgetWindows.openWindows = {
+                sampler: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("sampler");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes widgets when receiving localized block titles", () => {
+            const originalI18n = global._;
+            const translations = {
+                "pitch slider": "control deslizante de tono",
+                "music keyboard": "teclado musical",
+                "pitch staircase": "escalera de tono",
+                "status": "estado",
+                "sampler": "muestreador"
+            };
+            global._ = jest.fn(str => translations[str] || str);
+
+            window.widgetWindows.openWindows = {
+                "slider": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() },
+                "sampler": { close: jest.fn() }
+            };
+            windowFor({ blockNo: 7 }, "music keyboard");
+
+            try {
+                window.widgetWindows.closeBlkWidgets("control deslizante de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+
+                window.widgetWindows.closeBlkWidgets("teclado musical");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("7");
+
+                window.widgetWindows.closeBlkWidgets("escalera de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+                window.widgetWindows.closeBlkWidgets("estado");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+
+                window.widgetWindows.closeBlkWidgets("muestreador");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+            } finally {
+                global._ = originalI18n;
+            }
+        });
+
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
                 textContent: "C MAJOR",
                 id: "custom modeWidgetID"
             };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("custom mode");
 
@@ -1313,7 +1475,7 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([
                 { textContent: "OtherWidget", id: "" }
             ]);
 

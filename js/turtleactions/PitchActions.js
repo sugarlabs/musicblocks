@@ -90,7 +90,7 @@ function setupPitchActions(activity) {
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
-            if (typeof value !== "number") {
+            if (typeof value !== "number" || !Number.isFinite(value)) {
                 activity.errorMsg(NANERRORMSG, blk);
                 activity.logo.stopTurtle = true;
                 return;
@@ -173,6 +173,7 @@ function setupPitchActions(activity) {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static playNthModalPitch(number, octave, turtle, blk) {
+            if (!Number.isFinite(number)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
             //  (0, 4) --> do 4; ( 1, 4) --> re 4; ( 7, 4) --> do 5
@@ -272,6 +273,7 @@ function setupPitchActions(activity) {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static playPitchNumber(pitchNumber, turtle, blk) {
+            if (!Number.isFinite(pitchNumber)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inDefineMode) {
@@ -312,6 +314,7 @@ function setupPitchActions(activity) {
          * @throws {String} No Note Error
          */
         static playHertz(hertz, turtle, blk) {
+            if (!Number.isFinite(hertz)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
             const obj = frequencyToPitch(hertz);
@@ -376,6 +379,7 @@ function setupPitchActions(activity) {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList
          */
         static playSynthFrequency(hertz, turtle, blk) {
+            if (!Number.isFinite(hertz)) return;
             const tur = activity.turtles.ithTurtle(turtle);
             const obj = frequencyToPitch(hertz);
 
@@ -479,6 +483,7 @@ function setupPitchActions(activity) {
          * @returns {void}
          */
         static setScalarTranspose(transValue, turtle, blk) {
+            if (!Number.isFinite(transValue)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.scalarTransposition +=
@@ -511,6 +516,7 @@ function setupPitchActions(activity) {
          * @returns {void}
          */
         static setSemitoneTranspose(transValue, turtle, blk) {
+            if (!Number.isFinite(transValue)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.transposition += tur.singer.invertList.length > 0 ? -transValue : transValue;
@@ -542,6 +548,7 @@ function setupPitchActions(activity) {
          * @returns {void}
          */
         static setRatioTranspose(value, turtle, blk) {
+            if (!Number.isFinite(value)) return;
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.transpositionRatios.push(value);
 

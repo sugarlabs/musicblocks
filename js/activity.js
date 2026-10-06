@@ -168,8 +168,12 @@ let MYDEFINES = [
     "utils/musicutils-lookups",
     "utils/musicutils-rhythm",
     "utils/musicutils-solfege",
+    "utils/piemenu",
     "utils/musicutils-modewheel",
     "utils/musicutils-modecore",
+    "utils/musicutils-pitchscale",
+    "utils/musicutils-buildscale",
+    "utils/musicutils-pitchinfo",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -750,9 +754,6 @@ class Activity {
         // WorkspaceLayoutController (js/activity/workspace-layout-controller.js).
         // setupWorkspaceLayoutController() installs the delegation stubs below:
         // findBlocks, setHomeContainers, repositionBlocks, _handleRepositionBlocksOnResize.
-
-        //if any window resize event occurs:
-        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         // Sets up HelpController (js/activity/help-controller.js), which owns the help
         // window, about page, keyboard shortcuts dialog, statistics window,
@@ -1908,7 +1909,6 @@ class Activity {
                 this.setupPaletteMenu();
             }, 200);
         };
-        this.addEventListener(window, "resize", this._handleWindowResize);
         this._handleOrientationChangeResize = handleResize;
         this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
 
@@ -2662,6 +2662,7 @@ class Activity {
             const that = this;
 
             this.setupWindowBlurHandler(doHardStopButton);
+            this.setupResizeListeners();
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage, false, true);
@@ -3040,6 +3041,15 @@ class Activity {
         const end = window.__mbPerf.marks[endMark];
         if (typeof start !== "number" || typeof end !== "number") return;
         window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
+    }
+
+    /**
+     * Registers window resize listeners after dependency cleanup.
+     */
+    setupResizeListeners() {
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
+
+        this.addEventListener(window, "resize", this._handleWindowResize);
     }
 
     /**

@@ -47,6 +47,143 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("4");
     });
 
+    describe("getMeasurePosition", () => {
+        const singer = overrides => ({
+            pickup: 0,
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            meterAnchor: null,
+            ...overrides
+        });
+
+        it("counts beats and measures from the start without a meter change", () => {
+            expect(rhythm.getMeasurePosition(singer(), 0)).toEqual({
+                beat: 1,
+                measure: 1,
+                timeLeftInMeasure: 1
+            });
+            expect(rhythm.getMeasurePosition(singer(), 1.25)).toEqual({
+                beat: 2,
+                measure: 2,
+                timeLeftInMeasure: 0.75
+            });
+        });
+
+        it("reports the time left until the pickup ends", () => {
+            expect(rhythm.getMeasurePosition(singer({ pickup: 0.25 }), 0)).toEqual({
+                beat: 0,
+                measure: 0,
+                timeLeftInMeasure: 0.25
+            });
+            expect(rhythm.getMeasurePosition(singer({ pickup: 0.25 }), 0.25)).toEqual({
+                beat: 1,
+                measure: 1,
+                timeLeftInMeasure: 1
+            });
+        });
+
+        it("counts from the latest meter change", () => {
+            // Three beats of 3/4, then 4/4 from measure 2.
+            const s = singer({ meterAnchor: { wholeNotes: 0.75, measures: 1 } });
+            expect(rhythm.getMeasurePosition(s, 0.75)).toEqual({
+                beat: 1,
+                measure: 2,
+                timeLeftInMeasure: 1
+            });
+            expect(rhythm.getMeasurePosition(s, 2)).toEqual({
+                beat: 2,
+                measure: 3,
+                timeLeftInMeasure: 0.75
+            });
+        });
+
+        it("does not read float error as a sliver of a beat", () => {
+            const position = rhythm.getMeasurePosition(singer(), 0.7 + 0.1 + 0.2);
+            expect(position.beat).toBe(1);
+            expect(position.measure).toBe(2);
+            expect(position.timeLeftInMeasure).toBe(1);
+        });
+    });
+
+    describe("getMeterAnchor", () => {
+        const singer = (notesPlayed, overrides) => ({
+            notesPlayed,
+            pickup: 0,
+            beatsPerMeasure: 3,
+            noteValuePerBeat: 4,
+            meterAnchor: null,
+            ...overrides
+        });
+
+        it("anchors a change on a barline after the measures before it", () => {
+            expect(rhythm.getMeterAnchor(singer([3, 4]))).toEqual({
+                wholeNotes: 0.75,
+                measures: 1
+            });
+        });
+
+        it("counts a measure the change cuts short", () => {
+            expect(rhythm.getMeterAnchor(singer([1, 4]))).toEqual({
+                wholeNotes: 0.25,
+                measures: 1
+            });
+        });
+
+        it("builds on an earlier meter change", () => {
+            const s = singer([7, 4], {
+                beatsPerMeasure: 4,
+                meterAnchor: { wholeNotes: 0.75, measures: 1 }
+            });
+            expect(rhythm.getMeterAnchor(s)).toEqual({ wholeNotes: 1.75, measures: 2 });
+        });
+
+        it("does not anchor before the pickup ends", () => {
+            expect(rhythm.getMeterAnchor(singer([0, 1]))).toBeNull();
+            expect(rhythm.getMeterAnchor(singer([1, 4], { pickup: 0.25 }))).toBeNull();
+        });
+    });
+
+    describe("saveMeterState / restoreMeterState", () => {
+        it("puts back the meter, pickup, anchor and default strong beats", () => {
+            const anchor = { wholeNotes: 0.75, measures: 1 };
+            const singer = {
+                beatsPerMeasure: 4,
+                noteValuePerBeat: 4,
+                pickup: 0,
+                meterAnchor: anchor,
+                beatList: [1, 3],
+                defaultStrongBeats: true,
+                notesPlayed: [1, 1]
+            };
+            const saved = rhythm.saveMeterState(singer);
+
+            Object.assign(singer, {
+                beatsPerMeasure: 6,
+                noteValuePerBeat: 8,
+                pickup: 0.125,
+                meterAnchor: { wholeNotes: 2, measures: 3 },
+                defaultStrongBeats: false,
+                notesPlayed: [2, 1]
+            });
+            singer.beatList.push(4);
+            rhythm.restoreMeterState(singer, saved);
+
+            expect(singer).toEqual({
+                beatsPerMeasure: 4,
+                noteValuePerBeat: 4,
+                pickup: 0,
+                meterAnchor: anchor,
+                beatList: [1, 3],
+                defaultStrongBeats: true,
+                notesPlayed: [2, 1]
+            });
+            // The saved copy survives another restore.
+            singer.beatList.push(5);
+            rhythm.restoreMeterState(singer, saved);
+            expect(singer.beatList).toEqual([1, 3]);
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of Object.keys(rhythm)) {
             if (name === "MusicUtilsRhythm") continue;
@@ -81,6 +218,9 @@ describe("musicutils-rhythm", () => {
             "musicutils-solfege.js",
             "musicutils-modewheel.js",
             "musicutils-modecore.js",
+            "musicutils-pitchscale.js",
+            "musicutils-buildscale.js",
+            "musicutils-pitchinfo.js",
             "musicutils.js"
         ];
         const load = files => {

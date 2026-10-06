@@ -31,7 +31,7 @@
     announceToScreenReader
 */
 
-/* global showZoomOverlay */
+/* global showZoomOverlay, ManagedTimer */
 
 /*
    Global locations
@@ -182,6 +182,43 @@ class Blocks {
         /** Track the time with mouse down. */
         this.mouseDownTime = 0;
         this.longPressTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+
+        this.setTimeout = (callback, delay) => {
+            if (this._timerManager !== null) {
+                return this._timerManager.setTimeout(callback, delay);
+            }
+            return setTimeout(callback, delay);
+        };
+
+        this.clearTimeout = id => {
+            if (id === null || id === undefined) {
+                return false;
+            }
+            if (this._timerManager !== null) {
+                return this._timerManager.clearTimeout(id);
+            }
+            clearTimeout(id);
+            return true;
+        };
+
+        this.clearLongPressTimeout = () => {
+            if (this.longPressTimeout !== null) {
+                this.clearTimeout(this.longPressTimeout);
+                this.longPressTimeout = null;
+            }
+        };
 
         /** Paste offset is used to ensure pasted blocks don't overlap. */
         this.pasteDx = 0;
@@ -1381,7 +1418,7 @@ class Blocks {
                                     protoblock.name === "nameddo" &&
                                     protoblock.defaults[0] === that.blockList[oldBlock].value
                                 ) {
-                                    setTimeout(() => {
+                                    that.setTimeout(() => {
                                         blockPalette.remove(
                                             protoblock,
                                             that.blockList[oldBlock].value
@@ -2570,7 +2607,10 @@ class Blocks {
             }
 
             if (thisBlock !== null) {
-                this.blockList[thisBlock].unhighlight();
+                const block = this.blockList[thisBlock];
+                if (block && typeof block.unhighlight === "function") {
+                    block.unhighlight();
+                }
             }
 
             if (this.highlightedBlock === thisBlock) {
@@ -4658,6 +4698,10 @@ class Blocks {
             }
 
             const c2v = this.blockList[c2].value;
+            if (!(c1v > 0 && c2v > 0)) {
+                return;
+            }
+
             for (let i = 0; i < this.blockList.length; i++) {
                 if (this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
@@ -4686,7 +4730,7 @@ class Blocks {
                     }
 
                     const b2v = this.blockList[b2].value;
-                    bnv *= ((b1v * c2v) / b2v) * c1v;
+                    bnv = (bnv * b1v * c2v) / (b2v * c1v);
 
                     this.blockList[bn].value = bnv;
                     this.updateBlockText(bn);
@@ -4728,10 +4772,7 @@ class Blocks {
          * @returns {void}
          */
         this.triggerLongPress = () => {
-            if (this.longPressTimeout !== null) {
-                clearTimeout(this.longPressTimeout);
-                this.longPressTimeout = null;
-            }
+            this.clearLongPressTimeout();
 
             this.inLongPress = true;
             piemenuBlockContext(this.blockList[this.activeBlock]);
@@ -4881,9 +4922,17 @@ class Blocks {
                                 []
                             ];
                             break;
-                        default:
-                            blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
+                        default: {
+                            const valObj = { value: myBlock.value };
+                            if (
+                                myBlock.manualAccidental !== undefined &&
+                                myBlock.manualAccidental !== null
+                            ) {
+                                valObj.manualAccidental = myBlock.manualAccidental;
+                            }
+                            blockItem = [b, [myBlock.name, valObj], x, y, []];
                             break;
+                        }
                     }
                 } else if (
                     [
@@ -5768,7 +5817,7 @@ class Blocks {
                         // surface the failure the same way a real browser would),
                         // tell any listener synchronously via pubsub, the same
                         // channel "finishedLoading" already uses for success.
-                        setTimeout(() => {
+                        this.setTimeout(() => {
                             try {
                                 processChunk();
                             } catch (e) {
@@ -6224,7 +6273,11 @@ class Blocks {
                         postProcess = args => {
                             const thisBlock = args[0];
                             const value = args[1];
+                            const info = args[2];
                             that.blockList[thisBlock].value = value;
+                            if (info && info.manualAccidental !== undefined) {
+                                that.blockList[thisBlock].manualAccidental = info.manualAccidental;
+                            }
                             that.updateBlockText(thisBlock);
                         };
 
@@ -6233,7 +6286,7 @@ class Blocks {
                             blockOffset,
                             blkData[4],
                             postProcess,
-                            [thisBlock, value]
+                            [thisBlock, value, blkInfo[1]]
                         );
                         break;
                     case "drumname":

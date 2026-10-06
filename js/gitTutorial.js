@@ -578,8 +578,9 @@ const GitTutorial = (() => {
     inset: 0;
     z-index: 15000;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    overflow: auto;
     background: rgba(0,0,0,0.45);
     font-family: 'Nunito', sans-serif;
     animation: gt-fade-in 0.2s ease;
@@ -589,6 +590,7 @@ const GitTutorial = (() => {
 #git-tutorial-shell {
     width: 960px;
     max-width: 96vw;
+    margin: auto;
     background: #fff;
     border-radius: 24px;
     overflow: hidden;

@@ -14,11 +14,8 @@ const path = require("path");
 const vm = require("vm");
 const { TextEncoder } = require("util");
 
-const slicePath = () => ({ DonutSlice: "donut", DonutSliceCustomization: () => ({}) });
-
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
-global.slicePath = slicePath;
 global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
 const modewheel = require("../musicutils-modewheel");
@@ -108,13 +105,15 @@ describe("musicutils-modewheel", () => {
             "musicutils-solfege.js",
             "musicutils-modewheel.js",
             "musicutils-modecore.js",
+            "musicutils-pitchscale.js",
+            "musicutils-buildscale.js",
+            "musicutils-pitchinfo.js",
             "musicutils.js"
         ];
         const load = files => {
             const sandbox = {
                 TextEncoder,
                 _: value => value,
-                slicePath,
                 DRUMNAMES: [],
                 NOISENAMES: [],
                 VOICENAMES: [],

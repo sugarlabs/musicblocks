@@ -1791,6 +1791,71 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should keep microtonal note names as note names", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch("^C", 4);
+            await mouse.playPitch("vvD♭", 4);
+            await mouse.playPitch("^sol", 4);
+            await mouse.playPitch("E♯", 4);
+            await mouse.playPitch("C𝄪", 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["notename", { value: "^C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 6, 7]],
+            [5, ["notename", { value: "vvD♭" }], 0, 0, [4]],
+            [6, ["number", { value: 4 }], 0, 0, [4]],
+            [7, "pitch", 0, 0, [4, 8, 9, 10]],
+            [8, ["solfege", { value: "^sol" }], 0, 0, [7]],
+            [9, ["number", { value: 4 }], 0, 0, [7]],
+            [10, "pitch", 0, 0, [7, 11, 12, 13]],
+            [11, ["notename", { value: "E♯" }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]],
+            [13, "pitch", 0, 0, [10, 14, 15, null]],
+            [14, ["notename", { value: "C𝄪" }], 0, 0, [13]],
+            [15, ["number", { value: 4 }], 0, 0, [13]]
+        ]);
+    });
+
+    test("should convert a pitch that isn't a note name literal", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch(pitch, 4);
+            await mouse.playPitch(box1 + 1, 4);
+            await mouse.playPitch(5, 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["namedbox", { value: "pitch" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 8, 9]],
+            [5, "plus", 0, 0, [4, 6, 7]],
+            [6, ["namedbox", { value: "box1" }], 0, 0, [5]],
+            [7, ["number", { value: 1 }], 0, 0, [5]],
+            [8, ["number", { value: 4 }], 0, 0, [4]],
+            [9, "vspace", 0, 0, [4, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ]);
+    });
+
     test("should convert the current meter getter", () => {
         const code = `
         new Mouse(async mouse => {
@@ -1904,40 +1969,44 @@ describe("AST2BlockList Class", () => {
             [23, ["number", { value: 4 }], 0, 0, [21]],
             [24, "hertz", 0, 0, [14, 25, 26]],
             [25, ["number", { value: 392 }], 0, 0, [24]],
-            [26, "setscalartransposition", 0, 0, [24, 27, null, 28]],
-            [27, ["modelength", {}], 0, 0, [26]],
-            [28, "settransposition", 0, 0, [26, 29, null, 34]],
-            [29, "plus", 0, 0, [28, 30, 31]],
-            [30, ["number", { value: 1 }], 0, 0, [29]],
-            [31, "multiply", 0, 0, [29, 32, 33]],
-            [32, ["number", { value: 0 }], 0, 0, [31]],
-            [33, ["number", { value: 12 }], 0, 0, [31]],
-            [34, "settransposition", 0, 0, [28, 35, 38, 47]],
-            [35, "divide", 0, 0, [34, 36, 37]],
-            [36, ["number", { value: 50 }], 0, 0, [35]],
-            [37, ["number", { value: 100 }], 0, 0, [35]],
-            [38, "vspace", 0, 0, [34, 39]],
-            [39, "newnote", 0, 0, [38, 40, 43, null]],
-            [40, "divide", 0, 0, [39, 41, 42]],
-            [41, ["number", { value: 1 }], 0, 0, [40]],
-            [42, ["number", { value: 4 }], 0, 0, [40]],
-            [43, "vspace", 0, 0, [39, 44]],
-            [44, "pitch", 0, 0, [43, 45, 46, null]],
-            [45, ["solfege", { value: "sol" }], 0, 0, [44]],
+            [26, "setscalartransposition", 0, 0, [24, 27, null, 32]],
+            [27, "plus", 0, 0, [26, 28, 29]],
+            [28, ["number", { value: 0 }], 0, 0, [27]],
+            [29, "multiply", 0, 0, [27, 30, 31]],
+            [30, ["number", { value: 0 }], 0, 0, [29]],
+            [31, "modelength", 0, 0, [29]],
+            [32, "settransposition", 0, 0, [26, 33, null, 38]],
+            [33, "plus", 0, 0, [32, 34, 35]],
+            [34, ["number", { value: 1 }], 0, 0, [33]],
+            [35, "multiply", 0, 0, [33, 36, 37]],
+            [36, ["number", { value: 0 }], 0, 0, [35]],
+            [37, ["number", { value: 12 }], 0, 0, [35]],
+            [38, "settransposition", 0, 0, [32, 39, 42, 51]],
+            [39, "divide", 0, 0, [38, 40, 41]],
+            [40, ["number", { value: 50 }], 0, 0, [39]],
+            [41, ["number", { value: 100 }], 0, 0, [39]],
+            [42, "vspace", 0, 0, [38, 43]],
+            [43, "newnote", 0, 0, [42, 44, 47, null]],
+            [44, "divide", 0, 0, [43, 45, 46]],
+            [45, ["number", { value: 1 }], 0, 0, [44]],
             [46, ["number", { value: 4 }], 0, 0, [44]],
-            [47, "register", 0, 0, [34, 48, 49]],
-            [48, ["number", { value: 0 }], 0, 0, [47]],
-            [49, "invert1", 0, 0, [47, 50, 51, 52, 53, null]],
-            [50, ["solfege", { value: "sol" }], 0, 0, [49]],
-            [51, ["number", { value: 4 }], 0, 0, [49]],
-            [52, ["text", { value: "even" }], 0, 0, [49]],
-            [53, "setpitchnumberoffset", 0, 0, [49, 54, 55, 56]],
-            [54, ["notename", { value: "C" }], 0, 0, [53]],
+            [47, "vspace", 0, 0, [43, 48]],
+            [48, "pitch", 0, 0, [47, 49, 50, null]],
+            [49, ["solfege", { value: "sol" }], 0, 0, [48]],
+            [50, ["number", { value: 4 }], 0, 0, [48]],
+            [51, "register", 0, 0, [38, 52, 53]],
+            [52, ["number", { value: 0 }], 0, 0, [51]],
+            [53, "invert1", 0, 0, [51, 54, 55, 56, 57, null]],
+            [54, ["solfege", { value: "sol" }], 0, 0, [53]],
             [55, ["number", { value: 4 }], 0, 0, [53]],
-            [56, "setpitchnumberoffset", 0, 0, [53, 57, 58, null]],
-            [57, ["notename", { value: "C" }], 0, 0, [56]],
-            [58, "neg", 0, 0, [56, 59]],
-            [59, ["number", { value: 1 }], 0, 0, [58]]
+            [56, ["text", { value: "even" }], 0, 0, [53]],
+            [57, "setpitchnumberoffset", 0, 0, [53, 58, 59, 60]],
+            [58, ["notename", { value: "C" }], 0, 0, [57]],
+            [59, ["number", { value: 4 }], 0, 0, [57]],
+            [60, "setpitchnumberoffset", 0, 0, [57, 61, 62, null]],
+            [61, ["notename", { value: "C" }], 0, 0, [60]],
+            [62, "neg", 0, 0, [60, 63]],
+            [63, ["number", { value: 1 }], 0, 0, [62]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
@@ -1971,14 +2040,22 @@ describe("AST2BlockList Class", () => {
             [3, ["modename", { value: "major" }], 0, 0, [1]],
             [4, "interval", 0, 0, [1, 5, null, 6]],
             [5, ["number", { value: 5 }], 0, 0, [4]],
-            [6, "semitoneinterval", 0, 0, [4, 7, null, 8]],
-            [7, ["intervalname", {}], 0, 0, [6]],
-            [8, "semitoneinterval", 0, 0, [6, 9, null, 10]],
-            [9, ["intervalname", {}], 0, 0, [8]],
-            [10, "settemperament", 0, 0, [8, 11, 12, 13, null]],
-            [11, ["temperamentname", { value: "equal" }], 0, 0, [10]],
-            [12, ["notename", { value: "C" }], 0, 0, [10]],
-            [13, ["number", { value: 4 }], 0, 0, [10]]
+            [6, "semitoneinterval", 0, 0, [4, 7, null, 12]],
+            [7, "plus", 0, 0, [6, 8, 9]],
+            [8, ["number", { value: 4 }], 0, 0, [7]],
+            [9, "multiply", 0, 0, [7, 10, 11]],
+            [10, ["number", { value: 0 }], 0, 0, [9]],
+            [11, ["number", { value: 12 }], 0, 0, [9]],
+            [12, "semitoneinterval", 0, 0, [6, 13, null, 18]],
+            [13, "plus", 0, 0, [12, 14, 15]],
+            [14, ["intervalname", { value: "major 3" }], 0, 0, [13]],
+            [15, "multiply", 0, 0, [13, 16, 17]],
+            [16, ["number", { value: 0 }], 0, 0, [15]],
+            [17, ["number", { value: 12 }], 0, 0, [15]],
+            [18, "settemperament", 0, 0, [12, 19, 20, 21, null]],
+            [19, ["temperamentname", { value: "equal" }], 0, 0, [18]],
+            [20, ["notename", { value: "C" }], 0, 0, [18]],
+            [21, ["number", { value: 4 }], 0, 0, [18]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
@@ -2188,20 +2265,20 @@ describe("AST2BlockList Class", () => {
             [25, ["number", { value: 100 }], 0, 0, [23]],
             [26, "clear", 0, 0, [23, 27]],
             [27, "scrollxy", 0, 0, [26, 28, 29, 30]],
-            [28, ["x", { value: 100 }], 0, 0, [27]],
-            [29, ["y", { value: 0 }], 0, 0, [27]],
+            [28, ["number", { value: 100 }], 0, 0, [27]],
+            [29, ["number", { value: 0 }], 0, 0, [27]],
             [30, "setcolor", 0, 0, [27, 31, 32]],
             [31, ["number", { value: 0 }], 0, 0, [30]],
             [32, "setgrey", 0, 0, [30, 33, 34]],
-            [33, ["grey", { value: 100 }], 0, 0, [32]],
+            [33, ["number", { value: 100 }], 0, 0, [32]],
             [34, "setshade", 0, 0, [32, 35, 36]],
-            [35, ["shade", { value: 50 }], 0, 0, [34]],
+            [35, ["number", { value: 50 }], 0, 0, [34]],
             [36, "sethue", 0, 0, [34, 37, 38]],
-            [37, ["color", { value: 80 }], 0, 0, [36]],
+            [37, ["number", { value: 80 }], 0, 0, [36]],
             [38, "settranslucency", 0, 0, [36, 39, 40]],
             [39, ["number", { value: 50 }], 0, 0, [38]],
             [40, "setpensize", 0, 0, [38, 41, 42]],
-            [41, ["pensize", { value: 5 }], 0, 0, [40]],
+            [41, ["number", { value: 5 }], 0, 0, [40]],
             [42, "penup", 0, 0, [40, 43]],
             [43, "pendown", 0, 0, [42, 44]],
             [44, "background", 0, 0, [43, 45]],
@@ -2291,5 +2368,60 @@ describe("AST2BlockList Class", () => {
         const argBlock = blockList.find(b => b[0] === 2);
         expect(argBlock).toBeDefined();
         expect(argBlock[1]).toEqual(["number", { value: 1 }]);
+    });
+
+    test("should import playNoise and the value blocks that call a mouse method", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNoise("noise1");
+            var box1 = await mouse.getNotesPlayed(4);
+            var box2 = await mouse.numToPitch(5);
+            var box3 = await mouse.numToOctave(5);
+            var box4 = await mouse.getSynthVolume("piano");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "playnoise", 0, 0, [0, 2, 3]],
+            [2, ["noisename", { value: "noise1" }], 0, 0, [1]],
+            [3, ["storein2", { value: "box1" }], 0, 0, [1, 4, 6]],
+            [4, "elapsednotes2", 0, 0, [3, 5]],
+            [5, ["number", { value: 4 }], 0, 0, [4]],
+            [6, ["storein2", { value: "box2" }], 0, 0, [3, 7, 9]],
+            [7, "number2pitch", 0, 0, [6, 8]],
+            [8, ["number", { value: 5 }], 0, 0, [7]],
+            [9, ["storein2", { value: "box3" }], 0, 0, [6, 10, 12]],
+            [10, "number2octave", 0, 0, [9, 11]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["storein2", { value: "box4" }], 0, 0, [9, 13, null]],
+            [13, "synthvolumefactor", 0, 0, [12, 14]],
+            [14, ["text", { value: "piano" }], 0, 0, [13]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+    });
+
+    test("should still import the bare numToPitch and getSynthVolume calls older exports wrote", () => {
+        const code = `
+        new Mouse(async mouse => {
+            var box1 = numToPitch(5);
+            var box2 = getSynthVolume("piano");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList.map(block => block[1])).toEqual([
+            "start",
+            ["storein2", { value: "box1" }],
+            "number2pitch",
+            ["number", { value: 5 }],
+            ["storein2", { value: "box2" }],
+            "synthvolumefactor",
+            ["text", { value: "piano" }]
+        ]);
     });
 });

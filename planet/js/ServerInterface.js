@@ -73,6 +73,9 @@ class ServerInterface {
 
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
 
+        // A GET that hasn't answered by then is treated as a connection failure.
+        this.RequestTimeout = 20000;
+
         // Per-request rate limiting / retry (reuse existing RequestManager)
         this.requestManager = new RequestManager({
             minDelay: 300,
@@ -179,10 +182,13 @@ class ServerInterface {
      * @returns {Promise<any|null>}
      */
     async _get(path) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), this.RequestTimeout);
         try {
             const res = await fetch(this.BaseURL + path, {
                 method: "GET",
-                headers: { Accept: "application/json" }
+                headers: { Accept: "application/json" },
+                signal: controller.signal
             });
             if (!res.ok) {
                 console.warn(`[ServerInterface] GET ${path} → HTTP ${res.status}`);
@@ -192,7 +198,40 @@ class ServerInterface {
         } catch (err) {
             console.error(`[ServerInterface] GET ${path} failed:`, err);
             return null;
+        } finally {
+            clearTimeout(timer);
         }
+    }
+
+    /**
+     * Fetches rows [start, end) from a list endpoint that pages by page number
+     * and limit. GlobalPlanet asks for windows that don't start on a page
+     * boundary (Load More advances by 24 but asks for 25), so a window can span
+     * two pages: fetch each and keep only the requested rows.
+     *
+     * @param {Function} pathFor  (page, limit) => request path
+     * @param {number}   start    zero-based start index
+     * @param {number}   end      exclusive end index
+     * @returns {Promise<Object|null>}  { data: [...] }, or the failed response
+     */
+    async _getWindow(pathFor, start, end) {
+        const limit = end - start;
+        if (limit <= 0) return { data: [] };
+
+        const firstPage = Math.floor(start / limit) + 1;
+        const lastPage = Math.floor((end - 1) / limit) + 1;
+        const rows = [];
+
+        for (let page = firstPage; page <= lastPage; page++) {
+            const response = await this._get(pathFor(page, limit));
+            if (!response || !Array.isArray(response.data)) return response;
+            rows.push(...response.data);
+            // A short page is the last one, so there is nothing after it.
+            if (response.data.length < limit) break;
+        }
+
+        const skip = start - (firstPage - 1) * limit;
+        return { data: rows.slice(skip, skip + limit) };
     }
 
     /**
@@ -335,7 +374,8 @@ class ServerInterface {
         // Pre-populate GlobalPlanet.cache from the list response
         if (Planet.GlobalPlanet && Planet.GlobalPlanet.cache) {
             for (const row of apiResponse.data) {
-                if (!Planet.GlobalPlanet.cache[row.repoName]) {
+                const existing = Planet.GlobalPlanet.cache[row.repoName];
+                if (!existing || existing.ProjectLastUpdated !== row.updatedAt) {
                     Planet.GlobalPlanet.cache[row.repoName] = this._normaliseProjectRow(row);
                 }
             }
@@ -432,9 +472,6 @@ class ServerInterface {
      */
     async downloadProjectList(tags, sort, start, end, callback) {
         try {
-            const limit = end - start;
-            const page = Math.floor(start / limit) + 1;
-
             const sortMap = {
                 RECENT: "createdAt",
                 LIKED: "likes",
@@ -458,12 +495,15 @@ class ServerInterface {
 
             // MY PROJECTS: filter by keys stored in localStorage
             if (tags === "USER_PROJECTS") {
-                callback({ success: true, data: this._getOwnedProjectList() });
+                callback({ success: true, data: this._getOwnedProjectList().slice(start, end) });
                 return;
             }
 
-            const response = await this._get(
-                `/allRepos?page=${page}&limit=${limit}&sort=${sortParam}${topicParam}`
+            const response = await this._getWindow(
+                (page, limit) =>
+                    `/allRepos?page=${page}&limit=${limit}&sort=${sortParam}${topicParam}`,
+                start,
+                end
             );
 
             callback(this._normaliseProjectList(response));
@@ -512,11 +552,11 @@ class ServerInterface {
         }
 
         try {
-            const limit = end - start;
-            const page = Math.floor(start / limit) + 1;
-
-            const response = await this._get(
-                `/search?q=${encodeURIComponent(query.trim())}&page=${page}&limit=${limit}`
+            const q = encodeURIComponent(query.trim());
+            const response = await this._getWindow(
+                (page, limit) => `/search?q=${q}&page=${page}&limit=${limit}`,
+                start,
+                end
             );
 
             callback(this._normaliseProjectList(response));
@@ -532,21 +572,31 @@ class ServerInterface {
      * Fetches full metadata for one project from SQLite.
      * Checks IDB cache first; caches successful responses.
      *
-     * @param {string}   repoName  GitHub repo slug
-     * @param {Function} callback  called with { success, data: normalisedRow }
+     * @param {string}   repoName   GitHub repo slug
+     * @param {Function} callback   called with { success, data: normalisedRow }
+     * @param {boolean}  [skipCache=false] if true, bypasses metadata cache
      */
-    async getProjectDetails(repoName, callback) {
+    async getProjectDetails(repoName, callback, skipCache = false) {
         try {
             await this._initCache();
-            const cached = await this.cacheManager.getMetadata(repoName);
-            if (cached) {
-                callback({ success: true, data: cached });
-                return;
+            if (!skipCache) {
+                const cached = await this.cacheManager.getMetadata(repoName);
+                if (cached) {
+                    callback({ success: true, data: cached });
+                    return;
+                }
             }
 
             const response = await this._get(`/project/${encodeURIComponent(repoName)}`);
 
             if (!response || response.error) {
+                if (skipCache) {
+                    const fallback = await this.cacheManager.getMetadata(repoName);
+                    if (fallback) {
+                        callback({ success: true, data: fallback });
+                        return;
+                    }
+                }
                 callback(this.ConnectionFailureData);
                 return;
             }
@@ -557,6 +607,17 @@ class ServerInterface {
             callback({ success: true, data: normalised });
         } catch (err) {
             console.error("[ServerInterface] getProjectDetails error:", err);
+            if (skipCache) {
+                try {
+                    const fallback = await this.cacheManager.getMetadata(repoName);
+                    if (fallback) {
+                        callback({ success: true, data: fallback });
+                        return;
+                    }
+                } catch {
+                    // Ignore fallback error and return connection failure
+                }
+            }
             callback(this.ConnectionFailureData);
         }
     }
@@ -567,13 +628,21 @@ class ServerInterface {
      * Downloads the raw projectData.json for a project.
      * Checks IDB cache first; caches successful responses.
      *
-     * @param {string}   repoName  GitHub repo slug
-     * @param {Function} callback  called with { success, data: projectJSON }
+     * @param {string}   repoName          GitHub repo slug
+     * @param {Function} callback          called with { success, data: projectJSON }
+     * @param {string}   [expectedUpdatedAt] expected updatedAt timestamp to validate against cache
      */
-    async downloadProject(repoName, callback) {
+    async downloadProject(repoName, callback, expectedUpdatedAt) {
         try {
             await this._initCache();
-            const cached = await this.cacheManager.getProject(repoName);
+            const updatedAt =
+                expectedUpdatedAt !== undefined && expectedUpdatedAt !== null
+                    ? expectedUpdatedAt
+                    : this.Planet?.GlobalPlanet?.cache?.[repoName]?.ProjectLastUpdated || null;
+
+            const cached = updatedAt
+                ? await this.cacheManager.getProject(repoName, updatedAt)
+                : await this.cacheManager.getProject(repoName);
             if (cached) {
                 callback({ success: true, data: cached });
                 return;
@@ -589,7 +658,11 @@ class ServerInterface {
             }
 
             const projectData = response.content;
-            await this.cacheManager.cacheProject(repoName, projectData);
+            if (updatedAt) {
+                await this.cacheManager.cacheProject(repoName, projectData, updatedAt);
+            } else {
+                await this.cacheManager.cacheProject(repoName, projectData);
+            }
 
             callback({ success: true, data: projectData });
         } catch (err) {

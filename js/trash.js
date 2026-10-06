@@ -14,7 +14,7 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-/* global createjs, platformColor, BORDER, TRASHICON, TRASH_LID_ICON, TRASH_BODY_ICON, last, base64Encode, _ */
+/* global createjs, platformColor, BORDER, TRASHICON, TRASH_LID_ICON, TRASH_BODY_ICON, last, base64Encode, _, ManagedTimer */
 
 /* exported Trashcan */
 
@@ -59,16 +59,40 @@ class Trashcan {
         this._lidOriginalX = 0;
         this._lidOriginalY = 0;
         this._resizeTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
         this._handleResize = () => {
-            clearTimeout(this._resizeTimeout);
-            this._resizeTimeout = setTimeout(() => {
-                const newWidth = (window.innerWidth / this._scale - Trashcan.TRASHWIDTH) / 2;
-                const newHeight = window.innerHeight / this._scale - Trashcan.TRASHHEIGHT;
+            if (this._timerManager !== null) {
+                this._timerManager.clearTimeout(this._resizeTimeout);
+                this._resizeTimeout = this._timerManager.setTimeout(() => {
+                    const newWidth = (window.innerWidth / this._scale - Trashcan.TRASHWIDTH) / 2;
+                    const newHeight = window.innerHeight / this._scale - Trashcan.TRASHHEIGHT;
 
-                if (this.shouldResize(newWidth, newHeight)) {
-                    this.updateContainerPosition();
-                }
-            }, 300);
+                    if (this.shouldResize(newWidth, newHeight)) {
+                        this.updateContainerPosition();
+                    }
+                }, 300);
+            } else {
+                clearTimeout(this._resizeTimeout);
+                this._resizeTimeout = setTimeout(() => {
+                    const newWidth = (window.innerWidth / this._scale - Trashcan.TRASHWIDTH) / 2;
+                    const newHeight = window.innerHeight / this._scale - Trashcan.TRASHHEIGHT;
+
+                    if (this.shouldResize(newWidth, newHeight)) {
+                        this.updateContainerPosition();
+                    }
+                }, 300);
+            }
         };
 
         this.activity.trashContainer.addChild(this._container);

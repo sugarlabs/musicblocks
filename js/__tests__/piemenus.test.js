@@ -14,8 +14,11 @@ const {
     piemenuIntervals,
     piemenuKey,
     piemenuNumber,
-    piemenuModes
+    piemenuModes,
+    piemenuNoteValue,
+    piemenuColor
 } = require("../piemenus");
+const Block = require("../block");
 
 // Mock Globals
 global.INTERVALS = [
@@ -175,7 +178,7 @@ global.getModeNameFromLabel = (label, modes) => {
 };
 global.getModeSliceColors = (modes, colors) =>
     modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
-global.updateModeWheelItems = jest.fn();
+global.updateWheelItems = jest.fn();
 global.getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 global.getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
@@ -203,9 +206,24 @@ global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
 
 global.DEFAULTVOLUME = 0.5;
-global.Singer = { setSynthVolume: jest.fn() };
 global.SHARP = "♯";
 global.FLAT = "♭";
+global.NATURAL = "♮";
+global.DOUBLESHARP = "𝄪";
+global.DOUBLEFLAT = "𝄫";
+global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", ti: "B" };
+global.EQUIVALENTACCIDENTALS = {
+    "F": "E♯",
+    "C": "B♯",
+    "B": "C♭",
+    "E": "F♭",
+    "G": "F𝄪",
+    "D": "C𝄪",
+    "A": "G𝄪",
+    "F♯": "F♯",
+    "F#": "F♯"
+};
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
@@ -421,6 +439,136 @@ describe("piemenus behavioral tests", () => {
             mockBlock._exitWheel.navItems[0].navigateFunction();
 
             expect(refreshRowForBlock).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("manual accidental persistence (Issue #9003)", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        beforeEach(() => {
+            global.buildScale = jest.fn(scaleName => {
+                if (scaleName && scaleName.startsWith("G")) {
+                    return [["G", "A", "B", "C", "D", "E", "F♯", "G"], []];
+                }
+                return [["C", "D", "E", "F", "G", "A", "B", "C"], []];
+            });
+        });
+
+        const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
+
+        test("preserves intentional natural when reopening pitch pie menu in G Major", () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+            mockBlock.manualAccidental = "♮";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "♮");
+
+            // Does not overwrite intentional natural with key's F#
+            expect(mockBlock.value).toBe("F");
+            // Navigates the accidental wheel to natural (index 2)
+            expect(mockBlock._accidentalsWheel.navigateWheel).toHaveBeenCalledWith(2);
+        });
+
+        test("sets block.manualAccidental when accidental is picked on accidental wheel", async () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "");
+
+            // Simulate selecting natural (index 2) on accidental wheel
+            mockBlock._pitchWheel.selectedNavItemIndex = 3; // F
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._accidentalsWheel.navItems[2].title = "♮";
+
+            await mockBlock._accidentalsWheel.navItems[2].navigateFunction();
+
+            expect(mockBlock.manualAccidental).toBe("♮");
+            expect(mockBlock.value).toBe("F");
+        });
+
+        test("clears block.manualAccidental when pitch is changed on pitch wheel", async () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+            mockBlock.manualAccidental = "♮";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "♮");
+            expect(mockBlock.manualAccidental).toBe("♮");
+
+            // Turn wheel to G (index 4)
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._pitchWheel.navItems[4].title = "G";
+
+            await mockBlock._pitchWheel.navItems[4].navigateFunction();
+
+            // When note changes, manual accidental override is cleared to follow key
+            expect(mockBlock.manualAccidental).toBeNull();
+        });
+
+        test("preserves block.manualAccidental when clicking the already-selected pitch on pitch wheel", async () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "notename";
+            mockBlock.value = "F";
+            mockBlock.manualAccidental = "♮";
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, accidentals, "F", "♮");
+            expect(mockBlock.manualAccidental).toBe("♮");
+
+            // Click the already-selected slice (F at index 3)
+            mockBlock._pitchWheel.selectedNavItemIndex = 3;
+            mockBlock._pitchWheel.navItems[3].title = "F";
+
+            await mockBlock._pitchWheel.navItems[3].navigateFunction();
+
+            // Clicking the active slice should preserve the manual accidental override
+            expect(mockBlock.manualAccidental).toBe("♮");
+            expect(mockBlock.value).toBe("F");
+        });
+
+        test("scaledegree2 preserves manual accidental when re-clicking same degree and resets on degree change", async () => {
+            mockBlock.activity.KeySignatureEnv = ["C", "major", false];
+            mockBlock.name = "scaledegree2";
+            mockBlock.value = 1;
+            mockBlock.manualAccidental = "♯";
+
+            const degreeLabels = ["1", "2", "3", "4", "5", "6", "7"];
+            const degreeValues = [1, 2, 3, 4, 5, 6, 7];
+
+            piemenuPitches(mockBlock, degreeLabels, degreeValues, accidentals, 1, "♯");
+
+            // Re-click degree 1 (index 0)
+            mockBlock._pitchWheel.selectedNavItemIndex = 0;
+            mockBlock._pitchWheel.navItems[0].title = "1";
+            await mockBlock._pitchWheel.navItems[0].navigateFunction();
+
+            expect(mockBlock.manualAccidental).toBe("♯");
+            expect(mockBlock.value).toBe("1♯");
+
+            // Change to degree 2 (index 1)
+            mockBlock._pitchWheel.selectedNavItemIndex = 1;
+            mockBlock._pitchWheel.navItems[1].title = "2";
+            await mockBlock._pitchWheel.navItems[1].navigateFunction();
+
+            expect(mockBlock.manualAccidental).toBeNull();
+            expect(mockBlock.value).toBe(2);
+        });
+
+        test("preserves intentional natural for solfege blocks in G Major", () => {
+            mockBlock.activity.KeySignatureEnv = ["G", "major", false];
+            mockBlock.name = "solfege";
+            mockBlock.value = "fa";
+            mockBlock.manualAccidental = "♮";
+
+            const solfLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+            const solfValues = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+
+            piemenuPitches(mockBlock, solfLabels, solfValues, accidentals, "fa", "");
+
+            expect(mockBlock.value).toBe("fa");
+            expect(mockBlock._accidentalsWheel.navigateWheel).toHaveBeenCalledWith(2);
         });
     });
 
@@ -743,9 +891,9 @@ describe("piemenus behavioral tests", () => {
 
         test("selecting a group in the inner ring repaints the outer mode-name ring", () => {
             // global is mocked in this file; use the real implementation here.
-            const realUpdate = require("../utils/musicutils.js").updateModeWheelItems;
-            const prevUpdate = global.updateModeWheelItems;
-            global.updateModeWheelItems = realUpdate;
+            const realUpdate = require("../utils/piemenu.js").updateWheelItems;
+            const prevUpdate = global.updateWheelItems;
+            global.updateWheelItems = realUpdate;
 
             const savedModes = global.MODE_PIE_MENUS;
             const blank12 = Array(12).fill(" ");
@@ -788,9 +936,127 @@ describe("piemenus behavioral tests", () => {
                 });
             }
 
-            global.updateModeWheelItems = prevUpdate;
+            global.updateWheelItems = prevUpdate;
             global.MODE_PIE_MENUS = savedModes;
         });
+    });
+});
+
+describe("piemenuNumber wheel configuration", () => {
+    let mockBlock;
+
+    beforeEach(() => {
+        global.platformColor.numberWheelcolors = ["#555555"];
+        global.platformColor.exitWheelcolors2 = ["#666666"];
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "labelDiv") {
+                return {
+                    replaceChildren: jest.fn(),
+                    classList: { add: jest.fn(), remove: jest.fn() }
+                };
+            }
+            return {
+                style: {},
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+            };
+        });
+        global.document.getElementById = global.docById;
+        global.document.createElement = jest.fn().mockReturnValue({ style: {} });
+
+        mockBlock = {
+            container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: { _canvas: { width: 1000, height: 1000 } },
+                blockList: { "mock-id": { name: "mock-block" } }
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1)
+            },
+            connections: ["mock-id"],
+            protoblock: { scale: 1 },
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: 5,
+            _exitKeyPressed: jest.fn(),
+            _usePieNumberC1: jest.fn().mockReturnValue(false)
+        };
+        jest.clearAllMocks();
+    });
+
+    test("configures the radius tier for a short value list and leaves navAngle untouched", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+        piemenuNumber(mockBlock, [1, 2, 3], 2);
+
+        expect(global.configureWheel).toHaveBeenCalledWith(
+            mockBlock._numberWheel,
+            expect.objectContaining({ minRadius: 0.2, maxRadius: 0.6, selectionPaths: true })
+        );
+        expect(mockBlock._numberWheel.navAngle).toBeUndefined();
+        expect(mockBlock._numberWheel.titleRotateAngle).toBeUndefined();
+    });
+
+    test("configures the radius tier for a long value list (>16)", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+        const values = Array.from({ length: 20 }, (_, i) => i);
+        piemenuNumber(mockBlock, values, 5);
+
+        expect(global.configureWheel).toHaveBeenCalledWith(
+            mockBlock._numberWheel,
+            expect.objectContaining({ minRadius: 0.6, maxRadius: 1.0 })
+        );
+    });
+
+    test("configures the radius tier for a medium value list (>10)", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+        const values = Array.from({ length: 12 }, (_, i) => i);
+        piemenuNumber(mockBlock, values, 5);
+
+        expect(global.configureWheel).toHaveBeenCalledWith(
+            mockBlock._numberWheel,
+            expect.objectContaining({ minRadius: 0.5, maxRadius: 0.9 })
+        );
+    });
+
+    test.each([
+        [10, 0.2, 0.6], // exactly 10: not > 10, falls into the short tier
+        [11, 0.5, 0.9], // exactly 11: > 10, not > 16, medium tier
+        [16, 0.5, 0.9], // exactly 16: not > 16, stays in the medium tier
+        [17, 0.6, 1.0] // exactly 17: > 16, long tier
+    ])(
+        "configures the radius tier at the exact boundary of %i values (min=%f, max=%f)",
+        (length, minRadius, maxRadius) => {
+            mockBlock.blocks.blockList["mock-id"].name = "mock-block";
+            const values = Array.from({ length }, (_, i) => i);
+            piemenuNumber(mockBlock, values, 5);
+
+            expect(global.configureWheel).toHaveBeenCalledWith(
+                mockBlock._numberWheel,
+                expect.objectContaining({ minRadius, maxRadius })
+            );
+        }
+    );
+
+    test("sets navAngle to -90 for a setheading block", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "setheading";
+        piemenuNumber(mockBlock, [0, 90, 180, 270], 90);
+
+        expect(mockBlock._numberWheel.navAngle).toBe(-90);
+        expect(mockBlock._numberWheel.titleRotateAngle).toBeUndefined();
+    });
+
+    test("sets titleRotateAngle to 0 for a setbpm3 block and leaves navAngle untouched", () => {
+        mockBlock.blocks.blockList["mock-id"].name = "setbpm3";
+        piemenuNumber(mockBlock, [40, 60, 90, 120], 90);
+
+        expect(mockBlock._numberWheel.titleRotateAngle).toBe(0);
+        expect(mockBlock._numberWheel.navAngle).toBeUndefined();
     });
 });
 
@@ -1109,5 +1375,411 @@ describe("piemenuVoices teardown on close", () => {
         // Left attached, the handler holds the closed menu's wheel and block alive.
         expect(removeEventListener).toHaveBeenCalledWith("wheel", scrollHandler);
         expect(wheelDiv._scrollHandler).toBeNull();
+    });
+});
+
+describe("piemenuBasic and temperament wheel readability and positioning", () => {
+    const { piemenuBasic, getTemperamentSliceFont } = require("../piemenus");
+
+    let mockBlock;
+    let wheelDivMock;
+    let toolbarsMock;
+    let paletteMock;
+
+    beforeEach(() => {
+        wheelDivMock = {
+            style: {
+                display: "",
+                opacity: "",
+                position: "",
+                left: "",
+                top: "",
+                width: "550px",
+                height: "550px"
+            },
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            getBoundingClientRect: jest
+                .fn()
+                .mockReturnValue({ x: 0, y: 0, width: 550, height: 550 })
+        };
+        toolbarsMock = {
+            style: { display: "" },
+            offsetHeight: 64,
+            offsetTop: 0,
+            getBoundingClientRect: jest.fn().mockReturnValue({ bottom: 64, top: 0, height: 64 })
+        };
+        paletteMock = {
+            style: { display: "", transform: "" },
+            offsetWidth: 160,
+            offsetLeft: 0,
+            getBoundingClientRect: jest.fn().mockReturnValue({ right: 160, left: 0, width: 160 })
+        };
+
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "wheelDiv") return wheelDivMock;
+            if (id === "toolbars") return toolbarsMock;
+            if (id === "palette") return paletteMock;
+            return null;
+        });
+        global.document.getElementById = global.docById;
+
+        mockBlock = {
+            name: "temperamentname",
+            value: "equal",
+            text: { text: "Equal (12EDO)" },
+            container: {
+                x: 500,
+                y: 500,
+                setChildIndex: jest.fn(),
+                children: []
+            },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: {
+                    _canvas: { width: 1000, height: 1000 }
+                }
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1),
+                logo: { synth: new global.Synth() }
+            },
+            updateCache: jest.fn()
+        };
+    });
+
+    test("getTemperamentSliceFont scales font proportionally for slice count and label length", () => {
+        const wheelRadius = 600;
+        const sliceCount = 11;
+
+        const shortFont = getTemperamentSliceFont(wheelRadius, sliceCount, 6);
+        const mediumFont = getTemperamentSliceFont(wheelRadius, sliceCount, 13);
+        const longFont = getTemperamentSliceFont(wheelRadius, sliceCount, 25);
+
+        const shortSize = parseInt(shortFont.match(/\d+/)[0], 10);
+        const mediumSize = parseInt(mediumFont.match(/\d+/)[0], 10);
+        const longSize = parseInt(longFont.match(/\d+/)[0], 10);
+
+        expect(shortSize).toBe(60); // capped at maxSize
+        expect(mediumSize).toBe(44); // dynamically scaled proportional to label length
+        expect(longSize).toBe(37); // protected by minSize floor for readability
+        expect(shortSize).toBeGreaterThan(mediumSize);
+        expect(mediumSize).toBeGreaterThan(longSize);
+    });
+
+    test("piemenuBasic initializes wheels and sets proportional fonts on temperament items", () => {
+        const labels = [
+            "Equal (12EDO)",
+            "Equal (5EDO)",
+            "Equal (7EDO)",
+            "Equal (17EDO)",
+            "Equal (19EDO)",
+            "Equal (31EDO)",
+            "5-limit Just Intonation",
+            "Pythagorean (3-limit JI)",
+            "Meantone (1/3)",
+            "Meantone (1/4)",
+            "custom"
+        ];
+        const values = [
+            "equal",
+            "equal5",
+            "equal7",
+            "equal17",
+            "equal19",
+            "equal31",
+            "just intonation",
+            "Pythagorean",
+            "1/3 comma meantone",
+            "1/4 comma meantone",
+            "custom"
+        ];
+
+        piemenuBasic(mockBlock, labels, values, "equal");
+
+        expect(global.wheelnav).toHaveBeenCalled();
+        expect(mockBlock._basicWheel).toBeDefined();
+        expect(mockBlock._exitWheel).toBeDefined();
+        expect(mockBlock._basicWheel.titleRotateAngle).toBe(0);
+
+        // Check that navItem fonts were assigned
+        for (let i = 0; i < mockBlock._basicWheel.navItems.length; i++) {
+            expect(mockBlock._basicWheel.navItems[i].titleAttr.font).toMatch(
+                /bold \d+px sans-serif/
+            );
+        }
+    });
+
+    test("piemenuBasic centers the wheel over block when in the middle of workspace", () => {
+        const labels = ["Option A", "Option B"];
+        const values = ["a", "b"];
+        mockBlock.container.x = 500;
+        mockBlock.container.y = 500;
+        wheelDivMock.style.width = "500px";
+        wheelDivMock.style.height = "500px";
+
+        piemenuBasic(mockBlock, labels, values, "a");
+
+        const left = parseInt(wheelDivMock.style.left, 10);
+        const top = parseInt(wheelDivMock.style.top, 10);
+
+        expect(left).toBeGreaterThan(200);
+        expect(left).toBeLessThan(400);
+        expect(top).toBeGreaterThan(200);
+        expect(top).toBeLessThan(400);
+    });
+
+    test("piemenuBasic bounds the wheel inside canvas when block is near edges", () => {
+        const labels = ["Option A", "Option B"];
+        const values = ["a", "b"];
+
+        // Near top-left edge
+        mockBlock.container.x = 10;
+        mockBlock.container.y = 10;
+        piemenuBasic(mockBlock, labels, values, "a");
+        expect(parseInt(wheelDivMock.style.left, 10)).toBeGreaterThanOrEqual(0);
+        expect(parseInt(wheelDivMock.style.top, 10)).toBeGreaterThanOrEqual(0);
+
+        // Near bottom-right edge
+        mockBlock.container.x = 980;
+        mockBlock.container.y = 980;
+        piemenuBasic(mockBlock, labels, values, "a");
+        const left = parseInt(wheelDivMock.style.left, 10);
+        const top = parseInt(wheelDivMock.style.top, 10);
+        const actualSize = parseInt(wheelDivMock.style.width, 10);
+        expect(left + actualSize).toBeLessThanOrEqual(1000);
+        expect(top + actualSize).toBeLessThanOrEqual(1000);
+    });
+
+    test("piemenuBasic respects DOM toolbar and palette bounds to never overlap bars", () => {
+        const labels = ["Option A", "Option B"];
+        const values = ["a", "b"];
+
+        toolbarsMock.getBoundingClientRect.mockReturnValue({ bottom: 70, top: 0, height: 70 });
+        paletteMock.getBoundingClientRect.mockReturnValue({ right: 180, left: 0, width: 180 });
+
+        mockBlock.container.x = 0;
+        mockBlock.container.y = 0;
+        piemenuBasic(mockBlock, labels, values, "a");
+
+        const left = parseInt(wheelDivMock.style.left, 10);
+        const top = parseInt(wheelDivMock.style.top, 10);
+
+        expect(top).toBeGreaterThanOrEqual(78); // 70px toolbar + 8px margin
+        expect(left).toBeGreaterThanOrEqual(188); // 180px palette + 8px margin
+    });
+
+    test("piemenuBasic scales down to fit available space on small viewports", () => {
+        const labels = ["Option A", "Option B"];
+        const values = ["a", "b"];
+
+        mockBlock.blocks.turtles._canvas = { width: 340, height: 340 };
+        toolbarsMock.getBoundingClientRect.mockReturnValue({ bottom: 64, top: 0, height: 64 });
+        paletteMock.style.display = "none";
+
+        mockBlock.container.x = 50;
+        mockBlock.container.y = 50;
+        piemenuBasic(mockBlock, labels, values, "a");
+
+        const top = parseInt(wheelDivMock.style.top, 10);
+        const actualSize = parseInt(wheelDivMock.style.width, 10);
+
+        expect(top).toBeGreaterThanOrEqual(72); // 64 + 8
+        expect(top + actualSize).toBeLessThanOrEqual(340);
+    });
+
+    test("piemenuBasic updates block value and exits when a selection is navigated", () => {
+        const labels = ["Option A", "Option B"];
+        const values = ["valA", "valB"];
+
+        piemenuBasic(mockBlock, labels, values, "valA");
+
+        mockBlock._basicWheel.selectedNavItemIndex = 1;
+        mockBlock._basicWheel.navItems[1].navigateFunction();
+
+        expect(mockBlock.value).toBe("valB");
+        expect(mockBlock.text.text).toBe("Option B");
+        expect(mockBlock._basicWheel.removeWheel).toHaveBeenCalled();
+    });
+});
+
+describe("pie-menu exit key listener reference regression coverage", () => {
+    let mockBlock;
+    let labelDivMock;
+    let numberLabelMock;
+    let originalDocById;
+    let originalCreateElement;
+
+    beforeEach(() => {
+        labelDivMock = {
+            style: { display: "", opacity: "" },
+            classList: {
+                _classes: new Set(),
+                add: jest.fn(function (c) {
+                    this._classes.add(c);
+                }),
+                remove: jest.fn(function (c) {
+                    this._classes.delete(c);
+                }),
+                contains: jest.fn(function (c) {
+                    return this._classes.has(c);
+                })
+            },
+            replaceChildren: jest.fn(),
+            getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+        };
+
+        numberLabelMock = {
+            id: "numberLabel",
+            style: { display: "", opacity: "", left: "", top: "", width: "", fontSize: "" },
+            focus: jest.fn(),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+
+        originalDocById = global.docById;
+        global.docById = jest.fn(id => {
+            if (id === "labelDiv") {
+                return labelDivMock;
+            }
+            if (id === "numberLabel") {
+                return numberLabelMock;
+            }
+            return {
+                style: {
+                    display: "",
+                    opacity: "",
+                    position: "",
+                    left: "",
+                    top: "",
+                    width: "",
+                    height: ""
+                },
+                getBoundingClientRect: jest.fn().mockReturnValue({
+                    x: 0,
+                    y: 0,
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    width: 0,
+                    height: 0
+                }),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+        });
+
+        originalCreateElement = global.document.createElement;
+        global.document.createElement = jest.fn(() => numberLabelMock);
+
+        global.COLORS40 = Array(40).fill(["#000000", "#111111", "#222222"]);
+        global.getMunsellColor = jest.fn().mockReturnValue("#123456");
+        global.platformColor.numberWheelcolors = ["#333333"];
+        global.platformColor.noteValueWheelcolors = ["#444444"];
+        global.platformColor.subNoteValueWheelcolors = ["#555555"];
+        global.platformColor.tabsWheelcolors = ["#666666"];
+
+        mockBlock = {
+            container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: { _canvas: { width: 1000, height: 1000 } },
+                findPitchOctave: jest.fn().mockReturnValue(4),
+                setPitchOctave: jest.fn(),
+                blockList: { "mock-id": { name: "mock-block", connections: [null] } },
+                meter_block_changed: jest.fn()
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1),
+                KeySignatureEnv: ["C", "major", false],
+                logo: { synth: new global.Synth(), errorMsg: jest.fn() }
+            },
+            connections: ["mock-id"],
+            protoblock: { scale: 1 },
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: "",
+            name: "number",
+            _check_meter_block: null,
+            _usePieNumberC1: jest.fn().mockReturnValue(false),
+            _labelChanged: jest.fn(),
+            _exitKeyPressed: Block.prototype._exitKeyPressed
+        };
+        mockBlock._boundExitKeyPressed = mockBlock._exitKeyPressed.bind(mockBlock);
+    });
+
+    afterEach(() => {
+        global.docById = originalDocById;
+        global.document.createElement = originalCreateElement;
+    });
+
+    const testExitCleanup = (setupFn, triggerKey) => {
+        setupFn();
+
+        expect(labelDivMock.classList.contains("hasKeyboard")).toBe(true);
+
+        const keypressCalls = numberLabelMock.addEventListener.mock.calls.filter(
+            c => c[0] === "keypress"
+        );
+        expect(keypressCalls.length).toBe(1);
+        const registeredHandler = keypressCalls[0][1];
+
+        // Verify the registered handler is the stable bound handler
+        expect(registeredHandler).toBe(mockBlock._boundExitKeyPressed);
+
+        // Simulate exit key (Enter or Tab)
+        const event = { key: triggerKey, preventDefault: jest.fn() };
+        mockBlock._exitKeyPressed(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, false);
+
+        // Verify that removeEventListener was called with the exact same handler reference
+        const removeCalls = numberLabelMock.removeEventListener.mock.calls.filter(
+            c => c[0] === "keypress"
+        );
+        expect(removeCalls.length).toBe(1);
+        const removedHandler = removeCalls[0][1];
+
+        expect(removedHandler).toBe(registeredHandler);
+        expect(removedHandler).toBe(mockBlock._boundExitKeyPressed);
+        expect(labelDivMock.classList.contains("hasKeyboard")).toBe(false);
+    };
+
+    describe("piemenuNoteValue", () => {
+        test("removes the exact registered handler reference on Enter", () => {
+            testExitCleanup(() => piemenuNoteValue(mockBlock, 4), "Enter");
+        });
+
+        test("removes the exact registered handler reference on Tab", () => {
+            testExitCleanup(() => piemenuNoteValue(mockBlock, 4), "Tab");
+        });
+    });
+
+    describe("piemenuNumber", () => {
+        test("removes the exact registered handler reference on Enter", () => {
+            testExitCleanup(() => piemenuNumber(mockBlock, [1, 2, 4, 8], 4), "Enter");
+        });
+
+        test("removes the exact registered handler reference on Tab", () => {
+            testExitCleanup(() => piemenuNumber(mockBlock, [1, 2, 4, 8], 4), "Tab");
+        });
+    });
+
+    describe("piemenuColor", () => {
+        test("removes the exact registered handler reference on Enter", () => {
+            testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Enter");
+        });
+
+        test("removes the exact registered handler reference on Tab", () => {
+            testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Tab");
+        });
     });
 });

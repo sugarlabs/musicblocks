@@ -964,6 +964,60 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker._update).toHaveBeenCalled();
     });
+    test("_updateTupletValue safely handles out-of-bounds or invalid noteToDivide", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["notes", 0, 4, 4]]
+            }
+        };
+
+        expect(() => phraseMaker._updateTupletValue(-1, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue(5, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue(NaN, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue("invalid", 1, 3)).not.toThrow();
+        expect(phraseMaker._update).not.toHaveBeenCalled();
+
+        phraseMaker.activity = null;
+        expect(() => phraseMaker._updateTupletValue(0, 1, 3)).not.toThrow();
+    });
+    test("_updateTupletValue handles multiple rhythms when noteToDivide > 0", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0, 1]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1],
+            [1, 0],
+            [1, 1]
+        ];
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [
+                    ["notes", 0, 4, 4],
+                    ["notes", 1, 4, 4]
+                ]
+            }
+        };
+
+        // Increase path with noteToDivide = 1 (exercises i < noteToDivide loop for i = 0)
+        expect(() => phraseMaker._updateTupletValue(1, 2, 3)).not.toThrow();
+        expect(phraseMaker._update).toHaveBeenCalledWith(1, null, 3, "stupletvalue");
+        expect(phraseMaker.activity.logo.tupletRhythms[1]).toEqual(["notes", 1, 4, 4, 4]);
+
+        // Decrease path with noteToDivide = 1
+        phraseMaker._update.mockClear();
+        expect(() => phraseMaker._updateTupletValue(1, 3, 2)).not.toThrow();
+        expect(phraseMaker._update).toHaveBeenCalledWith(1, null, 2, "stupletvalue");
+        expect(phraseMaker.activity.logo.tupletRhythms[1]).toEqual(["notes", 1, 4, 4]);
+    });
     test("_tieNotes merges note durations", async () => {
         phraseMaker._readjustNotesBlocks = jest.fn();
         phraseMaker._syncMarkedBlocks = jest.fn();
@@ -2980,6 +3034,32 @@ describe("PhraseMaker Widget", () => {
             phraseMaker._createMatrixGraphicsPieSubmenu(0, "graphicsblocks", 0);
 
             expect(phraseMaker.docById).toHaveBeenCalled();
+        });
+
+        test("_createMatrixGraphicsPieSubmenu offers whole-number values for pen rows", () => {
+            // set color, set shade, set hue, set grey and set translucency share one
+            // value list; the chosen label becomes the block's text and parseInt value.
+            phraseMaker.activity.blocks.blockList[0].name = "setshade";
+
+            phraseMaker._createMatrixGraphicsPieSubmenu(0, "graphicsblocks", 0);
+
+            const labels = phraseMaker._pitchWheel.createWheel.mock.calls[0][0];
+            expect(labels).toEqual([
+                "0",
+                "10",
+                "20",
+                "30",
+                "40",
+                "50",
+                "60",
+                "70",
+                "80",
+                "90",
+                "100"
+            ]);
+            for (const label of labels) {
+                expect(String(parseInt(label, 10))).toBe(label);
+            }
         });
 
         test("_createMatrixGraphics2PieSubmenu sets up secondary graphics menu", () => {

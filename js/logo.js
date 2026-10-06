@@ -526,16 +526,23 @@ class Logo {
                     }
                 }
 
+                const currentMasterVolume =
+                    typeof Singer !== "undefined" &&
+                    Singer.masterVolume &&
+                    Singer.masterVolume.length > 0
+                        ? last(Singer.masterVolume)
+                        : DEFAULTVOLUME;
+
                 tur.singer.synthVolume = {
-                    "electronic synth": [DEFAULTVOLUME],
-                    "noise1": [DEFAULTVOLUME],
-                    "noise2": [DEFAULTVOLUME],
-                    "noise3": [DEFAULTVOLUME]
+                    "electronic synth": [currentMasterVolume],
+                    "noise1": [currentMasterVolume],
+                    "noise2": [currentMasterVolume],
+                    "noise3": [currentMasterVolume]
                 };
-                tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
+                tur.singer.synthVolume[DEFAULTVOICE] = [currentMasterVolume];
 
                 for (const synth in tur.singer.synthVolume) {
-                    this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+                    this.deps.Singer.setSynthVolume(this, turtle, synth, currentMasterVolume);
                 }
             }
             return;
@@ -605,7 +612,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this.deps.Singer.setMasterVolume(this, DEFAULTVOLUME);
+        this.deps.Singer.resetMasterVolume(this);
         for (const t in this.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
@@ -1164,9 +1171,10 @@ class Logo {
      * measure boundaries when necessary.
      *
      * When the note's duration carries it past the end of the current measure,
-     * the note is split: the portion that fits within the current measure (and
-     * any fully-spanned intermediate measures) is written first with ties,
-     * followed by the overflow into the next measure.  Recursion stops when
+     * the note is split at every barline it crosses: the portion that fits
+     * within the current measure, one full measure for each intermediate
+     * measure, and the remainder in the last measure, joined by ties (rests
+     * are not tied).  Recursion stops when
      * `split` is false, which all recursive calls pass explicitly.
      *
      * @param {string[]} note - Pitch names (e.g. `["G4"]`), or `["R"]` for a
@@ -1192,76 +1200,39 @@ class Logo {
 
         // Check to see if this note straddles a measure boundary
         const durationTime = 1 / duration;
-        const beatsIntoMeasure =
-            ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                tur.singer.pickup -
-                durationTime) *
-                tur.singer.noteValuePerBeat) %
-            tur.singer.beatsPerMeasure;
-        const timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
-        const timeLeftInMeasure =
-            tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
+        const { timeLeftInMeasure } = this.deps.utils.getMeasurePosition(
+            tur.singer,
+            tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - durationTime
+        );
 
         if (split && durationTime > timeLeftInMeasure) {
-            // overflowTime: the portion of the note that extends past all
-            // measure boundaries.
-            const overflowTime = durationTime - timeLeftInMeasure;
-            // partialTime: starts as the time remaining in the current measure;
-            // the while-loop below strips any whole measures to find the residual.
-            let partialTime = timeLeftInMeasure;
             // measureDuration: the total duration of one full measure.
             const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
-            const obj = this.deps.utils.rationalToFraction(overflowTime);
 
-            if (partialTime > 0) {
-                // Count how many full measures this note spans beyond the first.
-                let i = 0;
-                while (partialTime > measureDuration) {
-                    ++i;
-                    partialTime -= measureDuration;
-                }
-
-                // Write the portion that fits within the current partial measure.
-                let obj2 = this.deps.utils.rationalToFraction(partialTime);
-                if (obj2[0] !== 0) {
-                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                }
-                if (i > 0 || obj[0] > 0) {
-                    if (note[0] !== "R") {
-                        // Don't tie rests
-                        this.notation.notationInsertTie(turtle);
-                        this.notation.notationDrumStaging[turtle].push("tie");
-                    }
-                    obj2 = this.deps.utils.rationalToFraction(1 / measureDuration);
-                }
-
-                // Write one full measure's worth for each intermediate measure.
-                while (i > 0) {
-                    i -= 1;
-                    if (obj2[0] !== 0) {
-                        this.updateNotation(
-                            note,
-                            obj2[1] / obj2[0],
-                            turtle,
-                            insideChord,
-                            drum,
-                            false
-                        );
-                    }
-                    if (obj[0] > 0) {
-                        if (note[0] !== "R") {
-                            // Don't tie rests
-                            this.notation.notationInsertTie(turtle);
-                            this.notation.notationDrumStaging[turtle].push("tie");
-                        }
-                    }
-                }
+            // Cut the note at every barline it crosses: the portion that fits in
+            // the current measure, one full measure for each measure it spans,
+            // then the remainder that spills into the last measure.
+            const pieces = [timeLeftInMeasure];
+            let overflowTime = durationTime - timeLeftInMeasure;
+            // The tolerance keeps float error from adding a near-empty measure.
+            while (overflowTime - measureDuration > 1e-9) {
+                pieces.push(measureDuration);
+                overflowTime -= measureDuration;
             }
+            pieces.push(overflowTime);
 
-            // Write the overflow portion that extends into the next measure.
-            if (obj[0] > 0) {
+            const fractions = pieces
+                .map(time => this.deps.utils.rationalToFraction(time))
+                .filter(obj => obj[0] > 0);
+
+            fractions.forEach((obj, i) => {
+                if (i > 0 && note[0] !== "R") {
+                    // Don't tie rests
+                    this.notation.notationInsertTie(turtle);
+                    this.notation.notationDrumStaging[turtle].push("tie");
+                }
                 this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-            }
+            });
         } else {
             // .. otherwise proceed as normal
             this.notation.doUpdateNotation(...arguments);
@@ -1512,6 +1483,9 @@ class Logo {
 
         // Cancel all pending timers to prevent zombie graphics and sounds.
         const cancelledTimers = this._timerManager.clearAll();
+        if (this.blocks && typeof this.blocks.clearLongPressTimeout === "function") {
+            this.blocks.clearLongPressTimeout();
+        }
         if (cancelledTimers > 0) {
             console.debug(
                 "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
@@ -1722,6 +1696,13 @@ class Logo {
             turtle.embeddedGraphicsPending = 0;
             turtle.embeddedGraphicsGeneration += 1;
         }
+
+        // masterVolume is static, so a level left behind by an earlier run would still be in
+        // force here. This belongs on the run boundary rather than in prepSynths(): prepSynths()
+        // skips its setup when the synths are already up (a restart with no stop in between) and
+        // it also runs mid-project when onEveryBeatDo adds a companion turtle, where resetting
+        // would pull the rug out from a project that set its own level.
+        this.deps.Singer.resetMasterVolume(this);
 
         this.prepSynths();
 
@@ -2732,10 +2713,10 @@ class Logo {
      * @returns {*} The plugin's return value, or `undefined` for void or
      *     blocked calls.
      */
-    safePluginExecute(code, logo, turtle, blk, value, ...args) {
+    safePluginExecute(code, logo, turtle, blk, value, receivedArg, ...args) {
         if (typeof code === "function") {
             try {
-                return code(logo, turtle, blk, value, ...args);
+                return code(logo, turtle, blk, value, receivedArg, ...args);
             } catch (e) {
                 console.error("Plugin function execution failed: ", e);
                 return;
@@ -2756,7 +2737,9 @@ class Logo {
                     const op = match[1];
                     const mathBlock = logo.blockList[blk];
                     const conns = mathBlock.connections;
-                    mathBlock.value = Math[op](logo.parseArg(logo, turtle, conns[1], blk));
+                    mathBlock.value = Math[op](
+                        logo.parseArg(logo, turtle, conns[1], blk, receivedArg)
+                    );
                     return mathBlock.value;
                 }
             },
@@ -2766,9 +2749,21 @@ class Logo {
                 exec: () => {
                     const mathBlock = logo.blockList[blk];
                     const conns = mathBlock.connections;
-                    const base = logo.parseArg(logo, turtle, conns[1], blk);
-                    const exp = logo.parseArg(logo, turtle, conns[2], blk);
+                    const base = logo.parseArg(logo, turtle, conns[1], blk, receivedArg);
+                    const exp = logo.parseArg(logo, turtle, conns[2], blk, receivedArg);
                     mathBlock.value = Math.pow(base, exp);
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Unit conversion operations (degrees and radians in maths.json)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;mathBlock\.value = logo\.parseArg\(logo, turtle, conns\[1\]\) \* \((180\/Math\.PI|Math\.PI\/180)\);$/,
+                exec: match => {
+                    const mathBlock = logo.blockList[blk];
+                    const conns = mathBlock.connections;
+                    const factor = match[1] === "180/Math.PI" ? 180 / Math.PI : Math.PI / 180;
+                    mathBlock.value =
+                        logo.parseArg(logo, turtle, conns[1], blk, receivedArg) * factor;
                     return mathBlock.value;
                 }
             },
