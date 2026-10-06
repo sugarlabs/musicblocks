@@ -374,5 +374,26 @@ describe("OrnamentActions", () => {
                 global.MusicBlocks = originalMusicBlocks;
             }
         });
+
+        test("guards against invalid inputs", () => {
+            const invalidInputs = [
+                { interval: NaN, noteValue: 4 },
+                { interval: 3, noteValue: NaN },
+                { interval: 3, noteValue: 0 },
+                { interval: 3, noteValue: -1 },
+                { interval: Infinity, noteValue: 4 },
+                { interval: 3, noteValue: Infinity }
+            ];
+
+            invalidInputs.forEach(({ interval, noteValue }) => {
+                errorMsgCalls.length = 0; // reset array
+                Singer.OrnamentActions.doNeighbor(interval, noteValue, 0, 1);
+                expect(errorMsgCalls.length).toBe(1);
+                expect(errorMsgCalls[0].msg).toContain("must be valid numbers");
+                expect(turtle.singer.inNeighbor).toEqual([]);
+                expect(turtle.singer.neighborStepPitch).toEqual([]);
+                expect(turtle.singer.neighborNoteValue).toEqual([]);
+            });
+        });
     });
 });
