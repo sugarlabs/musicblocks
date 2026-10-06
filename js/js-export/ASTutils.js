@@ -136,6 +136,26 @@ class ASTUtils {
     /** Names of the actions that end with a Stop block in their own stack; see setStoppingActions. */
     static _stoppingActions = new Set();
 
+    /** How many loops (Repeat, Forever, While, Until) the code being generated is inside. */
+    static _loopDepth = 0;
+
+    /**
+     * Runs a generator with the loop depth raised by one, so action calls made inside it know
+     * they are called from a loop.
+     *
+     * @static
+     * @param {Function} generate - builds the AST of a loop
+     * @returns {Object} what generate returns
+     */
+    static _inLoop(generate) {
+        ASTUtils._loopDepth++;
+        try {
+            return generate();
+        } finally {
+            ASTUtils._loopDepth--;
+        }
+    }
+
     /**
      * Records which actions have a Stop block directly in their own stack (not inside a
      * loop or other clamp). In Music Blocks such a Stop also ends the loop the action was
@@ -722,6 +742,19 @@ class ASTUtils {
         const call = ASTUtils._getMethodCallAST(methodName, args, { action: true });
         if (!ASTUtils._stoppingActions.has(methodName)) return call;
 
+        if (ASTUtils._loopDepth > 0) {
+            // Tell the action it is called from a loop: its Stop then ends that loop, and
+            // the rest of the action still runs (see _resolveStopBlocks).
+            const callArgs = call.expression.argument.arguments;
+            if (callArgs.length < 2) {
+                callArgs.push({
+                    type: "ArrayExpression",
+                    elements: [{ type: "Literal", value: null }]
+                });
+            }
+            callArgs.push({ type: "Literal", value: true });
+        }
+
         return {
             type: "IfStatement",
             test: {
@@ -1069,7 +1102,8 @@ class ASTUtils {
      * @param {Boolean} [reportStop=false] - whether a Stop directly in the body is reported to
      * the caller: it sets a flag, the rest of the body still runs (as in Logo.doBreak when a
      * loop is above the call) and the body returns STOPFLOW instead of ENDFLOW
-     * @returns {void}
+     * @returns {String|null} the name of the parameter that tells the action it is called
+     * from a loop, when reportStop is set
      */
     static _resolveStopBlocks(body, end, reportStop = false) {
         const used = ASTUtils._getIdentifierNames(body);
@@ -1160,7 +1194,36 @@ class ASTUtils {
         const resolve = (stack, outer) => {
             for (const statement of [...stack.list]) {
                 if (statement.stopBlock) {
-                    if (outer === null && reportStop) {
+                    if (
+                        outer === null &&
+                        reportStop &&
+                        stack.list
+                            .slice(stack.list.indexOf(statement) + 1)
+                            .some(next => next.type !== "ReturnStatement")
+                    ) {
+                        // A Stop with more blocks after it. Called from a loop, the rest still
+                        // runs and the loop ends; otherwise the Stop ends the action there
+                        // (Logo.doBreak drops the action's own pending blocks).
+                        replace(statement, {
+                            type: "IfStatement",
+                            test: identifier(inLoopParam),
+                            consequent: {
+                                type: "BlockStatement",
+                                body: [
+                                    {
+                                        type: "ExpressionStatement",
+                                        expression: {
+                                            type: "AssignmentExpression",
+                                            operator: "=",
+                                            left: identifier(reportFlag),
+                                            right: { type: "Literal", value: true }
+                                        }
+                                    }
+                                ]
+                            },
+                            alternate: { type: "BlockStatement", body: [returnEnd(stack.end)] }
+                        });
+                    } else if (outer === null && reportStop) {
                         replace(statement, {
                             type: "ExpressionStatement",
                             expression: {
@@ -1218,6 +1281,7 @@ class ASTUtils {
         };
 
         const reportFlag = reportStop ? newName() : null;
+        const inLoopParam = reportStop ? newName() : null;
         resolve({ list: body.body, end, label: null }, null);
 
         if (reportStop) {
@@ -1242,7 +1306,9 @@ class ASTUtils {
                     alternate: last.argument
                 };
             }
+            return inLoopParam;
         }
+        return null;
     }
 
     /**
@@ -1270,25 +1336,27 @@ class ASTUtils {
             } else if (flow[0] === "repeat") {
                 ASTs.push(
                     ASTUtils._getStoppableLoopAST(
-                        ASTUtils._getForLoopAST(flow[1], flow[2], iterMax)
+                        ASTUtils._inLoop(() => ASTUtils._getForLoopAST(flow[1], flow[2], iterMax))
                     )
                 );
             } else if (flow[0] === "while") {
                 ASTs.push(
                     ASTUtils._getStoppableLoopAST(
-                        ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax)
+                        ASTUtils._inLoop(() => ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax))
                     )
                 );
             } else if (flow[0] === "forever") {
                 ASTs.push(
                     ASTUtils._getStoppableLoopAST(
-                        ASTUtils._getWhileLoopAST([1000], flow[2], iterMax)
+                        ASTUtils._inLoop(() => ASTUtils._getWhileLoopAST([1000], flow[2], iterMax))
                     )
                 );
             } else if (flow[0] === "until") {
                 ASTs.push(
                     ASTUtils._getStoppableLoopAST(
-                        ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax)
+                        ASTUtils._inLoop(() =>
+                            ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax)
+                        )
                     )
                 );
             } else if (flow[0] === "break") {
@@ -1444,11 +1512,19 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
         }
-        ASTUtils._resolveStopBlocks(
+        const inLoopParam = ASTUtils._resolveStopBlocks(
             AST["declarations"][0]["init"]["body"],
             "ENDFLOW",
             ASTUtils._stoppingActions.has(methodName)
         );
+        if (inLoopParam !== null) {
+            // The call sites inside a loop pass true.
+            AST["declarations"][0]["init"]["params"].push({
+                type: "AssignmentPattern",
+                left: { type: "Identifier", name: inLoopParam },
+                right: { type: "Literal", value: false }
+            });
+        }
 
         return AST;
     }

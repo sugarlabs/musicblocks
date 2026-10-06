@@ -62,6 +62,63 @@ class AST2BlockList {
     }
 
     /**
+     * An action that reports its Stop block takes a third parameter that is true when it is
+     * called from a loop, and ends early at a Stop that has blocks after it otherwise:
+     * `if (inLoop) { f = true; } else { return mouse.ENDFLOW; }`. Puts back the plain
+     * `f = true` and drops the parameter, leaving the code the importer already reads.
+     * Anything else that reads the parameter is left alone.
+     *
+     * @static
+     * @param {Object} fn - function node, changed in place
+     * @returns {void}
+     */
+    static _dropInLoopParam(fn) {
+        const param = fn.params && fn.params[2];
+        if (
+            !param ||
+            param.type !== "AssignmentPattern" ||
+            param.left.type !== "Identifier" ||
+            !/^stop\d+$/.test(param.left.name) ||
+            param.right.value !== false ||
+            !fn.body ||
+            fn.body.type !== "BlockStatement"
+        ) {
+            return;
+        }
+        const name = param.left.name;
+        const generated = statement =>
+            statement.type === "IfStatement" &&
+            statement.test.type === "Identifier" &&
+            statement.test.name === name &&
+            statement.consequent.type === "BlockStatement" &&
+            statement.consequent.body.length === 1 &&
+            statement.alternate &&
+            statement.alternate.type === "BlockStatement" &&
+            statement.alternate.body.length === 1 &&
+            statement.alternate.body[0].type === "ReturnStatement" &&
+            statement.alternate.body[0].argument &&
+            statement.alternate.body[0].argument.type === "MemberExpression" &&
+            statement.alternate.body[0].argument.object.name === "mouse" &&
+            statement.alternate.body[0].argument.property.name === "ENDFLOW";
+        let uses = 0;
+        const count = node => {
+            if (Array.isArray(node)) {
+                node.forEach(count);
+            } else if (node !== null && typeof node === "object") {
+                if (node.type === "Identifier" && node.name === name) uses++;
+                Object.values(node).forEach(count);
+            }
+        };
+        count(fn.body);
+        const found = fn.body.body.filter(generated);
+        if (found.length !== uses) return;
+        fn.body.body = fn.body.body.map(statement =>
+            generated(statement) ? statement.consequent.body[0] : statement
+        );
+        fn.params.splice(2, 1);
+    }
+
+    /**
      * Rewrites, in place, the code JSGenerate writes for Stop blocks back to
      * plain `break` statements, which the config maps to the Stop block:
      * - `{ let f = false; loop { ...; f = true; ...; if (f) break; } }` becomes
@@ -95,6 +152,7 @@ class AST2BlockList {
             /^(?:_*stopLoop|stop\d+)$/.test(declaration.declarations[0].id.name);
 
         const isFunction = ["ArrowFunctionExpression", "FunctionExpression"].includes(node.type);
+        if (isFunction) AST2BlockList._dropInLoopParam(node);
         // The Stop flags this function declares, for the call-site check below: setting
         // any other variable in that branch is the user's own code.
         const declared = new Set();
@@ -307,6 +365,22 @@ class AST2BlockList {
                 statement.test.right.value === "STOPFLOW" &&
                 isGeneratedStop(statement.consequent)
             ) {
+                const callArgs = statement.test.left.argument.arguments;
+                if (
+                    callArgs &&
+                    callArgs.length === 3 &&
+                    callArgs[2].type === "Literal" &&
+                    callArgs[2].value === true
+                ) {
+                    // The "called from a loop" flag; an action without arguments has [null].
+                    const empty =
+                        callArgs[1].type === "ArrayExpression" &&
+                        callArgs[1].elements.length === 1 &&
+                        callArgs[1].elements[0] !== null &&
+                        callArgs[1].elements[0].type === "Literal" &&
+                        callArgs[1].elements[0].value === null;
+                    callArgs.splice(empty ? 1 : 2, empty ? 2 : 1);
+                }
                 list[i] = {
                     type: "ExpressionStatement",
                     expression: statement.test.left,
