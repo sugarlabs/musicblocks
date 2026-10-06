@@ -1694,36 +1694,8 @@ function setupPitchBlocks(activity) {
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inPitchStaircase) {
-                const frequency = arg;
                 const note = obj;
-                let flag = 0;
-
-                for (let i = 0; i < logo.pitchStaircase.Stairs.length; i++) {
-                    if (logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        logo.pitchStaircase.Stairs.splice(i, 0, [
-                            note[0],
-                            note[1],
-                            parseFloat(frequency)
-                        ]);
-                        flag = 1;
-                        return;
-                    }
-                    if (logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        logo.pitchStaircase.Stairs.splice(i, 1, [
-                            note[0],
-                            note[1],
-                            parseFloat(frequency)
-                        ]);
-                        flag = 1;
-                        return;
-                    }
-                }
-
-                if (flag === 0) {
-                    logo.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
-                }
-
-                logo.pitchStaircase.stairPitchBlocks.push(blk);
+                logo.pitchStaircase.addStair(note[0], note[1], parseFloat(arg), blk);
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequencies.push(args[0]);
             } else {

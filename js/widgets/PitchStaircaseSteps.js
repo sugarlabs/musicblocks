@@ -34,13 +34,49 @@
 
 /**
  * @file PitchStaircaseSteps.js
- * @description Pitch Staircase steps: making a new step by applying the ratio to a stair, and
- * undoing steps.
+ * @description Pitch Staircase steps: adding the stairs from the blocks in the clamp, making a
+ * new step by applying the ratio to a stair, and undoing steps.
+ *
+ * Each stair is [note, octave, frequency, ratio denominator, ratio numerator, parent frequency,
+ * initial frequency]: the frequency is the initial frequency x numerator / denominator, and the
+ * parent is the stair it was made from. A stair from a block is its own parent and initial
+ * frequency, with a 1/1 ratio.
  *
  * The methods are moved as they were from the PitchStaircase class, which copies them onto
  * PitchStaircase.prototype (see PitchStaircase.installModules), so `this` is still the widget.
  */
 class PitchStaircaseSteps {
+    /**
+     * Adds a stair for a pitch or hertz block in the Pitch Staircase clamp. The stairs are kept
+     * from the highest frequency down; a stair with the same frequency replaces the old one.
+     * @param {string} note - The note name.
+     * @param {number|string} octave - The octave.
+     * @param {number} frequency - The frequency in Hz.
+     * @param {number} blk - The block that added the stair.
+     * @returns {void}
+     */
+    addStair(note, octave, frequency, blk) {
+        const stair = [note, octave, frequency, 1, 1, frequency, frequency];
+
+        let i;
+        for (i = 0; i < this.Stairs.length; i++) {
+            if (this.Stairs[i][2] < frequency) {
+                this.Stairs.splice(i, 0, stair);
+                break;
+            }
+            if (this.Stairs[i][2] === frequency) {
+                this.Stairs.splice(i, 1, stair);
+                break;
+            }
+        }
+
+        if (i === this.Stairs.length) {
+            this.Stairs.push(stair);
+        }
+
+        this.stairPitchBlocks.push(blk);
+    }
+
     /**
      * Removes the last step made.
      * @private
@@ -130,7 +166,7 @@ class PitchStaircaseSteps {
         const srcNumerator = this.Stairs[n][3];
         const srcDenominator = this.Stairs[n][4];
         const srcFrequency = this.Stairs[n][2];
-        const srcOctave = this.Stairs[n][6];
+        const srcInitialFrequency = this.Stairs[n][6];
 
         for (i = 0; i < this.Stairs.length; i++) {
             // Check if the frequency is effectively the same (within epsilon)
@@ -142,7 +178,7 @@ class PitchStaircaseSteps {
                     srcNumerator * parseFloat(inputNum2),
                     srcDenominator * parseFloat(inputNum1),
                     srcFrequency,
-                    srcOctave
+                    srcInitialFrequency
                 ]);
                 foundStep = true;
                 repeatStep = true;
@@ -158,7 +194,7 @@ class PitchStaircaseSteps {
                     srcNumerator * parseFloat(inputNum2),
                     srcDenominator * parseFloat(inputNum1),
                     srcFrequency,
-                    srcOctave
+                    srcInitialFrequency
                 ]);
                 foundStep = true;
                 break;
@@ -173,7 +209,7 @@ class PitchStaircaseSteps {
                 srcNumerator * parseFloat(inputNum2),
                 srcDenominator * parseFloat(inputNum1),
                 srcFrequency,
-                srcOctave
+                srcInitialFrequency
             ]);
             this._history.push(this.Stairs.length - 1);
         } else {

@@ -145,14 +145,6 @@ class PitchStaircase {
     init(activity) {
         this.activity = activity;
 
-        for (let i = 0; i < this.Stairs.length; i++) {
-            if (this.Stairs[i].length === 7) {
-                this.Stairs[i].push(this.Stairs[i][2]); // initial frequency
-                this.Stairs[i].push(this.Stairs[i][2]); // parent frequency
-            }
-        }
-
-        // this._initialFrequency = this.Stairs[0][2];
         this._history = [];
 
         const w = window.innerWidth;
