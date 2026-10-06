@@ -203,6 +203,32 @@ describe("themes.css colour tokens", () => {
         expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     });
 
+    it("keeps widget title bar buttons and icons visible and accessible in dark mode", () => {
+        const buttonRule = rules.find(
+            r =>
+                r.selector.includes(".wftButton") &&
+                !r.selector.includes("::") &&
+                !r.selector.includes(":") &&
+                themeOf(r.selector) === "dark"
+        );
+        expect(buttonRule).toBeDefined();
+
+        const iconRule = rules.find(
+            r => r.selector.includes(".wftButton.close::before") && themeOf(r.selector) === "dark"
+        );
+        expect(iconRule).toBeDefined();
+
+        const tokens = THEMES.dark;
+        const buttonBg = resolveColor(declaration(buttonRule.body, "background-color"), tokens);
+        const iconColor = resolveColor(declaration(iconRule.body, "background-color"), tokens);
+
+        expect(buttonBg).not.toBeNull();
+        expect(iconColor).not.toBeNull();
+
+        // WCAG 2.1 AA requirement for UI icons/controls (3:1) and text (4.5:1).
+        expect(contrastRatio(iconColor, buttonBg)).toBeGreaterThanOrEqual(4.5);
+    });
+
     it("ensures themes.css does not declare or reference deleted legacy properties", () => {
         const legacyNames = ["--bg", "--fg", "--border", "--panel-bg", "--overlay-bg", "--accent"];
         legacyNames.forEach(depName => {
