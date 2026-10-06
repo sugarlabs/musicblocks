@@ -155,6 +155,62 @@ class AST2BlockList {
             }
         }
 
+        // Only the statements the exporter writes for a Stop: a break, the end of the
+        // action, or the flag assignment. Anything else in the branch is the user's code.
+        const isGeneratedStop = consequent => {
+            const only =
+                consequent.type === "BlockStatement"
+                    ? consequent.body.length === 1
+                        ? consequent.body[0]
+                        : null
+                    : consequent;
+            if (only === null) return false;
+            if (only.type === "BreakStatement") return true;
+            if (only.type === "ReturnStatement") {
+                return (
+                    only.argument !== null &&
+                    only.argument.type === "MemberExpression" &&
+                    only.argument.object.name === "mouse" &&
+                    ["ENDFLOW", "ENDMOUSE"].includes(only.argument.property.name)
+                );
+            }
+            return (
+                only.type === "ExpressionStatement" &&
+                only.expression.type === "AssignmentExpression" &&
+                only.expression.operator === "=" &&
+                only.expression.left.type === "Identifier" &&
+                only.expression.right.value === true
+            );
+        };
+
+        // True when the flag appears only where the exporter puts it: its declaration, the
+        // `flag = true` Stop assignments and the final return. A hand-written read of the
+        // flag would lose its value if the importer dropped the declaration.
+        const onlyGeneratedFlagUses = (body, flag) => {
+            let total = 0;
+            let generated = 0;
+            const visit = child => {
+                if (Array.isArray(child)) {
+                    child.forEach(visit);
+                } else if (child !== null && typeof child === "object") {
+                    if (child.type === "Identifier" && child.name === flag) total++;
+                    if (
+                        child.type === "AssignmentExpression" &&
+                        child.operator === "=" &&
+                        child.left.type === "Identifier" &&
+                        child.left.name === flag &&
+                        child.right.value === true
+                    ) {
+                        generated++; // the assigned flag itself
+                    }
+                    Object.values(child).forEach(visit);
+                }
+            };
+            visit(body);
+            // declaration + final return test + every `flag = true`
+            return total === 2 + generated;
+        };
+
         // `f = true` statements for flag f, anywhere inside node, become break.
         const replaceFlagSets = (inside, flag) => {
             const setsFlag = child =>
@@ -202,7 +258,8 @@ class AST2BlockList {
                 value.test.type === "Identifier" &&
                 value.test.name === flag &&
                 value.consequent.type === "MemberExpression" &&
-                value.consequent.property.name === "STOPFLOW"
+                value.consequent.property.name === "STOPFLOW" &&
+                onlyGeneratedFlagUses(list, flag)
             ) {
                 last.argument = value.alternate;
                 list.shift();
@@ -219,7 +276,8 @@ class AST2BlockList {
                 statement.test.type === "BinaryExpression" &&
                 statement.test.operator === "===" &&
                 statement.test.left.type === "AwaitExpression" &&
-                statement.test.right.value === "STOPFLOW"
+                statement.test.right.value === "STOPFLOW" &&
+                isGeneratedStop(statement.consequent)
             ) {
                 list[i] = {
                     type: "ExpressionStatement",

@@ -615,6 +615,48 @@ describe("AST2BlockList Class", () => {
             expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
         });
 
+        // The same patterns in hand-written code are not the exporter's Stop, so the
+        // importer must not rewrite them and silently lose what the code does.
+        test("leaves a hand-written read of the Stop flag alone", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const generated = astring.generate(ASTUtils.getMethodAST("action", action));
+            const flag = generated.match(/let (\w+) = false/)[1];
+            const edited = generated.replace(
+                /(\n\s*)(return [^\n]*STOPFLOW)/,
+                `$1await mouse.print(${flag});$1$2`
+            );
+            expect(edited).not.toBe(generated);
+
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(edited, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a hand-written branch on STOPFLOW alone", () => {
+            const code = `
+            new Mouse(async mouse => {
+                if ((await action(mouse)) === "STOPFLOW") {
+                    await mouse.print("x");
+                }
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
         test("leaves the AST alone, so converting it twice gives the same blocks", () => {
             const AST = acorn.parse(
                 exportStart([["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]]),
