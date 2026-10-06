@@ -503,4 +503,41 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(prefetchSpy).toHaveBeenCalled();
         });
     });
+
+    // ── Storage failures ─────────────────────────────────────────────────────
+    describe("Unavailable storage", () => {
+        beforeEach(() => {
+            jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+        });
+
+        test("applies the git state and refreshes the menu when the store is full", () => {
+            gitDropdown._syncMenuState = jest.fn();
+            gitDropdown._prefetchCommits = jest.fn();
+
+            expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
+
+            expect(gitDropdown._syncMenuState).toHaveBeenCalled();
+            expect(gitDropdown._prefetchCommits).toHaveBeenCalled();
+        });
+
+        test("reads fall back to empty values when the store cannot be read", () => {
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(gitDropdown._getHashedKey()).toBe("");
+            expect(gitDropdown._getLastSavedHash()).toBe("");
+        });
+
+        test("clears a new project and stores a hash without throwing", () => {
+            expect(() => gitDropdown.clearForNewProject()).not.toThrow();
+            expect(() => gitDropdown._setLastSavedHash("hash-1")).not.toThrow();
+        });
+    });
 });
