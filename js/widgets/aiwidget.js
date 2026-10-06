@@ -117,7 +117,13 @@ function AIWidget() {
     this.pitchAnalysers = {};
 
     /**
-     * Disconnects and disposes the pitch analysers.
+     * Maps each synth name to the pitch analyser index currently connected to.
+     * @type {object}
+     */
+    this._connectedSynths = {};
+
+    /**
+     * Disposes the pitch analysers.
      * @private
      * @returns {void}
      */
@@ -125,13 +131,11 @@ function AIWidget() {
         for (const id in this.pitchAnalysers) {
             const analyser = this.pitchAnalysers[id];
             if (analyser) {
-                for (const synth in instruments[0]) {
-                    instruments[0][synth].disconnect(analyser);
-                }
                 analyser.dispose();
             }
         }
         this.pitchAnalysers = {};
+        this._connectedSynths = {};
     };
 
     /**
@@ -970,16 +974,16 @@ function AIWidget() {
                 analyser = 0;
             }
 
-            if (this.pitchAnalysers[analyser]) {
-                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+            if (this.pitchAnalysers[analyser] && this._connectedSynths[synth] !== analyser) {
                 instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                this._connectedSynths[synth] = analyser;
             }
 
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                if (this.pitchAnalysers[analyser]) {
-                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                if (this.pitchAnalysers[analyser] && this._connectedSynths[synth] !== analyser) {
                     instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                    this._connectedSynths[synth] = analyser;
                 }
             }
         }

@@ -2074,6 +2074,8 @@ function setupWidgetBlocks(activity) {
                     ""
                 );
                 if (interruption) return interruption;
+                // Each block opens its own window (keyed by blockNo).
+                logo.aiMusic.blockNo = blk;
                 logo.aiMusic.init(activity);
             };
 

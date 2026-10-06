@@ -300,8 +300,11 @@ describe("AIWidget Instance", () => {
         const firstAnalysers = analysers.slice();
         aiWidget.init(mockActivity);
 
+        // Disposing analysers must never call disconnect(): Tone.js throws an
+        // InvalidAccessError when disconnecting a destination the synth is not
+        // connected to, which broke the widget on reopen (#6853).
+        expect(disconnectMock).not.toHaveBeenCalled();
         for (const analyser of firstAnalysers) {
-            expect(disconnectMock).toHaveBeenCalledWith(analyser);
             expect(analyser.dispose).toHaveBeenCalledTimes(1);
         }
         expect(aiWidget.pitchAnalysers[0]).toBe(analysers[2]);
@@ -393,11 +396,13 @@ describe("AIWidget Instance", () => {
     it("should clean up analysers and animation frames on widget close", () => {
         const cancelAnimationFrameMock = jest.fn();
         global.cancelAnimationFrame = cancelAnimationFrameMock;
-        const disposeMock = jest.fn();
         const disconnectMock = jest.fn();
-        global.Tone.Analyser = jest.fn(() => ({
-            dispose: disposeMock
-        }));
+        const analysers = [];
+        global.Tone.Analyser = jest.fn(() => {
+            const analyser = { dispose: jest.fn() };
+            analysers.push(analyser);
+            return analyser;
+        });
         global.instruments = [
             {
                 piano: {
@@ -438,28 +443,18 @@ describe("AIWidget Instance", () => {
             one: 11,
             two: 22
         };
-        const closingDisposeMock = jest.fn();
-        const closingAnalyser = {
-            dispose: closingDisposeMock
-        };
-        aiWidget.pitchAnalysers = {
-            0: {
-                dispose: disposeMock
-            }
-        };
         aiWidget.init(mockActivity);
         aiWidget.drawVisualIDs = {
             one: 11,
             two: 22
         };
-        aiWidget.pitchAnalysers = {
-            0: closingAnalyser
-        };
         widgetInstance.onclose();
         expect(cancelAnimationFrameMock).toHaveBeenCalledWith(11);
         expect(cancelAnimationFrameMock).toHaveBeenCalledWith(22);
-        expect(disconnectMock).toHaveBeenCalledWith(closingAnalyser);
-        expect(closingDisposeMock).toHaveBeenCalledTimes(1);
+        expect(disconnectMock).not.toHaveBeenCalled();
+        for (const analyser of analysers) {
+            expect(analyser.dispose).toHaveBeenCalledTimes(1);
+        }
         expect(widgetInstance.destroy).toHaveBeenCalled();
         expect(aiWidget.pitchAnalysers).toEqual({});
     });
@@ -972,7 +967,7 @@ describe("AIWidget Instance", () => {
         expect(aiWidget._waitAndEndPlaying).toHaveBeenCalled();
     });
 
-    it("should reconnect reference sample synth to analyser 0", () => {
+    it("should connect reference sample synth to analyser 0 without disconnecting", () => {
         const disconnectMock = jest.fn();
         const connectMock = jest.fn();
         global.instruments = [
@@ -990,11 +985,11 @@ describe("AIWidget Instance", () => {
             1: {}
         };
         aiWidget.reconnectSynthsToAnalyser();
-        expect(disconnectMock).toHaveBeenCalled();
+        expect(disconnectMock).not.toHaveBeenCalled();
         expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[0]);
     });
 
-    it("should reconnect custom sample synth to analyser 1", () => {
+    it("should connect custom sample synth to analyser 1 without disconnecting", () => {
         const disconnectMock = jest.fn();
         const connectMock = jest.fn();
         global.instruments = [
@@ -1013,7 +1008,30 @@ describe("AIWidget Instance", () => {
             1: {}
         };
         aiWidget.reconnectSynthsToAnalyser();
-        expect(disconnectMock).toHaveBeenCalled();
+        expect(disconnectMock).not.toHaveBeenCalled();
         expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[1]);
+    });
+
+    it("should not reconnect an already connected synth", () => {
+        const disconnectMock = jest.fn();
+        const connectMock = jest.fn();
+        global.instruments = [
+            {
+                piano: {
+                    disconnect: disconnectMock,
+                    connect: connectMock
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+        aiWidget.reconnectSynthsToAnalyser();
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(disconnectMock).not.toHaveBeenCalled();
+        expect(connectMock).toHaveBeenCalledTimes(1);
     });
 });

@@ -917,5 +917,20 @@ describe("setupWidgetBlocks", () => {
             expect(global.AIWidget).toHaveBeenCalledTimes(1);
             expect(logo.aiMusic).toBeDefined();
         });
+
+        it("ai music sets the block number so each block opens its own window", () => {
+            const aiMusic = getBlock("aimusic");
+            aiMusic.flow(["childBlk"], logo, 0, "aiMusicBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            // First dispatch lazy-loads the widget and returns an interruption;
+            // runFromBlockNow re-runs the block, whose second dispatch reaches
+            // the blockNo assignment and init().
+            listener();
+            listener();
+
+            expect(logo.aiMusic.blockNo).toBe("aiMusicBlk");
+            expect(logo.aiMusic.init).toHaveBeenCalledTimes(1);
+        });
     });
 });
