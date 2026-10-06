@@ -3857,3 +3857,52 @@ describe("ManagedTimer Integration", () => {
         expect(blocks._timerManager.activeTimeoutCount).toBe(0);
     });
 });
+
+describe("findPitchOctave and setPitchOctave with custompitch", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("reads octave from slot 2 of custompitch", () => {
+        blocks.blockList[0] = { name: "custompitch", connections: [null, 1, 2, null] };
+        blocks.blockList[2] = { name: "number", value: 5 };
+        expect(blocks.findPitchOctave(0)).toBe(5);
+    });
+
+    it("updates octave in slot 2 of custompitch", () => {
+        const numberBlock = {
+            name: "number",
+            value: 4,
+            text: { text: "4" },
+            container: {
+                children: [{}],
+                setChildIndex: jest.fn(),
+                updateCache: jest.fn()
+            }
+        };
+        blocks.blockList[0] = { name: "custompitch", connections: [null, 1, 2, null] };
+        blocks.blockList[2] = numberBlock;
+        blocks.setPitchOctave(0, 6);
+        expect(numberBlock.value).toBe(6);
+        expect(numberBlock.text.text).toBe("6");
+    });
+});

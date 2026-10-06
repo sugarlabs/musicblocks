@@ -4364,7 +4364,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -4398,7 +4399,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
