@@ -602,6 +602,39 @@ describe("AIWidget Instance", () => {
         expect(mockActivity.storage.groq_api_key).toBe("new-key");
     });
 
+    it("passes a pre-existing API key to the MBDialog prompt as its default", async () => {
+        let apiKeyButton;
+        mockActivity.storage = { groq_api_key: "old-key" };
+        window.MBDialog = { prompt: jest.fn().mockResolvedValue("old-key") };
+        useApiKeyWidgetWindow(button => {
+            apiKeyButton = button;
+        });
+
+        aiWidget = new AIWidget();
+        aiWidget.init(mockActivity);
+        await apiKeyButton.onclick();
+
+        expect(window.MBDialog.prompt).toHaveBeenCalledWith(
+            expect.objectContaining({ defaultValue: "old-key" })
+        );
+        expect(mockActivity.storage.groq_api_key).toBe("old-key");
+    });
+
+    it("keeps the stored API key when the MBDialog prompt is cancelled", async () => {
+        let apiKeyButton;
+        mockActivity.storage = { groq_api_key: "old-key" };
+        window.MBDialog = { prompt: jest.fn().mockResolvedValue(null) };
+        useApiKeyWidgetWindow(button => {
+            apiKeyButton = button;
+        });
+
+        aiWidget = new AIWidget();
+        aiWidget.init(mockActivity);
+        await apiKeyButton.onclick();
+
+        expect(mockActivity.storage.groq_api_key).toBe("old-key");
+    });
+
     it("falls back to the browser prompt for the API key without MBDialog", async () => {
         let apiKeyButton;
         mockActivity.storage = { groq_api_key: "old-key" };
