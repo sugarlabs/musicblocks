@@ -1701,7 +1701,7 @@ describe("Block Foundation", () => {
             expect(eventEnter.preventDefault).toHaveBeenCalled();
             expect(block.label.removeEventListener).toHaveBeenCalledWith(
                 "keypress",
-                block._exitKeyPressed
+                block._boundExitKeyPressed
             );
             expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
                 false

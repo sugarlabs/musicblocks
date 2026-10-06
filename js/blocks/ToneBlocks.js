@@ -461,8 +461,9 @@ function setupToneBlocks(activity) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionActive"] = true;
                 logo.timbre.distortionEffect.push(blk);
                 logo.timbre.distortionParams.push(last(tur.singer.distortionAmount) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionAmount"] =
-                    args[0];
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionAmount"] = last(
+                    tur.singer.distortionAmount
+                );
             }
 
             return [args[1], 1];
@@ -543,7 +544,9 @@ function setupToneBlocks(activity) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloFrequency"] =
                     args[0];
                 logo.timbre.tremoloParams.push(last(tur.singer.tremoloDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = args[1];
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = last(
+                    tur.singer.tremoloDepth
+                );
             }
 
             return [args[2], 1];
@@ -674,7 +677,9 @@ function setupToneBlocks(activity) {
                 logo.timbre.chorusParams.push(last(tur.singer.delayTime));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = args[1];
                 logo.timbre.chorusParams.push(last(tur.singer.chorusDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = args[2];
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = last(
+                    tur.singer.chorusDepth
+                );
             }
 
             return [args[3], 1];
@@ -739,7 +744,21 @@ function setupToneBlocks(activity) {
          * @returns {Array} - An array containing the result of the flow.
          */
         flow(args, logo, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
             Singer.ToneActions.doVibrato(args[0], args[1], turtle, blk);
+
+            if (logo.inTimbre) {
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoActive"] = true;
+                logo.timbre.vibratoEffect.push(blk);
+                logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoIntensity"] = last(
+                    tur.singer.vibratoIntensity
+                );
+                logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoRate"] = last(
+                    tur.singer.vibratoRate
+                );
+            }
 
             return [args[2], 1];
         }

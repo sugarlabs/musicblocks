@@ -131,12 +131,37 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
     padding: 24px;
     background-color: var(--color-panel-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 10000;
     text-align: left;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+    .modalBox {
+        width: calc(100vw - 32px) !important;
+        padding: 20px 16px !important;
+        margin: 0 !important;
+    }
+
+    .modal-content {
+        width: calc(100vw - 32px) !important;
+        padding: 20px 16px !important;
+        margin: 0 !important;
+    }
+
+    .clear-button-container .confirm-button,
+    .clear-button-container .cancel-button {
+        min-width: 100px;
+        text-align: center;
+        box-sizing: border-box;
+    }
 }
 
 .modal-title {
@@ -149,6 +174,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     color: var(--color-text-primary);
     font-size: 16px;
     margin-bottom: 24px;
+    overflow-wrap: break-word;
 }
 
 .clear-button-container {
@@ -188,7 +214,8 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-border-primary);
 }
 
-/* Plugin dialog modal styles */
+/* Modal backdrop styles */
+.modal-backdrop,
 .plugin-modal-backdrop {
     position: fixed;
     top: 0;
@@ -261,12 +288,16 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
     padding: 24px;
     background-color: var(--color-bg-primary);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
     border-radius: 8px;
     z-index: 10000;
     text-align: left;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
 }
 
 .block-count-dropdown {
@@ -566,7 +597,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #record.recording .dot {
-    color: red;
+    color: red !important;
     animation: blink-animation 1.5s infinite;
 }
 
@@ -723,20 +754,719 @@ nav {
     color: white;
 }
 
-/* Auxiliary (secondary) toolbar opened by the 3-dot menu.
-   Its icon groups (ul.aux.left / ul.aux.right) are floated, and the toolbar
-   otherwise inherits the fixed 64px nav height, so when the icons wrap to a
-   second row (e.g. in advanced mode at some browser-zoom widths) that row
-   spilled below the blue background into the workspace. Contain the floated
-   rows and let the blue band grow to cover them, while keeping a single 64px
-   row when the icons fit. */
-#aux-toolbar,
-#aux-toolbar .nav-wrapper {
-    height: auto;
+/* ==========================================================================
+   Modernized Toolbar Styles (Layout, Grouping, and Theming)
+   ========================================================================== */
+
+#toolbars {
     min-height: 64px;
+    height: auto;
+    background-color: var(--color-brand-primary, #2196f3);
+    z-index: 10001 !important;
+    transition:
+        background-color 0.25s ease,
+        box-shadow 0.25s ease;
 }
-#aux-toolbar .nav-wrapper {
-    display: flow-root;
+
+body.dark #toolbars {
+    background-color: var(--color-bg-secondary, #1f2937);
+    border-bottom: 1px solid var(--color-border-primary, #374151);
+}
+
+body.highcontrast #toolbars {
+    background-color: #000000 !important;
+    border-bottom: 1px solid #ffffff !important;
+}
+
+body.highcontrast #toolbars .main-nav-container {
+    background-color: transparent !important;
+}
+
+#toolbars .main-nav-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 64px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    line-height: normal !important;
+}
+
+/* Zone sections */
+.toolbar-section {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    gap: 8px;
+    line-height: normal !important;
+}
+
+.toolbar-section.left-section {
+    flex-shrink: 0;
+}
+
+.toolbar-section.center-section {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+}
+
+.toolbar-section.right-section {
+    flex-shrink: 0;
+    gap: 10px;
+}
+
+/* Pill container groups */
+.toolbar-pill-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+    gap: 2px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: var(--radius-lg, 8px) !important;
+    padding: 3px 6px !important;
+    margin: 0 !important;
+    float: none !important;
+    box-sizing: border-box !important;
+    line-height: normal !important;
+}
+
+body.dark .toolbar-pill-group {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.highcontrast .toolbar-pill-group {
+    background: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+body.highcontrast .toolbar-pill-group > li > a {
+    color: #ffffff !important;
+}
+
+/* List items inside pill groups */
+.toolbar-pill-group > li {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    line-height: normal !important;
+    position: relative !important;
+}
+
+/* Buttons inside pill groups */
+.toolbar-pill-group > li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 6px !important;
+    border-radius: var(--radius-md, 6px) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease,
+        color 0.15s ease !important;
+    text-decoration: none !important;
+    line-height: 1 !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+.toolbar-pill-group > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+body.dark .toolbar-pill-group > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.highcontrast .toolbar-pill-group > li > a:hover {
+    background-color: #00ffff !important;
+    color: #000000 !important;
+}
+
+body.highcontrast .toolbar-pill-group > li > a:hover .material-icons,
+body.highcontrast .toolbar-pill-group > li > a:hover svg path,
+body.highcontrast .toolbar-pill-group > li > a:hover svg line,
+body.highcontrast .toolbar-pill-group > li > a:hover svg circle {
+    color: #000000 !important;
+    stroke: #000000 !important;
+}
+
+.toolbar-pill-group > li > a:active {
+    transform: scale(0.94) !important;
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.toolbar-pill-group > li > a:focus-visible,
+.toolbar-pill-group > li > a.toolbar-btn-focused {
+    outline: 2px solid #ffffff !important;
+    outline-offset: 2px !important;
+}
+
+body.highcontrast .toolbar-pill-group > li > a:focus-visible,
+body.highcontrast .toolbar-pill-group > li > a.toolbar-btn-focused {
+    outline: 2px solid #ffff00 !important;
+    outline-offset: 2px !important;
+}
+
+/* Icons inside toolbar */
+.toolbar-pill-group > li > a > .material-icons:not(.dot),
+.toolbar-pill-group > li > .material-icons:not(.dot) {
+    font-size: 26px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    height: auto !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    top: auto !important;
+}
+
+.toolbar-pill-group > li > a > .material-icons.md-48,
+.toolbar-pill-group > li > .material-icons.md-48 {
+    font-size: 26px !important;
+}
+
+/* Play button prominence */
+#play .material-icons {
+    font-size: 30px !important;
+}
+
+#stop .material-icons {
+    font-size: 28px !important;
+}
+
+/* Record button and concentric dot positioning */
+#record {
+    position: relative !important;
+}
+
+#record .ring {
+    position: relative !important;
+}
+
+#record .dot {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.5) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Record dropdown arrow alignment */
+#recordDropdownArrow {
+    min-width: 18px !important;
+    padding: 0 2px !important;
+    margin-left: -4px !important;
+    font-size: 22px !important;
+}
+
+/* Auxiliary (secondary) toolbar */
+#aux-toolbar {
+    height: auto !important;
+    min-height: 48px !important;
+    background-color: var(--color-brand-primary-hover, #1976d2) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+    padding: 6px 12px !important;
+    box-sizing: border-box !important;
+    line-height: normal !important;
+}
+
+body.dark #aux-toolbar {
+    background-color: var(--color-bg-tertiary, #374151) !important;
+    border-top-color: var(--color-border-primary, #4b5563) !important;
+}
+
+body.highcontrast #aux-toolbar {
+    background-color: #000000 !important;
+    border-top: 1px solid #ffffff !important;
+    border-bottom: 1px solid #ffffff !important;
+}
+
+body.highcontrast #aux-toolbar .aux-nav-container {
+    background-color: transparent !important;
+}
+
+#aux-toolbar .aux-nav-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 38px !important;
+    background: transparent !important;
+    line-height: normal !important;
+}
+
+#aux-toolbar .aux-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+    gap: 2px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: var(--radius-md, 6px) !important;
+    padding: 2px 4px !important;
+    margin: 0 !important;
+    float: none !important;
+    box-sizing: border-box !important;
+    line-height: normal !important;
+}
+
+body.dark #aux-toolbar .aux-group {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.highcontrast #aux-toolbar .aux-group {
+    background: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+body.highcontrast #aux-toolbar .aux-group > li > a {
+    color: #ffffff !important;
+}
+
+#aux-toolbar .aux-group > li {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    line-height: normal !important;
+    position: relative !important;
+}
+
+#aux-toolbar .aux-group > li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 4px !important;
+    border-radius: var(--radius-sm, 4px) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease !important;
+    text-decoration: none !important;
+    line-height: 1 !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+#aux-toolbar .aux-group > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark #aux-toolbar .aux-group > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.highcontrast #aux-toolbar .aux-group > li > a:hover {
+    background-color: #00ffff !important;
+    color: #000000 !important;
+}
+
+body.highcontrast #aux-toolbar .aux-group > li > a:hover .material-icons {
+    color: #000000 !important;
+}
+
+#aux-toolbar .aux-group > li > a:focus-visible,
+#aux-toolbar .aux-group > li > a.toolbar-btn-focused {
+    outline: 2px solid #ffffff !important;
+    outline-offset: 2px !important;
+}
+
+body.highcontrast #aux-toolbar .aux-group > li > a:focus-visible,
+body.highcontrast #aux-toolbar .aux-group > li > a.toolbar-btn-focused {
+    outline: 2px solid #ffff00 !important;
+    outline-offset: 2px !important;
+}
+
+#aux-toolbar .aux-group > li > a > .material-icons,
+#aux-toolbar .aux-group > li > .material-icons {
+    font-size: 22px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    height: auto !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    top: auto !important;
+}
+
+#aux-toolbar .aux-group > li > a > .material-icons.md-48,
+#aux-toolbar .aux-group > li > .material-icons.md-48 {
+    font-size: 22px !important;
+}
+
+/* Respect hidden states applied via inline styles or utility classes */
+.toolbar-pill-group > li[style*="display: none"],
+.toolbar-pill-group > li[style*="display:none"],
+.toolbar-pill-group > li.hidden,
+.toolbar-pill-group > li.hide,
+.toolbar-pill-group > li:has(> a[style*="display: none"]),
+.toolbar-pill-group > li:has(> a[style*="display:none"]),
+.toolbar-pill-group > li:has(> a.hidden),
+.toolbar-pill-group > li:has(> a.hide),
+#aux-toolbar .aux-group > li[style*="display: none"],
+#aux-toolbar .aux-group > li[style*="display:none"],
+#aux-toolbar .aux-group > li.hidden,
+#aux-toolbar .aux-group > li.hide,
+#aux-toolbar .aux-group > li:has(> a[style*="display: none"]),
+#aux-toolbar .aux-group > li:has(> a[style*="display:none"]),
+#aux-toolbar .aux-group > li:has(> a.hidden),
+#aux-toolbar .aux-group > li:has(> a.hide),
+#themedropdown li[style*="display: none"],
+#themedropdown li[style*="display:none"],
+#themedropdown li.hidden,
+#themedropdown li.hide,
+#themedropdown li:has(> a[style*="display: none"]),
+#themedropdown li:has(> a[style*="display:none"]),
+#themedropdown li:has(> a.hidden),
+#themedropdown li:has(> a.hide),
+.toolbar-pill-group > li > a[style*="display: none"],
+.toolbar-pill-group > li > a[style*="display:none"],
+.toolbar-pill-group > li > a.hidden,
+.toolbar-pill-group > li > a.hide,
+#aux-toolbar .aux-group > li > a[style*="display: none"],
+#aux-toolbar .aux-group > li > a[style*="display:none"],
+#aux-toolbar .aux-group > li > a.hidden,
+#aux-toolbar .aux-group > li > a.hide,
+#themedropdown li > a[style*="display: none"],
+#themedropdown li > a[style*="display:none"],
+#themedropdown li > a.hidden,
+#themedropdown li > a.hide {
+    display: none !important;
+}
+
+/* Dropdown menu restoration and theming */
+.materialize-iso .dropdown-content {
+    min-width: 200px !important;
+    max-height: 380px !important;
+    overflow-y: auto !important;
+    background-color: var(--color-bg-primary, #ffffff) !important;
+    border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 0.15)) !important;
+    border-radius: var(--radius-md, 6px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    z-index: 10002 !important;
+}
+
+body.dark .materialize-iso .dropdown-content {
+    background-color: var(--color-bg-secondary, #1f2937) !important;
+    border-color: var(--color-border-primary, #374151) !important;
+}
+
+.materialize-iso .dropdown-content li {
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
+    min-height: 36px !important;
+    height: auto !important;
+    line-height: normal !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clear: both !important;
+    background: transparent !important;
+}
+
+.materialize-iso .dropdown-content li > a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 36px !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    color: var(--color-text-primary, #1f2937) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+    float: none !important;
+}
+
+body.dark .materialize-iso .dropdown-content li > a {
+    color: var(--color-text-primary, #f3f4f6) !important;
+}
+
+.materialize-iso .dropdown-content li > a:hover {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.dark .materialize-iso .dropdown-content li > a:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Theme dropdown horizontal row styling */
+#themedropdown:not([style*="display: block"]) {
+    display: none !important;
+}
+
+#themedropdown[style*="display: block"] {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: calc(100% + 6px) !important;
+    background-color: var(--color-bg-secondary, #1f2937) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-border-primary, rgba(255, 255, 255, 0.2)) !important;
+    border-radius: var(--radius-md, 8px) !important;
+    padding: 4px 6px !important;
+    gap: 6px !important;
+    min-width: max-content !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+    z-index: 10002 !important;
+}
+
+body.light #themedropdown[style*="display: block"] {
+    background-color: var(--color-bg-primary, #ffffff) !important;
+    border-color: var(--color-border-primary, rgba(0, 0, 0, 0.15)) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.highcontrast #themedropdown[style*="display: block"] {
+    background-color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+}
+
+#themedropdown li {
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+#themedropdown li:not([style*="display: none"]):not([style*="display:none"]) {
+    display: inline-flex !important;
+}
+
+#themedropdown li[style*="display: none"],
+#themedropdown li[style*="display:none"],
+#themedropdown li.hidden,
+#themedropdown li.hide,
+#themedropdown li:has(> a[style*="display: none"]),
+#themedropdown li:has(> a[style*="display:none"]),
+#themedropdown li:has(> a.hidden),
+#themedropdown li:has(> a.hide),
+#themedropdown li > a[style*="display: none"],
+#themedropdown li > a[style*="display:none"],
+#themedropdown li > a.hidden,
+#themedropdown li > a.hide {
+    display: none !important;
+}
+
+#themedropdown li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--color-text-primary, #f3f4f6) !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease !important;
+}
+
+body.light #themedropdown li > a {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: var(--color-text-primary, #1f2937) !important;
+}
+
+body.highcontrast #themedropdown li > a {
+    background: transparent !important;
+    color: #00ffff !important;
+}
+
+#themedropdown li > a:hover {
+    background: rgba(255, 255, 255, 0.22) !important;
+    transform: scale(1.06) !important;
+}
+
+body.light #themedropdown li > a:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+    transform: scale(1.06) !important;
+}
+
+body.highcontrast #themedropdown li > a:hover {
+    background: #00ffff !important;
+    color: #000000 !important;
+}
+
+#themedropdown li > a .material-icons {
+    font-size: 20px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #toolbars .main-nav-container {
+        padding: 0 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        justify-content: flex-start !important;
+        gap: 6px !important;
+    }
+    #toolbars .main-nav-container::-webkit-scrollbar {
+        display: none;
+    }
+    .toolbar-section.center-section {
+        display: none !important;
+    }
+    .toolbar-section.left-section,
+    .toolbar-section.right-section {
+        flex-shrink: 0;
+    }
+    .toolbar-pill-group {
+        padding: 2px 4px !important;
+        gap: 1px !important;
+    }
+    .toolbar-pill-group > li > a {
+        height: 36px !important;
+        min-width: 36px !important;
+        padding: 0 4px !important;
+    }
+    .toolbar-pill-group > li > a > .material-icons,
+    .toolbar-pill-group > li > a > .material-icons.md-48 {
+        font-size: 22px !important;
+    }
+    .toolbar-section.right-section {
+        gap: 6px;
+    }
+    #aux-toolbar {
+        padding: 4px 6px !important;
+    }
+    #aux-toolbar .aux-nav-container {
+        justify-content: flex-start !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    #aux-toolbar .aux-nav-container::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    #toolbars .main-nav-container {
+        padding: 0 4px !important;
+        gap: 4px !important;
+    }
+    .toolbar-section.left-section {
+        gap: 4px;
+    }
+    .toolbar-section.right-section {
+        gap: 4px;
+    }
+    .toolbar-pill-group {
+        padding: 2px !important;
+        gap: 1px !important;
+    }
+    .toolbar-pill-group > li > a {
+        height: 34px !important;
+        min-width: 30px !important;
+        padding: 0 2px !important;
+    }
+    .toolbar-pill-group > li > a > .material-icons,
+    .toolbar-pill-group > li > a > .material-icons.md-48 {
+        font-size: 20px !important;
+    }
+    #play .material-icons {
+        font-size: 24px !important;
+    }
+    #stop .material-icons {
+        font-size: 22px !important;
+    }
+    #recordDropdownArrow {
+        min-width: 14px !important;
+        font-size: 18px !important;
+    }
+    #aux-toolbar {
+        padding: 4px !important;
+    }
+    #aux-toolbar .aux-nav-container {
+        gap: 4px !important;
+    }
+    #aux-toolbar .aux-group {
+        padding: 2px !important;
+        gap: 1px !important;
+    }
+    #aux-toolbar .aux-group > li > a {
+        height: 30px !important;
+        min-width: 28px !important;
+        padding: 0 2px !important;
+    }
+    #aux-toolbar .aux-group > li > a > .material-icons,
+    #aux-toolbar .aux-group > li > a > .material-icons.md-48 {
+        font-size: 18px !important;
+    }
 }
 
 nav .nav-container {
