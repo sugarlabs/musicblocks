@@ -2287,7 +2287,7 @@ describe("Logo runFromBlockNow", () => {
                 })
             };
 
-            logo._iterationBudget = 1;
+            logo._iterationBudgets["0"] = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -2327,15 +2327,81 @@ describe("Logo runFromBlockNow", () => {
         });
     });
 
+    describe("per-turtle iteration budget", () => {
+        test("spends only the budget of the turtle that is running", () => {
+            logo._resetIterationBudgets();
+            logo._MAX_ITERATIONS = 3;
+            logo.blockList = [makeFlowBlock("noop")];
+
+            for (let i = 0; i < 3; i++) {
+                logo.runFromBlockNow(logo, 0, 0, 0, null);
+                logo.runFromBlockNow(logo, 1, 0, 0, null);
+            }
+
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+            expect(logo._haltedTurtles["0"]).toBeUndefined();
+            expect(logo._haltedTurtles["1"]).toBeUndefined();
+        });
+
+        test("halts only the turtle that runs out of budget", () => {
+            logo._resetIterationBudgets();
+            logo._MAX_ITERATIONS = 3;
+            logo.blockList = [makeFlowBlock("noop")];
+
+            for (let i = 0; i < 4; i++) {
+                logo.runFromBlockNow(logo, 0, 0, 0, null);
+            }
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(logo._haltedTurtles["0"]).toBe(true);
+            expect(logo.stopTurtle).toBe(false);
+
+            mockActivity.errorMsg.mockClear();
+            logo.runFromBlockNow(logo, 1, 0, 0, null);
+
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+            expect(logo._haltedTurtles["1"]).toBeUndefined();
+        });
+
+        test("drops later work of a halted turtle without reporting again", () => {
+            logo._resetIterationBudgets();
+            logo._MAX_ITERATIONS = 1;
+            logo.blockList = [makeFlowBlock("noop")];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledTimes(1);
+        });
+
+        test("a new run restores the budget of every turtle", () => {
+            logo._resetIterationBudgets();
+            logo._MAX_ITERATIONS = 1;
+            logo.blockList = [makeFlowBlock("noop")];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(logo._haltedTurtles["0"]).toBe(true);
+
+            logo._resetIterationBudgets();
+            mockActivity.errorMsg.mockClear();
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        });
+    });
+
     describe("limits and plugin dispatch", () => {
-        test("stops execution and reports error when MAX_ITERATIONS exceeded", () => {
-            logo._iterationBudget = 1;
+        test("stops the turtle that exceeds MAX_ITERATIONS", () => {
+            logo._iterationBudgets["0"] = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(mockActivity.errorMsg).toHaveBeenCalled();
-            expect(logo.stopTurtle).toBe(true);
+            expect(logo._haltedTurtles["0"]).toBe(true);
         });
 
         test("evalFlowDict plugin executes when block name matches", () => {

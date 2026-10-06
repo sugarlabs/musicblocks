@@ -335,8 +335,12 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
+        // Block-execution budgets, keyed by turtle index, plus the turtles the
+        // guard has already halted. Keeping the budget per turtle stops one
+        // runaway turtle from spending the allowance of the others.
+        this._iterationBudgets = {};
+        this._haltedTurtles = {};
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -1701,7 +1705,7 @@ class Logo {
         this.stopTurtle = false;
 
         this._syncCounter = 0;
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
+        this._resetIterationBudgets();
 
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under the blocks.
@@ -2090,6 +2094,81 @@ class Logo {
     }
 
     /**
+     * Clears the per-turtle block-execution budgets and the halted-turtle
+     * flags. Called once at the start of every run.
+     *
+     * @returns {void}
+     */
+    _resetIterationBudgets() {
+        this._iterationBudgets = {};
+        this._haltedTurtles = {};
+    }
+
+    /**
+     * Consumes one unit of the block-execution budget of `turtle`, allocating
+     * that turtle's budget on first use.
+     *
+     * @param {number|string} turtle - Index of the turtle executing a block.
+     * @returns {number} Remaining budget of that turtle.
+     */
+    _consumeIterationBudget(turtle) {
+        const key = String(turtle);
+        let remaining = this._iterationBudgets[key];
+
+        if (remaining === undefined) {
+            remaining = this._MAX_ITERATIONS + 1;
+        }
+
+        remaining -= 1;
+        this._iterationBudgets[key] = remaining;
+
+        return remaining;
+    }
+
+    /**
+     * Stops the single turtle that exhausted its block-execution budget.
+     *
+     * The turtle's pending work is discarded and the turtle is recorded as
+     * halted, so nothing queued for it runs again during this run. Turtles
+     * sharing the run are left alone.
+     *
+     * @param {number|string} turtle - Index of the turtle to halt.
+     * @returns {void}
+     */
+    _haltTurtle(turtle) {
+        const key = String(turtle);
+        this._haltedTurtles[key] = true;
+
+        if (this.stepQueue[key] !== undefined) {
+            this.stepQueue[key] = [];
+        }
+
+        const tur = this.turtles && this.turtles.ithTurtle(turtle);
+        if (tur === undefined || tur === null) {
+            return;
+        }
+
+        tur.queue = [];
+        tur.parentFlowQueue = [];
+        tur.unhighlightQueue = [];
+        tur.parameterQueue = [];
+        tur.running = false;
+
+        if (tur.singer) {
+            tur.singer._unhighlightTimers = {};
+        }
+
+        if (tur.delayTimeout !== null) {
+            clearTimeout(tur.delayTimeout);
+            tur.delayTimeout = null;
+        }
+
+        if (typeof this.deps.refreshCanvas === "function") {
+            this.deps.refreshCanvas();
+        }
+    }
+
+    /**
      * Executes block `blk` synchronously, then continues the turtle's queue.
      *
      * This is the hot path of the interpreter and handles three phases per
@@ -2119,6 +2198,13 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        if (logo._haltedTurtles?.[String(turtle)]) {
+            // This turtle exhausted its block-execution budget earlier in this
+            // run. Drop the work still queued for it; the other turtles are
+            // unaffected.
+            return;
+        }
+
         const tracker = getPerformanceTracker();
         const profilingEnabled =
             tracker && typeof tracker.isEnabled === "function" && tracker.isEnabled();
@@ -2138,15 +2224,14 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
-        if (--logo._iterationBudget <= 0) {
+        if (logo._consumeIterationBudget(turtle) <= 0) {
             logo.deps.errorHandler(
                 _("Infinite loop detected. Execution stopped to prevent browser freeze."),
                 blk
             );
-            logo.stopTurtle = true;
+            logo._haltTurtle(turtle);
             logo._alreadyRunning = false;
             logo._syncCounter = 0;
-            logo._iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
                 performanceTracker.exitBlock();
