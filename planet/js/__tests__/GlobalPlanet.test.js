@@ -124,6 +124,19 @@ describe("GlobalPlanet", () => {
             expect(gp.remixPrefix).toBe("Remix of");
         });
     });
+    describe("initTagList", () => {
+        it("should read the selected sort option", () => {
+            const sortSelect = document.getElementById("sort-select");
+            sortSelect.value = "RECENT";
+
+            gp.specialTags = [];
+            jest.spyOn(gp, "refreshTagList").mockImplementation(() => {});
+
+            gp.initTagList();
+
+            expect(gp.sortBy).toBe("RECENT");
+        });
+    });
 
     describe("searchAllProjects", () => {
         it("should set searchMode to ALL_PROJECTS and call refreshProjects", () => {
