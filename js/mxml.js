@@ -163,17 +163,39 @@ const _MAJOR_FIFTHS = new Map([
 ]);
 
 // How far each mode sits from the major key on the same tonic.
+// Modes with no standard key signature (e.g. whole tone, chromatic) are
+// omitted so _keyFifths returns null and the caller leaves the score where it was.
 const _MODE_FIFTHS = new Map([
+    // Diatonic modes
     ["major", 0],
     ["ionian", 0],
     ["lydian", 1],
     ["mixolydian", -1],
     ["dorian", -2],
     ["minor", -3],
+    ["m", -3],
     ["aeolian", -3],
     ["natural minor", -3],
     ["phrygian", -4],
-    ["locrian", -5]
+    ["locrian", -5],
+
+    // Minor variants that share the natural-minor key signature
+    ["harmonic minor", -3],
+    ["melodic minor", -3],
+    ["jazz minor", -3],
+
+    // Pentatonics: nearest diatonic relative
+    ["major pentatonic", 0],
+    ["minor pentatonic", -3],
+    ["minyo", -3], // Japanese minyo — alias of minor pentatonic
+    ["chinese", 0], // Major pentatonic variant
+    ["egyptian", 0],
+    ["hirajoshi", -3],
+    ["in", -3], // Japanese in scale
+
+    // Blues
+    ["major blues", 0],
+    ["minor blues", -3]
 ]);
 
 /**

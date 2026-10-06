@@ -1281,12 +1281,28 @@ describe("saveMxmlOutput - key signature", () => {
         ["F", "major", "-1"],
         ["Bb", "major", "-2"],
         ["A", "minor", "0"],
+        ["A", "m", "0"],
         ["E", "minor", "1"],
         ["D", "dorian", "0"],
         ["G", "mixolydian", "0"],
         ["F", "lydian", "0"],
         ["G#", "minor", "5"],
-        ["A#", "minor", "7"]
+        ["A#", "minor", "7"],
+        // Minor variants
+        ["A", "harmonic minor", "0"],
+        ["A", "melodic minor", "0"],
+        ["A", "jazz minor", "0"],
+        // Pentatonics
+        ["C", "major pentatonic", "0"],
+        ["A", "minor pentatonic", "0"],
+        ["A", "minyo", "0"],
+        ["C", "chinese", "0"],
+        ["C", "egyptian", "0"],
+        ["A", "hirajoshi", "0"],
+        ["A", "in", "0"],
+        // Blues
+        ["C", "major blues", "0"],
+        ["A", "minor blues", "0"]
     ])("writes %s %s as fifths %s", (key, mode, expected) => {
         expect(fifthsIn(["key", key, mode, note("C4")])).toBe(expected);
     });
@@ -1296,7 +1312,8 @@ describe("saveMxmlOutput - key signature", () => {
     });
 
     it("stays where it was for a mode with no signature of its own", () => {
-        expect(fifthsIn(["key", "C", "harmonic minor", note("C4")])).toBe("0");
+        // whole tone has no key signature — should leave the score in C (0)
+        expect(fifthsIn(["key", "C", "whole tone", note("C4")])).toBe("0");
     });
 
     it("stays where it was for a key that cannot be written without double accidentals", () => {
