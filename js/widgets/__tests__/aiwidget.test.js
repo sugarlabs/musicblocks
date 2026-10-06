@@ -1033,7 +1033,7 @@ describe("Groq API key storage", () => {
     it("should keep a new key in session storage only", () => {
         const activity = { storage: {} };
 
-        setGroqApiKey("gsk_new");
+        expect(setGroqApiKey("gsk_new")).toBe(true);
 
         expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_new");
         expect(activity.storage.groq_api_key).toBeUndefined();
@@ -1046,6 +1046,28 @@ describe("Groq API key storage", () => {
         expect(getGroqApiKey(activity)).toBe("gsk_legacy");
         expect(activity.storage.groq_api_key).toBeUndefined();
         expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_legacy");
+    });
+
+    it("should drop the stored key even when the session already has one", () => {
+        const activity = { storage: { groq_api_key: "gsk_legacy" } };
+        setGroqApiKey("gsk_session");
+
+        expect(getGroqApiKey(activity)).toBe("gsk_session");
+        expect(activity.storage.groq_api_key).toBeUndefined();
+        expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_session");
+    });
+
+    it("should keep the stored key when it cannot be copied to the session", () => {
+        jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+        jest.spyOn(console, "warn").mockImplementation(() => {});
+        const activity = { storage: { groq_api_key: "gsk_legacy" } };
+
+        expect(getGroqApiKey(activity)).toBe("gsk_legacy");
+        expect(activity.storage.groq_api_key).toBe("gsk_legacy");
+        expect(getGroqApiKey(activity)).toBe("gsk_legacy");
+        expect(console.warn).toHaveBeenCalled();
     });
 
     it("should return an empty string when no key is stored", () => {
@@ -1062,6 +1084,8 @@ describe("Groq API key storage", () => {
         jest.spyOn(console, "warn").mockImplementation(() => {});
 
         expect(() => setGroqApiKey("gsk_unavailable")).not.toThrow();
+        expect(setGroqApiKey("gsk_unavailable")).toBe(false);
         expect(getGroqApiKey({ storage: {} })).toBe("");
+        expect(console.warn).toHaveBeenCalled();
     });
 });

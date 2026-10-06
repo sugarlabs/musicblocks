@@ -1252,47 +1252,51 @@ const GROQ_API_KEY_ITEM = "groq_api_key";
  * Returns the Groq API key for the current session.
  * The key is a credential, so it is kept in sessionStorage, which the browser
  * clears when the tab closes, rather than in the persistent store. A key saved
- * by an earlier build is moved to sessionStorage and removed from the old
- * location the first time it is read.
+ * by an earlier build is copied to sessionStorage and then removed from the old
+ * location; it is only removed once the copy is in place, so a storage failure
+ * cannot lose it.
  *
  * @param {Object} activity - the Activity, for the key saved by earlier builds
  * @returns {String} - the API key, or an empty string when none is set
  */
 function getGroqApiKey(activity) {
+    let stored = "";
     try {
-        const stored = sessionStorage.getItem(GROQ_API_KEY_ITEM);
-        if (stored) {
-            return stored;
-        }
+        stored = sessionStorage.getItem(GROQ_API_KEY_ITEM) || "";
     } catch (e) {
         console.warn("Could not read the Groq API key from session storage:", e);
     }
 
     const legacy = activity.storage ? activity.storage[GROQ_API_KEY_ITEM] : null;
-    if (legacy) {
-        setGroqApiKey(legacy);
+    if (!legacy) {
+        return stored;
+    }
+
+    // The copy is already there, or it was just stored for this session.
+    if (stored || setGroqApiKey(legacy)) {
         try {
             delete activity.storage[GROQ_API_KEY_ITEM];
         } catch (e) {
             console.warn("Could not remove the stored Groq API key:", e);
         }
-        return legacy;
     }
 
-    return "";
+    return stored || legacy;
 }
 
 /**
  * Saves the Groq API key for the current session.
  *
  * @param {String} key - the API key
- * @returns {void}
+ * @returns {Boolean} - whether the key was stored for this session
  */
 function setGroqApiKey(key) {
     try {
         sessionStorage.setItem(GROQ_API_KEY_ITEM, key);
+        return true;
     } catch (e) {
         console.warn("Could not save the Groq API key for this session:", e);
+        return false;
     }
 }
 
