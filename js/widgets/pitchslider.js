@@ -36,6 +36,7 @@ class PitchSlider {
         this._cellScale = 0;
         this.isActive = false;
         this.activeSlider = null;
+        this._keyHandler = null;
     }
 
     /**
@@ -57,7 +58,15 @@ class PitchSlider {
         }
 
         this._cellScale = 1.0;
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
+        }
+
         this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
+        if (typeof this.widgetWindow.takeFocus === "function") {
+            this.widgetWindow.takeFocus();
+        }
         announceToScreenReader(_("Pitch Slider opened"));
 
         this.isActive = true;
@@ -65,7 +74,10 @@ class PitchSlider {
         activity.logo.pitchSlider = this;
 
         this.widgetWindow.onclose = () => {
-            document.removeEventListener("keydown", keyHandler, true);
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
             for (const osc of oscillators) {
                 osc.triggerRelease();
                 osc.dispose();
@@ -78,6 +90,31 @@ class PitchSlider {
 
         const keyHandler = event => {
             if (!this.isActive) return;
+
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== this.widgetWindow
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable ||
+                    (activeElement.tagName === "INPUT" && activeElement.type !== "range"))
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
 
             if (
                 event.key === "ArrowUp" ||
@@ -125,6 +162,7 @@ class PitchSlider {
             }
         };
 
+        this._keyHandler = keyHandler;
         document.addEventListener("keydown", keyHandler, true);
 
         const MakeToolbar = id => {
@@ -149,9 +187,21 @@ class PitchSlider {
 
             slider.addEventListener("pointerdown", () => {
                 this.activeSlider = id;
+                if (typeof this.widgetWindow.takeFocus === "function") {
+                    this.widgetWindow.takeFocus();
+                }
             });
             slider.addEventListener("mousedown", () => {
                 this.activeSlider = id;
+                if (typeof this.widgetWindow.takeFocus === "function") {
+                    this.widgetWindow.takeFocus();
+                }
+            });
+            slider.addEventListener("focus", () => {
+                this.activeSlider = id;
+                if (typeof this.widgetWindow.takeFocus === "function") {
+                    this.widgetWindow.takeFocus();
+                }
             });
 
             const freqLabel = document.createElement("div");
