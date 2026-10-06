@@ -1202,6 +1202,31 @@ describe("Blocks Foundation", () => {
             ]);
             expect(copiedBlocks.flatMap(block => block[4])).not.toContain(undefined);
         });
+
+        it("preserves manualAccidental on copied value blocks (Issue #9003)", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            const makeValueBlock = (name, value, manualAccidental) => ({
+                name,
+                value,
+                manualAccidental,
+                connections: [null],
+                isValueBlock: jest.fn().mockReturnValue(true)
+            });
+            blocks.blockList = [
+                makeValueBlock("notename", "F", "♮"),
+                makeValueBlock("solfege", "Fa", null)
+            ];
+            blocks.selectedStack = 0;
+
+            const copiedBlocks = blocks._copyBlocksToObj(false);
+            expect(copiedBlocks[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
+
+            blocks.selectedStack = 1;
+            const copiedSolfege = blocks._copyBlocksToObj(false);
+            expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
+        });
     });
 
     describe("Parameter Block Cache Updates", () => {
@@ -1630,6 +1655,41 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(wellFormed)).not.toThrow();
             expect(mockActivity.errorMsg).not.toHaveBeenCalled();
             expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
+        });
+
+        it("restores manualAccidental when loading value blocks (Issue #9003)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                notename: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.updateBlockText = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        value: null,
+                        manualAccidental: null,
+                        connections: [null],
+                        container: { x: 0, y: 0 }
+                    };
+                    if (postProcess) {
+                        postProcess(args);
+                    }
+                }
+            );
+
+            const blockObjs = [
+                [0, ["notename", { value: "F", manualAccidental: "♮" }], 0, 0, [null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList[0].value).toBe("F");
+            expect(blocks.blockList[0].manualAccidental).toBe("♮");
+            expect(blocks.updateBlockText).toHaveBeenCalledWith(0);
         });
 
         // SwitchBlock.flow hooks its case onto the block after the switch

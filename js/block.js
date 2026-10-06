@@ -219,6 +219,9 @@ class Block {
         // Don't trigger notes on top of each other.
         this._triggerLock = false;
 
+        // Manual accidental override from pitch pie menu (Issue #9003)
+        this.manualAccidental = null;
+
         // If we update the parameters of a meter block, we have extra
         // actions to attend to.
         this._check_meter_block = null;

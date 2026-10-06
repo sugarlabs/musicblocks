@@ -4922,9 +4922,17 @@ class Blocks {
                                 []
                             ];
                             break;
-                        default:
-                            blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
+                        default: {
+                            const valObj = { value: myBlock.value };
+                            if (
+                                myBlock.manualAccidental !== undefined &&
+                                myBlock.manualAccidental !== null
+                            ) {
+                                valObj.manualAccidental = myBlock.manualAccidental;
+                            }
+                            blockItem = [b, [myBlock.name, valObj], x, y, []];
                             break;
+                        }
                     }
                 } else if (
                     [
@@ -6265,7 +6273,11 @@ class Blocks {
                         postProcess = args => {
                             const thisBlock = args[0];
                             const value = args[1];
+                            const info = args[2];
                             that.blockList[thisBlock].value = value;
+                            if (info && info.manualAccidental !== undefined) {
+                                that.blockList[thisBlock].manualAccidental = info.manualAccidental;
+                            }
                             that.updateBlockText(thisBlock);
                         };
 
@@ -6274,7 +6286,7 @@ class Blocks {
                             blockOffset,
                             blkData[4],
                             postProcess,
-                            [thisBlock, value]
+                            [thisBlock, value, blkInfo[1]]
                         );
                         break;
                     case "drumname":
