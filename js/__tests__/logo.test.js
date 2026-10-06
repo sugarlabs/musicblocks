@@ -2425,13 +2425,25 @@ describe("Logo runFromBlockNow", () => {
             logo._resetIterationBudgets();
             logo._MAX_ITERATIONS = 1;
             logo.blockList = [makeFlowBlock("noop")];
-            mockActivity.turtles.running = jest.fn(() => true);
+
+            // A realistic multi-turtle run: turtle 0 is about to run out of
+            // budget while turtle 1 is still executing.
+            const turtle1 = createMockTurtle();
+            turtle0.running = true;
+            turtle1.running = true;
+            mockActivity.turtles.turtleList = [turtle0, turtle1];
+            mockActivity.turtles.getTurtleCount = jest.fn(() => 2);
+            mockActivity.turtles.running = jest.fn(() =>
+                mockActivity.turtles.turtleList.some(turtle => turtle.running)
+            );
             logo._syncCounter = 42;
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(logo._haltedTurtles["0"]).toBe(true);
+            expect(turtle0.running).toBe(false);
+            expect(turtle1.running).toBe(true);
             expect(logo._alreadyRunning).toBe(true);
             expect(logo._syncCounter).toBe(42);
         });
@@ -2440,12 +2452,16 @@ describe("Logo runFromBlockNow", () => {
             logo._resetIterationBudgets();
             logo._MAX_ITERATIONS = 1;
             logo.blockList = [makeFlowBlock("noop")];
-            mockActivity.turtles.running = jest.fn(() => false);
+            turtle0.running = true;
+            mockActivity.turtles.running = jest.fn(() =>
+                mockActivity.turtles.turtleList.some(turtle => turtle.running)
+            );
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(logo._haltedTurtles["0"]).toBe(true);
+            expect(turtle0.running).toBe(false);
             expect(logo._alreadyRunning).toBe(false);
         });
     });
