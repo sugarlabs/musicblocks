@@ -78,6 +78,24 @@ class PitchStaircaseSteps {
     }
 
     /**
+     * Reads a whole number of at least 1 from a ratio input, writing the value used back into
+     * the input.
+     * @private
+     * @param {HTMLInputElement} input - The ratio input.
+     * @param {number} fallback - The value to use when the input isn't a number of at least 1.
+     * @returns {number}
+     */
+    _readRatio(input, fallback) {
+        let value = Math.floor(Number(input.value));
+        if (!Number.isFinite(value) || value < 1) {
+            value = fallback;
+        }
+
+        input.value = value;
+        return value;
+    }
+
+    /**
      * Removes the last step made.
      * @private
      * @returns {boolean} Whether there was a step to remove.
@@ -104,24 +122,8 @@ class PitchStaircaseSteps {
      * @returns {void}
      */
     _dissectStair(event) {
-        let inputNum1 = this._musicRatio1.value;
-
-        if (isNaN(inputNum1) || Number(inputNum1) <= 0) {
-            inputNum1 = 3;
-        } else {
-            inputNum1 = Math.floor(inputNum1);
-        }
-
-        this._musicRatio1.value = inputNum1;
-        let inputNum2 = this._musicRatio2.value;
-
-        if (isNaN(inputNum2) || Number(inputNum2) <= 0) {
-            inputNum2 = 2;
-        } else {
-            inputNum2 = Math.floor(inputNum2);
-        }
-
-        this._musicRatio2.value = inputNum2;
+        const inputNum1 = this._readRatio(this._musicRatio1, 3);
+        const inputNum2 = this._readRatio(this._musicRatio2, 2);
         const inputNum = parseFloat(inputNum2 / inputNum1);
 
         const oldcell = event.target;
