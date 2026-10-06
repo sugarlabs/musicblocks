@@ -30,7 +30,7 @@ const { Synth: SynthClass, instruments, instrumentsSource } = require("../../uti
 global.instruments = instruments;
 global.instrumentsSource = instrumentsSource;
 global.docById = id => document.getElementById(id);
-const { Tuner } = require("../tuner");
+const { Tuner, TunerAudioInput } = require("../tuner");
 
 describe("Tuner", () => {
     let tuner;
@@ -40,21 +40,21 @@ describe("Tuner", () => {
     });
 
     describe("getTunerFrequency", () => {
-        it("should return 440 when tunerAnalyser is null", () => {
-            tuner.tunerAnalyser = null;
+        it("should return 440 when the analyser is null", () => {
+            tuner.audioInput.analyser = null;
             tuner.detectPitch = jest.fn();
             expect(tuner.getTunerFrequency()).toBe(440);
             expect(tuner.detectPitch).not.toHaveBeenCalled();
         });
 
         it("should return 440 when detectPitch is null", () => {
-            tuner.tunerAnalyser = { getValue: jest.fn() };
+            tuner.audioInput.analyser = { getValue: jest.fn() };
             tuner.detectPitch = null;
             expect(tuner.getTunerFrequency()).toBe(440);
         });
 
         it("should return 440 when detected pitch is zero or negative", () => {
-            tuner.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
+            tuner.audioInput.analyser = { getValue: jest.fn(() => new Float32Array(16)) };
             tuner.detectPitch = jest.fn(() => 0);
             expect(tuner.getTunerFrequency()).toBe(440);
 
@@ -63,50 +63,50 @@ describe("Tuner", () => {
         });
 
         it("should return detected pitch when valid", () => {
-            tuner.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
+            tuner.audioInput.analyser = { getValue: jest.fn(() => new Float32Array(16)) };
             tuner.detectPitch = jest.fn(() => 261.63);
             expect(tuner.getTunerFrequency()).toBe(261.63);
         });
     });
 
     describe("stopTuner", () => {
-        it("should not throw when tunerMic is null", () => {
-            tuner.tunerMic = null;
-            tuner.tunerAnalyser = null;
+        it("should not throw when the mic is null", () => {
+            tuner.audioInput.mic = null;
+            tuner.audioInput.analyser = null;
             expect(() => tuner.stopTuner()).not.toThrow();
         });
 
-        it("should call close on tunerMic and null it", () => {
+        it("should call close on the mic and null it", () => {
             const mockClose = jest.fn();
-            tuner.tunerMic = { close: mockClose };
-            tuner.tunerAnalyser = null;
+            tuner.audioInput.mic = { close: mockClose };
+            tuner.audioInput.analyser = null;
             tuner.stopTuner();
             expect(mockClose).toHaveBeenCalledTimes(1);
-            expect(tuner.tunerMic).toBeNull();
+            expect(tuner.audioInput.mic).toBeNull();
         });
 
-        it("should disconnect and dispose tunerAnalyser when both exist", () => {
+        it("should disconnect and dispose the analyser when both exist", () => {
             const mockDisconnect = jest.fn();
             const mockDispose = jest.fn();
             const mockClose = jest.fn();
             const analyser = { dispose: mockDispose };
-            tuner.tunerMic = { close: mockClose, disconnect: mockDisconnect };
-            tuner.tunerAnalyser = analyser;
+            tuner.audioInput.mic = { close: mockClose, disconnect: mockDisconnect };
+            tuner.audioInput.analyser = analyser;
 
             tuner.stopTuner();
 
             expect(mockDisconnect).toHaveBeenCalledWith(analyser);
             expect(mockDispose).toHaveBeenCalled();
             expect(mockClose).toHaveBeenCalled();
-            expect(tuner.tunerAnalyser).toBeNull();
-            expect(tuner.tunerMic).toBeNull();
+            expect(tuner.audioInput.analyser).toBeNull();
+            expect(tuner.audioInput.mic).toBeNull();
         });
 
-        it("should skip analyser disposal when tunerAnalyser is null", () => {
+        it("should skip analyser disposal when the analyser is null", () => {
             const mockDisconnect = jest.fn();
             const mockClose = jest.fn();
-            tuner.tunerMic = { close: mockClose, disconnect: mockDisconnect };
-            tuner.tunerAnalyser = null;
+            tuner.audioInput.mic = { close: mockClose, disconnect: mockDisconnect };
+            tuner.audioInput.analyser = null;
 
             tuner.stopTuner();
 
@@ -120,8 +120,8 @@ describe("Tuner", () => {
             global.cancelAnimationFrame = mockCancel;
             tuner._tunerRafId = 123;
             tuner._tunerActive = true;
-            tuner.tunerMic = null;
-            tuner.tunerAnalyser = null;
+            tuner.audioInput.mic = null;
+            tuner.audioInput.analyser = null;
             tuner.stopTuner();
             expect(mockCancel).toHaveBeenCalledWith(123);
             expect(tuner._tunerRafId).toBeNull();
@@ -218,7 +218,7 @@ describe("Tuner with the real Synth", () => {
         expect(segments.length).toBe(11);
 
         // 1. Center in-tune (440Hz -> A4, near 0 cents, center green segment lit)
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(noteText.textContent).toBe("A4");
         expect(centsText.textContent).toMatch(/\+?[0-5] cents/);
@@ -239,7 +239,7 @@ describe("Tuner with the real Synth", () => {
             0 // silence
         ];
         for (const f of testFreqs) {
-            tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(f));
+            tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(f));
             await new Promise(resolve => setTimeout(resolve, 5));
             if (f > 0) {
                 expect(noteText.textContent).toBeTruthy();
@@ -264,7 +264,7 @@ describe("Tuner with the real Synth", () => {
         };
         window.addEventListener("error", onError);
         try {
-            tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
+            tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
             await new Promise(resolve => setTimeout(resolve, 20));
         } finally {
             window.removeEventListener("error", onError);
@@ -289,33 +289,33 @@ describe("Tuner with the real Synth", () => {
         const centsText = document.getElementById("centsText");
 
         // 1 octave above (+1200 cents, >50 cents sharp -> rightmost segment deep red)
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(880));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(880));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(noteText.textContent).toBe("A5");
         expect(centsText.textContent).toContain("+1 octave");
         expect(segments[10].getAttribute("fill")).toBe("#FF0000");
 
         // 1 octave below (-1200 cents, >50 cents flat -> leftmost segment deep red)
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(220));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(220));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(noteText.textContent).toBe("A3");
         expect(centsText.textContent).toContain("-1 octave");
         expect(segments[0].getAttribute("fill")).toBe("#FF0000");
 
         // Near target sharp (+20 cents)
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(445));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(445));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(noteText.textContent).toBe("A4");
         expect(centsText.textContent).toMatch(/\+?[0-9]+ cents/);
 
         // Near target flat (-20 cents)
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(435));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(435));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(noteText.textContent).toBe("A4");
         expect(centsText.textContent).toMatch(/-[0-9]+ cents/);
 
         // Inactive / zero frequency
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(0));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(0));
         await new Promise(resolve => setTimeout(resolve, 5));
 
         // Switch back to chromatic mode
@@ -408,7 +408,7 @@ describe("Tuner with the real Synth", () => {
         global.computeTargetPitchFrequency = jest.fn().mockReturnValue(NaN);
         navFn();
         expect(targetNoteSelector.textContent).toBe("C5");
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(segments[5].getAttribute("fill")).toBe("#00FF00");
 
@@ -418,7 +418,7 @@ describe("Tuner with the real Synth", () => {
         });
         navFn();
         expect(targetNoteSelector.textContent).toBe("C5");
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
         await new Promise(resolve => setTimeout(resolve, 5));
         expect(segments[5].getAttribute("fill")).toBe("#00FF00");
 
@@ -427,12 +427,12 @@ describe("Tuner with the real Synth", () => {
         // Test stopTuner
         tuner.stopTuner();
         expect(tuner._tunerActive).toBe(false);
-        expect(tuner.tunerMic).toBeNull();
-        expect(tuner.tunerAnalyser).toBeNull();
+        expect(tuner.audioInput.mic).toBeNull();
+        expect(tuner.audioInput.analyser).toBeNull();
     });
 
     test("getTunerFrequency returns 440 default when analyser is null", () => {
-        tuner.tunerAnalyser = null;
+        tuner.audioInput.analyser = null;
         expect(tuner.getTunerFrequency()).toBe(440);
     });
 
@@ -555,8 +555,8 @@ describe("Tuner with the real Synth", () => {
 
             expect(mics).toHaveLength(1);
             expect(mics[0].close).toHaveBeenCalled();
-            expect(tuner.tunerMic).toBeNull();
-            expect(tuner.tunerAnalyser).toBeNull();
+            expect(tuner.audioInput.mic).toBeNull();
+            expect(tuner.audioInput.analyser).toBeNull();
             expect(tuner._tunerActive).toBe(false);
         });
 
@@ -566,7 +566,7 @@ describe("Tuner with the real Synth", () => {
             await starting;
 
             expect(mics).toHaveLength(0);
-            expect(tuner.tunerMic).toBeNull();
+            expect(tuner.audioInput.mic).toBeNull();
             expect(tuner._tunerActive).toBe(false);
         });
 
@@ -582,7 +582,7 @@ describe("Tuner with the real Synth", () => {
             releaseOpen();
             await second;
 
-            expect(tuner.tunerMic).toBe(mics[0]);
+            expect(tuner.audioInput.mic).toBe(mics[0]);
             expect(tuner._tunerActive).toBe(true);
             tuner.stopTuner();
         });
@@ -591,12 +591,77 @@ describe("Tuner with the real Synth", () => {
     test("chromatic mode doesn't keep the text from target mode", async () => {
         await tuner.startTuner();
         tuner.displayText = "+1 octave";
-        tuner.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
+        tuner.audioInput.analyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(440));
 
         await new Promise(resolve => setTimeout(resolve, 5));
 
         expect(tuner.displayText).toBeNull();
         expect(document.getElementById("centsText").textContent).toMatch(/cents/);
         expect(document.getElementById("centsText").textContent).not.toBe("+1 octave");
+    });
+});
+
+describe("TunerAudioInput", () => {
+    let input;
+
+    beforeEach(() => {
+        input = new TunerAudioInput();
+        Tone.start.mockClear();
+    });
+
+    afterEach(() => {
+        input.close();
+    });
+
+    it("starts the audio context through Tone", async () => {
+        await input.start();
+        expect(Tone.start).toHaveBeenCalledTimes(1);
+    });
+
+    it("reports the audio context's sample rate", () => {
+        expect(input.getSampleRate()).toBe(Tone.context.sampleRate);
+    });
+
+    it("has no waveform until the microphone is open", () => {
+        expect(input.getWaveform()).toBeNull();
+    });
+
+    it("opens the microphone and connects it to an analyser", async () => {
+        expect(await input.open(() => false)).toBe(true);
+        expect(input.mic).toBeInstanceOf(Tone.UserMedia);
+        expect(input.analyser).toBeInstanceOf(Tone.Analyser);
+        expect(input.mic.connect).toHaveBeenCalledWith(input.analyser);
+        expect(input.getWaveform()).toBe(input.analyser.getValue());
+    });
+
+    it("closes the microphone again if stopped while it opened", async () => {
+        let mic;
+        const opened = await input.open(() => {
+            mic = input.mic;
+            return true;
+        });
+        expect(opened).toBe(false);
+        expect(mic.close).toHaveBeenCalled();
+        expect(input.mic).toBeNull();
+        expect(input.analyser).toBeNull();
+    });
+
+    it("closes the old microphone when opened again", async () => {
+        await input.open(() => false);
+        const first = input.mic;
+        await input.open(() => false);
+        expect(first.close).toHaveBeenCalled();
+        expect(input.mic).not.toBe(first);
+    });
+
+    it("close disconnects and disposes of the analyser and closes the mic", async () => {
+        await input.open(() => false);
+        const { mic, analyser } = input;
+        input.close();
+        expect(mic.disconnect).toHaveBeenCalledWith(analyser);
+        expect(analyser.dispose).toHaveBeenCalled();
+        expect(mic.close).toHaveBeenCalled();
+        expect(input.mic).toBeNull();
+        expect(input.getWaveform()).toBeNull();
     });
 });

@@ -188,6 +188,93 @@ const TunerUtils = {
 /* global Tone, instruments, wheelnav, Raphael, computeTargetPitchFrequency, piemenuPitches */
 
 /**
+ * The tuner's audio input: the audio context, the microphone and the waveform analyser. This is
+ * the only part of the tuner that uses Tone.js, so moving away from Tone.js means rewriting just
+ * this; the pitch detection, the display and the update loop only see plain sample buffers.
+ * @constructor
+ */
+function TunerAudioInput() {
+    /**
+     * Microphone input.
+     * @type {Tone.UserMedia|null}
+     */
+    this.mic = null;
+    /**
+     * Waveform analyser fed by the microphone.
+     * @type {Tone.Analyser|null}
+     */
+    this.analyser = null;
+}
+
+/**
+ * Starts (or resumes) the audio context. Browsers only allow this after a user gesture.
+ * @returns {Promise<void>}
+ */
+TunerAudioInput.prototype.start = function () {
+    return Tone.start();
+};
+
+/**
+ * The audio context's sample rate, which the pitch detector needs.
+ * @returns {number}
+ */
+TunerAudioInput.prototype.getSampleRate = function () {
+    return Tone.context.sampleRate;
+};
+
+/**
+ * Opens the microphone and connects it to a new analyser, closing any microphone already open.
+ * Opening waits on the browser's permission prompt; if `isStopped` says the tuner was stopped
+ * in the meantime, the microphone is closed again and no analyser is made.
+ * @param {function(): boolean} isStopped - Whether the tuner was stopped while the mic opened.
+ * @returns {Promise<boolean>} Whether the microphone is open and connected.
+ */
+TunerAudioInput.prototype.open = async function (isStopped) {
+    if (this.mic) {
+        this.mic.close();
+    }
+
+    const mic = new Tone.UserMedia();
+    this.mic = mic;
+    await mic.open();
+    if (isStopped()) {
+        mic.close();
+        if (this.mic === mic) {
+            this.mic = null;
+        }
+        return false;
+    }
+
+    this.analyser = new Tone.Analyser("waveform", 2048);
+    mic.connect(this.analyser);
+    return true;
+};
+
+/**
+ * The latest block of samples from the microphone.
+ * @returns {Float32Array|null} The samples, or null if the microphone isn't open.
+ */
+TunerAudioInput.prototype.getWaveform = function () {
+    return this.analyser ? this.analyser.getValue() : null;
+};
+
+/**
+ * Disconnects and disposes of the analyser and closes the microphone.
+ * @returns {void}
+ */
+TunerAudioInput.prototype.close = function () {
+    if (this.mic) {
+        if (this.analyser) {
+            this.mic.disconnect(this.analyser);
+            this.analyser.dispose();
+        }
+        this.mic.close();
+    }
+    this.analyser = null;
+    this.mic = null;
+};
+
+/**
  * The tuner the Sampler widget shows. It listens to the microphone, detects the pitch with the
  * YIN algorithm and draws the tuner display into #tunerContainer.
  *
@@ -198,15 +285,10 @@ const TunerUtils = {
  */
 function Tuner() {
     /**
-     * Tuner microphone input.
-     * @type {Tone.UserMedia|null}
+     * The microphone and analyser (the only Tone.js code in the tuner).
+     * @type {TunerAudioInput}
      */
-    this.tunerMic = null;
-    /**
-     * Tuner analyser for pitch detection.
-     * @type {Tone.Analyser|null}
-     */
-    this.tunerAnalyser = null;
+    this.audioInput = new TunerAudioInput();
     /**
      * Pitch detection function.
      * @type {function|null}
@@ -309,7 +391,7 @@ function Tuner() {
         }
 
         // Start audio context
-        await Tone.start();
+        await this.audioInput.start();
         if (stopped()) return;
 
         // Initialize synth for preview
@@ -325,26 +407,11 @@ function Tuner() {
         }
 
         // Rest of the tuner initialization code
-        if (this.tunerMic) {
-            this.tunerMic.close();
-        }
-
-        await Tone.start();
+        await this.audioInput.start();
         if (stopped()) return;
-        const mic = new Tone.UserMedia();
-        this.tunerMic = mic;
-        await mic.open();
-        if (stopped()) {
-            // stopTuner ran while the microphone was opening.
-            mic.close();
-            if (this.tunerMic === mic) {
-                this.tunerMic = null;
-            }
-            return;
-        }
+        // stopTuner may run while the microphone is opening.
+        if (!(await this.audioInput.open(stopped))) return;
 
-        this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
-        this.tunerMic.connect(this.tunerAnalyser);
         this._tunerActive = true;
         this._tunerSegments = null;
         if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
@@ -427,7 +494,7 @@ function Tuner() {
             };
         };
 
-        this.detectPitch = YIN(Tone.context.sampleRate);
+        this.detectPitch = YIN(this.audioInput.getSampleRate());
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
@@ -891,13 +958,13 @@ function Tuner() {
             if (!this._tunerActive) return;
 
             const tunerContainer = document.getElementById("tunerContainer");
-            if (!tunerContainer || !this.tunerAnalyser || !this.detectPitch) {
+            const buffer = this.audioInput.getWaveform();
+            if (!tunerContainer || !buffer || !this.detectPitch) {
                 this._tunerActive = false;
                 this._tunerRafId = null;
                 return;
             }
 
-            const buffer = this.tunerAnalyser.getValue();
             const pitch = this.detectPitch(buffer);
 
             if (pitch > 0) {
@@ -1164,15 +1231,7 @@ function Tuner() {
         }
         this._tunerRafId = null;
         this._tunerSegments = null;
-        if (this.tunerMic) {
-            if (this.tunerAnalyser) {
-                this.tunerMic.disconnect(this.tunerAnalyser);
-                this.tunerAnalyser.dispose();
-            }
-            this.tunerMic.close();
-        }
-        this.tunerAnalyser = null;
-        this.tunerMic = null;
+        this.audioInput.close();
     };
 
     const frequencyToNote = frequency => {
@@ -1210,9 +1269,9 @@ function Tuner() {
      * @returns {number} The detected frequency in Hz
      */
     this.getTunerFrequency = () => {
-        if (!this.tunerAnalyser || !this.detectPitch) return 440; // Default to A4 if no analyser
+        const buffer = this.audioInput.getWaveform();
+        if (!buffer || !this.detectPitch) return 440; // Default to A4 if no analyser
 
-        const buffer = this.tunerAnalyser.getValue();
         const pitch = this.detectPitch(buffer);
 
         // Return detected pitch or default to A4
@@ -1224,8 +1283,9 @@ if (typeof window !== "undefined") {
     window.TunerDisplay = TunerDisplay;
     window.TunerUtils = TunerUtils;
     window.Tuner = Tuner;
+    window.TunerAudioInput = TunerAudioInput;
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { TunerDisplay, TunerUtils, Tuner };
+    module.exports = { TunerDisplay, TunerUtils, Tuner, TunerAudioInput };
 }
