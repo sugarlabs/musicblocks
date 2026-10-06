@@ -95,6 +95,30 @@ class AST2BlockList {
             /^(?:_*stopLoop|stop\d+)$/.test(declaration.declarations[0].id.name);
 
         const isFunction = ["ArrowFunctionExpression", "FunctionExpression"].includes(node.type);
+        // The Stop flags this function declares, for the call-site check below: setting
+        // any other variable in that branch is the user's own code.
+        const declared = new Set();
+        if (isFunction) {
+            const find = child => {
+                if (Array.isArray(child)) {
+                    child.forEach(find);
+                } else if (child !== null && typeof child === "object") {
+                    if (
+                        child.type === "VariableDeclaration" &&
+                        child.declarations.length === 1 &&
+                        child.declarations[0].id.type === "Identifier" &&
+                        child.declarations[0].init !== null &&
+                        child.declarations[0].init.value === false &&
+                        isStopFlag(child)
+                    ) {
+                        declared.add(child.declarations[0].id.name);
+                    }
+                    Object.values(child).forEach(find);
+                }
+            };
+            find(node.body);
+        }
+        if (isFunction) AST2BlockList._declaredStopFlags.push(declared);
         for (const [key, value] of Object.entries(node)) {
             if (Array.isArray(value)) {
                 value.forEach(child => AST2BlockList._normalizeStops(child));
@@ -102,6 +126,8 @@ class AST2BlockList {
                 AST2BlockList._normalizeStops(value, isFunction && key === "body");
             }
         }
+        const visibleFlags = new Set(AST2BlockList._declaredStopFlags.flatMap(set => [...set]));
+        if (isFunction) AST2BlockList._declaredStopFlags.pop();
 
         let list = null;
         if (node.type === "Program" || node.type === "BlockStatement") {
@@ -179,6 +205,7 @@ class AST2BlockList {
                 only.expression.type === "AssignmentExpression" &&
                 only.expression.operator === "=" &&
                 only.expression.left.type === "Identifier" &&
+                visibleFlags.has(only.expression.left.name) &&
                 only.expression.right.value === true
             );
         };
@@ -258,6 +285,7 @@ class AST2BlockList {
                 value.test.type === "Identifier" &&
                 value.test.name === flag &&
                 value.consequent.type === "MemberExpression" &&
+                value.consequent.object.name === "mouse" &&
                 value.consequent.property.name === "STOPFLOW" &&
                 onlyGeneratedFlagUses(list, flag)
             ) {
@@ -1091,6 +1119,9 @@ class AST2BlockList {
         }
     }
 }
+
+// The Stop flags declared by the functions being converted, innermost last.
+AST2BlockList._declaredStopFlags = [];
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { AST2BlockList };

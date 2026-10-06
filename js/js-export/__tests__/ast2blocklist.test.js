@@ -657,6 +657,42 @@ describe("AST2BlockList Class", () => {
             expect(error.prefix).toMatch(/^Unsupported/);
         });
 
+        test("leaves a branch on STOPFLOW that sets another variable alone", () => {
+            const code = `
+            new Mouse(async mouse => {
+                if ((await action(mouse)) === "STOPFLOW") {
+                    stop0 = true;
+                }
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a return of another object's STOPFLOW alone", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const generated = astring.generate(ASTUtils.getMethodAST("action", action));
+            const edited = generated.replace("mouse.STOPFLOW", "other.STOPFLOW");
+            expect(edited).not.toBe(generated);
+
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(edited, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
         test("leaves the AST alone, so converting it twice gives the same blocks", () => {
             const AST = acorn.parse(
                 exportStart([["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]]),
