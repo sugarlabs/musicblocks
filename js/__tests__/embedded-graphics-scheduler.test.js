@@ -352,4 +352,78 @@ describe("EmbeddedGraphicsScheduler", () => {
         await freshCall;
         expect(turtle0.embeddedGraphicsPending).toBe(0);
     });
+    test("suppresses the delayed graphics callbacks of a halted turtle", async () => {
+        // A per-turtle iteration halt leaves the run going, so logo.stopTurtle
+        // stays false. The guards must consult that turtle's own flag too,
+        // otherwise callbacks queued before the halt move the turtle anyway.
+        const guards = [];
+        mockLogo._timerManager.setGuardedTimeout = jest.fn((fn, delay, aborted) => {
+            guards.push(aborted);
+            return guards.length;
+        });
+        mockLogo._haltedTurtles = { 0: true };
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
+        turtle0.singer.suppressOutput = false;
+        turtle0.singer.embeddedGraphics = { 9: [1] };
+
+        await scheduler.schedule(0, 0.5, 9, 0);
+
+        expect(guards.length).toBeGreaterThan(0);
+        guards.forEach(aborted => expect(aborted()).toBe(true));
+    });
+
+    test("keeps the delayed graphics callbacks of the turtles that still run", async () => {
+        const guards = [];
+        mockLogo._timerManager.setGuardedTimeout = jest.fn((fn, delay, aborted) => {
+            guards.push(aborted);
+            return guards.length;
+        });
+        mockLogo._haltedTurtles = { 0: true };
+        const turtle1 = buildTurtle();
+        mockLogo.turtles.ithTurtle = jest.fn(() => turtle1);
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
+        turtle1.singer.suppressOutput = false;
+        turtle1.singer.embeddedGraphics = { 9: [1] };
+
+        await scheduler.schedule(1, 0.5, 9, 0);
+
+        expect(guards.length).toBeGreaterThan(0);
+        guards.forEach(aborted => expect(aborted()).toBe(false));
+    });
+
+    test("a run-wide stop still suppresses the callbacks of every turtle", async () => {
+        const guards = [];
+        mockLogo._timerManager.setGuardedTimeout = jest.fn((fn, delay, aborted) => {
+            guards.push(aborted);
+            return guards.length;
+        });
+        mockLogo.stopTurtle = true;
+        mockLogo._haltedTurtles = {};
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
+        turtle0.singer.suppressOutput = false;
+        turtle0.singer.embeddedGraphics = { 9: [1] };
+
+        await scheduler.schedule(0, 0.5, 9, 0);
+
+        expect(guards.length).toBeGreaterThan(0);
+        guards.forEach(aborted => expect(aborted()).toBe(true));
+    });
+
+    test("_halted reports the state of the given turtle only", () => {
+        expect(scheduler._halted(0)).toBe(false);
+
+        mockLogo._haltedTurtles = { 0: true };
+        expect(scheduler._halted(0)).toBe(true);
+        expect(scheduler._halted(1)).toBe(false);
+
+        mockLogo.stopTurtle = true;
+        expect(scheduler._halted(1)).toBe(true);
+
+        mockLogo.stopTurtle = false;
+        mockLogo._haltedTurtles = undefined;
+        expect(scheduler._halted(0)).toBe(false);
+    });
 });
