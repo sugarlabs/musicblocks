@@ -467,12 +467,30 @@ describe("EmbeddedGraphicsScheduler", () => {
         mockLogo.parseArg = jest.fn(() => 5);
         mockLogo.blockList = blockList;
         turtle0.singer.suppressOutput = false;
-        turtle0.singer.embeddedGraphics = { 9: indexes };
 
-        await scheduler.schedule(0, 0.5, 9, 0);
+        // Schedule one block at a time and count its guards exactly, so a guard
+        // site that stops being wired up cannot hide behind the other blocks.
+        const splitBlocks = new Set(["right", "left", "forward", "back", "arc"]);
+        for (let i = 0; i < indexes.length; i++) {
+            const before = guards.length;
+            turtle0.singer.embeddedGraphics = { 9: [indexes[i]] };
+            await scheduler.schedule(0, 0.5, 9, 0);
+
+            const name = graphicsBlocks[i];
+            let expected = 1;
+            if (name === "clear") {
+                expected = 0;
+            } else if (splitBlocks.has(name)) {
+                expected = NOTEDIV / turtle0.singer.dispatchFactor;
+            }
+
+            expect({ block: name, guards: guards.length - before }).toEqual({
+                block: name,
+                guards: expected
+            });
+        }
 
         const shortNoteGuards = guards.length;
-        expect(shortNoteGuards).toBeGreaterThan(15);
 
         // A long note on a single forward move is split into many steps, which
         // reaches the "last" and "middle" guard sites that a one-step move
@@ -483,7 +501,7 @@ describe("EmbeddedGraphicsScheduler", () => {
         turtle0.singer.embeddedGraphics = { 9: [forwardBlock] };
         await scheduler.schedule(0, 10, 9, 0);
 
-        expect(guards.length).toBeGreaterThan(shortNoteGuards);
+        expect(guards.length - shortNoteGuards).toBe(NOTEDIV / turtle0.singer.dispatchFactor);
         guards.forEach(aborted => expect(aborted()).toBe(true));
 
         // The same guards follow the turtle: once it is no longer halted they
