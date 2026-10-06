@@ -1260,6 +1260,7 @@ Turtles.TurtlesView = class {
             // Calculate new SVG container dimensions
             // const dx = newCanvasWidth - 20;
             // const dy = newCanvasHeight - 55 - LEADING;
+            this.activity.refreshCanvas();
         };
 
         const __makeBoundary2 = () => {
