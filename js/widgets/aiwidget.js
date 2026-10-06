@@ -117,7 +117,8 @@ function AIWidget() {
     this.pitchAnalysers = {};
 
     /**
-     * Maps each synth name to the pitch analyser index currently connected to.
+     * Maps each synth name to the pitch analyser index and synth object it is
+     * currently connected to.
      * @type {object}
      */
     this._connectedSynths = {};
@@ -969,21 +970,41 @@ function AIWidget() {
 
         // Connect instruments. Ref tone connects with the first pitchAnalyser.
         for (const synth in instruments[0]) {
+            const synthObject = instruments[0][synth];
+
             let analyser = 1;
             if (synth === REFERENCESAMPLE) {
                 analyser = 0;
             }
 
-            if (this.pitchAnalysers[analyser] && this._connectedSynths[synth] !== analyser) {
-                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
-                this._connectedSynths[synth] = analyser;
+            const connection = this._connectedSynths[synth];
+            if (
+                this.pitchAnalysers[analyser] &&
+                (!connection ||
+                    connection.analyser !== analyser ||
+                    connection.synth !== synthObject)
+            ) {
+                synthObject.connect(this.pitchAnalysers[analyser]);
+                this._connectedSynths[synth] = {
+                    analyser,
+                    synth: synthObject
+                };
             }
 
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                if (this.pitchAnalysers[analyser] && this._connectedSynths[synth] !== analyser) {
-                    instruments[0][synth].connect(this.pitchAnalysers[analyser]);
-                    this._connectedSynths[synth] = analyser;
+                const customConnection = this._connectedSynths[synth];
+                if (
+                    this.pitchAnalysers[analyser] &&
+                    (!customConnection ||
+                        customConnection.analyser !== analyser ||
+                        customConnection.synth !== synthObject)
+                ) {
+                    synthObject.connect(this.pitchAnalysers[analyser]);
+                    this._connectedSynths[synth] = {
+                        analyser,
+                        synth: synthObject
+                    };
                 }
             }
         }

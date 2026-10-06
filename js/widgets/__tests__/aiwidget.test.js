@@ -1034,4 +1034,31 @@ describe("AIWidget Instance", () => {
         expect(disconnectMock).not.toHaveBeenCalled();
         expect(connectMock).toHaveBeenCalledTimes(1);
     });
+
+    it("should reconnect a replacement synth even when the analyser index is unchanged", () => {
+        const connectAMock = jest.fn();
+        const connectBMock = jest.fn();
+        const synthA = { connect: connectAMock };
+        const synthB = { connect: connectBMock };
+        global.instruments = [{ piano: synthA }];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(connectAMock).toHaveBeenCalledTimes(1);
+
+        // Replace the synth object under the same synth name.
+        global.instruments = [{ piano: synthB }];
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(connectBMock).toHaveBeenCalledTimes(1);
+
+        // Same synth object again must not reconnect.
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(connectBMock).toHaveBeenCalledTimes(1);
+        expect(connectAMock).toHaveBeenCalledTimes(1);
+    });
 });
