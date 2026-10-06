@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, loadPracticeLessons */
+/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, escapeHTML, loadPracticeLessons */
 /* exported PracticeUI, ExplorerJournalUI */
 
 // Criteria that mean the level itself is finished, as opposed to a hidden discovery.
@@ -424,8 +424,8 @@ const PracticeUI = {
 
         container.innerHTML = `
       <div class="quest-title">
-        <h3>${PracticeTheme.title}</h3>
-        <p>${PracticeTheme.subtitle}</p>
+        <h3>${this.escapeHTML(PracticeTheme.title)}</h3>
+        <p>${this.escapeHTML(PracticeTheme.subtitle)}</p>
       </div>
       ${PracticeTheme.intro}
       ${this.renderBigBadges(bigBadgeIds)}
@@ -436,7 +436,7 @@ const PracticeUI = {
           data-level="${p.level}">
           ${this.renderLevelBadgeStrip(p)}
           <span>${_("Level")} ${p.level}</span>
-          <small>${p.title}</small>
+          <small>${this.escapeHTML(p.title)}</small>
         </button>
       `
       ).join("")}
@@ -467,7 +467,7 @@ const PracticeUI = {
       <button id="back-to-levels">&larr; ${_("Back")}</button>
 
       <h2>${_("Level")} ${problem.level}</h2>
-      <h4>${problem.title}</h4>
+      <h4>${this.escapeHTML(problem.title)}</h4>
       <div class="practice-description">${problem.description}</div>
       ${this.renderRewards(problem)}
       <div id="practice-badge-status">${this.renderBadgeStatus(problem)}</div>
@@ -477,7 +477,7 @@ const PracticeUI = {
           nextProblem
               ? `<button id="next-level">
               <span>${_("Next Lesson")} &rarr;</span>
-              <small>${_("Level")} ${nextProblem.level} · ${nextProblem.title}</small>
+              <small>${_("Level")} ${nextProblem.level} · ${this.escapeHTML(nextProblem.title)}</small>
             </button>`
               : ""
       }
@@ -589,8 +589,8 @@ const PracticeUI = {
           <span
             class="big-badge big-badge-${badge.iconKey || "island"}"
             title="${this.getBadgeTitle(badge)}"
-            aria-label="${badge.label}">
-            <span>${badge.label}</span>
+            aria-label="${this.escapeAttribute(badge.label)}">
+            <span>${this.escapeHTML(badge.label)}</span>
           </span>
         `
             )
@@ -614,7 +614,7 @@ const PracticeUI = {
                     `<span
                       class="level-badge level-badge-${badge.iconKey || "discovery"}"
                       title="${this.getBadgeTitle(badge)}"
-                      aria-label="${badge.label}">
+                      aria-label="${this.escapeAttribute(badge.label)}">
                     </span>`
             )
             .join("")}
@@ -629,7 +629,7 @@ const PracticeUI = {
       <section class="reward-card">
         <h4>${_("Quest Rewards")}</h4>
         <ul>
-          ${problem.rewards.map(reward => `<li>${reward}</li>`).join("")}
+          ${problem.rewards.map(reward => `<li>${this.escapeHTML(reward)}</li>`).join("")}
         </ul>
       </section>
     `;
@@ -648,7 +648,7 @@ const PracticeUI = {
               .map(
                   badge => `
             <span class="badge-chip ${earnedBadgeIds.includes(badge.id) ? "earned" : ""}">
-              ${badge.label}
+              ${this.escapeHTML(badge.label)}
             </span>
           `
               )
@@ -782,6 +782,10 @@ const PracticeUI = {
 
     getBadgeTitle(badge) {
         return this.escapeAttribute(`${badge.label}: ${badge.message || _("Discovery badge")}`);
+    },
+
+    escapeHTML(value) {
+        return escapeHTML(value || "");
     },
 
     escapeAttribute(value) {
@@ -1311,12 +1315,7 @@ const ExplorerJournalUI = {
     },
 
     escapeHTML(value) {
-        return String(value || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
+        return escapeHTML(value || "");
     },
 
     escapeAttribute(value) {

@@ -22,6 +22,8 @@
 
 // practiceUI.js reads these as browser globals, so they exist before the panels render.
 global._ = text => text;
+const { escapeHTML } = require("../../utils/utils-logic");
+global.escapeHTML = escapeHTML;
 
 const { PracticeManager } = require("../practiceManager");
 
@@ -172,6 +174,15 @@ describe("PracticeUI small helpers", () => {
         expect(PracticeUI.escapeAttribute('a & "b" <c>')).toBe("a &amp; &quot;b&quot; &lt;c&gt;");
     });
 
+    test("escapes HTML special characters to prevent injection", () => {
+        expect(PracticeUI.escapeHTML('<script>alert("xss")</script>')).toBe(
+            "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;"
+        );
+        expect(PracticeUI.escapeHTML("Tom & 'Jerry'")).toBe("Tom &amp; &#039;Jerry&#039;");
+        expect(PracticeUI.escapeHTML(null)).toBe("");
+        expect(PracticeUI.escapeHTML(undefined)).toBe("");
+    });
+
     test("builds a badge tooltip from its label and message", () => {
         expect(PracticeUI.getBadgeTitle({ label: "Bridge", message: "It glows" })).toBe(
             "Bridge: It glows"
@@ -209,6 +220,14 @@ describe("PracticeUI card rendering", () => {
         expect(html).toContain("<li>Two</li>");
     });
 
+    test("escapes reward text to prevent XSS", () => {
+        const html = PracticeUI.renderRewards({
+            rewards: ['<img src=x onerror="alert(1)">']
+        });
+        expect(html).toContain("<li>&lt;img src=x onerror=&quot;alert(1)&quot;&gt;</li>");
+        expect(html).not.toContain("<img");
+    });
+
     test("renders nothing for a lesson with no badges", () => {
         expect(PracticeUI.renderBadgeStatus({})).toBe("");
     });
@@ -221,6 +240,16 @@ describe("PracticeUI card rendering", () => {
 
         expect(html).toMatch(/badge-chip earned[^>]*>\s*Bridge Builder/);
         expect(html).toMatch(/badge-chip [^>]*>\s*Name Keeper/);
+    });
+
+    test("escapes badge labels in badge status to prevent XSS", () => {
+        const problem = {
+            level: 1,
+            badges: [{ id: "b1", label: '<b onmouseover="alert(1)">Badge</b>' }]
+        };
+        const html = PracticeUI.renderBadgeStatus(problem);
+        expect(html).toContain("&lt;b onmouseover=&quot;alert(1)&quot;&gt;Badge&lt;/b&gt;");
+        expect(html).not.toContain("<b onmouseover");
     });
 
     test("shows no badge strip until something has been earned", () => {
@@ -244,6 +273,37 @@ describe("PracticeUI card rendering", () => {
 
     test("shows the island badge once it has been earned", () => {
         expect(PracticeUI.renderBigBadges(["echo_guardian"])).toContain("Echo Guardian");
+    });
+
+    test("escapes badge attributes and labels in big badges and level badge strip", () => {
+        const xssBadge = {
+            id: "xss_badge",
+            label: '<span onclick="alert(1)">XSS</span>',
+            message: 'msg"><script>'
+        };
+        const originalBigBadges = PracticeTheme.bigBadges;
+        PracticeTheme.bigBadges = { xss_badge: xssBadge };
+        try {
+            const renderedBig = PracticeUI.renderBigBadges(["xss_badge"]);
+            expect(renderedBig).toContain(
+                "&lt;span onclick=&quot;alert(1)&quot;&gt;XSS&lt;/span&gt;"
+            );
+            expect(renderedBig).not.toContain('<span onclick="alert(1)">');
+        } finally {
+            PracticeTheme.bigBadges = originalBigBadges;
+        }
+
+        const problem = {
+            level: 99,
+            badges: [xssBadge]
+        };
+        PracticeManager.progress[99] = { complete: false, badges: ["xss_badge"] };
+        const stripHtml = PracticeUI.renderLevelBadgeStrip(problem);
+        expect(stripHtml).toContain(
+            'aria-label="&lt;span onclick=&quot;alert(1)&quot;&gt;XSS&lt;/span&gt;"'
+        );
+        expect(stripHtml).not.toContain('<span onclick="alert(1)">');
+        delete PracticeManager.progress[99];
     });
 });
 
@@ -289,6 +349,41 @@ describe("PracticeUI.renderLevelMenu", () => {
         expect(PracticeUI.currentLevel).toBe(2);
         expect(container.textContent).toContain("Lesson 2");
     });
+
+    test("escapes theme title, subtitle, and lesson titles to prevent XSS", () => {
+        const originalTheme = PracticeTheme;
+        const originalProblems = PracticeProblems;
+        PracticeTheme = {
+            title: '<script>alert("theme")</script>',
+            subtitle: '<img src=x onerror="alert(1)">',
+            intro: "<p>intro</p>",
+            bigBadges: {}
+        };
+        PracticeProblems = [
+            makeProblem(1, { title: 'Lesson 1 <b onmouseover="alert(1)">bold</b>' })
+        ];
+
+        try {
+            const container = mountPracticeContent();
+            PracticeUI.renderLevelMenu();
+
+            expect(container.querySelector("script")).toBeNull();
+            expect(container.querySelector("img")).toBeNull();
+            expect(container.querySelector("b")).toBeNull();
+            expect(container.innerHTML).toContain("&lt;script&gt;alert(");
+            expect(container.innerHTML).not.toContain('<script>alert("theme")</script>');
+            expect(container.innerHTML).toContain("&lt;img src=x onerror=");
+            expect(container.innerHTML).not.toContain("<img src=x");
+            expect(container.innerHTML).toContain("Lesson 1 &lt;b onmouseover=");
+            expect(container.innerHTML).not.toContain("<b onmouseover=");
+            expect(container.textContent).toContain('<script>alert("theme")</script>');
+            expect(container.textContent).toContain('<img src=x onerror="alert(1)">');
+            expect(container.textContent).toContain('Lesson 1 <b onmouseover="alert(1)">bold</b>');
+        } finally {
+            PracticeTheme = originalTheme;
+            PracticeProblems = originalProblems;
+        }
+    });
 });
 
 describe("PracticeUI.renderLevel", () => {
@@ -301,6 +396,30 @@ describe("PracticeUI.renderLevel", () => {
         expect(container.textContent).toContain("Fragment #1");
         expect(container.querySelector("#check-level")).not.toBeNull();
         expect(container.querySelector("#back-to-levels")).not.toBeNull();
+    });
+
+    test("escapes lesson title and next lesson title to prevent XSS", () => {
+        const originalProblems = PracticeProblems;
+        PracticeProblems = [
+            makeProblem(1, { title: '<script>alert("lvl1")</script>' }),
+            makeProblem(2, { title: '<img src=x onerror="alert(2)">' })
+        ];
+
+        try {
+            const container = mountPracticeContent();
+            PracticeUI.renderLevel(1);
+
+            expect(container.querySelector("script")).toBeNull();
+            expect(container.querySelector("img")).toBeNull();
+            expect(container.innerHTML).toContain("&lt;script&gt;alert(");
+            expect(container.innerHTML).not.toContain('<script>alert("lvl1")</script>');
+            expect(container.innerHTML).toContain("&lt;img src=x onerror=");
+            expect(container.innerHTML).not.toContain("<img src=x");
+            expect(container.textContent).toContain('<script>alert("lvl1")</script>');
+            expect(container.textContent).toContain('<img src=x onerror="alert(2)">');
+        } finally {
+            PracticeProblems = originalProblems;
+        }
     });
 
     test("offers the next lesson with its number and title", () => {
