@@ -2230,8 +2230,14 @@ class Logo {
                 blk
             );
             logo._haltTurtle(turtle);
-            logo._alreadyRunning = false;
-            logo._syncCounter = 0;
+            if (!logo.turtles.running()) {
+                // The run-wide state describes a run that is over. While
+                // another turtle is still going it is not, and clearing
+                // _alreadyRunning would let Play treat that turtle as
+                // finished and restart the program underneath it.
+                logo._alreadyRunning = false;
+                logo._syncCounter = 0;
+            }
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
                 performanceTracker.exitBlock();
