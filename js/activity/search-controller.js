@@ -54,7 +54,14 @@ class SearchController {
                 if (block.deprecated) {
                     this.deprecatedBlockNames.push(blockLabel);
                 } else {
-                    let label = blockLabel;
+                    // staticLabels holds the block name followed by its
+                    // argument names; show them apart so results stay short.
+                    const argLabels = block.staticLabels
+                        .slice(1)
+                        .map(argLabel => argLabel.trim())
+                        .filter(argLabel => argLabel.length > 0)
+                        .join(", ");
+                    let label = (block.staticLabels[0] || "").trim();
                     if (label.length === 0) {
                         label = _(block.name);
                         switch (block.name) {
@@ -136,9 +143,13 @@ class SearchController {
                             }
                         }
                     }
+                    if (argLabels.length > 0) {
+                        searchTerms.push(argLabels.toLowerCase());
+                    }
 
                     this.searchSuggestions.push({
                         label: label,
+                        argLabels: argLabels,
                         value: block.name,
                         specialDict: block,
                         artwork: artwork,
@@ -152,7 +163,30 @@ class SearchController {
     }
 
     /**
-     * Filters searchSuggestions against a query term.
+     * Ranks how well a suggestion matches a search term; lower is better.
+     * Matches in the block name beat matches in extra search terms or
+     * argument names, and exact and prefix matches beat the rest.
+     * @param {object} item - A searchSuggestions entry.
+     * @param {string} term - Lowercased, trimmed search term.
+     * @returns {number} 0-4 for a match, -1 for no match.
+     */
+    _matchRank(item, term) {
+        const label = typeof item.label === "string" ? item.label.toLowerCase() : "";
+        if (label === term) return 0;
+        if (label.startsWith(term)) return 1;
+        if (label.split(/\s+/).some(word => word.startsWith(term))) return 2;
+        if (label.indexOf(term) !== -1) return 3;
+        if (
+            Array.isArray(item.searchTerms) &&
+            item.searchTerms.some(t => t && t.indexOf(term) !== -1)
+        ) {
+            return 4;
+        }
+        return -1;
+    }
+
+    /**
+     * Filters searchSuggestions against a query term, best matches first.
      * Returns matching items, respecting the result cache.
      * @param {string} term - Lowercased, trimmed search term.
      * @returns {Array}
@@ -162,19 +196,16 @@ class SearchController {
             return this._searchCache[term];
         }
 
-        const results = this.searchSuggestions.filter(item => {
-            if (!term || term.length === 0) {
-                return true;
-            }
-            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-            }
-            return (
-                item.label &&
-                typeof item.label === "string" &&
-                item.label.toLowerCase().indexOf(term) !== -1
-            );
-        });
+        let results;
+        if (!term || term.length === 0) {
+            results = this.searchSuggestions.slice();
+        } else {
+            results = this.searchSuggestions
+                .map(item => ({ item, rank: this._matchRank(item, term) }))
+                .filter(entry => entry.rank !== -1)
+                .sort((a, b) => a.rank - b.rank)
+                .map(entry => entry.item);
+        }
 
         this._searchCache[term] = results;
         return results;
@@ -416,7 +447,7 @@ class SearchController {
                     });
 
                     li.append(img);
-                    li.append($j("<a>").text(" " + item.label));
+                    that.searchUI.appendSuggestionLabel(li, item);
 
                     return li.appendTo(
                         ul.css({
@@ -721,7 +752,7 @@ class SearchController {
                     img.src = item.artwork || "";
                     img.height = 20;
                     li.append(img);
-                    li.append($j("<a>").text(" " + item.label));
+                    that.searchUI.appendSuggestionLabel(li, item);
                     return li.appendTo(ul.css("z-index", 35000));
                 };
             }

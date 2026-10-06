@@ -215,22 +215,34 @@ describe("Arpeggio Widget", () => {
             );
         });
 
-        test("should handle window maximize logic", () => {
+        test("should handle window maximize and restore logic", () => {
             arpeggio.init(activityMock);
+            const outerDiv = document.getElementById("arpeggioOuterDiv");
+            const innerDiv = document.getElementById("arpeggioInnerDiv");
+
             // Simulate maximize
             mockWidgetWindow._maximized = true;
             mockWidgetWindow.onmaximize();
 
             expect(mockWidgetBody.style.position).toBe("absolute");
-            expect(document.getElementById("arpeggioOuterDiv").style.height).toBe(
-                "calc(100vh - 80px)"
-            );
+            expect(mockWidgetBody.style.height).toBe("calc(100vh - 80px)");
+            expect(mockWidgetBody.style.width).toBe("200vh");
+            expect(outerDiv.style.height).toBe("calc(100vh - 80px)");
+            expect(outerDiv.style.width).toBe("calc(200vh - 64px)");
+            expect(innerDiv.style.height).toBe("calc(100vh - 80px)");
+            expect(innerDiv.style.width).toBe("calc(200vh - 64px)");
 
             // Simulate restore
             mockWidgetWindow._maximized = false;
             mockWidgetWindow.onmaximize();
 
             expect(mockWidgetBody.style.position).toBe("relative");
+            expect(mockWidgetBody.style.height).toBe("400px");
+            expect(mockWidgetBody.style.width).toBe("400px");
+            expect(outerDiv.style.height).toBe("400px");
+            expect(outerDiv.style.width).toBe("400px");
+            expect(innerDiv.style.height).toBe("400px");
+            expect(innerDiv.style.width).toBe("400px");
         });
     });
 

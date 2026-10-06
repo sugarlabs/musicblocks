@@ -571,6 +571,13 @@ class OfflineCommitManager {
         }));
 
         await this.storage.setCachedCommits(projectId, metaOnly);
+
+        // Synced drafts represented by the history just cached would show twice in the
+        // offline timeline (PUT /edit returns no sha to match them by), each keeping a full
+        // project copy. The cache holds only the newest 3 commits, so older synced drafts are
+        // never matched and stay as the offline record of those saves.
+        await this.storage.removeSyncedDrafts(projectId, metaOnly);
+
         console.debug(
             `[OfflineCommitManager] Cache refreshed for ${repo}: ${metaOnly.length} commits`
         );

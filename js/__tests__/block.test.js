@@ -24,6 +24,8 @@
 
 /* global jest, describe, it, expect, beforeEach */
 
+const fs = require("fs");
+const path = require("path");
 const Block = require("../block");
 const ManagedTimer = require("../utils/ManagedTimer");
 
@@ -1091,6 +1093,45 @@ describe("Block Foundation", () => {
 
             global.FileReader = originalFileReader;
             window.scroll = originalScroll;
+        });
+
+        it.each([
+            ["media", "myMedia"],
+            ["audiofile", "audioInput"],
+            ["loadFile", "myOpenAll"]
+        ])("opens the %s picker on the #%s file input in index.html", (name, inputId) => {
+            const originalDocById = global.docById;
+            const originalScroll = window.scroll;
+            const html = fs.readFileSync(path.join(__dirname, "../../index.html"), "utf8");
+            const page = new DOMParser().parseFromString(html, "text/html");
+            const nodes = [page.getElementById("ioDiv"), page.getElementById("audio")];
+            document.body.append(...nodes);
+            const clicked = [];
+            const clickSpy = jest
+                .spyOn(HTMLElement.prototype, "click")
+                .mockImplementation(function () {
+                    clicked.push(this);
+                });
+            global.docById = jest.fn(id => document.getElementById(id));
+            window.scroll = jest.fn();
+
+            try {
+                const block = new Block(
+                    { ...mockProtoBlock, name, capabilities: Object.create(null) },
+                    mockBlocks
+                );
+                block._doOpenMediaFromDevice(0);
+
+                expect(clicked).toHaveLength(1);
+                expect(clicked[0].id).toBe(inputId);
+                expect(clicked[0].tagName).toBe("INPUT");
+                expect(clicked[0].type).toBe("file");
+            } finally {
+                clickSpy.mockRestore();
+                nodes.forEach(node => node.remove());
+                global.docById = originalDocById;
+                window.scroll = originalScroll;
+            }
         });
     });
 

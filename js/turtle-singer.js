@@ -27,7 +27,7 @@
    noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
    keySignatureToMode, getSavedCustomModes,
-   clampNumber
+   clampNumber, saveMeterState, restoreMeterState
  */
 
 /*
@@ -39,6 +39,8 @@
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
         getCurrentEDO, isEquallyTempered
+    js/utils/musicutils-rhythm.js
+        saveMeterState, restoreMeterState
     js/utils/utils.js
         rationalSum, _
     js/utils/synthutils.js
@@ -254,6 +256,8 @@ class Singer {
         this.pickup = 0;
         this.beatsPerMeasure = 4;
         this.noteValuePerBeat = 4;
+        // Where the latest meter change started counting measures (see getMeterAnchor)
+        this.meterAnchor = null;
         this.currentBeat = 0;
         this.currentMeasure = 0;
 
@@ -600,6 +604,7 @@ class Singer {
 
         const actionArgs = [];
         const saveNoteCount = tur.singer.notesPlayed;
+        const saveMeter = saveMeterState(tur.singer);
         const saveTallyNotes = tur.singer.tallyNotes;
         tur.running = true;
 
@@ -622,6 +627,7 @@ class Singer {
             activity.errorMsg(noteCountErr);
         }
         tur.singer.notesPlayed = saveNoteCount;
+        restoreMeterState(tur.singer, saveMeter);
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
@@ -688,6 +694,7 @@ class Singer {
             prevTurtleTime: tur.singer.previousTurtleTime,
             turtleTime: tur.singer.turtleTime,
             noteCount: tur.singer.notesPlayed,
+            meter: saveMeterState(tur.singer),
             tallyNotes: tur.singer.tallyNotes
         };
 
@@ -720,6 +727,7 @@ class Singer {
             whichNoteToCount: saveState.whichNoteToCount,
             suppressOutput: saveState.suppressOutput
         });
+        restoreMeterState(tur.singer, saveState.meter);
 
         Object.assign(tur.painter, {
             color: saveState.color,
