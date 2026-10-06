@@ -1179,3 +1179,61 @@ describe("PitchStaircase Widget", () => {
         });
     });
 });
+
+describe("PitchStaircase modules", () => {
+    const MODULES = [
+        "PitchStaircaseTimers",
+        "PitchStaircaseLayout",
+        "PitchStaircaseSteps",
+        "PitchStaircasePlayback",
+        "PitchStaircaseSave",
+        "PitchStaircaseWindow"
+    ];
+
+    test("lists every module, and itself last, as its lazy-loading dependencies", () => {
+        expect(PitchStaircase.dependencies).toEqual([
+            ...MODULES.map(name => "widgets/" + name),
+            "widgets/pitchstaircase"
+        ]);
+    });
+
+    test("the Pitch Staircase block falls back to the same dependencies", () => {
+        const source = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "..", "blocks", "WidgetBlocks.js"),
+            "utf8"
+        );
+        const site = source.slice(source.indexOf('typeof PitchStaircase !== "undefined"'));
+        const fallback = site.slice(site.indexOf("["), site.indexOf("]") + 1);
+
+        expect(JSON.parse(fallback)).toEqual(PitchStaircase.dependencies);
+    });
+
+    test("installModules waits until every module is loaded", () => {
+        jest.isolateModules(() => {
+            const saved = global.PitchStaircaseSave;
+            delete global.PitchStaircaseSave;
+            try {
+                const Fresh = require("../pitchstaircase.js");
+                expect(Fresh.installModules()).toBe(false);
+                expect(Fresh.prototype._save).toBeUndefined();
+
+                global.PitchStaircaseSave = saved;
+                expect(Fresh.installModules()).toBe(true);
+                expect(Fresh.prototype._save).toBe(saved.prototype._save);
+            } finally {
+                global.PitchStaircaseSave = saved;
+            }
+        });
+    });
+
+    test("a widget has every module method", () => {
+        const psc = new PitchStaircase();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(typeof psc[method]).toBe("function");
+                }
+            }
+        }
+    });
+});
