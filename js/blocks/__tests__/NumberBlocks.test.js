@@ -162,7 +162,7 @@ global.MathUtility = {
     doOneOf: (a, b) => a,
     doRandom: (a, b, octave) => a,
     doMinus: (a, b) => Number(a) - Number(b),
-    doClamp: (a, min, max) => Math.max(min, Math.min(a, max))
+    clampNumber: (a, min, max) => Math.max(min, Math.min(a, max))
 };
 
 global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
@@ -323,18 +323,18 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(0);
         });
 
-        it("should call errorMsg when MathUtility.doClamp throws", () => {
+        it("should call errorMsg when clampNumber throws", () => {
             activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
             logo.parseArg = jest.fn(() => 5);
-            const originalDoClamp = global.MathUtility.doClamp;
-            global.MathUtility.doClamp = () => {
+            const originalClampNumber = global.clampNumber;
+            global.clampNumber = () => {
                 throw new Error("NanError");
             };
             const clampBlock = createdBlocks["clampNumber"];
             const result = clampBlock.arg(logo, 0, 110, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
             expect(result).toEqual(0);
-            global.MathUtility.doClamp = originalDoClamp;
+            global.clampNumber = originalClampNumber;
         });
     });
 

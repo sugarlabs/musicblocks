@@ -14,7 +14,7 @@
 
    _, ValueBlock, LeftBlock, NOINPUTERRORMSG, MathUtility,
    NANERRORMSG, toFixed2, NOSQRTERRORMSG, ZERODIVIDEERRORMSG,
-   calcOctave
+   calcOctave, clampNumber
  */
 
 /* exported setupNumberBlocks */
@@ -1025,7 +1025,7 @@ function setupNumberBlocks(activity) {
             if (max === null) return 0;
 
             try {
-                return MathUtility.doClamp(val, min, max);
+                return clampNumber(val, min, max);
             } catch (e) {
                 handleMathError(logo, e, blk);
                 return 0;

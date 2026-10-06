@@ -101,33 +101,6 @@ describe("MathUtility", () => {
         });
     });
 
-    describe("doClamp", () => {
-        test("clamps a value within the bounds", () => {
-            expect(MathUtility.doClamp(5, 0, 10)).toBe(5);
-        });
-
-        test("clamps a value below the minimum", () => {
-            expect(MathUtility.doClamp(-5, 0, 10)).toBe(0);
-        });
-
-        test("clamps a value above the maximum", () => {
-            expect(MathUtility.doClamp(15, 0, 10)).toBe(10);
-        });
-
-        test("handles swapped min/max automatically", () => {
-            expect(MathUtility.doClamp(15, 10, 0)).toBe(10);
-            expect(MathUtility.doClamp(-5, 10, 0)).toBe(0);
-            expect(MathUtility.doClamp(5, 10, 0)).toBe(5);
-        });
-
-        test("throws NanError for invalid inputs", () => {
-            expect(() => MathUtility.doClamp("invalid", 0, 10)).toThrow("NanError");
-            expect(() => MathUtility.doClamp(5, "invalid", 10)).toThrow("NanError");
-            expect(() => MathUtility.doClamp(5, 0, null)).toThrow("NanError");
-            expect(() => MathUtility.doClamp(NaN, 0, 10)).toThrow("NanError");
-        });
-    });
-
     describe("doOneOf", () => {
         test("returns either a or b", () => {
             const result = MathUtility.doOneOf("a", "b");
