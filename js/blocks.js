@@ -4238,7 +4238,7 @@ class Blocks {
          */
         this.findBlockInstance = blkName => {
             /** Returns true if block of name blkName is loaded. */
-            for (const blk of Object.keys(this.blockList)) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }

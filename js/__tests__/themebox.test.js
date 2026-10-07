@@ -315,4 +315,20 @@ describe("ThemeBox", () => {
         themeBox.refreshUIComponents();
         expect(mockActivity.trashcan.refresh).toHaveBeenCalledTimes(1);
     });
+
+    test("applyThemeInstantly refreshes activity.blocks blockList items if available", () => {
+        const mockBlock = {
+            protoblock: { palette: "rhythm" },
+            regenerateArtwork: jest.fn(),
+            text: { color: "#000000" }
+        };
+        mockActivity.blocks = {
+            blockList: {
+                blk1: mockBlock
+            }
+        };
+        themeBox.applyThemeInstantly();
+        expect(mockBlock.regenerateArtwork).toHaveBeenCalledWith(false);
+        expect(mockBlock.text.color).toBe(window.platformColor.blockText);
+    });
 });
