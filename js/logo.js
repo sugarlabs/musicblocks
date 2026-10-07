@@ -1361,6 +1361,17 @@ class Logo {
     // ========= Behavior =========================================================================
 
     resetTemperament() {
+        // A temperament only carries over to the next run while the project
+        // still sets one; otherwise it would leak into other projects.
+        const setsTemperament = this.blockList.some(
+            blk => blk && !blk.trash && blk.name === "settemperament"
+        );
+        if (!setsTemperament) {
+            this._userTemperament = null;
+            this.temperamentSelected = [];
+            this.synth.startingPitch = "C4";
+        }
+
         this.synth.changeInTemperament = false;
         this.synth.inTemperament = this._userTemperament || "equal";
     }

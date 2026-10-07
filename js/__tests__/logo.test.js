@@ -1483,6 +1483,38 @@ describe("Logo runLogoCommands", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    describe("temperament carried over from an earlier run", () => {
+        beforeEach(() => {
+            mockActivity.blocks.stackList = [];
+            logo._userTemperament = "just intonation";
+            logo.temperamentSelected = ["just intonation"];
+            logo.synth.startingPitch = "D4";
+        });
+
+        test("is kept while the project still has a set temperament block", () => {
+            logo.blockList = [{ name: "settemperament", trash: false, connections: [] }];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("just intonation");
+            expect(logo.synth.startingPitch).toBe("D4");
+        });
+
+        test("is dropped once no set temperament block is left", () => {
+            logo.blockList = [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "settemperament", trash: true, connections: [] }
+            ];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("equal");
+            expect(logo.synth.startingPitch).toBe("C4");
+            expect(logo._userTemperament).toBeNull();
+            expect(logo.temperamentSelected).toEqual([]);
+        });
+    });
+
     test("executes each evalOnStartList plugin at run startup", () => {
         const effects = [];
         logo.blockList = [];
