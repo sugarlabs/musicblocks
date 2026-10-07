@@ -1477,11 +1477,6 @@ describe("modeMapper", () => {
 });
 
 describe("getSharpFlatPreference", () => {
-    beforeEach(() => {
-        global.SHARPPREFERENCE = ["g major", "d major", "a major", "e major", "b major"];
-        global.FLATPREFERENCE = ["f major", "bb major", "eb major", "ab major", "db major"];
-    });
-
     it('should return "sharp" for keys that traditionally use sharps', () => {
         expect(getSharpFlatPreference("G")).toBe("sharp");
         expect(getSharpFlatPreference("D")).toBe("sharp");
@@ -1489,6 +1484,30 @@ describe("getSharpFlatPreference", () => {
     it('should return "natural" for C major and keys not in sharp/flat preferences', () => {
         expect(getSharpFlatPreference("C")).toBe("natural");
         expect(getSharpFlatPreference("Am")).toBe("natural");
+    });
+
+    it.each([
+        ["F♯ major", "sharp"],
+        ["C♯ major", "sharp"],
+        ["F♯ minor", "sharp"],
+        ["C♯ minor", "sharp"],
+        ["G♯ minor", "sharp"],
+        ["D♯ minor", "sharp"],
+        ["B♭ major", "flat"],
+        ["E♭ major", "flat"],
+        ["A♭ major", "flat"],
+        ["D♭ major", "flat"],
+        ["G♭ major", "flat"],
+        ["C♭ major", "flat"],
+        ["B♭ minor", "flat"],
+        ["E♭ minor", "flat"]
+    ])("should treat %s as a %s key", (keySignature, expected) => {
+        expect(getSharpFlatPreference(keySignature)).toBe(expected);
+    });
+
+    it("should accept # and b in place of ♯ and ♭", () => {
+        expect(getSharpFlatPreference("F# major")).toBe("sharp");
+        expect(getSharpFlatPreference("Bb major")).toBe("flat");
     });
 });
 
@@ -1977,6 +1996,24 @@ describe("getNote", () => {
         // 0.07 semitones = 7 cents
         const result = getNote("C", 4, 0.07, "C major");
         expect(result[2]).toBeCloseTo(7, 0);
+    });
+
+    it("should spell transposed notes with flats in flat keys", () => {
+        expect(getNote("A", 4, 1, "B♭ major")).toEqual(["B♭", 4, 0]);
+        expect(getNote("D", 4, 1, "E♭ major")).toEqual(["E♭", 4, 0]);
+        expect(getNote("G", 4, 1, "A♭ major")).toEqual(["A♭", 4, 0]);
+        expect(getNote("C", 4, 1, "B♭ minor")).toEqual(["D♭", 4, 0]);
+    });
+
+    it("should spell pitch numbers with sharps in sharp keys", () => {
+        expect(getNote(6, 4, 0, "F♯ major")).toEqual(["F♯", 4, 0]);
+        expect(getNote(1, 4, 0, "C♯ major")).toEqual(["C♯", 4, 0]);
+        expect(getNote(8, 4, 0, "C♯ minor")).toEqual(["G♯", 4, 0]);
+    });
+
+    it("should not change spellings in keys without a sharp or flat preference", () => {
+        expect(getNote("A", 4, 1, "C major")).toEqual(["A♯", 4, 0]);
+        expect(getNote(10, 4, 0, "C major")).toEqual(["B♭", 4, 0]);
     });
 });
 

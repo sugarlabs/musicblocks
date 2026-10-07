@@ -1172,8 +1172,10 @@ class ToolbarUI {
      */
     renderMenuIcon(onclick) {
         const menuIcon = docById("menu");
+        const toggleAuxBtn = docById("toggleAuxBtn");
         const auxToolbar = docById("aux-toolbar");
-        menuIcon.onclick = () => {
+
+        toggleAuxBtn.onclick = () => {
             const searchBar = docById("search");
             searchBar.classList.toggle("open");
             if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
