@@ -130,7 +130,7 @@ class MathUtility {
             // non-number is already rejected in js/block.js, but the project
             // loader (js/blocks.js, case "number") assigns Number(value) with
             // no isNaN check, so a saved project can carry one here.
-            if (Number.isNaN(c)) {
+            if (c !== undefined && !Number.isFinite(c)) {
                 throw new Error("NanError");
             }
             return GetRandomSolfege(a, b, c);
