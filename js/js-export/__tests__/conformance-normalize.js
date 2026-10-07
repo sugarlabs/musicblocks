@@ -155,7 +155,18 @@ function normalizeArgumentNode(blockId, blocksById) {
         JSInterface.methodReturns(block.name)
     ) {
         const node = { name: block.name };
-        if (block.value !== null && block.value !== undefined) {
+        if (block.name === "boolean") {
+            node.value = block.value === true || block.value === "true";
+        } else if (block.name === "number") {
+            const rawVal =
+                block.value !== null && block.value !== undefined ? block.value : block.privateData;
+            node.value =
+                typeof rawVal === "number"
+                    ? rawVal
+                    : !isNaN(Number(rawVal))
+                      ? Number(rawVal)
+                      : rawVal;
+        } else if (block.value !== null && block.value !== undefined) {
             node.value = block.value;
         } else if (block.privateData !== null && block.privateData !== undefined) {
             node.value = block.privateData;
@@ -171,6 +182,22 @@ function normalizeArgumentNode(blockId, blocksById) {
         if (childNode !== null) {
             argNodes.push(childNode);
         }
+    }
+
+    // Canonicalize unary negation of constant numeric literal:
+    // In ECMAScript AST, negative literals (e.g. -15) are UnaryExpression('-', 15),
+    // which AST2BlockList reconstructs as a 'neg' block wrapping a 'number' block.
+    // Semantically and structurally, neg(number(N)) is identical to number(-N).
+    if (
+        block.name === "neg" &&
+        argNodes.length === 1 &&
+        argNodes[0].name === "number" &&
+        typeof argNodes[0].value === "number"
+    ) {
+        return {
+            name: "number",
+            value: -argNodes[0].value
+        };
     }
 
     const node = { name: block.name };
