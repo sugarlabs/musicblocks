@@ -320,9 +320,13 @@ describe("Tempo Widget", () => {
                     { singer: { bpm: [200] } },
                     { singer: { bpm: [] } }
                 ];
+                // Like Turtles.getTurtle, which throws for a turtle that isn't there.
                 mockActivity.turtles = {
                     turtleList: turtles,
-                    ithTurtle: jest.fn(i => turtles[i])
+                    ithTurtle: jest.fn(i => {
+                        if (!turtles[i]) throw new Error(`Turtle ${i} not found`);
+                        return turtles[i];
+                    })
                 };
                 mockActivity.blocks.blockList = {
                     0: { name: "setbpm3", connections: [null, 1] },
@@ -338,11 +342,10 @@ describe("Tempo Widget", () => {
             });
 
             test("changes only the tempo of the turtle that ran the block", () => {
-                tempoWidget.BPMTurtles = [0];
+                tempoWidget.BPMTurtles = [turtles[0]];
 
                 tempoWidget._updateBPM(0);
 
-                expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(0);
                 expect(turtles[0].singer.bpm).toEqual([120]);
                 expect(turtles[1].singer.bpm).toEqual([200]);
                 expect(turtles[2].singer.bpm).toEqual([]);
@@ -350,7 +353,7 @@ describe("Tempo Widget", () => {
             });
 
             test("changes the current tempo of a turtle that set more than one", () => {
-                tempoWidget.BPMTurtles = [1];
+                tempoWidget.BPMTurtles = [turtles[1]];
                 turtles[1].singer.bpm = [60, 200];
 
                 tempoWidget._updateBPM(0);
@@ -360,7 +363,7 @@ describe("Tempo Widget", () => {
             });
 
             test("leaves a turtle without a tempo alone", () => {
-                tempoWidget.BPMTurtles = [2];
+                tempoWidget.BPMTurtles = [turtles[2]];
 
                 tempoWidget._updateBPM(0);
 
@@ -377,16 +380,28 @@ describe("Tempo Widget", () => {
                 expect(tempoWidget._intervals[0]).toBe(500);
             });
 
-            test("changes no turtle when the recorded one is gone", () => {
-                tempoWidget.BPMTurtles = [7];
+            test("still changes the right turtle after an earlier turtle is removed", () => {
+                // Turtles.removeTurtle splices the list, so turtle 1 is now at index 0.
+                tempoWidget.BPMTurtles = [turtles[1]];
+                const removed = turtles.splice(0, 1)[0];
 
                 expect(() => tempoWidget._updateBPM(0)).not.toThrow();
-                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
+                expect(turtles[0].singer.bpm).toEqual([120]);
+                expect(removed.singer.bpm).toEqual([90]);
+                expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            });
+
+            test("doesn't throw when the recorded turtle has been removed", () => {
+                tempoWidget.BPMTurtles = [turtles[2]];
+                turtles.splice(2, 1);
+
+                expect(() => tempoWidget._updateBPM(0)).not.toThrow();
+                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200]]);
             });
 
             test("a master BPM row changes the master tempo, not the turtles", () => {
                 mockActivity.blocks.blockList[0].name = "setmasterbpm2";
-                tempoWidget.BPMTurtles = [0];
+                tempoWidget.BPMTurtles = [turtles[0]];
 
                 tempoWidget._updateBPM(0);
 
