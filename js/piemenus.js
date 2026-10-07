@@ -4017,7 +4017,8 @@ const syncKeySignatureBlocks = activity => {
     if (setKeyBlock === null) {
         activity.blocks.findStacks();
         const stacks = activity.blocks.stackList;
-        stacks.sort();
+        // Block ids are numbers; the default sort would put 10 before 9.
+        stacks.sort((a, b) => a - b);
         for (const stackId of stacks) {
             if (activity.blocks.blockList[stackId].name === "start") {
                 const bottomBlock = activity.blocks.blockList[stackId].connections[1];
@@ -4054,7 +4055,10 @@ const syncKeySignatureBlocks = activity => {
                     null
                 );
                 const setKey = activity.blocks.blockList.length - 1;
-                activity.blocks.blockList[bottomBlock].connections[0] = setKey;
+                // An empty start block has no first child to re-parent.
+                if (bottomBlock !== null) {
+                    activity.blocks.blockList[bottomBlock].connections[0] = setKey;
+                }
 
                 if (activity.KeySignatureEnv[2]) {
                     activity.blocks.blockList[stackId].connections[1] = movable;
