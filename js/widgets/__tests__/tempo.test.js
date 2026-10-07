@@ -1049,6 +1049,37 @@ describe("Tempo Widget", () => {
             expect(ctx2.ellipse).toHaveBeenCalled();
         });
     });
+    describe("_draw() with more than one row", () => {
+        test("draws a row on its beat at its own edge, not at the row before's position", () => {
+            const ctxs = [0, 1].map(() => ({
+                clearRect: jest.fn(),
+                beginPath: jest.fn(),
+                ellipse: jest.fn(),
+                fill: jest.fn(),
+                closePath: jest.fn()
+            }));
+            tempoWidget.tempoCanvases = ctxs.map(ctx => ({
+                width: 300,
+                height: 150,
+                getContext: () => ctx
+            }));
+            const now = Date.now();
+            tempoWidget.BPMs = [100, 100];
+            tempoWidget._intervals = [600, 600];
+            tempoWidget._directions = [1, 1];
+            tempoWidget._widgetFirstTimes = [now, now];
+            // Row 0 is half way across; row 1's beat is due.
+            tempoWidget._widgetNextTimes = [now + 300, now - 1];
+
+            tempoWidget._draw();
+
+            expect(ctxs[0].ellipse.mock.calls[0][0]).toBe(150);
+            // Row 1 flips direction on its beat and is drawn at the left edge.
+            expect(tempoWidget._directions[1]).toBe(-1);
+            expect(ctxs[1].ellipse.mock.calls[0][0]).toBe(0);
+        });
+    });
+
     describe("init() - Additional Coverage", () => {
         test("should clear existing interval when re-initializing", () => {
             tempoWidget.BPMs = [100];

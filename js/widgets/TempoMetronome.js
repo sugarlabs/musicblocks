@@ -83,10 +83,14 @@ class TempoMetronome {
     _draw() {
         // First thing to do is figure out where we are supposed to be based on the elapsed time.
         const d = new Date();
-        let tempoCanvas, deltaTime, dx, x, ctx;
+        let tempoCanvas, deltaTime, dx, ctx;
         for (let i = 0; i < this.BPMs.length; i++) {
             tempoCanvas = this.tempoCanvases[i];
             if (!tempoCanvas) continue;
+
+            // Each row has its own position: on the frame of a beat it isn't worked out from the
+            // time, so it is set to the edge below rather than left at the row before's.
+            let x;
 
             // We start the music clock as the first note is being played.
             if (this._widgetFirstTimes[i] === null) {
