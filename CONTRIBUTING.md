@@ -257,9 +257,10 @@ See [GOVERNANCE.md](GOVERNANCE.md) for the review flow and
 
 ### Keeping Your PR Up-to-Date
 
-Our CI automatically rebases your PR onto the latest `master` whenever
-new changes are merged. For this to work on fork PRs, you **must** enable
-**"Allow edits from maintainers"** when creating your PR.
+Our CI automatically rebases eligible internal repository branches onto `master`
+whenever new changes are merged. For fork PRs, GitHub Actions cannot push directly
+to contributor forks. Enabling **"Allow edits from maintainers"** allows project
+maintainers to assist with rebasing or conflict resolution when needed.
 
 > **Note:** This checkbox only grants maintainers push access to the
 > _specific branch_ associated with your PR. It does **not** affect
@@ -288,7 +289,7 @@ git push --force-with-lease origin your-branch-name
 ```
 
 > **Tip:** Enable **"Allow edits from maintainers"** on your PR so
-> maintainers and our automation can keep your branch current. This
+> maintainers can assist in keeping your branch current. This
 > setting only applies to the PR branch. Your other branches and
 > fork settings are not affected.
 
