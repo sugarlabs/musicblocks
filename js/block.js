@@ -2306,6 +2306,11 @@ class Block {
         const loadGeneration = this._thumbnailLoadGeneration;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
+            this.removeChildBitmap("media");
+            this.imageBitmap = null;
+            this.image = "images/load-media.svg";
+            this.updateCache();
+            this._addImage();
             return;
         }
         const image = new Image();
