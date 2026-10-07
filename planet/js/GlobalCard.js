@@ -109,17 +109,9 @@ class GlobalCard {
          `;
     }
 
-    showToast(message, isError) {
-        if (
-            this.Planet &&
-            this.Planet.SaveInterface &&
-            typeof this.Planet.SaveInterface.showToast === "function"
-        ) {
-            if (isError !== undefined) {
-                this.Planet.SaveInterface.showToast(message, isError);
-            } else {
-                this.Planet.SaveInterface.showToast(message);
-            }
+    showToast(message, isError = false) {
+        if (this.Planet?.SaveInterface?.showToast) {
+            this.Planet.SaveInterface.showToast(message, isError);
         }
     }
 

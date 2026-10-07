@@ -116,7 +116,7 @@ describe("GlobalCard", () => {
     describe("showToast", () => {
         it("should call SaveInterface.showToast with the message", () => {
             card.showToast("Test message");
-            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith("Test message");
+            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith("Test message", false);
         });
 
         it("should not throw when SaveInterface is not available", () => {
