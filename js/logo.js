@@ -1766,6 +1766,7 @@ class Logo {
         this.inTimbre = false;
         this.inArpeggio = false;
         this.inRhythmRuler = false;
+        this.inTempo = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;

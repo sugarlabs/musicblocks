@@ -943,6 +943,7 @@ function setupWidgetBlocks(activity) {
 
             const __listener = () => {
                 logo.tempo.init(activity);
+                logo.inTempo = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
