@@ -643,4 +643,29 @@ describe("ServerInterface", () => {
             expect(jest.getTimerCount()).toBe(0);
         });
     });
+
+    describe("_post timeout", () => {
+        afterEach(() => {
+            jest.useRealTimers();
+            delete global.fetch;
+        });
+
+        it("gives up on a write that never answers", async () => {
+            jest.useFakeTimers();
+            global.fetch = jest.fn(
+                (url, { signal }) =>
+                    new Promise((resolve, reject) => {
+                        signal.addEventListener("abort", () =>
+                            reject(new DOMException("aborted", "AbortError"))
+                        );
+                    })
+            );
+
+            const pending = server._post("/edit", { projectData: [] }, "PUT");
+            jest.advanceTimersByTime(server.RequestTimeout);
+
+            await expect(pending).resolves.toBeNull();
+            expect(jest.getTimerCount()).toBe(0);
+        });
+    });
 });
