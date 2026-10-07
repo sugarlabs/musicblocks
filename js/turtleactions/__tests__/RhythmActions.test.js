@@ -642,7 +642,7 @@ describe("setupRhythmActions", () => {
 
     it("returns note value from active note", () => {
         targetTurtle.singer.inNoteBlock = [1];
-        targetTurtle.singer.noteValue = { 1: 0.25 };
+        targetTurtle.singer.noteValue = { 1: 4 };
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
@@ -650,11 +650,11 @@ describe("setupRhythmActions", () => {
     });
     it("falls back to lastNotePlayed when no active note", () => {
         targetTurtle.singer.inNoteBlock = [];
-        targetTurtle.singer.lastNotePlayed = [null, 8];
+        targetTurtle.singer.lastNotePlayed = [null, 8]; // stores note value (denominator)
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        expect(value).toBe(0.125);
+        expect(value).toBe(0.125); // returns beat value (1/8)
     });
     it("returns 0 when no note info exists", () => {
         targetTurtle.singer.inNoteBlock = [];
@@ -669,15 +669,14 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.inNoteBlock = [7];
 
         // Provide ALL possible sources
-        targetTurtle.singer.noteValue = { 7: 0.25 }; // highest priority
-        targetTurtle.singer.lastNotePlayed = [null, 8]; // second priority
+        targetTurtle.singer.noteValue = { 7: 4 }; // highest priority (note value)
+        targetTurtle.singer.lastNotePlayed = [null, 8]; // second priority (note value/denominator)
         targetTurtle.singer.notePitches = { 7: ["C"] }; // third priority
-        targetTurtle.singer.noteBeat = { 7: 4 };
+        targetTurtle.singer.noteBeat = { 7: 0.25 }; // beat value
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        // noteValue = 0.25 -> internally inverted twice -> returns 0.25
-        expect(value).toBe(0.25);
+        expect(value).toBe(0.25); // noteValue wins: returns reciprocal (beat duration)
     });
     it("falls back to noteBeat when noteValue and lastNotePlayed are absent", () => {
         targetTurtle.singer.inNoteBlock = [5];
@@ -685,29 +684,29 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.noteValue = {};
         targetTurtle.singer.lastNotePlayed = null;
         targetTurtle.singer.notePitches = { 5: ["C"] };
-        targetTurtle.singer.noteBeat = { 5: 4 };
+        targetTurtle.singer.noteBeat = { 5: 0.25 };
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        expect(value).toBe(0.25); // 1 / 4
+        expect(value).toBe(4); // noteBeat fallback returns reciprocal: 1/0.25 = 4
     });
     it("falls back past noteValue when it is explicitly null", () => {
         // clearNoteParams() in logo.js sets noteValue[blk] = null before a note
         // is assigned a real value, so null is a realistic, not artificial, input.
         targetTurtle.singer.inNoteBlock = [3];
         targetTurtle.singer.noteValue = { 3: null };
-        targetTurtle.singer.lastNotePlayed = [null, 8];
+        targetTurtle.singer.lastNotePlayed = [null, 8]; // stores note value (denominator)
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        expect(value).toBe(0.125); // falls through to lastNotePlayed, same as null noteValue never happened
+        expect(value).toBe(0.125); // falls through to lastNotePlayed: 1/8 = 0.125
     });
     it("does not fall back to noteBeat when notePitches is an empty array", () => {
         targetTurtle.singer.inNoteBlock = [6];
         targetTurtle.singer.noteValue = {};
         targetTurtle.singer.lastNotePlayed = null;
         targetTurtle.singer.notePitches = { 6: [] };
-        targetTurtle.singer.noteBeat = { 6: 4 };
+        targetTurtle.singer.noteBeat = { 6: 0.25 };
 
         const value = Singer.RhythmActions.getNoteValue(0);
 

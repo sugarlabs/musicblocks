@@ -475,28 +475,31 @@ function setupRhythmActions(activity) {
          */
         static getNoteValue(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
+            const noteValueKey = last(tur.singer.inNoteBlock);
 
-            let value = 0;
             if (
-                tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== null &&
-                tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== undefined
+                noteValueKey !== null &&
+                tur.singer.noteValue[noteValueKey] !== null &&
+                tur.singer.noteValue[noteValueKey] !== undefined
             ) {
-                value =
-                    tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== 0
-                        ? 1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)]
-                        : 0;
-            } else if (tur.singer.lastNotePlayed !== null) {
-                value = tur.singer.lastNotePlayed[1];
-            } else if (
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)] !== undefined &&
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
-            ) {
-                value = tur.singer.noteBeat[last(tur.singer.inNoteBlock)];
-            } else {
-                value = 0;
+                const noteValue = tur.singer.noteValue[noteValueKey];
+                return noteValue !== 0 ? 1 / noteValue : 0;
             }
 
-            return value !== 0 ? 1 / value : 0;
+            if (tur.singer.lastNotePlayed !== null) {
+                const denominator = tur.singer.lastNotePlayed[1];
+                return denominator !== 0 ? 1 / denominator : 0;
+            }
+
+            if (
+                tur.singer.notePitches[noteValueKey] !== undefined &&
+                tur.singer.notePitches[noteValueKey].length > 0
+            ) {
+                const noteBeat = tur.singer.noteBeat[noteValueKey];
+                return noteBeat !== 0 ? 1 / noteBeat : 0;
+            }
+
+            return 0;
         }
     };
 }
