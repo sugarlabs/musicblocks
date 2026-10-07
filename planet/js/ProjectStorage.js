@@ -26,6 +26,7 @@ class ProjectStorage {
         this.defaultProjectName = _("My Project");
         this.LocalStorage = null;
         this.data = null;
+        this.baseData = null;
         this.LocalStorageKey = "ProjectData";
         this.BackupStorageKey = "ProjectData_backup";
         this.VersionKey = "StorageVersion";
@@ -403,13 +404,33 @@ class ProjectStorage {
                 if (existing && existing.Projects) {
                     for (const [id, proj] of Object.entries(this.data.Projects || {})) {
                         const existingProj = existing.Projects[id];
+                        const baseProj = this.baseData?.Projects?.[id];
+
                         if (existingProj && existingProj.commitDrafts) {
                             const merged = new Map();
-                            existingProj.commitDrafts.forEach(d => merged.set(d.id, d));
+                            const baseDrafts = baseProj?.commitDrafts || [];
+                            const localDrafts = proj.commitDrafts || [];
 
-                            (proj.commitDrafts || []).forEach(localDraft => {
-                                const remoteDraft = merged.get(localDraft.id);
-                                if (!remoteDraft || remoteDraft.status !== "synced") {
+                            existingProj.commitDrafts.forEach(remoteDraft => {
+                                const inBase = baseDrafts.some(d => d.id === remoteDraft.id);
+                                const inLocal = localDrafts.some(d => d.id === remoteDraft.id);
+
+                                if (!inBase && !inLocal) {
+                                    merged.set(remoteDraft.id, remoteDraft);
+                                }
+                            });
+
+                            localDrafts.forEach(localDraft => {
+                                const remoteDraft = existingProj.commitDrafts.find(
+                                    d => d.id === localDraft.id
+                                );
+                                if (
+                                    remoteDraft &&
+                                    remoteDraft.status === "synced" &&
+                                    localDraft.status !== "synced"
+                                ) {
+                                    merged.set(localDraft.id, remoteDraft);
+                                } else {
                                     merged.set(localDraft.id, localDraft);
                                 }
                             });
@@ -422,6 +443,7 @@ class ProjectStorage {
                 }
 
                 await this.set(this.LocalStorageKey, this.data);
+                this.baseData = JSON.parse(JSON.stringify(this.data));
                 this.TimeLastSaved = Date.now();
             } finally {
                 this._saveInProgress = false;
@@ -462,6 +484,12 @@ class ProjectStorage {
                 console.error("[ProjectStorage] Backup restore also failed:", backupError);
                 this.data = null;
             }
+        }
+
+        if (this.data) {
+            this.baseData = JSON.parse(JSON.stringify(this.data));
+        } else {
+            this.baseData = null;
         }
     }
 

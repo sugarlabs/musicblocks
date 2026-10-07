@@ -908,5 +908,46 @@ describe("ProjectStorage", () => {
             ]);
             expect(persistedData.Projects["proj1"].ProjectName).toEqual("Changed Name");
         });
+
+        it("a draft intentionally removed by the current tab is not resurrected on save", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            // Start with a synced draft
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [
+                { id: "draft-A", status: "synced", message: "A", timestamp: 1, date: "2023-01-01" }
+            ];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            // Tab A establishes baseData and persists
+            await storageA.save();
+            // Tab B establishes baseData
+            await storageB.save();
+
+            // Tab A adds another draft
+            storageA.data.Projects["proj1"].commitDrafts.push({
+                id: "draft-B",
+                status: "pending",
+                timestamp: 2
+            });
+            await storageA.save();
+
+            // Tab B intentionally removes the synced draft using the actual method
+            await storageB.removeSyncedDrafts("proj1", [
+                { message: "A", date: "2023-01-02T00:00:00Z" }
+            ]);
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            // draft-A should be deleted because Tab B deleted it intentionally (was in its baseData).
+            // draft-B should be preserved because Tab B didn't delete it (was not in its baseData).
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-B", status: "pending", timestamp: 2 }
+            ]);
+        });
     });
 });
