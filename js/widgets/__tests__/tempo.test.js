@@ -307,6 +307,94 @@ describe("Tempo Widget", () => {
             expect(() => tempoWidget._updateBPM(0)).not.toThrow();
         });
 
+        describe("a set BPM row (#9318)", () => {
+            let turtles;
+
+            beforeEach(() => {
+                global.TONEBPM = 240;
+                global.Singer = { masterBPM: 90, defaultBPMFactor: 240 / 90 };
+                // Turtle 0 ran the BPM block in the Tempo block; turtle 1 is another start
+                // block with its own tempo; turtle 2 hasn't set one.
+                turtles = [
+                    { singer: { bpm: [90] } },
+                    { singer: { bpm: [200] } },
+                    { singer: { bpm: [] } }
+                ];
+                mockActivity.turtles = {
+                    turtleList: turtles,
+                    ithTurtle: jest.fn(i => turtles[i])
+                };
+                mockActivity.blocks.blockList = {
+                    0: { name: "setbpm3", connections: [null, 1] },
+                    1: {
+                        name: "number",
+                        value: 90,
+                        text: { text: "90" },
+                        updateCache: jest.fn()
+                    }
+                };
+                tempoWidget.BPMBlocks = [0];
+                tempoWidget.BPMs = [120];
+            });
+
+            test("changes only the tempo of the turtle that ran the block", () => {
+                tempoWidget.BPMTurtles = [0];
+
+                tempoWidget._updateBPM(0);
+
+                expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+                expect(turtles[0].singer.bpm).toEqual([120]);
+                expect(turtles[1].singer.bpm).toEqual([200]);
+                expect(turtles[2].singer.bpm).toEqual([]);
+                expect(global.Singer.masterBPM).toBe(90);
+            });
+
+            test("changes the current tempo of a turtle that set more than one", () => {
+                tempoWidget.BPMTurtles = [1];
+                turtles[1].singer.bpm = [60, 200];
+
+                tempoWidget._updateBPM(0);
+
+                expect(turtles[1].singer.bpm).toEqual([60, 120]);
+                expect(turtles[0].singer.bpm).toEqual([90]);
+            });
+
+            test("leaves a turtle without a tempo alone", () => {
+                tempoWidget.BPMTurtles = [2];
+
+                tempoWidget._updateBPM(0);
+
+                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
+            });
+
+            test("changes no turtle when the row has no recorded turtle", () => {
+                tempoWidget.BPMTurtles = [];
+
+                expect(() => tempoWidget._updateBPM(0)).not.toThrow();
+                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
+                // The block and the metronome still change.
+                expect(mockActivity.blocks.blockList[1].value).toBe(120);
+                expect(tempoWidget._intervals[0]).toBe(500);
+            });
+
+            test("changes no turtle when the recorded one is gone", () => {
+                tempoWidget.BPMTurtles = [7];
+
+                expect(() => tempoWidget._updateBPM(0)).not.toThrow();
+                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
+            });
+
+            test("a master BPM row changes the master tempo, not the turtles", () => {
+                mockActivity.blocks.blockList[0].name = "setmasterbpm2";
+                tempoWidget.BPMTurtles = [0];
+
+                tempoWidget._updateBPM(0);
+
+                expect(global.Singer.masterBPM).toBe(120);
+                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
+            });
+        });
+
         test("should not throw when connection is null", () => {
             mockActivity.blocks.blockList = {
                 0: { connections: [null, null] }
