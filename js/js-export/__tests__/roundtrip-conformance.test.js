@@ -41,7 +41,8 @@ const {
     basicValuesAndExpressions,
     variablesAndBoxes,
     actionsAndCalls,
-    controlFlow
+    controlFlow,
+    pitchAndPitches
 } = require("./conformance-corpus");
 
 describe("Round-Trip Conformance Test Harness", () => {
@@ -257,6 +258,15 @@ MusicBlocks.run();`;
 
     describe("Control Flow and Repetition Corpus", () => {
         test.each(controlFlow)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Pitch and Pitch Expressions Corpus", () => {
+        test.each(pitchAndPitches)("$description ($name)", ({ blocks }) => {
             const { recoveredBlocks } = runRoundTrip(blocks);
             const normalizedOriginal = normalizeBlockStructure(blocks);
             const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);

@@ -600,9 +600,142 @@ const controlFlow = [
     }
 ];
 
+const pitchAndPitches = [
+    {
+        name: "pitch_standard_note_name",
+        description: "Plays a note with standard letter note name (C in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["notename", { value: "C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_solfege_name",
+        description: "Plays a note with solfege name (sol in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["solfege", { value: "sol" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_microtonal_sharp_prefix",
+        description: "Plays a note with microtonal sharp prefix (^C in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["notename", { value: "^C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_microtonal_flat_prefix",
+        description: "Plays a note with microtonal flat prefix (vvD♭ in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["notename", { value: "vvD♭" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_microtonal_solfege",
+        description: "Plays a note with microtonal solfege (^sol in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["solfege", { value: "^sol" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_accidental_sharp_spelling",
+        description: "Plays a note with explicit sharp spelling (E♯ in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["notename", { value: "E♯" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_accidental_double_sharp",
+        description: "Plays a note with double sharp accidental (C𝄪 in octave 4)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["notename", { value: "C𝄪" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_variable_box_reference",
+        description: "Plays a pitch provided by a box variable reference (#8983 regression)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, ["storein2", { value: "pitchVal" }], 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 60 }], 0, 0, [1]],
+            [3, "pitch", 0, 0, [1, 4, 5, null]],
+            [4, ["namedbox", { value: "pitchVal" }], 0, 0, [3]],
+            [5, ["number", { value: 4 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "pitch_computed_arithmetic_expression",
+        description: "Plays a pitch computed from an arithmetic expression (#8983 regression)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, ["storein2", { value: "base" }], 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 60 }], 0, 0, [1]],
+            [3, "pitch", 0, 0, [1, 4, 7, null]],
+            [4, "plus", 0, 0, [3, 5, 6]],
+            [5, ["namedbox", { value: "base" }], 0, 0, [4]],
+            [6, ["number", { value: 1 }], 0, 0, [4]],
+            [7, ["number", { value: 4 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "pitch_numeric_pitch_number",
+        description: "Plays a numeric pitch value (#8983 regression)",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 5 }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]]
+        ]
+    },
+    {
+        name: "pitch_inside_newnote_clamp",
+        description: "Plays a pitch enclosed within a newnote duration clamp",
+        category: "pitch",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "newnote", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 1 }], 0, 0, [1]],
+            [3, "pitch", 0, 0, [1, 4, 5, null]],
+            [4, ["notename", { value: "A" }], 0, 0, [3]],
+            [5, ["number", { value: 4 }], 0, 0, [3]]
+        ]
+    }
+];
+
 module.exports = {
     basicValuesAndExpressions,
     variablesAndBoxes,
     actionsAndCalls,
-    controlFlow
+    controlFlow,
+    pitchAndPitches
 };
