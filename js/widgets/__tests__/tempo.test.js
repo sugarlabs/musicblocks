@@ -221,6 +221,8 @@ describe("Tempo Widget", () => {
 
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 expect.stringContaining("Please enter a number"),
+                null,
+                null,
                 3000
             );
         });
@@ -272,6 +274,22 @@ describe("Tempo Widget", () => {
     });
 
     // --- _updateBPM() tests ---
+    describe("error messages", () => {
+        test("pass 3000 as the timeout, not as the block to point at", () => {
+            // errorMsg(msg, blk, text, timeout): a block id of 3000 would draw the error arrow to
+            // block 3000 of a large project.
+            tempoWidget.BPMInputs = [{ value: "abc" }];
+            tempoWidget._useBPM(0);
+            tempoWidget.speedUp(0, 5000);
+            tempoWidget.slowDown(0, 5000);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledTimes(3);
+            for (const call of mockActivity.errorMsg.mock.calls) {
+                expect(call.slice(1)).toEqual([null, null, 3000]);
+            }
+        });
+    });
+
     describe("_updateBPM() block synchronization", () => {
         test("should update interval based on BPM", () => {
             tempoWidget.BPMs[0] = 120;
@@ -1157,6 +1175,8 @@ describe("Tempo Widget", () => {
             expect(tempoWidget.BPMs[0]).toBe(30);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "The beats per minute must be between 30 and 1000.",
+                null,
+                null,
                 3000
             );
         });
@@ -1582,6 +1602,8 @@ describe("Tempo Widget", () => {
             expect(tempoWidget.BPMs[0]).toBe(1000);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "The beats per minute must be below 1000.",
+                null,
+                null,
                 3000
             );
 
@@ -1594,6 +1616,8 @@ describe("Tempo Widget", () => {
             expect(tempoWidget.BPMs[0]).toBe(30);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "The beats per minute must be above 30",
+                null,
+                null,
                 3000
             );
 

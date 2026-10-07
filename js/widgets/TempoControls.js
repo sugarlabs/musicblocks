@@ -87,17 +87,32 @@ class TempoControls {
         const input = this.BPMInputs[i].value;
 
         if (isNaN(input)) {
-            this.activity.errorMsg(_("Please enter a number between 30 and 1000"), 3000);
+            this.activity.errorMsg(
+                _("Please enter a number between 30 and 1000"),
+                null,
+                null,
+                3000
+            );
             return;
         }
 
         this.BPMs[i] = Number(this.BPMInputs[i].value);
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
-            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
+            this.activity.errorMsg(
+                _("The beats per minute must be between 30 and 1000."),
+                null,
+                null,
+                3000
+            );
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
-            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
+            this.activity.errorMsg(
+                _("The beats per minute must be between 30 and 1000."),
+                null,
+                null,
+                3000
+            );
         }
 
         this._updateBPM(i);
@@ -115,7 +130,7 @@ class TempoControls {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + delta;
 
         if (this.BPMs[i] > 1000) {
-            this.activity.errorMsg(_("The beats per minute must be below 1000."), 3000);
+            this.activity.errorMsg(_("The beats per minute must be below 1000."), null, null, 3000);
             this.BPMs[i] = 1000;
         }
 
@@ -133,7 +148,7 @@ class TempoControls {
         const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
         this.BPMs[i] = parseFloat(this.BPMs[i]) - delta;
         if (this.BPMs[i] < 30) {
-            this.activity.errorMsg(_("The beats per minute must be above 30"), 3000);
+            this.activity.errorMsg(_("The beats per minute must be above 30"), null, null, 3000);
             this.BPMs[i] = 30;
         }
 
