@@ -358,7 +358,117 @@ const variablesAndBoxes = [
     }
 ];
 
+const actionsAndCalls = [
+    {
+        name: "action_definition_and_nameddo_call",
+        description: "Defines an action and calls it via nameddo",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "jump" }], 0, 0, [0]],
+            [2, "forward", 0, 0, [0, 3, null]],
+            [3, ["number", { value: 100 }], 0, 0, [2]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "jump" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_definition_and_beginner_do_call",
+        description: "Defines an action and calls it via beginner do block with text name slot",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "dance" }], 0, 0, [0]],
+            [2, "right", 0, 0, [0, 3, null]],
+            [3, ["number", { value: 90 }], 0, 0, [2]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, "do", 0, 0, [10, 12, null]],
+            [12, ["text", { value: "dance" }], 0, 0, [11]]
+        ]
+    },
+    {
+        name: "action_with_multiple_sequential_statements",
+        description: "Action containing a sequence of commands (forward then right)",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "squareStep" }], 0, 0, [0]],
+            [2, "forward", 0, 0, [0, 3, 4]],
+            [3, ["number", { value: 50 }], 0, 0, [2]],
+            [4, "right", 0, 0, [2, 5, null]],
+            [5, ["number", { value: 90 }], 0, 0, [4]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "squareStep" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_calling_another_action",
+        description: "Action definition that internally invokes another defined action",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "step" }], 0, 0, [0]],
+            [2, "forward", 0, 0, [0, 3, null]],
+            [3, ["number", { value: 20 }], 0, 0, [2]],
+            [10, "action", 100, 300, [null, 11, 12, null]],
+            [11, ["text", { value: "twoSteps" }], 0, 0, [10]],
+            [12, ["nameddo", { value: "step" }], 0, 0, [10, 13]],
+            [13, ["nameddo", { value: "step" }], 0, 0, [12, null]],
+            [20, "start", 300, 100, [null, 21, null]],
+            [21, ["nameddo", { value: "twoSteps" }], 0, 0, [20, null]]
+        ]
+    },
+    {
+        name: "multiple_independent_actions",
+        description: "Multiple independent action definitions called sequentially from start",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "firstAct" }], 0, 0, [0]],
+            [2, "forward", 0, 0, [0, 3, null]],
+            [3, ["number", { value: 30 }], 0, 0, [2]],
+            [10, "action", 100, 300, [null, 11, 12, null]],
+            [11, ["text", { value: "secondAct" }], 0, 0, [10]],
+            [12, "right", 0, 0, [10, 13, null]],
+            [13, ["number", { value: 45 }], 0, 0, [12]],
+            [20, "start", 300, 100, [null, 21, null]],
+            [21, ["nameddo", { value: "firstAct" }], 0, 0, [20, 22]],
+            [22, ["nameddo", { value: "secondAct" }], 0, 0, [21, null]]
+        ]
+    },
+    {
+        name: "action_with_arguments_nameddoArg",
+        description: "Action called with arguments using nameddoArg",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "moveBy" }], 0, 0, [0]],
+            [2, "forward", 0, 0, [0, 3, null]],
+            [3, ["number", { value: 50 }], 0, 0, [2]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddoArg", { value: "moveBy" }], 0, 0, [10, 12, null]],
+            [12, ["number", { value: 50 }], 0, 0, [11]]
+        ]
+    },
+    {
+        name: "action_with_local_box_variable",
+        description: "Action containing a local box assignment and print statement",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "computeLocal" }], 0, 0, [0]],
+            [2, ["storein2", { value: "temp" }], 0, 0, [0, 3, 4]],
+            [3, ["number", { value: 42 }], 0, 0, [2]],
+            [4, "print", 0, 0, [2, 5, null]],
+            [5, ["namedbox", { value: "temp" }], 0, 0, [4]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "computeLocal" }], 0, 0, [10, null]]
+        ]
+    }
+];
+
 module.exports = {
     basicValuesAndExpressions,
-    variablesAndBoxes
+    variablesAndBoxes,
+    actionsAndCalls
 };

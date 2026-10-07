@@ -37,7 +37,11 @@ const {
     normalizeBlockStructure
 } = require("./conformance-normalize");
 
-const { basicValuesAndExpressions, variablesAndBoxes } = require("./conformance-corpus");
+const {
+    basicValuesAndExpressions,
+    variablesAndBoxes,
+    actionsAndCalls
+} = require("./conformance-corpus");
 
 describe("Round-Trip Conformance Test Harness", () => {
     beforeEach(() => {
@@ -233,6 +237,15 @@ MusicBlocks.run();`;
 
     describe("Variables and Boxes Corpus", () => {
         test.each(variablesAndBoxes)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Actions and Calls Corpus", () => {
+        test.each(actionsAndCalls)("$description ($name)", ({ blocks }) => {
             const { recoveredBlocks } = runRoundTrip(blocks);
             const normalizedOriginal = normalizeBlockStructure(blocks);
             const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
