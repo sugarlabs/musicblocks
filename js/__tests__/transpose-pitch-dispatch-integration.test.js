@@ -127,6 +127,8 @@ Object.assign(global, logoconstants);
 const musicUtils = require("../utils/musicutils");
 Object.assign(global, {
     pitchToNumber: musicUtils.pitchToNumber,
+    getMeasurePosition: musicUtils.getMeasurePosition,
+    getMeterAnchor: musicUtils.getMeterAnchor,
     getStepSizeUp: musicUtils.getStepSizeUp,
     getStepSizeDown: musicUtils.getStepSizeDown,
     calcOctave: musicUtils.calcOctave,

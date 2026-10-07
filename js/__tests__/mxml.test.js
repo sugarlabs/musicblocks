@@ -1281,12 +1281,28 @@ describe("saveMxmlOutput - key signature", () => {
         ["F", "major", "-1"],
         ["Bb", "major", "-2"],
         ["A", "minor", "0"],
+        ["A", "m", "0"],
         ["E", "minor", "1"],
         ["D", "dorian", "0"],
         ["G", "mixolydian", "0"],
         ["F", "lydian", "0"],
         ["G#", "minor", "5"],
-        ["A#", "minor", "7"]
+        ["A#", "minor", "7"],
+        // Minor variants
+        ["A", "harmonic minor", "0"],
+        ["A", "melodic minor", "0"],
+        ["A", "jazz minor", "0"],
+        // Pentatonics
+        ["C", "major pentatonic", "0"],
+        ["A", "minor pentatonic", "0"],
+        ["A", "minyo", "0"],
+        ["C", "chinese", "0"],
+        ["C", "egyptian", "0"],
+        ["A", "hirajoshi", "0"],
+        ["A", "in", "0"],
+        // Blues
+        ["C", "major blues", "0"],
+        ["A", "minor blues", "0"]
     ])("writes %s %s as fifths %s", (key, mode, expected) => {
         expect(fifthsIn(["key", key, mode, note("C4")])).toBe(expected);
     });
@@ -1296,7 +1312,8 @@ describe("saveMxmlOutput - key signature", () => {
     });
 
     it("stays where it was for a mode with no signature of its own", () => {
-        expect(fifthsIn(["key", "C", "harmonic minor", note("C4")])).toBe("0");
+        // whole tone has no key signature — should leave the score in C (0)
+        expect(fifthsIn(["key", "C", "whole tone", note("C4")])).toBe("0");
     });
 
     it("stays where it was for a key that cannot be written without double accidentals", () => {
@@ -1347,5 +1364,51 @@ describe("saveMxmlOutput - a key change part way through", () => {
 
         // The measure attributes carry the signature, so it is not written twice.
         expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+});
+
+describe("saveMxmlOutput - short notes keep whole-number durations", () => {
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato, drum]
+    const note = (value, dots = 0) => [["G4"], value, dots, null, null, false, false, null];
+
+    const durationsOf = staging => {
+        const output = saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+        return [...output.matchAll(/<duration>([^<]+)<\/duration>/g)].map(m => m[1]);
+    };
+
+    it("writes a sixty-fourth note as a whole number", () => {
+        expect(durationsOf([note(64)])).toEqual(["1"]);
+    });
+
+    it("writes a dotted thirty-second note as a whole number", () => {
+        expect(durationsOf([note(32, 1)])).toEqual(["3"]);
+    });
+
+    it("never writes a fractional duration", () => {
+        const staging = [note(4), note(8), note(16), note(32), note(64)];
+        durationsOf(staging).forEach(d => expect(d).toMatch(/^\d+$/));
+    });
+
+    it("keeps the durations in proportion", () => {
+        const [quarter, eighth, sixteenth, thirtySecond, sixtyFourth] = durationsOf([
+            note(4),
+            note(8),
+            note(16),
+            note(32),
+            note(64)
+        ]).map(Number);
+
+        expect(quarter).toBe(eighth * 2);
+        expect(eighth).toBe(sixteenth * 2);
+        expect(sixteenth).toBe(thirtySecond * 2);
+        expect(thirtySecond).toBe(sixtyFourth * 2);
+    });
+
+    it("leaves a voice of ordinary note values on the grid it already used", () => {
+        const output = saveMxmlOutput({
+            notation: { notationStaging: { 0: [note(4), note(8), note(16)] } }
+        });
+
+        expect(output).toContain("<divisions>8</divisions>");
     });
 });

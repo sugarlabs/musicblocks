@@ -117,6 +117,18 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
+    it("keeps the floating widget roll-up button white in dark mode", () => {
+        expect(darkmodeCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+        );
+    });
+
+    it("keeps the floating widget close button white in dark mode", () => {
+        expect(darkmodeCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);
@@ -459,5 +471,23 @@ describe("Theme Switching & Inline Styles Purity", () => {
                 expect(decl).not.toMatch(/!important/i);
             }
         }
+    });
+
+    it("ensures #search does not suppress focus outline and defines visible focus indicator", () => {
+        const activitiesCss = fs.readFileSync(path.join(CSS_DIR, "activities.css"), "utf8");
+
+        const searchFocusMatch = activitiesCss.match(/(?:^|\})\s*#search:focus\s*\{([^}]*)\}/);
+        expect(searchFocusMatch).not.toBeNull();
+        expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*none/i);
+        expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*0\b/i);
+
+        const searchFocusVisibleMatch = activitiesCss.match(
+            /(?:^|\})\s*#search:focus-visible\s*\{([^}]*)\}/
+        );
+        expect(searchFocusVisibleMatch).not.toBeNull();
+        expect(searchFocusVisibleMatch[1]).toMatch(
+            /outline\s*:\s*2px\s+solid\s+var\(--color-brand-primary\)/i
+        );
+        expect(searchFocusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
     });
 });

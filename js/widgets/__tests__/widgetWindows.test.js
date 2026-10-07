@@ -718,6 +718,52 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("ARIA dialog and state semantics", () => {
+        test("frame is a focusable dialog labelled by its title element", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("tabindex")).toBe("-1");
+            expect(win._frame.getAttribute("aria-labelledby")).toBe(win._key + "WidgetID");
+        });
+
+        test("title bar and widget toolbar expose distinct toolbar roles", () => {
+            const win = createTestWindow();
+
+            expect(win._drag.getAttribute("role")).toBe("toolbar");
+            expect(win._toolbar.getAttribute("role")).toBe("toolbar");
+            expect(win._drag.getAttribute("aria-label")).not.toBe(
+                win._toolbar.getAttribute("aria-label")
+            );
+        });
+
+        test("maximize/restore keep the button aria-label in sync", () => {
+            const win = createTestWindow();
+
+            win._maximize();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Maximize window");
+        });
+
+        test("rollup/unroll toggle aria-expanded and rename the roll button", () => {
+            const win = createTestWindow();
+
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+
+            win._rollup();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("false");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Expand window");
+            expect(win._rollButton.title).toBe("Expand");
+
+            win.unroll();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+            expect(win._rollButton.title).toBe("Minimize");
+        });
+    });
+
     describe("updateTitle", () => {
         test("updates the title element textContent", () => {
             const win = createTestWindow("Old Title");
@@ -1245,10 +1291,15 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Win 2");
             window.widgetWindows.focused = win1;
 
+            win1._overlay(true);
+
             window.widgetWindows.hideAllWindows();
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1._frame.style.zIndex).toBe("10");
+            expect(win1._overlayframe.style.zIndex).toBe("-1");
+            expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
             expect(window.widgetWindows.focused).toBeNull();
         });
 

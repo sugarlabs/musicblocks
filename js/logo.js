@@ -1175,9 +1175,10 @@ class Logo {
      * measure boundaries when necessary.
      *
      * When the note's duration carries it past the end of the current measure,
-     * the note is split: the portion that fits within the current measure (and
-     * any fully-spanned intermediate measures) is written first with ties,
-     * followed by the overflow into the next measure.  Recursion stops when
+     * the note is split at every barline it crosses: the portion that fits
+     * within the current measure, one full measure for each intermediate
+     * measure, and the remainder in the last measure, joined by ties (rests
+     * are not tied).  Recursion stops when
      * `split` is false, which all recursive calls pass explicitly.
      *
      * @param {string[]} note - Pitch names (e.g. `["G4"]`), or `["R"]` for a
@@ -1203,76 +1204,39 @@ class Logo {
 
         // Check to see if this note straddles a measure boundary
         const durationTime = 1 / duration;
-        const beatsIntoMeasure =
-            ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                tur.singer.pickup -
-                durationTime) *
-                tur.singer.noteValuePerBeat) %
-            tur.singer.beatsPerMeasure;
-        const timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
-        const timeLeftInMeasure =
-            tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
+        const { timeLeftInMeasure } = this.deps.utils.getMeasurePosition(
+            tur.singer,
+            tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - durationTime
+        );
 
         if (split && durationTime > timeLeftInMeasure) {
-            // overflowTime: the portion of the note that extends past all
-            // measure boundaries.
-            const overflowTime = durationTime - timeLeftInMeasure;
-            // partialTime: starts as the time remaining in the current measure;
-            // the while-loop below strips any whole measures to find the residual.
-            let partialTime = timeLeftInMeasure;
             // measureDuration: the total duration of one full measure.
             const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
-            const obj = this.deps.utils.rationalToFraction(overflowTime);
 
-            if (partialTime > 0) {
-                // Count how many full measures this note spans beyond the first.
-                let i = 0;
-                while (partialTime > measureDuration) {
-                    ++i;
-                    partialTime -= measureDuration;
-                }
-
-                // Write the portion that fits within the current partial measure.
-                let obj2 = this.deps.utils.rationalToFraction(partialTime);
-                if (obj2[0] !== 0) {
-                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                }
-                if (i > 0 || obj[0] > 0) {
-                    if (note[0] !== "R") {
-                        // Don't tie rests
-                        this.notation.notationInsertTie(turtle);
-                        this.notation.notationDrumStaging[turtle].push("tie");
-                    }
-                    obj2 = this.deps.utils.rationalToFraction(1 / measureDuration);
-                }
-
-                // Write one full measure's worth for each intermediate measure.
-                while (i > 0) {
-                    i -= 1;
-                    if (obj2[0] !== 0) {
-                        this.updateNotation(
-                            note,
-                            obj2[1] / obj2[0],
-                            turtle,
-                            insideChord,
-                            drum,
-                            false
-                        );
-                    }
-                    if (obj[0] > 0) {
-                        if (note[0] !== "R") {
-                            // Don't tie rests
-                            this.notation.notationInsertTie(turtle);
-                            this.notation.notationDrumStaging[turtle].push("tie");
-                        }
-                    }
-                }
+            // Cut the note at every barline it crosses: the portion that fits in
+            // the current measure, one full measure for each measure it spans,
+            // then the remainder that spills into the last measure.
+            const pieces = [timeLeftInMeasure];
+            let overflowTime = durationTime - timeLeftInMeasure;
+            // The tolerance keeps float error from adding a near-empty measure.
+            while (overflowTime - measureDuration > 1e-9) {
+                pieces.push(measureDuration);
+                overflowTime -= measureDuration;
             }
+            pieces.push(overflowTime);
 
-            // Write the overflow portion that extends into the next measure.
-            if (obj[0] > 0) {
+            const fractions = pieces
+                .map(time => this.deps.utils.rationalToFraction(time))
+                .filter(obj => obj[0] > 0);
+
+            fractions.forEach((obj, i) => {
+                if (i > 0 && note[0] !== "R") {
+                    // Don't tie rests
+                    this.notation.notationInsertTie(turtle);
+                    this.notation.notationDrumStaging[turtle].push("tie");
+                }
                 this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-            }
+            });
         } else {
             // .. otherwise proceed as normal
             this.notation.doUpdateNotation(...arguments);

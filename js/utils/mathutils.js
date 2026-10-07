@@ -75,7 +75,15 @@ class MathUtility {
         const GetRandom = (n1, n2) => {
             // n1 should be <= n2
             [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
-            return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
+            // Pick from the whole numbers inside the range, so decimal bounds
+            // can't give a result below n1 or above n2.
+            const low = Math.ceil(Number(n1));
+            const high = Math.floor(Number(n2));
+            if (low > high) {
+                // No whole number between them (e.g. 2.2 and 2.8).
+                return Number(n1);
+            }
+            return low + Math.floor(Math.random() * (high - low + 1));
         };
 
         /**
