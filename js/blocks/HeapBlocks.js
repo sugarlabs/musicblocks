@@ -478,10 +478,17 @@ function setupHeapBlocks(activity) {
 
                 if (a === -1) {
                     // -1 to access the top of the heap
+                    if (logo.turtleHeaps[turtle].length === 0) {
+                        activity.errorMsg(_("empty heap"));
+                        return 0;
+                    }
                     a = logo.turtleHeaps[turtle].length;
-                } else if (a < 1) {
-                    a = 1;
-                    activity.errorMsg(_("Index must be > 0."));
+                } else {
+                    a = Math.floor(a);
+                    if (a < 1) {
+                        a = 1;
+                        activity.errorMsg(_("Index must be > 0."));
+                    }
                 }
 
                 if (a > 1000) {

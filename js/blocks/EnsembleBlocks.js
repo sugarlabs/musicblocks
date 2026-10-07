@@ -141,6 +141,8 @@ function setupEnsembleBlocks(activity) {
                         logo.turtleHeaps[i] = [];
                     }
 
+                    a = Math.floor(a);
+
                     if (a < 1) {
                         a = 1;
                         activity.errorMsg(_("Index must be > 0."));
