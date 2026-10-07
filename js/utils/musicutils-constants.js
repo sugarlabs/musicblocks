@@ -672,14 +672,14 @@ var SHARPPREFERENCE = [
     "a major",
     "e major",
     "b major",
-    "f# major",
-    "c# major",
+    "f" + SHARP + " major",
+    "c" + SHARP + " major",
     "e minor",
     "b minor",
-    "f# minor",
-    "c# minor",
-    "g# minor",
-    "d# minor"
+    "f" + SHARP + " minor",
+    "c" + SHARP + " minor",
+    "g" + SHARP + " minor",
+    "d" + SHARP + " minor"
 ];
 
 /**
@@ -688,24 +688,24 @@ var SHARPPREFERENCE = [
  */
 var FLATPREFERENCE = [
     "f major",
-    "bb major",
-    "eb major",
-    "ab major",
-    "db major",
-    "gb major",
-    "cb major",
+    "b" + FLAT + " major",
+    "e" + FLAT + " major",
+    "a" + FLAT + " major",
+    "d" + FLAT + " major",
+    "g" + FLAT + " major",
+    "c" + FLAT + " major",
     "d minor",
     "g minor",
     "c minor",
     "f minor",
-    "bb minor",
-    "eb minor",
+    "b" + FLAT + " minor",
+    "e" + FLAT + " minor",
     "d harmonic minor",
     "g harmonic minor",
     "c harmonic minor",
     "f harmonic minor",
-    "bb harmonic minor",
-    "eb harmonic minor"
+    "b" + FLAT + " harmonic minor",
+    "e" + FLAT + " harmonic minor"
 ];
 
 /**

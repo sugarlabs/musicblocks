@@ -204,6 +204,27 @@ describe("SearchController.prepSearchWidget", () => {
         );
         expect(suggestion.label).toBe("scale degree");
     });
+
+    test("labels a block by its name and keeps argument names apart", () => {
+        const block = makeProtoBlock("neighbor2", "neighbor (+/–)");
+        block.staticLabels = ["neighbor (+/–)", "scalar interval", "note value", ""];
+        const activity = makeActivity({ neighbor2: block });
+        setupSearchController(activity);
+        activity.searchController.prepSearchWidget();
+
+        const suggestion = activity.searchController.searchSuggestions[0];
+        expect(suggestion.label).toBe("neighbor (+/–)");
+        expect(suggestion.argLabels).toBe("scalar interval, note value");
+        expect(suggestion.searchTerms).toContain("scalar interval, note value");
+    });
+
+    test("gives a block without argument names an empty argLabels", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
+        setupSearchController(activity);
+        activity.searchController.prepSearchWidget();
+
+        expect(activity.searchController.searchSuggestions[0].argLabels).toBe("");
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -252,6 +273,56 @@ describe("SearchController.filterSuggestions", () => {
         sc.searchSuggestions = [];
         const cached = sc.filterSuggestions("drum");
         expect(cached).toBe(sc._searchCache["drum"]);
+    });
+});
+
+describe("SearchController.filterSuggestions ranking", () => {
+    let sc;
+
+    const withArgs = (name, labels) => {
+        const block = makeProtoBlock(name, labels[0]);
+        block.staticLabels = labels;
+        return block;
+    };
+
+    beforeEach(() => {
+        // Insertion order is reversed by prepSearchWidget, so the blocks
+        // most likely to be listed first without ranking come last here.
+        const activity = makeActivity({
+            newnote: withArgs("newnote", ["note", "value", ""]),
+            notecounter: withArgs("notecounter", ["sum note values", ""]),
+            notename: makeProtoBlock("notename", "note name"),
+            keynote: makeProtoBlock("keynote", "keynote"),
+            meter: withArgs("meter", ["meter", "number of beats", "note value"]),
+            tone: makeProtoBlock("tone", "tone", false, ["note frequency"]),
+            notetofrequency: withArgs("notetofrequency", ["note to frequency", "name", "octave"])
+        });
+        setupSearchController(activity);
+        sc = activity.searchController;
+        sc.prepSearchWidget();
+    });
+
+    test("orders exact, prefix, word-prefix, substring, then other matches", () => {
+        const values = sc.filterSuggestions("note").map(r => r.value);
+        expect(values).toEqual([
+            "newnote",
+            "notetofrequency",
+            "notename",
+            "notecounter",
+            "keynote",
+            "tone",
+            "meter"
+        ]);
+    });
+
+    test("keeps palette order between equally good matches", () => {
+        const values = sc.filterSuggestions("note").map(r => r.value);
+        expect(values.indexOf("notetofrequency")).toBeLessThan(values.indexOf("notename"));
+    });
+
+    test("still finds a block by an argument name alone", () => {
+        const values = sc.filterSuggestions("octave").map(r => r.value);
+        expect(values).toEqual(["notetofrequency"]);
     });
 });
 

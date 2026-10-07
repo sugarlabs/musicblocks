@@ -135,7 +135,18 @@ global.TimbreWidget = jest.fn(() => ({
 }));
 global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+global.SampleWidget.dependencies = [
+    "widgets/tuner",
+    "widgets/SamplerBlocks",
+    "widgets/SamplerPlayback",
+    "widgets/SamplerPitch",
+    "widgets/SamplerFiles",
+    "widgets/SamplerUI",
+    "widgets/SamplerPieMenu",
+    "widgets/SamplerCanvas",
+    "widgets/SamplerTuner",
+    "widgets/sampler"
+];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
@@ -180,7 +191,17 @@ global.RhythmRuler.dependencies = [
 global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
-global.LegoWidget.dependencies = ["widgets/legobricks"];
+global.LegoWidget.dependencies = [
+    "widgets/LegoBricksRows",
+    "widgets/LegoBricksLayout",
+    "widgets/LegoBricksExport",
+    "widgets/LegoBricksMedia",
+    "widgets/LegoBricksEyeDropper",
+    "widgets/LegoBricksColor",
+    "widgets/LegoBricksPlayback",
+    "widgets/LegoBricksVisualization",
+    "widgets/legobricks"
+];
 global.AIWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIWidget.dependencies = ["widgets/aiwidget"];
 

@@ -18,6 +18,7 @@
  */
 
 const setupMeterActions = require("../MeterActions");
+const { getMeasurePosition, getMeterAnchor } = require("../../utils/musicutils-rhythm");
 
 describe("setupMeterActions", () => {
     let activity;
@@ -31,6 +32,8 @@ describe("setupMeterActions", () => {
             }
         };
         global.TONEBPM = 240;
+        global.getMeasurePosition = getMeasurePosition;
+        global.getMeterAnchor = getMeterAnchor;
         global.Queue = jest.fn((action, duration, blk) => ({ action, duration, blk }));
         global.last = jest.fn(array => array[array.length - 1]);
         global._ = jest.fn(msg => msg);
@@ -638,6 +641,72 @@ describe("setupMeterActions", () => {
 
         expect(Singer.MeterActions.getBeatCount(0)).toBe(2);
         expect(Singer.MeterActions.getMeasureCount(0)).toBe(2);
+    });
+
+    describe("after a meter change", () => {
+        const expectPosition = (notesPlayed, beat, measure) => {
+            targetTurtle.singer.notesPlayed = notesPlayed;
+            expect(Singer.MeterActions.getBeatCount(0)).toBe(beat);
+            expect(Singer.MeterActions.getMeasureCount(0)).toBe(measure);
+        };
+
+        it("counts measures in the new meter from where it starts", () => {
+            Singer.MeterActions.setMeter(3, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [3, 4];
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+
+            expectPosition([3, 4], 1, 2);
+            expectPosition([5, 4], 3, 2);
+            expectPosition([7, 4], 1, 3);
+        });
+
+        it("counts beats in the new beat value", () => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [1, 1];
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+
+            expectPosition([11, 8], 4, 2);
+            expectPosition([7, 4], 1, 3);
+        });
+
+        it("starts a new measure when the meter changes mid-measure", () => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [1, 2];
+            Singer.MeterActions.setMeter(3, 1 / 4, 0);
+
+            expectPosition([1, 2], 1, 2);
+            expectPosition([5, 4], 1, 3);
+        });
+
+        it("keeps counting across several meter changes", () => {
+            Singer.MeterActions.setMeter(3, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [3, 4];
+            Singer.MeterActions.setMeter(2, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [5, 4];
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+
+            expectPosition([5, 4], 1, 3);
+            expectPosition([9, 4], 1, 4);
+        });
+
+        it("counts from the end of the pickup", () => {
+            targetTurtle.singer.pickup = 1 / 4;
+            Singer.MeterActions.setMeter(3, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [1, 1];
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+
+            expectPosition([1, 1], 1, 2);
+            expectPosition([2, 1], 1, 3);
+        });
+
+        it("does not restart the measure when the same meter is set again", () => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            targetTurtle.singer.notesPlayed = [1, 2];
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+
+            expect(targetTurtle.singer.meterAnchor).toBeNull();
+            expectPosition([1, 2], 3, 1);
+        });
     });
 
     test.each([
