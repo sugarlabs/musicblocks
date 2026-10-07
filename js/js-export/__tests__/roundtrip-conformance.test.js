@@ -42,7 +42,8 @@ const {
     variablesAndBoxes,
     actionsAndCalls,
     controlFlow,
-    pitchAndPitches
+    pitchAndPitches,
+    switchCases
 } = require("./conformance-corpus");
 
 describe("Round-Trip Conformance Test Harness", () => {
@@ -267,6 +268,15 @@ MusicBlocks.run();`;
 
     describe("Pitch and Pitch Expressions Corpus", () => {
         test.each(pitchAndPitches)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Switch and Branch Selection Corpus", () => {
+        test.each(switchCases)("$description ($name)", ({ blocks }) => {
             const { recoveredBlocks } = runRoundTrip(blocks);
             const normalizedOriginal = normalizeBlockStructure(blocks);
             const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);

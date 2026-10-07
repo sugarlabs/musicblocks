@@ -732,10 +732,128 @@ const pitchAndPitches = [
     }
 ];
 
+const switchCases = [
+    {
+        name: "switch_single_case_and_default",
+        description: "Switch statement with a single case branch and default branch",
+        category: "switch_branches",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "switch", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 1 }], 0, 0, [1]],
+            [3, "case", 0, 0, [1, 4, 5, 7]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, "forward", 0, 0, [3, 6, null]],
+            [6, ["number", { value: 50 }], 0, 0, [5]],
+            [7, "defaultcase", 0, 0, [3, 8, null]],
+            [8, "forward", 0, 0, [7, 9, null]],
+            [9, ["number", { value: 100 }], 0, 0, [8]]
+        ]
+    },
+    {
+        name: "switch_multiple_numeric_cases_and_default",
+        description: "Switch statement with multiple numeric case branches and default fallback",
+        category: "switch_branches",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "switch", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 2 }], 0, 0, [1]],
+            [3, "case", 0, 0, [1, 4, 5, 7]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, "forward", 0, 0, [3, 6, null]],
+            [6, ["number", { value: 10 }], 0, 0, [5]],
+            [7, "case", 0, 0, [3, 8, 9, 11]],
+            [8, ["number", { value: 2 }], 0, 0, [7]],
+            [9, "forward", 0, 0, [7, 10, null]],
+            [10, ["number", { value: 20 }], 0, 0, [9]],
+            [11, "defaultcase", 0, 0, [7, 12, null]],
+            [12, "forward", 0, 0, [11, 13, null]],
+            [13, ["number", { value: 30 }], 0, 0, [12]]
+        ]
+    },
+    {
+        name: "switch_controlled_by_box_variable",
+        description: "Switch statement discriminant evaluated from box variable",
+        category: "switch_branches",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, ["storein2", { value: "mode" }], 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 1 }], 0, 0, [1]],
+            [3, "switch", 0, 0, [1, 4, 5, null]],
+            [4, ["namedbox", { value: "mode" }], 0, 0, [3]],
+            [5, "case", 0, 0, [3, 6, 7, 9]],
+            [6, ["number", { value: 1 }], 0, 0, [5]],
+            [7, "forward", 0, 0, [5, 8, null]],
+            [8, ["number", { value: 100 }], 0, 0, [7]],
+            [9, "defaultcase", 0, 0, [5, 10, null]],
+            [10, "forward", 0, 0, [9, 11, null]],
+            [11, ["number", { value: 50 }], 0, 0, [10]]
+        ]
+    },
+    {
+        name: "switch_with_string_case_literals",
+        description: "Switch statement with string literal case patterns",
+        category: "switch_branches",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, ["storein2", { value: "choice" }], 0, 0, [0, 2, 3]],
+            [2, ["text", { value: "A" }], 0, 0, [1]],
+            [3, "switch", 0, 0, [1, 4, 5, null]],
+            [4, ["namedbox", { value: "choice" }], 0, 0, [3]],
+            [5, "case", 0, 0, [3, 6, 7, 9]],
+            [6, ["text", { value: "A" }], 0, 0, [5]],
+            [7, "forward", 0, 0, [5, 8, null]],
+            [8, ["number", { value: 10 }], 0, 0, [7]],
+            [9, "defaultcase", 0, 0, [5, 10, null]],
+            [10, "forward", 0, 0, [9, 11, null]],
+            [11, ["number", { value: 20 }], 0, 0, [10]]
+        ]
+    },
+    {
+        name: "switch_nested_inside_repeat_loop",
+        description: "Switch statement nested inside a repeat loop clamp",
+        category: "switch_branches",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "repeat", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 2 }], 0, 0, [1]],
+            [3, "switch", 0, 0, [1, 4, 5, null]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, "case", 0, 0, [3, 6, 7, 9]],
+            [6, ["number", { value: 1 }], 0, 0, [5]],
+            [7, "forward", 0, 0, [5, 8, null]],
+            [8, ["number", { value: 15 }], 0, 0, [7]],
+            [9, "defaultcase", 0, 0, [5, 10, null]],
+            [10, "forward", 0, 0, [9, 11, null]],
+            [11, ["number", { value: 25 }], 0, 0, [10]]
+        ]
+    },
+    {
+        name: "switch_with_arithmetic_discriminant_expression",
+        description: "Switch statement with a compound arithmetic discriminant expression (1 + 1)",
+        category: "switch_branches",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "switch", 0, 0, [0, 2, 5, null]],
+            [2, "plus", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 1 }], 0, 0, [2]],
+            [4, ["number", { value: 1 }], 0, 0, [2]],
+            [5, "case", 0, 0, [1, 6, 7, 9]],
+            [6, ["number", { value: 2 }], 0, 0, [5]],
+            [7, "forward", 0, 0, [5, 8, null]],
+            [8, ["number", { value: 40 }], 0, 0, [7]],
+            [9, "defaultcase", 0, 0, [5, 10, null]],
+            [10, "forward", 0, 0, [9, 11, null]],
+            [11, ["number", { value: 10 }], 0, 0, [10]]
+        ]
+    }
+];
+
 module.exports = {
     basicValuesAndExpressions,
     variablesAndBoxes,
     actionsAndCalls,
     controlFlow,
-    pitchAndPitches
+    pitchAndPitches,
+    switchCases
 };
