@@ -635,7 +635,7 @@ describe("Block Foundation", () => {
             findUniqueActionName = jest.fn().mockImplementation(name => name);
 
             mockBlocksForRename = {
-                activity: { refreshCanvas: jest.fn() },
+                activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn() },
                 blockList: [],
                 palettes: {
                     hide: jest.fn(),
@@ -707,6 +707,58 @@ describe("Block Foundation", () => {
 
             expect(mockBlocksForRename.renameNameddos).not.toHaveBeenCalled();
             expect(mockBlocksForRename.palettes.updatePalettes).not.toHaveBeenCalled();
+        });
+
+        it("should NOT enforce uniqueness or rewrite label value while user is typing (closeInput is false)", () => {
+            findUniqueActionName.mockReturnValue("Action1");
+            block.value = "Action1";
+            block.label = { value: "Action", style: { display: "" } };
+
+            block._labelChanged(false, true);
+
+            expect(findUniqueActionName).not.toHaveBeenCalled();
+            expect(removeActionPrototype).not.toHaveBeenCalled();
+            expect(block.label.value).toBe("Action");
+        });
+
+        it("should enforce uniqueness and rewrite label value upon commit (closeInput is true)", () => {
+            findUniqueActionName.mockReturnValue("Action1");
+            block.value = "oldAction";
+            block.label = { value: "Action", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(findUniqueActionName).toHaveBeenCalledWith("Action", 1);
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(mockBlocksForRename.activity.errorMsg).toHaveBeenCalled();
+            expect(block.label.value).toBe("Action1");
+            expect(block.value).toBe("Action1");
+        });
+
+        it("should keep label value unchanged upon commit when chosen name is already unique (closeInput is true)", () => {
+            findUniqueActionName.mockReturnValue("ActionUnique");
+            block.value = "oldAction";
+            block.label = { value: "ActionUnique", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(findUniqueActionName).toHaveBeenCalledWith("ActionUnique", 1);
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(mockBlocksForRename.activity.errorMsg).not.toHaveBeenCalled();
+            expect(block.label.value).toBe("ActionUnique");
+            expect(block.value).toBe("ActionUnique");
+        });
+
+        it("should refresh the action palette even when the collision-resolved name equals the original (closeInput is true)", () => {
+            // User had "action1", typed "action" (collides), resolves back to "action1".
+            findUniqueActionName.mockReturnValue("action1");
+            block.value = "action1";
+            block.label = { value: "action", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            // The palette must still refresh because the user intentionally typed a new name.
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
         });
     });
 
