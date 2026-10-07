@@ -225,6 +225,51 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
     });
 
+    test("should wrap a forever loop in repeat bars that run to the end of the voice", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4"], 4, 0, null, 0, -1, false],
+            "begin repeat",
+            [["G4"], 4, 0, null, 0, -1, false],
+            [["E4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toBe(
+            "\\meter\n" + "c'4 " + '\\bar ".|:" ' + "g'4 e'4 " + '\\bar ":|." '
+        );
+    });
+
+    test("should only repeat the innermost of nested forever loops", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin repeat",
+            [["G4"], 4, 0, null, 0, -1, false],
+            "begin repeat",
+            [["E4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toBe(
+            "\\meter\n" + "g'4 " + '\\bar ".|:" ' + "e'4 " + '\\bar ":|." '
+        );
+    });
+
+    test("should close a repeat that ends on a tuplet after the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin repeat",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4")
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toMatch(
+            /^\\meter\n\\bar "\.\|:" \\tuplet .*\} \\bar ":\|\." $/
+        );
+    });
+
+    test("should not add repeat bars without a forever loop", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\bar");
+    });
+
     test("should keep a crescendo that spans a tuplet inside the tuplet", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
@@ -897,6 +942,28 @@ describe("saveLilypondOutput", () => {
         const result = saveLilypondOutput(activity);
         expect(result.match(/\\bar "\|\."/g)).toHaveLength(1);
         expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
+    });
+
+    test("should not add a final bar after a last voice that ends on a repeat", () => {
+        activity.logo.notation.notationStaging[1] = [
+            "begin repeat",
+            [["E4"], 4, 0, null, 0, -1, false]
+        ];
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar ":\|\." \n\}/);
+        expect(result).not.toContain('\\bar "|."');
+    });
+
+    test("should repeat the drum staff along with the voice", () => {
+        activity.logo.notation.notationStaging[0] = [
+            "begin repeat",
+            [["G4"], 4, 0, null, 0, -1, false]
+        ];
+        activity.logo.notation.notationDrumStaging = {
+            0: ["begin repeat", [["sn"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/\\drummode \{\n[^}]*\\bar "\.\|:" sn4 \\bar ":\|\." \n\}/);
     });
 });
 

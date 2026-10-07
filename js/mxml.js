@@ -112,12 +112,29 @@ const _tupletNotesRatio = (tupletRatio, roundDown) => {
  */
 const _resolveDivisionsPerWholeNote = notes => {
     let scaleFactor = 1;
+    let perWholeNote = DIVISIONS_PER_WHOLE_NOTE;
     for (const entry of notes) {
-        if (!Array.isArray(entry) || !Array.isArray(entry[MXML_TUPLETVALUE])) continue;
-        const { actualNotes } = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
-        scaleFactor = _lcm(scaleFactor, actualNotes);
+        if (!Array.isArray(entry)) continue;
+
+        if (Array.isArray(entry[MXML_TUPLETVALUE])) {
+            const { actualNotes } = _tupletNotesRatio(
+                entry[MXML_TUPLETVALUE],
+                entry[MXML_ROUNDDOWN]
+            );
+            scaleFactor = _lcm(scaleFactor, actualNotes);
+            continue;
+        }
+
+        // A note of 1/v carrying d dots is (D / v) * (2 - 2^-d) divisions, so the
+        // grid has to be a multiple of v * 2^d for that to land on a whole number.
+        // At the base of 32 a sixty-fourth note comes out as 0.5.
+        const noteValue = Number(entry[1]);
+        const dots = Number(entry[2]);
+        if (Number.isInteger(noteValue) && noteValue > 0 && Number.isInteger(dots) && dots >= 0) {
+            perWholeNote = _lcm(perWholeNote, noteValue * 2 ** dots);
+        }
     }
-    return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
+    return perWholeNote * scaleFactor;
 };
 
 const _musicXmlPitch = note => {
@@ -163,17 +180,39 @@ const _MAJOR_FIFTHS = new Map([
 ]);
 
 // How far each mode sits from the major key on the same tonic.
+// Modes with no standard key signature (e.g. whole tone, chromatic) are
+// omitted so _keyFifths returns null and the caller leaves the score where it was.
 const _MODE_FIFTHS = new Map([
+    // Diatonic modes
     ["major", 0],
     ["ionian", 0],
     ["lydian", 1],
     ["mixolydian", -1],
     ["dorian", -2],
     ["minor", -3],
+    ["m", -3],
     ["aeolian", -3],
     ["natural minor", -3],
     ["phrygian", -4],
-    ["locrian", -5]
+    ["locrian", -5],
+
+    // Minor variants that share the natural-minor key signature
+    ["harmonic minor", -3],
+    ["melodic minor", -3],
+    ["jazz minor", -3],
+
+    // Pentatonics: nearest diatonic relative
+    ["major pentatonic", 0],
+    ["minor pentatonic", -3],
+    ["minyo", -3], // Japanese minyo — alias of minor pentatonic
+    ["chinese", 0], // Major pentatonic variant
+    ["egyptian", 0],
+    ["hirajoshi", -3],
+    ["in", -3], // Japanese in scale
+
+    // Blues
+    ["major blues", 0],
+    ["minor blues", -3]
 ]);
 
 /**
