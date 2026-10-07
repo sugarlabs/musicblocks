@@ -2083,7 +2083,8 @@ describe("Tempo widget beat value (#9309)", () => {
         expect(tempo._bpmLimits(0)).toEqual([30, 1000]);
 
         tempo.beatValues = [1];
-        expect(tempo._bpmLimits(0)).toEqual([7.5, 250]);
+        // 7.5 is rounded up, so the row never goes below 30 quarter notes.
+        expect(tempo._bpmLimits(0)).toEqual([8, 250]);
     });
 
     test("1500 eighth notes a minute is allowed, as the block allows it", () => {

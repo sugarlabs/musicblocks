@@ -293,8 +293,37 @@ describe("TempoControls", () => {
 
             expect(tempo._bpmLimits(0)).toEqual([60, 2000]);
             expect(tempo._bpmLimits(1)).toEqual([15, 500]);
-            expect(tempo._bpmLimits(2)[0]).toBeCloseTo(20);
-            expect(tempo._bpmLimits(2)[1]).toBeCloseTo(666.67, 1);
+            // 666.67 is rounded down, so the row never goes above 1000 quarter notes.
+            expect(tempo._bpmLimits(2)).toEqual([20, 666]);
+        });
+
+        test.each([
+            [1 / 10, [75, 2500]],
+            [3 / 16, [40, 1333]],
+            [1 / 3, [23, 750]],
+            [1 / 16, [120, 4000]]
+        ])("_bpmLimits for a beat value of %s are whole numbers: %j", (beatValue, limits) => {
+            tempo.beatValues = [beatValue];
+
+            expect(tempo._bpmLimits(0)).toEqual(limits);
+        });
+
+        test("a row clamped at a fractional limit gets a whole BPM and message", () => {
+            makeRow("setmasterbpm2", 600, 3 / 8);
+
+            tempo.speedUp(0, 100);
+
+            expect(tempo.BPMs[0]).toBe(666);
+            expect(numberBlock.text.text).toBe(666);
+            expect(tempo.BPMInputs[0].value).toBe(666);
+            // 666 3/8 notes is 999 quarter notes, inside the range.
+            expect(Singer.masterBPM).toBe(999);
+            expect(activity.errorMsg).toHaveBeenLastCalledWith(
+                "maximum 3/8 beats per minute is 666",
+                null,
+                null,
+                3000
+            );
         });
 
         test("_bpmRangeError names the beat value like the BPM blocks do", () => {

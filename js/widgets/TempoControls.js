@@ -58,13 +58,20 @@ class TempoControls {
     /**
      * The slowest and fastest BPM of a row. The tempo must be 30 to 1000 quarter notes per
      * minute, like the BPM blocks check, so with a beat value of 1/8 the row allows 60 to 2000.
+     * The limits are whole numbers inside that range (3/8 allows 20 to 666, not 666.67), so a
+     * clamped BPM shows as a whole number in the input, the block and the message.
      * @private
      * @param {number} i - The row.
      * @returns {number[]} The lowest and highest BPM.
      */
     _bpmLimits(i) {
         const beatValue = this._beatValue(i);
-        return [(30 * 0.25) / beatValue, (1000 * 0.25) / beatValue];
+        // Rounded to 1e-9 first, so float error in a whole limit (2000 for 1/8) can't move it.
+        const exact = value => Math.round(value * 1e9) / 1e9;
+        return [
+            Math.ceil(exact((30 * 0.25) / beatValue)),
+            Math.floor(exact((1000 * 0.25) / beatValue))
+        ];
     }
 
     /**
