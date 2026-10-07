@@ -251,6 +251,25 @@ function normalizeStatementSequence(startBlockId, blocksById) {
             continue;
         }
 
+        // Beginner "storein" block with text slot: normalize to canonical storein2 assignment
+        if (block.name === "storein") {
+            const varArg = normalizeArgumentNode(block.connections[1], blocksById);
+            const valArg = normalizeArgumentNode(block.connections[2], blocksById);
+            if (varArg && varArg.value) {
+                stmtNode.name = "storein2";
+                stmtNode.variable = String(varArg.value);
+                if (valArg) {
+                    stmtNode.args = [valArg];
+                }
+                currentId =
+                    block.connections.length > 0
+                        ? block.connections[block.connections.length - 1]
+                        : null;
+                statements.push(stmtNode);
+                continue;
+            }
+        }
+
         if (block.name === "nameddo" || block.name === "nameddoArg") {
             stmtNode.actionName = block.privateData || block.value || null;
         } else if (block.name === "storein2") {
