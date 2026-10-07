@@ -1250,6 +1250,30 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         expect(activityMock.logo[widget].rowLabels).toHaveLength(1);
     });
 
+    test("pitch staircase gets one complete stair per pitch, highest first", () => {
+        const PitchStaircaseSteps = require("../widgets/PitchStaircaseSteps");
+        activityMock.logo.inPitchStaircase = true;
+        activityMock.logo.pitchStaircase = {
+            Stairs: [],
+            stairPitchBlocks: [],
+            addStair: PitchStaircaseSteps.prototype.addStair
+        };
+        // Earlier tests may have cached C4; look both pitches up afresh.
+        Singer.clearPitchToFrequencyCache();
+        global.pitchToFrequency.mockReturnValueOnce(261.63).mockReturnValueOnce(392);
+        global.getNote = jest.fn().mockReturnValueOnce(["C", 4]).mockReturnValueOnce(["G", 4]);
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 101);
+        Singer.processPitch(activityMock, "G", 4, 0, 0, 102);
+
+        expect(activityMock.logo.pitchStaircase.Stairs).toEqual([
+            ["G", 4, 392, 1, 1, 392, 392],
+            ["C", 4, 261.63, 1, 1, 261.63, 261.63]
+        ]);
+        // The higher pitch goes in front of the lower one, and its block is still recorded.
+        expect(activityMock.logo.pitchStaircase.stairPitchBlocks).toEqual([101, 102]);
+    });
+
     test("a setdrum clamp overrides the pitch-drum matrix row", () => {
         activityMock.logo.inPitchDrumMatrix = true;
         turtleMock.singer.drumStyle = ["kick drum"];

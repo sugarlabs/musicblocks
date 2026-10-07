@@ -177,7 +177,15 @@ global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
 global.PitchSlider = jest.fn();
 global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
-global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
+global.PitchStaircase.dependencies = [
+    "widgets/PitchStaircaseTimers",
+    "widgets/PitchStaircaseLayout",
+    "widgets/PitchStaircaseSteps",
+    "widgets/PitchStaircasePlayback",
+    "widgets/PitchStaircaseSave",
+    "widgets/PitchStaircaseWindow",
+    "widgets/pitchstaircase"
+];
 global.RhythmRuler = jest.fn();
 global.RhythmRuler.dependencies = [
     "widgets/RhythmRulerLayout",
