@@ -2405,6 +2405,27 @@ describe("Logo runFromBlockNow", () => {
             expect(logo.recordingBuffer.hasData).toBe(true);
         });
 
+        test("does not buffer notation on interactive completion if staging is empty", () => {
+            logo._exportNotationFinished = false;
+            logo.runningLilypond = false;
+            logo.runningAbc = false;
+            logo.runningMxml = false;
+            logo.runningMIDI = false;
+            logo.notationOutput = "leftover_export_text";
+            logo.notation.notationStaging = {};
+            logo.recordingBuffer = {
+                hasData: false,
+                notationOutput: "",
+                notationNotes: {},
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.recordingBuffer.hasData).toBe(false);
+        });
+
         test("triggers afterSaveAbc, afterSaveMxml, and playback-ready message", () => {
             logo.runningAbc = true;
             logo.runFromBlockNow(logo, 0, 0, 0, null);

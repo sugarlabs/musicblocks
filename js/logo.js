@@ -1730,6 +1730,9 @@ class Logo {
         }
         this.specialArgs = [];
         this.connectionStore = {};
+        if (!this.runningLilypond && !this.runningAbc) {
+            this.notationOutput = "";
+        }
         if (this.recordingBuffer && !this.recording) {
             this.recordingBuffer = {
                 hasData: false,
@@ -2625,7 +2628,17 @@ class Logo {
                     } else {
                         // Record notation data into buffer for later save (Issue #2330)
                         // This allows saving Lilypond/ABC from interactive sessions
-                        if (logo.notationOutput && logo.notationOutput.length > 0) {
+                        const hasStagedNotation =
+                            logo.notation &&
+                            logo.notation.notationStaging &&
+                            Object.values(logo.notation.notationStaging).some(
+                                staging => Array.isArray(staging) && staging.length > 0
+                            );
+                        if (
+                            hasStagedNotation &&
+                            logo.notationOutput &&
+                            logo.notationOutput.length > 0
+                        ) {
                             logo.recordingBuffer.hasData = true;
                             logo.recordingBuffer.notationOutput = logo.notationOutput;
                             logo.recordingBuffer.notationNotes = JSON.parse(
