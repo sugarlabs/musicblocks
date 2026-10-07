@@ -281,7 +281,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
     let turtleSVG = "";
-    for (const turtle in turtles.turtleList) {
+    for (const turtle of Object.keys(turtles.turtleList)) {
         turtles.getTurtle(turtle).painter.closeSVG();
         turtleSVG += turtles.getTurtle(turtle).painter.svgOutput;
     }
@@ -312,7 +312,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
  * @returns {boolean} True if all turtle SVG outputs are empty, false otherwise.
  */
 let isSVGEmpty = turtles => {
-    for (const turtle in turtles.turtleList) {
+    for (const turtle of Object.keys(turtles.turtleList)) {
         turtles.getTurtle(turtle).painter.closeSVG();
         if (turtles.getTurtle(turtle).painter.svgOutput !== "") {
             return false;
