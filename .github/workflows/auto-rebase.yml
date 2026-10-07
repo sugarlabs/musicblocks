@@ -128,16 +128,17 @@ jobs:
                               continue;
                           }
 
-                          // Skip PRs from forks that don't allow maintainer edits
+                          // Skip PRs from forks — GITHUB_TOKEN has write access only to this
+                          // repository, so automated pushes to contributor forks are not
+                          // supported. Maintainers can rebase fork PRs manually when "Allow edits
+                          // from maintainers" is enabled.
                           if (headRepo.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
-                              if (!pr.maintainer_can_modify) {
-                                  core.warning(
-                                      `PR #${prNumber}: skipped — fork does not allow maintainer edits.`
-                                  );
-                                  skipped++;
-                                  skips.push({ pr: prNumber, reason: 'fork does not allow maintainer edits' });
-                                  continue;
-                              }
+                              core.info(
+                                  `PR #${prNumber}: skipped — fork PR (GITHUB_TOKEN cannot push to forks).`
+                              );
+                              skipped++;
+                              skips.push({ pr: prNumber, reason: 'fork PR (no push access)' });
+                              continue;
                           }
 
                           // Skip PRs with very recent *commits* to avoid racing the contributor.
