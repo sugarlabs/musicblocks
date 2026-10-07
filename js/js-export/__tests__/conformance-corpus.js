@@ -467,8 +467,142 @@ const actionsAndCalls = [
     }
 ];
 
+const controlFlow = [
+    {
+        name: "repeat_loop_fixed_count",
+        description: "Repeat loop with fixed integer iteration count (repeat 4)",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "repeat", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 4 }], 0, 0, [1]],
+            [3, "forward", 0, 0, [1, 4, null]],
+            [4, ["number", { value: 100 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "repeat_loop_dynamic_box_count",
+        description: "Repeat loop with dynamic iteration count from box variable (repeat n)",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, ["storein2", { value: "n" }], 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 3 }], 0, 0, [1]],
+            [3, "repeat", 0, 0, [1, 4, 5, null]],
+            [4, ["namedbox", { value: "n" }], 0, 0, [3]],
+            [5, "forward", 0, 0, [3, 6, null]],
+            [6, ["number", { value: 50 }], 0, 0, [5]]
+        ]
+    },
+    {
+        name: "repeat_loop_with_nested_repeat",
+        description: "Nested repeat loops (outer repeat 3, inner repeat 4)",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "repeat", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 3 }], 0, 0, [1]],
+            [3, "repeat", 0, 0, [1, 4, 5, null]],
+            [4, ["number", { value: 4 }], 0, 0, [3]],
+            [5, "forward", 0, 0, [3, 6, null]],
+            [6, ["number", { value: 10 }], 0, 0, [5]]
+        ]
+    },
+    {
+        name: "forever_infinite_loop",
+        description: "Forever loop clamp executing statements repeatedly",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "forever", 0, 0, [0, 2, null]],
+            [2, "forward", 0, 0, [1, 3, null]],
+            [3, ["number", { value: 10 }], 0, 0, [2]]
+        ]
+    },
+    {
+        name: "conditional_if_then",
+        description: "Single if-then conditional clamp with boolean condition",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "if", 0, 0, [0, 2, 3, null]],
+            [2, ["boolean", { value: "true" }], 0, 0, [1]],
+            [3, "forward", 0, 0, [1, 4, null]],
+            [4, ["number", { value: 25 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "conditional_if_then_else",
+        description: "Double clamp ifthenelse with then and else branches",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "ifthenelse", 0, 0, [0, 2, 3, 5, null]],
+            [2, ["boolean", { value: "true" }], 0, 0, [1]],
+            [3, "forward", 0, 0, [1, 4, null]],
+            [4, ["number", { value: 10 }], 0, 0, [3]],
+            [5, "forward", 0, 0, [1, 6, null]],
+            [6, ["number", { value: 20 }], 0, 0, [5]]
+        ]
+    },
+    {
+        name: "conditional_ifthenelse_inside_loop",
+        description: "Conditional ifthenelse nested inside repeat loop",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "repeat", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 2 }], 0, 0, [1]],
+            [3, "ifthenelse", 0, 0, [1, 4, 5, 7, null]],
+            [4, ["boolean", { value: "true" }], 0, 0, [3]],
+            [5, "forward", 0, 0, [3, 6, null]],
+            [6, ["number", { value: 10 }], 0, 0, [5]],
+            [7, "forward", 0, 0, [3, 8, null]],
+            [8, ["number", { value: 20 }], 0, 0, [7]]
+        ]
+    },
+    {
+        name: "while_loop_with_condition",
+        description: "While loop clamp continuing while boolean condition is true",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "while", 0, 0, [0, 2, 3, null]],
+            [2, ["boolean", { value: "true" }], 0, 0, [1]],
+            [3, "forward", 0, 0, [1, 4, null]],
+            [4, ["number", { value: 10 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "until_loop_with_condition",
+        description: "Until loop clamp repeating until boolean condition terminates",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "until", 0, 0, [0, 2, 3, null]],
+            [2, ["boolean", { value: "false" }], 0, 0, [1]],
+            [3, "forward", 0, 0, [1, 4, null]],
+            [4, ["number", { value: 10 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "repeat_loop_with_break",
+        description: "Repeat loop with break statement terminating early",
+        category: "control_flow",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "repeat", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 5 }], 0, 0, [1]],
+            [3, "forward", 0, 0, [1, 4, 5]],
+            [4, ["number", { value: 10 }], 0, 0, [3]],
+            [5, "break", 0, 0, [3, null]]
+        ]
+    }
+];
+
 module.exports = {
     basicValuesAndExpressions,
     variablesAndBoxes,
-    actionsAndCalls
+    actionsAndCalls,
+    controlFlow
 };

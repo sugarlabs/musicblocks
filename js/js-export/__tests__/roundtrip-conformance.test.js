@@ -40,7 +40,8 @@ const {
 const {
     basicValuesAndExpressions,
     variablesAndBoxes,
-    actionsAndCalls
+    actionsAndCalls,
+    controlFlow
 } = require("./conformance-corpus");
 
 describe("Round-Trip Conformance Test Harness", () => {
@@ -53,7 +54,8 @@ describe("Round-Trip Conformance Test Harness", () => {
             expect(resolveProtoBlock("start")).toEqual({ style: "hat", args: 0 });
             expect(resolveProtoBlock("action")).toEqual({ style: "hat", args: 1 });
             expect(resolveProtoBlock("repeat", 4)).toEqual({ style: "clamp", args: 2 });
-            expect(resolveProtoBlock("if", 5)).toEqual({ style: "doubleclamp", args: 3 });
+            expect(resolveProtoBlock("if", 4)).toEqual({ style: "clamp", args: 2 });
+            expect(resolveProtoBlock("ifthenelse", 5)).toEqual({ style: "doubleclamp", args: 3 });
             expect(resolveProtoBlock("number", 1)).toEqual({ style: "value", args: 0 });
             expect(resolveProtoBlock("plus", 3)).toEqual({ style: "arg", args: 2 });
             expect(resolveProtoBlock("forward", 3)).toEqual({ style: "command", args: 1 });
@@ -246,6 +248,15 @@ MusicBlocks.run();`;
 
     describe("Actions and Calls Corpus", () => {
         test.each(actionsAndCalls)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Control Flow and Repetition Corpus", () => {
+        test.each(controlFlow)("$description ($name)", ({ blocks }) => {
             const { recoveredBlocks } = runRoundTrip(blocks);
             const normalizedOriginal = normalizeBlockStructure(blocks);
             const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);

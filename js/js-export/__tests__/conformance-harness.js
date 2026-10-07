@@ -49,10 +49,16 @@ function resolveProtoBlock(name, connectionsLength = 0) {
     if (name === "action") {
         return { style: "hat", args: 1 };
     }
-    if (name === "if" || name === "ifthenelse") {
+    if (name === "ifthenelse") {
         return {
             style: "doubleclamp",
             args: connectionsLength > 0 ? connectionsLength - 2 : 3
+        };
+    }
+    if (name === "if") {
+        return {
+            style: "clamp",
+            args: connectionsLength > 0 ? connectionsLength - 2 : 2
         };
     }
     if (
