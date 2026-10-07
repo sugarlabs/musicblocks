@@ -1582,12 +1582,8 @@
             (function () {
                 function resizeCanvasesToScreen() {
                     const canvases = document.querySelectorAll("canvas");
-                    const width = window.innerWidth;
-                    const height = window.innerHeight;
 
                     canvases.forEach(c => {
-                        c.width = width;
-                        c.height = height;
                         c.style.width = "100%";
                         c.style.height = "100%";
                     });
