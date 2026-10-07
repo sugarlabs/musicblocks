@@ -949,5 +949,41 @@ describe("ProjectStorage", () => {
                 { id: "draft-B", status: "pending", timestamp: 2 }
             ]);
         });
+
+        it("a remote deletion is not undone by a stale local save", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            // Start with a synced draft
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [
+                { id: "draft-A", status: "synced", message: "A", timestamp: 1, date: "2023-01-01" }
+            ];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            // Tab A establishes baseData and persists
+            await storageA.save();
+            // Tab B establishes baseData
+            await storageB.save();
+
+            // Tab A intentionally removes the synced draft using the actual method
+            await storageA.removeSyncedDrafts("proj1", [
+                { message: "A", date: "2023-01-02T00:00:00Z" }
+            ]);
+
+            // Tab B (stale) performs an unrelated save (e.g. changing the project name)
+            storageB.data.Projects["proj1"].ProjectName = "Changed Name";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            // draft-A should be deleted because Tab A deleted it, and Tab B's save should respect that remote deletion.
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([]);
+            // Tab B's unrelated change should be preserved.
+            expect(persistedData.Projects["proj1"].ProjectName).toEqual("Changed Name");
+        });
     });
 });

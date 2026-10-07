@@ -421,9 +421,15 @@ class ProjectStorage {
                             });
 
                             localDrafts.forEach(localDraft => {
+                                const inBase = baseDrafts.some(d => d.id === localDraft.id);
                                 const remoteDraft = existingProj.commitDrafts.find(
                                     d => d.id === localDraft.id
                                 );
+
+                                if (inBase && !remoteDraft) {
+                                    return;
+                                }
+
                                 if (
                                     remoteDraft &&
                                     remoteDraft.status === "synced" &&
