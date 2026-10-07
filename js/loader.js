@@ -62,6 +62,9 @@ requirejs.config({
         "Chart": {
             exports: "Chart"
         },
+        "i18nextHttpBackend": {
+            exports: "i18nextHttpBackend"
+        },
         "p5.min": {
             exports: "p5"
         },
