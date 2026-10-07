@@ -145,7 +145,8 @@ class TempoControls {
     _useBPM(i) {
         const input = this.BPMInputs[i].value;
 
-        if (isNaN(input)) {
+        // isNaN("") is false and Number("") is 0, so an empty input would set the slowest tempo.
+        if (isNaN(input) || String(input).trim() === "") {
             this.activity.errorMsg(
                 _("Please enter a number between 30 and 1000"),
                 null,

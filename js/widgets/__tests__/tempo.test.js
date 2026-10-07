@@ -230,6 +230,23 @@ describe("Tempo Widget", () => {
             );
         });
 
+        test.each(["", "   "])("rejects an empty input (%p) and keeps the tempo", value => {
+            tempoWidget.BPMs[0] = 120;
+            tempoWidget.BPMInputs[0].value = value;
+            const updateSpy = jest.spyOn(tempoWidget, "_updateBPM");
+
+            tempoWidget._useBPM(0);
+
+            expect(tempoWidget.BPMs[0]).toBe(120);
+            expect(updateSpy).not.toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Please enter a number"),
+                null,
+                null,
+                3000
+            );
+        });
+
         test("should clamp BPM above 1000 to 1000", () => {
             tempoWidget.BPMInputs[0].value = 1500;
 
@@ -264,15 +281,6 @@ describe("Tempo Widget", () => {
             tempoWidget._useBPM(0);
 
             expect(tempoWidget.BPMInputs[0].value).toBe(150);
-        });
-
-        test("should clamp empty string input to 30", () => {
-            tempoWidget.BPMInputs[0].value = "";
-
-            tempoWidget._useBPM(0);
-
-            expect(tempoWidget.BPMs[0]).toBe(30);
-            expect(mockActivity.errorMsg).toHaveBeenCalled();
         });
     });
 
