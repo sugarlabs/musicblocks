@@ -1906,6 +1906,7 @@ class Activity {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
+                this._onResize(false);
                 this.setupPaletteMenu();
             }, 200);
         };
