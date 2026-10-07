@@ -81,7 +81,19 @@ global.TunerDisplay = class {
 
 global.ManagedTimer = require("../../utils/ManagedTimer.js");
 
+// The widget's methods live in these modules and are installed by the constructor,
+// so they must be global before a widget is made, as in the browser.
+global.SamplerBlocks = require("../SamplerBlocks.js");
+global.SamplerPlayback = require("../SamplerPlayback.js");
+global.SamplerPitch = require("../SamplerPitch.js");
+global.SamplerFiles = require("../SamplerFiles.js");
+global.SamplerUI = require("../SamplerUI.js");
+global.SamplerPieMenu = require("../SamplerPieMenu.js");
+global.SamplerCanvas = require("../SamplerCanvas.js");
+global.SamplerTuner = require("../SamplerTuner.js");
 const { SampleWidget, PitchSmoother, resolveBackendURL } = require("../sampler.js");
+// resolveBackendURL is a top-level function in sampler.js, so it's global in the browser too.
+global.resolveBackendURL = resolveBackendURL;
 
 describe("resolveBackendURL", () => {
     test("returns window.AI_SAMPLE_ENDPOINT when defined and strips trailing slashes", () => {
@@ -112,7 +124,18 @@ describe("resolveBackendURL", () => {
 
 describe("SampleWidget.dependencies", () => {
     test("includes the tuner module used by the sampler", () => {
-        expect(SampleWidget.dependencies).toEqual(["widgets/tuner", "widgets/sampler"]);
+        expect(SampleWidget.dependencies).toEqual([
+            "widgets/tuner",
+            "widgets/SamplerBlocks",
+            "widgets/SamplerPlayback",
+            "widgets/SamplerPitch",
+            "widgets/SamplerFiles",
+            "widgets/SamplerUI",
+            "widgets/SamplerPieMenu",
+            "widgets/SamplerCanvas",
+            "widgets/SamplerTuner",
+            "widgets/sampler"
+        ]);
     });
 });
 

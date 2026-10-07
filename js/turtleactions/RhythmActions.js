@@ -16,7 +16,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM */
+/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM, getMeasurePosition */
 
 /*
    Global Locations
@@ -26,6 +26,8 @@
         Singer
     js/logo.js
         TONEBPM
+    js/utils/musicutils-rhythm.js
+        getMeasurePosition
     js/js-export/export.js
         MusicBlocks, Mouse
 */
@@ -64,16 +66,10 @@ function setupRhythmActions(activity) {
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
-                let beatValue, measureValue;
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
-                    beatValue = measureValue = 0;
-                } else {
-                    const beat =
-                        tur.singer.noteValuePerBeat *
-                        (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup);
-                    beatValue = 1 + (beat % tur.singer.beatsPerMeasure);
-                    measureValue = 1 + Math.floor(beat / tur.singer.beatsPerMeasure);
-                }
+                const { beat: beatValue, measure: measureValue } = getMeasurePosition(
+                    tur.singer,
+                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
+                );
 
                 tur.singer.currentBeat = beatValue;
                 tur.singer.currentMeasure = measureValue;
