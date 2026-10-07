@@ -59,6 +59,21 @@ const piemenuBlockContext = block => {
 
     docById("contextWheelDiv").style.display = "";
 
+    // The long-press release can land on a wheel item because the wheel opens
+    // under the pointer. Stop only that menu event before wheelnav can select
+    // an item; releases elsewhere still reach the rest of the application.
+    if (window._contextWheelIgnoreNextMouseUp) {
+        const contextWheel = docById("contextWheelDiv");
+        const ignoreLongPressRelease = event => {
+            window._contextWheelIgnoreNextMouseUp = false;
+            document.removeEventListener("mouseup", ignoreLongPressRelease, true);
+            if (contextWheel.contains(event.target)) {
+                event.stopPropagation();
+            }
+        };
+        document.addEventListener("mouseup", ignoreLongPressRelease, true);
+    }
+
     const labels = [
         "imgsrc:header-icons/copy-button.svg",
         "imgsrc:header-icons/extract-button.svg",
@@ -172,6 +187,17 @@ const piemenuBlockContext = block => {
 
     window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
+        if (window._contextWheelIgnoreNextClick) {
+            const clickedInsideWheel =
+                event.target &&
+                typeof wheelElement.contains === "function" &&
+                wheelElement.contains(event.target);
+            window._contextWheelIgnoreNextClick = false;
+            if (!clickedInsideWheel) {
+                return;
+            }
+        }
+
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";

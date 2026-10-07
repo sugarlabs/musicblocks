@@ -3343,6 +3343,19 @@ class Block {
                 }
             };
             // We might be able to check which button was clicked.
+            if (that._triggerLongPress) {
+                that._triggerLongPress = false;
+                if (
+                    event.nativeEvent &&
+                    typeof event.nativeEvent.stopImmediatePropagation === "function"
+                ) {
+                    event.nativeEvent.stopImmediatePropagation();
+                } else if (typeof event.stopPropagation === "function") {
+                    event.stopPropagation();
+                }
+                return;
+            }
+
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
@@ -3468,6 +3481,8 @@ class Block {
             const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
+                window._contextWheelIgnoreNextClick = true;
+                window._contextWheelIgnoreNextMouseUp = true;
                 that.blocks.triggerLongPress();
             };
             if (that.blocks && typeof that.blocks.setTimeout === "function") {
@@ -3560,6 +3575,11 @@ class Block {
         this.container.on("pressmove", event => {
             // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
+
+            // A long press opens the context menu instead of starting a drag.
+            if (that._triggerLongPress || that.blocks.getLongPressStatus()) {
+                return;
+            }
 
             // Don't allow silence block to be dragged out of a note.
             if (that.name === "rest2") {

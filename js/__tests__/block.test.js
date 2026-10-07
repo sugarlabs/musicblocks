@@ -1559,6 +1559,7 @@ describe("Block Foundation", () => {
             block._calculateBlockHitArea = jest.fn();
 
             mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.getLongPressStatus = jest.fn().mockReturnValue(false);
             block.activity.closeHelpfulWheel = jest.fn();
             block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
             block.activity.logo.runLogoCommands = jest.fn();
@@ -1597,6 +1598,48 @@ describe("Block Foundation", () => {
             } finally {
                 jest.useRealTimers();
             }
+        });
+
+        it("does not treat a released long press as a regular click", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            const stopImmediatePropagation = jest.fn();
+
+            handlers.click({
+                nativeEvent: { button: 0, stopImmediatePropagation }
+            });
+
+            expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+            expect(block._triggerLongPress).toBe(false);
+            expect(stopImmediatePropagation).toHaveBeenCalled();
+        });
+
+        it("does not run a released long press with Shift held", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            const stopImmediatePropagation = jest.fn();
+
+            handlers.click({
+                nativeEvent: { button: 0, shiftKey: true, stopImmediatePropagation }
+            });
+
+            expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+            expect(mockBlocks.findTopBlock).not.toHaveBeenCalled();
+            expect(block._triggerLongPress).toBe(false);
+            expect(stopImmediatePropagation).toHaveBeenCalled();
+        });
+
+        it("does not move a block after a long press opens the menu", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            block.blocks.getLongPressStatus.mockReturnValue(true);
+            block.blocks.moveBlockRelativeBatched = jest.fn();
+
+            handlers.pressmove({
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(block.blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
         });
     });
 
