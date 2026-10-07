@@ -1843,7 +1843,7 @@ function Synth() {
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return instruments[turtle][sourceName].toDestination();
+            return this.routeInstrument(turtle, instruments[turtle][sourceName]);
         }
 
         return null;

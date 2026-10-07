@@ -2265,6 +2265,25 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
         });
 
+        it("should keep a reloaded instrument on the panner", async () => {
+            const mockSynth = createMockSynth();
+            instruments[panTurtle] = { guitar: mockSynth };
+            Synth.setTurtleOutput(panTurtle, panner);
+            const createSpy = jest.spyOn(Synth, "createSynth").mockResolvedValue();
+            const volumeSpy = jest.spyOn(Synth, "setVolume").mockImplementation(() => {});
+
+            try {
+                await Synth.loadSynth(panTurtle, "guitar");
+
+                expect(mockSynth.toDestination).not.toHaveBeenCalled();
+                expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
+                expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+            } finally {
+                createSpy.mockRestore();
+                volumeSpy.mockRestore();
+            }
+        });
+
         it("should return to the panner when the effects chain fails", async () => {
             const mockSynth = createMockSynth();
             mockSynth.chain.mockImplementation(() => {
