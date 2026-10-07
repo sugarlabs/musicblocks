@@ -11,7 +11,7 @@
 
 // This is the "Offline page" service worker
 
-const CACHE = "pwabuilder-precache";
+const CACHE = "pwabuilder-precache-v2";
 const offlineFallbackPage = "/index.html";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
@@ -35,7 +35,18 @@ self.addEventListener("install", function (event) {
 // Allow sw to control of current page
 self.addEventListener("activate", function (event) {
     console.log("[PWA Builder] Claiming clients for current page");
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(
+        Promise.all([
+            self.clients.claim(),
+            caches.keys().then(function (cacheNames) {
+                return Promise.all(
+                    cacheNames
+                        .filter(name => name.startsWith("pwabuilder-precache-") && name !== CACHE)
+                        .map(name => caches.delete(name))
+                );
+            })
+        ])
+    );
 });
 
 function isPrecachedRequest(request) {
@@ -54,9 +65,6 @@ function isStaticAssetRequest(request) {
 
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return false;
-
-    // Never runtime-cache URLs with query params (precache exact URLs instead).
-    if (url.search) return false;
 
     // Avoid caching programmatic fetch() calls (often API/data requests).
     if (!request.destination) return false;
@@ -182,7 +190,7 @@ self.addEventListener("fetch", function (event) {
                 } catch (error) {
                     console.log("[PWA Builder] Network request failed and no cache." + error);
 
-                    if (typeof offlineFallbackPage !== "undefined") {
+                    if (isAppShellNavigation(event.request)) {
                         const fallbackResponse = await caches.match(offlineFallbackPage);
                         if (fallbackResponse) return fallbackResponse;
                     }
