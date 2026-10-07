@@ -421,7 +421,6 @@ function LegoBricksPlayback() {
                 currentX: 0,
                 currentColor: null,
                 colorStartTime: null,
-                lastSignificantColor: null,
                 completed: false,
                 rowIndex: index
             });
@@ -462,39 +461,9 @@ function LegoBricksPlayback() {
             line.currentX += scanSpeed * deltaTime;
             const maxX = containerRect.width;
 
-            // Check if we've reached the container boundary
-            if (line.currentX > maxX) {
-                line.completed = true;
-                // Record final color segment if it existed
-                if (line.lastSignificantColor && line.colorStartTime) {
-                    const duration = (now - line.colorStartTime) / 1000;
-                    if (duration > 1.0) {
-                        // Only save segments longer than 1000ms
-                        this.colorData[line.rowIndex].colorSegments.push({
-                            color: line.lastSignificantColor.name,
-                            duration: duration,
-                            endTime: now - this.startTime
-                        });
-                    }
-                }
-                return;
-            }
-
-            // Check if we've reached the right edge of the actual image
-            if (this._isLineBeyondImageHorizontally(line)) {
-                line.completed = true;
-                // Record final color segment if it existed
-                if (line.lastSignificantColor && line.colorStartTime) {
-                    const duration = (now - line.colorStartTime) / 1000;
-                    if (duration > 1.0) {
-                        // Only save segments longer than 1000ms
-                        this.colorData[line.rowIndex].colorSegments.push({
-                            color: line.lastSignificantColor.name,
-                            duration: duration,
-                            endTime: now - this.startTime
-                        });
-                    }
-                }
+            // Check if we've reached the container boundary or the right edge of the actual image
+            if (line.currentX > maxX || this._isLineBeyondImageHorizontally(line)) {
+                this._finishScanLine(line, now);
                 return;
             }
 
@@ -511,6 +480,26 @@ function LegoBricksPlayback() {
             this._stopPlayback();
         } else {
             this._animationFrameId = requestAnimationFrame(() => this._animateLines());
+        }
+    };
+
+    /**
+     * Marks a scanning line as done and saves the color it was on. _sampleAndDetectColor only
+     * saves a segment when the color changes, so without this the color a row ends on, or a
+     * row's only color, would be lost.
+     * @private
+     * @param {object} line - The scanning line object
+     * @param {number} now - The current time in milliseconds
+     * @returns {void}
+     */
+    this._finishScanLine = function (line, now) {
+        line.completed = true;
+        if (line.currentColor && line.colorStartTime) {
+            const duration = now - line.colorStartTime;
+            // Same minimum as the segments saved on a color change.
+            if (duration > 1000) {
+                this._addColorSegment(line.rowIndex, line.currentColor, duration);
+            }
         }
     };
 

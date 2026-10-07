@@ -36,6 +36,7 @@ const METHODS = [
     "_playPhrase",
     "_animateLines",
     "_isLineBeyondImageHorizontally",
+    "_finishScanLine",
     "_stopPolyphonicPlayback",
     "_stopPlayback",
     "playColorMusicPolyphonic"
@@ -281,6 +282,76 @@ describe("LegoBricksPlayback", () => {
             expect(widget.scanningLines[0].completed).toBe(true);
             expect(widget._stopPlayback).toHaveBeenCalled();
             expect(rafSpy).not.toHaveBeenCalled();
+        });
+
+        describe("the color a line is on when it reaches the edge", () => {
+            const makeLine = (currentX, startedAgo) => ({
+                element: document.createElement("div"),
+                currentX,
+                rowIndex: 0,
+                currentColor: { name: "red", hue: 0 },
+                colorStartTime: performance.now() - startedAgo
+            });
+
+            beforeEach(() => {
+                widget._stopPlayback = jest.fn();
+                widget.colorData = [];
+            });
+
+            test("is saved when the line leaves the overlay", () => {
+                widget.scanningLines = [makeLine(500, 4000)];
+
+                widget._animateLines();
+
+                const segments = widget.colorData[0].colorSegments;
+                expect(segments).toHaveLength(1);
+                expect(segments[0].color).toBe("red");
+                // In milliseconds, like the segments saved on a color change.
+                expect(segments[0].duration).toBeGreaterThanOrEqual(4000);
+                expect(segments[0].duration).toBeLessThan(5000);
+            });
+
+            test("is saved when the line passes the image's right edge", () => {
+                widget._isLineBeyondImageHorizontally = jest.fn(() => true);
+                widget.scanningLines = [makeLine(10, 3000)];
+
+                widget._animateLines();
+
+                expect(widget.scanningLines[0].completed).toBe(true);
+                expect(widget.colorData[0].colorSegments).toEqual([
+                    expect.objectContaining({ color: "red" })
+                ]);
+            });
+
+            test("follows a segment saved on an earlier color change", () => {
+                widget._addColorSegment(0, { name: "blue", hue: 240 }, 2000);
+                widget.scanningLines = [makeLine(500, 1500)];
+
+                widget._animateLines();
+
+                expect(widget.colorData[0].colorSegments.map(s => s.color)).toEqual([
+                    "blue",
+                    "red"
+                ]);
+            });
+
+            test("is not saved when it lasted a second or less", () => {
+                widget.scanningLines = [makeLine(500, 500)];
+
+                widget._animateLines();
+
+                expect(widget.colorData[0]).toBeUndefined();
+            });
+
+            test("nothing is saved for a line that never found a color", () => {
+                widget.scanningLines = [
+                    { element: document.createElement("div"), currentX: 500, rowIndex: 0 }
+                ];
+
+                widget._animateLines();
+
+                expect(widget.colorData[0]).toBeUndefined();
+            });
         });
 
         test("does nothing when playback is off", () => {
