@@ -476,6 +476,14 @@ function setupWidgetBlocks(activity) {
                 "sample",
                 _getWidgetDependencies(typeof SampleWidget !== "undefined" ? SampleWidget : null, [
                     "widgets/tuner",
+                    "widgets/SamplerBlocks",
+                    "widgets/SamplerPlayback",
+                    "widgets/SamplerPitch",
+                    "widgets/SamplerFiles",
+                    "widgets/SamplerUI",
+                    "widgets/SamplerPieMenu",
+                    "widgets/SamplerCanvas",
+                    "widgets/SamplerTuner",
                     "widgets/sampler"
                 ]),
                 () => new SampleWidget(),
@@ -2204,6 +2212,14 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "legoWidget",
                 _getWidgetDependencies(typeof LegoWidget !== "undefined" ? LegoWidget : null, [
+                    "widgets/LegoBricksRows",
+                    "widgets/LegoBricksLayout",
+                    "widgets/LegoBricksExport",
+                    "widgets/LegoBricksMedia",
+                    "widgets/LegoBricksEyeDropper",
+                    "widgets/LegoBricksColor",
+                    "widgets/LegoBricksPlayback",
+                    "widgets/LegoBricksVisualization",
                     "widgets/legobricks"
                 ]),
                 () => new LegoWidget(),

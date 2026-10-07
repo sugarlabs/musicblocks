@@ -20,7 +20,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.LegoBricksRows = require("../LegoBricksRows");
+global.LegoBricksLayout = require("../LegoBricksLayout");
+global.LegoBricksExport = require("../LegoBricksExport");
+global.LegoBricksMedia = require("../LegoBricksMedia");
+global.LegoBricksEyeDropper = require("../LegoBricksEyeDropper");
+global.LegoBricksColor = require("../LegoBricksColor");
+global.LegoBricksPlayback = require("../LegoBricksPlayback");
+global.LegoBricksVisualization = require("../LegoBricksVisualization");
 const LegoWidget = require("../legobricks");
+global.LegoWidget = LegoWidget;
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
 
@@ -291,9 +300,24 @@ describe("LegoWidget Core Logic", () => {
             });
         });
 
-        it("should fall back to do for a note name outside the map", () => {
+        it("should keep the flat on an enharmonic note name such as Cb", () => {
             expect(legoWidget._convertRowToPitch({ note: "Cb4" })).toEqual({
-                solfege: "do",
+                solfege: "do♭",
+                octave: 4
+            });
+        });
+
+        it("should read the ♯ and ♭ that getNote writes into the row note", () => {
+            expect(legoWidget._convertRowToPitch({ note: "F♯4" })).toEqual({
+                solfege: "fa♯",
+                octave: 4
+            });
+            expect(legoWidget._convertRowToPitch({ note: "B♭3" })).toEqual({
+                solfege: "ti♭",
+                octave: 3
+            });
+            expect(legoWidget._convertRowToPitch({ note: "E♯4" })).toEqual({
+                solfege: "mi♯",
                 octave: 4
             });
         });
@@ -3092,5 +3116,77 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
             expect(legoWidget._timerManager.clearAll).toHaveBeenCalledTimes(1);
             expect(mockWindow.destroy).toHaveBeenCalledTimes(1);
         });
+    });
+});
+
+describe("LegoWidget — a module that fails to load", () => {
+    const MODULE_NAMES = [
+        "LegoBricksRows",
+        "LegoBricksLayout",
+        "LegoBricksExport",
+        "LegoBricksMedia",
+        "LegoBricksEyeDropper",
+        "LegoBricksColor",
+        "LegoBricksPlayback",
+        "LegoBricksVisualization"
+    ];
+    const loaded = {};
+
+    beforeEach(() => {
+        for (const name of MODULE_NAMES) {
+            loaded[name] = global[name];
+        }
+    });
+
+    afterEach(() => {
+        for (const name of MODULE_NAMES) {
+            global[name] = loaded[name];
+        }
+    });
+
+    it.each(MODULE_NAMES)("throws naming %s when it is not loaded", name => {
+        delete global[name];
+        expect(() => new LegoWidget()).toThrow(
+            "LegoWidget: LEGO Bricks module not loaded: " + name
+        );
+    });
+
+    it("installs no module when one is missing", () => {
+        const spies = {};
+        for (const name of MODULE_NAMES) {
+            spies[name] = jest.fn();
+            global[name] = spies[name];
+        }
+        delete global.LegoBricksVisualization;
+
+        const widget = {};
+        expect(() => LegoWidget.installModules(widget)).toThrow("LegoBricksVisualization");
+        for (const name of MODULE_NAMES.slice(0, -1)) {
+            expect(spies[name]).not.toHaveBeenCalled();
+        }
+        expect(widget).toEqual({});
+    });
+
+    it("names every missing module", () => {
+        delete global.LegoBricksMedia;
+        global.LegoBricksColor = undefined;
+        expect(() => new LegoWidget()).toThrow(
+            "LegoWidget: LEGO Bricks module not loaded: LegoBricksMedia, LegoBricksColor"
+        );
+    });
+
+    it("treats a module that loaded as something other than a function as missing", () => {
+        global.LegoBricksPlayback = {};
+        expect(() => new LegoWidget()).toThrow("LegoBricksPlayback");
+    });
+
+    it("still builds the widget once every module is back", () => {
+        delete global.LegoBricksRows;
+        expect(() => new LegoWidget()).toThrow("LegoBricksRows");
+        global.LegoBricksRows = loaded.LegoBricksRows;
+
+        const widget = new LegoWidget();
+        expect(typeof widget.addRowBlock).toBe("function");
+        expect(typeof widget._startWebcam).toBe("function");
     });
 });

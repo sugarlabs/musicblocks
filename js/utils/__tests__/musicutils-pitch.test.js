@@ -91,6 +91,38 @@ describe("musicutils-pitch", () => {
         }
     });
 
+    it("calculates interval octaves for numbers, keywords, and string-typed numbers", () => {
+        // Numeric values
+        expect(pitch.calcOctaveInterval(1)).toBe(1);
+        expect(pitch.calcOctaveInterval(-1)).toBe(-1);
+        expect(pitch.calcOctaveInterval(0)).toBe(0);
+        expect(pitch.calcOctaveInterval(2)).toBe(2);
+        expect(pitch.calcOctaveInterval(-2)).toBe(-2);
+
+        // Keywords
+        expect(pitch.calcOctaveInterval("next")).toBe(1);
+        expect(pitch.calcOctaveInterval("previous")).toBe(-1);
+        expect(pitch.calcOctaveInterval("current")).toBe(0);
+
+        // String-typed numbers
+        expect(pitch.calcOctaveInterval("1")).toBe(1);
+        expect(pitch.calcOctaveInterval("-1")).toBe(-1);
+        expect(pitch.calcOctaveInterval("0")).toBe(0);
+        expect(pitch.calcOctaveInterval("2")).toBe(2);
+        expect(pitch.calcOctaveInterval("-2")).toBe(-2);
+        expect(pitch.calcOctaveInterval(" 1 ")).toBe(1);
+        expect(pitch.calcOctaveInterval(" -2 ")).toBe(-2);
+
+        // Out of range or invalid inputs default to 0
+        expect(pitch.calcOctaveInterval("5")).toBe(0);
+        expect(pitch.calcOctaveInterval(3)).toBe(0);
+        expect(pitch.calcOctaveInterval(-3)).toBe(0);
+        expect(pitch.calcOctaveInterval("invalid")).toBe(0);
+        expect(pitch.calcOctaveInterval("")).toBe(0);
+        expect(pitch.calcOctaveInterval(null)).toBe(0);
+        expect(pitch.calcOctaveInterval(undefined)).toBe(0);
+    });
+
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
             "musicutils-constants.js",

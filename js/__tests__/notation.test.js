@@ -351,6 +351,13 @@ describe("Notation Class", () => {
             expect(notation._notationStaging[turtle]).toEqual(["end slur"]);
         });
 
+        it("should begin a repeat on both the note and drum staging", () => {
+            const turtle = "turtle1";
+            notation.notationBeginRepeat(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin repeat"]);
+            expect(notation._notationDrumStaging[turtle]).toEqual(["begin repeat"]);
+        });
+
         it("should insert tie", () => {
             const turtle = "turtle1";
             notation.notationInsertTie(turtle);
