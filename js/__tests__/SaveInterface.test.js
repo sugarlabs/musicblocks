@@ -861,7 +861,7 @@ describe("saveWAV & saveABC methods", () => {
         expect(activity.logo.runningAbc).toBe(true);
     });
 
-    it("should encode and download ABC notation output", () => {
+    it("should encode and download ABC notation output and clear notation output/buffer", () => {
         const mockSaveAbcOutput = jest.fn(() => "mock_abc_data");
 
         global.saveAbcOutput = mockSaveAbcOutput;
@@ -869,6 +869,12 @@ describe("saveWAV & saveABC methods", () => {
         const activity = {
             save: {
                 download: mockDownload
+            },
+            logo: {
+                notationOutput: "previous_abc_output",
+                recordingBuffer: {
+                    hasData: true
+                }
             }
         };
 
@@ -876,6 +882,8 @@ describe("saveWAV & saveABC methods", () => {
 
         expect(mockSaveAbcOutput).toHaveBeenCalledWith(activity);
         expect(mockDownload).toHaveBeenCalledWith("abc", "data:text;utf8,mock_abc_data", null);
+        expect(activity.logo.notationOutput).toBe("");
+        expect(activity.logo.recordingBuffer.hasData).toBe(false);
     });
 });
 
@@ -1164,7 +1172,9 @@ describe("saveLilypond Methods", () => {
         expect(mockActivity.logo.MIDIOutput).toContain(expectedMIDIOutput);
     });
 
-    it("should call saveLilypondOutput and afterSaveLilypondLY", () => {
+    it("should call saveLilypondOutput and afterSaveLilypondLY and clear notation output/buffer", () => {
+        instance.activity.logo.notationOutput = "previous_lilypond_output";
+        instance.activity.logo.recordingBuffer.hasData = true;
         instance.afterSaveLilypond("ignored.ly");
         expect(mockSaveLilypondOutput).toHaveBeenCalledWith(instance.activity);
         expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith(
@@ -1172,6 +1182,8 @@ describe("saveLilypond Methods", () => {
             "TestProject.ly"
         );
         expect(instance.notationConvert).toBe("");
+        expect(instance.activity.logo.notationOutput).toBe("");
+        expect(instance.activity.logo.recordingBuffer.hasData).toBe(false);
     });
 
     it('should set cursor to "wait" and call ly2pdf with correct arguments', () => {

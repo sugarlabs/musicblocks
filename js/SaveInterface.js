@@ -680,6 +680,12 @@ class SaveInterface {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
             } finally {
+                if (this.activity && this.activity.logo) {
+                    this.activity.logo.notationOutput = "";
+                    if (this.activity.logo.recordingBuffer) {
+                        this.activity.logo.recordingBuffer.hasData = false;
+                    }
+                }
                 document.body.style.cursor = "default";
             }
         });
@@ -933,6 +939,12 @@ class SaveInterface {
                 this.activity.errorMsg(`${_("Error generating Lilypond output.")} ${e.message}`);
             } finally {
                 this.notationConvert = "";
+                if (this.activity && this.activity.logo) {
+                    this.activity.logo.notationOutput = "";
+                    if (this.activity.logo.recordingBuffer) {
+                        this.activity.logo.recordingBuffer.hasData = false;
+                    }
+                }
                 document.body.style.cursor = "default";
             }
         });
