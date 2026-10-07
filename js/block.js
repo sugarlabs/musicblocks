@@ -5000,6 +5000,9 @@ class Block {
         }
 
         c = this.connections[0];
+        // Capture the value the user actually typed before any collision resolution
+        // so the second action switch can always detect a user-initiated rename.
+        const typedActionValue = newValue;
         if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             let uniqueValue;
@@ -5007,22 +5010,28 @@ class Block {
                 case "action":
                     {
                         const isNameChanged = oldValue !== newValue;
-                        if (isNameChanged) {
+                        if (isNameChanged && commitLabelEdit) {
                             this.blocks.palettes.removeActionPrototype(oldValue);
                         }
 
-                        // Ensure new name is unique.
-                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
-                        if (validatedName !== newValue) {
-                            newValue = validatedName;
-                            this.value = newValue;
-                            let label = this.value.toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                label = label.slice(0, STRINGLEN) + "...";
+                        // Ensure new name is unique upon committing the edit.
+                        if (commitLabelEdit) {
+                            const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                            if (validatedName !== newValue) {
+                                // Notify the user that their chosen name was already taken.
+                                this.activity.errorMsg(
+                                    `${_("Renaming")} "${newValue}" ${_("to avoid name collision")}: "${validatedName}"`
+                                );
+                                newValue = validatedName;
+                                this.value = newValue;
+                                let label = this.value.toString();
+                                if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                    label = label.slice(0, STRINGLEN) + "...";
+                                }
+                                this.text.text = label;
+                                this.label.value = newValue;
+                                this.updateCache();
                             }
-                            this.text.text = label;
-                            this.label.value = newValue;
-                            this.updateCache();
                         }
                     }
                     break;
@@ -5175,7 +5184,9 @@ class Block {
             switch (cblock.name) {
                 case "action":
                     {
-                        const isNameChanged = oldValue !== newValue;
+                        // Use typedActionValue so a collision-resolved rename (where the
+                        // resolved name equals oldValue) still triggers a palette refresh.
+                        const isNameChanged = oldValue !== typedActionValue;
                         if (isNameChanged && closeInput) {
                             this.blocks.renameDos(oldValue, newValue);
 
