@@ -62,7 +62,8 @@ describe("Activity Toolbar Integration", () => {
             querySelector: jest.fn(() => null),
             querySelectorAll: jest.fn(() => []),
             innerHTML: "",
-            offsetHeight: 40
+            offsetHeight: 40,
+            click: jest.fn()
         };
 
         document.getElementById = jest.fn(id => {
@@ -538,6 +539,161 @@ describe("Activity Toolbar Integration", () => {
             expect(activity._renderLoopRunning).toBe(false);
             expect(activity._renderLoopRafId).toBeNull();
             expect(global.cancelAnimationFrame).toHaveBeenCalledWith(99);
+        });
+    });
+
+    describe("Window resize and viewport handling", () => {
+        let resizeActivity;
+        let mockContainer;
+        let mockMyCanvas;
+        let mockCanvas;
+        let mockCanvasHolder;
+        let mockHideContents;
+        let origGetElementById;
+        let origInnerWidth;
+        let origInnerHeight;
+        let origOuterWidth;
+        let origOuterHeight;
+        let origPlatform;
+        let origGlobalPlatform;
+        let origHidden;
+
+        beforeEach(() => {
+            origGetElementById = document.getElementById;
+            origInnerWidth = window.innerWidth;
+            origInnerHeight = window.innerHeight;
+            origOuterWidth = window.outerWidth;
+            origOuterHeight = window.outerHeight;
+            origPlatform = window.platform;
+            origGlobalPlatform = global.platform;
+            origHidden = document.hidden;
+
+            mockContainer = { style: {} };
+            mockMyCanvas = { width: 0, height: 0 };
+            mockCanvas = { width: 0, height: 0 };
+            mockCanvasHolder = { width: 0, height: 0 };
+            mockHideContents = { click: jest.fn() };
+
+            document.getElementById = jest.fn(id => {
+                if (id === "canvasContainer") return mockContainer;
+                if (id === "myCanvas") return mockMyCanvas;
+                if (id === "canvas") return mockCanvas;
+                if (id === "canvasHolder") return mockCanvasHolder;
+                if (id === "hideContents") return mockHideContents;
+                return origGetElementById.call(document, id);
+            });
+
+            resizeActivity = new Activity();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+            document.getElementById = origGetElementById;
+            window.innerWidth = origInnerWidth;
+            window.innerHeight = origInnerHeight;
+            window.outerWidth = origOuterWidth;
+            window.outerHeight = origOuterHeight;
+            window.platform = origPlatform;
+            global.platform = origGlobalPlatform;
+            Object.defineProperty(document, "hidden", { value: origHidden, configurable: true });
+        });
+
+        test("handleResize resizes canvas and container to full viewport without clamping", () => {
+            Object.defineProperty(document, "hidden", { value: false, configurable: true });
+            window.innerWidth = 1920;
+            window.innerHeight = 1080;
+
+            mockHideContents.click.mockClear();
+            resizeActivity.refreshCanvas = jest.fn();
+            resizeActivity._handleOrientationChangeResize();
+
+            expect(mockContainer.style.width).toBe("1920px");
+            expect(mockContainer.style.height).toBe("1080px");
+            expect(mockMyCanvas.width).toBe(1920);
+            expect(mockMyCanvas.height).toBe(1080);
+            expect(mockCanvas.width).toBe(1920);
+            expect(mockCanvas.height).toBe(1080);
+            expect(mockCanvasHolder.width).toBe(1920);
+            expect(mockCanvasHolder.height).toBe(1080);
+            expect(mockHideContents.click).toHaveBeenCalled();
+            expect(resizeActivity.refreshCanvas).toHaveBeenCalled();
+
+            // Early exit if document is hidden
+            Object.defineProperty(document, "hidden", { value: true, configurable: true });
+            resizeActivity.refreshCanvas.mockClear();
+            resizeActivity._handleOrientationChangeResize();
+            expect(resizeActivity.refreshCanvas).not.toHaveBeenCalled();
+
+            // Early exit if width is zero or invalid
+            Object.defineProperty(document, "hidden", { value: false, configurable: true });
+            resizeActivity.refreshCanvas.mockClear();
+            window.innerWidth = 0;
+            window.innerHeight = 1080;
+            resizeActivity._handleOrientationChangeResize();
+            expect(resizeActivity.refreshCanvas).not.toHaveBeenCalled();
+            expect(mockContainer.style.width).toBe("1920px");
+            expect(mockContainer.style.height).toBe("1080px");
+            expect(mockMyCanvas.width).toBe(1920);
+            expect(mockMyCanvas.height).toBe(1080);
+
+            // Early exit if height is zero or invalid
+            window.innerWidth = 1920;
+            window.innerHeight = 0;
+            resizeActivity._handleOrientationChangeResize();
+            expect(resizeActivity.refreshCanvas).not.toHaveBeenCalled();
+            expect(mockContainer.style.width).toBe("1920px");
+            expect(mockContainer.style.height).toBe("1080px");
+            expect(mockMyCanvas.width).toBe(1920);
+            expect(mockMyCanvas.height).toBe(1080);
+        });
+
+        test("handleResize uses outerWidth and outerHeight when platform.androidWebkit is true", () => {
+            Object.defineProperty(document, "hidden", { value: false, configurable: true });
+            window.platform = { androidWebkit: true };
+            global.platform = window.platform;
+            window.innerWidth = 800;
+            window.innerHeight = 600;
+            window.outerWidth = 1080;
+            window.outerHeight = 1920;
+
+            mockHideContents.click.mockClear();
+            resizeActivity.refreshCanvas = jest.fn();
+            resizeActivity._handleOrientationChangeResize();
+
+            expect(mockContainer.style.width).toBe("1080px");
+            expect(mockContainer.style.height).toBe("1920px");
+            expect(mockMyCanvas.width).toBe(1080);
+            expect(mockMyCanvas.height).toBe(1920);
+            expect(mockCanvas.width).toBe(1080);
+            expect(mockCanvas.height).toBe(1920);
+            expect(mockCanvasHolder.width).toBe(1080);
+            expect(mockCanvasHolder.height).toBe(1920);
+            expect(mockHideContents.click).toHaveBeenCalled();
+            expect(resizeActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        test("_handleWindowResize debounces and calls handleResize and setupPaletteMenu", () => {
+            jest.useFakeTimers();
+            resizeActivity.setupPaletteMenu = jest.fn();
+            resizeActivity.refreshCanvas = jest.fn();
+
+            window.innerWidth = 1440;
+            window.innerHeight = 900;
+
+            resizeActivity._handleWindowResize();
+            expect(resizeActivity.setupPaletteMenu).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(100);
+            resizeActivity._handleWindowResize();
+            jest.advanceTimersByTime(100);
+            expect(resizeActivity.setupPaletteMenu).not.toHaveBeenCalled();
+            expect(resizeActivity.refreshCanvas).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(100);
+            expect(resizeActivity.setupPaletteMenu).toHaveBeenCalledTimes(1);
+            expect(resizeActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+            expect(mockMyCanvas.width).toBe(1440);
+            expect(mockMyCanvas.height).toBe(900);
         });
     });
 });
