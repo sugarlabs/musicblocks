@@ -849,11 +849,21 @@ const switchCases = [
     }
 ];
 
+const allCorpusCases = [
+    ...basicValuesAndExpressions,
+    ...variablesAndBoxes,
+    ...actionsAndCalls,
+    ...controlFlow,
+    ...pitchAndPitches,
+    ...switchCases
+];
+
 module.exports = {
     basicValuesAndExpressions,
     variablesAndBoxes,
     actionsAndCalls,
     controlFlow,
     pitchAndPitches,
-    switchCases
+    switchCases,
+    allCorpusCases
 };

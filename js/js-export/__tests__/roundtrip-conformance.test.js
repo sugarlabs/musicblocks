@@ -26,7 +26,10 @@ const {
     loadBlockListIntoActivity,
     exportBlocksToJS,
     importJSToBlocks,
-    runRoundTrip
+    runRoundTrip,
+    stripAstLocations,
+    verifySecondExportStability,
+    formatConformanceDiagnostics
 } = require("./conformance-harness");
 
 const {
@@ -43,7 +46,8 @@ const {
     actionsAndCalls,
     controlFlow,
     pitchAndPitches,
-    switchCases
+    switchCases,
+    allCorpusCases
 } = require("./conformance-corpus");
 
 describe("Round-Trip Conformance Test Harness", () => {
@@ -122,6 +126,42 @@ MusicBlocks.run();`;
             expect(result.recoveredBlocks[0][1]).toBe("start");
             expect(result.recoveredBlocks[1][1]).toBe("forward");
             expect(result.recoveredBlocks[2][1]).toEqual(["number", { value: 100 }]);
+        });
+
+        test("stripAstLocations strips parser metadata while preserving AST structure", () => {
+            const rawNode = {
+                type: "Literal",
+                value: 42,
+                raw: "42",
+                start: 0,
+                end: 2,
+                loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 2 } }
+            };
+            const stripped = stripAstLocations(rawNode);
+            expect(stripped).toEqual({
+                type: "Literal",
+                value: 42
+            });
+        });
+
+        test("formatConformanceDiagnostics formats clear diagnostic report", () => {
+            const diagnostic = formatConformanceDiagnostics({
+                caseName: "test_case_diagnostic",
+                stage: "NORMALIZED_DIFF",
+                error: new Error("Structural mismatch"),
+                diff: { expected: "forward", actual: "back" },
+                code1: "await mouse.goForward(100);",
+                code2: "await mouse.goForward(100);",
+                originalBlocks: [[0, "start", 0, 0, [null]]],
+                recoveredBlocks: [[0, "start", 0, 0, [null]]]
+            });
+            expect(diagnostic).toContain("CONFORMANCE FAILURE DIAGNOSTIC");
+            expect(diagnostic).toContain("Case: test_case_diagnostic");
+            expect(diagnostic).toContain("Stage: NORMALIZED_DIFF");
+            expect(diagnostic).toContain("Structural mismatch");
+            expect(diagnostic).toContain("await mouse.goForward(100);");
+            expect(diagnostic).toContain("--- Original Blocks ---");
+            expect(diagnostic).toContain("--- Recovered Blocks ---");
         });
     });
 
@@ -281,6 +321,26 @@ MusicBlocks.run();`;
             const normalizedOriginal = normalizeBlockStructure(blocks);
             const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
             expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Second-Export Stability and Fixed-Point Invariance", () => {
+        test.each(allCorpusCases)("$description ($name)", ({ blocks, name }) => {
+            const result = verifySecondExportStability(blocks);
+            if (!result.isStable) {
+                const diagnostic = formatConformanceDiagnostics({
+                    caseName: name,
+                    stage: "SECOND_EXPORT_STABILITY",
+                    code1: result.code1,
+                    code2: result.code2,
+                    originalBlocks: blocks,
+                    recoveredBlocks: result.recoveredBlocks,
+                    diff: { ast1: result.ast1, ast2: result.ast2 }
+                });
+                console.error(diagnostic);
+            }
+            expect(result.isStable).toBe(true);
+            expect(result.ast1).toEqual(result.ast2);
         });
     });
 });

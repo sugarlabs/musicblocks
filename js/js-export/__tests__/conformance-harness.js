@@ -120,7 +120,7 @@ function resolveProtoBlock(name, connectionsLength = 0) {
     ) {
         return { style: "arg", args: 2 };
     }
-    if (["not", "sqrt", "abs", "int", "round", "sin", "cos", "tan"].includes(name)) {
+    if (["neg", "not", "sqrt", "abs", "int", "round", "sin", "cos", "tan"].includes(name)) {
         return { style: "arg", args: 1 };
     }
     if (name === "pitch") {
@@ -295,6 +295,126 @@ function runRoundTrip(blockList) {
     };
 }
 
+/**
+ * Recursively strips parser location metadata and raw literal annotations from an
+ * AST node, preserving pure semantic syntax tree structure for AST comparison.
+ *
+ * @param {Object|Array} node - AST node or array of nodes
+ * @returns {Object|Array} Cleaned AST node without location metadata
+ */
+function stripAstLocations(node) {
+    if (!node || typeof node !== "object") {
+        return node;
+    }
+    if (Array.isArray(node)) {
+        return node.map(stripAstLocations);
+    }
+    const clean = {};
+    for (const key of Object.keys(node)) {
+        if (["start", "end", "loc", "range", "raw"].includes(key)) {
+            continue;
+        }
+        clean[key] = stripAstLocations(node[key]);
+    }
+    return clean;
+}
+
+/**
+ * Verifies that exporting the recovered blocks produces JavaScript that is
+ * AST-equivalent to the first export, proving that the conversion reaches
+ * a stable fixed point (Blocks -> JS1 -> Blocks -> JS2, where AST(JS1) == AST(JS2)).
+ *
+ * @param {Array} blockList - Original Music Blocks block representation
+ * @returns {{
+ *   code1: string,
+ *   code2: string,
+ *   ast1: Object,
+ *   ast2: Object,
+ *   isStable: boolean,
+ *   recoveredBlocks: Array
+ * }}
+ */
+function verifySecondExportStability(blockList) {
+    setupEnvironment();
+    const code1 = exportBlocksToJS(blockList);
+    const recoveredBlocks = importJSToBlocks(code1);
+    const code2 = exportBlocksToJS(recoveredBlocks);
+
+    const rawAst1 = acorn.parse(code1, { ecmaVersion: 2020 });
+    const rawAst2 = acorn.parse(code2, { ecmaVersion: 2020 });
+
+    const ast1 = stripAstLocations(rawAst1);
+    const ast2 = stripAstLocations(rawAst2);
+
+    const isStable = JSON.stringify(ast1) === JSON.stringify(ast2);
+
+    return {
+        code1,
+        code2,
+        ast1,
+        ast2,
+        isStable,
+        recoveredBlocks
+    };
+}
+
+/**
+ * Formats rich diagnostic context when a conformance or round-trip test fails,
+ * providing details on stage, blocks, generated code, and differences.
+ *
+ * @param {Object} details
+ * @param {string} [details.caseName] - Name of the test case
+ * @param {string} [details.stage] - Stage where failure occurred
+ * @param {Array} [details.originalBlocks] - Original block list
+ * @param {Array} [details.recoveredBlocks] - Recovered block list
+ * @param {string} [details.code1] - First JavaScript export
+ * @param {string} [details.code2] - Second JavaScript export
+ * @param {Error|string} [details.error] - Caught error or failure reason
+ * @param {*} [details.diff] - Structural difference or diagnostic info
+ * @returns {string} Formatted multi-line diagnostic string
+ */
+function formatConformanceDiagnostics(details = {}) {
+    const lines = ["=================== CONFORMANCE FAILURE DIAGNOSTIC ==================="];
+    if (details.caseName) {
+        lines.push(`Case: ${details.caseName}`);
+    }
+    if (details.stage) {
+        lines.push(`Stage: ${details.stage}`);
+    }
+    if (details.error) {
+        const errorMsg =
+            details.error instanceof Error
+                ? details.error.stack || details.error.message
+                : String(details.error);
+        lines.push("--- Error ---");
+        lines.push(errorMsg);
+    }
+    if (details.diff) {
+        lines.push("--- Diff / Discrepancy ---");
+        lines.push(
+            typeof details.diff === "string" ? details.diff : JSON.stringify(details.diff, null, 2)
+        );
+    }
+    if (details.code1) {
+        lines.push("--- Generated JavaScript (Export 1) ---");
+        lines.push(details.code1.trim());
+    }
+    if (details.code2) {
+        lines.push("--- Generated JavaScript (Export 2) ---");
+        lines.push(details.code2.trim());
+    }
+    if (details.originalBlocks) {
+        lines.push("--- Original Blocks ---");
+        lines.push(JSON.stringify(details.originalBlocks, null, 2));
+    }
+    if (details.recoveredBlocks) {
+        lines.push("--- Recovered Blocks ---");
+        lines.push(JSON.stringify(details.recoveredBlocks, null, 2));
+    }
+    lines.push("======================================================================");
+    return lines.join("\n");
+}
+
 module.exports = {
     ast2blocksConfig,
     resolveProtoBlock,
@@ -302,5 +422,8 @@ module.exports = {
     loadBlockListIntoActivity,
     exportBlocksToJS,
     importJSToBlocks,
-    runRoundTrip
+    runRoundTrip,
+    stripAstLocations,
+    verifySecondExportStability,
+    formatConformanceDiagnostics
 };
