@@ -30,6 +30,7 @@ global.docById = jest.fn(getDomElement);
 // silently ignored. Mock behavior by overwriting properties on the real
 // objects instead (done fresh in beforeEach below).
 let bodyClickHandler = null;
+let documentMouseupHandler = null;
 let computedDisplay = "none";
 
 function makeWheelNavItem() {
@@ -102,8 +103,10 @@ beforeEach(() => {
     jest.clearAllMocks();
     computedDisplay = "none";
     bodyClickHandler = null;
+    documentMouseupHandler = null;
     window._contextWheelClickHandler = undefined;
     window._contextWheelIgnoreNextClick = false;
+    window._contextWheelIgnoreNextMouseUp = false;
     for (const key of Object.keys(domElements)) delete domElements[key];
     originalHelpWidget = global.HelpWidget;
     delete global.HelpWidget;
@@ -114,6 +117,14 @@ beforeEach(() => {
     });
     document.body.removeEventListener = jest.fn((event, handler) => {
         if (event === "click" && bodyClickHandler === handler) bodyClickHandler = null;
+    });
+    document.addEventListener = jest.fn((event, handler) => {
+        if (event === "mouseup") documentMouseupHandler = handler;
+    });
+    document.removeEventListener = jest.fn((event, handler) => {
+        if (event === "mouseup" && documentMouseupHandler === handler) {
+            documentMouseupHandler = null;
+        }
     });
     window.getComputedStyle = jest.fn(() => ({ display: computedDisplay }));
 });
@@ -160,6 +171,41 @@ describe("piemenuBlockContext", () => {
         expect(wheel.navItems[0].selected).toBe(false);
         expect(wheel.clickModeRotate).toBe(false);
         expect(document.body.removeEventListener).not.toHaveBeenCalled();
+    });
+
+    test("only stops the long-press release when it targets the context wheel", () => {
+        window._contextWheelIgnoreNextMouseUp = true;
+        const block = makeBlock();
+
+        piemenuBlockContext(block);
+
+        const stopPropagation = jest.fn();
+        const contextWheel = getDomElement("contextWheelDiv");
+        const menuItem = {};
+        contextWheel.contains = jest.fn(target => target === menuItem);
+        const mouseupHandler = documentMouseupHandler;
+
+        mouseupHandler({ target: menuItem, stopPropagation });
+
+        expect(stopPropagation).toHaveBeenCalled();
+        expect(window._contextWheelIgnoreNextMouseUp).toBe(false);
+        expect(document.removeEventListener).toHaveBeenCalledWith("mouseup", mouseupHandler, true);
+    });
+
+    test("allows a long-press release outside the context wheel to propagate", () => {
+        window._contextWheelIgnoreNextMouseUp = true;
+        const block = makeBlock();
+
+        piemenuBlockContext(block);
+
+        const stopPropagation = jest.fn();
+        getDomElement("contextWheelDiv").contains = jest.fn(() => false);
+        const mouseupHandler = documentMouseupHandler;
+
+        mouseupHandler({ target: document.body, stopPropagation });
+
+        expect(stopPropagation).not.toHaveBeenCalled();
+        expect(window._contextWheelIgnoreNextMouseUp).toBe(false);
     });
 
     test("computes exact left/top pixel offsets from block position, canvas offset, and stage scale", () => {
