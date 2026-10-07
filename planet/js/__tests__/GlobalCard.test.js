@@ -124,12 +124,9 @@ describe("GlobalCard", () => {
             expect(() => card.showToast("msg")).not.toThrow();
         });
 
-        it("should handle error toast styling", () => {
-            jest.useFakeTimers();
-            document.body.innerHTML = '<div class="toast">msg</div>';
+        it("should forward error flag to SaveInterface.showToast", () => {
             card.showToast("Error!", true);
-            jest.advanceTimersByTime(20);
-            jest.useRealTimers();
+            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith("Error!", true);
         });
     });
 
