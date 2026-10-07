@@ -160,7 +160,8 @@ describe("MeterBlocks setup", () => {
             },
             tempo: {
                 BPMBlocks: [],
-                BPMs: []
+                BPMs: [],
+                BPMTurtles: []
             },
             inTempo: false,
             insideMeterWidget: false,
@@ -491,6 +492,35 @@ describe("MeterBlocks setup", () => {
         expect(logo.notation.notationTempo).toHaveBeenCalledWith(1, 100, 0.25);
         expect(logo.tempo.BPMBlocks).toContain("bpm3");
         expect(logo.tempo.BPMs).toContain("text");
+    });
+
+    it("records the turtle that ran each BPM block for the Tempo widget", () => {
+        activity.blocks.blockList.bpmBlock = { connections: [null, "num"] };
+        activity.blocks.blockList.num = { text: { text: "120" } };
+        const turtles = [{ name: "t0" }, { name: "t1" }, { name: "t2" }];
+        activity.turtles.ithTurtle.mockImplementation(i => turtles[i]);
+        logo.inTempo = true;
+
+        getBlock("setmasterbpm2").flow([120, 0.25], logo, 0, "bpmBlock");
+        getBlock("setbpm3").flow([200, 0.25], logo, 2, "bpmBlock");
+        getBlock("setmasterbpm").flow([90], logo, 1, "bpmBlock");
+
+        // One turtle per row, in step with BPMBlocks and BPMs. The turtle itself, not its index,
+        // which shifts when a turtle is removed.
+        expect(logo.tempo.BPMTurtles).toEqual([turtles[0], turtles[2], turtles[1]]);
+        expect(logo.tempo.BPMTurtles[1]).toBe(turtles[2]);
+        expect(logo.tempo.BPMBlocks).toHaveLength(3);
+        expect(logo.tempo.BPMs).toHaveLength(3);
+    });
+
+    it("records no turtle outside a Tempo block", () => {
+        activity.blocks.blockList.bpmBlock = { connections: [null, "num"] };
+        activity.blocks.blockList.num = { text: { text: "120" } };
+        logo.inTempo = false;
+
+        getBlock("setbpm3").flow([200, 0.25], logo, 2, "bpmBlock");
+
+        expect(logo.tempo.BPMTurtles).toEqual([]);
     });
 
     it("clamps BPM ranges inside FlowClamp blocks and cleans up listeners", () => {
