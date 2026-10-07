@@ -1202,6 +1202,31 @@ describe("Blocks Foundation", () => {
             ]);
             expect(copiedBlocks.flatMap(block => block[4])).not.toContain(undefined);
         });
+
+        it("preserves manualAccidental on copied value blocks (Issue #9003)", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            const makeValueBlock = (name, value, manualAccidental) => ({
+                name,
+                value,
+                manualAccidental,
+                connections: [null],
+                isValueBlock: jest.fn().mockReturnValue(true)
+            });
+            blocks.blockList = [
+                makeValueBlock("notename", "F", "♮"),
+                makeValueBlock("solfege", "Fa", null)
+            ];
+            blocks.selectedStack = 0;
+
+            const copiedBlocks = blocks._copyBlocksToObj(false);
+            expect(copiedBlocks[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
+
+            blocks.selectedStack = 1;
+            const copiedSolfege = blocks._copyBlocksToObj(false);
+            expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
+        });
     });
 
     describe("Parameter Block Cache Updates", () => {
@@ -1630,6 +1655,41 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(wellFormed)).not.toThrow();
             expect(mockActivity.errorMsg).not.toHaveBeenCalled();
             expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
+        });
+
+        it("restores manualAccidental when loading value blocks (Issue #9003)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                notename: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.updateBlockText = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        value: null,
+                        manualAccidental: null,
+                        connections: [null],
+                        container: { x: 0, y: 0 }
+                    };
+                    if (postProcess) {
+                        postProcess(args);
+                    }
+                }
+            );
+
+            const blockObjs = [
+                [0, ["notename", { value: "F", manualAccidental: "♮" }], 0, 0, [null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList[0].value).toBe("F");
+            expect(blocks.blockList[0].manualAccidental).toBe("♮");
+            expect(blocks.updateBlockText).toHaveBeenCalledWith(0);
         });
 
         // SwitchBlock.flow hooks its case onto the block after the switch
@@ -3806,6 +3866,97 @@ describe("noteValueValue", () => {
 
         expect(() => blocks.noteValueValue(2)).not.toThrow();
         expect(blocks.noteValueValue(2)).toBe(1);
+    });
+});
+
+describe("meter_block_changed", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+        blocks.updateBlockText = jest.fn();
+    });
+
+    function buildMeterAndTempo(meterBeat, tempoBlock, bpm, tempoBeat) {
+        blocks.blockList = [
+            { name: "meter", connections: [null, 1, 2, 5] },
+            { name: "number", value: 4, connections: [0] },
+            { name: "divide", connections: [0, 3, 4] },
+            { name: "number", value: meterBeat[0], connections: [2] },
+            { name: "number", value: meterBeat[1], connections: [2] },
+            { name: tempoBlock, connections: [0, 6, 7, null] },
+            { name: "number", value: bpm, connections: [5] },
+            { name: "divide", connections: [5, 8, 9] },
+            { name: "number", value: tempoBeat[0], connections: [7] },
+            { name: "number", value: tempoBeat[1], connections: [7] }
+        ];
+    }
+
+    const tempo = () => ({
+        bpm: blocks.blockList[6].value,
+        beat: [blocks.blockList[8].value, blocks.blockList[9].value]
+    });
+
+    it.each([
+        [90, [1, 4], [1, 8], 180],
+        [180, [1, 8], [3, 8], 60],
+        [90, [1, 4], [3, 8], 60],
+        [120, [1, 4], [3, 4], 40],
+        [60, [3, 8], [1, 4], 90],
+        [90, [7, 8], [5, 8], 126]
+    ])("turns %i bpm at %j into the same speed at the meter beat %j", (bpm, from, to, expected) => {
+        buildMeterAndTempo(to, "setbpm3", bpm, from);
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: expected, beat: to });
+    });
+
+    it("updates the master beats per minute block the same way", () => {
+        buildMeterAndTempo([3, 8], "setmasterbpm2", 180, [1, 8]);
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: 60, beat: [3, 8] });
+    });
+
+    it("leaves the tempo alone when the meter beat is not a pair of numbers", () => {
+        buildMeterAndTempo([3, 8], "setbpm3", 180, [1, 8]);
+        blocks.blockList[3].name = "plus";
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: 180, beat: [1, 8] });
+    });
+
+    it.each([
+        [0, 8],
+        [3, 0],
+        [-1, 8]
+    ])("leaves the tempo alone when the meter beat is %i/%i", (numerator, denominator) => {
+        buildMeterAndTempo([numerator, denominator], "setbpm3", 180, [1, 8]);
+
+        blocks.meter_block_changed(0);
+
+        expect(tempo()).toEqual({ bpm: 180, beat: [1, 8] });
+        expect(blocks.updateBlockText).not.toHaveBeenCalled();
     });
 });
 

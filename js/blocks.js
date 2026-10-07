@@ -4700,6 +4700,10 @@ class Blocks {
             }
 
             const c2v = this.blockList[c2].value;
+            if (!(c1v > 0 && c2v > 0)) {
+                return;
+            }
+
             for (let i = 0; i < this.blockList.length; i++) {
                 if (this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
@@ -4728,7 +4732,7 @@ class Blocks {
                     }
 
                     const b2v = this.blockList[b2].value;
-                    bnv *= ((b1v * c2v) / b2v) * c1v;
+                    bnv = (bnv * b1v * c2v) / (b2v * c1v);
 
                     this.blockList[bn].value = bnv;
                     this.updateBlockText(bn);
@@ -4920,9 +4924,17 @@ class Blocks {
                                 []
                             ];
                             break;
-                        default:
-                            blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
+                        default: {
+                            const valObj = { value: myBlock.value };
+                            if (
+                                myBlock.manualAccidental !== undefined &&
+                                myBlock.manualAccidental !== null
+                            ) {
+                                valObj.manualAccidental = myBlock.manualAccidental;
+                            }
+                            blockItem = [b, [myBlock.name, valObj], x, y, []];
                             break;
+                        }
                     }
                 } else if (
                     [
@@ -6263,7 +6275,11 @@ class Blocks {
                         postProcess = args => {
                             const thisBlock = args[0];
                             const value = args[1];
+                            const info = args[2];
                             that.blockList[thisBlock].value = value;
+                            if (info && info.manualAccidental !== undefined) {
+                                that.blockList[thisBlock].manualAccidental = info.manualAccidental;
+                            }
                             that.updateBlockText(thisBlock);
                         };
 
@@ -6272,7 +6288,7 @@ class Blocks {
                             blockOffset,
                             blkData[4],
                             postProcess,
-                            [thisBlock, value]
+                            [thisBlock, value, blkInfo[1]]
                         );
                         break;
                     case "drumname":

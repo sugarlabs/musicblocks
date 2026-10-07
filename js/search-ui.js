@@ -269,6 +269,45 @@ class SearchUI {
     }
 
     /**
+     * Appends a block suggestion's text to an autocomplete row: the block
+     * name, then its argument names in smaller, dimmed text. The row is laid
+     * out as a flex row so long text wraps beside the icon, not under it.
+     *
+     * @param {object} li - jQuery <li> that already holds the block icon
+     * @param {object} item - Search suggestion ({ label, argLabels })
+     * @returns {object} li
+     */
+    appendSuggestionLabel(li, item) {
+        const row = li[0];
+        if (row) {
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            const icon = row.querySelector("img");
+            if (icon) icon.style.flexShrink = "0";
+        }
+
+        const link = document.createElement("a");
+        link.style.flex = "1 1 auto";
+        link.style.minWidth = "0";
+        link.textContent = item.label;
+        if (item.argLabels) {
+            const args = document.createElement("span");
+            args.className = "search-item-args";
+            args.style.marginLeft = "0.25em";
+            args.style.fontSize = "0.85em";
+            args.style.opacity = "0.7";
+            args.textContent = item.argLabels;
+            // A real space keeps the name and arguments apart for screen
+            // readers and copied text, not just visually.
+            link.appendChild(document.createTextNode(" "));
+            link.appendChild(args);
+        }
+
+        li.append(link);
+        return li;
+    }
+
+    /**
      * Tears down the search UI: hides the helpful-search overlay and the
      * main search input.
      */
@@ -440,7 +479,7 @@ class SearchUI {
                 img.src = item.artwork || "";
                 img.height = 20;
                 li.append(img);
-                li.append($j("<a>").text(" " + item.label));
+                this.appendSuggestionLabel(li, item);
                 return li.appendTo(ul.css("z-index", 35000));
             };
         }
@@ -627,7 +666,7 @@ class SearchUI {
         li[0].addEventListener("mousedown", down, true);
         li[0].addEventListener("touchstart", down, { capture: true, passive: false });
         li.append(img);
-        li.append($j("<a>").text(" " + item.label));
+        this.appendSuggestionLabel(li, item);
 
         return li.appendTo(
             ul.css({

@@ -45,6 +45,38 @@ class AST2BlockList {
     }
 
     /**
+     * Returns whether a pitch name is solfege (sol, ti♭, ...) rather than a note name (G, B♭, ...),
+     * using the same test as the rest of Music Blocks. Microtonal prefixes (e.g. "^C", "vvD♭")
+     * are stripped first, so a note name keeps its block.
+     *
+     * @param {String} note - pitch name
+     * @returns {Boolean} whether note is solfege
+     */
+    static _isSolfege(note) {
+        const solfege =
+            (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
+            require("../utils/musicutils-solfege");
+        const pitch =
+            (typeof window !== "undefined" && window.MusicUtilsPitch) ||
+            require("../utils/musicutils-pitch");
+        const constants =
+            (typeof window !== "undefined" && window.MusicUtilsConstants) ||
+            require("../utils/musicutils-constants");
+        const stripped = pitch.stripMicrotonalPrefix(note);
+        // noteIsSolfege only knows the spellings in SOLFEGECONVERSIONTABLE, so check every note
+        // spelling first (E♯, F♭, C𝄪, ...), in the ASCII form ALLNOTENAMES uses.
+        const ascii = stripped
+            .replace(constants.DOUBLESHARP, "x")
+            .replace(constants.DOUBLEFLAT, "bb")
+            .replace(constants.SHARP, "#")
+            .replace(constants.FLAT, "b");
+        if (constants.ALLNOTENAMES.includes(ascii)) {
+            return false;
+        }
+        return solfege.noteIsSolfege(stripped);
+    }
+
+    /**
      * Returns a deep copy of an AST. Regular expression literal values are
      * shared, since nothing here changes them.
      *
@@ -834,11 +866,14 @@ class AST2BlockList {
                     if (!argConfig) {
                         throw new Error(`Missing argument configuration for: ${block_name}`);
                     }
-                    if (argConfig.type === "note_or_solfege") {
-                        // Handle pitch notes (solfege or note names)
-                        const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
+                    if (argConfig.type === "note_or_solfege" && typeof arg === "string") {
+                        // Handle pitch notes (solfege or note names). A pitch read from a box
+                        // or computed is handled below like any other value.
                         vspaces += _addNthArgToBlockList(
-                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { value: arg }],
+                            [
+                                AST2BlockList._isSolfege(arg) ? "solfege" : "notename",
+                                { value: arg }
+                            ],
                             i + 1,
                             blockList,
                             parentBlockNumber
@@ -852,6 +887,7 @@ class AST2BlockList {
                             parentBlockNumber
                         );
                     } else if (
+                        argConfig.type === "note_or_solfege" ||
                         argConfig.type === "NumberExpression" ||
                         argConfig.type === "BooleanExpression" ||
                         argConfig.type === "IntervalExpression"

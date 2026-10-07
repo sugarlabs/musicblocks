@@ -239,6 +239,8 @@ class LogoDependencies {
             mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
             rationalToFraction:
                 typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
+            getMeasurePosition:
+                typeof getMeasurePosition !== "undefined" ? getMeasurePosition : null,
             getStatsFromNotation:
                 typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
             delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
@@ -350,6 +352,8 @@ class LogoDependencies {
                 mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
                 rationalToFraction:
                     typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
+                getMeasurePosition:
+                    typeof getMeasurePosition !== "undefined" ? getMeasurePosition : null,
                 getStatsFromNotation:
                     typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
                 delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,

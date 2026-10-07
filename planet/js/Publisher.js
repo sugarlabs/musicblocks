@@ -85,7 +85,7 @@ class Publisher {
 
     findTagWithName(name) {
         const Planet = this.Planet;
-        const keys = Object.keys(Planet.TagsManifest);
+        const keys = Object.keys(Planet.TagsManifest || {});
 
         for (let i = 0; i < keys.length; i++)
             if (Planet.TagsManifest[keys[i]].TagName === name) return keys[i];
@@ -94,7 +94,7 @@ class Publisher {
     }
 
     addTags() {
-        const tags = this.Planet.TagsManifest;
+        const tags = this.Planet.TagsManifest || {};
         this.ChipTags = {};
         const keys = Object.keys(tags);
 
