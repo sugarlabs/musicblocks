@@ -202,7 +202,7 @@ class WorkspaceLayoutController {
                 }
             }
 
-            if (currentRightmostX > canvasWidth) {
+            if (!isNarrowing && currentRightmostX > canvasWidth) {
                 const shiftX = canvasWidth - currentRightmostX - 10;
 
                 group.forEach(blockId => {
@@ -292,53 +292,115 @@ class WorkspaceLayoutController {
                 return -1;
             };
 
-            // Work from right to left.
-            for (let i = groupLayouts.length - 1; i > 0; i--) {
-                const currentGroup = groupLayouts[i];
+            // Compact horizontal groups first, then stack them from right to left.
+            const RIGHT_PADDING = 10;
 
-                const middleIndex = findPreviousOverlappingIndex(i);
+            const moveChainSuffix = (chain, startIndex, amount) => {
+                if (amount === 0) {
+                    return;
+                }
 
-                if (middleIndex < 0) {
+                for (let i = startIndex; i < chain.length; i++) {
+                    moveGroup(groupLayouts[chain[i]], amount);
+                }
+            };
+
+            const processedLayoutIndexes = new Set();
+
+            for (let endIndex = groupLayouts.length - 1; endIndex >= 0; endIndex--) {
+                if (processedLayoutIndexes.has(endIndex)) {
                     continue;
                 }
 
-                const middleGroup = groupLayouts[middleIndex];
+                const chain = [endIndex];
+                processedLayoutIndexes.add(endIndex);
 
-                const pressure = middleGroup.right + GROUP_GAP - currentGroup.left;
+                let cursor = endIndex;
 
-                if (pressure <= 0) {
+                while (true) {
+                    const previousIndex = findPreviousOverlappingIndex(cursor);
+
+                    if (previousIndex < 0 || processedLayoutIndexes.has(previousIndex)) {
+                        break;
+                    }
+
+                    chain.unshift(previousIndex);
+                    processedLayoutIndexes.add(previousIndex);
+                    cursor = previousIndex;
+                }
+
+                const rightmostLayout = groupLayouts[chain[chain.length - 1]];
+                const rightLimit = canvasWidth - RIGHT_PADDING;
+
+                let remainingPressure = Math.max(0, rightmostLayout.right - rightLimit);
+
+                if (remainingPressure <= 0) {
                     continue;
                 }
 
-                const leftIndex = findPreviousOverlappingIndex(middleIndex);
+                // Phase 1: consume all available gaps without overlap.
+                let clusterStart = chain.length - 1;
 
-                if (leftIndex < 0) {
-                    const availableLeftSpace = Math.max(0, middleGroup.left - LEFT_PADDING);
+                while (remainingPressure > 0) {
+                    if (clusterStart === 0) {
+                        const leftmostLayout = groupLayouts[chain[0]];
 
-                    const movement = Math.min(pressure, availableLeftSpace);
+                        const availableLeftSpace = Math.max(0, leftmostLayout.left - LEFT_PADDING);
 
-                    moveGroup(middleGroup, -movement);
+                        const movement = Math.min(remainingPressure, availableLeftSpace);
 
-                    continue;
+                        moveChainSuffix(chain, 0, -movement);
+                        remainingPressure -= movement;
+                        break;
+                    }
+
+                    const currentLayout = groupLayouts[chain[clusterStart]];
+                    const previousLayout = groupLayouts[chain[clusterStart - 1]];
+
+                    const availableGap = Math.max(
+                        0,
+                        currentLayout.left - previousLayout.right - GROUP_GAP
+                    );
+
+                    if (availableGap > 0) {
+                        const movement = Math.min(remainingPressure, availableGap);
+
+                        moveChainSuffix(chain, clusterStart, -movement);
+                        remainingPressure -= movement;
+
+                        if (remainingPressure <= 0) {
+                            break;
+                        }
+                    }
+
+                    clusterStart--;
                 }
 
-                const leftGroup = groupLayouts[leftIndex];
+                // Phase 2: only after all free space is exhausted, stack right to left.
+                let stackStart = chain.length - 1;
 
-                const freeGap = middleGroup.anchorLeft - leftGroup.anchorRight - GROUP_GAP;
-                if (freeGap > 0) {
-                    // Close the remaining horizontal gap before allowing groups to overlap.
-                    const movement = Math.min(pressure, freeGap / 2);
+                while (remainingPressure > 0 && stackStart > 0) {
+                    const currentLayout = groupLayouts[chain[stackStart]];
+                    const previousLayout = groupLayouts[chain[stackStart - 1]];
 
-                    moveGroup(leftGroup, movement);
-                    moveGroup(middleGroup, -movement);
+                    const availableOverlap = Math.max(0, currentLayout.left - previousLayout.left);
 
-                    continue;
+                    if (availableOverlap <= 0) {
+                        stackStart--;
+                        continue;
+                    }
+
+                    const movement = Math.min(remainingPressure, availableOverlap);
+
+                    moveChainSuffix(chain, stackStart, -movement);
+                    remainingPressure -= movement;
+
+                    if (movement >= availableOverlap) {
+                        stackStart--;
+                    } else {
+                        break;
+                    }
                 }
-
-                // Propagate part of the resize pressure leftward so overlap develops progressively.
-                const movement = pressure / 2;
-
-                moveGroup(middleGroup, -movement);
             }
         }
 
