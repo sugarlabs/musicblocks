@@ -107,11 +107,16 @@ class TempoControls {
 
         const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
         if (!bpmBlock) return;
+        // Only a number block holds the BPM. An expression such as 60 x 2 works its value out
+        // again on the next run, so writing into it would be lost, and would label the operator
+        // block with the number.
         const blockNumber = bpmBlock.connections[1];
-        if (blockNumber !== null) {
-            this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-            this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-            this.activity.blocks.blockList[blockNumber].updateCache();
+        const numberBlock =
+            blockNumber !== null ? this.activity.blocks.blockList[blockNumber] : null;
+        if (numberBlock && numberBlock.name === "number") {
+            numberBlock.value = parseFloat(this.BPMs[i]);
+            numberBlock.text.text = this.BPMs[i];
+            numberBlock.updateCache();
             this.activity.refreshCanvas();
             this.activity.saveLocally();
         }

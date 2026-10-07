@@ -308,6 +308,7 @@ describe("Tempo Widget", () => {
                 connections: [null, 1]
             };
             const mockValueBlock = {
+                name: "number",
                 value: 100,
                 text: { text: "100" },
                 updateCache: jest.fn()
@@ -438,6 +439,33 @@ describe("Tempo Widget", () => {
                 expect(global.Singer.masterBPM).toBe(120);
                 expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
             });
+        });
+
+        test("leaves an expression in the BPM slot alone but still sets the tempo", () => {
+            // 60 x 2 works its value out again on the next run, so the widget can't store a
+            // BPM in it.
+            const multiplyBlock = {
+                name: "multiply",
+                value: null,
+                text: { text: "" },
+                updateCache: jest.fn()
+            };
+            mockActivity.blocks.blockList = {
+                0: { name: "setmasterbpm2", connections: [null, 1] },
+                1: multiplyBlock
+            };
+            tempoWidget.BPMBlocks[0] = 0;
+            tempoWidget.BPMs[0] = 132;
+            global.Singer.masterBPM = 120;
+
+            tempoWidget._updateBPM(0);
+
+            expect(multiplyBlock.value).toBeNull();
+            expect(multiplyBlock.text.text).toBe("");
+            expect(multiplyBlock.updateCache).not.toHaveBeenCalled();
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+            expect(global.Singer.masterBPM).toBe(132);
+            expect(tempoWidget._intervals[0]).toBeCloseTo(60000 / 132);
         });
 
         test("should not throw when connection is null", () => {
@@ -1933,7 +1961,12 @@ describe("Tempo widget beat value (#9309)", () => {
 
     // A row for a BPM block with the BPM 120 and the given beat value.
     const makeRow = (name, beatValue) => {
-        numberBlock = { value: 120, text: { text: "120" }, updateCache: jest.fn() };
+        numberBlock = {
+            name: "number",
+            value: 120,
+            text: { text: "120" },
+            updateCache: jest.fn()
+        };
         activity.blocks.blockList = { bpm: { name, connections: [null, "num"] }, num: numberBlock };
         tempo.BPMs = [120];
         tempo.BPMBlocks = ["bpm"];
