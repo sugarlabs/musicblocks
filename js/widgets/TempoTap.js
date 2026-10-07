@@ -167,10 +167,11 @@ class TempoTap {
         }
 
         let newBPM = Math.round((60 * 1000) / avgInterval);
-        if (newBPM < 30) {
-            newBPM = 30;
-        } else if (newBPM > 1000) {
-            newBPM = 1000;
+        const [minBPM, maxBPM] = this._bpmLimits(id);
+        if (newBPM < minBPM) {
+            newBPM = minBPM;
+        } else if (newBPM > maxBPM) {
+            newBPM = maxBPM;
         }
 
         this.BPMs[id] = newBPM;

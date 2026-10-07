@@ -161,7 +161,8 @@ describe("MeterBlocks setup", () => {
             tempo: {
                 BPMBlocks: [],
                 BPMs: [],
-                BPMTurtles: []
+                BPMTurtles: [],
+                beatValues: []
             },
             inTempo: false,
             insideMeterWidget: false,
@@ -563,6 +564,42 @@ describe("MeterBlocks setup", () => {
         getBlock("setbpm3").flow([200, 0.25], logo, 2, "bpmBlock");
 
         expect(logo.tempo.BPMTurtles).toEqual([]);
+    });
+
+    describe("the beat value given to the Tempo widget", () => {
+        beforeEach(() => {
+            logo.inTempo = true;
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+            activity.blocks.blockList.slotBlock = { name: "number", text: { text: "120" } };
+        });
+
+        it.each(["setmasterbpm2", "setbpm3"])("%s gives its evaluated beat value", name => {
+            getBlock(name).flow([120, 1 / 8], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([120]);
+            expect(logo.tempo.beatValues).toEqual([1 / 8]);
+        });
+
+        it.each([0, -0.25, NaN, Infinity, "1/8"])("gives 1/4 for a beat value of %s", beatValue => {
+            getBlock("setmasterbpm2").flow([120, beatValue], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.beatValues).toEqual([0.25]);
+        });
+
+        it("gives 1/4 for the legacy master BPM block, which has no beat value", () => {
+            getBlock("setmasterbpm").flow([120], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.beatValues).toEqual([0.25]);
+        });
+
+        it("keeps one beat value for each recorded BPM block", () => {
+            getBlock("setmasterbpm").flow([90], logo, 0, "bpmBlock");
+            getBlock("setbpm3").flow([120, 1 / 8], logo, 0, "bpmBlock");
+            getBlock("setmasterbpm2").flow([60, 1 / 2], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([90, 120, 60]);
+            expect(logo.tempo.beatValues).toEqual([0.25, 1 / 8, 1 / 2]);
+        });
     });
 
     it("clamps BPM ranges inside FlowClamp blocks and cleans up listeners", () => {

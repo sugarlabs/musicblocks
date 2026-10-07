@@ -937,6 +937,7 @@ function setupWidgetBlocks(activity) {
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
             logo.tempo.BPMTurtles = [];
+            logo.tempo.beatValues = [];
 
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);

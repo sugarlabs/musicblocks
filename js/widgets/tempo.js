@@ -113,6 +113,7 @@ class Tempo {
         // The turtle that ran each BPM block, so a set BPM row changes only that turtle's tempo.
         // The turtle itself rather than its index, which shifts when a turtle is removed.
         this.BPMTurtles = [];
+        this.beatValues = [];
         this.tempoCanvases = [];
         this.activeBPMIndex = 0;
         this._keyHandler = null;

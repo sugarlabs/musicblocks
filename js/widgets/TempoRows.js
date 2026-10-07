@@ -123,7 +123,8 @@ class TempoRows {
             this._firstClickTime = d.getTime();
         } else {
             newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime), 10);
-            if (newBPM > 29 && newBPM < 1001) {
+            const [minBPM, maxBPM] = this._bpmLimits(id);
+            if (newBPM >= minBPM && newBPM <= maxBPM) {
                 this.BPMs[id] = newBPM;
                 this._updateBPM(id);
                 BPMInput = this.BPMInputs[id];

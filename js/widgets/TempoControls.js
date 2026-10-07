@@ -17,7 +17,7 @@
 
 /*
    global
-   _, Singer, TONEBPM
+   _, Singer, TONEBPM, rationalToFraction
  */
 
 /*
@@ -28,6 +28,8 @@
         _
     js/logoconstants.js
         TONEBPM
+    js/utils/utils-logic.js
+        rationalToFraction
 */
 
 /* exported TempoControls */
@@ -41,6 +43,56 @@
  * Tempo.prototype (see Tempo.installModules), so `this` is still the widget.
  */
 class TempoControls {
+    /**
+     * The beat value of a row's BPM block. The block's BPM counts beats of this length, so 120
+     * with a beat value of 1/8 is 60 quarter notes per minute.
+     * @private
+     * @param {number} i - The row.
+     * @returns {number} The beat value, 1/4 if the block didn't give a positive number.
+     */
+    _beatValue(i) {
+        const beatValue = this.beatValues ? this.beatValues[i] : undefined;
+        return Number.isFinite(beatValue) && beatValue > 0 ? beatValue : 0.25;
+    }
+
+    /**
+     * The slowest and fastest BPM of a row. The tempo must be 30 to 1000 quarter notes per
+     * minute, like the BPM blocks check, so with a beat value of 1/8 the row allows 60 to 2000.
+     * @private
+     * @param {number} i - The row.
+     * @returns {number[]} The lowest and highest BPM.
+     */
+    _bpmLimits(i) {
+        const beatValue = this._beatValue(i);
+        return [(30 * 0.25) / beatValue, (1000 * 0.25) / beatValue];
+    }
+
+    /**
+     * Tells the user a row's BPM was out of range: msg for a beat value of 1/4, else the limit
+     * in the row's beats, in the words the BPM blocks use.
+     * @private
+     * @param {number} i - The row.
+     * @param {string} msg - The message for a beat value of 1/4.
+     * @param {boolean} tooFast - Whether the BPM was above the limit rather than below it.
+     * @returns {void}
+     */
+    _bpmRangeError(i, msg, tooFast) {
+        const beatValue = this._beatValue(i);
+        if (beatValue !== 0.25) {
+            const [minBPM, maxBPM] = this._bpmLimits(i);
+            const obj = rationalToFraction(beatValue);
+            const beat = obj[0] + "/" + obj[1];
+            msg = tooFast
+                ? _("maximum") +
+                  " " +
+                  beat +
+                  " " +
+                  _("beats per minute is %s").replace(/%s/g, maxBPM)
+                : beat + " " + _("beats per minute must be greater than %s").replace(/%s/g, minBPM);
+        }
+        this.activity.errorMsg(msg, null, null, 3000);
+    }
+
     /**
      * @private
      * @param {number} i
@@ -64,7 +116,9 @@ class TempoControls {
             this.activity.saveLocally();
         }
 
-        const bpmValue = parseFloat(this.BPMs[i]);
+        // The running tempo is in quarter notes, so convert with the block's beat value, as
+        // running the block does (MeterActions.setMasterBPM and setBPM).
+        const bpmValue = (parseFloat(this.BPMs[i]) * this._beatValue(i)) / 0.25;
         if (bpmBlock.name === "setmasterbpm2" || bpmBlock.name === "setmasterbpm") {
             Singer.masterBPM = bpmValue;
             Singer.defaultBPMFactor = TONEBPM / bpmValue;
@@ -97,22 +151,13 @@ class TempoControls {
         }
 
         this.BPMs[i] = Number(this.BPMInputs[i].value);
-        if (this.BPMs[i] > 1000) {
-            this.BPMs[i] = 1000;
-            this.activity.errorMsg(
-                _("The beats per minute must be between 30 and 1000."),
-                null,
-                null,
-                3000
-            );
-        } else if (this.BPMs[i] < 30) {
-            this.BPMs[i] = 30;
-            this.activity.errorMsg(
-                _("The beats per minute must be between 30 and 1000."),
-                null,
-                null,
-                3000
-            );
+        const [minBPM, maxBPM] = this._bpmLimits(i);
+        if (this.BPMs[i] > maxBPM) {
+            this.BPMs[i] = maxBPM;
+            this._bpmRangeError(i, _("The beats per minute must be between 30 and 1000."), true);
+        } else if (this.BPMs[i] < minBPM) {
+            this.BPMs[i] = minBPM;
+            this._bpmRangeError(i, _("The beats per minute must be between 30 and 1000."), false);
         }
 
         this._updateBPM(i);
@@ -129,9 +174,10 @@ class TempoControls {
         const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
         this.BPMs[i] = parseFloat(this.BPMs[i]) + delta;
 
-        if (this.BPMs[i] > 1000) {
-            this.activity.errorMsg(_("The beats per minute must be below 1000."), null, null, 3000);
-            this.BPMs[i] = 1000;
+        const maxBPM = this._bpmLimits(i)[1];
+        if (this.BPMs[i] > maxBPM) {
+            this._bpmRangeError(i, _("The beats per minute must be below 1000."), true);
+            this.BPMs[i] = maxBPM;
         }
 
         this._updateBPM(i);
@@ -147,9 +193,10 @@ class TempoControls {
     slowDown(i, step) {
         const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
         this.BPMs[i] = parseFloat(this.BPMs[i]) - delta;
-        if (this.BPMs[i] < 30) {
-            this.activity.errorMsg(_("The beats per minute must be above 30"), null, null, 3000);
-            this.BPMs[i] = 30;
+        const minBPM = this._bpmLimits(i)[0];
+        if (this.BPMs[i] < minBPM) {
+            this._bpmRangeError(i, _("The beats per minute must be above 30"), false);
+            this.BPMs[i] = minBPM;
         }
 
         this._updateBPM(i);

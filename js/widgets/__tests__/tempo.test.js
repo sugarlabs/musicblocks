@@ -32,6 +32,9 @@ global.Tempo = Tempo;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
+global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+global.TONEBPM = 240;
+global.Singer = { masterBPM: 90, defaultBPMFactor: 240 / 90 };
 global.getDrumSynthName = jest.fn();
 
 const mockWidgetWindowInstance = {
@@ -1922,6 +1925,192 @@ describe("Tap Tempo feature", () => {
         // Advancing 150ms completes the reset
         jest.advanceTimersByTime(150);
         expect(tempoWidget._tapButtonTimeout).toBeNull();
+    });
+});
+
+describe("Tempo widget beat value (#9309)", () => {
+    let tempo, activity, numberBlock, turtle;
+
+    // A row for a BPM block with the BPM 120 and the given beat value.
+    const makeRow = (name, beatValue) => {
+        numberBlock = { value: 120, text: { text: "120" }, updateCache: jest.fn() };
+        activity.blocks.blockList = { bpm: { name, connections: [null, "num"] }, num: numberBlock };
+        tempo.BPMs = [120];
+        tempo.BPMBlocks = ["bpm"];
+        tempo.beatValues = [beatValue];
+        tempo.BPMInputs = [{ value: 120 }];
+        tempo._intervals = [500];
+    };
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        turtle = { singer: { bpm: [60] } };
+        activity = {
+            blocks: { blockList: {}, loadNewBlocks: jest.fn() },
+            turtles: { turtleList: [turtle] },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn(),
+            textMsg: jest.fn(),
+            errorMsg: jest.fn()
+        };
+        tempo = new Tempo();
+        tempo.activity = activity;
+        Singer.masterBPM = 60;
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test("a master BPM row converts to quarter notes with its beat value", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+
+        tempo.speedUp(0);
+
+        // 132 eighth notes a minute is 66 quarter notes, as running the block gives.
+        expect(tempo.BPMs[0]).toBe(132);
+        expect(numberBlock.value).toBe(132);
+        expect(Singer.masterBPM).toBe(66);
+        expect(Singer.defaultBPMFactor).toBe(TONEBPM / 66);
+        // The metronome still beats every eighth note.
+        expect(tempo._intervals[0]).toBeCloseTo(60000 / 132);
+    });
+
+    test("a set BPM row gives its turtle the tempo in quarter notes", () => {
+        makeRow("setbpm3", 1 / 2);
+        tempo.BPMTurtles = [turtle];
+
+        tempo.BPMInputs[0].value = "100";
+        tempo._useBPM(0);
+
+        expect(turtle.singer.bpm).toEqual([200]);
+    });
+
+    test("a row with a beat value of 1/4 is unchanged", () => {
+        makeRow("setmasterbpm2", 1 / 4);
+
+        tempo.slowDown(0, 20);
+
+        expect(Singer.masterBPM).toBe(100);
+    });
+
+    test("a row without a beat value counts quarter notes", () => {
+        makeRow("setmasterbpm", undefined);
+        tempo.beatValues = [];
+
+        tempo.speedUp(0, 10);
+
+        expect(Singer.masterBPM).toBe(130);
+    });
+
+    test("the limits are 30 to 1000 quarter notes in the row's beats", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+        expect(tempo._bpmLimits(0)).toEqual([60, 2000]);
+
+        tempo.beatValues = [1 / 4];
+        expect(tempo._bpmLimits(0)).toEqual([30, 1000]);
+
+        tempo.beatValues = [1];
+        expect(tempo._bpmLimits(0)).toEqual([7.5, 250]);
+    });
+
+    test("1500 eighth notes a minute is allowed, as the block allows it", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+
+        tempo.BPMInputs[0].value = "1500";
+        tempo._useBPM(0);
+
+        expect(tempo.BPMs[0]).toBe(1500);
+        expect(Singer.masterBPM).toBe(750);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    test("a row is clamped at its own limits, with the block's message", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+
+        tempo.BPMInputs[0].value = "40";
+        tempo._useBPM(0);
+
+        expect(tempo.BPMs[0]).toBe(60);
+        expect(Singer.masterBPM).toBe(30);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            "1/8 beats per minute must be greater than 60",
+            null,
+            null,
+            3000
+        );
+
+        tempo.speedUp(0, 5000);
+
+        expect(tempo.BPMs[0]).toBe(2000);
+        expect(Singer.masterBPM).toBe(1000);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            "maximum 1/8 beats per minute is 2000",
+            null,
+            null,
+            3000
+        );
+    });
+
+    test("a row with a beat value of 1/4 keeps the widget's own messages", () => {
+        makeRow("setmasterbpm2", 1 / 4);
+
+        tempo.slowDown(0, 500);
+
+        expect(tempo.BPMs[0]).toBe(30);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            "The beats per minute must be above 30",
+            null,
+            null,
+            3000
+        );
+    });
+
+    test("tap tempo clamps to the row's limits", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+        jest.setSystemTime(10000);
+        tempo.tapTempo(0);
+        // Taps 1.5 seconds apart are 40 a minute, below the 60 eighth notes allowed.
+        jest.setSystemTime(11500);
+
+        expect(tempo.tapTempo(0)).toBe(60);
+        expect(Singer.masterBPM).toBe(30);
+    });
+
+    test("clicking the canvas accepts a BPM within the row's limits", () => {
+        makeRow("setmasterbpm2", 1 / 2);
+        jest.setSystemTime(10000);
+        tempo._onCanvasClick(0);
+        // 3 seconds is 20 a minute: too slow for 1/4 beats, but 1/2 beats allow down to 15.
+        jest.setSystemTime(13000);
+        tempo._onCanvasClick(0);
+
+        expect(tempo.BPMs[0]).toBe(20);
+        expect(Singer.masterBPM).toBe(40);
+    });
+
+    test("save keeps the row's beat value", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+        tempo.BPMs = [132];
+
+        tempo.__save(0);
+        jest.advanceTimersByTime(200);
+
+        const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(stack[1][1][1].value).toBe(132);
+        expect(stack[3][1][1].value).toBe(1);
+        expect(stack[4][1][1].value).toBe(8);
+    });
+
+    test("save writes 1/4 for a row without a beat value", () => {
+        tempo.BPMs = [100];
+
+        tempo.__save(0);
+        jest.advanceTimersByTime(200);
+
+        const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(stack[3][1][1].value).toBe(1);
+        expect(stack[4][1][1].value).toBe(4);
     });
 });
 
