@@ -476,7 +476,8 @@ describe("MeterBlocks setup", () => {
         expect(Singer.masterBPM).toBe(120);
         expect(Singer.defaultBPMFactor).toBe(TONEBPM / 120);
         expect(logo.tempo.BPMBlocks).toContain("legacy");
-        expect(logo.tempo.BPMs).toEqual([20, 1500, 120]);
+        // The clamped tempo the block actually set.
+        expect(logo.tempo.BPMs).toEqual([30, 1000, 120]);
     });
 
     it("sets per-turtle BPM values and tempo metadata", () => {
@@ -512,6 +513,15 @@ describe("MeterBlocks setup", () => {
 
             expect(logo.tempo.BPMs).toEqual([120]);
             expect(logo.tempo.BPMBlocks).toEqual(["bpmBlock"]);
+        });
+
+        it.each([Infinity, NaN])("treats a %s BPM like an empty label", bpm => {
+            const block = getBlock("setmasterbpm2");
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+
+            block.flow([bpm, 0.25], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([""]);
         });
 
         it("falls back to the slot's label when the BPM isn't a number", () => {
