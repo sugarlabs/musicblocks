@@ -111,6 +111,7 @@ describe("setupVolumeActions", () => {
                 synth: {
                     loadSynth: jest.fn(),
                     setMasterVolume: jest.fn(),
+                    setTurtleOutput: jest.fn(),
                     trigger: jest.fn()
                 },
                 notation: {
@@ -613,14 +614,23 @@ describe("setupVolumeActions", () => {
             expect(inst2.pan.value).toBe(-1);
         });
 
-        it("should connect all instruments to the panner", () => {
-            const connectSpy = jest.spyOn(instruments[0].synth1, "connect");
-            const connectSpyPiano = jest.spyOn(instruments[0].piano, "connect");
+        it("should route the turtle's instruments through its panner", () => {
+            Singer.VolumeActions.setPanning(-100, 0);
 
-            Singer.VolumeActions.setPanning(50, 0);
+            expect(activity.logo.synth.setTurtleOutput).toHaveBeenCalledWith(
+                0,
+                targetTurtle.singer.panner
+            );
+        });
 
-            expect(connectSpy).toHaveBeenCalledWith(targetTurtle.singer.panner);
-            expect(connectSpyPiano).toHaveBeenCalledWith(targetTurtle.singer.panner);
+        it("should keep the same panner as the output when panning changes", () => {
+            Singer.VolumeActions.setPanning(-100, 0);
+            const panner = targetTurtle.singer.panner;
+
+            Singer.VolumeActions.setPanning(100, 0);
+
+            expect(targetTurtle.singer.panner).toBe(panner);
+            expect(activity.logo.synth.setTurtleOutput).toHaveBeenLastCalledWith(0, panner);
         });
     });
 

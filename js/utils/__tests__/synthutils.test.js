@@ -2015,7 +2015,7 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("_performNotes effects routing and cleanup", () => {
-        it("should reconnect synth to destination and disconnect old routing when effects complete", async () => {
+        it("should reconnect synth to its output and disconnect old routing when effects complete", async () => {
             jest.useFakeTimers();
 
             const mockSynth = {
@@ -2039,7 +2039,7 @@ describe("Utility Functions (logic-only)", () => {
             jest.advanceTimersByTime(2000);
 
             expect(mockSynth.disconnect).toHaveBeenCalled();
-            expect(mockSynth.toDestination).toHaveBeenCalled();
+            expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
 
             jest.useRealTimers();
         });
@@ -2117,7 +2117,7 @@ describe("Utility Functions (logic-only)", () => {
             jest.advanceTimersByTime(2000);
 
             expect(mockSynth.disconnect).toHaveBeenCalled();
-            expect(mockSynth.toDestination).toHaveBeenCalled();
+            expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
 
             jest.useRealTimers();
         });
@@ -2178,11 +2178,129 @@ describe("Utility Functions (logic-only)", () => {
                 const cleanupFn = mockTimerManager.setGuardedTimeout.mock.calls[0][0];
                 cleanupFn();
                 expect(mockSynth.disconnect).toHaveBeenCalled();
-                expect(mockSynth.toDestination).toHaveBeenCalled();
+                expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
             } finally {
                 Synth._timerManager = originalTimerManager;
                 Synth.activity = undefined;
             }
+        });
+    });
+
+    describe("per-turtle output routing", () => {
+        const panTurtle = "panTurtle";
+        const panner = { name: "Panner" };
+        const createMockSynth = () => ({
+            toDestination: jest.fn().mockReturnThis(),
+            triggerAttackRelease: jest.fn(),
+            disconnect: jest.fn(),
+            connect: jest.fn(),
+            chain: jest.fn().mockReturnThis()
+        });
+
+        afterEach(() => {
+            delete Synth._turtleOutputs[panTurtle];
+            delete instruments[panTurtle];
+            jest.useRealTimers();
+        });
+
+        it("should play into the master output when no panner is set", () => {
+            const mockSynth = createMockSynth();
+
+            Synth.routeInstrument(panTurtle, mockSynth);
+
+            expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
+            expect(mockSynth.disconnect).not.toHaveBeenCalled();
+        });
+
+        it("should move existing instruments from the master output to the panner", () => {
+            const mockSynth = createMockSynth();
+            instruments[panTurtle] = { "electronic synth": mockSynth };
+            Synth.routeInstrument(panTurtle, mockSynth);
+
+            Synth.setTurtleOutput(panTurtle, panner);
+
+            expect(mockSynth.disconnect).toHaveBeenCalledWith(Tone.Destination);
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+        });
+
+        it("should not rewire a synth that is already routed to its output", () => {
+            const mockSynth = createMockSynth();
+            instruments[panTurtle] = { "electronic synth": mockSynth };
+            Synth.setTurtleOutput(panTurtle, panner);
+            mockSynth.connect.mockClear();
+
+            Synth.routeInstrument(panTurtle, mockSynth);
+
+            expect(mockSynth.connect).not.toHaveBeenCalled();
+        });
+
+        it("should keep the panner after an effects note is cleaned up", async () => {
+            jest.useFakeTimers();
+            const mockSynth = createMockSynth();
+            instruments[panTurtle] = { "electronic synth": mockSynth };
+            Synth.setTurtleOutput(panTurtle, panner);
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+            await _performNotes.call(
+                Synth,
+                mockSynth,
+                "C4",
+                0.25,
+                paramsEffects,
+                null,
+                false,
+                0,
+                panTurtle
+            );
+            expect(mockSynth.chain.mock.calls[0].at(-1)).toBe(panner);
+
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+            expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
+        });
+
+        it("should return to the panner when the effects chain fails", async () => {
+            const mockSynth = createMockSynth();
+            mockSynth.chain.mockImplementation(() => {
+                throw new Error("chain failed");
+            });
+            instruments[panTurtle] = { "electronic synth": mockSynth };
+            Synth.setTurtleOutput(panTurtle, panner);
+            Synth.inTemperament = "equal";
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            try {
+                await _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    "C4",
+                    0.25,
+                    { doVibrato: true, vibratoFrequency: 5, vibratoIntensity: 1 },
+                    null,
+                    false,
+                    0,
+                    panTurtle
+                );
+
+                expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+                expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
+            } finally {
+                errorSpy.mockRestore();
+            }
+        });
+
+        it("should drop every turtle's panner when instruments are disposed", () => {
+            Synth.setTurtleOutput(panTurtle, panner);
+
+            Synth.disposeAllInstruments();
+
+            expect(Synth.getTurtleOutput(panTurtle)).toBe(Tone.Destination);
         });
     });
 
@@ -3959,7 +4077,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // 2. Trigger drum instrument with URL and file sources
             global.instruments[testTurtle]["http://example.com/drum.wav"] = {
-                start: jest.fn()
+                start: jest.fn(),
+                connect: jest.fn()
             };
             global.instrumentsSource["http://example.com/drum.wav"] = [
                 1,
@@ -3980,7 +4099,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             ).toHaveBeenCalled();
 
             global.instruments[testTurtle]["file:///local/drum.wav"] = {
-                start: jest.fn()
+                start: jest.fn(),
+                connect: jest.fn()
             };
             global.instrumentsSource["file:///local/drum.wav"] = [1, "file:///local/drum.wav"];
             await synth.trigger(
@@ -3997,6 +4117,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             // 3. Trigger voice sample instrument with cent adjustments
             synth.sampleCentAdjustments["piano"] = 12;
             global.instruments[testTurtle]["piano"] = {
+                connect: jest.fn(),
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn(),
                 playbackRate: { value: 1 }
@@ -4010,6 +4131,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // 4. Trigger builtin synth (flag 3)
             global.instruments[testTurtle]["sine"] = {
+                connect: jest.fn(),
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn()
             };
@@ -4018,6 +4140,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // 5. Trigger noise synth (flag 4)
             global.instruments[testTurtle]["noise1"] = {
+                connect: jest.fn(),
                 triggerAttackRelease: jest.fn()
             };
             global.instrumentsSource["noise1"] = [4, "noise1"];
