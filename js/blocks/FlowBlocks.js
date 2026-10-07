@@ -1050,22 +1050,24 @@ function setupFlowBlocks(activity) {
     /**
      * Checks whether a Stop block can be reached from a stack, including
      * through any action it calls. A forever that can stop is not infinite.
-     * A Stop inside a nested loop only exits that loop, so loop bodies are skipped.
+     * A Stop inside a nested loop only exits that loop, but Stop mouse ends the
+     * whole turtle, so only Stop mouse counts inside nested loop bodies.
      * @param {number} blk - The first block of the stack.
      * @param {object} logo - The logo object.
-     * @returns {boolean} - True if a Stop block is reachable.
+     * @returns {boolean} - True if a Stop or Stop mouse block is reachable.
      */
     const canReachStop = (blk, logo) => {
         const blockList = activity.blocks.blockList;
         const actions = logo.actions || {};
-        const stack = [blk];
+        const stack = [[blk, false]];
         const seen = new Set();
         while (stack.length > 0) {
-            const b = stack.pop();
-            if (b === null || b === undefined || seen.has(b) || !blockList[b]) continue;
-            seen.add(b);
+            const [b, nested] = stack.pop();
+            const key = `${b}:${nested}`;
+            if (b === null || b === undefined || seen.has(key) || !blockList[b]) continue;
+            seen.add(key);
             const block = blockList[b];
-            if (block.name === "break") return true;
+            if (block.name === "stopTurtle" || (block.name === "break" && !nested)) return true;
             if (ACTIONCALLS.includes(block.name)) {
                 const arg = blockList[block.connections[1]];
                 const name = block.name.startsWith("named")
@@ -1074,11 +1076,12 @@ function setupFlowBlocks(activity) {
                       ? arg.value
                       : undefined;
                 // A computed action name could be any action.
-                stack.push(...(name === undefined ? Object.values(actions) : [actions[name]]));
+                const targets = name === undefined ? Object.values(actions) : [actions[name]];
+                stack.push(...targets.map(t => [t, nested]));
             }
-            const next = block.connections.slice(1);
+            const next = block.connections.slice(1).map(c => [c, nested]);
             // The body is the second-to-last connection; args still run first.
-            if (LOOPS.includes(block.name)) next.splice(next.length - 2, 1);
+            if (LOOPS.includes(block.name)) next[next.length - 2][1] = true;
             stack.push(...next);
         }
         return false;
