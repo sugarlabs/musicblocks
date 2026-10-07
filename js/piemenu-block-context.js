@@ -59,6 +59,19 @@ const piemenuBlockContext = block => {
 
     docById("contextWheelDiv").style.display = "";
 
+    // The long-press release can land on a wheel item because the wheel opens
+    // under the pointer. Consume that mouseup before wheelnav can treat it as
+    // an item selection; subsequent releases work normally.
+    if (window._contextWheelIgnoreNextMouseUp) {
+        const ignoreLongPressRelease = event => {
+            window._contextWheelIgnoreNextMouseUp = false;
+            document.removeEventListener("mouseup", ignoreLongPressRelease, true);
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        };
+        document.addEventListener("mouseup", ignoreLongPressRelease, true);
+    }
+
     const labels = [
         "imgsrc:header-icons/copy-button.svg",
         "imgsrc:header-icons/extract-button.svg",

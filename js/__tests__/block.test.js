@@ -1535,6 +1535,34 @@ describe("Block Foundation", () => {
             expect(block._triggerLongPress).toBe(false);
             expect(stopImmediatePropagation).toHaveBeenCalled();
         });
+
+        it("does not run a released long press with Shift held", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            const stopImmediatePropagation = jest.fn();
+
+            handlers.click({
+                nativeEvent: { button: 0, shiftKey: true, stopImmediatePropagation }
+            });
+
+            expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+            expect(mockBlocks.findTopBlock).not.toHaveBeenCalled();
+            expect(block._triggerLongPress).toBe(false);
+            expect(stopImmediatePropagation).toHaveBeenCalled();
+        });
+
+        it("does not move a block after a long press opens the menu", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            block.blocks.getLongPressStatus.mockReturnValue(true);
+            block.blocks.moveBlockRelativeBatched = jest.fn();
+
+            handlers.pressmove({
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(block.blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
+        });
     });
 
     describe("_checkWidgets()", () => {
