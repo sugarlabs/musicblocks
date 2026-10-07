@@ -100,7 +100,16 @@ global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
-global.Tempo.dependencies = ["widgets/tempo"];
+global.Tempo.dependencies = [
+    "widgets/TempoWindow",
+    "widgets/TempoRows",
+    "widgets/TempoKeyboard",
+    "widgets/TempoTap",
+    "widgets/TempoControls",
+    "widgets/TempoMetronome",
+    "widgets/TempoSave",
+    "widgets/tempo"
+];
 global.TimbreWidget = jest.fn(() => ({
     instrumentName: "testInstrument",
     blockNo: null,

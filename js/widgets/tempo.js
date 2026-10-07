@@ -14,25 +14,34 @@
 
 /*
    global
-   _, getDrumSynthName, Singer, TONEBPM, ManagedTimer
+   _, getDrumSynthName, TempoWindow, TempoRows, TempoKeyboard, TempoTap, TempoControls,
+   TempoMetronome, TempoSave
  */
 
 /*
    Global locations
     js/utils/musicutils.js
         getDrumSynthName
-    js/turtle-singer.js
-        Singer
     js/utils/utils.js
         _
-    js/logoconstants.js
-        TONEBPM
+    js/widgets/TempoWindow.js, TempoRows.js, TempoKeyboard.js, TempoTap.js, TempoControls.js,
+      TempoMetronome.js, TempoSave.js
+        TempoWindow, TempoRows, TempoKeyboard, TempoTap, TempoControls, TempoMetronome, TempoSave
 */
 
 /* exported Tempo */
 class Tempo {
     /** AMD module dependencies for lazy loading. */
-    static dependencies = ["widgets/tempo"];
+    static dependencies = [
+        "widgets/TempoWindow",
+        "widgets/TempoRows",
+        "widgets/TempoKeyboard",
+        "widgets/TempoTap",
+        "widgets/TempoControls",
+        "widgets/TempoMetronome",
+        "widgets/TempoSave",
+        "widgets/tempo"
+    ];
 
     static TEMPOSYNTH = "bottle";
     static TEMPOINTERVAL = 5;
@@ -43,7 +52,60 @@ class Tempo {
     static TEMPOHEIGHT = 100;
     static YRADIUS = 75;
 
+    /**
+     * Whether installModules has copied the module methods onto the prototype.
+     * @type {boolean}
+     */
+    static _modulesInstalled = false;
+
+    /**
+     * Copies the methods of the Tempo modules (TempoWindow.js, TempoRows.js, TempoKeyboard.js,
+     * TempoTap.js, TempoControls.js, TempoMetronome.js and TempoSave.js) onto Tempo.prototype,
+     * keeping their names and property descriptors, so they behave exactly like methods
+     * declared in this class and `this` inside them is the widget.
+     *
+     * RequireJS loads the modules alongside this file in no fixed order, so this runs when the
+     * file loads (if the modules are already defined) and again from the constructor, which
+     * only runs once every dependency has loaded.
+     * @returns {boolean} Whether the methods are installed.
+     */
+    static installModules() {
+        if (Tempo._modulesInstalled) {
+            return true;
+        }
+
+        const modules = [
+            typeof TempoWindow !== "undefined" ? TempoWindow : null,
+            typeof TempoRows !== "undefined" ? TempoRows : null,
+            typeof TempoKeyboard !== "undefined" ? TempoKeyboard : null,
+            typeof TempoTap !== "undefined" ? TempoTap : null,
+            typeof TempoControls !== "undefined" ? TempoControls : null,
+            typeof TempoMetronome !== "undefined" ? TempoMetronome : null,
+            typeof TempoSave !== "undefined" ? TempoSave : null
+        ];
+        if (modules.includes(null)) {
+            return false;
+        }
+
+        for (const module of modules) {
+            for (const name of Object.getOwnPropertyNames(module.prototype)) {
+                if (name !== "constructor") {
+                    Object.defineProperty(
+                        Tempo.prototype,
+                        name,
+                        Object.getOwnPropertyDescriptor(module.prototype, name)
+                    );
+                }
+            }
+        }
+
+        Tempo._modulesInstalled = true;
+        return true;
+    }
+
     constructor() {
+        Tempo.installModules();
+
         this._xradius = Tempo.YRADIUS / 3;
         this.BPMs = [];
         this.BPMInputs = [];
@@ -101,10 +163,7 @@ class Tempo {
         this._intervalID = null;
         this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
-        if (this._keyHandler) {
-            document.removeEventListener("keydown", this._keyHandler, true);
-            this._keyHandler = null;
-        }
+        this._removeKeyHandler();
         const widgetWindow = window.widgetWindows.windowFor(this, "tempo", "tempo", true);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -113,732 +172,26 @@ class Tempo {
             widgetWindow.takeFocus();
         }
 
-        widgetWindow.onclose = () => {
-            if (this._keyHandler) {
-                document.removeEventListener("keydown", this._keyHandler, true);
-                this._keyHandler = null;
-            }
-            if (this._tapTimeout) {
-                if (widgetWindow.timerManager) {
-                    widgetWindow.timerManager.clearTimeout(this._tapTimeout);
-                } else {
-                    clearTimeout(this._tapTimeout);
-                }
-                this._tapTimeout = null;
-            }
-            if (this._tapButtonTimeout) {
-                if (widgetWindow.timerManager) {
-                    widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
-                } else {
-                    clearTimeout(this._tapButtonTimeout);
-                }
-                this._tapButtonTimeout = null;
-            }
-            this._tapTimes = [];
-            this._lastTapIndex = null;
-            if (this._intervalID !== null) {
-                widgetWindow.timerManager.clearInterval(this._intervalID);
-            }
-            widgetWindow.destroy();
-        };
+        widgetWindow.onclose = () => this._closeWindow(widgetWindow);
 
-        const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
-        this.pauseBtn = pauseBtn;
-        pauseBtn.onclick = () => {
-            if (this.isMoving) {
-                this.pause();
-                // Use createElement to safely update button icon
-                const playImg = document.createElement("img");
-                playImg.src = "header-icons/play-button.svg";
-                playImg.title = _("Play");
-                playImg.alt = _("Play");
-                playImg.height = Tempo.ICONSIZE;
-                playImg.width = Tempo.ICONSIZE;
-                playImg.style.verticalAlign = "middle";
-                pauseBtn.textContent = "";
-                pauseBtn.appendChild(playImg);
-                this.isMoving = false;
-            } else {
-                this.resume();
-                // Use createElement to safely update button icon
-                const pauseImg = document.createElement("img");
-                pauseImg.src = "header-icons/pause-button.svg";
-                pauseImg.title = _("Pause");
-                pauseImg.alt = _("Pause");
-                pauseImg.height = Tempo.ICONSIZE;
-                pauseImg.width = Tempo.ICONSIZE;
-                pauseImg.style.verticalAlign = "middle";
-                pauseBtn.textContent = "";
-                pauseBtn.appendChild(pauseImg);
-                this.isMoving = true;
-            }
-        };
-
-        this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick =
-            () => {
-                // Debounce button
-                if (!this._get_save_lock()) {
-                    this._save_lock = true;
-                    this._saveTempo();
-                    if (this.widgetWindow && this.widgetWindow.timerManager) {
-                        this.widgetWindow.timerManager.setTimeout(
-                            () => (this._save_lock = false),
-                            1000
-                        );
-                    } else {
-                        setTimeout(() => (this._save_lock = false), 1000);
-                    }
-                }
-            };
-
-        const tapBtn = widgetWindow.addButton("tap-button.svg", Tempo.ICONSIZE, _("Tap tempo"));
-        this.tapBtn = tapBtn;
-        tapBtn.onclick = () => {
-            const id =
-                this.activeBPMIndex >= 0 && this.activeBPMIndex < this.BPMs.length
-                    ? this.activeBPMIndex
-                    : 0;
-            this.tapTempo(id);
-        };
+        this._addToolbar(widgetWindow);
 
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
-        let r1, r2, r3, tcCell;
-        for (let i = 0; i < this.BPMs.length; i++) {
-            this._directions.push(1);
-            this._widgetFirstTimes.push(this.activity.logo.firstNoteTime);
-            if (this.BPMs[i] <= 0) {
-                this.BPMs[i] = 30;
-            }
+        this._makeRows(widgetWindow);
 
-            this._intervals.push((60 / this.BPMs[i]) * 1000);
-            this._widgetNextTimes.push(this._widgetFirstTimes[i] - this._intervals[i]);
-
-            r1 = this.bodyTable.insertRow();
-            r2 = this.bodyTable.insertRow();
-            r3 = this.bodyTable.insertRow();
-            widgetWindow.addButton(
-                "up.svg",
-                Tempo.ICONSIZE,
-                _("speed up"),
-                r1.insertCell()
-            ).onclick = (
-                i => () =>
-                    this.speedUp(i)
-            )(i);
-            widgetWindow.addButton(
-                "down.svg",
-                Tempo.ICONSIZE,
-                _("slow down"),
-                r2.insertCell()
-            ).onclick = (
-                i => () =>
-                    this.slowDown(i)
-            )(i);
-
-            this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
-            this.BPMInputs[i].addEventListener("focus", () => {
-                this.activeBPMIndex = i;
-            });
-            this.tempoCanvases[i] = document.createElement("canvas");
-            this.tempoCanvases[i].style.width = Tempo.TEMPOWIDTH + "px";
-            this.tempoCanvases[i].style.height = Tempo.TEMPOHEIGHT + "px";
-            this.tempoCanvases[i].style.margin = "1px";
-            this.tempoCanvases[i].style.background = "rgba(255, 255, 255, 1)";
-            tcCell = r1.insertCell();
-            tcCell.appendChild(this.tempoCanvases[i]);
-            tcCell.setAttribute("rowspan", "3");
-
-            // The tempo can be set from the interval between successive clicks on the canvas.
-            this.tempoCanvases[i].style.cursor = "pointer";
-            this.tempoCanvases[i].title = _("Click to tap tempo");
-            this.tempoCanvases[i].onclick = (id => () => {
-                if (this._lastCanvasIndex !== id) {
-                    this._firstClickTime = null;
-                    this._lastCanvasIndex = id;
-                }
-                this.activeBPMIndex = id;
-                const d = new Date();
-                let newBPM, BPMInput;
-                if (this._firstClickTime === null) {
-                    this._firstClickTime = d.getTime();
-                } else {
-                    newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime), 10);
-                    if (newBPM > 29 && newBPM < 1001) {
-                        this.BPMs[id] = newBPM;
-                        this._updateBPM(id);
-                        BPMInput = this.BPMInputs[id];
-                        BPMInput.value = this.BPMs[id];
-                        this._firstClickTime = null;
-                    } else {
-                        this._firstClickTime = d.getTime();
-                    }
-                }
-            })(i);
-
-            this.BPMInputs[i].addEventListener(
-                "keyup",
-                (id => e => {
-                    this.activeBPMIndex = id;
-                    if (e.key === "Enter") {
-                        this._useBPM(id);
-                    }
-                })(i)
-            );
-        }
-
-        this._keyHandler = event => {
-            if (
-                typeof window === "undefined" ||
-                !window.widgetWindows ||
-                window.widgetWindows.focused !== widgetWindow
-            ) {
-                return;
-            }
-
-            if (
-                this.activity &&
-                this.activity.blocks &&
-                this.activity.blocks.activeBlock !== null &&
-                this.activity.blocks.activeBlock !== undefined
-            ) {
-                return;
-            }
-
-            const activeElement = document.activeElement;
-            if (
-                activeElement &&
-                (activeElement.tagName === "INPUT" ||
-                    activeElement.tagName === "TEXTAREA" ||
-                    activeElement.isContentEditable)
-            ) {
-                return;
-            }
-
-            if (
-                activeElement &&
-                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
-            ) {
-                return;
-            }
-
-            if (!this.BPMs || this.BPMs.length === 0) {
-                return;
-            }
-
-            const id =
-                this.activeBPMIndex >= 0 && this.activeBPMIndex < this.BPMs.length
-                    ? this.activeBPMIndex
-                    : 0;
-
-            if (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38) {
-                event.preventDefault();
-                event.stopPropagation();
-                if (event.shiftKey) {
-                    this.speedUp(id);
-                } else {
-                    this.speedUp(id, 1);
-                }
-                return;
-            }
-
-            if (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40) {
-                event.preventDefault();
-                event.stopPropagation();
-                if (event.shiftKey) {
-                    this.slowDown(id);
-                } else {
-                    this.slowDown(id, 1);
-                }
-                return;
-            }
-
-            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
-                event.preventDefault();
-                event.stopPropagation();
-                this.togglePlayPause();
-                return;
-            }
-
-            if (event.key === "t" || event.key === "T" || event.code === "KeyT") {
-                event.preventDefault();
-                event.stopPropagation();
-                this.tapTempo(id);
-            }
-        };
-
-        document.addEventListener("keydown", this._keyHandler, true);
+        this._addKeyHandler(widgetWindow);
 
         this.activity.textMsg(_("Adjust the tempo with the buttons."), 3000);
         this.resume();
 
         widgetWindow.sendToCenter();
     }
-
-    /**
-     * @private
-     * @param {number} i
-     * @returns {void}
-     */
-    _updateBPM(i) {
-        this._intervals[i] = (60 / this.BPMs[i]) * 1000;
-
-        if (!this.BPMBlocks || this.BPMBlocks[i] === null || this.BPMBlocks[i] === undefined) {
-            return;
-        }
-
-        const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
-        if (!bpmBlock) return;
-        const blockNumber = bpmBlock.connections[1];
-        if (blockNumber !== null) {
-            this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-            this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-            this.activity.blocks.blockList[blockNumber].updateCache();
-            this.activity.refreshCanvas();
-            this.activity.saveLocally();
-        }
-
-        const bpmValue = parseFloat(this.BPMs[i]);
-        if (bpmBlock.name === "setmasterbpm2" || bpmBlock.name === "setmasterbpm") {
-            Singer.masterBPM = bpmValue;
-            Singer.defaultBPMFactor = TONEBPM / bpmValue;
-        } else if (bpmBlock.name === "setbpm3" || bpmBlock.name === "setbpm2") {
-            // Only the turtle that ran the block: other start blocks keep their own tempo.
-            const turtle = this.BPMTurtles ? this.BPMTurtles[i] : null;
-            const isCurrent = turtle && this.activity.turtles.turtleList.includes(turtle);
-            if (isCurrent && turtle.singer && turtle.singer.bpm.length > 0) {
-                turtle.singer.bpm[turtle.singer.bpm.length - 1] = bpmValue;
-            }
-        }
-    }
-
-    /**
-     * @public
-     * @returns {void}
-     */
-    pause() {
-        if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this.widgetWindow.timerManager.clearInterval(this._intervalID);
-        } else {
-            clearInterval(this._intervalID);
-        }
-    }
-
-    /**
-     * @public
-     * @returns {void}
-     */
-    resume() {
-        // Reset widget time since we are restarting. We will no longer keep synch with the turtles.
-        const d = new Date();
-        for (let i = 0; i < this.BPMs.length; i++) {
-            this._widgetFirstTimes[i] = d.getTime();
-            this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
-            this._directions[i] = 1;
-        }
-
-        // Restart the interval.
-        if (this._intervalID !== null) {
-            if (this.widgetWindow && this.widgetWindow.timerManager) {
-                this.widgetWindow.timerManager.clearInterval(this._intervalID);
-            } else {
-                clearInterval(this._intervalID);
-            }
-        }
-
-        if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this._intervalID = this.widgetWindow.timerManager.setInterval(() => {
-                this._draw();
-            }, Tempo.TEMPOINTERVAL);
-        } else {
-            this._intervalID = setInterval(() => {
-                this._draw();
-            }, Tempo.TEMPOINTERVAL);
-        }
-    }
-
-    /**
-     * @private
-     * @param {number} i
-     * @returns {void}
-     */
-    _useBPM(i) {
-        const input = this.BPMInputs[i].value;
-
-        if (isNaN(input)) {
-            this.activity.errorMsg(_("Please enter a number between 30 and 1000"), 3000);
-            return;
-        }
-
-        this.BPMs[i] = Number(this.BPMInputs[i].value);
-        if (this.BPMs[i] > 1000) {
-            this.BPMs[i] = 1000;
-            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
-        } else if (this.BPMs[i] < 30) {
-            this.BPMs[i] = 30;
-            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
-        }
-
-        this._updateBPM(i);
-        this.BPMInputs[i].value = this.BPMs[i];
-    }
-
-    /**
-     * @public
-     * @returns {void}
-     */
-    togglePlayPause() {
-        if (this.pauseBtn && typeof this.pauseBtn.onclick === "function") {
-            this.pauseBtn.onclick();
-        } else if (this.isMoving) {
-            this.pause();
-            this.isMoving = false;
-        } else {
-            this.resume();
-            this.isMoving = true;
-        }
-    }
-
-    /**
-     * @private
-     * @returns {void}
-     */
-    _flashTapButton() {
-        if (!this.tapBtn) return;
-        const activeImg = document.createElement("img");
-        activeImg.src = "header-icons/tap-active-button.svg";
-        activeImg.title = _("Tap tempo");
-        activeImg.alt = _("Tap tempo");
-        activeImg.height = Tempo.ICONSIZE;
-        activeImg.width = Tempo.ICONSIZE;
-        activeImg.style.verticalAlign = "middle";
-        if (typeof this.tapBtn.replaceChildren === "function") {
-            this.tapBtn.replaceChildren(activeImg);
-        } else {
-            this.tapBtn.textContent = "";
-            if (typeof this.tapBtn.appendChild === "function") {
-                this.tapBtn.appendChild(activeImg);
-            }
-        }
-
-        if (this._tapButtonTimeout) {
-            if (this.widgetWindow && this.widgetWindow.timerManager) {
-                this.widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
-            } else {
-                clearTimeout(this._tapButtonTimeout);
-            }
-            this._tapButtonTimeout = null;
-        }
-
-        const reset = () => {
-            this._tapButtonTimeout = null;
-            if (!this.tapBtn) return;
-            const normalImg = document.createElement("img");
-            normalImg.src = "header-icons/tap-button.svg";
-            normalImg.title = _("Tap tempo");
-            normalImg.alt = _("Tap tempo");
-            normalImg.height = Tempo.ICONSIZE;
-            normalImg.width = Tempo.ICONSIZE;
-            normalImg.style.verticalAlign = "middle";
-            if (typeof this.tapBtn.replaceChildren === "function") {
-                this.tapBtn.replaceChildren(normalImg);
-            } else {
-                this.tapBtn.textContent = "";
-                if (typeof this.tapBtn.appendChild === "function") {
-                    this.tapBtn.appendChild(normalImg);
-                }
-            }
-        };
-
-        if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this._tapButtonTimeout = this.widgetWindow.timerManager.setTimeout(reset, 150);
-        } else {
-            this._tapButtonTimeout = setTimeout(reset, 150);
-        }
-    }
-
-    /**
-     * @private
-     * @returns {void}
-     */
-    _scheduleTapReset() {
-        const resetCallback = () => {
-            this._tapTimes = [];
-            this._tapTimeout = null;
-            this._lastTapIndex = null;
-        };
-        if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this._tapTimeout = this.widgetWindow.timerManager.setTimeout(resetCallback, 2001);
-        } else {
-            this._tapTimeout = setTimeout(resetCallback, 2001);
-        }
-    }
-
-    /**
-     * Sets or adjusts BPM using a rolling average of successive taps.
-     *
-     * @public
-     * @param {number} [id=0] - The index of the BPM to update.
-     * @returns {number|null} The newly calculated BPM, or null on first tap.
-     */
-    tapTempo(id = 0) {
-        if (!this.BPMs || this.BPMs.length === 0) {
-            return null;
-        }
-
-        if (id < 0 || id >= this.BPMs.length) {
-            id = 0;
-        }
-        this.activeBPMIndex = id;
-
-        if (this._lastTapIndex !== id) {
-            this._tapTimes = [];
-            this._lastTapIndex = id;
-        }
-
-        const now = Date.now();
-        this._flashTapButton();
-
-        if (this._tapTimeout) {
-            if (this.widgetWindow && this.widgetWindow.timerManager) {
-                this.widgetWindow.timerManager.clearTimeout(this._tapTimeout);
-            } else {
-                clearTimeout(this._tapTimeout);
-            }
-            this._tapTimeout = null;
-        }
-
-        const lastTap = this._tapTimes[this._tapTimes.length - 1];
-        if (!lastTap || now - lastTap > 2000) {
-            this._tapTimes = [now];
-            if (this.activity && typeof this.activity.textMsg === "function") {
-                this.activity.textMsg(_("Tap again to set tempo"), 1500);
-            }
-            this._scheduleTapReset();
-            return null;
-        }
-
-        this._tapTimes.push(now);
-        if (this._tapTimes.length > 5) {
-            this._tapTimes.shift();
-        }
-
-        let totalInterval = 0;
-        for (let j = 1; j < this._tapTimes.length; j++) {
-            totalInterval += this._tapTimes[j] - this._tapTimes[j - 1];
-        }
-        const avgInterval = totalInterval / (this._tapTimes.length - 1);
-
-        if (avgInterval <= 0) {
-            this._scheduleTapReset();
-            return null;
-        }
-
-        let newBPM = Math.round((60 * 1000) / avgInterval);
-        if (newBPM < 30) {
-            newBPM = 30;
-        } else if (newBPM > 1000) {
-            newBPM = 1000;
-        }
-
-        this.BPMs[id] = newBPM;
-        this._updateBPM(id);
-        if (this.BPMInputs[id]) {
-            this.BPMInputs[id].value = newBPM;
-        }
-
-        this._scheduleTapReset();
-        return newBPM;
-    }
-
-    /**
-     * @public
-     * @param {number} i
-     * @param {number} [step]
-     * @returns {void}
-     */
-    speedUp(i, step) {
-        const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
-        this.BPMs[i] = parseFloat(this.BPMs[i]) + delta;
-
-        if (this.BPMs[i] > 1000) {
-            this.activity.errorMsg(_("The beats per minute must be below 1000."), 3000);
-            this.BPMs[i] = 1000;
-        }
-
-        this._updateBPM(i);
-        this.BPMInputs[i].value = this.BPMs[i];
-    }
-
-    /**
-     * @public
-     * @param {number} i
-     * @param {number} [step]
-     * @returns {void}
-     */
-    slowDown(i, step) {
-        const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
-        this.BPMs[i] = parseFloat(this.BPMs[i]) - delta;
-        if (this.BPMs[i] < 30) {
-            this.activity.errorMsg(_("The beats per minute must be above 30"), 3000);
-            this.BPMs[i] = 30;
-        }
-
-        this._updateBPM(i);
-        this.BPMInputs[i].value = this.BPMs[i];
-    }
-
-    /**
-     * @private
-     * @returns {void}
-     */
-    _draw() {
-        // First thing to do is figure out where we are supposed to be based on the elapsed time.
-        const d = new Date();
-        let tempoCanvas, deltaTime, dx, x, ctx;
-        for (let i = 0; i < this.BPMs.length; i++) {
-            tempoCanvas = this.tempoCanvases[i];
-            if (!tempoCanvas) continue;
-
-            // We start the music clock as the first note is being played.
-            if (this._widgetFirstTimes[i] === null) {
-                this._widgetFirstTimes[i] = d.getTime();
-                this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
-            }
-
-            // How much time has gone by?
-            deltaTime = this._widgetNextTimes[i] - d.getTime();
-
-            // Are we done yet?
-            if (d.getTime() > this._widgetNextTimes[i]) {
-                // Play a tone.
-                this.activity.logo.synth.trigger(
-                    0,
-                    ["C2"],
-                    0.0625,
-                    Tempo.TEMPOSYNTH,
-                    null,
-                    null,
-                    false
-                );
-                this._widgetNextTimes[i] += this._intervals[i];
-
-                // If the loop fell behind (e.g. a throttled background tab), skip the
-                // missed beats instead of replaying them one per frame. Keep the
-                // beat phase so the next beat still lands on the original grid.
-                let beatsPassed = 1;
-                if (this._intervals[i] > 0 && d.getTime() >= this._widgetNextTimes[i]) {
-                    const missed =
-                        Math.floor((d.getTime() - this._widgetNextTimes[i]) / this._intervals[i]) +
-                        1;
-                    this._widgetNextTimes[i] += missed * this._intervals[i];
-                    beatsPassed += missed;
-                }
-
-                // Ensure we are at the edge (flip once per beat that went by).
-                if (beatsPassed % 2 === 1) {
-                    this._directions[i] = this._directions[i] === -1 ? 1 : -1;
-                }
-            } else {
-                // Determine new x position based on delta time.
-                if (this._intervals[i] !== 0) {
-                    dx = tempoCanvas.width * (deltaTime / this._intervals[i]);
-                } else {
-                    dx = 0;
-                }
-
-                // Set this._xradius based on the dx to achieve the compressing effect
-                if (tempoCanvas.width - dx <= Tempo.YRADIUS / 3) {
-                    this._xradius = tempoCanvas.width - dx;
-                } else if (dx <= Tempo.YRADIUS / 3) {
-                    this._xradius = dx;
-                } else {
-                    this._xradius = Tempo.YRADIUS / 3;
-                }
-
-                // Set x based on dx and direction
-                if (this._directions[i] === -1) {
-                    x = tempoCanvas.width - dx;
-                } else {
-                    x = dx;
-                }
-            }
-
-            // Set x value if it is undefined
-            if (x === undefined) {
-                if (this._directions[i] === -1) {
-                    x = 0;
-                } else {
-                    x = tempoCanvas.width;
-                }
-            }
-
-            ctx = tempoCanvas.getContext("2d");
-            ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
-            ctx.beginPath();
-            ctx.fillStyle = "rgba(0,0,0,1)";
-            ctx.ellipse(
-                x,
-                Tempo.YRADIUS,
-                Math.max(this._xradius, 1),
-                Tempo.YRADIUS,
-                0,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
-            ctx.closePath();
-        }
-    }
-
-    /**
-     * @private
-     * @param {number} i
-     * @returns {void}
-     */
-    __save(i) {
-        const callback = () => {
-            const delta = i * 42;
-            const newStack = [
-                [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
-                [1, ["number", { value: this.BPMs[i] }], 0, 0, [0]],
-                [2, ["divide", {}], 0, 0, [0, 3, 4]],
-                [3, ["number", { value: 1 }], 0, 0, [2]],
-                [4, ["number", { value: 4 }], 0, 0, [2]],
-                [5, ["vspace", {}], 0, 0, [0, null]]
-            ];
-            this.activity.blocks.loadNewBlocks(newStack);
-            this.activity.textMsg(_("New action block generated."), 3000);
-        };
-
-        if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this.widgetWindow.timerManager.setTimeout(callback, 200 * i);
-        } else {
-            setTimeout(callback, 200 * i);
-        }
-    }
-
-    /**
-     * @private
-     * @returns {void}
-     */
-    _saveTempo() {
-        // Save a BPM block for each tempo.
-        for (let i = 0; i < this.BPMs.length; i++) {
-            this.__save(i);
-        }
-    }
-
-    /**
-     * @private
-     * @returns {HTMLElement}
-     */
-    _get_save_lock() {
-        return this._save_lock;
-    }
 }
+
+Tempo.installModules();
+
 if (typeof module !== "undefined") {
     module.exports = Tempo;
 }

@@ -917,6 +917,13 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "tempo",
                 _getWidgetDependencies(typeof Tempo !== "undefined" ? Tempo : null, [
+                    "widgets/TempoWindow",
+                    "widgets/TempoRows",
+                    "widgets/TempoKeyboard",
+                    "widgets/TempoTap",
+                    "widgets/TempoControls",
+                    "widgets/TempoMetronome",
+                    "widgets/TempoSave",
                     "widgets/tempo"
                 ]),
                 () => new Tempo(),

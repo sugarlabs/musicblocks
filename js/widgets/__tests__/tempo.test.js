@@ -20,7 +20,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.TempoWindow = require("../TempoWindow.js");
+global.TempoRows = require("../TempoRows.js");
+global.TempoKeyboard = require("../TempoKeyboard.js");
+global.TempoTap = require("../TempoTap.js");
+global.TempoControls = require("../TempoControls.js");
+global.TempoMetronome = require("../TempoMetronome.js");
+global.TempoSave = require("../TempoSave.js");
 const Tempo = require("../tempo.js");
+global.Tempo = Tempo;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
@@ -1890,5 +1898,76 @@ describe("Tap Tempo feature", () => {
         // Advancing 150ms completes the reset
         jest.advanceTimersByTime(150);
         expect(tempoWidget._tapButtonTimeout).toBeNull();
+    });
+});
+
+describe("Tempo modules", () => {
+    const MODULES = [
+        "TempoWindow",
+        "TempoRows",
+        "TempoKeyboard",
+        "TempoTap",
+        "TempoControls",
+        "TempoMetronome",
+        "TempoSave"
+    ];
+
+    test("lists every module, and itself last, as its lazy-loading dependencies", () => {
+        expect(Tempo.dependencies).toEqual([
+            ...MODULES.map(name => "widgets/" + name),
+            "widgets/tempo"
+        ]);
+    });
+
+    test("the Tempo block falls back to the same dependencies", () => {
+        const source = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "..", "blocks", "WidgetBlocks.js"),
+            "utf8"
+        );
+        const site = source.slice(source.indexOf('typeof Tempo !== "undefined"'));
+        const fallback = site.slice(site.indexOf("["), site.indexOf("]") + 1);
+
+        expect(JSON.parse(fallback)).toEqual(Tempo.dependencies);
+    });
+
+    test("installModules waits until every module is loaded", () => {
+        jest.isolateModules(() => {
+            const saved = global.TempoSave;
+            delete global.TempoSave;
+            try {
+                const Fresh = require("../tempo.js");
+                expect(Fresh.installModules()).toBe(false);
+                expect(Fresh.prototype._saveTempo).toBeUndefined();
+
+                global.TempoSave = saved;
+                expect(Fresh.installModules()).toBe(true);
+                expect(Fresh.prototype._saveTempo).toBe(saved.prototype._saveTempo);
+            } finally {
+                global.TempoSave = saved;
+            }
+        });
+    });
+
+    test("no two modules define the same method", () => {
+        const seen = new Set();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(seen.has(method)).toBe(false);
+                    seen.add(method);
+                }
+            }
+        }
+    });
+
+    test("a widget has every module method", () => {
+        const tempo = new Tempo();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(typeof tempo[method]).toBe("function");
+                }
+            }
+        }
     });
 });
