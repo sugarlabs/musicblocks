@@ -117,7 +117,14 @@ function AIWidget() {
     this.pitchAnalysers = {};
 
     /**
-     * Disconnects and disposes the pitch analysers.
+     * Maps each synth name to the pitch analyser index and synth object it is
+     * currently connected to.
+     * @type {object}
+     */
+    this._connectedSynths = {};
+
+    /**
+     * Disposes the pitch analysers.
      * @private
      * @returns {void}
      */
@@ -125,13 +132,11 @@ function AIWidget() {
         for (const id in this.pitchAnalysers) {
             const analyser = this.pitchAnalysers[id];
             if (analyser) {
-                for (const synth in instruments[0]) {
-                    instruments[0][synth].disconnect(analyser);
-                }
                 analyser.dispose();
             }
         }
         this.pitchAnalysers = {};
+        this._connectedSynths = {};
     };
 
     /**
@@ -965,21 +970,41 @@ function AIWidget() {
 
         // Connect instruments. Ref tone connects with the first pitchAnalyser.
         for (const synth in instruments[0]) {
+            const synthObject = instruments[0][synth];
+
             let analyser = 1;
             if (synth === REFERENCESAMPLE) {
                 analyser = 0;
             }
 
-            if (this.pitchAnalysers[analyser]) {
-                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
-                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+            const connection = this._connectedSynths[synth];
+            if (
+                this.pitchAnalysers[analyser] &&
+                (!connection ||
+                    connection.analyser !== analyser ||
+                    connection.synth !== synthObject)
+            ) {
+                synthObject.connect(this.pitchAnalysers[analyser]);
+                this._connectedSynths[synth] = {
+                    analyser,
+                    synth: synthObject
+                };
             }
 
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                if (this.pitchAnalysers[analyser]) {
-                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
-                    instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                const customConnection = this._connectedSynths[synth];
+                if (
+                    this.pitchAnalysers[analyser] &&
+                    (!customConnection ||
+                        customConnection.analyser !== analyser ||
+                        customConnection.synth !== synthObject)
+                ) {
+                    synthObject.connect(this.pitchAnalysers[analyser]);
+                    this._connectedSynths[synth] = {
+                        analyser,
+                        synth: synthObject
+                    };
                 }
             }
         }
