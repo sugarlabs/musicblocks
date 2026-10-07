@@ -407,7 +407,8 @@ class Tempo {
         } else if (bpmBlock.name === "setbpm3" || bpmBlock.name === "setbpm2") {
             // Only the turtle that ran the block: other start blocks keep their own tempo.
             const turtle = this.BPMTurtles ? this.BPMTurtles[i] : null;
-            if (turtle && turtle.singer && turtle.singer.bpm.length > 0) {
+            const isCurrent = turtle && this.activity.turtles.turtleList.includes(turtle);
+            if (isCurrent && turtle.singer && turtle.singer.bpm.length > 0) {
                 turtle.singer.bpm[turtle.singer.bpm.length - 1] = bpmValue;
             }
         }

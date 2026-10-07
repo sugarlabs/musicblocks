@@ -391,12 +391,13 @@ describe("Tempo Widget", () => {
                 expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
             });
 
-            test("doesn't throw when the recorded turtle has been removed", () => {
-                tempoWidget.BPMTurtles = [turtles[2]];
-                turtles.splice(2, 1);
+            test("leaves a recorded turtle alone once it has been removed", () => {
+                tempoWidget.BPMTurtles = [turtles[1]];
+                const removed = turtles.splice(1, 1)[0];
 
                 expect(() => tempoWidget._updateBPM(0)).not.toThrow();
-                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200]]);
+                expect(removed.singer.bpm).toEqual([200]);
+                expect(turtles.map(t => t.singer.bpm)).toEqual([[90], []]);
             });
 
             test("a master BPM row changes the master tempo, not the turtles", () => {
