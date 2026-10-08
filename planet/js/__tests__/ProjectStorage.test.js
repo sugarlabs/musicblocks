@@ -994,6 +994,84 @@ describe("ProjectStorage", () => {
             expect(persisted.Projects.p1.commitDrafts.map(d => d.id)).toEqual(["draft-2"]);
         });
 
+        it("should not restore a draft removed by another tab", async () => {
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+            await storage.save();
+
+            const staleTabStorage = new ProjectStorage(mockPlanet);
+            staleTabStorage.LocalStorage = mockLocalforage;
+            staleTabStorage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1 Renamed in Tab B",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+
+            await storage.removeCommitDraft("p1", "draft-1");
+            await staleTabStorage.save();
+
+            const persisted = await storage.get(storage.LocalStorageKey);
+            expect(persisted.Projects.p1.commitDrafts).toEqual([]);
+        });
+
+        it("should preserve removal markers created by different tabs", async () => {
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            },
+                            {
+                                id: "draft-2",
+                                message: "Draft 2",
+                                timestamp: 2000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+            await storage.save();
+
+            const tabBStorage = new ProjectStorage(mockPlanet);
+            tabBStorage.LocalStorage = mockLocalforage;
+            tabBStorage.data = JSON.parse(JSON.stringify(storage.data));
+
+            await storage.removeCommitDraft("p1", "draft-1");
+            await tabBStorage.removeCommitDraft("p1", "draft-2");
+
+            const removedDraftIds = await storage.get("_removedDraftIds");
+            expect(new Set(removedDraftIds)).toEqual(new Set(["draft-1", "draft-2"]));
+        });
+
         it("should acquire navigator.locks when available during save", async () => {
             const originalNavigator = global.navigator;
             const mockRequest = jest.fn((name, callback) => callback());

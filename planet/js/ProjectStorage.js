@@ -299,21 +299,9 @@ class ProjectStorage {
         if (!this.data.Projects[id]) return;
         if (!this._removedDraftIds) this._removedDraftIds = new Set();
         if (draftId) this._removedDraftIds.add(draftId);
-        // Persist removal marker so other tabs know this draft was intentionally removed
-        await this._persistRemovedDraftIds();
         const drafts = this.data.Projects[id].commitDrafts || [];
         this.data.Projects[id].commitDrafts = drafts.filter(d => d.id !== draftId);
         await this.save();
-    }
-
-    /** Persist _removedDraftIds to LocalStorage so removals survive tab reloads. */
-    async _persistRemovedDraftIds() {
-        if (this._removedDraftIds && this._removedDraftIds.size > 0) {
-            await this.set(
-                (this._LocalRemovedDraftIdsKey ||= "_removedDraftIds"),
-                Array.from(this._removedDraftIds)
-            );
-        }
     }
 
     /**
@@ -353,7 +341,6 @@ class ProjectStorage {
             if (d.id) this._removedDraftIds.add(d.id);
         }
         this.data.Projects[id].commitDrafts = drafts.filter(d => !remove.has(d));
-        await this._persistRemovedDraftIds();
         await this.save();
     }
 
@@ -448,10 +435,12 @@ class ProjectStorage {
             const currentDrafts = Array.isArray(currentProj.commitDrafts)
                 ? currentProj.commitDrafts
                 : [];
+            const removedIds = this._removedDraftIds || new Set();
+            const retainedCurrentDrafts = currentDrafts.filter(d => !removedIds.has(d?.id));
 
             // Inherit updated sync status and sha for drafts matching existing storage
             const existingMap = new Map(existingDrafts.map(d => [d?.id, d]));
-            for (const draft of currentDrafts) {
+            for (const draft of retainedCurrentDrafts) {
                 const existing = existingMap.get(draft?.id);
                 if (existing) {
                     if (existing.status !== "pending" && draft.status === "pending") {
@@ -466,8 +455,7 @@ class ProjectStorage {
             // Merge both pending and retained synced drafts from existing storage
             // (OfflineCommitManager.refreshCache keeps older synced drafts as offline
             // records when the cached history doesn't cover them).
-            const currentIds = new Set(currentDrafts.map(d => d.id));
-            const removedIds = this._removedDraftIds || new Set();
+            const currentIds = new Set(retainedCurrentDrafts.map(d => d.id));
             const missingDrafts = existingDrafts.filter(
                 d =>
                     d?.id &&
@@ -476,8 +464,8 @@ class ProjectStorage {
                     !removedIds.has(d.id)
             );
 
-            if (missingDrafts.length > 0) {
-                currentProj.commitDrafts = [...currentDrafts, ...missingDrafts].sort(
+            if (retainedCurrentDrafts.length !== currentDrafts.length || missingDrafts.length > 0) {
+                currentProj.commitDrafts = [...retainedCurrentDrafts, ...missingDrafts].sort(
                     (a, b) => (a.timestamp || 0) - (b.timestamp || 0)
                 );
             }
@@ -489,8 +477,22 @@ class ProjectStorage {
             this._saveInProgress = true;
             try {
                 const saveOperation = async () => {
-                    // Write backup of current persisted data before overwriting primary.
+                    // Read the current project data before writing either storage record.
                     const existing = await this.get(this.LocalStorageKey);
+                    const removedDraftIds = await this.get(
+                        (this._LocalRemovedDraftIdsKey ||= "_removedDraftIds")
+                    );
+                    if (Array.isArray(removedDraftIds)) {
+                        for (const id of removedDraftIds) this._removedDraftIds.add(id);
+                    }
+                    if (this._removedDraftIds.size > 0) {
+                        await this.set(
+                            this._LocalRemovedDraftIdsKey,
+                            Array.from(this._removedDraftIds)
+                        );
+                    }
+
+                    // Write backup of current persisted data before overwriting primary.
                     if (existing !== null) {
                         await this.set(this.BackupStorageKey, existing);
                         this._mergeExistingOfflineDrafts(existing);
