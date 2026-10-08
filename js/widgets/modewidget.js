@@ -17,6 +17,7 @@
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
+    getTemperamentSliceAngles, applySliceAngles, enforceMinSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
     closeSharePopup
@@ -48,6 +49,9 @@ class ModeWidget {
     static MAX_TITLE_FONT_SIZE = 48;
     static MIN_TITLE_FONT_SIZE = 10;
     static TITLE_FONT_SCALE = 580;
+    static MIN_RADIUS_PERCENT = 0.4;
+    static MAX_RADIUS_PERCENT = 0.75;
+    static MIN_SLICE_DEGREES = 12;
 
     /**
      * @param {object} activity
@@ -501,6 +505,11 @@ class ModeWidget {
         if (isEquallyTempered(this._activeTemperamentKey)) {
             this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
         }
+        // Keep the cached key in step with whatever the synth now holds, so
+        // key-sensitive readers (_getModeSteps, save) never see a stale value.
+        if (this.logo.synth.inTemperament) {
+            this._activeTemperamentKey = this.logo.synth.inTemperament;
+        }
         this._rebuildModeIndex();
         this._piemenuMode();
     }
@@ -619,6 +628,16 @@ class ModeWidget {
             }
         }
         const entry = { name, pattern, edo };
+        // Authoring identity: prefer the live synth temperament (what playback
+        // will use), fall back to the cached widget key when a run reset the
+        // synth without notifying the widget. Record only when the pitch
+        // count matches the saved wheel count (import paths may not match).
+        const authoringKey = [this.logo.synth.inTemperament, this._activeTemperamentKey].find(
+            k => k && getCurrentEDO(k) === edo
+        );
+        if (authoringKey) {
+            entry.temperamentKey = authoringKey;
+        }
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
@@ -652,6 +671,12 @@ class ModeWidget {
         // Saved custom modes carry their native EDO in the registry.
         const custom = getSavedCustomModes().find(m => m.name === modeName);
         return custom && custom.edo ? custom.edo : null;
+    }
+
+    _getModeTemperamentKey(modeName) {
+        // Saved custom modes may carry the temperament they were authored in.
+        const custom = getSavedCustomModes().find(m => m.name === modeName);
+        return custom && custom.temperamentKey ? custom.temperamentKey : null;
     }
 
     // ── Bottom control bar ────────────────────────────────────────
@@ -901,31 +926,59 @@ class ModeWidget {
 
     _loadMode(modeName, mode, edoSelect) {
         const nativeEDO = this._getModeEDO(modeName);
-        if (nativeEDO && nativeEDO !== this._activeEDO) {
+        // Restore the temperament a saved custom mode was authored in when it
+        // still exists in the registry and is consistent with the saved pitch
+        // count. Legacy entries (no key) and unknown or inconsistent keys
+        // keep the EDO-only behavior.
+        const savedKey = this._getModeTemperamentKey(modeName);
+        const restorableKey =
+            savedKey &&
+            savedKey !== this._activeTemperamentKey &&
+            getCurrentEDO(savedKey) === nativeEDO &&
+            this._edoOptions().some(o => o.temperamentKey === savedKey)
+                ? savedKey
+                : null;
+        if (restorableKey) {
+            // Adopt before _rebuildWheel so its equal-temperament canonical
+            // mapping does not overwrite the restored key.
+            this.logo.synth.inTemperament = restorableKey;
+            this._activeTemperamentKey = restorableKey;
+        }
+        // Rebuild when the pitch count differs, or when only the temperament
+        // was restored — equal and ratio-based wheels with the same pitch
+        // count still have different geometry.
+        const needsRebuild = !!nativeEDO && (nativeEDO !== this._activeEDO || !!restorableKey);
+        if (needsRebuild) {
             // The saved mode was authored in a different tuning, so sync the
             // tuning dropdown and rebuild the wheel before selecting intervals.
             // Cache the outgoing state exactly like the dropdown handler so
             // round-trips restore it losslessly.
             const oldEDO = this._activeEDO;
             this._cacheState(oldEDO);
+            const selectValue = restorableKey || nativeEDO;
             if (edoSelect) {
                 // The dropdown may lack an option for an unusual native EDO
                 // (e.g. 21 from 1/4 comma meantone); add it so .value sticks.
-                if (!edoSelect.querySelector(`option[value="${nativeEDO}"]`)) {
+                if (!edoSelect.querySelector(`option[value="${selectValue}"]`)) {
                     const opt = document.createElement("option");
-                    opt.value = nativeEDO;
-                    opt.textContent = nativeEDO + "-EDO";
+                    opt.value = selectValue;
+                    opt.textContent =
+                        restorableKey && !isEquallyTempered(restorableKey)
+                            ? TEMPERAMENT[restorableKey]?.name || restorableKey
+                            : nativeEDO + "-EDO";
                     edoSelect.appendChild(opt);
                 }
-                edoSelect.value = nativeEDO;
+                edoSelect.value = selectValue;
             }
             this._rebuildWheel(nativeEDO);
-            this.textMsg(
-                _(
-                    `Mode ${modeName} is ${nativeEDO}-EDO; tuning switched from ${oldEDO}-EDO to ${nativeEDO}-EDO.`
-                ),
-                3000
-            );
+            if (oldEDO !== nativeEDO) {
+                this.textMsg(
+                    _(
+                        `Mode ${modeName} is ${nativeEDO}-EDO; tuning switched from ${oldEDO}-EDO to ${nativeEDO}-EDO.`
+                    ),
+                    3000
+                );
+            }
         }
         // Built-in mode patterns are resolved via _modeStepPattern so
         // non-EDO temperaments use ratio-derived steps. Custom modes carry
@@ -1706,8 +1759,93 @@ class ModeWidget {
         }, 2000);
     }
 
+    /** Title font size for a wheel of `count` slices, clamped to the widget's limits. */
+    _titleFontSize(count) {
+        return Math.min(
+            ModeWidget.MAX_TITLE_FONT_SIZE,
+            Math.max(
+                ModeWidget.MIN_TITLE_FONT_SIZE,
+                Math.floor(ModeWidget.TITLE_FONT_SCALE / count)
+            )
+        );
+    }
+
+    /**
+     * Hides labels on slices too narrow to hold them, so proportional widths do not
+     * turn into overlapping text. A hidden label is not lost: hovering its slice
+     * reveals it, and selecting the slice keeps it shown (see `_syncNarrowLabels`).
+     * The note wheel's "x" markers remain as the per-degree selection indicator.
+     *
+     * The comparison uses the arc at the label's own radius -- the mid radius of
+     * the donut, (min + max) / 2 -- against the width the text needs at the
+     * wheel's title font size. Every equal temperament keeps all its labels; only
+     * the narrowest non-EDO slices lose theirs.
+     * @param {object} wheel - A wheelnav instance whose navItems carry sliceAngle.
+     * @returns {void}
+     */
+    _hideNarrowLabels(wheel) {
+        if (!Array.isArray(wheel.navItems)) {
+            return;
+        }
+        const midRadiusPercent =
+            (ModeWidget.MIN_RADIUS_PERCENT + ModeWidget.MAX_RADIUS_PERCENT) / 2;
+        const fontSize = this._titleFontSize(wheel.navItems.length);
+        for (const item of wheel.navItems) {
+            const title = typeof item.title === "string" ? item.title.trim() : "";
+            if (!Number.isFinite(item.sliceAngle) || title.length === 0 || !item.navTitle) {
+                continue;
+            }
+            const available =
+                (2 * Math.PI * (ModeWidget.WHEELSIZE / 2) * midRadiusPercent * item.sliceAngle) /
+                360;
+            // Roughly 0.6em per character is the usual sans-serif advance width.
+            item._narrow = available < fontSize * 0.6 * title.length;
+            if (item._narrow) {
+                item.navItem.mouseover(() => item.navTitle.show());
+                item.navItem.mouseout(() => {
+                    if (!item.selected) {
+                        item.navTitle.hide();
+                    }
+                });
+            } else {
+                item.navTitle.show();
+            }
+        }
+        // createWheel() force-selects the root slice, so honour any selection
+        // already in place instead of hiding labels unconditionally.
+        this._syncNarrowLabels(wheel);
+    }
+
+    /**
+     * Re-applies label visibility for narrow slices after the selection changes:
+     * the selected slice keeps its number visible, every other narrow slice hides.
+     * Wide slices are always visible and are skipped.
+     * @param {object} wheel - The mode wheel whose navItems may be tagged `_narrow`.
+     * @returns {void}
+     */
+    _syncNarrowLabels(wheel) {
+        if (!Array.isArray(wheel.navItems)) {
+            return;
+        }
+        for (const item of wheel.navItems) {
+            if (!item._narrow || !item.navTitle) {
+                continue;
+            }
+            if (item.selected) {
+                item.navTitle.show();
+            } else {
+                item.navTitle.hide();
+            }
+        }
+    }
+
     _piemenuMode() {
         const n = this._activeEDO;
+        // One floored array feeds all three rings, so they stay aligned.
+        const sliceAngles = enforceMinSliceAngles(
+            getTemperamentSliceAngles(this._activeTemperamentKey, n),
+            ModeWidget.MIN_SLICE_DEGREES
+        );
 
         // Explicitly clear any existing wheels and leftover SVG slices before
         // rendering with the current EDO count.
@@ -1728,31 +1866,33 @@ class ModeWidget {
         this._noteWheel = new wheelnav("_noteWheel", this._modeWheel.raphael);
         this._playWheel = new wheelnav("_playWheel", this._modeWheel.raphael);
 
-        this._createModeWheel(n);
-        this._createNoteWheel(n);
-        this._createPlayWheel(n);
+        this._createModeWheel(n, sliceAngles);
+        this._createNoteWheel(n, sliceAngles);
+        this._createPlayWheel(n, sliceAngles);
         this._wireWheelEvents(n);
     }
 
-    _createModeWheel(n) {
-        const titleFontSize = Math.min(
-            ModeWidget.MAX_TITLE_FONT_SIZE,
-            Math.max(ModeWidget.MIN_TITLE_FONT_SIZE, Math.floor(ModeWidget.TITLE_FONT_SCALE / n))
-        );
+    _createModeWheel(n, sliceAngles) {
+        const titleFontSize = this._titleFontSize(n);
         configureWheel(this._modeWheel, {
             colors: platformColor.modeWheelcolors,
-            minRadius: 0.4,
-            maxRadius: 0.75,
+            minRadius: ModeWidget.MIN_RADIUS_PERCENT,
+            maxRadius: ModeWidget.MAX_RADIUS_PERCENT,
             clickModeRotate: false,
             selectionPaths: true,
             titleFont: "400 " + titleFontSize + "px sans-serif",
             navAngle: -90,
             animatetime: 0
         });
-        this._modeWheel.createWheel(Array.from({ length: n }, (_, i) => String(i)));
+        this._modeWheel.initWheel(Array.from({ length: n }, (_, i) => String(i)));
+        if (sliceAngles) {
+            applySliceAngles(this._modeWheel, sliceAngles);
+        }
+        this._modeWheel.createWheel();
+        this._hideNarrowLabels(this._modeWheel);
     }
 
-    _createNoteWheel(n) {
+    _createNoteWheel(n, sliceAngles) {
         configureWheel(this._noteWheel, {
             colors: platformColor.noteValueWheelcolors,
             minRadius: 0.75,
@@ -1769,10 +1909,14 @@ class ModeWidget {
 
         // Slice 0: blank (no X toggle — root is always selected)
         // Slices 1..n-1: "x" toggle (dynamic EDO layout)
-        this._noteWheel.createWheel([" ", ...new Array(n - 1).fill("x")]);
+        this._noteWheel.initWheel([" ", ...new Array(n - 1).fill("x")]);
+        if (sliceAngles) {
+            applySliceAngles(this._noteWheel, sliceAngles);
+        }
+        this._noteWheel.createWheel();
     }
 
-    _createPlayWheel(n) {
+    _createPlayWheel(n, sliceAngles) {
         configureWheel(this._playWheel, {
             colors: [platformColor.orange],
             minRadius: 0.3,
@@ -1784,7 +1928,11 @@ class ModeWidget {
             animatetime: 0
         });
 
-        this._playWheel.createWheel(new Array(n).fill(" "));
+        this._playWheel.initWheel(new Array(n).fill(" "));
+        if (sliceAngles) {
+            applySliceAngles(this._playWheel, sliceAngles);
+        }
+        this._playWheel.createWheel();
 
         for (let i = 0; i < n; i++) {
             this._playWheel.navItems[i].navItem.hide();
@@ -1793,6 +1941,7 @@ class ModeWidget {
 
     _wireWheelEvents(n) {
         const __setNote = () => {
+            this._syncNarrowLabels(this._modeWheel);
             const i = this._modeWheel.selectedNavItemIndex;
             if (i === 0) {
                 return;

@@ -9,6 +9,9 @@ const DomHelpers = require("../../utils/dom-helpers");
 global.downloadTextFile = DomHelpers.downloadTextFile;
 global.createSharePopup = DomHelpers.createSharePopup;
 global.closeSharePopup = DomHelpers.closeSharePopup;
+const musicutils = require("../../utils/musicutils.js");
+global.sliceAnglesFromRatios = musicutils.sliceAnglesFromRatios;
+global.applySliceAngles = musicutils.applySliceAngles;
 
 const setupImportGlobals = () => {
     global._ = jest.fn(text => text);

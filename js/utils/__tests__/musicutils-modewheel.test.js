@@ -94,6 +94,66 @@ describe("musicutils-modewheel", () => {
         }
     });
 
+    describe("enforceMinSliceAngles", () => {
+        it("raises slices below the floor and takes the excess from wider slices", () => {
+            expect(modewheel.enforceMinSliceAngles([8.9, 351.1], 12)).toEqual([12, 348]);
+        });
+
+        it("returns null instead of guessing at unusable input", () => {
+            expect(modewheel.enforceMinSliceAngles(null, 12)).toBeNull();
+            expect(modewheel.enforceMinSliceAngles([8.9, NaN, 351.1], 12)).toBeNull();
+            expect(modewheel.enforceMinSliceAngles([8.9, 351.1], NaN)).toBeNull();
+        });
+    });
+
+    describe("sliceAnglesFromRatios", () => {
+        it("sizes each slice by the log2 size of the interval it spans", () => {
+            const angles = modewheel.sliceAnglesFromRatios([1, 1.5], 2);
+            expect(angles).toHaveLength(2);
+            // 3/2 is 701.955 cents = 210.5865 degrees; slice 0 wraps the rest.
+            expect(angles[1]).toBeCloseTo(210.5865, 3);
+            expect(angles[0]).toBeCloseTo(149.4135, 3);
+            expect(angles[0] + angles[1]).toBeCloseTo(360, 6);
+        });
+
+        it("returns null for unusable input", () => {
+            expect(modewheel.sliceAnglesFromRatios(null, 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, NaN, 1.5], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 0, 1.5], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5, 1.2], 2)).toBeNull();
+        });
+    });
+
+    describe("getTemperamentSliceAngles", () => {
+        it("keeps equal slices for equally tempered, unknown, or count-mismatched keys", () => {
+            expect(modewheel.getTemperamentSliceAngles("equal", 12)).toBeNull();
+            expect(modewheel.getTemperamentSliceAngles("made-up", 12)).toBeNull();
+            expect(modewheel.getTemperamentSliceAngles("just intonation", 19)).toBeNull();
+        });
+
+        it("returns proportional widths for a non-EDO temperament", () => {
+            const angles = modewheel.getTemperamentSliceAngles("just intonation", 12);
+            expect(angles).toHaveLength(12);
+            expect(angles.reduce((sum, a) => sum + a, 0)).toBeCloseTo(360, 6);
+            // 5-limit JI extremes: 6/5 to 5/4 is the narrowest slice,
+            // 5/3 to 9/5 the widest; equal slices would be 30 each.
+            expect(Math.min(...angles)).toBeCloseTo(21.2, 1);
+            expect(Math.max(...angles)).toBeCloseTo(39.97, 1);
+        });
+    });
+
+    describe("applySliceAngles", () => {
+        it("writes each width onto its nav item and marks the wheel continuous", () => {
+            const wheel = { navItems: [{}, {}] };
+            const angles = [149.41349974038377, 210.58650025961623];
+            modewheel.applySliceAngles(wheel, angles);
+            expect(wheel.navItemsContinuous).toBe(true);
+            expect(wheel.navItems[0].sliceAngle).toBe(angles[0]);
+            expect(wheel.navItems[1].sliceAngle).toBe(angles[1]);
+        });
+    });
+
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
             "musicutils-constants.js",
@@ -142,6 +202,13 @@ describe("musicutils-modewheel", () => {
         it("publishes the module object for the RequireJS shim", () => {
             const sandbox = load(order);
             expect(sandbox.window.MusicUtilsModeWheel.getModeLabel("major")).toBe("major / ionian");
+        });
+
+        it("declares the temperament dependency in the RequireJS shim", () => {
+            const loader = readSource("../loader.js");
+            const shim = loader.match(/"utils\/musicutils-modewheel":\s*\{[^}]*\}/);
+            expect(shim).not.toBeNull();
+            expect(shim[0]).toContain('"utils/musicutils-temperament"');
         });
     });
 });
