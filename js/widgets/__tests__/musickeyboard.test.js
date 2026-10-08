@@ -1192,6 +1192,8 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
 
         const initKeyboard = (noteNames, keySignature = "C major") => {
             document.body.innerHTML = "";
+            global.MATRIXSOLFEWIDTH = constants.MATRIXSOLFEWIDTH;
+            global.EIGHTHNOTEWIDTH = constants.EIGHTHNOTEWIDTH;
             mockActivity.turtles.ithTurtle(0).singer.keySignature = keySignature;
             global.PITCHES = constants.PITCHES;
             global.PITCHES2 = constants.PITCHES2;
@@ -1209,7 +1211,18 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             noteNames.forEach((name, i) => {
                 const b = 44 + i * 3;
                 blockList[b] = { name: "pitch", connections: [null, b + 1, b + 2, null] };
-                blockList[b + 1] = { value: name };
+                blockList[b + 1] = {
+                    value: name,
+                    text: { text: name },
+                    container: { children: [], setChildIndex: jest.fn() },
+                    updateCache: jest.fn(),
+                    connections: [b],
+                    blocks: {
+                        setPitchOctave: (block, octave) => {
+                            blockList[blockList[block].connections[2]].value = octave;
+                        }
+                    }
+                };
                 blockList[b + 2] = { value: 4 };
             });
             mockActivity.blocks = {
@@ -1230,6 +1243,160 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             );
             return cell ? cell.textContent : undefined;
         };
+
+        const editPitch = (keyboard, blockNumber, pitch, accidental, octave) => {
+            const index = keyboard.displayLayout.findIndex(k => k.blockNumber === blockNumber);
+            keyboard._createColumnPieSubmenu(
+                keyboard.displayLayout.length - index - 1,
+                "pitchblocks"
+            );
+            keyboard._pitchWheel.navItems[0].title = pitch;
+            keyboard._accidentalsWheel.navItems[0].title = accidental;
+            keyboard._octavesWheel.navItems[0].title = String(octave);
+            keyboard._pitchWheel.selectedNavItemIndex = 0;
+            keyboard._accidentalsWheel.selectedNavItemIndex = 0;
+            keyboard._octavesWheel.selectedNavItemIndex = 0;
+            keyboard._pitchWheel.navItems[0].navigateFunction();
+            keyboard._exitWheel.navItems[0].navigateFunction();
+        };
+
+        test.each([
+            ["la", "♯", 4, "la♯", "A#4"],
+            ["re", "♭", 5, "re♭", "Db5"],
+            ["do", "♮", 5, "do", "C5"]
+        ])(
+            "persists a row edit to %s%s%s in recorded notes and piano keys",
+            (pitch, accidental, octave, value, note) => {
+                const keyboard = initKeyboard(["do", "sol"]);
+                const recordedKey = keyboard.displayLayout.find(k => k.blockNumber === 47);
+                keyboard._notesPlayed = [
+                    {
+                        startTime: 0,
+                        noteOctave: "G4",
+                        objId: recordedKey.objId,
+                        duration: 0.25,
+                        voice: "guitar",
+                        blockNumber: 47
+                    },
+                    {
+                        startTime: 1000,
+                        noteOctave: "C4",
+                        objId: "whiteRow0",
+                        duration: 0.5,
+                        voice: "guitar",
+                        blockNumber: 44
+                    }
+                ];
+
+                editPitch(keyboard, 47, pitch, accidental, octave);
+
+                expect(mockActivity.blocks.blockList[48].value).toBe(value);
+                expect(mockActivity.blocks.blockList[49].value).toBe(octave);
+                expect(keyboard.noteNames).toEqual(["do", value]);
+                expect(keyboard.octaves).toEqual([4, octave]);
+                const row = keyboard.displayLayout.find(k => k.blockNumber === 47);
+                expect(keyboard.noteMapper[row.objId]).toBe(note);
+                expect(keyboard._notesPlayed[0]).toMatchObject({
+                    noteOctave: note,
+                    objId: row.objId,
+                    blockNumber: 47,
+                    duration: 0.25
+                });
+                expect(keyboard._notesPlayed[1].noteOctave).toBe("C4");
+                expect(keyLabelFor(47)).toContain(String(octave));
+                expect(
+                    [...document.querySelectorAll("[id^=labelcol]")].map(cell => cell.textContent)
+                ).toContain(musicutils.convertFromSolfege(value) + octave);
+            }
+        );
+
+        test("keeps recorded padding notes attached to their pitches after a row edit", () => {
+            const keyboard = initKeyboard(["do", "sol"]);
+            const padding = keyboard.displayLayout.find(k => k.noteName === "D");
+            keyboard._notesPlayed = [
+                {
+                    startTime: 0,
+                    noteOctave: "D4",
+                    objId: padding.objId,
+                    duration: 0.25,
+                    voice: "guitar",
+                    blockNumber: padding.blockNumber
+                }
+            ];
+
+            editPitch(keyboard, 47, "la", "♯", 4);
+
+            const row = keyboard.displayLayout.find(k => k.noteName === "D");
+            expect(keyboard._notesPlayed[0]).toMatchObject({
+                noteOctave: "D4",
+                objId: row.objId,
+                blockNumber: row.blockNumber
+            });
+        });
+
+        test("keeps recordings when an edit merges two real pitch rows", () => {
+            const keyboard = initKeyboard(["do", "sol"]);
+            const pending = [];
+            jest.spyOn(keyboard, "_setWidgetTimeout").mockImplementation(callback => {
+                pending.push(callback);
+            });
+            const row = keyboard.displayLayout.find(k => k.blockNumber === 47);
+            keyboard._notesPlayed = [
+                {
+                    startTime: 0,
+                    noteOctave: "G4",
+                    objId: row.objId,
+                    duration: 0.25,
+                    voice: "guitar",
+                    blockNumber: 47
+                }
+            ];
+
+            editPitch(keyboard, 47, "do", "♮", 4);
+
+            expect(
+                keyboard.displayLayout.filter(k => k.noteName === "C" && k.noteOctave === 4)
+            ).toHaveLength(1);
+            expect(keyboard._notesPlayed[0]).toMatchObject({
+                noteOctave: "C4",
+                objId: "whiteRow0",
+                blockNumber: 44
+            });
+            expect(keyboard._rowBlocks).toEqual([44]);
+            editPitch(keyboard, 44, "re", "♮", 4);
+            expect(keyboard.displayLayout.some(k => k.blockNumber === 47)).toBe(false);
+            expect(keyboard._notesPlayed[0].noteOctave).toBe("D4");
+            pending.forEach(callback => callback());
+            expect(mockActivity.blocks.sendStackToTrash).toHaveBeenCalledWith(
+                mockActivity.blocks.blockList[47]
+            );
+        });
+
+        test("updates recorded frequencies and Hertz keys", () => {
+            const keyboard = initKeyboard(["hertz"]);
+            const row = keyboard.displayLayout[0];
+            keyboard._notesPlayed = [
+                {
+                    startTime: 0,
+                    noteOctave: 4,
+                    objId: row.objId,
+                    duration: 0.25,
+                    voice: "guitar",
+                    blockNumber: 44
+                }
+            ];
+            keyboard._createColumnPieSubmenu(0, "synthsblocks");
+            keyboard._pitchWheel.navItems[0].title = "392";
+            keyboard._pitchWheel.selectedNavItemIndex = 0;
+            keyboard._pitchWheel.navItems[0].navigateFunction();
+            keyboard._exitWheel.navItems[0].navigateFunction();
+
+            expect(mockActivity.blocks.blockList[45].value).toBe(392);
+            expect(keyboard.octaves).toEqual([392]);
+            expect(keyboard._notesPlayed[0].noteOctave).toBe(392);
+            expect(keyboard.noteMapper.hertzRow0).toBe(392);
+            expect(keyLabelFor(44)).toContain("392");
+        });
 
         test("keeps a flat lowest note (E♭4 in C minor) on its key", () => {
             const keyboard = initKeyboard(["mi♭", "sol"]);

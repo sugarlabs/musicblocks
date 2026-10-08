@@ -1555,14 +1555,10 @@ function MusicKeyboard(activity) {
             return false;
         });
 
-        function removeBlock(that, i) {
-            that._setWidgetTimeout(() => {
-                that._removePitchBlock(that.remove[i]);
+        for (const blockNumber of this.remove) {
+            this._setWidgetTimeout(() => {
+                this._removePitchBlock(blockNumber);
             }, 200);
-        }
-
-        for (let i = 0; i < this.remove.length; i++) {
-            removeBlock(this, i);
         }
 
         const sortedHertzList = sortedList.filter(note => note.noteName === "hertz");
