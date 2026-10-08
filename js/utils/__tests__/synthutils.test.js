@@ -2247,7 +2247,9 @@ describe("Utility Functions (logic-only)", () => {
 
         it("should play through the output passed to trigger", async () => {
             const mockSynth = createMockSynth();
-            instruments[routeTurtle] = { "electronic synth": mockSynth };
+            instruments[routeTurtle] = {};
+            Synth.createDefaultSynth(routeTurtle);
+            instruments[routeTurtle]["electronic synth"] = mockSynth;
 
             await Synth.trigger(
                 routeTurtle,
@@ -2293,6 +2295,22 @@ describe("Utility Functions (logic-only)", () => {
 
             expect(mockSynth.connect).toHaveBeenCalledTimes(1);
             expect(mockSynth.connect).toHaveBeenCalledWith(panner);
+        });
+
+        it("should connect a newly loaded instrument to the master output", async () => {
+            const mockSynth = createMockSynth();
+            instruments[routeTurtle] = { "cow bell": mockSynth };
+            const createSpy = jest.spyOn(Synth, "createSynth").mockResolvedValue();
+            const volumeSpy = jest.spyOn(Synth, "setVolume").mockImplementation(() => {});
+
+            try {
+                await Synth.loadSynth(routeTurtle, "cow bell");
+
+                expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
+            } finally {
+                createSpy.mockRestore();
+                volumeSpy.mockRestore();
+            }
         });
 
         it("should leave a reloaded instrument on its output", async () => {

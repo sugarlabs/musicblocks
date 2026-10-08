@@ -1843,7 +1843,9 @@ function Synth() {
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return instruments[turtle][sourceName];
+            const synth = instruments[turtle][sourceName];
+            // A new instrument plays into the master output until a note routes it elsewhere.
+            return _routedOutput.has(synth) ? synth : this.routeInstrument(synth, Tone.Destination);
         }
 
         return null;
@@ -2268,7 +2270,7 @@ function Synth() {
             return synth;
         }
 
-        // New instruments are created already connected to Tone.Destination.
+        // A synth that was never routed plays into Tone.Destination (see loadSynth).
         const previous = current || Tone.Destination;
         if (previous !== output) {
             try {
