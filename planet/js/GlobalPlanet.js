@@ -364,7 +364,14 @@ class GlobalPlanet {
                 callback(projectData);
             } else callback(projectData);
         } else {
-            if (error !== null) error();
+            if (error !== null) {
+                error();
+            } else if (Planet.SaveInterface && Planet.SaveInterface.showToast) {
+                Planet.SaveInterface.showToast(
+                    _("Could not load project. Please check your connection and try again."),
+                    true
+                );
+            }
         }
     }
 

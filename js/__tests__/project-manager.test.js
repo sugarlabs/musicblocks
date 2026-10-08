@@ -1345,6 +1345,21 @@ describe("start() URL parameter parsing", () => {
         expect(activity.loadStartWrapper).toHaveBeenCalled();
     });
 
+    it("parses ?repo= URL param and schedules _loadProject without warning", () => {
+        setURL("/?repo=project-1588145070717097&run=True");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+
+        pm.start();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.projectID).toBe("project-1588145070717097");
+        expect(activity.loadStartWrapper).toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
     it("parses run=true flag from multi-param URL", () => {
         setURL("/?id=proj&run=true");
         const activity = makeStartActivity();
