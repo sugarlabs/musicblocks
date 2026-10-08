@@ -599,7 +599,12 @@ class ModeWidget {
         }
     }
 
-    _saveCustomMode(name, pattern, edo = this._activeEDO) {
+    _saveCustomMode(
+        name,
+        pattern,
+        edo = this._activeEDO,
+        temperamentKey = this._activeTemperamentKey
+    ) {
         if (!Number.isInteger(edo)) {
             this.errorMsg(_("Invalid EDO for mode."));
             return false;
@@ -624,7 +629,7 @@ class ModeWidget {
                 return false;
             }
         }
-        const entry = { name, pattern, edo, temperamentKey: this._activeTemperamentKey };
+        const entry = { name, pattern, edo, temperamentKey };
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
@@ -1671,7 +1676,19 @@ class ModeWidget {
             const parsed = this._parseImportFile(data);
             if (!parsed) return;
             const name = this._resolveBuiltInCollision(parsed.name, parsed.edo);
-            if (!this._saveCustomMode(name, parsed.pattern, parsed.edo)) return;
+            // The import retunes to _temperamentKeyForEDO(parsed.edo) in
+            // _applyImportedMode below; store that target key, not the
+            // still-previous _activeTemperamentKey.
+            if (
+                !this._saveCustomMode(
+                    name,
+                    parsed.pattern,
+                    parsed.edo,
+                    this._temperamentKeyForEDO(parsed.edo)
+                )
+            ) {
+                return;
+            }
             this._applyImportedMode(parsed.edo, parsed.pattern, name);
         });
     }

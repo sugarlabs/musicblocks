@@ -793,7 +793,12 @@ describe("ModeWidget", () => {
 
         modeWidget._importFile();
 
-        expect(saveSpy).toHaveBeenCalledWith("major (31 EDO)", [3, 4, 2, 3, 4, 3, 3], 31);
+        expect(saveSpy).toHaveBeenCalledWith(
+            "major (31 EDO)",
+            [3, 4, 2, 3, 4, 3, 3],
+            31,
+            "equal31"
+        );
         saveSpy.mockRestore();
         delete MUSICALMODES["major"];
     });
@@ -814,7 +819,7 @@ describe("ModeWidget", () => {
 
         modeWidget._importFile();
 
-        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12);
+        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12, "equal");
         saveSpy.mockRestore();
     });
 
@@ -852,6 +857,35 @@ describe("ModeWidget", () => {
         expect(edo).toBe(48);
         expect(pattern).toEqual([8, 8, 4, 8, 8, 8, 4]);
         saveSpy.mockRestore();
+    });
+
+    test("should store the imported mode's target temperament, not the stale active key", () => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
+            cb(null, {
+                text: JSON.stringify({
+                    name: "imported31",
+                    edo: 31,
+                    pattern: [3, 4, 2, 3, 4, 3, 3]
+                }),
+                file: { name: "imported31.json", size: 100 }
+            });
+        });
+        modeWidget._activeTemperamentKey = "just intonation";
+        modeWidget._activeEDO = 12;
+        modeWidget.logo.synth.inTemperament = "just intonation";
+        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+        modeWidget._importFile();
+
+        const saved = JSON.parse(localStorage.getItem("customModes"));
+        const entry = saved.find(m => m.name === "imported31");
+        expect(entry.edo).toBe(31);
+        expect(entry.temperamentKey).toBe("equal31");
+
+        modeWidget._deleteCustomMode("imported31");
     });
 
     test("should preserve equal temperament when importing a 21-EDO mode", () => {
