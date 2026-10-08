@@ -892,15 +892,33 @@ describe("ProjectStorage", () => {
             ]);
         });
 
-        it("should not resurrect drafts removed via removeSyncedDrafts", async () => {
+        it("should not resurrect drafts removed via removeSyncedDrafts even if persisted copy was pending", async () => {
             const commitDate = "2026-04-10T10:00:00Z";
+            // Persisted copy has the draft with status "pending"
+            await storage.set(storage.LocalStorageKey, {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-to-remove",
+                                message: "Commit 1",
+                                timestamp: Date.parse(commitDate) - 1000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            });
+
+            // In-memory has the draft marked as synced
             storage.data = {
                 Projects: {
                     p1: {
                         ProjectName: "Project 1",
                         commitDrafts: [
                             {
-                                id: "synced-1",
+                                id: "draft-to-remove",
                                 message: "Commit 1",
                                 timestamp: Date.parse(commitDate) - 1000,
                                 status: "synced"
@@ -909,13 +927,101 @@ describe("ProjectStorage", () => {
                     }
                 }
             };
-            await storage.save();
 
-            // Calling removeSyncedDrafts drops the synced draft
+            // Calling removeSyncedDrafts drops the draft from memory and tombstones it
             await storage.removeSyncedDrafts("p1", [{ message: "Commit 1", date: commitDate }]);
+
+            // Ensure subsequent save does not resurrect the tombstoned pending draft
+            await storage.save();
 
             const persisted = await storage.get(storage.LocalStorageKey);
             expect(persisted.Projects.p1.commitDrafts).toHaveLength(0);
+        });
+
+        it("should not resurrect drafts removed via removeCommitDraft across saves", async () => {
+            // Storage has draft-1 and draft-2 as pending
+            await storage.set(storage.LocalStorageKey, {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            },
+                            {
+                                id: "draft-2",
+                                message: "Draft 2",
+                                timestamp: 2000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            });
+
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            },
+                            {
+                                id: "draft-2",
+                                message: "Draft 2",
+                                timestamp: 2000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // Intentionally remove draft-1 in this tab
+            await storage.removeCommitDraft("p1", "draft-1");
+
+            // Subsequent save() must not resurrect draft-1
+            await storage.save();
+
+            const persisted = await storage.get(storage.LocalStorageKey);
+            expect(persisted.Projects.p1.commitDrafts.map(d => d.id)).toEqual(["draft-2"]);
+        });
+
+        it("should acquire navigator.locks when available during save", async () => {
+            const originalNavigator = global.navigator;
+            const mockRequest = jest.fn((name, callback) => callback());
+
+            try {
+                Object.defineProperty(global, "navigator", {
+                    value: { locks: { request: mockRequest } },
+                    configurable: true
+                });
+
+                storage.data = {
+                    Projects: {
+                        p1: { ProjectName: "Project 1", commitDrafts: [] }
+                    }
+                };
+
+                await storage.save();
+
+                expect(mockRequest).toHaveBeenCalledWith(
+                    "musicblocks_planet_project_storage",
+                    expect.any(Function)
+                );
+            } finally {
+                Object.defineProperty(global, "navigator", {
+                    value: originalNavigator,
+                    configurable: true
+                });
+            }
         });
 
         it("should inherit persisted synced status and sha for matching drafts", async () => {
