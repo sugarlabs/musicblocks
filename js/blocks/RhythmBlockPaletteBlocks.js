@@ -134,9 +134,16 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
+                arg1 = 4;
             } else {
                 arg1 = args[1];
+            }
+
+            // Rhythm2Block expects denominator (4=quarter, 8=eighth, etc.).
+            // Convert fractional duration inputs (e.g., 0.25) to denominator (4).
+            const blockName = activity.blocks.blockList[blk]?.name;
+            if (blockName === "rhythm2" && arg1 < 1) {
+                arg1 = Math.round(1 / arg1);
             }
 
             noteDuration = 1 / arg1;
