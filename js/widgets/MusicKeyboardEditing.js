@@ -1036,11 +1036,6 @@ const MusicKeyboardEditing = {
             let changed = false;
 
             const updateRow = (noteName, noteOctave) => {
-                displayLayout[index].noteName = noteName;
-                displayLayout[index].noteOctave = noteOctave;
-                const row = this.layout.find(item => item.blockNumber === block);
-                row.noteName = noteName;
-                row.noteOctave = noteOctave;
                 const sourceIndex = this._rowBlocks.indexOf(block);
                 if (sourceIndex !== -1) {
                     this.noteNames[sourceIndex] = noteName;
@@ -1109,6 +1104,7 @@ const MusicKeyboardEditing = {
                     this.displayLayout = this._keysLayout();
                     syncRowSources();
                     this._createKeyboard();
+                    this._refreshNoteToKeyMap();
                     for (const note of this._notesPlayed) {
                         const row =
                             this.displayLayout.find(

@@ -1272,6 +1272,46 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             keyboard._exitWheel.navItems[0].navigateFunction();
         };
 
+        test("MIDI plays and records an edited pitch without reactivating MIDI", async () => {
+            const keyboard = initKeyboard(["sol"]);
+            const input = { onmidimessage: null };
+            const originalRequestMIDIAccess = navigator.requestMIDIAccess;
+            navigator.requestMIDIAccess = jest.fn().mockResolvedValue({
+                inputs: new Map([["keyboard", input]])
+            });
+            mockActivity.textMsg = jest.fn();
+            try {
+                keyboard.doMIDI();
+                await Promise.resolve();
+                expect(keyboard.noteToKeyMap.C4).toBeDefined();
+
+                editPitch(keyboard, 44, "ti", "♮", 5);
+
+                expect(keyboard.noteToKeyMap.C4).toBeUndefined();
+                const row = keyboard.displayLayout.find(item => item.blockNumber === 44);
+                expect(keyboard.noteToKeyMap.B5).toBe(row.objId);
+                mockActivity.logo.synth.trigger.mockClear();
+                input.onmidimessage({ data: [144, 83, 100], timeStamp: 1000 });
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    "B5",
+                    1,
+                    "guitar",
+                    null,
+                    null
+                );
+                input.onmidimessage({ data: [128, 83, 0], timeStamp: 1250 });
+                expect(keyboard._notesPlayed[0]).toMatchObject({
+                    noteOctave: "B5",
+                    objId: row.objId,
+                    blockNumber: 44
+                });
+                expect(navigator.requestMIDIAccess).toHaveBeenCalledTimes(1);
+            } finally {
+                navigator.requestMIDIAccess = originalRequestMIDIAccess;
+            }
+        });
+
         test.each(["la", "hertz"])(
             "keeps an added %s row when another row is edited",
             addedName => {

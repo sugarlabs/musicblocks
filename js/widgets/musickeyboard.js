@@ -1913,14 +1913,7 @@ function MusicKeyboard(activity) {
         this.octaves = [];
     };
 
-    /**
-     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
-     * @memberof MusicKeyboard
-     */
-    this.doMIDI = () => {
-        let duration = 0;
-        let startTime = 0;
-
+    this._refreshNoteToKeyMap = () => {
         this.noteToKeyMap = {};
 
         for (let idx = 0; idx < this.layout.length; idx++) {
@@ -1934,6 +1927,17 @@ function MusicKeyboard(activity) {
                 }
             }
         }
+    };
+
+    /**
+     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
+     * @memberof MusicKeyboard
+     */
+    this.doMIDI = () => {
+        let duration = 0;
+        let startTime = 0;
+
+        this._refreshNoteToKeyMap();
 
         /**
          * Handler for starting a note on MIDI interaction.
