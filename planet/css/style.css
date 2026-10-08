@@ -540,6 +540,25 @@ a {
 	display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition:
+        transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#globalcontents .card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+    z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #globalcontents .card {
+        transition: none;
+    }
+
+    #globalcontents .card:hover {
+        transform: none;
+    }
 }
 
 .nav-extended {
