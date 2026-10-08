@@ -206,8 +206,8 @@ class ProjectManager {
                         "font-size: 16px; font-family: sans-serif; font-weight: bold;"
                     );
                 }
-                that.keyboardEnableFlag = 1;
             }
+            that.keyboardEnableFlag = 1;
 
             pubsub.off("finishedLoading", __afterLoad);
         };
