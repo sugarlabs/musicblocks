@@ -705,6 +705,45 @@ describe("ModeWidget", () => {
         modeNameSpy.mockRestore();
     });
 
+    test("should persist the active temperament key with a custom mode", () => {
+        modeWidget._activeTemperamentKey = "just intonation";
+        modeWidget._activeEDO = 12;
+
+        expect(modeWidget._saveCustomMode("tempMode", Array(12).fill(1))).toBe(true);
+
+        const saved = JSON.parse(localStorage.getItem("customModes"));
+        const entry = saved.find(m => m.name === "tempMode");
+        expect(entry.temperamentKey).toBe("just intonation");
+
+        modeWidget._deleteCustomMode("tempMode");
+    });
+
+    test("should restore the saved temperament when loading a custom mode", () => {
+        const pattern = Array(12).fill(1);
+        const modes = JSON.parse(localStorage.getItem("customModes") || "[]");
+        modes.push({ name: "jiChromatic", pattern, edo: 12, temperamentKey: "just intonation" });
+        localStorage.setItem("customModes", JSON.stringify(modes));
+        modeWidget._activeTemperamentKey = "equal";
+        modeWidget.logo.synth.inTemperament = "equal";
+        modeWidget._activeEDO = 12;
+        const fakeSelect = {
+            querySelector: jest.fn(() => null),
+            appendChild: jest.fn(),
+            value: "equal"
+        };
+
+        modeWidget._loadMode("jiChromatic", pattern, fakeSelect);
+
+        // Both the live synth tuning and the cached key follow the saved mode.
+        expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        expect(modeWidget._activeTemperamentKey).toBe("just intonation");
+        expect(modeWidget._activeEDO).toBe(12);
+        expect(modeWidget._selectedNotes).toEqual(Array(12).fill(true));
+        expect(fakeSelect.value).toBe("just intonation");
+
+        modeWidget._deleteCustomMode("jiChromatic");
+    });
+
     test("should detect a built-in mode at a non-12 EDO", () => {
         modeWidget._activeEDO = 19;
         modeWidget._modeLabelCell = { textContent: "" };
