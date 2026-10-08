@@ -637,51 +637,52 @@ const PhraseMakerAudio = {
     },
 
     /**
-     * Processes graphics commands to update the turtle's painter state.
+     * Processes graphics commands with the turtle that ran the Phrase Maker block.
      * @param {Object} pm - The PhraseMaker instance.
      * @param {string[]} obj - An array containing the graphics command and its parameters.
      */
     _processGraphics(pm, obj) {
-        const firstTurtle = pm.activity.turtles.getTurtle(0);
+        // The turtle that ran the Phrase Maker block (see PhraseMaker.init).
+        const turtle = pm._turtle || pm.activity.turtles.getTurtle(0);
         switch (obj[0]) {
             case "forward":
-                firstTurtle.painter.doForward(obj[1]);
+                turtle.painter.doForward(obj[1]);
                 break;
             case "back":
-                firstTurtle.painter.doForward(-obj[1]);
+                turtle.painter.doForward(-obj[1]);
                 break;
             case "right":
-                firstTurtle.painter.doRight(obj[1]);
+                turtle.painter.doRight(obj[1]);
                 break;
             case "left":
-                firstTurtle.painter.doRight(-obj[1]);
+                turtle.painter.doRight(-obj[1]);
                 break;
             case "setcolor":
-                firstTurtle.painter.doSetColor(obj[1]);
+                turtle.painter.doSetColor(obj[1]);
                 break;
             case "sethue":
-                firstTurtle.painter.doSetHue(obj[1]);
+                turtle.painter.doSetHue(obj[1]);
                 break;
             case "setshade":
-                firstTurtle.painter.doSetValue(obj[1]);
+                turtle.painter.doSetValue(obj[1]);
                 break;
             case "setgrey":
-                firstTurtle.painter.doSetChroma(obj[1]);
+                turtle.painter.doSetChroma(obj[1]);
                 break;
             case "settranslucency":
-                firstTurtle.painter.doSetPenAlpha(1.0 - obj[1] / 100);
+                turtle.painter.doSetPenAlpha(1.0 - obj[1] / 100);
                 break;
             case "setpensize":
-                firstTurtle.painter.doSetPensize(obj[1]);
+                turtle.painter.doSetPensize(obj[1]);
                 break;
             case "setheading":
-                firstTurtle.painter.doSetHeading(obj[1]);
+                turtle.painter.doSetHeading(obj[1]);
                 break;
             case "arc":
-                firstTurtle.painter.doArc(obj[1], obj[2]);
+                turtle.painter.doArc(obj[1], obj[2]);
                 break;
             case "setxy":
-                firstTurtle.painter.doSetXY(obj[1], obj[2]);
+                turtle.painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
                 console.debug("unknown graphics command " + obj[0]);

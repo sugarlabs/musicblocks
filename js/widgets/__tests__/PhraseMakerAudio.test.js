@@ -323,6 +323,44 @@ describe("PhraseMakerAudio", () => {
             expect(mockTurtle.painter.doSetXY).toHaveBeenCalledWith(100, 200);
         });
 
+        describe("the turtle it draws with (#9330)", () => {
+            let turtle0, ownTurtle;
+
+            const makeTurtle = () => ({
+                painter: { doForward: jest.fn(), doRight: jest.fn(), doSetColor: jest.fn() }
+            });
+
+            beforeEach(() => {
+                // After a project is loaded, turtle 0 is a hidden turtle of the old project.
+                turtle0 = makeTurtle();
+                ownTurtle = makeTurtle();
+                mockPM.activity.turtles.getTurtle = jest.fn(i => (i === 0 ? turtle0 : null));
+            });
+
+            test("draws with the turtle that ran the Phrase Maker block, not turtle 0", () => {
+                mockPM._turtle = ownTurtle;
+
+                PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+                PhraseMakerAudio._processGraphics(mockPM, ["right", 90]);
+                PhraseMakerAudio._processGraphics(mockPM, ["setcolor", 10]);
+
+                expect(ownTurtle.painter.doForward).toHaveBeenCalledWith(100);
+                expect(ownTurtle.painter.doRight).toHaveBeenCalledWith(90);
+                expect(ownTurtle.painter.doSetColor).toHaveBeenCalledWith(10);
+                expect(turtle0.painter.doForward).not.toHaveBeenCalled();
+                expect(turtle0.painter.doRight).not.toHaveBeenCalled();
+                expect(mockPM.activity.turtles.getTurtle).not.toHaveBeenCalled();
+            });
+
+            test("draws with turtle 0 when no turtle was kept", () => {
+                mockPM._turtle = undefined;
+
+                PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+
+                expect(turtle0.painter.doForward).toHaveBeenCalledWith(100);
+            });
+        });
+
         test("logs unknown commands", () => {
             const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
             PhraseMakerAudio._processGraphics(mockPM, ["unknown", 0]);
