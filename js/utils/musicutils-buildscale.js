@@ -940,8 +940,16 @@ var getInterval = (interval, keySignature, pitch, edo) => {
     const halfSteps = obj[1];
 
     // In 12-EDO, find a pitch by how it sounds, so a scale that spells a note
-    // G♯ still matches the A♭ in PITCHES.
-    const is12EDO = halfSteps.reduce((sum, step) => sum + step, 0) === 12;
+    // G♯ still matches the A♭ in PITCHES. Other EDOs keep matching by name. The
+    // EDO is worked out as buildScale() does, not from the steps it returns.
+    let currentEDO = edo;
+    if (!currentEDO) {
+        currentEDO = 12;
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+        }
+    }
+    const is12EDO = currentEDO === 12;
     const indexInScale = name => {
         const pitchClass = is12EDO ? _notePitchClass(name) : NaN;
         if (Number.isNaN(pitchClass)) {

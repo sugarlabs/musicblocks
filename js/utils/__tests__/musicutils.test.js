@@ -2472,6 +2472,18 @@ describe("getInterval", () => {
         expect(getInterval(1, "C major", "D♭", 19)).toBe(3);
         expect(getInterval(1, "C major", "E♯", 19)).toBe(3);
         expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
+        // C♭ major's scale has 12-EDO steps even in 19-EDO, but B is still matched by name.
+        expect(getInterval(2, "C♭ major", "B", 19)).toBe(3);
+    });
+
+    it("should use the current temperament's EDO when none is given", () => {
+        const savedActivity = global.globalActivity;
+        global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
+        try {
+            expect(getInterval(2, "C♭ major", "B")).toBe(3);
+        } finally {
+            global.globalActivity = savedActivity;
+        }
     });
 
     it("should return the correct interval for a pitch in the scale", () => {
