@@ -532,6 +532,14 @@ describe("Utility Logic Functions", () => {
     });
 
     describe("deepClone()", () => {
+        it("handles primitives, null, and undefined", () => {
+            expect(deepClone(null)).toBeNull();
+            expect(deepClone(undefined)).toBeUndefined();
+            expect(deepClone(42)).toBe(42);
+            expect(deepClone("musicblocks")).toBe("musicblocks");
+            expect(deepClone(true)).toBe(true);
+        });
+
         it("clones objects", () => {
             const obj = { a: 1, b: { c: 2 } };
             const cloned = deepClone(obj);
@@ -550,6 +558,11 @@ describe("Utility Logic Functions", () => {
             expect(cloned.a).not.toBe(obj.a);
             expect(cloned.a[2]).not.toBe(obj.a[2]);
             expect(cloned.c.d).not.toBe(obj.c.d);
+        });
+
+        it("handles empty arrays and objects", () => {
+            expect(deepClone([])).toEqual([]);
+            expect(deepClone({})).toEqual({});
         });
     });
 
