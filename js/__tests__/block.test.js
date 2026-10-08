@@ -28,6 +28,15 @@ const fs = require("fs");
 const path = require("path");
 const Block = require("../block");
 const ManagedTimer = require("../utils/ManagedTimer");
+const musicutils = require("../utils/musicutils");
+
+Object.assign(global, {
+    getTemperamentKeys: musicutils.getTemperamentKeys,
+    getTemperament: musicutils.getTemperament,
+    isCustomTemperament: musicutils.isCustomTemperament,
+    isEquallyTempered: musicutils.isEquallyTempered,
+    addTemperamentToDictionary: musicutils.addTemperamentToDictionary
+});
 
 // --- MOCK SETUP ---
 
@@ -2087,6 +2096,34 @@ describe("Block Foundation", () => {
             block._changeLabel();
             expect(global.piemenuVoices).toHaveBeenCalled();
             expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["noise1..."]);
+        });
+
+        it("_changeLabel customNote launches piemenuCustomNotes with custom labels and does not call piemenuPitches", () => {
+            global.piemenuCustomNotes = jest.fn();
+            global.piemenuPitches = jest.fn();
+            block.name = "customNote";
+            block.value = "C(+0¢)";
+            block.customID = null;
+            block.activity = {
+                logo: { customTemperamentDefined: false },
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { y: 0 }
+            };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+            block._changeLabel();
+            expect(global.piemenuPitches).not.toHaveBeenCalled();
+            expect(global.piemenuCustomNotes).toHaveBeenCalledTimes(1);
+            const args = global.piemenuCustomNotes.mock.calls[0];
+            expect(args[0]).toBe(block);
+            expect(args[1]["custom"].pitchNumber).toBe(5);
+            expect(args[1]["custom"][0]).toEqual([1, "C", 4]);
+            expect(args[1]["custom"][4]).toEqual([1.781, "A#", 4]);
+            expect(args[2]).toContain("custom");
+            expect(args[3]).toBe("custom");
+            expect(args[4]).toBe("C(+0¢)");
         });
     });
 

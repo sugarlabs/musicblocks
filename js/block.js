@@ -4320,51 +4320,65 @@ class Block {
                 piemenuPitches(this, scalenotes_, SCALENOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "customNote") {
-            if (!this.activity.logo.customTemperamentDefined) {
-                // If custom temperament is not defined by user, then
-                // custom temperament is supposed to be equal
-                // temperament.
-                obj = splitSolfege(this.value);
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-
-                if (this.piemenuOKtoLaunch()) {
-                    piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            const keys = getTemperamentKeys();
+            const noteLabels = {};
+            const customLabels = [];
+            for (let i = 0; i < keys.length; i++) {
+                const temperament = getTemperament(keys[i]);
+                // Only add valid custom temperaments with note definitions to noteLabels
+                if (
+                    isCustomTemperament(keys[i]) &&
+                    temperament &&
+                    !isEquallyTempered(keys[i]) &&
+                    temperament["0"] &&
+                    Array.isArray(temperament["0"])
+                ) {
+                    customLabels.push(keys[i]);
+                    noteLabels[keys[i]] = temperament;
                 }
+            }
+            if (!customLabels.length) {
+                const defaultCustom = {
+                    0: [1, "C", 4],
+                    1: [1.189, "D#", 4],
+                    2: [1.334, "F", 4],
+                    3: [1.498, "G", 4],
+                    4: [1.781, "A#", 4],
+                    pitchNumber: 5
+                };
+                customLabels.push("custom");
+                noteLabels["custom"] = defaultCustom;
+                const currentCustom = getTemperament("custom");
+                if (!currentCustom || !currentCustom["0"] || !Array.isArray(currentCustom["0"])) {
+                    addTemperamentToDictionary("custom", defaultCustom);
+                }
+            }
+            let selectedCustom;
+            if (this.customID !== null && customLabels.includes(this.customID)) {
+                selectedCustom = this.customID;
             } else {
-                const keys = getTemperamentKeys();
-                const noteLabels = {};
-                const customLabels = [];
-                for (let i = 0; i < keys.length; i++) {
-                    const temperament = getTemperament(keys[i]);
-                    // Only add valid temperaments to noteLabels
-                    if (temperament && typeof temperament === "object") {
-                        noteLabels[keys[i]] = temperament;
-                    }
-                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
-                        customLabels.push(keys[i]);
-                }
-                if (!customLabels.length) return;
-                let selectedCustom;
-                if (this.customID !== null) selectedCustom = this.customID;
-                else selectedCustom = customLabels[0];
+                selectedCustom = customLabels[0];
+            }
 
-                if (this.value !== null) {
-                    selectedNote = this.value;
+            if (this.value !== null) {
+                selectedNote = this.value;
+            } else {
+                // Ensure we have a valid temperament before accessing its properties
+                const selectedTemperament =
+                    noteLabels[selectedCustom] || getTemperament(selectedCustom);
+                if (
+                    selectedTemperament &&
+                    selectedTemperament["0"] &&
+                    selectedTemperament["0"][1]
+                ) {
+                    selectedNote = selectedTemperament["0"][1];
                 } else {
-                    // Ensure we have a valid temperament before accessing its properties
-                    const selectedTemperament = getTemperament(selectedCustom);
-                    if (
-                        selectedTemperament &&
-                        selectedTemperament["0"] &&
-                        selectedTemperament["0"][1]
-                    ) {
-                        selectedNote = selectedTemperament["0"][1];
-                    } else {
-                        // Fallback to a default note
-                        selectedNote = "C";
-                    }
+                    // Fallback to a default note
+                    selectedNote = "C";
                 }
+            }
 
+            if (this.piemenuOKtoLaunch()) {
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
             }
         } else if (this.name === "eastindiansolfege") {

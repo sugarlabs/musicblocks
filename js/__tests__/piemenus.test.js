@@ -213,7 +213,8 @@ global.Synth = jest.fn().mockImplementation(() => ({
     loadSynth: jest.fn().mockResolvedValue(),
     setMasterVolume: jest.fn(),
     setVolume: jest.fn(),
-    trigger: jest.fn().mockResolvedValue()
+    trigger: jest.fn().mockResolvedValue(),
+    getCustomFrequency: jest.fn().mockReturnValue([261.63])
 }));
 global.instruments = [{}];
 global.DEFAULTVOICE = "sine";
@@ -1866,6 +1867,122 @@ describe("pie-menu exit key listener reference regression coverage", () => {
 
         test("removes the exact registered handler reference on Tab", () => {
             testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Tab");
+        });
+    });
+
+    describe("piemenuCustomNotes", () => {
+        const noteLabels = {
+            custom: {
+                0: [1, "C", 4],
+                1: [1.189, "D#", 4],
+                2: [1.334, "F", 4],
+                3: [1.498, "G", 4],
+                4: [1.781, "A#", 4],
+                pitchNumber: 5
+            }
+        };
+        const customLabels = ["custom"];
+
+        test("sets note wheel labels in descending pitch order (highest to lowest / tonic)", () => {
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            expect(mockBlock._cusNoteWheel).toBeDefined();
+            expect(mockBlock._cusNoteWheel.createWheel).toHaveBeenCalledWith([
+                "A#",
+                "G",
+                "F",
+                "D#",
+                "C"
+            ]);
+        });
+
+        test("enables rotation by default and keeps upright title orientation", () => {
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            expect(mockBlock._cusNoteWheel.clickModeRotate).not.toBe(false);
+            expect(mockBlock._cusNoteWheel.titleRotateAngle).toBe(0);
+        });
+
+        test("creates and navigates octave wheel when parent is custompitch", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            expect(mockBlock._octavesWheel).toBeDefined();
+            expect(mockBlock._octavesWheel.createWheel).toHaveBeenCalled();
+            expect(mockBlock._octavesWheel.navigateWheel).toHaveBeenCalledWith(4); // 8 - 4
+        });
+
+        test("increments octave when wrapping upward from highest pitch across boundary to tonic", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            // Starting note: A# (index 0)
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "A#");
+
+            // Navigate to C (index 4) - upward wrap across boundary
+            const cItemIndex = 4;
+            mockBlock._cusNoteWheel.navigateWheel(cItemIndex);
+
+            expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("parent-id", 5);
+            expect(mockBlock._octavesWheel.navigateWheel).toHaveBeenCalledWith(3); // 8 - 5
+        });
+
+        test("decrements octave when wrapping downward from tonic across boundary to highest pitch", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            // Starting note: C (index 4)
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            // Navigate to A# (index 0) - downward wrap across boundary
+            const aSharpIndex = 0;
+            mockBlock._cusNoteWheel.navigateWheel(aSharpIndex);
+
+            expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("parent-id", 3);
+            expect(mockBlock._octavesWheel.navigateWheel).toHaveBeenCalledWith(5); // 8 - 3
+        });
+
+        test("keeps octave unchanged when navigating within the same octave in both directions", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            // Starting note: C (index 4)
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+            mockBlock.blocks.setPitchOctave.mockClear();
+
+            // Navigate C4 -> D#4 -> F4 -> G4 (indices 4 -> 3 -> 2 -> 1)
+            mockBlock._cusNoteWheel.navigateWheel(3); // D#
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(2); // F
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(1); // G
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+
+            // Reverse direction G4 -> F4 -> D#4 -> C4 (indices 1 -> 2 -> 3 -> 4)
+            mockBlock._cusNoteWheel.navigateWheel(2); // F
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(3); // D#
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(4); // C
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+        });
+
+        test("triggers pitch preview with synth and announces to screen reader", async () => {
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            mockBlock._cusNoteWheel.navigateWheel(4); // C
+            await new Promise(r => setTimeout(r, 10));
+
+            expect(mockBlock.activity.logo.synth.trigger).toHaveBeenCalled();
+            expect(global.announceToScreenReader).toHaveBeenCalledWith(
+                expect.stringContaining("C")
+            );
         });
     });
 });
