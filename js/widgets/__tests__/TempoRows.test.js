@@ -132,6 +132,22 @@ describe("TempoRows", () => {
             expect(tempo._intervals[0]).toBe(2000);
         });
 
+        test.each([
+            ["40 at 1/8 opens at 60, the 30 quarter notes it plays at", 40, 1 / 8, 60],
+            ["2000 at 1/4 opens at 1000", 2000, 1 / 4, 1000],
+            ["20 at 1/2 is allowed (15 to 500) and stays", 20, 1 / 2, 20],
+            ["90 at 1/4 stays", 90, 1 / 4, 90]
+        ])("opens each row at the tempo it plays: %s", (label, bpm, beatValue, shown) => {
+            tempo.BPMs = [bpm];
+            tempo.beatValues = [beatValue];
+
+            tempo._makeRows(widgetWindow);
+
+            expect(tempo.BPMs[0]).toBe(shown);
+            expect(tempo.BPMInputs[0].value).toBe(String(shown));
+            expect(tempo._intervals[0]).toBeCloseTo(60000 / shown);
+        });
+
         test("makes no rows without a BPM", () => {
             tempo.BPMs = [];
 

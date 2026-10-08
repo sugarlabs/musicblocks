@@ -46,6 +46,13 @@ class TempoRows {
             if (this.BPMs[i] <= 0) {
                 this.BPMs[i] = 30;
             }
+            // Show the tempo the block actually plays at: the blocks hold it to 30 to 1000
+            // quarter notes, so with a beat value of 1/8 a BPM of 40 plays as 60.
+            const [minBPM, maxBPM] = this._bpmLimits(i);
+            const bpm = Number(this.BPMs[i]);
+            if (Number.isFinite(bpm)) {
+                this.BPMs[i] = Math.min(Math.max(bpm, minBPM), maxBPM);
+            }
 
             this._intervals.push((60 / this.BPMs[i]) * 1000);
             this._widgetNextTimes.push(this._widgetFirstTimes[i] - this._intervals[i]);

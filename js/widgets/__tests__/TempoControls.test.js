@@ -359,6 +359,43 @@ describe("TempoControls", () => {
             );
         });
 
+        test("speeding up a row below its lowest BPM never slows the tempo down", () => {
+            // Master BPM 40 at 1/8 plays at the 30 quarter-note minimum (60 eighth notes).
+            makeRow("setmasterbpm2", 40, 1 / 8);
+
+            tempo.speedUp(0);
+
+            // 44 would be 22 quarter notes, slower than the 30 playing now.
+            expect(tempo.BPMs[0]).toBe(60);
+            expect(Singer.masterBPM).toBe(30);
+            expect(activity.errorMsg).toHaveBeenLastCalledWith(
+                "1/8 beats per minute must be greater than 60",
+                null,
+                null,
+                3000
+            );
+
+            tempo.speedUp(0);
+            expect(tempo.BPMs[0]).toBe(66);
+            expect(Singer.masterBPM).toBe(33);
+        });
+
+        test("slowing down a row above its highest BPM never speeds the tempo up", () => {
+            makeRow("setmasterbpm2", 2500, 1 / 8);
+
+            tempo.slowDown(0, 1);
+
+            // 2499 eighth notes would be over 1000 quarter notes.
+            expect(tempo.BPMs[0]).toBe(2000);
+            expect(Singer.masterBPM).toBe(1000);
+            expect(activity.errorMsg).toHaveBeenLastCalledWith(
+                "maximum 1/8 beats per minute is 2000",
+                null,
+                null,
+                3000
+            );
+        });
+
         test("slowing a 1/2 row to 20 sets 40 quarter notes, which 1/4 would refuse", () => {
             makeRow("setmasterbpm2", 30, 1 / 2);
 

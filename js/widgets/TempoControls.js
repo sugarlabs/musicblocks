@@ -187,10 +187,14 @@ class TempoControls {
         const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
         this.BPMs[i] = parseFloat(this.BPMs[i]) + delta;
 
-        const maxBPM = this._bpmLimits(i)[1];
+        // Both limits: a row that starts below the lowest BPM is still below it after a step up.
+        const [minBPM, maxBPM] = this._bpmLimits(i);
         if (this.BPMs[i] > maxBPM) {
             this._bpmRangeError(i, _("The beats per minute must be below 1000."), true);
             this.BPMs[i] = maxBPM;
+        } else if (this.BPMs[i] < minBPM) {
+            this._bpmRangeError(i, _("The beats per minute must be above 30"), false);
+            this.BPMs[i] = minBPM;
         }
 
         this._updateBPM(i);
@@ -206,10 +210,13 @@ class TempoControls {
     slowDown(i, step) {
         const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
         this.BPMs[i] = parseFloat(this.BPMs[i]) - delta;
-        const minBPM = this._bpmLimits(i)[0];
+        const [minBPM, maxBPM] = this._bpmLimits(i);
         if (this.BPMs[i] < minBPM) {
             this._bpmRangeError(i, _("The beats per minute must be above 30"), false);
             this.BPMs[i] = minBPM;
+        } else if (this.BPMs[i] > maxBPM) {
+            this._bpmRangeError(i, _("The beats per minute must be below 1000."), true);
+            this.BPMs[i] = maxBPM;
         }
 
         this._updateBPM(i);
