@@ -551,6 +551,19 @@ describe("Utility Logic Functions", () => {
             expect(cloned.a[2]).not.toBe(obj.a[2]);
             expect(cloned.c.d).not.toBe(obj.c.d);
         });
+        it("does not copy unsafe object keys", () => {
+            const obj = JSON.parse(
+                '{"__proto__":{"polluted":true},"constructor":{"polluted":true},"prototype":{"polluted":true},"safe":1}'
+            );
+
+            const cloned = deepClone(obj);
+
+            expect(cloned.safe).toBe(1);
+            expect(Object.prototype.hasOwnProperty.call(cloned, "__proto__")).toBe(false);
+            expect(Object.prototype.hasOwnProperty.call(cloned, "constructor")).toBe(false);
+            expect(Object.prototype.hasOwnProperty.call(cloned, "prototype")).toBe(false);
+            expect(Object.getPrototypeOf(cloned)).toBe(Object.prototype);
+        });
     });
 
     describe("isSafeUrl()", () => {

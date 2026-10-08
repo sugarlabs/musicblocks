@@ -343,7 +343,7 @@
       "isGenerator": false,
       "returns": 3,
       "throws": 0,
-      "branches": 4
+      "branches": 5
     },
     {
       "name": "escapeHTML",
@@ -1004,7 +1004,7 @@
     }
   ],
   "totals": {
-    "branches": 201,
+    "branches": 202,
     "returns": 107,
     "throws": 0
   }
