@@ -1043,6 +1043,32 @@ describe("ModeWidget", () => {
         });
     });
 
+    describe("_updateModeDisplay", () => {
+        test("updates the mode table label without touching the window title", () => {
+            modeWidget._modeLabelCell = { textContent: "" };
+
+            modeWidget._updateModeDisplay("C major");
+
+            expect(modeWidget._modeLabelCell.textContent).toBe("C major");
+            // The window title is set once, to "custom mode", by windowFor() in the
+            // constructor and must stay that way: block-drag-controller.js and
+            // block.js both gate reinitialization on the open title still reading
+            // "custom mode" (widgetWindows.isReinitWidgetTitle()). Overwriting it
+            // with the current mode name here used to silently disable that once
+            // any mode had been displayed.
+            expect(modeWidget.widgetWindow.updateTitle).not.toHaveBeenCalled();
+        });
+
+        test("clearing the mode name still leaves the window title untouched", () => {
+            modeWidget._modeLabelCell = { textContent: "C major" };
+
+            modeWidget._updateModeDisplay("");
+
+            expect(modeWidget._modeLabelCell.textContent).toBe("");
+            expect(modeWidget.widgetWindow.updateTitle).not.toHaveBeenCalled();
+        });
+    });
+
     describe("mode pie menu safety", () => {
         test("closes when the control-bar button is clicked while open", () => {
             modeWidget._piemenuModes();

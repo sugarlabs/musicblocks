@@ -337,3 +337,59 @@ Music Blocks loads several stylesheets asynchronously via `<link rel="preload" a
 - **Widget Titlebar Structural & Responsive Cascade**: Unconditionally asserts that `.wftTitle` elements exist within floating widget frames on desktop, dark mode, and mobile viewport breakpoints (preventing silent passes if DOM structure changes), and verifies that titlebar text color resolves to `--color-text-secondary` on desktop and `--color-widget-titlebar-text` under mobile breakpoints.
 - **Scoped Teardown & Clean Error Propagation**: Uses precise title-based and class-based selector scoping (window instance frames and `.mb-system-dialog`) for window/dialog cleanup to avoid cross-spec leakage. The test suite operates cleanly without suppressing uncaught exceptions, allowing all genuine runtime regressions (such as theme switching errors or missing properties) to propagate directly and fail the spec.
 - **Selector Specificity & Cascade Isolation**: Tests verify that component-level stylesheets maintain expected cascade precedence across theme transitions (Light, Dark, High-Contrast, Light) without residual inline style leakage or theme class conflicts.
+
+## Testing Existing Behavior
+
+When fixing an issue in existing Music Blocks code, first identify the implementation related to the reported behavior. Then look for the corresponding test file, usually in a nearby `__tests__/` directory.
+
+A useful workflow is:
+
+1. Find the method or code path related to the issue.
+2. Check the surrounding directory for an existing `__tests__/` directory.
+3. Open the corresponding test file and inspect nearby tests for project conventions.
+4. Reproduce the reported behavior with the smallest possible test setup.
+5. Assert the observable result of the behavior.
+6. Run the specific test file before running the full test suite.
+
+### Worked Example: Testing `GlobalPlanet.initTagList()`
+
+During a change involving the GlobalPlanet sort selection, the implementation was located in:
+
+`planet/js/GlobalPlanet.js`
+
+The corresponding tests were located in:
+
+`planet/js/__tests__/GlobalPlanet.test.js`
+
+The test file already creates the DOM element required by the behavior.
+
+The test can then set the selected value, call the method under test, and verify the resulting state.
+
+The regression test follows the same setup used by the existing tests:
+
+```javascript
+describe("initTagList", () => {
+    it("should read the selected sort option", () => {
+        const sortSelect = document.getElementById("sort-select");
+        sortSelect.value = "RECENT";
+
+        gp.specialTags = [];
+        jest.spyOn(gp, "refreshTagList").mockImplementation(() => {});
+
+        gp.initTagList();
+
+        expect(gp.sortBy).toBe("RECENT");
+    });
+});
+```
+
+This test checks observable behavior: after `initTagList()` runs, `gp.sortBy` contains the selected sort option.
+
+When adding a regression test, prefer a small test that reproduces the issue and verifies the behavior a contributor or user can observe.
+Existing tests in the same file are also useful examples of the project's testing conventions.
+
+### Relating the Test to the Implementation
+
+When possible, trace the test back to the implementation before writing the assertion. In this example, the test creates the required DOM element, sets its value, invokes `initTagList()`, and checks the resulting `sortBy` state.
+
+This keeps the test focused on the behavior rather than on internal implementation details.

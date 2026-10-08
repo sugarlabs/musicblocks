@@ -4007,4 +4007,23 @@ describe("ManagedTimer Integration", () => {
         expect(blocks.longPressTimeout).toBeNull();
         expect(blocks._timerManager.activeTimeoutCount).toBe(0);
     });
+
+    it("findBlockInstance returns true if named block exists and is not in trash", () => {
+        blocks.blockList = [{ name: "pitch", trash: false }];
+        expect(blocks.findBlockInstance("pitch")).toBe(true);
+        expect(blocks.findBlockInstance("rhythm")).toBe(false);
+    });
+
+    it("clearParameterBlocks clears text on parameter blocks", () => {
+        blocks.blockList = [
+            {
+                protoblock: { parameter: true },
+                text: { text: "hello" },
+                name: "pitch",
+                container: { cacheCanvas: null }
+            }
+        ];
+        blocks.clearParameterBlocks();
+        expect(blocks.blockList[0].text.text).toBe("");
+    });
 });

@@ -855,7 +855,9 @@ class Palettes {
     getSearchPos() {
         return {
             x: this.cellSize * this.activity.turtleBlocksScale * 1.5,
-            y: (this.top + this.cellSize * 0.95) * this.activity.turtleBlocksScale
+            y:
+                (this.top + this.cellSize * 0.95 + (this.activity.toolbarHeight || 0)) *
+                this.activity.turtleBlocksScale
         };
     }
 

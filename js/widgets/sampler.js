@@ -15,7 +15,7 @@
 
    DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP, getVoiceSynthName, ManagedTimer,
    SamplerBlocks, SamplerPlayback, SamplerPitch, SamplerFiles, SamplerUI, SamplerPieMenu,
-   SamplerCanvas, SamplerTuner
+   SamplerCanvas, SamplerTuner, Tuner
 */
 
 /* exported SampleWidget, resolveBackendURL */
@@ -160,6 +160,11 @@ function SampleWidget() {
     this.pitchAnalysers = {};
 
     // Add tuner related properties
+    /**
+     * The tuner: microphone input, pitch detection and the tuner display (js/widgets/tuner.js).
+     * @type {Tuner}
+     */
+    this.tuner = new Tuner();
     this.tunerEnabled = false;
     this.tunerAnalyser = null;
     this.tunerMic = null;

@@ -28,7 +28,8 @@ const {
     getWheelSafeBounds,
     positionWheelDiv,
     handleWheelResize,
-    debouncedSetWheelSize
+    debouncedSetWheelSize,
+    syncKeySignatureBlocks
 } = require("../piemenus");
 const Block = require("../block");
 
@@ -1163,6 +1164,76 @@ describe("piemenuKey behavioral tests", () => {
         expect(mockActivity.blocks.blockList[2].value).toBe("dorian");
         // …and no new block is created.
         expect(mockActivity.blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
+    });
+});
+
+describe("syncKeySignatureBlocks inserting a new setkey block", () => {
+    // A blockList that grows like the real one, so the "last block created"
+    // indexes the function relies on point at the blocks it just made.
+    const makeActivity = blockList => {
+        const blocks = {
+            blockList,
+            stackList: [],
+            findStacks: jest.fn(() => {
+                blocks.stackList = blockList
+                    .map((b, i) => (b && b.connections[0] === null ? i : null))
+                    .filter(i => i !== null);
+            }),
+            _makeNewBlockWithConnections: jest.fn((name, _value, connections) => {
+                blockList.push({ name, connections: connections.slice() });
+            }),
+            adjustExpandableClampBlock: jest.fn()
+        };
+        return {
+            blocks,
+            logo: { blocks },
+            KeySignatureEnv: ["G", "dorian", false],
+            textMsg: jest.fn()
+        };
+    };
+
+    test("does not throw when the start block is empty", () => {
+        const blockList = [{ name: "start", connections: [null, null, null] }];
+        const activity = makeActivity(blockList);
+
+        expect(() => syncKeySignatureBlocks(activity)).not.toThrow();
+
+        const setKey = blockList.findIndex(b => b.name === "setkey2");
+        expect(blockList[0].connections[1]).toBe(setKey);
+        expect(blockList[setKey].connections).toEqual([0, setKey + 1, setKey + 2, null]);
+        expect(blockList[setKey + 1]).toMatchObject({ name: "notename", value: "G" });
+        expect(blockList[setKey + 2]).toMatchObject({ name: "modename", value: "dorian" });
+    });
+
+    test("still re-parents the first block of a non-empty start block", () => {
+        const blockList = [
+            { name: "start", connections: [null, 1, null] },
+            { name: "newnote", connections: [0, null, null] }
+        ];
+        const activity = makeActivity(blockList);
+
+        syncKeySignatureBlocks(activity);
+
+        const setKey = blockList.findIndex(b => b.name === "setkey2");
+        expect(blockList[0].connections[1]).toBe(setKey);
+        expect(blockList[setKey].connections[3]).toBe(1);
+        expect(blockList[1].connections[0]).toBe(setKey);
+    });
+
+    test("uses the lowest-numbered start block, comparing ids as numbers", () => {
+        // Filler blocks 0-8 are connected, so they are not stacks.
+        const blockList = Array.from({ length: 9 }, () => ({ name: "text", connections: [0] }));
+        blockList.push({ name: "start", connections: [null, 11, null] }); // 9
+        blockList.push({ name: "start", connections: [null, 12, null] }); // 10
+        blockList.push({ name: "newnote", connections: [9, null, null] }); // 11
+        blockList.push({ name: "newnote", connections: [10, null, null] }); // 12
+        const activity = makeActivity(blockList);
+
+        syncKeySignatureBlocks(activity);
+
+        const setKey = blockList.findIndex(b => b.name === "setkey2");
+        expect(blockList[9].connections[1]).toBe(setKey);
+        expect(blockList[10].connections[1]).toBe(12);
     });
 });
 

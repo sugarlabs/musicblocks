@@ -641,4 +641,27 @@ describe("PlanetInterface", () => {
         expect(planetInterface.getCurrentProjectImage()).toBeNull();
         expect(planetInterface.getTimeLastSaved()).toBeNull();
     });
+
+    it("_pushBlockDisplayNames maps palette protoList block static labels", () => {
+        const postMessage = jest.fn();
+        planetInterface.iframe = {
+            contentWindow: { postMessage }
+        };
+        mockActivity.blocks = {
+            palettes: {
+                dict: {
+                    rhythm: {
+                        protoList: {
+                            note: { name: "note", staticLabels: ["Quarter Note"] }
+                        }
+                    }
+                }
+            }
+        };
+        planetInterface._pushBlockDisplayNames();
+        expect(postMessage).toHaveBeenCalledWith(
+            { type: "MB_BLOCK_NAMES", payload: { note: "Quarter Note" } },
+            "*"
+        );
+    });
 });
