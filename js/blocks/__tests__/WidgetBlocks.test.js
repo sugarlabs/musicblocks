@@ -892,6 +892,22 @@ describe("setupWidgetBlocks", () => {
             expect(logo[logoKey]).toBeDefined();
         });
 
+        it("gives the Meter widget the turtle that ran the block", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, 4, 5] },
+                4: { value: 1 },
+                5: { value: 4 }
+            };
+
+            getBlock("meterwidget").flow(["childBlk"], logo, 3, "meterBlk");
+            logo._meterBlock = 1;
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(global.MeterWidget).toHaveBeenCalledWith(activity, "meterBlk", 3);
+        });
+
         it("does not open when the meter block input is disconnected", () => {
             activity.blocks.blockList = {
                 1: { connections: [null, 2, null] },

@@ -700,7 +700,7 @@ function setupWidgetBlocks(activity) {
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
                         ["widgets/meterwidget"]
                     ),
-                    () => new MeterWidget(activity, blk),
+                    () => new MeterWidget(activity, blk, turtle),
                     () => {
                         logo.insideMeterWidget = false;
                     }
