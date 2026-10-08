@@ -145,6 +145,8 @@ class CacheManager {
         try {
             const data = await this._getFromStore(this.STORES.METADATA, id);
 
+            if (this.invalidatedMetadataIds.has(id)) return null;
+
             if (data && !this._isExpired(data.expiry)) {
                 // Update last accessed time
                 await this._updateLastAccessed(this.STORES.METADATA, id);

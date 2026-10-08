@@ -352,6 +352,36 @@ describe("IndexedDB CacheManager integration", () => {
             });
         });
 
+        it("should not return metadata invalidated while a read is in flight", async () => {
+            const metadata = { name: "Stale Project" };
+
+            await cacheManager.cacheMetadata("proj-race", metadata);
+
+            const originalGetFromStore = cacheManager._getFromStore;
+
+            let resolveRead;
+            cacheManager._getFromStore = jest.fn(
+                () =>
+                    new Promise(resolve => {
+                        resolveRead = resolve;
+                    })
+            );
+
+            const readPromise = cacheManager.getMetadata("proj-race");
+
+            cacheManager.invalidatedMetadataIds.add("proj-race");
+
+            resolveRead({
+                id: "proj-race",
+                metadata,
+                expiry: Date.now() + 10000
+            });
+
+            expect(await readPromise).toBeNull();
+
+            cacheManager._getFromStore = originalGetFromStore;
+        });
+
         test("returns null for unknown id", async () => {
             expect(await cacheManager.getMetadata("nonexistent")).toBeNull();
         });
