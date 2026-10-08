@@ -194,6 +194,35 @@ describe("ServerInterface", () => {
         });
     });
 
+    it("returns PROJECT_NOT_FOUND when project details respond with 404", async () => {
+        jest.spyOn(server, "_get").mockResolvedValue({
+            __httpError: true,
+            status: 404
+        });
+
+        const callback = jest.fn();
+
+        await server.getProjectDetails("missing-project", callback);
+
+        expect(callback).toHaveBeenCalledWith({
+            success: false,
+            error: "PROJECT_NOT_FOUND"
+        });
+    });
+
+    it("returns ConnectionFailureData for non-404 HTTP errors", async () => {
+        jest.spyOn(server, "_get").mockResolvedValue({
+            __httpError: true,
+            status: 500
+        });
+
+        const callback = jest.fn();
+
+        await server.getProjectDetails("broken-project", callback);
+
+        expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
+    });
+
     describe("request handling", () => {
         it("should call _get for getTagManifest", async () => {
             const manifest = { music: { TagName: "Music" } };
@@ -605,6 +634,20 @@ describe("ServerInterface", () => {
             await server.searchProjects("p", "RECENT", 24, 49, callback);
 
             expect(names(callback)).toEqual(range(24, 49));
+        });
+    });
+
+    it("should preserve HTTP status when requested", async () => {
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: false,
+            status: 404
+        });
+
+        const result = await server._get("/project/missing-project", true);
+
+        expect(result).toEqual({
+            __httpError: true,
+            status: 404
         });
     });
 

@@ -179,9 +179,10 @@ class ServerInterface {
     /**
      * Low-level GET — returns parsed JSON or null on network error.
      * @param {string} path  e.g. "/allRepos?page=1"
-     * @returns {Promise<any|null>}
+     * @param {boolean} [includeStatus=false] Preserve HTTP status for non-OK responses.
+     * @returns {Promise<any|null|{__httpError: boolean, status: number}>}
      */
-    async _get(path) {
+    async _get(path, includeStatus = false) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), this.RequestTimeout);
         try {
@@ -192,6 +193,14 @@ class ServerInterface {
             });
             if (!res.ok) {
                 console.warn(`[ServerInterface] GET ${path} → HTTP ${res.status}`);
+
+                if (includeStatus) {
+                    return {
+                        __httpError: true,
+                        status: res.status
+                    };
+                }
+
                 return null;
             }
             return await res.json();
@@ -587,9 +596,17 @@ class ServerInterface {
                 }
             }
 
-            const response = await this._get(`/project/${encodeURIComponent(repoName)}`);
+            const response = await this._get(`/project/${encodeURIComponent(repoName)}`, true);
 
-            if (!response || response.error) {
+            if (response?.__httpError && response.status === 404) {
+                callback({
+                    success: false,
+                    error: "PROJECT_NOT_FOUND"
+                });
+                return;
+            }
+
+            if (!response || response.error || response.__httpError) {
                 if (skipCache) {
                     const fallback = await this.cacheManager.getMetadata(repoName);
                     if (fallback) {
