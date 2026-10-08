@@ -299,9 +299,21 @@ class ProjectStorage {
         if (!this.data.Projects[id]) return;
         if (!this._removedDraftIds) this._removedDraftIds = new Set();
         if (draftId) this._removedDraftIds.add(draftId);
+        // Persist removal marker so other tabs know this draft was intentionally removed
+        await this._persistRemovedDraftIds();
         const drafts = this.data.Projects[id].commitDrafts || [];
         this.data.Projects[id].commitDrafts = drafts.filter(d => d.id !== draftId);
         await this.save();
+    }
+
+    /** Persist _removedDraftIds to LocalStorage so removals survive tab reloads. */
+    async _persistRemovedDraftIds() {
+        if (this._removedDraftIds && this._removedDraftIds.size > 0) {
+            await this.set(
+                (this._LocalRemovedDraftIdsKey ||= "_removedDraftIds"),
+                Array.from(this._removedDraftIds)
+            );
+        }
     }
 
     /**
@@ -341,6 +353,7 @@ class ProjectStorage {
             if (d.id) this._removedDraftIds.add(d.id);
         }
         this.data.Projects[id].commitDrafts = drafts.filter(d => !remove.has(d));
+        await this._persistRemovedDraftIds();
         await this.save();
     }
 
@@ -450,20 +463,21 @@ class ProjectStorage {
                 }
             }
 
-            // Only merge pending drafts from existing storage that are missing in the current tab
-            // and were not intentionally removed in this tab.
+            // Merge both pending and retained synced drafts from existing storage
+            // (OfflineCommitManager.refreshCache keeps older synced drafts as offline
+            // records when the cached history doesn't cover them).
             const currentIds = new Set(currentDrafts.map(d => d.id));
             const removedIds = this._removedDraftIds || new Set();
-            const missingPending = existingDrafts.filter(
+            const missingDrafts = existingDrafts.filter(
                 d =>
                     d?.id &&
-                    d.status === "pending" &&
+                    (d.status === "pending" || d.status === "synced") &&
                     !currentIds.has(d.id) &&
                     !removedIds.has(d.id)
             );
 
-            if (missingPending.length > 0) {
-                currentProj.commitDrafts = [...currentDrafts, ...missingPending].sort(
+            if (missingDrafts.length > 0) {
+                currentProj.commitDrafts = [...currentDrafts, ...missingDrafts].sort(
                     (a, b) => (a.timestamp || 0) - (b.timestamp || 0)
                 );
             }
@@ -611,8 +625,18 @@ class ProjectStorage {
     async init() {
         // don't use Planet's localStorage, use IndexedDB if available to allow bigger projects.
         this.LocalStorage = localforage;
+        this._LocalRemovedDraftIdsKey = "_removedDraftIds";
         await this.port();
         await this.restore();
+        // Load persisted removal markers from storage so removals survive tab reloads
+        try {
+            const persisted = await this.get(this._LocalRemovedDraftIdsKey);
+            if (Array.isArray(persisted) && persisted.length > 0) {
+                this._removedDraftIds = new Set(persisted);
+            }
+        } catch (_) {
+            /* ignore */
+        }
         await this.initialiseStorage();
     }
 }
