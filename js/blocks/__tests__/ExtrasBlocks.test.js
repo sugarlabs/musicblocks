@@ -94,6 +94,7 @@ describe("ExtrasBlocks", () => {
 
     beforeEach(() => {
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {},
                 showBlocks: jest.fn(),
@@ -138,7 +139,6 @@ describe("ExtrasBlocks", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -320,6 +320,7 @@ describe("ExtrasBlocks - additional branch coverage", () => {
 
     beforeEach(() => {
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {
                     blk1: { connections: [null, null], value: "hello", name: "text" },
@@ -371,7 +372,6 @@ describe("ExtrasBlocks - additional branch coverage", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -478,6 +478,7 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
     beforeEach(() => {
         instances = {};
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {
                     blk1: { connections: [null, null], value: "hello", name: "text" },
@@ -525,7 +526,6 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -636,7 +636,8 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         logo.svgBackground = true;
         logo.svgOutput = "output";
         instances["SaveSVGBlock"].flow(["test.svg"], logo, turtle, blk);
-        expect(activity.save.saveSVG).toHaveBeenCalledWith("test.svg");
+        expect(logo.svgOutput).toMatch(/^<rect x="0" y="0" height="300" width="400" /);
+        expect(activity.save.saveSVG).toHaveBeenCalledWith(activity, "test.svg");
     });
 
     test("real ShowBlocksBlock flow() calls showBlocks", () => {
