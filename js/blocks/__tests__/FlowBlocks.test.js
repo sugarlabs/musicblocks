@@ -572,18 +572,32 @@ describe("FlowBlocks integration", () => {
         expect(block.flow([34], logo, 0)).toEqual([34, 20]);
     });
 
-    test("ForeverBlock notates a single pass as a repeat when exporting Lilypond", () => {
+    test.each(["runningLilypond", "runningAbc", "runningMxml"])(
+        "ForeverBlock notates a single pass as a repeat when %s",
+        flag => {
+            const block = getBlock("forever");
+            const turtle = activity.turtles.ithTurtle(0);
+            turtle.singer.suppressOutput = true;
+            turtle.queue = [new Queue(50, 1, 40, null)];
+            logo[flag] = true;
+            logo.notation = { notationBeginRepeat: jest.fn() };
+
+            // Nothing after a forever ever runs, so its pending flow is dropped.
+            expect(block.flow([35], logo, 0)).toEqual([35, 1]);
+            expect(logo.notation.notationBeginRepeat).toHaveBeenCalledWith(0);
+            expect(turtle.queue).toEqual([]);
+        }
+    );
+
+    test("ForeverBlock stays unrolled when exporting MIDI", () => {
         const block = getBlock("forever");
         const turtle = activity.turtles.ithTurtle(0);
         turtle.singer.suppressOutput = true;
-        turtle.queue = [new Queue(50, 1, 40, null)];
-        logo.runningLilypond = true;
+        logo.runningMIDI = true;
         logo.notation = { notationBeginRepeat: jest.fn() };
 
-        // Nothing after a forever ever runs, so its pending flow is dropped.
-        expect(block.flow([35], logo, 0)).toEqual([35, 1]);
-        expect(logo.notation.notationBeginRepeat).toHaveBeenCalledWith(0);
-        expect(turtle.queue).toEqual([]);
+        expect(block.flow([37], logo, 0)).toEqual([37, 20]);
+        expect(logo.notation.notationBeginRepeat).not.toHaveBeenCalled();
     });
 
     test("ForeverBlock does not notate a repeat while counting notes", () => {
