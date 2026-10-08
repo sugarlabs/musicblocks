@@ -2362,6 +2362,15 @@ describe("getStepSize", () => {
         expect(result).toBe(0);
     });
 
+    it("should step to the next scale note however the scale spells it", () => {
+        // G is not in A harmonic minor; the next note up is G♯, one semitone away.
+        expect(_getStepSize("A harmonic minor", "G", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("A harmonic minor", "A♭", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("A harmonic minor", "A", "down", 0, "equal")).toBe(-1);
+        // C is not in D major; the next note up is C♯.
+        expect(_getStepSize("D major", "C", "up", 0, "equal")).toBe(1);
+    });
+
     it('should return 0 for "C" going down in a key without a lower note', () => {
         const result = _getStepSize("C major", "C", "down", 0, "equal");
         expect(result).toBe(-1);
@@ -2431,6 +2440,16 @@ describe("nthDegreeToPitch", () => {
 });
 
 describe("getInterval", () => {
+    it("should find a pitch by its sound when the scale spells it differently", () => {
+        // A harmonic minor spells its seventh G♯; A♭ is the same note.
+        expect(getInterval(1, "A harmonic minor", "A♭")).toBe(1);
+        expect(getInterval(1, "A harmonic minor", "G♯")).toBe(1);
+        // G is not in the scale: step up from the G♯ above it.
+        expect(getInterval(1, "A harmonic minor", "G")).toBe(1);
+        // C is not in D major: step up from the C♯ above it.
+        expect(getInterval(1, "D major", "C")).toBe(1);
+    });
+
     it("should return the correct interval for a pitch in the scale", () => {
         const result = getInterval(2, "C major", "E");
         expect(result).toBe(3); // Example: `E` is the 3rd degree in C major.
