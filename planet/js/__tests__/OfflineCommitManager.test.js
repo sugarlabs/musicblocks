@@ -84,6 +84,7 @@ describe("OfflineCommitManager", () => {
                 };
             }),
             getCachedCommits: jest.fn(id => storage.data.Projects[id]?.cachedCommits || []),
+            _persistRemovedDraftIds: jest.fn(async () => {}),
             setCachedCommits: jest.fn(async (id, commits) => {
                 storage.data.Projects[id].cachedCommits = commits.slice(0, 3);
             }),
@@ -95,6 +96,14 @@ describe("OfflineCommitManager", () => {
                     draft.status = status;
                     if (sha) draft.sha = sha;
                 }
+            }),
+            set: jest.fn(async (key, obj) => {
+                // simple mock that stores values in a map
+                if (!storage._localStore) storage._localStore = new Map();
+                storage._localStore.set(key, obj);
+            }),
+            get: jest.fn(async key => {
+                return storage._localStore?.get(key) || null;
             }),
             removeSyncedDrafts: jest.fn(async (id, commits) =>
                 ProjectStorage.prototype.removeSyncedDrafts.call(storage, id, commits)
