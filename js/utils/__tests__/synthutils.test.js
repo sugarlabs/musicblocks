@@ -2186,9 +2186,10 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-    describe("per-turtle output routing", () => {
-        const panTurtle = "panTurtle";
+    describe("instrument output routing", () => {
+        const routeTurtle = "routeTurtle";
         const panner = { name: "Panner" };
+        const vibrato = { doVibrato: true, vibratoFrequency: 5, vibratoIntensity: 1 };
         const createMockSynth = () => ({
             toDestination: jest.fn().mockReturnThis(),
             triggerAttackRelease: jest.fn(),
@@ -2197,66 +2198,79 @@ describe("Utility Functions (logic-only)", () => {
             chain: jest.fn().mockReturnThis()
         });
 
+        beforeEach(() => {
+            Synth.inTemperament = "equal";
+        });
+
         afterEach(() => {
-            delete Synth._turtleOutputs[panTurtle];
-            delete instruments[panTurtle];
+            delete instruments[routeTurtle];
             jest.useRealTimers();
         });
 
-        it("should play into the master output when no panner is set", () => {
+        it("should leave a new instrument on the master output", () => {
             const mockSynth = createMockSynth();
 
-            Synth.routeInstrument(panTurtle, mockSynth);
+            Synth.routeInstrument(mockSynth, Tone.Destination);
 
             expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
             expect(mockSynth.disconnect).not.toHaveBeenCalled();
         });
 
-        it("should move existing instruments from the master output to the panner", () => {
+        it("should move an instrument from the master output to the panner", () => {
             const mockSynth = createMockSynth();
-            instruments[panTurtle] = { "electronic synth": mockSynth };
-            Synth.routeInstrument(panTurtle, mockSynth);
 
-            Synth.setTurtleOutput(panTurtle, panner);
+            Synth.routeInstrument(mockSynth, panner);
 
             expect(mockSynth.disconnect).toHaveBeenCalledWith(Tone.Destination);
             expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
         });
 
-        it("should not rewire a synth that is already routed to its output", () => {
+        it("should drop the panner when the output changes back", () => {
             const mockSynth = createMockSynth();
-            instruments[panTurtle] = { "electronic synth": mockSynth };
-            Synth.setTurtleOutput(panTurtle, panner);
+            Synth.routeInstrument(mockSynth, panner);
+
+            Synth.routeInstrument(mockSynth, Tone.Destination);
+
+            expect(mockSynth.disconnect).toHaveBeenLastCalledWith(panner);
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(Tone.Destination);
+        });
+
+        it("should not rewire an instrument already on its output", () => {
+            const mockSynth = createMockSynth();
+            Synth.routeInstrument(mockSynth, panner);
             mockSynth.connect.mockClear();
 
-            Synth.routeInstrument(panTurtle, mockSynth);
+            Synth.routeInstrument(mockSynth, panner);
 
             expect(mockSynth.connect).not.toHaveBeenCalled();
+        });
+
+        it("should play through the output passed to trigger", async () => {
+            const mockSynth = createMockSynth();
+            instruments[routeTurtle] = { "electronic synth": mockSynth };
+
+            await Synth.trigger(
+                routeTurtle,
+                "C4",
+                0.25,
+                "electronic synth",
+                null,
+                null,
+                false,
+                0,
+                panner
+            );
+
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
         });
 
         it("should keep the panner after an effects note is cleaned up", async () => {
             jest.useFakeTimers();
             const mockSynth = createMockSynth();
-            instruments[panTurtle] = { "electronic synth": mockSynth };
-            Synth.setTurtleOutput(panTurtle, panner);
-            Synth.inTemperament = "equal";
+            Synth.routeInstrument(mockSynth, panner);
 
-            const paramsEffects = {
-                doVibrato: true,
-                vibratoFrequency: 5,
-                vibratoIntensity: 1
-            };
-            await _performNotes.call(
-                Synth,
-                mockSynth,
-                "C4",
-                0.25,
-                paramsEffects,
-                null,
-                false,
-                0,
-                panTurtle
-            );
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, vibrato, null, false, 0, panner);
             expect(mockSynth.chain.mock.calls[0].at(-1)).toBe(panner);
 
             jest.advanceTimersByTime(2000);
@@ -2265,19 +2279,35 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
         });
 
-        it("should keep a reloaded instrument on the panner", async () => {
+        it("should wait for the effects chain before moving an instrument", async () => {
+            jest.useFakeTimers();
             const mockSynth = createMockSynth();
-            instruments[panTurtle] = { guitar: mockSynth };
-            Synth.setTurtleOutput(panTurtle, panner);
+            Synth.routeInstrument(mockSynth, Tone.Destination);
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, vibrato, null, false, 0);
+            mockSynth.connect.mockClear();
+
+            Synth.routeInstrument(mockSynth, panner);
+            expect(mockSynth.connect).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.connect).toHaveBeenCalledTimes(1);
+            expect(mockSynth.connect).toHaveBeenCalledWith(panner);
+        });
+
+        it("should leave a reloaded instrument on its output", async () => {
+            const mockSynth = createMockSynth();
+            instruments[routeTurtle] = { guitar: mockSynth };
+            Synth.routeInstrument(mockSynth, panner);
+            mockSynth.connect.mockClear();
             const createSpy = jest.spyOn(Synth, "createSynth").mockResolvedValue();
             const volumeSpy = jest.spyOn(Synth, "setVolume").mockImplementation(() => {});
 
             try {
-                await Synth.loadSynth(panTurtle, "guitar");
+                await Synth.loadSynth(routeTurtle, "guitar");
 
                 expect(mockSynth.toDestination).not.toHaveBeenCalled();
-                expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
-                expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+                expect(mockSynth.connect).not.toHaveBeenCalled();
             } finally {
                 createSpy.mockRestore();
                 volumeSpy.mockRestore();
@@ -2289,9 +2319,7 @@ describe("Utility Functions (logic-only)", () => {
             mockSynth.chain.mockImplementation(() => {
                 throw new Error("chain failed");
             });
-            instruments[panTurtle] = { "electronic synth": mockSynth };
-            Synth.setTurtleOutput(panTurtle, panner);
-            Synth.inTemperament = "equal";
+            Synth.routeInstrument(mockSynth, panner);
             const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
             try {
@@ -2300,11 +2328,11 @@ describe("Utility Functions (logic-only)", () => {
                     mockSynth,
                     "C4",
                     0.25,
-                    { doVibrato: true, vibratoFrequency: 5, vibratoIntensity: 1 },
+                    vibrato,
                     null,
                     false,
                     0,
-                    panTurtle
+                    panner
                 );
 
                 expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
@@ -2312,14 +2340,6 @@ describe("Utility Functions (logic-only)", () => {
             } finally {
                 errorSpy.mockRestore();
             }
-        });
-
-        it("should drop every turtle's panner when instruments are disposed", () => {
-            Synth.setTurtleOutput(panTurtle, panner);
-
-            Synth.disposeAllInstruments();
-
-            expect(Synth.getTurtleOutput(panTurtle)).toBe(Tone.Destination);
         });
     });
 

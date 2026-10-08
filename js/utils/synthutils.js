@@ -453,7 +453,7 @@ const instrumentsSource = {};
 // effects chain is still active on the same synth.
 const _effectsInFlight = new WeakMap();
 
-// The node each synth was last routed to by routeInstrument().
+// The output each synth should play into, as last set by routeInstrument().
 const _routedOutput = new WeakMap();
 
 /**
@@ -1843,7 +1843,7 @@ function Synth() {
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return this.routeInstrument(turtle, instruments[turtle][sourceName]);
+            return instruments[turtle][sourceName];
         }
 
         return null;
@@ -1860,7 +1860,7 @@ function Synth() {
      * @param {Object|null} paramsFilters - Parameters for filters.
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
-     * @param {number} [turtle] - The turtle whose output the synth plays into.
+     * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. a panner.
      */
     this._performNotes = async (
         synth,
@@ -1870,7 +1870,7 @@ function Synth() {
         paramsFilters,
         setNote,
         future,
-        turtle
+        output = Tone.Destination
     ) => {
         const isStandardNote = note => {
             if (typeof note !== "string") return true;
@@ -2122,7 +2122,7 @@ function Synth() {
                     }
                 }
 
-                synth.chain(...chainNodes, this.getTurtleOutput(turtle));
+                synth.chain(...chainNodes, output);
 
                 if (!paramsEffects || !paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
@@ -2178,8 +2178,7 @@ function Synth() {
                             } catch (_) {
                                 // Already disconnected — safe to ignore.
                             }
-                            _routedOutput.delete(synth);
-                            this.routeInstrument(turtle, synth);
+                            synth.connect(_routedOutput.get(synth) || output);
                         }
                     } catch (e) {
                         console.debug("Error disposing effects:", e);
@@ -2217,8 +2216,7 @@ function Synth() {
             const remaining = (_effectsInFlight.get(synth) || 1) - 1;
             _effectsInFlight.set(synth, remaining);
             if (remaining === 0 && synth && typeof synth.toDestination === "function") {
-                _routedOutput.delete(synth);
-                this.routeInstrument(turtle, synth);
+                synth.connect(_routedOutput.get(synth) || output);
             }
         }
     };
@@ -2248,60 +2246,40 @@ function Synth() {
         }
     };
 
-    // Output node per turtle, set once the turtle runs "set panning".
-    this._turtleOutputs = {};
-
     /**
-     * Returns the node a turtle's instruments play into: its panner when
-     * one is set, otherwise the master output.
+     * Moves a synth onto the given output, dropping its previous route. Does
+     * nothing if it already plays there, so it is cheap to call before every
+     * note. While an effects chain owns the synth, the move waits for the
+     * chain's cleanup.
      * @function
      * @memberof Synth
-     * @param {number} turtle - The turtle index.
-     * @returns {Tone.ToneAudioNode} The output node.
-     */
-    this.getTurtleOutput = turtle => this._turtleOutputs[turtle] || Tone.Destination;
-
-    /**
-     * Connects a synth to its turtle's output, dropping the direct path to the
-     * master output when a panner sits in between. Does nothing if the synth is
-     * already routed there, so it is cheap to call before every note.
-     * @function
-     * @memberof Synth
-     * @param {number} turtle - The turtle index.
      * @param {Tone.ToneAudioNode} synth - The instrument to route.
+     * @param {Tone.ToneAudioNode} output - The node to play into, e.g. a panner.
      * @returns {Tone.ToneAudioNode} The same synth.
      */
-    this.routeInstrument = (turtle, synth) => {
-        const output = this.getTurtleOutput(turtle);
-        if (_routedOutput.get(synth) === output) {
+    this.routeInstrument = (synth, output) => {
+        const current = _routedOutput.get(synth);
+        if (current === output) {
             return synth;
         }
 
-        if (output !== Tone.Destination) {
+        _routedOutput.set(synth, output);
+        if ((_effectsInFlight.get(synth) || 0) > 0) {
+            return synth;
+        }
+
+        // New instruments are created already connected to Tone.Destination.
+        const previous = current || Tone.Destination;
+        if (previous !== output) {
             try {
-                synth.disconnect(Tone.Destination);
+                synth.disconnect(previous);
             } catch (e) {
-                // Not connected to the master output.
+                // Not connected there.
             }
         }
 
         synth.connect(output);
-        _routedOutput.set(synth, output);
         return synth;
-    };
-
-    /**
-     * Sends every instrument of a turtle through the given node.
-     * @function
-     * @memberof Synth
-     * @param {number} turtle - The turtle index.
-     * @param {Tone.ToneAudioNode} output - The node to play into, e.g. a panner.
-     */
-    this.setTurtleOutput = (turtle, output) => {
-        this._turtleOutputs[turtle] = output;
-        for (const instrumentName in instruments[turtle]) {
-            this.routeInstrument(turtle, instruments[turtle][instrumentName]);
-        }
     };
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
@@ -2317,6 +2295,7 @@ function Synth() {
      * @param {Object|null} paramsFilters - Parameters for filters.
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
+     * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. the turtle's panner.
      */
     this.trigger = async (
         turtle,
@@ -2326,7 +2305,8 @@ function Synth() {
         paramsEffects,
         paramsFilters,
         setNote,
-        future
+        future,
+        output
     ) => {
         // Capture the current instrument epoch to detect disposal during async operations
         const epoch = this._instrumentEpoch;
@@ -2416,6 +2396,10 @@ function Synth() {
                 future = 0.0;
             }
 
+            if (!output) {
+                output = Tone.Destination;
+            }
+
             // Ensure the requested instrument is properly initialized. It may be
             // missing because all instruments are disposed on Stop, so reload it
             // on demand instead of silently playing (or skipping) the note.
@@ -2463,7 +2447,7 @@ function Synth() {
                 return; // Exit gracefully - synth is no longer available
             }
 
-            this.routeInstrument(turtle, tempSynth);
+            this.routeInstrument(tempSynth, output);
 
             switch (flag) {
                 case 1: // drum
@@ -2495,7 +2479,7 @@ function Synth() {
                         paramsFilters,
                         setNote,
                         future,
-                        turtle
+                        output
                     );
                     break;
                 case 3: // builtin synth
@@ -2512,7 +2496,7 @@ function Synth() {
                         paramsFilters,
                         setNote,
                         future,
-                        turtle
+                        output
                     );
                     break;
                 case 4:
@@ -2530,7 +2514,7 @@ function Synth() {
                         paramsFilters,
                         setNote,
                         future,
-                        turtle
+                        output
                     );
                     break;
             }
@@ -4047,7 +4031,6 @@ function Synth() {
      */
     this.disposeAllInstruments = () => {
         this._instrumentEpoch++;
-        this._turtleOutputs = {};
         _disposeRecordingPlayer();
         _revokeRecordingURL();
 

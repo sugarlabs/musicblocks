@@ -217,8 +217,6 @@ function setupVolumeActions(activity) {
             } else {
                 tur.singer.panner.pan.value = value;
             }
-
-            activity.logo.synth.setTurtleOutput(turtle, tur.singer.panner);
         }
 
         /**
