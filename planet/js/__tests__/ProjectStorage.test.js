@@ -799,4 +799,170 @@ describe("ProjectStorage", () => {
             expect(storage.data.Projects["xyz"].ProjectName).toBe("Precious Project");
         });
     });
+
+    describe("multi-tab offline commit draft preservation (#9157)", () => {
+        it("should preserve offline commit drafts created in another tab when a stale tab saves", async () => {
+            // Tab A initializes and creates an offline draft for project 'p1'
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-tab-a",
+                                message: "Draft A",
+                                timestamp: 1000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                },
+                CurrentProject: "p1"
+            };
+            await storage.save();
+
+            // Tab B has stale in-memory data (no commitDrafts)
+            const staleTabStorage = new ProjectStorage(mockPlanet);
+            staleTabStorage.LocalStorage = mockLocalforage;
+            staleTabStorage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1 Renamed in Tab B",
+                        commitDrafts: []
+                    }
+                },
+                CurrentProject: "p1"
+            };
+
+            // Tab B saves an unrelated change (e.g. project rename)
+            await staleTabStorage.save();
+
+            // Check persisted storage
+            const persisted = await storage.get(storage.LocalStorageKey);
+            expect(persisted.Projects.p1.ProjectName).toBe("Project 1 Renamed in Tab B");
+            expect(persisted.Projects.p1.commitDrafts).toHaveLength(1);
+            expect(persisted.Projects.p1.commitDrafts[0].id).toBe("draft-tab-a");
+        });
+
+        it("should combine independent offline commit drafts created in different tabs", async () => {
+            // Tab A saves draft 1
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+            await storage.save();
+
+            // Tab B has draft 2 in memory
+            const tabBStorage = new ProjectStorage(mockPlanet);
+            tabBStorage.LocalStorage = mockLocalforage;
+            tabBStorage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-2",
+                                message: "Draft 2",
+                                timestamp: 2000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+
+            await tabBStorage.save();
+
+            const persisted = await storage.get(storage.LocalStorageKey);
+            expect(persisted.Projects.p1.commitDrafts).toHaveLength(2);
+            expect(persisted.Projects.p1.commitDrafts.map(d => d.id)).toEqual([
+                "draft-1",
+                "draft-2"
+            ]);
+        });
+
+        it("should not resurrect drafts removed via removeSyncedDrafts", async () => {
+            const commitDate = "2026-04-10T10:00:00Z";
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "synced-1",
+                                message: "Commit 1",
+                                timestamp: Date.parse(commitDate) - 1000,
+                                status: "synced"
+                            }
+                        ]
+                    }
+                }
+            };
+            await storage.save();
+
+            // Calling removeSyncedDrafts drops the synced draft
+            await storage.removeSyncedDrafts("p1", [{ message: "Commit 1", date: commitDate }]);
+
+            const persisted = await storage.get(storage.LocalStorageKey);
+            expect(persisted.Projects.p1.commitDrafts).toHaveLength(0);
+        });
+
+        it("should inherit persisted synced status and sha for matching drafts", async () => {
+            // Tab A has synced draft-1 with sha
+            storage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "synced",
+                                sha: "commit-sha-123"
+                            }
+                        ]
+                    }
+                }
+            };
+            await storage.save();
+
+            // Tab B still has draft-1 in memory as pending without sha
+            const tabBStorage = new ProjectStorage(mockPlanet);
+            tabBStorage.LocalStorage = mockLocalforage;
+            tabBStorage.data = {
+                Projects: {
+                    p1: {
+                        ProjectName: "Project 1 Renamed in Tab B",
+                        commitDrafts: [
+                            {
+                                id: "draft-1",
+                                message: "Draft 1",
+                                timestamp: 1000,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                }
+            };
+
+            await tabBStorage.save();
+
+            const persisted = await storage.get(storage.LocalStorageKey);
+            expect(persisted.Projects.p1.commitDrafts).toHaveLength(1);
+            expect(persisted.Projects.p1.commitDrafts[0].status).toBe("synced");
+            expect(persisted.Projects.p1.commitDrafts[0].sha).toBe("commit-sha-123");
+        });
+    });
 });

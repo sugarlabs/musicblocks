@@ -390,6 +390,60 @@ class ProjectStorage {
         }
     }
 
+    /**
+     * Merges persisted pending offline commit drafts from existing storage into
+     * in-memory storage before saving, so that a stale tab does not overwrite
+     * pending offline commit drafts created in another tab.
+     * @param {Object} existing  The existing persisted storage object read from LocalStorageKey
+     * @private
+     */
+    _mergeExistingOfflineDrafts(existing) {
+        if (!existing || !existing.Projects || !this.data || !this.data.Projects) {
+            return;
+        }
+
+        for (const id of Object.keys(existing.Projects)) {
+            const existingProj = existing.Projects[id];
+            if (!existingProj) continue;
+
+            const currentProj = this.data.Projects[id];
+            if (!currentProj) continue;
+
+            const existingDrafts = Array.isArray(existingProj.commitDrafts)
+                ? existingProj.commitDrafts
+                : [];
+            const currentDrafts = Array.isArray(currentProj.commitDrafts)
+                ? currentProj.commitDrafts
+                : [];
+
+            // Inherit updated sync status and sha for drafts matching existing storage
+            const existingMap = new Map(existingDrafts.map(d => [d?.id, d]));
+            for (const draft of currentDrafts) {
+                const existing = existingMap.get(draft?.id);
+                if (existing) {
+                    if (existing.status !== "pending" && draft.status === "pending") {
+                        draft.status = existing.status;
+                    }
+                    if (existing.sha && !draft.sha) {
+                        draft.sha = existing.sha;
+                    }
+                }
+            }
+
+            // Only merge pending drafts from existing storage that are missing in the current tab
+            const currentIds = new Set(currentDrafts.map(d => d.id));
+            const missingPending = existingDrafts.filter(
+                d => d?.id && d.status === "pending" && !currentIds.has(d.id)
+            );
+
+            if (missingPending.length > 0) {
+                currentProj.commitDrafts = [...currentDrafts, ...missingPending].sort(
+                    (a, b) => (a.timestamp || 0) - (b.timestamp || 0)
+                );
+            }
+        }
+    }
+
     async save() {
         const run = this._saveQueue.then(async () => {
             this._saveInProgress = true;
@@ -398,6 +452,7 @@ class ProjectStorage {
                 const existing = await this.get(this.LocalStorageKey);
                 if (existing !== null) {
                     await this.set(this.BackupStorageKey, existing);
+                    this._mergeExistingOfflineDrafts(existing);
                 }
 
                 await this.set(this.LocalStorageKey, this.data);
