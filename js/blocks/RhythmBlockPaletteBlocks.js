@@ -129,7 +129,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * @returns {Array} - Array containing the result of the flow.
          */
         flow(args, logo, turtle, blk) {
-            let noteBeatValue, arg0, arg1;
+            let noteDuration, noteDenominator, arg0, arg1;
             arg0 = getNoteCount(args[0], 3, blk);
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
@@ -139,11 +139,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 arg1 = args[1];
             }
 
-            if (activity.blocks.blockList[blk].name === "rhythm2") {
-                noteBeatValue = 1 / arg1;
-            } else {
-                noteBeatValue = arg1;
-            }
+            noteDuration = 1 / arg1;
+            noteDenominator = arg1;
 
             const isTuplet =
                 typeof logo.tuplet === "object" &&
@@ -188,7 +185,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                                 logo.addingNotesToTuplet = true;
                             }
                         }
-                        last(tRhythms).push(noteBeatValue);
+                        last(tRhythms).push(noteDuration);
                     }
                 } else {
                     const tRhythms =
@@ -198,12 +195,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             ? (logo.tupletRhythms[turtle] = logo.tupletRhythms[turtle] || [])
                             : logo.tupletRhythms;
                     for (let i = 0; i < arg0; i++) {
-                        tRhythms.push(["individual", 1, noteBeatValue]);
+                        tRhythms.push(["individual", 1, noteDuration]);
                     }
                 }
 
                 for (let i = 0; i < arg0; i++) {
-                    Singer.processNote(activity, noteBeatValue, false, blk, turtle);
+                    Singer.processNote(activity, noteDenominator, false, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
                 // We don't check for balance since we want to support
@@ -230,7 +227,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 if (drumIndex !== -1) {
                     for (let i = 0; i < arg0; i++) {
-                        logo.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
+                        logo.rhythmRuler.Rulers[drumIndex][0].push(noteDuration);
                     }
                 }
             } else {
@@ -249,10 +246,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                 }
 
+                tur.singer.noteValue[blk] = noteDuration;
+
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteDenominator;
 
                 let __callback;
 
@@ -269,7 +268,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     scheduleNote(
                         logo,
                         activity,
-                        noteBeatValue,
+                        noteDenominator,
                         blk,
                         turtle,
                         __callback,
@@ -1124,7 +1123,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 arg1 = args[1];
             }
 
-            const noteBeatValue = (1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor;
+            const beatFactor = activity.turtles.ithTurtle(turtle).singer.beatFactor;
+            const noteValue = (1 / arg1) * beatFactor;
             const isTuplet =
                 typeof logo.tuplet === "object" &&
                 logo.tuplet !== null &&
@@ -1166,14 +1166,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
                                 logo.addingNotesToTuplet = true;
                             }
                         }
-
-                        Singer.processNote(activity, noteBeatValue, false, blk, turtle);
+                        tParams.push([1, noteValue]);
+                        Singer.processNote(activity, noteValue, false, blk, turtle);
                     }
                 } else {
-                    tParams.push([1, noteBeatValue]);
+                    tParams.push([1, noteValue]);
                     const obj = ["simple", 0];
                     for (let i = 0; i < arg0; i++) {
-                        obj.push((1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor);
+                        obj.push(noteValue);
                     }
                     tRhythms.push(obj);
                 }
@@ -1188,11 +1188,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 }
 
                 tur.singer.inNoteBlock.push(blk);
+                tur.singer.noteValue[blk] = noteValue;
 
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor / noteBeatValue / arg0;
+                const beatValue = bpmFactor / noteValue / arg0;
 
                 let __callback = null;
                 for (let i = 0; i < arg0; i++) {
@@ -1208,7 +1209,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     scheduleNote(
                         logo,
                         activity,
-                        noteBeatValue * arg0,
+                        noteValue * arg0,
                         blk,
                         turtle,
                         __callback,
