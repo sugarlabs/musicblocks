@@ -139,11 +139,11 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 arg1 = args[1];
             }
 
-            // Rhythm2Block expects denominator (4=quarter, 8=eighth, etc.).
-            // Convert fractional duration inputs (e.g., 0.25) to denominator (4).
             const blockName = activity.blocks.blockList[blk]?.name;
+            // Rhythm2Block: arg1 can be denominator (>=1, e.g., 4) or duration (<1, e.g., 0.25).
+            // Convert duration to denominator. Use exact reciprocal, not rounded.
             if (blockName === "rhythm2" && arg1 < 1) {
-                arg1 = Math.round(1 / arg1);
+                arg1 = 1 / arg1;
             }
 
             noteDuration = 1 / arg1;
