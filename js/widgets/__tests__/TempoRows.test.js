@@ -136,7 +136,9 @@ describe("TempoRows", () => {
             ["40 at 1/8 opens at 60, the 30 quarter notes it plays at", 40, 1 / 8, 60],
             ["2000 at 1/4 opens at 1000", 2000, 1 / 4, 1000],
             ["20 at 1/2 is allowed (15 to 500) and stays", 20, 1 / 2, 20],
-            ["90 at 1/4 stays", 90, 1 / 4, 90]
+            ["90 at 1/4 stays", 90, 1 / 4, 90],
+            ["0 at 1/2 opens at 15, the 30 quarter notes it plays at", 0, 1 / 2, 15],
+            ["0 at 1/8 opens at 60", 0, 1 / 8, 60]
         ])("opens each row at the tempo it plays: %s", (label, bpm, beatValue, shown) => {
             tempo.BPMs = [bpm];
             tempo.beatValues = [beatValue];
