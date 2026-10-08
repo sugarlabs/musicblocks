@@ -20,8 +20,7 @@
    Midi,
    ABCJS,
    ensureABCJS,
-   extractProjectDataFromHTML,
-   unescapeHTML,
+   parseProjectFileData,
    isSafeUrl,
    getTemperament,
    getOctaveRatio,
@@ -1221,19 +1220,11 @@ class ProjectManager {
                             const cleanData = rawData.replace(/\n/g, " ");
                             let obj;
                             try {
-                                if (cleanData.includes("html")) {
-                                    let extracted;
-                                    extracted = extractProjectDataFromHTML(cleanData);
-                                    if (!extracted) {
-                                        that.errorMsg(
-                                            _("Cannot find project data in this HTML file.")
-                                        );
-                                        finishLoading();
-                                        return;
-                                    }
-                                    obj = JSON.parse(unescapeHTML(extracted));
-                                } else {
-                                    obj = JSON.parse(cleanData);
+                                obj = parseProjectFileData(cleanData);
+                                if (obj === null) {
+                                    that.errorMsg(_("Cannot find project data in this HTML file."));
+                                    finishLoading();
+                                    return;
                                 }
                                 for (const name in that.palettes.dict) {
                                     that.palettes.dict[name].hideMenu(true);
@@ -1322,17 +1313,11 @@ class ProjectManager {
                         const cleanData = rawData.replace(/\n/g, " ");
                         let obj;
                         try {
-                            if (cleanData.includes("html")) {
-                                let extracted;
-                                extracted = extractProjectDataFromHTML(cleanData);
-                                if (!extracted) {
-                                    that.errorMsg(_("Cannot find project data in this HTML file."));
-                                    finishLoading();
-                                    return;
-                                }
-                                obj = JSON.parse(unescapeHTML(extracted));
-                            } else {
-                                obj = JSON.parse(cleanData);
+                            obj = parseProjectFileData(cleanData);
+                            if (obj === null) {
+                                that.errorMsg(_("Cannot find project data in this HTML file."));
+                                finishLoading();
+                                return;
                             }
                             for (const name in that.blocks.palettes.dict) {
                                 that.palettes.dict[name].hideMenu(true);

@@ -27,7 +27,7 @@
     - js/utils/platformstyle.js
         platformColor
     - js/utils/utils-logic.js
-        resolveObject, isUnsafeObjectKey
+        resolveObject, isUnsafeObjectKey, unescapeHTML
     - js/utils/browser-utils.js
         canvasPixelRatio, doBrowserCheck, fnBrowserDetect, windowHeight, windowWidth
 */
@@ -36,7 +36,7 @@ if (typeof module !== "undefined" && module.exports) {
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
-    var { resolveObject, isUnsafeObjectKey } = UtilsLogic;
+    var { resolveObject, isUnsafeObjectKey, unescapeHTML } = UtilsLogic;
 
     var DomHelpers =
         (typeof window !== "undefined" && window.DomHelpers) ||
@@ -64,7 +64,7 @@ if (typeof module !== "undefined" && module.exports) {
    delayExecution,
    doPublish, doSVG,
    format, getTextWidth,
-   importMembers, isSVGEmpty, waitForReadiness
+   importMembers, isSVGEmpty, parseProjectFileData, waitForReadiness
 */
 
 /**
@@ -351,6 +351,34 @@ function extractProjectDataFromHTML(cleanData) {
     return matchResult[1];
 }
 
+/**
+ * Parses the text of a loaded project file, which is either a plain
+ * JSON project (.tb/.json) or an HTML export with the JSON escaped
+ * inside its code div.
+ *
+ * JSON is tried first: block values in a plain project (text, URLs,
+ * loadFile contents, base64 media) can legitimately contain "html", so
+ * looking for that substring is not a reliable way to detect an HTML
+ * export. A real HTML export never parses as JSON.
+ *
+ * @param {string} cleanData - File content (newlines already cleaned).
+ * @returns {*} The parsed project data, or null if the file is an HTML
+ *     export with no project data.
+ * @throws {SyntaxError} If the file is neither valid JSON nor HTML.
+ */
+function parseProjectFileData(cleanData) {
+    try {
+        return JSON.parse(cleanData);
+    } catch (jsonError) {
+        if (!cleanData.includes("html")) {
+            throw jsonError;
+        }
+    }
+
+    const extracted = extractProjectDataFromHTML(cleanData);
+    return extracted ? JSON.parse(unescapeHTML(extracted)) : null;
+}
+
 // hideDOMLabel() and displayMsg() moved to js/utils/dom-helpers.js
 
 // safeSVG() and toFixed2() moved to js/utils/utils-logic.js
@@ -476,6 +504,7 @@ if (typeof module !== "undefined" && module.exports) {
         ...PluginUtils,
         ...MacroUtils,
         extractProjectDataFromHTML,
+        parseProjectFileData,
         _,
         format,
         delayExecution,
