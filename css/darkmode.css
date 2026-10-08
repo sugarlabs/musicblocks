@@ -156,14 +156,6 @@ body.highcontrast {
     background-color: var(--color-widget-frame-bg) !important;
 }
 
-.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup {
-    background-color: #ffffff;
-}
-
-.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.close {
-    background-color: #ffffff;
-}
-
 /* Fix white table header strip in floating widgets during dark mode while preserving table body colors */
 .dark #floatingWindows table thead tr:first-child td,
 .dark #floatingWindows table thead tr:first-child th {
