@@ -2209,6 +2209,17 @@ describe("buildScale", () => {
         }
     });
 
+    it("should spell a scale on a sharp or flat tonic from that tonic", () => {
+        expect(buildScale("G♯ lydian")[0].join(" ")).toBe("G♯ A♯ B♯ C𝄪 D♯ E♯ F𝄪 G♯");
+        expect(buildScale("B♭ harmonic minor")[0].join(" ")).toBe("B♭ C D♭ E♭ F G♭ A B♭");
+    });
+
+    it("should keep the old spelling when a degree needs more than a double accidental", () => {
+        // Its sixth note, G♯, would need a triple sharp to be spelled as an F, so the scale is
+        // left as it was.
+        expect(buildScale("A♯ enigmatic")[0].join(" ")).toBe("A♯ B D E F♯ G♯ G𝄪 A♯");
+    });
+
     it("should leave scales that already use each letter once unchanged", () => {
         expect(buildScale("C major")[0].join(" ")).toBe("C D E F G A B C");
         expect(buildScale("E natural minor")[0].join(" ")).toBe("E F♯ G A B C D E");

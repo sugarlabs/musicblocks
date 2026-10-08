@@ -302,17 +302,15 @@ var buildScale = (keySignature, edo) => {
                 "2": DOUBLESHARP
             };
 
+            // An unrecognised tonic makes the pitch NaN, which no accidental
+            // matches below, so the scale is left as it was.
             const tonicLetter = letters.indexOf(myKeySignature[0]);
             let pitch = naturalPitches[tonicLetter];
-            let spellable = tonicLetter !== -1;
             for (const symbol of myKeySignature.slice(1)) {
-                if (!(symbol in accidentalSteps)) {
-                    spellable = false;
-                    break;
-                }
                 pitch += accidentalSteps[symbol];
             }
 
+            let spellable = true;
             const letterScale = [myKeySignature];
             for (let degree = 1; spellable && degree < 7; degree++) {
                 pitch += halfSteps[degree - 1];
