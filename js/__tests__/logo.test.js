@@ -112,6 +112,7 @@ global.getIntervalDirection = jest.fn(() => 1);
 global.getIntervalNumber = jest.fn(() => 5);
 global.mixedNumber = jest.fn(n => n.toString());
 global.rationalToFraction = jest.fn(n => [1, Math.round(1 / n)]);
+global.getMeasurePosition = require("../utils/musicutils-rhythm").getMeasurePosition;
 global.doStopVideoCam = jest.fn();
 global.CAMERAVALUE = "camera:";
 global.VIDEOVALUE = "video:";
@@ -1482,6 +1483,38 @@ describe("Logo runLogoCommands", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    describe("temperament carried over from an earlier run", () => {
+        beforeEach(() => {
+            mockActivity.blocks.stackList = [];
+            logo._userTemperament = "just intonation";
+            logo.temperamentSelected = ["just intonation"];
+            logo.synth.startingPitch = "D4";
+        });
+
+        test("is kept while the project still has a set temperament block", () => {
+            logo.blockList = [{ name: "settemperament", trash: false, connections: [] }];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("just intonation");
+            expect(logo.synth.startingPitch).toBe("D4");
+        });
+
+        test("is dropped once no set temperament block is left", () => {
+            logo.blockList = [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "settemperament", trash: true, connections: [] }
+            ];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("equal");
+            expect(logo.synth.startingPitch).toBe("C4");
+            expect(logo._userTemperament).toBeNull();
+            expect(logo.temperamentSelected).toEqual([]);
+        });
+    });
+
     test("executes each evalOnStartList plugin at run startup", () => {
         const effects = [];
         logo.blockList = [];
@@ -2404,6 +2437,27 @@ describe("Logo runFromBlockNow", () => {
             expect(logo.recordingBuffer.hasData).toBe(true);
         });
 
+        test("does not buffer notation on interactive completion if staging is empty", () => {
+            logo._exportNotationFinished = false;
+            logo.runningLilypond = false;
+            logo.runningAbc = false;
+            logo.runningMxml = false;
+            logo.runningMIDI = false;
+            logo.notationOutput = "leftover_export_text";
+            logo.notation.notationStaging = {};
+            logo.recordingBuffer = {
+                hasData: false,
+                notationOutput: "",
+                notationNotes: {},
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.recordingBuffer.hasData).toBe(false);
+        });
+
         test("triggers afterSaveAbc, afterSaveMxml, and playback-ready message", () => {
             logo.runningAbc = true;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -3143,6 +3197,70 @@ describe("Logo updateNotation", () => {
         logo.updateNotation(["C4"], 0.5, 0, false, null, true);
         expect(logo.notation.notationInsertTie).toHaveBeenCalledWith(0);
         expect(logo.notation.doUpdateNotation).toHaveBeenCalled();
+    });
+
+    test("finds barlines from the latest meter change", () => {
+        const singer = mockActivity.turtles.ithTurtle().singer;
+        logo.notation.notationDrumStaging[0] = [];
+        // Three beats of 3/4, then a whole note starting on the downbeat of 4/4.
+        Object.assign(singer, {
+            notesPlayed: [7, 4],
+            pickup: 0,
+            noteValuePerBeat: 4,
+            beatsPerMeasure: 4,
+            meterAnchor: { wholeNotes: 0.75, measures: 1 }
+        });
+
+        logo.updateNotation(["C4"], 1, 0, false, null, true);
+
+        expect(logo.notation.notationInsertTie).not.toHaveBeenCalled();
+        expect(logo.notation.doUpdateNotation).toHaveBeenCalledTimes(1);
+    });
+
+    describe("notes longer than the rest of the measure", () => {
+        const { rationalToFraction } = require("../utils/utils-logic");
+        let singer;
+
+        // Plays a note of `wholeNotes` starting at `start` and returns the staged pieces
+        // (in whole notes) and the number of ties.
+        const stage = (note, start, wholeNotes) => {
+            singer.notesPlayed = [start + wholeNotes, 1];
+            logo.updateNotation(note, 1 / wholeNotes, 0, false, null, true);
+            return {
+                pieces: logo.notation.doUpdateNotation.mock.calls.map(call => 1 / call[1]),
+                ties: logo.notation.notationInsertTie.mock.calls.length
+            };
+        };
+
+        beforeEach(() => {
+            logo.deps.utils.rationalToFraction = rationalToFraction;
+            logo.notation.notationDrumStaging[0] = [];
+            singer = mockActivity.turtles.ithTurtle().singer;
+            Object.assign(singer, { pickup: 0, meterAnchor: null });
+        });
+
+        test("splits at every barline the note crosses", () => {
+            // 2/4, a whole note starting on beat 2
+            Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 2 });
+        });
+
+        test("splits after a pickup", () => {
+            // 3/4 with a 1/8 pickup, a whole note from the start
+            Object.assign(singer, { beatsPerMeasure: 3, noteValuePerBeat: 4, pickup: 0.125 });
+            expect(stage(["C4"], 0, 1)).toEqual({ pieces: [0.125, 0.75, 0.125], ties: 2 });
+        });
+
+        test("writes one full measure per measure spanned", () => {
+            // 4/4, a note of two whole notes from a downbeat
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 1, 2)).toEqual({ pieces: [1, 1], ties: 1 });
+        });
+
+        test("does not tie rests", () => {
+            Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
+            expect(stage(["R"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 0 });
+        });
     });
 });
 

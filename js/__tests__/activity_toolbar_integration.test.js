@@ -540,4 +540,65 @@ describe("Activity Toolbar Integration", () => {
             expect(global.cancelAnimationFrame).toHaveBeenCalledWith(99);
         });
     });
+
+    describe("sendAllToTrash and pasted Object.keys loop execution", () => {
+        test("sendAllToTrash iterates Object.keys on palettes and blockList to move blocks to trash", () => {
+            const hideMenu = jest.fn();
+            activity.palettes = { dict: { rhythm: { hideMenu } } };
+            const mockBlock = {
+                connections: [null],
+                name: "pitch",
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            };
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [mockBlock],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(() => "preview"),
+                trashPreviews: {},
+                trashStacks: [],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+            activity.blocksContainer = { x: 50, y: 50 };
+            activity.refreshCanvas = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(activity.blocksContainer.x).toBe(0);
+            expect(activity.blocksContainer.y).toBe(0);
+            expect(hideMenu).toHaveBeenCalledWith(true);
+            expect(activity.blocks._beginDeferCheckBounds).toHaveBeenCalled();
+            expect(activity.blocks._endDeferCheckBounds).toHaveBeenCalled();
+            expect(mockBlock.trash).toBe(true);
+            expect(mockBlock.hide).toHaveBeenCalled();
+            expect(mockBlock.container.uncache).toHaveBeenCalled();
+            expect(activity.blocks.trashStacks).toContain("0");
+            expect(activity.blocks.trashPreviews["0"]).toBe("preview");
+        });
+
+        test("pasted iterates Object.keys on palettes.dict and loads blocks", () => {
+            const hideMenu = jest.fn();
+            activity.palettes = { dict: { rhythm: { hideMenu } } };
+            activity.blocks = { loadNewBlocks: jest.fn() };
+            activity.pasteBox = { hide: jest.fn() };
+            activity.refreshCanvas = jest.fn();
+
+            const pasteElem = { value: JSON.stringify([{ name: "pitch" }]) };
+            document.getElementById = jest.fn(id => (id === "paste" ? pasteElem : null));
+
+            activity.pasted();
+
+            expect(hideMenu).toHaveBeenCalledWith(true);
+            expect(activity.refreshCanvas).toHaveBeenCalled();
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "pitch" }]);
+            expect(activity.pasteBox.hide).toHaveBeenCalled();
+        });
+    });
 });

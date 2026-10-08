@@ -496,7 +496,7 @@ class Logo {
         if (this._synthsInitialized) {
             // Ensure any newly added turtles (e.g., companion turtles) are
             // initialized without disrupting existing turtles' runtime state.
-            for (const turtle in this.turtles.turtleList) {
+            for (const turtle of Object.keys(this.turtles.turtleList)) {
                 if (turtle in this.deps.instruments) {
                     continue;
                 }
@@ -549,7 +549,7 @@ class Logo {
         }
         this.synth.newTone();
 
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const tur = this.turtles.ithTurtle(turtle);
 
             if (!(turtle in this.deps.instruments)) {
@@ -591,7 +591,7 @@ class Logo {
             tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(turtle);
             for (const synth in tur.singer.synthVolume) {
@@ -613,7 +613,7 @@ class Logo {
         }
 
         this.deps.Singer.resetMasterVolume(this);
-        for (const t in this.turtles.turtleList) {
+        for (const t of Object.keys(this.turtles.turtleList)) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
             for (const synth in tur.singer.synthVolume) {
@@ -1171,9 +1171,10 @@ class Logo {
      * measure boundaries when necessary.
      *
      * When the note's duration carries it past the end of the current measure,
-     * the note is split: the portion that fits within the current measure (and
-     * any fully-spanned intermediate measures) is written first with ties,
-     * followed by the overflow into the next measure.  Recursion stops when
+     * the note is split at every barline it crosses: the portion that fits
+     * within the current measure, one full measure for each intermediate
+     * measure, and the remainder in the last measure, joined by ties (rests
+     * are not tied).  Recursion stops when
      * `split` is false, which all recursive calls pass explicitly.
      *
      * @param {string[]} note - Pitch names (e.g. `["G4"]`), or `["R"]` for a
@@ -1199,76 +1200,39 @@ class Logo {
 
         // Check to see if this note straddles a measure boundary
         const durationTime = 1 / duration;
-        const beatsIntoMeasure =
-            ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                tur.singer.pickup -
-                durationTime) *
-                tur.singer.noteValuePerBeat) %
-            tur.singer.beatsPerMeasure;
-        const timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
-        const timeLeftInMeasure =
-            tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
+        const { timeLeftInMeasure } = this.deps.utils.getMeasurePosition(
+            tur.singer,
+            tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - durationTime
+        );
 
         if (split && durationTime > timeLeftInMeasure) {
-            // overflowTime: the portion of the note that extends past all
-            // measure boundaries.
-            const overflowTime = durationTime - timeLeftInMeasure;
-            // partialTime: starts as the time remaining in the current measure;
-            // the while-loop below strips any whole measures to find the residual.
-            let partialTime = timeLeftInMeasure;
             // measureDuration: the total duration of one full measure.
             const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
-            const obj = this.deps.utils.rationalToFraction(overflowTime);
 
-            if (partialTime > 0) {
-                // Count how many full measures this note spans beyond the first.
-                let i = 0;
-                while (partialTime > measureDuration) {
-                    ++i;
-                    partialTime -= measureDuration;
-                }
-
-                // Write the portion that fits within the current partial measure.
-                let obj2 = this.deps.utils.rationalToFraction(partialTime);
-                if (obj2[0] !== 0) {
-                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                }
-                if (i > 0 || obj[0] > 0) {
-                    if (note[0] !== "R") {
-                        // Don't tie rests
-                        this.notation.notationInsertTie(turtle);
-                        this.notation.notationDrumStaging[turtle].push("tie");
-                    }
-                    obj2 = this.deps.utils.rationalToFraction(1 / measureDuration);
-                }
-
-                // Write one full measure's worth for each intermediate measure.
-                while (i > 0) {
-                    i -= 1;
-                    if (obj2[0] !== 0) {
-                        this.updateNotation(
-                            note,
-                            obj2[1] / obj2[0],
-                            turtle,
-                            insideChord,
-                            drum,
-                            false
-                        );
-                    }
-                    if (obj[0] > 0) {
-                        if (note[0] !== "R") {
-                            // Don't tie rests
-                            this.notation.notationInsertTie(turtle);
-                            this.notation.notationDrumStaging[turtle].push("tie");
-                        }
-                    }
-                }
+            // Cut the note at every barline it crosses: the portion that fits in
+            // the current measure, one full measure for each measure it spans,
+            // then the remainder that spills into the last measure.
+            const pieces = [timeLeftInMeasure];
+            let overflowTime = durationTime - timeLeftInMeasure;
+            // The tolerance keeps float error from adding a near-empty measure.
+            while (overflowTime - measureDuration > 1e-9) {
+                pieces.push(measureDuration);
+                overflowTime -= measureDuration;
             }
+            pieces.push(overflowTime);
 
-            // Write the overflow portion that extends into the next measure.
-            if (obj[0] > 0) {
+            const fractions = pieces
+                .map(time => this.deps.utils.rationalToFraction(time))
+                .filter(obj => obj[0] > 0);
+
+            fractions.forEach((obj, i) => {
+                if (i > 0 && note[0] !== "R") {
+                    // Don't tie rests
+                    this.notation.notationInsertTie(turtle);
+                    this.notation.notationDrumStaging[turtle].push("tie");
+                }
                 this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-            }
+            });
         } else {
             // .. otherwise proceed as normal
             this.notation.doUpdateNotation(...arguments);
@@ -1397,6 +1361,17 @@ class Logo {
     // ========= Behavior =========================================================================
 
     resetTemperament() {
+        // A temperament only carries over to the next run while the project
+        // still sets one; otherwise it would leak into other projects.
+        const setsTemperament = this.blockList.some(
+            blk => blk && !blk.trash && blk.name === "settemperament"
+        );
+        if (!setsTemperament) {
+            this._userTemperament = null;
+            this.temperamentSelected = [];
+            this.synth.startingPitch = "C4";
+        }
+
         this.synth.changeInTemperament = false;
         this.synth.inTemperament = this._userTemperament || "equal";
     }
@@ -1452,7 +1427,7 @@ class Logo {
         this.sounds = [];
 
         // Kill all active audio voices to prevent "zombie audio"
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const tur = this.turtles.getTurtle(turtle);
             if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
                 tur.singer.killAllVoices();
@@ -1766,6 +1741,9 @@ class Logo {
         }
         this.specialArgs = [];
         this.connectionStore = {};
+        if (!this.runningLilypond && !this.runningAbc) {
+            this.notationOutput = "";
+        }
         if (this.recordingBuffer && !this.recording) {
             this.recordingBuffer = {
                 hasData: false,
@@ -1777,7 +1755,7 @@ class Logo {
         }
 
         // Each turtle needs to keep its own wait time and music states.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             this.initTurtle(turtle);
         }
 
@@ -1807,7 +1785,7 @@ class Logo {
         this.clearTurtleListeners();
 
         // Init the graphic state.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const requiredTurtle = this.turtles.getTurtle(turtle);
             requiredTurtle.container.x = this.turtles.turtleX2screenX(requiredTurtle.x);
             requiredTurtle.container.y = this.turtles.turtleY2screenY(requiredTurtle.y);
@@ -1880,7 +1858,7 @@ class Logo {
         this.onRunTurtle();
 
         // Mark all turtles as not running.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             this.turtles.getTurtle(turtle).running = false;
         }
 
@@ -2661,7 +2639,17 @@ class Logo {
                     } else {
                         // Record notation data into buffer for later save (Issue #2330)
                         // This allows saving Lilypond/ABC from interactive sessions
-                        if (logo.notationOutput && logo.notationOutput.length > 0) {
+                        const hasStagedNotation =
+                            logo.notation &&
+                            logo.notation.notationStaging &&
+                            Object.values(logo.notation.notationStaging).some(
+                                staging => Array.isArray(staging) && staging.length > 0
+                            );
+                        if (
+                            hasStagedNotation &&
+                            logo.notationOutput &&
+                            logo.notationOutput.length > 0
+                        ) {
                             logo.recordingBuffer.hasData = true;
                             logo.recordingBuffer.notationOutput = logo.notationOutput;
                             logo.recordingBuffer.notationNotes = JSON.parse(

@@ -596,10 +596,18 @@ var calcOctaveInterval = arg => {
         case -2:
             value = -2;
             break;
-        default:
+        default: {
+            // A number passed as a string (e.g. "1", "-1", "2") from a block input
+            // should resolve to its numeric interval octave if within [-2, 2].
+            const parsed = typeof arg === "string" && arg.trim() !== "" ? Number(arg) : NaN;
+            if (Number.isInteger(parsed) && parsed >= -2 && parsed <= 2) {
+                value = parsed;
+                break;
+            }
             console.debug("Interval octave must be between -2 and 2.");
             value = 0;
             break;
+        }
     }
 
     return value;

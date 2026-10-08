@@ -24,6 +24,9 @@ global.DEFAULTVOICE = "DEFAULTVOICE";
 global.DEFAULTVOICES = ["DEFAULTVOICE"];
 global.MIN_HIGHLIGHT_DURATION_MS = 100;
 global.clampNumber = require("../utils/utils-logic").clampNumber;
+const { saveMeterState, restoreMeterState } = require("../utils/musicutils-rhythm");
+global.saveMeterState = saveMeterState;
+global.restoreMeterState = restoreMeterState;
 
 const Singer = require("../turtle-singer");
 
@@ -1043,6 +1046,38 @@ describe("numberOfNotes — state restoration and tally logic", () => {
 
         expect(logoMock.turtleHeaps[0]).toEqual([1, 2, 3]);
     });
+
+    test("should restore the meter state along with notesPlayed", () => {
+        const anchor = { wholeNotes: 0.75, measures: 1 };
+        Object.assign(turtleMock.singer, {
+            notesPlayed: [1, 1],
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            meterAnchor: anchor,
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+        // The counted stack changes to 3/4 and stays there.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            Object.assign(turtleMock.singer, {
+                notesPlayed: [2, 1],
+                beatsPerMeasure: 3,
+                meterAnchor: { wholeNotes: 1, measures: 2 },
+                beatList: [1]
+            });
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(turtleMock.singer).toMatchObject({
+            notesPlayed: [1, 1],
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            meterAnchor: anchor,
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+    });
 });
 
 describe("processPitch — note block execution path", () => {
@@ -1215,6 +1250,30 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         expect(activityMock.logo[widget].rowLabels).toHaveLength(1);
     });
 
+    test("pitch staircase gets one complete stair per pitch, highest first", () => {
+        const PitchStaircaseSteps = require("../widgets/PitchStaircaseSteps");
+        activityMock.logo.inPitchStaircase = true;
+        activityMock.logo.pitchStaircase = {
+            Stairs: [],
+            stairPitchBlocks: [],
+            addStair: PitchStaircaseSteps.prototype.addStair
+        };
+        // Earlier tests may have cached C4; look both pitches up afresh.
+        Singer.clearPitchToFrequencyCache();
+        global.pitchToFrequency.mockReturnValueOnce(261.63).mockReturnValueOnce(392);
+        global.getNote = jest.fn().mockReturnValueOnce(["C", 4]).mockReturnValueOnce(["G", 4]);
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 101);
+        Singer.processPitch(activityMock, "G", 4, 0, 0, 102);
+
+        expect(activityMock.logo.pitchStaircase.Stairs).toEqual([
+            ["G", 4, 392, 1, 1, 392, 392],
+            ["C", 4, 261.63, 1, 1, 261.63, 261.63]
+        ]);
+        // The higher pitch goes in front of the lower one, and its block is still recorded.
+        expect(activityMock.logo.pitchStaircase.stairPitchBlocks).toEqual([101, 102]);
+    });
+
     test("a setdrum clamp overrides the pitch-drum matrix row", () => {
         activityMock.logo.inPitchDrumMatrix = true;
         turtleMock.singer.drumStyle = ["kick drum"];
@@ -1344,6 +1403,64 @@ describe("noteCounter regression behavior", () => {
         Singer.noteCounter(logoMock, 0, 1);
 
         expect(logoMock.turtleHeaps[0]).toEqual([4, 5]);
+    });
+
+    test("should not leave a meter change from the counted stack behind", () => {
+        const { getMeasurePosition, getMeterAnchor } = require("../utils/musicutils-rhythm");
+        // One quarter note played in 4/4.
+        Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4, notesPlayed: [1, 4] });
+        // The counted stack: 3/4, three quarter notes, 4/4.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            singer.meterAnchor = getMeterAnchor(singer);
+            singer.beatsPerMeasure = 3;
+            singer.notesPlayed = [1, 1];
+            singer.meterAnchor = getMeterAnchor(singer);
+            singer.beatsPerMeasure = 4;
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(singer.notesPlayed).toEqual([1, 4]);
+        expect(singer.meterAnchor).toBeNull();
+        const { beat, measure } = getMeasurePosition(singer, 1 / 4);
+        expect(beat).toBe(2);
+        expect(measure).toBe(1);
+    });
+
+    test("should restore the meter when the counted stack ends in another meter", () => {
+        const { getMeasurePosition } = require("../utils/musicutils-rhythm");
+        Object.assign(singer, {
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            notesPlayed: [1, 4],
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+        // The counted stack: a pickup, 6/8 and two eighth notes, left in 6/8.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            Object.assign(singer, {
+                pickup: 1 / 8,
+                beatsPerMeasure: 6,
+                noteValuePerBeat: 8,
+                meterAnchor: { wholeNotes: 1 / 4, measures: 1 },
+                notesPlayed: [1, 2],
+                beatList: [1, 4]
+            });
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(singer).toMatchObject({
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            pickup: 0,
+            meterAnchor: null,
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+        const { beat, measure } = getMeasurePosition(singer, 1 / 4);
+        expect(beat).toBe(2);
+        expect(measure).toBe(1);
     });
 });
 

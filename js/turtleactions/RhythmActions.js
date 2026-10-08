@@ -16,7 +16,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM */
+/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM, getMeasurePosition */
 
 /*
    Global Locations
@@ -26,6 +26,8 @@
         Singer
     js/logo.js
         TONEBPM
+    js/utils/musicutils-rhythm.js
+        getMeasurePosition
     js/js-export/export.js
         MusicBlocks, Mouse
 */
@@ -64,16 +66,10 @@ function setupRhythmActions(activity) {
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
-                let beatValue, measureValue;
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
-                    beatValue = measureValue = 0;
-                } else {
-                    const beat =
-                        tur.singer.noteValuePerBeat *
-                        (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup);
-                    beatValue = 1 + (beat % tur.singer.beatsPerMeasure);
-                    measureValue = 1 + Math.floor(beat / tur.singer.beatsPerMeasure);
-                }
+                const { beat: beatValue, measure: measureValue } = getMeasurePosition(
+                    tur.singer,
+                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
+                );
 
                 tur.singer.currentBeat = beatValue;
                 tur.singer.currentMeasure = measureValue;
@@ -398,7 +394,7 @@ function setupRhythmActions(activity) {
         static multiplyNoteValue(factor, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (typeof factor !== "number" || isNaN(factor) || factor === 0) {
+            if (!Number.isFinite(factor) || factor === 0) {
                 return;
             }
 
@@ -434,10 +430,10 @@ function setupRhythmActions(activity) {
             if (tur.singer.suppressOutput) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
-                if (typeof swingValue !== "number" || isNaN(swingValue) || swingValue === 0) {
+                if (!Number.isFinite(swingValue) || swingValue === 0) {
                     return;
                 }
-                if (typeof noteValue !== "number" || isNaN(noteValue) || noteValue === 0) {
+                if (!Number.isFinite(noteValue) || noteValue === 0) {
                     return;
                 }
                 tur.singer.swing.push(1 / swingValue);

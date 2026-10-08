@@ -389,9 +389,12 @@ class Arpeggio {
                 widgetWindow.getWidgetBody().style.left = "0px";
                 widgetWindow.getWidgetBody().style.height = "400px";
                 widgetWindow.getWidgetBody().style.width = "400px";
-                // const innerDiv = docById("arpeggioInnerDiv");
-                innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
-                innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+                docById("arpeggioOuterDiv").style.height =
+                    widgetWindow.getWidgetBody().style.height;
+                docById("arpeggioOuterDiv").style.width = widgetWindow.getWidgetBody().style.width;
+                docById("arpeggioInnerDiv").style.height =
+                    widgetWindow.getWidgetBody().style.height;
+                docById("arpeggioInnerDiv").style.width = widgetWindow.getWidgetBody().style.width;
             }
         };
 

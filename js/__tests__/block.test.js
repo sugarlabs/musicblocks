@@ -24,6 +24,8 @@
 
 /* global jest, describe, it, expect, beforeEach */
 
+const fs = require("fs");
+const path = require("path");
 const Block = require("../block");
 const ManagedTimer = require("../utils/ManagedTimer");
 
@@ -633,7 +635,7 @@ describe("Block Foundation", () => {
             findUniqueActionName = jest.fn().mockImplementation(name => name);
 
             mockBlocksForRename = {
-                activity: { refreshCanvas: jest.fn() },
+                activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn() },
                 blockList: [],
                 palettes: {
                     hide: jest.fn(),
@@ -706,6 +708,58 @@ describe("Block Foundation", () => {
             expect(mockBlocksForRename.renameNameddos).not.toHaveBeenCalled();
             expect(mockBlocksForRename.palettes.updatePalettes).not.toHaveBeenCalled();
         });
+
+        it("should NOT enforce uniqueness or rewrite label value while user is typing (closeInput is false)", () => {
+            findUniqueActionName.mockReturnValue("Action1");
+            block.value = "Action1";
+            block.label = { value: "Action", style: { display: "" } };
+
+            block._labelChanged(false, true);
+
+            expect(findUniqueActionName).not.toHaveBeenCalled();
+            expect(removeActionPrototype).not.toHaveBeenCalled();
+            expect(block.label.value).toBe("Action");
+        });
+
+        it("should enforce uniqueness and rewrite label value upon commit (closeInput is true)", () => {
+            findUniqueActionName.mockReturnValue("Action1");
+            block.value = "oldAction";
+            block.label = { value: "Action", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(findUniqueActionName).toHaveBeenCalledWith("Action", 1);
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(mockBlocksForRename.activity.errorMsg).toHaveBeenCalled();
+            expect(block.label.value).toBe("Action1");
+            expect(block.value).toBe("Action1");
+        });
+
+        it("should keep label value unchanged upon commit when chosen name is already unique (closeInput is true)", () => {
+            findUniqueActionName.mockReturnValue("ActionUnique");
+            block.value = "oldAction";
+            block.label = { value: "ActionUnique", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(findUniqueActionName).toHaveBeenCalledWith("ActionUnique", 1);
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(mockBlocksForRename.activity.errorMsg).not.toHaveBeenCalled();
+            expect(block.label.value).toBe("ActionUnique");
+            expect(block.value).toBe("ActionUnique");
+        });
+
+        it("should refresh the action palette even when the collision-resolved name equals the original (closeInput is true)", () => {
+            // User had "action1", typed "action" (collides), resolves back to "action1".
+            findUniqueActionName.mockReturnValue("action1");
+            block.value = "action1";
+            block.label = { value: "action", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            // The palette must still refresh because the user intentionally typed a new name.
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+        });
     });
 
     describe("loadThumbnail()", () => {
@@ -771,6 +825,32 @@ describe("Block Foundation", () => {
 
             expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
             expect(block.value).toBe("fallback-cached");
+        });
+
+        it("restores the media placeholder when an empty value has no configured artwork", () => {
+            block.blocks.blockList[0] = block;
+            block.value = null;
+            block.name = "media";
+            block.image = null;
+            block.removeChildBitmap = Block.prototype.removeChildBitmap.bind(block);
+            const selectedThumbnail = { name: "media" };
+            block.container.addChild(selectedThumbnail);
+            block.imageBitmap = selectedThumbnail;
+
+            block.loadThumbnail(null);
+            expect(block.container.children).not.toContain(selectedThumbnail);
+            expect(block.imageBitmap).toBeNull();
+            expect(block.image).toBe("images/load-media.svg");
+            expect(block.updateCache).toHaveBeenCalledTimes(1);
+            expect(mockImageInstance.src).toBe("images/load-media.svg");
+
+            mockImageInstance.onload();
+
+            expect(block.container.children).toHaveLength(1);
+            expect(block.container.children[0]).not.toBe(selectedThumbnail);
+            expect(block.container.children[0].name).toBe("media");
+            expect(block.imageBitmap).toBe(block.container.children[0]);
+            expect(block.updateCache).toHaveBeenCalledTimes(2);
         });
 
         it("records the effective converted value for a user selection", () => {
@@ -1091,6 +1171,45 @@ describe("Block Foundation", () => {
 
             global.FileReader = originalFileReader;
             window.scroll = originalScroll;
+        });
+
+        it.each([
+            ["media", "myMedia"],
+            ["audiofile", "audioInput"],
+            ["loadFile", "myOpenAll"]
+        ])("opens the %s picker on the #%s file input in index.html", (name, inputId) => {
+            const originalDocById = global.docById;
+            const originalScroll = window.scroll;
+            const html = fs.readFileSync(path.join(__dirname, "../../index.html"), "utf8");
+            const page = new DOMParser().parseFromString(html, "text/html");
+            const nodes = [page.getElementById("ioDiv"), page.getElementById("audio")];
+            document.body.append(...nodes);
+            const clicked = [];
+            const clickSpy = jest
+                .spyOn(HTMLElement.prototype, "click")
+                .mockImplementation(function () {
+                    clicked.push(this);
+                });
+            global.docById = jest.fn(id => document.getElementById(id));
+            window.scroll = jest.fn();
+
+            try {
+                const block = new Block(
+                    { ...mockProtoBlock, name, capabilities: Object.create(null) },
+                    mockBlocks
+                );
+                block._doOpenMediaFromDevice(0);
+
+                expect(clicked).toHaveLength(1);
+                expect(clicked[0].id).toBe(inputId);
+                expect(clicked[0].tagName).toBe("INPUT");
+                expect(clicked[0].type).toBe("file");
+            } finally {
+                clickSpy.mockRestore();
+                nodes.forEach(node => node.remove());
+                global.docById = originalDocById;
+                window.scroll = originalScroll;
+            }
         });
     });
 
@@ -1440,6 +1559,7 @@ describe("Block Foundation", () => {
             block._calculateBlockHitArea = jest.fn();
 
             mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.getLongPressStatus = jest.fn().mockReturnValue(false);
             block.activity.closeHelpfulWheel = jest.fn();
             block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
             block.activity.logo.runLogoCommands = jest.fn();
@@ -1478,6 +1598,48 @@ describe("Block Foundation", () => {
             } finally {
                 jest.useRealTimers();
             }
+        });
+
+        it("does not treat a released long press as a regular click", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            const stopImmediatePropagation = jest.fn();
+
+            handlers.click({
+                nativeEvent: { button: 0, stopImmediatePropagation }
+            });
+
+            expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+            expect(block._triggerLongPress).toBe(false);
+            expect(stopImmediatePropagation).toHaveBeenCalled();
+        });
+
+        it("does not run a released long press with Shift held", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            const stopImmediatePropagation = jest.fn();
+
+            handlers.click({
+                nativeEvent: { button: 0, shiftKey: true, stopImmediatePropagation }
+            });
+
+            expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+            expect(mockBlocks.findTopBlock).not.toHaveBeenCalled();
+            expect(block._triggerLongPress).toBe(false);
+            expect(stopImmediatePropagation).toHaveBeenCalled();
+        });
+
+        it("does not move a block after a long press opens the menu", () => {
+            const { block, handlers } = makeClickBlock(false);
+            block._triggerLongPress = true;
+            block.blocks.getLongPressStatus.mockReturnValue(true);
+            block.blocks.moveBlockRelativeBatched = jest.fn();
+
+            handlers.pressmove({
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(block.blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
         });
     });
 
@@ -1987,6 +2149,232 @@ describe("Block Foundation", () => {
             testBlock.container._listeners["pressup"]({});
             expect(testBlocks.clearTimeout).toHaveBeenCalled();
             expect(timerManager.activeTimeoutCount).toBe(0);
+        });
+    });
+
+    describe("Screen Reader Accessibility", () => {
+        let block;
+        let testBlocks;
+
+        beforeEach(() => {
+            document.body.innerHTML = `
+                <div id="canvasContainer">
+                    <canvas id="myCanvas"></canvas>
+                    <div id="accessibleBlocks" class="visually-hidden" role="region" aria-label="Workspace Blocks"></div>
+                </div>
+            `;
+            testBlocks = {
+                activity: {
+                    refreshCanvas: jest.fn(),
+                    closeHelpfulWheel: jest.fn(),
+                    getStageScale: () => 1
+                },
+                blockList: [],
+                highlight: jest.fn(),
+                findTopBlock: jest.fn().mockReturnValue(0),
+                getLongPressStatus: jest.fn().mockReturnValue(false),
+                stageClick: false,
+                selectionModeOn: false
+            };
+            block = new Block(
+                {
+                    name: "forward",
+                    staticLabels: ["forward"],
+                    image: "forward.svg",
+                    size: 1,
+                    docks: [
+                        [0, 0, 0],
+                        [0, 0, 0]
+                    ],
+                    capabilities: {}
+                },
+                testBlocks
+            );
+            block.blockIndex = 0;
+            block.container = {
+                x: 10,
+                y: 20,
+                on: jest.fn(),
+                dispatchEvent: jest.fn(),
+                children: []
+            };
+        });
+
+        afterEach(() => {
+            document.body.innerHTML = "";
+        });
+
+        it("Block.getAccessibleContainer retrieves existing accessible container", () => {
+            const existing = document.getElementById("accessibleBlocks");
+            const container = Block.getAccessibleContainer();
+            expect(container).toBe(existing);
+        });
+
+        it("Block.getAccessibleContainer creates and appends container to canvasContainer when not already present", () => {
+            document.body.innerHTML = '<div id="canvasContainer"></div>';
+            const container = Block.getAccessibleContainer();
+            expect(container).not.toBeNull();
+            expect(container.id).toBe("accessibleBlocks");
+            expect(container.className).toBe("visually-hidden");
+            expect(container.getAttribute("role")).toBe("region");
+            expect(container.getAttribute("aria-label")).toBe("Workspace Blocks");
+            expect(container.parentNode.id).toBe("canvasContainer");
+        });
+
+        it("Block.getAccessibleContainer creates and appends container to document.body when canvasContainer is absent", () => {
+            document.body.innerHTML = "";
+            const container = Block.getAccessibleContainer();
+            expect(container).not.toBeNull();
+            expect(container.id).toBe("accessibleBlocks");
+            expect(container.parentNode).toBe(document.body);
+        });
+
+        it("getAccessibleLabel returns correct descriptive label", () => {
+            expect(block.getAccessibleLabel()).toBe("forward block");
+
+            block.value = 100;
+            expect(block.getAccessibleLabel()).toBe("forward, value: 100");
+        });
+
+        it("getAccessibleLabel uses overrideName when present", () => {
+            block.overrideName = "myCustomFunction";
+            expect(block.getAccessibleLabel()).toBe("myCustomFunction block");
+
+            block.value = 42;
+            expect(block.getAccessibleLabel()).toBe("myCustomFunction, value: 42");
+        });
+
+        it("getAccessibleLabel does not announce data URLs in values", () => {
+            block.value = "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=";
+            expect(block.getAccessibleLabel()).toBe("forward block");
+        });
+
+        it("_setupAccessibleElement creates an off-screen accessible button", () => {
+            const el = block._setupAccessibleElement();
+            expect(el).not.toBeNull();
+            expect(el.getAttribute("role")).toBe("button");
+            expect(el.getAttribute("tabindex")).toBe("0");
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+            expect(el.id).toBe("accessible-block-0");
+        });
+
+        it("activate dispatches synthetic click event to container", () => {
+            block.activate();
+            expect(block.container.dispatchEvent).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "click",
+                    stageX: 60,
+                    stageY: 30
+                })
+            );
+        });
+
+        it("activate scales click coordinates using getStageScale", () => {
+            block.activity = {
+                getStageScale: jest.fn().mockReturnValue(2)
+            };
+            block.activate();
+            expect(block.container.dispatchEvent).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "click",
+                    stageX: 120,
+                    stageY: 60
+                })
+            );
+        });
+
+        it("dispose cleans up accessible element from DOM", () => {
+            block._setupAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).not.toBeNull();
+
+            block.dispose();
+            expect(document.getElementById("accessible-block-0")).toBeNull();
+            expect(block.accessibleElement).toBeNull();
+        });
+
+        it("pressing Enter or Space activates the block", () => {
+            const el = block._setupAccessibleElement();
+            const activateSpy = jest.spyOn(block, "activate");
+
+            const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+            el.dispatchEvent(enterEvent);
+            expect(activateSpy).toHaveBeenCalledTimes(1);
+
+            const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+            el.dispatchEvent(spaceEvent);
+            expect(activateSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("arrow keys navigate between sibling block elements", () => {
+            const block2 = new Block(
+                { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },
+                testBlocks
+            );
+            block2.blockIndex = 1;
+            block2.container = {
+                x: 0,
+                y: 0,
+                on: jest.fn(),
+                dispatchEvent: jest.fn(),
+                children: []
+            };
+
+            const el1 = block._setupAccessibleElement();
+            const el2 = block2._setupAccessibleElement();
+
+            const focusSpy = jest.spyOn(el2, "focus");
+            const downArrowEvent = new KeyboardEvent("keydown", {
+                key: "ArrowDown",
+                bubbles: true
+            });
+            el1.dispatchEvent(downArrowEvent);
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        it("_removeAccessibleElement removes the element from DOM", () => {
+            block._setupAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).not.toBeNull();
+
+            block._removeAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).toBeNull();
+            expect(block.accessibleElement).toBeNull();
+        });
+
+        it("_updateAccessibleElement updates aria-label and id", () => {
+            block._setupAccessibleElement();
+            block.value = 50;
+            block.blockIndex = 2;
+            block._updateAccessibleElement();
+
+            expect(block.accessibleElement.id).toBe("accessible-block-2");
+            expect(block.accessibleElement.getAttribute("aria-label")).toBe("forward, value: 50");
+        });
+
+        it("_toggle_inline adds/removes child accessibility controls on expand/collapse", () => {
+            const childBlock = new Block(
+                { name: "number", staticLabels: ["100"], image: "number.svg", docks: [] },
+                testBlocks
+            );
+            childBlock.blockIndex = 1;
+            childBlock.container = { visible: true };
+            childBlock._setupAccessibleElement = jest.fn();
+            childBlock._removeAccessibleElement = jest.fn();
+
+            testBlocks.blockList = [block, childBlock];
+            testBlocks.dragGroup = [1];
+            testBlocks.insideInlineCollapsibleBlock = jest.fn().mockReturnValue(null);
+            testBlocks.findDragGroup = jest.fn();
+            testBlocks.findNestedClampBlocks = jest.fn();
+            block.connections = [null, 1, null, null];
+            block.activity = { refreshCanvas: jest.fn() };
+
+            // Collapse: should call _removeAccessibleElement
+            block._toggle_inline(0, false);
+            expect(childBlock._removeAccessibleElement).toHaveBeenCalled();
+
+            // Expand: should call _setupAccessibleElement
+            block._toggle_inline(0, true);
+            expect(childBlock._setupAccessibleElement).toHaveBeenCalled();
         });
     });
 });

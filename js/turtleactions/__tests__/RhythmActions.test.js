@@ -18,6 +18,7 @@
  */
 
 const setupRhythmActions = require("../RhythmActions");
+const { getMeasurePosition } = require("../../utils/musicutils-rhythm");
 
 describe("setupRhythmActions", () => {
     let activity;
@@ -27,6 +28,7 @@ describe("setupRhythmActions", () => {
         global._ = msg => msg;
         global.last = arr => arr[arr.length - 1];
         global.TONEBPM = 120;
+        global.getMeasurePosition = getMeasurePosition;
 
         global.Singer = {
             processNote: jest.fn()
@@ -115,6 +117,23 @@ describe("setupRhythmActions", () => {
 
         expect(targetTurtle.singer.currentBeat).toBe(3);
         expect(targetTurtle.singer.currentMeasure).toBe(1);
+    });
+
+    it("dispatches beat events counted from the latest meter change", () => {
+        // Three beats of 3/4, then the first note of 4/4.
+        targetTurtle.singer.notesPlayed = [3, 4];
+        targetTurtle.singer.pickup = 0;
+        targetTurtle.singer.noteValuePerBeat = 4;
+        targetTurtle.singer.beatsPerMeasure = 4;
+        targetTurtle.singer.meterAnchor = { wholeNotes: 0.75, measures: 1 };
+        targetTurtle.singer.beatList = [1];
+        targetTurtle.singer.factorList = [];
+
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
+
+        expect(targetTurtle.singer.currentBeat).toBe(1);
+        expect(targetTurtle.singer.currentMeasure).toBe(2);
+        expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_1_0__");
     });
 
     it("triggers everybeat event when beatList contains 'everybeat'", () => {

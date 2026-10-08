@@ -450,6 +450,20 @@ class Notation {
     }
 
     /**
+     * Marks the start of a section that repeats forever. Nothing follows it,
+     * so the repeat runs to the end of the voice. The drum staff is built
+     * from the drum staging, so the marker goes there too.
+     *
+     * @param turtle
+     * @returns {void}
+     */
+    notationBeginRepeat(turtle) {
+        this._notationStaging[turtle].push("begin repeat");
+        this._notationDrumStaging[turtle].push("begin repeat");
+        this._pickupPoint[turtle] = null;
+    }
+
+    /**
      * Adds a tie.
      *
      * @param turtle

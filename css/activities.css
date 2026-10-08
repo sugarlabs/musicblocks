@@ -104,12 +104,12 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 /* confirm and cancel buttons align horizontally (for newproject dropdown)*/
 #newdropdown .button-row {
-    display: flex;
+    display: flex !important;
     gap: 16px;
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 16px;
+    margin-top: 16px !important;
 }
 
 .new-project-title {
@@ -254,6 +254,12 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     align-items: center;
 }
 
+.plugin-modal-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .plugin-upload-button {
     border: 2px solid var(--color-brand-primary);
     border-radius: 4px;
@@ -357,7 +363,11 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 #search:focus {
     border-color: var(--color-brand-primary-hover);
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
-    outline: none;
+}
+
+#search:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
 }
 
 #search.open {

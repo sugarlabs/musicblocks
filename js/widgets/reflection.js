@@ -43,6 +43,42 @@ class ReflectionMatrix {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static REQUEST_TIMEOUT = 30000;
+    /**
+     * Backend origins the widget may talk to, keyed by host name.
+     *
+     * The hosted site is served over HTTPS, so it has to use its own API origin;
+     * a plain-HTTP backend is blocked there as mixed content. The local servers
+     * are listed for development.
+     *
+     * @type {Object}
+     */
+    static BACKENDS = {
+        "localhost": "http://localhost:8000",
+        "127.0.0.1": "http://127.0.0.1:8000",
+        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org"
+    };
+
+    /**
+     * Resolves the backend origin to send requests to.
+     *
+     * @param {string} [host] - Host name to resolve; defaults to the page host.
+     * @returns {string|null} Backend origin without a trailing slash, or null
+     *     when the host is not one this widget knows a backend for.
+     */
+    static backendURL(host) {
+        const name = host === undefined ? window.location.hostname : host;
+
+        if (Object.prototype.hasOwnProperty.call(ReflectionMatrix.BACKENDS, name)) {
+            return ReflectionMatrix.BACKENDS[name];
+        }
+
+        if (name.endsWith(".musicblocks.sugarlabs.org")) {
+            return "https://api.musicblocks.sugarlabs.org";
+        }
+
+        return null;
+    }
+
     constructor() {
         /**
          * Chat history array to store the conversation
@@ -283,7 +319,7 @@ class ReflectionMatrix {
         this._lifecycle.mount();
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
+        this.PORT = ReflectionMatrix.backendURL();
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -721,9 +757,20 @@ class ReflectionMatrix {
      * Sends JSON to the backend through the shared lifecycle tracker.
      * @param {string} path - Backend path suffix.
      * @param {Object} payload - Request payload.
-     * @returns {Promise<Object|null>}
+     * @returns {Promise<Object|null>} Backend response, or null when no backend
+     *     is configured for this host.
      */
     _postJSON(path, payload) {
+        if (!this.PORT) {
+            this.activity.errorMsg(
+                _(
+                    "Reflection is not available on this host. The backend URL could not be determined."
+                ),
+                3000
+            );
+            return Promise.resolve(null);
+        }
+
         return this._lifecycle.postJSON(
             `${this.PORT}${path}`,
             payload,

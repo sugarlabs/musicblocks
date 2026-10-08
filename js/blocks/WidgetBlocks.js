@@ -385,7 +385,7 @@ function setupWidgetBlocks(activity) {
                 "temperament",
                 _getWidgetDependencies(
                     typeof TemperamentWidget !== "undefined" ? TemperamentWidget : null,
-                    ["widgets/temperament"]
+                    ["widgets/TemperamentUI", "widgets/temperament"]
                 ),
                 () => new TemperamentWidget(),
                 turtle,
@@ -476,6 +476,14 @@ function setupWidgetBlocks(activity) {
                 "sample",
                 _getWidgetDependencies(typeof SampleWidget !== "undefined" ? SampleWidget : null, [
                     "widgets/tuner",
+                    "widgets/SamplerBlocks",
+                    "widgets/SamplerPlayback",
+                    "widgets/SamplerPitch",
+                    "widgets/SamplerFiles",
+                    "widgets/SamplerUI",
+                    "widgets/SamplerPieMenu",
+                    "widgets/SamplerCanvas",
+                    "widgets/SamplerTuner",
                     "widgets/sampler"
                 ]),
                 () => new SampleWidget(),
@@ -921,6 +929,7 @@ function setupWidgetBlocks(activity) {
             logo.inTempo = true;
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
+            logo.tempo.BPMTurtles = [];
 
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
@@ -1402,7 +1411,15 @@ function setupWidgetBlocks(activity) {
                 "pitchStaircase",
                 _getWidgetDependencies(
                     typeof PitchStaircase !== "undefined" ? PitchStaircase : null,
-                    ["widgets/pitchstaircase"]
+                    [
+                        "widgets/PitchStaircaseTimers",
+                        "widgets/PitchStaircaseLayout",
+                        "widgets/PitchStaircaseSteps",
+                        "widgets/PitchStaircasePlayback",
+                        "widgets/PitchStaircaseSave",
+                        "widgets/PitchStaircaseWindow",
+                        "widgets/pitchstaircase"
+                    ]
                 ),
                 () => new PitchStaircase(),
                 turtle,
@@ -2204,6 +2221,14 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "legoWidget",
                 _getWidgetDependencies(typeof LegoWidget !== "undefined" ? LegoWidget : null, [
+                    "widgets/LegoBricksRows",
+                    "widgets/LegoBricksLayout",
+                    "widgets/LegoBricksExport",
+                    "widgets/LegoBricksMedia",
+                    "widgets/LegoBricksEyeDropper",
+                    "widgets/LegoBricksColor",
+                    "widgets/LegoBricksPlayback",
+                    "widgets/LegoBricksVisualization",
                     "widgets/legobricks"
                 ]),
                 () => new LegoWidget(),

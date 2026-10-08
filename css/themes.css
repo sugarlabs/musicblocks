@@ -88,6 +88,35 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     color: var(--color-text-secondary);
 }
 
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton {
+    background-color: var(--color-bg-tertiary);
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.close:hover {
+    background-color: var(--color-error);
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup:hover {
+    background-color: var(--color-success);
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.wftMaxmin:hover {
+    background-color: var(--color-border-primary);
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::before,
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::after,
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::before,
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::after {
+    background-color: var(--color-text-primary);
+}
+
+@media (max-width: 600px) {
+    .dark #floatingWindows > .windowFrame > .wfTopBar .wftButton {
+        background: none;
+    }
+}
+
 .dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
     color: var(--color-text-secondary) !important;
     background-color: var(--color-bg-secondary) !important;
@@ -678,6 +707,10 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     border: 2px solid var(--color-border-primary);
+}
+
+.highcontrast .plugin-modal-actions .confirm-button {
+    border: 2px solid var(--color-brand-primary);
 }
 
 .highcontrast .cancel-button:hover {

@@ -84,7 +84,7 @@ Fixes #
 - [ ] I have followed the project's coding style guidelines.
 - [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
 - [ ] I have addressed the code review feedback from the previous submission, if applicable.
-- [ ] I have enabled **"Allow edits from maintainers"** (required for auto-rebase; affects PR branch only).
+- [ ] I have enabled **"Allow edits from maintainers"** (allows maintainers to assist with rebases or edits; affects PR branch only).
 
 ---
 
