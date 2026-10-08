@@ -139,6 +139,25 @@ describe("Utility Logic Functions", () => {
         it("returns input as is if not a number", () => {
             expect(toFixed2("abc")).toBe("abc");
         });
+
+        it("rounds values whose string form is in exponent notation", () => {
+            // x after `right 90; forward 100` from the origin
+            expect(toFixed2(100 * Math.cos(Math.PI / 2))).toBe("0");
+            expect(toFixed2(0.3 - 0.1 - 0.2)).toBe("0");
+            expect(toFixed2(1.5e-7)).toBe("0");
+        });
+
+        it("shows a small negative value as 0, not -0", () => {
+            expect(toFixed2(-0.004)).toBe("0");
+            expect(toFixed2(-1e-15)).toBe("0");
+            expect(toFixed2(-0.005)).toBe("-0.01");
+        });
+
+        it("keeps integers, including large ones, as they are", () => {
+            expect(toFixed2(-7)).toBe("-7");
+            expect(toFixed2(1e21)).toBe("1e+21");
+            expect(toFixed2(100.001)).toBe("100");
+        });
     });
 
     describe("mixedNumber()", () => {
