@@ -449,6 +449,12 @@ class RhythmRulerCircular {
         const up = this._hitTestCircular(event);
         if (!up) return;
 
+        if (this._tapMode) {
+            const cell = this._rulers[down.rulerIndex].cells[down.cellIndex];
+            this._dissectRuler({ currentTarget: cell }, down.rulerIndex);
+            return;
+        }
+
         // A tie requires both endpoints to be on the same ruler and on
         // different slices; anything else falls through to dissect.
         if (down.rulerIndex === up.rulerIndex && down.cellIndex !== up.cellIndex) {
