@@ -1346,6 +1346,9 @@ function setupWidgetBlocks(activity) {
 
             logo.inMusicKeyboard = true;
             logo.musicKeyboard.blockNo = blk;
+            // The keyboard plays and saves at this turtle's tempo (the turtle itself, not its
+            // index, which shifts when a turtle is removed).
+            logo.musicKeyboard.turtle = activity.turtles.ithTurtle(turtle);
             logo.musicKeyboard.instruments = [];
             logo.musicKeyboard.noteNames = [];
             logo.musicKeyboard.octaves = [];

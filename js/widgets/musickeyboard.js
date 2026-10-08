@@ -859,7 +859,9 @@ function MusicKeyboard(activity) {
          * Beats per minute (BPM) for the MusicKeyboard.
          * @type {number}
          */
-        const tur = this.activity.turtles.ithTurtle(0);
+        // The tempo of the turtle that ran the Music Keyboard block. Not turtle 0: after a
+        // project is loaded, turtle 0 is a trashed turtle of the old project.
+        const tur = this.turtle || this.activity.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
         /**

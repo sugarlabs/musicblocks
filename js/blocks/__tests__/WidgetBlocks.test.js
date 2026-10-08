@@ -601,6 +601,16 @@ describe("setupWidgetBlocks", () => {
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
         });
 
+        it("gives the Music Keyboard the turtle that ran the block (#9337)", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboard = { init: jest.fn() };
+
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk");
+
+            expect(logo.musicKeyboard.turtle).toBe(activity.turtles.ithTurtle(2));
+            expect(logo.musicKeyboard.turtle).not.toBe(activity.turtles.ithTurtle(0));
+        });
+
         it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
             const keyboard = getBlock("musickeyboard");
             logo.musicKeyboard = null;
