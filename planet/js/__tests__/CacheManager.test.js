@@ -318,6 +318,40 @@ describe("IndexedDB CacheManager integration", () => {
             expect(await cacheManager.getMetadata("proj-delete")).toBeNull();
         });
 
+        it("should not return invalidated metadata when deletion fails", async () => {
+            const metadata = { name: "Stale Project" };
+
+            await cacheManager.cacheMetadata("proj-stale", metadata);
+            expect(await cacheManager.getMetadata("proj-stale")).toEqual(metadata);
+
+            const originalTransaction = cacheManager.db.transaction;
+            cacheManager.db.transaction = jest.fn(() => {
+                throw new Error("Delete failed");
+            });
+
+            const deleted = await cacheManager.deleteMetadata("proj-stale");
+
+            expect(deleted).toBe(false);
+            expect(cacheManager.invalidatedMetadataIds.has("proj-stale")).toBe(true);
+
+            cacheManager.db.transaction = originalTransaction;
+
+            expect(await cacheManager.getMetadata("proj-stale")).toBeNull();
+        });
+
+        it("should clear metadata invalidation after successfully caching fresh metadata", async () => {
+            cacheManager.invalidatedMetadataIds.add("proj-fresh");
+
+            await cacheManager.cacheMetadata("proj-fresh", {
+                name: "Fresh Project"
+            });
+
+            expect(cacheManager.invalidatedMetadataIds.has("proj-fresh")).toBe(false);
+            expect(await cacheManager.getMetadata("proj-fresh")).toEqual({
+                name: "Fresh Project"
+            });
+        });
+
         test("returns null for unknown id", async () => {
             expect(await cacheManager.getMetadata("nonexistent")).toBeNull();
         });
