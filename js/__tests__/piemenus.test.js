@@ -21,9 +21,6 @@ const {
     piemenuColor,
     piemenuBoolean,
     piemenuModes,
-    piemenuNoteValue,
-    piemenuColor,
-    piemenuCustomNotes
     piemenuVoices,
     piemenuBasic,
     piemenuDissectNumber,

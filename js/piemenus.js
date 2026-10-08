@@ -4603,10 +4603,6 @@ if (typeof module !== "undefined" && module.exports) {
         dismissActivePieMenu,
         showWheelDiv,
         hideWheelDiv,
-        syncKeySignatureBlocks,
-        piemenuNoteValue,
-        piemenuColor,
-        piemenuCustomNotes
         handleWheelResize,
         debouncedSetWheelSize,
         syncKeySignatureBlocks
