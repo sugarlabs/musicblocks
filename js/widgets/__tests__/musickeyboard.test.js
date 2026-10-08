@@ -1244,6 +1244,18 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             return cell ? cell.textContent : undefined;
         };
 
+        const recordedNote = (keyboard, blockNumber, noteOctave, startTime = 0) => {
+            const row = keyboard.displayLayout.find(item => item.blockNumber === blockNumber);
+            return {
+                startTime,
+                noteOctave,
+                objId: row.objId,
+                duration: 0.25,
+                voice: row.voice,
+                blockNumber
+            };
+        };
+
         const editPitch = (keyboard, blockNumber, pitch, accidental, octave) => {
             const index = keyboard.displayLayout.findIndex(k => k.blockNumber === blockNumber);
             keyboard._createColumnPieSubmenu(
@@ -1260,6 +1272,35 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             keyboard._exitWheel.navItems[0].navigateFunction();
         };
 
+        test.each(["la", "hertz"])(
+            "keeps an added %s row when another row is edited",
+            addedName => {
+                const keyboard = initKeyboard(["do", "sol", addedName]);
+                keyboard.noteNames.pop();
+                keyboard.octaves.pop();
+                keyboard.instruments.pop();
+                keyboard._syncLayouts();
+
+                editPitch(keyboard, 44, "re", "♮", 4);
+
+                const row = keyboard.displayLayout.find(item => item.blockNumber === 50);
+                expect(row).toMatchObject({ noteOctave: 4, voice: "guitar" });
+                const sourceIndex = keyboard._rowBlocks.indexOf(50);
+                expect(keyboard.noteNames[sourceIndex]).toBe(addedName);
+                expect(keyboard.octaves[sourceIndex]).toBe(4);
+                expect(keyboard.instruments[sourceIndex]).toBe("guitar");
+                expect(keyLabelFor(50)).toBeDefined();
+                if (addedName === "la") {
+                    editPitch(keyboard, 50, "ti", "♮", 5);
+                    expect(
+                        keyboard.noteMapper[
+                            keyboard.displayLayout.find(item => item.blockNumber === 50).objId
+                        ]
+                    ).toBe("B5");
+                }
+            }
+        );
+
         test.each([
             ["la", "♯", 4, "la♯", "A#4"],
             ["re", "♭", 5, "re♭", "Db5"],
@@ -1268,24 +1309,9 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             "persists a row edit to %s%s%s in recorded notes and piano keys",
             (pitch, accidental, octave, value, note) => {
                 const keyboard = initKeyboard(["do", "sol"]);
-                const recordedKey = keyboard.displayLayout.find(k => k.blockNumber === 47);
                 keyboard._notesPlayed = [
-                    {
-                        startTime: 0,
-                        noteOctave: "G4",
-                        objId: recordedKey.objId,
-                        duration: 0.25,
-                        voice: "guitar",
-                        blockNumber: 47
-                    },
-                    {
-                        startTime: 1000,
-                        noteOctave: "C4",
-                        objId: "whiteRow0",
-                        duration: 0.5,
-                        voice: "guitar",
-                        blockNumber: 44
-                    }
+                    recordedNote(keyboard, 47, "G4"),
+                    recordedNote(keyboard, 44, "C4", 1000)
                 ];
 
                 editPitch(keyboard, 47, pitch, accidental, octave);
@@ -1313,16 +1339,7 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         test("keeps recorded padding notes attached to their pitches after a row edit", () => {
             const keyboard = initKeyboard(["do", "sol"]);
             const padding = keyboard.displayLayout.find(k => k.noteName === "D");
-            keyboard._notesPlayed = [
-                {
-                    startTime: 0,
-                    noteOctave: "D4",
-                    objId: padding.objId,
-                    duration: 0.25,
-                    voice: "guitar",
-                    blockNumber: padding.blockNumber
-                }
-            ];
+            keyboard._notesPlayed = [recordedNote(keyboard, padding.blockNumber, "D4")];
 
             editPitch(keyboard, 47, "la", "♯", 4);
 
@@ -1340,17 +1357,7 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             jest.spyOn(keyboard, "_setWidgetTimeout").mockImplementation(callback => {
                 pending.push(callback);
             });
-            const row = keyboard.displayLayout.find(k => k.blockNumber === 47);
-            keyboard._notesPlayed = [
-                {
-                    startTime: 0,
-                    noteOctave: "G4",
-                    objId: row.objId,
-                    duration: 0.25,
-                    voice: "guitar",
-                    blockNumber: 47
-                }
-            ];
+            keyboard._notesPlayed = [recordedNote(keyboard, 47, "G4")];
 
             editPitch(keyboard, 47, "do", "♮", 4);
 
@@ -1374,17 +1381,7 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
 
         test("updates recorded frequencies and Hertz keys", () => {
             const keyboard = initKeyboard(["hertz"]);
-            const row = keyboard.displayLayout[0];
-            keyboard._notesPlayed = [
-                {
-                    startTime: 0,
-                    noteOctave: 4,
-                    objId: row.objId,
-                    duration: 0.25,
-                    voice: "guitar",
-                    blockNumber: 44
-                }
-            ];
+            keyboard._notesPlayed = [recordedNote(keyboard, 44, 4)];
             keyboard._createColumnPieSubmenu(0, "synthsblocks");
             keyboard._pitchWheel.navItems[0].title = "392";
             keyboard._pitchWheel.selectedNavItemIndex = 0;

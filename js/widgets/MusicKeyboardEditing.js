@@ -738,6 +738,14 @@ const MusicKeyboardEditing = {
             }
         };
 
+        const syncRowSources = () => {
+            const rows = this.layout.filter(item => item.blockNumber < FAKEBLOCKNUMBER);
+            this.noteNames = rows.map(item => item.noteName);
+            this.octaves = rows.map(item => item.noteOctave);
+            this.instruments = rows.map(item => item.voice);
+            this._rowBlocks = rows.map(item => item.blockNumber);
+        };
+
         /**
          * Synchronizes this.layout and this.displayLayout, ensuring all notes
          * are aligned, gap-filled, and that real note blocks preserve their
@@ -781,6 +789,7 @@ const MusicKeyboardEditing = {
                 }
                 return { ...note };
             });
+            syncRowSources();
         };
 
         /**
@@ -1098,11 +1107,7 @@ const MusicKeyboardEditing = {
                 }
                 if (changed) {
                     this.displayLayout = this._keysLayout();
-                    const rows = this.layout.filter(item => item.blockNumber < FAKEBLOCKNUMBER);
-                    this.noteNames = rows.map(item => item.noteName);
-                    this.octaves = rows.map(item => item.noteOctave);
-                    this.instruments = rows.map(item => item.voice);
-                    this._rowBlocks = rows.map(item => item.blockNumber);
+                    syncRowSources();
                     this._createKeyboard();
                     for (const note of this._notesPlayed) {
                         const row =
