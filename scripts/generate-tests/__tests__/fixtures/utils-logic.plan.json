@@ -677,7 +677,7 @@
       "isGenerator": false,
       "returns": 3,
       "throws": 0,
-      "branches": 2
+      "branches": 3
     },
     {
       "name": "toFraction",
@@ -1004,7 +1004,7 @@
     }
   ],
   "totals": {
-    "branches": 202,
+    "branches": 203,
     "returns": 107,
     "throws": 0
   }
