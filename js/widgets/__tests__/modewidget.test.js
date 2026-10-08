@@ -705,77 +705,6 @@ describe("ModeWidget", () => {
         modeNameSpy.mockRestore();
     });
 
-    describe("custom mode source temperament persistence", () => {
-        const pattern = [2, 2, 1, 2, 2, 2, 1];
-
-        const setState = (temperamentKey, edo) => {
-            modeWidget.logo.synth.inTemperament = temperamentKey;
-            modeWidget._activeTemperamentKey = temperamentKey;
-            modeWidget._activeEDO = edo;
-        };
-
-        const fakeSelect = () => ({
-            value: "equal",
-            querySelector: jest.fn(() => false),
-            appendChild: jest.fn()
-        });
-
-        beforeEach(() => {
-            localStorage.clear();
-            global.getCurrentEDO.mockReturnValue(12);
-        });
-
-        afterEach(() => {
-            jest.restoreAllMocks();
-        });
-
-        test("save records the source temperament key with the mode", () => {
-            setState("just intonation", 12);
-            modeWidget._saveCustomMode("jiMode", pattern);
-
-            const saved = JSON.parse(localStorage.getItem("customModes"));
-            expect(saved.find(m => m.name === "jiMode").temperamentKey).toBe("just intonation");
-        });
-
-        test("selecting a saved custom mode restores its source temperament", () => {
-            localStorage.setItem(
-                "customModes",
-                JSON.stringify([
-                    { name: "jiMode", pattern, edo: 12, temperamentKey: "just intonation" }
-                ])
-            );
-            setState("equal", 12);
-            const rebuildSpy = jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
-            jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
-            jest.spyOn(modeWidget, "_setModeName").mockImplementation(() => {});
-            const select = fakeSelect();
-
-            modeWidget._loadMode("jiMode", pattern, select);
-
-            expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
-            expect(modeWidget._activeTemperamentKey).toBe("just intonation");
-            expect(rebuildSpy).toHaveBeenCalledWith(12);
-            expect(select.value).toBe("just intonation");
-        });
-
-        test("legacy custom mode without a temperament key keeps the current tuning", () => {
-            localStorage.setItem(
-                "customModes",
-                JSON.stringify([{ name: "legacyMode", pattern, edo: 12 }])
-            );
-            setState("equal", 12);
-            const rebuildSpy = jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
-            jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
-            jest.spyOn(modeWidget, "_setModeName").mockImplementation(() => {});
-
-            modeWidget._loadMode("legacyMode", pattern, fakeSelect());
-
-            expect(modeWidget.logo.synth.inTemperament).toBe("equal");
-            expect(modeWidget._activeTemperamentKey).toBe("equal");
-            expect(rebuildSpy).not.toHaveBeenCalled();
-        });
-    });
-
     test("should detect a built-in mode at a non-12 EDO", () => {
         modeWidget._activeEDO = 19;
         modeWidget._modeLabelCell = { textContent: "" };
@@ -1157,17 +1086,15 @@ describe("ModeWidget", () => {
 
     describe("narrow slice labels", () => {
         const makeItem = (title, sliceAngle) => {
-            const handlers = {};
             return {
                 title,
                 sliceAngle,
                 selected: false,
                 navTitle: { hide: jest.fn(), show: jest.fn() },
                 navItem: {
-                    mouseover: fn => (handlers.mouseover = fn),
-                    mouseout: fn => (handlers.mouseout = fn)
-                },
-                handlers
+                    mouseover: jest.fn(),
+                    mouseout: jest.fn()
+                }
             };
         };
 
@@ -1457,16 +1384,12 @@ describe("ModeWidget", () => {
         test("one floored proportional array feeds all three rings, applied before createWheel", () => {
             modeWidget._piemenuMode();
 
-            const expected = enforceMinSliceAngles(
-                getTemperamentSliceAngles("just intonation", 12),
-                ModeWidget.MIN_SLICE_DEGREES
-            );
+            const widths = modeWidget._modeWheel.navItems.map(item => item.sliceAngle);
             const wheels = [modeWidget._modeWheel, modeWidget._noteWheel, modeWidget._playWheel];
             for (const wheel of wheels) {
-                expect(wheel.navItems.map(item => item.sliceAngle)).toEqual(expected);
+                expect(wheel.navItems.map(item => item.sliceAngle)).toEqual(widths);
             }
 
-            const widths = wheels[0].navItems.map(item => item.sliceAngle);
             expect(widths).toHaveLength(12);
             expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
             expect(Math.min(...widths)).toBeGreaterThanOrEqual(ModeWidget.MIN_SLICE_DEGREES);

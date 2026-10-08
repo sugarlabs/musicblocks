@@ -36,7 +36,8 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsTemperament =
         (typeof window !== "undefined" && window.MusicUtilsTemperament) ||
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
-    var { getTemperament, getTemperamentRatio, isEquallyTempered } = MusicUtilsTemperament;
+    var { getTemperament, getTemperamentRatio, isEquallyTempered, ratioToWheelAngle } =
+        MusicUtilsTemperament;
 }
 
 /** Custom modes saved by the mode widget; corrupt data yields []. */
@@ -121,23 +122,16 @@ var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
  * pitch up to the octave. Ratios must ascend within one octave and carry no
  * trailing octave; anything else yields null instead of shuffled slices.
  * @param {number[]} ratios - One ratio per slice, WITHOUT a trailing octave.
- * @param {number} [octaveRatio=2] - Ratio of the octave; missing or <= 1 means 2.
+ * @param {number} [octaveRatio=2] - Ratio of the octave.
  * @returns {number[]|null} Angles summing to 360, or null for unusable input.
  */
 var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
     if (!Array.isArray(ratios) || ratios.length < 2) {
         return null;
     }
-    if (!Number.isFinite(octaveRatio) || octaveRatio <= 1) {
-        octaveRatio = 2;
-    }
-    if (ratios.some(r => !Number.isFinite(r) || r <= 0)) {
-        return null;
-    }
 
     const pitchCount = ratios.length;
-    const logOctave = Math.log2(octaveRatio);
-    const positions = ratios.map(r => (360 * Math.log2(r)) / logOctave);
+    const positions = ratios.map(r => ratioToWheelAngle(r, octaveRatio) - 270);
     // Separate variable, not an in-place -= 360: sliceAngle[n-1] also reads
     // positions[n-1], so mutating it would corrupt the last slice.
     const wrappedRoot = positions[pitchCount - 1] - 360;
@@ -167,11 +161,7 @@ var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
     if (!entry || !Array.isArray(entry.ratios)) {
         return null;
     }
-    // Temperament entries may carry a trailing octave (modewidget._ensureTempKey
-    // builds ratios of length pitchNumber + 1, ending on the octave). Tolerate
-    // exactly that one extra entry, but bail on anything longer -- a blind
-    // slice(0, pitchCount) would silently truncate an over-long table instead.
-    if (entry.ratios.length !== pitchCount && entry.ratios.length !== pitchCount + 1) {
+    if (entry.ratios.length !== pitchCount) {
         return null;
     }
     if (isEquallyTempered(temperamentKey)) {
@@ -195,12 +185,7 @@ var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
  * @returns {number[]|null} New widths summing to 360, or null (bad input).
  */
 var enforceMinSliceAngles = (sliceAngles, minDegrees) => {
-    if (
-        !Array.isArray(sliceAngles) ||
-        sliceAngles.length === 0 ||
-        !Number.isFinite(minDegrees) ||
-        !sliceAngles.every(Number.isFinite)
-    ) {
+    if (!Array.isArray(sliceAngles) || sliceAngles.length === 0) {
         return null;
     }
     // A floor above 360/n could not be honoured for every slice, so clamp it.

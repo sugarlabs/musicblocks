@@ -450,15 +450,11 @@ const TemperamentUI = {
         // angle[pitchNumber] is the octave (ratios[pitchNumber] === powerBase),
         // so this tiles the circle exactly once.
         tw.wheel.navAngle = 270 + (angle[1] - angle[0]) / 2;
-        // Unequal widths must accumulate; without this wheelnav spaces every
-        // slice at a uniform 360/pitchNumber and only offsets the half-width,
-        // leaving the tick marks between the pitches.
-        tw.wheel.navItemsContinuous = true;
         tw.wheel.initWheel(minutes);
+        const widths = angle.slice(0, pitchNumber).map((a, i) => angle[i + 1] - a);
+        applySliceAngles(tw.wheel, widths);
         for (let i = 0; i < pitchNumber; i++) {
-            const sliceWidth = angle[i + 1] - angle[i];
-            tw.wheel.navItems[i].sliceAngle = sliceWidth;
-            angle1[i] = angle[i] + sliceWidth / 2;
+            angle1[i] = angle[i] + widths[i] / 2;
         }
         tw.wheel.createWheel();
         docById("wheelDiv3").style.position = "absolute";
