@@ -1756,6 +1756,78 @@ describe("Blocks Foundation", () => {
             });
         });
 
+        // Merging a project whose actions use the default names "action" and
+        // "action1" into a workspace that already has an "action" renames the
+        // incoming ones to "action1" and "action11". Each do block must follow
+        // the action it called, and not be renamed twice along the way.
+        describe("action renames when merging", () => {
+            const merge = project => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [
+                    { name: "action", trash: false, connections: [null, 1, null, null] },
+                    { name: "text", value: "action", trash: false, connections: [0] }
+                ];
+                blocks.protoBlockDict = {};
+                for (const name of ["start", "action", "text", "nameddo", "do"]) {
+                    blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
+                }
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+                mockActivity._suppressRefresh = true;
+                blocks.loadNewBlocks(project);
+                return project;
+            };
+
+            const actionsNamedByDefault = () => [
+                [0, ["action", { collapsed: false }], 0, 0, [null, 1, null, null]],
+                [1, ["text", { value: "action" }], 0, 0, [0]],
+                [2, ["action", { collapsed: false }], 0, 0, [null, 3, null, null]],
+                [3, ["text", { value: "action1" }], 0, 0, [2]]
+            ];
+
+            it("keeps each nameddo block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, ["nameddo", { value: "action" }], 0, 0, [4, 6]]);
+                project.push([6, ["nameddo", { value: "action1" }], 0, 0, [5, null]]);
+
+                merge(project);
+
+                expect(project[1][1][1]).toEqual({ value: "action1" });
+                expect(project[3][1][1]).toEqual({ value: "action11" });
+                expect(project[5][1][1]).toEqual({ value: "action1" });
+                expect(project[6][1][1]).toEqual({ value: "action11" });
+            });
+
+            it("keeps each do block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, 7]]);
+                project.push([6, ["text", { value: "action" }], 0, 0, [5]]);
+                project.push([7, "do", 0, 0, [5, 8, null]]);
+                project.push([8, ["text", { value: "action1" }], 0, 0, [7]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+                expect(project[8][1][1]).toEqual({ value: "action11" });
+            });
+
+            it("leaves do blocks alone when no action is renamed", () => {
+                const project = [
+                    [0, ["action", { collapsed: false }], 0, 0, [null, 1, null, null]],
+                    [1, ["text", { value: "chorus" }], 0, 0, [0]],
+                    [2, "start", 0, 0, [null, 3, null]],
+                    [3, ["nameddo", { value: "chorus" }], 0, 0, [2, null]]
+                ];
+
+                merge(project);
+
+                expect(project[1][1][1]).toEqual({ value: "chorus" });
+                expect(project[3][1][1]).toEqual({ value: "chorus" });
+            });
+        });
+
         it("accepts valid parent-child stacks without false cycle detection", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
