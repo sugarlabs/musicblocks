@@ -48,6 +48,7 @@ describe("ServerInterface", () => {
             init: jest.fn().mockResolvedValue(true),
             getMetadata: jest.fn().mockResolvedValue(null),
             cacheMetadata: jest.fn().mockResolvedValue(true),
+            deleteMetadata: jest.fn().mockResolvedValue(true),
             getProject: jest.fn().mockResolvedValue(null),
             cacheProject: jest.fn().mockResolvedValue(true),
             clearAll: jest.fn().mockResolvedValue(true),
@@ -194,7 +195,7 @@ describe("ServerInterface", () => {
         });
     });
 
-    it("returns PROJECT_NOT_FOUND when project details respond with 404", async () => {
+    it("returns PROJECT_NOT_FOUND and invalidates cached metadata when project details respond with 404", async () => {
         jest.spyOn(server, "_get").mockResolvedValue({
             __httpError: true,
             status: 404
@@ -204,6 +205,7 @@ describe("ServerInterface", () => {
 
         await server.getProjectDetails("missing-project", callback);
 
+        expect(server.cacheManager.deleteMetadata).toHaveBeenCalledWith("missing-project");
         expect(callback).toHaveBeenCalledWith({
             success: false,
             error: "PROJECT_NOT_FOUND"
