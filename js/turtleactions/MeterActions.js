@@ -153,6 +153,12 @@ function setupMeterActions(activity) {
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
+            // Guard: reject non-finite and non-positive BPM values before any
+            // arithmetic.
+            if (!Number.isFinite(bpm) || bpm <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
             const _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
             if (_bpm < 30) {

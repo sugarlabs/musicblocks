@@ -217,6 +217,21 @@ describe("setupMeterActions", () => {
             expect(Singer.masterBPM).toBe(expected);
             if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
         });
+        test.each([
+            ["NaN", NaN],
+            ["zero", 0],
+            ["negative", -60],
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity]
+        ])("setMasterBPM(%s) shows an error and does not mutate masterBPM", (label, badBpm) => {
+            activity.errorMsg.mockClear();
+            const masterBpmBefore = Singer.masterBPM;
+            const factorBefore = Singer.defaultBPMFactor;
+            Singer.MeterActions.setMasterBPM(badBpm, 0.25, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
+            expect(Singer.masterBPM).toBe(masterBpmBefore);
+            expect(Singer.defaultBPMFactor).toBe(factorBefore);
+        });
     });
 
     it("should set a listener for every beat", () => {
