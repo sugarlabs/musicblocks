@@ -142,8 +142,20 @@ function setupEnsembleBlocks(activity) {
                     }
 
                     a = Math.floor(a);
+                    const heapLen = logo.turtleHeaps[i].length;
 
-                    if (a < 1) {
+                    if (a < 0) {
+                        if (heapLen === 0) {
+                            activity.errorMsg(_("empty heap"));
+                            return 0;
+                        }
+                        if (-a <= heapLen) {
+                            a = heapLen + a + 1;
+                        } else {
+                            a = 1;
+                            activity.errorMsg(_("Index must be > 0."));
+                        }
+                    } else if (a < 1) {
                         a = 1;
                         activity.errorMsg(_("Index must be > 0."));
                     }

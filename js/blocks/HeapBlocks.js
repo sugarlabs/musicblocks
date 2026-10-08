@@ -476,19 +476,23 @@ function setupHeapBlocks(activity) {
                     logo.turtleHeaps[turtle] = [];
                 }
 
-                if (a === -1) {
-                    // -1 to access the top of the heap
-                    if (logo.turtleHeaps[turtle].length === 0) {
+                a = Math.floor(a);
+                const heapLen = logo.turtleHeaps[turtle].length;
+
+                if (a < 0) {
+                    if (heapLen === 0) {
                         activity.errorMsg(_("empty heap"));
                         return 0;
                     }
-                    a = logo.turtleHeaps[turtle].length;
-                } else {
-                    a = Math.floor(a);
-                    if (a < 1) {
+                    if (-a <= heapLen) {
+                        a = heapLen + a + 1;
+                    } else {
                         a = 1;
                         activity.errorMsg(_("Index must be > 0."));
                     }
+                } else if (a < 1) {
+                    a = 1;
+                    activity.errorMsg(_("Index must be > 0."));
                 }
 
                 if (a > 1000) {
@@ -585,7 +589,10 @@ function setupHeapBlocks(activity) {
             }
 
             let idx = Math.floor(args[0]);
-            if (idx < 1) {
+            const heapLen = logo.turtleHeaps[turtle].length;
+            if (idx < 0 && -idx <= heapLen) {
+                idx = heapLen + idx + 1;
+            } else if (idx < 1) {
                 activity.errorMsg(_("Index must be > 0."));
                 idx = 1;
             }
