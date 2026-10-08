@@ -599,6 +599,8 @@ class ServerInterface {
             const response = await this._get(`/project/${encodeURIComponent(repoName)}`, true);
 
             if (response?.__httpError && response.status === 404) {
+                await this.cacheManager.deleteMetadata(repoName);
+
                 callback({
                     success: false,
                     error: "PROJECT_NOT_FOUND"

@@ -149,6 +149,13 @@ describe("CacheManager", () => {
         });
     });
 
+    describe("deleteMetadata before init", () => {
+        it("should return false if not initialized", async () => {
+            const result = await cacheManager.deleteMetadata("test-id");
+            expect(result).toBe(false);
+        });
+    });
+
     describe("cacheProject before init", () => {
         it("should return false if not initialized", async () => {
             const result = await cacheManager.cacheProject("test-id", { data: "test" });
@@ -296,6 +303,19 @@ describe("IndexedDB CacheManager integration", () => {
             const metadata = { name: "Project A", author: "ABC" };
             await cacheManager.cacheMetadata("proj-1", metadata);
             expect(await cacheManager.getMetadata("proj-1")).toEqual(metadata);
+        });
+
+        it("should delete cached metadata", async () => {
+            const metadata = { name: "Test Project" };
+
+            await cacheManager.cacheMetadata("proj-delete", metadata);
+
+            expect(await cacheManager.getMetadata("proj-delete")).toEqual(metadata);
+
+            const deleted = await cacheManager.deleteMetadata("proj-delete");
+
+            expect(deleted).toBe(true);
+            expect(await cacheManager.getMetadata("proj-delete")).toBeNull();
         });
 
         test("returns null for unknown id", async () => {

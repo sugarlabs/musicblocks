@@ -184,6 +184,32 @@ class CacheManager {
     }
 
     /**
+     * Deletes cached project metadata
+     * @param {string} id - Project ID
+     * @returns {Promise<boolean>}
+     */
+    async deleteMetadata(id) {
+        if (!this.isInitialized) return false;
+
+        try {
+            await new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.STORES.METADATA], "readwrite");
+                const store = transaction.objectStore(this.STORES.METADATA);
+
+                store.delete(id);
+
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+
+            return true;
+        } catch (error) {
+            cacheDebugLog("[CacheManager] Error deleting metadata:", error);
+            return false;
+        }
+    }
+
+    /**
      * Gets full project data from cache
      * @param {string} id - Project ID
      * @param {string} [expectedUpdatedAt] - Optional expected updatedAt version to validate against
