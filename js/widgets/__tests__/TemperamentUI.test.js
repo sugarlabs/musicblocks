@@ -356,9 +356,10 @@ describe("TemperamentUI module", () => {
         TemperamentUI.createOuterWheel(mockTW, [1, 2], 2);
         expect(mockTW.wheel).toBeDefined();
         expect(mockTW.wheel.initWheel).toHaveBeenCalledWith(["|", "|"]);
-        // Degenerate [1, 2] fixture: slice i spans pitch i..i+1 with no
-        // trailing-octave ratio, so the first slice covers the full 360 deg.
-        expect(mockTW.wheel.navItems[0].sliceAngle).toBe(360);
+        // Degenerate [1, 2] fixture: the synthesized octave endpoint yields
+        // widths [360, 0], so the positive-finite guard skips explicit angles
+        // and the wheel keeps its equal-slice default (mock init value).
+        expect(mockTW.wheel.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel.createWheel).toHaveBeenCalled();
     });
 
@@ -1031,6 +1032,33 @@ describe("TemperamentUI module", () => {
             expect(widths[0]).toBeCloseTo(210.5865, 3);
             expect(widths[1]).toBeCloseTo(80.0613, 3);
             expect(widths[2]).toBeCloseTo(69.3522, 3);
+        });
+
+        test("octave-short ratio array synthesizes the octave endpoint", () => {
+            mockTW.ratios = [1, 1.5, 1.75];
+            mockTW.pitchNumber = 3;
+            mockTW.powerBase = 2;
+
+            TemperamentUI.arbitraryEdit(mockTW);
+
+            expect(mockTW.wheel.navItems).toHaveLength(3);
+            const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
+            expect(widths.every(w => Number.isFinite(w))).toBe(true);
+            expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
+            expect(widths[0]).toBeCloseTo(210.5865, 3);
+            expect(widths[1]).toBeCloseTo(80.0613, 3);
+            expect(widths[2]).toBeCloseTo(69.3522, 3);
+        });
+
+        test("non-positive widths keep the equal-slice default", () => {
+            mockTW.ratios = [1, 1.75, 1.5, 2];
+            mockTW.pitchNumber = 3;
+            mockTW.powerBase = 2;
+
+            TemperamentUI.arbitraryEdit(mockTW);
+
+            expect(mockTW.wheel.navItemsContinuous).toBe(false);
+            expect(mockTW.wheel.navItems.map(item => item.sliceAngle)).toEqual([0, 0, 0]);
         });
     });
 

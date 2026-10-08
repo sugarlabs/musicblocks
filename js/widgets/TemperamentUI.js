@@ -445,16 +445,23 @@ const TemperamentUI = {
             // Change angles of outer circle
             angle[i] = ratioToWheelAngle(ratios[i], tw.powerBase);
         }
+        if (!Number.isFinite(angle[pitchNumber])) {
+            // Octave-short ratio array: the octave sits one full turn above the root.
+            angle[pitchNumber] = angle[0] + 360;
+        }
 
         // Tick marks sit between pitches, so slice i spans pitch i..pitch i+1.
-        // angle[pitchNumber] is the octave (ratios[pitchNumber] === powerBase),
-        // so this tiles the circle exactly once.
+        // angle[pitchNumber] is the octave (ratios[pitchNumber] === powerBase,
+        // synthesized above when the array is octave-short), so this tiles
+        // the circle exactly once.
         tw.wheel.navAngle = 270 + (angle[1] - angle[0]) / 2;
         tw.wheel.initWheel(minutes);
         const widths = angle.slice(0, pitchNumber).map((a, i) => angle[i + 1] - a);
-        applySliceAngles(tw.wheel, widths);
-        for (let i = 0; i < pitchNumber; i++) {
-            angle1[i] = angle[i] + widths[i] / 2;
+        if (widths.every(w => Number.isFinite(w) && w > 0)) {
+            applySliceAngles(tw.wheel, widths);
+            for (let i = 0; i < pitchNumber; i++) {
+                angle1[i] = angle[i] + widths[i] / 2;
+            }
         }
         tw.wheel.createWheel();
         docById("wheelDiv3").style.position = "absolute";
@@ -548,7 +555,15 @@ const TemperamentUI = {
                 };
                 docById("done").onclick = function () {
                     tw.tempRatios1 = tw.tempRatios.slice();
-                    const pn = tw.tempRatios1.length;
+                    // tempRatios1 carries a trailing octave entry; the wheel
+                    // pitch count excludes it.
+                    const last = tw.tempRatios1[tw.tempRatios1.length - 1];
+                    const pn =
+                        tw.tempRatios1.length > 1 &&
+                        Number.isFinite(last) &&
+                        Math.abs(last - tw.powerBase) < 1e-6
+                            ? tw.tempRatios1.length - 1
+                            : tw.tempRatios1.length;
                     TemperamentUI.createOuterWheel(tw, tw.tempRatios1, pn);
                 };
                 docById("close").onclick = function () {
