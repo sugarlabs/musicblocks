@@ -603,12 +603,37 @@ describe("setupWidgetBlocks", () => {
 
         it("gives the Music Keyboard the turtle that ran the block (#9337)", () => {
             const keyboard = getBlock("musickeyboard");
-            logo.musicKeyboard = { init: jest.fn() };
+            let turtleAtInit = null;
+            logo.musicKeyboard = {
+                init: jest.fn(() => {
+                    turtleAtInit = logo.musicKeyboard.turtle;
+                })
+            };
 
             keyboard.flow(["childBlk"], logo, 2, "kbdBlk");
+            logo.setTurtleListener.mock.calls[0][2]();
 
-            expect(logo.musicKeyboard.turtle).toBe(activity.turtles.ithTurtle(2));
-            expect(logo.musicKeyboard.turtle).not.toBe(activity.turtles.ithTurtle(0));
+            expect(turtleAtInit).toBe(activity.turtles.ithTurtle(2));
+            expect(turtleAtInit).not.toBe(activity.turtles.ithTurtle(0));
+        });
+
+        it("opens each turtle's Music Keyboard with that turtle, whatever ran in between", () => {
+            const keyboard = getBlock("musickeyboard");
+            const turtlesAtInit = [];
+            logo.musicKeyboard = {
+                init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboard.turtle))
+            };
+
+            // Two turtles run Music Keyboard blocks before either listener fires.
+            keyboard.flow(["childBlk"], logo, 1, "kbdBlk1");
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk2");
+            logo.setTurtleListener.mock.calls[0][2]();
+            logo.setTurtleListener.mock.calls[1][2]();
+
+            // toBe: the mock turtles look alike, so only identity tells them apart.
+            expect(turtlesAtInit).toHaveLength(2);
+            expect(turtlesAtInit[0]).toBe(activity.turtles.ithTurtle(1));
+            expect(turtlesAtInit[1]).toBe(activity.turtles.ithTurtle(2));
         });
 
         it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
