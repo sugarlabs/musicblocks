@@ -709,6 +709,10 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     border: 2px solid var(--color-border-primary);
 }
 
+.highcontrast .plugin-modal-actions .confirm-button {
+    border: 2px solid var(--color-brand-primary);
+}
+
 .highcontrast .cancel-button:hover {
     background-color: var(--color-brand-secondary);
     color: var(--color-text-inverse);

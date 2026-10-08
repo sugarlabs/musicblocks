@@ -154,7 +154,7 @@ global.TemperamentWidget = jest.fn(() => ({
     scale: null,
     init: jest.fn()
 }));
-global.TemperamentWidget.dependencies = ["widgets/temperament"];
+global.TemperamentWidget.dependencies = ["widgets/TemperamentUI", "widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
 global.MusicKeyboard.dependencies = [
@@ -177,7 +177,15 @@ global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
 global.PitchSlider = jest.fn();
 global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
-global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
+global.PitchStaircase.dependencies = [
+    "widgets/PitchStaircaseTimers",
+    "widgets/PitchStaircaseLayout",
+    "widgets/PitchStaircaseSteps",
+    "widgets/PitchStaircasePlayback",
+    "widgets/PitchStaircaseSave",
+    "widgets/PitchStaircaseWindow",
+    "widgets/pitchstaircase"
+];
 global.RhythmRuler = jest.fn();
 global.RhythmRuler.dependencies = [
     "widgets/RhythmRulerLayout",
@@ -468,6 +476,18 @@ describe("setupWidgetBlocks", () => {
             tempo.flow(["childBlk"], logo, 0, "tempoBlk");
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("tempoBlk", 0, "_tempo_0");
             expect(logo.setTurtleListener).toHaveBeenCalled();
+        });
+
+        it("starts each run with no recorded turtles", () => {
+            const tempo = getBlock("tempo");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            logo.tempo.BPMTurtles = [3, 4];
+
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+
+            expect(logo.tempo.BPMTurtles).toEqual([]);
+            expect(logo.tempo.BPMBlocks).toEqual([]);
+            expect(logo.tempo.BPMs).toEqual([]);
         });
     });
 

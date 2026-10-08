@@ -150,6 +150,10 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doRandom("do", "sol", NaN)).toThrow("NanError");
         });
 
+        test.each([Infinity, -Infinity])("rejects a non-finite octave %p", octave => {
+            expect(() => MathUtility.doRandom("do", "sol", octave)).toThrow("NanError");
+        });
+
         test("still accepts an undefined octave after the NaN guard", () => {
             const result = MathUtility.doRandom("do", "mi", undefined);
             expect(result).toHaveLength(2);

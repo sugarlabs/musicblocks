@@ -44,5 +44,5 @@ jobs:
                       git push --force-with-lease origin YOUR_BRANCH
                       ```
 
-                      > **Tip:** Enable "Allow edits from maintainers" on this PR so we can auto-rebase for you next time. This only grants access to your PR branch. Your fork's other branches are not affected.
+                      > **Tip:** Enable "Allow edits from maintainers" on this PR so maintainers can assist with rebasing or conflict resolution if needed. This only grants access to your PR branch. Your fork's other branches are not affected.
                   commentOnClean: ""

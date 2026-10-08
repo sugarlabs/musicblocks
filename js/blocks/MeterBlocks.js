@@ -1019,6 +1019,7 @@ function setupMeterBlocks(activity) {
             }
 
             if (logo.inTempo) {
+                logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
                 logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
@@ -1080,6 +1081,7 @@ function setupMeterBlocks(activity) {
             }
 
             if (logo.inTempo) {
+                logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
                 logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
@@ -1155,6 +1157,7 @@ function setupMeterBlocks(activity) {
             }
 
             if (logo.inTempo) {
+                logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
                 logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }

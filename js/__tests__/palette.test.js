@@ -430,6 +430,17 @@ describe("Palettes Class", () => {
             expect(typeof pos.x).toBe("number");
             expect(typeof pos.y).toBe("number");
         });
+
+        test("includes toolbar height in search position", () => {
+            mockActivity.toolbarHeight = 53;
+
+            const pos = palettes.getSearchPos();
+
+            expect(pos.y).toBe(
+                (palettes.top + palettes.cellSize * 0.95 + mockActivity.toolbarHeight) *
+                    mockActivity.turtleBlocksScale
+            );
+        });
     });
 
     describe("getPluginMacroExpansion method", () => {
