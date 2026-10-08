@@ -2371,6 +2371,14 @@ describe("getStepSize", () => {
         expect(_getStepSize("D major", "C", "up", 0, "equal")).toBe(1);
     });
 
+    it("should keep the named enharmonic rules in other temperaments", () => {
+        // In 19-EDO E♯ is still matched to the scale's F by name.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-2);
+        // ...and an F is matched to F♯ major's E♯.
+        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(2);
+    });
+
     it('should return 0 for "C" going down in a key without a lower note', () => {
         const result = _getStepSize("C major", "C", "down", 0, "equal");
         expect(result).toBe(-1);
@@ -2448,6 +2456,22 @@ describe("getInterval", () => {
         expect(getInterval(1, "A harmonic minor", "G")).toBe(1);
         // C is not in D major: step up from the C♯ above it.
         expect(getInterval(1, "D major", "C")).toBe(1);
+    });
+
+    it("should step from the nearest scale note for a sharp or flat outside the scale", () => {
+        // C♯ is not in C major: step up from D, the next note above.
+        expect(getInterval(1, "C major", "C♯")).toBe(2);
+        // D♭ is not in C major: step down from C, the next note below.
+        expect(getInterval(-1, "C major", "D♭")).toBe(-1);
+        // An ASCII sharp is read as ♯.
+        expect(getInterval(1, "G major", "F#")).toBe(1);
+    });
+
+    it("should keep matching notes by name in other temperaments", () => {
+        expect(getInterval(1, "C major", "C♯", 19)).toBe(3);
+        expect(getInterval(1, "C major", "D♭", 19)).toBe(3);
+        expect(getInterval(1, "C major", "E♯", 19)).toBe(3);
+        expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
     });
 
     it("should return the correct interval for a pitch in the scale", () => {

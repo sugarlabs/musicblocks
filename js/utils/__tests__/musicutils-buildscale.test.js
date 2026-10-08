@@ -37,6 +37,17 @@ const musicutils = require("../musicutils");
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
 describe("musicutils-buildscale", () => {
+    it("reads the pitch class a note name sounds as, whatever its spelling", () => {
+        expect(buildscale._notePitchClass("C")).toBe(0);
+        expect(buildscale._notePitchClass("G♯")).toBe(8);
+        expect(buildscale._notePitchClass("A♭")).toBe(8);
+        expect(buildscale._notePitchClass("F𝄪")).toBe(7);
+        expect(buildscale._notePitchClass("B𝄫")).toBe(9);
+        expect(buildscale._notePitchClass("C♭")).toBe(11);
+        expect(buildscale._notePitchClass("xyz")).toBeNaN();
+        expect(buildscale._notePitchClass(undefined)).toBeNaN();
+    });
+
     it("still builds a scale and resolves frequencies", () => {
         expect(buildscale.buildScale("C major", 12)[0].slice(0, 3)).toEqual(["C", "D", "E"]);
         expect(buildscale.pitchToFrequency("A", 4, 0, "C major", "equal")).toBeCloseTo(440, 5);
