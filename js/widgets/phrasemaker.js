@@ -109,6 +109,15 @@ class PhraseMaker {
         this._instrumentName = this._deps.DEFAULTVOICE || DEFAULTVOICE;
 
         /**
+         * The turtle that ran the Phrase Maker block, whose painter is updated by graphics rows.
+         * The turtle itself rather than its index, which shifts when a turtle is removed.
+         *
+         * @type {object|null}
+         * @private
+         */
+        this._turtle = null;
+
+        /**
          * Flag indicating the initial state of the PhraseMaker.
          * @type {boolean}
          */
@@ -508,14 +517,22 @@ class PhraseMaker {
     /**
      * Loads drum synths used by existing PhraseMaker rows before cell preview playback.
      * @private
-     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
+     * @param {number|object} [turtleIndex] - Index or instance of the turtle that triggered this widget.
      */
-    _loadDrumSynthsForRows(turtleIndex = 0) {
+    _loadDrumSynthsForRows(turtleIndex) {
         if (!this.activity?.logo?.synth) {
             return;
         }
 
-        const tur = this.activity.turtles?.ithTurtle?.(turtleIndex);
+        const tur =
+            turtleIndex !== undefined
+                ? typeof turtleIndex === "number"
+                    ? this.activity.turtles?.ithTurtle?.(turtleIndex) ||
+                      this.activity.turtles?.getTurtle?.(turtleIndex)
+                    : turtleIndex
+                : this._turtle ||
+                  this.activity.turtles?.ithTurtle?.(0) ||
+                  this.activity.turtles?.getTurtle?.(0);
         const instrumentNames = tur?.singer?.instrumentNames;
         const loadedDrums = new Set();
 
@@ -576,9 +593,9 @@ class PhraseMaker {
      * Initializes the PhraseMaker matrix widget.
      * This method sets up the PhraseMaker matrix in the DOM (Document Object Model) and initializes its functionality.
      * @param {Activity} activity - The activity instance associated with the PhraseMaker widget.
-     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
+     * @param {number|object} [turtleIndex] - Index or instance of the turtle that triggered this widget.
      */
-    init(activity, turtleIndex = 0) {
+    init(activity, turtleIndex) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
         let tempTable;
@@ -588,9 +605,17 @@ class PhraseMaker {
 
         // Read the meter from the turtle that triggered this widget so that
         // bar-line separators reflect the correct time signature.
-        const turtle = activity.turtles.ithTurtle(turtleIndex);
-        const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
-        const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4;
+        const getTur = idx =>
+            activity.turtles?.ithTurtle?.(idx) || activity.turtles?.getTurtle?.(idx);
+        const turtle =
+            turtleIndex !== undefined
+                ? typeof turtleIndex === "number"
+                    ? getTur(turtleIndex)
+                    : turtleIndex
+                : this._turtle || getTur(0);
+        this._turtle = turtle;
+        const beatsPerMeasure = turtle?.singer?.beatsPerMeasure || 4;
+        const noteValuePerBeat = turtle?.singer?.noteValuePerBeat || 4;
 
         // Calculate the duration of ONE measure.
         // For 3/4: 3 beats × (1/4) = 0.75
