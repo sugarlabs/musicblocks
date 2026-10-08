@@ -306,11 +306,14 @@ describe("GlobalPlanet", () => {
             expect(callback).toHaveBeenCalled();
         });
 
-        it("should not set batchHasOfflineError when a project is missing", () => {
+        it("should remove stale cache and not set offline error when a project is missing", () => {
             const callback = jest.fn();
 
             gp.loadCount = 1;
             gp.batchHasOfflineError = false;
+            gp.cache["missing-project"] = {
+                ProjectName: "Stale project"
+            };
 
             gp.addProjectToCache(
                 "missing-project",
@@ -321,6 +324,7 @@ describe("GlobalPlanet", () => {
                 callback
             );
 
+            expect(gp.cache["missing-project"]).toBeUndefined();
             expect(gp.batchHasOfflineError).toBe(false);
             expect(callback).toHaveBeenCalled();
         });

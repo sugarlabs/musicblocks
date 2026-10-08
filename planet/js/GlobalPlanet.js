@@ -301,7 +301,9 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
-        } else if (data.error !== "PROJECT_NOT_FOUND") {
+        } else if (data.error === "PROJECT_NOT_FOUND") {
+            delete this.cache[id];
+        } else {
             this.batchHasOfflineError = true;
         }
 
