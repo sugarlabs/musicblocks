@@ -2182,6 +2182,38 @@ describe("buildScale", () => {
         expect(buildScale("E natural minor")[0]).toContain("F♯");
         expect(buildScale("E natural minor")[0]).not.toContain("G♭");
     });
+
+    it.each([
+        ["A harmonic minor", "A B C D E F G♯ A"],
+        ["D harmonic minor", "D E F G A B♭ C♯ D"],
+        ["E harmonic minor", "E F♯ G A B C D♯ E"],
+        ["G harmonic minor", "G A B♭ C D E♭ F♯ G"],
+        ["B harmonic minor", "B C♯ D E F♯ G A♯ B"],
+        ["A melodic minor", "A B C D E F♯ G♯ A"],
+        ["E melodic minor", "E F♯ G A B C♯ D♯ E"],
+        ["G melodic minor", "G A B♭ C D E F♯ G"]
+    ])("should spell %s with one letter per degree", (keySignature, expected) => {
+        expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it("should not repeat a letter in any seven-note scale it can spell", () => {
+        const roots = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+        const modes = ["harmonic minor", "melodic minor", "harmonic major", "hungarian"];
+        for (const root of roots) {
+            for (const mode of modes) {
+                const letters = buildScale(`${root} ${mode}`)[0]
+                    .slice(0, 7)
+                    .map(note => note[0]);
+                expect(new Set(letters).size).toBe(7);
+            }
+        }
+    });
+
+    it("should leave scales that already use each letter once unchanged", () => {
+        expect(buildScale("C major")[0].join(" ")).toBe("C D E F G A B C");
+        expect(buildScale("E natural minor")[0].join(" ")).toBe("E F♯ G A B C D E");
+        expect(buildScale("C harmonic minor")[0].join(" ")).toBe("C D E♭ F G A♭ B C");
+    });
 });
 
 describe("scalePatternToEDO", () => {
@@ -2353,6 +2385,12 @@ describe("nthDegreeToPitch", () => {
     it("should return the correct note for the 2nd scale degree in C major", () => {
         const result = nthDegreeToPitch("C major", 2);
         expect(result).toEqual(["D", 0]);
+    });
+
+    it("should name the raised degrees of harmonic minor by their own letter", () => {
+        expect(nthDegreeToPitch("A harmonic minor", 7)).toEqual(["G♯", 0]);
+        expect(nthDegreeToPitch("E harmonic minor", 2)).toEqual(["F♯", 0]);
+        expect(nthDegreeToPitch("E harmonic minor", 7)).toEqual(["D♯", 0]);
     });
 
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {

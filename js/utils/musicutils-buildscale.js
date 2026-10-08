@@ -286,6 +286,51 @@ var buildScale = (keySignature, edo) => {
                 }
             }
         }
+
+        // A scale that needs both sharps and flats (harmonic or melodic minor,
+        // for example) can still repeat a letter here: A harmonic minor came
+        // out as A B C D E F A♭. Spell such a scale with one letter per degree.
+        if (halfSteps.length === 7 && new Set(scale.slice(0, 7).map(note => note[0])).size < 7) {
+            const letters = "CDEFGAB";
+            const naturalPitches = [0, 2, 4, 5, 7, 9, 11];
+            const accidentalSteps = { [DOUBLEFLAT]: -2, [FLAT]: -1, [SHARP]: 1, [DOUBLESHARP]: 2 };
+            const accidentalNames = {
+                "-2": DOUBLEFLAT,
+                "-1": FLAT,
+                "0": "",
+                "1": SHARP,
+                "2": DOUBLESHARP
+            };
+
+            const tonicLetter = letters.indexOf(myKeySignature[0]);
+            let pitch = naturalPitches[tonicLetter];
+            let spellable = tonicLetter !== -1;
+            for (const symbol of myKeySignature.slice(1)) {
+                if (!(symbol in accidentalSteps)) {
+                    spellable = false;
+                    break;
+                }
+                pitch += accidentalSteps[symbol];
+            }
+
+            const letterScale = [myKeySignature];
+            for (let degree = 1; spellable && degree < 7; degree++) {
+                pitch += halfSteps[degree - 1];
+                const letter = (tonicLetter + degree) % 7;
+                // How far the pitch is from the natural letter, in -6..5 semitones.
+                const offset = ((((pitch - naturalPitches[letter]) % 12) + 18) % 12) - 6;
+                if (!(offset in accidentalNames)) {
+                    spellable = false;
+                    break;
+                }
+                letterScale.push(letters[letter] + accidentalNames[offset]);
+            }
+
+            if (spellable) {
+                letterScale.push(myKeySignature);
+                return [letterScale, halfSteps];
+            }
+        }
     }
     return [scale, halfSteps];
 };
