@@ -91,13 +91,8 @@ describe("macro-utils", () => {
         });
 
         test("prevents prototype pollution from malicious object keys (__proto__, constructor, prototype)", () => {
-            const maliciousData = JSON.stringify({
-                __proto__: { polluted: true },
-                constructor: { polluted: true },
-                prototype: { polluted: true },
-                validMacro: [1, 2, 3]
-            });
-
+            const maliciousData =
+                '{"__proto__":{"polluted":true},"constructor":{"polluted":true},"prototype":{"polluted":true},"validMacro":[1,2,3]}';
             processMacroData(maliciousData, palettes, blocks, macroDict);
 
             expect({}.polluted).toBeUndefined();
