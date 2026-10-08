@@ -167,5 +167,15 @@ describe("macro-utils", () => {
             expect(Object.prototype.hasOwnProperty.call(macroDict, "constructor")).toBe(false);
             expect(Object.prototype.hasOwnProperty.call(macroDict, "prototype")).toBe(false);
         });
+
+        test("rejects unsafe keys after string normalization", () => {
+            const maliciousStack = [{ evil: true }];
+
+            prepareMacroExports(["__proto__"], maliciousStack, macroDict);
+
+            expect(Object.getPrototypeOf(macroDict)).toBe(Object.prototype);
+            expect(Object.prototype.hasOwnProperty.call(macroDict, "__proto__")).toBe(false);
+            expect({}.evil).toBeUndefined();
+        });
     });
 });

@@ -21,13 +21,6 @@ if (typeof module !== "undefined" && module.exports) {
     var { isUnsafeObjectKey } = UtilsLogic;
 }
 
-const _isUnsafeKey = key => {
-    if (typeof isUnsafeObjectKey === "function") {
-        return isUnsafeObjectKey(key);
-    }
-    return ["__proto__", "prototype", "constructor"].includes(key);
-};
-
 /**
  * Processes macro data, adds macros to the palette, and updates the macro dictionary.
  * @param {string} macroData - JSON-encoded dictionary containing macro data.
@@ -43,7 +36,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             palettes.add("myblocks", "black", "#a0a0a0");
 
             for (const name of Object.keys(obj)) {
-                if (_isUnsafeKey(name)) continue;
+                if (isUnsafeObjectKey(name)) continue;
                 // console.debug("adding " + name + " to macroDict");
                 macroDict[name] = obj[name];
                 blocks.addToMyPalette(name, macroDict[name]);
@@ -66,8 +59,12 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
  * @returns {string} The JSON-encoded text of the updated macro dictionary.
  */
 let prepareMacroExports = (name, stack, macroDict) => {
-    if (name !== null && name !== undefined && !_isUnsafeKey(name)) {
-        macroDict[name] = stack;
+    if (name !== null && name !== undefined) {
+        const key = String(name);
+
+        if (!isUnsafeObjectKey(key)) {
+            macroDict[key] = stack;
+        }
     }
 
     return JSON.stringify(macroDict);
