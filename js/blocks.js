@@ -536,7 +536,7 @@ class Blocks {
             }
 
             this.findStacks();
-            for (const stack in this.stackList) {
+            for (const stack of Object.keys(this.stackList)) {
                 this.adjustDocks(this.stackList[stack], true);
             }
 
@@ -550,7 +550,7 @@ class Blocks {
             /** We reset the protoblock scale on the palettes, but don't */
             /** modify the palettes themselves. */
             for (palette in this.activity.palettes.dict) {
-                for (const blk in this.activity.palettes.dict[palette].protoList) {
+                for (const blk of Object.keys(this.activity.palettes.dict[palette].protoList)) {
                     this.activity.palettes.dict[palette].protoList[blk].scale = scale;
                 }
             }
@@ -3786,7 +3786,7 @@ class Blocks {
             const namedBlocks = new Set(["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"]);
 
             /** Update the blocks, do->oldName should be do->newName */
-            for (const blk in this.blockList) {
+            for (const blk of Object.keys(this.blockList)) {
                 if (this.blockList[blk].trash) {
                     continue;
                 }
@@ -4364,7 +4364,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -4398,7 +4399,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -4789,7 +4791,7 @@ class Blocks {
             }
 
             /** First, hide the palettes as they will need updating. */
-            for (const name in this.activity.palettes.dict) {
+            for (const name of Object.keys(this.activity.palettes.dict)) {
                 this.activity.palettes.dict[name].hideMenu(true);
             }
 
@@ -5001,7 +5003,7 @@ class Blocks {
          * @returns boolean
          */
         this.findBlockInstance = blkName => {
-            for (const blk in this.blockList) {
+            for (const blk of Object.keys(this.blockList)) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -5379,6 +5381,7 @@ class Blocks {
                 }
 
                 /** Make sure action names are unique. */
+                const renamedActions = new Map(); /** old name: new name */
                 for (const b in actionNames) {
                     /** Is there a proto do block with this name? If so, find a */
                     /** new name. */
@@ -5419,9 +5422,19 @@ class Blocks {
 
                         console.debug("action " + oldName + " is being renamed " + name);
                         blkData[1][1] = { value: name };
+                        if (!renamedActions.has(oldName)) {
+                            renamedActions.set(oldName, name);
+                        }
                     }
+                }
 
-                    /** and any do blocks */
+                /**
+                 * ...and any do blocks. This runs once all the renames are
+                 * known: a do block already moved from "action" to "action1"
+                 * must not be moved again when an incoming "action1" is
+                 * itself renamed to "action11".
+                 */
+                if (renamedActions.size > 0) {
                     let blkName;
                     for (const d in doNames) {
                         const thisBlkData = blockObjs[d];
@@ -5433,18 +5446,20 @@ class Blocks {
                         if (
                             ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(blkName)
                         ) {
-                            if (thisBlkData[1][1]["value"] === oldName) {
-                                thisBlkData[1][1] = { value: name };
+                            const oldName = thisBlkData[1][1]["value"];
+                            if (renamedActions.has(oldName)) {
+                                thisBlkData[1][1] = { value: renamedActions.get(oldName) };
                             }
                         } else {
                             const doBlkData = blockObjs[doNames[d]];
                             if (typeof doBlkData[1][1] === "string") {
-                                if (doBlkData[1][1] === oldName) {
-                                    doBlkData[1][1] = name;
+                                if (renamedActions.has(doBlkData[1][1])) {
+                                    doBlkData[1][1] = renamedActions.get(doBlkData[1][1]);
                                 }
                             } else {
-                                if (doBlkData[1][1]["value"] === oldName) {
-                                    doBlkData[1][1] = { value: name };
+                                const oldName = doBlkData[1][1]["value"];
+                                if (renamedActions.has(oldName)) {
+                                    doBlkData[1][1] = { value: renamedActions.get(oldName) };
                                 }
                             }
                         }
@@ -6753,7 +6768,7 @@ class Blocks {
 
                 /** Do a final check on the action and boxes palettes. */
                 let updatePalettes = false;
-                for (const blk in this.blockList) {
+                for (const blk of Object.keys(this.blockList)) {
                     if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
@@ -6781,7 +6796,7 @@ class Blocks {
                 }
 
                 updatePalettes = false;
-                for (const blk in this.blockList) {
+                for (const blk of Object.keys(this.blockList)) {
                     if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
@@ -6946,7 +6961,7 @@ class Blocks {
             if (actionArg) {
                 const actionName = actionArg.value;
                 /** Look for any "orphan" action blocks. */
-                for (const blk in this.blockList) {
+                for (const blk of Object.keys(this.blockList)) {
                     const thisBlock = this.blockList[blk];
                     if (thisBlock.trash) continue;
 
@@ -7268,7 +7283,7 @@ class Blocks {
 
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
-            for (const name in this.activity.palettes.dict) {
+            for (const name of Object.keys(this.activity.palettes.dict)) {
                 this.activity.palettes.dict[name].hideMenu(true);
             }
 
@@ -7309,7 +7324,7 @@ class Blocks {
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
             if (parentBlock !== null) {
-                for (const c in this.blockList[parentBlock].connections) {
+                for (const c of Object.keys(this.blockList[parentBlock].connections)) {
                     if (this.blockList[parentBlock].connections[c] === thisBlock) {
                         this.blockList[parentBlock].connections[c] = null;
                         break;
@@ -7435,7 +7450,7 @@ class Blocks {
          * @returns {void}
          */
         this.clearParameterBlocks = () => {
-            for (const blk in this.blockList) {
+            for (const blk of Object.keys(this.blockList)) {
                 if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
                     /** The audiofile block label is handled in block.js */
                     if (this.blockList[blk].name === "audiofile") {

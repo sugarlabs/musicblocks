@@ -28,7 +28,8 @@ const {
     getWheelSafeBounds,
     positionWheelDiv,
     handleWheelResize,
-    debouncedSetWheelSize
+    debouncedSetWheelSize,
+    syncKeySignatureBlocks
 } = require("../piemenus");
 const Block = require("../block");
 
@@ -212,7 +213,8 @@ global.Synth = jest.fn().mockImplementation(() => ({
     loadSynth: jest.fn().mockResolvedValue(),
     setMasterVolume: jest.fn(),
     setVolume: jest.fn(),
-    trigger: jest.fn().mockResolvedValue()
+    trigger: jest.fn().mockResolvedValue(),
+    getCustomFrequency: jest.fn().mockReturnValue([261.63])
 }));
 global.instruments = [{}];
 global.DEFAULTVOICE = "sine";
@@ -1166,6 +1168,76 @@ describe("piemenuKey behavioral tests", () => {
     });
 });
 
+describe("syncKeySignatureBlocks inserting a new setkey block", () => {
+    // A blockList that grows like the real one, so the "last block created"
+    // indexes the function relies on point at the blocks it just made.
+    const makeActivity = blockList => {
+        const blocks = {
+            blockList,
+            stackList: [],
+            findStacks: jest.fn(() => {
+                blocks.stackList = blockList
+                    .map((b, i) => (b && b.connections[0] === null ? i : null))
+                    .filter(i => i !== null);
+            }),
+            _makeNewBlockWithConnections: jest.fn((name, _value, connections) => {
+                blockList.push({ name, connections: connections.slice() });
+            }),
+            adjustExpandableClampBlock: jest.fn()
+        };
+        return {
+            blocks,
+            logo: { blocks },
+            KeySignatureEnv: ["G", "dorian", false],
+            textMsg: jest.fn()
+        };
+    };
+
+    test("does not throw when the start block is empty", () => {
+        const blockList = [{ name: "start", connections: [null, null, null] }];
+        const activity = makeActivity(blockList);
+
+        expect(() => syncKeySignatureBlocks(activity)).not.toThrow();
+
+        const setKey = blockList.findIndex(b => b.name === "setkey2");
+        expect(blockList[0].connections[1]).toBe(setKey);
+        expect(blockList[setKey].connections).toEqual([0, setKey + 1, setKey + 2, null]);
+        expect(blockList[setKey + 1]).toMatchObject({ name: "notename", value: "G" });
+        expect(blockList[setKey + 2]).toMatchObject({ name: "modename", value: "dorian" });
+    });
+
+    test("still re-parents the first block of a non-empty start block", () => {
+        const blockList = [
+            { name: "start", connections: [null, 1, null] },
+            { name: "newnote", connections: [0, null, null] }
+        ];
+        const activity = makeActivity(blockList);
+
+        syncKeySignatureBlocks(activity);
+
+        const setKey = blockList.findIndex(b => b.name === "setkey2");
+        expect(blockList[0].connections[1]).toBe(setKey);
+        expect(blockList[setKey].connections[3]).toBe(1);
+        expect(blockList[1].connections[0]).toBe(setKey);
+    });
+
+    test("uses the lowest-numbered start block, comparing ids as numbers", () => {
+        // Filler blocks 0-8 are connected, so they are not stacks.
+        const blockList = Array.from({ length: 9 }, () => ({ name: "text", connections: [0] }));
+        blockList.push({ name: "start", connections: [null, 11, null] }); // 9
+        blockList.push({ name: "start", connections: [null, 12, null] }); // 10
+        blockList.push({ name: "newnote", connections: [9, null, null] }); // 11
+        blockList.push({ name: "newnote", connections: [10, null, null] }); // 12
+        const activity = makeActivity(blockList);
+
+        syncKeySignatureBlocks(activity);
+
+        const setKey = blockList.findIndex(b => b.name === "setkey2");
+        expect(blockList[9].connections[1]).toBe(setKey);
+        expect(blockList[10].connections[1]).toBe(12);
+    });
+});
+
 describe("pie menu Escape-key dismissal", () => {
     let elements;
 
@@ -1795,6 +1867,122 @@ describe("pie-menu exit key listener reference regression coverage", () => {
 
         test("removes the exact registered handler reference on Tab", () => {
             testExitCleanup(() => piemenuColor(mockBlock, [0, 10, 20, 30], 0, "setcolor"), "Tab");
+        });
+    });
+
+    describe("piemenuCustomNotes", () => {
+        const noteLabels = {
+            custom: {
+                0: [1, "C", 4],
+                1: [1.189, "D#", 4],
+                2: [1.334, "F", 4],
+                3: [1.498, "G", 4],
+                4: [1.781, "A#", 4],
+                pitchNumber: 5
+            }
+        };
+        const customLabels = ["custom"];
+
+        test("sets note wheel labels in descending pitch order (highest to lowest / tonic)", () => {
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            expect(mockBlock._cusNoteWheel).toBeDefined();
+            expect(mockBlock._cusNoteWheel.createWheel).toHaveBeenCalledWith([
+                "A#",
+                "G",
+                "F",
+                "D#",
+                "C"
+            ]);
+        });
+
+        test("enables rotation by default and keeps upright title orientation", () => {
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            expect(mockBlock._cusNoteWheel.clickModeRotate).not.toBe(false);
+            expect(mockBlock._cusNoteWheel.titleRotateAngle).toBe(0);
+        });
+
+        test("creates and navigates octave wheel when parent is custompitch", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            expect(mockBlock._octavesWheel).toBeDefined();
+            expect(mockBlock._octavesWheel.createWheel).toHaveBeenCalled();
+            expect(mockBlock._octavesWheel.navigateWheel).toHaveBeenCalledWith(4); // 8 - 4
+        });
+
+        test("increments octave when wrapping upward from highest pitch across boundary to tonic", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            // Starting note: A# (index 0)
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "A#");
+
+            // Navigate to C (index 4) - upward wrap across boundary
+            const cItemIndex = 4;
+            mockBlock._cusNoteWheel.navigateWheel(cItemIndex);
+
+            expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("parent-id", 5);
+            expect(mockBlock._octavesWheel.navigateWheel).toHaveBeenCalledWith(3); // 8 - 5
+        });
+
+        test("decrements octave when wrapping downward from tonic across boundary to highest pitch", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            // Starting note: C (index 4)
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            // Navigate to A# (index 0) - downward wrap across boundary
+            const aSharpIndex = 0;
+            mockBlock._cusNoteWheel.navigateWheel(aSharpIndex);
+
+            expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("parent-id", 3);
+            expect(mockBlock._octavesWheel.navigateWheel).toHaveBeenCalledWith(5); // 8 - 3
+        });
+
+        test("keeps octave unchanged when navigating within the same octave in both directions", () => {
+            mockBlock.connections = ["parent-id"];
+            mockBlock.blocks.blockList["parent-id"] = { name: "custompitch" };
+            mockBlock.blocks.findPitchOctave.mockReturnValue(4);
+
+            // Starting note: C (index 4)
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+            mockBlock.blocks.setPitchOctave.mockClear();
+
+            // Navigate C4 -> D#4 -> F4 -> G4 (indices 4 -> 3 -> 2 -> 1)
+            mockBlock._cusNoteWheel.navigateWheel(3); // D#
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(2); // F
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(1); // G
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+
+            // Reverse direction G4 -> F4 -> D#4 -> C4 (indices 1 -> 2 -> 3 -> 4)
+            mockBlock._cusNoteWheel.navigateWheel(2); // F
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(3); // D#
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+            mockBlock._cusNoteWheel.navigateWheel(4); // C
+            expect(mockBlock.blocks.setPitchOctave).not.toHaveBeenCalled();
+        });
+
+        test("triggers pitch preview with synth and announces to screen reader", async () => {
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "custom", "C");
+
+            mockBlock._cusNoteWheel.navigateWheel(4); // C
+            await new Promise(r => setTimeout(r, 10));
+
+            expect(mockBlock.activity.logo.synth.trigger).toHaveBeenCalled();
+            expect(global.announceToScreenReader).toHaveBeenCalledWith(
+                expect.stringContaining("C")
+            );
         });
     });
 });

@@ -234,6 +234,7 @@ class Block {
         this._trashHoverScaled = false;
         this._trashHoverGroupState = null;
         this._dragPointerDown = false;
+        this.accessibleElement = null;
     }
 
     /**
@@ -450,7 +451,7 @@ class Block {
         if (this.disconnectedBitmap !== null && this.disconnectedHighlightBitmap !== null) {
             if (
                 !this.bitmap.visible &&
-                !this.highlightBitmap.visible &&
+                (this.highlightBitmap === null || !this.highlightBitmap.visible) &&
                 !this.disconnectedBitmap.visible &&
                 !this.disconnectedHighlightBitmap.visible
             ) {
@@ -458,18 +459,23 @@ class Block {
                     return true;
                 } else if (
                     !this.collapseBlockBitmap.visible &&
-                    !this.highlightCollapseBlockBitmap.visible
+                    (this.highlightCollapseBlockBitmap === null ||
+                        !this.highlightCollapseBlockBitmap.visible)
                 ) {
                     return true;
                 }
             }
         } else {
-            if (!this.bitmap.visible && !this.highlightBitmap.visible) {
+            if (
+                !this.bitmap.visible &&
+                (this.highlightBitmap === null || !this.highlightBitmap.visible)
+            ) {
                 if (this.collapseBlockBitmap === null) {
                     return true;
                 } else if (
                     !this.collapseBlockBitmap.visible &&
-                    !this.highlightCollapseBlockBitmap.visible
+                    (this.highlightCollapseBlockBitmap === null ||
+                        !this.highlightCollapseBlockBitmap.visible)
                 ) {
                     return true;
                 }
@@ -588,6 +594,7 @@ class Block {
         }
         this.label = null;
         this.labelattr = null;
+        this._removeAccessibleElement();
 
         if (this.container) {
             if (typeof this.container.removeAllEventListeners === "function") {
@@ -643,8 +650,8 @@ class Block {
             return;
         }
 
-        if (!this.container.visible) {
-            // block is hidden, so do nothing.
+        if (this.container === null || !this.container.visible) {
+            // block is hidden or uninitialized, so do nothing.
             return;
         }
 
@@ -658,8 +665,12 @@ class Block {
         }
 
         // Always hide the non-highlighted artwork.
-        this.container.visible = true;
-        this.bitmap.visible = false;
+        if (this.container !== null) {
+            this.container.visible = true;
+        }
+        if (this.bitmap !== null) {
+            this.bitmap.visible = false;
+        }
         if (this.disconnectedBitmap !== null) {
             this.disconnectedBitmap.visible = false;
         }
@@ -681,24 +692,30 @@ class Block {
             }
 
             // but not the uncollapsed highlighted artwork.
-            this.highlightBitmap.visible = false;
+            if (this.highlightBitmap !== null) {
+                this.highlightBitmap.visible = false;
+            }
             if (this.disconnectedHighlightBitmap !== null) {
                 this.disconnectedHighlightBitmap.visible = false;
             }
-
-            this.highlightBitmap.visible = false;
         } else {
             // Show the highlighted artwork.
             // If the block is disconnected, use the disconnected bitmap.
             if (this.isDisconnected()) {
-                this.disconnectedHighlightBitmap.visible = true;
-                this.highlightBitmap.visible = false;
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = true;
+                }
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = false;
+                }
             } else {
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
 
-                this.highlightBitmap.visible = true;
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = true;
+                }
             }
 
             // If it is an uncollapsed collapsable, make sure the
@@ -746,12 +763,16 @@ class Block {
         }
 
         // Always hide the highlighted artwork.
-        this.highlightBitmap.visible = false;
+        if (this.highlightBitmap !== null) {
+            this.highlightBitmap.visible = false;
+        }
         if (this.disconnectedHighlightBitmap !== null) {
             this.disconnectedHighlightBitmap.visible = false;
         }
 
-        this.container.visible = true;
+        if (this.container !== null) {
+            this.container.visible = true;
+        }
 
         // If it is a collapsed collapsable, unhighlight the collapsed state.
         if (this.collapsed) {
@@ -771,21 +792,31 @@ class Block {
             }
 
             // and not the uncollapsed artwork.
-            this.bitmap.visible = false;
+            if (this.bitmap !== null) {
+                this.bitmap.visible = false;
+            }
         } else {
             // If the block is disconnected, use the disconnected bitmap.
             if (this.isDisconnected()) {
-                this.disconnectedBitmap.visible = true;
-                this.bitmap.visible = false;
+                if (this.disconnectedBitmap !== null) {
+                    this.disconnectedBitmap.visible = true;
+                }
+                if (this.bitmap !== null) {
+                    this.bitmap.visible = false;
+                }
             } else {
                 if (this.disconnectedBitmap !== null) {
                     this.disconnectedBitmap.visible = false;
                 }
 
-                this.bitmap.visible = true;
+                if (this.bitmap !== null) {
+                    this.bitmap.visible = true;
+                }
             }
 
-            this.container.visible = true;
+            if (this.container !== null) {
+                this.container.visible = true;
+            }
 
             if (this.isCollapsible()) {
                 // There could be a race condition when making a
@@ -812,7 +843,7 @@ class Block {
     unhighlightSelectedBlocks(blk, selection) {
         if (selection) {
             this.blocks.unhighlight(blk, true);
-            if (!this.collapsed) {
+            if (!this.collapsed && this.disconnectedBitmap !== null) {
                 this.disconnectedBitmap.visible = true;
             }
             this.updateCache();
@@ -1965,6 +1996,7 @@ class Block {
 
         this.updateCache();
         this.activity.refreshCanvas();
+        this._removeAccessibleElement();
     }
 
     /**
@@ -2016,13 +2048,27 @@ class Block {
             this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
-                    this.bitmap.visible = false;
-                    this.highlightBitmap.visible = false;
-                    this.collapseBlockBitmap.visible = true;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = true;
-                    this.expandButtonBitmap.visible = true;
-                    this.collapseButtonBitmap.visible = false;
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = false;
+                    }
+                    if (this.highlightBitmap !== null) {
+                        this.highlightBitmap.visible = false;
+                    }
+                    if (this.collapseBlockBitmap !== null) {
+                        this.collapseBlockBitmap.visible = true;
+                    }
+                    if (this.highlightCollapseBlockBitmap !== null) {
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    }
+                    if (this.collapseText !== null) {
+                        this.collapseText.visible = true;
+                    }
+                    if (this.expandButtonBitmap !== null) {
+                        this.expandButtonBitmap.visible = true;
+                    }
+                    if (this.collapseButtonBitmap !== null) {
+                        this.collapseButtonBitmap.visible = false;
+                    }
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
@@ -2034,41 +2080,67 @@ class Block {
                     // If the block is disconnected, use the
                     // disconnected bitmap.
                     if (this.isDisconnected()) {
-                        this.disconnectedBitmap.visible = true;
-                        this.bitmap.visible = false;
+                        if (this.disconnectedBitmap !== null) {
+                            this.disconnectedBitmap.visible = true;
+                        }
+                        if (this.bitmap !== null) {
+                            this.bitmap.visible = false;
+                        }
                     } else {
                         if (this.disconnectedBitmap !== null) {
                             this.disconnectedBitmap.visible = false;
                         }
 
-                        this.bitmap.visible = true;
+                        if (this.bitmap !== null) {
+                            this.bitmap.visible = true;
+                        }
                     }
 
-                    this.highlightBitmap.visible = false;
+                    if (this.highlightBitmap !== null) {
+                        this.highlightBitmap.visible = false;
+                    }
                     if (this.disconnectedHighlightBitmap !== null) {
                         this.disconnectedHighlightBitmap.visible = false;
                     }
 
-                    this.collapseBlockBitmap.visible = false;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = false;
-                    this.expandButtonBitmap.visible = false;
-                    this.collapseButtonBitmap.visible = true;
+                    if (this.collapseBlockBitmap !== null) {
+                        this.collapseBlockBitmap.visible = false;
+                    }
+                    if (this.highlightCollapseBlockBitmap !== null) {
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    }
+                    if (this.collapseText !== null) {
+                        this.collapseText.visible = false;
+                    }
+                    if (this.expandButtonBitmap !== null) {
+                        this.expandButtonBitmap.visible = false;
+                    }
+                    if (this.collapseButtonBitmap !== null) {
+                        this.collapseButtonBitmap.visible = true;
+                    }
                 }
             } else {
                 // If the block is disconnected, use the disconnected bitmap.
                 if (this.isDisconnected()) {
-                    this.disconnectedBitmap.visible = true;
-                    this.bitmap.visible = false;
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = true;
+                    }
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = false;
+                    }
                 } else {
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
 
-                    this.bitmap.visible = true;
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = true;
+                    }
                 }
 
-                this.highlightBitmap.visible = false;
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = false;
+                }
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
@@ -2076,6 +2148,7 @@ class Block {
 
             this.updateCache();
             this.activity.refreshCanvas();
+            this._setupAccessibleElement();
         }
     }
 
@@ -2306,6 +2379,11 @@ class Block {
         const loadGeneration = this._thumbnailLoadGeneration;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
+            this.removeChildBitmap("media");
+            this.imageBitmap = null;
+            this.image = "images/load-media.svg";
+            this.updateCache();
+            this._addImage();
             return;
         }
         const image = new Image();
@@ -2645,15 +2723,25 @@ class Block {
         this.collapsed = !isCollapsed;
 
         // These are the buttons to collapse/expand the stack.
-        this.collapseButtonBitmap.visible = isCollapsed;
-        this.expandButtonBitmap.visible = !isCollapsed;
+        if (this.collapseButtonBitmap !== null) {
+            this.collapseButtonBitmap.visible = isCollapsed;
+        }
+        if (this.expandButtonBitmap !== null) {
+            this.expandButtonBitmap.visible = !isCollapsed;
+        }
 
         // These are the collapse-state bitmaps.
-        this.collapseBlockBitmap.visible = !isCollapsed;
-        this.highlightCollapseBlockBitmap.visible = false;
-        this.collapseText.visible = !isCollapsed;
+        if (this.collapseBlockBitmap !== null) {
+            this.collapseBlockBitmap.visible = !isCollapsed;
+        }
+        if (this.highlightCollapseBlockBitmap !== null) {
+            this.highlightCollapseBlockBitmap.visible = false;
+        }
+        if (this.collapseText !== null) {
+            this.collapseText.visible = !isCollapsed;
+        }
 
-        if (this.isInlineCollapsible() && this.collapseText.visible) {
+        if (this.isInlineCollapsible() && this.collapseText !== null && this.collapseText.visible) {
             switch (this.name) {
                 case "newnote":
                     this._newNoteLabel();
@@ -2670,8 +2758,12 @@ class Block {
             }
         }
 
-        this.bitmap.visible = this.collapsed;
-        this.highlightBitmap.visible = false;
+        if (this.bitmap !== null) {
+            this.bitmap.visible = this.collapsed;
+        }
+        if (this.highlightBitmap !== null) {
+            this.highlightBitmap.visible = false;
+        }
         if (this.disconnectedBitmap !== null) {
             this.disconnectedBitmap.visible = false;
         }
@@ -2680,29 +2772,31 @@ class Block {
             this.disconnectedHighlightBitmap.visible = false;
         }
 
-        if (this.name === "action") {
-            // Label the collapsed block with the action label.
-            if (this.connections[1] !== null) {
-                let text = this.blocks.blockList[this.connections[1]].value;
-                if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
-                    text = text.slice(0, STRINGLEN) + "...";
+        if (this.collapseText !== null) {
+            if (this.name === "action") {
+                // Label the collapsed block with the action label.
+                if (this.connections[1] !== null) {
+                    let text = this.blocks.blockList[this.connections[1]].value;
+                    if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
+                        text = text.slice(0, STRINGLEN) + "...";
+                    }
+
+                    this.collapseText.text = text;
+                } else {
+                    this.collapseText.text = "";
                 }
-
-                this.collapseText.text = text;
-            } else {
-                this.collapseText.text = "";
             }
-        }
 
-        // Make sure the text is on top.
-        this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
+            // Make sure the text is on top.
+            this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
+        }
 
         if (this.isInlineCollapsible()) {
             // Only collapse the contents of the note block.
             this._toggle_inline(thisBlock, isCollapsed);
         } else {
             // Set collapsed state of all of the blocks in the drag group.
-            if (this.blocks.dragGroup.length > 0) {
+            if (this.blocks.dragGroup && this.blocks.dragGroup.length > 0) {
                 for (let b = 1; b < this.blocks.dragGroup.length; b++) {
                     const blk = this.blocks.dragGroup[b];
                     if (this.collapsed) {
@@ -3081,11 +3175,20 @@ class Block {
             this.blocks.findDragGroup(this.connections[1]);
             for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                 const blk = this.blocks.dragGroup[b];
-                this.blocks.blockList[blk].container.visible = collapse;
-                if (collapse) {
-                    this.blocks.blockList[blk].inCollapsed = false;
-                } else {
-                    this.blocks.blockList[blk].inCollapsed = true;
+                const targetBlock = this.blocks.blockList[blk];
+                if (targetBlock) {
+                    targetBlock.container.visible = collapse;
+                    if (collapse) {
+                        targetBlock.inCollapsed = false;
+                        if (typeof targetBlock._setupAccessibleElement === "function") {
+                            targetBlock._setupAccessibleElement();
+                        }
+                    } else {
+                        targetBlock.inCollapsed = true;
+                        if (typeof targetBlock._removeAccessibleElement === "function") {
+                            targetBlock._removeAccessibleElement();
+                        }
+                    }
                 }
             }
         }
@@ -3095,19 +3198,31 @@ class Block {
             this.blocks.findDragGroup(this.connections[2]);
             for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                 const blk = this.blocks.dragGroup[b];
-                // Look to see if the local parent block is collapsed.
-                const parent = this.blocks.insideInlineCollapsibleBlock(blk);
-                if (parent === null || !this.blocks.blockList[parent].collapsed) {
-                    this.blocks.blockList[blk].container.visible = collapse;
-                    if (collapse) {
-                        this.blocks.blockList[blk].inCollapsed = false;
+                const targetBlock = this.blocks.blockList[blk];
+                if (targetBlock) {
+                    // Look to see if the local parent block is collapsed.
+                    const parent = this.blocks.insideInlineCollapsibleBlock(blk);
+                    if (parent === null || !this.blocks.blockList[parent].collapsed) {
+                        targetBlock.container.visible = collapse;
+                        if (collapse) {
+                            targetBlock.inCollapsed = false;
+                            if (typeof targetBlock._setupAccessibleElement === "function") {
+                                targetBlock._setupAccessibleElement();
+                            }
+                        } else {
+                            targetBlock.inCollapsed = true;
+                            if (typeof targetBlock._removeAccessibleElement === "function") {
+                                targetBlock._removeAccessibleElement();
+                            }
+                        }
                     } else {
-                        this.blocks.blockList[blk].inCollapsed = true;
+                        // Parent is collapsed, so keep hidden.
+                        targetBlock.container.visible = false;
+                        targetBlock.inCollapsed = true;
+                        if (typeof targetBlock._removeAccessibleElement === "function") {
+                            targetBlock._removeAccessibleElement();
+                        }
                     }
-                } else {
-                    // Parent is collapsed, so keep hidden.
-                    this.blocks.blockList[blk].container.visible = false;
-                    this.blocks.blockList[blk].inCollapsed = true;
                 }
             }
         }
@@ -3265,6 +3380,7 @@ class Block {
         const thisBlock = this.blockIndex;
 
         this._calculateBlockHitArea();
+        this._setupAccessibleElement();
 
         this.container.on("mouseover", () => {
             _getStatic("contextWheelDiv").style.display = "none";
@@ -3312,6 +3428,19 @@ class Block {
                 }
             };
             // We might be able to check which button was clicked.
+            if (that._triggerLongPress) {
+                that._triggerLongPress = false;
+                if (
+                    event.nativeEvent &&
+                    typeof event.nativeEvent.stopImmediatePropagation === "function"
+                ) {
+                    event.nativeEvent.stopImmediatePropagation();
+                } else if (typeof event.stopPropagation === "function") {
+                    event.stopPropagation();
+                }
+                return;
+            }
+
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
@@ -3437,6 +3566,8 @@ class Block {
             const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
+                window._contextWheelIgnoreNextClick = true;
+                window._contextWheelIgnoreNextMouseUp = true;
                 that.blocks.triggerLongPress();
             };
             if (that.blocks && typeof that.blocks.setTimeout === "function") {
@@ -3529,6 +3660,11 @@ class Block {
         this.container.on("pressmove", event => {
             // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
+
+            // A long press opens the context menu instead of starting a drag.
+            if (that._triggerLongPress || that.blocks.getLongPressStatus()) {
+                return;
+            }
 
             // Don't allow silence block to be dragged out of a note.
             if (that.name === "rest2") {
@@ -4184,51 +4320,65 @@ class Block {
                 piemenuPitches(this, scalenotes_, SCALENOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "customNote") {
-            if (!this.activity.logo.customTemperamentDefined) {
-                // If custom temperament is not defined by user, then
-                // custom temperament is supposed to be equal
-                // temperament.
-                obj = splitSolfege(this.value);
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-
-                if (this.piemenuOKtoLaunch()) {
-                    piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            const keys = getTemperamentKeys();
+            const noteLabels = {};
+            const customLabels = [];
+            for (let i = 0; i < keys.length; i++) {
+                const temperament = getTemperament(keys[i]);
+                // Only add valid custom temperaments with note definitions to noteLabels
+                if (
+                    isCustomTemperament(keys[i]) &&
+                    temperament &&
+                    !isEquallyTempered(keys[i]) &&
+                    temperament["0"] &&
+                    Array.isArray(temperament["0"])
+                ) {
+                    customLabels.push(keys[i]);
+                    noteLabels[keys[i]] = temperament;
                 }
+            }
+            if (!customLabels.length) {
+                const defaultCustom = {
+                    0: [1, "C", 4],
+                    1: [1.189, "D#", 4],
+                    2: [1.334, "F", 4],
+                    3: [1.498, "G", 4],
+                    4: [1.781, "A#", 4],
+                    pitchNumber: 5
+                };
+                customLabels.push("custom");
+                noteLabels["custom"] = defaultCustom;
+                const currentCustom = getTemperament("custom");
+                if (!currentCustom || !currentCustom["0"] || !Array.isArray(currentCustom["0"])) {
+                    addTemperamentToDictionary("custom", defaultCustom);
+                }
+            }
+            let selectedCustom;
+            if (this.customID !== null && customLabels.includes(this.customID)) {
+                selectedCustom = this.customID;
             } else {
-                const keys = getTemperamentKeys();
-                const noteLabels = {};
-                const customLabels = [];
-                for (let i = 0; i < keys.length; i++) {
-                    const temperament = getTemperament(keys[i]);
-                    // Only add valid temperaments to noteLabels
-                    if (temperament && typeof temperament === "object") {
-                        noteLabels[keys[i]] = temperament;
-                    }
-                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
-                        customLabels.push(keys[i]);
-                }
-                if (!customLabels.length) return;
-                let selectedCustom;
-                if (this.customID !== null) selectedCustom = this.customID;
-                else selectedCustom = customLabels[0];
+                selectedCustom = customLabels[0];
+            }
 
-                if (this.value !== null) {
-                    selectedNote = this.value;
+            if (this.value !== null) {
+                selectedNote = this.value;
+            } else {
+                // Ensure we have a valid temperament before accessing its properties
+                const selectedTemperament =
+                    noteLabels[selectedCustom] || getTemperament(selectedCustom);
+                if (
+                    selectedTemperament &&
+                    selectedTemperament["0"] &&
+                    selectedTemperament["0"][1]
+                ) {
+                    selectedNote = selectedTemperament["0"][1];
                 } else {
-                    // Ensure we have a valid temperament before accessing its properties
-                    const selectedTemperament = getTemperament(selectedCustom);
-                    if (
-                        selectedTemperament &&
-                        selectedTemperament["0"] &&
-                        selectedTemperament["0"][1]
-                    ) {
-                        selectedNote = selectedTemperament["0"][1];
-                    } else {
-                        // Fallback to a default note
-                        selectedNote = "C";
-                    }
+                    // Fallback to a default note
+                    selectedNote = "C";
                 }
+            }
 
+            if (this.piemenuOKtoLaunch()) {
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
             }
         } else if (this.name === "eastindiansolfege") {
@@ -5000,6 +5150,9 @@ class Block {
         }
 
         c = this.connections[0];
+        // Capture the value the user actually typed before any collision resolution
+        // so the second action switch can always detect a user-initiated rename.
+        const typedActionValue = newValue;
         if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             let uniqueValue;
@@ -5007,22 +5160,28 @@ class Block {
                 case "action":
                     {
                         const isNameChanged = oldValue !== newValue;
-                        if (isNameChanged) {
+                        if (isNameChanged && commitLabelEdit) {
                             this.blocks.palettes.removeActionPrototype(oldValue);
                         }
 
-                        // Ensure new name is unique.
-                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
-                        if (validatedName !== newValue) {
-                            newValue = validatedName;
-                            this.value = newValue;
-                            let label = this.value.toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                label = label.slice(0, STRINGLEN) + "...";
+                        // Ensure new name is unique upon committing the edit.
+                        if (commitLabelEdit) {
+                            const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                            if (validatedName !== newValue) {
+                                // Notify the user that their chosen name was already taken.
+                                this.activity.errorMsg(
+                                    `${_("Renaming")} "${newValue}" ${_("to avoid name collision")}: "${validatedName}"`
+                                );
+                                newValue = validatedName;
+                                this.value = newValue;
+                                let label = this.value.toString();
+                                if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                    label = label.slice(0, STRINGLEN) + "...";
+                                }
+                                this.text.text = label;
+                                this.label.value = newValue;
+                                this.updateCache();
                             }
-                            this.text.text = label;
-                            this.label.value = newValue;
-                            this.updateCache();
                         }
                     }
                     break;
@@ -5175,7 +5334,9 @@ class Block {
             switch (cblock.name) {
                 case "action":
                     {
-                        const isNameChanged = oldValue !== newValue;
+                        // Use typedActionValue so a collision-resolved rename (where the
+                        // resolved name equals oldValue) still triggers a palette refresh.
+                        const isNameChanged = oldValue !== typedActionValue;
                         if (isNameChanged && closeInput) {
                             this.blocks.renameDos(oldValue, newValue);
 
@@ -5284,6 +5445,157 @@ class Block {
             delete this._capturedInitialValue;
             delete this._capturedInitialText;
         }
+        this._updateAccessibleElement();
+    }
+
+    /**
+     * Get or create the accessible container for workspace blocks.
+     * @static
+     * @returns {HTMLElement|null}
+     */
+    static getAccessibleContainer() {
+        if (typeof document === "undefined" || !document.getElementById) {
+            return null;
+        }
+        let container = document.getElementById("accessibleBlocks");
+        if (!container && typeof document.createElement === "function") {
+            container = document.createElement("div");
+            container.id = "accessibleBlocks";
+            container.className = "visually-hidden";
+            container.setAttribute("role", "region");
+            container.setAttribute("aria-label", "Workspace Blocks");
+            container.style.cssText =
+                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+            const parent = document.getElementById("canvasContainer") || document.body;
+            if (parent && typeof parent.appendChild === "function") {
+                parent.appendChild(container);
+            }
+        }
+        return container;
+    }
+
+    /**
+     * Get an accessible descriptive label for assistive technology.
+     * @returns {string}
+     */
+    getAccessibleLabel() {
+        const name =
+            (this.overrideName && this.name !== "outputtools" && this.overrideName) ||
+            (this.protoblock && this.protoblock.staticLabels && this.protoblock.staticLabels[0]) ||
+            this.name ||
+            "block";
+        if (
+            this.value !== null &&
+            this.value !== undefined &&
+            this.value !== "" &&
+            !(typeof this.value === "string" && this.value.startsWith("data:"))
+        ) {
+            return `${name}, value: ${this.value}`;
+        }
+        return `${name} block`;
+    }
+
+    /**
+     * Programmatically activate this block (simulates canvas click).
+     * @returns {void}
+     */
+    activate() {
+        if (!this.container) {
+            return;
+        }
+        const scale =
+            this.activity && typeof this.activity.getStageScale === "function"
+                ? this.activity.getStageScale()
+                : 1;
+        const event = {
+            type: "click",
+            stageX: ((this.container.x || 0) + 50) * scale,
+            stageY: ((this.container.y || 0) + 10) * scale,
+            nativeEvent: {}
+        };
+        if (typeof this.container.dispatchEvent === "function") {
+            this.container.dispatchEvent(event);
+        }
+    }
+
+    /**
+     * Set up an off-screen accessible mirror element for this block.
+     * @private
+     * @returns {HTMLElement|null}
+     */
+    _setupAccessibleElement() {
+        if (typeof document === "undefined" || !document.createElement) {
+            return null;
+        }
+        this._removeAccessibleElement();
+
+        const container = Block.getAccessibleContainer();
+        if (!container || typeof container.appendChild !== "function") {
+            return null;
+        }
+
+        const el = document.createElement("div");
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.className = "accessible-workspace-block";
+        if (this.blockIndex !== -1 && this.blockIndex !== undefined) {
+            el.id = "accessible-block-" + this.blockIndex;
+        }
+
+        el.setAttribute("aria-label", this.getAccessibleLabel());
+
+        el.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+                event.preventDefault();
+                event.stopPropagation();
+                this.activate();
+            } else if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+                event.preventDefault();
+                const next = el.nextElementSibling;
+                if (next && typeof next.focus === "function") {
+                    next.focus();
+                }
+            } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+                event.preventDefault();
+                const prev = el.previousElementSibling;
+                if (prev && typeof prev.focus === "function") {
+                    prev.focus();
+                }
+            }
+        });
+
+        container.appendChild(el);
+        this.accessibleElement = el;
+        return el;
+    }
+
+    /**
+     * Remove the accessible mirror element from the DOM.
+     * @private
+     * @returns {void}
+     */
+    _removeAccessibleElement() {
+        if (this.accessibleElement) {
+            if (this.accessibleElement.parentNode) {
+                this.accessibleElement.parentNode.removeChild(this.accessibleElement);
+            }
+            this.accessibleElement = null;
+        }
+    }
+
+    /**
+     * Update the accessible mirror element's attributes.
+     * @private
+     * @returns {void}
+     */
+    _updateAccessibleElement() {
+        if (!this.accessibleElement) {
+            return;
+        }
+        if (this.blockIndex !== -1 && this.blockIndex !== undefined) {
+            this.accessibleElement.id = "accessible-block-" + this.blockIndex;
+        }
+        this.accessibleElement.setAttribute("aria-label", this.getAccessibleLabel());
     }
 }
 

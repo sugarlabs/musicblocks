@@ -132,4 +132,15 @@ describe("GitTutorial - 4-Step Interactive Guide", () => {
 
         expect(document.getElementById("git-tutorial-overlay")).toBeNull();
     });
+
+    test("styles overlay and shell with scrollable behavior on short viewports", () => {
+        GitTutorial.open(mockActivity);
+
+        const styleEl = document.getElementById("git-tutorial-styles");
+        expect(styleEl).not.toBeNull();
+        expect(styleEl.textContent).toContain("overflow-y: auto");
+        expect(styleEl.textContent).toContain("box-sizing: border-box");
+        expect(styleEl.textContent).toContain("@media (max-height: 640px)");
+        expect(styleEl.textContent).toContain("margin: 0 auto;");
+    });
 });

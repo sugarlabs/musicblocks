@@ -446,7 +446,18 @@ describe("GlobalPlanet", () => {
             expect(callback).not.toHaveBeenCalled();
         });
 
-        it("should not throw when error callback is null and data fails", () => {
+        it("should show error toast when error callback is null and SaveInterface is available", () => {
+            mockPlanet.SaveInterface = { showToast: jest.fn() };
+            const callback = jest.fn();
+            gp.afterDownloadData("proj1", { success: false }, callback, null);
+            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith(
+                "Could not load project. Please check your connection and try again.",
+                true
+            );
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        it("should not throw when error callback is null and SaveInterface is missing", () => {
             const callback = jest.fn();
             expect(() => {
                 gp.afterDownloadData("proj1", { success: false }, callback, null);

@@ -65,6 +65,7 @@ const _KNOWN_URL_PARAMS = new Set([
     "music",
     "outurl",
     "performance",
+    "repo",
     "run",
     "show",
     "turtle"
@@ -1491,6 +1492,8 @@ class ProjectManager {
 
         if (params.has("id")) {
             that.projectID = params.get("id");
+        } else if (params.has("repo")) {
+            that.projectID = params.get("repo");
         }
 
         const isTrue = name => (params.get(name) || "").toLowerCase() === "true";

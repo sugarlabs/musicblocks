@@ -1345,39 +1345,12 @@ class Singer {
                 activity.logo.synth.inTemperament
             );
 
-            for (let i = 0; i < activity.logo.pitchStaircase.Stairs.length; i++) {
-                if (activity.logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                    activity.logo.pitchStaircase.Stairs.splice(i, 0, [
-                        noteObj1[0],
-                        noteObj1[1],
-                        parseFloat(frequency),
-                        1,
-                        1
-                    ]);
-                    return;
-                }
-
-                if (activity.logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                    activity.logo.pitchStaircase.Stairs.splice(i, 1, [
-                        noteObj1[0],
-                        noteObj1[1],
-                        parseFloat(frequency),
-                        1,
-                        1
-                    ]);
-                    return;
-                }
-            }
-
-            activity.logo.pitchStaircase.Stairs.push([
+            activity.logo.pitchStaircase.addStair(
                 noteObj1[0],
                 noteObj1[1],
                 parseFloat(frequency),
-                1,
-                1
-            ]);
-
-            activity.logo.pitchStaircase.stairPitchBlocks.push(blk);
+                blk
+            );
         } else if (activity.logo.inMusicKeyboard) {
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;

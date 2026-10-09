@@ -496,7 +496,7 @@ class Logo {
         if (this._synthsInitialized) {
             // Ensure any newly added turtles (e.g., companion turtles) are
             // initialized without disrupting existing turtles' runtime state.
-            for (const turtle in this.turtles.turtleList) {
+            for (const turtle of Object.keys(this.turtles.turtleList)) {
                 if (turtle in this.deps.instruments) {
                     continue;
                 }
@@ -549,7 +549,7 @@ class Logo {
         }
         this.synth.newTone();
 
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const tur = this.turtles.ithTurtle(turtle);
 
             if (!(turtle in this.deps.instruments)) {
@@ -591,7 +591,7 @@ class Logo {
             tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(turtle);
             for (const synth in tur.singer.synthVolume) {
@@ -613,7 +613,7 @@ class Logo {
         }
 
         this.deps.Singer.resetMasterVolume(this);
-        for (const t in this.turtles.turtleList) {
+        for (const t of Object.keys(this.turtles.turtleList)) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
             const tur = this.turtles.ithTurtle(t);
             for (const synth in tur.singer.synthVolume) {
@@ -1361,6 +1361,17 @@ class Logo {
     // ========= Behavior =========================================================================
 
     resetTemperament() {
+        // A temperament only carries over to the next run while the project
+        // still sets one; otherwise it would leak into other projects.
+        const setsTemperament = this.blockList.some(
+            blk => blk && !blk.trash && blk.name === "settemperament"
+        );
+        if (!setsTemperament) {
+            this._userTemperament = null;
+            this.temperamentSelected = [];
+            this.synth.startingPitch = "C4";
+        }
+
         this.synth.changeInTemperament = false;
         this.synth.inTemperament = this._userTemperament || "equal";
     }
@@ -1416,7 +1427,7 @@ class Logo {
         this.sounds = [];
 
         // Kill all active audio voices to prevent "zombie audio"
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const tur = this.turtles.getTurtle(turtle);
             if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
                 tur.singer.killAllVoices();
@@ -1730,6 +1741,9 @@ class Logo {
         }
         this.specialArgs = [];
         this.connectionStore = {};
+        if (!this.runningLilypond && !this.runningAbc) {
+            this.notationOutput = "";
+        }
         if (this.recordingBuffer && !this.recording) {
             this.recordingBuffer = {
                 hasData: false,
@@ -1741,7 +1755,7 @@ class Logo {
         }
 
         // Each turtle needs to keep its own wait time and music states.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             this.initTurtle(turtle);
         }
 
@@ -1771,7 +1785,7 @@ class Logo {
         this.clearTurtleListeners();
 
         // Init the graphic state.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             const requiredTurtle = this.turtles.getTurtle(turtle);
             requiredTurtle.container.x = this.turtles.turtleX2screenX(requiredTurtle.x);
             requiredTurtle.container.y = this.turtles.turtleY2screenY(requiredTurtle.y);
@@ -1844,7 +1858,7 @@ class Logo {
         this.onRunTurtle();
 
         // Mark all turtles as not running.
-        for (const turtle in this.turtles.turtleList) {
+        for (const turtle of Object.keys(this.turtles.turtleList)) {
             this.turtles.getTurtle(turtle).running = false;
         }
 
@@ -2625,7 +2639,17 @@ class Logo {
                     } else {
                         // Record notation data into buffer for later save (Issue #2330)
                         // This allows saving Lilypond/ABC from interactive sessions
-                        if (logo.notationOutput && logo.notationOutput.length > 0) {
+                        const hasStagedNotation =
+                            logo.notation &&
+                            logo.notation.notationStaging &&
+                            Object.values(logo.notation.notationStaging).some(
+                                staging => Array.isArray(staging) && staging.length > 0
+                            );
+                        if (
+                            hasStagedNotation &&
+                            logo.notationOutput &&
+                            logo.notationOutput.length > 0
+                        ) {
                             logo.recordingBuffer.hasData = true;
                             logo.recordingBuffer.notationOutput = logo.notationOutput;
                             logo.recordingBuffer.notationNotes = JSON.parse(

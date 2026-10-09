@@ -264,6 +264,15 @@ describe("processLilypondNotes", () => {
         );
     });
 
+    test("should not add repeat bars when no notes follow the forever loop", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 0, null, 0, -1, false],
+            "begin repeat"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\bar");
+    });
+
     test("should not add repeat bars without a forever loop", () => {
         logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
@@ -952,6 +961,16 @@ describe("saveLilypondOutput", () => {
         const result = saveLilypondOutput(activity);
         expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar ":\|\." \n\}/);
         expect(result).not.toContain('\\bar "|."');
+    });
+
+    test("should keep the final bar when no notes follow the last voice's forever", () => {
+        activity.logo.notation.notationStaging[1] = [
+            [["E4"], 4, 0, null, 0, -1, false],
+            "begin repeat"
+        ];
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
+        expect(result).not.toContain(":|.");
     });
 
     test("should repeat the drum staff along with the voice", () => {

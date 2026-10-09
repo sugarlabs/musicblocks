@@ -1902,7 +1902,16 @@ class Activity {
         }
 
         let resizeTimeout;
+        let resizeAnimationFrame;
+
         this._handleWindowResize = () => {
+            if (!resizeAnimationFrame) {
+                resizeAnimationFrame = requestAnimationFrame(() => {
+                    this._handleRepositionBlocksOnResize();
+                    resizeAnimationFrame = null;
+                });
+            }
+
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
@@ -1990,7 +1999,7 @@ class Activity {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
-            for (const name in this.blocks.palettes.dict) {
+            for (const name of Object.keys(this.blocks.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2006,7 +2015,7 @@ class Activity {
             // which scans all blocks, so N moves × N blocks = O(N²).
             this.blocks._beginDeferCheckBounds();
 
-            for (const blk in this.blocks.blockList) {
+            for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
                 if (!myBlock) continue;
 
@@ -2504,7 +2513,7 @@ class Activity {
                 return;
             }
 
-            for (const name in this.palettes.dict) {
+            for (const name of Object.keys(this.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -3047,8 +3056,6 @@ class Activity {
      * Registers window resize listeners after dependency cleanup.
      */
     setupResizeListeners() {
-        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
         this.addEventListener(window, "resize", this._handleWindowResize);
     }
 

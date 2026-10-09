@@ -99,7 +99,8 @@ function makeActivity({ blockList = {}, turtleList = [] } = {}) {
         }),
         _beginDeferCheckBounds: jest.fn(),
         _endDeferCheckBounds: jest.fn(),
-        checkBounds: jest.fn()
+        checkBounds: jest.fn(),
+        _updateViewportCulling: jest.fn()
     };
 
     return {
@@ -118,6 +119,7 @@ function makeActivity({ blockList = {}, turtleList = [] } = {}) {
         palettes: { updatePalettes: jest.fn() },
         homeButtonContainer: { children: [{}] },
         _changeBlockVisibility: jest.fn(),
+        refreshCanvas: jest.fn(),
         __tick: jest.fn(),
         closeHelpfulWheel: jest.fn(() => {
             const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
@@ -191,11 +193,15 @@ describe("setupWorkspaceLayoutController", () => {
             global.GOHOMEBUTTON
         );
 
-        // repositionBlocks() -> _findBlocks() flips the toggle again.
+        // repositionBlocks() should refresh the resized workspace
+        // without invoking _findBlocks() or changing the home-layout state.
         activity.repositionBlocks();
-        expect(controller._isFirstHomeClick).toBe(true);
+        expect(controller._isFirstHomeClick).toBe(false);
+        expect(activity.blocks._updateViewportCulling).toHaveBeenCalled();
+        expect(activity.refreshCanvas).toHaveBeenCalled();
 
-        // _handleRepositionBlocksOnResize() -> repositionBlocks() -> _findBlocks().
+        // The resize handler delegates to repositionBlocks() and should
+        // preserve the current home-layout state.
         activity._handleRepositionBlocksOnResize();
         expect(controller._isFirstHomeClick).toBe(false);
     });
@@ -529,7 +535,7 @@ describe("repositionBlocks", () => {
         expect(blockList.root.beforeMobilePosition).toEqual({ x: 300, y: 300 });
     });
 
-    test("returning to desktop width restores the pre-tablet offset and clears beforeMobilePosition", () => {
+    test("returning to desktop width restores the pre-tablet horizontal position and clears beforeMobilePosition", () => {
         const blockList = { root: makeBlock("root", { x: 300, y: 300 }) };
         const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
@@ -547,7 +553,7 @@ describe("repositionBlocks", () => {
 
         expect(blockList.root.beforeMobilePosition).toBeNull();
         expect(blockList.root.container.x).toBe(300);
-        expect(blockList.root.container.y).toBe(300);
+        expect(blockList.root.container.y).toBe(100);
     });
 
     test("mobile width: records before600pxPosition once", () => {
@@ -563,14 +569,19 @@ describe("repositionBlocks", () => {
 
     test("shifts a drag group left when it overflows the right edge of the canvas", () => {
         setInnerWidth(400);
-        const blockList = { root: makeBlock("root", { x: 380, y: 0, width: 50 }) };
+
+        const blockList = {
+            root: makeBlock("root", { x: 380, y: 0, width: 50 })
+        };
+
         const activity = setupActivity({ blockList });
-        jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
 
-        // rightmostX (430) > canvasWidth (400) => shiftX = max(10, 400-430-10) = 10
-        expect(blockList.root.container.x).toBe(390);
+        // rightmostX = 430
+        // shiftX = 400 - 430 - 10 = -40
+        // new x = 380 - 40 = 340
+        expect(blockList.root.container.x).toBe(340);
     });
 
     test("shifts a drag group right when it starts left of the canvas origin", () => {
@@ -585,19 +596,88 @@ describe("repositionBlocks", () => {
         expect(blockList.root.container.x).toBe(100);
     });
 
-    test("invokes _findBlocks once after repositioning drag groups", () => {
-        const activity = setupActivity({ blockList: { a: makeBlock("a") } });
-        jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
+    test("updates viewport culling and refreshes the canvas after repositioning", () => {
+        const activity = setupActivity({
+            blockList: {
+                root: makeBlock("root", { x: 100, y: 100 })
+            }
+        });
 
         activity.repositionBlocks();
 
-        expect(activity.workspaceLayoutController._findBlocks).toHaveBeenCalledTimes(1);
+        expect(activity.blocks._updateViewportCulling).toHaveBeenCalledTimes(1);
+        expect(activity.refreshCanvas).toHaveBeenCalledTimes(1);
     });
 
     test("handles an empty workspace without throwing", () => {
         const activity = setupActivity({ blockList: {} });
 
         expect(() => activity.repositionBlocks()).not.toThrow();
+    });
+
+    test("uses blockList keys instead of block.id when finding drag groups", () => {
+        const block = makeBlock(undefined, { x: 100, y: 100 });
+
+        const blockList = {
+            0: block
+        };
+
+        const activity = setupActivity({ blockList });
+
+        activity.repositionBlocks();
+
+        expect(activity.blocks.findDragGroup).toHaveBeenCalledWith(0);
+        expect(activity.blocks.findDragGroup).not.toHaveBeenCalledWith(undefined);
+    });
+
+    test("restores drag groups to their original horizontal positions after narrowing and widening", () => {
+        setInnerWidth(1200);
+
+        const blockList = {
+            0: makeBlock("rootA", { x: 300, y: 100, width: 120 }),
+            1: makeBlock("rootB", { x: 700, y: 100, width: 120 }),
+            2: makeBlock("rootC", { x: 1000, y: 100, width: 120 })
+        };
+
+        const activity = setupActivity({ blockList });
+
+        activity.repositionBlocks();
+
+        setInnerWidth(700);
+        activity.repositionBlocks();
+
+        setInnerWidth(1200);
+        activity.repositionBlocks();
+
+        expect(blockList[0].container.x).toBe(300);
+        expect(blockList[1].container.x).toBe(700);
+        expect(blockList[2].container.x).toBe(1000);
+    });
+
+    test("does not drift drag groups left across repeated resize cycles", () => {
+        setInnerWidth(1200);
+
+        const blockList = {
+            0: makeBlock("rootA", { x: 300, y: 100, width: 120 }),
+            1: makeBlock("rootB", { x: 700, y: 100, width: 120 }),
+            2: makeBlock("rootC", { x: 1000, y: 100, width: 120 })
+        };
+
+        const activity = setupActivity({ blockList });
+
+        activity.repositionBlocks();
+
+        for (let i = 0; i < 3; i++) {
+            setInnerWidth(700);
+            activity.repositionBlocks();
+
+            setInnerWidth(1200);
+            activity.repositionBlocks();
+        }
+
+        expect(blockList[0].container.x).toBe(300);
+        expect(blockList[1].container.x).toBe(700);
+        expect(blockList[2].container.x).toBe(1000);
     });
 });
 

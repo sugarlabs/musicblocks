@@ -194,17 +194,7 @@ class HelpWidget {
             leftArrow.setAttribute("title", _("Previous"));
             leftArrow.setAttribute("aria-label", _("Previous"));
 
-            if (this._keydownHandler) {
-                document.removeEventListener("keydown", this._keydownHandler);
-            }
-            this._keydownHandler = event => {
-                if (event.key === "ArrowLeft") {
-                    leftArrow.click();
-                } else if (event.key === "ArrowRight") {
-                    rightArrow.click();
-                }
-            };
-            document.addEventListener("keydown", this._keydownHandler);
+            this._setupKeyHandler(leftArrow, rightArrow);
 
             let cell = docById("left-arrow");
             if (page === 0) {
@@ -445,6 +435,79 @@ class HelpWidget {
     }
 
     /**
+     * Set up keyboard event handling for tour page navigation
+     * @private
+     * @param {HTMLElement} leftArrow
+     * @param {HTMLElement} rightArrow
+     * @returns {void}
+     */
+    _setupKeyHandler(leftArrow, rightArrow) {
+        if (this._keydownHandler) {
+            document.removeEventListener("keydown", this._keydownHandler);
+            this._keydownHandler = null;
+        }
+
+        if (this._standaloneBlockHelp) {
+            return;
+        }
+
+        const handleButtonKey = event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                event.currentTarget.click();
+            }
+        };
+
+        if (leftArrow) {
+            leftArrow.onkeydown = handleButtonKey;
+        }
+        if (rightArrow) {
+            rightArrow.onkeydown = handleButtonKey;
+        }
+
+        this._keydownHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== this.widgetWindow
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.tagName === "SELECT" ||
+                    activeElement.isContentEditable ||
+                    activeElement.getAttribute("contenteditable") === "true")
+            ) {
+                return;
+            }
+
+            if (
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.activeBlock !== null &&
+                this.activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            if (event.key === "ArrowLeft" && leftArrow) {
+                event.preventDefault();
+                leftArrow.click();
+            } else if (event.key === "ArrowRight" && rightArrow) {
+                event.preventDefault();
+                rightArrow.click();
+            }
+        };
+
+        document.addEventListener("keydown", this._keydownHandler);
+    }
+
+    /**
      * @private
      * @param {number} page
      * @returns {void}
@@ -463,7 +526,12 @@ class HelpWidget {
         const imageSrc = typeof image === "function" ? image() : image;
 
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
+        rightArrow.setAttribute(
+            "aria-disabled",
+            page === HELPCONTENT.length - 1 ? "true" : "false"
+        );
         leftArrow.classList.toggle("disabled", page === 0);
+        leftArrow.setAttribute("aria-disabled", page === 0 ? "true" : "false");
 
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
@@ -880,17 +948,7 @@ class HelpWidget {
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
 
-        if (this._keydownHandler) {
-            document.removeEventListener("keydown", this._keydownHandler);
-        }
-        this._keydownHandler = event => {
-            if (event.key === "ArrowLeft") {
-                leftArrow.click();
-            } else if (event.key === "ArrowRight") {
-                rightArrow.click();
-            }
-        };
-        document.addEventListener("keydown", this._keydownHandler);
+        this._setupKeyHandler(leftArrow, rightArrow);
 
         if (this._standaloneBlockHelp) {
             rightArrow.style.display = "none";
@@ -899,6 +957,9 @@ class HelpWidget {
             leftArrow.classList.remove("hover");
         } else if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
+            rightArrow.setAttribute("aria-disabled", "true");
+        } else {
+            rightArrow.setAttribute("aria-disabled", "false");
         }
         cell.onclick = () => {
             if (this._standaloneBlockHelp) return;
