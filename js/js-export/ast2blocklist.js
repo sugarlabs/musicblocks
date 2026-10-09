@@ -328,7 +328,7 @@ class AST2BlockList {
             const argConfigs = config.argument_blocks;
 
             // Implementation of toTrees(AST).
-            let root = {};
+            let root = { children: [] };
             for (let body of AST.body) {
                 _createNodeAndAddToTree(body, root);
             }
@@ -465,6 +465,9 @@ class AST2BlockList {
             }
 
             function _createNodeAndAddToTree(bodyAST, parent) {
+                if (bodyAST.type === "EmptyStatement") {
+                    return;
+                }
                 let pair = _matchBody(bodyAST);
                 if (pair === null) {
                     throw {
@@ -509,6 +512,7 @@ class AST2BlockList {
                 }
                 // Set children
                 if (pair.ast.children_properties !== undefined) {
+                    node["children"] = [];
                     for (const child of _getPropertyValue(
                         bodyAST,
                         pair.ast.children_properties[0]
@@ -736,7 +740,10 @@ class AST2BlockList {
                     vspaces += ret.vspaces;
 
                     // Set child-parent connection for first group
-                    if (property.connections.child !== undefined) {
+                    if (
+                        property.connections.child !== undefined &&
+                        ret.firstChildBlockNumber !== undefined
+                    ) {
                         connections[property.connections.child] = ret.firstChildBlockNumber;
                         let childBlock = blockList[ret.firstChildBlockNumber];
                         let childProperty = _propertyOf(childBlock);
@@ -750,7 +757,10 @@ class AST2BlockList {
                         let ret = _processChildren(secondGroup, 0, blockList);
                         vspaces += ret.vspaces;
                         // Set child-parent connection for second group
-                        if (property.connections.second_child !== undefined) {
+                        if (
+                            property.connections.second_child !== undefined &&
+                            ret.firstChildBlockNumber !== undefined
+                        ) {
                             connections[property.connections.second_child] =
                                 ret.firstChildBlockNumber;
                             let childBlock = blockList[ret.firstChildBlockNumber];
