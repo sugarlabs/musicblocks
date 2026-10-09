@@ -967,6 +967,23 @@ describe("setupIntervalsBlocks", () => {
             }
         );
 
+        it.each(["measureintervalsemitones", "measureintervalscalar"])(
+            "%s holds back the enclosing clamp signals by index",
+            blockName => {
+                logo.turtleHeaps = { [turtleIndex]: [] };
+                logo.turtleDicts = { [turtleIndex]: {} };
+                turtleState.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+                let skipped;
+                logo.runFromBlockNow = jest.fn(() => {
+                    skipped = JSON.parse(JSON.stringify(turtleState.butNotThese));
+                });
+
+                createdBlocks[blockName].arg(logo, turtleIndex, "blkMeasure");
+
+                expect(skipped).toEqual({ 7: [0, 1] });
+            }
+        );
+
         it("Heap absent before measurement: the heap is restored as an empty array, not an object", () => {
             logo.turtleHeaps = {};
             logo.turtleDicts = { [turtleIndex]: {} };

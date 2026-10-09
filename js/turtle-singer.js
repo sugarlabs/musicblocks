@@ -595,11 +595,9 @@ class Singer {
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
+        // Logo skips these signals by index once the counting run ends.
         for (const b in tur.endOfClampSignals) {
-            tur.butNotThese[b] = [];
-            for (const i of tur.endOfClampSignals[b]) {
-                tur.butNotThese[b].push(i);
-            }
+            tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
         }
 
         const actionArgs = [];
@@ -702,7 +700,7 @@ class Singer {
         tur.singer.justCounting.push(true);
 
         Object.keys(tur.endOfClampSignals).forEach(b => {
-            tur.butNotThese[b] = Object.keys(tur.endOfClampSignals[b]);
+            tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
         });
 
         tur.running = true;

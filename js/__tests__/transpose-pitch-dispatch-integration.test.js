@@ -213,6 +213,7 @@ function createTurtle() {
             suppressOutput: true,
             drumStyle: [],
             invertList: [],
+            justCounting: [],
             justMeasuring: [],
             arpeggio: [],
             intervals: [],
