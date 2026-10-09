@@ -613,14 +613,14 @@ describe("setupVolumeActions", () => {
             expect(inst2.pan.value).toBe(-1);
         });
 
-        it("should connect all instruments to the panner", () => {
+        it("should not connect instruments beside their current route", () => {
             const connectSpy = jest.spyOn(instruments[0].synth1, "connect");
             const connectSpyPiano = jest.spyOn(instruments[0].piano, "connect");
 
-            Singer.VolumeActions.setPanning(50, 0);
+            Singer.VolumeActions.setPanning(-100, 0);
 
-            expect(connectSpy).toHaveBeenCalledWith(targetTurtle.singer.panner);
-            expect(connectSpyPiano).toHaveBeenCalledWith(targetTurtle.singer.panner);
+            expect(connectSpy).not.toHaveBeenCalled();
+            expect(connectSpyPiano).not.toHaveBeenCalled();
         });
     });
 

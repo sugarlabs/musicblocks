@@ -625,6 +625,16 @@ describe("State initialization — effects parameters", () => {
     test("should initialize panner to null", () => {
         expect(singer.panner).toBeNull();
     });
+
+    test("should dispose the panner when a new run resets the singer", () => {
+        const panner = { dispose: jest.fn() };
+        singer.panner = panner;
+
+        singer.reset();
+
+        expect(panner.dispose).toHaveBeenCalled();
+        expect(singer.panner).toBeNull();
+    });
 });
 
 describe("State initialization — crescendo", () => {
@@ -2416,5 +2426,27 @@ describe("processNote — custom timbre effects normalization (#9043)", () => {
         expect(paramsEffects.chorusDepth).toBe(0.7);
         expect(paramsEffects.chorusRate).toBe(1.5);
         expect(paramsEffects.delayTime).toBe(3.5);
+    });
+
+    it("should pass the turtle panner to synth.trigger", () => {
+        const blk = "mockBlk";
+        const panner = { name: "Panner" };
+        singer.panner = panner;
+        singer.inNoteBlock = [blk];
+        singer.instrumentNames = ["customVoice"];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+        expect(callArgs[callArgs.length - 1]).toBe(panner);
     });
 });

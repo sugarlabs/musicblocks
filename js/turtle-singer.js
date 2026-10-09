@@ -131,6 +131,12 @@ class Singer {
         }
         this._unhighlightTimers = {};
 
+        // Each run sets its own panning.
+        if (this.panner) {
+            this.panner.dispose();
+            this.panner = null;
+        }
+
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
         /** @deprecated */ this.decay = [];
@@ -2475,7 +2481,8 @@ class Singer {
                                             paramsEffects,
                                             null,
                                             false,
-                                            future
+                                            future,
+                                            tur.singer.panner
                                         );
                                     }
                                 } else if (
@@ -2492,7 +2499,8 @@ class Singer {
                                             null,
                                             null,
                                             false,
-                                            future
+                                            future,
+                                            tur.singer.panner
                                         );
                                     }
                                 } else {
@@ -2511,7 +2519,8 @@ class Singer {
                                                     null,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
@@ -2527,7 +2536,8 @@ class Singer {
                                                             paramsEffects,
                                                             filters,
                                                             true,
-                                                            future
+                                                            future,
+                                                            tur.singer.panner
                                                         );
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
@@ -2541,7 +2551,8 @@ class Singer {
                                                             paramsEffects,
                                                             filters,
                                                             false,
-                                                            future
+                                                            future,
+                                                            tur.singer.panner
                                                         );
                                                         tur.singer.glideOverride = 0;
                                                     }
@@ -2554,7 +2565,8 @@ class Singer {
                                                         paramsEffects,
                                                         filters,
                                                         false,
-                                                        future
+                                                        future,
+                                                        tur.singer.panner
                                                     );
                                                 }
                                             }
@@ -2571,7 +2583,8 @@ class Singer {
                                                     paramsEffects,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         } else {
@@ -2584,7 +2597,8 @@ class Singer {
                                                     paramsEffects,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         }
@@ -2644,7 +2658,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                tur.singer.panner
                                             );
                                         }
                                     } else {
@@ -2657,7 +2672,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                tur.singer.panner
                                             );
                                         }
                                     }
