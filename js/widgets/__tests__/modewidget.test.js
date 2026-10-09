@@ -102,8 +102,7 @@ const {
     isEquallyTempered,
     pitchToFrequency,
     getTemperamentSliceAngles,
-    enforceMinSliceAngles,
-    applySliceAngles
+    enforceMinSliceAngles
 } = require("../../utils/musicutils.js");
 const { configureWheel, updateWheelItems } = require("../../utils/piemenu.js");
 global.getSavedCustomModes = getSavedCustomModes;
@@ -122,7 +121,7 @@ global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
 global.getTemperamentSliceAngles = getTemperamentSliceAngles;
 global.enforceMinSliceAngles = enforceMinSliceAngles;
-global.applySliceAngles = jest.fn(applySliceAngles);
+global.applySliceAngles = jest.fn(global.applySliceAngles);
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
 global.TuningFormats = require("../../utils/tuningformats");
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);

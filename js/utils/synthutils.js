@@ -1027,7 +1027,13 @@ function Synth() {
                             (isCustomTemperament(customID) && target === _stripCents(n3)) ||
                             target === _stripCents(n1)
                         ) {
-                            const octaveDiff = octave - thisTemperament[pitchNumber][2];
+                            const entryOctave = Number(thisTemperament[pitchNumber][2]);
+                            if (!Number.isFinite(entryOctave)) {
+                                // Malformed legacy entry: skip like an
+                                // unmatched note instead of a NaN frequency.
+                                continue;
+                            }
+                            const octaveDiff = octave - entryOctave;
                             return Number(
                                 thisTemperament[pitchNumber][0] *
                                     startPitchFrequency *

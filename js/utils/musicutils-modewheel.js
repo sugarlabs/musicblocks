@@ -116,15 +116,7 @@ var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     return `100 ${clamped}px sans-serif`;
 };
 
-/**
- * Per-slice wheelnav angles in degrees, proportional to real interval sizes:
- * slice i spans the gap from pitch i-1 to pitch i, slice 0 wrapping the last
- * pitch up to the octave. Ratios must ascend within one octave and carry no
- * trailing octave; anything else yields null instead of shuffled slices.
- * @param {number[]} ratios - One ratio per slice, WITHOUT a trailing octave.
- * @param {number} [octaveRatio=2] - Ratio of the octave.
- * @returns {number[]|null} Angles summing to 360, or null for unusable input.
- */
+/** Per-slice wheelnav angles: slice i spans pitch i-1 to i, slice 0 wrapping the last pitch to the octave. Null for unusable input. */
 var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
     if (!Array.isArray(ratios) || ratios.length < 2) {
         return null;
@@ -132,7 +124,7 @@ var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
 
     const pitchCount = ratios.length;
     const positions = ratios.map(r => ratioToWheelAngle(r, octaveRatio) - 270);
-    // Separate variable, not an in-place -= 360: sliceAngle[n-1] also reads
+    // Separate variable, not an in-place -= 360: angles[n-1] also reads
     // positions[n-1], so mutating it would corrupt the last slice.
     const wrappedRoot = positions[pitchCount - 1] - 360;
 
@@ -143,16 +135,7 @@ var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
     return angles.every(a => a > 0) ? angles : null;
 };
 
-/**
- * `sliceAnglesFromRatios` for a TEMPERAMENT entry. Returns null when equal
- * slices should be used instead: equally tempered or unknown keys, missing
- * ratios, or a pitchCount that does not match the ratio table. Only built-in
- * entries with a `ratios` array qualify; editor-saved custom temperaments
- * store ratios in numeric pitch keys and fall back to equal slices.
- * @param {string} temperamentKey - Key into the TEMPERAMENT table.
- * @param {number} pitchCount - Number of wheelnav slices to produce.
- * @returns {number[]|null} Angles summing to 360, or null to keep equal slices.
- */
+/** Proportional slice angles for a TEMPERAMENT entry, or null to keep equal slices. */
 var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
     if (!Number.isInteger(pitchCount) || pitchCount < 2) {
         return null;
@@ -172,18 +155,11 @@ var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
         return null;
     }
 
-    const ratios = entry.ratios.slice(0, pitchCount).map(getTemperamentRatio);
+    const ratios = entry.ratios.map(getTemperamentRatio);
     return sliceAnglesFromRatios(ratios, octaveRatio);
 };
 
-/**
- * Raises slices narrower than `minDegrees` to that floor and absorbs the
- * excess proportionally from the wider slices, so the widths still sum to 360.
- * Input must be slice widths that already sum to 360.
- * @param {number[]|null} sliceAngles - Degrees per slice, or null.
- * @param {number} minDegrees - Minimum slice width in degrees.
- * @returns {number[]|null} New widths summing to 360, or null (bad input).
- */
+/** Raises slices below minDegrees to that floor, absorbing the excess from wider slices. Null for bad input. */
 var enforceMinSliceAngles = (sliceAngles, minDegrees) => {
     if (!Array.isArray(sliceAngles) || sliceAngles.length === 0) {
         return null;
@@ -205,12 +181,8 @@ var enforceMinSliceAngles = (sliceAngles, minDegrees) => {
 };
 
 /**
- * Gives a wheel proportional slice widths. Must be called after initWheel()
- * and before createWheel(), since createWheel is what bakes baseAngle into the
- * SVG paths.
- * @param {object} wheel - A configured wheelnav instance.
- * @param {number[]|null} sliceAngles - Degrees per slice, or null to keep equal slices.
- * @returns {void}
+ * Gives a wheel proportional slice widths. Must run after initWheel() and
+ * before createWheel(), which bakes sliceAngle into the SVG paths.
  */
 var applySliceAngles = (wheel, sliceAngles) => {
     if (

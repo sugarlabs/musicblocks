@@ -9,9 +9,6 @@ const DomHelpers = require("../../utils/dom-helpers");
 global.downloadTextFile = DomHelpers.downloadTextFile;
 global.createSharePopup = DomHelpers.createSharePopup;
 global.closeSharePopup = DomHelpers.closeSharePopup;
-const musicutils = require("../../utils/musicutils.js");
-global.sliceAnglesFromRatios = musicutils.sliceAnglesFromRatios;
-global.applySliceAngles = musicutils.applySliceAngles;
 
 const setupImportGlobals = () => {
     global._ = jest.fn(text => text);
@@ -615,6 +612,53 @@ describe("TemperamentWidget basic tests", () => {
             1: [2, "C", 4]
         });
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
+    });
+
+    test("_save skips the dictionary write when the rename flips the custom check", () => {
+        // Predefined at build time (no replacement entry is constructed),
+        // but the rename collides so the final name classifies as custom:
+        // storing under it would write null into TEMPERAMENT.
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(name => name !== "just intonation");
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+        global.Singer.clearPitchToFrequencyCache = jest.fn();
+
+        widget.inTemperament = "just intonation";
+        widget.ratios = [1, 2];
+        widget.pitchNumber = 2;
+        widget.powerBase = 2;
+        widget.ratiosNotesPair = [
+            [1, ["C", 4]],
+            [1, ["C", 4]]
+        ];
+
+        widget._logo = {
+            synth: {
+                stop: jest.fn(),
+                startingPitch: "C4"
+            },
+            customTemperamentDefined: false
+        };
+
+        widget.activity = {
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "just intonation1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        widget.activity.textMsg = jest.fn();
+        widget._save();
+
+        expect(global.addTemperamentToDictionary).not.toHaveBeenCalled();
+        expect(widget._logo.customTemperamentDefined).toBe(false);
+        expect(widget.activity.blocks.protoBlockDict["custompitch"].hidden).toBe(true);
     });
 
     test("_save invalidates a frequency already cached under the redefined temperament's name", () => {

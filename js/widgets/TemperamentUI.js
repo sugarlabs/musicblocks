@@ -210,9 +210,7 @@ const _applyWheelGeometry = (wheelInstance, ratios, powerBase, pitchNumber, radi
     for (let i = 0; i < wheelInstance.navItemCount; i++) {
         angle[i] = ratioToWheelAngle(ratios[i], powerBase);
     }
-    // Proportional slice widths from the temperament ratios (which carry a
-    // trailing octave entry that sliceAnglesFromRatios must not see); null
-    // keeps equal slices for equal temperaments.
+    // Proportional widths from the temperament ratios; null keeps equal slices.
     applySliceAngles(
         wheelInstance,
         sliceAnglesFromRatios(ratios.slice(0, wheelInstance.navItemCount), powerBase)
@@ -438,26 +436,19 @@ const TemperamentUI = {
         const minutes = [];
         const angle = [];
         const angle1 = [];
-        for (let i = 0; i <= pitchNumber; i++) {
-            if (i !== pitchNumber) {
-                minutes.push("|");
-            }
+        for (let i = 0; i < pitchNumber; i++) {
             // Change angles of outer circle
+            minutes.push("|");
             angle[i] = ratioToWheelAngle(ratios[i], tw.powerBase);
         }
-        if (!Number.isFinite(angle[pitchNumber])) {
-            // Octave-short ratio array: the octave sits one full turn above the root.
-            angle[pitchNumber] = angle[0] + 360;
-        }
 
-        // Tick marks sit between pitches, so slice i spans pitch i..pitch i+1.
-        // angle[pitchNumber] is the octave (ratios[pitchNumber] === powerBase,
-        // synthesized above when the array is octave-short), so this tiles
-        // the circle exactly once.
         tw.wheel.navAngle = 270 + (angle[1] - angle[0]) / 2;
         tw.wheel.initWheel(minutes);
-        const widths = angle.slice(0, pitchNumber).map((a, i) => angle[i + 1] - a);
-        if (widths.every(w => Number.isFinite(w) && w > 0)) {
+        // Ticks sit between pitches (slice i spans pitch i..i+1); rotate the
+        // helper's pitch i-1..i convention into place.
+        const proportional = sliceAnglesFromRatios(ratios.slice(0, pitchNumber), tw.powerBase);
+        if (proportional) {
+            const widths = [...proportional.slice(1), proportional[0]];
             applySliceAngles(tw.wheel, widths);
             for (let i = 0; i < pitchNumber; i++) {
                 angle1[i] = angle[i] + widths[i] / 2;

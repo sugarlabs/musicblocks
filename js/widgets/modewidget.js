@@ -494,17 +494,15 @@ class ModeWidget {
             }
         });
     }
-    _rebuildWheel(edoCount, preserveTemperament = false) {
+    _rebuildWheel(edoCount) {
         this._cancelAnimations();
         this._activeEDO = edoCount;
         this._undoStack = []; // Clear stale undo entries from old EDO
         // Only map EDO to a built-in temperament key when the active
         // temperament is equally tempered; non-equal temperaments (just
         // intonation, meantone, ...) keep their own key even though their
-        // pitch count collides with an equal EDO. Skipped when the caller
-        // just restored a saved temperament, so a non-canonical
-        // equally-tempered key is not overwritten by the canonical mapping.
-        if (!preserveTemperament && isEquallyTempered(this._activeTemperamentKey)) {
+        // pitch count collides with an equal EDO.
+        if (isEquallyTempered(this._activeTemperamentKey)) {
             this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
         }
         this._rebuildModeIndex();
@@ -659,12 +657,6 @@ class ModeWidget {
         this._rebuildModeIndex();
     }
 
-    _getModeEDO(modeName) {
-        // Saved custom modes carry their native EDO in the registry.
-        const custom = getSavedCustomModes().find(m => m.name === modeName);
-        return custom && custom.edo ? custom.edo : null;
-    }
-
     _ensureDropdownOption(select, value, label) {
         // The dropdown may lack an option for an unusual value (e.g. 21
         // from 1/4 comma meantone); add it so .value sticks.
@@ -677,18 +669,8 @@ class ModeWidget {
         select.value = value;
     }
 
-    /**
-     * Restores the temperament a custom mode was saved with when the live
-     * tuning or the cached key drifted (e.g. the project reloaded under
-     * equal while the mode was saved in just intonation). Unknown keys and
-     * out-of-range pitch counts are ignored, preserving EDO validation.
-     * @param {string} modeName - Name of the mode being loaded.
-     * @param {object} [edoSelect] - Tuning dropdown to sync (may be null).
-     * @returns {boolean} True when a saved temperament was restored.
-     */
-    _restoreSavedTemperament(modeName, edoSelect) {
-        // Saved custom modes carry the temperament they were authored in.
-        const custom = getSavedCustomModes().find(m => m.name === modeName);
+    /** Restores the temperament a custom mode was saved with. Returns true when restored. */
+    _restoreSavedTemperament(custom, modeName, edoSelect) {
         const savedKey = custom && custom.temperamentKey ? custom.temperamentKey : null;
         if (
             !savedKey ||
@@ -706,12 +688,9 @@ class ModeWidget {
         if (edoSelect) {
             this._ensureDropdownOption(edoSelect, savedKey, savedName);
         }
-        this.logo.synth.inTemperament = savedKey;
         this._activeTemperamentKey = savedKey;
-        // Preserve the just-restored key: _rebuildWheel would otherwise
-        // remap a non-canonical equally-tempered key to the canonical EDO
-        // key, silently undoing the restore.
-        this._rebuildWheel(savedEDO, true);
+        this._rebuildWheel(savedEDO);
+        this.logo.synth.inTemperament = savedKey;
         this.textMsg(_(`Mode ${modeName} restored temperament ${savedName}.`), 3000);
         return true;
     }
@@ -947,22 +926,16 @@ class ModeWidget {
             return;
         }
 
-        // _loadMode handles both cases: a different native EDO (rebuild the
-        // wheel to match its native tuning) and a same-EDO temperament drift
-        // (restore the saved temperament). edoSelect is null here (built
-        // later); _loadMode handles that.
+        // _loadMode covers a different native EDO and a same-EDO temperament drift.
         this._loadMode(currentModeName[1], currentMode, null);
     }
 
     _loadMode(modeName, mode, edoSelect) {
-        const nativeEDO = this._getModeEDO(modeName);
-        // Restore the temperament the mode was saved with when the live
-        // tuning or the cached key drifted (e.g. project reloaded under
-        // equal while the mode was saved in just intonation). When a
-        // restore rebuilds the wheel, the native-EDO branch below is
-        // skipped: the saved temperament (EDO-validated) wins, so there is
-        // exactly one rebuild and one toast.
-        const restored = this._restoreSavedTemperament(modeName, edoSelect);
+        const custom = getSavedCustomModes().find(m => m.name === modeName);
+        const nativeEDO = custom && custom.edo ? custom.edo : null;
+        // A restored temperament already rebuilt the wheel; otherwise rebuild
+        // for a different native EDO.
+        const restored = this._restoreSavedTemperament(custom, modeName, edoSelect);
         if (!restored && nativeEDO && nativeEDO !== this._activeEDO) {
             // The saved mode was authored in a different tuning, so sync the
             // tuning dropdown and rebuild the wheel before selecting intervals.
@@ -987,8 +960,7 @@ class ModeWidget {
         const isCustom = !MUSICALMODES[modeName];
         const pattern = isCustom ? mode : nativeEDO ? mode : this._modeStepPattern(modeName, null);
         this._applyModePattern(pattern);
-        // Cache under the actually-active EDO, not the stored native EDO:
-        // a temperament restore may have rebuilt to a different pitch count.
+        // Cache under the active EDO: a restore may have rebuilt to a different pitch count.
         if (nativeEDO) {
             this._cacheState(this._activeEDO);
         }
@@ -1785,17 +1757,9 @@ class ModeWidget {
     }
 
     /**
-     * Hides labels on slices too narrow to hold them, so proportional widths do not
-     * turn into overlapping text. A hidden label is not lost: hovering its slice
-     * reveals it, and selecting the slice keeps it shown (see `_syncNarrowLabels`).
-     * The note wheel's "x" markers remain as the per-degree selection indicator.
-     *
-     * The comparison uses the arc at the label's own radius -- the mid radius of
-     * the donut, (min + max) / 2 -- against the width the text needs at the
-     * wheel's title font size. Every equal temperament keeps all its labels; only
-     * the narrowest non-EDO slices lose theirs.
-     * @param {object} wheel - A wheelnav instance whose navItems carry sliceAngle.
-     * @returns {void}
+     * Hides labels on slices too narrow to hold them. A hidden label is not
+     * lost: hovering its slice reveals it, and selecting the slice keeps it
+     * shown (see `_syncNarrowLabels`).
      */
     _hideNarrowLabels(wheel) {
         if (!Array.isArray(wheel.navItems)) {

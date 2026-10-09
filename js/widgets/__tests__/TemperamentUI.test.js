@@ -19,9 +19,6 @@ global.ManagedTimer = ManagedTimer;
 
 const TemperamentUI = require("../TemperamentUI");
 const TemperamentWidget = require("../temperament");
-const musicutils = require("../../utils/musicutils.js");
-global.sliceAnglesFromRatios = musicutils.sliceAnglesFromRatios;
-global.applySliceAngles = musicutils.applySliceAngles;
 
 describe("TemperamentUI module", () => {
     let mockTW;
