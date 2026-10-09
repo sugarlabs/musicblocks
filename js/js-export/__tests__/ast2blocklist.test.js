@@ -479,17 +479,18 @@ describe("AST2BlockList Class", () => {
                     ]
                 ]
             ];
-            const code =
-                astring.generate(ASTUtils.getMethodAST("action", action)) +
-                "\n" +
-                exportStart(start);
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const actionCode = astring.generate(ASTUtils.getMethodAST("action", action));
+            const code = actionCode + "\n" + exportStart(start);
 
             expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
-            expect(code).not.toMatch(/\bbreak;/);
+            // The bare break, a syntax error outside a loop, isn't in the action.
+            expect(actionCode).not.toMatch(/\bbreak;/);
 
             const printed = [];
             const mouse = {
                 ENDFLOW: "ENDFLOW",
+                STOPFLOW: Promise.resolve("STOPFLOW"),
                 ENDMOUSE: "ENDMOUSE",
                 print: async value => printed.push(value),
                 playNote: async (value, flow) => flow(),
@@ -500,10 +501,134 @@ describe("AST2BlockList Class", () => {
                 run = flow(mouse);
             });
             await run;
-            // The Stop ends the action. Ending the Repeat it was called from, as Music
-            // Blocks does, isn't exported yet (#9004), so the Repeat keeps going.
-            expect(printed.slice(0, 3)).toEqual(["DO", "RE", "MI"]);
+            // As in Music Blocks, the Stop ends the Repeat the action was called from, after
+            // the rest of this round: the Repeat doesn't start a second round.
+            expect(printed).toEqual(["DO", "RE", "MI"]);
         });
+
+        test("an action with a Stop runs to its end, then ends the loop that called it", async () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const start = [
+                [
+                    "repeat",
+                    [3],
+                    [
+                        ["nameddo_action", null],
+                        ["print", ["after"]]
+                    ]
+                ]
+            ];
+            const code =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+
+            const printed = [];
+            const mouse = {
+                ENDFLOW: Promise.resolve(),
+                STOPFLOW: Promise.resolve("STOPFLOW"),
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value)
+            };
+            let run;
+            await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                run = flow(mouse);
+            });
+            await run;
+            expect(printed).toEqual(["k", "j", "after"]);
+        });
+
+        // What Music Blocks prints for an action with a Stop, run in a real browser:
+        // Logo.doBreak removes the loop when there is one, and otherwise drops the next
+        // pending blocks, which are the action's own when the Stop is not its last block.
+        describe("an action with a Stop, as Music Blocks runs it", () => {
+            const run = async (action, start) => {
+                ASTUtils.setStoppingActions(["action"], [action]);
+                const code =
+                    astring.generate(ASTUtils.getMethodAST("action", action)) +
+                    "\n" +
+                    exportStart(start);
+                expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+                const printed = [];
+                const mouse = {
+                    ENDFLOW: Promise.resolve(),
+                    STOPFLOW: Promise.resolve("STOPFLOW"),
+                    ENDMOUSE: "ENDMOUSE",
+                    print: async value => printed.push(value)
+                };
+                let finish;
+                await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                    finish = flow(mouse);
+                });
+                await finish;
+                return printed;
+            };
+            const middle = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            const last = [["print", ["k"]], ["break"]];
+            const call = ["nameddo_action", null];
+            const z = ["print", ["z"]];
+
+            test("Stop in the middle, no loop: the action ends, the caller carries on", async () => {
+                expect(await run(middle, [call, z])).toEqual(["k", "z"]);
+            });
+
+            test("Stop in the middle, call inside an if: the action ends, the caller carries on", async () => {
+                const start = [["if", ["bool_true"], [call]], z];
+                expect(await run(middle, start)).toEqual(["k", "z"]);
+            });
+
+            test("Stop last, no loop: the rest of the caller is skipped", async () => {
+                expect(await run(last, [call, z])).toEqual(["k"]);
+            });
+
+            test("Stop in the middle, called from a loop: the rest runs and the loop ends", async () => {
+                expect(await run(middle, [["repeat", [3], [call, z]]])).toEqual(["k", "j", "z"]);
+            });
+
+            test("Stop last, called from a loop: the loop ends after the round", async () => {
+                expect(await run(last, [["repeat", [3], [call, z]]])).toEqual(["k", "z"]);
+            });
+        });
+
+        test.each([
+            ["called from a loop", [["repeat", [3], [["nameddo_action", null]]]]],
+            [
+                "called with no loop",
+                [
+                    ["nameddo_action", null],
+                    ["print", ["z"]]
+                ]
+            ],
+            ["called inside an if", [["if", ["bool_true"], [["nameddo_action", null]]]]]
+        ])(
+            "an action with a Stop imports back as the same action call and Stop, %s",
+            (_, start) => {
+                const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+                ASTUtils.setStoppingActions(["action"], [action]);
+                const withStop =
+                    astring.generate(ASTUtils.getMethodAST("action", action)) +
+                    "\n" +
+                    exportStart(start);
+                ASTUtils.setStoppingActions([], []);
+                const plain =
+                    astring.generate(
+                        ASTUtils.getMethodAST("action", [
+                            ["print", ["k"]],
+                            ["print", ["j"]]
+                        ])
+                    ) +
+                    "\n" +
+                    exportStart(start);
+                const toBlocks = code =>
+                    AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+
+                expect(() => toBlocks(withStop)).not.toThrow();
+                // Same blocks as the code without the check at the call, plus the Stop block.
+                const stopBlocks = toBlocks(withStop).length;
+                expect(stopBlocks).toBe(toBlocks(plain).length + 1);
+            }
+        );
 
         // The importer only undoes the flags and labels the exporter writes;
         // the same shapes in hand-written code must not turn into Stop blocks.
@@ -552,6 +677,84 @@ describe("AST2BlockList Class", () => {
             expect(error).toBeDefined();
             expect(error.prefix).toBe("Unsupported statement: ");
             expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
+        });
+
+        // The same patterns in hand-written code are not the exporter's Stop, so the
+        // importer must not rewrite them and silently lose what the code does.
+        test("leaves a hand-written read of the Stop flag alone", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const generated = astring.generate(ASTUtils.getMethodAST("action", action));
+            const flag = generated.match(/let (\w+) = false/)[1];
+            const edited = generated.replace(
+                /(\n\s*)(return [^\n]*STOPFLOW)/,
+                `$1await mouse.print(${flag});$1$2`
+            );
+            expect(edited).not.toBe(generated);
+
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(edited, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a hand-written branch on STOPFLOW alone", () => {
+            const code = `
+            new Mouse(async mouse => {
+                if ((await action(mouse)) === "STOPFLOW") {
+                    await mouse.print("x");
+                }
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a branch on STOPFLOW that sets another variable alone", () => {
+            const code = `
+            new Mouse(async mouse => {
+                if ((await action(mouse)) === "STOPFLOW") {
+                    stop0 = true;
+                }
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a return of another object's STOPFLOW alone", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const generated = astring.generate(ASTUtils.getMethodAST("action", action));
+            const edited = generated.replace("mouse.STOPFLOW", "other.STOPFLOW");
+            expect(edited).not.toBe(generated);
+
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(edited, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
         });
 
         test("leaves the AST alone, so converting it twice gives the same blocks", () => {
