@@ -52,7 +52,13 @@ describe("MBDialog", () => {
             setItem: jest.fn(),
             clear: jest.fn()
         };
-        Object.defineProperty(window, "localStorage", { value: localStorageMock });
+        // Delete first so defineProperty creates the property again;
+        // redefining an existing window property keeps the old value.
+        delete window.localStorage;
+        Object.defineProperty(window, "localStorage", {
+            value: localStorageMock,
+            configurable: true
+        });
 
         // Mock requestAnimationFrame and cancelAnimationFrame
         window.requestAnimationFrame = jest.fn().mockImplementation(cb => {
