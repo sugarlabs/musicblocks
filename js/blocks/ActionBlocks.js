@@ -1193,7 +1193,7 @@ function setupActionBlocks(activity) {
          */
         flow(args, logo) {
             // Dispatch an event.
-            if (args.length !== 1) return;
+            if (args.length !== 1 || args[0] === null) return;
 
             // If the event is not in the event list, add it.
             if (!(args[0] in logo.eventList)) {
