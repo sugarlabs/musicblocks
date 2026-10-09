@@ -1673,6 +1673,115 @@ describe("MusicKeyboard core logic", () => {
         });
     });
 
+    describe("the tempo it plays and saves at (#9337)", () => {
+        let origWidgetWindows, origSinger, turtles, mockActivity;
+
+        beforeEach(() => {
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({ append: jest.fn(), style: {} })
+            };
+            origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+            origSinger = global.Singer;
+            global.Singer = { masterBPM: 90 };
+            // After a project is loaded, turtle 0 is a trashed turtle of the old project and
+            // the project runs on turtle 1, which set 120 BPM.
+            turtles = [{ singer: { bpm: [] } }, { singer: { bpm: [120] } }];
+            mockActivity = {
+                turtles: { ithTurtle: jest.fn(i => turtles[i]) },
+                logo: { synth: { stopSound: jest.fn() } }
+            };
+        });
+
+        afterEach(() => {
+            global.window.widgetWindows = origWidgetWindows;
+            global.Singer = origSinger;
+        });
+
+        test("uses the tempo of the turtle that ran the block, not turtle 0", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(120);
+            expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+        });
+
+        test("uses that turtle's latest tempo", () => {
+            turtles[1].singer.bpm = [120, 75];
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(75);
+        });
+
+        test("uses the master tempo when that turtle hasn't set one", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[0];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(90);
+        });
+
+        test("uses turtle 0 when it doesn't know the turtle", () => {
+            turtles[0].singer.bpm = [100];
+            const keyboard = new MusicKeyboard(mockActivity);
+
+            keyboard._createWidgetWindow();
+
+            expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+            expect(keyboard.bpm).toBe(100);
+        });
+
+        test("lays out its keys in that turtle's key signature", () => {
+            const origNoteToFrequency = global.noteToFrequency;
+            const origConvertFromSolfege = global.convertFromSolfege;
+            global.noteToFrequency = jest.fn().mockReturnValue(392);
+            global.convertFromSolfege = jest.fn(name => name);
+            turtles[0].singer.keySignature = "C major";
+            turtles[1].singer.keySignature = "D minor";
+
+            try {
+                const keyboard = new MusicKeyboard(mockActivity);
+                keyboard.turtle = turtles[1];
+                keyboard.noteNames = ["sol"];
+                keyboard.octaves = [4];
+                keyboard._rowBlocks = [44];
+                keyboard.instruments = ["guitar"];
+
+                keyboard._keysLayout();
+
+                expect(global.noteToFrequency).toHaveBeenCalledWith("sol4", "D minor");
+                expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            } finally {
+                global.noteToFrequency = origNoteToFrequency;
+                global.convertFromSolfege = origConvertFromSolfege;
+            }
+        });
+
+        test("lets go of the turtle when it is closed", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+            keyboard._createWidgetWindow();
+
+            window.widgetWindows.windowFor().onclose();
+
+            expect(keyboard.turtle).toBeNull();
+        });
+    });
+
     describe("Web MIDI cleanup on widget close", () => {
         test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
             const mockInput1 = { onmidimessage: jest.fn() };

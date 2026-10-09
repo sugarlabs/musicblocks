@@ -859,7 +859,9 @@ function MusicKeyboard(activity) {
          * Beats per minute (BPM) for the MusicKeyboard.
          * @type {number}
          */
-        const tur = this.activity.turtles.ithTurtle(0);
+        // The tempo of the turtle that ran the Music Keyboard block. Not turtle 0: after a
+        // project is loaded, turtle 0 is a trashed turtle of the old project.
+        const tur = this.turtle || this.activity.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
         /**
@@ -934,6 +936,8 @@ function MusicKeyboard(activity) {
                 });
             }
             this.midiON = false;
+            // Don't hold on to the turtle once the keyboard is closed.
+            this.turtle = null;
 
             selectedNotes = [];
             const wheelDiv = docById("wheelDivptm");
@@ -1511,7 +1515,7 @@ function MusicKeyboard(activity) {
                 sortableList.push({
                     frequency: noteToFrequency(
                         convertFromSolfege(this.noteNames[i]) + this.octaves[i],
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
+                        (this.turtle || this.activity.turtles.ithTurtle(0)).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
