@@ -525,10 +525,11 @@ class ReflectionMatrix {
         messageContainer.classList.add("message-container", "user");
 
         const senderName = document.createElement("div");
+        senderName.classList.add("sender-name");
         senderName.style.fontSize = "12px";
         senderName.style.fontWeight = "bold";
         senderName.style.marginBottom = "4px";
-        senderName.style.color = "#555";
+        senderName.style.color = "var(--color-text-secondary)";
         senderName.style.overflowWrap = "break-word";
         senderName.style.alignSelf = "flex-start";
         senderName.innerText = "You";
@@ -566,10 +567,11 @@ class ReflectionMatrix {
         messageContainer.className = "message-container";
 
         const senderName = document.createElement("div");
+        senderName.classList.add("sender-name");
         senderName.style.fontSize = "12px";
         senderName.style.fontWeight = "bold";
         senderName.style.marginBottom = "4px";
-        senderName.style.color = "#383838ff";
+        senderName.style.color = "var(--color-text-secondary)";
         senderName.style.alignSelf = "flex-start";
         senderName.innerText = this.mentorsMap[role];
 
@@ -941,10 +943,11 @@ class ReflectionMatrix {
             messageContainer.className = "message-container";
 
             const senderName = document.createElement("div");
+            senderName.classList.add("sender-name");
             senderName.style.fontSize = "12px";
             senderName.style.fontWeight = "bold";
             senderName.style.marginBottom = "4px";
-            senderName.style.color = "#555";
+            senderName.style.color = "var(--color-text-secondary)";
             senderName.style.overflowWrap = "break-word";
             senderName.style.alignSelf = "flex-start";
 
