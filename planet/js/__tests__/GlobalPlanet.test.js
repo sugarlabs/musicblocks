@@ -306,11 +306,41 @@ describe("GlobalPlanet", () => {
             expect(callback).toHaveBeenCalled();
         });
 
+        it("should remove stale cache and not set offline error when a project is missing", () => {
+            const callback = jest.fn();
+
+            gp.loadCount = 1;
+            gp.batchHasOfflineError = false;
+            gp.cache["missing-project"] = {
+                ProjectName: "Stale project"
+            };
+
+            gp.addProjectToCache(
+                "missing-project",
+                {
+                    success: false,
+                    error: "PROJECT_NOT_FOUND"
+                },
+                callback
+            );
+
+            expect(gp.cache["missing-project"]).toBeUndefined();
+            expect(gp.batchHasOfflineError).toBe(false);
+            expect(callback).toHaveBeenCalled();
+        });
+
         it("should set batchHasOfflineError on failure", () => {
             const callback = jest.fn();
             gp.loadCount = 1;
             gp.batchHasOfflineError = false;
-            gp.addProjectToCache("proj1", { success: false }, callback);
+            gp.addProjectToCache(
+                "proj1",
+                {
+                    success: false,
+                    error: "ERROR_CONNECTION_FAILURE"
+                },
+                callback
+            );
 
             expect(gp.batchHasOfflineError).toBe(true);
             expect(callback).toHaveBeenCalled();

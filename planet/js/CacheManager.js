@@ -53,6 +53,7 @@ class CacheManager {
             THUMBNAILS: "projectThumbnails"
         };
 
+        this.invalidatedMetadataIds = new Set();
         this.isInitialized = false;
     }
 
@@ -139,9 +140,12 @@ class CacheManager {
      */
     async getMetadata(id) {
         if (!this.isInitialized) return null;
+        if (this.invalidatedMetadataIds.has(id)) return null;
 
         try {
             const data = await this._getFromStore(this.STORES.METADATA, id);
+
+            if (this.invalidatedMetadataIds.has(id)) return null;
 
             if (data && !this._isExpired(data.expiry)) {
                 // Update last accessed time
@@ -176,9 +180,40 @@ class CacheManager {
 
             await this._putToStore(this.STORES.METADATA, entry);
             await this._enforceMaxSize(this.STORES.METADATA);
+
+            this.invalidatedMetadataIds.delete(id);
+
             return true;
         } catch (error) {
             cacheDebugLog("[CacheManager] Error caching metadata:", error);
+            return false;
+        }
+    }
+
+    /**
+     * Deletes cached project metadata
+     * @param {string} id - Project ID
+     * @returns {Promise<boolean>}
+     */
+    async deleteMetadata(id) {
+        this.invalidatedMetadataIds.add(id);
+
+        if (!this.isInitialized) return false;
+
+        try {
+            await new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.STORES.METADATA], "readwrite");
+                const store = transaction.objectStore(this.STORES.METADATA);
+
+                store.delete(id);
+
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+
+            return true;
+        } catch (error) {
+            cacheDebugLog("[CacheManager] Error deleting metadata:", error);
             return false;
         }
     }

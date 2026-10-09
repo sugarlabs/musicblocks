@@ -48,6 +48,7 @@ describe("ServerInterface", () => {
             init: jest.fn().mockResolvedValue(true),
             getMetadata: jest.fn().mockResolvedValue(null),
             cacheMetadata: jest.fn().mockResolvedValue(true),
+            deleteMetadata: jest.fn().mockResolvedValue(true),
             getProject: jest.fn().mockResolvedValue(null),
             cacheProject: jest.fn().mockResolvedValue(true),
             clearAll: jest.fn().mockResolvedValue(true),
@@ -192,6 +193,36 @@ describe("ServerInterface", () => {
             expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
             expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
         });
+    });
+
+    it("returns PROJECT_NOT_FOUND and invalidates cached metadata when project details respond with 404", async () => {
+        jest.spyOn(server, "_get").mockResolvedValue({
+            __httpError: true,
+            status: 404
+        });
+
+        const callback = jest.fn();
+
+        await server.getProjectDetails("missing-project", callback);
+
+        expect(server.cacheManager.deleteMetadata).toHaveBeenCalledWith("missing-project");
+        expect(callback).toHaveBeenCalledWith({
+            success: false,
+            error: "PROJECT_NOT_FOUND"
+        });
+    });
+
+    it("returns ConnectionFailureData for non-404 HTTP errors", async () => {
+        jest.spyOn(server, "_get").mockResolvedValue({
+            __httpError: true,
+            status: 500
+        });
+
+        const callback = jest.fn();
+
+        await server.getProjectDetails("broken-project", callback);
+
+        expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
     });
 
     describe("request handling", () => {
@@ -605,6 +636,20 @@ describe("ServerInterface", () => {
             await server.searchProjects("p", "RECENT", 24, 49, callback);
 
             expect(names(callback)).toEqual(range(24, 49));
+        });
+    });
+
+    it("should preserve HTTP status when requested", async () => {
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: false,
+            status: 404
+        });
+
+        const result = await server._get("/project/missing-project", true);
+
+        expect(result).toEqual({
+            __httpError: true,
+            status: 404
         });
     });
 
