@@ -51,6 +51,8 @@
  *   rejecting with an error.
  * @param {number} [options.initialDelay=50] - Initial delay in milliseconds before
  *   the first retry. Subsequent delays double each attempt.
+ * @param {number} [options.maxDelay=1000] - Maximum delay in milliseconds between
+ *   retries. Caps exponential backoff growth.
  * @param {string} [options.errorMessage="Retry limit exceeded"] - Error message used
  *   when max retries are exhausted.
  * @returns {Promise} Resolves when `check` returns truthy and `onSuccess`
@@ -63,6 +65,7 @@
  *   onSuccess: (bounds) => container.cache(bounds.x, bounds.y, bounds.width, bounds.height),
  *   maxRetries: 20,
  *   initialDelay: 50,
+ *   maxDelay: 1000,
  *   errorMessage: "COULD NOT CREATE CACHE"
  * });
  *
@@ -83,6 +86,7 @@ const retryWithBackoff = async ({
     delayFn,
     maxRetries = 20,
     initialDelay = 50,
+    maxDelay = 1000,
     errorMessage = "Retry limit exceeded"
 }) => {
     // Default delay function: Promise-based setTimeout
@@ -110,7 +114,13 @@ const retryWithBackoff = async ({
             onRetry(count);
         }
 
-        await delay(initialDelay * Math.pow(2, count));
+        const calculatedDelay = initialDelay * Math.pow(2, count);
+        const cappedDelay =
+            Number.isFinite(maxDelay) && maxDelay > 0
+                ? Math.min(maxDelay, calculatedDelay)
+                : calculatedDelay;
+
+        await delay(cappedDelay);
     }
 
     throw new Error(errorMessage);
