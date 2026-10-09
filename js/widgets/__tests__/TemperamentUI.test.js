@@ -90,6 +90,17 @@ describe("TemperamentUI module", () => {
             initWheel: jest.fn(labels => {
                 wheel.initWheelArgs = labels ? [...labels] : [];
                 wheel.navItemCount = labels.length;
+                wheel.navItems = labels.map(title => ({
+                    title: title,
+                    fillAttr: "",
+                    sliceHoverAttr: {},
+                    slicePathAttr: {},
+                    sliceSelectedAttr: {},
+                    titleAttr: { font: "" },
+                    titleSelectedAttr: { font: "" },
+                    sliceAngle: 0,
+                    menuRadius: 0
+                }));
             }),
             createWheel: jest.fn(),
             refreshWheel: jest.fn(),
@@ -311,7 +322,9 @@ describe("TemperamentUI module", () => {
         expect(mockTW.notesCircle).toBeDefined();
         expect(mockTW.notesCircle.initWheel).toHaveBeenCalledWith(["0", "1"]);
         expect(mockTW.notesCircle.slicePathCustom.menuRadius).toBeGreaterThan(0);
-        expect(mockTW.notesCircle.navItems[0].sliceAngle).toBe(180);
+        // [1, 2] is a degenerate full-octave fixture: no proportional widths,
+        // so the wheel keeps its equal-slice default (mock init value 0).
+        expect(mockTW.notesCircle.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.notesCircle.createWheel).toHaveBeenCalled();
     });
 
@@ -320,7 +333,7 @@ describe("TemperamentUI module", () => {
         expect(mockTW.wheel1).toBeDefined();
         expect(mockTW.wheel1.initWheel).toHaveBeenCalledWith(["0", "1"]);
         expect(mockTW.wheel1.slicePathCustom.menuRadius).toBeGreaterThan(0);
-        expect(mockTW.wheel1.navItems[0].sliceAngle).toBe(180);
+        expect(mockTW.wheel1.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel1.createWheel).toHaveBeenCalled();
     });
 
@@ -338,7 +351,7 @@ describe("TemperamentUI module", () => {
         TemperamentUI.createOuterWheel(mockTW, [1, 2], 2);
         expect(mockTW.wheel).toBeDefined();
         expect(mockTW.wheel.initWheel).toHaveBeenCalledWith(["|", "|"]);
-        expect(mockTW.wheel.navItems[0].sliceAngle).toBe(180);
+        expect(mockTW.wheel.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel.createWheel).toHaveBeenCalled();
     });
 
@@ -996,6 +1009,41 @@ describe("TemperamentUI module", () => {
         });
     });
 
+    describe("proportional slice geometry", () => {
+        // The tick wheel accumulates proportional widths between pitches, and a
+        // ratio array with no trailing octave synthesizes the same widths.
+        test.each([{ ratios: [1, 1.5, 1.75, 2] }, { ratios: [1, 1.5, 1.75] }])(
+            "outer tick wheel gets proportional widths for $ratios",
+            ({ ratios }) => {
+                mockTW.ratios = ratios;
+                mockTW.pitchNumber = 3;
+                mockTW.powerBase = 2;
+
+                TemperamentUI.arbitraryEdit(mockTW);
+
+                expect(mockTW.wheel.navItemsContinuous).toBe(true);
+                const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
+                expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
+                expect(widths).toEqual([
+                    expect.closeTo(210.5865, 3),
+                    expect.closeTo(80.0613, 3),
+                    expect.closeTo(69.3522, 3)
+                ]);
+            }
+        );
+
+        test("non-positive widths keep the equal-slice default", () => {
+            mockTW.ratios = [1, 1.75, 1.5, 2];
+            mockTW.pitchNumber = 3;
+            mockTW.powerBase = 2;
+
+            TemperamentUI.arbitraryEdit(mockTW);
+
+            expect(mockTW.wheel.navItemsContinuous).toBe(false);
+            expect(mockTW.wheel.navItems.map(item => item.sliceAngle)).toEqual([0, 0, 0]);
+        });
+    });
+
     describe("Wheel Characterization tests (Master vs Refactor)", () => {
         function getWheelSnapshot(wheelInstance, count) {
             return {
@@ -1092,7 +1140,7 @@ describe("TemperamentUI module", () => {
             expect(mainSnap.menuRadius).toBeCloseTo(28.559933214452663, 6);
             expect(mainSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(mainSnap.sliceAngles).toEqual([
-                51.428571, 70.91743, 38.524798, 28.513973, 93.832028, 15.6102, 106.735801
+                33.519386, 61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001
             ]);
 
             // 2. createInnerWheel (radius 128)
@@ -1106,7 +1154,7 @@ describe("TemperamentUI module", () => {
             expect(innerSnap.menuRadius).toBeCloseTo(24.371143009666273, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                51.428571, 70.91743, 38.524798, 28.513973, 93.832028, 15.6102, 106.735801
+                33.519386, 61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001
             ]);
 
             // 3. createOuterWheel
@@ -1119,7 +1167,7 @@ describe("TemperamentUI module", () => {
             expect(outerSnap.navAngle).toBeCloseTo(300.58650025961623, 6);
             expect(outerSnap.initWheelArgs).toEqual(["|", "|", "|", "|", "|", "|", "|"]);
             expect(outerSnap.sliceAngles.slice(0, 6)).toEqual([
-                51.428571, 64.465543, 23.774956, 70.91743, 44.976685, 43.263815
+                61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001
             ]);
         });
 
@@ -1138,7 +1186,7 @@ describe("TemperamentUI module", () => {
             expect(mainSnap.menuRadius).toBeCloseTo(22.439947525641376, 6);
             expect(mainSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(mainSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
             // 2. createInnerWheel (radius 128)
@@ -1152,7 +1200,7 @@ describe("TemperamentUI module", () => {
             expect(innerSnap.menuRadius).toBeCloseTo(19.148755221880645, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
             // 3. createOuterWheel
@@ -1165,7 +1213,7 @@ describe("TemperamentUI module", () => {
             expect(outerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(outerSnap.initWheelArgs).toEqual(["|", "|", "|", "|", "|", "|", "|"]);
             expect(outerSnap.sliceAngles.slice(0, 6)).toEqual([
-                51.428571, 84.835613, 35.555241, 72.28646, 25.382268, 26.379464
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
         });
 
@@ -1182,7 +1230,7 @@ describe("TemperamentUI module", () => {
             );
             expect(mainSnap.menuRadius).toBeCloseTo(22.439947525641376, 6);
             expect(mainSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
             // 2. createOuterWheel matches master exactly
@@ -1194,7 +1242,7 @@ describe("TemperamentUI module", () => {
             );
             expect(outerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(outerSnap.sliceAngles.slice(0, 6)).toEqual([
-                51.428571, 84.835613, 35.555241, 72.28646, 25.382268, 26.379464
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
             // 3. createInnerWheel:
@@ -1216,7 +1264,7 @@ describe("TemperamentUI module", () => {
             expect(innerSnap.navAngle).toBe(270);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
             // Intended fix assertion:

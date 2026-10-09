@@ -100,7 +100,9 @@ const {
     getNonEDOModeSteps,
     getNonEDOFrequency,
     isEquallyTempered,
-    pitchToFrequency
+    pitchToFrequency,
+    getTemperamentSliceAngles,
+    enforceMinSliceAngles
 } = require("../../utils/musicutils.js");
 const { configureWheel, updateWheelItems } = require("../../utils/piemenu.js");
 global.getSavedCustomModes = getSavedCustomModes;
@@ -117,6 +119,9 @@ global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
 global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
+global.getTemperamentSliceAngles = getTemperamentSliceAngles;
+global.enforceMinSliceAngles = enforceMinSliceAngles;
+global.applySliceAngles = jest.fn(global.applySliceAngles);
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
 global.TuningFormats = require("../../utils/tuningformats");
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
@@ -699,6 +704,32 @@ describe("ModeWidget", () => {
         modeNameSpy.mockRestore();
     });
 
+    test("should persist and restore the temperament key with a custom mode", () => {
+        const pattern = Array(12).fill(1);
+        modeWidget._activeTemperamentKey = "just intonation";
+        modeWidget._activeEDO = 12;
+
+        expect(modeWidget._saveCustomMode("jiChromatic", pattern)).toBe(true);
+        expect(
+            JSON.parse(localStorage.getItem("customModes")).find(m => m.name === "jiChromatic")
+        ).toMatchObject({ temperamentKey: "just intonation" });
+
+        modeWidget._activeTemperamentKey = "equal";
+        modeWidget.logo.synth.inTemperament = "equal";
+        const fakeSelect = { querySelector: jest.fn(() => null), appendChild: jest.fn() };
+
+        modeWidget._loadMode("jiChromatic", pattern, fakeSelect);
+
+        // Both the live synth tuning and the cached key follow the saved mode.
+        expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        expect(modeWidget._activeTemperamentKey).toBe("just intonation");
+        expect(modeWidget._activeEDO).toBe(12);
+        expect(modeWidget._selectedNotes).toEqual(Array(12).fill(true));
+        expect(fakeSelect.value).toBe("just intonation");
+
+        modeWidget._deleteCustomMode("jiChromatic");
+    });
+
     test("should detect a built-in mode at a non-12 EDO", () => {
         modeWidget._activeEDO = 19;
         modeWidget._modeLabelCell = { textContent: "" };
@@ -748,7 +779,12 @@ describe("ModeWidget", () => {
 
         modeWidget._importFile();
 
-        expect(saveSpy).toHaveBeenCalledWith("major (31 EDO)", [3, 4, 2, 3, 4, 3, 3], 31);
+        expect(saveSpy).toHaveBeenCalledWith(
+            "major (31 EDO)",
+            [3, 4, 2, 3, 4, 3, 3],
+            31,
+            "equal31"
+        );
         saveSpy.mockRestore();
         delete MUSICALMODES["major"];
     });
@@ -769,7 +805,7 @@ describe("ModeWidget", () => {
 
         modeWidget._importFile();
 
-        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12);
+        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12, "equal");
         saveSpy.mockRestore();
     });
 
@@ -807,6 +843,35 @@ describe("ModeWidget", () => {
         expect(edo).toBe(48);
         expect(pattern).toEqual([8, 8, 4, 8, 8, 8, 4]);
         saveSpy.mockRestore();
+    });
+
+    test("should store the imported mode's target temperament, not the stale active key", () => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
+            cb(null, {
+                text: JSON.stringify({
+                    name: "imported31",
+                    edo: 31,
+                    pattern: [3, 4, 2, 3, 4, 3, 3]
+                }),
+                file: { name: "imported31.json", size: 100 }
+            });
+        });
+        modeWidget._activeTemperamentKey = "just intonation";
+        modeWidget._activeEDO = 12;
+        modeWidget.logo.synth.inTemperament = "just intonation";
+        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+        modeWidget._importFile();
+
+        const saved = JSON.parse(localStorage.getItem("customModes"));
+        const entry = saved.find(m => m.name === "imported31");
+        expect(entry.edo).toBe(31);
+        expect(entry.temperamentKey).toBe("equal31");
+
+        modeWidget._deleteCustomMode("imported31");
     });
 
     test("should preserve equal temperament when importing a 21-EDO mode", () => {
@@ -1078,6 +1143,44 @@ describe("ModeWidget", () => {
         });
     });
 
+    describe("narrow slice labels", () => {
+        const makeItem = (title, sliceAngle) => {
+            return {
+                title,
+                sliceAngle,
+                selected: false,
+                navTitle: { hide: jest.fn(), show: jest.fn() },
+                navItem: {
+                    mouseover: jest.fn(),
+                    mouseout: jest.fn()
+                }
+            };
+        };
+
+        let wheel;
+
+        beforeEach(() => {
+            // 48px font: "10" needs 57.6px, so 30deg fits and 10deg does not.
+            wheel = { navItems: [makeItem("0", 30), makeItem("10", 10)] };
+            modeWidget._hideNarrowLabels(wheel);
+        });
+
+        test("hides labels that do not fit, selection keeps the narrow one visible", () => {
+            const [wide, narrow] = wheel.navItems;
+
+            expect(wide._narrow).toBe(false);
+            expect(narrow._narrow).toBe(true);
+            expect(wide.navTitle.show).toHaveBeenCalled();
+            expect(wide.navTitle.hide).not.toHaveBeenCalled();
+            expect(narrow.navTitle.hide).toHaveBeenCalled();
+
+            narrow.selected = true;
+            modeWidget._syncNarrowLabels(wheel);
+            expect(narrow.navTitle.show).toHaveBeenCalled();
+            expect(wide.navTitle.hide).not.toHaveBeenCalled();
+        });
+    });
+
     describe("window maximization and scaling", () => {
         test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
             const widget = new ModeWidget(mockActivity);
@@ -1321,6 +1424,36 @@ describe("ModeWidget", () => {
 
             expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
             expect(widget._playing).toBe(false);
+        });
+    });
+
+    describe("proportional slice wiring", () => {
+        beforeEach(() => {
+            global.applySliceAngles.mockClear();
+            modeWidget._activeEDO = 12;
+            modeWidget._activeTemperamentKey = "just intonation";
+        });
+
+        test("one floored proportional array feeds all three rings, applied before createWheel", () => {
+            modeWidget._piemenuMode();
+
+            const widths = modeWidget._modeWheel.navItems.map(item => item.sliceAngle);
+            const wheels = [modeWidget._modeWheel, modeWidget._noteWheel, modeWidget._playWheel];
+            for (const wheel of wheels) {
+                expect(wheel.navItems.map(item => item.sliceAngle)).toEqual(widths);
+            }
+
+            expect(widths).toHaveLength(12);
+            expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
+            expect(Math.min(...widths)).toBeGreaterThanOrEqual(ModeWidget.MIN_SLICE_DEGREES);
+
+            // createWheel bakes sliceAngle into the SVG paths, so widths must
+            // be applied before it runs — match each apply call to its wheel.
+            const applyOrders = global.applySliceAngles.mock.invocationCallOrder;
+            expect(applyOrders).toHaveLength(3);
+            wheels.forEach((wheel, i) => {
+                expect(applyOrders[i]).toBeLessThan(wheel.createWheel.mock.invocationCallOrder[0]);
+            });
         });
     });
 });

@@ -20,6 +20,7 @@
 
 /* global
    _, docById, platformColor, wheelnav, slicePath, ratioToWheelAngle,
+   sliceAnglesFromRatios, applySliceAngles,
    frequencyToPitch,
    Singer
  */
@@ -178,25 +179,7 @@ const _highlightTab = (menuItems, activeIndex) => {
 };
 
 /**
- * Computes angular differences between consecutive wheel angles and wrap-around gap.
- * @param {number[]} angle - Array of wheel angles in degrees.
- * @param {number} pitchNumber - Number of pitches in the temperament.
- * @returns {number[]} Array of angle differences of length pitchNumber - 1.
- */
-const _computeAngleDiffs = (angle, pitchNumber) => {
-    const angleDiff = [];
-    for (let i = 1; i < pitchNumber; i++) {
-        if (i === pitchNumber - 1) {
-            angleDiff[i - 1] = angle[0] + 360 - angle[i];
-        } else {
-            angleDiff[i - 1] = angle[i] - angle[i - 1];
-        }
-    }
-    return angleDiff;
-};
-
-/**
- * Computes slice angles, base angles, and menu radius for main and inner wheels.
+ * Computes proportional slice angles and menu radius for main and inner wheels.
  * @param {Object} wheelInstance - The wheelnav instance.
  * @param {number[]} ratios - Pitch ratios array.
  * @param {number} powerBase - Base of the octave ratio space (e.g. 2).
@@ -205,28 +188,13 @@ const _computeAngleDiffs = (angle, pitchNumber) => {
  * @returns {void}
  */
 const _applyWheelGeometry = (wheelInstance, ratios, powerBase, pitchNumber, radius) => {
-    const angle = [];
-    const baseAngle = [];
-    const sliceAngle = [];
-    for (let i = 0; i < wheelInstance.navItemCount; i++) {
-        angle[i] = ratioToWheelAngle(ratios[i], powerBase);
-        if (i === 0) {
-            sliceAngle[i] = 360 / pitchNumber;
-            baseAngle[i] = wheelInstance.navAngle - sliceAngle[0] / 2;
-        } else {
-            baseAngle[i] = baseAngle[i - 1] + sliceAngle[i - 1];
-            sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
-        }
-        wheelInstance.navItems[i].sliceAngle = sliceAngle[i];
-    }
-
-    const angleDiff = _computeAngleDiffs(angle, pitchNumber);
+    // Proportional widths from the temperament ratios; null keeps equal slices.
+    const widths = sliceAnglesFromRatios(ratios.slice(0, wheelInstance.navItemCount), powerBase);
+    applySliceAngles(wheelInstance, widths);
 
     let menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
-    for (let i = 0; i < angleDiff.length; i++) {
-        if (angleDiff[i] < 11) {
-            menuRadius = (2 * Math.PI * radius) / pitchNumber / 6;
-        }
+    if (widths !== null && widths.some(width => width < 11)) {
+        menuRadius = (2 * Math.PI * radius) / pitchNumber / 6;
     }
     if (menuRadius > 29) {
         menuRadius = (2 * Math.PI * radius) / 33;
@@ -439,32 +407,24 @@ const TemperamentUI = {
 
         const minutes = [];
         const angle = [];
-        const baseAngle1 = [];
-        const sliceAngle1 = [];
         const angle1 = [];
-        for (let i = 0; i <= pitchNumber; i++) {
-            if (i !== pitchNumber) {
-                minutes.push("|");
-            }
+        for (let i = 0; i < pitchNumber; i++) {
+            // Change angles of outer circle
+            minutes.push("|");
             angle[i] = ratioToWheelAngle(ratios[i], tw.powerBase);
         }
 
-        const angleDiff1 = _computeAngleDiffs(angle, pitchNumber);
-        for (let i = 0; i < angleDiff1.length; i++) {
-            angle1[i] = angle[i] + angleDiff1[i] / 2;
-        }
-
-        tw.wheel.navAngle = 270 + angleDiff1[0] / 2;
+        tw.wheel.navAngle = 270 + (angle[1] - angle[0]) / 2;
         tw.wheel.initWheel(minutes);
-        for (let i = 0; i < pitchNumber; i++) {
-            if (i === 0) {
-                sliceAngle1[i] = 360 / pitchNumber;
-                baseAngle1[i] = tw.wheel.navAngle - sliceAngle1[0] / 2;
-            } else {
-                baseAngle1[i] = baseAngle1[i - 1] + sliceAngle1[i - 1];
-                sliceAngle1[i] = 2 * (angle1[i] - baseAngle1[i]);
+        // Ticks sit between pitches (slice i spans pitch i..i+1); rotate the
+        // helper's pitch i-1..i convention into place.
+        const proportional = sliceAnglesFromRatios(ratios.slice(0, pitchNumber), tw.powerBase);
+        if (proportional) {
+            const widths = [...proportional.slice(1), proportional[0]];
+            applySliceAngles(tw.wheel, widths);
+            for (let i = 0; i < pitchNumber; i++) {
+                angle1[i] = angle[i] + widths[i] / 2;
             }
-            tw.wheel.navItems[i].sliceAngle = sliceAngle1[i];
         }
         tw.wheel.createWheel();
         docById("wheelDiv3").style.position = "absolute";
@@ -558,7 +518,11 @@ const TemperamentUI = {
                 };
                 docById("done").onclick = function () {
                     tw.tempRatios1 = tw.tempRatios.slice();
-                    const pn = tw.tempRatios1.length;
+                    // tempRatios1 carries a trailing octave entry; the wheel
+                    // pitch count excludes it.
+                    const n = tw.tempRatios1.length;
+                    const pn =
+                        n > 1 && Math.abs(tw.tempRatios1[n - 1] - tw.powerBase) < 1e-6 ? n - 1 : n;
                     TemperamentUI.createOuterWheel(tw, tw.tempRatios1, pn);
                 };
                 docById("close").onclick = function () {

@@ -827,9 +827,24 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
                 TEMPERAMENT[temperament][pitchNumber][2]
             ];
         } else {
-            // Add in octave factor from above.
-            const o = Number(TEMPERAMENT[temperament][pitchNumber][2]) + octaveFactor;
-            return [TEMPERAMENT[temperament][pitchNumber][1], o];
+            const entry = TEMPERAMENT[temperament][pitchNumber];
+            const entryOctave = Number(entry[2]);
+            if (Number.isFinite(entryOctave)) {
+                // Add in octave factor from above.
+                return [entry[1], entryOctave + octaveFactor];
+            }
+            // Malformed legacy entry (non-numeric octave): derive an
+            // equal-division name/octave for this index instead of NaN,
+            // matching the undefined-entry fill above (no octave factor).
+            if (typeof startPitch !== "string") {
+                return [entry[1], NaN];
+            }
+            const intervalIndex = Math.round((pitchIdx * 12) / octaveLength) % 12;
+            const eq = getNoteFromInterval(
+                startPitch,
+                TEMPERAMENT["equal"]["interval"][intervalIndex]
+            );
+            return [eq[0], eq[1]];
         }
     } else {
         const temperamentPitchNumber = TEMPERAMENT[temperament]["pitchNumber"] || 12;

@@ -21,6 +21,8 @@
    getSavedCustomModes, getModeNamesForGroup, getModeLabel,
    getModeNameFromLabel, getModeSliceColors,
    getModeGroupTitleFont, getModeSliceFont,
+   getTemperamentSliceAngles, sliceAnglesFromRatios,
+   enforceMinSliceAngles, applySliceAngles,
    MusicUtilsModeWheel
  */
 
@@ -31,6 +33,11 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof window !== "undefined" && window.MusicUtilsConstants) ||
         (typeof require !== "undefined" ? require("./musicutils-constants") : {});
     var { MODE_PIE_MENUS } = MusicUtilsConstants;
+    var MusicUtilsTemperament =
+        (typeof window !== "undefined" && window.MusicUtilsTemperament) ||
+        (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
+    var { getTemperament, getTemperamentRatio, isEquallyTempered, ratioToWheelAngle } =
+        MusicUtilsTemperament;
 }
 
 /** Custom modes saved by the mode widget; corrupt data yields []. */
@@ -109,6 +116,84 @@ var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     return `100 ${clamped}px sans-serif`;
 };
 
+/** Per-slice wheelnav angles: slice i spans pitch i-1 to i, slice 0 wrapping the last pitch to the octave. Null for unusable input. */
+var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
+    if (!Array.isArray(ratios) || ratios.length < 2) {
+        return null;
+    }
+
+    const pitchCount = ratios.length;
+    const positions = ratios.map(r => ratioToWheelAngle(r, octaveRatio) - 270);
+    // Separate variable, not an in-place -= 360: angles[n-1] also reads
+    // positions[n-1], so mutating it would corrupt the last slice.
+    const wrappedRoot = positions[pitchCount - 1] - 360;
+
+    const angles = new Array(pitchCount);
+    for (let i = 0; i < pitchCount; i++) {
+        angles[i] = positions[i] - (i === 0 ? wrappedRoot : positions[i - 1]);
+    }
+    return angles.every(a => a > 0) ? angles : null;
+};
+
+/** Proportional slice angles for a TEMPERAMENT entry, or null to keep equal slices. */
+var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
+    const entry = getTemperament(temperamentKey);
+    if (
+        !Number.isInteger(pitchCount) ||
+        pitchCount < 2 ||
+        !entry ||
+        !Array.isArray(entry.ratios) ||
+        entry.ratios.length !== pitchCount ||
+        isEquallyTempered(temperamentKey)
+    ) {
+        return null;
+    }
+    const octaveRatio = Number(entry.octaveRatio);
+    if (!Number.isFinite(octaveRatio) || octaveRatio <= 1) {
+        return null;
+    }
+    return sliceAnglesFromRatios(entry.ratios.map(getTemperamentRatio), octaveRatio);
+};
+
+/** Raises slices below minDegrees to that floor, absorbing the excess from wider slices. Null for bad input. */
+var enforceMinSliceAngles = (sliceAngles, minDegrees) => {
+    if (!Array.isArray(sliceAngles) || sliceAngles.length === 0) {
+        return null;
+    }
+    // A floor above 360/n could not be honoured for every slice, so clamp it.
+    const floor = Math.min(minDegrees, 360 / sliceAngles.length);
+    const raised = sliceAngles.map(width => Math.max(width, floor));
+    // Headroom above the floor always covers the excess (floor <= 360/n), so no
+    // slice drops below the floor; when every slice sits on the floor the excess
+    // is float noise only.
+    const excess = raised.reduce((sum, width) => sum + width, 0) - 360;
+    if (excess > 1e-9) {
+        const headroom = raised.reduce((sum, width) => sum + (width - floor), 0);
+        for (let i = 0; i < raised.length; i++) {
+            raised[i] -= (excess * (raised[i] - floor)) / headroom;
+        }
+    }
+    return raised;
+};
+
+/**
+ * Gives a wheel proportional slice widths. Must run after initWheel() and
+ * before createWheel(), which bakes sliceAngle into the SVG paths.
+ */
+var applySliceAngles = (wheel, sliceAngles) => {
+    if (
+        !Array.isArray(sliceAngles) ||
+        !Array.isArray(wheel.navItems) ||
+        sliceAngles.length < wheel.navItems.length
+    ) {
+        return;
+    }
+    wheel.navItemsContinuous = true;
+    for (let i = 0; i < wheel.navItems.length; i++) {
+        wheel.navItems[i].sliceAngle = sliceAngles[i];
+    }
+};
+
 var MusicUtilsModeWheel = {
     getSavedCustomModes,
     getModeNamesForGroup,
@@ -116,7 +201,11 @@ var MusicUtilsModeWheel = {
     getModeNameFromLabel,
     getModeSliceColors,
     getModeGroupTitleFont,
-    getModeSliceFont
+    getModeSliceFont,
+    getTemperamentSliceAngles,
+    sliceAnglesFromRatios,
+    enforceMinSliceAngles,
+    applySliceAngles
 };
 
 if (typeof module !== "undefined" && module.exports) {

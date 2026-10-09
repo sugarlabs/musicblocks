@@ -27,7 +27,7 @@
     PREVIEWVOLUME, rationalToFraction, setOctaveRatio, SHARP, Singer,
     TuningFormats, updateTemperaments, frequencyToPitch, clampNumber,
     ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup
+    closeSharePopup, stripMicrotonalPrefix
 */
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
@@ -133,6 +133,8 @@ function TemperamentWidget() {
     let temperamentTableDiv;
 
     const _stripCents = n => n.replace(/\(.*?\)/g, "");
+    // Strip cents deviations and microtonal prefixes: display annotations, not note names.
+    const _cleanNoteName = n => stripMicrotonalPrefix(_stripCents(n));
 
     /**
      * Reference to the temperament cell.
@@ -1630,7 +1632,7 @@ function TemperamentWidget() {
             } else if (Array.isArray(this.notes[i])) {
                 interval.push(this.notes[i][0]);
             } else if (typeof this.notes[i] === "string") {
-                interval.push(parseNoteString(_stripCents(this.notes[i]))[0]);
+                interval.push(parseNoteString(_cleanNoteName(this.notes[i]))[0]);
             } else {
                 interval.push("");
             }
@@ -1811,6 +1813,10 @@ function TemperamentWidget() {
         const entry = { pitchNumber: pitchNumber, octaveRatio: period };
         for (let i = 0; i < pitchNumber; i++) {
             const pitch = frequencyToPitch(ratios[i] * resolvedHz);
+            if (!Number.isFinite(Number(pitch[1]))) {
+                this.activity.errorMsg(_("Cannot import: invalid note octave."), 3000);
+                return false;
+            }
             entry["" + i] = [ratios[i], pitch[0], pitch[1]];
         }
 
@@ -1903,6 +1909,35 @@ function TemperamentWidget() {
             }
         }
 
+        // Strip cents-deviation prefixes (^/v): they are display annotations,
+        // not note names; persisting "vB" breaks pitch lookup ("pitch vB not
+        // found in mode"). Parse once: the block emission below reuses these.
+        const cleanNotes = this.notes.map(_cleanNoteName);
+        const parsedNotes = cleanNotes.map(parseNoteString);
+
+        // Build and validate the replacement entry before the dictionary
+        // replace: a refused save keeps the old entry (later side effects
+        // like block emission still run). Classify once: findUniqueTemperamentName
+        // may rename the key below, and the classification must not flip with it.
+        const isCustom = isCustomTemperament(this.inTemperament);
+        let newTemperament = null;
+        if (isCustom) {
+            newTemperament = {
+                pitchNumber: this.pitchNumber,
+                octaveRatio: this.powerBase
+            };
+            for (let i = 0; i < this.pitchNumber; i++) {
+                if (!Number.isFinite(parsedNotes[i][1])) {
+                    this.activity.errorMsg(
+                        _(`Cannot save temperament: pitch ${i + 1} has no valid octave.`),
+                        3000
+                    );
+                    return;
+                }
+                newTemperament["" + i] = [this.ratios[i], parsedNotes[i][0], parsedNotes[i][1]];
+            }
+        }
+
         setOctaveRatio(this.powerBase);
 
         const startPitchParsed = parseNoteString(this._logo.synth.startingPitch);
@@ -1979,7 +2014,7 @@ function TemperamentWidget() {
                 newStack.push([idx + 7, ["number", { value: this.pitchNumber }], 0, 0, [idx + 5]]);
                 newStack.push([idx + 8, "vspace", 0, 0, [idx, idx + 9]]);
                 newStack.push([idx + 9, ["pitch"], 0, 0, [idx + 8, idx + 10, idx + 11, null]]);
-                if (!isCustomTemperament(this.inTemperament)) {
+                if (!isCustom) {
                     newStack.push([
                         idx + 10,
                         ["notename", { value: this.ratiosNotesPair[i][1][0] }],
@@ -1995,21 +2030,10 @@ function TemperamentWidget() {
                         [idx + 9]
                     ]);
                 } else {
-                    newStack.push([
-                        idx + 10,
-                        [
-                            "text",
-                            {
-                                value: _stripCents(this.notes[i])
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 9]
-                    ]);
+                    newStack.push([idx + 10, ["text", { value: cleanNotes[i] }], 0, 0, [idx + 9]]);
                     newStack.push([
                         idx + 11,
-                        ["number", { value: parseNoteString(_stripCents(this.notes[i]))[1] }],
+                        ["number", { value: parsedNotes[i][1] }],
                         0,
                         0,
                         [idx + 9]
@@ -2046,7 +2070,7 @@ function TemperamentWidget() {
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
                 newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
 
-                if (!isCustomTemperament(this.inTemperament)) {
+                if (!isCustom) {
                     newStack.push([
                         idx + 8,
                         ["notename", { value: this.ratiosNotesPair[i][1][0] }],
@@ -2062,21 +2086,10 @@ function TemperamentWidget() {
                         [idx + 7]
                     ]);
                 } else {
-                    newStack.push([
-                        idx + 8,
-                        [
-                            "text",
-                            {
-                                value: _stripCents(this.notes[i])
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 7]
-                    ]);
+                    newStack.push([idx + 8, ["text", { value: cleanNotes[i] }], 0, 0, [idx + 7]]);
                     newStack.push([
                         idx + 9,
-                        ["number", { value: parseNoteString(_stripCents(this.notes[i]))[1] }],
+                        ["number", { value: parsedNotes[i][1] }],
                         0,
                         0,
                         [idx + 7]
@@ -2098,18 +2111,9 @@ function TemperamentWidget() {
             that.activity.textMsg(_("New action block generated."), 3000);
         }, 500);
 
-        if (isCustomTemperament(this.inTemperament)) {
+        if (isCustom) {
+            // Entries validated above; replace atomically.
             deleteTemperamentFromList(this.inTemperament);
-            const newTemperament = {
-                pitchNumber: this.pitchNumber,
-                octaveRatio: this.powerBase
-            };
-            for (let i = 0; i < this.pitchNumber; i++) {
-                const number = "" + i;
-                const cleanName = _stripCents(this.notes[i]);
-                const noteParsed = parseNoteString(cleanName);
-                newTemperament[number] = [this.ratios[i], noteParsed[0], noteParsed[1]];
-            }
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
             // The redefined temperament keeps its old name, so any frequency
@@ -2119,7 +2123,7 @@ function TemperamentWidget() {
             Singer.clearPitchToFrequencyCache();
         }
 
-        if (isCustomTemperament(this.inTemperament)) {
+        if (isCustom) {
             this._logo.customTemperamentDefined = true;
             this.activity.blocks.protoBlockDict["custompitch"].hidden = false;
             this.activity.blocks.palettes.updatePalettes("pitch");

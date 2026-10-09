@@ -167,7 +167,11 @@ if (typeof module !== "undefined" && module.exports) {
         getModeNameFromLabel,
         getModeSliceColors,
         getModeGroupTitleFont,
-        getModeSliceFont
+        getModeSliceFont,
+        getTemperamentSliceAngles,
+        sliceAnglesFromRatios,
+        enforceMinSliceAngles,
+        applySliceAngles
     } = MusicUtilsModeWheel;
     var MusicUtilsModeCore =
         (typeof window !== "undefined" && window.MusicUtilsModeCore) ||
@@ -435,6 +439,10 @@ if (typeof module !== "undefined" && module.exports) {
         getModeSliceColors,
         getModeGroupTitleFont,
         getModeSliceFont,
+        getTemperamentSliceAngles,
+        sliceAnglesFromRatios,
+        enforceMinSliceAngles,
+        applySliceAngles,
         getNonEDOFrequency
     };
 }

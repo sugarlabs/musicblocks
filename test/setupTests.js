@@ -73,7 +73,10 @@ const {
     FIXEDSOLFEGE,
     FIXEDSOLFEGE1,
     CENTSSYMBOL,
-    MUSICALMODES
+    MUSICALMODES,
+    sliceAnglesFromRatios,
+    applySliceAngles,
+    stripMicrotonalPrefix
 } = require("../js/utils/musicutils.js");
 
 // Set commonly used constants as globals for backward compatibility with tests
@@ -104,6 +107,9 @@ global.FIXEDSOLFEGE = FIXEDSOLFEGE;
 global.FIXEDSOLFEGE1 = FIXEDSOLFEGE1;
 global.CENTSSYMBOL = CENTSSYMBOL;
 global.MUSICALMODES = MUSICALMODES;
+global.sliceAnglesFromRatios = sliceAnglesFromRatios;
+global.applySliceAngles = applySliceAngles;
+global.stripMicrotonalPrefix = stripMicrotonalPrefix;
 
 // Provide ErrorHandler global for tests
 global.ErrorHandler = {
