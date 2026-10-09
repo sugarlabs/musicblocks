@@ -1655,183 +1655,237 @@ describe("Palettes Class", () => {
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
-            let capturedImg;
-            const paletteList = {
-                appendChild: jest.fn()
-            };
-            const realCreateFragment = document.createDocumentFragment;
-
-            document.createDocumentFragment = jest.fn(() => {
-                return realCreateFragment.call(document);
+            const previousRaf = window.requestAnimationFrame;
+            const previousCancelRaf = window.cancelAnimationFrame;
+            let rafCallback = null;
+            window.requestAnimationFrame = jest.fn(cb => {
+                rafCallback = cb;
+                return 456;
             });
+            window.cancelAnimationFrame = jest.fn();
 
-            global.docById = jest.fn(id => {
-                if (id === "PaletteBody_items") return paletteList;
-                return null;
-            });
+            try {
+                let capturedImg;
+                const paletteList = {
+                    appendChild: jest.fn()
+                };
+                const realCreateFragment = document.createDocumentFragment;
 
-            const realCreate = REAL_CREATE_ELEMENT;
+                document.createDocumentFragment = jest.fn(() => {
+                    return realCreateFragment.call(document);
+                });
 
-            document.createElement = jest.fn(tag => {
-                const el = realCreate.call(document, tag);
+                global.docById = jest.fn(id => {
+                    if (id === "PaletteBody_items") return paletteList;
+                    return null;
+                });
 
-                // Preserve upstream behavior for td
-                if (tag === "td") {
-                    const originalAppend = el.appendChild;
-                    el.appendChild = child => {
-                        capturedImg = child;
-                        return originalAppend.call(el, child);
-                    };
-                }
+                const realCreate = REAL_CREATE_ELEMENT;
 
-                // Preserve your img handling
-                if (tag === "img") {
-                    el.width = 50;
-                    el.style = {};
-                }
+                document.createElement = jest.fn(tag => {
+                    const el = realCreate.call(document, tag);
 
-                return el;
-            });
-            global.mediaPALETTE = "<svg></svg>";
-            global.cameraPALETTE = "<svg></svg>";
-            global.videoPALETTE = "<svg></svg>";
-            mockActivity.pluginsImages = { customimg: "<svg></svg>" };
-            jest.spyOn(document, "addEventListener").mockImplementation(() => {});
-            jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
-
-            palettes.add("test");
-            const palette = palettes.dict.test;
-            mockActivity.blocksContainer = { x: 0, y: 0 };
-            palette._makeBlockFromProtoblock = jest.fn();
-            palette.protoList = [{ name: "media" }, { name: "customimg" }];
-            palette.model.update = jest.fn(() => {
-                palette.model.blocks = [
-                    {
-                        blkname: "media",
-                        modname: "media",
-                        artwork: "<svg></svg>",
-                        hidden: false,
-                        image: true
-                    },
-                    {
-                        blkname: "customimg",
-                        modname: "customimg",
-                        artwork: "<svg></svg>",
-                        hidden: false,
-                        image: true
+                    // Preserve upstream behavior for td
+                    if (tag === "td") {
+                        const originalAppend = el.appendChild;
+                        el.appendChild = child => {
+                            capturedImg = child;
+                            return originalAppend.call(el, child);
+                        };
                     }
-                ];
-            });
 
-            palette._showMenuItems();
+                    // Preserve your img handling
+                    if (tag === "img") {
+                        el.width = 50;
+                        el.style = {};
+                    }
 
-            const img = capturedImg;
-            expect(img).toBeDefined();
-            img.offsetWidth = 10;
-            img.offsetHeight = 10;
-            document.body.appendChild = jest.fn();
-            document.body.removeChild = jest.fn();
+                    return el;
+                });
+                global.mediaPALETTE = "<svg></svg>";
+                global.cameraPALETTE = "<svg></svg>";
+                global.videoPALETTE = "<svg></svg>";
+                mockActivity.pluginsImages = { customimg: "<svg></svg>" };
+                jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+                jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 
-            img.onmouseover();
-            expect(document.body.style.cursor).toBe("pointer");
-            img.onmouseleave();
-            expect(document.body.style.cursor).toBe("default");
-            expect(img.ondragstart()).toBe(false);
-            img.onmousedown({
-                pageX: 10,
-                pageY: 20,
-                preventDefault: jest.fn()
-            });
-            const mouseMoveHandler = document.addEventListener.mock.calls.find(
-                call => call[0] === "mousemove"
-            )[1];
-            mouseMoveHandler({
-                type: "mousemove",
-                pageX: 15,
-                pageY: 25,
-                preventDefault: jest.fn()
-            });
+                palettes.add("test");
+                const palette = palettes.dict.test;
+                mockActivity.blocksContainer = { x: 0, y: 0 };
+                palette._makeBlockFromProtoblock = jest.fn();
+                palette.protoList = [{ name: "media" }, { name: "customimg" }];
+                palette.model.update = jest.fn(() => {
+                    palette.model.blocks = [
+                        {
+                            blkname: "media",
+                            modname: "media",
+                            artwork: "<svg></svg>",
+                            hidden: false,
+                            image: true
+                        },
+                        {
+                            blkname: "customimg",
+                            modname: "customimg",
+                            artwork: "<svg></svg>",
+                            hidden: false,
+                            image: true
+                        }
+                    ];
+                });
 
-            img.onmouseup({});
+                palette._showMenuItems();
+
+                const img = capturedImg;
+                expect(img).toBeDefined();
+                img.offsetWidth = 10;
+                img.offsetHeight = 10;
+                document.body.appendChild = jest.fn();
+                document.body.removeChild = jest.fn();
+
+                img.onmouseover();
+                expect(document.body.style.cursor).toBe("pointer");
+                img.onmouseleave();
+                expect(document.body.style.cursor).toBe("default");
+                expect(img.ondragstart()).toBe(false);
+                img.onmousedown({
+                    pageX: 10,
+                    pageY: 20,
+                    preventDefault: jest.fn()
+                });
+                const mouseMoveHandler = document.addEventListener.mock.calls.find(
+                    call => call[0] === "mousemove"
+                )[1];
+                mouseMoveHandler({
+                    type: "mousemove",
+                    pageX: 15,
+                    pageY: 25,
+                    preventDefault: jest.fn()
+                });
+
+                if (rafCallback) rafCallback();
+
+                mouseMoveHandler({
+                    type: "mousemove",
+                    pageX: 20,
+                    pageY: 30,
+                    preventDefault: jest.fn()
+                });
+
+                const mouseUpHandler = document.addEventListener.mock.calls.find(
+                    call => call[0] === "mouseup"
+                )[1];
+                mouseUpHandler({});
+                expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
+            } finally {
+                window.requestAnimationFrame = previousRaf;
+                window.cancelAnimationFrame = previousCancelRaf;
+            }
         });
 
         test("_showMenuItems handles touch drag", () => {
-            let capturedImg;
-            const paletteList = {
-                appendChild: jest.fn()
-            };
-            const realCreateFragment = document.createDocumentFragment;
-
-            document.createDocumentFragment = jest.fn(() => {
-                return realCreateFragment.call(document);
+            const previousRaf = window.requestAnimationFrame;
+            const previousCancelRaf = window.cancelAnimationFrame;
+            let rafCallback = null;
+            window.requestAnimationFrame = jest.fn(cb => {
+                rafCallback = cb;
+                return 789;
             });
+            window.cancelAnimationFrame = jest.fn();
 
-            global.docById = jest.fn(id => {
-                if (id === "PaletteBody_items") return paletteList;
-                return null;
-            });
+            try {
+                let capturedImg;
+                const paletteList = {
+                    appendChild: jest.fn()
+                };
+                const realCreateFragment = document.createDocumentFragment;
 
-            const realCreate = REAL_CREATE_ELEMENT;
+                document.createDocumentFragment = jest.fn(() => {
+                    return realCreateFragment.call(document);
+                });
 
-            document.createElement = jest.fn(tag => {
-                const el = realCreate.call(document, tag);
+                global.docById = jest.fn(id => {
+                    if (id === "PaletteBody_items") return paletteList;
+                    return null;
+                });
 
-                if (tag === "td") {
-                    const originalAppend = el.appendChild;
-                    el.appendChild = child => {
-                        capturedImg = child;
-                        return originalAppend.call(el, child);
-                    };
-                }
+                const realCreate = REAL_CREATE_ELEMENT;
 
-                if (tag === "img") {
-                    el.width = 50;
-                    el.style = {};
-                }
+                document.createElement = jest.fn(tag => {
+                    const el = realCreate.call(document, tag);
 
-                return el;
-            });
-            jest.spyOn(document, "addEventListener").mockImplementation(() => {});
-            jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
-
-            palettes.add("test");
-            const palette = palettes.dict.test;
-            palette._makeBlockFromProtoblock = jest.fn();
-            mockActivity.blocksContainer = { x: 0, y: 0 };
-            palette.protoList = [{ name: "media" }];
-            palette.model.update = jest.fn(() => {
-                palette.model.blocks = [
-                    {
-                        blkname: "media",
-                        modname: "media",
-                        artwork: "<svg></svg>",
-                        hidden: false,
-                        image: true
+                    if (tag === "td") {
+                        const originalAppend = el.appendChild;
+                        el.appendChild = child => {
+                            capturedImg = child;
+                            return originalAppend.call(el, child);
+                        };
                     }
-                ];
-            });
 
-            palette._showMenuItems();
+                    if (tag === "img") {
+                        el.width = 50;
+                        el.style = {};
+                    }
 
-            const img = capturedImg;
-            expect(img).toBeDefined();
-            img.offsetWidth = 10;
-            img.offsetHeight = 10;
-            document.body.appendChild = jest.fn();
-            document.body.removeChild = jest.fn();
-            img.ontouchstart({
-                touches: [{ clientX: 10, clientY: 20 }],
-                preventDefault: jest.fn()
-            });
-            const touchMoveHandler = document.addEventListener.mock.calls.find(
-                call => call[0] === "touchmove"
-            )[1];
-            touchMoveHandler({
-                type: "touchmove",
-                touches: [{ clientX: 12, clientY: 22 }],
-                preventDefault: jest.fn()
-            });
-            img.ontouchend({});
+                    return el;
+                });
+                jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+                jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
+
+                palettes.add("test");
+                const palette = palettes.dict.test;
+                palette._makeBlockFromProtoblock = jest.fn();
+                mockActivity.blocksContainer = { x: 0, y: 0 };
+                palette.protoList = [{ name: "media" }];
+                palette.model.update = jest.fn(() => {
+                    palette.model.blocks = [
+                        {
+                            blkname: "media",
+                            modname: "media",
+                            artwork: "<svg></svg>",
+                            hidden: false,
+                            image: true
+                        }
+                    ];
+                });
+
+                palette._showMenuItems();
+
+                const img = capturedImg;
+                expect(img).toBeDefined();
+                img.offsetWidth = 10;
+                img.offsetHeight = 10;
+                document.body.appendChild = jest.fn();
+                document.body.removeChild = jest.fn();
+                img.ontouchstart({
+                    touches: [{ clientX: 10, clientY: 20 }],
+                    preventDefault: jest.fn()
+                });
+                const touchMoveHandler = document.addEventListener.mock.calls.find(
+                    call => call[0] === "touchmove"
+                )[1];
+                touchMoveHandler({
+                    type: "touchmove",
+                    touches: [{ clientX: 12, clientY: 22 }],
+                    preventDefault: jest.fn()
+                });
+
+                if (rafCallback) rafCallback();
+
+                touchMoveHandler({
+                    type: "touchmove",
+                    touches: [{ clientX: 15, clientY: 25 }],
+                    preventDefault: jest.fn()
+                });
+
+                const touchEndHandler = document.addEventListener.mock.calls.find(
+                    call => call[0] === "touchend"
+                )[1];
+                touchEndHandler({});
+                expect(window.cancelAnimationFrame).toHaveBeenCalledWith(789);
+            } finally {
+                window.requestAnimationFrame = previousRaf;
+                window.cancelAnimationFrame = previousCancelRaf;
+            }
         });
 
         test("_showMenuItems hides palette when mobile", () => {

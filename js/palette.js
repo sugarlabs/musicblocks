@@ -561,7 +561,7 @@ class Palettes {
         this._clearKeyboardFocus();
 
         if (closeMenus) {
-            for (const name in this.dict) {
+            for (const name of Object.keys(this.dict)) {
                 if (this.dict[name] && typeof this.dict[name].hideMenu === "function") {
                     this.dict[name].hideMenu();
                 }
@@ -1060,7 +1060,7 @@ class Palettes {
     }
 
     getInfo() {
-        for (const key in this.dict) {
+        for (const key of Object.keys(this.dict)) {
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -1098,7 +1098,7 @@ class Palettes {
 
     reinitialize(palettes) {
         // First hide all palettes
-        for (const name in this.dict) {
+        for (const name of Object.keys(this.dict)) {
             if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                 const palette = this.dict[name];
                 if (palette && typeof palette.hideMenu === "function") {
@@ -1217,7 +1217,7 @@ class PaletteModel {
 
     update() {
         this.blocks = [];
-        for (const blk in this.palette.protoList) {
+        for (const blk of Object.keys(this.palette.protoList)) {
             const block = this.palette.protoList[blk];
             // Don't show hidden blocks on the menus
             // But we still make them.
@@ -1771,17 +1771,25 @@ class Palette {
                     img.style.top = pageY - halfH + "px";
                 };
 
+                let rAFId = null;
+                let ticking = false;
+                let lastX, lastY;
                 const onMouseMove = e => {
                     e.preventDefault();
-                    let x, y;
                     if (e.type === "touchmove") {
-                        x = e.touches[0].clientX;
-                        y = e.touches[0].clientY;
+                        lastX = e.touches[0].clientX;
+                        lastY = e.touches[0].clientY;
                     } else {
-                        x = e.pageX;
-                        y = e.pageY;
+                        lastX = e.pageX;
+                        lastY = e.pageY;
                     }
-                    moveAt(x, y);
+                    if (!ticking) {
+                        ticking = true;
+                        rAFId = window.requestAnimationFrame(() => {
+                            moveAt(lastX, lastY);
+                            ticking = false;
+                        });
+                    }
                 };
                 onMouseMove(event);
 
@@ -1793,8 +1801,15 @@ class Palette {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
-                    img.onmouseup = null;
-                    img.ontouchend = null;
+                    document.removeEventListener("mouseup", up);
+                    document.removeEventListener("touchend", up);
+
+                    if (rAFId) {
+                        window.cancelAnimationFrame(rAFId);
+                        rAFId = null;
+                        ticking = false;
+                        moveAt(lastX, lastY);
+                    }
 
                     const x = parseInt(img.style.left, 10);
                     const y = parseInt(img.style.top, 10);
@@ -1818,8 +1833,8 @@ class Palette {
                     );
                 };
 
-                img.ontouchend = up;
-                img.onmouseup = up;
+                document.addEventListener("mouseup", up);
+                document.addEventListener("touchend", up);
             };
 
             img.ontouchstart = down;
@@ -1866,7 +1881,7 @@ class Palette {
 
     getInfo() {
         let returnString = this.name + " palette:";
-        for (const thisBlock in this.protoList) {
+        for (const thisBlock of Object.keys(this.protoList)) {
             returnString += " " + this.protoList[thisBlock].name;
         }
         return returnString;

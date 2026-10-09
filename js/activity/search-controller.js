@@ -384,17 +384,25 @@ class SearchController {
                             img.style.top = pageY - img.offsetHeight / 2 + "px";
                         };
 
+                        let rAFId = null;
+                        let ticking = false;
+                        let lastX, lastY;
                         const onMouseMove = e => {
                             e.preventDefault();
-                            let x, y;
                             if (e.type === "touchmove") {
-                                x = e.touches[0].clientX;
-                                y = e.touches[0].clientY;
+                                lastX = e.touches[0].clientX;
+                                lastY = e.touches[0].clientY;
                             } else {
-                                x = e.pageX;
-                                y = e.pageY;
+                                lastX = e.pageX;
+                                lastY = e.pageY;
                             }
-                            moveAt(x, y);
+                            if (!ticking) {
+                                ticking = true;
+                                rAFId = window.requestAnimationFrame(() => {
+                                    moveAt(lastX, lastY);
+                                    ticking = false;
+                                });
+                            }
                         };
                         onMouseMove(event);
 
@@ -405,6 +413,12 @@ class SearchController {
                             document.body.style.cursor = "default";
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
+                            if (rAFId) {
+                                window.cancelAnimationFrame(rAFId);
+                                rAFId = null;
+                                ticking = false;
+                                moveAt(lastX, lastY);
+                            }
 
                             const x = parseInt(img.style.left, 10);
                             const y = parseInt(img.style.top, 10);
