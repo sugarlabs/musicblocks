@@ -19,7 +19,7 @@
  * Private members' names begin with underscore '_".
  */
 
-/* global JSInterface, last */
+/* global JSInterface, last, deepClone */
 
 /* exported ASTUtils */
 
@@ -268,7 +268,7 @@ class ASTUtils {
      * @returns {Object} barebone Abstract Syntax Tree for JavaScript based Music Blocks programs
      */
     static get BAREBONE_AST() {
-        return JSON.parse(JSON.stringify(ASTUtils._bareboneAST));
+        return deepClone(ASTUtils._bareboneAST);
     }
 
     /**
@@ -1365,7 +1365,7 @@ class ASTUtils {
      * @returns {Object} mouse Abstract Syntax Tree for the tree
      */
     static getMouseAST(tree) {
-        const AST = JSON.parse(JSON.stringify(ASTUtils._mouseAST));
+        const AST = deepClone(ASTUtils._mouseAST);
 
         const ASTs = ASTUtils._getBlockAST(tree);
         for (const i in ASTs) {
