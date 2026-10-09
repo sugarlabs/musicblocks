@@ -510,6 +510,31 @@ describe("PhraseMaker Widget", () => {
             // undefined || 4 = 4; 4 / 4 = 1.0
             expect(pm._measureLimit).toBeCloseTo(1.0);
         });
+
+        test("records the turtle on pm._turtle when initialized with a turtle index (#9330)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({
+                1: { beats: 3, noteValue: 4 }
+            });
+            callInitPartial(pm, activity, 1);
+            expect(pm._turtle).toBeDefined();
+            expect(pm._turtle.singer.beatsPerMeasure).toBe(3);
+        });
+
+        test("preserves pm._turtle on subsequent init calls with omitted turtleIndex (#9330)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({
+                0: { beats: 4, noteValue: 4 },
+                1: { beats: 3, noteValue: 4 }
+            });
+            callInitPartial(pm, activity, 1);
+            expect(pm._turtle.singer.beatsPerMeasure).toBe(3);
+
+            activity.turtles.ithTurtle.mockClear();
+            callInitPartial(pm, activity, undefined);
+            expect(pm._turtle.singer.beatsPerMeasure).toBe(3);
+            expect(activity.turtles.ithTurtle).not.toHaveBeenCalled();
+        });
     });
 
     describe("dependency injection", () => {

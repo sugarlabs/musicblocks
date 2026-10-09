@@ -329,6 +329,47 @@ describe("PhraseMakerAudio", () => {
             expect(consoleSpy).toHaveBeenCalledWith("unknown graphics command unknown");
             consoleSpy.mockRestore();
         });
+
+        test("uses the turtle that ran the block rather than turtle 0 (#9330)", () => {
+            const trashedTurtle = {
+                painter: { doForward: jest.fn() }
+            };
+            const runningTurtle = {
+                painter: { doForward: jest.fn() }
+            };
+            mockPM.activity.turtles.getTurtle = jest.fn(i => {
+                if (i === 0) return trashedTurtle;
+                if (i === 1) return runningTurtle;
+                throw new Error(`Turtle ${i} not found`);
+            });
+            mockPM._turtle = runningTurtle;
+
+            PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+
+            expect(runningTurtle.painter.doForward).toHaveBeenCalledWith(100);
+            expect(trashedTurtle.painter.doForward).not.toHaveBeenCalled();
+            expect(mockPM.activity.turtles.getTurtle).not.toHaveBeenCalled();
+        });
+
+        test("keeps that turtle when an earlier turtle is removed", () => {
+            const runningTurtle = {
+                painter: { doForward: jest.fn() }
+            };
+            mockPM._turtle = runningTurtle;
+            mockPM.activity.turtles.getTurtle = jest.fn(() => {
+                throw new Error("Should not look up turtle by index");
+            });
+
+            PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+
+            expect(runningTurtle.painter.doForward).toHaveBeenCalledWith(100);
+        });
+
+        test("falls back to turtle 0 when _turtle is not set", () => {
+            delete mockPM._turtle;
+            PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+            expect(mockTurtle.painter.doForward).toHaveBeenCalledWith(100);
+        });
     });
 
     describe("_playChord", () => {

@@ -623,6 +623,20 @@ describe("setupWidgetBlocks", () => {
             );
         });
 
+        it("gives the Phrase Maker widget the turtle that ran the block", () => {
+            const matrix = getBlock("matrix");
+            const expectedTurtle = { singer: {} };
+            activity.turtles.ithTurtle = jest.fn(i => (i === 2 ? expectedTurtle : null));
+            logo.phraseMaker = {
+                clearBlocks: jest.fn(),
+                init: jest.fn()
+            };
+
+            matrix.flow(["childBlk"], logo, 2, "matrixBlk");
+
+            expect(logo.phraseMaker._turtle).toBe(expectedTurtle);
+        });
+
         it("returns interruption if widget is already loading (guard check)", () => {
             const temperament = getBlock("temperament");
             logo.temperament = "loading";

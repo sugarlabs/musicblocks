@@ -1810,6 +1810,8 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             logo.phraseMaker.blockNo = blk;
+            logo.phraseMaker._turtle =
+                activity.turtles?.ithTurtle?.(turtle) || activity.turtles?.getTurtle?.(turtle);
 
             logo.phraseMaker._instrumentName = DEFAULTVOICE;
 
