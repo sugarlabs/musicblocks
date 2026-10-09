@@ -2182,6 +2182,49 @@ describe("buildScale", () => {
         expect(buildScale("E natural minor")[0]).toContain("F♯");
         expect(buildScale("E natural minor")[0]).not.toContain("G♭");
     });
+
+    it.each([
+        ["A harmonic minor", "A B C D E F G♯ A"],
+        ["D harmonic minor", "D E F G A B♭ C♯ D"],
+        ["E harmonic minor", "E F♯ G A B C D♯ E"],
+        ["G harmonic minor", "G A B♭ C D E♭ F♯ G"],
+        ["B harmonic minor", "B C♯ D E F♯ G A♯ B"],
+        ["A melodic minor", "A B C D E F♯ G♯ A"],
+        ["E melodic minor", "E F♯ G A B C♯ D♯ E"],
+        ["G melodic minor", "G A B♭ C D E F♯ G"]
+    ])("should spell %s with one letter per degree", (keySignature, expected) => {
+        expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it("should not repeat a letter in any seven-note scale it can spell", () => {
+        const roots = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+        const modes = ["harmonic minor", "melodic minor", "harmonic major", "hungarian"];
+        for (const root of roots) {
+            for (const mode of modes) {
+                const letters = buildScale(`${root} ${mode}`)[0]
+                    .slice(0, 7)
+                    .map(note => note[0]);
+                expect(new Set(letters).size).toBe(7);
+            }
+        }
+    });
+
+    it("should spell a scale on a sharp or flat tonic from that tonic", () => {
+        expect(buildScale("G♯ lydian")[0].join(" ")).toBe("G♯ A♯ B♯ C𝄪 D♯ E♯ F𝄪 G♯");
+        expect(buildScale("B♭ harmonic minor")[0].join(" ")).toBe("B♭ C D♭ E♭ F G♭ A B♭");
+    });
+
+    it("should keep the old spelling when a degree needs more than a double accidental", () => {
+        // Its sixth note, G♯, would need a triple sharp to be spelled as an F, so the scale is
+        // left as it was.
+        expect(buildScale("A♯ enigmatic")[0].join(" ")).toBe("A♯ B D E F♯ G♯ G𝄪 A♯");
+    });
+
+    it("should leave scales that already use each letter once unchanged", () => {
+        expect(buildScale("C major")[0].join(" ")).toBe("C D E F G A B C");
+        expect(buildScale("E natural minor")[0].join(" ")).toBe("E F♯ G A B C D E");
+        expect(buildScale("C harmonic minor")[0].join(" ")).toBe("C D E♭ F G A♭ B C");
+    });
 });
 
 describe("scalePatternToEDO", () => {
@@ -2310,13 +2353,36 @@ describe("getStepSize", () => {
     });
 
     it('should return the correct step size for "F#" in "F# major" going up', () => {
+        // Same as "F♯ major" / "F♯": F♯ up to G♯.
         const result = _getStepSize("F# major", "F#", "up", 0, "equal");
-        expect(result).toBe(0);
+        expect(result).toBe(2);
     });
 
     it('should return the correct step size for "G#" in "G# major" going down', () => {
+        // Same as "G♯ major" / "G♯": G♯ down to F𝄪.
         const result = _getStepSize("G# major", "G#", "down", 0, "equal");
-        expect(result).toBe(0);
+        expect(result).toBe(-1);
+    });
+
+    it("should step to the next scale note however the scale spells it", () => {
+        // G is not in A harmonic minor; the next note up is G♯, one semitone away.
+        expect(_getStepSize("A harmonic minor", "G", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("A harmonic minor", "A♭", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("A harmonic minor", "A", "down", 0, "equal")).toBe(-1);
+        // C is not in D major; the next note up is C♯.
+        expect(_getStepSize("D major", "C", "up", 0, "equal")).toBe(1);
+        // ASCII accidentals are read as ♯ and ♭.
+        expect(_getStepSize("A harmonic minor", "G#", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("D major", "C#", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("B♭ major", "Bb", "up", 0, "equal")).toBe(2);
+    });
+
+    it("should keep the named enharmonic rules in other temperaments", () => {
+        // In 19-EDO E♯ is still matched to the scale's F by name.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-2);
+        // ...and an F is matched to F♯ major's E♯.
+        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(2);
     });
 
     it('should return 0 for "C" going down in a key without a lower note', () => {
@@ -2355,6 +2421,12 @@ describe("nthDegreeToPitch", () => {
         expect(result).toEqual(["D", 0]);
     });
 
+    it("should name the raised degrees of harmonic minor by their own letter", () => {
+        expect(nthDegreeToPitch("A harmonic minor", 7)).toEqual(["G♯", 0]);
+        expect(nthDegreeToPitch("E harmonic minor", 2)).toEqual(["F♯", 0]);
+        expect(nthDegreeToPitch("E harmonic minor", 7)).toEqual(["D♯", 0]);
+    });
+
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
         const result = nthDegreeToPitch("C major", 8);
         expect(result).toEqual(["C", 1]);
@@ -2382,6 +2454,46 @@ describe("nthDegreeToPitch", () => {
 });
 
 describe("getInterval", () => {
+    it("should find a pitch by its sound when the scale spells it differently", () => {
+        // A harmonic minor spells its seventh G♯; A♭ is the same note.
+        expect(getInterval(1, "A harmonic minor", "A♭")).toBe(1);
+        expect(getInterval(1, "A harmonic minor", "G♯")).toBe(1);
+        // G is not in the scale: step up from the G♯ above it.
+        expect(getInterval(1, "A harmonic minor", "G")).toBe(1);
+        // C is not in D major: step up from the C♯ above it.
+        expect(getInterval(1, "D major", "C")).toBe(1);
+    });
+
+    it("should step from the nearest scale note for a sharp or flat outside the scale", () => {
+        // C♯ is not in C major: step up from D, the next note above.
+        expect(getInterval(1, "C major", "C♯")).toBe(2);
+        // D♭ is not in C major: step down from C, the next note below.
+        expect(getInterval(-1, "C major", "D♭")).toBe(-1);
+        // ASCII accidentals are read as ♯ and ♭, inside or outside the scale.
+        expect(getInterval(1, "G major", "F#")).toBe(1);
+        expect(getInterval(1, "C major", "C#")).toBe(2);
+        expect(getInterval(1, "A harmonic minor", "G#")).toBe(1);
+    });
+
+    it("should keep matching notes by name in other temperaments", () => {
+        expect(getInterval(1, "C major", "C♯", 19)).toBe(3);
+        expect(getInterval(1, "C major", "D♭", 19)).toBe(3);
+        expect(getInterval(1, "C major", "E♯", 19)).toBe(3);
+        expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
+        // C♭ major's scale has 12-EDO steps even in 19-EDO, but B is still matched by name.
+        expect(getInterval(2, "C♭ major", "B", 19)).toBe(3);
+    });
+
+    it("should use the current temperament's EDO when none is given", () => {
+        const savedActivity = global.globalActivity;
+        global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
+        try {
+            expect(getInterval(2, "C♭ major", "B")).toBe(3);
+        } finally {
+            global.globalActivity = savedActivity;
+        }
+    });
+
     it("should return the correct interval for a pitch in the scale", () => {
         const result = getInterval(2, "C major", "E");
         expect(result).toBe(3); // Example: `E` is the 3rd degree in C major.
@@ -4269,8 +4381,8 @@ describe("_getStepSize with temperament", () => {
     });
 
     it("should return correct step size for sharps and flats", () => {
-        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(0);
-        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(0);
+        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(2);
+        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(-1);
     });
 
     it("follows the mode for custom temperaments without ratios", () => {
