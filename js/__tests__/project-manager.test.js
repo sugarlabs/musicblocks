@@ -545,6 +545,16 @@ describe("_loadStart", () => {
         expect(activity.keyboardEnableFlag).toBe(1); // re-enabled once load is done
     });
 
+    it("re-enables keyboard input after finishedLoading fires even when turtles are running", async () => {
+        const activity = makeActivity();
+        activity.turtles.running = jest.fn(() => true);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+        expect(activity.keyboardEnableFlag).toBe(0);
+        global.pubsub.emit("finishedLoading");
+        expect(activity.keyboardEnableFlag).toBe(1);
+    });
+
     it("post-load callback fires only once — self-unsubscribes after first event", async () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
