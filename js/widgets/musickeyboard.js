@@ -936,6 +936,8 @@ function MusicKeyboard(activity) {
                 });
             }
             this.midiON = false;
+            // Don't hold on to the turtle once the keyboard is closed.
+            this.turtle = null;
 
             selectedNotes = [];
             const wheelDiv = docById("wheelDivptm");
@@ -1513,7 +1515,7 @@ function MusicKeyboard(activity) {
                 sortableList.push({
                     frequency: noteToFrequency(
                         convertFromSolfege(this.noteNames[i]) + this.octaves[i],
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
+                        (this.turtle || this.activity.turtles.ithTurtle(0)).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
