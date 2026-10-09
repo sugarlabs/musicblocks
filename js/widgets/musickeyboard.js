@@ -1913,6 +1913,11 @@ function MusicKeyboard(activity) {
         this.octaves = [];
     };
 
+    /**
+     * Rebuilds the MIDI pitch-to-key map from the current keyboard layout.
+     * @private
+     * @memberof MusicKeyboard
+     */
     this._refreshNoteToKeyMap = () => {
         this.noteToKeyMap = {};
 
