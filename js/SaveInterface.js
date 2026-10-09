@@ -509,11 +509,12 @@ class SaveInterface {
      * This method is to save SVG representation of an activity
      *
      * @param {SaveInterface} activity -The activity object to save
+     * @param {string} [filename] - The file name to save to, without asking.
      * @returns {void}
      * @method
      * @instance
      */
-    saveSVG(activity) {
+    saveSVG(activity, filename) {
         const svg =
             "data:image/svg+xml;utf8," +
             doSVG(
@@ -524,7 +525,7 @@ class SaveInterface {
                 activity.canvas.height,
                 1.0
             );
-        activity.save.download("svg", svg, null);
+        activity.save.download("svg", svg, filename || null);
     }
 
     /**
