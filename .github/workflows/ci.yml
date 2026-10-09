@@ -222,6 +222,39 @@ jobs:
                   verbose: true
 
     # ----------------------------------------------------------------------
+    # Stryker mutation testing (mathutils.js)
+    # ----------------------------------------------------------------------
+    mutation:
+        name: Mutation testing (mathutils.js)
+        runs-on: ubuntu-latest
+        # mathutils.js has 245 mutants. CI runners have 2 CPUs so concurrency=1.
+        # 245 mutants × ~5 s/mutant (single worker) ≈ 20 min. 45 min gives headroom.
+        timeout-minutes: 45
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: |
+                  if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
+                    npm install --legacy-peer-deps
+                  else
+                    npm ci
+                  fi
+              shell: bash
+
+            - name: Run Stryker on mathutils.js
+              run: npx stryker run --mutate "js/utils/mathutils.js"
+
+    # ----------------------------------------------------------------------
     # Cypress end-to-end tests
     # ----------------------------------------------------------------------
     e2e:
