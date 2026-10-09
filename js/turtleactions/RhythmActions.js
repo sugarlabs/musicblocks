@@ -471,23 +471,25 @@ function setupRhythmActions(activity) {
          */
         static getNoteValue(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
+            const noteValueKey = last(tur.singer.inNoteBlock);
 
             let value = 0;
             if (
-                tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== null &&
-                tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== undefined
+                noteValueKey !== null &&
+                tur.singer.noteValue[noteValueKey] !== null &&
+                tur.singer.noteValue[noteValueKey] !== undefined
             ) {
                 value =
-                    tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== 0
-                        ? 1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)]
+                    tur.singer.noteValue[noteValueKey] !== 0
+                        ? 1 / tur.singer.noteValue[noteValueKey]
                         : 0;
             } else if (tur.singer.lastNotePlayed !== null) {
                 value = tur.singer.lastNotePlayed[1];
             } else if (
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)] !== undefined &&
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+                tur.singer.notePitches[noteValueKey] !== undefined &&
+                tur.singer.notePitches[noteValueKey].length > 0
             ) {
-                value = tur.singer.noteBeat[last(tur.singer.inNoteBlock)];
+                value = tur.singer.noteBeat[noteValueKey];
             } else {
                 value = 0;
             }

@@ -688,14 +688,13 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.inNoteBlock = [7];
 
         // Provide ALL possible sources
-        targetTurtle.singer.noteValue = { 7: 0.25 }; // highest priority
-        targetTurtle.singer.lastNotePlayed = [null, 8]; // second priority
+        targetTurtle.singer.noteValue = { 7: 0.25 }; // highest priority (note value = duration)
+        targetTurtle.singer.lastNotePlayed = [null, 8]; // second priority (denominator)
         targetTurtle.singer.notePitches = { 7: ["C"] }; // third priority
-        targetTurtle.singer.noteBeat = { 7: 4 };
+        targetTurtle.singer.noteBeat = { 7: 4 }; // beat value = denominator
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        // noteValue = 0.25 -> internally inverted twice -> returns 0.25
         expect(value).toBe(0.25);
     });
     it("falls back to noteBeat when noteValue and lastNotePlayed are absent", () => {
@@ -708,7 +707,7 @@ describe("setupRhythmActions", () => {
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        expect(value).toBe(0.25); // 1 / 4
+        expect(value).toBe(0.25);
     });
     it("falls back past noteValue when it is explicitly null", () => {
         // clearNoteParams() in logo.js sets noteValue[blk] = null before a note
@@ -719,14 +718,14 @@ describe("setupRhythmActions", () => {
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
-        expect(value).toBe(0.125); // falls through to lastNotePlayed, same as null noteValue never happened
+        expect(value).toBe(0.125);
     });
     it("does not fall back to noteBeat when notePitches is an empty array", () => {
         targetTurtle.singer.inNoteBlock = [6];
         targetTurtle.singer.noteValue = {};
         targetTurtle.singer.lastNotePlayed = null;
         targetTurtle.singer.notePitches = { 6: [] };
-        targetTurtle.singer.noteBeat = { 6: 4 };
+        targetTurtle.singer.noteBeat = { 6: 0.25 };
 
         const value = Singer.RhythmActions.getNoteValue(0);
 
