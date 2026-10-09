@@ -26,7 +26,10 @@ const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "ut
 describe("musicutils-modewheel", () => {
     it("labels the major/ionian and minor/aeolian pairs together", () => {
         expect(modewheel.getModeLabel("major")).toBe("major / ionian");
+        expect(modewheel.getModeLabel("ionian")).toBe("major / ionian");
         expect(modewheel.getModeLabel("minor")).toBe("minor / aeolian");
+        expect(modewheel.getModeLabel("aeolian")).toBe("minor / aeolian");
+        expect(modewheel.getModeLabel(" ")).toBe(" ");
         expect(modewheel.getModeLabel("dorian")).toBe("dorian");
     });
 
@@ -34,10 +37,13 @@ describe("musicutils-modewheel", () => {
         expect(modewheel.getModeNameFromLabel("major / ionian", [])).toBe("major");
         expect(modewheel.getModeNameFromLabel("minor / aeolian", [])).toBe("aeolian");
         expect(modewheel.getModeNameFromLabel("dorian", ["dorian", "phrygian"])).toBe("dorian");
+        expect(modewheel.getModeNameFromLabel("unknown", ["dorian", "phrygian"])).toBe("unknown");
     });
 
     it("lists the mode names for a pie-menu group, padding custom slots", () => {
         expect(modewheel.getModeNamesForGroup("7")).toHaveLength(12);
+        expect(modewheel.getModeNamesForGroup("custom")).toHaveLength(12);
+        expect(modewheel.getModeNamesForGroup("custom", Array(15).fill("m"))).toHaveLength(12);
         expect(modewheel.getModeNamesForGroup("custom", ["a", "b"])).toEqual([
             "a",
             "b",
@@ -66,10 +72,54 @@ describe("musicutils-modewheel", () => {
     it("sizes the group title and slice fonts to the wheel radius", () => {
         expect(modewheel.getModeGroupTitleFont(100)).toBe("100 8px sans-serif");
         expect(modewheel.getModeSliceFont(100, 7, 10)).toContain("sans-serif");
+        expect(modewheel.getModeSliceFont(100, 100, 100)).toContain("sans-serif");
+        expect(modewheel.getModeSliceFont(100, 1, 1)).toContain("sans-serif");
     });
 
-    it("has no saved custom modes by default", () => {
-        expect(modewheel.getSavedCustomModes()).toEqual([]);
+    describe("getSavedCustomModes", () => {
+        afterEach(() => {
+            if (typeof localStorage !== "undefined" && localStorage.clear) {
+                localStorage.clear();
+            }
+        });
+
+        it("has no saved custom modes by default", () => {
+            if (typeof localStorage !== "undefined" && localStorage.clear) {
+                localStorage.clear();
+            }
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+        });
+
+        it("returns parsed custom modes when valid array is stored", () => {
+            const validModes = [{ name: "custom-1" }, { name: "custom-2" }];
+            localStorage.setItem("customModes", JSON.stringify(validModes));
+            expect(modewheel.getSavedCustomModes()).toEqual(validModes);
+        });
+
+        it("returns empty array when JSON is corrupt or malformed", () => {
+            localStorage.setItem("customModes", "{ invalid json");
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+        });
+
+        it("returns empty array when stored data is not an array", () => {
+            localStorage.setItem("customModes", JSON.stringify({ not: "an array" }));
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+
+            localStorage.setItem("customModes", JSON.stringify(12345));
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+        });
+
+        it("filters out null, non-objects, or items without string name", () => {
+            const mixedModes = [
+                null,
+                undefined,
+                { name: 123 },
+                { otherKey: "val" },
+                { name: "valid-mode" }
+            ];
+            localStorage.setItem("customModes", JSON.stringify(mixedModes));
+            expect(modewheel.getSavedCustomModes()).toEqual([{ name: "valid-mode" }]);
+        });
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
