@@ -246,6 +246,14 @@ class PlanetInterface {
                 return rejectOnProjectSaveError ? Promise.reject(error) : Promise.resolve(null);
             }
 
+            // The project being loaded is already the current one, so saving
+            // now would overwrite its stored copy with the blocks loaded so
+            // far. Its stored copy is still complete, so save once it is done.
+            if (this.activity.blocks.isLoading()) {
+                this.activity.blocks.runAfterLoad(this.saveLocally);
+                return Promise.resolve(null);
+            }
+
             this.activity.stage.update();
             const data = this.activity.prepareExport();
             const svgData = doSVG(

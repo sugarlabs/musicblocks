@@ -365,6 +365,11 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
 }
 
+#search:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+}
+
 #search.open {
     margin-top: 0;
 }

@@ -36,7 +36,13 @@ const mockActivity = {
     textMsg: jest.fn(),
     errorMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
-    blocks: { loadNewBlocks: jest.fn(), palettes: { _hideMenus: jest.fn() }, trashStacks: [] },
+    blocks: {
+        loadNewBlocks: jest.fn(),
+        isLoading: jest.fn(() => false),
+        runAfterLoad: jest.fn(),
+        palettes: { _hideMenus: jest.fn() },
+        trashStacks: []
+    },
     logo: { doStopTurtles: jest.fn() },
     canvas: {},
     turtles: {},
@@ -250,6 +256,29 @@ describe("PlanetInterface", () => {
             expect(mockActivity.stage.update).toHaveBeenCalled();
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
+    });
+
+    test("saveLocally waits for a project load to finish instead of saving part of it", async () => {
+        const saveLocally = jest.fn().mockResolvedValue();
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally, getCurrentProjectID: () => "B" }
+        };
+        mockActivity.prepareExport.mockClear();
+        mockActivity.blocks.runAfterLoad.mockClear();
+        mockActivity.blocks.isLoading.mockReturnValueOnce(true);
+
+        await expect(planetInterface.saveLocally()).resolves.toBeNull();
+
+        expect(mockActivity.prepareExport).not.toHaveBeenCalled();
+        expect(saveLocally).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.runAfterLoad).toHaveBeenCalledWith(planetInterface.saveLocally);
+
+        const [saveAfterLoad] = mockActivity.blocks.runAfterLoad.mock.calls[0];
+        doSVG.mockReturnValue("");
+        mockActivity.prepareExport.mockReturnValue("[full project]");
+        await saveAfterLoad();
+
+        expect(saveLocally).toHaveBeenCalledWith("[full project]", null, "B");
     });
 
     test("saveLocally handles unavailable Planet storage according to its failure option", async () => {
