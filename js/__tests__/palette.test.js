@@ -550,7 +550,7 @@ describe("Palettes Class", () => {
     });
 
     describe("showPalette method", () => {
-        test("returns early when mobile is true", () => {
+        test("shows palette when mobile is true", () => {
             palettes.mobile = true;
             palettes.dict = {
                 testPalette: { showMenu: jest.fn() }
@@ -558,7 +558,8 @@ describe("Palettes Class", () => {
 
             palettes.showPalette("testPalette");
 
-            expect(palettes.dict.testPalette.showMenu).not.toHaveBeenCalled();
+            expect(palettes.dict.testPalette.showMenu).toHaveBeenCalledWith(true);
+            expect(palettes.activePalette).toBe("testPalette");
         });
 
         test("shows palette and sets activePalette when not mobile", () => {
