@@ -799,4 +799,191 @@ describe("ProjectStorage", () => {
             expect(storage.data.Projects["xyz"].ProjectName).toBe("Precious Project");
         });
     });
+    describe("cross-tab commitDrafts preservation", () => {
+        const initialData = {
+            Projects: {
+                proj1: {
+                    ProjectName: "Shared Project",
+                    ProjectData: "blocks",
+                    commitDrafts: []
+                }
+            },
+            CurrentProject: "proj1",
+            LikedProjects: {},
+            ReportedProjects: {},
+            DefaultCreatorName: "anonymous"
+        };
+
+        it("stale tab save preserves a newer persisted draft and unrelated field changes", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+            storageA.data = JSON.parse(JSON.stringify(initialData));
+            storageB.data = JSON.parse(JSON.stringify(initialData));
+
+            await storageA.save();
+
+            // Tab A adds a draft
+            storageA.data.Projects["proj1"].commitDrafts = [{ id: "draft-A", status: "pending" }];
+            await storageA.save();
+
+            // Tab B (stale) renames project and saves
+            storageB.data.Projects["proj1"].ProjectName = "Renamed Project";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-A", status: "pending" }
+            ]);
+            expect(persistedData.Projects["proj1"].ProjectName).toEqual("Renamed Project");
+        });
+
+        it("independent draft additions from two tabs both survive", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+            storageA.data = JSON.parse(JSON.stringify(initialData));
+            storageB.data = JSON.parse(JSON.stringify(initialData));
+
+            // Tab A adds draft-A
+            storageA.data.Projects["proj1"].commitDrafts.push({
+                id: "draft-A",
+                status: "pending",
+                timestamp: 1
+            });
+            await storageA.save();
+
+            // Tab B adds draft-B (its in-memory state lacks draft-A)
+            storageB.data.Projects["proj1"].commitDrafts.push({
+                id: "draft-B",
+                status: "pending",
+                timestamp: 2
+            });
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            expect(persistedData.Projects["proj1"].commitDrafts).toHaveLength(2);
+            expect(persistedData.Projects["proj1"].commitDrafts).toContainEqual({
+                id: "draft-A",
+                status: "pending",
+                timestamp: 1
+            });
+            expect(persistedData.Projects["proj1"].commitDrafts).toContainEqual({
+                id: "draft-B",
+                status: "pending",
+                timestamp: 2
+            });
+        });
+
+        it("stale pending state cannot regress a persisted synced draft", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [{ id: "draft-A", status: "pending" }];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            await storageA.save();
+
+            // Tab A syncs draft
+            storageA.data.Projects["proj1"].commitDrafts[0].status = "synced";
+            storageA.data.Projects["proj1"].commitDrafts[0].sha = "12345";
+            await storageA.save();
+
+            // Tab B (stale memory still says pending) performs unrelated save
+            storageB.data.Projects["proj1"].ProjectName = "Changed Name";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-A", status: "synced", sha: "12345" }
+            ]);
+            expect(persistedData.Projects["proj1"].ProjectName).toEqual("Changed Name");
+        });
+
+        it("a draft intentionally removed by the current tab is not resurrected on save", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            // Start with a synced draft
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [
+                { id: "draft-A", status: "synced", message: "A", timestamp: 1, date: "2023-01-01" }
+            ];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            // Tab A establishes baseData and persists
+            await storageA.save();
+            // Tab B establishes baseData
+            await storageB.save();
+
+            // Tab A adds another draft
+            storageA.data.Projects["proj1"].commitDrafts.push({
+                id: "draft-B",
+                status: "pending",
+                timestamp: 2
+            });
+            await storageA.save();
+
+            // Tab B intentionally removes the synced draft using the actual method
+            await storageB.removeSyncedDrafts("proj1", [
+                { message: "A", date: "2023-01-02T00:00:00Z" }
+            ]);
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            // draft-A should be deleted because Tab B deleted it intentionally (was in its baseData).
+            // draft-B should be preserved because Tab B didn't delete it (was not in its baseData).
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([
+                { id: "draft-B", status: "pending", timestamp: 2 }
+            ]);
+        });
+
+        it("a remote deletion is not undone by a stale local save", async () => {
+            const sharedStore = createMockLocalforage();
+            const storageA = new ProjectStorage(createMockPlanet());
+            const storageB = new ProjectStorage(createMockPlanet());
+            storageA.LocalStorage = storageB.LocalStorage = sharedStore;
+
+            // Start with a synced draft
+            const dataWithDraft = JSON.parse(JSON.stringify(initialData));
+            dataWithDraft.Projects["proj1"].commitDrafts = [
+                { id: "draft-A", status: "synced", message: "A", timestamp: 1, date: "2023-01-01" }
+            ];
+
+            storageA.data = JSON.parse(JSON.stringify(dataWithDraft));
+            storageB.data = JSON.parse(JSON.stringify(dataWithDraft));
+            // Tab A establishes baseData and persists
+            await storageA.save();
+            // Tab B establishes baseData
+            await storageB.save();
+
+            // Tab A intentionally removes the synced draft using the actual method
+            await storageA.removeSyncedDrafts("proj1", [
+                { message: "A", date: "2023-01-02T00:00:00Z" }
+            ]);
+
+            // Tab B (stale) performs an unrelated save (e.g. changing the project name)
+            storageB.data.Projects["proj1"].ProjectName = "Changed Name";
+            await storageB.save();
+
+            const persistedData = JSON.parse(await sharedStore.getItem(storageA.LocalStorageKey));
+
+            // draft-A should be deleted because Tab A deleted it, and Tab B's save should respect that remote deletion.
+            expect(persistedData.Projects["proj1"].commitDrafts).toEqual([]);
+            // Tab B's unrelated change should be preserved.
+            expect(persistedData.Projects["proj1"].ProjectName).toEqual("Changed Name");
+        });
+    });
 });
