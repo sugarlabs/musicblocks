@@ -473,21 +473,23 @@ describe("Theme Switching & Inline Styles Purity", () => {
         }
     });
 
-    it("ensures #search does not suppress focus outline and defines visible focus indicator", () => {
+    it("ensures #search keeps a visible focus indicator from the global focus-visible rule", () => {
         const activitiesCss = fs.readFileSync(path.join(CSS_DIR, "activities.css"), "utf8");
 
         const searchFocusMatch = activitiesCss.match(/(?:^|\})\s*#search:focus\s*\{([^}]*)\}/);
         expect(searchFocusMatch).not.toBeNull();
         expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*none/i);
         expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*0\b/i);
-
-        const searchFocusVisibleMatch = activitiesCss.match(
-            /(?:^|\})\s*#search:focus-visible\s*\{([^}]*)\}/
+        expect(activitiesCss).not.toMatch(
+            /#search:focus-visible\s*\{[^}]*outline\s*:\s*(?:none|0\b)/i
         );
-        expect(searchFocusVisibleMatch).not.toBeNull();
-        expect(searchFocusVisibleMatch[1]).toMatch(
+
+        // The search input has no rule of its own; the global one draws its outline (#9152).
+        const focusVisibleMatch = activitiesCss.match(/(?:^|\})\s*\*:focus-visible\s*\{([^}]*)\}/);
+        expect(focusVisibleMatch).not.toBeNull();
+        expect(focusVisibleMatch[1]).toMatch(
             /outline\s*:\s*2px\s+solid\s+var\(--color-brand-primary\)/i
         );
-        expect(searchFocusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
+        expect(focusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
     });
 });
