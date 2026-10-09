@@ -129,8 +129,14 @@ function setupMeterActions(activity) {
                 return;
             }
 
+            if (!Number.isFinite(beatValue) || beatValue <= 0) {
+                activity.errorMsg(_("Beat value must be a positive number."), blk);
+                return;
+            }
+
             let _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
+
             if (_bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
@@ -153,8 +159,21 @@ function setupMeterActions(activity) {
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
+            // Guard: reject non-finite and non-positive BPM values before any
+            // arithmetic.
+            if (!Number.isFinite(bpm) || bpm <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
+
+            if (!Number.isFinite(beatValue) || beatValue <= 0) {
+                activity.errorMsg(_("Beat value must be a positive number."), blk);
+                return;
+            }
+
             const _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
+
             if (_bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
