@@ -1758,8 +1758,16 @@ describe("getNoteFromInterval", () => {
     it("should calculate minor 3rd correctly", () => {
         expect(getNoteFromInterval("C4", "minor 3")).toEqual(["E♭", 4]);
     });
-    it("should calculate diminished interval correctly", () => {
-        expect(getNoteFromInterval("B4", "diminished 5")).toBeDefined();
+    it("should calculate diminished intervals correctly for both major-based and perfect-based", () => {
+        // Perfect-based: lowered by 1 half-step
+        expect(getNoteFromInterval("C4", "diminished 4")).toEqual(["F♭", 4]);
+        expect(getNoteFromInterval("C4", "diminished 5")).toEqual(["G♭", 4]);
+        expect(getNoteFromInterval("C4", "diminished 8")).toEqual(["C♭", 5]);
+
+        // Major-based: lowered by 2 half-steps (whole step)
+        expect(getNoteFromInterval("C4", "diminished 3")).toEqual(["E𝄫", 4]);
+        expect(getNoteFromInterval("C4", "diminished 6")).toEqual(["A𝄫", 4]);
+        expect(getNoteFromInterval("C4", "diminished 7")).toEqual(["B𝄫", 4]);
     });
     it("should handle octave rollover correctly", () => {
         const result = getNoteFromInterval("B4", "major 2");
