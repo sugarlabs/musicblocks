@@ -66,6 +66,52 @@ describe("musicutils-pitch", () => {
         expect(pitch.stripMicrotonalPrefix("x^C4")).toBe("x^C4");
     });
 
+    describe("normalizeNoteAccidentals", () => {
+        it("normalizes single Unicode flat and sharp symbols to ASCII", () => {
+            expect(pitch.normalizeNoteAccidentals("♭")).toBe("b");
+            expect(pitch.normalizeNoteAccidentals("♯")).toBe("#");
+            expect(pitch.normalizeNoteAccidentals("C♭")).toBe("Cb");
+            expect(pitch.normalizeNoteAccidentals("F♯")).toBe("F#");
+            expect(pitch.normalizeNoteAccidentals("C♭4")).toBe("Cb4");
+            expect(pitch.normalizeNoteAccidentals("F♯5")).toBe("F#5");
+        });
+
+        it("normalizes double-flat and double-sharp Unicode symbols to ASCII", () => {
+            expect(pitch.normalizeNoteAccidentals("𝄫")).toBe("bb");
+            expect(pitch.normalizeNoteAccidentals("𝄪")).toBe("x");
+            expect(pitch.normalizeNoteAccidentals("B𝄫")).toBe("Bbb");
+            expect(pitch.normalizeNoteAccidentals("G𝄪")).toBe("Gx");
+            expect(pitch.normalizeNoteAccidentals("B𝄫3")).toBe("Bbb3");
+            expect(pitch.normalizeNoteAccidentals("G𝄪2")).toBe("Gx2");
+        });
+
+        it("leaves natural notes and non-accidental strings unchanged", () => {
+            expect(pitch.normalizeNoteAccidentals("C")).toBe("C");
+            expect(pitch.normalizeNoteAccidentals("D4")).toBe("D4");
+            expect(pitch.normalizeNoteAccidentals("A0")).toBe("A0");
+            expect(pitch.normalizeNoteAccidentals("")).toBe("");
+            expect(pitch.normalizeNoteAccidentals("Do")).toBe("Do");
+            expect(pitch.normalizeNoteAccidentals("rest")).toBe("rest");
+        });
+
+        it("strips leading microtonal prefixes before normalizing accidentals", () => {
+            expect(pitch.normalizeNoteAccidentals("^C")).toBe("C");
+            expect(pitch.normalizeNoteAccidentals("^^C")).toBe("C");
+            expect(pitch.normalizeNoteAccidentals("vvD♭")).toBe("Db");
+            expect(pitch.normalizeNoteAccidentals("vF♯4")).toBe("F#4");
+            expect(pitch.normalizeNoteAccidentals("^^^C♭")).toBe("^Cb");
+        });
+
+        it("normalizes multiple and mixed Unicode accidentals in note sequences", () => {
+            expect(pitch.normalizeNoteAccidentals("C♭♭")).toBe("Cbb");
+            expect(pitch.normalizeNoteAccidentals("C♯♯")).toBe("C##");
+            expect(pitch.normalizeNoteAccidentals("C♭♯")).toBe("Cb#");
+            expect(pitch.normalizeNoteAccidentals("C𝄫𝄪")).toBe("Cbbx");
+            expect(pitch.normalizeNoteAccidentals("C♭ D♯ E𝄫 F𝄪")).toBe("Cb D# Ebb Fx");
+            expect(pitch.normalizeNoteAccidentals("Sol♭")).toBe("Solb");
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of Object.keys(pitch)) {
             if (name === "MusicUtilsPitch") continue;
