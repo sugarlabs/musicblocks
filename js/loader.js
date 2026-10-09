@@ -77,6 +77,10 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/platformstyle": {
+            deps: ["utils/utils-logic"],
+            exports: "platformThemes"
+        },
         "utils/plugin-utils": {
             exports: "PluginUtils"
         },
@@ -716,6 +720,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             const CORE_BOOTSTRAP_MODULES = [
                 "easeljs.min",
                 "tweenjs.min",
+                "utils/utils-logic",
                 "utils/platformstyle",
                 "utils/dom-helpers",
                 "utils/utils",
