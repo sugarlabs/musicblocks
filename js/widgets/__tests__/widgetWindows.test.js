@@ -954,6 +954,68 @@ describe("widgetWindows", () => {
             expect(win._rolled).toBe(false);
             expect(win._body.style.display).toBe("flex");
         });
+
+        test("destroy removes window elements and deletes key from openWindows", () => {
+            const win = createTestWindow("testDestroyKey");
+            const key = win._key;
+            expect(key in window.widgetWindows.openWindows).toBe(true);
+
+            win.destroy();
+
+            expect(key in window.widgetWindows.openWindows).toBe(false);
+            expect(window.widgetWindows.openWindows[key]).toBeUndefined();
+        });
+
+        test("sendToCenter uses the fallback height when nav is absent", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("132px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                if (nav && parent) parent.appendChild(nav);
+            }
+        });
+
+        test("sendToCenter preserves a zero nav height", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const zeroNav = document.createElement("nav");
+            Object.defineProperty(zeroNav, "offsetHeight", { value: 0 });
+            document.body.appendChild(zeroNav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("100px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                zeroNav.remove();
+                if (nav && parent) parent.appendChild(nav);
+            }
+        });
     });
 
     describe("widgetWindows global functions", () => {
@@ -1466,6 +1528,16 @@ describe("widgetWindows", () => {
             window.widgetWindows.closeBlkWidgets("sampler");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes LEGO Bricks widget using mapped key 'LEGO Bricks'", () => {
+            window.widgetWindows.openWindows = {
+                "LEGO Bricks": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("LEGO Bricks");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("LEGO Bricks");
         });
 
         it("closes widgets when receiving localized block titles", () => {

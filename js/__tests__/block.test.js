@@ -28,6 +28,15 @@ const fs = require("fs");
 const path = require("path");
 const Block = require("../block");
 const ManagedTimer = require("../utils/ManagedTimer");
+const musicutils = require("../utils/musicutils");
+
+Object.assign(global, {
+    getTemperamentKeys: musicutils.getTemperamentKeys,
+    getTemperament: musicutils.getTemperament,
+    isCustomTemperament: musicutils.isCustomTemperament,
+    isEquallyTempered: musicutils.isEquallyTempered,
+    addTemperamentToDictionary: musicutils.addTemperamentToDictionary
+});
 
 // --- MOCK SETUP ---
 
@@ -522,6 +531,25 @@ describe("Block Foundation", () => {
                 expect(block.highlightBitmap.visible).toBe(false);
             });
 
+            it("should tolerate unhighlighting before highlight artwork has loaded", () => {
+                block.highlightBitmap = null;
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(true);
+                expect(block.container.visible).toBe(true);
+            });
+
+            it("should tolerate highlighting before highlight artwork has loaded", () => {
+                block.highlightBitmap = null;
+                block.disconnectedHighlightBitmap = null;
+                block.container.bitmapCache = null;
+
+                expect(() => block.highlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(false);
+                expect(block.container.visible).toBe(true);
+            });
+
             it("should not update a cache that has not been created yet", () => {
                 block.container.bitmapCache = null;
 
@@ -542,6 +570,41 @@ describe("Block Foundation", () => {
                 expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
                 expect(block.disconnectedBitmap.visible).toBe(true);
                 expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+
+            it("should tolerate null disconnectedBitmap when selection is true", () => {
+                mockBlocks.unhighlight = jest.fn();
+                block.disconnectedBitmap = null;
+                block.collapsed = false;
+
+                expect(() => block.unhighlightSelectedBlocks(0, true)).not.toThrow();
+                expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
+            });
+        });
+
+        describe("ignore()", () => {
+            it("should evaluate visibility safely when highlightBitmap is null", () => {
+                block.bitmap = { visible: false };
+                block.highlightBitmap = null;
+                block.collapseBlockBitmap = null;
+
+                expect(() => block.ignore()).not.toThrow();
+                expect(block.ignore()).toBe(true);
+            });
+        });
+
+        describe("collapseToggle()", () => {
+            it("should tolerate toggling collapse when optional collapse artwork is null", () => {
+                block.collapseBlockBitmap = { visible: true };
+                block.collapseButtonBitmap = null;
+                block.expandButtonBitmap = null;
+                block.highlightCollapseBlockBitmap = null;
+                block.collapseText = null;
+                mockBlocks.findDragGroup = jest.fn();
+                mockBlocks.dragGroup = [0];
+
+                expect(() => block.collapseToggle()).not.toThrow();
+                expect(block.collapsed).toBe(true);
             });
         });
 
@@ -2033,6 +2096,34 @@ describe("Block Foundation", () => {
             block._changeLabel();
             expect(global.piemenuVoices).toHaveBeenCalled();
             expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["noise1..."]);
+        });
+
+        it("_changeLabel customNote launches piemenuCustomNotes with custom labels and does not call piemenuPitches", () => {
+            global.piemenuCustomNotes = jest.fn();
+            global.piemenuPitches = jest.fn();
+            block.name = "customNote";
+            block.value = "C(+0¢)";
+            block.customID = null;
+            block.activity = {
+                logo: { customTemperamentDefined: false },
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { y: 0 }
+            };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+            block._changeLabel();
+            expect(global.piemenuPitches).not.toHaveBeenCalled();
+            expect(global.piemenuCustomNotes).toHaveBeenCalledTimes(1);
+            const args = global.piemenuCustomNotes.mock.calls[0];
+            expect(args[0]).toBe(block);
+            expect(args[1]["custom"].pitchNumber).toBe(5);
+            expect(args[1]["custom"][0]).toEqual([1, "C", 4]);
+            expect(args[1]["custom"][4]).toEqual([1.781, "A#", 4]);
+            expect(args[2]).toContain("custom");
+            expect(args[3]).toBe("custom");
+            expect(args[4]).toBe("C(+0¢)");
         });
     });
 

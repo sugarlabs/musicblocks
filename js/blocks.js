@@ -4364,7 +4364,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -4398,7 +4399,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -5379,6 +5381,7 @@ class Blocks {
                 }
 
                 /** Make sure action names are unique. */
+                const renamedActions = new Map(); /** old name: new name */
                 for (const b in actionNames) {
                     /** Is there a proto do block with this name? If so, find a */
                     /** new name. */
@@ -5419,9 +5422,19 @@ class Blocks {
 
                         console.debug("action " + oldName + " is being renamed " + name);
                         blkData[1][1] = { value: name };
+                        if (!renamedActions.has(oldName)) {
+                            renamedActions.set(oldName, name);
+                        }
                     }
+                }
 
-                    /** and any do blocks */
+                /**
+                 * ...and any do blocks. This runs once all the renames are
+                 * known: a do block already moved from "action" to "action1"
+                 * must not be moved again when an incoming "action1" is
+                 * itself renamed to "action11".
+                 */
+                if (renamedActions.size > 0) {
                     let blkName;
                     for (const d in doNames) {
                         const thisBlkData = blockObjs[d];
@@ -5433,18 +5446,20 @@ class Blocks {
                         if (
                             ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(blkName)
                         ) {
-                            if (thisBlkData[1][1]["value"] === oldName) {
-                                thisBlkData[1][1] = { value: name };
+                            const oldName = thisBlkData[1][1]["value"];
+                            if (renamedActions.has(oldName)) {
+                                thisBlkData[1][1] = { value: renamedActions.get(oldName) };
                             }
                         } else {
                             const doBlkData = blockObjs[doNames[d]];
                             if (typeof doBlkData[1][1] === "string") {
-                                if (doBlkData[1][1] === oldName) {
-                                    doBlkData[1][1] = name;
+                                if (renamedActions.has(doBlkData[1][1])) {
+                                    doBlkData[1][1] = renamedActions.get(doBlkData[1][1]);
                                 }
                             } else {
-                                if (doBlkData[1][1]["value"] === oldName) {
-                                    doBlkData[1][1] = { value: name };
+                                const oldName = doBlkData[1][1]["value"];
+                                if (renamedActions.has(oldName)) {
+                                    doBlkData[1][1] = { value: renamedActions.get(oldName) };
                                 }
                             }
                         }

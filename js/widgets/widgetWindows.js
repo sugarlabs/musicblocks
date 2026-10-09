@@ -45,7 +45,7 @@ window.widgetWindows = {
         "oscilloscope": "oscilloscope",
         "temperament": "temperament",
         "meter": "meter",
-        "LEGO Bricks": "LEGO BRICKS",
+        "LEGO Bricks": "LEGO Bricks",
         "pitch slider": "slider",
         "pitch staircase": "pitch staircase",
         "music keyboard": "music keyboard",
@@ -752,7 +752,7 @@ class WidgetWindow {
             return this;
         }
 
-        const navHeight = document.querySelector("nav").offsetHeight;
+        const navHeight = document.querySelector("nav")?.offsetHeight ?? 64;
         this.setPosition(
             (cRect.width - fRect.width) / 2,
             (cRect.height - fRect.height + navHeight) / 2
@@ -858,7 +858,7 @@ class WidgetWindow {
         if (this.timerManager) {
             this.timerManager.clearAll();
         }
-        window.widgetWindows.openWindows[this._key] = undefined;
+        delete window.widgetWindows.openWindows[this._key];
     }
 
     /**

@@ -20,6 +20,17 @@
 
 function setupMeterBlocks(activity) {
     /**
+     * The beats per minute a set BPM block gives the Tempo widget: the evaluated argument, so an
+     * expression such as 60 x 2 gives 120, or the label of the block in the BPM slot when the
+     * argument isn't a finite number (the widget treats an empty label as 30).
+     * @param {*} bpm - The block's evaluated BPM argument.
+     * @param {number} bpmBlock - The block in the BPM slot.
+     * @returns {number|string}
+     */
+    const _tempoWidgetBPM = (bpm, bpmBlock) =>
+        Number.isFinite(bpm) ? bpm : activity.blocks.blockList[bpmBlock].text.text;
+
+    /**
      * Represents a block that provides the current musical meter (time signature).
      * @class
      * @extends ValueBlock
@@ -1021,7 +1032,7 @@ function setupMeterBlocks(activity) {
             if (logo.inTempo) {
                 logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
-                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
+                logo.tempo.BPMs.push(_tempoWidgetBPM(args[0], bpmnumberblock));
             }
         }
     }
@@ -1083,7 +1094,13 @@ function setupMeterBlocks(activity) {
             if (logo.inTempo) {
                 logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
-                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
+                // Give the widget the clamped tempo the block actually set.
+                logo.tempo.BPMs.push(
+                    _tempoWidgetBPM(
+                        typeof args[0] === "number" ? Singer.masterBPM : args[0],
+                        bpmnumberblock
+                    )
+                );
             }
         }
     }
@@ -1159,7 +1176,7 @@ function setupMeterBlocks(activity) {
             if (logo.inTempo) {
                 logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
-                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
+                logo.tempo.BPMs.push(_tempoWidgetBPM(args[0], bpmnumberblock));
             }
         }
     }
