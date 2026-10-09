@@ -144,6 +144,7 @@ const createBaseSandbox = () => ({
 const loadActivitySandbox = ({ overrides = {}, prependCode = "" } = {}) => {
     const sandbox = { ...createBaseSandbox(), ...overrides };
     if (sandbox.window) {
+        sandbox.window = Object.create(sandbox.window);
         sandbox.window.platformColor = sandbox.platformColor;
     }
     // Instrument the source on its own, then append the bootstrap statements.

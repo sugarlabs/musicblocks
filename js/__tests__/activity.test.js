@@ -152,5 +152,8 @@ describe("Activity Constructor Environment & Preference Initialization", () => {
         });
         expect(sandbox2.platformColor).toEqual(customColor);
         expect(sandbox2.window.platformColor).toEqual(customColor);
+
+        // Ensure sandbox1 wasn't mutated by sandbox2
+        expect(sandbox1.window.platformColor).toEqual({ stopIconcolor: "red" });
     });
 });
