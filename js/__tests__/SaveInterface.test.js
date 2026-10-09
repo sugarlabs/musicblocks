@@ -885,6 +885,19 @@ describe("saveWAV & saveABC methods", () => {
         expect(activity.logo.notationOutput).toBe("");
         expect(activity.logo.recordingBuffer.hasData).toBe(false);
     });
+
+    it("should save ABC notation under the file name it is given", () => {
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+        const activity = { save: { download: mockDownload } };
+
+        instance.afterSaveAbc.call({ activity }, "mysong.abc");
+
+        expect(mockDownload).toHaveBeenLastCalledWith(
+            "abc",
+            "data:text;utf8,mock_abc_data",
+            "mysong.abc"
+        );
+    });
 });
 
 describe("beforeunload warning", () => {
@@ -1175,7 +1188,8 @@ describe("saveLilypond Methods", () => {
     it("should call saveLilypondOutput and afterSaveLilypondLY and clear notation output/buffer", () => {
         instance.activity.logo.notationOutput = "previous_lilypond_output";
         instance.activity.logo.recordingBuffer.hasData = true;
-        instance.afterSaveLilypond("ignored.ly");
+        // Called with no file name, as when an export finishes, it uses the dialog's.
+        instance.afterSaveLilypond();
         expect(mockSaveLilypondOutput).toHaveBeenCalledWith(instance.activity);
         expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith(
             "Lilypond Data",
@@ -1184,6 +1198,11 @@ describe("saveLilypond Methods", () => {
         expect(instance.notationConvert).toBe("");
         expect(instance.activity.logo.notationOutput).toBe("");
         expect(instance.activity.logo.recordingBuffer.hasData).toBe(false);
+    });
+
+    it("should save Lilypond under the file name it is given", () => {
+        instance.afterSaveLilypond("mysong.ly");
+        expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith("Lilypond Data", "mysong.ly");
     });
 
     it('should set cursor to "wait" and call ly2pdf with correct arguments', () => {
@@ -1264,6 +1283,26 @@ describe("saveLilypond Methods", () => {
         expect(writeText).toHaveBeenCalledWith(lydata);
         expect(document.execCommand).toHaveBeenCalledWith("copy");
         expect(mockActivity.textMsg).not.toHaveBeenCalled();
+    });
+
+    it("should download the .ly file under the given file name, or the dialog's", () => {
+        delete navigator.clipboard;
+        document.execCommand.mockReturnValue(true);
+        saveInterface.download = jest.fn();
+
+        saveInterface.afterSaveLilypondLY(lydata, "mysong.ly");
+        expect(saveInterface.download).toHaveBeenLastCalledWith(
+            "ly",
+            expect.any(String),
+            "mysong.ly"
+        );
+
+        saveInterface.afterSaveLilypondLY(lydata);
+        expect(saveInterface.download).toHaveBeenLastCalledWith(
+            "ly",
+            expect.any(String),
+            "TestProject.ly"
+        );
     });
 
     it("should use legacy copy when Clipboard API is unavailable", () => {
