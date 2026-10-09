@@ -460,6 +460,43 @@ describe("ServerInterface", () => {
         });
     });
 
+    describe("owned project list", () => {
+        afterEach(() => {
+            localStorage.removeItem("mb_git_key_cached-repo");
+            localStorage.removeItem("mb_git_key_new-repo");
+        });
+
+        it("reports the cached updatedAt for an owned project, so addProjects skips it", () => {
+            localStorage.setItem("mb_git_key_cached-repo", "k1");
+            localStorage.setItem("mb_git_key_new-repo", "k2");
+            server.Planet = {
+                GlobalPlanet: {
+                    cache: { "cached-repo": { ProjectLastUpdated: "2026-10-01T10:00:00Z" } }
+                }
+            };
+
+            const list = server._getOwnedProjectList();
+
+            expect(list).toEqual(
+                expect.arrayContaining([
+                    ["cached-repo", "2026-10-01T10:00:00Z"],
+                    ["new-repo", null]
+                ])
+            );
+        });
+
+        it("returns the same list on every call", () => {
+            localStorage.setItem("mb_git_key_new-repo", "k2");
+
+            const first = server._getOwnedProjectList();
+            jest.useFakeTimers().setSystemTime(Date.now() + 60000);
+            const second = server._getOwnedProjectList();
+            jest.useRealTimers();
+
+            expect(second).toEqual(first);
+        });
+    });
+
     describe("Stats and cache helpers", () => {
         it("should combine request and cache stats", async () => {
             mockRequestManager.getStats.mockReturnValueOnce({ totalRequests: 1 });
