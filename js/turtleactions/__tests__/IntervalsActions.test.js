@@ -1066,6 +1066,11 @@ describe("setupIntervalsActions", () => {
         expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
     });
 
+    test("defineMode handles non-string name correctly", () => {
+        expect(() => Singer.IntervalsActions.defineMode(1234, 0, undefined)).not.toThrow();
+        expect(turtle.singer.inDefineMode).toBe(true);
+    });
+
     test("defineMode error paths", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
