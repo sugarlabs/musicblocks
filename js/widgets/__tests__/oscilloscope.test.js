@@ -1029,13 +1029,16 @@ describe("Oscilloscope", () => {
                 turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0
             };
-            const mockAnalyser = { getValue: jest.fn(() => new Float32Array(128)) };
+            const analyserValues = new Float32Array([0.25, -0.5, 0.75, -1]);
+            const mockAnalyser = {
+                getValue: jest.fn(() => analyserValues)
+            };
             osc.pitchAnalysers[0] = mockAnalyser;
 
             osc._renderFrame();
 
             expect(mockAnalyser.getValue).toHaveBeenCalled();
-            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
+            expect(osc._frozenWaveforms[0]).toEqual(analyserValues);
             expect(ctx.fillRect).toHaveBeenCalled();
             expect(ctx.stroke).toHaveBeenCalled();
         });
