@@ -339,11 +339,12 @@ class SaveInterface {
             image = planet.getCurrentProjectImage();
         }
 
+        // Function replacers keep "$&", "$$", etc. in user data from being expanded.
         file = file
-            .replace(/{{ project_description }}/g, escapeHTML(description))
-            .replace(/{{ project_name }}/g, escapeHTML(name))
-            .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(sanitizeImageURL(image)));
+            .replace(/{{ project_description }}/g, () => escapeHTML(description))
+            .replace(/{{ project_name }}/g, () => escapeHTML(name))
+            .replace(/{{ data }}/g, () => escapeHTML(data))
+            .replace(/{{ project_image }}/g, () => escapeHTML(sanitizeImageURL(image)));
 
         return file;
     }

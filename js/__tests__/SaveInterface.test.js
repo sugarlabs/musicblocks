@@ -395,6 +395,30 @@ describe("save HTML methods", () => {
         expect(html).not.toContain("window.onload = function()");
     });
 
+    it("should not expand $ replacement patterns from project data in prepareHTML", () => {
+        const { unescapeHTML, extractProjectDataFromHTML } = require("../utils/utils");
+        const data = JSON.stringify([
+            [0, ["text", { value: "Price: 5$" }], 0, 0, [null]],
+            [1, ["text", { value: "cost $$5" }], 0, 0, [null]],
+            [2, ["text", { value: "a$<b $' $&" }], 0, 0, [null]]
+        ]);
+        const si = new SaveInterface({
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "My $& project"),
+                getCurrentProjectDescription: jest.fn(() => "Costs 5$'"),
+                getCurrentProjectImage: jest.fn(() => "")
+            },
+            prepareExport: jest.fn(() => data)
+        });
+
+        const html = si.prepareHTML();
+
+        expect(html).toContain("<title>My $&amp; project</title>");
+        expect(html).toContain("<p>Costs 5$&#039;</p>");
+        const extracted = extractProjectDataFromHTML(html.replace(/\n/g, " "));
+        expect(unescapeHTML(extracted)).toBe(data);
+    });
+
     it("escapeHTML should encode all five HTML special characters", () => {
         expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
     });
