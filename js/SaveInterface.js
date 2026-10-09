@@ -664,18 +664,19 @@ class SaveInterface {
      *
      * This method handles the post-processing steps after saving ABC notation.
      *
+     * @param {string} [filename] - The file name to save to, without asking.
      * @returns {void}
      * @memberof SaveInterface
      * @method
      * @instance
      */
-    afterSaveAbc() {
+    afterSaveAbc(filename) {
         // Lazy-load abc module before using saveAbcOutput
 
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
-                this.activity.save.download("abc", "data:text;utf8," + abc, null);
+                this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
@@ -913,7 +914,8 @@ class SaveInterface {
      *
      * This method handles post-processing steps after saving a Lilypond file, such as handling PDF conversion.
      *
-     * @param {string} filename - The name of the Lilypond file.
+     * @param {string} [filename] - The name of the Lilypond file. Without one, the
+     * name typed into the Save as Lilypond dialog is used.
      * @returns {void}
      * @memberof SaveInterface
      * @method
@@ -923,7 +925,7 @@ class SaveInterface {
         // Lazy-load lilypond module before using saveLilypondOutput
 
         _lazyRequire(["activity/lilypond"], () => {
-            filename = docById("fileName").value;
+            filename = filename || docById("fileName").value;
             try {
                 const ly = saveLilypondOutput(this.activity);
                 switch (this.notationConvert) {
@@ -956,7 +958,8 @@ class SaveInterface {
      * This method handles post-processing steps specific to saving a Lilypond file in LY format.
      *
      * @param {string} lydata - The Lilypond data.
-     * @param {string} filename - The name of the Lilypond file.
+     * @param {string} [filename] - The name of the Lilypond file. Without one, the
+     * name typed into the Save as Lilypond dialog is used.
      * @returns {void}
      * @memberof SaveInterface
      * @method
@@ -964,7 +967,7 @@ class SaveInterface {
      */
 
     afterSaveLilypondLY(lydata, filename) {
-        filename = docById("fileName").value;
+        filename = filename || docById("fileName").value;
         const showCopiedMessage = () => {
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here:") +
