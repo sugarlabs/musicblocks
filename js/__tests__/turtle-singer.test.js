@@ -1013,6 +1013,19 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
     });
 
+    test("should hold back the enclosing clamp signals by index", () => {
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        let skipped;
+        logoMock.runFromBlockNow = jest.fn(() => {
+            skipped = JSON.parse(JSON.stringify(turtleMock.butNotThese));
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(skipped).toEqual({ 7: [0, 1] });
+        expect(turtleMock.butNotThese).toEqual({});
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -1371,6 +1384,21 @@ describe("noteCounter regression behavior", () => {
         const originalLength = singer.justCounting.length;
         Singer.noteCounter(logoMock, 0, 1);
         expect(singer.justCounting.length).toBe(originalLength);
+    });
+
+    test("should hold back the enclosing clamp signals by index", () => {
+        // Logo compares numeric indices when the counted run ends; anything
+        // else lets an enclosing transposition fire early and then again.
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        let skipped;
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            skipped = JSON.parse(JSON.stringify(turtleMock.butNotThese));
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(skipped).toEqual({ 7: [0, 1] });
+        expect(turtleMock.butNotThese).toEqual({});
     });
 
     test("should restore an untouched heap as an array, not an object", () => {

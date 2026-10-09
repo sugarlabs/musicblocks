@@ -451,11 +451,7 @@ function setupIntervalsBlocks(activity) {
 
             // Save the state of endOfClampSignals
             for (const b in tur.endOfClampSignals) {
-                tur.butNotThese[b] = [];
-
-                for (const i in tur.endOfClampSignals[b]) {
-                    tur.butNotThese[b].push(i);
-                }
+                tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
             }
 
             const actionArgs = [];
@@ -573,10 +569,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.push(true);
 
             for (const b in tur.endOfClampSignals) {
-                tur.butNotThese[b] = [];
-                for (const i in tur.endOfClampSignals[b]) {
-                    tur.butNotThese[b].push(i);
-                }
+                tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
             }
 
             const actionArgs = [];

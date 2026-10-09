@@ -2546,6 +2546,21 @@ describe("Logo runFromBlockNow", () => {
             expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
         });
 
+        test("a note counter's silent run does not end the turtle's run", () => {
+            logo._cleanupAfterCompletion = jest.fn();
+            logo.onStopTurtle = jest.fn();
+            turtle0.running = true;
+            turtle0.singer.justCounting = [true];
+            turtle0.endOfClampSignals = { 0: ["_tie_0"] };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+            expect(turtle0.running).toBe(true);
+            expect(logo.onStopTurtle).not.toHaveBeenCalled();
+            expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
         test("_cleanupAfterCompletion does not stop WAV recorder", () => {
             const recorderStop = jest.fn();
             logo.synth = makeSynth();
