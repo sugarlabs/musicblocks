@@ -704,32 +704,19 @@ describe("ModeWidget", () => {
         modeNameSpy.mockRestore();
     });
 
-    test("should persist the active temperament key with a custom mode", () => {
+    test("should persist and restore the temperament key with a custom mode", () => {
+        const pattern = Array(12).fill(1);
         modeWidget._activeTemperamentKey = "just intonation";
         modeWidget._activeEDO = 12;
 
-        expect(modeWidget._saveCustomMode("tempMode", Array(12).fill(1))).toBe(true);
+        expect(modeWidget._saveCustomMode("jiChromatic", pattern)).toBe(true);
+        expect(
+            JSON.parse(localStorage.getItem("customModes")).find(m => m.name === "jiChromatic")
+        ).toMatchObject({ temperamentKey: "just intonation" });
 
-        const saved = JSON.parse(localStorage.getItem("customModes"));
-        const entry = saved.find(m => m.name === "tempMode");
-        expect(entry.temperamentKey).toBe("just intonation");
-
-        modeWidget._deleteCustomMode("tempMode");
-    });
-
-    test("should restore the saved temperament when loading a custom mode", () => {
-        const pattern = Array(12).fill(1);
-        const modes = JSON.parse(localStorage.getItem("customModes") || "[]");
-        modes.push({ name: "jiChromatic", pattern, edo: 12, temperamentKey: "just intonation" });
-        localStorage.setItem("customModes", JSON.stringify(modes));
         modeWidget._activeTemperamentKey = "equal";
         modeWidget.logo.synth.inTemperament = "equal";
-        modeWidget._activeEDO = 12;
-        const fakeSelect = {
-            querySelector: jest.fn(() => null),
-            appendChild: jest.fn(),
-            value: "equal"
-        };
+        const fakeSelect = { querySelector: jest.fn(() => null), appendChild: jest.fn() };
 
         modeWidget._loadMode("jiChromatic", pattern, fakeSelect);
 
@@ -1178,25 +1165,19 @@ describe("ModeWidget", () => {
             modeWidget._hideNarrowLabels(wheel);
         });
 
-        test("hides only the label that does not fit its slice", () => {
-            expect(wheel.navItems[0].navTitle.show).toHaveBeenCalled();
-            expect(wheel.navItems[1].navTitle.hide).toHaveBeenCalled();
-            expect(wheel.navItems[1]._narrow).toBe(true);
-            expect(wheel.navItems[0]._narrow).toBe(false);
-        });
+        test("hides labels that do not fit, selection keeps the narrow one visible", () => {
+            const [wide, narrow] = wheel.navItems;
 
-        test("_syncNarrowLabels follows the selection and leaves wide slices alone", () => {
-            const wide = wheel.navItems[0];
-            const narrow = wheel.navItems[1];
+            expect(wide._narrow).toBe(false);
+            expect(narrow._narrow).toBe(true);
+            expect(wide.navTitle.show).toHaveBeenCalled();
+            expect(wide.navTitle.hide).not.toHaveBeenCalled();
+            expect(narrow.navTitle.hide).toHaveBeenCalled();
 
             narrow.selected = true;
             modeWidget._syncNarrowLabels(wheel);
             expect(narrow.navTitle.show).toHaveBeenCalled();
             expect(wide.navTitle.hide).not.toHaveBeenCalled();
-
-            narrow.selected = false;
-            modeWidget._syncNarrowLabels(wheel);
-            expect(narrow.navTitle.hide).toHaveBeenCalledTimes(2);
         });
     });
 

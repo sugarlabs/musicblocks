@@ -1909,6 +1909,12 @@ function TemperamentWidget() {
             }
         }
 
+        // Strip cents-deviation prefixes (^/v): they are display annotations,
+        // not note names; persisting "vB" breaks pitch lookup ("pitch vB not
+        // found in mode"). Parse once: the block emission below reuses these.
+        const cleanNotes = this.notes.map(_cleanNoteName);
+        const parsedNotes = cleanNotes.map(parseNoteString);
+
         // Build and validate the replacement entry before the dictionary
         // replace: a refused save keeps the old entry (later side effects
         // like block emission still run). Classify once: findUniqueTemperamentName
@@ -1921,20 +1927,14 @@ function TemperamentWidget() {
                 octaveRatio: this.powerBase
             };
             for (let i = 0; i < this.pitchNumber; i++) {
-                const number = "" + i;
-                // Strip cents-deviation prefixes (^/v): they are display
-                // annotations, not note names; persisting "vB" breaks pitch
-                // lookup ("pitch vB not found in mode").
-                const cleanName = _cleanNoteName(this.notes[i]);
-                const noteParsed = parseNoteString(cleanName);
-                if (!Number.isFinite(noteParsed[1])) {
+                if (!Number.isFinite(parsedNotes[i][1])) {
                     this.activity.errorMsg(
                         _(`Cannot save temperament: pitch ${i + 1} has no valid octave.`),
                         3000
                     );
                     return;
                 }
-                newTemperament[number] = [this.ratios[i], noteParsed[0], noteParsed[1]];
+                newTemperament["" + i] = [this.ratios[i], parsedNotes[i][0], parsedNotes[i][1]];
             }
         }
 
@@ -2030,26 +2030,10 @@ function TemperamentWidget() {
                         [idx + 9]
                     ]);
                 } else {
-                    newStack.push([
-                        idx + 10,
-                        [
-                            "text",
-                            {
-                                value: _cleanNoteName(this.notes[i])
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 9]
-                    ]);
+                    newStack.push([idx + 10, ["text", { value: cleanNotes[i] }], 0, 0, [idx + 9]]);
                     newStack.push([
                         idx + 11,
-                        [
-                            "number",
-                            {
-                                value: parseNoteString(_cleanNoteName(this.notes[i]))[1]
-                            }
-                        ],
+                        ["number", { value: parsedNotes[i][1] }],
                         0,
                         0,
                         [idx + 9]
@@ -2102,26 +2086,10 @@ function TemperamentWidget() {
                         [idx + 7]
                     ]);
                 } else {
-                    newStack.push([
-                        idx + 8,
-                        [
-                            "text",
-                            {
-                                value: _cleanNoteName(this.notes[i])
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 7]
-                    ]);
+                    newStack.push([idx + 8, ["text", { value: cleanNotes[i] }], 0, 0, [idx + 7]]);
                     newStack.push([
                         idx + 9,
-                        [
-                            "number",
-                            {
-                                value: parseNoteString(_cleanNoteName(this.notes[i]))[1]
-                            }
-                        ],
+                        ["number", { value: parsedNotes[i][1] }],
                         0,
                         0,
                         [idx + 7]

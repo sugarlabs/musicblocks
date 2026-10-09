@@ -137,26 +137,22 @@ var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
 
 /** Proportional slice angles for a TEMPERAMENT entry, or null to keep equal slices. */
 var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
-    if (!Number.isInteger(pitchCount) || pitchCount < 2) {
-        return null;
-    }
     const entry = getTemperament(temperamentKey);
-    if (!entry || !Array.isArray(entry.ratios)) {
-        return null;
-    }
-    if (entry.ratios.length !== pitchCount) {
-        return null;
-    }
-    if (isEquallyTempered(temperamentKey)) {
+    if (
+        !Number.isInteger(pitchCount) ||
+        pitchCount < 2 ||
+        !entry ||
+        !Array.isArray(entry.ratios) ||
+        entry.ratios.length !== pitchCount ||
+        isEquallyTempered(temperamentKey)
+    ) {
         return null;
     }
     const octaveRatio = Number(entry.octaveRatio);
     if (!Number.isFinite(octaveRatio) || octaveRatio <= 1) {
         return null;
     }
-
-    const ratios = entry.ratios.map(getTemperamentRatio);
-    return sliceAnglesFromRatios(ratios, octaveRatio);
+    return sliceAnglesFromRatios(entry.ratios.map(getTemperamentRatio), octaveRatio);
 };
 
 /** Raises slices below minDegrees to that floor, absorbing the excess from wider slices. Null for bad input. */
@@ -167,12 +163,12 @@ var enforceMinSliceAngles = (sliceAngles, minDegrees) => {
     // A floor above 360/n could not be honoured for every slice, so clamp it.
     const floor = Math.min(minDegrees, 360 / sliceAngles.length);
     const raised = sliceAngles.map(width => Math.max(width, floor));
-    const excess = raised.reduce((sum, width) => sum + width, 0) - 360;
     // Headroom above the floor always covers the excess (floor <= 360/n), so no
-    // slice drops below the floor. When every slice sits on the floor the only
-    // excess is float noise and headroom is 0, so skip the division.
-    const headroom = raised.reduce((sum, width) => sum + (width - floor), 0);
-    if (excess > 0 && headroom > 0) {
+    // slice drops below the floor; when every slice sits on the floor the excess
+    // is float noise only.
+    const excess = raised.reduce((sum, width) => sum + width, 0) - 360;
+    if (excess > 1e-9) {
+        const headroom = raised.reduce((sum, width) => sum + (width - floor), 0);
         for (let i = 0; i < raised.length; i++) {
             raised[i] -= (excess * (raised[i] - floor)) / headroom;
         }

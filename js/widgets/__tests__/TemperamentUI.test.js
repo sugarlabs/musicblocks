@@ -322,9 +322,8 @@ describe("TemperamentUI module", () => {
         expect(mockTW.notesCircle).toBeDefined();
         expect(mockTW.notesCircle.initWheel).toHaveBeenCalledWith(["0", "1"]);
         expect(mockTW.notesCircle.slicePathCustom.menuRadius).toBeGreaterThan(0);
-        // [1, 2] is the degenerate full-octave fixture: sliceAnglesFromRatios
-        // returns null, so applySliceAngles keeps wheelnav's equal-slice
-        // default (the mock leaves its init value untouched).
+        // [1, 2] is a degenerate full-octave fixture: no proportional widths,
+        // so the wheel keeps its equal-slice default (mock init value 0).
         expect(mockTW.notesCircle.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.notesCircle.createWheel).toHaveBeenCalled();
     });
@@ -334,7 +333,6 @@ describe("TemperamentUI module", () => {
         expect(mockTW.wheel1).toBeDefined();
         expect(mockTW.wheel1.initWheel).toHaveBeenCalledWith(["0", "1"]);
         expect(mockTW.wheel1.slicePathCustom.menuRadius).toBeGreaterThan(0);
-        // Degenerate [1, 2] fixture: equal-slice fallback, no explicit angle.
         expect(mockTW.wheel1.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel1.createWheel).toHaveBeenCalled();
     });
@@ -353,9 +351,6 @@ describe("TemperamentUI module", () => {
         TemperamentUI.createOuterWheel(mockTW, [1, 2], 2);
         expect(mockTW.wheel).toBeDefined();
         expect(mockTW.wheel.initWheel).toHaveBeenCalledWith(["|", "|"]);
-        // Degenerate [1, 2] fixture: the synthesized octave endpoint yields
-        // widths [360, 0], so the positive-finite guard skips explicit angles
-        // and the wheel keeps its equal-slice default (mock init value).
         expect(mockTW.wheel.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel.createWheel).toHaveBeenCalled();
     });
@@ -1015,37 +1010,27 @@ describe("TemperamentUI module", () => {
     });
 
     describe("proportional slice geometry", () => {
-        test("outer tick wheel accumulates slice widths between pitches", () => {
-            mockTW.ratios = [1, 1.5, 1.75, 2];
-            mockTW.pitchNumber = 3;
-            mockTW.powerBase = 2;
+        // The tick wheel accumulates proportional widths between pitches, and a
+        // ratio array with no trailing octave synthesizes the same widths.
+        test.each([{ ratios: [1, 1.5, 1.75, 2] }, { ratios: [1, 1.5, 1.75] }])(
+            "outer tick wheel gets proportional widths for $ratios",
+            ({ ratios }) => {
+                mockTW.ratios = ratios;
+                mockTW.pitchNumber = 3;
+                mockTW.powerBase = 2;
 
-            TemperamentUI.arbitraryEdit(mockTW);
+                TemperamentUI.arbitraryEdit(mockTW);
 
-            expect(mockTW.wheel.navItemsContinuous).toBe(true);
-            expect(mockTW.wheel.navItems).toHaveLength(3);
-            const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
-            expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
-            expect(widths[0]).toBeCloseTo(210.5865, 3);
-            expect(widths[1]).toBeCloseTo(80.0613, 3);
-            expect(widths[2]).toBeCloseTo(69.3522, 3);
-        });
-
-        test("octave-short ratio array synthesizes the octave endpoint", () => {
-            mockTW.ratios = [1, 1.5, 1.75];
-            mockTW.pitchNumber = 3;
-            mockTW.powerBase = 2;
-
-            TemperamentUI.arbitraryEdit(mockTW);
-
-            expect(mockTW.wheel.navItems).toHaveLength(3);
-            const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
-            expect(widths.every(w => Number.isFinite(w))).toBe(true);
-            expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
-            expect(widths[0]).toBeCloseTo(210.5865, 3);
-            expect(widths[1]).toBeCloseTo(80.0613, 3);
-            expect(widths[2]).toBeCloseTo(69.3522, 3);
-        });
+                expect(mockTW.wheel.navItemsContinuous).toBe(true);
+                const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
+                expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
+                expect(widths).toEqual([
+                    expect.closeTo(210.5865, 3),
+                    expect.closeTo(80.0613, 3),
+                    expect.closeTo(69.3522, 3)
+                ]);
+            }
+        );
 
         test("non-positive widths keep the equal-slice default", () => {
             mockTW.ratios = [1, 1.75, 1.5, 2];
