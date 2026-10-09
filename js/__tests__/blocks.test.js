@@ -1309,17 +1309,35 @@ describe("Blocks Foundation", () => {
             });
 
             it.each([
+                ["updateBlockPositions", b => b.updateBlockPositions()],
+                ["bringToTop", b => b.bringToTop()],
                 ["checkBounds", b => b.checkBounds()],
                 ["unhighlightAll", b => b.unhighlightAll()],
                 ["hide", b => b.hide()],
                 ["show", b => b.show()],
                 ["changeDisabledStatus", b => b.changeDisabledStatus("start", true)],
                 ["findUniqueActionName", b => b.findUniqueActionName("action")],
+                ["findUniqueCustomName", b => b.findUniqueCustomName("custom")],
+                ["findUniqueTemperamentName", b => b.findUniqueTemperamentName("custom")],
+                ["_findDrumURLs", b => b._findDrumURLs()],
+                ["renameBoxes", b => b.renameBoxes("box1", "box2")],
+                ["renameStoreinBoxes", b => b.renameStoreinBoxes("box1", "box2")],
+                ["renameStorein2Boxes", b => b.renameStorein2Boxes("box1", "box2")],
+                ["renameNamedboxes", b => b.renameNamedboxes("box1", "box2")],
                 ["findBlockInstance", b => b.findBlockInstance("start")],
                 ["clearParameterBlocks", b => b.clearParameterBlocks()],
                 ["isCoordinateOnBlock", b => b.isCoordinateOnBlock(0, 0)]
             ])("%s skips the empty slot", (_, run) => {
                 expect(() => run(blocks)).not.toThrow();
+            });
+
+            it("deleteActionBlock skips the empty slot", async () => {
+                mockActivity.palettes.removeActionPrototype = jest.fn();
+                blocks.blockList.push({ name: "text", value: "chorus", trash: false });
+                const action = { name: "action", connections: [null, 1, null] };
+
+                await expect(blocks.deleteActionBlock(action)).resolves.toBeUndefined();
+                expect(mockActivity.palettes.removeActionPrototype).toHaveBeenCalledWith("chorus");
             });
         });
     });
