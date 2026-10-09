@@ -1751,6 +1751,75 @@ describe("processNote playback path avoids discarded ratio computation", () => {
     });
 });
 
+describe("record notation while playing", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        const blk = "mockBlk";
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.blink = jest.fn();
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.suppressOutput = true;
+        turtleMock.singer.justCounting = [];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        Object.assign(activityMock.logo, {
+            runningLilypond: false,
+            runningMxml: false,
+            runningAbc: false,
+            runningMIDI: false,
+            specialArgs: [],
+            dispatchTurtleSignals: jest.fn(),
+            notationMIDI: jest.fn(),
+            updateNotation: jest.fn()
+        });
+        Object.assign(activityMock.logo.synth, {
+            inTemperament: "equal",
+            changeInTemperament: false,
+            startingPitch: "A0",
+            getFrequency: jest.fn(() => [261.63]),
+            getCustomFrequency: jest.fn(() => [261.63])
+        });
+        activityMock.stage = { update: jest.fn() };
+    });
+
+    test("starts every run with recording off", () => {
+        turtleMock.singer.recordingNotation = true;
+        turtleMock.singer.reset();
+        expect(turtleMock.singer.recordingNotation).toBe(false);
+    });
+
+    test("does not stage notes while playing without recording", () => {
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.logo.updateNotation).not.toHaveBeenCalled();
+    });
+
+    test("stages notes while playing once recording is on", () => {
+        turtleMock.singer.recordingNotation = true;
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(
+            ["C4"],
+            expect.any(Number),
+            0,
+            -1,
+            []
+        );
+        // MIDI data is only collected for a MIDI export.
+        expect(activityMock.logo.notationMIDI).not.toHaveBeenCalled();
+    });
+});
+
 describe("scalarDistance edge cases", () => {
     let turtleMock;
     let activityMock;

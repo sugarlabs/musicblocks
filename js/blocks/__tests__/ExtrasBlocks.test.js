@@ -639,6 +639,14 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         expect(activity.save.saveSVG).toHaveBeenCalledWith("test.svg");
     });
 
+    test("real RecordNotationBlock flow() turns on notation recording for its mouse", () => {
+        const tur = { singer: { recordingNotation: false } };
+        activity.turtles.ithTurtle.mockReturnValueOnce(tur);
+        instances["RecordNotationBlock"].flow([], logo, turtle, blk);
+        expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(turtle);
+        expect(tur.singer.recordingNotation).toBe(true);
+    });
+
     test("real ShowBlocksBlock flow() calls showBlocks", () => {
         instances["ShowBlocksBlock"].flow([], logo, turtle, blk);
         expect(activity.blocks.showBlocks).toHaveBeenCalled();
