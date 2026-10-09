@@ -1678,6 +1678,25 @@ describe("TimbreWidget", () => {
         });
 
         describe("_save and _undo methods", () => {
+            afterEach(() => {
+                const table = jsdomDocument.getElementById("timbreTable");
+                if (table && table.parentNode) {
+                    table.parentNode.removeChild(table);
+                }
+                const selOsc1 = jsdomDocument.getElementById("selOsc1");
+                if (selOsc1 && selOsc1.parentNode) {
+                    selOsc1.parentNode.removeChild(selOsc1);
+                }
+                const rangeFx0 = jsdomDocument.getElementById("myRangeFx0");
+                if (rangeFx0 && rangeFx0.parentNode) {
+                    rangeFx0.parentNode.removeChild(rangeFx0);
+                }
+                const spanFx0 = jsdomDocument.getElementById("myspanFx0");
+                if (spanFx0 && spanFx0.parentNode) {
+                    spanFx0.parentNode.removeChild(spanFx0);
+                }
+            });
+
             test("_save loads new settimbre blocks and increments delta", () => {
                 timbre._delta = 0;
                 timbre._save();
@@ -1844,6 +1863,340 @@ describe("TimbreWidget", () => {
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
                 expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 80, 0);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("80");
+            });
+
+            test("_undo pops and restores previous states from _undoStack across multiple steps", () => {
+                timbre._update = jest.fn();
+                timbre._undoStack = [];
+
+                timbre.FMSynthParams = ["10"];
+                timbre._recordUndo("fmsynth", timbre.FMSynthParams, 0);
+                timbre.FMSynthParams = ["25"];
+                timbre._recordUndo("fmsynth", timbre.FMSynthParams, 0);
+                timbre.FMSynthParams = ["50"];
+
+                expect(timbre._undoStack).toHaveLength(2);
+                timbre._undo();
+                expect(timbre.FMSynthParams[0]).toBe("25");
+                expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(25);
+                timbre._undo();
+                expect(timbre.FMSynthParams[0]).toBe("10");
+                expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(10);
+                expect(timbre._undoStack).toHaveLength(0);
+
+                timbre.tremoloParams = ["5", "30"];
+                timbre._recordUndo("tremolo", timbre.tremoloParams, 0);
+                timbre.tremoloParams = ["15", "80"];
+                timbre._undo();
+                expect(timbre.tremoloParams).toEqual(["5", "30"]);
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["tremoloFrequency"]
+                ).toBe(5);
+
+                timbre.ENVs = ["1", "50", "60", "1"];
+                timbre._recordUndo("envelope", timbre.ENVs, 0);
+                timbre.ENVs = ["5", "20", "40", "10"];
+                timbre._undo();
+                expect(timbre.ENVs).toEqual(["1", "50", "60", "1"]);
+                expect(timbre.synthVals["envelope"]["attack"]).toBe(0.01);
+            });
+
+            test("_recordUndo initializes stack when null and enforces 50 item capacity", () => {
+                timbre._undoStack = null;
+                timbre._recordUndo("amsynth", [1], 0);
+                expect(timbre._undoStack).toHaveLength(1);
+
+                for (let i = 2; i <= 55; i++) {
+                    timbre._recordUndo("amsynth", [i], 0);
+                }
+                expect(timbre._undoStack).toHaveLength(50);
+                expect(timbre._undoStack[0].values).toEqual([6]);
+                expect(timbre._undoStack[49].values).toEqual([55]);
+            });
+
+            test("_syncThumbTooltips updates tooltip values for range sliders in timbreTable", () => {
+                const table = jsdomDocument.createElement("div");
+                table.id = "timbreTable";
+                const slider = jsdomDocument.createElement("input");
+                slider.type = "range";
+                slider.value = "77";
+                const thumb = jsdomDocument.createElement("span");
+                thumb.className = "thumb";
+                const val = jsdomDocument.createElement("span");
+                val.className = "value";
+                val.textContent = "0";
+                thumb.appendChild(val);
+                table.appendChild(slider);
+                table.appendChild(thumb);
+                jsdomDocument.body.appendChild(table);
+
+                timbre._syncThumbTooltips();
+                expect(val.textContent).toBe("77");
+            });
+
+            test("_applyUndoState isolates effect routing during _update and restores previous active flags", () => {
+                let activeDuringUpdate = null;
+                timbre._update = jest.fn(() => {
+                    activeDuringUpdate = Object.assign({}, timbre.isActive);
+                });
+
+                timbre.isActive["effects"] = true;
+                timbre.isActive["tremolo"] = true;
+                timbre.isActive["envelope"] = false;
+
+                timbre._recordUndo("envelope", [10, 20, 30, 40], 0);
+                timbre._undo();
+
+                expect(activeDuringUpdate["envelope"]).toBe(true);
+                expect(activeDuringUpdate["tremolo"]).toBe(false);
+                expect(activeDuringUpdate["effects"]).toBe(false);
+
+                expect(timbre.isActive["effects"]).toBe(true);
+                expect(timbre.isActive["tremolo"]).toBe(true);
+                expect(timbre.isActive["envelope"]).toBe(false);
+            });
+
+            test("_applyUndoState restores both vibrato rate operands using oneHundredToFraction", () => {
+                const origOneHundred = global.oneHundredToFraction;
+                try {
+                    timbre._update = jest.fn();
+                    global.oneHundredToFraction = jest.fn(() => [3, 4]);
+
+                    timbre._recordUndo("vibrato", ["15", "75"], 2);
+                    timbre.vibratoParams = ["50", "90"];
+                    timbre._undo();
+
+                    expect(timbre.vibratoParams).toEqual(["15", "75"]);
+                    expect(timbre._update).toHaveBeenCalledWith(2, "15", 0);
+                    expect(timbre._update).toHaveBeenCalledWith(2, 4, 1);
+                    expect(timbre._update).toHaveBeenCalledWith(2, 3, 2);
+                    expect(
+                        global.instrumentsEffects[0][timbre.instrumentName]["vibratoIntensity"]
+                    ).toBe(0.15);
+                    expect(
+                        global.instrumentsEffects[0][timbre.instrumentName]["vibratoFrequency"]
+                    ).toBe(0.75);
+                } finally {
+                    global.oneHundredToFraction = origOneHundred;
+                }
+            });
+
+            test("_applyUndoState restores amsynth, noisesynth, duosynth, phaser, chorus, distortion, and oscillator", () => {
+                timbre._update = jest.fn();
+
+                timbre._recordUndo("amsynth", ["9"], 0);
+                timbre._undo();
+                expect(timbre.AMSynthParams[0]).toBe("9");
+                expect(timbre.amSynthParamvals["harmonicity"]).toBe(9);
+
+                timbre._recordUndo("noisesynth", ["3"], 0);
+                timbre._undo();
+                expect(timbre.NoiseSynthParams[0]).toBe("3");
+                expect(timbre.noiseSynthParamvals["noise.type"]).toBe(3);
+
+                timbre._recordUndo("duosynth", ["11", "33"], 0);
+                timbre._undo();
+                expect(timbre.duoSynthParams).toEqual(["11", "33"]);
+                expect(timbre.duoSynthParamVals.vibratoRate).toBe(11);
+                expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.33);
+
+                timbre._recordUndo("phaser", ["7", "4", "220"], 1);
+                timbre._undo();
+                expect(timbre.phaserParams).toEqual(["7", "4", "220"]);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["rate"]).toBe(7);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["octaves"]).toBe(4);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["baseFrequency"]).toBe(
+                    220
+                );
+
+                timbre._recordUndo("chorus", ["5", "3", "70"], 1);
+                timbre._undo();
+                expect(timbre.chorusParams).toEqual(["5", "3", "70"]);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["chorusRate"]).toBe(5);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["delayTime"]).toBe(3);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["chorusDepth"]).toBe(
+                    0.7
+                );
+
+                timbre._recordUndo("distortion", ["65"], 0);
+                timbre._undo();
+                expect(timbre.distortionParams[0]).toBe("65");
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["distortionAmount"]
+                ).toBe(0.65);
+
+                const sel = jsdomDocument.createElement("select");
+                sel.id = "selOsc1";
+                const opt = jsdomDocument.createElement("option");
+                opt.value = "triangle";
+                sel.appendChild(opt);
+                jsdomDocument.body.appendChild(sel);
+                timbre.isActive["oscillator"] = true;
+                timbre._recordUndo("oscillator", ["triangle", 4], 0);
+                timbre._undo();
+                expect(timbre.oscParams).toEqual(["triangle", 4]);
+                expect(timbre.synthVals["oscillator"]["type"]).toBe("triangle4");
+                expect(sel.value).toBe("triangle");
+            });
+
+            test("_purgeUndoSnapshots removes snapshots only for specified effect", () => {
+                timbre._undoStack = [
+                    { effect: "amsynth", values: [1], blockValue: 0 },
+                    { effect: "fmsynth", values: [2], blockValue: 0 },
+                    { effect: "amsynth", values: [3], blockValue: 0 }
+                ];
+                timbre._purgeUndoSnapshots("amsynth");
+                expect(timbre._undoStack).toEqual([
+                    { effect: "fmsynth", values: [2], blockValue: 0 }
+                ]);
+            });
+
+            test("_applyUndoState skips when target block is missing in blockList", () => {
+                timbre._update = jest.fn();
+                timbre.AMSynthesizer = [999];
+                mockBlocks.blockList[999] = null;
+
+                timbre._recordUndo("amsynth", [12], 0);
+                timbre._undo();
+
+                expect(timbre._update).not.toHaveBeenCalled();
+            });
+
+            test("_applyUndoState does not modify DOM sliders when panel is not active", () => {
+                timbre._update = jest.fn();
+                const range = jsdomDocument.createElement("input");
+                range.id = "myRangeFx0";
+                range.value = "99";
+                const span = jsdomDocument.createElement("span");
+                span.id = "myspanFx0";
+                span.textContent = "99";
+                jsdomDocument.body.appendChild(range);
+                jsdomDocument.body.appendChild(span);
+
+                timbre.isActive["tremolo"] = false;
+                timbre.isActive["chorus"] = true;
+
+                timbre._recordUndo("tremolo", [5, 10], 0);
+                timbre._undo();
+
+                expect(range.value).toBe("99");
+                expect(span.textContent).toBe("99");
+            });
+
+            test("slider changes trigger _recordUndo across synths, oscillators, envelope, and effects", async () => {
+                timbre._update = jest.fn();
+                timbre._undoStack = [];
+
+                // Synth sliders
+                timbre._synth();
+                const amRadio = jsdomDocument.querySelector('input[value="AMSynth"]');
+                await amRadio.onclick({ target: amRadio });
+                jsdomDocument
+                    .getElementById("wrapperS0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack.length).toBeGreaterThan(0);
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("amsynth");
+
+                const fmRadio = jsdomDocument.querySelector('input[value="FMSynth"]');
+                await fmRadio.onclick({ target: fmRadio });
+                jsdomDocument
+                    .getElementById("wrapperS0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("fmsynth");
+
+                const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+                await duoRadio.onclick({ target: duoRadio });
+                jsdomDocument
+                    .getElementById("wrapperS0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("duosynth");
+
+                // Oscillator sliders
+                timbre.oscParams = ["sine", 6];
+                timbre._oscillator(false);
+                const wrapperOsc0 = jsdomDocument.getElementById("wrapperOsc0");
+                const wrapperOsc1 = jsdomDocument.getElementById("wrapperOsc1");
+                wrapperOsc0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("oscillator");
+                wrapperOsc1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("oscillator");
+
+                // Envelope slider
+                timbre._envelope(false);
+                const wrapperEnv0 = jsdomDocument.getElementById("wrapperEnv0");
+                wrapperEnv0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("envelope");
+
+                // Effects sliders
+                timbre._effects();
+                const tremoloRadio = jsdomDocument.querySelector('input[value="Tremolo"]');
+                await tremoloRadio.onclick({ target: tremoloRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("tremolo");
+                jsdomDocument
+                    .getElementById("wrapperFx1")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("tremolo");
+
+                const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                await vibratoRadio.onclick({ target: vibratoRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("vibrato");
+                jsdomDocument
+                    .getElementById("wrapperFx1")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("vibrato");
+
+                const chorusRadio = jsdomDocument.querySelector('input[value="Chorus"]');
+                await chorusRadio.onclick({ target: chorusRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("chorus");
+
+                const phaserRadio = jsdomDocument.querySelector('input[value="Phaser"]');
+                await phaserRadio.onclick({ target: phaserRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("phaser");
+
+                const distortionRadio = jsdomDocument.querySelector('input[value="Distortion"]');
+                await distortionRadio.onclick({ target: distortionRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("distortion");
             });
         });
 
