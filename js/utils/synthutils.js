@@ -2242,11 +2242,15 @@ function Synth() {
                 // If it is STILL suspended after 2 seconds, it is definitely blocked
                 if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
                     window.hasShownAudioWarning = true;
-                    alert(
-                        _(
-                            "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-                        )
+                    const notice = _(
+                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
                     );
+
+                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                        window.MBDialog.alert(notice);
+                    } else {
+                        alert(notice);
+                    }
                 }
             }, 2000);
         }
