@@ -267,6 +267,8 @@ class Singer {
         this.firstPitch = [];
         this.lastPitch = [];
         this.suppressOutput = Boolean(suppressOutput);
+        // Set by the record notation block, so notes are staged while playing too
+        this.recordingNotation = false;
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
         this.runningFromEvent = false;
@@ -2355,12 +2357,12 @@ class Singer {
                                 d = tur.singer.tieCarryOver;
                             }
 
-                            if (
+                            const exporting =
                                 activity.logo.runningLilypond ||
                                 activity.logo.runningMxml ||
                                 activity.logo.runningAbc ||
-                                activity.logo.runningMIDI
-                            ) {
+                                activity.logo.runningMIDI;
+                            if (exporting) {
                                 activity.logo.notationMIDI(
                                     chordNotes,
                                     chordDrums,
@@ -2369,6 +2371,8 @@ class Singer {
                                     bpmValue || 90,
                                     last(tur.singer.instrumentNames)
                                 );
+                            }
+                            if (exporting || tur.singer.recordingNotation) {
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }
