@@ -74,6 +74,25 @@ function findUnreciprocatedConnections(blocks) {
     return broken;
 }
 
+/**
+ * Blocks.loadNewBlocks() (js/blocks.js, _makeNewBlockWithConnections) resolves
+ * every connection by adding it to the array's own position --
+ * `connections[c] + blockOffset` -- it never reads a block's own [0] id back
+ * out of the data at all. findUnreciprocatedConnections() above checks id-based
+ * graph consistency, which is necessary but not sufficient: a block whose
+ * array position doesn't match its own embedded id can still pass that check
+ * while loading completely wrong (a connection written as "14" resolves to
+ * whatever sits at array position 14, regardless of which block claims id 14).
+ * This checks the invariant the loader actually depends on.
+ */
+function findPositionMismatches(blocks) {
+    return blocks
+        .map((block, position) =>
+            block[0] !== position ? `position ${position} has id ${block[0]}` : null
+        )
+        .filter(Boolean);
+}
+
 /** The [numerator, denominator] value of a newnote block in `blocks`. */
 function noteValueOf(blocks, newnoteBlock) {
     const byIndex = new Map(blocks.map(block => [block[0], block]));
@@ -494,9 +513,57 @@ describe("Test 11: Real key-signature extraction", () => {
 
         expect(keySignatureOf(blocks)).toEqual({ root: "C", mode: "major" });
     });
+
+    // Regression tests: no file writes a major key this far round the circle
+    // of fifths, but a minor (or other non-major) mode legitimately needs
+    // majorTonicFifths out here. js/mxml.js's own _MAJOR_FIFTHS carries these
+    // same four entries for exactly this reason; _MXML_FIFTHS_TO_MAJOR_TONIC
+    // originally only mirrored its -7..7 "a major key could actually use this"
+    // subset, silently falling back to C major for every one of these instead.
+    it.each([
+        [5, "minor", "G♯", "minor"],
+        [6, "minor", "D♯", "minor"],
+        [7, "minor", "A♯", "minor"],
+        [-7, "lydian", "F♭", "lydian"]
+    ])(
+        "fifths %i, mode %s -> %s %s (extended range)",
+        async (fifths, mode, expectedRoot, expectedMode) => {
+            const { blocks } = await parseAndCapture(
+                scorePartwise(
+                    SIMPLE_NOTE("C", 4, "quarter"),
+                    `<divisions>8</divisions>${withKey(fifths, mode)}`
+                )
+            );
+
+            expect(keySignatureOf(blocks)).toEqual({ root: expectedRoot, mode: expectedMode });
+        }
+    );
 });
 
 describe("Test 12: Tempo", () => {
+    it("loads correctly ordered: setkey2 reaches setbpm3, not settimbre, when a tempo is present", async () => {
+        // Regression test: the tempo segment is appended after
+        // settimbre/voicename/hidden in array order despite having lower ids
+        // (Blocks.loadNewBlocks() resolves connections by array position, not
+        // by matching a block's own [0] id -- see findPositionMismatches).
+        // Before the fix, setkey2's connection to the tempo block's id instead
+        // resolved to whatever sat at that array *position*, which was settimbre.
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<direction><sound tempo="96"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+
+        const setkey2 = blocks.find(b => blockName(b) === "setkey2");
+        const next = blocks.find(b => b[0] === setkey2[4][3]);
+        expect(blockName(next)).toBe("setbpm3");
+    });
+
     it("omits the setbpm3 block entirely when the file stages no tempo", async () => {
         const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
 
@@ -646,6 +713,7 @@ describe("Test 13: Multi-part scores", () => {
 
         const { blocks } = await parseAndCapture(xml);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
         // Part 3 has no notes at all -- its settimbre note-dock stays null,
         // same single-part behaviour Test 9 already covers.
         const settimbres = blocks.filter(b => blockName(b) === "settimbre");

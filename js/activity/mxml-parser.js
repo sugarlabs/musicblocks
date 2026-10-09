@@ -112,7 +112,17 @@ const _MXML_FIFTHS_TO_MAJOR_TONIC = {
     "4": "E",
     "5": "B",
     "6": "F#",
-    "7": "C#"
+    "7": "C#",
+    // No file writes a major key this far round the circle of fifths, but a
+    // minor (or other non-major) mode can land a majorTonicFifths value out
+    // here: G# minor is <fifths>5</fifths>, A# minor is <fifths>7</fifths>,
+    // Fb lydian is <fifths>-7</fifths> -- all ordinary, in range, real values.
+    // Mirrors js/mxml.js's own _MAJOR_FIFTHS, which carries these same four
+    // entries for the same reason (see its comment there).
+    "8": "G#",
+    "9": "D#",
+    "10": "A#",
+    "-8": "Fb"
 };
 
 // How far each mode's key signature sits from the major key on the same tonic.
@@ -450,6 +460,16 @@ const setupActivityMxmlParser = activityInstance => {
             allBlocks.push(...blocks);
             blockId = nextBlockId;
         });
+
+        // Blocks.loadNewBlocks() resolves every connection by adding it to the
+        // array's own position (_makeNewBlockWithConnections: connections[c] +
+        // blockOffset) -- it never reads a block's own [0] id back out of the
+        // data. Every id-assigning function above keeps ids consecutive and
+        // gapless, so sorting by id guarantees array position matches id for
+        // every block, regardless of which order the pieces above were
+        // assembled in (the tempo segment, when present, is appended after
+        // settimbre/voicename/hidden despite having lower ids).
+        allBlocks.sort((a, b) => a[0] - b[0]);
 
         this.blocks.loadNewBlocks(allBlocks);
         return null;
