@@ -12,7 +12,7 @@
 /*
    globals
 
-   */
+*/
 
 if (typeof module !== "undefined" && module.exports) {
     var UtilsLogic =
@@ -59,8 +59,12 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
  * @returns {string} The JSON-encoded text of the updated macro dictionary.
  */
 let prepareMacroExports = (name, stack, macroDict) => {
-    if (name !== null) {
-        macroDict[name] = stack;
+    if (name !== null && name !== undefined) {
+        const key = String(name);
+
+        if (!isUnsafeObjectKey(key)) {
+            macroDict[key] = stack;
+        }
     }
 
     return JSON.stringify(macroDict);
