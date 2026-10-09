@@ -228,7 +228,11 @@ describe("Test 6: Multiple notes chain correctly", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
 
         const newnotes = blocks.filter(b => blockName(b) === "newnote");
-        const hiddens = blocks.filter(b => blockName(b) === "hidden" && b[0] !== 14);
+        // The preamble's own hidden block is settimbre's flow-next, not a note's
+        // trailing spacer; exclude it by that relationship, not a hardcoded id --
+        // the preamble's exact block count has already changed across PRs once.
+        const settimbre = blocks.find(b => blockName(b) === "settimbre");
+        const hiddens = blocks.filter(b => blockName(b) === "hidden" && b[0] !== settimbre[4][3]);
         expect(newnotes[1][4][0]).toBe(hiddens[0][0]);
         expect(newnotes[2][4][0]).toBe(hiddens[1][0]);
         expect(newnotes[3][4][0]).toBe(hiddens[2][0]);
@@ -398,5 +402,254 @@ describe("Test 10: Round-trips what this project's own exporter writes", () => {
         ]);
         expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});
+
+/** A part's {root, mode} from its setkey2 block. */
+function keySignatureOf(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    const setkey2 = blocks.find(b => blockName(b) === "setkey2");
+    return {
+        root: byIndex.get(setkey2[4][1])[1][1].value,
+        mode: byIndex.get(setkey2[4][2])[1][1].value
+    };
+}
+
+/** Every setkey2 block's {root, mode}, in block-array order (one per part). */
+function keySignatures(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    return blocks
+        .filter(b => blockName(b) === "setkey2")
+        .map(b => ({
+            root: byIndex.get(b[4][1])[1][1].value,
+            mode: byIndex.get(b[4][2])[1][1].value
+        }));
+}
+
+/** Every setbpm3 block's quarter-notes-per-minute value, in block-array order. */
+function tempos(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    return blocks
+        .filter(b => blockName(b) === "setbpm3")
+        .map(b => byIndex.get(b[4][1])[1][1].value);
+}
+
+const withKey = (fifths, mode) =>
+    `<key><fifths>${fifths}</fifths>${mode ? `<mode>${mode}</mode>` : ""}</key>`;
+
+describe("Test 11: Real key-signature extraction", () => {
+    it("defaults to C major when the file has no <key> at all", async () => {
+        const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
+
+        expect(keySignatureOf(blocks)).toEqual({ root: "C", mode: "major" });
+    });
+
+    it.each([
+        [0, null, "C", "major"],
+        [1, null, "G", "major"],
+        [-1, null, "F", "major"],
+        [7, null, "C♯", "major"],
+        [-7, null, "C♭", "major"],
+        [0, "minor", "A", "minor"],
+        [-3, "minor", "C", "minor"],
+        [0, "dorian", "D", "dorian"],
+        [-2, "dorian", "C", "dorian"],
+        [2, "mixolydian", "A", "mixolydian"],
+        [0, "ionian", "C", "major"],
+        [-3, "aeolian", "C", "minor"]
+    ])("fifths %i, mode %s -> %s %s", async (fifths, mode, expectedRoot, expectedMode) => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter"),
+                `<divisions>8</divisions>${withKey(fifths, mode)}`
+            )
+        );
+
+        expect(keySignatureOf(blocks)).toEqual({ root: expectedRoot, mode: expectedMode });
+    });
+
+    it("treats an unrecognized <mode> as a major-offset key, reading <fifths> at face value", async () => {
+        // An unrecognized mode name falls back to a 0 fifths-offset (as if it
+        // were major) and a "major" mode name -- not a blanket "always C major"
+        // regardless of <fifths>, which fifths=3 here would otherwise hide.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter"),
+                `<divisions>8</divisions>${withKey(3, "whatever")}`
+            )
+        );
+
+        expect(keySignatureOf(blocks)).toEqual({ root: "A", mode: "major" });
+    });
+
+    it("falls back to C major when the combination falls outside a sane fifths range", async () => {
+        // fifths=7 (C# major territory) with locrian's -5 offset needs a major
+        // key at fifths=12, which no reasonable key signature reaches.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter"),
+                `<divisions>8</divisions>${withKey(7, "locrian")}`
+            )
+        );
+
+        expect(keySignatureOf(blocks)).toEqual({ root: "C", mode: "major" });
+    });
+});
+
+describe("Test 12: Tempo", () => {
+    it("omits the setbpm3 block entirely when the file stages no tempo", async () => {
+        const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
+
+        expect(blocks.filter(b => blockName(b) === "setbpm3")).toHaveLength(0);
+    });
+
+    it("reads <sound tempo> into a setbpm3 block at 4/4", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<direction><sound tempo="96"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([96]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("scales the setbpm3 value by the time signature's beat type", async () => {
+        // MusicXML tempo is always quarter notes per minute; the setbpm3 block
+        // counts beats of the project's own time signature (see
+        // js/midi.js's finalizeTracks(), which uses the same conversion).
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions><time><beats>6</beats><beat-type>8</beat-type></time></attributes>" +
+            '<direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        // 120 quarter notes/min at a 1/8-beat time signature == 240 eighth-beats/min.
+        expect(tempos(blocks)).toEqual([240]);
+    });
+
+    it("ignores a non-positive or non-numeric tempo rather than staging a bad value", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<direction><sound tempo="0"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(blocks.filter(b => blockName(b) === "setbpm3")).toHaveLength(0);
+    });
+});
+
+describe("Test 13: Multi-part scores", () => {
+    const twoPartScore = (part1Measures, part2Measures) =>
+        "<score-partwise>" +
+        '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
+        `<part id="P1"><measure number="1"><attributes><divisions>8</divisions></attributes>${part1Measures}</measure></part>` +
+        `<part id="P2"><measure number="1"><attributes><divisions>8</divisions></attributes>${part2Measures}</measure></part>` +
+        "</score-partwise>";
+
+    it("builds a separate note chain per part, each with its own voice label", async () => {
+        const { blocks } = await parseAndCapture(
+            twoPartScore(SIMPLE_NOTE("C", 4, "quarter"), SIMPLE_NOTE("E", 3, "quarter"))
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "E", octave: 3 }
+        ]);
+        const voiceTexts = blocks
+            .filter(b => blockName(b) === "text")
+            .map(b => b[1][1].value)
+            .filter(v => v.startsWith("Voice"));
+        expect(voiceTexts).toEqual(["Voice 1", "Voice 2"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("gives each part its own settimbre/newnote chain, not a shared one", async () => {
+        const { blocks } = await parseAndCapture(
+            twoPartScore(SIMPLE_NOTE("C", 4, "quarter"), SIMPLE_NOTE("E", 3, "quarter"))
+        );
+
+        const settimbres = blocks.filter(b => blockName(b) === "settimbre");
+        const newnotes = blocks.filter(b => blockName(b) === "newnote");
+        expect(settimbres).toHaveLength(2);
+        expect(newnotes).toHaveLength(2);
+        expect(newnotes[0][4][0]).toBe(settimbres[0][0]);
+        expect(newnotes[1][4][0]).toBe(settimbres[1][0]);
+    });
+
+    it("extracts each part's own key signature independently", async () => {
+        const xml =
+            "<score-partwise>" +
+            '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
+            '<part id="P1"><measure number="1"><attributes><divisions>8</divisions>' +
+            withKey(2, null) +
+            "</attributes>" +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part>" +
+            '<part id="P2"><measure number="1"><attributes><divisions>8</divisions>' +
+            withKey(-3, "minor") +
+            "</attributes>" +
+            SIMPLE_NOTE("C", 3, "quarter") +
+            "</measure></part>" +
+            "</score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(keySignatures(blocks)).toEqual([
+            { root: "D", mode: "major" },
+            { root: "C", mode: "minor" }
+        ]);
+    });
+
+    it("shares one tempo across every part, same as a MIDI file's tempo applies to every track", async () => {
+        const xml =
+            "<score-partwise>" +
+            '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
+            '<part id="P1"><measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="100"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part>" +
+            '<part id="P2"><measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            SIMPLE_NOTE("E", 3, "quarter") +
+            "</measure></part>" +
+            "</score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([100, 100]);
+    });
+
+    it("keeps full block-graph integrity across three parts, key signatures and a tempo", async () => {
+        const xml =
+            "<score-partwise>" +
+            '<part-list><score-part id="P1"/><score-part id="P2"/><score-part id="P3"/></part-list>' +
+            '<part id="P1"><measure number="1"><attributes><divisions>8</divisions>' +
+            withKey(1, null) +
+            "<time><beats>3</beats><beat-type>4</beat-type></time></attributes>" +
+            '<direction><sound tempo="110"/></direction>' +
+            SIMPLE_NOTE("G", 4, "quarter") +
+            SIMPLE_NOTE("A", 4, "eighth") +
+            "</measure></part>" +
+            '<part id="P2"><measure number="1"><attributes><divisions>4</divisions>' +
+            withKey(-2, "dorian") +
+            "</attributes>" +
+            "<note><rest/><duration>4</duration><type>quarter</type></note>" +
+            SIMPLE_NOTE("B", 3, "quarter") +
+            "</measure></part>" +
+            '<part id="P3"><measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            "</measure></part>" +
+            "</score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        // Part 3 has no notes at all -- its settimbre note-dock stays null,
+        // same single-part behaviour Test 9 already covers.
+        const settimbres = blocks.filter(b => blockName(b) === "settimbre");
+        expect(settimbres).toHaveLength(3);
+        expect(settimbres[2][4][2]).toBeNull();
     });
 });
