@@ -344,6 +344,17 @@ describe("selectBlocksInDragArea", () => {
         expect(result).toEqual([inside]);
     });
 
+    test("skips empty slots left in blockList by a disposed block", () => {
+        const activity = makeActivity();
+        setupSelectionController(activity);
+        const inside = makeBlock({ x: 5, y: 5, width: 10, height: 10 });
+        activity.blocks.blockList = [null, inside];
+
+        activity.selectionController.dragArea = { x: 0, y: 0, width: 20, height: 20 };
+
+        expect(activity.selectBlocksInDragArea()).toEqual([inside]);
+    });
+
     test("offsets block x-position by blocksContainer.x when scrollBlockContainer is true", () => {
         const activity = makeActivity();
         setupSelectionController(activity);

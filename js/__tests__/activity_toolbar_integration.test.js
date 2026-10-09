@@ -583,6 +583,42 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.blocks.trashPreviews["0"]).toBe("preview");
         });
 
+        test("sendAllToTrash does not record blocks that are already in the trash again", () => {
+            activity.palettes = { dict: {} };
+            const makeBlock = trash => ({
+                connections: [null],
+                name: "pitch",
+                trash,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            });
+            const trashed = makeBlock(true);
+            const live = makeBlock(false);
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [trashed, null, live],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(() => "preview"),
+                trashPreviews: {},
+                trashStacks: ["0"],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+            activity.blocksContainer = { x: 0, y: 0 };
+            activity.refreshCanvas = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(activity.blocks.trashStacks).toEqual(["0", "2"]);
+            expect(activity.blocks.captureStackPreview).toHaveBeenCalledTimes(1);
+            expect(activity.blocks.moveBlockRelative).toHaveBeenCalledTimes(1);
+            expect(trashed.hide).not.toHaveBeenCalled();
+            expect(live.trash).toBe(true);
+        });
+
         test("pasted iterates Object.keys on palettes.dict and loads blocks", () => {
             const hideMenu = jest.fn();
             activity.palettes = { dict: { rhythm: { hideMenu } } };
