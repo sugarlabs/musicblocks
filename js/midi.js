@@ -186,45 +186,39 @@ class MidiTranscriber {
     }
 
     buildSchedule(track) {
-        const sched = [];
+        const events = [];
         track.notes.forEach((note, index) => {
             const [noteStart, noteEnd] = this.noteSeconds(note);
             const start = Math.round(noteStart * 100) / 100;
             const end = Math.round(noteEnd * 100) / 100;
 
-            if (note.duration === 0) return;
-
-            const lastNote = sched[sched.length - 1];
-
-            if (index === 0 && start > 0) {
-                sched.push({ start: 0, end: start, notes: [{ name: "R" }] });
-            }
-
-            if (lastNote && lastNote.start === start && lastNote.end === end) {
-                lastNote.notes.push(note);
-                return;
-            }
-
-            if (lastNote && lastNote.start <= start && lastNote.end > start) {
-                const prevNotes = [...lastNote.notes];
-                const oldEnd = lastNote.end;
-
-                lastNote.end = start;
-
-                sched.push({ start: start, end: end, notes: [...prevNotes, note] });
-
-                if (oldEnd > end) {
-                    sched.push({ start: end, end: oldEnd, notes: prevNotes });
-                }
-                return;
-            }
-
-            if (lastNote && lastNote.end < start) {
-                sched.push({ start: lastNote.end, end: start, notes: [{ name: "R" }] });
-            }
-
-            sched.push({ start: start, end: end, notes: [note] });
+            if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+            events.push({ time: start, index, note }, { time: end, index });
         });
+
+        events.sort((a, b) => a.time - b.time);
+        const sched = [];
+        // Key by note instance, not pitch: overlapping repetitions have independent endings.
+        const activeNotes = new Map();
+        let start = 0;
+        for (let i = 0; i < events.length;) {
+            const end = events[i].time;
+            if (end > start) {
+                sched.push({
+                    start,
+                    end,
+                    notes: activeNotes.size ? [...activeNotes.values()] : [{ name: "R" }]
+                });
+            }
+            // Apply every change at this boundary before emitting the next interval. This
+            // avoids zero-length chords and keeps notes ending here out of the next chord.
+            while (i < events.length && events[i].time === end) {
+                const event = events[i++];
+                if (event.note) activeNotes.set(event.index, event.note);
+                else activeNotes.delete(event.index);
+            }
+            start = end;
+        }
         return sched;
     }
 
@@ -259,6 +253,8 @@ class MidiTranscriber {
         let k = 0;
         if (this.stopProcessing) return; // Exit if flag is set
         if (!track.notes.length) return;
+        const sched = this.buildSchedule(track);
+        if (!sched.length) return;
         const r = this.jsONON.length;
         const isPercussionTrack =
             track.instrument.percussion && (track.channel === 9 || track.channel === 10);
@@ -282,7 +278,6 @@ class MidiTranscriber {
             [r + 1, ["text", { value: actionBlockName }], 0, 0, [r]]
         );
 
-        const sched = this.buildSchedule(track);
         this.isPercussion.push(isPercussionTrack);
 
         let noteSum = 0;
