@@ -542,7 +542,7 @@ const analyzeProject = activity => {
 
     const blockList = [];
     for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
-        if (activity.blocks.blockList[blk].trash) {
+        if (!activity.blocks.blockList[blk] || activity.blocks.blockList[blk].trash) {
             continue;
         }
 
@@ -893,7 +893,7 @@ const getStatsFromNotation = activity => {
     projectStats["rests"] = 0;
     projectStats["ornaments"] = 0;
     for (const b of blockList) {
-        if (b.trash) {
+        if (!b || b.trash) {
             continue;
         }
         switch (b.name) {

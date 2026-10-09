@@ -1292,6 +1292,54 @@ describe("Blocks Foundation", () => {
             expect(() => blocks._findTwoArgs()).not.toThrow();
             expect(blocks._expandablesList).toEqual([1]);
         });
+
+        describe("after disposeBlock evicts a trashed stack", () => {
+            let blocks;
+
+            beforeEach(() => {
+                mockActivity.palettes.dict.action = { protoList: [] };
+                blocks = new Blocks(mockActivity);
+                blocks.boundary = { hide: jest.fn() };
+                blocks.blockList = [{ trash: true, dispose: jest.fn() }];
+                blocks.disposeBlock(0);
+            });
+
+            it("leaves a null slot in blockList", () => {
+                expect(blocks.blockList).toEqual([null]);
+            });
+
+            it.each([
+                ["updateBlockPositions", b => b.updateBlockPositions()],
+                ["bringToTop", b => b.bringToTop()],
+                ["checkBounds", b => b.checkBounds()],
+                ["unhighlightAll", b => b.unhighlightAll()],
+                ["hide", b => b.hide()],
+                ["show", b => b.show()],
+                ["changeDisabledStatus", b => b.changeDisabledStatus("start", true)],
+                ["findUniqueActionName", b => b.findUniqueActionName("action")],
+                ["findUniqueCustomName", b => b.findUniqueCustomName("custom")],
+                ["findUniqueTemperamentName", b => b.findUniqueTemperamentName("custom")],
+                ["_findDrumURLs", b => b._findDrumURLs()],
+                ["renameBoxes", b => b.renameBoxes("box1", "box2")],
+                ["renameStoreinBoxes", b => b.renameStoreinBoxes("box1", "box2")],
+                ["renameStorein2Boxes", b => b.renameStorein2Boxes("box1", "box2")],
+                ["renameNamedboxes", b => b.renameNamedboxes("box1", "box2")],
+                ["findBlockInstance", b => b.findBlockInstance("start")],
+                ["clearParameterBlocks", b => b.clearParameterBlocks()],
+                ["isCoordinateOnBlock", b => b.isCoordinateOnBlock(0, 0)]
+            ])("%s skips the empty slot", (_, run) => {
+                expect(() => run(blocks)).not.toThrow();
+            });
+
+            it("deleteActionBlock skips the empty slot", async () => {
+                mockActivity.palettes.removeActionPrototype = jest.fn();
+                blocks.blockList.push({ name: "text", value: "chorus", trash: false });
+                const action = { name: "action", connections: [null, 1, null] };
+
+                await expect(blocks.deleteActionBlock(action)).resolves.toBeUndefined();
+                expect(mockActivity.palettes.removeActionPrototype).toHaveBeenCalledWith("chorus");
+            });
+        });
     });
 
     describe("Stack Cleanup And Dock Adjustment", () => {
@@ -1994,6 +2042,13 @@ describe("Blocks Foundation", () => {
             await new Promise(r => setTimeout(r, 50));
             loadContainer.remove();
             delete global.pubsub;
+        });
+
+        it("loads a project when an evicted trash stack left a null slot in blockList", () => {
+            blocks.blockList = [null];
+
+            expect(() => blocks.loadNewBlocks(makeBatch(2))).not.toThrow();
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
         });
 
         it("does not start a second call while a first call is still processing", () => {
