@@ -517,15 +517,21 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 throw new Error("QuotaExceededError");
             });
             jest.spyOn(console, "warn").mockImplementation(() => {});
+            gitDropdown._prefetchCommits = jest.fn();
         });
 
         test("applies the git state and refreshes the menu when the store is full", () => {
-            gitDropdown._syncMenuState = jest.fn();
-            gitDropdown._prefetchCommits = jest.fn();
-
             expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
 
-            expect(gitDropdown._syncMenuState).toHaveBeenCalled();
+            expect(gitDropdown._getRepoName()).toBe("my-repo");
+            expect(gitDropdown._getHashedKey()).toBe("key-1");
+            expect(mockItemCreate.style.display).toBe("none");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
+            expect(mockBtn.setAttribute).toHaveBeenCalledWith(
+                "data-tooltip",
+                "My project: My Repo"
+            );
             expect(gitDropdown._prefetchCommits).toHaveBeenCalled();
         });
 
@@ -536,8 +542,88 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
         });
 
         test("clears a new project and stores a hash without throwing", () => {
+            gitDropdown._applyGitState("my-repo", "key-1", "My Repo");
+
             expect(() => gitDropdown.clearForNewProject()).not.toThrow();
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(mockItemCreate.style.display).toBe("list-item");
+            expect(mockItemCommit.style.display).toBe("none");
+            expect(mockItemHistory.style.display).toBe("none");
+
             expect(() => gitDropdown._setLastSavedHash("hash-1")).not.toThrow();
+            expect(gitDropdown._getLastSavedHash()).toBe("hash-1");
+        });
+
+        test("MB_GIT_STATE and MB_NEW_PROJECT keep the menu usable when storage throws", () => {
+            expect(() => {
+                window.dispatchEvent(
+                    new MessageEvent("message", {
+                        data: {
+                            type: "MB_GIT_STATE",
+                            repoName: "planet-project-xyz",
+                            hashedKey: "planet-key-xyz",
+                            projectName: "Planet Project",
+                            projectId: "p99"
+                        },
+                        origin: window.location.origin,
+                        source: mockIframe.contentWindow
+                    })
+                );
+            }).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("planet-project-xyz");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
+
+            expect(() => {
+                window.dispatchEvent(
+                    new MessageEvent("message", {
+                        data: {
+                            type: "MB_NEW_PROJECT"
+                        },
+                        origin: window.location.origin,
+                        source: mockIframe.contentWindow
+                    })
+                );
+            }).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(mockItemCreate.style.display).toBe("list-item");
+            expect(mockItemCommit.style.display).toBe("none");
+        });
+    });
+
+    describe("Quota-exceeded writes", () => {
+        beforeEach(() => {
+            jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+            gitDropdown._prefetchCommits = jest.fn();
+        });
+
+        test("keeps applied git state readable after a failed persist", () => {
+            expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("my-repo");
+            expect(gitDropdown._getHashedKey()).toBe("key-1");
+            expect(mockItemCreate.style.display).toBe("none");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
+        });
+
+        test("replaces a previously stored repo when the new persist fails", () => {
+            Storage.prototype.setItem.mockRestore();
+            localStorage.setItem("mbGitRepoName", "old-repo");
+            expect(gitDropdown._getRepoName()).toBe("old-repo");
+            jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+
+            expect(() => gitDropdown._applyGitState("new-repo", "key-2", "New Repo")).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("new-repo");
+            expect(mockItemCommit.style.display).toBe("list-item");
         });
     });
 });
