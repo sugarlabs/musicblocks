@@ -15,13 +15,26 @@
 /**
  * The git menu keeps a handful of small keys describing the current project.
  * localStorage throws when the profile blocks storage or has no room left,
- * so read and write through here: the menu keeps working without its stored
- * state rather than failing on an uncaught exception.
+ * so read and write through here. Values stay in memory when persistence
+ * fails, so the menu keeps working for the rest of the session.
  */
 const gitStorage = {
+    _memory: Object.create(null),
+
+    _reset() {
+        this._memory = Object.create(null);
+    },
+
     getItem(key) {
+        if (Object.prototype.hasOwnProperty.call(this._memory, key)) {
+            return this._memory[key];
+        }
         try {
-            return localStorage.getItem(key);
+            const value = localStorage.getItem(key);
+            if (value !== null) {
+                this._memory[key] = value;
+            }
+            return value;
         } catch (e) {
             console.warn(`Could not read the stored git state (${key}):`, e);
             return null;
@@ -29,6 +42,7 @@ const gitStorage = {
     },
 
     setItem(key, value) {
+        this._memory[key] = String(value);
         try {
             localStorage.setItem(key, value);
         } catch (e) {
@@ -39,8 +53,10 @@ const gitStorage = {
     removeItem(key) {
         try {
             localStorage.removeItem(key);
+            delete this._memory[key];
         } catch (e) {
             console.warn(`Could not clear the stored git state (${key}):`, e);
+            this._memory[key] = null;
         }
     }
 };
@@ -50,6 +66,7 @@ class GitDropdownUI {
         this.activity = null;
         this._BASE_URL = "";
         this._prefetchPromise = null;
+        gitStorage._reset();
     }
 
     init(activity) {
