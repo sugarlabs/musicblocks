@@ -2017,7 +2017,8 @@ class Activity {
 
             for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
-                if (!myBlock) continue;
+                // Blocks already in the trash were recorded when they were trashed.
+                if (!myBlock || myBlock.trash) continue;
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -2035,7 +2036,7 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
 
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                    if (turtle !== null) {
                         const primaryTurtle = this.turtles.getTurtle(turtle);
 
                         primaryTurtle.inTrash = true;
@@ -2053,10 +2054,8 @@ class Activity {
                         }
                     }
                 } else if (myBlock.name === "action") {
-                    if (!myBlock.trash) {
-                        this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
-                        actionBlockCounter += 1;
-                    }
+                    this.blocks.deleteActionBlock(myBlock);
+                    actionBlockCounter += 1;
                 }
 
                 this.blocks.blockList[blk].trash = true;
@@ -2201,7 +2200,7 @@ class Activity {
                 // Skip trashed blocks — they are hidden and their backing
                 // canvases are freed in sendStackToTrash(). Re-caching them
                 // here would waste ~0.5–2 MB per trashed block.
-                if (block.trash) return;
+                if (!block || block.trash) return;
 
                 if (block.container) {
                     block.container.uncache();

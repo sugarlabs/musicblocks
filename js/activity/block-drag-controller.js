@@ -987,7 +987,7 @@ class BlockDragController {
                         continue;
                     }
 
-                    if (blocks.blockList[b].trash) {
+                    if (!blocks.blockList[b] || blocks.blockList[b].trash) {
                         continue;
                     }
 
