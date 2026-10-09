@@ -324,6 +324,7 @@ class JSGenerate {
      */
     static generateCode() {
         JSGenerate.generateFailed = false;
+        ASTUtils.skippedBlocks.clear();
 
         JSGenerate.AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
 
@@ -366,6 +367,13 @@ class JSGenerate {
             const AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
             AST["body"].splice(0, 0, ASTUtils.getMouseAST([]));
             JSGenerate.code = astring.generate(AST);
+        } else if (ASTUtils.skippedBlocks.size > 0) {
+            // The export is complete apart from these, so say which blocks were left out
+            // rather than letting the difference pass unnoticed.
+            console.warn(
+                "JAVASCRIPT EXPORT IS INCOMPLETE\nNo mapping for: " +
+                    [...ASTUtils.skippedBlocks].sort().join(", ")
+            );
         }
     }
 
