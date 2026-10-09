@@ -113,6 +113,14 @@ function setupOrnamentActions(activity) {
          * @returns {void}
          */
         static doNeighbor(interval, noteValue, turtle, blk) {
+            if (!Number.isFinite(interval) || !Number.isFinite(noteValue) || noteValue <= 0) {
+                activity.errorMsg(
+                    _("Neighbor inputs must be valid numbers, and note value must be positive."),
+                    blk
+                );
+                return;
+            }
+
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.inNeighbor.push(blk);
