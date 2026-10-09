@@ -261,6 +261,8 @@ class Blocks {
          */
         this._loadQueue = [];
         this._loadInProgress = false;
+        /** Callbacks waiting for the load queue to drain, see runAfterLoad(). */
+        this._afterLoadCallbacks = new Set();
         /**
          * Set while the most recent loadNewBlocks() attempt ended in a
          * chunk-processing failure and cleared at the start of the next
@@ -5041,7 +5043,8 @@ class Blocks {
 
         /**
          * Marks the current load as finished and, if another load was
-         * queued while it ran, starts that one.
+         * queued while it ran, starts that one. Otherwise runs whatever
+         * was waiting on runAfterLoad().
          * @private
          * @returns {void}
          */
@@ -5052,7 +5055,49 @@ class Blocks {
                 const next = this._loadQueue.shift();
                 this._loadInProgress = true;
                 this._loadNewBlocksNow(next.blockObjs, next.loadToken);
+                return;
             }
+
+            const callbacks = [...this._afterLoadCallbacks];
+            this._afterLoadCallbacks.clear();
+
+            // A failed load leaves only part of the project behind, which is
+            // exactly what the waiting callbacks were held back from seeing.
+            if (this._lastLoadFailed) return;
+
+            for (const callback of callbacks) {
+                try {
+                    callback();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        /**
+         * Whether a project is still being loaded. Until the load finishes,
+         * blockList holds only the blocks created so far, so the workspace
+         * must not be exported or saved.
+         * @public
+         * @returns {boolean}
+         */
+        this.isLoading = () => this._loadInProgress;
+
+        /**
+         * Runs callback once every pending load has finished, or right away
+         * if nothing is loading. Passing the same callback again while it is
+         * waiting does not queue it twice.
+         * @public
+         * @param {Function} callback
+         * @returns {void}
+         */
+        this.runAfterLoad = callback => {
+            if (!this._loadInProgress) {
+                callback();
+                return;
+            }
+
+            this._afterLoadCallbacks.add(callback);
         };
 
         /**

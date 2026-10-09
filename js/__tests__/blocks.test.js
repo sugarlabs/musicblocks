@@ -2309,6 +2309,74 @@ describe("Blocks Foundation", () => {
                 window.removeEventListener("error", onWindowError);
             }
         });
+
+        it("runAfterLoad runs the callback right away when nothing is loading", () => {
+            const callback = jest.fn();
+
+            blocks.runAfterLoad(callback);
+
+            expect(blocks.isLoading()).toBe(false);
+            expect(callback).toHaveBeenCalledTimes(1);
+        });
+
+        it("runAfterLoad waits for every queued load and runs a repeated callback once", async () => {
+            const seen = [];
+            const callback = jest.fn(() =>
+                seen.push([blocks.isLoading(), blocks.blockList.length])
+            );
+            const bothLoadsFinished = new Promise(resolve => {
+                let count = 0;
+                global.pubsub.on("finishedLoading", () => {
+                    count += 1;
+                    if (count === 2) resolve();
+                });
+            });
+
+            blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(makeBatch(3));
+            expect(blocks.isLoading()).toBe(true);
+
+            blocks.runAfterLoad(callback);
+            blocks.runAfterLoad(callback);
+            expect(callback).not.toHaveBeenCalled();
+
+            await bothLoadsFinished;
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(seen).toEqual([[false, 28]]);
+        });
+
+        it("runAfterLoad drops its callbacks when the load fails partway", async () => {
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("deferred chunk failure");
+                }
+                blocks.blockList[blockOffset + b] = { connections: null, trash: false };
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+            const callback = jest.fn();
+
+            try {
+                blocks.loadNewBlocks(makeBatch(25));
+                blocks.runAfterLoad(callback);
+                await new Promise(r => setTimeout(r, 50));
+            } finally {
+                window.removeEventListener("error", onWindowError);
+            }
+
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(callback).not.toHaveBeenCalled();
+
+            blocks._processOneBlock = stubProcessOneBlock();
+            blocks.loadNewBlocks(makeBatch(2));
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(callback).not.toHaveBeenCalled();
+        });
     });
 
     describe("ProjectManager recovery keeps _loadInProgress correct end to end (#8855)", () => {

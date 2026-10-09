@@ -100,6 +100,8 @@ const makeActivity = (overrides = {}) => ({
     blocks: {
         blockList: [],
         loadNewBlocks: jest.fn(),
+        isLoading: jest.fn(() => false),
+        runAfterLoad: jest.fn(),
         palettes: { dict: {} },
         customTemperamentDefined: false
     },
@@ -1113,6 +1115,30 @@ describe("saveLocally", () => {
         expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
             operation: "saveLocally_saveSession"
         });
+    });
+
+    it("keeps the saved session until a project load has finished", () => {
+        const storage = { "currentProject": "My Project", "SESSIONMy Project": "[saved]" };
+        const activity = makeActivity({ storage, canvas: { width: 100 } });
+        activity.blocks.isLoading.mockReturnValue(true);
+        const pm = new ProjectManager(activity);
+        pm.prepareExport = jest.fn(() => "[partial]");
+
+        pm.saveLocally();
+        pm.saveLocally();
+
+        expect(pm.prepareExport).not.toHaveBeenCalled();
+        expect(storage["SESSIONMy Project"]).toBe("[saved]");
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(2);
+        expect(activity.blocks.runAfterLoad.mock.calls[1][0]).toBe(
+            activity.blocks.runAfterLoad.mock.calls[0][0]
+        );
+
+        activity.blocks.isLoading.mockReturnValue(false);
+        pm.prepareExport.mockReturnValue("[full]");
+        activity.blocks.runAfterLoad.mock.calls[0][0]();
+
+        expect(storage["SESSIONMy Project"]).toBe("[full]");
     });
 });
 
