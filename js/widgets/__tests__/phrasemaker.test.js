@@ -502,6 +502,48 @@ describe("PhraseMaker Widget", () => {
             expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(1);
         });
 
+        test("keeps the turtle that ran the block for the graphics rows (#9330)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [0, 1].map(() => ({
+                singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" }
+            }));
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+
+            callInitPartial(pm, activity, 1);
+
+            expect(pm._turtle).toBe(turtles[1]);
+        });
+
+        test("keeps that turtle when the widget rebuilds itself (sort, add row, ...)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [
+                { singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" } },
+                { singer: { beatsPerMeasure: 3, noteValuePerBeat: 4, keySignature: "C major" } }
+            ];
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+            callInitPartial(pm, activity, 1);
+
+            // _sort, _restartGrid, pitchBlockAdded and adding a row call init(this.activity).
+            callInitPartial(pm, activity, undefined);
+
+            expect(pm._turtle).toBe(turtles[1]);
+            // The meter is still read from that turtle: 3/4.
+            expect(pm._measureLimit).toBeCloseTo(0.75);
+        });
+
+        test("takes the turtle the block gives on a new run", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [0, 1].map(() => ({
+                singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" }
+            }));
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+            callInitPartial(pm, activity, 1);
+
+            callInitPartial(pm, activity, 0);
+
+            expect(pm._turtle).toBe(turtles[0]);
+        });
+
         test("falls back to 4/4 when singer meter is not yet initialized", () => {
             const pm = new PhraseMaker(mockDeps);
             // meterByIndex is empty: beats/noteValue are undefined, || 4 applies
