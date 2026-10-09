@@ -1474,6 +1474,17 @@ describe("Logo runLogoCommands", () => {
         expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 1, 1, 0, null);
     });
 
+    test("stops recording BPM blocks for the Tempo widget left from the last run", () => {
+        // A run stopped inside a Tempo block never reaches the block's listener.
+        logo.inTempo = true;
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.inTempo).toBe(false);
+    });
+
     test("falls back to default cursor when no start stacks", () => {
         mockActivity.blocks.stackList = [];
         logo.blockList = [];

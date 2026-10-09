@@ -20,10 +20,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.TempoWindow = require("../TempoWindow.js");
+global.TempoRows = require("../TempoRows.js");
+global.TempoKeyboard = require("../TempoKeyboard.js");
+global.TempoTap = require("../TempoTap.js");
+global.TempoControls = require("../TempoControls.js");
+global.TempoMetronome = require("../TempoMetronome.js");
+global.TempoSave = require("../TempoSave.js");
 const Tempo = require("../tempo.js");
+global.Tempo = Tempo;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
+global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+global.TONEBPM = 240;
+global.Singer = { masterBPM: 90, defaultBPMFactor: 240 / 90 };
 global.getDrumSynthName = jest.fn();
 
 const mockWidgetWindowInstance = {
@@ -213,6 +224,25 @@ describe("Tempo Widget", () => {
 
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 expect.stringContaining("Please enter a number"),
+                null,
+                null,
+                3000
+            );
+        });
+
+        test.each(["", "   "])("rejects an empty input (%p) and keeps the tempo", value => {
+            tempoWidget.BPMs[0] = 120;
+            tempoWidget.BPMInputs[0].value = value;
+            const updateSpy = jest.spyOn(tempoWidget, "_updateBPM");
+
+            tempoWidget._useBPM(0);
+
+            expect(tempoWidget.BPMs[0]).toBe(120);
+            expect(updateSpy).not.toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Please enter a number"),
+                null,
+                null,
                 3000
             );
         });
@@ -252,18 +282,25 @@ describe("Tempo Widget", () => {
 
             expect(tempoWidget.BPMInputs[0].value).toBe(150);
         });
-
-        test("should clamp empty string input to 30", () => {
-            tempoWidget.BPMInputs[0].value = "";
-
-            tempoWidget._useBPM(0);
-
-            expect(tempoWidget.BPMs[0]).toBe(30);
-            expect(mockActivity.errorMsg).toHaveBeenCalled();
-        });
     });
 
     // --- _updateBPM() tests ---
+    describe("error messages", () => {
+        test("pass 3000 as the timeout, not as the block to point at", () => {
+            // errorMsg(msg, blk, text, timeout): a block id of 3000 would draw the error arrow to
+            // block 3000 of a large project.
+            tempoWidget.BPMInputs = [{ value: "abc" }];
+            tempoWidget._useBPM(0);
+            tempoWidget.speedUp(0, 5000);
+            tempoWidget.slowDown(0, 5000);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledTimes(3);
+            for (const call of mockActivity.errorMsg.mock.calls) {
+                expect(call.slice(1)).toEqual([null, null, 3000]);
+            }
+        });
+    });
+
     describe("_updateBPM() block synchronization", () => {
         test("should update interval based on BPM", () => {
             tempoWidget.BPMs[0] = 120;
@@ -279,6 +316,7 @@ describe("Tempo Widget", () => {
                 connections: [null, 1]
             };
             const mockValueBlock = {
+                name: "number",
                 value: 100,
                 text: { text: "100" },
                 updateCache: jest.fn()
@@ -409,6 +447,33 @@ describe("Tempo Widget", () => {
                 expect(global.Singer.masterBPM).toBe(120);
                 expect(turtles.map(t => t.singer.bpm)).toEqual([[90], [200], []]);
             });
+        });
+
+        test("leaves an expression in the BPM slot alone but still sets the tempo", () => {
+            // 60 x 2 works its value out again on the next run, so the widget can't store a
+            // BPM in it.
+            const multiplyBlock = {
+                name: "multiply",
+                value: null,
+                text: { text: "" },
+                updateCache: jest.fn()
+            };
+            mockActivity.blocks.blockList = {
+                0: { name: "setmasterbpm2", connections: [null, 1] },
+                1: multiplyBlock
+            };
+            tempoWidget.BPMBlocks[0] = 0;
+            tempoWidget.BPMs[0] = 132;
+            global.Singer.masterBPM = 120;
+
+            tempoWidget._updateBPM(0);
+
+            expect(multiplyBlock.value).toBeNull();
+            expect(multiplyBlock.text.text).toBe("");
+            expect(multiplyBlock.updateCache).not.toHaveBeenCalled();
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+            expect(global.Singer.masterBPM).toBe(132);
+            expect(tempoWidget._intervals[0]).toBeCloseTo(60000 / 132);
         });
 
         test("should not throw when connection is null", () => {
@@ -992,6 +1057,37 @@ describe("Tempo Widget", () => {
             expect(ctx2.ellipse).toHaveBeenCalled();
         });
     });
+    describe("_draw() with more than one row", () => {
+        test("draws a row on its beat at its own edge, not at the row before's position", () => {
+            const ctxs = [0, 1].map(() => ({
+                clearRect: jest.fn(),
+                beginPath: jest.fn(),
+                ellipse: jest.fn(),
+                fill: jest.fn(),
+                closePath: jest.fn()
+            }));
+            tempoWidget.tempoCanvases = ctxs.map(ctx => ({
+                width: 300,
+                height: 150,
+                getContext: () => ctx
+            }));
+            const now = Date.now();
+            tempoWidget.BPMs = [100, 100];
+            tempoWidget._intervals = [600, 600];
+            tempoWidget._directions = [1, 1];
+            tempoWidget._widgetFirstTimes = [now, now];
+            // Row 0 is half way across; row 1's beat is due.
+            tempoWidget._widgetNextTimes = [now + 300, now - 1];
+
+            tempoWidget._draw();
+
+            expect(ctxs[0].ellipse.mock.calls[0][0]).toBe(150);
+            // Row 1 flips direction on its beat and is drawn at the left edge.
+            expect(tempoWidget._directions[1]).toBe(-1);
+            expect(ctxs[1].ellipse.mock.calls[0][0]).toBe(0);
+        });
+    });
+
     describe("init() - Additional Coverage", () => {
         test("should clear existing interval when re-initializing", () => {
             tempoWidget.BPMs = [100];
@@ -1149,6 +1245,8 @@ describe("Tempo Widget", () => {
             expect(tempoWidget.BPMs[0]).toBe(30);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "The beats per minute must be between 30 and 1000.",
+                null,
+                null,
                 3000
             );
         });
@@ -1574,6 +1672,8 @@ describe("Tempo Widget", () => {
             expect(tempoWidget.BPMs[0]).toBe(1000);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "The beats per minute must be below 1000.",
+                null,
+                null,
                 3000
             );
 
@@ -1586,6 +1686,8 @@ describe("Tempo Widget", () => {
             expect(tempoWidget.BPMs[0]).toBe(30);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "The beats per minute must be above 30",
+                null,
+                null,
                 3000
             );
 
@@ -1890,5 +1992,268 @@ describe("Tap Tempo feature", () => {
         // Advancing 150ms completes the reset
         jest.advanceTimersByTime(150);
         expect(tempoWidget._tapButtonTimeout).toBeNull();
+    });
+});
+
+describe("Tempo widget beat value (#9309)", () => {
+    let tempo, activity, numberBlock, turtle;
+
+    // A row for a BPM block with the BPM 120 and the given beat value.
+    const makeRow = (name, beatValue) => {
+        numberBlock = {
+            name: "number",
+            value: 120,
+            text: { text: "120" },
+            updateCache: jest.fn()
+        };
+        activity.blocks.blockList = { bpm: { name, connections: [null, "num"] }, num: numberBlock };
+        tempo.BPMs = [120];
+        tempo.BPMBlocks = ["bpm"];
+        tempo.beatValues = [beatValue];
+        tempo.BPMInputs = [{ value: 120 }];
+        tempo._intervals = [500];
+    };
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        turtle = { singer: { bpm: [60] } };
+        activity = {
+            blocks: { blockList: {}, loadNewBlocks: jest.fn() },
+            turtles: { turtleList: [turtle] },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn(),
+            textMsg: jest.fn(),
+            errorMsg: jest.fn()
+        };
+        tempo = new Tempo();
+        tempo.activity = activity;
+        Singer.masterBPM = 60;
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test("a master BPM row converts to quarter notes with its beat value", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+
+        tempo.speedUp(0);
+
+        // 132 eighth notes a minute is 66 quarter notes, as running the block gives.
+        expect(tempo.BPMs[0]).toBe(132);
+        expect(numberBlock.value).toBe(132);
+        expect(Singer.masterBPM).toBe(66);
+        expect(Singer.defaultBPMFactor).toBe(TONEBPM / 66);
+        // The metronome still beats every eighth note.
+        expect(tempo._intervals[0]).toBeCloseTo(60000 / 132);
+    });
+
+    test("a set BPM row gives its turtle the tempo in quarter notes", () => {
+        makeRow("setbpm3", 1 / 2);
+        tempo.BPMTurtles = [turtle];
+
+        tempo.BPMInputs[0].value = "100";
+        tempo._useBPM(0);
+
+        expect(turtle.singer.bpm).toEqual([200]);
+    });
+
+    test("a row with a beat value of 1/4 is unchanged", () => {
+        makeRow("setmasterbpm2", 1 / 4);
+
+        tempo.slowDown(0, 20);
+
+        expect(Singer.masterBPM).toBe(100);
+    });
+
+    test("a row without a beat value counts quarter notes", () => {
+        makeRow("setmasterbpm", undefined);
+        tempo.beatValues = [];
+
+        tempo.speedUp(0, 10);
+
+        expect(Singer.masterBPM).toBe(130);
+    });
+
+    test("the limits are 30 to 1000 quarter notes in the row's beats", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+        expect(tempo._bpmLimits(0)).toEqual([60, 2000]);
+
+        tempo.beatValues = [1 / 4];
+        expect(tempo._bpmLimits(0)).toEqual([30, 1000]);
+
+        tempo.beatValues = [1];
+        // 7.5 is rounded up, so the row never goes below 30 quarter notes.
+        expect(tempo._bpmLimits(0)).toEqual([8, 250]);
+    });
+
+    test("1500 eighth notes a minute is allowed, as the block allows it", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+
+        tempo.BPMInputs[0].value = "1500";
+        tempo._useBPM(0);
+
+        expect(tempo.BPMs[0]).toBe(1500);
+        expect(Singer.masterBPM).toBe(750);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    test("a row is clamped at its own limits, with the block's message", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+
+        tempo.BPMInputs[0].value = "40";
+        tempo._useBPM(0);
+
+        expect(tempo.BPMs[0]).toBe(60);
+        expect(Singer.masterBPM).toBe(30);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            "1/8 beats per minute must be greater than 60",
+            null,
+            null,
+            3000
+        );
+
+        tempo.speedUp(0, 5000);
+
+        expect(tempo.BPMs[0]).toBe(2000);
+        expect(Singer.masterBPM).toBe(1000);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            "maximum 1/8 beats per minute is 2000",
+            null,
+            null,
+            3000
+        );
+    });
+
+    test("a row with a beat value of 1/4 keeps the widget's own messages", () => {
+        makeRow("setmasterbpm2", 1 / 4);
+
+        tempo.slowDown(0, 500);
+
+        expect(tempo.BPMs[0]).toBe(30);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            "The beats per minute must be above 30",
+            null,
+            null,
+            3000
+        );
+    });
+
+    test("tap tempo clamps to the row's limits", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+        jest.setSystemTime(10000);
+        tempo.tapTempo(0);
+        // Taps 1.5 seconds apart are 40 a minute, below the 60 eighth notes allowed.
+        jest.setSystemTime(11500);
+
+        expect(tempo.tapTempo(0)).toBe(60);
+        expect(Singer.masterBPM).toBe(30);
+    });
+
+    test("clicking the canvas accepts a BPM within the row's limits", () => {
+        makeRow("setmasterbpm2", 1 / 2);
+        jest.setSystemTime(10000);
+        tempo._onCanvasClick(0);
+        // 3 seconds is 20 a minute: too slow for 1/4 beats, but 1/2 beats allow down to 15.
+        jest.setSystemTime(13000);
+        tempo._onCanvasClick(0);
+
+        expect(tempo.BPMs[0]).toBe(20);
+        expect(Singer.masterBPM).toBe(40);
+    });
+
+    test("save keeps the row's beat value", () => {
+        makeRow("setmasterbpm2", 1 / 8);
+        tempo.BPMs = [132];
+
+        tempo.__save(0);
+        jest.advanceTimersByTime(200);
+
+        const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(stack[1][1][1].value).toBe(132);
+        expect(stack[3][1][1].value).toBe(1);
+        expect(stack[4][1][1].value).toBe(8);
+    });
+
+    test("save writes 1/4 for a row without a beat value", () => {
+        tempo.BPMs = [100];
+
+        tempo.__save(0);
+        jest.advanceTimersByTime(200);
+
+        const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(stack[3][1][1].value).toBe(1);
+        expect(stack[4][1][1].value).toBe(4);
+    });
+});
+
+describe("Tempo modules", () => {
+    const MODULES = [
+        "TempoWindow",
+        "TempoRows",
+        "TempoKeyboard",
+        "TempoTap",
+        "TempoControls",
+        "TempoMetronome",
+        "TempoSave"
+    ];
+
+    test("lists every module, and itself last, as its lazy-loading dependencies", () => {
+        expect(Tempo.dependencies).toEqual([
+            ...MODULES.map(name => "widgets/" + name),
+            "widgets/tempo"
+        ]);
+    });
+
+    test("the Tempo block falls back to the same dependencies", () => {
+        const source = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "..", "blocks", "WidgetBlocks.js"),
+            "utf8"
+        );
+        const site = source.slice(source.indexOf('typeof Tempo !== "undefined"'));
+        const fallback = site.slice(site.indexOf("["), site.indexOf("]") + 1);
+
+        expect(JSON.parse(fallback)).toEqual(Tempo.dependencies);
+    });
+
+    test("installModules waits until every module is loaded", () => {
+        jest.isolateModules(() => {
+            const saved = global.TempoSave;
+            delete global.TempoSave;
+            try {
+                const Fresh = require("../tempo.js");
+                expect(Fresh.installModules()).toBe(false);
+                expect(Fresh.prototype._saveTempo).toBeUndefined();
+
+                global.TempoSave = saved;
+                expect(Fresh.installModules()).toBe(true);
+                expect(Fresh.prototype._saveTempo).toBe(saved.prototype._saveTempo);
+            } finally {
+                global.TempoSave = saved;
+            }
+        });
+    });
+
+    test("no two modules define the same method", () => {
+        const seen = new Set();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(seen.has(method)).toBe(false);
+                    seen.add(method);
+                }
+            }
+        }
+    });
+
+    test("a widget has every module method", () => {
+        const tempo = new Tempo();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(typeof tempo[method]).toBe("function");
+                }
+            }
+        }
     });
 });

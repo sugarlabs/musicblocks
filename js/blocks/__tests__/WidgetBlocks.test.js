@@ -100,7 +100,16 @@ global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
-global.Tempo.dependencies = ["widgets/tempo"];
+global.Tempo.dependencies = [
+    "widgets/TempoWindow",
+    "widgets/TempoRows",
+    "widgets/TempoKeyboard",
+    "widgets/TempoTap",
+    "widgets/TempoControls",
+    "widgets/TempoMetronome",
+    "widgets/TempoSave",
+    "widgets/tempo"
+];
 global.TimbreWidget = jest.fn(() => ({
     instrumentName: "testInstrument",
     blockNo: null,
@@ -488,6 +497,20 @@ describe("setupWidgetBlocks", () => {
             expect(logo.tempo.BPMTurtles).toEqual([]);
             expect(logo.tempo.BPMBlocks).toEqual([]);
             expect(logo.tempo.BPMs).toEqual([]);
+        });
+
+        it("stops recording BPM blocks once the widget opens", () => {
+            const tempo = getBlock("tempo");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            expect(logo.inTempo).toBe(true);
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.tempo.init).toHaveBeenCalledWith(activity);
+            // A BPM block after the Tempo block must not add a row to the widget.
+            expect(logo.inTempo).toBe(false);
         });
     });
 

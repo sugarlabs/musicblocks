@@ -917,6 +917,13 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "tempo",
                 _getWidgetDependencies(typeof Tempo !== "undefined" ? Tempo : null, [
+                    "widgets/TempoWindow",
+                    "widgets/TempoRows",
+                    "widgets/TempoKeyboard",
+                    "widgets/TempoTap",
+                    "widgets/TempoControls",
+                    "widgets/TempoMetronome",
+                    "widgets/TempoSave",
                     "widgets/tempo"
                 ]),
                 () => new Tempo(),
@@ -930,12 +937,14 @@ function setupWidgetBlocks(activity) {
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
             logo.tempo.BPMTurtles = [];
+            logo.tempo.beatValues = [];
 
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
                 logo.tempo.init(activity);
+                logo.inTempo = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
