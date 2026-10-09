@@ -4291,16 +4291,20 @@ const piemenuKey = activity => {
     const x = event.clientX;
     const y = event.clientY;
     const bounds = getWheelSafeBounds({ activity });
-    const wheelSize = Math.max(0, Math.min(350, bounds.rightBound - bounds.safeLeft - 8));
     const chooseKeyDiv = docById("chooseKeyDiv");
-    chooseKeyDiv.style.width = wheelSize + "px";
-    chooseKeyDiv.style.height = wheelSize + "px";
     const movableDiv = docById("movable");
     const movableRect =
         typeof movableDiv.getBoundingClientRect === "function"
             ? movableDiv.getBoundingClientRect()
             : null;
     const movableHeight = movableDiv.offsetHeight || (movableRect && movableRect.height) || 0;
+    const availableHeight = bounds.bottomBound - bounds.safeTop - movableHeight - 8;
+    const wheelSize = Math.max(
+        0,
+        Math.min(350, bounds.rightBound - bounds.safeLeft - 8, availableHeight)
+    );
+    chooseKeyDiv.style.width = wheelSize + "px";
+    chooseKeyDiv.style.height = wheelSize + "px";
     const maxLeft = Math.max(bounds.safeLeft, bounds.rightBound - wheelSize - 8);
     const maxTop = Math.max(bounds.safeTop, bounds.bottomBound - wheelSize - movableHeight - 8);
     const left = Math.min(maxLeft, Math.max(bounds.safeLeft, x - wheelSize / 2));
