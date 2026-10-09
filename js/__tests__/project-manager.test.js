@@ -2738,6 +2738,83 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(() => handlers.change()).not.toThrow();
     });
 
+    it("change handler parses ABC files through ABCJS and activity.parseABC", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.ensureABCJS.mockResolvedValueOnce(undefined);
+        global.ABCJS.parseOnly.mockReturnValueOnce([{ header: {} }]);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.abc" }];
+        handlers.change();
+        await readers[2].promise;
+
+        expect(global.ensureABCJS).toHaveBeenCalledTimes(1);
+        expect(global.ABCJS.parseOnly).toHaveBeenCalledWith("X:1\nK:C\nC");
+        expect(activity.parseABC).toHaveBeenCalledWith({ header: {} });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler reports rejected ABCJS loading and restores state", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        const abcError = new Error("ABCJS unavailable");
+        global.ensureABCJS.mockRejectedValueOnce(abcError);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.abc" }];
+        handlers.change();
+        await readers[2].promise;
+
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(abcError, {
+            operation: "abcImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(activity.parseABC).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
     it("drop handler cleans up when file is empty", () => {
         origFileReader = global.FileReader;
         class MockFR {
