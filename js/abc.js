@@ -343,6 +343,26 @@ class AbcExporter {
         this.parts.push(decoration);
     }
 
+    /**
+     * Attaches a decoration to the note already written rather than the one still
+     * to come. The end of a hairpin is staged after the last note it covers, but
+     * in ABC a decoration goes in front of the note it belongs to.
+     *
+     * @param {string} decoration - the ABC decoration, e.g. "!<)!".
+     * @returns {void}
+     */
+    __pushOnLastNote(decoration) {
+        if (this.lastNoteStart === null) {
+            this.__pushPrefix(decoration);
+            return;
+        }
+
+        this.parts.splice(this.lastNoteStart, 0, decoration);
+        if (this.prefixStart !== null) {
+            this.prefixStart++;
+        }
+    }
+
     __pushField(field, ownLine = false) {
         const at = this.prefixStart === null ? this.parts.length : this.prefixStart;
         const written = this.parts.slice(0, at).join("");
@@ -385,13 +405,13 @@ class AbcExporter {
                 this.__pushPrefix("!<(!");
                 break;
             case "end crescendo":
-                this.__pushPrefix("!<)!");
+                this.__pushOnLastNote("!<)!");
                 break;
             case "begin decrescendo":
                 this.__pushPrefix("!>(!");
                 break;
             case "end decrescendo":
-                this.__pushPrefix("!>)!");
+                this.__pushOnLastNote("!>)!");
                 break;
             case "begin slur":
                 this.queueSlur++;
