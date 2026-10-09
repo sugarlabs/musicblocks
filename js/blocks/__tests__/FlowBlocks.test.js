@@ -709,6 +709,35 @@ describe("FlowBlocks integration", () => {
             };
             expectUnrolled();
         });
+
+        test("unrolls a loop with a Stop mouse in its body", () => {
+            activity.blocks.blockList = {
+                60: { name: "newnote", connections: [10, null, null, 61] },
+                61: { name: "stopTurtle", connections: [60, 62, null] },
+                62: { name: "text", value: "start", connections: [61] }
+            };
+            expectUnrolled();
+        });
+
+        test("unrolls a loop with a Stop mouse inside a nested loop", () => {
+            activity.blocks.blockList = {
+                60: { name: "repeat", connections: [10, 61, 62, null] },
+                61: { name: "number", value: 4, connections: [60] },
+                62: { name: "stopTurtle", connections: [60, null, null] }
+            };
+            expectUnrolled();
+        });
+
+        test("unrolls a loop whose nested loop calls an action with a Stop mouse", () => {
+            activity.blocks.blockList = {
+                60: { name: "repeat", connections: [10, 61, 62, null] },
+                61: { name: "number", value: 4, connections: [60] },
+                62: { name: "nameddo", privateData: "chorus", connections: [60, null] },
+                70: { name: "stopTurtle", connections: [null, null, null] }
+            };
+            logo.actions = { chorus: 70 };
+            expectUnrolled();
+        });
     });
 
     test("RepeatBlock validates number and repeats child", () => {
