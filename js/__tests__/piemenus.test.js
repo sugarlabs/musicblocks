@@ -1143,6 +1143,53 @@ describe("piemenuKey behavioral tests", () => {
         expect(titles.length).toBe(4);
     });
 
+    test("opens clear of the palette", () => {
+        const chooseKeyDiv = { style: { display: "" } };
+        const movable = {
+            style: { display: "" },
+            getBoundingClientRect: () => ({ height: 70 })
+        };
+        const previousDocById = global.docById;
+        mockActivity.palettes = { collapsed: false, paletteWidth: 165 };
+        global.docById = jest.fn(id => {
+            if (id === "chooseKeyDiv") return chooseKeyDiv;
+            if (id === "movable") return movable;
+            if (id === "palette") {
+                return {
+                    style: { display: "", visibility: "", transform: "" },
+                    getBoundingClientRect: () => ({ right: 128 })
+                };
+            }
+            if (id === "toolbars") {
+                return {
+                    style: { display: "", visibility: "" },
+                    getBoundingClientRect: () => ({ bottom: 64 })
+                };
+            }
+            return {
+                style: { display: "none" },
+                getBoundingClientRect: () => ({ right: 0, bottom: 0, height: 0 })
+            };
+        });
+        global.document.getElementById = global.docById;
+        window.innerWidth = 1280;
+        window.innerHeight = 720;
+        global.event = { clientX: 194, clientY: 91 };
+
+        try {
+            piemenuKey(mockActivity);
+        } finally {
+            global.docById = previousDocById;
+            global.document.getElementById = previousDocById;
+            delete mockActivity.palettes;
+        }
+
+        expect(parseInt(chooseKeyDiv.style.left, 10)).toBe(173);
+        expect(parseInt(chooseKeyDiv.style.top, 10)).toBe(141);
+        expect(parseInt(movable.style.left, 10)).toBe(238);
+        expect(parseInt(movable.style.top, 10)).toBe(491);
+    });
+
     test("updates an existing setkey block in place instead of creating a new one", () => {
         mockActivity.storage.KeySignatureEnv = "G,dorian,false";
         mockActivity.blocks.blockList = {

@@ -4290,11 +4290,23 @@ const piemenuKey = activity => {
 
     const x = event.clientX;
     const y = event.clientY;
+    const wheelSize = 350;
+    const bounds = getWheelSafeBounds({ activity });
+    const movableDiv = docById("movable");
+    const movableRect =
+        typeof movableDiv.getBoundingClientRect === "function"
+            ? movableDiv.getBoundingClientRect()
+            : null;
+    const movableHeight = movableDiv.offsetHeight || (movableRect && movableRect.height) || 0;
+    const maxLeft = Math.max(bounds.safeLeft, bounds.rightBound - wheelSize - 8);
+    const maxTop = Math.max(bounds.safeTop, bounds.bottomBound - wheelSize - movableHeight - 8);
+    const left = Math.min(maxLeft, Math.max(bounds.safeLeft, x - wheelSize / 2));
+    const top = Math.min(maxTop, Math.max(bounds.safeTop, y + 50));
 
-    docById("chooseKeyDiv").style.left = x - 175 + "px";
-    docById("chooseKeyDiv").style.top = y + 50 + "px";
-    docById("movable").style.left = x - 110 + "px";
-    docById("movable").style.top = y + 400 + "px";
+    docById("chooseKeyDiv").style.left = left + "px";
+    docById("chooseKeyDiv").style.top = top + "px";
+    movableDiv.style.left = left + 65 + "px";
+    movableDiv.style.top = top + wheelSize + "px";
 
     const __exitMenu = () => {
         docById("chooseKeyDiv").style.display = "none";
