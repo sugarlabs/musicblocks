@@ -826,9 +826,7 @@ function AIWidget() {
                         cancelText: _("Cancel")
                     });
                 } else {
-                    key = prompt(
-                        _("Enter your Groq API Key: %s").replace(/%s/g, currentKey)
-                    );
+                    key = prompt(_("Enter your Groq API Key: %s").replace(/%s/g, currentKey));
                 }
 
                 if (key !== null) {
