@@ -120,8 +120,8 @@ var getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
 };
 
 /**
- * The 12-EDO pitch class a note name sounds as, whatever its spelling: G♯ and A♭ are
- * both 8, F𝄪 and G are both 7.
+ * The 12-EDO pitch class a note name sounds as, whatever its spelling: G♯, A♭ and G# are
+ * all 8, F𝄪 and G are both 7. ASCII # and b are read as ♯ and ♭.
  * @function
  * @param {string} name - A note name such as "G♯" or "B𝄫".
  * @returns {number} 0 to 11, or NaN for a name it cannot read.
@@ -132,7 +132,14 @@ var _notePitchClass = name => {
     }
     let semitones = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[name[0]];
     for (const symbol of name.slice(1)) {
-        semitones += { [DOUBLEFLAT]: -2, [FLAT]: -1, [SHARP]: 1, [DOUBLESHARP]: 2 }[symbol];
+        semitones += {
+            [DOUBLEFLAT]: -2,
+            [FLAT]: -1,
+            "b": -1,
+            [SHARP]: 1,
+            "#": 1,
+            [DOUBLESHARP]: 2
+        }[symbol];
     }
     return ((semitones % 12) + 12) % 12;
 };
@@ -964,14 +971,16 @@ var getInterval = (interval, keySignature, pitch, edo) => {
         pitch = FIXEDSOLFEGE[pitch];
     }
 
-    let ii;
+    // Read ASCII accidentals ("Bb", "F#") as ♭ and ♯ first, so those pitches go
+    // through the same search, including the step to a nearby note in the scale.
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
-        ii = indexInScale(pitch);
     } else if (pitch in STOSHARP) {
         pitch = STOSHARP[pitch];
-        ii = indexInScale(pitch);
-    } else if (indexInScale(pitch) !== -1) {
+    }
+
+    let ii;
+    if (indexInScale(pitch) !== -1) {
         ii = indexInScale(pitch);
     } else {
         ii = indexInScale(pitch);

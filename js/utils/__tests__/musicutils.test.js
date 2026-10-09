@@ -2353,13 +2353,15 @@ describe("getStepSize", () => {
     });
 
     it('should return the correct step size for "F#" in "F# major" going up', () => {
+        // Same as "F♯ major" / "F♯": F♯ up to G♯.
         const result = _getStepSize("F# major", "F#", "up", 0, "equal");
-        expect(result).toBe(0);
+        expect(result).toBe(2);
     });
 
     it('should return the correct step size for "G#" in "G# major" going down', () => {
+        // Same as "G♯ major" / "G♯": G♯ down to F𝄪.
         const result = _getStepSize("G# major", "G#", "down", 0, "equal");
-        expect(result).toBe(0);
+        expect(result).toBe(-1);
     });
 
     it("should step to the next scale note however the scale spells it", () => {
@@ -2369,6 +2371,10 @@ describe("getStepSize", () => {
         expect(_getStepSize("A harmonic minor", "A", "down", 0, "equal")).toBe(-1);
         // C is not in D major; the next note up is C♯.
         expect(_getStepSize("D major", "C", "up", 0, "equal")).toBe(1);
+        // ASCII accidentals are read as ♯ and ♭.
+        expect(_getStepSize("A harmonic minor", "G#", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("D major", "C#", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("B♭ major", "Bb", "up", 0, "equal")).toBe(2);
     });
 
     it("should keep the named enharmonic rules in other temperaments", () => {
@@ -2463,8 +2469,10 @@ describe("getInterval", () => {
         expect(getInterval(1, "C major", "C♯")).toBe(2);
         // D♭ is not in C major: step down from C, the next note below.
         expect(getInterval(-1, "C major", "D♭")).toBe(-1);
-        // An ASCII sharp is read as ♯.
+        // ASCII accidentals are read as ♯ and ♭, inside or outside the scale.
         expect(getInterval(1, "G major", "F#")).toBe(1);
+        expect(getInterval(1, "C major", "C#")).toBe(2);
+        expect(getInterval(1, "A harmonic minor", "G#")).toBe(1);
     });
 
     it("should keep matching notes by name in other temperaments", () => {
@@ -4373,8 +4381,8 @@ describe("_getStepSize with temperament", () => {
     });
 
     it("should return correct step size for sharps and flats", () => {
-        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(0);
-        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(0);
+        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(2);
+        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(-1);
     });
 
     it("follows the mode for custom temperaments without ratios", () => {

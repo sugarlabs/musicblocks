@@ -44,6 +44,8 @@ describe("musicutils-buildscale", () => {
         expect(buildscale._notePitchClass("F𝄪")).toBe(7);
         expect(buildscale._notePitchClass("B𝄫")).toBe(9);
         expect(buildscale._notePitchClass("C♭")).toBe(11);
+        expect(buildscale._notePitchClass("G#")).toBe(8);
+        expect(buildscale._notePitchClass("Bb")).toBe(10);
         expect(buildscale._notePitchClass("xyz")).toBeNaN();
         expect(buildscale._notePitchClass(undefined)).toBeNaN();
     });
