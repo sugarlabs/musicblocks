@@ -26,6 +26,13 @@ const STR_MY_PROJECT = _("My Project");
 const STR_SHOW = _("Show");
 const STR_HIDE = _("Hide");
 
+// The MIDI and guitar tablature sections of a Lilypond file, commented out.
+const LY_MIDI_OFF =
+    "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
+const LY_GUITAR_HEAD_OFF =
+    '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+const LY_GUITAR_END_OFF = "      >>\n%}\n";
+
 /**
  * Environment-aware lazy module loader.
  * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
@@ -838,8 +845,7 @@ class SaveInterface {
                 this.activity.logo.MIDIOutput =
                     "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
             } else {
-                this.activity.logo.MIDIOutput =
-                    "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
+                this.activity.logo.MIDIOutput = LY_MIDI_OFF;
             }
 
             if (guitarCheck) {
@@ -847,9 +853,8 @@ class SaveInterface {
                     '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
                 this.activity.logo.guitarOutputEnd = "      >>\n\n";
             } else {
-                this.activity.logo.guitarOutputHead =
-                    '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
+                this.activity.logo.guitarOutputHead = LY_GUITAR_HEAD_OFF;
+                this.activity.logo.guitarOutputEnd = LY_GUITAR_END_OFF;
             }
 
             // Check if we're using buffered data (Issue #2330)
@@ -905,6 +910,28 @@ class SaveInterface {
                 // Close the dialog box after hitting button.
                 docById("lilypondModal").style.display = "none";
             }
+        });
+    }
+
+    /**
+     * Save the notation recorded so far as a Lilypond file, for the save as
+     * Lilypond block. Without the Save as Lilypond dialog, the file gets the
+     * default header, and its MIDI and guitar sections are left commented out.
+     *
+     * @param {string} filename - The name of the Lilypond file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    saveLilypondFromBlock(filename) {
+        _lazyRequire(["activity/lilypond"], () => {
+            const logo = this.activity.logo;
+            logo.notationOutput = LILYPONDHEADER;
+            logo.MIDIOutput = LY_MIDI_OFF;
+            logo.guitarOutputHead = LY_GUITAR_HEAD_OFF;
+            logo.guitarOutputEnd = LY_GUITAR_END_OFF;
+            this.afterSaveLilypond(filename);
         });
     }
 

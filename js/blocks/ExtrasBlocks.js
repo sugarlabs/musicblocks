@@ -70,6 +70,11 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    // Save as ... from the toolbar runs the whole program again to write its
+    // notation, so the save blocks in it wait for a real run.
+    const exportingNotation = logo =>
+        logo.runningLilypond || logo.runningAbc || logo.runningMxml || logo.runningMIDI;
+
     /**
      * Represents a SaveABCBlock.
      * Extends FlowBlock.
@@ -83,7 +88,13 @@ function setupExtrasBlocks(activity) {
         constructor() {
             super("saveabc");
             this.setPalette("extras", activity);
-            this.setHelpString();
+            this.setHelpString([
+                _(
+                    "The Save as ABC block saves the notes recorded with the Record notation block as an ABC file."
+                ),
+                "documentation",
+                ""
+            ]);
 
             this.formBlock({
                 name: _("save as ABC"),
@@ -91,15 +102,15 @@ function setupExtrasBlocks(activity) {
                 argTypes: ["textin"],
                 defaults: [`${_("title")}.abc`]
             });
-            this.hidden = true;
-            this.deprecated = true;
         }
 
         /**
          * Handles the flow of the SaveABCBlock.
          * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
          */
-        flow(args) {
+        flow(args, logo) {
+            if (exportingNotation(logo)) return;
             if (args.length === 1) {
                 activity.save.afterSaveAbc(args[0]);
             }
@@ -119,7 +130,13 @@ function setupExtrasBlocks(activity) {
         constructor() {
             super("savelilypond");
             this.setPalette("extras", activity);
-            this.setHelpString();
+            this.setHelpString([
+                _(
+                    "The Save as Lilypond block saves the notes recorded with the Record notation block as a Lilypond file."
+                ),
+                "documentation",
+                ""
+            ]);
 
             this.formBlock({
                 name: _("save as Lilypond"),
@@ -127,17 +144,17 @@ function setupExtrasBlocks(activity) {
                 argTypes: ["textin"],
                 defaults: [`${_("title")}.ly`]
             });
-            this.hidden = true;
-            this.deprecated = true;
         }
 
         /**
          * Handles the flow of the SaveLilypondBlock.
          * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
          */
-        flow(args) {
+        flow(args, logo) {
+            if (exportingNotation(logo)) return;
             if (args.length === 1) {
-                activity.save.afterSaveLilypond(args[0]);
+                activity.save.saveLilypondFromBlock(args[0]);
             }
         }
     }
@@ -155,7 +172,11 @@ function setupExtrasBlocks(activity) {
         constructor() {
             super("savesvg");
             this.setPalette("extras", activity);
-            this.setHelpString();
+            this.setHelpString([
+                _("The Save as SVG block saves the mouse artwork as an SVG file."),
+                "documentation",
+                ""
+            ]);
 
             this.formBlock({
                 name: _("save as SVG"),
@@ -163,8 +184,6 @@ function setupExtrasBlocks(activity) {
                 argTypes: ["textin"],
                 defaults: [`${_("title")}.svg`]
             });
-            this.hidden = true;
-            this.deprecated = true;
         }
 
         /**
@@ -175,6 +194,7 @@ function setupExtrasBlocks(activity) {
          * @param {Block} blk - The block instance.
          */
         flow(args, logo, turtle, blk) {
+            if (exportingNotation(logo)) return;
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -196,6 +216,48 @@ function setupExtrasBlocks(activity) {
                 }
 
                 activity.save.saveSVG(args[0]);
+            }
+        }
+    }
+
+    /**
+     * Represents a SaveMxmlBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
+    class SaveMxmlBlock extends FlowBlock {
+        /**
+         * Creates an instance of SaveMxmlBlock.
+         */
+        constructor() {
+            super("savemxml");
+            this.setPalette("extras", activity);
+            this.setHelpString([
+                _(
+                    "The Save as MusicXML block saves the notes recorded with the Record notation block as a MusicXML file."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("save as MusicXML"),
+                args: 1,
+                argTypes: ["textin"],
+                defaults: [`${_("title")}.xml`]
+            });
+        }
+
+        /**
+         * Handles the flow of the SaveMxmlBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         */
+        flow(args, logo) {
+            if (exportingNotation(logo)) return;
+            if (args.length === 1) {
+                activity.save.afterSaveMxml(args[0]);
             }
         }
     }
@@ -891,6 +953,7 @@ function setupExtrasBlocks(activity) {
     new SaveABCBlock().setup(activity);
     new SaveLilypondBlock().setup(activity);
     new SaveSVGBlock().setup(activity);
+    new SaveMxmlBlock().setup(activity);
     new NoBackgroundBlock().setup(activity);
     new ShowBlocksBlock().setup(activity);
     new HideBlocksBlock().setup(activity);
