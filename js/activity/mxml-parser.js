@@ -88,7 +88,13 @@ function _pitchToNoteName(pitchEl) {
     const step = _text(pitchEl, "step") ?? "C";
     const alter = _text(pitchEl, "alter") ?? "0";
     const octave = Number(_text(pitchEl, "octave") ?? "4");
-    const suffix = _MXML_ALTER_SUFFIX[alter] ?? "";
+    // MusicXML defines <alter> as a decimal value, so equivalent integer
+    // spellings such as "1.0" and "+1" must produce the same accidental.
+    const normalizedAlter = Number(alter);
+    const suffix =
+        Number.isInteger(normalizedAlter) && normalizedAlter in _MXML_ALTER_SUFFIX
+            ? _MXML_ALTER_SUFFIX[normalizedAlter]
+            : "";
     return { name: step + suffix, octave };
 }
 
