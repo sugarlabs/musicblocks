@@ -1081,6 +1081,20 @@ describe("saveLilypond Methods", () => {
         });
     });
 
+    it("should give a block-saved Lilypond file the default header and closing sections", () => {
+        instance.afterSaveLilypond = jest.fn();
+        instance.saveLilypondFromBlock("song.ly");
+
+        const logo = instance.activity.logo;
+        expect(logo.notationOutput).toBe(LILYPONDHEADER);
+        // The MIDI section closes the \score block.
+        expect(logo.MIDIOutput).toContain("% MIDI SECTION");
+        expect(logo.MIDIOutput.trimEnd().endsWith("}")).toBe(true);
+        expect(logo.guitarOutputHead).toContain("% GUITAR TAB SECTION");
+        expect(logo.guitarOutputEnd).toContain(">>");
+        expect(instance.afterSaveLilypond).toHaveBeenCalledWith("song.ly");
+    });
+
     it("should open the Lilypond modal and populate fields", () => {
         instance.saveLilypond(activity);
 
