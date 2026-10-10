@@ -556,6 +556,54 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     let finalScale = [];
     const sd = [];
 
+    const getScaleDegreeAccidental = (scaleNote, pitchNote) => {
+        if (scaleNote === pitchNote) {
+            return NATURAL;
+        }
+        const getOffset = note => {
+            if (note.includes(DOUBLESHARP)) {
+                return 2;
+            }
+            if (note.includes(SHARP)) {
+                return 1;
+            }
+            if (note.includes(DOUBLEFLAT)) {
+                return -2;
+            }
+            if (note.includes(FLAT)) {
+                return -1;
+            }
+            return 0;
+        };
+        if (
+            pitchNote.length > 1 &&
+            !pitchNote.includes(DOUBLESHARP) &&
+            !pitchNote.includes(SHARP) &&
+            !pitchNote.includes(DOUBLEFLAT) &&
+            !pitchNote.includes(FLAT) &&
+            !pitchNote.includes(NATURAL)
+        ) {
+            return null;
+        }
+        const diff = getOffset(pitchNote) - getOffset(scaleNote);
+        if (diff === 0) {
+            return NATURAL;
+        }
+        if (diff === 1) {
+            return SHARP;
+        }
+        if (diff === -1) {
+            return FLAT;
+        }
+        if (diff >= 2) {
+            return DOUBLESHARP;
+        }
+        if (diff <= -2) {
+            return DOUBLEFLAT;
+        }
+        return null;
+    };
+
     // if movable do is present just return the major/perfect tones
     if (movable) {
         finalScale = buildScale(chosenMode[0] + " major", edo)[0];
@@ -567,18 +615,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
             for (const i in finalScale) {
                 if (finalScale[i][0] === pitch[0]) {
                     sd.push(String(Number(i) + 1));
-                    if (finalScale[i] === pitch) {
-                        sd.push(NATURAL);
-                    } else {
-                        if (finalScale[i].includes(SHARP)) {
-                            sd.push(FLAT);
-                        } else if (finalScale[i].includes(FLAT)) {
-                            sd.push(FLAT);
-                        } else if (pitch.includes(SHARP)) {
-                            sd.push(SHARP);
-                        } else if (pitch.includes(FLAT)) {
-                            sd.push(FLAT);
-                        }
+                    const accidental = getScaleDegreeAccidental(finalScale[i], pitch);
+                    if (accidental) {
+                        sd.push(accidental);
                     }
                 }
             }
@@ -594,18 +633,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                 for (const i in chosenModeScale) {
                     if (chosenModeScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (chosenModeScale[i] === pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (chosenModeScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (chosenModeScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
+                        const accidental = getScaleDegreeAccidental(chosenModeScale[i], pitch);
+                        if (accidental) {
+                            sd.push(accidental);
                         }
                     }
                 }
@@ -678,18 +708,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                 for (const i in finalScale) {
                     if (finalScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (finalScale[i] === pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (finalScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (finalScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
+                        const accidental = getScaleDegreeAccidental(finalScale[i], pitch);
+                        if (accidental) {
+                            sd.push(accidental);
                         }
                     }
                 }
@@ -791,18 +812,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                 for (const i in finalScale) {
                     if (finalScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (finalScale[i] === pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (finalScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (finalScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
+                        const accidental = getScaleDegreeAccidental(finalScale[i], pitch);
+                        if (accidental) {
+                            sd.push(accidental);
                         }
                     }
                 }

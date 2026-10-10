@@ -3441,6 +3441,22 @@ describe("scaleDegreeToPitchMapping", () => {
         const result = scaleDegreeToPitchMapping("C major", null, false, "C#");
         expect(result).toEqual(["1", "8"]);
     });
+
+    it("maps altered pitches to correct accidentals in flat and sharp keys", () => {
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B")).toEqual(["4", "♯"]);
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B" + DOUBLEFLAT)).toEqual([
+            "4",
+            "♭"
+        ]);
+        expect(scaleDegreeToPitchMapping("C minor", null, false, "B")).toEqual(["7", "♯"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLESHARP)).toEqual([
+            "7",
+            "♯"
+        ]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F")).toEqual(["7", "♭"]);
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B♭")).toEqual(["4", "♮"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F♯")).toEqual(["7", "♮"]);
+    });
 });
 
 describe("getPitchInfo", () => {

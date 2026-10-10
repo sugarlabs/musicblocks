@@ -33,6 +33,7 @@ global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
 const buildscale = require("../musicutils-buildscale");
 const musicutils = require("../musicutils");
+const { SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
@@ -60,6 +61,57 @@ describe("musicutils-buildscale", () => {
         expect(buildscale._getStepSize("C major", "C", "up", 0, "equal19", 19)).toBe(3);
         expect(buildscale.getInterval(4, "C major", "C")).toBe(7);
         expect(buildscale.getInterval(-2, "C major", "C")).toBe(-3);
+    });
+
+    it("resolves correct accidentals in reverse scale-degree mapping for altered and unaltered pitches", () => {
+        // Flat-key scale note with natural pitch above it (F major: Bb -> B)
+        expect(buildscale.scaleDegreeToPitchMapping("F major", null, false, "B")).toEqual([
+            "4",
+            SHARP
+        ]);
+
+        // Flat-key scale note with lowered pitch (F major: Bb -> Bbb)
+        expect(
+            buildscale.scaleDegreeToPitchMapping("F major", null, false, "B" + DOUBLEFLAT)
+        ).toEqual(["4", FLAT]);
+
+        // Flat-key example from C minor (C minor: Bb -> B)
+        expect(buildscale.scaleDegreeToPitchMapping("C minor", null, false, "B")).toEqual([
+            "7",
+            SHARP
+        ]);
+
+        // Sharp-key scale note with raised pitch (G major: F# -> F##)
+        expect(
+            buildscale.scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLESHARP)
+        ).toEqual(["7", SHARP]);
+
+        // Sharp-key scale note with lowered pitch (G major: F# -> F)
+        expect(buildscale.scaleDegreeToPitchMapping("G major", null, false, "F")).toEqual([
+            "7",
+            FLAT
+        ]);
+
+        // Unaltered scale notes return natural
+        expect(buildscale.scaleDegreeToPitchMapping("F major", null, false, "B" + FLAT)).toEqual([
+            "4",
+            NATURAL
+        ]);
+        expect(buildscale.scaleDegreeToPitchMapping("G major", null, false, "F" + SHARP)).toEqual([
+            "7",
+            NATURAL
+        ]);
+
+        // Movable do behavior with altered scale note (F major: Bb -> B)
+        expect(buildscale.scaleDegreeToPitchMapping("F major", null, true, "B")).toEqual([
+            "4",
+            SHARP
+        ]);
+
+        // Double accidental on natural scale note (C major: C -> C##)
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLESHARP)
+        ).toEqual(["1", DOUBLESHARP, "8", DOUBLESHARP]);
     });
 
     it("still resolves a minor key signature's scale and solfege", () => {
