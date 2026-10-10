@@ -142,6 +142,7 @@ const makeEvent = (overrides = {}) => ({
 });
 
 const KEYCODE = {
+    RETURN: 13,
     UP: 38,
     DOWN: 40,
     LEFT: 37,
@@ -346,6 +347,87 @@ describe("KeyboardController", () => {
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.SPACE, shiftKey: true }));
 
             expect(activity.turtles.setStageScale).toHaveBeenCalledWith(0.5);
+        });
+    });
+
+    describe("return / enter key handling", () => {
+        it("starts playback and prevents default when not running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
+            expect(activity._doFastButton).toHaveBeenCalled();
+        });
+
+        it("stops playback and prevents default when running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(true);
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("does not start playback when an open widget window is present", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            global.window.widgetWindows = {
+                isOpen: jest.fn(() => false),
+                openWindows: { tempo: true }
+            };
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("submits paste text and hides paste box on Enter when visible", () => {
+            const activity = makeActivity();
+            activity.paste.style.visibility = "visible";
+            activity.paste.value = "stack payload";
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity.pasted).toHaveBeenCalled();
+            expect(activity.paste.style.visibility).toBe("hidden");
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("suppresses Enter when isInputON is true", () => {
+            const activity = makeActivity();
+            activity.isInputON = true;
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+            expect(activity._doHardStopButton).not.toHaveBeenCalled();
+        });
+
+        it("suppresses Enter when searchWidget is visible", () => {
+            const activity = makeActivity();
+            activity.searchWidget.style.visibility = "visible";
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+            expect(activity._doHardStopButton).not.toHaveBeenCalled();
         });
     });
 
