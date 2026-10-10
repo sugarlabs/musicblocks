@@ -214,12 +214,7 @@ class KeyboardController {
             wheelDiv.style.display === "" ||
             activity.turtles.running();
         activity.inTempoWidget = this._isWidgetOpen("tempo");
-        if (
-            (event.altKey && !disableKeys) ||
-            event.keyCode === 13 ||
-            event.key === "/" ||
-            event.key === "\\"
-        ) {
+        if ((event.altKey && !disableKeys) || event.key === "/" || event.key === "\\") {
             switch (event.keyCode) {
                 case 66: // 'B'
                     activity.textMsg("Alt-B " + _("Saving block artwork"));
@@ -234,33 +229,10 @@ class KeyboardController {
                     activity._allClear(false);
                     break;
                 case 82: {
-                    // 'R or ENTER'
+                    // 'R'
                     activity.textMsg("Alt-R " + _("Play"));
                     activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     activity._doFastButton();
-                    break;
-                }
-                case 13: {
-                    // Alt+ENTER
-                    if (activity.isInputON) return;
-
-                    if (activity.searchWidget.style.visibility === "visible") {
-                        return;
-                    }
-                    if (pasteEl.style.visibility === "visible") {
-                        activity.pasted();
-                        pasteEl.style.visibility = "hidden";
-                        return;
-                    }
-
-                    // Check if any widget window is open
-                    const hasOpenWidget = this._hasOpenWidget();
-                    if (activity.turtles.running()) {
-                        activity._doHardStopButton();
-                    } else if (!hasOpenWidget) {
-                        activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                        activity._doFastButton();
-                    }
                     break;
                 }
                 case 83: // 'S'
@@ -339,9 +311,29 @@ class KeyboardController {
                     break;
             }
         } else {
-            if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
-                if (pasteEl.value.length > 0) {
-                    activity.pasted();
+            if (event.keyCode === RETURN) {
+                if (activity.isInputON) return;
+
+                if (activity.searchWidget.style.visibility === "visible") {
+                    return;
+                }
+                if (pasteEl.style.visibility === "visible") {
+                    if (pasteEl.value.length > 0) {
+                        activity.pasted();
+                    }
+                    pasteEl.style.visibility = "hidden";
+                    return;
+                }
+
+                // Check if any widget window is open
+                const hasOpenWidget = this._hasOpenWidget();
+                if (activity.turtles.running()) {
+                    event.preventDefault();
+                    activity._doHardStopButton();
+                } else if (!disableKeys && !hasOpenWidget) {
+                    event.preventDefault();
+                    activity.toolbar.highlightStop(platformColor.stopIconcolor);
+                    activity._doFastButton();
                 }
             } else if (event.keyCode === SPACE) {
                 // Check if any widget window is open
@@ -482,19 +474,6 @@ class KeyboardController {
                             activity.searchWidget.style.visibility = "hidden";
                         }
                         break;
-                    case RETURN: {
-                        // Check if any widget window is open
-                        const hasOpenWidget = this._hasOpenWidget();
-                        if (activity.turtles.running()) {
-                            event.preventDefault();
-                            activity._doHardStopButton();
-                        } else if (!disableKeys && !hasOpenWidget) {
-                            event.preventDefault();
-                            activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                            activity._doFastButton();
-                        }
-                        break;
-                    }
                     default:
                         break;
                 }
