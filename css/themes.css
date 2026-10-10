@@ -33,8 +33,8 @@
 
 /* High Contrast Mode Theme Dropdown - Override ALL styles */
 .highcontrast #themedropdown {
-    background-color: var(--color-text-inverse) !important;
-    border: 1px solid #ffffff !important;
+    background-color: var(--color-bg-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
 }
 
 .highcontrast #themedropdown li {
@@ -493,20 +493,20 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast .keyboard-shortcuts-panel {
-    background: #000000;
-    color: var(--color-text-inverse);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu,
 .highcontrast #helpdropdown.helpdropdown-menu li > a {
-    background: #000000;
+    background: var(--color-bg-primary);
     color: var(--color-text-primary);
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-border-primary);
     box-shadow: none;
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li + li {
-    border-top-color: var(--color-text-inverse);
+    border-top-color: var(--color-border-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover,
@@ -544,7 +544,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .highcontrast .keyboard-shortcuts-row,
 .highcontrast .keyboard-shortcuts-section-title {
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-border-primary);
 }
 
 @media (max-width: 900px) {
@@ -559,15 +559,15 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast #canvas {
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse) 080 !important;
+    background-color: #000080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse) 0ff !important;
+    background-color: #0000ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -605,7 +605,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast #printText {
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-border-primary);
 }
 
 .highcontrast #loading-image-container {
@@ -617,7 +617,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast .language-link {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #submitLilypond {
@@ -644,36 +644,36 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast #helpfulSearchDiv {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
 .highcontrast #crossButton {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #chooseKeyDiv {
-    background: #000000;
-    color: var(--color-text-inverse);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #movable {
-    background: #000000;
-    color: var(--color-text-inverse);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .dropdown-content li > a {
-    background-color: var(--color-text-inverse);
+    background-color: var(--color-bg-primary);
     color: var(--color-brand-secondary);
 }
 
 .highcontrast .dropdown-content {
-    background-color: var(--color-text-inverse);
-    border: 1px solid #ffffff;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
 }
 
 .highcontrast .modalBox {
-    background-color: var(--color-text-inverse);
+    background-color: var(--color-bg-primary);
     border: 2px solid var(--color-border-primary);
     box-shadow: 0 0 8px rgba(255, 255, 0, 0.45);
 }
@@ -728,12 +728,12 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast .material-tooltip {
-    background-color: var(--color-text-inverse) !important;
-    border: 1px solid #ffffff;
+    background-color: var(--color-bg-primary) !important;
+    border: 1px solid var(--color-border-primary);
 }
 
 .highcontrast .material-tooltip .backdrop {
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .highcontrast #languagedropdown li a.selected-language {
