@@ -812,14 +812,9 @@ function AIWidget() {
                 }
             };
 
-        widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
+        widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Settings"), "").onclick =
             function () {
-                const key = prompt(
-                    _("Enter your Groq API Key: %s").replace(/%s/g, getGroqApiKey(that.activity))
-                );
-                if (key !== null) {
-                    setGroqApiKey(key.trim());
-                }
+                that.openSettings();
             };
 
         widgetWindow.sendToCenter();
@@ -858,32 +853,45 @@ function AIWidget() {
             responsive: "resize"
         })[0];
 
-        if (ABCJS.synth.supportsAudio()) {
-            const audioContext = this.activity.logo.synth.tone.context;
-            try {
-                await audioContext.resume();
+        if (!visualObj) {
+            this.activity.errorMsg(_("Could not parse the ABC notation."));
+            return;
+        }
 
-                if (this.midiBuffer) {
-                    this.midiBuffer.stop();
-                }
-
-                this.midiBuffer = new ABCJS.synth.CreateSynth();
-
-                await this.midiBuffer.init({
-                    visualObj: visualObj,
-                    audioContext: audioContext,
-                    millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
-                    soundFontUrl: "https://paulrosen.github.io/abcjs-soundfonts/FluidR3_GM"
-                });
-
-                await this.midiBuffer.prime();
-                this.midiBuffer.start();
-            } catch (error) {
-                console.warn("synth error", error);
-                this.activity.errorMsg(_("Synth error: %s").replace(/%s/g, error.message));
-            }
-        } else {
+        if (!ABCJS.synth.supportsAudio()) {
             this.activity.errorMsg(_("Audio not supported in this browser."));
+            return;
+        }
+
+        try {
+            // abcjs connects raw AudioBufferSourceNodes to the context's
+            // destination, so it must use its own plain AudioContext. Tone.js's
+            // wrapped Context exposes a ToneAudioNode master Gain as its
+            // destination (and logo.synth.tone is null until a project is run),
+            // so passing it here makes playback fail silently. supportsAudio()
+            // has already created window.abcjsAudioContext as a raw context.
+            const audioContext = window.abcjsAudioContext;
+            if (audioContext && typeof audioContext.resume === "function") {
+                await audioContext.resume();
+            }
+
+            if (this.midiBuffer) {
+                this.midiBuffer.stop();
+            }
+
+            this.midiBuffer = new ABCJS.synth.CreateSynth();
+
+            await this.midiBuffer.init({
+                visualObj: visualObj,
+                millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+                soundFontUrl: "https://paulrosen.github.io/abcjs-soundfonts/FluidR3_GM"
+            });
+
+            await this.midiBuffer.prime();
+            this.midiBuffer.start();
+        } catch (error) {
+            console.warn("synth error", error);
+            this.activity.errorMsg(_("Synth error: %s").replace(/%s/g, error.message));
         }
     };
 
@@ -1034,6 +1042,30 @@ function AIWidget() {
     };
 
     /**
+     * Shows the settings modal.
+     * @returns {void}
+     */
+    this.openSettings = function () {
+        if (!this.settingsContainer) {
+            this._scale();
+        }
+        this.settingsContainer.style.display = "block";
+        if (this._loadModels && getGroqApiKey(this.activity)) {
+            this._loadModels();
+        }
+    };
+
+    /**
+     * Hides the settings modal.
+     * @returns {void}
+     */
+    this.closeSettings = function () {
+        if (this.settingsContainer) {
+            this.settingsContainer.style.display = "none";
+        }
+    };
+
+    /**
      * Creates a canvas element and calls LLM API for music
      * @param {number} width - The width of the canvas.
      * @param {number} height - The height of the canvas.
@@ -1175,7 +1207,7 @@ function AIWidget() {
                         content: prompt_eng
                     }
                 ],
-                model: "llama-3.1-8b-instant"
+                model: getGroqModel()
             });
 
             submitButton.disabled = true;
@@ -1263,6 +1295,140 @@ function AIWidget() {
             abcNotationSong = textarea.value;
         });
 
+        // Settings modal - opened by the settings button. The model list is fetched from
+        // Groq using the user's API key; the key and chosen model live in
+        // sessionStorage.
+        const settingsContainer = document.createElement("div");
+        settingsContainer.className = "plugin-modal-backdrop ai-interface-container";
+        settingsContainer.style.display = "none";
+        fragment.appendChild(settingsContainer);
+
+        const settingsCard = document.createElement("div");
+        settingsCard.className = "modalBox";
+        settingsContainer.appendChild(settingsCard);
+
+        // Close when the backdrop (not the card) is clicked.
+        settingsContainer.addEventListener("click", function (event) {
+            if (event.target === settingsContainer) {
+                that.closeSettings();
+            }
+        });
+
+        const closeButton = document.createElement("img");
+        closeButton.src = "header-icons/close-button.svg";
+        closeButton.title = _("Close");
+        closeButton.alt = _("Close");
+        closeButton.setAttribute("height", "20px");
+        closeButton.setAttribute("width", "20px");
+        closeButton.style.cssText = "position:absolute; top:8px; right:8px; cursor:pointer";
+        closeButton.onclick = function () {
+            that.closeSettings();
+        };
+        settingsCard.appendChild(closeButton);
+
+        const settingsTitle = document.createElement("div");
+        settingsTitle.className = "modal-title";
+        settingsTitle.textContent = _("Settings");
+        settingsCard.appendChild(settingsTitle);
+
+        const keyLabel = document.createElement("label");
+        keyLabel.textContent = _("Groq API Key");
+        keyLabel.style.cssText = "display:block;margin-bottom:8px;color:var(--color-text-primary);";
+        settingsCard.appendChild(keyLabel);
+
+        const keyInput = document.createElement("input");
+        keyInput.type = "password";
+        keyInput.value = getGroqApiKey(that.activity);
+        keyInput.style.cssText =
+            "width:100%;box-sizing:border-box;padding:10px 12px;font-size:16px;" +
+            "background-color:var(--color-bg-secondary);color:var(--color-text-primary);" +
+            "border:2px solid var(--color-border-primary);border-radius:8px;";
+        settingsCard.appendChild(keyInput);
+
+        const loadButton = document.createElement("button");
+        loadButton.className = "cancel-button";
+        loadButton.type = "button";
+        loadButton.textContent = _("Load models");
+        loadButton.style.cssText = "margin-top:8px;";
+        settingsCard.appendChild(loadButton);
+
+        const modelStatus = document.createElement("div");
+        modelStatus.style.cssText =
+            "margin-top:8px;font-size:14px;min-height:20px;color:var(--color-text-secondary);";
+        settingsCard.appendChild(modelStatus);
+
+        const modelLabel = document.createElement("label");
+        modelLabel.textContent = _("Model");
+        modelLabel.style.cssText =
+            "display:none;margin-bottom:8px;color:var(--color-text-primary);";
+        settingsCard.appendChild(modelLabel);
+
+        const modelSelect = document.createElement("select");
+        modelSelect.className = "plugin-modal-select";
+        modelSelect.style.display = "none";
+        modelSelect.disabled = true;
+        const modelPlaceholder = document.createElement("option");
+        modelPlaceholder.value = "";
+        modelPlaceholder.textContent = _("Load models to choose");
+        modelSelect.appendChild(modelPlaceholder);
+        settingsCard.appendChild(modelSelect);
+
+        // Reveal the model controls only once an API key is present.
+        const updateModelControlsVisibility = function () {
+            const visible = keyInput.value.trim() !== "";
+            modelLabel.style.display = visible ? "block" : "none";
+            modelSelect.style.display = visible ? "block" : "none";
+        };
+        keyInput.addEventListener("input", updateModelControlsVisibility);
+        updateModelControlsVisibility();
+
+        // Fetch the models available to the entered key and populate the
+        // select. Also run automatically when the modal opens with a saved key.
+        const loadModels = async function () {
+            const key = keyInput.value.trim();
+            if (!key) {
+                modelStatus.textContent = _("Enter your API key first.");
+                return;
+            }
+            setGroqApiKey(key);
+            updateModelControlsVisibility();
+            modelStatus.textContent = _("Loading models...");
+            try {
+                const models = await fetchGroqModels(key);
+                modelSelect.replaceChildren();
+                models.forEach(model => {
+                    const option = document.createElement("option");
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                });
+                const current = getGroqModel();
+                modelSelect.value = models.includes(current) ? current : models[0];
+                modelSelect.disabled = false;
+                modelStatus.textContent = "";
+            } catch (error) {
+                modelStatus.textContent = _("Could not load models: ") + error.message;
+                modelSelect.disabled = true;
+            }
+        };
+
+        loadButton.onclick = loadModels;
+
+        const saveButton = document.createElement("button");
+        saveButton.className = "confirm-button";
+        saveButton.textContent = _("Save");
+        saveButton.onclick = function () {
+            setGroqApiKey(keyInput.value.trim());
+            if (modelSelect.value) {
+                setGroqModel(modelSelect.value);
+            }
+            that.closeSettings();
+        };
+        settingsCard.appendChild(saveButton);
+
+        this.settingsContainer = settingsContainer;
+        this._loadModels = loadModels;
+
         // Single DOM append — all elements are now in the fragment
         this.widgetWindow.getWidgetBody().appendChild(fragment);
     };
@@ -1272,6 +1438,83 @@ function AIWidget() {
  * Item name the Groq API key is stored under.
  */
 const GROQ_API_KEY_ITEM = "groq_api_key";
+
+/**
+ * Item name the selected Groq model is stored under.
+ */
+const GROQ_MODEL_ITEM = "groq_model";
+
+/**
+ * Model used when the user has not chosen one.
+ */
+const DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b";
+
+/**
+ * Returns the selected Groq model, or the default when none is stored.
+ *
+ * @returns {String} - the model ID
+ */
+function getGroqModel() {
+    try {
+        return sessionStorage.getItem(GROQ_MODEL_ITEM) || DEFAULT_GROQ_MODEL;
+    } catch (e) {
+        console.warn("Could not read the Groq model from session storage:", e);
+        return DEFAULT_GROQ_MODEL;
+    }
+}
+
+/**
+ * Fetches the models available to the given API key from Groq.
+ *
+ * @param {String} apiKey - the Groq API key
+ * @returns {Promise<String[]>} - the model IDs
+ */
+async function fetchGroqModels(apiKey) {
+    const response = await fetch("https://api.groq.com/openai/v1/models", {
+        headers: {
+            Authorization: `Bearer ${apiKey}`
+        }
+    });
+    if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    return (data.data || []).map(model => model.id).filter(isGenerativeModel);
+}
+
+/**
+ * Tells whether a Groq model is a generative (chat completion) model.
+ * Excludes speech-to-text, guard, and embedding models, which cannot
+ * generate ABC notation.
+ *
+ * @param {String} id - the model ID
+ * @returns {Boolean} - whether the model is generative
+ */
+function isGenerativeModel(id) {
+    if (/whisper|guard|embed|orpheus|playai|playht/i.test(id)) {
+        return false;
+    }
+    const size = id.match(/-(\d+)b/i);
+    // Keep models without a size token and those at or above 20B; drop the
+    // smaller ones, which produce poor ABC notation.
+    return !size || parseInt(size[1], 10) >= 20;
+}
+
+/**
+ * Saves the selected Groq model for the current session.
+ *
+ * @param {String} model - the model ID
+ * @returns {Boolean} - whether the model was stored
+ */
+function setGroqModel(model) {
+    try {
+        sessionStorage.setItem(GROQ_MODEL_ITEM, model);
+        return true;
+    } catch (e) {
+        console.warn("Could not save the Groq model for this session:", e);
+        return false;
+    }
+}
 
 /**
  * Returns the Groq API key for the current session.
@@ -1436,6 +1679,10 @@ if (typeof module !== "undefined" && module.exports) {
         createPitchBlocks,
         searchIndexForMusicBlock,
         getGroqApiKey,
-        setGroqApiKey
+        setGroqApiKey,
+        getGroqModel,
+        setGroqModel,
+        fetchGroqModels,
+        isGenerativeModel
     };
 }
