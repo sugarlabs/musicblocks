@@ -267,11 +267,12 @@ function AIDebuggerWidget() {
 
         // Chat log area
         this.chatLog = document.createElement("div");
-        this.chatLog.className = "chatLog";
+        this.chatLog.className = "chatLog aidebugger-chat-log";
         this.chatLog.style.flex = "1";
         this.chatLog.style.overflowY = "auto";
         this.chatLog.style.padding = "15px";
-        this.chatLog.style.backgroundColor = "#fafafa";
+        this.chatLog.style.backgroundColor = "var(--color-bg-primary)";
+        this.chatLog.style.color = "var(--color-text-primary)";
         this.chatLog.style.display = "flex";
         this.chatLog.style.flexDirection = "column";
         this.chatLog.style.gap = "10px";
@@ -280,18 +281,22 @@ function AIDebuggerWidget() {
 
         // Input area
         const inputContainer = document.createElement("div");
+        inputContainer.className = "aidebugger-input-container";
         inputContainer.style.display = "flex";
         inputContainer.style.padding = "15px";
-        inputContainer.style.backgroundColor = "#fff";
-        inputContainer.style.borderTop = "1px solid #ddd";
+        inputContainer.style.backgroundColor = "var(--color-bg-primary)";
+        inputContainer.style.borderTop = "1px solid var(--color-border-primary)";
         inputContainer.style.gap = "10px";
 
         // Message input
         this.messageInput = document.createElement("input");
         this.messageInput.type = "text";
+        this.messageInput.className = "aidebugger-input";
         this.messageInput.placeholder = "Type your message here...";
         this.messageInput.style.flex = "1";
         this.messageInput.style.padding = "12px";
+        this.messageInput.style.backgroundColor = "var(--color-bg-primary)";
+        this.messageInput.style.color = "var(--color-text-primary)";
         this.messageInput.style.border = "1px solid #ddd";
         this.messageInput.style.borderRadius = "25px";
         this.messageInput.style.fontSize = "14px";
@@ -414,22 +419,26 @@ function AIDebuggerWidget() {
         timeDiv.textContent = new Date(message.timestamp).toLocaleTimeString();
 
         if (message.type === "user") {
+            messageDiv.className = "aidebugger-message aidebugger-message-user";
             messageDiv.style.alignSelf = "flex-end";
             messageDiv.style.backgroundColor = "#2196F3";
             messageDiv.style.color = "white";
             messageDiv.textContent = message.content;
             messageDiv.appendChild(timeDiv);
         } else if (message.type === "bot") {
+            messageDiv.className = "aidebugger-message aidebugger-message-bot";
             messageDiv.style.alignSelf = "flex-start";
-            messageDiv.style.backgroundColor = "#e0e0e0";
-            messageDiv.style.color = "#333";
+            messageDiv.style.backgroundColor = "var(--color-bg-tertiary)";
+            messageDiv.style.color = "var(--color-text-primary)";
+            messageDiv.style.border = "1px solid var(--color-border-primary)";
             messageDiv.textContent = message.content;
             messageDiv.appendChild(timeDiv);
         } else if (message.type === "system") {
+            messageDiv.className = "aidebugger-message aidebugger-message-system";
             messageDiv.style.alignSelf = "center";
-            messageDiv.style.backgroundColor = "#fff3cd";
-            messageDiv.style.color = "#856404";
-            messageDiv.style.border = "1px solid #ffeaa7";
+            messageDiv.style.backgroundColor = "var(--color-warning-bg)";
+            messageDiv.style.color = "var(--color-text-primary)";
+            messageDiv.style.border = "1px solid var(--color-border-primary)";
             messageDiv.style.fontStyle = "italic";
             messageDiv.textContent = message.content;
             messageDiv.appendChild(timeDiv);
@@ -551,10 +560,11 @@ function AIDebuggerWidget() {
         }
 
         const typingDiv = document.createElement("div");
-        typingDiv.className = "typing-indicator";
+        typingDiv.className = "typing-indicator aidebugger-typing-indicator";
         typingDiv.style.alignSelf = "flex-start";
-        typingDiv.style.backgroundColor = "#e0e0e0";
-        typingDiv.style.color = "#666";
+        typingDiv.style.backgroundColor = "var(--color-bg-tertiary)";
+        typingDiv.style.color = "var(--color-text-secondary)";
+        typingDiv.style.border = "1px solid var(--color-border-primary)";
         typingDiv.style.padding = "12px 16px";
         typingDiv.style.borderRadius = "18px";
         typingDiv.style.marginBottom = "8px";
@@ -630,12 +640,13 @@ function AIDebuggerWidget() {
      */
     this._showConsentBanner = function () {
         const banner = document.createElement("div");
+        banner.className = "aidebugger-consent-banner";
         banner.style.padding = "16px 20px";
         banner.style.margin = "12px";
         banner.style.borderRadius = "12px";
-        banner.style.backgroundColor = "#fff3cd";
-        banner.style.border = "1px solid #ffc107";
-        banner.style.color = "#664d03";
+        banner.style.backgroundColor = "var(--color-warning-bg)";
+        banner.style.border = "1px solid var(--color-border-primary)";
+        banner.style.color = "var(--color-text-primary)";
         banner.style.fontSize = "13px";
         banner.style.lineHeight = "1.5";
 
@@ -672,11 +683,13 @@ function AIDebuggerWidget() {
         acceptBtn.style.fontWeight = "600";
 
         const declineBtn = document.createElement("button");
+        declineBtn.className = "cancel-button aidebugger-cancel-btn";
         declineBtn.textContent = _("Cancel");
         declineBtn.style.padding = "8px 16px";
-        declineBtn.style.border = "1px solid #ccc";
+        declineBtn.style.border = "1px solid var(--color-border-primary)";
         declineBtn.style.borderRadius = "6px";
-        declineBtn.style.backgroundColor = "white";
+        declineBtn.style.backgroundColor = "var(--color-bg-primary)";
+        declineBtn.style.color = "var(--color-text-primary)";
         declineBtn.style.cursor = "pointer";
         declineBtn.style.fontSize = "13px";
 
