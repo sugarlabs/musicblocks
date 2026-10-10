@@ -492,4 +492,28 @@ describe("Theme Switching & Inline Styles Purity", () => {
         );
         expect(focusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
     });
+
+    it("ensures themes.css has valid highcontrast properties and avoids black-on-black text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast .blue rules have valid color syntax and do not contain fragmented tokens
+        expect(themesCss).not.toMatch(/var\(--color-text-inverse\)\s*0[0-9a-f]+/i);
+
+        // Verify .highcontrast rules do not use var(--color-text-inverse) on dark/transparent backgrounds
+        const blackBgElements = [
+            "#helpfulSearchDiv",
+            "#crossButton",
+            "#chooseKeyDiv",
+            "#movable",
+            "\\.language-link",
+            "\\.keyboard-shortcuts-panel"
+        ];
+        blackBgElements.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-inverse\\)`,
+                "i"
+            );
+            expect(themesCss).not.toMatch(regex);
+        });
+    });
 });
