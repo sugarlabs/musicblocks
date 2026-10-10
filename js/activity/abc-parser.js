@@ -65,25 +65,40 @@ function _stripAbcAccidentalPrefix(name) {
 
 // Converts an abcjs pitch object to a Music Blocks note name.
 //
-// The function resolves accidentals in two layers, matching standard
+// The function resolves accidentals in three layers, matching standard
 // ABC semantics:
 //   1. An explicit inline accidental on the pitch itself (the
 //      `accidental` field set by abcjs for ^, _, =, ^^, __).
-//   2. A key-signature accidental that applies to the note letter.
-// If neither applies the bare note letter is returned.
-function _adjustPitch(note, keySignature, inlineAccidental) {
-    const bare = _stripAbcAccidentalPrefix(note).replace(",", "");
+//      This accidental overrides the key signature for the rest
+//      of the current bar.
+//   2. A carried inline accidental from earlier in the current bar.
+//   3. A key-signature accidental that applies to the note letter.
+// If none applies the bare note letter is returned.
+function _adjustPitch(note, keySignature, inlineAccidental, barAccidentals) {
+    const bare = _stripAbcAccidentalPrefix(note).replace(/[,']/g, "");
+    const letter = bare.toUpperCase();
 
     // Inline accidental takes priority (ABC rule: it overrides the
     // key signature for the rest of the bar).
     if (inlineAccidental && inlineAccidental in _ABC_ACCIDENTAL_SUFFIX) {
+        if (barAccidentals) {
+            barAccidentals[letter] = inlineAccidental;
+        }
         return bare + _ABC_ACCIDENTAL_SUFFIX[inlineAccidental];
     }
 
+    // Carried inline accidental from earlier in the bar.
+    if (barAccidentals && letter in barAccidentals) {
+        const carriedAccidental = barAccidentals[letter];
+        if (carriedAccidental in _ABC_ACCIDENTAL_SUFFIX) {
+            return bare + _ABC_ACCIDENTAL_SUFFIX[carriedAccidental];
+        }
+    }
+
     // Fall back to the key signature.
-    const ksa = keySignature.accidentals.find(acc => {
-        const noteToCompare = acc.note.toUpperCase().replace(",", "");
-        return noteToCompare.toLowerCase() === bare.toLowerCase();
+    const ksa = keySignature?.accidentals?.find(acc => {
+        const noteToCompare = acc.note.toUpperCase().replace(/[,']/g, "");
+        return noteToCompare === letter;
     });
 
     if (ksa && ksa.acc in _ABC_ACCIDENTAL_SUFFIX) {
@@ -109,7 +124,8 @@ function _createPitchBlocks(
     keySignature,
     actionBlock,
     triplet,
-    meterDen
+    meterDen,
+    barAccidentals
 ) {
     const duration = toFraction(pitchDuration);
     const hiddenBlockId = blockId + (pitches ? 8 : 6);
@@ -135,7 +151,8 @@ function _createPitchBlocks(
         const adjustedNote = _adjustPitch(
             pitches.name,
             keySignature,
-            pitches.accidental
+            pitches.accidental,
+            barAccidentals
         ).toUpperCase();
         noteBlocks.push(
             [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
@@ -265,6 +282,8 @@ function _handleBarElement(element, repeatArray, baseBlocksCount) {
  *
  * tripletFinder is initialized fresh for each voice so that triplet state
  * never bleeds from one voice into the next.
+ * barAccidentals tracks inline accidentals across notes within a bar and
+ * resets at each bar line element.
  *
  * @param {Array} voice - The voice element array.
  * @param {number} blockId - Current block ID counter.
@@ -277,6 +296,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
     // Reset triplet state at every voice boundary so that an unclosed
     // triplet in one voice cannot affect timing in subsequent voices.
     let tripletFinder = null;
+    let barAccidentals = {};
     const actionBlock = [];
 
     voice.forEach(element => {
@@ -293,7 +313,8 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 staff.key,
                 actionBlock,
                 tripletFinder,
-                staffRecord.meterDen
+                staffRecord.meterDen,
+                barAccidentals
             );
 
             // Check and set tripletFinder to null if element?.endTriplet exists.
@@ -301,6 +322,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder = null;
             }
         } else if (element.el_type === "bar") {
+            barAccidentals = {};
             _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
         }
     });
@@ -654,9 +676,9 @@ const setupActivityAbcParser = activityInstance => {
 // AMD module definition — mirrors the pattern used in recorder.js.
 if (typeof define === "function" && define.amd) {
     define(function () {
-        return { setupActivityAbcParser };
+        return { setupActivityAbcParser, _adjustPitch };
     });
 } else if (typeof module !== "undefined" && module.exports) {
     // Jest / Node environment
-    module.exports = { setupActivityAbcParser };
+    module.exports = { setupActivityAbcParser, _adjustPitch };
 }

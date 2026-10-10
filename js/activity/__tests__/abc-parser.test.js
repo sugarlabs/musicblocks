@@ -11,7 +11,7 @@
 
 "use strict";
 
-const { setupActivityAbcParser } = require("../abc-parser.js");
+const { setupActivityAbcParser, _adjustPitch } = require("../abc-parser.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -86,6 +86,19 @@ function blocksOfType(blocks, type) {
     return blocks.filter(b => {
         const t = Array.isArray(b[1]) ? b[1][0] : b[1];
         return t === type;
+    });
+}
+
+/** Return an array of { notename, octave } objects for all pitch blocks in order. */
+function getPitchEntries(blocks) {
+    const pitchBlocks = blocksOfType(blocks, "pitch");
+    return pitchBlocks.map(pb => {
+        const notenameBlock = blocks.find(b => b[0] === pb[4][1]);
+        const octaveBlock = blocks.find(b => b[0] === pb[4][2]);
+        return {
+            notename: notenameBlock[1][1].value,
+            octave: octaveBlock[1][1].value
+        };
     });
 }
 
@@ -813,5 +826,360 @@ describe("Test 9: Empty-voice and degenerate input guard", () => {
             b => (Array.isArray(b[1]) ? b[1][0] : b[1]) === "newnote"
         );
         expect(newnotes).toHaveLength(2);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 10 — Octave marks (C,, / c') on notes (issue #9370)
+// ---------------------------------------------------------------------------
+describe("Test 10: Notes with octave marks (C,, / c')", () => {
+    test("K:C C, C,, c c' c'' produces valid note names and correct octaves", async () => {
+        // C, (pitch -7) -> octave 3
+        // C,, (pitch -14) -> octave 2
+        // c (pitch 7) -> octave 5
+        // c' (pitch 14) -> octave 6
+        // c'' (pitch 21) -> octave 7
+        const tune = makeTune({
+            title: "Octaves in C",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeNote("C,", -7),
+                            makeNote("C,,", -14),
+                            makeNote("c", 7),
+                            makeNote("c'", 14),
+                            makeNote("c''", 21)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "C", octave: 3 },
+            { notename: "C", octave: 2 },
+            { notename: "C", octave: 5 },
+            { notename: "C", octave: 6 },
+            { notename: "C", octave: 7 }
+        ]);
+    });
+
+    test("K:G F F, F,, f f' f'' applies key-signature sharp across all octaves", async () => {
+        // In G major, F is sharped. Notes with multiple commas (F,,) or
+        // apostrophes (f', f'') must get F♯ and never retain octave marks.
+        const tune = makeTune({
+            title: "Octaves in G",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "G", mode: "major", accidentals: [{ note: "f", acc: "sharp" }] },
+                    voices: [
+                        [
+                            makeNote("F", 3),
+                            makeNote("F,", -4),
+                            makeNote("F,,", -11),
+                            makeNote("f", 10),
+                            makeNote("f'", 17),
+                            makeNote("f''", 24)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "F♯", octave: 4 },
+            { notename: "F♯", octave: 3 },
+            { notename: "F♯", octave: 2 },
+            { notename: "F♯", octave: 5 },
+            { notename: "F♯", octave: 6 },
+            { notename: "F♯", octave: 7 }
+        ]);
+    });
+
+    test("K:F B B, B,, b b' applies key-signature flat across all octaves", async () => {
+        const tune = makeTune({
+            title: "Octaves in F",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "F", mode: "major", accidentals: [{ note: "B", acc: "flat" }] },
+                    voices: [
+                        [
+                            makeNote("B", 6),
+                            makeNote("B,", -1),
+                            makeNote("B,,", -8),
+                            makeNote("b", 13),
+                            makeNote("b'", 20)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "B♭", octave: 4 },
+            { notename: "B♭", octave: 3 },
+            { notename: "B♭", octave: 2 },
+            { notename: "B♭", octave: 5 },
+            { notename: "B♭", octave: 6 }
+        ]);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 11 — Inline accidentals carried through the measure (issue #9370)
+// ---------------------------------------------------------------------------
+describe("Test 11: Inline accidentals carried through the measure", () => {
+    test("K:C ^F F =F F | F carries sharp and natural until bar line", async () => {
+        // Measure 1: ^F (sharp), F (carries sharp), =F (natural), F (carries natural)
+        // Measure 2: F (resets to key signature, i.e. natural in K:C)
+        const tune = makeTune({
+            title: "Carried accidentals in C",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+                            makeNote("F", 3),
+                            makeNote("=F", 3, 0.25, { accidental: "natural" }),
+                            makeNote("F", 3),
+                            makeBar("bar_thin"),
+                            makeNote("F", 3)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "F♯", octave: 4 },
+            { notename: "F♯", octave: 4 },
+            { notename: "F", octave: 4 },
+            { notename: "F", octave: 4 },
+            { notename: "F", octave: 4 }
+        ]);
+    });
+
+    test("K:G =F F F F | F natural cancels key signature for rest of bar and resets at bar line", async () => {
+        // Measure 1: =F (natural overrides K:G sharp), F, F, F (all carry natural)
+        // Measure 2: F (falls back to K:G key signature, becomes F♯)
+        const tune = makeTune({
+            title: "Natural override in G",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "G", mode: "major", accidentals: [{ note: "f", acc: "sharp" }] },
+                    voices: [
+                        [
+                            makeNote("=F", 3, 0.25, { accidental: "natural" }),
+                            makeNote("F", 3),
+                            makeNote("F", 3),
+                            makeNote("F", 3),
+                            makeBar("bar_thin"),
+                            makeNote("F", 3)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "F", octave: 4 },
+            { notename: "F", octave: 4 },
+            { notename: "F", octave: 4 },
+            { notename: "F", octave: 4 },
+            { notename: "F♯", octave: 4 }
+        ]);
+    });
+
+    test("reproduces full octave and carried accidental tune from issue #9370", async () => {
+        // X:1 T:octave test L:1/4 K:G F, F,, f f'|^c c =f f|
+        const tune = makeTune({
+            title: "octave test",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "G", mode: "major", accidentals: [{ note: "f", acc: "sharp" }] },
+                    voices: [
+                        [
+                            makeNote("F,", -4),
+                            makeNote("F,,", -11),
+                            makeNote("f", 10),
+                            makeNote("f'", 17),
+                            makeBar("bar_thin"),
+                            makeNote("^c", 7, 0.25, { accidental: "sharp" }),
+                            makeNote("c", 7),
+                            makeNote("=f", 10, 0.25, { accidental: "natural" }),
+                            makeNote("f", 10),
+                            makeBar("bar_thin")
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "F♯", octave: 3 },
+            { notename: "F♯", octave: 2 },
+            { notename: "F♯", octave: 5 },
+            { notename: "F♯", octave: 6 },
+            { notename: "C♯", octave: 5 },
+            { notename: "C♯", octave: 5 },
+            { notename: "F", octave: 5 },
+            { notename: "F", octave: 5 }
+        ]);
+    });
+
+    test("carried flat accidental propagates until next bar", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeNote("_B", 6, 0.25, { accidental: "flat" }),
+                            makeNote("B", 6),
+                            makeBar("bar_thin"),
+                            makeNote("B", 6)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "B♭", octave: 4 },
+            { notename: "B♭", octave: 4 },
+            { notename: "B", octave: 4 }
+        ]);
+    });
+
+    test("accidentals do not bleed across voice boundaries", async () => {
+        const tune = makeTune({
+            title: "Multi-voice accidental bleed guard",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+                            makeNote("F", 3),
+                            makeBar("bar_thin")
+                        ],
+                        [makeNote("F", 3), makeBar("bar_thin")]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        // Voice 1: F♯, F♯. Voice 2 must NOT inherit Voice 1's sharp: F
+        expect(entries).toEqual([
+            { notename: "F♯", octave: 4 },
+            { notename: "F♯", octave: 4 },
+            { notename: "F", octave: 4 }
+        ]);
+    });
+
+    test("carried accidentals reset across repeat bar lines", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeBar("bar_left_repeat"),
+                            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+                            makeNote("F", 3),
+                            makeBar("bar_right_repeat"),
+                            makeNote("F", 3)
+                        ]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(tune);
+        const entries = getPitchEntries(blocks);
+
+        expect(entries).toEqual([
+            { notename: "F♯", octave: 4 },
+            { notename: "F♯", octave: 4 },
+            { notename: "F", octave: 4 }
+        ]);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 12 — Direct _adjustPitch unit tests (issue #9370)
+// ---------------------------------------------------------------------------
+describe("Test 12: Direct _adjustPitch function", () => {
+    const keySigC = { accidentals: [] };
+    const keySigG = { accidentals: [{ note: "f", acc: "sharp" }] };
+
+    test("strips multiple commas and apostrophes from note names", () => {
+        expect(_adjustPitch("C,,", keySigC)).toBe("C");
+        expect(_adjustPitch("C,,,", keySigC)).toBe("C");
+        expect(_adjustPitch("c'", keySigC)).toBe("c");
+        expect(_adjustPitch("c''", keySigC)).toBe("c");
+        expect(_adjustPitch("c'''", keySigC)).toBe("c");
+    });
+
+    test("matches key signature for notes with octave marks", () => {
+        expect(_adjustPitch("F,,", keySigG)).toBe("F♯");
+        expect(_adjustPitch("f'", keySigG)).toBe("f♯");
+        expect(_adjustPitch("f''", keySigG)).toBe("f♯");
+    });
+
+    test("updates barAccidentals map on inline accidental and carries over", () => {
+        const barAcc = {};
+        const note1 = _adjustPitch("^c", keySigC, "sharp", barAcc);
+        expect(note1).toBe("c♯");
+        expect(barAcc).toEqual({ C: "sharp" });
+
+        const note2 = _adjustPitch("c", keySigC, undefined, barAcc);
+        expect(note2).toBe("c♯");
+    });
+
+    test("carried natural overrides key signature", () => {
+        const barAcc = {};
+        const note1 = _adjustPitch("=f", keySigG, "natural", barAcc);
+        expect(note1).toBe("f");
+        expect(barAcc).toEqual({ F: "natural" });
+
+        const note2 = _adjustPitch("f", keySigG, undefined, barAcc);
+        expect(note2).toBe("f");
     });
 });
