@@ -1111,6 +1111,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                logo.inPitchDrumMatrix = false;
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0

@@ -173,7 +173,15 @@ global.PhraseMaker.dependencies = [
 global.Arpeggio = jest.fn();
 global.Arpeggio.dependencies = ["widgets/arpeggio"];
 global.PitchDrumMatrix = jest.fn();
-global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
+global.PitchDrumMatrix.dependencies = [
+    "widgets/PitchDrumMatrixWindow",
+    "widgets/PitchDrumMatrixGrid",
+    "widgets/PitchDrumMatrixBlocks",
+    "widgets/PitchDrumMatrixCells",
+    "widgets/PitchDrumMatrixPlayback",
+    "widgets/PitchDrumMatrixSave",
+    "widgets/pitchdrummatrix"
+];
 global.PitchSlider = jest.fn();
 global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
@@ -488,6 +496,56 @@ describe("setupWidgetBlocks", () => {
             expect(logo.tempo.BPMTurtles).toEqual([]);
             expect(logo.tempo.BPMBlocks).toEqual([]);
             expect(logo.tempo.BPMs).toEqual([]);
+        });
+    });
+
+    describe("PitchDrumMatrixBlock", () => {
+        const runBlock = pitchDrumMatrix => {
+            logo.pitchDrumMatrix = pitchDrumMatrix;
+            getBlock("pitchdrummatrix").flow(["childBlk"], logo, 0, "pdmBlk");
+            return logo.setTurtleListener.mock.calls[0][2];
+        };
+        const widget = (rowLabels, drums) => ({
+            rowLabels,
+            rowArgs: [],
+            drums,
+            clearBlocks: jest.fn(),
+            init: jest.fn(),
+            makeClickable: jest.fn()
+        });
+
+        it("records the pitches and drums inside the block", () => {
+            runBlock(widget([], []));
+
+            expect(logo.inPitchDrumMatrix).toBe(true);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("pdmBlk", 0, "_pitchdrummatrix_0");
+        });
+
+        it("stops recording once the block has run, so later notes play", () => {
+            const pdm = widget([], []);
+            const listener = runBlock(pdm);
+            pdm.rowLabels.push("sol");
+            pdm.drums.push("kick drum");
+
+            listener();
+
+            expect(logo.inPitchDrumMatrix).toBe(false);
+            expect(pdm.init).toHaveBeenCalledWith(activity);
+            expect(pdm.makeClickable).toHaveBeenCalled();
+        });
+
+        it("stops recording when the block has no pitch or no drum too", () => {
+            const pdm = widget([], []);
+            const listener = runBlock(pdm);
+
+            listener();
+
+            expect(logo.inPitchDrumMatrix).toBe(false);
+            expect(pdm.init).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "You must have at least one pitch block and one drum block in the matrix.",
+                "pdmBlk"
+            );
         });
     });
 
