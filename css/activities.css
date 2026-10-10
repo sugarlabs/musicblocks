@@ -3058,12 +3058,13 @@ input.timbreName {
 }
 
 .popupMsg {
-    min-width: 50%;
+    width: max-content;
     max-width: 55%;
     height: auto;
     position: absolute;
-    top: 130px;
-    left: 33%;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
     border-radius: 8px;
     background-color: #8cc6ff;
     font-family: "Roboto", sans-serif;
