@@ -654,6 +654,80 @@ describe("afterSaveMIDI", () => {
             velocity: 0.8
         });
     });
+
+    it("should skip notes with zero or invalid duration and not corrupt globalTime with Infinity", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4"],
+                    duration: 0,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: ["D4"],
+                    duration: -2,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: ["E4"],
+                    duration: NaN,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: ["F4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+
+        // The zero, negative, and NaN duration notes should be skipped.
+        // F4 should be the only note added, starting at time 0 (not Infinity).
+        expect(instrumentTrack.addNote).toHaveBeenCalledTimes(1);
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "F4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("should handle drum notes with invalid bpm safely by falling back to 90 bpm", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["snare drum"],
+                    drum: ["snare drum"],
+                    duration: 4,
+                    bpm: 0,
+                    instrument: "drums"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const drumTrack = tracks.find(track => track.name === "Track 1 - snare drum");
+
+        expect(drumTrack.addNote).toHaveBeenCalledWith({
+            midi: 38,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+    });
 });
 
 describe("save artwork methods", () => {

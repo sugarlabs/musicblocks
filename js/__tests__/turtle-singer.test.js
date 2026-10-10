@@ -1654,6 +1654,65 @@ describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)
     });
 });
 
+describe("processNote notation and MIDI emission guards against non-positive durations", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.runningMIDI = true;
+        activityMock.logo.notationMIDI = jest.fn();
+        activityMock.logo.updateNotation = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.synth.getFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.getCustomFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.start = jest.fn();
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        turtleMock.singer.suppressOutput = true;
+    });
+
+    test("does not emit notationMIDI or updateNotation when calculated duration d <= 0", () => {
+        const blk = "zeroNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        // When duration is 0, d is 0
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).not.toHaveBeenCalled();
+        expect(activityMock.logo.updateNotation).not.toHaveBeenCalled();
+    });
+
+    test("emits notationMIDI and updateNotation when calculated duration d > 0", () => {
+        const blk = "validNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(["C4"], [], 4, 0, 90, "piano");
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
+    });
+});
+
 describe("processNote playback path avoids discarded ratio computation", () => {
     let turtleMock;
     let activityMock;
