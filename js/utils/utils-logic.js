@@ -59,7 +59,7 @@ var deepClone = obj => {
     if (Array.isArray(obj)) return obj.map(item => deepClone(item));
     const cloned = {};
     for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key) && !isUnsafeObjectKey(key)) {
             cloned[key] = deepClone(obj[key]);
         }
     }

@@ -170,8 +170,10 @@ const showMaterialHighlight = (x, y, r, event, scale, stage) => {
  * Hides the button highlight effect.
  * @param {Object} circles - An object containing the highlight and active shapes.
  * @param {createjs.Stage} stage - The stage from which to remove the highlight.
+ * @param {Object} [timerManager] - Optional ManagedTimer instance.
+ * @returns {number} The timer ID.
  */
-const hideButtonHighlight = (circles, stage) => {
+const hideButtonHighlight = (circles, stage, timerManager) => {
     // Un-real circles!
     if (circles.active === undefined) {
         return;
@@ -179,20 +181,30 @@ const hideButtonHighlight = (circles, stage) => {
 
     createjs.Tween.get(circles.active).to({ alpha: 0 }, 200);
     createjs.Tween.get(circles.highlight).to({ alpha: 0 }, 400);
-    setTimeout(() => {
+    const cleanup = () => {
         stage.removeChild(circles.active, circles.highlight);
-    }, 410);
+    };
+    if (timerManager && typeof timerManager.setTimeout === "function") {
+        return timerManager.setTimeout(cleanup, 410);
+    }
+    return setTimeout(cleanup, 410);
 };
 
 /**
  * Hides the palette name display after a certain delay.
  * @param {createjs.Text} palette_text - The palette text to hide.
  * @param {createjs.Stage} stage - The stage from which to remove the palette text.
+ * @param {Object} [timerManager] - Optional ManagedTimer instance.
+ * @returns {number} The timer ID.
  */
-const hidePaletteNameDisplay = (palette_text, stage) => {
-    setTimeout(() => {
+const hidePaletteNameDisplay = (palette_text, stage, timerManager) => {
+    const cleanup = () => {
         stage.removeChild(palette_text);
-    }, 150);
+    };
+    if (timerManager && typeof timerManager.setTimeout === "function") {
+        return timerManager.setTimeout(cleanup, 150);
+    }
+    return setTimeout(cleanup, 150);
 };
 
 // Constants...

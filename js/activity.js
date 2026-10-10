@@ -168,6 +168,7 @@ let MYDEFINES = [
     "utils/musicutils-lookups",
     "utils/musicutils-rhythm",
     "utils/musicutils-solfege",
+    "utils/piemenu",
     "utils/musicutils-modewheel",
     "utils/musicutils-modecore",
     "utils/musicutils-pitchscale",
@@ -753,9 +754,6 @@ class Activity {
         // WorkspaceLayoutController (js/activity/workspace-layout-controller.js).
         // setupWorkspaceLayoutController() installs the delegation stubs below:
         // findBlocks, setHomeContainers, repositionBlocks, _handleRepositionBlocksOnResize.
-
-        //if any window resize event occurs:
-        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         // Sets up HelpController (js/activity/help-controller.js), which owns the help
         // window, about page, keyboard shortcuts dialog, statistics window,
@@ -1904,14 +1902,22 @@ class Activity {
         }
 
         let resizeTimeout;
+        let resizeAnimationFrame;
+
         this._handleWindowResize = () => {
+            if (!resizeAnimationFrame) {
+                resizeAnimationFrame = requestAnimationFrame(() => {
+                    this._handleRepositionBlocksOnResize();
+                    resizeAnimationFrame = null;
+                });
+            }
+
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this.setupPaletteMenu();
             }, 200);
         };
-        this.addEventListener(window, "resize", this._handleWindowResize);
         this._handleOrientationChangeResize = handleResize;
         this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
 
@@ -1993,7 +1999,7 @@ class Activity {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
-            for (const name in this.blocks.palettes.dict) {
+            for (const name of Object.keys(this.blocks.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2009,7 +2015,7 @@ class Activity {
             // which scans all blocks, so N moves × N blocks = O(N²).
             this.blocks._beginDeferCheckBounds();
 
-            for (const blk in this.blocks.blockList) {
+            for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
                 if (!myBlock) continue;
 
@@ -2507,7 +2513,7 @@ class Activity {
                 return;
             }
 
-            for (const name in this.palettes.dict) {
+            for (const name of Object.keys(this.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2665,6 +2671,7 @@ class Activity {
             const that = this;
 
             this.setupWindowBlurHandler(doHardStopButton);
+            this.setupResizeListeners();
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage, false, true);
@@ -3043,6 +3050,13 @@ class Activity {
         const end = window.__mbPerf.marks[endMark];
         if (typeof start !== "number" || typeof end !== "number") return;
         window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
+    }
+
+    /**
+     * Registers window resize listeners after dependency cleanup.
+     */
+    setupResizeListeners() {
+        this.addEventListener(window, "resize", this._handleWindowResize);
     }
 
     /**

@@ -62,10 +62,15 @@ global.document = {
 
 const createMockWidgetWindow = () => {
     const buttons = [];
-    return {
+    const mockWindow = {
         _toolbar: {
             appendChild: jest.fn()
         },
+        takeFocus: jest.fn().mockImplementation(function () {
+            if (global.window && global.window.widgetWindows) {
+                global.window.widgetWindows.focused = mockWindow;
+            }
+        }),
         addRangeSlider: jest.fn().mockImplementation(() => ({
             addEventListener: jest.fn(),
             style: {},
@@ -84,6 +89,7 @@ const createMockWidgetWindow = () => {
         destroy: jest.fn(),
         onclose: null
     };
+    return mockWindow;
 };
 
 const PitchSlider = require("../pitchslider.js");
@@ -99,11 +105,13 @@ describe("PitchSlider Widget", () => {
 
         global.window.widgetWindows = {
             openWindows: {},
+            focused: null,
             windowFor: jest.fn().mockImplementation(() => createMockWidgetWindow())
         };
         global.window.btoa = jest.fn(str => Buffer.from(str).toString("base64"));
 
         if (!global.document) global.document = {};
+        global.document.activeElement = null;
         global.document.createElement = jest.fn().mockImplementation(createMockElement);
         global.document.addEventListener = jest.fn();
         global.document.removeEventListener = jest.fn();
@@ -154,6 +162,10 @@ describe("PitchSlider Widget", () => {
 
         test("initializes activeSlider to null", () => {
             expect(slider.activeSlider).toBeNull();
+        });
+
+        test("initializes _keyHandler to null", () => {
+            expect(slider._keyHandler).toBeNull();
         });
     });
 
@@ -436,6 +448,133 @@ describe("PitchSlider Widget", () => {
 
             const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
+        });
+
+        test("ignores arrow keys when widgetWindow is not focused or focus is null", () => {
+            window.widgetWindows.focused = null;
+            const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(event.stopPropagation).not.toHaveBeenCalled();
+
+            window.widgetWindows.focused = {}; // Different window focused
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(event.stopPropagation).not.toHaveBeenCalled();
+        });
+
+        test("ignores arrow keys when a text input, textarea, or contentEditable element is active", () => {
+            const setMockActiveElement = el => {
+                try {
+                    Object.defineProperty(document, "activeElement", {
+                        value: el,
+                        configurable: true,
+                        writable: true
+                    });
+                } catch (e) {
+                    // Ignore if not supported
+                }
+                global.document.activeElement = el;
+            };
+
+            setMockActiveElement({ tagName: "INPUT", type: "text" });
+            const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+
+            setMockActiveElement({ tagName: "INPUT", type: "search" });
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+
+            setMockActiveElement({ tagName: "TEXTAREA" });
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+
+            setMockActiveElement({ tagName: "DIV", isContentEditable: true });
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            setMockActiveElement(null);
+        });
+
+        test("allows arrow keys when activeElement is a range slider input", () => {
+            const setMockActiveElement = el => {
+                try {
+                    Object.defineProperty(document, "activeElement", {
+                        value: el,
+                        configurable: true,
+                        writable: true
+                    });
+                } catch (e) {
+                    // Ignore if not supported
+                }
+                global.document.activeElement = el;
+            };
+
+            setMockActiveElement({ tagName: "INPUT", type: "range" });
+            const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+            keyHandler(event);
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(event.stopPropagation).toHaveBeenCalled();
+            setMockActiveElement(null);
+        });
+
+        test("ignores arrow keys when a button or select element is active", () => {
+            const setMockActiveElement = el => {
+                try {
+                    Object.defineProperty(document, "activeElement", {
+                        value: el,
+                        configurable: true,
+                        writable: true
+                    });
+                } catch (e) {
+                    // Ignore if not supported
+                }
+                global.document.activeElement = el;
+            };
+
+            setMockActiveElement({ tagName: "BUTTON" });
+            const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+
+            setMockActiveElement({ tagName: "SELECT" });
+            keyHandler(event);
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            setMockActiveElement(null);
+        });
+
+        test("allows arrow keys when opening widget while activity.blocks.activeBlock is set", () => {
+            activityMock.blocks.activeBlock = { id: "block1" };
+            const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+            keyHandler(event);
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(event.stopPropagation).toHaveBeenCalled();
+            activityMock.blocks.activeBlock = null;
+        });
+
+        test("cleans up previous keydown listener if re-initialized", () => {
+            const firstHandler = slider._keyHandler;
+            expect(firstHandler).toBeDefined();
+
+            global.window.widgetWindows.openWindows["slider"] = false;
+            slider.init(activityMock);
+
+            expect(document.removeEventListener).toHaveBeenCalledWith(
+                "keydown",
+                firstHandler,
+                true
+            );
+        });
+
+        test("widgetWindow.onclose cleanly removes keydown listener and nulls _keyHandler", () => {
+            expect(slider._keyHandler).toBeDefined();
+            slider.widgetWindow.onclose();
+            expect(document.removeEventListener).toHaveBeenCalledWith(
+                "keydown",
+                expect.any(Function),
+                true
+            );
+            expect(slider._keyHandler).toBeNull();
         });
     });
 

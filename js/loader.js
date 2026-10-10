@@ -196,6 +196,9 @@ requirejs.config({
             deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"],
             exports: "MusicUtilsSolfege"
         },
+        "utils/piemenu": {
+            exports: "PieMenuUtils"
+        },
         "utils/musicutils-modewheel": {
             deps: ["utils/utils", "utils/musicutils-constants"],
             exports: "MusicUtilsModeWheel"

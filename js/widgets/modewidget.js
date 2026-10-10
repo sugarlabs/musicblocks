@@ -1373,9 +1373,13 @@ class ModeWidget {
         this.refreshCanvas();
     }
 
+    // Only the mode table's label cell shows the current mode name; the window
+    // title stays "custom mode" (set once in the constructor). Updating it here
+    // used to overwrite that title, which also broke isReinitWidgetTitle()'s
+    // title === "custom mode" check once any mode had been displayed, silently
+    // disabling reinitialization when the connected block changes.
     _updateModeDisplay(name) {
         this._modeLabelCell.textContent = name;
-        this.widgetWindow.updateTitle(name);
     }
 
     // ── Save / export ─────────────────────────────────────────────
@@ -1741,7 +1745,9 @@ class ModeWidget {
             maxRadius: 0.75,
             clickModeRotate: false,
             selectionPaths: true,
-            titleFont: "400 " + titleFontSize + "px sans-serif"
+            titleFont: "400 " + titleFontSize + "px sans-serif",
+            navAngle: -90,
+            animatetime: 0
         });
         this._modeWheel.createWheel(Array.from({ length: n }, (_, i) => String(i)));
     }
@@ -1753,7 +1759,9 @@ class ModeWidget {
             maxRadius: 0.9,
             clickModeRotate: false,
             selectionPaths: true,
-            titleRotateAngle: 90
+            titleRotateAngle: 90,
+            navAngle: -90,
+            animatetime: 0
         });
 
         // Reconcile selectedNotes: preserve existing, ensure index 0 is always true
@@ -1771,7 +1779,9 @@ class ModeWidget {
             maxRadius: 0.4,
             clickModeRotate: false,
             selectionPaths: true,
-            titleRotateAngle: 90
+            titleRotateAngle: 90,
+            navAngle: -90,
+            animatetime: 0
         });
 
         this._playWheel.createWheel(new Array(n).fill(" "));

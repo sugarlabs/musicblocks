@@ -20,7 +20,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// The widget's methods live in these modules, and RhythmRuler copies them onto its
+// prototype, so they must be global before rhythmruler.js loads (as in the browser).
+global.RhythmRulerLayout = require("../RhythmRulerLayout.js");
+global.RhythmRulerHistory = require("../RhythmRulerHistory.js");
+global.RhythmRulerEditing = require("../RhythmRulerEditing.js");
+global.RhythmRulerPlayback = require("../RhythmRulerPlayback.js");
+global.RhythmRulerSave = require("../RhythmRulerSave.js");
+global.RhythmRulerCircular = require("../RhythmRulerCircular.js");
 const RhythmRuler = require("../rhythmruler.js");
+// In the browser RhythmRuler is a global class, and the moved methods read its
+// static constants (RhythmRuler.ICONSIZE and so on) through that global.
+global.RhythmRuler = RhythmRuler;
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 
 // --- Global Mocks (Fake the Browser Environment) ---
@@ -394,6 +405,66 @@ describe("RhythmRuler Widget", () => {
 
             expect(callback).not.toHaveBeenCalled();
             expect(rhythmRuler._timerManager.activeCount).toBe(0);
+        });
+    });
+
+    describe("Per-drum play controls", () => {
+        let originalBeginnerMode;
+
+        beforeEach(() => {
+            originalBeginnerMode = Object.getOwnPropertyDescriptor(global, "beginnerMode");
+        });
+
+        afterEach(() => {
+            if (originalBeginnerMode) {
+                Object.defineProperty(global, "beginnerMode", originalBeginnerMode);
+            } else {
+                delete global.beginnerMode;
+            }
+        });
+
+        test.each([
+            [false, true],
+            ["false", true],
+            [true, false],
+            ["true", false]
+        ])("shows controls only in advanced mode (beginnerMode=%s)", (mode, showPlay) => {
+            mockActivity.beginnerMode = mode;
+            // The toolbar element used to be exposed as the global beginnerMode.
+            // It must not override the current Activity mode.
+            global.beginnerMode = { id: "beginnerMode" };
+            rhythmRuler.Rulers = [[[4], []]];
+            jest.spyOn(rhythmRuler, "__setNoteValueDisplay").mockImplementation();
+            jest.spyOn(rhythmRuler, "__addCellEventHandlers").mockImplementation();
+            jest.spyOn(rhythmRuler, "_setButtonIcon").mockImplementation();
+            const rows = [];
+            const createTable = () => ({
+                style: {},
+                insertRow: () => {
+                    const row = {
+                        cells: [],
+                        style: {},
+                        setAttribute: jest.fn(),
+                        insertCell: jest.fn(() => {
+                            const cell = {
+                                style: {},
+                                appendChild: jest.fn(),
+                                replaceChildren: jest.fn()
+                            };
+                            row.cells.push(cell);
+                            return cell;
+                        })
+                    };
+                    rows.push(row);
+                    return row;
+                }
+            });
+            jest.spyOn(document, "createElement").mockImplementation(tag =>
+                tag === "table" ? createTable() : { style: {} }
+            );
+            rhythmRuler._buildRulerTable({ getWidgetBody: () => ({ append: jest.fn() }) });
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalledTimes(showPlay ? 1 : 0);
+            expect(rows[0].cells).toHaveLength(showPlay ? 2 : 1);
         });
     });
 
@@ -2582,7 +2653,15 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
 
         test("RhythmRuler.dependencies declares AMD dependencies", () => {
             expect(Array.isArray(RhythmRuler.dependencies)).toBe(true);
-            expect(RhythmRuler.dependencies).toEqual(["widgets/rhythmruler"]);
+            expect(RhythmRuler.dependencies).toEqual([
+                "widgets/RhythmRulerLayout",
+                "widgets/RhythmRulerHistory",
+                "widgets/RhythmRulerEditing",
+                "widgets/RhythmRulerPlayback",
+                "widgets/RhythmRulerSave",
+                "widgets/RhythmRulerCircular",
+                "widgets/rhythmruler"
+            ]);
         });
     });
 

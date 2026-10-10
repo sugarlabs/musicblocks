@@ -21,6 +21,7 @@
  */
 
 const { setupPitchBlocks } = require("../PitchBlocks");
+const PitchStaircaseSteps = require("../../widgets/PitchStaircaseSteps");
 
 const SHARP = "\u266F";
 const FLAT = "\u266D";
@@ -265,7 +266,8 @@ describe("setupPitchBlocks", () => {
             },
             pitchStaircase: {
                 Stairs: [],
-                stairPitchBlocks: []
+                stairPitchBlocks: [],
+                addStair: PitchStaircaseSteps.prototype.addStair
             },
             pitchSlider: {
                 frequencies: []
@@ -591,7 +593,9 @@ describe("setupPitchBlocks", () => {
             logo.inPitchStaircase = true;
             // pitchStaircase mocks in beforeEach
             block.flow([440], logo, 0, 10);
-            expect(logo.pitchStaircase.Stairs).toHaveLength(1); // Stairs gets populated
+            // A complete stair: its own parent and initial frequency, with a 1/1 ratio.
+            expect(logo.pitchStaircase.Stairs).toEqual([["A", 4, 440, 1, 1, 440, 440]]);
+            expect(logo.pitchStaircase.stairPitchBlocks).toEqual([10]);
 
             // Branch: inPitchSlider
             logo.inPitchStaircase = false;

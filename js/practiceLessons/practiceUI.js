@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, loadPracticeLessons */
+/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, escapeHTML, loadPracticeLessons */
 /* exported PracticeUI, ExplorerJournalUI */
 
 // Criteria that mean the level itself is finished, as opposed to a hidden discovery.
@@ -61,12 +61,35 @@ const PracticeUI = {
     },
 
     getJournalDefaultRight() {
-        const practicePanel = document.getElementById("practice-panel");
-        if (practicePanel && practicePanel.style.display !== "none") {
-            return `${this.PANEL_WIDTH + this.PANEL_GAP}px`;
+        const practicePanel = this.getVisiblePanel("practice-panel");
+        if (practicePanel && !practicePanel.classList.contains("practice-panel-collapsed")) {
+            const journalPanel = document.getElementById("explorer-journal-panel");
+            const journalWidth = journalPanel?.offsetWidth || this.PANEL_WIDTH;
+            const availableRight = Math.max(
+                0,
+                window.innerWidth - journalWidth - this.COLLAPSE_TOGGLE_WIDTH
+            );
+            return `${Math.min(practicePanel.offsetWidth + this.PANEL_GAP, availableRight)}px`;
         }
 
         return "0";
+    },
+
+    keepPanelInViewport(panel) {
+        if (
+            panel.dataset.userMoved !== "true" ||
+            panel.style.display === "none" ||
+            panel.classList.contains("practice-panel-collapsed")
+        ) {
+            return;
+        }
+
+        const rect = panel.getBoundingClientRect();
+        const maxLeft = Math.max(this.COLLAPSE_TOGGLE_WIDTH, window.innerWidth - rect.width);
+        const maxTop = Math.max(64, window.innerHeight - rect.height);
+        panel.style.left = `${Math.min(Math.max(this.COLLAPSE_TOGGLE_WIDTH, rect.left), maxLeft)}px`;
+        panel.style.top = `${Math.min(Math.max(64, rect.top), maxTop)}px`;
+        panel.style.right = "auto";
     },
 
     refreshJournalPanelOffset() {
@@ -178,6 +201,7 @@ const PracticeUI = {
         panel.classList.remove("practice-panel-collapsed");
         this.restorePanelExpandState(panel);
         this.syncCollapseToggle(panel);
+        this.keepPanelInViewport(panel);
 
         if (panel.id === "explorer-journal-panel") {
             if (panel.dataset.userMoved !== "true") {
@@ -194,6 +218,7 @@ const PracticeUI = {
         [practicePanel, journalPanel].forEach(panel => {
             if (panel && panel.classList.contains("practice-panel-collapsed")) {
                 panel.style.top = `${this.getCollapsedLaneTop(panel)}px`;
+                this.bringPanelToFront(panel);
             }
         });
     },
@@ -261,14 +286,9 @@ const PracticeUI = {
         handle.onpointermove = event => {
             if (!dragging) return;
 
-            const nextLeft = startLeft + event.clientX - startX;
-            const nextTop = startTop + event.clientY - startY;
-            const maxLeft = Math.max(0, window.innerWidth - panel.offsetWidth);
-            const maxTop = Math.max(0, window.innerHeight - panel.offsetHeight);
-
-            panel.style.left = `${Math.min(Math.max(0, nextLeft), maxLeft)}px`;
-            panel.style.top = `${Math.min(Math.max(0, nextTop), maxTop)}px`;
-            panel.style.right = "auto";
+            panel.style.left = `${startLeft + event.clientX - startX}px`;
+            panel.style.top = `${startTop + event.clientY - startY}px`;
+            this.keepPanelInViewport(panel);
         };
 
         handle.onpointerup = event => {
@@ -284,12 +304,27 @@ const PracticeUI = {
         };
 
         panel.onpointerdown = () => this.bringPanelToFront(panel);
+        panel.onfocusin = () => this.bringPanelToFront(panel);
+
+        const refreshPosition = () => {
+            this.keepPanelInViewport(panel);
+            this.refreshJournalPanelOffset();
+        };
+        window.addEventListener("resize", refreshPosition);
+        if (window.ResizeObserver) {
+            new window.ResizeObserver(refreshPosition).observe(
+                panel.querySelector(".practice-panel-frame")
+            );
+        }
     },
 
     bringPanelToFront(panel) {
         const nextZ = Number(document.body.dataset.practicePanelZ || 9000) + 1;
         document.body.dataset.practicePanelZ = String(nextZ);
         panel.style.zIndex = nextZ;
+        if (!panel.classList.contains("practice-panel-collapsed")) {
+            this.refreshCollapsedLane();
+        }
     },
 
     restorePanel(panel, fallbackRight) {
@@ -298,6 +333,7 @@ const PracticeUI = {
             panel.style.left = "auto";
             panel.style.right = fallbackRight !== undefined ? fallbackRight : "0";
         }
+        this.keepPanelInViewport(panel);
         this.bringPanelToFront(panel);
     },
 
@@ -424,8 +460,8 @@ const PracticeUI = {
 
         container.innerHTML = `
       <div class="quest-title">
-        <h3>${PracticeTheme.title}</h3>
-        <p>${PracticeTheme.subtitle}</p>
+        <h3>${this.escapeHTML(PracticeTheme.title)}</h3>
+        <p>${this.escapeHTML(PracticeTheme.subtitle)}</p>
       </div>
       ${PracticeTheme.intro}
       ${this.renderBigBadges(bigBadgeIds)}
@@ -436,7 +472,7 @@ const PracticeUI = {
           data-level="${p.level}">
           ${this.renderLevelBadgeStrip(p)}
           <span>${_("Level")} ${p.level}</span>
-          <small>${p.title}</small>
+          <small>${this.escapeHTML(p.title)}</small>
         </button>
       `
       ).join("")}
@@ -467,7 +503,7 @@ const PracticeUI = {
       <button id="back-to-levels">&larr; ${_("Back")}</button>
 
       <h2>${_("Level")} ${problem.level}</h2>
-      <h4>${problem.title}</h4>
+      <h4>${this.escapeHTML(problem.title)}</h4>
       <div class="practice-description">${problem.description}</div>
       ${this.renderRewards(problem)}
       <div id="practice-badge-status">${this.renderBadgeStatus(problem)}</div>
@@ -477,7 +513,7 @@ const PracticeUI = {
           nextProblem
               ? `<button id="next-level">
               <span>${_("Next Lesson")} &rarr;</span>
-              <small>${_("Level")} ${nextProblem.level} · ${nextProblem.title}</small>
+              <small>${_("Level")} ${nextProblem.level} · ${this.escapeHTML(nextProblem.title)}</small>
             </button>`
               : ""
       }
@@ -589,8 +625,8 @@ const PracticeUI = {
           <span
             class="big-badge big-badge-${badge.iconKey || "island"}"
             title="${this.getBadgeTitle(badge)}"
-            aria-label="${badge.label}">
-            <span>${badge.label}</span>
+            aria-label="${this.escapeAttribute(badge.label)}">
+            <span>${this.escapeHTML(badge.label)}</span>
           </span>
         `
             )
@@ -614,7 +650,7 @@ const PracticeUI = {
                     `<span
                       class="level-badge level-badge-${badge.iconKey || "discovery"}"
                       title="${this.getBadgeTitle(badge)}"
-                      aria-label="${badge.label}">
+                      aria-label="${this.escapeAttribute(badge.label)}">
                     </span>`
             )
             .join("")}
@@ -629,7 +665,7 @@ const PracticeUI = {
       <section class="reward-card">
         <h4>${_("Quest Rewards")}</h4>
         <ul>
-          ${problem.rewards.map(reward => `<li>${reward}</li>`).join("")}
+          ${problem.rewards.map(reward => `<li>${this.escapeHTML(reward)}</li>`).join("")}
         </ul>
       </section>
     `;
@@ -648,7 +684,7 @@ const PracticeUI = {
               .map(
                   badge => `
             <span class="badge-chip ${earnedBadgeIds.includes(badge.id) ? "earned" : ""}">
-              ${badge.label}
+              ${this.escapeHTML(badge.label)}
             </span>
           `
               )
@@ -719,10 +755,13 @@ const PracticeUI = {
         const notice = this.getQuestNotice();
 
         notice.className = `practice-quest-notice show ${type || "success"}`;
-        notice.innerHTML = `
-          <strong>${title}</strong>
-          <span>${message}</span>
-        `;
+        notice.textContent = "";
+        const strong = document.createElement("strong");
+        strong.textContent = title;
+        const span = document.createElement("span");
+        span.textContent = message;
+        notice.appendChild(strong);
+        notice.appendChild(span);
 
         clearTimeout(this.noticeTimer);
         this.noticeTimer = setTimeout(() => {
@@ -779,6 +818,10 @@ const PracticeUI = {
 
     getBadgeTitle(badge) {
         return this.escapeAttribute(`${badge.label}: ${badge.message || _("Discovery badge")}`);
+    },
+
+    escapeHTML(value) {
+        return escapeHTML(value || "");
     },
 
     escapeAttribute(value) {
@@ -1308,12 +1351,7 @@ const ExplorerJournalUI = {
     },
 
     escapeHTML(value) {
-        return String(value || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
+        return escapeHTML(value || "");
     },
 
     escapeAttribute(value) {

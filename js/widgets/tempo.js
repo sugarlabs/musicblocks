@@ -48,6 +48,9 @@ class Tempo {
         this.BPMs = [];
         this.BPMInputs = [];
         this.BPMBlocks = [];
+        // The turtle that ran each BPM block, so a set BPM row changes only that turtle's tempo.
+        // The turtle itself rather than its index, which shifts when a turtle is removed.
+        this.BPMTurtles = [];
         this.tempoCanvases = [];
         this.activeBPMIndex = 0;
         this._keyHandler = null;
@@ -402,10 +405,11 @@ class Tempo {
             Singer.masterBPM = bpmValue;
             Singer.defaultBPMFactor = TONEBPM / bpmValue;
         } else if (bpmBlock.name === "setbpm3" || bpmBlock.name === "setbpm2") {
-            for (const tur of this.activity.turtles.turtleList) {
-                if (tur.singer.bpm.length > 0) {
-                    tur.singer.bpm[tur.singer.bpm.length - 1] = bpmValue;
-                }
+            // Only the turtle that ran the block: other start blocks keep their own tempo.
+            const turtle = this.BPMTurtles ? this.BPMTurtles[i] : null;
+            const isCurrent = turtle && this.activity.turtles.turtleList.includes(turtle);
+            if (isCurrent && turtle.singer && turtle.singer.bpm.length > 0) {
+                turtle.singer.bpm[turtle.singer.bpm.length - 1] = bpmValue;
             }
         }
     }

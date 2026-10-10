@@ -281,6 +281,7 @@ class GlobalPlanet {
     downloadProjectsToCache(data, callback) {
         const Planet = this.Planet;
         this.loadCount = data.length;
+        this.batchHasOfflineError = false;
 
         for (let i = 0; i < data.length; i++) {
             (function () {
@@ -301,7 +302,7 @@ class GlobalPlanet {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
         } else {
-            this.throwOfflineError();
+            this.batchHasOfflineError = true;
         }
 
         this.loadCount -= 1;
@@ -313,7 +314,8 @@ class GlobalPlanet {
             id,
             function (d) {
                 this.addProjectToCache(id, d, callback);
-            }.bind(this)
+            }.bind(this),
+            true
         );
     }
 
@@ -336,26 +338,40 @@ class GlobalPlanet {
     downloadDataToCache(id, callback, error) {
         if (error === undefined) error = null;
 
+        const cacheEntry = this.cache[id] ?? null;
+        const expectedUpdatedAt = this.cache[id]?.ProjectLastUpdated || null;
+
         this.Planet.ServerInterface.downloadProject(
             id,
             function (data) {
-                this.afterDownloadData(id, data, callback, error);
-            }.bind(this)
+                this.afterDownloadData(id, data, callback, error, cacheEntry);
+            }.bind(this),
+            expectedUpdatedAt
         );
     }
 
-    afterDownloadData(id, data, callback, error) {
+    afterDownloadData(id, data, callback, error, cacheEntry = this.cache[id]) {
         const Planet = this.Planet;
 
         if (error === undefined) error = null;
 
         if (data.success) {
+            const projectData = Planet.ProjectStorage.decodeTB(data.data);
             if (id in this.cache) {
-                this.cache[id].ProjectData = Planet.ProjectStorage.decodeTB(data.data);
-                callback(this.cache[id].ProjectData);
-            } else callback(Planet.ProjectStorage.decodeTB(data.data));
+                if (this.cache[id] === cacheEntry) {
+                    this.cache[id].ProjectData = projectData;
+                }
+                callback(projectData);
+            } else callback(projectData);
         } else {
-            if (error !== null) error();
+            if (error !== null) {
+                error();
+            } else if (Planet.SaveInterface && Planet.SaveInterface.showToast) {
+                Planet.SaveInterface.showToast(
+                    _("Could not load project. Please check your connection and try again."),
+                    true
+                );
+            }
         }
     }
 
@@ -394,7 +410,11 @@ class GlobalPlanet {
 
         // If nothing rendered at all, show "no projects" rather than an empty grid.
         if (rendered === 0 && data.length > 0) {
-            this.throwNoProjectsError();
+            if (this.batchHasOfflineError) {
+                this.throwOfflineError();
+            } else {
+                this.throwNoProjectsError();
+            }
             return;
         }
 

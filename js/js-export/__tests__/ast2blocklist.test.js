@@ -1791,6 +1791,71 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should keep microtonal note names as note names", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch("^C", 4);
+            await mouse.playPitch("vvD♭", 4);
+            await mouse.playPitch("^sol", 4);
+            await mouse.playPitch("E♯", 4);
+            await mouse.playPitch("C𝄪", 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["notename", { value: "^C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 6, 7]],
+            [5, ["notename", { value: "vvD♭" }], 0, 0, [4]],
+            [6, ["number", { value: 4 }], 0, 0, [4]],
+            [7, "pitch", 0, 0, [4, 8, 9, 10]],
+            [8, ["solfege", { value: "^sol" }], 0, 0, [7]],
+            [9, ["number", { value: 4 }], 0, 0, [7]],
+            [10, "pitch", 0, 0, [7, 11, 12, 13]],
+            [11, ["notename", { value: "E♯" }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]],
+            [13, "pitch", 0, 0, [10, 14, 15, null]],
+            [14, ["notename", { value: "C𝄪" }], 0, 0, [13]],
+            [15, ["number", { value: 4 }], 0, 0, [13]]
+        ]);
+    });
+
+    test("should convert a pitch that isn't a note name literal", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch(pitch, 4);
+            await mouse.playPitch(box1 + 1, 4);
+            await mouse.playPitch(5, 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["namedbox", { value: "pitch" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 8, 9]],
+            [5, "plus", 0, 0, [4, 6, 7]],
+            [6, ["namedbox", { value: "box1" }], 0, 0, [5]],
+            [7, ["number", { value: 1 }], 0, 0, [5]],
+            [8, ["number", { value: 4 }], 0, 0, [4]],
+            [9, "vspace", 0, 0, [4, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ]);
+    });
+
     test("should convert the current meter getter", () => {
         const code = `
         new Mouse(async mouse => {
@@ -2303,5 +2368,60 @@ describe("AST2BlockList Class", () => {
         const argBlock = blockList.find(b => b[0] === 2);
         expect(argBlock).toBeDefined();
         expect(argBlock[1]).toEqual(["number", { value: 1 }]);
+    });
+
+    test("should import playNoise and the value blocks that call a mouse method", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNoise("noise1");
+            var box1 = await mouse.getNotesPlayed(4);
+            var box2 = await mouse.numToPitch(5);
+            var box3 = await mouse.numToOctave(5);
+            var box4 = await mouse.getSynthVolume("piano");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "playnoise", 0, 0, [0, 2, 3]],
+            [2, ["noisename", { value: "noise1" }], 0, 0, [1]],
+            [3, ["storein2", { value: "box1" }], 0, 0, [1, 4, 6]],
+            [4, "elapsednotes2", 0, 0, [3, 5]],
+            [5, ["number", { value: 4 }], 0, 0, [4]],
+            [6, ["storein2", { value: "box2" }], 0, 0, [3, 7, 9]],
+            [7, "number2pitch", 0, 0, [6, 8]],
+            [8, ["number", { value: 5 }], 0, 0, [7]],
+            [9, ["storein2", { value: "box3" }], 0, 0, [6, 10, 12]],
+            [10, "number2octave", 0, 0, [9, 11]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["storein2", { value: "box4" }], 0, 0, [9, 13, null]],
+            [13, "synthvolumefactor", 0, 0, [12, 14]],
+            [14, ["text", { value: "piano" }], 0, 0, [13]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+    });
+
+    test("should still import the bare numToPitch and getSynthVolume calls older exports wrote", () => {
+        const code = `
+        new Mouse(async mouse => {
+            var box1 = numToPitch(5);
+            var box2 = getSynthVolume("piano");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList.map(block => block[1])).toEqual([
+            "start",
+            ["storein2", { value: "box1" }],
+            "number2pitch",
+            ["number", { value: 5 }],
+            ["storein2", { value: "box2" }],
+            "synthvolumefactor",
+            ["text", { value: "piano" }]
+        ]);
     });
 });

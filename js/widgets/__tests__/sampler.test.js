@@ -70,6 +70,11 @@ global.Singer = { ToneActions: { setTimbre: jest.fn() } };
 global.docById = id => document.getElementById(id);
 global.docByClass = cls => document.getElementsByClassName(cls);
 global.alert = jest.fn();
+// The Sampler's tuner (js/widgets/tuner.js); each widget gets its own.
+global.Tuner = function () {
+    this.startTuner = jest.fn().mockResolvedValue();
+    this.stopTuner = jest.fn();
+};
 global.TunerDisplay = class {
     constructor(canvas, width, height) {
         this.canvas = canvas;
@@ -81,7 +86,19 @@ global.TunerDisplay = class {
 
 global.ManagedTimer = require("../../utils/ManagedTimer.js");
 
+// The widget's methods live in these modules and are installed by the constructor,
+// so they must be global before a widget is made, as in the browser.
+global.SamplerBlocks = require("../SamplerBlocks.js");
+global.SamplerPlayback = require("../SamplerPlayback.js");
+global.SamplerPitch = require("../SamplerPitch.js");
+global.SamplerFiles = require("../SamplerFiles.js");
+global.SamplerUI = require("../SamplerUI.js");
+global.SamplerPieMenu = require("../SamplerPieMenu.js");
+global.SamplerCanvas = require("../SamplerCanvas.js");
+global.SamplerTuner = require("../SamplerTuner.js");
 const { SampleWidget, PitchSmoother, resolveBackendURL } = require("../sampler.js");
+// resolveBackendURL is a top-level function in sampler.js, so it's global in the browser too.
+global.resolveBackendURL = resolveBackendURL;
 
 describe("resolveBackendURL", () => {
     test("returns window.AI_SAMPLE_ENDPOINT when defined and strips trailing slashes", () => {
@@ -112,7 +129,18 @@ describe("resolveBackendURL", () => {
 
 describe("SampleWidget.dependencies", () => {
     test("includes the tuner module used by the sampler", () => {
-        expect(SampleWidget.dependencies).toEqual(["widgets/tuner", "widgets/sampler"]);
+        expect(SampleWidget.dependencies).toEqual([
+            "widgets/tuner",
+            "widgets/SamplerBlocks",
+            "widgets/SamplerPlayback",
+            "widgets/SamplerPitch",
+            "widgets/SamplerFiles",
+            "widgets/SamplerUI",
+            "widgets/SamplerPieMenu",
+            "widgets/SamplerCanvas",
+            "widgets/SamplerTuner",
+            "widgets/sampler"
+        ]);
     });
 });
 
@@ -244,8 +272,6 @@ describe("Sampler Widget", () => {
                         LiveWaveForm: jest.fn(),
                         playRecording: jest.fn(),
                         stopPlayBackRecording: jest.fn(),
-                        startTuner: jest.fn().mockResolvedValue(),
-                        stopTuner: jest.fn(),
                         getWaveFormValues: jest.fn(() => [0, 0.5, -0.5]),
                         startRecordingTimer: jest.fn()
                     }
@@ -937,10 +963,10 @@ describe("Sampler Widget", () => {
 
             widgetWindow.onclose();
 
-            expect(mockActivity.logo.synth.stopTuner).toHaveBeenCalled();
+            expect(widget.tuner.stopTuner).toHaveBeenCalled();
 
             await widget._tunerBtn.onclick();
-            expect(mockActivity.logo.synth.startTuner).toHaveBeenCalledTimes(2);
+            expect(widget.tuner.startTuner).toHaveBeenCalledTimes(2);
         });
 
         test("onclose does not call stopRecording/stopTuner when neither is active", () => {
@@ -949,7 +975,7 @@ describe("Sampler Widget", () => {
             widgetWindow.onclose();
 
             expect(mockActivity.logo.synth.stopRecording).not.toHaveBeenCalled();
-            expect(mockActivity.logo.synth.stopTuner).not.toHaveBeenCalled();
+            expect(widget.tuner.stopTuner).not.toHaveBeenCalled();
         });
 
         test("onclose disposes the pitch analysers and disconnects the synths", () => {
@@ -1484,8 +1510,7 @@ describe("Sampler Widget", () => {
                 logo: {
                     synth: {
                         trigger: jest.fn(),
-                        stopRecording: jest.fn(),
-                        stopTuner: jest.fn()
+                        stopRecording: jest.fn()
                     }
                 },
                 errorMsg: jest.fn(),

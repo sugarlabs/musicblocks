@@ -105,6 +105,11 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     let queueSlur = false;
     let queueCrescendo = false;
     let queueDecrescendo = false;
+    // With nested forevers, only the innermost one ever repeats, and a
+    // forever with no notes after it has nothing to repeat.
+    const staged = logo.notation.notationStaging[turtle];
+    const lastRepeat = staged.lastIndexOf("begin repeat");
+    const repeatStart = staged.slice(lastRepeat + 1).some(Array.isArray) ? lastRepeat : -1;
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
@@ -279,6 +284,11 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     break;
                 case "end slur":
                     logo.notationNotes[turtle] += ")  ";
+                    break;
+                case "begin repeat":
+                    if (i === repeatStart) {
+                        logo.notationNotes[turtle] += '\\bar ".|:" ';
+                    }
                     break;
                 case "begin harmonics":
                     logo.notationNotes[turtle] += "\\harmonicsOn ";
@@ -648,6 +658,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             __startQueuedSpanners();
         }
     }
+
+    if (repeatStart !== -1) {
+        logo.notationNotes[turtle] += '\\bar ":|." ';
+    }
 };
 
 const saveLilypondOutput = function (activity) {
@@ -796,6 +810,8 @@ const saveLilypondOutput = function (activity) {
 
             this.freygish = "";
             processLilypondNotes(this, activity.logo, t);
+            // A voice ending on a repeat bar must not also get a final bar.
+            const endsOnRepeat = activity.logo.notationNotes[t].trimEnd().endsWith('\\bar ":|."');
 
             if (this.freygish !== "") {
                 activity.logo.notationOutput += this.freygish;
@@ -816,7 +832,7 @@ const saveLilypondOutput = function (activity) {
                 activity.logo.notationOutput += "\\drummode {\n";
                 activity.logo.notationOutput += activity.logo.notationNotes[t];
                 // Add bar to last turtle's output.
-                if (t === lastVoice) {
+                if (t === lastVoice && !endsOnRepeat) {
                     activity.logo.notationOutput += ' \\bar "|."';
                 }
 
@@ -842,7 +858,7 @@ const saveLilypondOutput = function (activity) {
                 activity.logo.notationOutput += activity.logo.notationNotes[t];
 
                 // Add bar to last turtle's output.
-                if (t === lastVoice) {
+                if (t === lastVoice && !endsOnRepeat) {
                     activity.logo.notationOutput += ' \\bar "|."';
                 }
 

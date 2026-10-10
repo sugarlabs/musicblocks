@@ -67,6 +67,62 @@ describe("MathUtility", () => {
             expect(result).toBeLessThanOrEqual(5);
         });
 
+        describe("decimal bounds", () => {
+            // Math.random() at its two extremes gives the lowest and highest result.
+            const extremes = (a, b) => {
+                const spy = jest.spyOn(Math, "random");
+                spy.mockReturnValue(0);
+                const lowest = MathUtility.doRandom(a, b);
+                spy.mockReturnValue(0.9999999);
+                const highest = MathUtility.doRandom(a, b);
+                spy.mockRestore();
+                return [lowest, highest];
+            };
+
+            test("stays inside 0.5 to 1.5", () => {
+                expect(extremes(0.5, 1.5)).toEqual([1, 1]);
+            });
+
+            test("stays inside 1.5 to 3", () => {
+                expect(extremes(1.5, 3)).toEqual([2, 3]);
+            });
+
+            test("stays inside a negative decimal range", () => {
+                expect(extremes(-2.5, -0.5)).toEqual([-2, -1]);
+            });
+
+            test("stays inside swapped decimal bounds", () => {
+                expect(extremes(3, 1.5)).toEqual([2, 3]);
+            });
+
+            test("returns min when no whole number is in the range", () => {
+                expect(extremes(2.2, 2.8)).toEqual([2.2, 2.2]);
+                expect(extremes(2.8, 2.2)).toEqual([2.2, 2.2]);
+            });
+
+            test("keeps the full range for whole number bounds", () => {
+                expect(extremes(1, 6)).toEqual([1, 6]);
+                expect(extremes(-5, 5)).toEqual([-5, 5]);
+            });
+
+            test("stays inside the range for large bounds", () => {
+                // Adding the random offset to low before flooring rounds up to 2 ** 51 + 2 here.
+                const spy = jest.spyOn(Math, "random").mockReturnValue(0.9);
+                const result = MathUtility.doRandom(2 ** 51 + 0.5, 2 ** 51 + 1.5);
+                spy.mockRestore();
+                expect(result).toBe(2 ** 51 + 1);
+            });
+
+            test("never leaves the range over many draws", () => {
+                for (let i = 0; i < 2000; i++) {
+                    const result = MathUtility.doRandom(0.5, 3.7);
+                    expect(Number.isInteger(result)).toBe(true);
+                    expect(result).toBeGreaterThanOrEqual(1);
+                    expect(result).toBeLessThanOrEqual(3);
+                }
+            });
+        });
+
         test("returns solfege with swapped order (n1 > n2 in solfege)", () => {
             const result = MathUtility.doRandom("sol", "do", 4);
             expect(result).toHaveLength(2);
@@ -92,6 +148,10 @@ describe("MathUtility", () => {
             // Without the guard this returns something like ["mi", "NaN"], which
             // reads as a valid solfege pair everywhere downstream.
             expect(() => MathUtility.doRandom("do", "sol", NaN)).toThrow("NanError");
+        });
+
+        test.each([Infinity, -Infinity])("rejects a non-finite octave %p", octave => {
+            expect(() => MathUtility.doRandom("do", "sol", octave)).toThrow("NanError");
         });
 
         test("still accepts an undefined octave after the NaN guard", () => {

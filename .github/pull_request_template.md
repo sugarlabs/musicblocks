@@ -11,7 +11,21 @@ Please complete the sections below to help us review your changes efficiently.
 
 <!-- Reference the specific issue using #issue_number (e.g., "Fixes #123"). -->
 
-**Fixes:** #
+Fixes #
+
+---
+
+## MusicBlocks Project Link
+
+<!-- First-time contributors (CI enforced): create and publish/share your MusicBlocks project, then paste the generated share link here (e.g., https://musicblocks.sugarlabs.org/index.html?repo=my-project-from-production-3&run=True). Existing contributors can leave this blank. -->
+
+**Project Link:**
+
+---
+
+## MusicBlocks Project Screenshot or Screen-Recording
+
+<!-- First-time contributors (CI enforced): attach a screenshot or a screen-recording of your published MusicBlocks project here. Existing contributors can leave this blank. -->
 
 ---
 
@@ -70,7 +84,7 @@ Please complete the sections below to help us review your changes efficiently.
 - [ ] I have followed the project's coding style guidelines.
 - [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
 - [ ] I have addressed the code review feedback from the previous submission, if applicable.
-- [ ] I have enabled **"Allow edits from maintainers"** (required for auto-rebase; affects PR branch only).
+- [ ] I have enabled **"Allow edits from maintainers"** (allows maintainers to assist with rebases or edits; affects PR branch only).
 
 ---
 

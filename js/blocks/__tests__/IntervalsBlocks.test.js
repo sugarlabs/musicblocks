@@ -100,6 +100,9 @@ describe("setupIntervalsBlocks", () => {
         global.INTERVALVALUES = {
             fifth: [0, 0, 1.5]
         };
+        const rhythm = require("../../utils/musicutils-rhythm");
+        global.saveMeterState = rhythm.saveMeterState;
+        global.restoreMeterState = rhythm.restoreMeterState;
 
         global.Singer = {
             IntervalsActions: {
@@ -133,6 +136,12 @@ describe("setupIntervalsBlocks", () => {
                 firstPitch: [],
                 lastPitch: [],
                 notesPlayed: 0,
+                beatsPerMeasure: 4,
+                noteValuePerBeat: 4,
+                pickup: 0,
+                meterAnchor: null,
+                beatList: [1, 3],
+                defaultStrongBeats: true,
                 duplicateFactor: 1,
                 arpeggio: [],
                 inDuplicate: false
@@ -929,6 +938,34 @@ describe("setupIntervalsBlocks", () => {
             activity.blocks.blockList.blkMeasure = { connections: [null, "child"] };
             logo.runFromBlockNow = jest.fn();
         });
+
+        it.each(["measureintervalsemitones", "measureintervalscalar"])(
+            "%s restores the meter state along with notesPlayed",
+            blockName => {
+                logo.turtleHeaps = { [turtleIndex]: [] };
+                logo.turtleDicts = { [turtleIndex]: {} };
+                const anchor = { wholeNotes: 0.75, measures: 1 };
+                turtleState.singer.meterAnchor = anchor;
+                // The measured stack changes to 3/4 and stays there.
+                logo.runFromBlockNow = jest.fn(() => {
+                    Object.assign(turtleState.singer, {
+                        beatsPerMeasure: 3,
+                        meterAnchor: { wholeNotes: 2, measures: 3 },
+                        beatList: [1]
+                    });
+                });
+
+                createdBlocks[blockName].arg(logo, turtleIndex, "blkMeasure");
+
+                expect(turtleState.singer).toMatchObject({
+                    beatsPerMeasure: 4,
+                    noteValuePerBeat: 4,
+                    meterAnchor: anchor,
+                    beatList: [1, 3],
+                    defaultStrongBeats: true
+                });
+            }
+        );
 
         it("Heap absent before measurement: the heap is restored as an empty array, not an object", () => {
             logo.turtleHeaps = {};

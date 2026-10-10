@@ -135,7 +135,18 @@ global.TimbreWidget = jest.fn(() => ({
 }));
 global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+global.SampleWidget.dependencies = [
+    "widgets/tuner",
+    "widgets/SamplerBlocks",
+    "widgets/SamplerPlayback",
+    "widgets/SamplerPitch",
+    "widgets/SamplerFiles",
+    "widgets/SamplerUI",
+    "widgets/SamplerPieMenu",
+    "widgets/SamplerCanvas",
+    "widgets/SamplerTuner",
+    "widgets/sampler"
+];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
@@ -143,10 +154,14 @@ global.TemperamentWidget = jest.fn(() => ({
     scale: null,
     init: jest.fn()
 }));
-global.TemperamentWidget.dependencies = ["widgets/temperament"];
+global.TemperamentWidget.dependencies = ["widgets/TemperamentUI", "widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
-global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+global.MusicKeyboard.dependencies = [
+    "widgets/MusicKeyboardEditing",
+    "widgets/MusicKeyboardRendering",
+    "widgets/musickeyboard"
+];
 global.PhraseMaker = jest.fn();
 global.PhraseMaker.dependencies = [
     "widgets/PhraseMakerUtils",
@@ -162,13 +177,39 @@ global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
 global.PitchSlider = jest.fn();
 global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
-global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
+global.PitchStaircase.dependencies = [
+    "widgets/PitchStaircaseTimers",
+    "widgets/PitchStaircaseLayout",
+    "widgets/PitchStaircaseSteps",
+    "widgets/PitchStaircasePlayback",
+    "widgets/PitchStaircaseSave",
+    "widgets/PitchStaircaseWindow",
+    "widgets/pitchstaircase"
+];
 global.RhythmRuler = jest.fn();
-global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
+global.RhythmRuler.dependencies = [
+    "widgets/RhythmRulerLayout",
+    "widgets/RhythmRulerHistory",
+    "widgets/RhythmRulerEditing",
+    "widgets/RhythmRulerPlayback",
+    "widgets/RhythmRulerSave",
+    "widgets/RhythmRulerCircular",
+    "widgets/rhythmruler"
+];
 global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
-global.LegoWidget.dependencies = ["widgets/legobricks"];
+global.LegoWidget.dependencies = [
+    "widgets/LegoBricksRows",
+    "widgets/LegoBricksLayout",
+    "widgets/LegoBricksExport",
+    "widgets/LegoBricksMedia",
+    "widgets/LegoBricksEyeDropper",
+    "widgets/LegoBricksColor",
+    "widgets/LegoBricksPlayback",
+    "widgets/LegoBricksVisualization",
+    "widgets/legobricks"
+];
 global.AIWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIWidget.dependencies = ["widgets/aiwidget"];
 
@@ -435,6 +476,18 @@ describe("setupWidgetBlocks", () => {
             tempo.flow(["childBlk"], logo, 0, "tempoBlk");
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("tempoBlk", 0, "_tempo_0");
             expect(logo.setTurtleListener).toHaveBeenCalled();
+        });
+
+        it("starts each run with no recorded turtles", () => {
+            const tempo = getBlock("tempo");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            logo.tempo.BPMTurtles = [3, 4];
+
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+
+            expect(logo.tempo.BPMTurtles).toEqual([]);
+            expect(logo.tempo.BPMBlocks).toEqual([]);
+            expect(logo.tempo.BPMs).toEqual([]);
         });
     });
 
@@ -837,6 +890,22 @@ describe("setupWidgetBlocks", () => {
 
             expect(Widget).toHaveBeenCalledTimes(1);
             expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("gives the Meter widget the turtle that ran the block", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, 4, 5] },
+                4: { value: 1 },
+                5: { value: 4 }
+            };
+
+            getBlock("meterwidget").flow(["childBlk"], logo, 3, "meterBlk");
+            logo._meterBlock = 1;
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(global.MeterWidget).toHaveBeenCalledWith(activity, "meterBlk", 3);
         });
 
         it("does not open when the meter block input is disconnected", () => {

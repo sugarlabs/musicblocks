@@ -815,7 +815,8 @@ describe("saveMxmlOutput notation markers", () => {
         ["end slur"],
         ["tie"],
         ["begin harmonics"],
-        ["end harmonics"]
+        ["end harmonics"],
+        ["begin repeat"]
     ].flat();
 
     it("never renders a staged marker as a note", () => {
@@ -1264,5 +1265,244 @@ describe("saveMxmlOutput - unpitched notes carry a staff position", () => {
 
         expect(output).not.toContain("<unpitched/>");
         expect(output).not.toMatch(/<unpitched>\s*<\/unpitched>/);
+    });
+});
+
+describe("saveMxmlOutput - key signature", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, false, false, null];
+    const fifthsIn = staging =>
+        (saveMxmlOutput({ notation: { notationStaging: { 0: staging } } }).match(
+            /<fifths>(-?\d+)<\/fifths>/
+        ) || [])[1];
+
+    it.each([
+        ["C", "major", "0"],
+        ["G", "major", "1"],
+        ["D", "major", "2"],
+        ["F", "major", "-1"],
+        ["Bb", "major", "-2"],
+        ["A", "minor", "0"],
+        ["A", "m", "0"],
+        ["E", "minor", "1"],
+        ["D", "dorian", "0"],
+        ["G", "mixolydian", "0"],
+        ["F", "lydian", "0"],
+        ["G#", "minor", "5"],
+        ["A#", "minor", "7"],
+        // Minor variants
+        ["A", "harmonic minor", "0"],
+        ["A", "melodic minor", "0"],
+        ["A", "jazz minor", "0"],
+        // Pentatonics
+        ["C", "major pentatonic", "0"],
+        ["A", "minor pentatonic", "0"],
+        ["A", "minyo", "0"],
+        ["C", "chinese", "0"],
+        ["C", "egyptian", "0"],
+        ["A", "hirajoshi", "0"],
+        ["A", "in", "0"],
+        // Blues
+        ["C", "major blues", "0"],
+        ["A", "minor blues", "0"]
+    ])("writes %s %s as fifths %s", (key, mode, expected) => {
+        expect(fifthsIn(["key", key, mode, note("C4")])).toBe(expected);
+    });
+
+    it("reads a flat written as a sign", () => {
+        expect(fifthsIn(["key", "B♭", "major", note("C4")])).toBe("-2");
+    });
+
+    it("stays where it was for a mode with no signature of its own", () => {
+        // whole tone has no key signature — should leave the score in C (0)
+        expect(fifthsIn(["key", "C", "whole tone", note("C4")])).toBe("0");
+    });
+
+    it("stays where it was for a key that cannot be written without double accidentals", () => {
+        expect(fifthsIn(["key", "G#", "major", note("C4")])).toBe("0");
+    });
+
+    it("defaults to C when nothing staged a key", () => {
+        expect(fifthsIn([note("C4")])).toBe("0");
+    });
+});
+
+describe("saveMxmlOutput - a key change part way through", () => {
+    const note = (pitch, value = 4) => [[pitch], value, 0, null, null, false, false, null];
+    const exportOf = staging => saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+
+    // Every <fifths> the export writes, in order.
+    const fifthsIn = output => [...output.matchAll(/<fifths>(-?\d+)<\/fifths>/g)].map(m => m[1]);
+
+    it("writes the new signature when a key changes at a measure boundary", () => {
+        const output = exportOf([
+            "key",
+            "C",
+            "major",
+            note("C4", 1),
+            "key",
+            "G",
+            "major",
+            note("D4", 1)
+        ]);
+
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+
+    it("writes the new signature when a key changes inside a measure", () => {
+        const output = exportOf(["key", "C", "major", note("C4"), "key", "G", "major", note("D4")]);
+
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+
+    it("writes the signature once when the key does not change", () => {
+        const output = exportOf(["key", "G", "major", note("C4"), note("D4"), note("E4")]);
+
+        expect(fifthsIn(output)).toEqual(["1"]);
+    });
+
+    it("writes a key change that lands on the same measure as a meter change", () => {
+        const output = exportOf([note("C4", 1), "key", "G", "major", "meter", 3, 4, note("D4", 1)]);
+
+        // The measure attributes carry the signature, so it is not written twice.
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+});
+
+describe("saveMxmlOutput - short notes keep whole-number durations", () => {
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato, drum]
+    const note = (value, dots = 0) => [["G4"], value, dots, null, null, false, false, null];
+
+    const durationsOf = staging => {
+        const output = saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+        return [...output.matchAll(/<duration>([^<]+)<\/duration>/g)].map(m => m[1]);
+    };
+
+    it("writes a sixty-fourth note as a whole number", () => {
+        expect(durationsOf([note(64)])).toEqual(["1"]);
+    });
+
+    it("writes a dotted thirty-second note as a whole number", () => {
+        expect(durationsOf([note(32, 1)])).toEqual(["3"]);
+    });
+
+    it("never writes a fractional duration", () => {
+        const staging = [note(4), note(8), note(16), note(32), note(64)];
+        durationsOf(staging).forEach(d => expect(d).toMatch(/^\d+$/));
+    });
+
+    it("keeps the durations in proportion", () => {
+        const [quarter, eighth, sixteenth, thirtySecond, sixtyFourth] = durationsOf([
+            note(4),
+            note(8),
+            note(16),
+            note(32),
+            note(64)
+        ]).map(Number);
+
+        expect(quarter).toBe(eighth * 2);
+        expect(eighth).toBe(sixteenth * 2);
+        expect(sixteenth).toBe(thirtySecond * 2);
+        expect(thirtySecond).toBe(sixtyFourth * 2);
+    });
+
+    it("leaves a voice of ordinary note values on the grid it already used", () => {
+        const output = saveMxmlOutput({
+            notation: { notationStaging: { 0: [note(4), note(8), note(16)] } }
+        });
+
+        expect(output).toContain("<divisions>8</divisions>");
+    });
+});
+
+describe("saveMxmlOutput - forever repeats", () => {
+    const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, false, false];
+    const drum = (name, noteValue = 4) => [[], noteValue, 0, null, null, false, false, name];
+
+    const exportVoice = staged => {
+        const xml = saveMxmlOutput({ notation: { notationStaging: { 0: staged } } });
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+        return doc;
+    };
+
+    // Each measure's barlines as "location:direction", in document order.
+    const barlinesOf = measure =>
+        Array.from(measure.getElementsByTagName("barline")).map(barline => {
+            const repeat = barline.getElementsByTagName("repeat")[0];
+            return `${barline.getAttribute("location") || "plain"}:${
+                repeat ? repeat.getAttribute("direction") : "none"
+            }`;
+        });
+    const measuresOf = doc => Array.from(doc.getElementsByTagName("measure"));
+    const stepsOf = measure =>
+        Array.from(measure.getElementsByTagName("step")).map(s => s.textContent);
+
+    it("wraps the notes after a forever in repeat barlines", () => {
+        const measures = measuresOf(exportVoice(["begin repeat", note("G4"), note("E4")]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["left:forward", "right:backward"]);
+        expect(stepsOf(measures[0])).toEqual(["G", "E"]);
+    });
+
+    it("splits the measure where a forever starts mid-measure", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat", note("G4")]));
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps later barlines on the beat after a mid-measure split", () => {
+        const measures = measuresOf(
+            exportVoice([
+                note("C4"),
+                note("C4"),
+                note("C4"),
+                "begin repeat",
+                note("D4"),
+                note("E4"),
+                note("F4"),
+                note("G4")
+            ])
+        );
+
+        // In 4/4 the D finishes the first measure, so E F G start the next one.
+        expect(measures.map(stepsOf)).toEqual([["C", "C", "C"], ["D"], ["E", "F", "G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes", null]);
+        expect(measures.map(barlinesOf)).toEqual([[], ["left:forward"], ["right:backward"]]);
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        const measures = measuresOf(
+            exportVoice(["begin repeat", note("C4"), "begin repeat", note("G4")])
+        );
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("gives a drum part the same repeat", () => {
+        const doc = exportVoice(["begin repeat", drum("snare drum"), drum("kick drum")]);
+        const part = doc.getElementsByTagName("part")[0];
+
+        expect(part.getAttribute("id")).toBe("D1");
+        expect(barlinesOf(measuresOf(doc)[0])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps the plain final barline when no notes follow the forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat"]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
+    });
+
+    it("writes no repeat barlines without a forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), note("G4")]));
+
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
     });
 });

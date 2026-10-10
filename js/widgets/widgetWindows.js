@@ -45,7 +45,7 @@ window.widgetWindows = {
         "oscilloscope": "oscilloscope",
         "temperament": "temperament",
         "meter": "meter",
-        "LEGO Bricks": "LEGO BRICKS",
+        "LEGO Bricks": "LEGO Bricks",
         "pitch slider": "slider",
         "pitch staircase": "pitch staircase",
         "music keyboard": "music keyboard",
@@ -168,6 +168,14 @@ window.widgetWindows = {
 
         // Handle Escape (Close)
         if (e.key === "Escape") {
+            // An open pie menu takes Escape first (see piemenus.js). Widgets open
+            // theirs in #wheelDivptm, and the Mode widget uses #wheelDiv.
+            const isPieMenuOpen = ["wheelDivptm", "wheelDiv"].some(id => {
+                const pieMenu = docById(id);
+                return pieMenu && pieMenu.style.display !== "none";
+            });
+            if (isPieMenuOpen) return;
+
             focused.onclose();
             e.preventDefault();
             e.stopPropagation();
@@ -244,7 +252,12 @@ window.widgetWindows = {
                 e.target.closest(".dropdown-content") ||
                 e.target.closest(".dropdown-trigger"));
 
-        if (isToolbarInteraction) {
+        // Widget pie menus (Music Keyboard, Phrase Maker, Sampler) open in
+        // #wheelDivptm, outside the widget frame, so a click on one must not
+        // take focus away from the widget that opened it.
+        const isWidgetPieMenuInteraction = e.target?.closest && e.target.closest("#wheelDivptm");
+
+        if (isToolbarInteraction || isWidgetPieMenuInteraction) {
             return;
         }
 
@@ -345,8 +358,11 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
+        this._frame.setAttribute("tabindex", "-1");
         this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
+        this._drag.setAttribute("role", "toolbar");
+        this._drag.setAttribute("aria-label", _("Window controls"));
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
 
@@ -384,6 +400,7 @@ class WidgetWindow {
         titleEl.replaceChildren();
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
+        this._frame.setAttribute("aria-labelledby", titleEl.id);
 
         this._nonclose.onmousedown = e => {
             window.widgetWindows.draggingWindow = this;
@@ -402,6 +419,7 @@ class WidgetWindow {
         rollButton.title = _("Minimize");
         rollButton.setAttribute("role", "button");
         rollButton.setAttribute("aria-label", _("Roll up window"));
+        rollButton.setAttribute("aria-expanded", "true");
         rollButton.setAttribute("tabindex", "0");
         rollButton.onclick = e => {
             if (this._rolled) {
@@ -443,6 +461,8 @@ class WidgetWindow {
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
+        this._toolbar.setAttribute("role", "toolbar");
+        this._toolbar.setAttribute("aria-label", _("Widget toolbar"));
 
         this._widget = this._create("div", "wfbWidget", this._body);
         this._widgetWheelHandler = event => {
@@ -512,7 +532,7 @@ class WidgetWindow {
         });
     }
 
-    _overlay(add) {
+    _overlay(add, resetFrameZIndex = true) {
         if (add) {
             this._frame.style.zIndex = "10";
             this._overlayframe.style.left = "0";
@@ -523,7 +543,7 @@ class WidgetWindow {
             this._overlayframe.style.border = "0.25vw solid black";
             this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
-            this._frame.style.zIndex = "10000";
+            if (resetFrameZIndex) this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
             this._overlayframe.style.zIndex = "-1";
             this._overlayframe.style.backgroundColor = "transparent";
@@ -732,7 +752,7 @@ class WidgetWindow {
             return this;
         }
 
-        const navHeight = document.querySelector("nav").offsetHeight;
+        const navHeight = document.querySelector("nav")?.offsetHeight ?? 64;
         this.setPosition(
             (cRect.width - fRect.width) / 2,
             (cRect.height - fRect.height + navHeight) / 2
@@ -749,6 +769,7 @@ class WidgetWindow {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
+            this._maxminButton.setAttribute("aria-label", _("Maximize window"));
         }
         this._maximized = false;
 
@@ -772,6 +793,7 @@ class WidgetWindow {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Restore");
+            this._maxminButton.setAttribute("aria-label", _("Restore"));
         }
         this._maximized = true;
         this.unroll();
@@ -836,7 +858,7 @@ class WidgetWindow {
         if (this.timerManager) {
             this.timerManager.clearAll();
         }
-        window.widgetWindows.openWindows[this._key] = undefined;
+        delete window.widgetWindows.openWindows[this._key];
     }
 
     /**
@@ -917,6 +939,11 @@ class WidgetWindow {
     _rollup() {
         this._rolled = true;
         this._body.style.display = "none";
+        if (this._rollButton) {
+            this._rollButton.setAttribute("aria-expanded", "false");
+            this._rollButton.setAttribute("aria-label", _("Expand window"));
+            this._rollButton.title = _("Expand");
+        }
         return this;
     }
 
@@ -927,8 +954,13 @@ class WidgetWindow {
     unroll() {
         this._rolled = false;
         this._body.style.display = "flex";
-        if (this._rollButton && this._rollButton.classList.contains("plus")) {
-            this._rollButton.classList.remove("plus");
+        if (this._rollButton) {
+            if (this._rollButton.classList.contains("plus")) {
+                this._rollButton.classList.remove("plus");
+            }
+            this._rollButton.setAttribute("aria-expanded", "true");
+            this._rollButton.setAttribute("aria-label", _("Roll up window"));
+            this._rollButton.title = _("Minimize");
         }
         return this;
     }
@@ -980,7 +1012,10 @@ window.widgetWindows.isOpen = name => {
  */
 window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        if (win !== undefined) win._frame.style.display = "none";
+        if (win !== undefined) {
+            win._frame.style.display = "none";
+            win._overlay(false, false);
+        }
     });
     window.widgetWindows.focused = null;
 };

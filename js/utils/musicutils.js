@@ -142,8 +142,16 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsRhythm =
         (typeof window !== "undefined" && window.MusicUtilsRhythm) ||
         (typeof require !== "undefined" ? require("./musicutils-rhythm") : {});
-    var { reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor } =
-        MusicUtilsRhythm;
+    var {
+        reducedFraction,
+        calcNoteValueToDisplay,
+        durationToNoteValue,
+        convertFactor,
+        getMeasurePosition,
+        getMeterAnchor,
+        saveMeterState,
+        restoreMeterState
+    } = MusicUtilsRhythm;
     var MusicUtilsSolfege =
         (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
         (typeof require !== "undefined" ? require("./musicutils-solfege") : {});
@@ -158,10 +166,8 @@ if (typeof module !== "undefined" && module.exports) {
         getModeLabel,
         getModeNameFromLabel,
         getModeSliceColors,
-        updateModeWheelItems,
         getModeGroupTitleFont,
-        getModeSliceFont,
-        configureWheel
+        getModeSliceFont
     } = MusicUtilsModeWheel;
     var MusicUtilsModeCore =
         (typeof window !== "undefined" && window.MusicUtilsModeCore) ||
@@ -239,7 +245,8 @@ if (typeof module !== "undefined" && module.exports) {
    durationToNoteValue, noteToFrequency, computeTargetPitchFrequency, getSolfege, splitScaleDegree,
    getNumNote, calcOctave, calcOctaveInterval, isInt,
    convertFromSolfege, getPitchInfo, i18nSolfege,
-   convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+   convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState,
+   getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
@@ -254,9 +261,8 @@ if (typeof module !== "undefined" && module.exports) {
     MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
-    updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
-    isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
-    configureWheel
+    getModeGroupTitleFont, getModeSliceFont,
+    isNonEDO, getNonEDOModeSteps, getNonEDOFrequency
 */
 
 // Is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
@@ -313,6 +319,10 @@ if (typeof module !== "undefined" && module.exports) {
         isInt,
         convertFromSolfege,
         convertFactor,
+        getMeasurePosition,
+        getMeterAnchor,
+        saveMeterState,
+        restoreMeterState,
         getPitchInfo,
         noteToFrequency,
         computeTargetPitchFrequency,
@@ -423,10 +433,8 @@ if (typeof module !== "undefined" && module.exports) {
         getModeLabel,
         getModeNameFromLabel,
         getModeSliceColors,
-        updateModeWheelItems,
         getModeGroupTitleFont,
         getModeSliceFont,
-        getNonEDOFrequency,
-        configureWheel
+        getNonEDOFrequency
     };
 }

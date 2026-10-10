@@ -1197,3 +1197,38 @@ describe("saveAbcOutput - one voice per turtle", () => {
         expect(result).not.toMatch(/\S +V:/);
     });
 });
+
+describe("saveAbcOutput - forever repeats", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const notesOf = staged => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: staged } }
+        };
+        processABCNotes(logo, "0");
+        return logo.notationNotes[0];
+    };
+
+    it("wraps the notes after a forever in repeat bars", () => {
+        expect(notesOf(["begin repeat", note("G4"), note("E4")])).toBe("|: G4 E4 :|");
+    });
+
+    it("starts the repeat where the forever starts", () => {
+        expect(notesOf([note("C4"), "begin repeat", note("G4")])).toBe("C4 |: G4 :|");
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        expect(notesOf(["begin repeat", note("C4"), "begin repeat", note("G4")])).toBe(
+            "C4 |: G4 :|"
+        );
+    });
+
+    it("writes no repeat bars when no notes follow the forever", () => {
+        expect(notesOf([note("C4"), "begin repeat"])).toBe("C4 ");
+    });
+
+    it("writes no repeat bars without a forever", () => {
+        expect(notesOf([note("C4"), note("G4")])).toBe("C4 G4 ");
+    });
+});

@@ -69,6 +69,51 @@ describe("getClosestStandardNoteValue", () => {
         expect(getClosestStandardNoteValue(1)).toEqual([1, 1]);
         expect(getClosestStandardNoteValue(0.0078125)).toEqual([1, 128]);
     });
+
+    // The whole-note through 1/128-note family is the standard set of
+    // powers-of-two note durations used throughout Western music notation.
+    // Feeding each exact duration back in must return that same duration.
+    it.each([
+        [1, [1, 1]],
+        [0.5, [1, 2]],
+        [0.25, [1, 4]],
+        [0.125, [1, 8]],
+        [0.0625, [1, 16]],
+        [0.03125, [1, 32]],
+        [0.015625, [1, 64]],
+        [0.0078125, [1, 128]]
+    ])(
+        "returns the exact match [%s -> %j] for every standard note duration",
+        (duration, expected) => {
+            expect(getClosestStandardNoteValue(duration)).toEqual(expected);
+        }
+    );
+
+    it("snaps a duration to the standard value it is numerically nearer to", () => {
+        expect(getClosestStandardNoteValue(0.24)).toEqual([1, 4]);
+        expect(getClosestStandardNoteValue(0.12)).toEqual([1, 8]);
+        // Dotted values are closer to these inputs than the plain note values.
+        expect(getClosestStandardNoteValue(0.2)).toEqual([3, 16]);
+        expect(getClosestStandardNoteValue(0.1)).toEqual([3, 32]);
+        expect(getClosestStandardNoteValue(0.16)).toEqual([1, 6]);
+    });
+
+    it("prefers a plain note when equally close to a dotted note", () => {
+        expect(getClosestStandardNoteValue(0.21875)).toEqual([1, 4]);
+    });
+
+    it("snaps durations at or beyond the largest value to the dotted whole note", () => {
+        expect(getClosestStandardNoteValue(1.5)).toEqual([3, 2]);
+        expect(getClosestStandardNoteValue(2)).toEqual([3, 2]);
+        expect(getClosestStandardNoteValue(1000)).toEqual([3, 2]);
+    });
+
+    it("snaps zero and negative durations to the smallest standard value", () => {
+        // Every standard duration is positive, so the smallest one (1/128)
+        // is always nearest to zero and to any negative duration.
+        expect(getClosestStandardNoteValue(0)).toEqual([1, 128]);
+        expect(getClosestStandardNoteValue(-5)).toEqual([1, 128]);
+    });
 });
 
 describe("transcribeMidi", () => {
@@ -459,15 +504,31 @@ describe("transcribeMidi", () => {
                 });
         };
 
-        // The imported beats-per-minute block, and the quarter notes per minute it plays at
+        // Decodes one setbpm3 block's own number into bpm/beatValue/quarterNotesPerMinute
         // (MeterActions.setBPM plays bpm * beatValue / 0.25 quarter notes per minute).
-        const tempoOf = blocks => {
-            const byIndex = new Map(blocks.map(block => [block[0], block]));
-            const setbpm = blocks.find(block => blockName(block) === "setbpm3");
+        const decodeTempo = (byIndex, setbpm) => {
             const beat = byIndex.get(setbpm[4][2]);
             const bpm = numberOf(byIndex, setbpm[4][1]);
             const beatValue = numberOf(byIndex, beat[4][1]) / numberOf(byIndex, beat[4][2]);
             return { bpm, beatValue, quarterNotesPerMinute: (bpm * beatValue) / 0.25 };
+        };
+
+        // The file's starting tempo. finalizeTracks() always appends exactly one setbpm3 per
+        // track, after any mid-track tempo-change blocks (see midTrackTempoChanges below), so
+        // it's always the *last* setbpm3 in the array even though it's chronologically first.
+        const tempoOf = blocks => {
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const setbpms = blocks.filter(block => blockName(block) === "setbpm3");
+            return decodeTempo(byIndex, setbpms[setbpms.length - 1]);
+        };
+
+        // Tempo changes mid-track, in chronological order. Only valid for a single-track
+        // fixture: within one track these are pushed to the block array as the note loop
+        // walks forward through the schedule, so array order matches chronological order.
+        const midTrackTempoChanges = blocks => {
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const setbpms = blocks.filter(block => blockName(block) === "setbpm3");
+            return setbpms.slice(0, -1).map(setbpm => decodeTempo(byIndex, setbpm));
         };
 
         it.each([40, 60, 72, 90, 120, 140, 180, 208])(
@@ -518,9 +579,11 @@ describe("transcribeMidi", () => {
             });
         };
 
-        it("plays every note for as long as the file does across a tempo change", async () => {
+        it("writes a setbpm3 block at a tempo change, so notation reads at 120 after it", async () => {
             // 60 bpm for two quarter notes, then 120 bpm: under MIDI timing the notes last
-            // 1, 1, 0.5, 0.5 and 1 seconds, and the half note spans the change.
+            // 1, 1, 0.5, 0.5 and 1 seconds. Before the mid-track setbpm3 fix, every note was
+            // notated against the file's starting 60 bpm alone, so notes 3-5 (actually
+            // quarter, quarter, half at the new tempo) read as eighth, eighth, quarter.
             const blocks = await importBlocks(
                 midiFile({
                     tempos: [
@@ -532,20 +595,38 @@ describe("transcribeMidi", () => {
             );
 
             expect(tempoOf(blocks).quarterNotesPerMinute).toBe(60);
-            expect(noteValues(blocks)).toEqual(["1/4", "1/4", "1/8", "1/8", "1/4"]);
-            expect(playbackSeconds(blocks)).toEqual([1, 1, 0.5, 0.5, 1]);
+            expect(midTrackTempoChanges(blocks).map(t => t.quarterNotesPerMinute)).toEqual([120]);
+            expect(noteValues(blocks)).toEqual(["1/4", "1/4", "1/4", "1/4", "1/2"]);
+
+            // Playback timing is unchanged by the fix: each note still plays for as long as
+            // it does in the file, just against the tempo actually in force at that point.
+            const tempos = [60, 60, 120, 120, 120];
+            const seconds = noteValues(blocks).map((value, i) => {
+                const [numerator, denominator] = value.split("/").map(Number);
+                return ((numerator / denominator) * 4 * 60) / tempos[i];
+            });
+            expect(seconds).toEqual([1, 1, 0.5, 0.5, 1]);
         });
 
-        it("reads notes before a delayed first tempo event at 120 bpm", async () => {
+        it("reads notes before a delayed first tempo event at 120 bpm, then at the new tempo", async () => {
             // MIDI plays 120 bpm until the first tempo event, here 60 bpm at the third
-            // quarter note, so the notes and rest last 0.25, 0.25, 0.5, 1 and 1 seconds.
+            // quarter note, so the notes and rest last 0.25, 0.25, 0.5, 1 and 1 seconds. Before
+            // the fix, the last two notes (actually quarter notes at 60 bpm) were notated
+            // against the file's starting 120 bpm alone and read as half notes.
             const blocks = await importBlocks(
                 midiFile({ tempos: [[2 * PPQ, 60]], lengths: [0.5, -0.5, 1, 1, 1] })
             );
 
             expect(tempoOf(blocks).quarterNotesPerMinute).toBe(120);
-            expect(noteValues(blocks)).toEqual(["1/8", "1/8", "1/4", "1/2", "1/2"]);
-            expect(playbackSeconds(blocks)).toEqual([0.25, 0.25, 0.5, 1, 1]);
+            expect(midTrackTempoChanges(blocks).map(t => t.quarterNotesPerMinute)).toEqual([60]);
+            expect(noteValues(blocks)).toEqual(["1/8", "1/8", "1/4", "1/4", "1/4"]);
+
+            const tempos = [120, 120, 120, 60, 60];
+            const seconds = noteValues(blocks).map((value, i) => {
+                const [numerator, denominator] = value.split("/").map(Number);
+                return ((numerator / denominator) * 4 * 60) / tempos[i];
+            });
+            expect(seconds).toEqual([0.25, 0.25, 0.5, 1, 1]);
         });
 
         it("sizes rests at the file's tempo", async () => {
@@ -555,6 +636,42 @@ describe("transcribeMidi", () => {
 
             expect(noteValues(blocks)).toEqual(["1/4", "1/4", "1/8", "1/8", "1/4"]);
             expect(blocks.filter(block => blockName(block) === "rest2")).toHaveLength(2);
+        });
+
+        it("keeps the block graph fully reciprocated across a tempo change", async () => {
+            const blocks = await importBlocks(
+                midiFile({
+                    tempos: [
+                        [0, 60],
+                        [2 * PPQ, 120]
+                    ],
+                    lengths: [1, 1, 1, 1, 2]
+                })
+            );
+
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        it("writes a setbpm3 block at each of several tempo changes, in order", async () => {
+            // Three tempo segments: 60 bpm, then 90 at the second quarter, then 150 at the
+            // fourth, each covering exactly one quarter note.
+            const blocks = await importBlocks(
+                midiFile({
+                    tempos: [
+                        [0, 60],
+                        [PPQ, 90],
+                        [3 * PPQ, 150]
+                    ],
+                    lengths: [1, 1, 1, 1]
+                })
+            );
+
+            expect(tempoOf(blocks).quarterNotesPerMinute).toBe(60);
+            expect(midTrackTempoChanges(blocks).map(t => t.quarterNotesPerMinute)).toEqual([
+                90, 150
+            ]);
+            expect(noteValues(blocks)).toEqual(["1/4", "1/4", "1/4", "1/4"]);
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         });
 
         it("imports a melody that lasts as long as the file", async () => {

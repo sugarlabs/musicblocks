@@ -139,7 +139,7 @@ body.highcontrast {
 }
 
 .dark #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar {
-    background: #1e88e5 !important;
+    background: var(--color-widget-titlebar-bg) !important;
 }
 
 .dark #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar .wftTitle {
@@ -154,6 +154,14 @@ body.highcontrast {
 
 .dark #floatingWindows .windowFrame {
     background-color: var(--color-widget-frame-bg) !important;
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup {
+    background-color: #ffffff;
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.close {
+    background-color: #ffffff;
 }
 
 /* Fix white table header strip in floating widgets during dark mode while preserving table body colors */

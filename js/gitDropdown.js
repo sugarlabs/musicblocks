@@ -379,8 +379,19 @@ class GitDropdownUI {
 
     async _doCreate(repoName, displayName, description) {
         const projectData = this._getProjectData();
-        const thumbnail = this._getThumbnail();
         const fullDesc = description || `${displayName} — a Music Blocks project`;
+
+        try {
+            const saveResult = await this.activity.saveLocally();
+            if (saveResult === false || saveResult === null) {
+                this._showToast("Could not save your project. Please try again.", "error");
+                return;
+            }
+        } catch (_) {
+            this._showToast("Could not save your project. Please try again.", "error");
+            return;
+        }
+        const thumbnail = this._getThumbnail();
 
         // ── Instant offline pre-check ─────────────────────────────────────────
         // Same pattern as _doCommit: if the device has no network right now,
@@ -403,6 +414,7 @@ class GitDropdownUI {
                     projectName: displayName,
                     description: fullDesc,
                     creatorName: "anonymous",
+                    thumbnail,
                     tags: [],
                     projectId: null
                 },
@@ -543,6 +555,7 @@ class GitDropdownUI {
                         projectName: displayName,
                         description: fullDesc,
                         creatorName: "anonymous",
+                        thumbnail,
                         tags: [],
                         projectId: null
                     },
@@ -1638,20 +1651,11 @@ class GitDropdownUI {
 
     _getThumbnail() {
         try {
-            if (
-                this.activity &&
-                this.activity.storage &&
-                this.activity.currentSession !== undefined
-            ) {
-                const img = this.activity.storage["SESSIONIMAGE" + this.activity.currentSession];
-                if (img && typeof img === "string" && img.startsWith("data:image")) {
-                    return img;
-                }
-            }
-        } catch (e) {
-            /* ignore */
+            const canvas = this.activity && this.activity.canvas;
+            return canvas ? canvas.toDataURL("image/png") : null;
+        } catch (_) {
+            return null;
         }
-        return null;
     }
 
     _getDefaultProjectName() {

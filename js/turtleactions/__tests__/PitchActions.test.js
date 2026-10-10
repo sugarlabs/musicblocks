@@ -436,6 +436,23 @@ describe("Tests for Singer.PitchActions setup", () => {
         });
     });
 
+    describe("playHertz NaN/Infinity guards", () => {
+        it("should return early without processing if hertz is NaN or Infinity", () => {
+            const processPitchSpy = jest.spyOn(Singer, "processPitch");
+
+            Singer.PitchActions.playHertz(NaN, 0, blkId);
+            expect(processPitchSpy).not.toHaveBeenCalled();
+
+            Singer.PitchActions.playHertz(Infinity, 0, blkId);
+            expect(processPitchSpy).not.toHaveBeenCalled();
+
+            Singer.PitchActions.playHertz(-Infinity, 0, blkId);
+            expect(processPitchSpy).not.toHaveBeenCalled();
+
+            processPitchSpy.mockRestore();
+        });
+    });
+
     test("Tests for playHertz (symbolic/440Hz)", () => {
         turtle.singer.notePitches = { 1: [] };
         turtle.singer.noteOctaves = { 1: [] };
