@@ -59,6 +59,16 @@ class PitchDrumMatrixBlocks {
     }
 
     /**
+     * Whether any pitch block became a row. Rests and pitches inside Set Drum don't.
+     *
+     * @public
+     * @returns {boolean} - True if the matrix has at least one pitch row.
+     */
+    hasPitchRows() {
+        return this._rowBlocks.length > 0;
+    }
+
+    /**
      * Adds a node (intersection) to the block map.
      *
      * @public

@@ -509,7 +509,14 @@ describe("setupWidgetBlocks", () => {
             rowLabels,
             rowArgs: [],
             drums,
+            rowBlocks: [],
             clearBlocks: jest.fn(),
+            addRowBlock(blk) {
+                this.rowBlocks.push(blk);
+            },
+            hasPitchRows() {
+                return this.rowBlocks.length > 0;
+            },
             init: jest.fn(),
             makeClickable: jest.fn()
         });
@@ -525,6 +532,7 @@ describe("setupWidgetBlocks", () => {
             const pdm = widget([], []);
             const listener = runBlock(pdm);
             pdm.rowLabels.push("sol");
+            pdm.addRowBlock("solBlk");
             pdm.drums.push("kick drum");
 
             listener();
@@ -541,6 +549,22 @@ describe("setupWidgetBlocks", () => {
             listener();
 
             expect(logo.inPitchDrumMatrix).toBe(false);
+            expect(pdm.init).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "You must have at least one pitch block and one drum block in the matrix.",
+                "pdmBlk"
+            );
+        });
+
+        it("says there is no pitch block when the block only has rests", () => {
+            const pdm = widget([], []);
+            const listener = runBlock(pdm);
+            // A rest is a label, but not a row.
+            pdm.rowLabels.push("rest");
+            pdm.drums.push("kick drum");
+
+            listener();
+
             expect(pdm.init).not.toHaveBeenCalled();
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "You must have at least one pitch block and one drum block in the matrix.",

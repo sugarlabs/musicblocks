@@ -1114,7 +1114,7 @@ function setupWidgetBlocks(activity) {
                 logo.inPitchDrumMatrix = false;
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
-                    logo.pitchDrumMatrix.rowLabels.length === 0
+                    !logo.pitchDrumMatrix.hasPitchRows()
                 ) {
                     activity.errorMsg(
                         _(
