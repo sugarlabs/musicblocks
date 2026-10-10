@@ -238,4 +238,43 @@ describe("themes.css colour tokens", () => {
             expect(varRegex.test(themesCss)).toBe(false);
         });
     });
+
+    it.each(["dark", "highcontrast"])(
+        "keeps debugger chat messages readable in the %s theme",
+        theme => {
+            const botRule = rules.find(
+                r => r.selector.trim() === `.${theme} .aidebugger-message-bot`
+            );
+            const userRule = rules.find(
+                r => r.selector.trim() === `.${theme} .aidebugger-message-user`
+            );
+            expect(botRule).toBeDefined();
+            expect(userRule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const botFg = resolveColor(declaration(botRule.body, "color"), tokens);
+            const botBg = resolveColor(declaration(botRule.body, "background-color"), tokens);
+            expect(botFg).not.toBeNull();
+            expect(botBg).not.toBeNull();
+            expect(contrastRatio(botFg, botBg)).toBeGreaterThanOrEqual(4.5);
+
+            const userFg = resolveColor(declaration(userRule.body, "color"), tokens);
+            const userBg = resolveColor(declaration(userRule.body, "background-color"), tokens);
+            expect(userFg).not.toBeNull();
+            expect(userBg).not.toBeNull();
+            expect(contrastRatio(userFg, userBg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])("keeps debugger input readable in the %s theme", theme => {
+        const rule = rules.find(r => r.selector.trim() === `.${theme} .aidebugger-input`);
+        expect(rule).toBeDefined();
+
+        const tokens = THEMES[theme];
+        const fg = resolveColor(declaration(rule.body, "color"), tokens);
+        const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+        expect(fg).not.toBeNull();
+        expect(bg).not.toBeNull();
+        expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+    });
 });
