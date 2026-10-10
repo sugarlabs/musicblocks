@@ -72,8 +72,9 @@ function setupMeterActions(activity) {
         static setMeter(beatCount, noteValue, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            const beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
-            const noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
+            const beatsPerMeasure = !Number.isFinite(beatCount) || beatCount <= 0 ? 4 : beatCount;
+            const noteValuePerBeat =
+                !Number.isFinite(noteValue) || noteValue <= 0 ? 4 : 1 / noteValue;
             // Measures after a change are counted in the new meter from where it starts.
             if (
                 beatsPerMeasure !== tur.singer.beatsPerMeasure ||
@@ -114,7 +115,7 @@ function setupMeterActions(activity) {
         static setPickup(value, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            tur.singer.pickup = Math.max(0, value);
+            tur.singer.pickup = Number.isFinite(value) ? Math.max(0, value) : 0;
             activity.logo.notation.notationPickup(turtle, tur.singer.pickup);
         }
 
@@ -126,6 +127,11 @@ function setupMeterActions(activity) {
             // effect. Infinity would set an impossibly fast tempo.
             if (!Number.isFinite(bpm) || bpm <= 0) {
                 activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
+
+            if (!Number.isFinite(beatValue) || beatValue <= 0) {
+                activity.errorMsg(_("Beat value must be a positive number."), blk);
                 return;
             }
 
@@ -153,6 +159,16 @@ function setupMeterActions(activity) {
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
+            if (!Number.isFinite(bpm) || bpm <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
+
+            if (!Number.isFinite(beatValue) || beatValue <= 0) {
+                activity.errorMsg(_("Beat value must be a positive number."), blk);
+                return;
+            }
+
             const _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
             if (_bpm < 30) {
