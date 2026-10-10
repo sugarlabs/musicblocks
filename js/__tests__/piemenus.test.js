@@ -1146,8 +1146,9 @@ describe("piemenuKey behavioral tests", () => {
     test("opens clear of the palette", () => {
         const chooseKeyDiv = { style: { display: "" } };
         const movable = {
-            style: { display: "" },
-            getBoundingClientRect: () => ({ height: 70 })
+            style: { display: "", marginLeft: "24px" },
+            offsetWidth: 220,
+            getBoundingClientRect: () => ({ height: 70, width: 220 })
         };
         const previousDocById = global.docById;
         mockActivity.palettes = { collapsed: false, paletteWidth: 165 };
@@ -1189,14 +1190,16 @@ describe("piemenuKey behavioral tests", () => {
         expect(parseInt(chooseKeyDiv.style.width, 10)).toBe(350);
         expect(parseInt(chooseKeyDiv.style.height, 10)).toBe(350);
         expect(parseInt(movable.style.left, 10)).toBe(238);
+        expect(parseInt(movable.style.left, 10) + 24 + 220).toBe(482);
         expect(parseInt(movable.style.top, 10)).toBe(491);
     });
 
     test("shrinks to the safe width on a narrow viewport", () => {
         const chooseKeyDiv = { style: { display: "" } };
         const movable = {
-            style: { display: "" },
-            getBoundingClientRect: () => ({ height: 70 })
+            style: { display: "", marginLeft: "24px" },
+            offsetWidth: 280,
+            getBoundingClientRect: () => ({ height: 70, width: 280 })
         };
         const previousDocById = global.docById;
         mockActivity.palettes = { collapsed: false, paletteWidth: 165 };
@@ -1237,7 +1240,8 @@ describe("piemenuKey behavioral tests", () => {
         expect(parseInt(chooseKeyDiv.style.height, 10)).toBe(319);
         expect(parseInt(chooseKeyDiv.style.left, 10)).toBe(173);
         expect(parseInt(chooseKeyDiv.style.left, 10) + 319).toBe(492);
-        expect(parseInt(movable.style.left, 10)).toBe(238);
+        expect(parseInt(movable.style.left, 10)).toBe(188);
+        expect(parseInt(movable.style.left, 10) + 24 + 280).toBe(492);
         expect(parseInt(movable.style.top, 10)).toBe(460);
     });
 

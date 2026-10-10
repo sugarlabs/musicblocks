@@ -4312,7 +4312,23 @@ const piemenuKey = activity => {
 
     chooseKeyDiv.style.left = left + "px";
     chooseKeyDiv.style.top = top + "px";
-    movableDiv.style.left = left + 65 + "px";
+
+    const movableWidth = movableDiv.offsetWidth || (movableRect && movableRect.width) || 0;
+    let marginLeft = parseFloat(movableDiv.style.marginLeft);
+    let marginRight = parseFloat(movableDiv.style.marginRight);
+    if (movableDiv.nodeType === 1 && typeof window.getComputedStyle === "function") {
+        const computedStyle = window.getComputedStyle(movableDiv);
+        const computedLeft = parseFloat(computedStyle.marginLeft);
+        const computedRight = parseFloat(computedStyle.marginRight);
+        if (!Number.isNaN(computedLeft)) marginLeft = computedLeft;
+        if (!Number.isNaN(computedRight)) marginRight = computedRight;
+    }
+    if (Number.isNaN(marginLeft)) marginLeft = 0;
+    if (Number.isNaN(marginRight)) marginRight = 0;
+    const movableOuter = marginLeft + movableWidth + marginRight;
+    const movableLeft = Math.min(left + 65, bounds.rightBound - 8 - movableOuter);
+
+    movableDiv.style.left = movableLeft + "px";
     movableDiv.style.top = top + wheelSize + "px";
 
     const __exitMenu = () => {
