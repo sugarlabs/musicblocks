@@ -55,12 +55,13 @@ const _ABC_MODE_MAP = {
 };
 
 /**
- * Strips ABC inline accidental prefixes (^, ^^, _, __, =) from a
- * note name so only the bare letter (plus optional octave comma)
- * remains.  For example "^^G" becomes "G", "_E" becomes "E".
+ * Strips ABC inline accidental prefixes (^, ^^, _, __, =) and octave
+ * marks (any number of "," or "'") from a note name so only the bare
+ * letter remains.  For example "^^G" becomes "G", "_E," becomes "E"
+ * and "c''" becomes "c".  The octave itself comes from pitch.pitch.
  */
 function _stripAbcAccidentalPrefix(name) {
-    return name.replace(/^[\^_=]+/, "");
+    return name.replace(/^[\^_=]+/, "").replace(/[,']+$/, "");
 }
 
 // Converts an abcjs pitch object to a Music Blocks note name.
@@ -72,7 +73,7 @@ function _stripAbcAccidentalPrefix(name) {
 //   2. A key-signature accidental that applies to the note letter.
 // If neither applies the bare note letter is returned.
 function _adjustPitch(note, keySignature, inlineAccidental) {
-    const bare = _stripAbcAccidentalPrefix(note).replace(",", "");
+    const bare = _stripAbcAccidentalPrefix(note);
 
     // Inline accidental takes priority (ABC rule: it overrides the
     // key signature for the rest of the bar).
@@ -82,7 +83,7 @@ function _adjustPitch(note, keySignature, inlineAccidental) {
 
     // Fall back to the key signature.
     const ksa = keySignature.accidentals.find(acc => {
-        const noteToCompare = acc.note.toUpperCase().replace(",", "");
+        const noteToCompare = _stripAbcAccidentalPrefix(acc.note);
         return noteToCompare.toLowerCase() === bare.toLowerCase();
     });
 
@@ -109,7 +110,8 @@ function _createPitchBlocks(
     keySignature,
     actionBlock,
     triplet,
-    meterDen
+    meterDen,
+    inlineAccidental
 ) {
     const duration = toFraction(pitchDuration);
     const hiddenBlockId = blockId + (pitches ? 8 : 6);
@@ -135,7 +137,7 @@ function _createPitchBlocks(
         const adjustedNote = _adjustPitch(
             pitches.name,
             keySignature,
-            pitches.accidental
+            inlineAccidental
         ).toUpperCase();
         noteBlocks.push(
             [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
@@ -277,6 +279,9 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
     // Reset triplet state at every voice boundary so that an unclosed
     // triplet in one voice cannot affect timing in subsequent voices.
     let tripletFinder = null;
+    // An inline accidental holds for the same pitch until the next bar line,
+    // but abcjs only sets it on the note that carries the mark.
+    let barAccidentals = {};
     const actionBlock = [];
 
     voice.forEach(element => {
@@ -286,14 +291,25 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder = element.startTriplet;
             }
 
+            const pitch = element.pitches?.[0];
+            let accidental = pitch?.accidental;
+            if (pitch) {
+                if (accidental) {
+                    barAccidentals[pitch.pitch] = accidental;
+                } else {
+                    accidental = barAccidentals[pitch.pitch];
+                }
+            }
+
             blockId += _createPitchBlocks(
-                element.pitches?.[0],
+                pitch,
                 blockId,
                 element.duration,
                 staff.key,
                 actionBlock,
                 tripletFinder,
-                staffRecord.meterDen
+                staffRecord.meterDen,
+                accidental
             );
 
             // Check and set tripletFinder to null if element?.endTriplet exists.
@@ -301,6 +317,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder = null;
             }
         } else if (element.el_type === "bar") {
+            barAccidentals = {};
             _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
         }
     });
