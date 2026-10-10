@@ -36,6 +36,19 @@ const DIVISIONS_EPSILON = 1e-6;
 // constant alone could represent.
 const DIVISIONS_PER_WHOLE_NOTE = 32;
 
+// The <type> name MusicXML gives each note-value denominator.
+const MXML_NOTE_TYPES = new Map([
+    [1, "whole"],
+    [2, "half"],
+    [4, "quarter"],
+    [8, "eighth"],
+    [16, "16th"],
+    [32, "32nd"],
+    [64, "64th"],
+    [128, "128th"],
+    [256, "256th"]
+]);
+
 /**
  * Converts a LilyPond duration, the form notation.js stages pickups and tempo beats in
  * (convertFactor() in js/utils/musicutils.js), to a length in whole notes.
@@ -809,6 +822,18 @@ class MusicXMLExporter {
                         if (tieStart) this.add('<tie type="start"/>');
                         if (part.isPercussion && obj[MXML_DRUM]) {
                             this.add(`<instrument id="${part.instruments.get(p)}"/>`);
+                        }
+                        // A tuplet note's duration is scaled by its ratio, so the written
+                        // note only survives in <type>; Lilypond's importer stops without
+                        // one. That note is the power of two it was rounded down to.
+                        const noteType = MXML_NOTE_TYPES.get(
+                            timeModification ? obj[MXML_ROUNDDOWN] : obj[1]
+                        );
+                        if (noteType !== undefined) {
+                            this.add(`<type>${noteType}</type>`);
+                            if (!timeModification) {
+                                for (let d = 0; d < obj[2]; d++) this.add("<dot/>");
+                            }
                         }
                         if (timeModification) {
                             this.add("<time-modification>");
