@@ -2441,18 +2441,31 @@ class Singer {
                                     blk in activity.blocks.blockList
                                 ) {
                                     // Start from the note block's parent
-                                    let par = activity.blocks.blockList[blk].connections[0];
-                                    par = activity.blocks.blockList[par];
+                                    let parentId = activity.blocks.blockList[blk].connections
+                                        ? activity.blocks.blockList[blk].connections[0]
+                                        : null;
+                                    const visited = new Set();
                                     // Keep looking for all parents up in order
-                                    while (par.name !== "setdrum") {
-                                        // If settimbre encountered before setdrum, the said case is true
-                                        if (par.name === "settimbre") {
+                                    while (
+                                        parentId !== null &&
+                                        parentId !== undefined &&
+                                        !visited.has(parentId)
+                                    ) {
+                                        visited.add(parentId);
+                                        const parentBlock = activity.blocks.blockList[parentId];
+                                        if (!parentBlock) {
+                                            break;
+                                        }
+                                        if (parentBlock.name === "settimbre") {
                                             hasSetTimbreInSetDrum = true;
                                             break;
                                         }
-                                        par = par.connections[0];
-                                        if (par === null) break;
-                                        par = activity.blocks.blockList[par];
+                                        if (parentBlock.name === "setdrum") {
+                                            break;
+                                        }
+                                        parentId = parentBlock.connections
+                                            ? parentBlock.connections[0]
+                                            : null;
                                     }
                                 }
 

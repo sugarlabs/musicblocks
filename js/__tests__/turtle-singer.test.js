@@ -2418,3 +2418,138 @@ describe("processNote — custom timbre effects normalization (#9043)", () => {
         expect(paramsEffects.delayTime).toBe(3.5);
     });
 });
+
+describe("processNote — drum mode parent block traversal null and cycle safety", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth.start = jest.fn();
+        activityMock.logo.synth.triggerDrum = jest.fn();
+        activityMock.logo.synth.trigger = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.stage = { update: jest.fn() };
+        singer = turtleMock.singer;
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it("does not throw when note block has null parent connection in drum mode", () => {
+        const blk = "rootNoteBlk";
+        singer.drumStyle = ["acoustic"];
+        singer.inNoteBlock = [blk];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = ["kick"];
+        singer.embeddedGraphics[blk] = [];
+
+        activityMock.blocks.blockList = {
+            [blk]: { name: "note", connections: [null] }
+        };
+
+        expect(() => {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        }).not.toThrow();
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            expect.anything(),
+            expect.anything(),
+            "acoustic",
+            null,
+            null,
+            false,
+            expect.anything()
+        );
+    });
+
+    it("terminates safely without infinite loop when parent block connections contain a cycle", () => {
+        const blk = "cyclicNoteBlk";
+        singer.drumStyle = ["acoustic"];
+        singer.inNoteBlock = [blk];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = ["snare"];
+        singer.embeddedGraphics[blk] = [];
+
+        activityMock.blocks.blockList = {
+            [blk]: { name: "note", connections: ["parentA"] },
+            parentA: { name: "repeat", connections: ["parentB"] },
+            parentB: { name: "action", connections: ["parentA"] }
+        };
+
+        expect(() => {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        }).not.toThrow();
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            expect.anything(),
+            expect.anything(),
+            "acoustic",
+            null,
+            null,
+            false,
+            expect.anything()
+        );
+    });
+
+    it("detects settimbre inside setdrum and sets hasSetTimbreInSetDrum so drum is not triggered", () => {
+        const blk = "timbreInDrumNoteBlk";
+        singer.drumStyle = ["acoustic"];
+        singer.inNoteBlock = [blk];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+
+        activityMock.blocks.blockList = {
+            [blk]: { name: "note", connections: ["timbreBlk"] },
+            timbreBlk: { name: "settimbre", connections: ["drumBlk"] },
+            drumBlk: { name: "setdrum", connections: [null] }
+        };
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "C4",
+            expect.anything(),
+            DEFAULTVOICE,
+            expect.anything(),
+            null,
+            false,
+            expect.anything()
+        );
+        expect(activityMock.logo.synth.trigger).not.toHaveBeenCalledWith(
+            0,
+            expect.anything(),
+            expect.anything(),
+            "acoustic",
+            null,
+            null,
+            false,
+            expect.anything()
+        );
+    });
+});
