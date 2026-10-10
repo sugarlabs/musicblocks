@@ -4290,11 +4290,46 @@ const piemenuKey = activity => {
 
     const x = event.clientX;
     const y = event.clientY;
+    const bounds = getWheelSafeBounds({ activity });
+    const chooseKeyDiv = docById("chooseKeyDiv");
+    const movableDiv = docById("movable");
+    const movableRect =
+        typeof movableDiv.getBoundingClientRect === "function"
+            ? movableDiv.getBoundingClientRect()
+            : null;
+    const movableHeight = movableDiv.offsetHeight || (movableRect && movableRect.height) || 0;
+    const availableHeight = bounds.bottomBound - bounds.safeTop - movableHeight - 8;
+    const wheelSize = Math.max(
+        0,
+        Math.min(350, bounds.rightBound - bounds.safeLeft - 8, availableHeight)
+    );
+    chooseKeyDiv.style.width = wheelSize + "px";
+    chooseKeyDiv.style.height = wheelSize + "px";
+    const maxLeft = Math.max(bounds.safeLeft, bounds.rightBound - wheelSize - 8);
+    const maxTop = Math.max(bounds.safeTop, bounds.bottomBound - wheelSize - movableHeight - 8);
+    const left = Math.min(maxLeft, Math.max(bounds.safeLeft, x - wheelSize / 2));
+    const top = Math.min(maxTop, Math.max(bounds.safeTop, y + 50));
 
-    docById("chooseKeyDiv").style.left = x - 175 + "px";
-    docById("chooseKeyDiv").style.top = y + 50 + "px";
-    docById("movable").style.left = x - 110 + "px";
-    docById("movable").style.top = y + 400 + "px";
+    chooseKeyDiv.style.left = left + "px";
+    chooseKeyDiv.style.top = top + "px";
+
+    const movableWidth = movableDiv.offsetWidth || (movableRect && movableRect.width) || 0;
+    let marginLeft = parseFloat(movableDiv.style.marginLeft);
+    let marginRight = parseFloat(movableDiv.style.marginRight);
+    if (movableDiv.nodeType === 1 && typeof window.getComputedStyle === "function") {
+        const computedStyle = window.getComputedStyle(movableDiv);
+        const computedLeft = parseFloat(computedStyle.marginLeft);
+        const computedRight = parseFloat(computedStyle.marginRight);
+        if (!Number.isNaN(computedLeft)) marginLeft = computedLeft;
+        if (!Number.isNaN(computedRight)) marginRight = computedRight;
+    }
+    if (Number.isNaN(marginLeft)) marginLeft = 0;
+    if (Number.isNaN(marginRight)) marginRight = 0;
+    const movableOuter = marginLeft + movableWidth + marginRight;
+    const movableLeft = Math.min(left + 65, bounds.rightBound - 8 - movableOuter);
+
+    movableDiv.style.left = movableLeft + "px";
+    movableDiv.style.top = top + wheelSize + "px";
 
     const __exitMenu = () => {
         docById("chooseKeyDiv").style.display = "none";
