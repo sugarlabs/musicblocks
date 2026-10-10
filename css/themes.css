@@ -1582,3 +1582,100 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .highcontrast .message-container .sender-name {
     color: var(--color-text-secondary) !important;
 }
+
+/* ==========================================================================
+   AI Debugger Widget — dark & high-contrast
+   ========================================================================== */
+
+/* Dark Mode */
+.dark .aidebugger-chat-log {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.dark .aidebugger-input-container {
+    background-color: var(--color-bg-primary) !important;
+    border-top: 1px solid var(--color-border-primary) !important;
+}
+
+.dark .aidebugger-input {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.dark .aidebugger-message-bot {
+    background-color: var(--color-bg-tertiary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.dark .aidebugger-message-user {
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-text-inverse) !important;
+}
+
+.dark .aidebugger-message-system {
+    background-color: var(--color-warning-bg) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.dark .aidebugger-typing-indicator {
+    background-color: var(--color-bg-tertiary) !important;
+    color: var(--color-text-secondary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.dark .aidebugger-consent-banner {
+    background-color: var(--color-warning-bg) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+/* High Contrast Mode */
+.highcontrast .aidebugger-chat-log {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.highcontrast .aidebugger-input-container {
+    background-color: var(--color-bg-primary) !important;
+    border-top: 1px solid var(--color-border-primary) !important;
+}
+
+.highcontrast .aidebugger-input {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.highcontrast .aidebugger-message-bot {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    border: 2px solid var(--color-border-primary) !important;
+}
+
+.highcontrast .aidebugger-message-user {
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-text-inverse) !important;
+    border: 1px solid var(--color-brand-primary) !important;
+}
+
+.highcontrast .aidebugger-message-system {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-brand-primary) !important;
+    border: 1px solid var(--color-brand-primary) !important;
+}
+
+.highcontrast .aidebugger-typing-indicator {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.highcontrast .aidebugger-consent-banner {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
