@@ -828,6 +828,7 @@ const MusicKeyboardRendering = {
             setKeyboardCellLabel(newel, "", "", _("rest"));
             newel.style.position = "relative";
             newel.style.zIndex = "100";
+            this.loadRestHandler(newel);
 
             for (let i = 0; i < this.idContainer.length; i++) {
                 // If the blockNumber is null, don't make the key clickable.
