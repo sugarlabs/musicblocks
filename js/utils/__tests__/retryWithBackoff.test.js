@@ -133,6 +133,107 @@ describe("retryWithBackoff Utility", () => {
 
             expect(delayFn).toHaveBeenCalledWith(50);
         });
+
+        test("caps delay at default maxDelay (1000ms) when exponential delay exceeds it", async () => {
+            let attempts = 0;
+            const check = jest.fn().mockImplementation(() => {
+                attempts++;
+                return attempts === 8 ? "ok" : false;
+            });
+            const onSuccess = jest.fn();
+            const delayFn = jest.fn().mockResolvedValue();
+
+            await retryWithBackoff({
+                check,
+                onSuccess,
+                delayFn,
+                initialDelay: 50,
+                maxRetries: 10
+            });
+
+            // Delays without cap: 50, 100, 200, 400, 800, 1600, 3200
+            // With default maxDelay=1000: 50, 100, 200, 400, 800, 1000, 1000
+            expect(delayFn).toHaveBeenCalledTimes(7);
+            expect(delayFn).toHaveBeenNthCalledWith(1, 50);
+            expect(delayFn).toHaveBeenNthCalledWith(2, 100);
+            expect(delayFn).toHaveBeenNthCalledWith(3, 200);
+            expect(delayFn).toHaveBeenNthCalledWith(4, 400);
+            expect(delayFn).toHaveBeenNthCalledWith(5, 800);
+            expect(delayFn).toHaveBeenNthCalledWith(6, 1000);
+            expect(delayFn).toHaveBeenNthCalledWith(7, 1000);
+        });
+
+        test("caps delay at custom maxDelay when provided", async () => {
+            let attempts = 0;
+            const check = jest.fn().mockImplementation(() => {
+                attempts++;
+                return attempts === 5 ? "ok" : false;
+            });
+            const onSuccess = jest.fn();
+            const delayFn = jest.fn().mockResolvedValue();
+
+            await retryWithBackoff({
+                check,
+                onSuccess,
+                delayFn,
+                initialDelay: 50,
+                maxDelay: 300,
+                maxRetries: 10
+            });
+
+            // Delays without cap: 50, 100, 200, 400
+            // With custom maxDelay=300: 50, 100, 200, 300
+            expect(delayFn).toHaveBeenCalledTimes(4);
+            expect(delayFn).toHaveBeenNthCalledWith(1, 50);
+            expect(delayFn).toHaveBeenNthCalledWith(2, 100);
+            expect(delayFn).toHaveBeenNthCalledWith(3, 200);
+            expect(delayFn).toHaveBeenNthCalledWith(4, 300);
+        });
+
+        test("bounds total scheduled wait time over 20 retries to ~16.55s instead of ~14.5 hours", async () => {
+            let totalMs = 0;
+            const delayFn = jest.fn().mockImplementation(ms => {
+                totalMs += ms;
+                return Promise.resolve();
+            });
+
+            await expect(
+                retryWithBackoff({
+                    check: () => null,
+                    onSuccess: jest.fn(),
+                    delayFn,
+                    maxRetries: 20,
+                    initialDelay: 50
+                })
+            ).rejects.toThrow("Retry limit exceeded");
+
+            // 20 retries: 50 + 100 + 200 + 400 + 800 + 15 * 1000 = 16,550 ms
+            expect(delayFn).toHaveBeenCalledTimes(20);
+            expect(totalMs).toBe(16550);
+        });
+
+        test("allows uncapped exponential backoff when maxDelay is Infinity", async () => {
+            let attempts = 0;
+            const check = jest.fn().mockImplementation(() => {
+                attempts++;
+                return attempts === 7 ? "ok" : false;
+            });
+            const onSuccess = jest.fn();
+            const delayFn = jest.fn().mockResolvedValue();
+
+            await retryWithBackoff({
+                check,
+                onSuccess,
+                delayFn,
+                initialDelay: 50,
+                maxDelay: Infinity,
+                maxRetries: 10
+            });
+
+            expect(delayFn).toHaveBeenCalledTimes(6);
+            expect(delayFn).toHaveBeenNthCalledWith(5, 800);
+            expect(delayFn).toHaveBeenNthCalledWith(6, 1600);
+        });
     });
 
     describe("onRetry Callback Invocation", () => {
