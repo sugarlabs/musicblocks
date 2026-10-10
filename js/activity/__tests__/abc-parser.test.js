@@ -984,6 +984,43 @@ describe("Test 11: Inline accidentals last for the rest of the bar", () => {
         ]);
     });
 
+    test("the accidental carries across a staff line break inside the bar", async () => {
+        // abcjs splits "^F F" / "F F|F" on two source lines into two staff
+        // lines with no bar between them.
+        const staffLine = voice => ({
+            meter: { value: [{ num: 4, den: 4 }] },
+            key: cMajorKey,
+            voices: [voice]
+        });
+        const tune = {
+            metaText: { title: "Test", instruction: "guitar" },
+            lines: [
+                {
+                    staff: [
+                        staffLine([
+                            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+                            makeNote("F", 3)
+                        ])
+                    ]
+                },
+                {
+                    staff: [
+                        staffLine([makeNote("F", 3), makeNote("F", 3), makeBar(), makeNote("F", 3)])
+                    ]
+                }
+            ]
+        };
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["F♯", 4],
+            ["F♯", 4],
+            ["F♯", 4],
+            ["F", 4]
+        ]);
+    });
+
     test("the accidental does not carry into the next voice", async () => {
         const tune = makeTune({
             staves: [

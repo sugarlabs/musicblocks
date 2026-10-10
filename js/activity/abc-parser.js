@@ -273,15 +273,20 @@ function _handleBarElement(element, repeatArray, baseBlocksCount) {
  * @param {object} staff - The staff object.
  * @param {string} staffIdx - The staff index key.
  * @param {object} staffRecord - The localized staff record (mutated in place).
+ * @param {number} voiceIdx - The voice's index within the staff.
  * @returns {number} newBlockId
  */
-function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
+function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
     // Reset triplet state at every voice boundary so that an unclosed
     // triplet in one voice cannot affect timing in subsequent voices.
     let tripletFinder = null;
     // An inline accidental holds for the same pitch until the next bar line,
-    // but abcjs only sets it on the note that carries the mark.
-    let barAccidentals = {};
+    // but abcjs only sets it on the note that carries the mark. A bar can run
+    // across staff lines, so the state lives on the staff record per voice.
+    const barAccidentals = staffRecord.barAccidentals;
+    if (!barAccidentals[voiceIdx]) {
+        barAccidentals[voiceIdx] = {};
+    }
     const actionBlock = [];
 
     voice.forEach(element => {
@@ -295,9 +300,9 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
             let accidental = pitch?.accidental;
             if (pitch) {
                 if (accidental) {
-                    barAccidentals[pitch.pitch] = accidental;
+                    barAccidentals[voiceIdx][pitch.pitch] = accidental;
                 } else {
-                    accidental = barAccidentals[pitch.pitch];
+                    accidental = barAccidentals[voiceIdx][pitch.pitch];
                 }
             }
 
@@ -317,7 +322,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder = null;
             }
         } else if (element.el_type === "bar") {
-            barAccidentals = {};
+            barAccidentals[voiceIdx] = {};
             _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
         }
     });
@@ -641,18 +646,20 @@ const setupActivityAbcParser = activityInstance => {
                         startBlock,
                         repeatBlock: [],
                         repeatArray: [],
-                        nameddoIds: []
+                        nameddoIds: [],
+                        barAccidentals: []
                     };
                     blockId = newBlockId;
                 }
 
-                staff.voices.forEach(voice => {
+                staff.voices.forEach((voice, voiceIdx) => {
                     blockId = _processVoice(
                         voice,
                         blockId,
                         staff,
                         staffIdx,
-                        staffBlocksMap[staffIdx]
+                        staffBlocksMap[staffIdx],
+                        voiceIdx
                     );
                 });
             });
