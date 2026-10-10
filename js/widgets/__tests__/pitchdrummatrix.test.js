@@ -20,7 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.PitchDrumMatrixWindow = require("../PitchDrumMatrixWindow.js");
+global.PitchDrumMatrixGrid = require("../PitchDrumMatrixGrid.js");
+global.PitchDrumMatrixBlocks = require("../PitchDrumMatrixBlocks.js");
+global.PitchDrumMatrixCells = require("../PitchDrumMatrixCells.js");
+global.PitchDrumMatrixPlayback = require("../PitchDrumMatrixPlayback.js");
+global.PitchDrumMatrixSave = require("../PitchDrumMatrixSave.js");
 const PitchDrumMatrix = require("../pitchdrummatrix.js");
+global.PitchDrumMatrix = PitchDrumMatrix;
 
 // The real jsdom document, for the DOM suite at the end.
 const jsdomDocument = global.document;
@@ -1566,5 +1573,74 @@ describe("PitchDrumMatrix with a real DOM", () => {
             click(0, 0);
             expect(pdm._blockMap).toEqual([[20, 30]]);
         });
+    });
+});
+
+describe("PitchDrumMatrix modules", () => {
+    const MODULES = [
+        "PitchDrumMatrixWindow",
+        "PitchDrumMatrixGrid",
+        "PitchDrumMatrixBlocks",
+        "PitchDrumMatrixCells",
+        "PitchDrumMatrixPlayback",
+        "PitchDrumMatrixSave"
+    ];
+
+    test("lists every module, and itself last, as its lazy-loading dependencies", () => {
+        expect(PitchDrumMatrix.dependencies).toEqual([
+            ...MODULES.map(name => "widgets/" + name),
+            "widgets/pitchdrummatrix"
+        ]);
+    });
+
+    test("the Pitch Drum block falls back to the same dependencies", () => {
+        const source = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "..", "blocks", "WidgetBlocks.js"),
+            "utf8"
+        );
+        const site = source.slice(source.indexOf('typeof PitchDrumMatrix !== "undefined"'));
+        const fallback = site.slice(site.indexOf("["), site.indexOf("]") + 1);
+
+        expect(JSON.parse(fallback)).toEqual(PitchDrumMatrix.dependencies);
+    });
+
+    test("installModules waits until every module is loaded", () => {
+        jest.isolateModules(() => {
+            const saved = global.PitchDrumMatrixSave;
+            delete global.PitchDrumMatrixSave;
+            try {
+                const Fresh = require("../pitchdrummatrix.js");
+                expect(Fresh.installModules()).toBe(false);
+                expect(Fresh.prototype._save).toBeUndefined();
+
+                global.PitchDrumMatrixSave = saved;
+                expect(Fresh.installModules()).toBe(true);
+                expect(Fresh.prototype._save).toBe(saved.prototype._save);
+            } finally {
+                global.PitchDrumMatrixSave = saved;
+            }
+        });
+    });
+
+    test("no two modules define the same method", () => {
+        const seen = new Map();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method === "constructor") continue;
+                expect(seen.get(method)).toBeUndefined();
+                seen.set(method, name);
+            }
+        }
+    });
+
+    test("a widget has every module method", () => {
+        const pdm = new PitchDrumMatrix();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(typeof pdm[method]).toBe("function");
+                }
+            }
+        }
     });
 });

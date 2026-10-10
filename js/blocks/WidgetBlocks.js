@@ -1084,7 +1084,15 @@ function setupWidgetBlocks(activity) {
                 "pitchDrumMatrix",
                 _getWidgetDependencies(
                     typeof PitchDrumMatrix !== "undefined" ? PitchDrumMatrix : null,
-                    ["widgets/pitchdrummatrix"]
+                    [
+                        "widgets/PitchDrumMatrixWindow",
+                        "widgets/PitchDrumMatrixGrid",
+                        "widgets/PitchDrumMatrixBlocks",
+                        "widgets/PitchDrumMatrixCells",
+                        "widgets/PitchDrumMatrixPlayback",
+                        "widgets/PitchDrumMatrixSave",
+                        "widgets/pitchdrummatrix"
+                    ]
                 ),
                 () => new PitchDrumMatrix(),
                 turtle,
