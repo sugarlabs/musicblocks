@@ -1407,7 +1407,7 @@ function AIWidget() {
                 modelSelect.disabled = false;
                 modelStatus.textContent = "";
             } catch (error) {
-                modelStatus.textContent = _("Could not load models: ") + error.message;
+                modelStatus.textContent = groqErrorMessage(error);
                 modelSelect.disabled = true;
             }
         };
@@ -1476,10 +1476,27 @@ async function fetchGroqModels(apiKey) {
         }
     });
     if (!response.ok) {
-        throw new Error(`${response.status} ${response.statusText}`);
+        const error = new Error(`${response.status} ${response.statusText}`);
+        error.status = response.status;
+        throw error;
     }
     const data = await response.json();
     return (data.data || []).map(model => model.id).filter(isGenerativeModel);
+}
+
+/**
+ * Turns a failed model fetch into a message for the settings modal.
+ * A rejected key is the common case, so it gets a clear hint instead of the
+ * raw status line.
+ *
+ * @param {Error} error - the error thrown by fetchGroqModels
+ * @returns {String} - the message to show
+ */
+function groqErrorMessage(error) {
+    if (error.status === 401) {
+        return _("Invalid API key. Please check the key and try again.");
+    }
+    return _("Could not load models: ") + error.message;
 }
 
 /**
@@ -1683,6 +1700,7 @@ if (typeof module !== "undefined" && module.exports) {
         getGroqModel,
         setGroqModel,
         fetchGroqModels,
-        isGenerativeModel
+        isGenerativeModel,
+        groqErrorMessage
     };
 }

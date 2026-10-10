@@ -22,7 +22,8 @@ const {
     getGroqModel,
     setGroqModel,
     fetchGroqModels,
-    isGenerativeModel
+    isGenerativeModel,
+    groqErrorMessage
 } = require("../aiwidget");
 
 // Mock globals
@@ -1134,6 +1135,32 @@ describe("Groq model storage and fetch", () => {
         });
 
         await expect(fetchGroqModels("gsk_bad")).rejects.toThrow("401 Unauthorized");
+    });
+
+    it("should attach the HTTP status to the error", async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 401,
+            statusText: "Unauthorized"
+        });
+
+        await expect(fetchGroqModels("gsk_bad")).rejects.toMatchObject({ status: 401 });
+    });
+
+    it("should describe a rejected key without the raw status", () => {
+        const error = new Error("401 Unauthorized");
+        error.status = 401;
+
+        expect(groqErrorMessage(error)).toBe(
+            "Invalid API key. Please check the key and try again."
+        );
+    });
+
+    it("should keep the status for other failures", () => {
+        const error = new Error("503 Service Unavailable");
+        error.status = 503;
+
+        expect(groqErrorMessage(error)).toBe("Could not load models: 503 Service Unavailable");
     });
 });
 
