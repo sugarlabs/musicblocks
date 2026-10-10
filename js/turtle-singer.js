@@ -862,6 +862,69 @@ class Singer {
     // ========= Action =======================================================
 
     /**
+     * Resolves the arpeggio interval for the current execution visit.
+     * Advances tur.singer.arpeggioIndex and wraps around at the end of the chord.
+     *
+     * @param {Object} activity - The activity instance
+     * @param {Object} tur - The turtle instance
+     * @param {String} note - Note value or solfege
+     * @param {Number} octave - Scale octave
+     * @param {String|null} direction - Interval direction or null
+     * @param {Number} edo - The current EDO steps per octave
+     * @returns {{ arpeggioTrans: Number, anote: String }}
+     */
+    static resolveArpeggio(activity, tur, note, octave, direction, edo) {
+        const alen = tur.singer.arpeggio.length;
+        if (alen === 0) {
+            return { arpeggioTrans: 0, anote: note };
+        }
+
+        const keySig = Array.isArray(tur.singer.keySignature)
+            ? tur.singer.keySignature.join(" ")
+            : tur.singer.keySignature;
+
+        let basePitch = note;
+        if (tur.singer.movable && typeof noteIsSolfege === "function" && noteIsSolfege(note)) {
+            const baseNoteObj = getNote(
+                note,
+                octave,
+                0,
+                keySig,
+                tur.singer.movable,
+                direction,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            basePitch = baseNoteObj[0];
+        }
+
+        if (
+            typeof tur.singer.arpeggioIndex !== "number" ||
+            tur.singer.arpeggioIndex >= alen ||
+            tur.singer.arpeggioIndex < 0
+        ) {
+            tur.singer.arpeggioIndex = 0;
+        }
+
+        const entry = tur.singer.arpeggio[tur.singer.arpeggioIndex];
+        let anote = note;
+        let arpeggioTrans = 0;
+
+        if (isNaN(entry[0])) {
+            anote = "rest";
+        } else {
+            arpeggioTrans = getInterval(entry[0], keySig, basePitch, edo) + entry[1];
+        }
+
+        tur.singer.arpeggioIndex += 1;
+        if (tur.singer.arpeggioIndex === alen) {
+            tur.singer.arpeggioIndex = 0;
+        }
+
+        return { arpeggioTrans, anote };
+    }
+
+    /**
      * @static
      * @param {String} note - note value or solfege
      * @param {Number} octave - scale octave
@@ -973,34 +1036,41 @@ class Singer {
                 }
             }
 
-            // The Duplicate block re-queues this block once per duplicate,
-            // so the row is added once per visit with no extra multiplier.
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
-            let atrans = transposition + cents;
-            if (tur.singer.arpeggio.length > 0) {
-                atrans += tur.singer.arpeggio[0];
-            }
-
-            const nnote = getNote(
+            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+                activity,
+                tur,
                 note,
                 octave,
+                null,
+                edo
+            );
+            const atrans = transposition + cents + arpeggioTrans;
+            const keySig = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature.join(" ")
+                : tur.singer.keySignature;
+
+            const nnote = getNote(
+                anote,
+                octave,
                 atrans, // transposition,
-                tur.singer.keySignature,
+                keySig,
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
-            nnote[0] = noteIsSolfege(note)
-                ? getSolfege(
-                      nnote[0],
-                      tur.singer.keySignature,
-                      false, // getNote already applied movable Do; widgets use fixed Do
-                      activity.logo.synth.inTemperament,
-                      edo
-                  )
-                : nnote[0];
+            nnote[0] =
+                anote !== "rest" && noteIsSolfege(note)
+                    ? getSolfege(
+                          nnote[0],
+                          keySig,
+                          false, // getNote already applied movable Do; widgets use fixed Do
+                          activity.logo.synth.inTemperament,
+                          edo
+                      )
+                    : nnote[0];
 
             if (tur.singer.drumStyle.length > 0) {
                 activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
@@ -1017,19 +1087,26 @@ class Singer {
                 }
             }
 
-            // The Duplicate block re-queues this block once per duplicate,
-            // so the row is added once per visit with no extra multiplier.
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
-            let atrans = transposition + cents;
-            if (tur.singer.arpeggio.length > 0) {
-                atrans += tur.singer.arpeggio[0];
-            }
-            const noteObj = getNote(
+            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+                activity,
+                tur,
                 note,
                 octave,
+                null,
+                edo
+            );
+            const atrans = transposition + cents + arpeggioTrans;
+            const keySig = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature.join(" ")
+                : tur.singer.keySignature;
+
+            const noteObj = getNote(
+                anote,
+                octave,
                 atrans, // transposition,
-                tur.singer.keySignature,
+                keySig,
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
@@ -1038,14 +1115,17 @@ class Singer {
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
 
-            if (
-                tur.singer.keySignature[0] === "C" &&
-                tur.singer.keySignature[1].toLowerCase() === "major" &&
-                noteIsSolfege(note)
-            ) {
+            const isCMajor = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature[0] === "C" &&
+                  typeof tur.singer.keySignature[1] === "string" &&
+                  tur.singer.keySignature[1].toLowerCase() === "major"
+                : typeof tur.singer.keySignature === "string" &&
+                  tur.singer.keySignature.toLowerCase().startsWith("c major");
+
+            if (anote !== "rest" && isCMajor && noteIsSolfege(note)) {
                 noteObj[0] = getSolfege(
                     noteObj[0],
-                    tur.singer.keySignature,
+                    keySig,
                     tur.singer.movable,
                     activity.logo.synth.inTemperament,
                     edo
@@ -1082,19 +1162,26 @@ class Singer {
                 }
             }
 
-            // The Duplicate block re-queues this block once per duplicate,
-            // so the row is added once per visit with no extra multiplier.
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
-            let atrans = transposition + cents;
-            if (tur.singer.arpeggio.length > 0) {
-                atrans += tur.singer.arpeggio[0];
-            }
-            const noteObj = getNote(
+            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+                activity,
+                tur,
                 note,
                 octave,
+                null,
+                edo
+            );
+            const atrans = transposition + cents + arpeggioTrans;
+            const keySig = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature.join(" ")
+                : tur.singer.keySignature;
+
+            const noteObj = getNote(
+                anote,
+                octave,
                 atrans, // transposition,
-                tur.singer.keySignature,
+                keySig,
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
@@ -1103,14 +1190,17 @@ class Singer {
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
 
-            if (
-                tur.singer.keySignature[0] === "C" &&
-                tur.singer.keySignature[1].toLowerCase() === "major" &&
-                noteIsSolfege(note)
-            ) {
+            const isCMajor = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature[0] === "C" &&
+                  typeof tur.singer.keySignature[1] === "string" &&
+                  tur.singer.keySignature[1].toLowerCase() === "major"
+                : typeof tur.singer.keySignature === "string" &&
+                  tur.singer.keySignature.toLowerCase().startsWith("c major");
+
+            if (anote !== "rest" && isCMajor && noteIsSolfege(note)) {
                 noteObj[0] = getSolfege(
                     noteObj[0],
-                    tur.singer.keySignature,
+                    keySig,
                     tur.singer.movable,
                     activity.logo.synth.inTemperament,
                     edo
