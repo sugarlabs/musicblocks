@@ -1542,6 +1542,99 @@ describe("PitchDrumMatrix with a real DOM", () => {
         });
     });
 
+    describe("drums played from a URL", () => {
+        const url = "https://example.com/clap.wav";
+        const lookups = [
+            "getDrumName",
+            "getDrumSynthName",
+            "getDrumIcon",
+            "DRUMNAMES",
+            "DEFAULTDRUM"
+        ];
+        const musicutils = require("../../utils/musicutils.js");
+        // The real lookups, over two drums as synthutils.js lists them.
+        const real = {
+            ...musicutils,
+            DRUMNAMES: [
+                ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "drum"],
+                ["kick drum", "kick drum", "images/kick.svg", "bd", "drum"]
+            ],
+            DEFAULTDRUM: "kick drum"
+        };
+        const mocked = {};
+
+        beforeEach(() => {
+            for (const name of lookups) {
+                mocked[name] = global[name];
+                global[name] = real[name];
+            }
+        });
+
+        afterEach(() => {
+            Object.assign(global, mocked);
+        });
+
+        const withUrlDrum = () =>
+            build({
+                labels: ["C"],
+                args: [4],
+                rowBlocks: [20],
+                drums: ["kick drum", url],
+                colBlocks: [30, 31]
+            });
+        const drumImage = (pdm, col) => pdm._pdmDrumTable.rows[0].cells[col].querySelector("img");
+
+        test("names the column after its URL", () => {
+            const { pdm } = withUrlDrum();
+
+            expect(drumImage(pdm, 0).title).toBe("kick drum");
+            expect(drumImage(pdm, 1).title).toBe(url);
+            expect(drumImage(pdm, 1).alt).toBe(url);
+            expect(drumImage(pdm, 1).getAttribute("src")).toBe("images/drum.svg");
+        });
+
+        test("clicking a cell plays the URL drum, not the default drum", () => {
+            jest.useFakeTimers();
+            const { activity } = withUrlDrum();
+
+            click(0, 1);
+            jest.runAllTimers();
+
+            expect(activity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                "C2",
+                0.125,
+                url,
+                null,
+                null
+            );
+        });
+
+        test("Save keeps the URL in a text block", () => {
+            const { pdm, activity } = withUrlDrum();
+            click(0, 1);
+
+            pdm._save();
+
+            const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+            const mapdrum = stack.find(block => block[1] === "mapdrum");
+            const drum = stack.find(block => block[0] === mapdrum[4][1]);
+            expect(drum[1]).toEqual(["text", { value: url }]);
+        });
+
+        test("Save still uses a drum name block for a built-in drum", () => {
+            const { pdm, activity } = withUrlDrum();
+            click(0, 0);
+
+            pdm._save();
+
+            const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+            const mapdrum = stack.find(block => block[1] === "mapdrum");
+            const drum = stack.find(block => block[0] === mapdrum[4][1]);
+            expect(drum[1]).toEqual(["drumname", { value: "kick drum" }]);
+        });
+    });
+
     describe("layout and state", () => {
         test("restoring from full screen puts the outer div back", () => {
             threeRows();

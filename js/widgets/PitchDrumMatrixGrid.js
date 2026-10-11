@@ -216,9 +216,10 @@ class PitchDrumMatrixGrid {
         cell.style.lineHeight = 100 + "%";
         cell.setAttribute("id", drumIdx); // Column // row.cells.length - 1);
 
-        // Work around i8n bug in Firefox.
+        // Work around i8n bug in Firefox. getDrumName gives null for a drum played from a URL,
+        // so keep the URL; the cells play and save the drum named here.
         let name = getDrumName(drumname);
-        if (name === "") {
+        if (!name) {
             name = drumname;
         }
 

@@ -147,7 +147,9 @@ class PitchDrumMatrixSave {
                 0,
                 [previousBlock, drumnameidx, pitchidx, hiddenidx]
             ]);
-            newStack.push([drumnameidx, ["drumname", { value: drumName }], 0, 0, [mapdrumidx]]);
+            // A drum played from a URL goes in a text block, as the Phrase Maker saves it.
+            const drumBlock = drumName.slice(0, 4) === "http" ? "text" : "drumname";
+            newStack.push([drumnameidx, [drumBlock, { value: drumName }], 0, 0, [mapdrumidx]]);
             newStack.push([pitchidx, "pitch", 0, 0, [mapdrumidx, notenameidx, octaveidx, null]]);
             newStack.push([
                 notenameidx,
