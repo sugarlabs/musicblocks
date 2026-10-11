@@ -436,7 +436,21 @@ class SaveInterface {
 
                 notes.forEach(noteData => {
                     if (!noteData.note || noteData.note.length === 0) return;
-                    const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
+                    if (
+                        typeof noteData.duration !== "number" ||
+                        noteData.duration <= 0 ||
+                        !isFinite(noteData.duration)
+                    ) {
+                        return;
+                    }
+                    const bpm =
+                        typeof noteData.bpm === "number" &&
+                        noteData.bpm > 0 &&
+                        isFinite(noteData.bpm)
+                            ? noteData.bpm
+                            : 90;
+                    const duration = ((1 / noteData.duration) * 60 * 4) / bpm;
+                    if (!isFinite(duration) || duration <= 0) return;
                     const instrument = noteData.instrument || "default";
 
                     if (noteData.drum) {
