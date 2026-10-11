@@ -142,7 +142,13 @@ global.TimbreWidget = jest.fn(() => ({
     },
     init: jest.fn()
 }));
-global.TimbreWidget.dependencies = ["widgets/timbre"];
+global.TimbreWidget.dependencies = [
+    "widgets/TimbreState",
+    "widgets/TimbrePanels",
+    "widgets/TimbreAudio",
+    "widgets/TimbreBlocks",
+    "widgets/timbre"
+];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
 global.SampleWidget.dependencies = [
     "widgets/tuner",

@@ -578,6 +578,10 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "timbre",
                 _getWidgetDependencies(typeof TimbreWidget !== "undefined" ? TimbreWidget : null, [
+                    "widgets/TimbreState",
+                    "widgets/TimbrePanels",
+                    "widgets/TimbreAudio",
+                    "widgets/TimbreBlocks",
                     "widgets/timbre"
                 ]),
                 () => new TimbreWidget(),
