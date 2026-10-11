@@ -622,7 +622,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .highcontrast #submitLilypond {
     background-color: var(--color-brand-secondary);
-    color: var(--color-text-primary);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #search,
@@ -639,7 +639,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a:hover {
-    color: var(--color-text-primary) !important;
+    color: var(--color-text-inverse) !important;
     background-color: var(--color-brand-secondary) !important;
 }
 
@@ -755,7 +755,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .highcontrast .dropdown-content li > a:focus,
 .highcontrast .dropdown-content li > a.dropdown-item-focused {
     background-color: var(--color-brand-secondary);
-    color: var(--color-text-primary);
+    color: var(--color-text-inverse);
 }
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */
