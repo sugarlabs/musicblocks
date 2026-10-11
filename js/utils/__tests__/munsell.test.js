@@ -218,6 +218,23 @@ describe("getMunsellColor edge cases", () => {
         expect(color).toBeDefined();
     });
 
+    it("should return at once for -Infinity and very large negative hues", () => {
+        // These used to loop forever adding 40 to the hue.
+        expect(getMunsellColor(-Infinity, 50, 50)).toBeUndefined();
+        // ...the same as Infinity and NaN, which never looped.
+        expect(getMunsellColor(Infinity, 50, 50)).toBeUndefined();
+        expect(getMunsellColor(NaN, 50, 50)).toBeUndefined();
+        expect(getMunsellColor(-1e20, 50, 50)).toBeDefined();
+        // -1e12 / 2.5 is a whole number of turns of the 40 hues, so it is hue 0.
+        expect(getMunsellColor(-1e12, 50, 50)).toBe(getMunsellColor(0, 50, 50));
+    });
+
+    it("should wrap negative hues to the same colour as before", () => {
+        expect(getMunsellColor(-10, 50, 50)).toBe(getMunsellColor(90, 50, 50));
+        expect(getMunsellColor(-100, 30, 70)).toBe(getMunsellColor(0, 30, 70));
+        expect(getMunsellColor(-2.5, 50, 50)).toBe(getMunsellColor(97.5, 50, 50));
+    });
+
     it("should handle mid-range values", () => {
         const color = getMunsellColor(50, 50, 50);
         expect(color).toMatch(/^(#[0-9a-fA-F]{6}|rgba\(\d+, \d+, \d+, \d+\.?\d*\))$/);

@@ -6765,12 +6765,8 @@ let getMunsellColor = (hue, value, chroma) => {
     // value (aka shade) 0-100 -> 0-10
     // chroma (aka grey) 0-100 -> 0-14
     // We linear-interpret value.
-    let h = Math.round(hue / 2.5);
-    while (h < 0) {
-        h += 40;
-    }
-
-    h %= 40; // doesn't guarentee it will be positive.
+    // A modulo, not a loop that adds 40: -Infinity would never get out of the loop.
+    const h = ((Math.round(hue / 2.5) % 40) + 40) % 40;
 
     let v1 = Math.floor(value / 10);
     let v2 = v1 + 1;

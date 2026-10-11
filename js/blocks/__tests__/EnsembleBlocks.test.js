@@ -913,6 +913,20 @@ describe("setupEnsembleBlocks", () => {
             expect(getMunsellColor).toHaveBeenCalledWith(0, 50, 100);
             expect(tur.doTurtleShell).toHaveBeenCalled();
         });
+
+        it.each([[-Infinity], [Infinity], [NaN]])(
+            "should set the default color for a non-finite number (%p)",
+            hue => {
+                const tur = turtles.ithTurtle(0);
+                tur.doTurtleShell = jest.fn();
+                getMunsellColor.mockClear();
+                setTurtleColorBlock.flow([hue], logo, 0, 10);
+                expect(getMunsellColor).toHaveBeenCalledWith(0, 50, 100);
+                expect(getMunsellColor).toHaveBeenCalledWith(0, 70, 80);
+                expect(getMunsellColor).not.toHaveBeenCalledWith(hue, 50, 100);
+                expect(tur.doTurtleShell).toHaveBeenCalled();
+            }
+        );
     });
 
     describe("TurtleNameBlock", () => {
