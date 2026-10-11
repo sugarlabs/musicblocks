@@ -1204,4 +1204,74 @@ describe("setupEnsembleBlocks", () => {
             expect(pitchToNumber).toHaveBeenCalledWith("F#", -2, "C");
         });
     });
+
+    describe("TurtleHeapBlock", () => {
+        it("should floor fractional index", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return 2.5;
+            });
+            logo.turtleHeaps[0] = [10, 20, 30];
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(result).toBe(20);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should support negative indices down to -heap_length", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.turtleHeaps[0] = [10, 20, 30];
+
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -1;
+            });
+            expect(turtleHeapBlock.arg(logo, 0, blk, null)).toBe(30);
+
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -2;
+            });
+            expect(turtleHeapBlock.arg(logo, 0, blk, null)).toBe(20);
+
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -3;
+            });
+            expect(turtleHeapBlock.arg(logo, 0, blk, null)).toBe(10);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should report empty heap and return 0 on empty heap with negative index", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.turtleHeaps[0] = [];
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -1;
+            });
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith("empty heap");
+            expect(result).toBe(0);
+        });
+
+        it("should adjust negative index < -heap_length and call errorMsg", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.turtleHeaps[0] = [10, 20, 30];
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -4;
+            });
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Index must be > 0.");
+            expect(result).toBe(10);
+        });
+    });
 });
