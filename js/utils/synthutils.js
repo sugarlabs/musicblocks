@@ -447,6 +447,9 @@ const instrumentsSource = {};
 // effects chain is still active on the same synth.
 const _effectsInFlight = new WeakMap();
 
+// The output each synth should play into, as last set by routeInstrument().
+const _routedOutput = new WeakMap();
+
 /**
  * Object containing effects associated with instruments in the timbre widget.
  * @type {Object.<number, Object>}
@@ -1803,7 +1806,9 @@ function Synth() {
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return instruments[turtle][sourceName].toDestination();
+            const synth = instruments[turtle][sourceName];
+            // A new instrument plays into the master output until a note routes it elsewhere.
+            return _routedOutput.has(synth) ? synth : this.routeInstrument(synth, Tone.Destination);
         }
 
         return null;
@@ -1820,6 +1825,7 @@ function Synth() {
      * @param {Object|null} paramsFilters - Parameters for filters.
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
+     * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. a panner.
      */
     this._performNotes = async (
         synth,
@@ -1828,7 +1834,8 @@ function Synth() {
         paramsEffects,
         paramsFilters,
         setNote,
-        future
+        future,
+        output = Tone.Destination
     ) => {
         const isStandardNote = note => {
             if (typeof note !== "string") return true;
@@ -2080,7 +2087,7 @@ function Synth() {
                     }
                 }
 
-                synth.chain(...chainNodes, Tone.Destination);
+                synth.chain(...chainNodes, output);
 
                 if (!paramsEffects || !paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
@@ -2136,7 +2143,7 @@ function Synth() {
                             } catch (_) {
                                 // Already disconnected — safe to ignore.
                             }
-                            synth.toDestination();
+                            synth.connect(_routedOutput.get(synth) || output);
                         }
                     } catch (e) {
                         console.debug("Error disposing effects:", e);
@@ -2174,7 +2181,7 @@ function Synth() {
             const remaining = (_effectsInFlight.get(synth) || 1) - 1;
             _effectsInFlight.set(synth, remaining);
             if (remaining === 0 && synth && typeof synth.toDestination === "function") {
-                synth.toDestination();
+                synth.connect(_routedOutput.get(synth) || output);
             }
         }
     };
@@ -2204,6 +2211,42 @@ function Synth() {
         }
     };
 
+    /**
+     * Moves a synth onto the given output, dropping its previous route. Does
+     * nothing if it already plays there, so it is cheap to call before every
+     * note. While an effects chain owns the synth, the move waits for the
+     * chain's cleanup.
+     * @function
+     * @memberof Synth
+     * @param {Tone.ToneAudioNode} synth - The instrument to route.
+     * @param {Tone.ToneAudioNode} output - The node to play into, e.g. a panner.
+     * @returns {Tone.ToneAudioNode} The same synth.
+     */
+    this.routeInstrument = (synth, output) => {
+        const current = _routedOutput.get(synth);
+        if (current === output) {
+            return synth;
+        }
+
+        _routedOutput.set(synth, output);
+        if ((_effectsInFlight.get(synth) || 0) > 0) {
+            return synth;
+        }
+
+        // A synth that was never routed plays into Tone.Destination (see loadSynth).
+        const previous = current || Tone.Destination;
+        if (previous !== output) {
+            try {
+                synth.disconnect(previous);
+            } catch (e) {
+                // Not connected there.
+            }
+        }
+
+        synth.connect(output);
+        return synth;
+    };
+
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     /**
      * Triggers notes on a specified turtle with the given parameters.
@@ -2217,6 +2260,7 @@ function Synth() {
      * @param {Object|null} paramsFilters - Parameters for filters.
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
+     * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. the turtle's panner.
      */
     this.trigger = async (
         turtle,
@@ -2226,7 +2270,8 @@ function Synth() {
         paramsEffects,
         paramsFilters,
         setNote,
-        future
+        future,
+        output
     ) => {
         // Capture the current instrument epoch to detect disposal during async operations
         const epoch = this._instrumentEpoch;
@@ -2316,6 +2361,10 @@ function Synth() {
                 future = 0.0;
             }
 
+            if (!output) {
+                output = Tone.Destination;
+            }
+
             // Ensure the requested instrument is properly initialized. It may be
             // missing because all instruments are disposed on Stop, so reload it
             // on demand instead of silently playing (or skipping) the note.
@@ -2363,6 +2412,8 @@ function Synth() {
                 return; // Exit gracefully - synth is no longer available
             }
 
+            this.routeInstrument(tempSynth, output);
+
             switch (flag) {
                 case 1: // drum
                     if (
@@ -2386,13 +2437,14 @@ function Synth() {
                 case 2: // voice sample
                     this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        tempSynth,
                         notes,
                         beatValue,
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future
+                        future,
+                        output
                     );
                     break;
                 case 3: // builtin synth
@@ -2402,13 +2454,14 @@ function Synth() {
 
                     this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        tempSynth,
                         tempNotes,
                         beatValue,
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future
+                        future,
+                        output
                     );
                     break;
                 case 4:
@@ -2419,13 +2472,14 @@ function Synth() {
                 default:
                     this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        tempSynth,
                         tempNotes,
                         beatValue,
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future
+                        future,
+                        output
                     );
                     break;
             }
