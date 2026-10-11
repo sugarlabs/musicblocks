@@ -1,9 +1,18 @@
-name: 'Close stale pull requests'
+name: Close Stale Pull Requests
 
 on:
-  schedule:
-    - cron: '30 19 * * *' # Schedule for 7:30 PM every day
-  workflow_dispatch:
+    schedule:
+        - cron: "30 19 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+concurrency:
+    group: stale-pull-requests
+    cancel-in-progress: false
 
 permissions:
   contents: read
@@ -12,17 +21,285 @@ permissions:
   actions: write # cache progress between runs
 
 jobs:
-  stale:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/stale@v9
-        with:
-          stale-pr-message: 'This pull request has been open for more than 60 days without any activity. It will be closed in 3 days unless the `stale` label is removed or commented on.'
-          close-pr-message: 'Closed pull request due to inactivity for more than 63 days.'
-          days-before-pr-stale: 60 # Number of days before a PR is considered stale
-          days-before-pr-close: 3 # Number of days after a stale PR before it is closed
-          days-before-issue-stale: -1 # Not managing stale issues
-          days-before-issue-close: -1 # Not managing stale issues
-          ignore-pr-updates: true # Ignore PR updates when determining staleness
-          operations-per-run: 150 # Increase the default 30-operation limit
+    stale:
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+
+        steps:
+            - name: Process stale pull requests
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const STALE_DAYS = 60;
+                      const CLOSE_DAYS = 3;
+                      const MAX_OPERATIONS = 150;
+                      const STALE_LABEL = "stale";
+                      const STALE_MS = STALE_DAYS * 86400000;
+                      const CLOSE_MS = CLOSE_DAYS * 86400000;
+
+                      function parseTime(value) {
+                        if (typeof value !== "string" || value.length === 0) return null;
+                        const time = Date.parse(value);
+                        return Number.isFinite(time) ? time : null;
+                      }
+
+                      function activityTime(record, createdAt) {
+                        const recorded = parseTime(record && record.pushedAt);
+                        if (recorded !== null) return recorded;
+                        return parseTime(createdAt);
+                      }
+
+                      function latestStaleLabelTime(events) {
+                        if (!Array.isArray(events)) return null;
+                        for (let i = events.length - 1; i >= 0; i--) {
+                          const event = events[i];
+                          if (
+                            event &&
+                            event.event === "labeled" &&
+                            event.label &&
+                            event.label.name === STALE_LABEL
+                          ) {
+                            return parseTime(event.created_at);
+                          }
+                        }
+                        return null;
+                      }
+
+                      function decideStaleAction(input) {
+                        const now = input && input.now;
+                        const lastPush = input && input.lastPush;
+                        const hasStaleLabel = input && input.hasStaleLabel;
+                        const staleSince = input && input.staleSince;
+                        if (!Number.isFinite(now) || !Number.isFinite(lastPush)) return "skip";
+
+                        if (hasStaleLabel) {
+                          if (!Number.isFinite(staleSince)) return "skip";
+                          if (now - lastPush < STALE_MS) return "remove-label";
+                          if (now - staleSince < CLOSE_MS) return "grace";
+                          return "close";
+                        }
+
+                        if (now - lastPush >= STALE_MS) return "label";
+                        return "fresh";
+                      }
+
+                      function decodeState(data) {
+                        if (!data || Array.isArray(data) || typeof data.content !== "string") {
+                          throw new Error("Activity state file is missing or is not a file.");
+                        }
+                        let parsed;
+                        try {
+                          parsed = JSON.parse(Buffer.from(data.content, "base64").toString("utf8"));
+                        } catch (err) {
+                          throw new Error("Activity state file is not valid JSON.");
+                        }
+                        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+                          throw new Error("Activity state file is not a JSON object.");
+                        }
+                        return parsed;
+                      }
+
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+                      let operations = 0;
+
+                      async function mutate(description, fn) {
+                        if (operations >= MAX_OPERATIONS) {
+                          core.warning(`Operation limit reached: ${description}`);
+                          return false;
+                        }
+                        await fn();
+                        operations++;
+                        core.info(description);
+                        return true;
+                      }
+
+                      async function loadState() {
+                        try {
+                          const response = await github.rest.repos.getContent({
+                            owner,
+                            repo,
+                            path: "pr-push-state.json",
+                            ref: "automation/pr-push-state"
+                          });
+                          return decodeState(response.data);
+                        } catch (err) {
+                          if (err.status === 404) return {};
+                          throw err;
+                        }
+                      }
+
+                      async function getStaleLabelTime(prNumber) {
+                        const events = await github.paginate(
+                          github.rest.issues.listEventsForTimeline,
+                          {
+                            owner,
+                            repo,
+                            issue_number: prNumber,
+                            per_page: 100
+                          }
+                        );
+                        return latestStaleLabelTime(events);
+                      }
+
+                      async function confirmedDecision(pr, hasStaleLabel, staleSince) {
+                        let latestState;
+                        try {
+                          latestState = await loadState();
+                        } catch (err) {
+                          core.setFailed(`Could not load push state: ${err.message}`);
+                          return "stop";
+                        }
+                        const latestPush = activityTime(latestState[String(pr.number)], pr.created_at);
+                        return decideStaleAction({
+                          now: Date.now(),
+                          lastPush: latestPush,
+                          hasStaleLabel,
+                          staleSince
+                        });
+                      }
+
+                      async function processPR(pr, state) {
+                        const record = state[String(pr.number)];
+                        const lastPush = activityTime(record, pr.created_at);
+                        const hasStaleLabel =
+                          Array.isArray(pr.labels) &&
+                          pr.labels.some(label => label.name === STALE_LABEL);
+                        const staleSince = hasStaleLabel ? await getStaleLabelTime(pr.number) : null;
+                        const decision = decideStaleAction({
+                          now: Date.now(),
+                          lastPush,
+                          hasStaleLabel,
+                          staleSince
+                        });
+
+                        if (decision === "skip") {
+                          core.warning(
+                            `Skipping PR #${pr.number}; activity or stale label time is unavailable.`
+                          );
+                          return;
+                        }
+                        if (decision === "fresh") return;
+
+                        if (decision === "remove-label") {
+                          await mutate(`Removing stale label from PR #${pr.number}`, async () => {
+                            await github.rest.issues.removeLabel({
+                              owner,
+                              repo,
+                              issue_number: pr.number,
+                              name: STALE_LABEL
+                            });
+                          });
+                          return;
+                        }
+
+                        if (decision === "grace") {
+                          core.info(`PR #${pr.number} is in its grace period.`);
+                          return;
+                        }
+
+                        if (decision === "label") {
+                          const latestDecision = await confirmedDecision(pr, false, null);
+                          if (latestDecision === "stop") return "stop";
+                          if (latestDecision !== "label") {
+                            core.info(`PR #${pr.number} received newer human activity; not labeling.`);
+                            return;
+                          }
+
+                          const labeled = await mutate(
+                            `Adding stale label to PR #${pr.number}`,
+                            async () => {
+                              await github.rest.issues.addLabels({
+                                owner,
+                                repo,
+                                issue_number: pr.number,
+                                labels: [STALE_LABEL]
+                              });
+                            }
+                          );
+                          if (!labeled) return;
+
+                          await mutate(`Adding stale notice to PR #${pr.number}`, async () => {
+                            await github.rest.issues.createComment({
+                              owner,
+                              repo,
+                              issue_number: pr.number,
+                              body:
+                                `This PR has had no recorded human code push for ${STALE_DAYS} days. ` +
+                                `It will be closed after ${CLOSE_DAYS} additional days without a new push.`
+                            });
+                          });
+                          return;
+                        }
+
+                        const latestDecision = await confirmedDecision(pr, true, staleSince);
+                        if (latestDecision === "stop") return "stop";
+                        if (latestDecision !== "close") {
+                          core.info(`PR #${pr.number} received newer human activity; not closing.`);
+                          return;
+                        }
+
+                        const commentAdded = await mutate(
+                          `Adding closure comment to PR #${pr.number}`,
+                          async () => {
+                            await github.rest.issues.createComment({
+                              owner,
+                              repo,
+                              issue_number: pr.number,
+                              body: "Closed due to inactivity after the stale grace period."
+                            });
+                          }
+                        );
+                        if (!commentAdded) return;
+
+                        await mutate(`Closing PR #${pr.number}`, async () => {
+                          await github.rest.pulls.update({
+                            owner,
+                            repo,
+                            pull_number: pr.number,
+                            state: "closed"
+                          });
+                        });
+                      }
+
+                      async function run() {
+                        let prs;
+                        try {
+                          prs = await github.paginate(github.rest.pulls.list, {
+                            owner,
+                            repo,
+                            state: "open",
+                            per_page: 100
+                          });
+                        } catch (error) {
+                          core.setFailed(`Failed to fetch open PRs: ${error.message}`);
+                          return;
+                        }
+
+                        core.info(`Found ${prs.length} open PRs.`);
+
+                        let currentState;
+                        try {
+                          currentState = await loadState();
+                        } catch (err) {
+                          core.setFailed(`Could not load push state: ${err.message}`);
+                          return;
+                        }
+
+                        for (const pr of prs) {
+                          if (operations >= MAX_OPERATIONS) {
+                            core.warning("Maximum operation limit reached.");
+                            break;
+                          }
+                          try {
+                            const result = await processPR(pr, currentState);
+                            if (result === "stop") return;
+                          } catch (error) {
+                            core.error(`Failed to process PR #${pr.number}: ${error.message}`);
+                          }
+                        }
+
+                        core.info(`Finished. Operations used: ${operations}.`);
+                      }
+
+                      await run();
