@@ -101,6 +101,39 @@ describe("parseSclFile", () => {
         expect(result.pitches[3].ratio).toBeCloseTo(2, 10);
     });
 
+    it("skips comment lines between the pitch count and the pitch values", () => {
+        const content = [
+            "! meanquar.scl",
+            "!",
+            "1/4-comma meantone scale",
+            " 3",
+            "!",
+            " 76.04900",
+            "   ! an indented comment between pitches",
+            " 5/4",
+            " 2/1"
+        ].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(3);
+        expect(result.pitches).toHaveLength(3);
+        expect(result.pitches[0].cents).toBeCloseTo(76.049, 3);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 10);
+        expect(result.pitches[2].ratio).toBeCloseTo(2, 10);
+    });
+
+    it("skips a comment line between the description and the pitch count", () => {
+        const content = ["! note.scl", "Note", "! a comment", "2", "3/2", "2/1"].join("\n");
+        const result = parseSclFile(content);
+        expect(result.description).toBe("Note");
+        expect(result.pitchCount).toBe(2);
+        expect(result.pitches[0].ratio).toBeCloseTo(1.5, 10);
+    });
+
+    it("does not count a comment line as a pitch value", () => {
+        const content = ["! short.scl", "!", "Short", "3", "100.0", "!", "2/1"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("Invalid .scl file: expected 3 pitches, got 2");
+    });
+
     it("rejects a cents unit on a number without a decimal point", () => {
         const content = ["! unit.scl", "!", "Unit", "1", "2cents"].join("\n");
         expect(() => parseSclFile(content)).toThrow(
