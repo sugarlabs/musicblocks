@@ -73,6 +73,12 @@ class CacheManager {
             cacheDebugLog("[CacheManager] Initialized successfully");
             return true;
         } catch (error) {
+            if (this.db) {
+                this.db.close();
+                this.db = null;
+            }
+            this.isInitialized = false;
+
             console.error("[CacheManager] Initialization failed:", error);
             return false;
         }
