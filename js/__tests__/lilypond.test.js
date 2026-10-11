@@ -30,12 +30,14 @@ const toFraction = jest.fn(num => {
     return [num, 1];
 });
 
-const NOTATIONDURATION = 1;
-const NOTATIONNOTE = 0;
-const NOTATIONROUNDDOWN = 2;
-const NOTATIONSTACCATO = 6;
-const NOTATIONTUPLETVALUE = 3;
-const NOTATIONDOTCOUNT = 4;
+const {
+    NOTATIONNOTE,
+    NOTATIONDURATION,
+    NOTATIONDOTCOUNT,
+    NOTATIONTUPLETVALUE,
+    NOTATIONROUNDDOWN,
+    NOTATIONSTACCATO
+} = require("../logoconstants");
 
 global.frequencyToPitch = frequencyToPitch;
 global.getScaleAndHalfSteps = getScaleAndHalfSteps;
@@ -377,7 +379,7 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process note object with dot notation", () => {
-        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 2, -1, false]];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 2, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("4..");
     });
@@ -434,9 +436,9 @@ describe("processLilypondNotes", () => {
     });
     test("should handle tuplet with notes of varying durations", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 8, 4, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 8, 4, [3, 2], 0, -1, false]
+            [["G4"], 8, 0, [3, 2], 4, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 8, 0, [3, 2], 4, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -444,8 +446,8 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with varying tuplet factors", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 4], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 4], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -453,9 +455,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tie command within tuplet", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
             "tie",
-            [["A4"], 4, 2, [3, 2], 0, -1, false]
+            [["A4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("~");
@@ -464,9 +466,9 @@ describe("processLilypondNotes", () => {
 
     test("should break tuplet when reaching POW2 duration (0.5)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false],
             [["C4"], 4, 0, null, 0, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -474,26 +476,26 @@ describe("processLilypondNotes", () => {
     });
     test("should handle null tuplet value interrupting tuplet", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
             [["A4"], 4, 0, null, 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
     test("should break tuplet when tuplet factor changes", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [5, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [5, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
     test("should handle tuplet with mixed NOTATIONROUNDDOWN values (greater)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 8, 4, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 8, 0, [3, 2], 4, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -501,9 +503,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with mixed NOTATIONROUNDDOWN values (less)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 4, [3, 2], 0, -1, false],
-            [["A4"], 8, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 4, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 4, -1, false],
+            [["A4"], 8, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 4, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -511,9 +513,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with equal NOTATIONROUNDDOWN values", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
