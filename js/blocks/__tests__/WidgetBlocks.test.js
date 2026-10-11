@@ -556,6 +556,18 @@ describe("setupWidgetBlocks", () => {
             expect(global.SampleWidget).toHaveBeenCalledTimes(1);
             expect(logo.sample).toBeDefined();
         });
+
+        it("stops collecting the timbre once the sampler opens", () => {
+            const sampler = getBlock("sampler");
+            sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(logo.sample.init).toHaveBeenCalled();
+            expect(logo.inSample).toBe(false);
+        });
     });
 
     describe("AIDebuggerBlock", () => {
@@ -973,6 +985,15 @@ describe("setupWidgetBlocks", () => {
 
             expect(global.AIWidget).toHaveBeenCalledTimes(1);
             expect(logo.aiMusic).toBeDefined();
+        });
+
+        it("aimusic does not put the sampler into capture mode", () => {
+            const aiMusic = getBlock("aimusic");
+            aiMusic.flow(["childBlk"], logo, 0, "aiMusicBlk");
+
+            expect(logo.inSample).toBe(false);
+            expect(logo.sample).toBeNull();
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("aiMusicBlk", 0, "_aimusic_0");
         });
     });
 });

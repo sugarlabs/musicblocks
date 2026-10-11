@@ -500,6 +500,7 @@ function setupWidgetBlocks(activity) {
 
             const __listener = event => {
                 logo.sample.init(activity);
+                logo.inSample = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -2073,9 +2074,7 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            logo.inSample = true;
-
-            const listenerName = "_sampler_" + turtle;
+            const listenerName = "_aimusic_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {

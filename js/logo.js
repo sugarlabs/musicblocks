@@ -254,6 +254,8 @@ class Logo {
         this.inMusicKeyboard = false;
         this._currentDrumBlock = null;
         this.inTimbre = false;
+        this.inSample = false;
+        this.inReflectionMatrix = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
@@ -1764,6 +1766,12 @@ class Logo {
         this.inLegoWidget = false;
         this.inMusicKeyboard = false;
         this.inTimbre = false;
+        this.inSample = false;
+        this.inTempo = false;
+        this.inPitchSlider = false;
+        this.inPitchStaircase = false;
+        this.inReflectionMatrix = false;
+        this.inOscilloscope = false;
         this.inArpeggio = false;
         this.inRhythmRuler = false;
         this.insideModeWidget = false;

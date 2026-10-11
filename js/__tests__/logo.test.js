@@ -1483,6 +1483,26 @@ describe("Logo runLogoCommands", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    test("widget capture modes left on by an earlier run are cleared", () => {
+        // A run stopped inside a widget clamp never reaches the listener that
+        // turns its mode off, so the next run must not inherit it.
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+        const modes = [
+            "inSample",
+            "inTempo",
+            "inPitchSlider",
+            "inPitchStaircase",
+            "inReflectionMatrix",
+            "inOscilloscope"
+        ];
+        for (const mode of modes) logo[mode] = true;
+
+        logo.runLogoCommands(null, null);
+
+        for (const mode of modes) expect(logo[mode]).toBe(false);
+    });
+
     describe("temperament carried over from an earlier run", () => {
         beforeEach(() => {
             mockActivity.blocks.stackList = [];
