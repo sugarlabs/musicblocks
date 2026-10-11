@@ -68,7 +68,7 @@ jobs:
 
                         if (hasStaleLabel) {
                           if (!Number.isFinite(staleSince)) return "skip";
-                          if (now - lastPush < STALE_MS) return "remove-label";
+                          if (lastPush > staleSince || now - lastPush < STALE_MS) return "remove-label";
                           if (now - staleSince < CLOSE_MS) return "grace";
                           return "close";
                         }
@@ -230,6 +230,13 @@ jobs:
                         if (latestDecision === "stop") return "stop";
                         if (latestDecision !== "close") {
                           core.info(`PR #${pr.number} received newer human activity; not closing.`);
+                          return;
+                        }
+
+                        if (operations > MAX_OPERATIONS - 2) {
+                          core.warning(
+                            `Operation limit reached before closing PR #${pr.number}.`
+                          );
                           return;
                         }
 
