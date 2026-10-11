@@ -121,7 +121,8 @@ var getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
 
 /**
  * The 12-EDO pitch class a note name sounds as, whatever its spelling: G♯, A♭ and G# are
- * all 8, F𝄪 and G are both 7. ASCII # and b are read as ♯ and ♭.
+ * all 8; F𝄪, Fx, F## and G are all 7. ASCII #, b and x are read as ♯, ♭ and 𝄪, so
+ * ## and bb are double accidentals too.
  * @function
  * @param {string} name - A note name such as "G♯" or "B𝄫".
  * @returns {number} 0 to 11, or NaN for a name it cannot read.
@@ -138,7 +139,8 @@ var _notePitchClass = name => {
             "b": -1,
             [SHARP]: 1,
             "#": 1,
-            [DOUBLESHARP]: 2
+            [DOUBLESHARP]: 2,
+            "x": 2
         }[symbol];
     }
     return ((semitones % 12) + 12) % 12;
@@ -491,6 +493,14 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     // shift up or down to the next note in the key.
     let offset = 0;
     if (currentEDO === 12) {
+        // Walk from the PITCHES name that sounds the same when this name isn't listed
+        // (F𝄪, Fx, A♭♭, E♯, ...).
+        if (!PITCHES.includes(thisPitch) && !PITCHES2.includes(thisPitch)) {
+            const pitchClass = _notePitchClass(thisPitch);
+            if (!Number.isNaN(pitchClass)) {
+                thisPitch = PITCHES[pitchClass];
+            }
+        }
         let startIndex = PITCHES.indexOf(thisPitch);
         if (startIndex !== -1) {
             // Convert starting 12-EDO index to approximate EDO step position
@@ -977,6 +987,15 @@ var getInterval = (interval, keySignature, pitch, edo) => {
         pitch = BTOFLAT[pitch];
     } else if (pitch in STOSHARP) {
         pitch = STOSHARP[pitch];
+    }
+
+    // A name that PITCHES and PITCHES2 don't list (F𝄪, Fx, A♭♭, E♯, ...) is replaced by the
+    // PITCHES name that sounds the same, so a pitch outside the scale can still step to it.
+    if (is12EDO && !PITCHES.includes(pitch) && !PITCHES2.includes(pitch)) {
+        const pitchClass = _notePitchClass(pitch);
+        if (!Number.isNaN(pitchClass)) {
+            pitch = PITCHES[pitchClass];
+        }
     }
 
     let ii;

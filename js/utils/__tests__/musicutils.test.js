@@ -2375,6 +2375,15 @@ describe("getStepSize", () => {
         expect(_getStepSize("A harmonic minor", "G#", "up", 0, "equal")).toBe(1);
         expect(_getStepSize("D major", "C#", "up", 0, "equal")).toBe(1);
         expect(_getStepSize("B♭ major", "Bb", "up", 0, "equal")).toBe(2);
+        // Double accidentals outside the scale step from the note they sound as: F𝄪 is G,
+        // and the next note up in A harmonic minor is G♯.
+        for (const name of ["F𝄪", "Fx", "F##"]) {
+            expect(_getStepSize("A harmonic minor", name, "up", 0, "equal")).toBe(1);
+        }
+        // A𝄫 is G; the next note down in A harmonic minor is F.
+        for (const name of ["A𝄫", "Abb"]) {
+            expect(_getStepSize("A harmonic minor", name, "down", 0, "equal")).toBe(-2);
+        }
     });
 
     it("should keep the named enharmonic rules in other temperaments", () => {
@@ -2473,6 +2482,11 @@ describe("getInterval", () => {
         expect(getInterval(1, "G major", "F#")).toBe(1);
         expect(getInterval(1, "C major", "C#")).toBe(2);
         expect(getInterval(1, "A harmonic minor", "G#")).toBe(1);
+        // Double accidentals, inside or outside the scale.
+        for (const name of ["F𝄪", "Fx", "F##", "A𝄫", "Abb"]) {
+            expect(getInterval(1, "A harmonic minor", name)).toBe(1);
+        }
+        expect(getInterval(1, "G♯ major", "Fx")).toBe(1);
     });
 
     it("should keep matching notes by name in other temperaments", () => {
