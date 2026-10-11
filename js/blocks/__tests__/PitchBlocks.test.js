@@ -610,6 +610,58 @@ describe("setupPitchBlocks", () => {
         });
     });
 
+    describe("HertzBlock in the Pitch-Drum Matrix", () => {
+        let pdm;
+        let singer;
+
+        beforeEach(() => {
+            pdm = {
+                rowLabels: [],
+                rowArgs: [],
+                drums: [],
+                addRowBlock: jest.fn(),
+                addColBlock: jest.fn()
+            };
+            logo.pitchDrumMatrix = pdm;
+            logo.pitchBlocks = [];
+            logo.inMatrix = false;
+            logo.inPitchDrumMatrix = true;
+            singer = turtles.ithTurtle(0).singer;
+            singer.drumStyle = [];
+            global.Singer.PitchActions.playHertz.mockClear();
+        });
+
+        afterEach(() => {
+            logo.inPitchDrumMatrix = false;
+        });
+
+        it("adds a row at the nearest note, without the cents", () => {
+            // 450 Hz is A4 and 39 cents.
+            global.frequencyToPitch.mockReturnValue(["A", 4, 39]);
+
+            createdBlocks["hertz"].flow([450], logo, 0, 10);
+
+            expect(pdm.rowLabels).toEqual(["A"]);
+            expect(pdm.rowArgs).toEqual([4]);
+            expect(pdm.addRowBlock).toHaveBeenCalledWith(10);
+            expect(logo.pitchBlocks).toEqual([10]);
+            expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(global.Singer.PitchActions.playHertz).not.toHaveBeenCalled();
+        });
+
+        it("adds a drum column inside Set Drum", () => {
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            singer.drumStyle = ["snare drum"];
+
+            createdBlocks["hertz"].flow([440], logo, 0, 10);
+
+            expect(pdm.drums).toEqual(["snare drum"]);
+            expect(pdm.addColBlock).toHaveBeenCalledWith(10);
+            expect(pdm.rowLabels).toEqual([]);
+            expect(pdm.addRowBlock).not.toHaveBeenCalled();
+        });
+    });
+
     describe("SetPitchNumberOffsetBlock", () => {
         it("flow", () => {
             const block = createdBlocks["setpitchnumberoffset"];
