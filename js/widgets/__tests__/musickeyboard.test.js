@@ -2484,3 +2484,67 @@ describe("MusicKeyboard sequencer matrix, note tracking, and chord grouping", ()
         });
     });
 });
+
+describe("MusicKeyboard rest key pointer handler", () => {
+    let keyboard, element, originalPlatformColor;
+
+    const listener = type => element.addEventListener.mock.calls.find(call => call[0] === type)[1];
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 0, 1, 0, 0, 0));
+        originalPlatformColor = global.platformColor;
+        global.platformColor = { orange: "orange" };
+        delete localStorage.beginnerMode;
+
+        keyboard = new MusicKeyboard({
+            logo: { synth: { trigger: jest.fn(), stopSound: jest.fn() } }
+        });
+        keyboard._notesPlayed = [];
+        keyboard._createTable = jest.fn();
+        keyboard._updateWidgetWindowSize = jest.fn();
+        element = {
+            id: "rest",
+            addEventListener: jest.fn(),
+            style: {},
+            setPointerCapture: jest.fn(),
+            dispatchEvent: jest.fn()
+        };
+        keyboard.loadRestHandler(element);
+    });
+
+    afterEach(() => {
+        global.platformColor = originalPlatformColor;
+        jest.useRealTimers();
+    });
+
+    test("records a rest lasting as long as the key was held", () => {
+        const start = Date.now();
+        listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
+        expect(element.style.backgroundColor).toBe("orange");
+
+        jest.advanceTimersByTime(500);
+        listener("pointerup")();
+
+        expect(keyboard._notesPlayed).toEqual([
+            { startTime: start, noteOctave: "R", objId: null, duration: 0.5 }
+        ]);
+        expect(element.style.backgroundColor).toBe("white");
+        expect(keyboard._createTable).toHaveBeenCalled();
+        expect(keyboard.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("records the rest when the pointer is cancelled mid-press", () => {
+        listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
+        listener("pointercancel")();
+
+        expect(keyboard._notesPlayed).toHaveLength(1);
+        expect(keyboard._notesPlayed[0].noteOctave).toBe("R");
+    });
+
+    test("ignores a release that was not preceded by a press", () => {
+        listener("pointerup")();
+
+        expect(keyboard._notesPlayed).toEqual([]);
+    });
+});
