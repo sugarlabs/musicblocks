@@ -1093,7 +1093,8 @@ function setupEnsembleBlocks(activity) {
 
             let fillColor;
             let strokeColor;
-            if (typeof args[0] === "number") {
+            // A non-finite number gets the default colour, like a non-number.
+            if (Number.isFinite(args[0])) {
                 fillColor = getMunsellColor(args[0], 50, 100);
                 strokeColor = getMunsellColor(args[0], 70, 80);
             } else {
