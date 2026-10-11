@@ -701,6 +701,25 @@ describe("save artwork methods", () => {
         );
     });
 
+    it("should save the SVG under a given file name", () => {
+        global.doSVG = jest.fn(() => "<svg>Mock SVG</svg>");
+        const activity = {
+            save: {
+                download: mockDownload
+            },
+            canvas: { width: 500, height: 500 },
+            logo: "mockLogo",
+            turtles: "mockTurtles"
+        };
+
+        instance.saveSVG(activity, "drawing.svg");
+        expect(mockDownload).toHaveBeenCalledWith(
+            "svg",
+            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
+            "drawing.svg"
+        );
+    });
+
     it("should call toDataURL and download the PNG file", () => {
         const mockCanvas = { toDataURL: jest.fn(() => "data:image/png;base64,mockdata") };
         global.docById = jest.fn(() => mockCanvas);
