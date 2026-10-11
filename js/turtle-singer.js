@@ -1050,7 +1050,7 @@ class Singer {
                 null,
                 edo
             );
-            const atrans = transposition + cents + arpeggioTrans;
+            const atrans = transposition + cents / 100 + arpeggioTrans;
             const keySig = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature.join(" ")
                 : tur.singer.keySignature;
@@ -1111,7 +1111,7 @@ class Singer {
                 null,
                 edo
             );
-            const atrans = transposition + cents + arpeggioTrans;
+            const atrans = transposition + cents / 100 + arpeggioTrans;
             const keySig = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature.join(" ")
                 : tur.singer.keySignature;
@@ -1186,7 +1186,7 @@ class Singer {
                 null,
                 edo
             );
-            const atrans = transposition + cents + arpeggioTrans;
+            const atrans = transposition + cents / 100 + arpeggioTrans;
             const keySig = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature.join(" ")
                 : tur.singer.keySignature;

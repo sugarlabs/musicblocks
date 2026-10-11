@@ -2827,13 +2827,27 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggio = [[2, 0]]; // E (+4 semitones)
             turtleMock.singer.arpeggioIndex = 0;
 
-            Singer.processPitch(activityMock, "C", 4, 0.5, turtleMock, "mockBlk");
+            Singer.processPitch(activityMock, "C", 4, 50, turtleMock, "mockBlk");
 
             const lastCall = global.getNote.mock.calls[global.getNote.mock.calls.length - 1];
             const transpositionArg = lastCall[2];
 
-            // 2 (base transposition) + 0.5 (cents) + 4 (arpeggio interval) = 6.5
+            // 2 (base transposition) + 0.5 (50 cents) + 4 (arpeggio interval) = 6.5
             expect(transpositionArg).toBeCloseTo(6.5, 5);
+        });
+
+        test("composes negative cents adjustment correctly", () => {
+            turtleMock.singer.transposition = 2; // D
+            turtleMock.singer.arpeggio = [[2, 0]]; // E (+4 semitones)
+            turtleMock.singer.arpeggioIndex = 0;
+
+            Singer.processPitch(activityMock, "C", 4, -50, turtleMock, "mockBlk");
+
+            const lastCall = global.getNote.mock.calls[global.getNote.mock.calls.length - 1];
+            const transpositionArg = lastCall[2];
+
+            // 2 (base transposition) - 0.5 (-50 cents) + 4 (arpeggio interval) = 5.5
+            expect(transpositionArg).toBeCloseTo(5.5, 5);
         });
 
         test("handles rest entry [NaN, 0] in arpeggio chord", () => {
