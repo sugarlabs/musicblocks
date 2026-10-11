@@ -189,14 +189,15 @@ class PitchDrumMatrixGrid {
             cell.style.border = "2px solid white";
             cell.style.borderRadius = "10px";
 
-            cell.onmouseover = () => {
-                if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorSelected;
+            // `cell` is reassigned below, so the handlers use the cell they are on.
+            cell.onmouseover = e => {
+                if (e.currentTarget.style.backgroundColor !== "black") {
+                    e.currentTarget.style.backgroundColor = platformColor.selectorSelected;
                 }
             };
-            cell.onmouseout = () => {
-                if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.onmouseout = e => {
+                if (e.currentTarget.style.backgroundColor !== "black") {
+                    e.currentTarget.style.backgroundColor = platformColor.selectorBackground;
                 }
             };
 

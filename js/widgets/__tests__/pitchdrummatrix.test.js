@@ -1044,8 +1044,8 @@ describe("PitchDrumMatrix Widget", () => {
             expect(typeof cell.onmouseover).toBe("function");
             expect(typeof cell.onmouseout).toBe("function");
 
-            cell.onmouseover();
-            cell.onmouseout();
+            cell.onmouseover({ currentTarget: cell });
+            cell.onmouseout({ currentTarget: cell });
         });
 
         test("makeClickable sets up click listeners and restores blockMap entries", () => {
@@ -1736,6 +1736,30 @@ describe("PitchDrumMatrix with a real DOM", () => {
 
             expect(widgetWindow.getWidgetBody().style.height).toBe("400px");
             expect(jsdomDocument.getElementById("pdmOuterDiv").style.width).toBe("500px");
+        });
+
+        test("hovering a cell highlights that cell, not the last drum name", () => {
+            const { pdm } = threeRows();
+            const cell = jsdomDocument.getElementById("1,0");
+            const drumName = pdm._pdmDrumTable.rows[0].cells[0];
+
+            cell.dispatchEvent(new window.MouseEvent("mouseover"));
+            expect(cell.style.backgroundColor).toBe("rgb(208, 208, 208)");
+            expect(drumName.style.backgroundColor).toBe(selectorBackground);
+
+            cell.dispatchEvent(new window.MouseEvent("mouseout"));
+            expect(cell.style.backgroundColor).toBe(selectorBackground);
+        });
+
+        test("hovering a selected cell keeps it selected", () => {
+            threeRows();
+            click(0, 0);
+            const cell = jsdomDocument.getElementById("0,0");
+
+            cell.dispatchEvent(new window.MouseEvent("mouseover"));
+            cell.dispatchEvent(new window.MouseEvent("mouseout"));
+
+            expect(cell.style.backgroundColor).toBe("black");
         });
 
         test("drum columns get a width in pixels", () => {
