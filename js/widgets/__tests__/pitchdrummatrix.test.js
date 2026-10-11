@@ -255,8 +255,8 @@ describe("PitchDrumMatrix Widget", () => {
             pdm.addNode(1, 0);
 
             expect(pdm._blockMap).toEqual([
-                [0, 1],
-                [1, 0]
+                [0, 1, 0],
+                [1, 0, 0]
             ]);
         });
 
@@ -264,7 +264,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm.addNode(0, 1);
             pdm.addNode(0, 1);
 
-            expect(pdm._blockMap).toEqual([[0, 1]]);
+            expect(pdm._blockMap).toEqual([[0, 1, 0]]);
         });
 
         test("removeNode removes a matching intersection", () => {
@@ -273,7 +273,7 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm.removeNode(0, 1);
 
-            expect(pdm._blockMap).toEqual([[1, 0]]);
+            expect(pdm._blockMap).toEqual([[1, 0, 0]]);
         });
 
         test("removeNode leaves the map unchanged when nothing matches", () => {
@@ -281,7 +281,7 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm.removeNode(5, 5);
 
-            expect(pdm._blockMap).toEqual([[0, 1]]);
+            expect(pdm._blockMap).toEqual([[0, 1, 0]]);
         });
     });
 
@@ -1134,7 +1134,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._setCellPitchDrum(1, 0, true);
 
             expect(cell0.style.backgroundColor).toBe(platformColor.selectorBackground);
-            expect(pdm._blockMap).toEqual([[10, 200]]);
+            expect(pdm._blockMap).toEqual([[10, 200, 0]]);
         });
 
         test("_save creates and loads action stack when grid has selections", () => {
@@ -1378,7 +1378,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
 
                 expect(labels(pdm).map(cell => cell.dataset.noteArg)).toEqual(["C"]);
                 click(0, 0);
-                expect(pdm._blockMap).toEqual([[20, 30]]);
+                expect(pdm._blockMap).toEqual([[20, 30, 0]]);
             } finally {
                 global._ = s => s;
             }
@@ -1415,7 +1415,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
             click(0, 1);
             expect(() => pdm._setCellPitchDrum(0, 0, true)).not.toThrow();
 
-            expect(pdm._blockMap).toEqual([[20, 30]]);
+            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
             expect(jsdomDocument.getElementById("0,1").style.backgroundColor).toBe(
                 selectorBackground
             );
@@ -1542,6 +1542,68 @@ describe("PitchDrumMatrix with a real DOM", () => {
         });
     });
 
+    describe("a pitch block with more than one row", () => {
+        // A pitch block in a Repeat makes a row each time it runs.
+        const repeated = blockMap =>
+            build({
+                labels: ["G", "G"],
+                args: [4, 4],
+                rowBlocks: [20, 20],
+                drums: ["kick drum", "snare drum"],
+                colBlocks: [30, 31],
+                blockMap
+            });
+        const black = pdm =>
+            pdm._pdmCellTables.map(table =>
+                [...table.rows[0].cells]
+                    .map(cell => (cell.style.backgroundColor === "black" ? 1 : 0))
+                    .join("")
+            );
+
+        test("keeps a drum for each row", () => {
+            const { pdm } = repeated();
+            click(0, 0);
+            click(1, 1);
+
+            expect(pdm._blockMap).toEqual([
+                [20, 30, 0],
+                [20, 31, 1]
+            ]);
+            expect(black(pdm)).toEqual(["10", "01"]);
+        });
+
+        test("puts each drum back on its own row when the project runs again", () => {
+            const { pdm } = repeated([
+                [20, 30, 0],
+                [20, 31, 1]
+            ]);
+
+            expect(black(pdm)).toEqual(["10", "01"]);
+        });
+
+        test("picking another drum in one row leaves the other row alone", () => {
+            const { pdm } = repeated();
+            click(0, 0);
+            click(1, 0);
+            click(0, 1);
+
+            expect(pdm._blockMap).toEqual([
+                [20, 30, 1],
+                [20, 31, 0]
+            ]);
+            expect(black(pdm)).toEqual(["01", "10"]);
+        });
+
+        test("toggling one row off keeps the other row's drum", () => {
+            const { pdm } = repeated();
+            click(0, 0);
+            click(1, 0);
+            click(1, 0);
+
+            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
+        });
+    });
+
     describe("drums played from a URL", () => {
         const url = "https://example.com/clap.wav";
         const lookups = [
@@ -1664,7 +1726,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(pdm._blockMap).toEqual([]);
 
             click(0, 0);
-            expect(pdm._blockMap).toEqual([[20, 30]]);
+            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
         });
     });
 });

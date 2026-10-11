@@ -88,7 +88,7 @@ class PitchDrumMatrixCells {
             obj = this._blockMap[i];
             if (obj[0] !== -1) {
                 // Look for this note in the pitch and drum blocks.
-                row = this._rowBlocks.indexOf(obj[0]);
+                row = this._rowOf(obj[0], obj[2] || 0);
                 col = -1;
                 for (let j = 0; j < this._colBlocks.length; j++) {
                     if (this._colBlocks[j] === obj[1]) {
@@ -152,7 +152,7 @@ class PitchDrumMatrixCells {
                 if (cell.style.backgroundColor === "black") {
                     pitchBlock = this._rowBlocks[rowi];
                     drumBlock = this._colBlocks[i];
-                    this.removeNode(pitchBlock, drumBlock);
+                    this.removeNode(pitchBlock, drumBlock, this._rowRepeat(rowi));
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }
@@ -162,9 +162,9 @@ class PitchDrumMatrixCells {
         drumBlock = this._colBlocks[coli];
 
         if (playNote) {
-            this.addNode(pitchBlock, drumBlock);
+            this.addNode(pitchBlock, drumBlock, this._rowRepeat(rowi));
         } else {
-            this.removeNode(pitchBlock, drumBlock);
+            this.removeNode(pitchBlock, drumBlock, this._rowRepeat(rowi));
         }
 
         table = this._pdmCellTables[rowi];

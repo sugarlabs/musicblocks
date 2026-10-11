@@ -74,17 +74,18 @@ class PitchDrumMatrixBlocks {
      * @public
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
+     * @param {number} [repeat=0] - Which row of the pitch block, when it has more than one.
      * @returns {void}
      */
-    addNode(pitchBlock, drumBlock) {
+    addNode(pitchBlock, drumBlock, repeat = 0) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
             obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1] === drumBlock) {
+            if (obj[0] === pitchBlock && obj[1] === drumBlock && (obj[2] || 0) === repeat) {
                 return; // node is already in the list
             }
         }
-        this._blockMap.push([pitchBlock, drumBlock]);
+        this._blockMap.push([pitchBlock, drumBlock, repeat]);
     }
 
     /**
@@ -93,16 +94,56 @@ class PitchDrumMatrixBlocks {
      * @public
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
+     * @param {number} [repeat=0] - Which row of the pitch block, when it has more than one.
      * @returns {void}
      */
-    removeNode(pitchBlock, drumBlock) {
+    removeNode(pitchBlock, drumBlock, repeat = 0) {
         let obj;
         for (let i = this._blockMap.length - 1; i >= 0; i--) {
             obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1] === drumBlock) {
+            if (obj[0] === pitchBlock && obj[1] === drumBlock && (obj[2] || 0) === repeat) {
                 this._blockMap.splice(i, 1);
             }
         }
+    }
+
+    /**
+     * Counts the rows before this one with the same pitch block. A pitch block in a Repeat
+     * makes a row each time it runs.
+     *
+     * @private
+     * @param {number} row - The row index.
+     * @returns {number} - 0 for the first row of its pitch block, 1 for the second, and so on.
+     */
+    _rowRepeat(row) {
+        let repeat = 0;
+        for (let i = 0; i < row; i++) {
+            if (this._rowBlocks[i] === this._rowBlocks[row]) {
+                repeat += 1;
+            }
+        }
+        return repeat;
+    }
+
+    /**
+     * Finds the row of a pitch block, the inverse of _rowRepeat.
+     *
+     * @private
+     * @param {number} pitchBlock - The pitch block.
+     * @param {number} repeat - Which row of the pitch block.
+     * @returns {number} - The row index, or -1 if the pitch block has no such row.
+     */
+    _rowOf(pitchBlock, repeat) {
+        let seen = 0;
+        for (let i = 0; i < this._rowBlocks.length; i++) {
+            if (this._rowBlocks[i] === pitchBlock) {
+                if (seen === repeat) {
+                    return i;
+                }
+                seen += 1;
+            }
+        }
+        return -1;
     }
 }
 
