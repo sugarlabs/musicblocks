@@ -196,6 +196,26 @@ describe("setupMeterActions", () => {
             // bpm stack must be unchanged — no bad value was stored
             expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
         });
+
+        test.each([
+            ["NaN", NaN],
+            ["zero", 0],
+            ["negative", -0.25],
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity]
+        ])(
+            "setBPM with bad beatValue (%s) shows an error and does not push to bpm",
+            (label, badBeatValue) => {
+                activity.errorMsg.mockClear();
+                const bpmBefore = [...targetTurtle.singer.bpm];
+                Singer.MeterActions.setBPM(120, badBeatValue, 0, 1);
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "Beat value must be a positive number.",
+                    1
+                );
+                expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
+            }
+        );
     });
 
     describe("master BPM settings", () => {
