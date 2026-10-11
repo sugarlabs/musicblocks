@@ -292,6 +292,11 @@ class PitchDrumMatrix {
         widgetWindow.onmaximize = () => {
             this._onMaximize(widgetWindow);
         };
+        // Running the project again while the window is maximized rebuilds it at the
+        // normal size above, so size it for full screen again.
+        if (widgetWindow._maximized) {
+            this._onMaximize(widgetWindow);
+        }
 
         activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
     }

@@ -1710,6 +1710,34 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(outer.style.width).toBe("500px");
         });
 
+        test("running again while maximized keeps the full screen size", () => {
+            const { pdm, activity } = threeRows();
+            widgetWindow._maximized = true;
+            widgetWindow.onmaximize();
+
+            // The real WidgetWindow.clear() empties the body.
+            widgetWindow.getWidgetBody().textContent = "";
+            pdm.init(activity);
+
+            const body = widgetWindow.getWidgetBody();
+            expect(body.style.height).toBe("calc(-95px + 100vh)");
+            expect(body.style.width).toBe("calc(-55px + 100vw)");
+            const outer = jsdomDocument.getElementById("pdmOuterDiv");
+            expect(outer.style.height).toBe("calc(-95px + 100vh)");
+            const inner = jsdomDocument.getElementById("pdmInnerDiv");
+            expect(inner.style.width).toBe("calc(-55px + 100vw)");
+        });
+
+        test("running again when not maximized keeps the normal size", () => {
+            const { pdm, activity } = threeRows();
+
+            widgetWindow.getWidgetBody().textContent = "";
+            pdm.init(activity);
+
+            expect(widgetWindow.getWidgetBody().style.height).toBe("400px");
+            expect(jsdomDocument.getElementById("pdmOuterDiv").style.width).toBe("500px");
+        });
+
         test("drum columns get a width in pixels", () => {
             const { pdm } = threeRows();
 
