@@ -169,4 +169,102 @@ describe("RhythmRulerCircular", () => {
             expect(outside.__dissectByNumber).not.toHaveBeenCalled();
         });
     });
+    describe("circular tapping", () => {
+        let widget;
+        const hit = { rulerIndex: 0, cellIndex: 0 };
+        const click = () => {
+            widget._onCircularMouseDown({});
+            widget._onCircularMouseUp({});
+        };
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            global._ = text => text;
+            global.Singer = { defaultBPMFactor: 1000 };
+            global.last = list => list[list.length - 1];
+            const utils = require("../../utils/utils-logic.js");
+            global.nearestBeat = utils.nearestBeat;
+            global.rationalToFraction = utils.rationalToFraction;
+            global.platformColor = { selectorBackground: "#aaa" };
+            const table = document.createElement("table");
+            const row = table.insertRow();
+            row.setAttribute("data-row", "0");
+            row.insertCell();
+            row.insertCell();
+            document.body.append(table);
+            widget = Object.assign(Object.create(RhythmRuler.prototype), {
+                activity: {
+                    hideMsgs: jest.fn(),
+                    logo: { synth: { trigger: jest.fn(), stop: jest.fn() } },
+                    turtles: { ithTurtle: () => ({ singer: { beatsPerMeasure: 4 } }) }
+                },
+                Rulers: [[[2, 2], []]],
+                Drums: [null],
+                _rulers: [row],
+                _tapMode: true,
+                _tapTimes: [],
+                _tapCell: null,
+                _playing: false,
+                _bpmFactor: 1000,
+                _dissectNumber: { value: "2" },
+                _undoList: [],
+                _hitTestCircular: jest.fn(() => hit),
+                _setWidgetTimeout: setTimeout,
+                _setWidgetInterval: setInterval,
+                _clearWidgetInterval: clearInterval,
+                _setButtonIcon: jest.fn(),
+                _noteWidth: value => 200 / Math.abs(value),
+                __setNoteValueDisplay: jest.fn(),
+                __addCellEventHandlers: jest.fn(),
+                _calculateZebraStripes: jest.fn(),
+                _refreshCircularView: jest.fn(),
+                saveDissectHistory: jest.fn(),
+                _drawCircularView: jest.fn()
+            });
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+            document.body.replaceChildren();
+        });
+
+        test("counts in, records taps, redraws the rhythm, and supports Undo", () => {
+            const cell = widget._rulers[0].cells[0];
+            widget._hitTestCircular.mockReturnValueOnce(hit).mockReturnValueOnce({
+                rulerIndex: 0,
+                cellIndex: 1
+            });
+            click();
+            expect(widget.Rulers[0][0]).toEqual([2, 2]);
+            expect(widget._tapCell).toBe(cell);
+            jest.advanceTimersByTime(500);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
+            expect(widget._tapTimes).toHaveLength(1);
+            jest.advanceTimersByTime(125);
+            click();
+            jest.advanceTimersByTime(250);
+            click();
+            expect(widget._tapTimes).toHaveLength(3);
+            jest.advanceTimersByTime(125);
+            expect(widget.Rulers[0][0]).toEqual([8, 4, 8, 2]);
+            expect(widget._tapMode).toBe(false);
+            expect(widget._tapCell).toBeNull();
+            expect(widget._refreshCircularView).toHaveBeenCalled();
+            expect(widget._undoList).toEqual([["tap", "0"]]);
+            widget._undo();
+            expect(widget.Rulers[0][0]).toEqual([2, 2]);
+            expect(widget._rulers[0].cells).toHaveLength(2);
+        });
+
+        test("does not start tapping or split a rest", () => {
+            widget.Rulers[0][0][0] = -2;
+            click();
+            expect(widget.Rulers[0][0]).toEqual([-2, 2]);
+            expect(widget._tapMode).toBe(false);
+            expect(widget._tapCell).toBeNull();
+            expect(jest.getTimerCount()).toBe(0);
+            expect(widget._undoList).toEqual([]);
+        });
+    });
 });
