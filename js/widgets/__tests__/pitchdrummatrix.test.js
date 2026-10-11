@@ -20,7 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.PitchDrumMatrixWindow = require("../PitchDrumMatrixWindow.js");
+global.PitchDrumMatrixGrid = require("../PitchDrumMatrixGrid.js");
+global.PitchDrumMatrixBlocks = require("../PitchDrumMatrixBlocks.js");
+global.PitchDrumMatrixCells = require("../PitchDrumMatrixCells.js");
+global.PitchDrumMatrixPlayback = require("../PitchDrumMatrixPlayback.js");
+global.PitchDrumMatrixSave = require("../PitchDrumMatrixSave.js");
 const PitchDrumMatrix = require("../pitchdrummatrix.js");
+global.PitchDrumMatrix = PitchDrumMatrix;
 
 // The real jsdom document, for the DOM suite at the end.
 const jsdomDocument = global.document;
@@ -248,8 +255,8 @@ describe("PitchDrumMatrix Widget", () => {
             pdm.addNode(1, 0);
 
             expect(pdm._blockMap).toEqual([
-                [0, 1],
-                [1, 0]
+                [0, 1, 0],
+                [1, 0, 0]
             ]);
         });
 
@@ -257,7 +264,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm.addNode(0, 1);
             pdm.addNode(0, 1);
 
-            expect(pdm._blockMap).toEqual([[0, 1]]);
+            expect(pdm._blockMap).toEqual([[0, 1, 0]]);
         });
 
         test("removeNode removes a matching intersection", () => {
@@ -266,7 +273,7 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm.removeNode(0, 1);
 
-            expect(pdm._blockMap).toEqual([[1, 0]]);
+            expect(pdm._blockMap).toEqual([[1, 0, 0]]);
         });
 
         test("removeNode leaves the map unchanged when nothing matches", () => {
@@ -274,7 +281,7 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm.removeNode(5, 5);
 
-            expect(pdm._blockMap).toEqual([[0, 1]]);
+            expect(pdm._blockMap).toEqual([[0, 1, 0]]);
         });
     });
 
@@ -1037,8 +1044,8 @@ describe("PitchDrumMatrix Widget", () => {
             expect(typeof cell.onmouseover).toBe("function");
             expect(typeof cell.onmouseout).toBe("function");
 
-            cell.onmouseover();
-            cell.onmouseout();
+            cell.onmouseover({ currentTarget: cell });
+            cell.onmouseout({ currentTarget: cell });
         });
 
         test("makeClickable sets up click listeners and restores blockMap entries", () => {
@@ -1127,7 +1134,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._setCellPitchDrum(1, 0, true);
 
             expect(cell0.style.backgroundColor).toBe(platformColor.selectorBackground);
-            expect(pdm._blockMap).toEqual([[10, 200]]);
+            expect(pdm._blockMap).toEqual([[10, 200, 0]]);
         });
 
         test("_save creates and loads action stack when grid has selections", () => {
@@ -1371,7 +1378,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
 
                 expect(labels(pdm).map(cell => cell.dataset.noteArg)).toEqual(["C"]);
                 click(0, 0);
-                expect(pdm._blockMap).toEqual([[20, 30]]);
+                expect(pdm._blockMap).toEqual([[20, 30, 0]]);
             } finally {
                 global._ = s => s;
             }
@@ -1408,7 +1415,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
             click(0, 1);
             expect(() => pdm._setCellPitchDrum(0, 0, true)).not.toThrow();
 
-            expect(pdm._blockMap).toEqual([[20, 30]]);
+            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
             expect(jsdomDocument.getElementById("0,1").style.backgroundColor).toBe(
                 selectorBackground
             );
@@ -1535,6 +1542,161 @@ describe("PitchDrumMatrix with a real DOM", () => {
         });
     });
 
+    describe("a pitch block with more than one row", () => {
+        // A pitch block in a Repeat makes a row each time it runs.
+        const repeated = blockMap =>
+            build({
+                labels: ["G", "G"],
+                args: [4, 4],
+                rowBlocks: [20, 20],
+                drums: ["kick drum", "snare drum"],
+                colBlocks: [30, 31],
+                blockMap
+            });
+        const black = pdm =>
+            pdm._pdmCellTables.map(table =>
+                [...table.rows[0].cells]
+                    .map(cell => (cell.style.backgroundColor === "black" ? 1 : 0))
+                    .join("")
+            );
+
+        test("keeps a drum for each row", () => {
+            const { pdm } = repeated();
+            click(0, 0);
+            click(1, 1);
+
+            expect(pdm._blockMap).toEqual([
+                [20, 30, 0],
+                [20, 31, 1]
+            ]);
+            expect(black(pdm)).toEqual(["10", "01"]);
+        });
+
+        test("puts each drum back on its own row when the project runs again", () => {
+            const { pdm } = repeated([
+                [20, 30, 0],
+                [20, 31, 1]
+            ]);
+
+            expect(black(pdm)).toEqual(["10", "01"]);
+        });
+
+        test("picking another drum in one row leaves the other row alone", () => {
+            const { pdm } = repeated();
+            click(0, 0);
+            click(1, 0);
+            click(0, 1);
+
+            expect(pdm._blockMap).toEqual([
+                [20, 30, 1],
+                [20, 31, 0]
+            ]);
+            expect(black(pdm)).toEqual(["01", "10"]);
+        });
+
+        test("toggling one row off keeps the other row's drum", () => {
+            const { pdm } = repeated();
+            click(0, 0);
+            click(1, 0);
+            click(1, 0);
+
+            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
+        });
+    });
+
+    describe("drums played from a URL", () => {
+        const url = "https://example.com/clap.wav";
+        const lookups = [
+            "getDrumName",
+            "getDrumSynthName",
+            "getDrumIcon",
+            "DRUMNAMES",
+            "DEFAULTDRUM"
+        ];
+        const musicutils = require("../../utils/musicutils.js");
+        // The real lookups, over two drums as synthutils.js lists them.
+        const real = {
+            ...musicutils,
+            DRUMNAMES: [
+                ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "drum"],
+                ["kick drum", "kick drum", "images/kick.svg", "bd", "drum"]
+            ],
+            DEFAULTDRUM: "kick drum"
+        };
+        const mocked = {};
+
+        beforeEach(() => {
+            for (const name of lookups) {
+                mocked[name] = global[name];
+                global[name] = real[name];
+            }
+        });
+
+        afterEach(() => {
+            Object.assign(global, mocked);
+        });
+
+        const withUrlDrum = () =>
+            build({
+                labels: ["C"],
+                args: [4],
+                rowBlocks: [20],
+                drums: ["kick drum", url],
+                colBlocks: [30, 31]
+            });
+        const drumImage = (pdm, col) => pdm._pdmDrumTable.rows[0].cells[col].querySelector("img");
+
+        test("names the column after its URL", () => {
+            const { pdm } = withUrlDrum();
+
+            expect(drumImage(pdm, 0).title).toBe("kick drum");
+            expect(drumImage(pdm, 1).title).toBe(url);
+            expect(drumImage(pdm, 1).alt).toBe(url);
+            expect(drumImage(pdm, 1).getAttribute("src")).toBe("images/drum.svg");
+        });
+
+        test("clicking a cell plays the URL drum, not the default drum", () => {
+            jest.useFakeTimers();
+            const { activity } = withUrlDrum();
+
+            click(0, 1);
+            jest.runAllTimers();
+
+            expect(activity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                "C2",
+                0.125,
+                url,
+                null,
+                null
+            );
+        });
+
+        test("Save keeps the URL in a text block", () => {
+            const { pdm, activity } = withUrlDrum();
+            click(0, 1);
+
+            pdm._save();
+
+            const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+            const mapdrum = stack.find(block => block[1] === "mapdrum");
+            const drum = stack.find(block => block[0] === mapdrum[4][1]);
+            expect(drum[1]).toEqual(["text", { value: url }]);
+        });
+
+        test("Save still uses a drum name block for a built-in drum", () => {
+            const { pdm, activity } = withUrlDrum();
+            click(0, 0);
+
+            pdm._save();
+
+            const stack = activity.blocks.loadNewBlocks.mock.calls[0][0];
+            const mapdrum = stack.find(block => block[1] === "mapdrum");
+            const drum = stack.find(block => block[0] === mapdrum[4][1]);
+            expect(drum[1]).toEqual(["drumname", { value: "kick drum" }]);
+        });
+    });
+
     describe("layout and state", () => {
         test("restoring from full screen puts the outer div back", () => {
             threeRows();
@@ -1546,6 +1708,58 @@ describe("PitchDrumMatrix with a real DOM", () => {
             const outer = jsdomDocument.getElementById("pdmOuterDiv");
             expect(outer.style.height).toBe("400px");
             expect(outer.style.width).toBe("500px");
+        });
+
+        test("running again while maximized keeps the full screen size", () => {
+            const { pdm, activity } = threeRows();
+            widgetWindow._maximized = true;
+            widgetWindow.onmaximize();
+
+            // The real WidgetWindow.clear() empties the body.
+            widgetWindow.getWidgetBody().textContent = "";
+            pdm.init(activity);
+
+            const body = widgetWindow.getWidgetBody();
+            expect(body.style.height).toBe("calc(-95px + 100vh)");
+            expect(body.style.width).toBe("calc(-55px + 100vw)");
+            const outer = jsdomDocument.getElementById("pdmOuterDiv");
+            expect(outer.style.height).toBe("calc(-95px + 100vh)");
+            const inner = jsdomDocument.getElementById("pdmInnerDiv");
+            expect(inner.style.width).toBe("calc(-55px + 100vw)");
+        });
+
+        test("running again when not maximized keeps the normal size", () => {
+            const { pdm, activity } = threeRows();
+
+            widgetWindow.getWidgetBody().textContent = "";
+            pdm.init(activity);
+
+            expect(widgetWindow.getWidgetBody().style.height).toBe("400px");
+            expect(jsdomDocument.getElementById("pdmOuterDiv").style.width).toBe("500px");
+        });
+
+        test("hovering a cell highlights that cell, not the last drum name", () => {
+            const { pdm } = threeRows();
+            const cell = jsdomDocument.getElementById("1,0");
+            const drumName = pdm._pdmDrumTable.rows[0].cells[0];
+
+            cell.dispatchEvent(new window.MouseEvent("mouseover"));
+            expect(cell.style.backgroundColor).toBe("rgb(208, 208, 208)");
+            expect(drumName.style.backgroundColor).toBe(selectorBackground);
+
+            cell.dispatchEvent(new window.MouseEvent("mouseout"));
+            expect(cell.style.backgroundColor).toBe(selectorBackground);
+        });
+
+        test("hovering a selected cell keeps it selected", () => {
+            threeRows();
+            click(0, 0);
+            const cell = jsdomDocument.getElementById("0,0");
+
+            cell.dispatchEvent(new window.MouseEvent("mouseover"));
+            cell.dispatchEvent(new window.MouseEvent("mouseout"));
+
+            expect(cell.style.backgroundColor).toBe("black");
         });
 
         test("drum columns get a width in pixels", () => {
@@ -1564,7 +1778,76 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(pdm._blockMap).toEqual([]);
 
             click(0, 0);
-            expect(pdm._blockMap).toEqual([[20, 30]]);
+            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
         });
+    });
+});
+
+describe("PitchDrumMatrix modules", () => {
+    const MODULES = [
+        "PitchDrumMatrixWindow",
+        "PitchDrumMatrixGrid",
+        "PitchDrumMatrixBlocks",
+        "PitchDrumMatrixCells",
+        "PitchDrumMatrixPlayback",
+        "PitchDrumMatrixSave"
+    ];
+
+    test("lists every module, and itself last, as its lazy-loading dependencies", () => {
+        expect(PitchDrumMatrix.dependencies).toEqual([
+            ...MODULES.map(name => "widgets/" + name),
+            "widgets/pitchdrummatrix"
+        ]);
+    });
+
+    test("the Pitch Drum block falls back to the same dependencies", () => {
+        const source = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "..", "blocks", "WidgetBlocks.js"),
+            "utf8"
+        );
+        const site = source.slice(source.indexOf('typeof PitchDrumMatrix !== "undefined"'));
+        const fallback = site.slice(site.indexOf("["), site.indexOf("]") + 1);
+
+        expect(JSON.parse(fallback)).toEqual(PitchDrumMatrix.dependencies);
+    });
+
+    test("installModules waits until every module is loaded", () => {
+        jest.isolateModules(() => {
+            const saved = global.PitchDrumMatrixSave;
+            delete global.PitchDrumMatrixSave;
+            try {
+                const Fresh = require("../pitchdrummatrix.js");
+                expect(Fresh.installModules()).toBe(false);
+                expect(Fresh.prototype._save).toBeUndefined();
+
+                global.PitchDrumMatrixSave = saved;
+                expect(Fresh.installModules()).toBe(true);
+                expect(Fresh.prototype._save).toBe(saved.prototype._save);
+            } finally {
+                global.PitchDrumMatrixSave = saved;
+            }
+        });
+    });
+
+    test("no two modules define the same method", () => {
+        const seen = new Map();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method === "constructor") continue;
+                expect(seen.get(method)).toBeUndefined();
+                seen.set(method, name);
+            }
+        }
+    });
+
+    test("a widget has every module method", () => {
+        const pdm = new PitchDrumMatrix();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(typeof pdm[method]).toBe("function");
+                }
+            }
+        }
     });
 });

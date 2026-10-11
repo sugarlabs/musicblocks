@@ -1674,6 +1674,24 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+            } else if (logo.inPitchDrumMatrix) {
+                // The widget's rows are notes, so use the nearest note and octave. The pitch
+                // path would add the cents as semitones.
+                const note = obj;
+                if (tur.singer.drumStyle.length > 0) {
+                    logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    logo.pitchDrumMatrix.addColBlock(blk);
+                } else {
+                    logo.pitchDrumMatrix.addRowBlock(blk);
+                    if (!logo.pitchBlocks.includes(blk)) {
+                        logo.pitchBlocks.push(blk);
+                    }
+
+                    logo.pitchDrumMatrix.rowLabels.push(note[0]);
+                    logo.pitchDrumMatrix.rowArgs.push(note[1]);
+                    tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                    tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                }
             } else if (logo.inLegoWidget) {
                 logo.legoWidget.addRowBlock(blk);
                 if (!logo.pitchBlocks.includes(blk)) {

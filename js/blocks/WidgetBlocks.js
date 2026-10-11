@@ -1084,7 +1084,15 @@ function setupWidgetBlocks(activity) {
                 "pitchDrumMatrix",
                 _getWidgetDependencies(
                     typeof PitchDrumMatrix !== "undefined" ? PitchDrumMatrix : null,
-                    ["widgets/pitchdrummatrix"]
+                    [
+                        "widgets/PitchDrumMatrixWindow",
+                        "widgets/PitchDrumMatrixGrid",
+                        "widgets/PitchDrumMatrixBlocks",
+                        "widgets/PitchDrumMatrixCells",
+                        "widgets/PitchDrumMatrixPlayback",
+                        "widgets/PitchDrumMatrixSave",
+                        "widgets/pitchdrummatrix"
+                    ]
                 ),
                 () => new PitchDrumMatrix(),
                 turtle,
@@ -1103,9 +1111,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                logo.inPitchDrumMatrix = false;
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
-                    logo.pitchDrumMatrix.rowLabels.length === 0
+                    !logo.pitchDrumMatrix.hasPitchRows()
                 ) {
                     activity.errorMsg(
                         _(

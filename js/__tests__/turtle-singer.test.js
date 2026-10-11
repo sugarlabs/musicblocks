@@ -1190,6 +1190,33 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         expect(activityMock.logo.pitchDrumMatrix.rowArgs).toHaveLength(1);
     });
 
+    test("pitch-drum matrix keeps the row as the last note, for Step Pitch", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+
+        Singer.processPitch(activityMock, "re", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["C4", 4]);
+    });
+
+    test.each([
+        ["a rest", "rest", []],
+        ["a pitch inside Set Drum", "re", ["snare drum"]]
+    ])("pitch-drum matrix keeps the last note for %s", (name, note, drumStyle) => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.drumStyle = drumStyle;
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+        turtleMock.singer.previousNotePlayed = ["B3", 4];
+
+        Singer.processPitch(activityMock, note, 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["C4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["B3", 4]);
+    });
+
     test("phrase maker adds exactly one row while duplicateFactor is 3", () => {
         activityMock.logo.inMatrix = true;
 

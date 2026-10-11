@@ -181,6 +181,10 @@ function setupDrumActions(activity) {
                     drumname = drum;
                 }
             }
+            // A drum played from a URL, as Play Drum allows.
+            if (typeof drum === "string" && drum.slice(0, 4) === "http") {
+                drumname = drum;
+            }
 
             const tur = activity.turtles.ithTurtle(turtle);
 
