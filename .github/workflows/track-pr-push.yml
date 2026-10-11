@@ -194,8 +194,7 @@ jobs:
                         const pushedAt = new Date().toISOString();
                         const eventSha = context.eventName === "push" ? context.sha : null;
                         const branchRef = `heads/${stateBranch}`;
-                        let state = {};
-                        let fileSha = null;
+                        const maxAttempts = 3;
 
                         try {
                           await github.rest.git.getRef({ owner, repo, ref: branchRef });
@@ -217,47 +216,62 @@ jobs:
                           });
                         }
 
-                        try {
-                          const response = await github.rest.repos.getContent({
+                        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                          let state = {};
+                          let fileSha = null;
+
+                          try {
+                            const response = await github.rest.repos.getContent({
+                              owner,
+                              repo,
+                              path: statePath,
+                              ref: stateBranch
+                            });
+                            state = decodeState(response.data);
+                            fileSha = response.data.sha;
+                          } catch (error) {
+                            if (error.status !== 404) {
+                              core.setFailed(error.message);
+                              return;
+                            }
+                            core.info("pr-push-state.json not found. Initializing new state object.");
+                          }
+
+                          let updated = false;
+                          for (const pr of matching) {
+                            const key = String(pr.number);
+                            if (!newerPush(state[key], pushedAt)) continue;
+                            state[key] = pushRecord(pr, pushedAt, actor, eventSha);
+                            core.info(`Recorded push for PR #${pr.number} by ${actor} at ${pushedAt}.`);
+                            updated = true;
+                          }
+
+                          if (!updated) {
+                            core.info("No state updates needed.");
+                            return;
+                          }
+
+                          const params = {
                             owner,
                             repo,
                             path: statePath,
-                            ref: stateBranch
-                          });
-                          state = decodeState(response.data);
-                          fileSha = response.data.sha;
-                        } catch (error) {
-                          if (error.status !== 404) {
-                            core.setFailed(error.message);
+                            message: "chore: update PR push activity state",
+                            content: Buffer.from(JSON.stringify(state, null, 2) + "\n").toString("base64"),
+                            branch: stateBranch
+                          };
+                          if (fileSha) params.sha = fileSha;
+
+                          try {
+                            await github.rest.repos.createOrUpdateFileContents(params);
                             return;
+                          } catch (error) {
+                            const conflict = error.status === 409 || error.status === 422;
+                            if (!conflict || attempt === maxAttempts) throw error;
+                            core.warning(
+                              `State file changed while updating; retrying (${attempt} of ${maxAttempts}).`
+                            );
                           }
-                          core.info("pr-push-state.json not found. Initializing new state object.");
                         }
-
-                        let updated = false;
-                        for (const pr of matching) {
-                          const key = String(pr.number);
-                          if (!newerPush(state[key], pushedAt)) continue;
-                          state[key] = pushRecord(pr, pushedAt, actor, eventSha);
-                          core.info(`Recorded push for PR #${pr.number} by ${actor} at ${pushedAt}.`);
-                          updated = true;
-                        }
-
-                        if (!updated) {
-                          core.info("No state updates needed.");
-                          return;
-                        }
-
-                        const params = {
-                          owner,
-                          repo,
-                          path: statePath,
-                          message: "chore: update PR push activity state",
-                          content: Buffer.from(JSON.stringify(state, null, 2) + "\n").toString("base64"),
-                          branch: stateBranch
-                        };
-                        if (fileSha) params.sha = fileSha;
-                        await github.rest.repos.createOrUpdateFileContents(params);
                       }
 
                       await run();
