@@ -480,16 +480,27 @@ class ServerInterface {
             };
             const sortParam = sortMap[sort] || "createdAt";
 
-            // Resolve topic filter from legacy tag array
+            // Resolve topic filter from tag array (JSON string, Array, or comma-separated string)
             let topicParam = "";
             if (tags && tags !== "ALL_PROJECTS" && tags !== "USER_PROJECTS") {
-                try {
-                    const tagArray = JSON.parse(tags);
-                    if (Array.isArray(tagArray) && tagArray.length > 0) {
-                        topicParam = `&topic=${encodeURIComponent(tagArray[0])}`;
+                let tagArray = [];
+                if (Array.isArray(tags)) {
+                    tagArray = tags;
+                } else {
+                    try {
+                        const parsed = JSON.parse(tags);
+                        tagArray = Array.isArray(parsed) ? parsed : [parsed];
+                    } catch (_) {
+                        tagArray = typeof tags === "string" ? tags.split(",") : [tags];
                     }
-                } catch (_) {
-                    topicParam = `&topic=${encodeURIComponent(tags)}`;
+                }
+
+                const cleanedTags = tagArray
+                    .map(t => String(t).trim().toLowerCase())
+                    .filter(Boolean);
+
+                if (cleanedTags.length > 0) {
+                    topicParam = `&topic=${cleanedTags.map(encodeURIComponent).join(",")}`;
                 }
             }
 

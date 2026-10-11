@@ -391,14 +391,67 @@ describe("ServerInterface", () => {
             expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
         });
 
-        it("should fetch project list using GET /allRepos", async () => {
+        it("should fetch project list using GET /allRepos with single tag", async () => {
             jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
             const callback = jest.fn();
             await server.downloadProjectList(["tag"], "recent", 0, 10, callback);
 
             expect(server._get).toHaveBeenCalledWith(
-                expect.stringContaining("/allRepos?page=1&limit=10")
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt&topic=tag")
             );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should fetch project list with multiple tags when passed as an array", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList(["music", "math", "art"], "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    "/allRepos?page=1&limit=10&sort=createdAt&topic=music,math,art"
+                )
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should fetch project list with multiple tags when passed as a JSON string", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList(
+                JSON.stringify(["music", "math"]),
+                "recent",
+                0,
+                10,
+                callback
+            );
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt&topic=music,math")
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should fetch project list when tags is a comma-separated string", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList("music,math", "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt&topic=music,math")
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should omit topic param when tags is ALL_PROJECTS", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList("ALL_PROJECTS", "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt")
+            );
+            expect(server._get).not.toHaveBeenCalledWith(expect.stringContaining("&topic="));
             expect(callback).toHaveBeenCalled();
         });
 
