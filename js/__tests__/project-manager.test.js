@@ -2743,7 +2743,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         const readers = [];
         class MockFR {
             constructor() {
-                this.result = "X:1\nK:C\nC";
+                this.result = "X:1\nK:C\nC \\ D";
                 this.onload = null;
                 readers.push(this);
             }
@@ -2755,7 +2755,26 @@ describe("_setupFileHandlers inner callbacks", () => {
         }
         global.FileReader = MockFR;
         global.ensureABCJS.mockResolvedValueOnce(undefined);
-        global.ABCJS.parseOnly.mockReturnValueOnce([{ header: {} }]);
+        const mockTune = {
+            metaText: { title: "Test Tune" },
+            lines: [
+                {
+                    staff: [
+                        {
+                            voices: [
+                                [
+                                    {
+                                        el_type: "note",
+                                        pitches: [{ name: "C", pitch: 0 }]
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+        global.ABCJS.parseOnly.mockReturnValueOnce([mockTune]);
 
         const activity = makeActivity();
         const handlers = captureHandlers(activity);
@@ -2767,8 +2786,8 @@ describe("_setupFileHandlers inner callbacks", () => {
         await readers[2].promise;
 
         expect(global.ensureABCJS).toHaveBeenCalledTimes(1);
-        expect(global.ABCJS.parseOnly).toHaveBeenCalledWith("X:1\nK:C\nC");
-        expect(activity.parseABC).toHaveBeenCalledWith({ header: {} });
+        expect(global.ABCJS.parseOnly).toHaveBeenCalledWith("X:1\nK:C\nC \\ D");
+        expect(activity.parseABC).toHaveBeenCalledWith(mockTune);
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();

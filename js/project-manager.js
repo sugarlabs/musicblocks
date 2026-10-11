@@ -1290,9 +1290,8 @@ class ProjectManager {
                     document.body.style.cursor = "wait";
                     that.doLoadAnimation();
                     try {
-                        let abcData =
+                        const abcData =
                             (event && event.target && event.target.result) || abcReader.result;
-                        abcData = abcData.replace(/\\/g, "");
 
                         await ensureABCJS();
                         const tunebook = new ABCJS.parseOnly(abcData);
