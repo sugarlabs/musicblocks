@@ -406,6 +406,80 @@ describe("KeyboardController", () => {
             expect(activity._doFastButton).not.toHaveBeenCalled();
         });
 
+        it("hides paste box without pasting or starting playback on Enter when paste box is empty", () => {
+            const activity = makeActivity();
+            activity.paste.style.visibility = "visible";
+            activity.paste.value = "";
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity.pasted).not.toHaveBeenCalled();
+            expect(activity.paste.style.visibility).toBe("hidden");
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("toggles playback with Alt+Enter when idle or running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const eventIdle = makeEvent({ keyCode: KEYCODE.RETURN, altKey: true });
+
+            controller.__keyPressed(eventIdle);
+
+            expect(eventIdle.preventDefault).toHaveBeenCalled();
+            expect(activity._doFastButton).toHaveBeenCalled();
+
+            activity.turtles.running.mockReturnValue(true);
+            const eventRunning = makeEvent({ keyCode: KEYCODE.RETURN, altKey: true });
+
+            controller.__keyPressed(eventRunning);
+
+            expect(eventRunning.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+        });
+
+        it("toggles playback with Shift+Enter when idle or running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const eventIdle = makeEvent({ keyCode: KEYCODE.RETURN, shiftKey: true });
+
+            controller.__keyPressed(eventIdle);
+
+            expect(eventIdle.preventDefault).toHaveBeenCalled();
+            expect(activity._doFastButton).toHaveBeenCalled();
+
+            activity.turtles.running.mockReturnValue(true);
+            const eventRunning = makeEvent({ keyCode: KEYCODE.RETURN, shiftKey: true });
+
+            controller.__keyPressed(eventRunning);
+
+            expect(eventRunning.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+        });
+
+        it("toggles playback with Ctrl+Enter when idle or running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const eventIdle = makeEvent({ keyCode: KEYCODE.RETURN, ctrlKey: true });
+
+            controller.__keyPressed(eventIdle);
+
+            expect(eventIdle.preventDefault).toHaveBeenCalled();
+            expect(activity._doFastButton).toHaveBeenCalled();
+
+            activity.turtles.running.mockReturnValue(true);
+            const eventRunning = makeEvent({ keyCode: KEYCODE.RETURN, ctrlKey: true });
+
+            controller.__keyPressed(eventRunning);
+
+            expect(eventRunning.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+        });
+
         it("suppresses Enter when isInputON is true", () => {
             const activity = makeActivity();
             activity.isInputON = true;
