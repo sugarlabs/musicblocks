@@ -992,6 +992,9 @@ class Singer {
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
+            // Step Pitch steps from the row before, as in the Phrase Maker.
+            tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+            tur.singer.lastNotePlayed = [nnote[0] + nnote[1], 4];
             nnote[0] = noteIsSolfege(note)
                 ? getSolfege(
                       nnote[0],

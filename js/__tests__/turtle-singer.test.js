@@ -1190,6 +1190,17 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         expect(activityMock.logo.pitchDrumMatrix.rowArgs).toHaveLength(1);
     });
 
+    test("pitch-drum matrix keeps the row as the last note, for Step Pitch", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+
+        Singer.processPitch(activityMock, "re", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["C4", 4]);
+    });
+
     test("phrase maker adds exactly one row while duplicateFactor is 3", () => {
         activityMock.logo.inMatrix = true;
 

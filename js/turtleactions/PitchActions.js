@@ -84,6 +84,7 @@ function setupPitchActions(activity) {
             if (
                 !activity.logo.inMatrix &&
                 !activity.logo.inMusicKeyboard &&
+                !activity.logo.inPitchDrumMatrix &&
                 tur.singer.inNoteBlock.length === 0
             ) {
                 // If there was no previous pitch, use default.
