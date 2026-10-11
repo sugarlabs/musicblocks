@@ -1689,8 +1689,9 @@ function setupPitchBlocks(activity) {
 
                     logo.pitchDrumMatrix.rowLabels.push(note[0]);
                     logo.pitchDrumMatrix.rowArgs.push(note[1]);
+                    tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                    tur.singer.lastNotePlayed = [note[0] + note[1], 4];
                 }
-                tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inLegoWidget) {
                 logo.legoWidget.addRowBlock(blk);
                 if (!logo.pitchBlocks.includes(blk)) {

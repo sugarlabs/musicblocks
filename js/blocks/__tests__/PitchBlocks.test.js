@@ -638,6 +638,7 @@ describe("setupPitchBlocks", () => {
         it("adds a row at the nearest note, without the cents", () => {
             // 450 Hz is A4 and 39 cents.
             global.frequencyToPitch.mockReturnValue(["A", 4, 39]);
+            singer.lastNotePlayed = ["G4", 4];
 
             createdBlocks["hertz"].flow([450], logo, 0, 10);
 
@@ -646,6 +647,7 @@ describe("setupPitchBlocks", () => {
             expect(pdm.addRowBlock).toHaveBeenCalledWith(10);
             expect(logo.pitchBlocks).toEqual([10]);
             expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(singer.previousNotePlayed).toEqual(["G4", 4]);
             expect(global.Singer.PitchActions.playHertz).not.toHaveBeenCalled();
         });
 
@@ -659,6 +661,18 @@ describe("setupPitchBlocks", () => {
             expect(pdm.addColBlock).toHaveBeenCalledWith(10);
             expect(pdm.rowLabels).toEqual([]);
             expect(pdm.addRowBlock).not.toHaveBeenCalled();
+        });
+
+        it("leaves the last note alone for a drum column", () => {
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            singer.drumStyle = ["snare drum"];
+            singer.lastNotePlayed = ["G4", 4];
+            singer.previousNotePlayed = ["F4", 4];
+
+            createdBlocks["hertz"].flow([440], logo, 0, 10);
+
+            expect(singer.lastNotePlayed).toEqual(["G4", 4]);
+            expect(singer.previousNotePlayed).toEqual(["F4", 4]);
         });
     });
 
