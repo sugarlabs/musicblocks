@@ -116,6 +116,14 @@ function pitches(blocks) {
         }));
 }
 
+/** Every playdrum block's drum name, in block-array order. */
+function drumNames(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    return blocks
+        .filter(b => blockName(b) === "playdrum")
+        .map(b => byIndex.get(b[4][1])[1][1].value);
+}
+
 const SIMPLE_NOTE = (step, octave, type, opts = "") =>
     `<note><pitch><step>${step}</step>${opts}<octave>${octave}</octave></pitch><duration>1</duration><type>${type}</type></note>`;
 
@@ -724,5 +732,379 @@ describe("Test 13: Multi-part scores", () => {
         const settimbres = blocks.filter(b => blockName(b) === "settimbre");
         expect(settimbres).toHaveLength(3);
         expect(settimbres[2][4][2]).toBeNull();
+    });
+});
+
+describe("Test 14: Grace notes", () => {
+    it("skips a grace note rather than importing it as a full-length note", async () => {
+        // A grace note has a <type> (quarter here) but no <duration> -- it
+        // doesn't take up measure time. Importing it as a full note would make
+        // the following note start late and throw off every note after it.
+        // (Re-covers what part 1 of this series intended to fix but never
+        // actually pushed -- see this PR's description.)
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><grace/><pitch><step>D</step><octave>4</octave></pitch><type>quarter</type></note>" +
+                    SIMPLE_NOTE("C", 4, "quarter")
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});
+
+describe("Test 15: Drum/unpitched parts", () => {
+    const drumScore = noteXml =>
+        "<score-partwise>" +
+        '<part-list><score-part id="D1">' +
+        '<score-instrument id="D1-X1"><instrument-name>snare drum</instrument-name></score-instrument>' +
+        "</score-part></part-list>" +
+        `<part id="D1"><measure number="1"><attributes><divisions>8</divisions></attributes>${noteXml}</measure></part>` +
+        "</score-partwise>";
+
+    it("builds a playdrum/drumname pair nested in the newnote wrapper, not a pitch", async () => {
+        const { blocks } = await parseAndCapture(
+            drumScore(
+                "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+                    "<duration>8</duration><type>quarter</type>" +
+                    '<instrument id="D1-X1"/></note>'
+            )
+        );
+
+        expect(drumNames(blocks)).toEqual(["snare drum"]);
+        expect(pitches(blocks)).toEqual([]);
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+
+        // playdrum sits where pitch normally would -- inside the newnote's
+        // clamp (connected from the vspace), not appended after it.
+        const newnote = blocks.find(b => blockName(b) === "newnote");
+        const vspace = blocks.find(b => b[0] === newnote[4][2]);
+        const playdrum = blocks.find(b => blockName(b) === "playdrum");
+        expect(playdrum[4][0]).toBe(vspace[0]);
+    });
+
+    it("falls back to kick drum when the <instrument> reference doesn't resolve", async () => {
+        const { blocks } = await parseAndCapture(
+            drumScore(
+                "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+                    '<duration>8</duration><type>quarter</type><instrument id="nonexistent"/></note>'
+            )
+        );
+
+        expect(drumNames(blocks)).toEqual(["kick drum"]);
+    });
+
+    it("falls back to kick drum when the note has no <instrument> reference at all", async () => {
+        const { blocks } = await parseAndCapture(
+            drumScore(
+                "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+                    "<duration>8</duration><type>quarter</type></note>"
+            )
+        );
+
+        expect(drumNames(blocks)).toEqual(["kick drum"]);
+    });
+
+    it("falls back to kick drum when the matched <score-instrument> has an empty <instrument-name>", async () => {
+        // A different fallback path than "the id doesn't resolve at all" --
+        // this is the score-instrument being found, but its own name text
+        // being empty/whitespace-only.
+        const xml =
+            "<score-partwise>" +
+            '<part-list><score-part id="D1">' +
+            '<score-instrument id="D1-X1"><instrument-name></instrument-name></score-instrument>' +
+            "</score-part></part-list>" +
+            '<part id="D1"><measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+            '<duration>8</duration><type>quarter</type><instrument id="D1-X1"/></note>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(drumNames(blocks)).toEqual(["kick drum"]);
+    });
+
+    it("mixes drum and pitched notes in the same part correctly", async () => {
+        const { blocks } = await parseAndCapture(
+            drumScore(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+                    '<duration>8</duration><type>quarter</type><instrument id="D1-X1"/></note>'
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(drumNames(blocks)).toEqual(["snare drum"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});
+
+describe("Test 16: Ties", () => {
+    const tiedNote = (step, octave, tieAttrs) =>
+        `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
+        `<duration>8</duration><type>quarter</type>${tieAttrs}</note>`;
+
+    it("merges two tied notes into one note block with their durations summed", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') + tiedNote("C", 4, '<tie type="stop"/>')
+            )
+        );
+
+        // Two tied quarter notes (1/4 + 1/4, unreduced) = 8/16, which the
+        // "divide" block itself resolves to 1/2 at runtime -- one half note.
+        expect(noteValues(blocks)).toEqual([[8, 16]]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("merges a tie spanning three notes (a tie that both stops and restarts)", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    tiedNote("C", 4, '<tie type="stop"/><tie type="start"/>') +
+                    tiedNote("C", 4, '<tie type="stop"/>')
+            )
+        );
+
+        // Three tied quarter notes, unreduced: (1/4+1/4)=8/16, then
+        // 8/16+1/4=48/64, which reduces to 3/4 -- a dotted-half-note's worth.
+        expect(noteValues(blocks)).toEqual([[48, 64]]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+    });
+
+    it("keeps an untied note after a tie chain separate", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    tiedNote("C", 4, '<tie type="stop"/>') +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("emits the accumulated duration for a malformed file that ends mid-tie", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(tiedNote("C", 4, '<tie type="start"/>'))
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("treats a note with both start and stop tags, and no active chain, as standalone", async () => {
+        // Invalid MusicXML on its own (a tie can't stop before it starts),
+        // but a defensive reading matters: this must not be read as a new
+        // chain waiting for a stop that will never come (it already "has"
+        // one), which would wrongly swallow the next note's duration into it.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/><tie type="stop"/>') +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("flushes an open tie before an unrelated note instead of folding it in", async () => {
+        // A tie left open (no matching stop) followed by a completely
+        // unrelated note (different pitch, no tie tags at all) must not
+        // silently absorb that note's duration/pitch into the open tie --
+        // the open tie is flushed as-is, then D is handled as its own note.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(tiedNote("C", 4, '<tie type="start"/>') + SIMPLE_NOTE("D", 4, "quarter"))
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("flushes an open tie before a note with a tie stop but a different pitch", async () => {
+        // Invalid MusicXML (ties are always same-pitch), but defensively:
+        // a mismatched "stop" must not be read as closing this tie.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') + tiedNote("D", 4, '<tie type="stop"/>')
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+    });
+
+    it("flushes an open tie before an intervening rest", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    "<note><rest/><duration>8</duration><type>quarter</type></note>"
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+    });
+});
+
+describe("Test 17: Repeats", () => {
+    const BARLINE_FORWARD = '<barline location="left"><repeat direction="forward"/></barline>';
+    const barlineBackward = times =>
+        `<barline location="right"><repeat direction="backward"${times ? ` times="${times}"` : ""}/></barline>`;
+
+    it("wraps the whole part in a repeat block when there's no explicit forward repeat", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") + SIMPLE_NOTE("D", 4, "quarter") + barlineBackward(3)
+            )
+        );
+
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        const settimbre = blocks.find(b => blockName(b) === "settimbre");
+        const newnotes = blocks.filter(b => blockName(b) === "newnote");
+        expect(repeat).toBeDefined();
+        const countBlock = blocks.find(b => b[0] === repeat[4][1]);
+        expect(countBlock[1][1].value).toBe(3);
+        // settimbre connects to the repeat block, not straight to the first note.
+        expect(settimbre[4][2]).toBe(repeat[0]);
+        expect(repeat[4][2]).toBe(newnotes[0][0]);
+        // The range covers the whole part, so nothing follows the repeat.
+        expect(repeat[4][3]).toBeNull();
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("defaults to a repeat count of 2 when times is absent", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(SIMPLE_NOTE("C", 4, "quarter") + barlineBackward(null))
+        );
+
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        const countBlock = blocks.find(b => b[0] === repeat[4][1]);
+        expect(countBlock[1][1].value).toBe(2);
+    });
+
+    it("wraps only a middle section, leaving notes before and after it outside the clamp", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    BARLINE_FORWARD +
+                    SIMPLE_NOTE("D", 4, "quarter") +
+                    SIMPLE_NOTE("E", 4, "quarter") +
+                    barlineBackward(null) +
+                    SIMPLE_NOTE("F", 4, "quarter")
+            )
+        );
+
+        const [cNote, dNote, eNote, fNote] = blocks.filter(b => blockName(b) === "newnote");
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+
+        // C, before the range, is untouched and still leads into the repeat block.
+        expect(cNote[4][1]).toBeDefined(); // sanity: still a real block
+        expect(dNote[4][0]).toBe(repeat[0]); // D (range start) connects from repeat
+        // E (range end)'s own trailing hidden spacer has nothing following it
+        // from inside the clamp.
+        const eHidden = blocks.find(b => blockName(b) === "hidden" && b[4][0] === eNote[0]);
+        expect(eHidden[4][1]).toBeNull();
+        expect(fNote[4][0]).toBe(repeat[0]); // F (after the range) connects from repeat
+        expect(repeat[4][2]).toBe(dNote[0]);
+        expect(repeat[4][3]).toBe(fNote[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("ignores an unmatched forward repeat (no backward repeat ever closes it)", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") + BARLINE_FORWARD + SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(blocks.filter(b => blockName(b) === "repeat")).toHaveLength(0);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("treats a second forward repeat before any backward repeat as moving the start forward", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    BARLINE_FORWARD +
+                    SIMPLE_NOTE("D", 4, "quarter") +
+                    BARLINE_FORWARD +
+                    SIMPLE_NOTE("E", 4, "quarter") +
+                    barlineBackward(null)
+            )
+        );
+
+        const [, dNote, eNote] = blocks.filter(b => blockName(b) === "newnote");
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        // The range starts at E (the second, later forward repeat), not D.
+        expect(repeat[4][2]).toBe(eNote[0]);
+        expect(dNote[4][1]).toBeDefined(); // D is unaffected, still outside the range
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps two sequential unpaired backward repeats as separate, non-overlapping ranges", async () => {
+        // "A :| B :|" is two one-note repeats (A alone, then B alone), not
+        // two ranges that both claim to start at A -- the second repeat's
+        // implicit start must pick up right after the first one ended.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("A", 4, "quarter") +
+                    barlineBackward(null) +
+                    SIMPLE_NOTE("B", 4, "quarter") +
+                    barlineBackward(null)
+            )
+        );
+
+        const [aNote, bNote] = blocks.filter(b => blockName(b) === "newnote");
+        const [repeat1, repeat2] = blocks.filter(b => blockName(b) === "repeat");
+        expect(repeat1[4][2]).toBe(aNote[0]);
+        expect(repeat2[4][2]).toBe(bNote[0]);
+        // The two repeats are chained directly: the first's flow-next is the
+        // second repeat block, not A or B's own hidden spacer.
+        expect(repeat1[4][3]).toBe(repeat2[0]);
+        expect(bNote[4][0]).toBe(repeat2[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
     });
 });
