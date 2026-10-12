@@ -1857,8 +1857,6 @@ class Activity {
         const canvas = document.getElementById("myCanvas");
         const overCanvas = document.getElementById("canvas");
         const canvasHolder = document.getElementById("canvasHolder");
-        const defaultWidth = 1600;
-        const defaultHeight = 900;
 
         function handleResize() {
             // Skip resize when the tab is hidden to prevent 0×0 canvas
@@ -1866,34 +1864,30 @@ class Activity {
                 return;
             }
 
-            const isMaximized =
-                window.innerWidth === window.screen.width &&
-                window.innerHeight === window.screen.height;
-            if (isMaximized) {
-                container.style.width = defaultWidth + "px";
-                container.style.height = defaultHeight + "px";
-                canvas.width = defaultWidth;
-                canvas.height = defaultHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = defaultWidth;
-                canvasHolder.height = defaultHeight;
-            } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-
-                // Guard against zero or invalid dimensions
-                if (windowWidth <= 0 || windowHeight <= 0) {
-                    return;
-                }
-
-                container.style.width = windowWidth + "px";
-                container.style.height = windowHeight + "px";
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = canvas.width;
-                canvasHolder.height = canvas.height;
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+            const isAndroidWebkit =
+                (typeof platform !== "undefined" && platform.androidWebkit) ||
+                (typeof window !== "undefined" && window.platform && window.platform.androidWebkit);
+            if (isAndroidWebkit) {
+                windowWidth = window.outerWidth;
+                windowHeight = window.outerHeight;
             }
+
+            // Guard against zero or invalid dimensions
+            if (windowWidth <= 0 || windowHeight <= 0) {
+                return;
+            }
+
+            container.style.width = windowWidth + "px";
+            container.style.height = windowHeight + "px";
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+            overCanvas.width = canvas.width;
+            overCanvas.height = canvas.height;
+            canvasHolder.width = canvas.width;
+            canvasHolder.height = canvas.height;
+
             const hideContents = document.getElementById("hideContents");
             if (hideContents) {
                 hideContents.click();
