@@ -926,6 +926,11 @@ function setupWidgetBlocks(activity) {
                     resetFlag();
                     return;
                 }
+                if (logo.chordBuilderWidget === "loading") {
+                    resetFlag();
+                    return;
+                }
+                logo.chordBuilderWidget = "loading";
                 _lazyLoadWidget(
                     logo,
                     "chordBuilderWidget",
@@ -933,7 +938,8 @@ function setupWidgetBlocks(activity) {
                         typeof ChordBuilderWidget !== "undefined" ? ChordBuilderWidget : null,
                         ["widgets/ChordBuilderAudio", "widgets/chordbuilder"]
                     ),
-                    () => new ChordBuilderWidget(activity)
+                    () => new ChordBuilderWidget(activity),
+                    () => resetFlag()
                 );
             };
 

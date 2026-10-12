@@ -260,5 +260,17 @@ describe("ChordBuilderAudio", () => {
             jest.advanceTimersByTime(5000);
             expect(mockSynth.trigger).not.toHaveBeenCalled();
         });
+
+        it("does not call onDone again if stop() is called after playback completion", () => {
+            const progression = [{ name: "C", notes: ["C", "E", "G"] }];
+            const onDone = jest.fn();
+
+            audio.playProgression(progression, 120, null, onDone);
+            jest.advanceTimersByTime(2000);
+            expect(onDone).toHaveBeenCalledTimes(1);
+
+            audio.stop();
+            expect(onDone).toHaveBeenCalledTimes(1);
+        });
     });
 });

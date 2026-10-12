@@ -306,7 +306,7 @@ describe("ChordBuilderWidget", () => {
         });
 
         it("generates and loads block stack for chord progression", () => {
-            widget.loadPreset("pop"); // 4 chords
+            widget.loadPreset("pop"); // 4 chords: C, G, Am, F
             widget.saveToBlocks();
 
             expect(mockBlocks.loadNewBlocks).toHaveBeenCalled();
@@ -317,9 +317,47 @@ describe("ChordBuilderWidget", () => {
             expect(stack[0][1][0]).toBe("start");
             expect(stack[1][1][0]).toBe("setbpm");
 
+            // setbpm block contains 4 connections with progression in slot 2 and trailing null
+            const setbpmBlock = stack[1];
+            expect(setbpmBlock[4]).toHaveLength(4);
+            expect(setbpmBlock[4][0]).toBe(0); // parent (start)
+            expect(setbpmBlock[4][1]).toBe(2); // bpm value
+            expect(setbpmBlock[4][3]).toBeNull(); // trailing flow slot
+
             // Contains chordinterval blocks for each progression chord
             const chordBlocks = stack.filter(b => b[1][0] === "chordinterval");
             expect(chordBlocks).toHaveLength(4);
+            expect(setbpmBlock[4][2]).toBe(chordBlocks[0][0]); // setbpm child is first chord
+
+            // Contains exported playable notes with root and octave
+            const noteBlocks = stack.filter(b => b[1][0] === "newnote");
+            expect(noteBlocks).toHaveLength(4);
+
+            const pitchBlocks = stack.filter(b => b[1][0] === "pitch");
+            expect(pitchBlocks).toHaveLength(4);
+
+            const notenameBlocks = stack.filter(b => b[1][0] === "notename");
+            expect(notenameBlocks).toHaveLength(4);
+            expect(notenameBlocks.map(b => b[1][1].value)).toEqual(["C", "G", "A", "F"]);
+
+            // Octave blocks match widget.octave
+            chordBlocks.forEach(chordBlock => {
+                const innerNoteId = chordBlock[4][2];
+                const noteBlock = stack.find(b => b[0] === innerNoteId);
+                expect(noteBlock).toBeDefined();
+                expect(noteBlock[1][0]).toBe("newnote");
+
+                const vspaceId = noteBlock[4][2];
+                const vspaceBlock = stack.find(b => b[0] === vspaceId);
+                const pitchId = vspaceBlock[4][1];
+                const pitchBlock = stack.find(b => b[0] === pitchId);
+                expect(pitchBlock).toBeDefined();
+                expect(pitchBlock[1][0]).toBe("pitch");
+
+                const octaveBlockId = pitchBlock[4][2];
+                const octaveBlock = stack.find(b => b[0] === octaveBlockId);
+                expect(octaveBlock[1][1].value).toBe(widget.octave);
+            });
 
             expect(mockActivity.textMsg).toHaveBeenCalledWith(
                 "New chord progression blocks generated.",

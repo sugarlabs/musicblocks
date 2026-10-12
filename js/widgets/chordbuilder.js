@@ -441,7 +441,7 @@ class ChordBuilderWidget {
         const bpmValId = idCounter++;
 
         newStack.push([startBlockId, ["start", {}], startX, startY, [null, setBpmBlockId]]);
-        newStack.push([setBpmBlockId, ["setbpm", {}], 0, 0, [startBlockId, bpmValId, null]]);
+        newStack.push([setBpmBlockId, ["setbpm", {}], 0, 0, [startBlockId, bpmValId, null, null]]);
         newStack.push([bpmValId, ["number", { value: this.tempo }], 0, 0, [setBpmBlockId]]);
 
         let lastFlowId = setBpmBlockId;
@@ -450,6 +450,15 @@ class ChordBuilderWidget {
         this.progression.forEach(chord => {
             const chordBlockId = idCounter++;
             const chordNameId = idCounter++;
+            const noteBlockId = idCounter++;
+            const durationId = idCounter++;
+            const durationNumeratorId = idCounter++;
+            const durationDenominatorId = idCounter++;
+            const noteBodyId = idCounter++;
+            const pitchBlockId = idCounter++;
+            const rootId = idCounter++;
+            const octaveId = idCounter++;
+            const noteEndId = idCounter++;
 
             // Map chord quality to MusicBlocks chord type
             let chordType = "major";
@@ -462,9 +471,36 @@ class ChordBuilderWidget {
                 ["chordinterval", {}],
                 0,
                 0,
-                [lastFlowId, chordNameId, null, null]
+                [lastFlowId, chordNameId, noteBlockId, null]
             ]);
             newStack.push([chordNameId, ["chordname", { value: chordType }], 0, 0, [chordBlockId]]);
+            newStack.push([
+                noteBlockId,
+                ["newnote", {}],
+                0,
+                0,
+                [chordBlockId, durationId, noteBodyId, noteEndId]
+            ]);
+            newStack.push([
+                durationId,
+                ["divide", {}],
+                0,
+                0,
+                [noteBlockId, durationNumeratorId, durationDenominatorId]
+            ]);
+            newStack.push([durationNumeratorId, ["number", { value: 1 }], 0, 0, [durationId]]);
+            newStack.push([durationDenominatorId, ["number", { value: 4 }], 0, 0, [durationId]]);
+            newStack.push([noteBodyId, ["vspace", {}], 0, 0, [noteBlockId, pitchBlockId]]);
+            newStack.push([
+                pitchBlockId,
+                ["pitch", {}],
+                0,
+                0,
+                [noteBodyId, rootId, octaveId, null]
+            ]);
+            newStack.push([rootId, ["notename", { value: chord.root }], 0, 0, [pitchBlockId]]);
+            newStack.push([octaveId, ["number", { value: this.octave }], 0, 0, [pitchBlockId]]);
+            newStack.push([noteEndId, ["hidden", {}], 0, 0, [noteBlockId, null]]);
 
             // Link previous block to this chord block
             newStack[lastFlowId][4][lastFlowConnIndex] = chordBlockId;

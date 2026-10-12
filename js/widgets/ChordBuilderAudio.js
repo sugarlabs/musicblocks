@@ -252,6 +252,7 @@ class ChordBuilderAudio {
 
             this.isPlaying = false;
             this.activeStep = -1;
+            this._onDoneCallback = null;
             if (typeof onDone === "function") {
                 onDone();
             }

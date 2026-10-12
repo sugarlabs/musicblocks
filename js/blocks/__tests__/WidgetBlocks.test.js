@@ -550,6 +550,32 @@ describe("setupWidgetBlocks", () => {
             expect(logo.insideChordBuilder).toBe(true);
             expect(result).toEqual(["childBlk", 1]);
         });
+
+        it("shows existing widget window if widget already exists", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            const showMock = jest.fn();
+            logo.chordBuilderWidget = { widgetWindow: { show: showMock } };
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+            expect(showMock).toHaveBeenCalled();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+
+        it("does not trigger second load and resets flag if widget is loading", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            logo.chordBuilderWidget = "loading";
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            global.ChordBuilderWidget.mockClear();
+
+            listener();
+            expect(global.ChordBuilderWidget).not.toHaveBeenCalled();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
     });
 
     describe("OscilloscopeWidgetBlock", () => {
