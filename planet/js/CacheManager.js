@@ -65,20 +65,15 @@ class CacheManager {
 
         try {
             this.db = await this._openDatabase();
-            this.isInitialized = true;
 
             // Clean up expired entries on init
             await this.clearExpired();
 
+            this.isInitialized = true;
             cacheDebugLog("[CacheManager] Initialized successfully");
             return true;
         } catch (error) {
-            if (this.db) {
-                this.db.close();
-                this.db = null;
-            }
-            this.isInitialized = false;
-
+            this.close();
             console.error("[CacheManager] Initialization failed:", error);
             return false;
         }
@@ -297,7 +292,7 @@ class CacheManager {
      * @returns {Promise<number>} - Number of entries cleared
      */
     async clearExpired() {
-        if (!this.isInitialized) return 0;
+        if (!this.db) return 0;
 
         let cleared = 0;
         const now = Date.now();

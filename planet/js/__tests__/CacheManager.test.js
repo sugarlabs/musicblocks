@@ -268,16 +268,21 @@ describe("IndexedDB CacheManager integration", () => {
         test("closes the database if initialization cleanup fails", async () => {
             const database = await freshManager._openDatabase();
             const closeSpy = jest.spyOn(database, "close");
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
             jest.spyOn(freshManager, "_openDatabase").mockResolvedValue(database);
             jest.spyOn(freshManager, "clearExpired").mockRejectedValue(new Error("cleanup failed"));
 
-            const result = await freshManager.init();
+            try {
+                const result = await freshManager.init();
 
-            expect(result).toBe(false);
-            expect(closeSpy).toHaveBeenCalled();
-            expect(freshManager.db).toBeNull();
-            expect(freshManager.isInitialized).toBe(false);
+                expect(result).toBe(false);
+                expect(closeSpy).toHaveBeenCalled();
+                expect(freshManager.db).toBeNull();
+                expect(freshManager.isInitialized).toBe(false);
+            } finally {
+                consoleErrorSpy.mockRestore();
+            }
         });
 
         test("returns false when window.indexedDB is missing", async () => {
