@@ -772,8 +772,24 @@ const TemperamentUI = {
          */
         tw.performEqualEdit = function (event) {
             if (!docById("octaveIn")) return;
-            const pitchNumber1 = Number(docById("octaveIn").value);
-            const pitchNumber2 = Number(docById("octaveOut").value);
+            const input1 = Number(docById("octaveIn").value);
+            const input2 = Number(docById("octaveOut").value);
+            const maxPitch = tw.ratios.length - 1;
+            if (
+                !Number.isInteger(input1) ||
+                !Number.isInteger(input2) ||
+                Math.min(input1, input2) < 0 ||
+                Math.max(input1, input2) > maxPitch
+            ) {
+                tw.activity.errorMsg(
+                    _("Please enter pitch numbers between 0 and %s.").replace("%s", maxPitch),
+                    3000
+                );
+                return;
+            }
+            // The range can be typed in either order.
+            const pitchNumber1 = Math.min(input1, input2);
+            const pitchNumber2 = Math.max(input1, input2);
             const numDivs = Number(docById("divisions").value);
             if (!Number.isFinite(numDivs) || !Number.isInteger(numDivs) || numDivs < 1) {
                 tw.activity.errorMsg(_("Please enter a valid number of divisions."), 3000);
@@ -895,7 +911,6 @@ const TemperamentUI = {
             const input1 = docById("ratioIn").value;
             const input2 = docById("ratioOut").value;
             const rec = docById("recursion").value;
-            const len = tw.frequencies.length;
             const ratio1 = input1 / input2;
             if (
                 !isFinite(input1) ||
@@ -914,39 +929,38 @@ const TemperamentUI = {
                 return;
             }
             const ratio = [];
-            const frequency = [];
             const ratioDifference = [];
             tw.tempRatios = tw.ratios.slice();
 
             /**
-             * Recursively calculates ratios to ensure they fit within the octave space.
-             * Inserts the resulting ratio into the sorted tempRatios array.
+             * Folds a ratio into the octave space [1, powerBase) and inserts it into the
+             * sorted tempRatios array, replacing an equal ratio if there is one.
              *
              * @param {number} i - The current iteration index.
              */
             const calculateRatios = function (i) {
-                if (frequency[i] < tw.frequencies[len - 1]) {
-                    for (let j = 0; j < tw.tempRatios.length; j++) {
-                        ratioDifference[j] = ratio[i] - tw.tempRatios[j];
-                        if (ratioDifference[j] < 0) {
-                            tw.tempRatios.splice(j, 0, ratio[i]);
-                            break;
-                        }
-                        if (ratioDifference[j] === 0) {
-                            tw.tempRatios.splice(j, 1, ratio[i]);
-                            break;
-                        }
-                    }
-                } else {
-                    ratio[i] = ratio[i] / 2;
-                    frequency[i] = tw.frequencies[0] * ratio[i];
-                    calculateRatios(i);
+                while (ratio[i] >= tw.powerBase) {
+                    ratio[i] /= tw.powerBase;
                 }
+                while (ratio[i] < 1) {
+                    ratio[i] *= tw.powerBase;
+                }
+                for (let j = 0; j < tw.tempRatios.length; j++) {
+                    ratioDifference[j] = ratio[i] - tw.tempRatios[j];
+                    if (ratioDifference[j] < 0) {
+                        tw.tempRatios.splice(j, 0, ratio[i]);
+                        return;
+                    }
+                    if (ratioDifference[j] === 0) {
+                        tw.tempRatios.splice(j, 1, ratio[i]);
+                        return;
+                    }
+                }
+                tw.tempRatios.push(ratio[i]);
             };
 
             for (let i = 0; i < rec; i++) {
                 ratio[i] = Math.pow(ratio1, i + 1);
-                frequency[i] = tw.frequencies[0] * ratio[i];
                 calculateRatios(i);
             }
             tw.tempRatios.sort(function (a, b) {
@@ -1108,6 +1122,13 @@ const TemperamentUI = {
             const startRatio = docById("startNote").value;
             const endRatio = docById("endNote").value;
             const ratio = startRatio / endRatio;
+            if (!Number.isFinite(ratio) || ratio <= 1) {
+                tw.activity.errorMsg(
+                    _("Please enter an octave ratio greater than 1 (e.g. 2:1)."),
+                    3000
+                );
+                return;
+            }
             if (ratio !== 2) {
                 tw.activity.textMsg(
                     _("The octave ratio has changed. This changes temperament significantly."),
