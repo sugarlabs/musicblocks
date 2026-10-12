@@ -410,11 +410,14 @@ describe("Test 10: Round-trips what this project's own exporter writes", () => {
 
         const { blocks } = await parseAndCapture(exported);
 
+        // The exporter writes <type>, which the parser prefers over dividing the
+        // duration by the divisions, so each note comes back as the value it was
+        // staged with rather than as a thirty-second-note count.
         expect(noteValues(blocks)).toEqual([
-            [8, 32],
-            [8, 32],
-            [4, 32],
-            [16, 32]
+            [1, 4],
+            [1, 4],
+            [1, 8],
+            [1, 2]
         ]);
         expect(pitches(blocks)).toEqual([
             { name: "C", octave: 4 },
