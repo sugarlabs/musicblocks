@@ -15,6 +15,7 @@ const path = require("path");
 const CSS_DIR = path.join(__dirname, "..", "..", "css");
 const tokensCss = fs.readFileSync(path.join(CSS_DIR, "tokens.css"), "utf8");
 const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+const playOnlyCss = fs.readFileSync(path.join(CSS_DIR, "play-only-mode.css"), "utf8");
 
 /**
  * Collects the custom properties declared in one selector block.
@@ -317,4 +318,42 @@ describe("themes.css colour tokens", () => {
         expect(bg).not.toBeNull();
         expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
     });
+});
+
+describe("play-only-mode.css colour tokens", () => {
+    const playOnlyRules = parseRules(playOnlyCss);
+
+    it.each(["light", "dark", "highcontrast"])(
+        "keeps floating action buttons readable in the %s theme",
+        theme => {
+            const rule = playOnlyRules.find(
+                r => r.selector.includes("#buttoncontainerBOTTOM") && r.selector.includes("div")
+            );
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+            expect(rule.body).toContain("var(--color-border-primary)");
+        }
+    );
+
+    it.each(["light", "dark", "highcontrast"])(
+        "keeps keyboard holder readable in the %s theme",
+        theme => {
+            const rule = playOnlyRules.find(r => r.selector.includes("#keyboardHolder2"));
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+            expect(rule.body).toContain("var(--color-border-primary)");
+        }
+    );
 });
