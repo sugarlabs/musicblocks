@@ -40,6 +40,7 @@ class CacheManager {
         this.dbName = options.dbName || "MusicBlocksPlanetCache";
         this.dbVersion = 1;
         this.db = null;
+        this.initializationPromise = null;
 
         // Cache expiry times
         this.metadataExpiry = options.metadataExpiry || 24 * 60 * 60 * 1000; // 24 hours
@@ -62,7 +63,25 @@ class CacheManager {
      */
     async init() {
         if (this.isInitialized) return true;
+        if (this.initializationPromise) return this.initializationPromise;
 
+        const initializationPromise = this._initialize();
+        this.initializationPromise = initializationPromise;
+        try {
+            return await initializationPromise;
+        } finally {
+            if (this.initializationPromise === initializationPromise) {
+                this.initializationPromise = null;
+            }
+        }
+    }
+
+    /**
+     * Opens the database and completes startup cleanup
+     * @private
+     * @returns {Promise<boolean>}
+     */
+    async _initialize() {
         try {
             this.db = await this._openDatabase();
 
