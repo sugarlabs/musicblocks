@@ -52,6 +52,16 @@ const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textCont
 // just as correct.
 const _addFractions = ([n1, d1], [n2, d2]) => [n1 * d2 + n2 * d1, d1 * d2];
 
+// Whether two note "content" values (pitch/drum/rest, as built in
+// _processPart) are the same. A real tie is always same-pitch; used to
+// decide whether a <tie type="stop"/> note genuinely continues the open
+// chain, or just happens to carry a tie tag that doesn't actually apply to it.
+const _contentsEqual = (a, b) => {
+    if (a === null || b === null) return a === b;
+    if (a.type !== b.type) return false;
+    return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
+};
+
 /**
  * A note's length as a Music Blocks [numerator, denominator] fraction.
  *
@@ -413,6 +423,10 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
     let firstBlockId = noteStartIds[0];
     if (repeats.length === 0) return { blocks: [], nextBlockId: blockId, firstBlockId };
 
+    // Repeat blocks created by an earlier iteration of this loop are added
+    // here too (not just the original notes), since two adjacent ranges --
+    // e.g. two sequential unpaired backward repeats -- need the second
+    // range's "prev" to resolve to the first range's own repeat block.
     const byId = new Map(noteBlocks.map(block => [block[0], block]));
     const repeatBlocks = [];
 
@@ -420,21 +434,30 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
         const startNote = byId.get(noteStartIds[startIndex]);
         const endHidden = byId.get(noteEndIds[endIndex]);
         const prevId = startNote[4][0];
+        const prevBlock = byId.get(prevId);
         const nextNoteId = endIndex + 1 < noteStartIds.length ? noteStartIds[endIndex + 1] : null;
 
         const repeatId = blockId;
         const countId = blockId + 1;
         blockId += 2;
 
-        repeatBlocks.push(
-            [repeatId, "repeat", 0, 0, [prevId, countId, startNote[0], nextNoteId]],
-            [countId, ["number", { value: times }], 0, 0, [repeatId]]
-        );
+        const repeatBlock = [repeatId, "repeat", 0, 0, [prevId, countId, startNote[0], nextNoteId]];
+        repeatBlocks.push(repeatBlock, [countId, ["number", { value: times }], 0, 0, [repeatId]]);
+        byId.set(repeatId, repeatBlock);
 
         if (startIndex === 0) {
             firstBlockId = repeatId;
         } else {
-            byId.get(prevId)[4][1] = repeatId;
+            // Redirect whichever of prevBlock's own connection slots
+            // currently points at this range's start note -- not a
+            // hardcoded index. prevBlock is a "hidden" spacer (2-element
+            // connections, slot 1 is "next") for the common case, but when
+            // this range immediately follows another repeat's range,
+            // prevBlock is that *repeat* block instead (4-element
+            // connections, slot 3 is its flow-next) -- a fixed [4][1] would
+            // silently corrupt that repeat's count-argument slot instead.
+            const prevSlot = prevBlock[4].indexOf(startNote[0]);
+            prevBlock[4][prevSlot] = repeatId;
         }
         startNote[4][0] = repeatId;
         endHidden[4][1] = null;
@@ -478,6 +501,12 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
     const noteEndIds = [];
     const repeats = [];
     let repeatPendingStart = null;
+    // The last note index any repeat range (explicit or implicit) has
+    // already covered, so a second unpaired backward repeat starts right
+    // after the first one instead of both claiming to start from 0 --
+    // "A :| B :|" is two one-note repeats, not two overlapping ranges both
+    // beginning at A.
+    let lastRepeatEnd = -1;
     let divisions = 1;
     let prevId = chainPrevId;
     let producedNotes = false;
@@ -510,10 +539,11 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
                     repeatPendingStart = noteStartIds.length;
                 } else if (direction === "backward") {
                     const times = Number(repeatEl.getAttribute("times")) || 2;
-                    const startIndex = repeatPendingStart ?? 0;
+                    const startIndex = repeatPendingStart ?? lastRepeatEnd + 1;
                     const endIndex = noteStartIds.length - 1;
                     if (endIndex >= startIndex) {
                         repeats.push({ startIndex, endIndex, times });
+                        lastRepeatEnd = endIndex;
                     }
                     repeatPendingStart = null;
                 }
@@ -548,7 +578,23 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
                 if (type === "stop") hasTieStop = true;
             }
 
-            if (tieDuration !== null) {
+            // Only a note that both has a tie stop and shares the open tie's
+            // pitch genuinely continues the chain -- anything else (a rest,
+            // a different pitch, a note with no tie tag at all) is unrelated
+            // content that happened to arrive while a tie was open. Flushing
+            // the accumulated tie first, then handling this note as its own
+            // independent note/new-tie, keeps that content from being
+            // silently folded into the open tie's duration.
+            const continuesTie =
+                tieDuration !== null && hasTieStop && _contentsEqual(content, tieContent);
+
+            if (tieDuration !== null && !continuesTie) {
+                emitNote(tieDuration, tieContent);
+                tieDuration = null;
+                tieContent = null;
+            }
+
+            if (continuesTie) {
                 const combined = _addFractions(tieDuration, duration);
                 if (hasTieStart) {
                     tieDuration = combined;
