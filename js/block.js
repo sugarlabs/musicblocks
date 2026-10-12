@@ -4839,7 +4839,7 @@ class Block {
                         let temperament;
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
-                                this.blocks.blockList[i].name === "settemperament" &&
+                                this.blocks.blockList[i]?.name === "settemperament" &&
                                 this.blocks.blockList[i].connections[0] !== null
                             ) {
                                 const index = this.blocks.blockList[i].connections[1];

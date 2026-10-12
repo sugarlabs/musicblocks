@@ -752,13 +752,6 @@ function MusicKeyboard(activity) {
         let startDate = new Date();
         let startTime = 0;
 
-        // Prevent the browser from scrolling or showing a context menu when the
-        // user presses a key on a touch device.
-        // Use pan-x instead of none so that the 700 px-wide keyboard can
-        // still be scrolled horizontally on narrow mobile viewports by
-        // dragging on a key; pinch-zoom is still suppressed.
-        element.style.touchAction = "pan-x";
-
         /**
          * Start a musical note when the element is pressed (mouse or touch).
          */
@@ -775,16 +768,6 @@ function MusicKeyboard(activity) {
                 null
             );
         };
-
-        // Use Pointer Events so that mouse clicks, touchscreen taps, and stylus
-        // presses all trigger the same note-start behaviour.  The legacy
-        // onmousedown handler was silently ignored on touch devices.
-        element.addEventListener("pointerdown", function (e) {
-            e.preventDefault(); // prevent ghost mouse events on touch screens
-            element.setPointerCapture(e.pointerId); // keep events even if finger slides off
-            activeKey = element;
-            __startNote(element);
-        });
 
         /**
          * End a musical note when the element is released.
@@ -819,9 +802,64 @@ function MusicKeyboard(activity) {
             this._updateWidgetWindowSize();
         };
 
+        this._addKeyPointerHandlers(element, __startNote, __endNote);
+    };
+
+    /**
+     * Makes the (rest) key record a rest when it is pressed and released,
+     * the same way the spacebar does, with the press length as its duration.
+     * @param {HTMLElement} element - The rest key cell.
+     */
+    this.loadRestHandler = function (element) {
+        let startTime = 0;
+
+        const __startRest = element => {
+            startTime = new Date().getTime();
+            element.style.backgroundColor = platformColor.orange;
+        };
+
+        const __endRest = element => {
+            element.style.backgroundColor = "white";
+            const duration = this._roundNoteDuration((new Date().getTime() - startTime) / 1000);
+            this._notesPlayed.push({
+                startTime: startTime,
+                noteOctave: "R",
+                objId: null,
+                duration: duration
+            });
+            this._createTable();
+            this._updateWidgetWindowSize();
+        };
+
+        this._addKeyPointerHandlers(element, __startRest, __endRest);
+    };
+
+    /**
+     * Wires pointer handlers onto a keyboard key. Uses Pointer Events so that
+     * mouse clicks, touchscreen taps, and stylus presses all behave the same;
+     * the legacy onmousedown handler was silently ignored on touch devices.
+     * @param {HTMLElement} element - The key cell.
+     * @param {Function} onStart - Called with the element when it is pressed.
+     * @param {Function} onEnd - Called with the element when it is released.
+     */
+    this._addKeyPointerHandlers = function (element, onStart, onEnd) {
+        // Prevent the browser from scrolling or showing a context menu when the
+        // user presses a key on a touch device.
+        // Use pan-x instead of none so that the 700 px-wide keyboard can
+        // still be scrolled horizontally on narrow mobile viewports by
+        // dragging on a key; pinch-zoom is still suppressed.
+        element.style.touchAction = "pan-x";
+
+        element.addEventListener("pointerdown", function (e) {
+            e.preventDefault(); // prevent ghost mouse events on touch screens
+            element.setPointerCapture(e.pointerId); // keep events even if finger slides off
+            activeKey = element;
+            onStart(element);
+        });
+
         element.addEventListener("pointerup", function () {
             if (activeKey === element) {
-                __endNote(element);
+                onEnd(element);
                 activeKey = null;
             } else if (activeKey !== null) {
                 activeKey.dispatchEvent(new Event("pointerup"));
@@ -832,7 +870,7 @@ function MusicKeyboard(activity) {
         // (e.g., an incoming phone call dismisses the touch).
         element.addEventListener("pointercancel", function () {
             if (activeKey === element) {
-                __endNote(element);
+                onEnd(element);
                 activeKey = null;
             } else if (activeKey !== null) {
                 activeKey.dispatchEvent(new Event("pointerup"));
@@ -859,7 +897,9 @@ function MusicKeyboard(activity) {
          * Beats per minute (BPM) for the MusicKeyboard.
          * @type {number}
          */
-        const tur = this.activity.turtles.ithTurtle(0);
+        // The tempo of the turtle that ran the Music Keyboard block. Not turtle 0: after a
+        // project is loaded, turtle 0 is a trashed turtle of the old project.
+        const tur = this.turtle || this.activity.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
         /**
@@ -934,6 +974,8 @@ function MusicKeyboard(activity) {
                 });
             }
             this.midiON = false;
+            // Don't hold on to the turtle once the keyboard is closed.
+            this.turtle = null;
 
             selectedNotes = [];
             const wheelDiv = docById("wheelDivptm");
@@ -1511,7 +1553,7 @@ function MusicKeyboard(activity) {
                 sortableList.push({
                     frequency: noteToFrequency(
                         convertFromSolfege(this.noteNames[i]) + this.octaves[i],
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
+                        (this.turtle || this.activity.turtles.ithTurtle(0)).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],

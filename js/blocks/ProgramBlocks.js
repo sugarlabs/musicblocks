@@ -1034,7 +1034,7 @@ function setupProgramBlocks(activity) {
                 // Look for a block with logo name
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
                     if (
-                        activity.blocks.blockList[i].protoblock.staticLabels.length > 0 &&
+                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
                         activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;

@@ -1474,6 +1474,17 @@ describe("Logo runLogoCommands", () => {
         expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 1, 1, 0, null);
     });
 
+    test("stops recording BPM blocks for the Tempo widget left from the last run", () => {
+        // A run stopped inside a Tempo block never reaches the block's listener.
+        logo.inTempo = true;
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.inTempo).toBe(false);
+    });
+
     test("falls back to default cursor when no start stacks", () => {
         mockActivity.blocks.stackList = [];
         logo.blockList = [];
@@ -1481,6 +1492,26 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(document.body.style.cursor).toBe("default");
+    });
+
+    test("widget capture modes left on by an earlier run are cleared", () => {
+        // A run stopped inside a widget clamp never reaches the listener that
+        // turns its mode off, so the next run must not inherit it.
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+        const modes = [
+            "inSample",
+            "inTempo",
+            "inPitchSlider",
+            "inPitchStaircase",
+            "inReflectionMatrix",
+            "inOscilloscope"
+        ];
+        for (const mode of modes) logo[mode] = true;
+
+        logo.runLogoCommands(null, null);
+
+        for (const mode of modes) expect(logo[mode]).toBe(false);
     });
 
     describe("temperament carried over from an earlier run", () => {
@@ -2544,6 +2575,33 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
+        test("a note counter's silent run does not end the turtle's run", () => {
+            logo._cleanupAfterCompletion = jest.fn();
+            logo.onStopTurtle = jest.fn();
+            turtle0.running = true;
+            turtle0.singer.justCounting = [true];
+            turtle0.endOfClampSignals = { 7: ["_transposition_0", "_tie_0"] };
+            turtle0.butNotThese = { 7: [0] };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_transposition_0");
+            expect(turtle0.running).toBe(true);
+            expect(logo.onStopTurtle).not.toHaveBeenCalled();
+            expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
+        test("a note counter's silent run keeps its signals on a premature restart", () => {
+            logo._prematureRestart = true;
+            turtle0.singer.justCounting = [true];
+            turtle0.endOfClampSignals = { 7: ["_tie_0"] };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_tie_0");
         });
 
         test("_cleanupAfterCompletion does not stop WAV recorder", () => {

@@ -2164,7 +2164,7 @@ class Palette {
                 // Check if a status block already exists
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
-                    if (block.name === "status" && !block.trash) {
+                    if (block?.name === "status" && !block.trash) {
                         return;
                     }
                 }

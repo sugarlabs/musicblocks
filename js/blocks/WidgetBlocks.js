@@ -500,6 +500,7 @@ function setupWidgetBlocks(activity) {
 
             const __listener = event => {
                 logo.sample.init(activity);
+                logo.inSample = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -917,6 +918,13 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "tempo",
                 _getWidgetDependencies(typeof Tempo !== "undefined" ? Tempo : null, [
+                    "widgets/TempoWindow",
+                    "widgets/TempoRows",
+                    "widgets/TempoKeyboard",
+                    "widgets/TempoTap",
+                    "widgets/TempoControls",
+                    "widgets/TempoMetronome",
+                    "widgets/TempoSave",
                     "widgets/tempo"
                 ]),
                 () => new Tempo(),
@@ -930,12 +938,14 @@ function setupWidgetBlocks(activity) {
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
             logo.tempo.BPMTurtles = [];
+            logo.tempo.beatValues = [];
 
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
                 logo.tempo.init(activity);
+                logo.inTempo = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1084,7 +1094,15 @@ function setupWidgetBlocks(activity) {
                 "pitchDrumMatrix",
                 _getWidgetDependencies(
                     typeof PitchDrumMatrix !== "undefined" ? PitchDrumMatrix : null,
-                    ["widgets/pitchdrummatrix"]
+                    [
+                        "widgets/PitchDrumMatrixWindow",
+                        "widgets/PitchDrumMatrixGrid",
+                        "widgets/PitchDrumMatrixBlocks",
+                        "widgets/PitchDrumMatrixCells",
+                        "widgets/PitchDrumMatrixPlayback",
+                        "widgets/PitchDrumMatrixSave",
+                        "widgets/pitchdrummatrix"
+                    ]
                 ),
                 () => new PitchDrumMatrix(),
                 turtle,
@@ -1103,9 +1121,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                logo.inPitchDrumMatrix = false;
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
-                    logo.pitchDrumMatrix.rowLabels.length === 0
+                    !logo.pitchDrumMatrix.hasPitchRows()
                 ) {
                     activity.errorMsg(
                         _(
@@ -1354,7 +1373,12 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_musickeyboard_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // The keyboard plays and saves at this turtle's tempo (the turtle itself, not its
+            // index, which shifts when a turtle is removed). Set when this listener opens it, so
+            // another turtle's Music Keyboard block running in between can't swap it.
+            const keyboardTurtle = activity.turtles.ithTurtle(turtle);
             const __listener = () => {
+                logo.musicKeyboard.turtle = keyboardTurtle;
                 logo.musicKeyboard.init(logo);
             };
 
@@ -2073,9 +2097,7 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            logo.inSample = true;
-
-            const listenerName = "_sampler_" + turtle;
+            const listenerName = "_aimusic_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {

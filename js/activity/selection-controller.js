@@ -212,6 +212,8 @@ class SelectionController {
         this.dragRect = this.dragArea;
 
         activity.blocks.blockList.forEach(block => {
+            if (!block) return;
+
             this.blockRect = {
                 x: activity.scrollBlockContainer
                     ? block.container.x + activity.blocksContainer.x

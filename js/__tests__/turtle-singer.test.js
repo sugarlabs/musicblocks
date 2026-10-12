@@ -625,6 +625,16 @@ describe("State initialization — effects parameters", () => {
     test("should initialize panner to null", () => {
         expect(singer.panner).toBeNull();
     });
+
+    test("should dispose the panner when a new run resets the singer", () => {
+        const panner = { dispose: jest.fn() };
+        singer.panner = panner;
+
+        singer.reset();
+
+        expect(panner.dispose).toHaveBeenCalled();
+        expect(singer.panner).toBeNull();
+    });
 });
 
 describe("State initialization — crescendo", () => {
@@ -1013,6 +1023,19 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
     });
 
+    test("should hold back the enclosing clamp signals by index", () => {
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        let skipped;
+        logoMock.runFromBlockNow = jest.fn(() => {
+            skipped = JSON.parse(JSON.stringify(turtleMock.butNotThese));
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(skipped).toEqual({ 7: [0, 1] });
+        expect(turtleMock.butNotThese).toEqual({});
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -1188,6 +1211,33 @@ describe("processPitch widget-row definition adds one row per visit", () => {
 
         expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(1);
         expect(activityMock.logo.pitchDrumMatrix.rowArgs).toHaveLength(1);
+    });
+
+    test("pitch-drum matrix keeps the row as the last note, for Step Pitch", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+
+        Singer.processPitch(activityMock, "re", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["C4", 4]);
+    });
+
+    test.each([
+        ["a rest", "rest", []],
+        ["a pitch inside Set Drum", "re", ["snare drum"]]
+    ])("pitch-drum matrix keeps the last note for %s", (name, note, drumStyle) => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.drumStyle = drumStyle;
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+        turtleMock.singer.previousNotePlayed = ["B3", 4];
+
+        Singer.processPitch(activityMock, note, 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["C4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["B3", 4]);
     });
 
     test("phrase maker adds exactly one row while duplicateFactor is 3", () => {
@@ -1371,6 +1421,21 @@ describe("noteCounter regression behavior", () => {
         const originalLength = singer.justCounting.length;
         Singer.noteCounter(logoMock, 0, 1);
         expect(singer.justCounting.length).toBe(originalLength);
+    });
+
+    test("should hold back the enclosing clamp signals by index", () => {
+        // Logo compares numeric indices when the counted run ends; anything
+        // else lets an enclosing transposition fire early and then again.
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        let skipped;
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            skipped = JSON.parse(JSON.stringify(turtleMock.butNotThese));
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(skipped).toEqual({ 7: [0, 1] });
+        expect(turtleMock.butNotThese).toEqual({});
     });
 
     test("should restore an untouched heap as an array, not an object", () => {
@@ -1651,6 +1716,65 @@ describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)
         // Nested notes only read/consume delayedNotes to compute their "future" offset;
         // clearing is reserved for when the outermost note of the group completes.
         expect(singer.delayedNotes).toEqual([[nestedBlk, 1 / 4]]);
+    });
+});
+
+describe("processNote notation and MIDI emission guards against non-positive durations", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.runningMIDI = true;
+        activityMock.logo.notationMIDI = jest.fn();
+        activityMock.logo.updateNotation = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.synth.getFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.getCustomFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.start = jest.fn();
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        turtleMock.singer.suppressOutput = true;
+    });
+
+    test("does not emit notationMIDI or updateNotation when calculated duration d <= 0", () => {
+        const blk = "zeroNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        // When duration is 0, d is 0
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).not.toHaveBeenCalled();
+        expect(activityMock.logo.updateNotation).not.toHaveBeenCalled();
+    });
+
+    test("emits notationMIDI and updateNotation when calculated duration d > 0", () => {
+        const blk = "validNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(["C4"], [], 4, 0, 90, "piano");
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 });
 
@@ -2416,5 +2540,27 @@ describe("processNote — custom timbre effects normalization (#9043)", () => {
         expect(paramsEffects.chorusDepth).toBe(0.7);
         expect(paramsEffects.chorusRate).toBe(1.5);
         expect(paramsEffects.delayTime).toBe(3.5);
+    });
+
+    it("should pass the turtle panner to synth.trigger", () => {
+        const blk = "mockBlk";
+        const panner = { name: "Panner" };
+        singer.panner = panner;
+        singer.inNoteBlock = [blk];
+        singer.instrumentNames = ["customVoice"];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+        expect(callArgs[callArgs.length - 1]).toBe(panner);
     });
 });
