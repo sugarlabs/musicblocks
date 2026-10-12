@@ -270,19 +270,36 @@ describe("IndexedDB CacheManager integration", () => {
             const closeSpy = jest.spyOn(database, "close");
             const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-            jest.spyOn(freshManager, "_openDatabase").mockResolvedValue(database);
-            jest.spyOn(freshManager, "clearExpired").mockRejectedValue(new Error("cleanup failed"));
+            const openDatabaseSpy = jest
+                .spyOn(freshManager, "_openDatabase")
+                .mockResolvedValue(database);
+            const clearExpiredSpy = jest
+                .spyOn(freshManager, "clearExpired")
+                .mockRejectedValue(new Error("cleanup failed"));
 
             try {
-                const result = await freshManager.init();
+                const results = await Promise.all([freshManager.init(), freshManager.init()]);
 
-                expect(result).toBe(false);
-                expect(closeSpy).toHaveBeenCalled();
+                expect(results).toEqual([false, false]);
+                expect(openDatabaseSpy).toHaveBeenCalledTimes(1);
+                expect(clearExpiredSpy).toHaveBeenCalledTimes(1);
+                expect(closeSpy).toHaveBeenCalledTimes(1);
                 expect(freshManager.db).toBeNull();
                 expect(freshManager.isInitialized).toBe(false);
             } finally {
                 consoleErrorSpy.mockRestore();
             }
+        });
+
+        test("concurrent init calls share a successful initialization", async () => {
+            const openDatabaseSpy = jest.spyOn(freshManager, "_openDatabase");
+
+            const results = await Promise.all([freshManager.init(), freshManager.init()]);
+
+            expect(results).toEqual([true, true]);
+            expect(openDatabaseSpy).toHaveBeenCalledTimes(1);
+            expect(freshManager.db).not.toBeNull();
+            expect(freshManager.isInitialized).toBe(true);
         });
 
         test("returns false when window.indexedDB is missing", async () => {
