@@ -149,6 +149,12 @@ describe("musicutils-pitch", () => {
             expect(fn("C4")).toEqual(["C", 4]);
             expect(fn("Bb-1")).toEqual(["B" + FLAT, -1]);
         });
+
+        it("handles non-string inputs safely by returning [str, 4]", () => {
+            expect(fn(null)).toEqual([null, 4]);
+            expect(fn(undefined)).toEqual([undefined, 4]);
+            expect(fn(440)).toEqual([440, 4]);
+        });
     });
 
     describe("loaded as classic scripts, the way the browser does", () => {
