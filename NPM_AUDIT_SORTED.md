@@ -2,7 +2,7 @@
 
 Sorted vulnerabilities based on `--audit-level=high` with `--omit=dev`.
 
-After running `npm audit fix --force`, the following vulnerabilities have been addressed:
+After running `npm audit fix --force`, the report lists vulnerabilities that were fixed and those that remain:
 
 ## Critical (Fixed)
 
