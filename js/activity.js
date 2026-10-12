@@ -40,7 +40,7 @@ try {
    setupBlockScaleController,
    setupContextMenuController,
    requestClear,
-   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
+   setupActivityAbcParser, setupActivityMxmlParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, docByClass,
@@ -2290,6 +2290,7 @@ class Activity {
 
         this._loadProject = (...args) => this.projectManager._loadProject(...args);
         setupActivityAbcParser(this);
+        setupActivityMxmlParser(this);
         this.loadStartWrapper = (...args) => this.projectManager.loadStartWrapper(...args);
 
         this.showContents = (...args) => this.projectManager.showContents(...args);

@@ -1223,6 +1223,7 @@ class ProjectManager {
                 const reader = new FileReader();
                 const midiReader = new FileReader();
                 const abcReader = new FileReader();
+                const mxmlReader = new FileReader();
 
                 reader.onload = () => {
                     that.loading = true;
@@ -1326,15 +1327,37 @@ class ProjectManager {
                     }
                 };
 
+                mxmlReader.onload = async event => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+                    try {
+                        const mxmlData =
+                            (event && event.target && event.target.result) || mxmlReader.result;
+
+                        await that.parseMXML(mxmlData);
+                        finishLoading();
+                    } catch (e) {
+                        ErrorHandler.capture(e, { operation: "mxmlImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    }
+                };
+
                 const file = that.fileChooser.files[0];
                 if (file) {
                     const extension = file.name.split(".").pop().toLowerCase();
                     const isMidi = extension === "mid" || extension === "midi";
                     const isABC = extension === "abc";
+                    const isMXML = extension === "xml" || extension === "musicxml";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
                     } else if (isABC) {
                         abcReader.readAsText(file);
+                    } else if (isMXML) {
+                        mxmlReader.readAsText(file);
                     } else {
                         reader.readAsText(file);
                     }
@@ -1352,6 +1375,7 @@ class ProjectManager {
             const midiReader = new FileReader();
 
             const abcReader = new FileReader();
+            const mxmlReader = new FileReader();
             reader.onload = () => {
                 that.loading = true;
                 document.body.style.cursor = "wait";
@@ -1432,6 +1456,23 @@ class ProjectManager {
                 }
             };
 
+            mxmlReader.onload = async event => {
+                that.loading = true;
+                document.body.style.cursor = "wait";
+                try {
+                    const mxmlData = event.target.result;
+
+                    await that.parseMXML(mxmlData);
+                    finishLoading();
+                } catch (e) {
+                    ErrorHandler.capture(e, { operation: "mxmlImport" });
+                    that.errorMsg(
+                        _("Cannot load project from the file. Please check the file type.")
+                    );
+                    finishLoading();
+                }
+            };
+
             if (files[0] !== undefined) {
                 const extension = files[0].name.split(".").pop().toLowerCase();
 
@@ -1444,6 +1485,12 @@ class ProjectManager {
                 const isABC = extension === "abc";
                 if (isABC) {
                     abcReader.readAsText(files[0]);
+                    return;
+                }
+
+                const isMXML = extension === "xml" || extension === "musicxml";
+                if (isMXML) {
+                    mxmlReader.readAsText(files[0]);
                     return;
                 }
                 reader.readAsText(files[0]);

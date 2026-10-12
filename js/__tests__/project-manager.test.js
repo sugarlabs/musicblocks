@@ -140,6 +140,7 @@ const makeActivity = (overrides = {}) => ({
     textMsg: jest.fn(),
     refreshCanvas: jest.fn(),
     parseABC: jest.fn(),
+    parseMXML: jest.fn(),
     toolbar: {
         closeAuxToolbar: jest.fn()
     },
@@ -2902,6 +2903,79 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
+    it("change handler parses MusicXML files through activity.parseMXML", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "<score-partwise></score-partwise>";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        activity.parseMXML.mockResolvedValueOnce(null);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.xml" }];
+        handlers.change();
+        await readers[3].promise;
+
+        expect(activity.parseMXML).toHaveBeenCalledWith("<score-partwise></score-partwise>");
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler reports a rejected parseMXML call and restores state", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "<score-partwise></score-partwise>";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        const mxmlError = new Error("MusicXML import failed");
+        activity.parseMXML.mockRejectedValueOnce(mxmlError);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.xml" }];
+        handlers.change();
+        await readers[3].promise;
+
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(mxmlError, {
+            operation: "mxmlImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
     it("drop handler cleans up when file is empty", () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -3174,6 +3248,87 @@ describe("_setupFileHandlers inner callbacks", () => {
             "Cannot load project from the file. Please check the file type."
         );
         expect(activity.parseABC).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler imports MusicXML and cleans up after parsing", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "<score-partwise></score-partwise>";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const activity = makeActivity();
+        activity.parseMXML.mockResolvedValueOnce(null);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "song.xml" }] }
+        });
+        await readers[3].promise;
+
+        expect(activity.parseMXML).toHaveBeenCalledWith("<score-partwise></score-partwise>");
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler reports a rejected parseMXML call and restores state", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "<score-partwise></score-partwise>";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const activity = makeActivity();
+        const mxmlError = new Error("MusicXML import failed");
+        activity.parseMXML.mockRejectedValueOnce(mxmlError);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "song.xml" }] }
+        });
+        await readers[3].promise;
+
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(mxmlError, {
+            operation: "mxmlImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
