@@ -142,6 +142,7 @@ describe("musicutils-pitch", () => {
             expect(fn("  C4  ")).toEqual(["C", 4]);
             expect(fn("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
             expect(fn("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+            expect(fn("   ")).toEqual(["", 4]);
         });
 
         it("keeps existing behaviour with octave present", () => {

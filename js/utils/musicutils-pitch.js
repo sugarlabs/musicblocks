@@ -290,12 +290,18 @@ function _parse_pitch_string(str) {
         semitoneOffset += ACCIDENTAL_SEMITONE_MAP[char] || 0;
     }
 
-    // Direct O(1) mapping for semitone offsets in [-2, 2]
-    const CANONICAL_ACCIDENTALS = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
-    const accidental =
-        CANONICAL_ACCIDENTALS[semitoneOffset + 2] !== undefined
-            ? CANONICAL_ACCIDENTALS[semitoneOffset + 2]
-            : (semitoneOffset > 0 ? SHARP : FLAT).repeat(Math.abs(semitoneOffset));
+    let accidental = "";
+    if (semitoneOffset === 1) {
+        accidental = SHARP;
+    } else if (semitoneOffset === -1) {
+        accidental = FLAT;
+    } else if (semitoneOffset === 2) {
+        accidental = DOUBLESHARP;
+    } else if (semitoneOffset === -2) {
+        accidental = DOUBLEFLAT;
+    } else if (semitoneOffset !== 0) {
+        accidental = (semitoneOffset > 0 ? SHARP : FLAT).repeat(Math.abs(semitoneOffset));
+    }
 
     return [baseLetter + accidental, octave];
 }
