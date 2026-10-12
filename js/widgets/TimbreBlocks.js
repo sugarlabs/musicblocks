@@ -187,9 +187,306 @@ class TimbreBlocks {
 
     /**
      * @private
+     * Records a parameter snapshot on the undo stack before user mutation.
+     * @param {string} effect - Parameter section identifier
+     * @param {Array} values - Array of parameter values
+     * @param {number} blockValue - Block index
+     * @returns {void}
+     */
+    _recordUndo(effect, values, blockValue) {
+        if (!this._undoStack) {
+            this._undoStack = [];
+        }
+        if (this._undoStack.length >= 50) {
+            this._undoStack.shift();
+        }
+        this._undoStack.push({
+            effect,
+            values: Array.isArray(values) ? values.slice() : [values],
+            blockValue
+        });
+    }
+
+    /**
+     * @private
+     * Removes undo snapshots belonging to a replaced section or synthesizer.
+     * @param {string} effect - Effect identifier to purge
+     * @returns {void}
+     */
+    _purgeUndoSnapshots(effect) {
+        if (this._undoStack && this._undoStack.length > 0) {
+            this._undoStack = this._undoStack.filter(s => s.effect !== effect);
+        }
+    }
+
+    /**
+     * @private
+     * Syncs Materialize CSS .thumb slider tooltip labels.
+     * @returns {void}
+     */
+    _syncThumbTooltips() {
+        const timbreTable = docById("timbreTable");
+        if (!timbreTable) {
+            return;
+        }
+        const sliders = timbreTable.querySelectorAll("input[type=range]");
+        for (let k = 0; k < sliders.length; k++) {
+            const slider = sliders[k];
+            let sibling = slider.nextElementSibling;
+            while (sibling) {
+                if (sibling.classList.contains("thumb")) {
+                    const valSpan = sibling.querySelector(".value");
+                    if (valSpan) {
+                        valSpan.textContent = slider.value;
+                    }
+                    break;
+                }
+                sibling = sibling.nextElementSibling;
+            }
+        }
+    }
+
+    /**
+     * @private
+     * Restores an undo history state.
+     * @param {Object} state - The popped undo state
+     * @returns {void}
+     */
+    _applyUndoState(state) {
+        if (!state || !state.effect) {
+            return;
+        }
+
+        const effect = state.effect;
+        const vals = state.values;
+        const blockValue = state.blockValue;
+        const savedActive = Object.assign({}, this.isActive);
+        const isPanelActive = Boolean(savedActive[effect]);
+
+        const effectBlockMap = {
+            amsynth: this.AMSynthesizer,
+            fmsynth: this.FMSynthesizer,
+            noisesynth: this.NoiseSynthesizer,
+            duosynth: this.duoSynthesizer,
+            tremolo: this.tremoloEffect,
+            vibrato: this.vibratoEffect,
+            phaser: this.phaserEffect,
+            chorus: this.chorusEffect,
+            distortion: this.distortionEffect,
+            envelope: this.env,
+            oscillator: this.osc
+        };
+        const blockArray = effectBlockMap[effect];
+        if (blockArray && blockArray.length > 0) {
+            const targetBlockId = blockArray[blockValue];
+            if (targetBlockId === null || targetBlockId === undefined) {
+                return;
+            }
+            if (
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.blockList &&
+                !this.activity.blocks.blockList[targetBlockId]
+            ) {
+                return;
+            }
+        }
+
+        try {
+            for (const key of Object.keys(this.isActive)) {
+                this.isActive[key] = false;
+            }
+            this.isActive[effect] = true;
+
+            const setSlider = (rangeId, spanId, val, round = true) => {
+                if (!isPanelActive) {
+                    return;
+                }
+                const range = docById(rangeId);
+                if (range) range.value = parseFloat(val);
+                const span = docById(spanId);
+                if (span) span.textContent = round ? Math.round(parseFloat(val) * 100) / 100 : val;
+            };
+
+            if (effect === "amsynth") {
+                setSlider("myRangeS0", "myspanS0", vals[0], false);
+                this.amSynthParamvals["harmonicity"] = parseFloat(vals[0]);
+                this.AMSynthParams[0] = vals[0];
+                this._update(blockValue, vals[0], 0);
+                if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                    this.activity.logo.synth.createSynth(
+                        0,
+                        this.instrumentName,
+                        "amsynth",
+                        this.amSynthParamvals
+                    );
+                }
+            } else if (effect === "fmsynth") {
+                setSlider("myRangeS0", "myspanS0", vals[0], false);
+                this.fmSynthParamvals["modulationIndex"] = parseFloat(vals[0]);
+                this.FMSynthParams[0] = vals[0];
+                this._update(blockValue, vals[0], 0);
+                if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                    this.activity.logo.synth.createSynth(
+                        0,
+                        this.instrumentName,
+                        "fmsynth",
+                        this.fmSynthParamvals
+                    );
+                }
+            } else if (effect === "noisesynth") {
+                setSlider("myRangeS0", "myspanS0", vals[0], false);
+                this.noiseSynthParamvals["noise.type"] = parseFloat(vals[0]);
+                this.NoiseSynthParams[0] = vals[0];
+                this._update(blockValue, vals[0], 0);
+                if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                    this.activity.logo.synth.createSynth(
+                        0,
+                        this.instrumentName,
+                        "noisesynth",
+                        this.noiseSynthParamvals
+                    );
+                }
+            } else if (effect === "duosynth") {
+                for (let i = 0; i < vals.length; i++) {
+                    setSlider("myRangeS" + i, "myspanS" + i, vals[i], false);
+                    this.duoSynthParams[i] = vals[i];
+                    this._update(blockValue, vals[i], i);
+                }
+                this._setDuoSynthParamVals(vals[0], vals[1]);
+                if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                    this.activity.logo.synth.createSynth(
+                        0,
+                        this.instrumentName,
+                        "duosynth",
+                        this.duoSynthParamVals
+                    );
+                }
+            } else if (effect === "tremolo") {
+                for (let i = 0; i < 2; i++) {
+                    setSlider("myRangeFx" + i, "myspanFx" + i, vals[i]);
+                    this.tremoloParams[i] = vals[i];
+                    this._update(blockValue, vals[i], i);
+                }
+                if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    instrumentsEffects[0][this.instrumentName]["tremoloFrequency"] = parseFloat(
+                        vals[0]
+                    );
+                    instrumentsEffects[0][this.instrumentName]["tremoloDepth"] =
+                        parseFloat(vals[1]) / 100;
+                }
+            } else if (effect === "vibrato") {
+                setSlider("myRangeFx0", "myspanFx0", vals[0]);
+                this.vibratoParams[0] = vals[0];
+                this._update(blockValue, vals[0], 0);
+
+                const obj = oneHundredToFraction(parseFloat(vals[1]));
+                if (isPanelActive) {
+                    const span = docById("myspanFx1");
+                    const range1 = docById("myRangeFx1");
+                    if (range1) range1.value = parseFloat(vals[1]);
+                    if (span) span.textContent = obj[0] + "/" + obj[1];
+                }
+                this.vibratoParams[1] = vals[1];
+                this._update(blockValue, obj[1], 1);
+                this._update(blockValue, obj[0], 2);
+
+                if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] =
+                        parseFloat(vals[0]) / 100;
+                    instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] =
+                        parseFloat(obj[0]) / parseFloat(obj[1]);
+                }
+            } else if (effect === "phaser") {
+                for (let i = 0; i < 3; i++) {
+                    setSlider("myRangeFx" + i, "myspanFx" + i, vals[i]);
+                    this.phaserParams[i] = vals[i];
+                    this._update(blockValue, vals[i], i);
+                }
+                if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    instrumentsEffects[0][this.instrumentName]["rate"] = parseFloat(vals[0]);
+                    instrumentsEffects[0][this.instrumentName]["octaves"] = parseFloat(vals[1]);
+                    instrumentsEffects[0][this.instrumentName]["baseFrequency"] = parseFloat(
+                        vals[2]
+                    );
+                }
+            } else if (effect === "chorus") {
+                for (let i = 0; i < 3; i++) {
+                    setSlider("myRangeFx" + i, "myspanFx" + i, vals[i]);
+                    this.chorusParams[i] = vals[i];
+                    this._update(blockValue, vals[i], i);
+                }
+                if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    instrumentsEffects[0][this.instrumentName]["chorusRate"] = parseFloat(vals[0]);
+                    instrumentsEffects[0][this.instrumentName]["delayTime"] = parseFloat(vals[1]);
+                    instrumentsEffects[0][this.instrumentName]["chorusDepth"] =
+                        parseFloat(vals[2]) / 100;
+                }
+            } else if (effect === "distortion") {
+                setSlider("myRangeFx0", "myspanFx0", vals[0]);
+                this.distortionParams[0] = vals[0];
+                this._update(blockValue, vals[0], 0);
+                if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    instrumentsEffects[0][this.instrumentName]["distortionAmount"] =
+                        parseFloat(vals[0]) / 100;
+                }
+            } else if (effect === "envelope") {
+                for (let i = 0; i < 4; i++) {
+                    setSlider("myRange" + i, "myspan" + i, vals[i], false);
+                    this.synthVals["envelope"][this.adsrMap[i]] = parseFloat(vals[i]) / 100;
+                    this.ENVs[i] = vals[i];
+                    this._update(blockValue, parseFloat(vals[i]), i);
+                }
+                if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                    this.activity.logo.synth.createSynth(
+                        0,
+                        this.instrumentName,
+                        this.synthVals["oscillator"]["source"],
+                        this.synthVals
+                    );
+                }
+            } else if (effect === "oscillator") {
+                if (isPanelActive) {
+                    const sel = docById("selOsc1");
+                    if (sel) sel.value = vals[0];
+                }
+                setSlider("myRangeO0", "myspanO0", vals[1], false);
+                this.oscParams[0] = vals[0];
+                this.oscParams[1] = vals[1];
+                this.synthVals["oscillator"]["type"] = vals[0] + vals[1].toString();
+                this.synthVals["oscillator"]["source"] = vals[0];
+                this._update(blockValue, vals[0], 0);
+                this._update(blockValue, vals[1], 1);
+                if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                    this.activity.logo.synth.createSynth(
+                        0,
+                        this.instrumentName,
+                        vals[0],
+                        this.synthVals
+                    );
+                }
+            }
+
+            if (isPanelActive) {
+                this._syncThumbTooltips();
+            }
+            this._playNote("G4", 1 / 8);
+        } finally {
+            this.isActive = savedActive;
+        }
+    }
+
+    /**
+     * @private
      * @returns {void}
      */
     _undo() {
+        if (this._undoStack && this._undoStack.length > 0) {
+            const prevState = this._undoStack.pop();
+            this._applyUndoState(prevState);
+            return;
+        }
+
         let blockValue = 0;
 
         if (this.isActive["envelope"]) {
@@ -493,14 +790,17 @@ class TimbreBlocks {
         if (this.AMSynthesizer.length !== 0 && synthChosen !== "AMSynth") {
             lastBlk = this.AMSynthesizer.pop();
             this.AMSynthParams = [];
+            this._purgeUndoSnapshots("amsynth");
             this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.FMSynthesizer.length !== 0 && synthChosen !== "FMSynth") {
             lastBlk = this.FMSynthesizer.pop();
             this.FMSynthParams = [];
+            this._purgeUndoSnapshots("fmsynth");
             this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.duoSynthesizer.length !== 0 && synthChosen !== "DuoSynth") {
             lastBlk = this.duoSynthesizer.pop();
             this.duoSynthParams = [];
+            this._purgeUndoSnapshots("duosynth");
             this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (synthChosen === "FMSynth" || synthChosen === "AMSynth") {
             this._setWidgetTimeout(() => this.blockConnection(2, bottomOfClamp), 500);

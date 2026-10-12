@@ -210,6 +210,7 @@ class TimbrePanels {
 
                     document.getElementById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
+                        this._recordUndo("amsynth", this.AMSynthParams, blockValue);
                         docById("myRangeS0").value = parseFloat(elem.value);
                         this.amSynthParamvals["harmonicity"] = parseFloat(elem.value);
                         this.AMSynthParams[0] = elem.value;
@@ -275,6 +276,7 @@ class TimbrePanels {
 
                     document.getElementById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
+                        this._recordUndo("fmsynth", this.FMSynthParams, blockValue);
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
                         this.fmSynthParamvals["modulationIndex"] = parseFloat(elem.value);
@@ -342,6 +344,7 @@ class TimbrePanels {
 
                     document.getElementById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
+                        this._recordUndo("noisesynth", this.NoiseSynthParams, blockValue);
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
                         this.noiseSynthParamvals["noise.type"] = parseFloat(elem.value);
@@ -398,6 +401,7 @@ class TimbrePanels {
                                 const elem = event.target;
                                 const m = Number(elem.id.slice(-1));
                                 const val = parseFloat(elem.value);
+                                this._recordUndo("duosynth", this.duoSynthParams, blockValue);
                                 this.duoSynthParams[m] = elem.value;
                                 docById("myRangeS" + m).value = val;
                                 if (m === 0) {
@@ -515,6 +519,7 @@ class TimbrePanels {
 
         document.getElementById("wrapperOsc0").addEventListener("change", event => {
             const elem = event.target;
+            this._recordUndo("oscillator", this.oscParams, blockValue);
             this.oscParams[0] = elem.value;
             this.synthVals["oscillator"]["type"] = elem.value + this.oscParams[1].toString();
             this.synthVals["oscillator"]["source"] = elem.value;
@@ -531,6 +536,7 @@ class TimbrePanels {
         document.getElementById("wrapperOsc1").addEventListener("change", event => {
             const elem = event.target;
             const val = parseFloat(elem.value);
+            this._recordUndo("oscillator", this.oscParams, blockValue);
             this.oscParams[1] = elem.value;
             this.synthVals["oscillator"]["type"] = this.oscParams[0] + val.toString();
             docById("myRangeO0").value = val;
@@ -607,6 +613,7 @@ class TimbrePanels {
             wrapperEnv.addEventListener("change", event => {
                 const elem = event.target;
                 const val = parseFloat(elem.value);
+                this._recordUndo("envelope", this.ENVs, blockValue);
                 docById("myRange" + i).value = val;
                 docById("myspan" + i).textContent = elem.value;
                 this.synthVals["envelope"][this.adsrMap[i]] = val / 100;
@@ -1205,6 +1212,11 @@ class TimbrePanels {
                         if (!instrumentsEffects[0][this.instrumentName]) {
                             instrumentsEffects[0][this.instrumentName] = {};
                         }
+                        this._recordUndo(
+                            "tremolo",
+                            this.tremoloParams,
+                            this.tremoloEffect.length - 1
+                        );
                         docById("myRangeFx0").value = val;
                         docById("myspanFx0").textContent = val;
                         instrumentsEffects[0][this.instrumentName]["tremoloFrequency"] = val;
@@ -1220,6 +1232,11 @@ class TimbrePanels {
                         if (!instrumentsEffects[0][this.instrumentName]) {
                             instrumentsEffects[0][this.instrumentName] = {};
                         }
+                        this._recordUndo(
+                            "tremolo",
+                            this.tremoloParams,
+                            this.tremoloEffect.length - 1
+                        );
                         docById("myRangeFx1").value = val;
                         docById("myspanFx1").textContent = val;
                         instrumentsEffects[0][this.instrumentName]["tremoloDepth"] = val / 100;
@@ -1295,6 +1312,11 @@ class TimbrePanels {
                         if (!instrumentsEffects[0][this.instrumentName]) {
                             instrumentsEffects[0][this.instrumentName] = {};
                         }
+                        this._recordUndo(
+                            "vibrato",
+                            this.vibratoParams,
+                            this.vibratoEffect.length - 1
+                        );
                         myRangeFxs[0].value = val;
                         myspanFxs[0].textContent = val;
                         instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = val / 100;
@@ -1310,6 +1332,11 @@ class TimbrePanels {
                         if (!instrumentsEffects[0][this.instrumentName]) {
                             instrumentsEffects[0][this.instrumentName] = {};
                         }
+                        this._recordUndo(
+                            "vibrato",
+                            this.vibratoParams,
+                            this.vibratoEffect.length - 1
+                        );
                         myRangeFxs[1].value = val;
                         const obj = oneHundredToFraction(val);
                         myspanFxs[1].textContent = obj[0] + "/" + obj[1];
@@ -1414,6 +1441,8 @@ class TimbrePanels {
                                 }
                                 myRangeFxs[m].value = val;
                                 myspanFxs[m].textContent = val;
+
+                                this._recordUndo("chorus", this.chorusParams, blockValue);
 
                                 if (m === 0) {
                                     instrumentsEffects[0][this.instrumentName]["chorusRate"] = val;
@@ -1529,6 +1558,8 @@ class TimbrePanels {
                                 myRangeFxs[m].value = val;
                                 myspanFxs[m].textContent = val;
 
+                                this._recordUndo("phaser", this.phaserParams, blockValue);
+
                                 if (m === 0) {
                                     instrumentsEffects[0][this.instrumentName]["rate"] = val;
                                 }
@@ -1596,6 +1627,7 @@ class TimbrePanels {
                         if (!instrumentsEffects[0][this.instrumentName]) {
                             instrumentsEffects[0][this.instrumentName] = {};
                         }
+                        this._recordUndo("distortion", this.distortionParams, blockValue);
                         docById("myRangeFx0").value = val;
                         docById("myspanFx0").textContent = val;
                         instrumentsEffects[0][this.instrumentName]["distortionAmount"] = val / 100;

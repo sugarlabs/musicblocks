@@ -1845,6 +1845,562 @@ describe("TimbreWidget", () => {
                 expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 80, 0);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("80");
             });
+
+            test("_undo pops and restores previous states from _undoStack across multiple steps", () => {
+                timbre._update = jest.fn();
+                timbre._undoStack = [];
+
+                timbre.FMSynthParams = ["10"];
+                timbre._recordUndo("fmsynth", timbre.FMSynthParams, 0);
+                timbre.FMSynthParams = ["25"];
+                timbre._recordUndo("fmsynth", timbre.FMSynthParams, 0);
+                timbre.FMSynthParams = ["50"];
+
+                expect(timbre._undoStack).toHaveLength(2);
+                timbre._undo();
+                expect(timbre.FMSynthParams[0]).toBe("25");
+                expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(25);
+                timbre._undo();
+                expect(timbre.FMSynthParams[0]).toBe("10");
+                expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(10);
+                expect(timbre._undoStack).toHaveLength(0);
+
+                timbre.tremoloParams = ["5", "30"];
+                timbre._recordUndo("tremolo", timbre.tremoloParams, 0);
+                timbre.tremoloParams = ["15", "80"];
+                timbre._undo();
+                expect(timbre.tremoloParams).toEqual(["5", "30"]);
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["tremoloFrequency"]
+                ).toBe(5);
+
+                timbre.ENVs = ["1", "50", "60", "1"];
+                timbre._recordUndo("envelope", timbre.ENVs, 0);
+                timbre.ENVs = ["5", "20", "40", "10"];
+                timbre._undo();
+                expect(timbre.ENVs).toEqual(["1", "50", "60", "1"]);
+                expect(timbre.synthVals["envelope"]["attack"]).toBe(0.01);
+            });
+
+            test("_recordUndo initializes stack when null and enforces 50 item capacity", () => {
+                timbre._undoStack = null;
+                timbre._recordUndo("amsynth", [1], 0);
+                expect(timbre._undoStack).toHaveLength(1);
+
+                for (let i = 2; i <= 55; i++) {
+                    timbre._recordUndo("amsynth", [i], 0);
+                }
+                expect(timbre._undoStack).toHaveLength(50);
+                expect(timbre._undoStack[0].values).toEqual([6]);
+                expect(timbre._undoStack[49].values).toEqual([55]);
+            });
+
+            test("_syncThumbTooltips updates tooltip values for range sliders in timbreTable", () => {
+                const table = jsdomDocument.createElement("div");
+                table.id = "timbreTable";
+                const slider = jsdomDocument.createElement("input");
+                slider.type = "range";
+                slider.value = "77";
+                const thumb = jsdomDocument.createElement("span");
+                thumb.className = "thumb";
+                const val = jsdomDocument.createElement("span");
+                val.className = "value";
+                val.textContent = "0";
+                thumb.appendChild(val);
+                table.appendChild(slider);
+                table.appendChild(thumb);
+                jsdomDocument.body.appendChild(table);
+
+                timbre._syncThumbTooltips();
+                expect(val.textContent).toBe("77");
+
+                table.remove();
+            });
+
+            test("_purgeUndoSnapshots removes only snapshots matching target effect", () => {
+                timbre._undoStack = [
+                    { effect: "amsynth", values: [1], blockValue: 0 },
+                    { effect: "fmsynth", values: [2], blockValue: 0 },
+                    { effect: "amsynth", values: [3], blockValue: 0 }
+                ];
+                timbre._purgeUndoSnapshots("amsynth");
+                expect(timbre._undoStack).toEqual([
+                    { effect: "fmsynth", values: [2], blockValue: 0 }
+                ]);
+            });
+
+            test("_applyUndoState skips when target block is missing in blockList", () => {
+                timbre._update = jest.fn();
+                timbre.AMSynthesizer = [999];
+                mockBlocks.blockList[999] = null;
+
+                timbre._recordUndo("amsynth", [12], 0);
+                timbre._undo();
+
+                expect(timbre._update).not.toHaveBeenCalled();
+            });
+
+            test("_applyUndoState does not modify DOM sliders when panel is not active", () => {
+                timbre._update = jest.fn();
+                const range = jsdomDocument.createElement("input");
+                range.id = "myRangeFx0";
+                range.value = "99";
+                const span = jsdomDocument.createElement("span");
+                span.id = "myspanFx0";
+                span.textContent = "99";
+                jsdomDocument.body.appendChild(range);
+                jsdomDocument.body.appendChild(span);
+
+                timbre.isActive["tremolo"] = false;
+                timbre.isActive["chorus"] = true;
+
+                timbre._recordUndo("tremolo", [5, 10], 0);
+                timbre._undo();
+
+                expect(range.value).toBe("99");
+                expect(span.textContent).toBe("99");
+            });
+
+            test("slider changes trigger _recordUndo across synths, oscillators, envelope, and effects", async () => {
+                timbre._update = jest.fn();
+                timbre._undoStack = [];
+
+                // Synth sliders
+                timbre._synth();
+                const amRadio = jsdomDocument.querySelector('input[value="AMSynth"]');
+                await amRadio.onclick({ target: amRadio });
+                jsdomDocument
+                    .getElementById("wrapperS0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack.length).toBeGreaterThan(0);
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("amsynth");
+
+                const fmRadio = jsdomDocument.querySelector('input[value="FMSynth"]');
+                await fmRadio.onclick({ target: fmRadio });
+                jsdomDocument
+                    .getElementById("wrapperS0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("fmsynth");
+
+                const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+                await duoRadio.onclick({ target: duoRadio });
+                jsdomDocument
+                    .getElementById("wrapperS0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("duosynth");
+
+                // Oscillator sliders
+                timbre.oscParams = ["sine", 6];
+                timbre._oscillator(false);
+                const wrapperOsc0 = jsdomDocument.getElementById("wrapperOsc0");
+                const wrapperOsc1 = jsdomDocument.getElementById("wrapperOsc1");
+                wrapperOsc0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("oscillator");
+                wrapperOsc1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("oscillator");
+
+                // Envelope slider
+                timbre._envelope(false);
+                const wrapperEnv0 = jsdomDocument.getElementById("wrapperEnv0");
+                wrapperEnv0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("envelope");
+
+                // Effects sliders
+                timbre._effects();
+                const tremoloRadio = jsdomDocument.querySelector('input[value="Tremolo"]');
+                await tremoloRadio.onclick({ target: tremoloRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("tremolo");
+                jsdomDocument
+                    .getElementById("wrapperFx1")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("tremolo");
+
+                const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                await vibratoRadio.onclick({ target: vibratoRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("vibrato");
+                jsdomDocument
+                    .getElementById("wrapperFx1")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("vibrato");
+
+                const chorusRadio = jsdomDocument.querySelector('input[value="Chorus"]');
+                await chorusRadio.onclick({ target: chorusRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("chorus");
+
+                const phaserRadio = jsdomDocument.querySelector('input[value="Phaser"]');
+                await phaserRadio.onclick({ target: phaserRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("phaser");
+
+                const distortionRadio = jsdomDocument.querySelector('input[value="Distortion"]');
+                await distortionRadio.onclick({ target: distortionRadio });
+                jsdomDocument
+                    .getElementById("wrapperFx0")
+                    .dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                expect(timbre._undoStack[timbre._undoStack.length - 1].effect).toBe("distortion");
+            });
+
+            test("_undoStack is cleared on window close and initialized empty for new sessions", () => {
+                timbre.activity = { hideMsgs: jest.fn() };
+                timbre._undoStack = [{ effect: "amsynth", values: [1], blockValue: 0 }];
+                timbre._createWidgetWindow();
+                expect(timbre._undoStack).toEqual([]);
+
+                timbre._undoStack = [{ effect: "amsynth", values: [2], blockValue: 0 }];
+                const mockWin = window.widgetWindows.windowFor(timbre, "timbre", "timbre", true);
+                if (mockWin && mockWin.onclose) {
+                    mockWin.onclose();
+                }
+                expect(timbre._undoStack).toEqual([]);
+            });
+
+            test("_applyUndoState restores amsynth state and updates DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.activity = mockActivity;
+                timbre.isActive["amsynth"] = true;
+                const range = jsdomDocument.createElement("input");
+                range.id = "myRangeS0";
+                const span = jsdomDocument.createElement("span");
+                span.id = "myspanS0";
+                jsdomDocument.body.appendChild(range);
+                jsdomDocument.body.appendChild(span);
+
+                timbre._recordUndo("amsynth", ["6"], 0);
+                timbre._undo();
+
+                expect(timbre.AMSynthParams[0]).toBe("6");
+                expect(timbre.amSynthParamvals["harmonicity"]).toBe(6);
+                expect(timbre._update).toHaveBeenCalledWith(0, "6", 0);
+                expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    timbre.instrumentName,
+                    "amsynth",
+                    expect.any(Object)
+                );
+                expect(range.value).toBe("6");
+                expect(span.textContent).toBe("6");
+                range.remove();
+                span.remove();
+            });
+
+            test("_applyUndoState restores noisesynth state and updates DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.activity = mockActivity;
+                timbre.isActive["noisesynth"] = true;
+                const range = jsdomDocument.createElement("input");
+                range.id = "myRangeS0";
+                const span = jsdomDocument.createElement("span");
+                span.id = "myspanS0";
+                jsdomDocument.body.appendChild(range);
+                jsdomDocument.body.appendChild(span);
+
+                timbre._recordUndo("noisesynth", ["pink"], 0);
+                timbre._undo();
+
+                expect(timbre.NoiseSynthParams[0]).toBe("pink");
+                expect(timbre._update).toHaveBeenCalledWith(0, "pink", 0);
+                expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    timbre.instrumentName,
+                    "noisesynth",
+                    expect.any(Object)
+                );
+                range.remove();
+                span.remove();
+            });
+
+            test("_applyUndoState restores duosynth state and updates DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.activity = mockActivity;
+                timbre.isActive["duosynth"] = true;
+                const range0 = jsdomDocument.createElement("input");
+                range0.id = "myRangeS0";
+                const span0 = jsdomDocument.createElement("span");
+                span0.id = "myspanS0";
+                const range1 = jsdomDocument.createElement("input");
+                range1.id = "myRangeS1";
+                const span1 = jsdomDocument.createElement("span");
+                span1.id = "myspanS1";
+                jsdomDocument.body.appendChild(range0);
+                jsdomDocument.body.appendChild(span0);
+                jsdomDocument.body.appendChild(range1);
+                jsdomDocument.body.appendChild(span1);
+
+                timbre._recordUndo("duosynth", ["4", "20"], 0);
+                timbre._undo();
+
+                expect(timbre.duoSynthParams).toEqual(["4", "20"]);
+                expect(timbre.duoSynthParamVals.vibratoRate).toBe(4);
+                expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.2);
+                expect(timbre._update).toHaveBeenCalledWith(0, "4", 0);
+                expect(timbre._update).toHaveBeenCalledWith(0, "20", 1);
+                expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    timbre.instrumentName,
+                    "duosynth",
+                    expect.any(Object)
+                );
+                range0.remove();
+                span0.remove();
+                range1.remove();
+                span1.remove();
+            });
+
+            test("_applyUndoState restores vibrato state and updates fraction DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.isActive["vibrato"] = true;
+                global.instrumentsEffects[0][timbre.instrumentName] = {};
+                const range0 = jsdomDocument.createElement("input");
+                range0.id = "myRangeFx0";
+                const span0 = jsdomDocument.createElement("span");
+                span0.id = "myspanFx0";
+                const range1 = jsdomDocument.createElement("input");
+                range1.id = "myRangeFx1";
+                const span1 = jsdomDocument.createElement("span");
+                span1.id = "myspanFx1";
+                jsdomDocument.body.appendChild(range0);
+                jsdomDocument.body.appendChild(span0);
+                jsdomDocument.body.appendChild(range1);
+                jsdomDocument.body.appendChild(span1);
+
+                timbre._recordUndo("vibrato", [8, 25], 0);
+                timbre._undo();
+
+                expect(timbre.vibratoParams).toEqual([8, 25]);
+                expect(timbre._update).toHaveBeenCalledWith(0, 8, 0);
+                expect(range0.value).toBe("8");
+                expect(range1.value).toBe("25");
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["vibratoIntensity"]
+                ).toBe(0.08);
+                range0.remove();
+                span0.remove();
+                range1.remove();
+                span1.remove();
+            });
+
+            test("_applyUndoState restores phaser state and updates DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.isActive["phaser"] = true;
+                global.instrumentsEffects[0][timbre.instrumentName] = {};
+                const ranges = [];
+                const spans = [];
+                for (let i = 0; i < 3; i++) {
+                    const r = jsdomDocument.createElement("input");
+                    r.id = "myRangeFx" + i;
+                    const s = jsdomDocument.createElement("span");
+                    s.id = "myspanFx" + i;
+                    jsdomDocument.body.appendChild(r);
+                    jsdomDocument.body.appendChild(s);
+                    ranges.push(r);
+                    spans.push(s);
+                }
+
+                timbre._recordUndo("phaser", [7, 5, 250], 0);
+                timbre._undo();
+
+                expect(timbre.phaserParams).toEqual([7, 5, 250]);
+                expect(timbre._update).toHaveBeenCalledWith(0, 7, 0);
+                expect(timbre._update).toHaveBeenCalledWith(0, 5, 1);
+                expect(timbre._update).toHaveBeenCalledWith(0, 250, 2);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["rate"]).toBe(7);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["octaves"]).toBe(5);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["baseFrequency"]).toBe(
+                    250
+                );
+
+                ranges.forEach(r => r.remove());
+                spans.forEach(s => s.remove());
+            });
+
+            test("_applyUndoState restores chorus state and updates DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.isActive["chorus"] = true;
+                global.instrumentsEffects[0][timbre.instrumentName] = {};
+                const ranges = [];
+                const spans = [];
+                for (let i = 0; i < 3; i++) {
+                    const r = jsdomDocument.createElement("input");
+                    r.id = "myRangeFx" + i;
+                    const s = jsdomDocument.createElement("span");
+                    s.id = "myspanFx" + i;
+                    jsdomDocument.body.appendChild(r);
+                    jsdomDocument.body.appendChild(s);
+                    ranges.push(r);
+                    spans.push(s);
+                }
+
+                timbre._recordUndo("chorus", [4, 6, 80], 0);
+                timbre._undo();
+
+                expect(timbre.chorusParams).toEqual([4, 6, 80]);
+                expect(timbre._update).toHaveBeenCalledWith(0, 4, 0);
+                expect(timbre._update).toHaveBeenCalledWith(0, 6, 1);
+                expect(timbre._update).toHaveBeenCalledWith(0, 80, 2);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["chorusRate"]).toBe(4);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["delayTime"]).toBe(6);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["chorusDepth"]).toBe(
+                    0.8
+                );
+
+                ranges.forEach(r => r.remove());
+                spans.forEach(s => s.remove());
+            });
+
+            test("_applyUndoState restores distortion state and updates DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.isActive["distortion"] = true;
+                global.instrumentsEffects[0][timbre.instrumentName] = {};
+                const range = jsdomDocument.createElement("input");
+                range.id = "myRangeFx0";
+                const span = jsdomDocument.createElement("span");
+                span.id = "myspanFx0";
+                jsdomDocument.body.appendChild(range);
+                jsdomDocument.body.appendChild(span);
+
+                timbre._recordUndo("distortion", [75], 0);
+                timbre._undo();
+
+                expect(timbre.distortionParams).toEqual([75]);
+                expect(timbre._update).toHaveBeenCalledWith(0, 75, 0);
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["distortionAmount"]
+                ).toBe(0.75);
+
+                range.remove();
+                span.remove();
+            });
+
+            test("_applyUndoState restores oscillator state and updates selector DOM when active", () => {
+                timbre._update = jest.fn();
+                timbre.activity = mockActivity;
+                timbre.isActive["oscillator"] = true;
+                const sel = jsdomDocument.createElement("select");
+                sel.id = "selOsc1";
+                const opt = jsdomDocument.createElement("option");
+                opt.value = "triangle";
+                sel.appendChild(opt);
+                const range = jsdomDocument.createElement("input");
+                range.id = "myRangeO0";
+                const span = jsdomDocument.createElement("span");
+                span.id = "myspanO0";
+                jsdomDocument.body.appendChild(sel);
+                jsdomDocument.body.appendChild(range);
+                jsdomDocument.body.appendChild(span);
+
+                timbre._recordUndo("oscillator", ["triangle", 8], 0);
+                timbre._undo();
+
+                expect(timbre.oscParams).toEqual(["triangle", 8]);
+                expect(timbre.synthVals["oscillator"]["source"]).toBe("triangle");
+                expect(timbre.synthVals["oscillator"]["type"]).toBe("triangle8");
+                expect(sel.value).toBe("triangle");
+                expect(range.value).toBe("8");
+                expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    timbre.instrumentName,
+                    "triangle",
+                    expect.any(Object)
+                );
+
+                sel.remove();
+                range.remove();
+                span.remove();
+            });
+
+            test("_changeBlock purges undo snapshots when replacing synths", () => {
+                timbre._undoStack = [
+                    { effect: "amsynth", values: [1], blockValue: 0 },
+                    { effect: "fmsynth", values: [2], blockValue: 0 },
+                    { effect: "duosynth", values: [3], blockValue: 0 }
+                ];
+                timbre.AMSynthesizer = [10];
+                timbre.FMSynthesizer = [20];
+                timbre.duoSynthesizer = [30];
+                timbre._setWidgetTimeout = jest.fn();
+
+                timbre._changeBlock("FMSynth");
+                expect(timbre._undoStack.some(s => s.effect === "amsynth")).toBe(false);
+
+                timbre._changeBlock("AMSynth");
+                expect(timbre._undoStack.some(s => s.effect === "fmsynth")).toBe(false);
+
+                timbre._changeBlock("None");
+                expect(timbre._undoStack.some(s => s.effect === "duosynth")).toBe(false);
+            });
+
+            test("_applyUndoState guards against null or invalid state object", () => {
+                timbre._update = jest.fn();
+                timbre._applyUndoState(null);
+                timbre._applyUndoState({});
+                expect(timbre._update).not.toHaveBeenCalled();
+            });
+
+            test("_applyUndoState guards when targetBlockId is null or undefined in block array", () => {
+                timbre._update = jest.fn();
+                timbre.AMSynthesizer = [null];
+                timbre._applyUndoState({ effect: "amsynth", values: [1], blockValue: 0 });
+                expect(timbre._update).not.toHaveBeenCalled();
+            });
+
+            test("_syncThumbTooltips traverses non-thumb siblings to reach thumb", () => {
+                const table = jsdomDocument.createElement("div");
+                table.id = "timbreTable";
+                const slider = jsdomDocument.createElement("input");
+                slider.type = "range";
+                slider.value = "42";
+                const dummy = jsdomDocument.createElement("div");
+                const thumb = jsdomDocument.createElement("span");
+                thumb.className = "thumb";
+                const val = jsdomDocument.createElement("span");
+                val.className = "value";
+                thumb.appendChild(val);
+                table.appendChild(slider);
+                table.appendChild(dummy);
+                table.appendChild(thumb);
+                jsdomDocument.body.appendChild(table);
+
+                timbre._syncThumbTooltips();
+                expect(val.textContent).toBe("42");
+                table.remove();
+            });
         });
 
         describe("Clamp, block connections, and replacement", () => {
