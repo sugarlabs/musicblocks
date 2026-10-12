@@ -772,8 +772,10 @@ const TemperamentUI = {
          */
         tw.performEqualEdit = function (event) {
             if (!docById("octaveIn")) return;
-            const input1 = Number(docById("octaveIn").value);
-            const input2 = Number(docById("octaveOut").value);
+            // Number("") is 0, so a blank field must not pass as pitch 0.
+            const toPitch = value => (String(value).trim() === "" ? NaN : Number(value));
+            const input1 = toPitch(docById("octaveIn").value);
+            const input2 = toPitch(docById("octaveOut").value);
             const maxPitch = tw.ratios.length - 1;
             if (
                 !Number.isInteger(input1) ||
@@ -910,9 +912,15 @@ const TemperamentUI = {
             if (!docById("ratioIn")) return;
             const input1 = docById("ratioIn").value;
             const input2 = docById("ratioOut").value;
-            const rec = docById("recursion").value;
+            const rec = Number(docById("recursion").value);
             const ratio1 = input1 / input2;
+            if (!Number.isInteger(rec) || rec < 1 || rec > 56) {
+                tw.activity.errorMsg(_("Please enter a recursion between 1 and 56."), 3000);
+                return;
+            }
             if (
+                !Number.isFinite(tw.powerBase) ||
+                tw.powerBase <= 1 ||
                 !isFinite(input1) ||
                 !isFinite(input2) ||
                 input1 <= 0 ||
@@ -961,6 +969,14 @@ const TemperamentUI = {
 
             for (let i = 0; i < rec; i++) {
                 ratio[i] = Math.pow(ratio1, i + 1);
+                // An overflowed or underflowed ratio would never leave the fold loops.
+                if (!Number.isFinite(ratio[i]) || ratio[i] <= 0) {
+                    tw.activity.errorMsg(
+                        _("Please enter a valid ratio (e.g. 3:2) within the octave space."),
+                        3000
+                    );
+                    return;
+                }
                 calculateRatios(i);
             }
             tw.tempRatios.sort(function (a, b) {

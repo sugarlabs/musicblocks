@@ -711,7 +711,9 @@ describe("TemperamentUI module", () => {
             ["0", "20"],
             ["-1", "4"],
             ["a", "4"],
-            ["0", "2.5"]
+            ["0", "2.5"],
+            ["", "4"],
+            ["0", "  "]
         ])("performEqualEdit rejects the pitch range %s to %s", (from, to) => {
             useTwelveEdo();
             const ratios = mockTW.ratios.slice();
@@ -872,6 +874,37 @@ describe("TemperamentUI module", () => {
             runRatioEdit("7", "4", "1");
 
             expect(mockTW.ratios).toEqual([1, 1.5, 1.75]);
+        });
+
+        test.each(["0", "57", "1.5", "abc", "", "1000000000"])(
+            "ratioEdit rejects the recursion %p",
+            recursion => {
+                mockTW.ratios = [1, 1.5, 2];
+                mockTW.frequencies = [440, 660, 880];
+                mockTW.powerBase = 2;
+                runRatioEdit("2", "3", recursion);
+
+                expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                    "Please enter a recursion between 1 and 56.",
+                    3000
+                );
+                expect(mockTW.ratios).toEqual([1, 1.5, 2]);
+                expect(mockTW._visualizerView).not.toHaveBeenCalled();
+            }
+        );
+
+        test("ratioEdit rejects a ratio that overflows instead of looping forever", () => {
+            mockTW.ratios = [1, 1e300];
+            mockTW.frequencies = [1, 1e300];
+            mockTW.powerBase = 1e300;
+            runRatioEdit("1e299", "1", "2");
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid ratio (e.g. 3:2) within the octave space.",
+                3000
+            );
+            expect(mockTW.ratios).toEqual([1, 1e300]);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
         });
 
         test("ratioEdit handles overDivisionCap", () => {
