@@ -516,16 +516,20 @@ class ServerInterface {
     /**
      * Returns [[repoName, updatedAt]] for every project this browser owns
      * (keys stored in localStorage with the mb_git_key_ prefix).
+     *
+     * localStorage holds no updatedAt, so a project already in GlobalPlanet.cache
+     * reports the one cached for it, and addProjects() doesn't fetch its details again.
      * @returns {Array}
      */
     _getOwnedProjectList() {
         const list = [];
+        const cache = this.Planet?.GlobalPlanet?.cache ?? {};
         try {
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key && key.startsWith(this._KEY_PREFIX)) {
                     const repoName = key.slice(this._KEY_PREFIX.length);
-                    list.push([repoName, new Date().toISOString()]);
+                    list.push([repoName, cache[repoName]?.ProjectLastUpdated ?? null]);
                 }
             }
         } catch (_) {
