@@ -399,6 +399,7 @@ function setupRhythmActions(activity) {
             }
 
             tur.singer.beatFactor /= factor;
+            tur.singer.beatFactorValues.push(factor);
 
             const listenerName = "_multiplybeat_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
@@ -408,7 +409,8 @@ function setupRhythmActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = () => (tur.singer.beatFactor *= factor);
+            // Nested clamps share one listener name, so each one pops its own factor.
+            const __listener = () => (tur.singer.beatFactor *= tur.singer.beatFactorValues.pop());
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }

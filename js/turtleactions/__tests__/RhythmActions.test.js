@@ -52,6 +52,7 @@ describe("setupRhythmActions", () => {
                 beatList: [],
                 factorList: [],
                 beatFactor: 1,
+                beatFactorValues: [],
                 currentBeat: null,
                 currentMeasure: null,
 
@@ -585,6 +586,29 @@ describe("setupRhythmActions", () => {
         Singer.RhythmActions.multiplyNoteValue(2, 0, 1);
 
         expect(targetTurtle.singer.beatFactor).toBe(1);
+    });
+
+    it.each([
+        [2, 3],
+        [2, 0.5]
+    ])("restores beatFactor after nesting multiply %p around multiply %p", (outer, inner) => {
+        // Like the real logo, a nested clamp replaces the listener of the same name,
+        // so the inner listener is the one that fires at both clamp ends.
+        let listener;
+        activity.logo.setTurtleListener = jest.fn((_, __, fn) => {
+            listener = fn;
+        });
+
+        Singer.RhythmActions.multiplyNoteValue(outer, 0, 1);
+        Singer.RhythmActions.multiplyNoteValue(inner, 0, 2);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1 / (outer * inner));
+
+        listener();
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1 / outer);
+
+        listener();
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+        expect(targetTurtle.singer.beatFactorValues).toEqual([]);
     });
 
     it("preserves beatFactor when multiply factor is zero or invalid", () => {

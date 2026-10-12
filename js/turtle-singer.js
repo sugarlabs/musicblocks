@@ -154,6 +154,7 @@ class Singer {
         this.defaultNoteValue = 4;
         this.register = 0;
         this.beatFactor = 1;
+        this.beatFactorValues = [];
         this.dotCount = 0;
         this.oscList = {};
         this.noteBeat = {};
