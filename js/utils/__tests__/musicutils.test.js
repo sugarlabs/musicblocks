@@ -4507,6 +4507,13 @@ describe("actual drum lookup helpers", () => {
             expect(_parse_pitch_string("C" + DOUBLEFLAT)).toEqual(["C" + DOUBLEFLAT, 4]);
             expect(_parse_pitch_string("C#b")).toEqual(["C", 4]);
         });
+
+        it("should handle pitch strings with leading and trailing whitespace", () => {
+            expect(_parse_pitch_string("  C4  ")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+            expect(_parse_pitch_string("  x  ")).toEqual(["x", 4]);
+        });
     });
 });
 

@@ -274,7 +274,8 @@ var getNumber = (notename, octave, temperament, edo) => {
  * @returns {Array} An array containing [normalizedNoteName, octave].
  */
 function _parse_pitch_string(str) {
-    const match = str.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)?$/u);
+    const trimmed = typeof str === "string" ? str.trim() : str;
+    const match = trimmed.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)?$/u);
     if (match) {
         const baseLetter = match[1].toUpperCase();
         const accidentalStr = match[2];
@@ -313,8 +314,8 @@ function _parse_pitch_string(str) {
 
         return [normalizedName, octave];
     }
-    // Fallback: no octave digit found – normalize accidentals and default octave to 4
-    return [str.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
+    // Fallback: unrecognized format – normalize accidentals and default octave to 4
+    return [trimmed.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
 }
 
 /**
