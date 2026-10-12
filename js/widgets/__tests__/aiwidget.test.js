@@ -18,7 +18,12 @@ const {
     createPitchBlocks,
     searchIndexForMusicBlock,
     getGroqApiKey,
-    setGroqApiKey
+    setGroqApiKey,
+    getGroqModel,
+    setGroqModel,
+    fetchGroqModels,
+    isGenerativeModel,
+    groqErrorMessage
 } = require("../aiwidget");
 
 // Mock globals
@@ -1063,6 +1068,99 @@ describe("AIWidget Instance", () => {
         aiWidget.reconnectSynthsToAnalyser();
         expect(connectBMock).toHaveBeenCalledTimes(1);
         expect(connectAMock).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("Groq model storage and fetch", () => {
+    beforeEach(() => {
+        sessionStorage.clear();
+        global.fetch = jest.fn();
+    });
+
+    afterEach(() => {
+        sessionStorage.clear();
+    });
+
+    it("should return the default model when none is stored", () => {
+        expect(getGroqModel()).toBe("openai/gpt-oss-20b");
+    });
+
+    it("should round-trip the selected model through session storage", () => {
+        expect(setGroqModel("openai/gpt-oss-120b")).toBe(true);
+        expect(getGroqModel()).toBe("openai/gpt-oss-120b");
+    });
+
+    it("should fetch and map the model ids returned by Groq", async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: () =>
+                Promise.resolve({
+                    data: [
+                        { id: "openai/gpt-oss-20b" },
+                        { id: "qwen/qwen3.8-27b" },
+                        { id: "meta-llama/llama-3.2-7b-instruct" },
+                        { id: "whisper-large-v3" },
+                        { id: "canopylabs/orpheus-v1-english" }
+                    ]
+                })
+        });
+
+        const models = await fetchGroqModels("gsk_test");
+        expect(models).toEqual(["openai/gpt-oss-20b", "qwen/qwen3.8-27b"]);
+        expect(global.fetch).toHaveBeenCalledWith("https://api.groq.com/openai/v1/models", {
+            headers: { Authorization: "Bearer gsk_test" }
+        });
+    });
+
+    it("should classify only generative models of 20B and up as usable", () => {
+        expect(isGenerativeModel("openai/gpt-oss-20b")).toBe(true);
+        expect(isGenerativeModel("qwen/qwen3.8-27b")).toBe(true);
+        expect(isGenerativeModel("meta-llama/llama-3.3-70b-versatile")).toBe(true);
+        expect(isGenerativeModel("some/model-without-size")).toBe(true);
+
+        expect(isGenerativeModel("meta-llama/llama-3.2-1b-preview")).toBe(false);
+        expect(isGenerativeModel("meta-llama/llama-3.2-3b-preview")).toBe(false);
+        expect(isGenerativeModel("meta-llama/llama-3.2-7b-instruct")).toBe(false);
+        expect(isGenerativeModel("meta-llama/llama-3.1-8b-instant")).toBe(false);
+        expect(isGenerativeModel("whisper-large-v3")).toBe(false);
+        expect(isGenerativeModel("canopylabs/orpheus-v1-english")).toBe(false);
+        expect(isGenerativeModel("meta-llama/llama-guard-3-8b")).toBe(false);
+    });
+
+    it("should throw when Groq rejects the request", async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 401,
+            statusText: "Unauthorized"
+        });
+
+        await expect(fetchGroqModels("gsk_bad")).rejects.toThrow("401 Unauthorized");
+    });
+
+    it("should attach the HTTP status to the error", async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 401,
+            statusText: "Unauthorized"
+        });
+
+        await expect(fetchGroqModels("gsk_bad")).rejects.toMatchObject({ status: 401 });
+    });
+
+    it("should describe a rejected key without the raw status", () => {
+        const error = new Error("401 Unauthorized");
+        error.status = 401;
+
+        expect(groqErrorMessage(error)).toBe(
+            "Invalid API key. Please check the key and try again."
+        );
+    });
+
+    it("should keep the status for other failures", () => {
+        const error = new Error("503 Service Unavailable");
+        error.status = 503;
+
+        expect(groqErrorMessage(error)).toBe("Could not load models: 503 Service Unavailable");
     });
 });
 

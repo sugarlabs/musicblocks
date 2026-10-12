@@ -89,6 +89,23 @@ class KeyboardController {
             return;
         }
 
+        // When the user is typing in a form field (widget settings inputs, the
+        // AI prompt/sample fields, etc.), let the browser handle the keystroke
+        // natively instead of firing Music Blocks shortcuts such as Ctrl+V
+        // paste-as-block. The paste box's own input is exempt so pasting and
+        // submitting code there still works.
+        const activeElement = document.activeElement;
+        if (
+            activeElement &&
+            activeElement !== activity.paste &&
+            (activeElement.tagName === "INPUT" ||
+                activeElement.tagName === "TEXTAREA" ||
+                activeElement.tagName === "SELECT" ||
+                activeElement.isContentEditable)
+        ) {
+            return;
+        }
+
         // First, check if the pitch slider is open
         if (this._isWidgetOpen("slider")) {
             // If the event is an arrow key, let the PitchSlider handle it
