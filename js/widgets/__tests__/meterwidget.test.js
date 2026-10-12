@@ -544,6 +544,127 @@ describe("Meter Widget", () => {
         jest.useRealTimers();
     });
 
+    describe("Drum Playback and Beat Distinction", () => {
+        test("plays snare drum for strong beat and kick drum for weak beat", () => {
+            meterWidget._playing = true;
+            meterWidget._strongBeats = [true, false];
+
+            meterWidget.__playOneBeat(0, 500);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "snare drum",
+                null,
+                null
+            );
+
+            mockActivity.logo.synth.trigger.mockClear();
+
+            meterWidget.__playOneBeat(1, 500);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "kick drum",
+                null,
+                null
+            );
+
+            const widgetWindow = window.widgetWindows.windowFor();
+            widgetWindow.onclose();
+            expect(meterWidget._playing).toBe(false);
+            expect(meterWidget._playBeatTimeout).toBeNull();
+        });
+    });
+
+    describe("Block Export with _save()", () => {
+        test("generates onbeatdo block stack and calls loadNewBlocks", () => {
+            meterWidget._strongBeats = [true, false, true, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith(expect.any(Array));
+            const generatedStack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(generatedStack.length).toBe(6);
+            expect(generatedStack).toEqual([
+                [0, "onbeatdo", 100, 100, [null, 1, 2, 3]],
+                [1, ["number", { value: 1 }], 0, 0, [0]],
+                [2, ["text", { value: "action" }], 0, 0, [0]],
+                [3, "onbeatdo", 0, 0, [0, 4, 5, null]],
+                [4, ["number", { value: 3 }], 0, 0, [3]],
+                [5, ["text", { value: "action" }], 0, 0, [3]]
+            ]);
+        });
+
+        test("exports single onbeatdo block stack when only one beat is strong", () => {
+            meterWidget._strongBeats = [true, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith([
+                [0, "onbeatdo", 100, 100, [null, 1, 2, null]],
+                [1, ["number", { value: 1 }], 0, 0, [0]],
+                [2, ["text", { value: "action" }], 0, 0, [0]]
+            ]);
+        });
+
+        test("exports empty stack when no beats are strong", () => {
+            meterWidget._strongBeats = [false, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith([]);
+        });
+    });
+
+    describe("Scaling and Timeout Helpers", () => {
+        test("scales SVG element when window is maximized", () => {
+            const mockSvg = {
+                style: {},
+                setAttribute: jest.fn()
+            };
+            const mockFrame = { offsetHeight: 600 };
+            const mockDrag = { offsetHeight: 100 };
+
+            meterWidget.getWidgetFrame = jest.fn().mockReturnValue(mockFrame);
+            meterWidget.getDragElement = jest.fn().mockReturnValue(mockDrag);
+            meterWidget.getWidgetBody = jest.fn().mockReturnValue({
+                getElementsByTagName: jest.fn().mockReturnValue([mockSvg])
+            });
+            meterWidget.isMaximized = jest.fn().mockReturnValue(true);
+
+            meterWidget._scale();
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", "500px");
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", "500px");
+        });
+
+        test("clears and sets widget timeout correctly", () => {
+            jest.useFakeTimers();
+            try {
+                const callback1 = jest.fn();
+                const timerId1 = meterWidget._setWidgetTimeout(callback1, 100);
+
+                expect(timerId1).toBeDefined();
+                expect(callback1).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(99);
+                expect(callback1).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(1);
+                expect(callback1).toHaveBeenCalledTimes(1);
+
+                const callback2 = jest.fn();
+                const timerId2 = meterWidget._setWidgetTimeout(callback2, 100);
+
+                expect(meterWidget._clearWidgetTimeout(timerId2)).toBe(true);
+                jest.advanceTimersByTime(100);
+                expect(callback2).not.toHaveBeenCalled();
+
+                expect(meterWidget._clearWidgetTimeout(null)).toBe(false);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+    });
+
     test("creates inputs with distinct IDs and accessible labels", () => {
         const widgetWindow = window.widgetWindows.windowFor();
         const toolbarCalls = widgetWindow._toolbar.appendChild.mock.calls;
