@@ -292,10 +292,38 @@ describe("setupHeapBlocks", () => {
             expect(result).toEqual(20);
         });
 
-        it("should treat -1 as the top of the heap", () => {
+        it("should floor fractional index", () => {
+            logo.parseArg.mockReturnValue(2.5);
+            const result = indexHeapBlock.arg(logo, 0, blk, 2.5);
+            expect(result).toEqual(20);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should treat negative indices down to -heap_length as counting from the end", () => {
+            logo.parseArg.mockReturnValue(-1);
+            expect(indexHeapBlock.arg(logo, 0, blk, -1)).toEqual(30);
+
+            logo.parseArg.mockReturnValue(-2);
+            expect(indexHeapBlock.arg(logo, 0, blk, -2)).toEqual(20);
+
+            logo.parseArg.mockReturnValue(-3);
+            expect(indexHeapBlock.arg(logo, 0, blk, -3)).toEqual(10);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should report empty heap and return 0 on empty heap with negative index", () => {
+            setTurtleHeap(0, []);
             logo.parseArg.mockReturnValue(-1);
             const result = indexHeapBlock.arg(logo, 0, blk, -1);
-            expect(result).toEqual(30);
+            expect(activity.errorMsg).toHaveBeenCalledWith("empty heap");
+            expect(result).toEqual(0);
+        });
+
+        it("should adjust index < -heap_length and call errorMsg", () => {
+            logo.parseArg.mockReturnValue(-4);
+            const result = indexHeapBlock.arg(logo, 0, blk, -4);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Index must be > 0.");
+            expect(result).toEqual(10);
         });
 
         it("should adjust index < 1 and call errorMsg", () => {
@@ -343,6 +371,24 @@ describe("setupHeapBlocks", () => {
         it("should allow string values", () => {
             setHeapEntryBlock.flow([2, "test"], logo, 0, blk);
             expect(logo.turtleHeaps[0][1]).toEqual("test");
+        });
+
+        it("should set value with negative indices down to -heap_length", () => {
+            setHeapEntryBlock.flow([-1, 99], logo, 0, blk);
+            expect(logo.turtleHeaps[0]).toEqual([1, 2, 99]);
+
+            setHeapEntryBlock.flow([-2, 88], logo, 0, blk);
+            expect(logo.turtleHeaps[0]).toEqual([1, 88, 99]);
+
+            setHeapEntryBlock.flow([-3, 77], logo, 0, blk);
+            expect(logo.turtleHeaps[0]).toEqual([77, 88, 99]);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should adjust negative index < -heap_length and set index 1", () => {
+            setHeapEntryBlock.flow([-4, 55], logo, 0, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Index must be > 0.");
+            expect(logo.turtleHeaps[0][0]).toEqual(55);
         });
 
         it("should adjust index < 1 and set the value at index 1", () => {

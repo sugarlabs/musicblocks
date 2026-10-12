@@ -1,0 +1,256 @@
+name: Coverage delta
+
+# Compares Jest statement/branch/function/line coverage between the PR and
+# the base branch. The job fails (and prints a clear report) when any metric
+# regresses by more than THRESHOLD percentage points (default: 0.1 pp).
+# Never runs on Renovate bot PRs.
+#
+# Three-job design for isolation:
+#   measure-base  -- checks out base.sha; uploads base summary as an artifact
+#   measure-pr    -- checks out the default merge commit (PR head merged with
+#                    current base); uploads PR summary as an artifact
+#   compare       -- downloads both artifacts; compares the four metrics
+#
+# Using the merge commit for measure-pr (no explicit ref) ensures the
+# comparison is "base" vs "base + PR changes" rather than "master tip" vs
+# "PR head (which may be many commits behind master)".
+#
+# Because each job gets its own runner, PR code (npm ci / jest in measure-pr)
+# is never co-located with the base summary file, and lifecycle scripts in the
+# PR cannot overwrite it.
+
+on:
+    pull_request:
+        branches: [master]
+
+concurrency:
+    group: coverage-delta-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    # ── Job 1: measure coverage on the BASE branch ────────────────────────────
+    measure-base:
+        name: Coverage – base branch
+        runs-on: ubuntu-latest
+        if: github.actor != 'renovate[bot]'
+        timeout-minutes: 30
+        steps:
+            - name: Checkout base branch
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.base.sha }}
+                  persist-credentials: false
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
+              shell: bash
+
+            - name: Run Jest with coverage
+              run: |
+                  npx jest --coverage --coverageReporters=json-summary --ci \
+                      --passWithNoTests
+              shell: bash
+
+            - name: Upload base coverage summary
+              uses: actions/upload-artifact@v4
+              with:
+                  name: base-coverage-summary
+                  path: coverage/coverage-summary.json
+                  retention-days: 1
+
+    # ── Job 2: measure coverage on the PR merge commit ────────────────────────
+    measure-pr:
+        name: Coverage – PR merge commit
+        runs-on: ubuntu-latest
+        if: github.actor != 'renovate[bot]'
+        timeout-minutes: 30
+        steps:
+            - name: Checkout PR merge commit
+              uses: actions/checkout@v4
+              with:
+                  # No explicit ref: Actions checks out refs/pull/<N>/merge,
+                  # the synthetic merge commit of the PR head with the current
+                  # base. This ensures we measure exactly the PR's contribution
+                  # on top of the same base, regardless of how far behind
+                  # master the PR branch is.
+                  persist-credentials: false
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
+              shell: bash
+
+            - name: Run Jest with coverage
+              run: |
+                  npx jest --coverage --coverageReporters=json-summary --ci \
+                      --passWithNoTests
+              shell: bash
+
+            - name: Upload PR coverage summary
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pr-coverage-summary
+                  path: coverage/coverage-summary.json
+                  retention-days: 1
+
+    # ── Job 3: compare the two summaries ─────────────────────────────────────
+    compare:
+        name: Coverage delta vs base
+        runs-on: ubuntu-latest
+        needs: [measure-base, measure-pr]
+        # always() ensures this job runs even when upstream jobs fail or are
+        # skipped, so we can fail the check explicitly rather than leaving it
+        # in a skipped state (a skipped required check can satisfy branch
+        # protection, silently hiding measurement failures).
+        if: always() && github.actor != 'renovate[bot]'
+        timeout-minutes: 5
+        steps:
+            - name: Fail if measurement jobs did not succeed
+              if: |
+                  needs.measure-base.result != 'success' ||
+                  needs.measure-pr.result != 'success'
+              run: |
+                  echo "measure-base result: ${{ needs.measure-base.result }}"
+                  echo "measure-pr  result: ${{ needs.measure-pr.result }}"
+                  echo ""
+                  echo "One or both measurement jobs did not succeed."
+                  echo "Coverage comparison cannot be performed."
+                  exit 1
+              shell: bash
+
+            - name: Download base coverage summary
+              uses: actions/download-artifact@v4
+              with:
+                  name: base-coverage-summary
+                  path: base
+
+            - name: Download PR coverage summary
+              uses: actions/download-artifact@v4
+              with:
+                  name: pr-coverage-summary
+                  path: pr
+
+            - name: Compare coverage metrics
+              run: |
+                  node - <<'EOF'
+                  const fs = require("fs");
+
+                  const base = JSON.parse(fs.readFileSync("base/coverage-summary.json")).total;
+                  const pr   = JSON.parse(fs.readFileSync("pr/coverage-summary.json")).total;
+
+                  // Threshold: 0.1 percentage point.
+                  //
+                  // We work in integer hundredths of a pp (10 = 0.10 pp) for the
+                  // regression gate. This avoids two distinct correctness bugs:
+                  //
+                  // 1. Floating-point boundary error: 79.17 - 79.07 in IEEE 754
+                  //    yields -0.09999999999999432, which is < -0.1 and would
+                  //    incorrectly FAIL a PR whose drop is exactly on the boundary.
+                  //    Comparing Math.round(delta * 100) against an integer threshold
+                  //    eliminates this class of error entirely.
+                  //
+                  // 2. Istanbul pct rounding masking real drops: Istanbul truncates
+                  //    pct to two decimal places. A drop from 18,003 to 18,002
+                  //    covered out of 20,000 items leaves both values displaying as
+                  //    90.01, so pct subtraction shows 0.00 and misses the real drop.
+                  //    Using covered/total cross-multiplication (pure integer math)
+                  //    catches every covered-item loss, no matter how small.
+                  const THRESHOLD_PP  = 0.1;
+                  const THRESHOLD_INT = Math.round(THRESHOLD_PP * 100); // 10 hundredths
+
+                  const metrics = ["statements", "branches", "functions", "lines"];
+                  let failed = false;
+
+                  console.log("\nCoverage delta report (threshold: -" + THRESHOLD_PP + " pp)");
+                  console.log("-".repeat(66));
+                  console.log(
+                      "Metric".padEnd(14),
+                      "Base %".padStart(8),
+                      "PR %".padStart(8),
+                      "Delta".padStart(8),
+                      "Status".padStart(18)
+                  );
+                  console.log("-".repeat(66));
+
+                  for (const m of metrics) {
+                      const baseTotal   = base[m].total;
+                      const baseCovered = base[m].covered;
+                      const prTotal     = pr[m].total;
+                      const prCovered   = pr[m].covered;
+
+                      // pct is used only for human-readable display.
+                      const basePct = base[m].pct;
+                      const prPct   = pr[m].pct;
+
+                      // Guard: if there are no coverable items, skip the gate.
+                      if (baseTotal === 0 || prTotal === 0) {
+                          console.log(
+                              m.padEnd(14),
+                              String(basePct).padStart(8),
+                              String(prPct).padStart(8),
+                              "+0.00%".padStart(8),
+                              "N/A (empty)".padStart(18)
+                          );
+                          continue;
+                      }
+
+                      // Compute the delta in integer hundredths of a percentage
+                      // point using cross-multiplication to stay in integer math:
+                      //   delta_int = round((prCovered/prTotal - baseCovered/baseTotal) * 10000)
+                      //             = round((prCovered * baseTotal - baseCovered * prTotal)
+                      //                     * 10000 / (prTotal * baseTotal))
+                      const numerator   = (prCovered * baseTotal - baseCovered * prTotal) * 10000;
+                      const denominator = prTotal * baseTotal;
+                      const deltaInt    = Math.round(numerator / denominator);
+
+                      // Display delta computed from pct (already rounded by Istanbul).
+                      const deltaPct = prPct - basePct;
+                      const deltaStr = (deltaPct >= 0 ? "+" : "") + deltaPct.toFixed(2) + "%";
+
+                      // A drop is a FAIL only when it exceeds THRESHOLD_INT hundredths.
+                      // An exact boundary drop (deltaInt === -THRESHOLD_INT) is WARN.
+                      const regressed = deltaInt < -THRESHOLD_INT;
+                      const status    = regressed
+                          ? "FAIL (> -" + THRESHOLD_PP + " pp)"
+                          : (deltaInt < 0 ? "WARN (minor drop)" : "OK");
+
+                      console.log(
+                          m.padEnd(14),
+                          String(basePct).padStart(8),
+                          String(prPct).padStart(8),
+                          deltaStr.padStart(8),
+                          status.padStart(18)
+                      );
+
+                      if (regressed) failed = true;
+                  }
+
+                  console.log("-".repeat(66));
+
+                  if (failed) {
+                      console.error(
+                          "\nOne or more coverage metrics dropped by more than " +
+                          THRESHOLD_PP + " pp compared to the base branch." +
+                          "\nPlease add tests to cover the new code, or adjust the PR so" +
+                          "\ncoverage does not regress."
+                      );
+                      process.exit(1);
+                  }
+
+                  console.log("\nAll coverage metrics are within the allowed threshold.");
+                  EOF
+              shell: bash

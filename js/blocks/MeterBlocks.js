@@ -31,6 +31,16 @@ function setupMeterBlocks(activity) {
         Number.isFinite(bpm) ? bpm : activity.blocks.blockList[bpmBlock].text.text;
 
     /**
+     * The beat value a set BPM block gives the Tempo widget, so the widget can convert its BPM
+     * to quarter notes like running the block does: the evaluated argument, or 1/4 when it isn't
+     * a positive number.
+     * @param {*} beatValue - The block's evaluated beat value argument.
+     * @returns {number}
+     */
+    const _tempoWidgetBeatValue = beatValue =>
+        Number.isFinite(beatValue) && beatValue > 0 ? beatValue : 0.25;
+
+    /**
      * Represents a block that provides the current musical meter (time signature).
      * @class
      * @extends ValueBlock
@@ -1033,6 +1043,7 @@ function setupMeterBlocks(activity) {
                 logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
                 logo.tempo.BPMs.push(_tempoWidgetBPM(args[0], bpmnumberblock));
+                logo.tempo.beatValues.push(_tempoWidgetBeatValue(args[1]));
             }
         }
     }
@@ -1101,6 +1112,8 @@ function setupMeterBlocks(activity) {
                         bpmnumberblock
                     )
                 );
+                // This block has no beat value: its BPM is in quarter notes.
+                logo.tempo.beatValues.push(0.25);
             }
         }
     }
@@ -1177,6 +1190,7 @@ function setupMeterBlocks(activity) {
                 logo.tempo.BPMTurtles.push(activity.turtles.ithTurtle(turtle));
                 logo.tempo.BPMBlocks.push(blk);
                 logo.tempo.BPMs.push(_tempoWidgetBPM(args[0], bpmnumberblock));
+                logo.tempo.beatValues.push(_tempoWidgetBeatValue(args[1]));
             }
         }
     }

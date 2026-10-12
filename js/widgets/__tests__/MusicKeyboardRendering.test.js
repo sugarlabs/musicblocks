@@ -182,6 +182,7 @@ describe("MusicKeyboardRendering", () => {
             keyboard.layout = displayLayout.map(note => ({ ...note }));
             keyboard._cacheDocumentKeyHandlers = jest.fn();
             keyboard.loadHandler = jest.fn();
+            keyboard.loadRestHandler = jest.fn();
             keyboard.addKeyboardShortcuts = jest.fn();
             keyboard._createKeyboard();
             return keyboard;
@@ -210,6 +211,12 @@ describe("MusicKeyboardRendering", () => {
 
             const whiteKeys = docById("myrow").cells;
             expect(whiteKeys[whiteKeys.length - 1].textContent).toBe("(rest)");
+        });
+
+        test("makes the rest key clickable", () => {
+            const keyboard = drawKeyboard([{ noteName: "hertz", noteOctave: 440, blockNumber: 6 }]);
+
+            expect(keyboard.loadRestHandler).toHaveBeenCalledWith(docById("rest"));
         });
 
         test("writes key labels as text, not markup", () => {

@@ -294,6 +294,27 @@ describe("setupDrumActions", () => {
         });
     });
 
+    describe("mapPitchToDrum with a drum played from a URL", () => {
+        beforeEach(() => {
+            targetTurtle.singer.drumStyle = [];
+        });
+
+        it("keeps the URL, like Play Drum does", () => {
+            const url = "https://example.com/clap.wav";
+            Singer.DrumActions.mapPitchToDrum(url, 0, 1);
+
+            expect(targetTurtle.singer.drumStyle).toEqual([url]);
+            expect(Singer.DrumActions.GetDrumname(url)).toBe(url);
+        });
+
+        it("still uses the default drum for a name that is not a drum or a URL", () => {
+            Singer.DrumActions.mapPitchToDrum("clap.wav", 0, 1);
+            Singer.DrumActions.mapPitchToDrum(42, 0, 1);
+
+            expect(targetTurtle.singer.drumStyle).toEqual(["defaultDrum", "defaultDrum"]);
+        });
+    });
+
     describe("setDrum: pitchDrumTable scoping (issue #8199)", () => {
         beforeEach(() => {
             targetTurtle.singer.drumStyle = [];

@@ -576,9 +576,11 @@ class PhraseMaker {
      * Initializes the PhraseMaker matrix widget.
      * This method sets up the PhraseMaker matrix in the DOM (Document Object Model) and initializes its functionality.
      * @param {Activity} activity - The activity instance associated with the PhraseMaker widget.
-     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
+     * @param {number} [turtleIndex] - Index of the turtle that triggered this widget. Left out
+     * when the widget rebuilds itself (sort, add row, ...), which keeps the turtle it has; turtle
+     * 0 if it has none.
      */
-    init(activity, turtleIndex = 0) {
+    init(activity, turtleIndex) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
         let tempTable;
@@ -588,7 +590,13 @@ class PhraseMaker {
 
         // Read the meter from the turtle that triggered this widget so that
         // bar-line separators reflect the correct time signature.
-        const turtle = activity.turtles.ithTurtle(turtleIndex);
+        // Graphics rows draw with this turtle when played. Not turtle 0: after a project is
+        // loaded, turtle 0 is a hidden turtle of the old project.
+        const turtle =
+            turtleIndex === undefined && this._turtle
+                ? this._turtle
+                : activity.turtles.ithTurtle(turtleIndex === undefined ? 0 : turtleIndex);
+        this._turtle = turtle;
         const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
         const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4;
 

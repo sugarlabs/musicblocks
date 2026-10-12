@@ -1018,6 +1018,31 @@ describe("Oscilloscope", () => {
             expect(ctx.fillRect).not.toHaveBeenCalled();
         });
 
+        test("captures waveform from analyser when frozen and no cached waveform exists", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+            const analyserValues = new Float32Array([0.25, -0.5, 0.75, -1]);
+            const mockAnalyser = {
+                getValue: jest.fn(() => analyserValues)
+            };
+            osc.pitchAnalysers[0] = mockAnalyser;
+
+            osc._renderFrame();
+
+            expect(mockAnalyser.getValue).toHaveBeenCalled();
+            expect(osc._frozenWaveforms[0]).toEqual(analyserValues);
+            expect(ctx.fillRect).toHaveBeenCalled();
+            expect(ctx.stroke).toHaveBeenCalled();
+        });
+
         test("draws using cached waveform when frozen", () => {
             const osc = createOscilloscope();
             osc.isFrozen = true;
