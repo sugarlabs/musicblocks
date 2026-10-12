@@ -158,6 +158,33 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.lastNotePlayed[0]).toBe("G4");
         });
 
+        test("in the Pitch-Drum Matrix, steps from the row before instead of G4", () => {
+            activity.logo.inPitchDrumMatrix = true;
+            turtle.singer.inNoteBlock = [];
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            Singer.addScalarTransposition.mockClear();
+            try {
+                Singer.PitchActions.stepPitch(1, 0, blkId);
+                expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                    activity.logo,
+                    0,
+                    "C",
+                    4,
+                    1
+                );
+            } finally {
+                activity.logo.inPitchDrumMatrix = false;
+            }
+        });
+
+        test("outside a widget or note, still starts from G4", () => {
+            turtle.singer.inNoteBlock = [];
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            Singer.addScalarTransposition.mockClear();
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "G", 4, 1);
+        });
+
         test("inverted path", () => {
             turtle.singer.lastNotePlayed = ["A4", 4];
             turtle.singer.invertList = [["C", 4, "even"]];
@@ -433,6 +460,23 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.playPitchNumber(10, 0, blkId);
             expect(spy.mock.calls[0][0]).toBe(15); // 10 + 5
             spy.mockRestore();
+        });
+    });
+
+    describe("playHertz NaN/Infinity guards", () => {
+        it("should return early without processing if hertz is NaN or Infinity", () => {
+            const processPitchSpy = jest.spyOn(Singer, "processPitch");
+
+            Singer.PitchActions.playHertz(NaN, 0, blkId);
+            expect(processPitchSpy).not.toHaveBeenCalled();
+
+            Singer.PitchActions.playHertz(Infinity, 0, blkId);
+            expect(processPitchSpy).not.toHaveBeenCalled();
+
+            Singer.PitchActions.playHertz(-Infinity, 0, blkId);
+            expect(processPitchSpy).not.toHaveBeenCalled();
+
+            processPitchSpy.mockRestore();
         });
     });
 

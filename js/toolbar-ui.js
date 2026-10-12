@@ -122,7 +122,6 @@ class ToolbarUI {
     init(activity) {
         this.activity = activity;
         let strings;
-        let strings_;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             strings = [
                 ["mb-logo", _("About Music Blocks")],
@@ -137,12 +136,15 @@ class ToolbarUI {
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
                 ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["planetIcon", _("Git Planet")],
+                ["planetIconDisabled", _("Offline. Git Planet is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
-                ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["helpGuideItem", _("Help"), true],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
+                ["practiceLessonsItem", _("Practice levels"), true],
+                ["explorerJournalItem", _("Explorer Journal"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -161,102 +163,44 @@ class ToolbarUI {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-midi", _("Save project as MIDI"), "innerHTML"],
-                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-wav", _("Save music as WAV"), "innerHTML"],
-                ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
-                ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
-                ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", "English (United States)", "innerHTML"],
-                ["enUK", "English (United Kingdom)", "innerHTML"],
-                ["ja", "日本語", "innerHTML"],
-                ["ko", "한국인", "innerHTML"],
-                ["es", "español", "innerHTML"],
-                ["fr", "français", "innerHTML"],
-                ["de", "Deutsch", "innerHTML"],
-                ["it", "italiana", "innerHTML"],
-                ["pt", "português", "innerHTML"],
-                ["kana", "にほんご", "innerHTML"],
-                ["zhCN", "中文", "innerHTML"],
-                ["th", "ภาษาไทย", "innerHTML"],
-                ["tr", "Türkçe", "innerHTML"],
-                ["ayc", "aymara", "innerHTML"],
-                ["quz", "quechua", "innerHTML"],
-                ["gug", "guarani", "innerHTML"],
-                ["hi", "हिंदी", "innerHTML"],
-                ["ta", "தமிழ்", "innerHTML"],
-                ["ibo", "igbo", "innerHTML"],
-                ["ar", "عربى", "innerHTML"],
-                ["te", "తెలుగు", "innerHTML"],
-                ["bn", "বাংলা", "innerHTML"],
-                ["he", "עִברִית", "innerHTML"],
-                ["ur", "اردو", "innerHTML"]
-            ];
-
-            // Workaround for FF
-            strings_ = [
-                _("About Music Blocks"),
-                _("Play"),
-                _("Stop"),
-                _("Record"),
-                _("Record options"),
-                _("Enter Fullscreen"),
-                _("Enter Fullscreen"),
-                _("Toggle Fullscreen"),
-                _("New project"),
-                _("Load project from file"),
-                _("Save project"),
-                _("Save project"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
-                _("Auxiliary menu"),
-                _("Help and shortcuts"),
-                _("Help"),
-                _("Keyboard shortcuts"),
-                _("Run slowly"),
-                _("Run step by step"),
-                _("Display statistics"),
-                _("Load plugin"),
-                _("Delete plugin"),
-                _("Enable horizontal scrolling"),
-                _("Disable horizontal scrolling"),
-                _("Change theme"),
-                _("Light Mode"),
-                _("Dark Mode"),
-                _("High-contrast Mode"),
-                _("Merge with current project"),
-                _("Set Pitch Preview"),
-                _("JavaScript Editor"),
-                _("Restore"),
-                _("Switch to beginner mode"),
-                _("Switch to advanced mode"),
-                _("Select language"),
-                _("Save project as HTML"),
-                _("Save project as MIDI"),
-                _("Save mouse artwork as SVG"),
-                _("Save mouse artwork as PNG"),
-                _("Save music as WAV"),
-                _("Save sheet music as ABC"),
-                _("Save sheet music as Lilypond"),
-                _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"),
-                _("Confirm"),
-                _("Select language"),
-                _("Save project as HTML"),
-                _("Save turtle artwork as PNG"),
-                _("Save project as HTML"),
-                _("Save turtle artwork as SVG"),
-                _("Save turtle artwork as PNG"),
-                _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"),
-                _("Confirm")
+                ["save-html-beg", _("Save project as HTML"), true],
+                ["save-png-beg", _("Save mouse artwork as PNG"), true],
+                ["save-html", _("Save project as HTML"), true],
+                ["save-midi", _("Save project as MIDI"), true],
+                ["save-svg", _("Save mouse artwork as SVG"), true],
+                ["save-png", _("Save mouse artwork as PNG"), true],
+                ["save-wav", _("Save music as WAV"), true],
+                ["save-abc", _("Save sheet music as ABC"), true],
+                ["save-ly", _("Save sheet music as Lilypond"), true],
+                ["save-mxml", _("Save sheet music as MusicXML"), true],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["new-project", _("Confirm"), true],
+                ["enUS", "English (United States)", true],
+                ["enUK", "English (United Kingdom)", true],
+                ["ja", "日本語", true],
+                ["ko", "한국인", true],
+                ["es", "español", true],
+                ["fr", "français", true],
+                ["de", "Deutsch", true],
+                ["it", "italiana", true],
+                ["pt", "português", true],
+                ["kana", "にほんご", true],
+                ["zhCN", "中文", true],
+                ["th", "ภาษาไทย", true],
+                ["tr", "Türkçe", true],
+                ["az", "azərbaycanca", true],
+                ["ayc", "aymara", true],
+                ["quz", "quechua", true],
+                ["gug", "guarani", true],
+                ["hi", "हिंदी", true],
+                ["ta", "தமிழ்", true],
+                ["ibo", "igbo", true],
+                ["ar", "عربى", true],
+                ["te", "తెలుగు", true],
+                ["bn", "বাংলা", true],
+                ["he", "עִברִית", true],
+                ["ur", "اردو", true]
             ];
         } else {
             strings = [
@@ -272,12 +216,15 @@ class ToolbarUI {
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
                 ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["planetIcon", _("Git Planet")],
+                ["planetIconDisabled", _("Offline. Git Planet is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
-                ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["helpGuideItem", _("Help"), true],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
+                ["practiceLessonsItem", _("Practice levels"), true],
+                ["explorerJournalItem", _("Explorer Journal"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -295,85 +242,42 @@ class ToolbarUI {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save turtle artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-svg", _("Save turtle artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", "English (United States)", "innerHTML"],
-                ["enUK", "English (United Kingdom)", "innerHTML"],
-                ["ja", "日本語", "innerHTML"],
-                ["ko", "한국인", "innerHTML"],
-                ["es", "español", "innerHTML"],
-                ["fr", "français", "innerHTML"],
-                ["de", "Deutsch", "innerHTML"],
-                ["it", "italiana", "innerHTML"],
-                ["pt", "português", "innerHTML"],
-                ["kana", "にほんご", "innerHTML"],
-                ["zhCN", "中文", "innerHTML"],
-                ["th", "ภาษาไทย", "innerHTML"],
-                ["tr", "Türkçe", "innerHTML"],
-                ["ayc", "aymara", "innerHTML"],
-                ["quz", "quechua", "innerHTML"],
-                ["gug", "guarani", "innerHTML"],
-                ["hi", "हिंदी", "innerHTML"],
-                ["ta", "தமிழ்", "innerHTML"],
-                ["ibo", "igbo", "innerHTML"],
-                ["ar", "عربى", "innerHTML"],
-                ["te", "తెలుగు", "innerHTML"],
-                ["bn", "বাংলা", "innerHTML"],
-                ["he", "עִברִית", "innerHTML"],
-                ["ur", "اردو", "innerHTML"]
-            ];
-
-            // Workaround for FF
-            strings_ = [
-                _("About Turtle Blocks"),
-                _("Play"),
-                _("Stop"),
-                _("Record"),
-                _("Record options"),
-                _("Enter Fullscreen"),
-                _("Enter Fullscreen"),
-                _("Toggle Fullscreen"),
-                _("New project"),
-                _("Load project from file"),
-                _("Save project"),
-                _("Save project as HTML"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
-                _("Auxiliary menu"),
-                _("Help and shortcuts"),
-                _("Help"),
-                _("Keyboard shortcuts"),
-                _("Run slowly"),
-                _("Run step by step"),
-                _("Display statistics"),
-                _("Load plugin"),
-                _("Delete plugin"),
-                _("Enable horizontal scrolling"),
-                _("Disable horizontal scrolling"),
-                _("Change theme"),
-                _("Light Mode"),
-                _("Dark Mode"),
-                _("High-contrast Mode"),
-                _("Merge with current project"),
-                _("JavaScript Editor"),
-                _("Restore"),
-                _("Switch to beginner mode"),
-                _("Switch to advanced mode"),
-                _("Select language"),
-                _("Save project as HTML"),
-                _("Save turtle artwork as PNG"),
-                _("Save project as HTML"),
-                _("Save turtle artwork as SVG"),
-                _("Save turtle artwork as PNG"),
-                _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"),
-                _("Confirm")
+                ["save-html-beg", _("Save project as HTML"), true],
+                ["save-png-beg", _("Save turtle artwork as PNG"), true],
+                ["save-html", _("Save project as HTML"), true],
+                ["save-svg", _("Save turtle artwork as SVG"), true],
+                ["save-png", _("Save turtle artwork as PNG"), true],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["git-create", _("Track my project"), true],
+                ["git-commit", _("Mark this moment"), true],
+                ["git-history", _("Time travel"), true],
+                ["new-project", _("Confirm"), true],
+                ["enUS", "English (United States)", true],
+                ["enUK", "English (United Kingdom)", true],
+                ["ja", "日本語", true],
+                ["ko", "한국인", true],
+                ["es", "español", true],
+                ["fr", "français", true],
+                ["de", "Deutsch", true],
+                ["it", "italiana", true],
+                ["pt", "português", true],
+                ["kana", "にほんご", true],
+                ["zhCN", "中文", true],
+                ["th", "ภาษาไทย", true],
+                ["tr", "Türkçe", true],
+                ["az", "azərbaycanca", true],
+                ["ayc", "aymara", true],
+                ["quz", "quechua", true],
+                ["gug", "guarani", true],
+                ["hi", "हिंदी", true],
+                ["ta", "தமிழ்", true],
+                ["ibo", "igbo", true],
+                ["ar", "عربى", true],
+                ["te", "తెలుగు", true],
+                ["bn", "বাংলা", true],
+                ["he", "עִברִית", true],
+                ["ur", "اردو", true]
             ];
         }
 
@@ -381,18 +285,26 @@ class ToolbarUI {
         const advancedMode = docById("advancedMode");
         if (this.activity.beginnerMode) {
             // || mode === "null") {
-            advancedMode.style.display = "block";
-            beginnerMode.style.display = "none";
+            if (advancedMode) {
+                advancedMode.style.display = "block";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "none";
+            }
         } else {
-            advancedMode.style.display = "none";
-            beginnerMode.style.display = "block";
+            if (advancedMode) {
+                advancedMode.style.display = "none";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "block";
+            }
         }
 
         for (let i = 0; i < strings.length; i++) {
             const obj = strings[i];
-            const trans = strings_[i];
+            const trans = obj[1];
             const elem = docById(obj[0]);
-            if (strings[i].length === 3) {
+            if (strings[i][2]) {
                 if (elem !== undefined && elem !== null) {
                     elem.textContent = obj[1];
                 }
@@ -416,17 +328,10 @@ class ToolbarUI {
             });
         }
 
-        // Hide the tooltip node directly. Materialize has no "close" command:
-        // it recognises only "remove", and anything else falls through to a
-        // full re-initialisation that rebuilds the tooltip with the plugin
-        // defaults, discarding the delay set just above. Setting visibility is
-        // what Materialize's own mouseleave handler does, and it leaves the
-        // element's configuration and its cached tooltip node untouched.
+        // Materialize has no "close" command. Its mouseleave handler cancels
+        // a pending show and hides an active tooltip without resetting options.
         $j(".tooltipped").on("click", function () {
-            const tooltipId = this.getAttribute("data-tooltip-id");
-            if (tooltipId) {
-                $j("#" + tooltipId).css("visibility", "hidden");
-            }
+            $j(this).trigger("mouseleave.tooltip");
         });
 
         const restoreWidgetFocus = () => {
@@ -844,6 +749,7 @@ class ToolbarUI {
             };
         });
 
+        updateThemeOptions();
         icon.onclick = updateThemeOptions;
     }
 
@@ -1095,7 +1001,12 @@ class ToolbarUI {
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
         const RecordDropdownArrow = docById("recordDropdownArrow");
-        const browser = fnBrowserDetect();
+        const browser =
+            typeof fnBrowserDetect === "function"
+                ? fnBrowserDetect()
+                : typeof window !== "undefined" && typeof window.fnBrowserDetect === "function"
+                  ? window.fnBrowserDetect()
+                  : "unknown";
         const hideIn = ["firefox", "safari"];
 
         this._cleanupRecordDropdownListeners();
@@ -1261,8 +1172,10 @@ class ToolbarUI {
      */
     renderMenuIcon(onclick) {
         const menuIcon = docById("menu");
+        const toggleAuxBtn = docById("toggleAuxBtn");
         const auxToolbar = docById("aux-toolbar");
-        menuIcon.onclick = () => {
+
+        toggleAuxBtn.onclick = () => {
             const searchBar = docById("search");
             searchBar.classList.toggle("open");
             if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
@@ -1309,7 +1222,13 @@ class ToolbarUI {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const practiceLessonsItem = docById("practiceLessonsItem");
+        const explorerJournalItem = docById("explorerJournalItem");
+        const hasDropdownMenu =
+            !!helpGuideItem ||
+            !!shortcutsGuideItem ||
+            !!practiceLessonsItem ||
+            !!explorerJournalItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1330,6 +1249,41 @@ class ToolbarUI {
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
                 }
+            };
+        }
+
+        if (practiceLessonsItem) {
+            practiceLessonsItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.startPracticeMode === "function") {
+                    window.startPracticeMode();
+                }
+            };
+        }
+
+        if (explorerJournalItem) {
+            explorerJournalItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.openExplorerJournal === "function") {
+                    window.openExplorerJournal();
+                }
+            };
+        }
+
+        const gitTutorialItem = docById("gitTutorialItem");
+        if (gitTutorialItem && typeof GitTutorial !== "undefined") {
+            gitTutorialItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                GitTutorial.open(this.activity);
             };
         }
 
@@ -1708,6 +1662,7 @@ class ToolbarUI {
             "te",
             "ibo",
             "tr",
+            "az",
             "ar",
             "bn",
             "ur",
@@ -1840,17 +1795,16 @@ class ToolbarUI {
         const getNavigableButtons = () => {
             // Main toolbar button selectors
             const mainSelectors =
-                "#play, #stop, #record, #recordDropdownArrow, #FullScreen, #newFile, #load, " +
-                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon, " +
-                "#installButton";
+                "#play, #stop, #record, #recordDropdownArrow, #gitProjectBtn, #newFile, #load, " +
+                "#saveButton, #saveButtonAdvanced, #planetIcon, #FullScreen, #helpIcon, " +
+                "#installButton, #toggleAuxBtn";
 
-            // Aux toolbar button selectors
+            // Aux toolbar button selectors (Option A: Playback & Inspection, Workspace & Tools, Preferences & Modes)
             const auxSelectors =
-                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, " +
-                "#loadPluginIcon, #delPluginIcon, #enableHorizScrollIcon, " +
-                "#disableHorizScrollIcon, #themeSelectIcon, #mergeWithCurrentIcon, " +
-                "#wrapTurtle, #chooseKeyIcon, #toggleJavaScriptIcon, #restoreIcon, " +
-                "#beginnerMode, #advancedMode, #languageSelectIcon";
+                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, #toggleJavaScriptIcon, " +
+                "#wrapTurtle, #enableHorizScrollIcon, #disableHorizScrollIcon, #restoreIcon, " +
+                "#chooseKeyIcon, #mergeWithCurrentIcon, #loadPluginIcon, #delPluginIcon, " +
+                "#beginnerMode, #advancedMode, #themeSelectIcon, #languageSelectIcon";
 
             const isVisible = btn => {
                 const style = window.getComputedStyle(btn);
@@ -2472,6 +2426,29 @@ class ToolbarUI {
             if (btn) btn.style.color = color;
             this._dimTimeout = null;
         }, 500);
+    }
+
+    /**
+     * Renders the "My Project" Git dropdown icon and wires up the Materialize
+     * dropdown trigger. The menu item visibility is managed by GitDropdownUI.
+     *
+     * @public
+     * @param {GitDropdownUI} gitDropdownUI - The GitDropdownUI instance.
+     * @returns {void}
+     */
+    renderGitDropdownIcon(gitDropdownUI) {
+        const btn = docById("gitProjectBtn");
+        if (!btn) return;
+
+        const sync = () => {
+            if (gitDropdownUI && typeof gitDropdownUI._syncMenuState === "function") {
+                gitDropdownUI._syncMenuState();
+            }
+        };
+
+        btn.addEventListener("click", sync);
+        btn.addEventListener("mouseenter", sync);
+        btn.addEventListener("focus", sync);
     }
 }
 

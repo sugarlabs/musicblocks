@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="142"
+   height="50"
+   id="svg3051">
+  <path
+     d="M 1,33 A 14,14 0 0 1 15,19 l 2,0 0,-2 A 16,16 0 0 1 33,1 l 108,0 0,8 a 16,16 0 0 0 -16,16 16,16 0 0 0 16,16 l 0,8 -100,0 -24,0 0,-2 -2,0 A 14,14 0 0 1 1,33 z"
+     id="path3070"
+         style="fill:#d8d100;fill-opacity:1;stroke:#a19a00;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3072"
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="122"
+       y="30"
+       id="tspan3074">not</tspan>
+  </text>
+</svg>

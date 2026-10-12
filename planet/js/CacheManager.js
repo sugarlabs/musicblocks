@@ -186,15 +186,21 @@ class CacheManager {
     /**
      * Gets full project data from cache
      * @param {string} id - Project ID
+     * @param {string} [expectedUpdatedAt] - Optional expected updatedAt version to validate against
      * @returns {Promise<Object|null>} - Cached project data or null
      */
-    async getProject(id) {
+    async getProject(id, expectedUpdatedAt) {
         if (!this.isInitialized) return null;
 
         try {
             const data = await this._getFromStore(this.STORES.PROJECTS, id);
 
             if (data && !this._isExpired(data.expiry)) {
+                if (expectedUpdatedAt !== undefined && expectedUpdatedAt !== null) {
+                    if (!data.updatedAt || data.updatedAt !== expectedUpdatedAt) {
+                        return null;
+                    }
+                }
                 await this._updateLastAccessed(this.STORES.PROJECTS, id);
                 return data.projectData;
             }
@@ -210,15 +216,17 @@ class CacheManager {
      * Caches full project data
      * @param {string} id - Project ID
      * @param {Object} projectData - Full project data
+     * @param {string} [updatedAt] - Optional updatedAt timestamp/version
      * @returns {Promise<boolean>}
      */
-    async cacheProject(id, projectData) {
+    async cacheProject(id, projectData, updatedAt) {
         if (!this.isInitialized) return false;
 
         try {
             const entry = {
                 id,
                 projectData,
+                updatedAt: updatedAt || null,
                 expiry: Date.now() + this.projectExpiry,
                 lastAccessed: Date.now(),
                 cachedAt: Date.now()

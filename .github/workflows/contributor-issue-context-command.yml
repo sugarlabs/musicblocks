@@ -1,0 +1,183 @@
+name: Contributor issue context
+
+# Answers a comment of exactly "/context" on an open issue by creating or
+# refreshing one canonical comment with that issue's contributor context:
+# existing PRs, recent discussion, and detection limitations. It only ever
+# edits its own comment and never assigns, labels, or closes anything.
+# The report comes from .github/scripts/issue-context.py.
+#
+# Comment and issue text is untrusted. It is only read from the event payload
+# inside github-script, never expanded into a shell script.
+
+on:
+    issue_comment:
+        types: [created]
+
+permissions:
+    contents: read
+    issues: write
+    pull-requests: read
+
+jobs:
+    context:
+        name: Post contributor issue context
+        # Cheap pre-filter; the exact trimmed "/context" match is checked below.
+        if: >-
+            !github.event.issue.pull_request &&
+            github.event.issue.state == 'open' &&
+            github.event.comment.user.type != 'Bot' &&
+            contains(github.event.comment.body, '/context')
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        concurrency:
+            group: contributor-issue-context-${{ github.event.issue.number }}
+            cancel-in-progress: false
+        steps:
+            - name: Check for the /context command
+              id: command
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const body = context.payload.comment.body || '';
+                      if (body.trim() !== '/context') {
+                          core.info('The comment is not exactly /context; nothing to do.');
+                          core.setOutput('requested', 'false');
+                          return;
+                      }
+                      core.setOutput('requested', 'true');
+                      try {
+                          await github.rest.reactions.createForIssueComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              comment_id: context.payload.comment.id,
+                              content: 'eyes'
+                          });
+                      } catch (error) {
+                          core.warning(`Could not acknowledge the request: ${error.message}`);
+                      }
+
+            - name: Find the canonical context comment
+              id: existing
+              if: steps.command.outputs.requested == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const MARKER = '<!-- contributor-issue-context -->';
+                      const COOLDOWN_MS = 10 * 60 * 1000;
+                      const comments = await github.paginate(github.rest.issues.listComments, {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                          per_page: 100
+                      });
+                      // Only comments this workflow wrote count; a person quoting
+                      // the marker is never treated as the canonical comment.
+                      const ours = comments
+                          .filter(c => c.user && c.user.type === 'Bot' && c.user.login === 'github-actions[bot]')
+                          .filter(c => (c.body || '').startsWith(MARKER))
+                          .sort((a, b) => a.id - b.id);
+                      const canonical = ours[0];
+                      core.setOutput('comment_id', canonical ? String(canonical.id) : '');
+                      core.setOutput('duplicate_ids', ours.slice(1).map(c => c.id).join(','));
+                      const age = canonical ? Date.now() - Date.parse(canonical.updated_at) : Infinity;
+                      const fresh = age >= 0 && age < COOLDOWN_MS;
+                      core.setOutput('fresh', String(fresh));
+                      if (fresh) {
+                          core.info(`Comment ${canonical.id} was refreshed less than 10 minutes ago; skipping.`);
+                          await core.summary
+                              .addRaw('Contributor issue context was refreshed less than 10 minutes ago; not regenerated.')
+                              .write();
+                      }
+
+            - name: Checkout code
+              if: steps.command.outputs.requested == 'true' && steps.existing.outputs.fresh != 'true'
+              uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+
+            - name: Generate issue context
+              if: steps.command.outputs.requested == 'true' && steps.existing.outputs.fresh != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  REPOSITORY: ${{ github.repository }}
+                  ISSUE_NUMBER: ${{ github.event.issue.number }}
+              run: |
+                  if ! [[ "$ISSUE_NUMBER" =~ ^[1-9][0-9]{0,6}$ ]]; then
+                    echo "::error title=Invalid issue number::The event did not carry a valid issue number."
+                    exit 1
+                  fi
+                  if ! python3 .github/scripts/issue-context.py \
+                    --repo "$REPOSITORY" --issue "$ISSUE_NUMBER" --format github-comment \
+                    > "$RUNNER_TEMP/contributor-issue-context.md" \
+                    2> "$RUNNER_TEMP/issue-context.err"; then
+                    # The error text is shown with workflow commands disabled so
+                    # nothing in it can be interpreted by the runner.
+                    stop_token="$(python3 -c 'import secrets; print(secrets.token_hex(16))')"
+                    echo "::stop-commands::$stop_token"
+                    cat "$RUNNER_TEMP/issue-context.err"
+                    echo "::$stop_token::"
+                    echo "::error title=Issue context failed::The report for issue #$ISSUE_NUMBER could not be generated; the existing context comment was left unchanged. See the log above for details."
+                    exit 1
+                  fi
+
+            - name: Create or update the canonical comment
+              if: steps.command.outputs.requested == 'true' && steps.existing.outputs.fresh != 'true'
+              uses: actions/github-script@v7
+              env:
+                  COMMENT_ID: ${{ steps.existing.outputs.comment_id }}
+                  DUPLICATE_IDS: ${{ steps.existing.outputs.duplicate_ids }}
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const MARKER = '<!-- contributor-issue-context -->';
+                      const body = fs.readFileSync(`${process.env.RUNNER_TEMP}/contributor-issue-context.md`, 'utf8');
+                      if (!body.startsWith(MARKER) || body.length > 65536) {
+                          core.setFailed('The generated comment is missing its marker or exceeds the comment size limit.');
+                          return;
+                      }
+                      const target = { owner: context.repo.owner, repo: context.repo.repo };
+                      const commentId = Number(process.env.COMMENT_ID || 0);
+                      if (commentId) {
+                          await github.rest.issues.updateComment({ ...target, comment_id: commentId, body });
+                          core.info(`Updated comment ${commentId}.`);
+                      } else {
+                          const { data } = await github.rest.issues.createComment({
+                              ...target,
+                              issue_number: context.payload.issue.number,
+                              body
+                          });
+                          core.info(`Created comment ${data.id}.`);
+                      }
+                      // Duplicates can only come from this workflow (for example a
+                      // run that raced before concurrency applied), so remove them.
+                      const duplicates = (process.env.DUPLICATE_IDS || '').split(',').filter(Boolean).map(Number);
+                      for (const id of duplicates) {
+                          try {
+                              await github.rest.issues.deleteComment({ ...target, comment_id: id });
+                              core.info(`Removed duplicate comment ${id}.`);
+                          } catch (error) {
+                              core.warning(`Could not remove duplicate comment ${id}: ${error.message}`);
+                          }
+                      }
+                      await core.summary
+                          .addRaw(`Contributor issue context ${commentId ? 'updated' : 'created'} for issue #${context.payload.issue.number}.`)
+                          .write();
+
+            - name: Report failure on the request
+              if: failure() && steps.command.outputs.requested == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      try {
+                          await github.rest.reactions.createForIssueComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              comment_id: context.payload.comment.id,
+                              content: 'confused'
+                          });
+                      } catch (error) {
+                          core.warning(`Could not react to the request: ${error.message}`);
+                      }
+                      await core.summary
+                          .addRaw('Contributor issue context could not be refreshed; any existing context comment was left unchanged.')
+                          .write();

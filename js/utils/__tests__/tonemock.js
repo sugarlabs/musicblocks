@@ -103,6 +103,8 @@ class Synth {
         this.triggerRelease = jest.fn().mockReturnThis();
         this.start = jest.fn().mockReturnThis();
         this.chain = jest.fn().mockReturnThis();
+        this.connect = jest.fn().mockReturnThis();
+        this.disconnect = jest.fn().mockReturnThis();
         this.volume = {
             value: 0,
             cancelScheduledValues: jest.fn().mockReturnThis(),

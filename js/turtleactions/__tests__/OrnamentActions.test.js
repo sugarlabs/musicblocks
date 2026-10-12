@@ -242,7 +242,7 @@ describe("OrnamentActions", () => {
                     expect(beginSlurCalls.length).toBe(expectBeginSlur ? 1 : 0);
                     expect(dispatchCalls.length).toBe(expectDispatch ? 1 : 0);
                     expect(listenerCalls.length).toBe(1);
-                    const expectedName = "_staccato_0_" + blk;
+                    const expectedName = "_slur_0_" + blk;
                     if (expectMouseListener) expect(mouseMB.listeners).toContain(expectedName);
                     else expect(mouseMB.listeners).not.toContain(expectedName);
                     listenerFunctions[expectedName]();
@@ -274,6 +274,26 @@ describe("OrnamentActions", () => {
             } finally {
                 global.MusicBlocks = originalMusicBlocks;
             }
+        });
+
+        test("regression: staccato and slur through JS API do not clobber each other", () => {
+            // Use undefined for blk to simulate JS API calls. Before the fix, both
+            // registered the listener name "_staccato_0_undefined", so the slur's listener
+            // overwrote the staccato's. After the fix they have distinct names
+            // ("_staccato_0_undefined" vs "_slur_0_undefined"), so both exist
+            // and both pop() calls fire, leaving staccato length at 0.
+            Singer.OrnamentActions.setStaccato(4, 0, undefined); // pushes 0.25
+            Singer.OrnamentActions.setSlur(2, 0, undefined); // pushes -0.5
+            expect(turtle.singer.staccato).toEqual([0.25, -0.5]);
+
+            // Fire both cleanup listeners independently
+            listenerFunctions["_staccato_0_undefined"]();
+            listenerFunctions["_slur_0_undefined"]();
+
+            // Both values must have been popped — staccato array must be empty
+            expect(turtle.singer.staccato).toEqual([]);
+            // Slur notation should end exactly once
+            expect(endSlurCalls.length).toBe(1);
         });
     });
 
@@ -353,6 +373,53 @@ describe("OrnamentActions", () => {
             } finally {
                 global.MusicBlocks = originalMusicBlocks;
             }
+        });
+
+        test("dispatches errorMsg and skips push when noteValue is invalid", () => {
+            const invalidNoteValues = [NaN, -1, -0.5, 0, Infinity, null, undefined, "invalid"];
+            invalidNoteValues.forEach(val => {
+                errorMsgCalls.length = 0;
+                const before = {
+                    inNeighbor: [...turtle.singer.inNeighbor],
+                    neighborStepPitch: [...turtle.singer.neighborStepPitch],
+                    neighborNoteValue: [...turtle.singer.neighborNoteValue]
+                };
+                Singer.OrnamentActions.doNeighbor(3, val, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Neighbor note value must be a positive number."
+                );
+                expect(turtle.singer.inNeighbor).toEqual(before.inNeighbor);
+                expect(turtle.singer.neighborStepPitch).toEqual(before.neighborStepPitch);
+                expect(turtle.singer.neighborNoteValue).toEqual(before.neighborNoteValue);
+            });
+        });
+
+        test("dispatches errorMsg and skips push when interval is non-finite", () => {
+            const invalidIntervals = [NaN, Infinity, -Infinity, null, undefined, "bad"];
+            invalidIntervals.forEach(val => {
+                errorMsgCalls.length = 0;
+                const before = {
+                    inNeighbor: [...turtle.singer.inNeighbor],
+                    neighborStepPitch: [...turtle.singer.neighborStepPitch],
+                    neighborNoteValue: [...turtle.singer.neighborNoteValue]
+                };
+                Singer.OrnamentActions.doNeighbor(val, 4, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Neighbor interval must be a finite number."
+                );
+                expect(turtle.singer.inNeighbor).toEqual(before.inNeighbor);
+                expect(turtle.singer.neighborStepPitch).toEqual(before.neighborStepPitch);
+                expect(turtle.singer.neighborNoteValue).toEqual(before.neighborNoteValue);
+            });
+        });
+
+        test("negative interval is accepted (pitch direction is valid)", () => {
+            Singer.OrnamentActions.doNeighbor(-3, 4, 0, 1);
+            expect(turtle.singer.neighborStepPitch).toContain(-3);
+            expect(turtle.singer.neighborNoteValue).toContain(4);
+            expect(errorMsgCalls.length).toBe(0);
         });
     });
 });

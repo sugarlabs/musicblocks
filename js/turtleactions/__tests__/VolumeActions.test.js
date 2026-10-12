@@ -281,7 +281,7 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume.piano).toEqual([50]);
         });
 
-        it("listener restores synthVolume to the pre-crescendo value and pops crescendoInitialVolume", () => {
+        it("listener restores synthVolume to the pre-crescendo value, pops synthVolume stack, and resets audio", () => {
             targetTurtle.singer.synthVolume = { default: [50] };
             targetTurtle.singer.crescendoInitialVolume = { default: [50] };
 
@@ -293,8 +293,50 @@ describe("setupVolumeActions", () => {
 
             listener();
 
-            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 50]);
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50]);
             expect(targetTurtle.singer.crescendoInitialVolume.default).toEqual([50]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 50);
+        });
+
+        it("restores volume and pops synthVolume stack across nested crescendos", () => {
+            targetTurtle.singer.synthVolume = { default: [50] };
+            targetTurtle.singer.crescendoInitialVolume = { default: [50] };
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            const outerListener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+            targetTurtle.singer.synthVolume.default[1] = 60;
+
+            Singer.VolumeActions.doCrescendo("crescendo", 5, 0, 2);
+            const innerListener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+            targetTurtle.singer.synthVolume.default[2] = 65;
+
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 60, 65]);
+
+            innerListener();
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 60]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 60);
+
+            outerListener();
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 50);
+        });
+
+        it("restores volume for all active synths without corrupting other instruments", () => {
+            targetTurtle.singer.synthVolume = { piano: [80], violin: [40] };
+            targetTurtle.singer.crescendoInitialVolume = { piano: [80], violin: [40] };
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            const listener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+
+            targetTurtle.singer.synthVolume.piano[1] = 90;
+            targetTurtle.singer.synthVolume.violin[1] = 50;
+
+            listener();
+
+            expect(targetTurtle.singer.synthVolume.piano).toEqual([80]);
+            expect(targetTurtle.singer.synthVolume.violin).toEqual([40]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "piano", 80);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "violin", 40);
         });
     });
 
@@ -373,6 +415,19 @@ describe("setupVolumeActions", () => {
                 expect(stored).toBeGreaterThanOrEqual(0);
                 expect(stored).toBeLessThanOrEqual(100);
             }
+        });
+
+        it("should return early without processing if volume is NaN or Infinity", () => {
+            targetTurtle.singer.synthVolume = { default: [50] };
+
+            Singer.VolumeActions.setRelativeVolume(NaN, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+
+            Singer.VolumeActions.setRelativeVolume(Infinity, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+
+            Singer.VolumeActions.setRelativeVolume(-Infinity, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
         });
 
         it("should call notationBeginArticulation when justCounting is empty", () => {
@@ -558,14 +613,14 @@ describe("setupVolumeActions", () => {
             expect(inst2.pan.value).toBe(-1);
         });
 
-        it("should connect all instruments to the panner", () => {
+        it("should not connect instruments beside their current route", () => {
             const connectSpy = jest.spyOn(instruments[0].synth1, "connect");
             const connectSpyPiano = jest.spyOn(instruments[0].piano, "connect");
 
-            Singer.VolumeActions.setPanning(50, 0);
+            Singer.VolumeActions.setPanning(-100, 0);
 
-            expect(connectSpy).toHaveBeenCalledWith(targetTurtle.singer.panner);
-            expect(connectSpyPiano).toHaveBeenCalledWith(targetTurtle.singer.panner);
+            expect(connectSpy).not.toHaveBeenCalled();
+            expect(connectSpyPiano).not.toHaveBeenCalled();
         });
     });
 
@@ -710,6 +765,22 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume.violin).toEqual([DEFAULTVOLUME]);
         });
 
+        it("initializes synthVolume for a voice already in instrumentNames without an entry", () => {
+            // "set default instrument" adds the voice to instrumentNames but
+            // never creates a synthVolume entry, so the includes() check is
+            // true while synthVolume[synth] is still undefined.
+            targetTurtle.singer.instrumentNames = ["default", "violin"];
+            delete targetTurtle.singer.synthVolume.violin;
+            delete targetTurtle.singer.crescendoInitialVolume.violin;
+
+            expect(() =>
+                Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock")
+            ).not.toThrow();
+
+            expect(targetTurtle.singer.synthVolume.violin).toEqual([DEFAULTVOLUME, 70]);
+            expect(loadSynthSpy).not.toHaveBeenCalled();
+        });
+
         it("does not reset an already-tracked synth volume when the instrument is newly added", () => {
             targetTurtle.singer.instrumentNames = ["default"];
             targetTurtle.singer.synthVolume.violin = [99];
@@ -783,8 +854,12 @@ describe("setupVolumeActions", () => {
             expect(Singer.VolumeActions.getSynthVolume("piano", 0)).toBe(70);
         });
 
-        it("should return undefined when getting volume for non-existent synth", () => {
-            expect(Singer.VolumeActions.getSynthVolume("nonExistentSynth", 0)).toBeUndefined();
+        it("should return 50 when getting volume for non-existent synth", () => {
+            expect(Singer.VolumeActions.getSynthVolume("nonExistentSynth", 0)).toBe(50);
+        });
+
+        it("should return 50 for inherited object properties like toString", () => {
+            expect(Singer.VolumeActions.getSynthVolume("toString", 0)).toBe(50);
         });
     });
 

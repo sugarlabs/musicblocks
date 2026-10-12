@@ -35,7 +35,7 @@ window.widgetWindows = {
     // verify the target widget's windowFor() call and confirm it does not
     // rely on blockNo for its window key.
     KEY_MAPPING: {
-        "pitch-drum mapper": "pitch drum",
+        "pitch drum": "pitch drum",
         "custom mode": "custom mode",
         "tempo": "tempo",
         "arpeggio": "arpeggio",
@@ -45,7 +45,62 @@ window.widgetWindows = {
         "oscilloscope": "oscilloscope",
         "temperament": "temperament",
         "meter": "meter",
-        "LEGO Bricks": "LEGO BRICKS"
+        "LEGO Bricks": "LEGO Bricks",
+        "pitch slider": "slider",
+        "pitch staircase": "pitch staircase",
+        "music keyboard": "music keyboard",
+        "status": "status"
+    },
+
+    /**
+     * Single source of truth for widgets that should reinitialize when a
+     * connected block changes while their window is open.
+     *
+     * Entries are the English windowFor() title strings. At runtime the
+     * open .wftTitle and the widget block's staticLabels[0] are both
+     * produced with _(), so they must match each other; call sites also
+     * require title === staticLabels[0] before calling reInitWidget().
+     *
+     * Separate from KEY_MAPPING, which is only for closeBlkWidgets().
+     */
+    REINIT_WIDGET_TITLES: new Set([
+        "oscilloscope",
+        "tempo",
+        "rhythm maker",
+        "pitch slider",
+        "pitch staircase",
+        "status",
+        "phrase maker",
+        "LEGO Bricks",
+        "arpeggio",
+        "custom mode",
+        "music keyboard",
+        "pitch drum",
+        "meter",
+        "temperament",
+        "mode",
+        "timbre"
+    ]),
+
+    /**
+     * True when title is listed in REINIT_WIDGET_TITLES.
+     *
+     * The registry stores English title strings; at runtime the open widget's
+     * title is already localized via _(). We therefore translate each registry
+     * entry with _() before comparing — the same approach used by
+     * closeBlkWidgets() for KEY_MAPPING.
+     *
+     * @param {string} title - Open widget .wftTitle text (may be localized)
+     * @returns {boolean}
+     */
+    isReinitWidgetTitle(title) {
+        const translate = typeof _ === "function" ? _ : str => str;
+        for (const englishTitle of window.widgetWindows.REINIT_WIDGET_TITLES) {
+            if (translate(englishTitle) === title) {
+                return true;
+            }
+        }
+        return false;
     },
 
     /**
@@ -113,6 +168,14 @@ window.widgetWindows = {
 
         // Handle Escape (Close)
         if (e.key === "Escape") {
+            // An open pie menu takes Escape first (see piemenus.js). Widgets open
+            // theirs in #wheelDivptm, and the Mode widget uses #wheelDiv.
+            const isPieMenuOpen = ["wheelDivptm", "wheelDiv"].some(id => {
+                const pieMenu = docById(id);
+                return pieMenu && pieMenu.style.display !== "none";
+            });
+            if (isPieMenuOpen) return;
+
             focused.onclose();
             e.preventDefault();
             e.stopPropagation();
@@ -136,6 +199,21 @@ window.widgetWindows = {
             }
         }
     },
+    _handleResize() {
+        if (window.innerWidth <= 600) return;
+
+        for (const win of Object.values(this.openWindows)) {
+            if (!win || win._maximized || win._frame.style.display === "none") continue;
+
+            const rect = win._frame.getBoundingClientRect();
+            const x = Math.min(Math.max(rect.left, 0), Math.max(0, window.innerWidth - rect.width));
+            const y = Math.min(
+                Math.max(rect.top, 64),
+                Math.max(64, window.innerHeight - rect.height)
+            );
+            if (x !== rect.left || y !== rect.top) win.setPosition(x, y);
+        }
+    },
     _initGlobalListeners() {
         if (this._globalListenersInitialized) return;
 
@@ -143,6 +221,7 @@ window.widgetWindows = {
         this._boundHandleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
         this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
         this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
+        this._boundHandleResize = this._handleResize.bind(this);
 
         document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
         document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
@@ -150,6 +229,7 @@ window.widgetWindows = {
         // Use capture phase (true) to handle keyboard shortcuts before individual
         // widgets can intercept them via stopPropagation().
         document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
+        window.addEventListener("resize", this._boundHandleResize);
 
         this._globalListenersInitialized = true;
     },
@@ -172,7 +252,12 @@ window.widgetWindows = {
                 e.target.closest(".dropdown-content") ||
                 e.target.closest(".dropdown-trigger"));
 
-        if (isToolbarInteraction) {
+        // Widget pie menus (Music Keyboard, Phrase Maker, Sampler) open in
+        // #wheelDivptm, outside the widget frame, so a click on one must not
+        // take focus away from the widget that opened it.
+        const isWidgetPieMenuInteraction = e.target?.closest && e.target.closest("#wheelDivptm");
+
+        if (isToolbarInteraction || isWidgetPieMenuInteraction) {
             return;
         }
 
@@ -273,8 +358,11 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
+        this._frame.setAttribute("tabindex", "-1");
         this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
+        this._drag.setAttribute("role", "toolbar");
+        this._drag.setAttribute("aria-label", _("Window controls"));
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
 
@@ -305,13 +393,14 @@ class WidgetWindow {
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
-        this._nonclose.justifyContent = "space-between";
+        this._nonclose.style.justifyContent = "space-between";
         this._nonclose.style.width = "100%";
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
         titleEl.replaceChildren();
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
+        this._frame.setAttribute("aria-labelledby", titleEl.id);
 
         this._nonclose.onmousedown = e => {
             window.widgetWindows.draggingWindow = this;
@@ -330,6 +419,7 @@ class WidgetWindow {
         rollButton.title = _("Minimize");
         rollButton.setAttribute("role", "button");
         rollButton.setAttribute("aria-label", _("Roll up window"));
+        rollButton.setAttribute("aria-expanded", "true");
         rollButton.setAttribute("tabindex", "0");
         rollButton.onclick = e => {
             if (this._rolled) {
@@ -371,6 +461,8 @@ class WidgetWindow {
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
+        this._toolbar.setAttribute("role", "toolbar");
+        this._toolbar.setAttribute("aria-label", _("Widget toolbar"));
 
         this._widget = this._create("div", "wfbWidget", this._body);
         this._widgetWheelHandler = event => {
@@ -440,7 +532,7 @@ class WidgetWindow {
         });
     }
 
-    _overlay(add) {
+    _overlay(add, resetFrameZIndex = true) {
         if (add) {
             this._frame.style.zIndex = "10";
             this._overlayframe.style.left = "0";
@@ -451,7 +543,7 @@ class WidgetWindow {
             this._overlayframe.style.border = "0.25vw solid black";
             this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
-            this._frame.style.zIndex = "10000";
+            if (resetFrameZIndex) this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
             this._overlayframe.style.zIndex = "-1";
             this._overlayframe.style.backgroundColor = "transparent";
@@ -606,10 +698,12 @@ class WidgetWindow {
     takeFocus() {
         window.widgetWindows.focused = this;
         const windows = docById("floatingWindows");
-        const siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0.7";
+        if (windows && windows.children) {
+            const siblings = windows.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.zIndex = "0";
+                siblings[i].style.opacity = "0.7";
+            }
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -645,6 +739,10 @@ class WidgetWindow {
      */
     sendToCenter() {
         const canvas = docById("myCanvas");
+        if (!canvas) {
+            this.setPosition(200, 140);
+            return this;
+        }
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 
@@ -654,7 +752,7 @@ class WidgetWindow {
             return this;
         }
 
-        const navHeight = document.querySelector("nav").offsetHeight;
+        const navHeight = document.querySelector("nav")?.offsetHeight ?? 64;
         this.setPosition(
             (cRect.width - fRect.width) / 2,
             (cRect.height - fRect.height + navHeight) / 2
@@ -671,6 +769,7 @@ class WidgetWindow {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
+            this._maxminButton.setAttribute("aria-label", _("Maximize window"));
         }
         this._maximized = false;
 
@@ -694,6 +793,7 @@ class WidgetWindow {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Restore");
+            this._maxminButton.setAttribute("aria-label", _("Restore"));
         }
         this._maximized = true;
         this.unroll();
@@ -758,7 +858,7 @@ class WidgetWindow {
         if (this.timerManager) {
             this.timerManager.clearAll();
         }
-        window.widgetWindows.openWindows[this._key] = undefined;
+        delete window.widgetWindows.openWindows[this._key];
     }
 
     /**
@@ -782,6 +882,7 @@ class WidgetWindow {
      */
     show() {
         this._frame.style.display = "block";
+        window.widgetWindows._handleResize();
     }
 
     /**
@@ -838,6 +939,11 @@ class WidgetWindow {
     _rollup() {
         this._rolled = true;
         this._body.style.display = "none";
+        if (this._rollButton) {
+            this._rollButton.setAttribute("aria-expanded", "false");
+            this._rollButton.setAttribute("aria-label", _("Expand window"));
+            this._rollButton.title = _("Expand");
+        }
         return this;
     }
 
@@ -848,8 +954,13 @@ class WidgetWindow {
     unroll() {
         this._rolled = false;
         this._body.style.display = "flex";
-        if (this._rollButton && this._rollButton.classList.contains("plus")) {
-            this._rollButton.classList.remove("plus");
+        if (this._rollButton) {
+            if (this._rollButton.classList.contains("plus")) {
+                this._rollButton.classList.remove("plus");
+            }
+            this._rollButton.setAttribute("aria-expanded", "true");
+            this._rollButton.setAttribute("aria-label", _("Roll up window"));
+            this._rollButton.title = _("Minimize");
         }
         return this;
     }
@@ -892,7 +1003,7 @@ window.widgetWindows.clear = name => {
  * @returns {boolean}
  */
 window.widgetWindows.isOpen = name => {
-    return window.widgetWindows.openWindows[name] ? true : "";
+    return !!window.widgetWindows.openWindows[name];
 };
 
 /**
@@ -901,7 +1012,10 @@ window.widgetWindows.isOpen = name => {
  */
 window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        if (win !== undefined) win._frame.style.display = "none";
+        if (win !== undefined) {
+            win._frame.style.display = "none";
+            win._overlay(false, false);
+        }
     });
     window.widgetWindows.focused = null;
 };
@@ -938,4 +1052,5 @@ window.widgetWindows.showWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "block";
     });
+    window.widgetWindows._handleResize();
 };

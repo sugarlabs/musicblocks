@@ -33,6 +33,127 @@ class ASTUtils {
         return typeof name === "string" && /^[A-Za-z_$][0-9A-Za-z_$]*$/.test(name);
     }
 
+    /**
+     * Returns a valid JavaScript identifier for an action name.
+     *
+     * Action names are free text ("chorus 2", "1st verse"), but an action is exported as a
+     * `let` binding that its calls refer to, so the name has to be an identifier and there is
+     * no string form to fall back to the way boxes fall back to setBox. Characters that can't
+     * appear in an identifier become "_", and names that would still not parse, or would
+     * shadow what the generated code itself uses (mouse, actionArgs, Math, ...), get a leading
+     * "_". Letters outside ASCII are kept, so non-English action names read the same.
+     *
+     * @static
+     * @param {String} name - action name
+     * @returns {String} identifier
+     */
+    static _getActionIdentifier(name) {
+        return ASTUtils._actionIdentifiers.get(name) ?? ASTUtils._toIdentifier(name);
+    }
+
+    /**
+     * Converts free text to an identifier, without regard to what else is in the program.
+     *
+     * @static
+     * @param {String} name - action name
+     * @returns {String} identifier
+     */
+    static _toIdentifier(name) {
+        // U+200C and U+200D are allowed after the first character (ECMAScript IdentifierPart).
+        let id = String(name).replace(/[^\p{ID_Continue}$\u200C\u200D]/gu, "_");
+        if (!/^[\p{ID_Start}_$]/u.test(id) || ASTUtils._RESERVED_NAMES.has(id)) {
+            id = "_" + id;
+        }
+        return id;
+    }
+
+    /**
+     * Assigns every action in the program its identifier up front, so two names that convert
+     * to the same identifier ("chorus-2" and "chorus_2") don't produce two `let chorus_2`.
+     * Names that are already identifiers keep them; a converted name that is taken gets a
+     * numeric suffix. Definitions and calls both read this map, so they always agree.
+     *
+     * Converted names also avoid the program's box variables: a box whose name is an identifier
+     * is exported as a `var` in its flow, which would shadow an action of the same name there.
+     *
+     * @static
+     * @param {String[]} names - every action name in the program
+     * @param {String[]} [boxNames] - every box the program stores into, see getBoxNames
+     * @returns {void}
+     */
+    static setActionNames(names, boxNames = []) {
+        const identifiers = new Map();
+        const taken = new Set(boxNames.filter(ASTUtils._isValidIdentifier));
+        for (const name of names) {
+            const id = ASTUtils._toIdentifier(name);
+            if (id === name && !taken.has(id)) {
+                identifiers.set(name, id);
+                taken.add(id);
+            }
+        }
+        for (const name of names) {
+            if (identifiers.has(name)) continue;
+            const base = ASTUtils._toIdentifier(name);
+            let id = base;
+            for (let n = 2; taken.has(id); n++) id = `${base}_${n}`;
+            identifiers.set(name, id);
+            taken.add(id);
+        }
+        ASTUtils._actionIdentifiers = identifiers;
+    }
+
+    /**
+     * Returns the name of every box the given stack trees store into.
+     *
+     * @static
+     * @param {Object[]} trees - stack trees, as built by JSGenerate
+     * @returns {String[]} box names
+     */
+    static getBoxNames(trees) {
+        const names = [];
+        const walk = node => {
+            if (!Array.isArray(node)) return;
+            if (typeof node[0] === "string") {
+                if (node[0].startsWith("storein2_")) {
+                    names.push(node[0].slice("storein2_".length));
+                } else if (
+                    node[0] === "storein" &&
+                    Array.isArray(node[1]) &&
+                    typeof node[1][0] === "string"
+                ) {
+                    names.push(node[1][0]);
+                }
+            }
+            node.forEach(walk);
+        };
+        trees.forEach(walk);
+        return names;
+    }
+
+    /** Action name → identifier for the program being generated; see setActionNames. */
+    static _actionIdentifiers = new Map();
+
+    /**
+     * Returns the names of every identifier used in the given ASTs.
+     *
+     * @static
+     * @param {...Object} ASTs - Abstract Syntax Trees to search
+     * @returns {Set<String>} identifier names
+     */
+    static _getIdentifierNames(...ASTs) {
+        const names = new Set();
+        const visit = node => {
+            if (Array.isArray(node)) {
+                node.forEach(visit);
+            } else if (node !== null && typeof node === "object") {
+                if (node.type === "Identifier") names.add(node.name);
+                Object.values(node).forEach(visit);
+            }
+        };
+        ASTs.forEach(visit);
+        return names;
+    }
+
     static _getMouseCallExpression(methodName, args) {
         return {
             type: "CallExpression",
@@ -51,6 +172,18 @@ class ASTUtils {
             arguments: args
         };
     }
+
+    /**
+     * Names an exported action can't take: reserved words, plus the names the generated code
+     * relies on (a top-level `let Math` would break every Math.floor in the program).
+     */
+    static _RESERVED_NAMES = new Set(
+        `await break case catch class const continue debugger default delete do else enum export
+        extends false finally for function if implements import in instanceof interface let new
+        null package private protected public return static super switch this throw true try
+        typeof var void while with yield arguments eval undefined NaN Infinity
+        mouse actionArgs Mouse MusicBlocks Math MathUtility`.split(/\s+/)
+    );
 
     /**
      * @static
@@ -234,24 +367,60 @@ class ASTUtils {
     static _getForLoopAST(args, flow, iteratorNum) {
         if (iteratorNum === undefined) iteratorNum = 0;
 
+        const declarations = [
+            {
+                type: "VariableDeclarator",
+                id: {
+                    type: "Identifier",
+                    name: "i" + iteratorNum
+                },
+                init: {
+                    type: "Literal",
+                    value: 0
+                }
+            }
+        ];
+
+        // Repeat works out its count once, as MathUtility.doRepeatCount(n),
+        // but `i < n` re-evaluates n every pass and runs Math.ceil(n) times.
+        // Only a non-negative integer literal can stay as it is (a negative
+        // one prints as a unary minus, which doesn't convert back to Repeat).
+        const body = ASTUtils._getBlockAST(flow, iteratorNum + 1);
+        let limit = ASTUtils._getArgsAST(args)[0];
+        if (!(limit.type === "Literal" && Number.isInteger(limit.value) && limit.value >= 0)) {
+            // A box can have any valid name, so pick one the count and the
+            // body don't use; otherwise the limit would shadow that box.
+            const used = ASTUtils._getIdentifierNames(limit, body);
+            let limitName = "limit" + iteratorNum;
+            while (used.has(limitName)) limitName = "_" + limitName;
+
+            declarations.push({
+                type: "VariableDeclarator",
+                id: {
+                    type: "Identifier",
+                    name: limitName
+                },
+                init: {
+                    type: "CallExpression",
+                    callee: {
+                        type: "Identifier",
+                        name: "MathUtility.doRepeatCount"
+                    },
+                    arguments: [limit]
+                }
+            });
+            limit = {
+                type: "Identifier",
+                name: limitName
+            };
+        }
+
         return {
             type: "ForStatement",
             init: {
                 type: "VariableDeclaration",
                 kind: "let",
-                declarations: [
-                    {
-                        type: "VariableDeclarator",
-                        id: {
-                            type: "Identifier",
-                            name: "i" + iteratorNum
-                        },
-                        init: {
-                            type: "Literal",
-                            value: 0
-                        }
-                    }
-                ]
+                declarations
             },
             test: {
                 type: "BinaryExpression",
@@ -259,7 +428,7 @@ class ASTUtils {
                     type: "Identifier",
                     name: "i" + iteratorNum
                 },
-                right: ASTUtils._getArgsAST(args)[0],
+                right: limit,
                 operator: "<"
             },
             update: {
@@ -273,7 +442,7 @@ class ASTUtils {
             },
             body: {
                 type: "BlockStatement",
-                body: ASTUtils._getBlockAST(flow, iteratorNum + 1)
+                body
             }
         };
     }
@@ -393,7 +562,7 @@ class ASTUtils {
                     type: "VariableDeclarator",
                     id: {
                         type: "Identifier",
-                        name: `${methodName}`
+                        name: ASTUtils._getActionIdentifier(methodName)
                     },
                     init: {
                         type: "ArrowFunctionExpression",
@@ -486,7 +655,7 @@ class ASTUtils {
             if (props.action) {
                 AST["expression"]["argument"]["callee"] = {
                     type: "Identifier",
-                    name: `${methodName}`
+                    name: ASTUtils._getActionIdentifier(methodName)
                 };
                 AST["expression"]["argument"]["arguments"] = [
                     {
@@ -568,18 +737,17 @@ class ASTUtils {
             multiply: ["binexp", "*"],
             divide: ["binexp", "/"],
             mod: ["binexp", "%"],
-            equal: ["binexp", "=="],
+            equal: ["binexp", "==="],
             less: ["binexp", "<"],
             greater: ["binexp", ">"],
             or: ["binexp", "||"],
             and: ["binexp", "&&"],
-            xor: ["binexp", "^"],
+            xor: ["method", "MathUtility.doXor"],
             not: ["unexp", "!"],
             neg: ["unexp", "-"],
             abs: ["method", "Math.abs"],
             sqrt: ["method", "Math.sqrt"],
-            power: ["method", "Math.pow"],
-            int: ["method", "Math.floor"]
+            power: ["method", "Math.pow"]
         };
 
         function getBinaryExpAST(operator, operand1, operand2) {
@@ -742,6 +910,250 @@ class ASTUtils {
     }
 
     /**
+     * Returns every Stop block marker inside node, including ones in nested
+     * clamp callbacks. Markers a nested loop took over are no longer markers.
+     *
+     * @static
+     * @param {Object} node - Abstract Syntax Tree to search
+     * @returns {[Object]} Stop block markers
+     */
+    static _findStopBlocks(node) {
+        const stops = [];
+        const visit = child => {
+            if (Array.isArray(child)) {
+                child.forEach(visit);
+            } else if (child !== null && typeof child === "object") {
+                if (child.stopBlock) stops.push(child);
+                Object.values(child).forEach(visit);
+            }
+        };
+        visit(node);
+        return stops;
+    }
+
+    /**
+     * Returns the loop so that a Stop block inside it works as it does in
+     * Music Blocks (Logo.doBreak): the rest of the current iteration still
+     * runs and then the loop ends. A bare `break` would leave at once, only
+     * leave a switch, or be a syntax error inside a clamp callback, so each
+     * Stop sets a flag that the loop checks at the end of every iteration:
+     * `{ let stopLoop = false; loop { ...; stopLoop = true; ...; if (stopLoop) break; } }`
+     *
+     * @static
+     * @param {Object} loop - Abstract Syntax Tree of a for, while or do-while loop
+     * @returns {Object} the loop, or a block holding the flag and the loop
+     */
+    static _getStoppableLoopAST(loop) {
+        const stops = ASTUtils._findStopBlocks(loop.body);
+        if (stops.length === 0) return loop;
+
+        // A box can have any valid name, so pick one the loop doesn't use.
+        const used = ASTUtils._getIdentifierNames(loop);
+        let flag = "stopLoop";
+        while (used.has(flag)) flag = "_" + flag;
+
+        for (const stop of stops) {
+            delete stop.label;
+            delete stop.stopBlock;
+            Object.assign(stop, {
+                type: "ExpressionStatement",
+                expression: {
+                    type: "AssignmentExpression",
+                    operator: "=",
+                    left: { type: "Identifier", name: flag },
+                    right: { type: "Literal", value: true }
+                }
+            });
+        }
+
+        loop.body.body.push({
+            type: "IfStatement",
+            test: { type: "Identifier", name: flag },
+            consequent: { type: "BreakStatement", label: null },
+            alternate: null
+        });
+
+        return {
+            type: "BlockStatement",
+            body: [
+                {
+                    type: "VariableDeclaration",
+                    kind: "let",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: { type: "Identifier", name: flag },
+                            init: { type: "Literal", value: false }
+                        }
+                    ]
+                },
+                loop
+            ]
+        };
+    }
+
+    /**
+     * Resolves the Stop block markers that no loop took over. With no loop,
+     * Logo.doBreak drops the next pending continuation, so a Stop skips the
+     * rest of the stack one level above the clamp it is in, and the program
+     * carries on after that. For example, in `Start { Note { Stop }; X }` X
+     * doesn't run, and in `Start { if { if { Stop }; W }; X }` W doesn't but
+     * X does.
+     *
+     * That outer stack is left with `return` when it is a function body
+     * (Start, an action or a clamp callback), or with a labeled `break` when
+     * it is a block. When the Stop is inside a clamp callback, which a return
+     * or break can't leave, it sets a flag that is checked after the clamp.
+     * A Stop directly in Start or an action just returns.
+     *
+     * Not covered: in Music Blocks a Stop in an action also ends the loop the
+     * action was called from, but the exported action only returns (#9004).
+     *
+     * @static
+     * @param {Object} body - BlockStatement of a Start or action function
+     * @param {String} end - "ENDMOUSE" or "ENDFLOW", the value the body returns
+     * @returns {void}
+     */
+    static _resolveStopBlocks(body, end) {
+        const used = ASTUtils._getIdentifierNames(body);
+        let count = 0;
+        const newName = () => {
+            let name;
+            do {
+                name = "stop" + count++;
+            } while (used.has(name));
+            used.add(name);
+            return name;
+        };
+
+        const identifier = name => ({ type: "Identifier", name });
+        const returnEnd = value => ({
+            type: "ReturnStatement",
+            argument: {
+                type: "MemberExpression",
+                object: identifier("mouse"),
+                computed: false,
+                property: identifier(value)
+            }
+        });
+        const replace = (node, replacement) => {
+            Object.keys(node).forEach(key => delete node[key]);
+            Object.assign(node, replacement);
+        };
+
+        // Leaves a stack: return from a function body, or break out of a
+        // block, which gets a label the first time it is needed.
+        const exitStatement = stack => {
+            if (stack.end !== null) return returnEnd(stack.end);
+            if (stack.label === null) {
+                stack.label = newName();
+                stack.wrap(stack.label);
+            }
+            return { type: "BreakStatement", label: identifier(stack.label) };
+        };
+
+        // Every statement list directly inside statement (if/else branches,
+        // switch cases, clamp callbacks), without looking inside those lists.
+        const innerStacks = statement => {
+            const stacks = [];
+            const visit = (node, parent, key) => {
+                if (Array.isArray(node)) {
+                    node.forEach((child, i) => visit(child, node, i));
+                } else if (node !== null && typeof node === "object") {
+                    if (node.type === "ArrowFunctionExpression") {
+                        stacks.push({ list: node.body.body, end: "ENDFLOW" });
+                    } else if (node.type === "BlockStatement") {
+                        stacks.push({
+                            list: node.body,
+                            end: null,
+                            wrap: label => {
+                                parent[key] = {
+                                    type: "LabeledStatement",
+                                    label: identifier(label),
+                                    body: node
+                                };
+                            }
+                        });
+                    } else if (node.type === "SwitchCase") {
+                        stacks.push({
+                            list: node.consequent,
+                            end: null,
+                            wrap: label => {
+                                // Keep the break that ends the case outside.
+                                const statements = node.consequent.splice(
+                                    0,
+                                    node.consequent.length - 1
+                                );
+                                node.consequent.unshift({
+                                    type: "LabeledStatement",
+                                    label: identifier(label),
+                                    body: { type: "BlockStatement", body: statements }
+                                });
+                            }
+                        });
+                    } else {
+                        Object.entries(node).forEach(([k, child]) => visit(child, node, k));
+                    }
+                }
+            };
+            visit(statement, null, null);
+            return stacks;
+        };
+
+        const resolve = (stack, outer) => {
+            for (const statement of [...stack.list]) {
+                if (statement.stopBlock) {
+                    if (outer === null) {
+                        replace(statement, returnEnd(stack.end));
+                    } else if (stack.end === null) {
+                        // No function in between: leave the outer stack directly.
+                        replace(statement, exitStatement(outer.stack));
+                    } else {
+                        // Inside a clamp callback: set a flag the outer stack checks.
+                        if (!outer.flag) {
+                            outer.flag = newName();
+                            const at = outer.stack.list.indexOf(outer.statement);
+                            outer.stack.list.splice(at, 0, {
+                                type: "VariableDeclaration",
+                                kind: "let",
+                                declarations: [
+                                    {
+                                        type: "VariableDeclarator",
+                                        id: identifier(outer.flag),
+                                        init: { type: "Literal", value: false }
+                                    }
+                                ]
+                            });
+                            outer.stack.list.splice(at + 2, 0, {
+                                type: "IfStatement",
+                                test: identifier(outer.flag),
+                                consequent: exitStatement(outer.stack),
+                                alternate: null
+                            });
+                        }
+                        replace(statement, {
+                            type: "ExpressionStatement",
+                            expression: {
+                                type: "AssignmentExpression",
+                                operator: "=",
+                                left: identifier(outer.flag),
+                                right: { type: "Literal", value: true }
+                            }
+                        });
+                    }
+                    continue;
+                }
+                const context = { stack, statement, flag: null };
+                for (const inner of innerStacks(statement)) {
+                    resolve({ label: null, ...inner }, context);
+                }
+            }
+        };
+
+        resolve({ list: body.body, end, label: null }, null);
+    }
+
+    /**
      * Returns list of Abstract Syntax Trees corresponding to each flow statement.
      *
      * @static
@@ -764,17 +1176,36 @@ class ASTUtils {
             } else if (flow[0] === "ifthenelse") {
                 ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], flow[3], iterMax));
             } else if (flow[0] === "repeat") {
-                ASTs.push(ASTUtils._getForLoopAST(flow[1], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getForLoopAST(flow[1], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "while") {
-                ASTs.push(ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "forever") {
-                ASTs.push(ASTUtils._getWhileLoopAST([1000], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getWhileLoopAST([1000], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "until") {
-                ASTs.push(ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "break") {
+                // The Stop block. Its loop (or the enclosing Start or action,
+                // if there is no loop) turns this marker into real code.
                 ASTs.push({
                     type: "BreakStatement",
-                    label: null
+                    label: null,
+                    stopBlock: true
                 });
             } else if (flow[0] === "switch") {
                 ASTs.push({
@@ -921,6 +1352,7 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
         }
+        ASTUtils._resolveStopBlocks(AST["declarations"][0]["init"]["body"], "ENDFLOW");
 
         return AST;
     }
@@ -939,6 +1371,7 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["expression"]["arguments"][0]["body"]["body"].splice(i, 0, ASTs[i]);
         }
+        ASTUtils._resolveStopBlocks(AST["expression"]["arguments"][0]["body"], "ENDMOUSE");
 
         return AST;
     }

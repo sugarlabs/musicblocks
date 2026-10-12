@@ -189,6 +189,49 @@ describe("Publisher", () => {
         it("should return null for non-existent tag name", () => {
             expect(publisher.findTagWithName("NonExistent")).toBeNull();
         });
+
+        it("should return null when the tag manifest has not loaded", () => {
+            mockPlanet.TagsManifest = null;
+            expect(publisher.findTagWithName("Music")).toBeNull();
+        });
+    });
+
+    describe("addTags", () => {
+        it("should build ChipTags from user-addable tags", () => {
+            publisher.addTags();
+            expect(publisher.ChipTags).toEqual({ Music: null, Art: null });
+        });
+
+        it("should not throw when the tag manifest has not loaded", () => {
+            mockPlanet.TagsManifest = null;
+            expect(() => publisher.addTags()).not.toThrow();
+            expect(publisher.ChipTags).toEqual({});
+        });
+    });
+
+    describe("setTagInput", () => {
+        it("should associate the publish tags label with the generated input", () => {
+            document.body.innerHTML += `
+                <div class="chips chips-initial" id="tagsadd">
+                    <input class="input" />
+                </div>
+                <label id="publish-tags-label"></label>
+            `;
+
+            publisher.ChipTags = {
+                Music: "1",
+                Art: "2"
+            };
+
+            publisher.setTagInput([]);
+
+            const input = document.querySelector("#tagsadd input");
+            const label = document.getElementById("publish-tags-label");
+
+            expect(input.id).toBe("publish-tags-input");
+            expect(input.name).toBe("publish-tags");
+            expect(label.htmlFor).toBe("publish-tags-input");
+        });
     });
 
     describe("parseProject", () => {

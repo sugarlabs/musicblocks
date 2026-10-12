@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2108"
+   version="1.1"
+   height="31.5"
+   width="255.5">
+  <metadata
+     id="metadata2114">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2112" />
+  <g
+     id="g2096">
+    <g
+       id="g2094"
+       transform="scale(1.5)">
+      <path
+         id="path2084"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 74.4873 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -74.4873 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+      <text
+         id="text2088"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan2086"
+           y="13"
+           x="99">nth mouse name</tspan></text>
+      <text
+         id="text2092"
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan2090"
+           y="12"
+           x="99" /></text>
+    </g>
+  </g>
+  <g
+     id="g2106"
+     transform="translate(152)">
+    <g
+       id="g2104"
+       transform="scale(1.5)">
+      <path
+         id="path2098"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text2102"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan2100"
+           y="14"
+           x="13">1</tspan></text>
+    </g>
+  </g>
+</svg>

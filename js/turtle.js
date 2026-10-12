@@ -27,9 +27,8 @@
  * Class pertaining to each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Turtles controller which
- * acts as a bridge between the Turtle model and the Turtle view, and
- * serves as a gateway to any external code.
+ * @classdesc This is the prototype of an individual Turtle. It owns per-turtle lifecycle state
+ * and its Singer and Painter components, and acts as a bridge between the Turtle model and view.
  *
  * External code instantiates this class, and can access all the members
  * of TurtleView and TurtleModel.
@@ -211,126 +210,43 @@ class Turtle {
 
         this.inSetTimbre = false;
 
-        this.painter.cp1x = 0;
-        this.painter.cp1y = 100;
-        this.painter.cp2x = 100;
-        this.painter.cp2y = 100;
+        // Clean up pending delay timers on this turtle before reinitializing
+        if (this.delayTimeout !== null && typeof this.delayTimeout !== "undefined") {
+            if (this.activity && this.activity.logo && this.activity.logo._timerManager) {
+                this.activity.logo._timerManager.clearTimeout(this.delayTimeout);
+            } else if (typeof clearTimeout === "function") {
+                clearTimeout(this.delayTimeout);
+            }
+            this.delayTimeout = null;
+        }
 
-        /** @deprecated */ this.singer.attack = [];
-        /** @deprecated */ this.singer.decay = [];
-        /** @deprecated */ this.singer.sustain = [];
-        /** @deprecated */ this.singer.release = [];
+        // Clean up active audio voices and pending unhighlight timers for this turtle before reinitializing
+        if (this.singer) {
+            if (typeof this.singer.killAllVoices === "function") {
+                this.singer.killAllVoices();
+            }
+            if (this.singer._unhighlightTimers) {
+                if (this.activity && this.activity.logo && this.activity.logo._timerManager) {
+                    for (const blk in this.singer._unhighlightTimers) {
+                        this.activity.logo._timerManager.clearTimeout(
+                            this.singer._unhighlightTimers[blk]
+                        );
+                    }
+                }
+                this.singer._unhighlightTimers = {};
+            }
+        }
 
-        this.singer.scalarTransposition = 0;
-        this.singer.scalarTranspositionValues = [];
-        this.singer.transposition = 0;
-        this.singer.transpositionValues = [];
-        this.singer.transpositionRatios = [];
-
-        this.singer.register = 0;
-        this.singer.beatFactor = 1;
-        this.singer.dotCount = 0;
-        this.singer.noteBeat = {};
-        this.singer.noteValue = {};
-        this.singer.oscList = {};
-        this.singer.noteDrums = {};
-        this.singer.notePitches = {};
-        this.singer.noteOctaves = {};
-        this.singer.noteCents = {};
-        this.singer.noteHertz = {};
-        this.singer.noteBeatValues = {};
-        this.singer.embeddedGraphics = {};
-        this.singer.lastNotePlayed = null;
-        this.singer.previousNotePlayed = null;
-        this.singer.noteStatus = null;
-        this.singer.noteDirection = 0;
-        this.singer.pitchNumberOffset = 39;
-        this.singer.currentOctave = 4;
-        this.singer.inHarmonic = [];
-        this.singer.partials = [];
-        this.singer.inNeighbor = [];
-        this.singer.neighborStepPitch = [];
-        this.singer.neighborNoteValue = [];
-        this.singer.inDefineMode = false;
-        this.singer.defineMode = [];
-
-        this.singer.notesPlayed = [0, 1];
-        this.singer.whichNoteToCount = 1;
-        this.singer.movable = false;
-
-        this.singer.bpm = [];
-        this.singer.previousTurtleTime = 0;
-        this.singer.turtleTime = 0;
-        this.singer.pushedNote = false;
-        this.singer.duplicateFactor = 1;
-        this.singer.inDuplicate = false;
-        this.singer.skipFactor = 1;
-        this.singer.skipIndex = 0;
-        this.singer.instrumentNames = [DEFAULTVOICE];
-        this.singer.inCrescendo = [];
-        this.singer.crescendoDelta = [];
-        this.singer.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
-        this.singer.intervals = [];
-        this.singer.semitoneIntervals = [];
-        this.singer.chordIntervals = [];
-        this.singer.ratioIntervals = [];
-        this.singer.staccato = [];
-        this.singer.glide = [];
-        this.singer.glideOverride = 0;
-        this.singer.swing = [];
-        this.singer.swingTarget = [];
-        this.singer.swingCarryOver = 0;
-        this.singer.tie = false;
-        this.singer.tieNotePitches = [];
-        this.singer.tieNoteExtras = [];
-        this.singer.tieCarryOver = 0;
-        this.singer.tieFirstDrums = [];
-        this.singer.drift = 0;
-        this.singer.maxLagCorrectionRatio = 0.25;
-        this.singer.drumStyle = [];
-        this.singer.voices = [];
-        this.singer.backward = [];
-
-        this.singer.vibratoIntensity = [];
-        this.singer.vibratoRate = [];
-        this.singer.distortionAmount = [];
-        this.singer.tremoloFrequency = [];
-        this.singer.tremoloDepth = [];
-        this.singer.rate = [];
-        this.singer.octaves = [];
-        this.singer.baseFrequency = [];
-        this.singer.chorusRate = [];
-        this.singer.delayTime = [];
-        this.singer.chorusDepth = [];
-        this.singer.neighborArgNote1 = [];
-        this.singer.neighborArgNote2 = [];
-        this.singer.neighborArgBeat = [];
-        this.singer.neighborArgCurrentBeat = [];
-
-        this.singer.inNoteBlock = [];
-        this.singer.multipleVoices = false;
-        this.singer.invertList = [];
-        this.singer.beatList = [];
-        this.singer.factorList = [];
-        this.singer.keySignature = "C " + "major";
-        this.singer.pitchDrumTable = {};
-        this.singer.defaultStrongBeats = false;
-
-        this.singer.pickup = 0;
-        this.singer.beatsPerMeasure = 4; // default is 4/4 time
-        this.singer.noteValuePerBeat = 4;
-        this.singer.currentBeat = 0;
-        this.singer.currentMeasure = 0;
-
-        this.singer.justCounting = [];
-        this.singer.justMeasuring = [];
-        this.singer.firstPitch = [];
-        this.singer.lastPitch = [];
-        this.singer.suppressOutput = suppressOutput;
-
-        this.singer.dispatchFactor = 1;
-
-        this.singer.runningFromEvent = false;
+        // Reset child components via their own canonical lifecycles
+        if (this.painter && typeof this.painter.reset === "function") {
+            this.painter.reset();
+        }
+        if (this.singer && typeof this.singer.reset === "function") {
+            this.singer.reset(suppressOutput);
+            if (typeof DEFAULTVOICE !== "undefined") {
+                this.singer.instrumentNames = [DEFAULTVOICE];
+            }
+        }
     }
 
     // ================================ CONTROLLER ============================
@@ -723,6 +639,11 @@ Turtle.TurtleView = class {
 
         this._canvas = document.getElementById("overlayCanvas");
         this._ctx = this._canvas.getContext("2d");
+
+        // Bumped on every doShowImage call so a slower, overlapping request
+        // can tell -- once its await resolves -- that a newer one already
+        // won and back off instead of clobbering it.
+        this._imageRequestId = 0;
     }
 
     /**
@@ -740,10 +661,20 @@ Turtle.TurtleView = class {
         }
 
         const gifAnimator = this.activity.gifAnimator;
+        const requestId = ++this._imageRequestId;
 
         // HARD CLEANUP: kill previous GIF before loading a new one
         if (this._activeGifId && gifAnimator) {
             gifAnimator.stopAnimation(this._activeGifId);
+
+            // Drop this turtle's own bookkeeping record for the GIF we just
+            // stopped, too -- stopAnimation() only frees GIFAnimator's side.
+            // Left in place, it lingers in _media until an explicit "clear"
+            // (many looping-animation projects never call one), and every
+            // turtle move iterates the whole array via _updateMediaPositions().
+            this._media = this._media.filter(
+                item => !(item.type === "gif" && item.id === this._activeGifId)
+            );
 
             //Clear the old GIF pixels from overlay canvas
             const ctx = this._ctx;
@@ -774,6 +705,15 @@ Turtle.TurtleView = class {
 
                 // If animation was created successfully
                 if (gifId !== null) {
+                    // A newer doShowImage call already ran while we were
+                    // awaiting createAnimation -- it owns _activeGifId/_media
+                    // now, so stop the animation we just created and bail
+                    // out instead of clobbering the newer request's state.
+                    if (requestId !== this._imageRequestId) {
+                        gifAnimator.stopAnimation(gifId);
+                        return;
+                    }
+
                     // Register as the ONLY active GIF for this turtle
                     this._activeGifId = gifId;
 
@@ -796,6 +736,12 @@ Turtle.TurtleView = class {
         //original static image code (for non-GIFs or static GIFs)
         const image = new Image();
         image.onload = () => {
+            // Same overlap guard as the GIF path above: don't add a stale
+            // static image on top of whatever a newer request set up.
+            if (requestId !== this._imageRequestId) {
+                return;
+            }
+
             const bitmap = new createjs.Bitmap(image);
             this.imageContainer.addChild(bitmap);
             this._media.push(bitmap);

@@ -19,22 +19,13 @@
 
 function setupProgramBlocks(activity) {
     /**
-     * Determines whether a dictionary key is a built-in turtle status property.
+     * Determines whether a dictionary key is a built-in turtle status property, in any language.
      *
      * @param {string} key - The dictionary key to check.
      * @returns {boolean} True if the key represents a turtle status property, false otherwise.
      */
     function isTurtleStatusKey(key) {
-        return (
-            key === _("color") ||
-            key === _("shade") ||
-            key === _("grey") ||
-            key === _("pen size") ||
-            key === _("font") ||
-            key === _("heading") ||
-            key === "x" ||
-            key === "y"
-        );
+        return Turtle.DictActions.IsTurtleKey(key);
     }
     /**
      * Represents a block that loads the heap from a web page in the logo programming language.
@@ -1043,7 +1034,7 @@ function setupProgramBlocks(activity) {
                 // Look for a block with logo name
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
                     if (
-                        activity.blocks.blockList[i].protoblock.staticLabels.length > 0 &&
+                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
                         activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;

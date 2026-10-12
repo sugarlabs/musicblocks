@@ -502,6 +502,48 @@ describe("PhraseMaker Widget", () => {
             expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(1);
         });
 
+        test("keeps the turtle that ran the block for the graphics rows (#9330)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [0, 1].map(() => ({
+                singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" }
+            }));
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+
+            callInitPartial(pm, activity, 1);
+
+            expect(pm._turtle).toBe(turtles[1]);
+        });
+
+        test("keeps that turtle when the widget rebuilds itself (sort, add row, ...)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [
+                { singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" } },
+                { singer: { beatsPerMeasure: 3, noteValuePerBeat: 4, keySignature: "C major" } }
+            ];
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+            callInitPartial(pm, activity, 1);
+
+            // _sort, _restartGrid, pitchBlockAdded and adding a row call init(this.activity).
+            callInitPartial(pm, activity, undefined);
+
+            expect(pm._turtle).toBe(turtles[1]);
+            // The meter is still read from that turtle: 3/4.
+            expect(pm._measureLimit).toBeCloseTo(0.75);
+        });
+
+        test("takes the turtle the block gives on a new run", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [0, 1].map(() => ({
+                singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" }
+            }));
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+            callInitPartial(pm, activity, 1);
+
+            callInitPartial(pm, activity, 0);
+
+            expect(pm._turtle).toBe(turtles[0]);
+        });
+
         test("falls back to 4/4 when singer meter is not yet initialized", () => {
             const pm = new PhraseMaker(mockDeps);
             // meterByIndex is empty: beats/noteValue are undefined, || 4 applies
@@ -964,6 +1006,60 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker._update).toHaveBeenCalled();
     });
+    test("_updateTupletValue safely handles out-of-bounds or invalid noteToDivide", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["notes", 0, 4, 4]]
+            }
+        };
+
+        expect(() => phraseMaker._updateTupletValue(-1, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue(5, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue(NaN, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue("invalid", 1, 3)).not.toThrow();
+        expect(phraseMaker._update).not.toHaveBeenCalled();
+
+        phraseMaker.activity = null;
+        expect(() => phraseMaker._updateTupletValue(0, 1, 3)).not.toThrow();
+    });
+    test("_updateTupletValue handles multiple rhythms when noteToDivide > 0", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0, 1]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1],
+            [1, 0],
+            [1, 1]
+        ];
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [
+                    ["notes", 0, 4, 4],
+                    ["notes", 1, 4, 4]
+                ]
+            }
+        };
+
+        // Increase path with noteToDivide = 1 (exercises i < noteToDivide loop for i = 0)
+        expect(() => phraseMaker._updateTupletValue(1, 2, 3)).not.toThrow();
+        expect(phraseMaker._update).toHaveBeenCalledWith(1, null, 3, "stupletvalue");
+        expect(phraseMaker.activity.logo.tupletRhythms[1]).toEqual(["notes", 1, 4, 4, 4]);
+
+        // Decrease path with noteToDivide = 1
+        phraseMaker._update.mockClear();
+        expect(() => phraseMaker._updateTupletValue(1, 3, 2)).not.toThrow();
+        expect(phraseMaker._update).toHaveBeenCalledWith(1, null, 2, "stupletvalue");
+        expect(phraseMaker.activity.logo.tupletRhythms[1]).toEqual(["notes", 1, 4, 4]);
+    });
     test("_tieNotes merges note durations", async () => {
         phraseMaker._readjustNotesBlocks = jest.fn();
         phraseMaker._syncMarkedBlocks = jest.fn();
@@ -1145,6 +1241,58 @@ describe("PhraseMaker Widget", () => {
         };
 
         phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+    });
+    test("_setNoteCell detects graphics block from MATRIXGRAPHICS", () => {
+        phraseMaker._noteStored = ["forward"];
+        phraseMaker.rowLabels = ["forward"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: [],
+            MATRIXGRAPHICS: ["forward", "back", "right", "left"],
+            MATRIXGRAPHICS2: ["arc", "setxy"]
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+        // synth.trigger must NOT be called for a graphics block
+        expect(phraseMaker.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+    test("_setNoteCell detects graphics block from MATRIXGRAPHICS2", () => {
+        phraseMaker._noteStored = ["arc"];
+        phraseMaker.rowLabels = ["arc"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: [],
+            MATRIXGRAPHICS: ["forward", "back", "right", "left"],
+            MATRIXGRAPHICS2: ["arc", "setxy"]
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+        // synth.trigger must NOT be called for a graphics block
+        expect(phraseMaker.activity.logo.synth.trigger).not.toHaveBeenCalled();
     });
     test("_clear resets matrix safely", () => {
         phraseMaker.rowLabels = ["C"];
@@ -2928,6 +3076,32 @@ describe("PhraseMaker Widget", () => {
             phraseMaker._createMatrixGraphicsPieSubmenu(0, "graphicsblocks", 0);
 
             expect(phraseMaker.docById).toHaveBeenCalled();
+        });
+
+        test("_createMatrixGraphicsPieSubmenu offers whole-number values for pen rows", () => {
+            // set color, set shade, set hue, set grey and set translucency share one
+            // value list; the chosen label becomes the block's text and parseInt value.
+            phraseMaker.activity.blocks.blockList[0].name = "setshade";
+
+            phraseMaker._createMatrixGraphicsPieSubmenu(0, "graphicsblocks", 0);
+
+            const labels = phraseMaker._pitchWheel.createWheel.mock.calls[0][0];
+            expect(labels).toEqual([
+                "0",
+                "10",
+                "20",
+                "30",
+                "40",
+                "50",
+                "60",
+                "70",
+                "80",
+                "90",
+                "100"
+            ]);
+            for (const label of labels) {
+                expect(String(parseInt(label, 10))).toBe(label);
+            }
         });
 
         test("_createMatrixGraphics2PieSubmenu sets up secondary graphics menu", () => {

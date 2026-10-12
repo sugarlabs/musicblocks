@@ -12,7 +12,7 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
-/* global _, _THIS_IS_MUSIC_BLOCKS_ */
+/* global _, _THIS_IS_MUSIC_BLOCKS_, MATRIXBUTTONHEIGHT, toFixed2 */
 
 /* exported StatusMatrix */
 class StatusMatrix {

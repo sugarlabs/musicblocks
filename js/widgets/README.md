@@ -103,6 +103,16 @@ imported in `js/activity.js`.
     };
     ```
 
+7. **Register the widget for stack reinitialization (if needed)**
+   If disconnecting or reconnecting blocks inside an open widget should
+   refresh that widget, add its English `windowFor()` title to
+   `REINIT_WIDGET_TITLES` in `js/widgets/widgetWindows.js` (the single
+   source of truth). That title must match the widget block's
+   `formBlock({ name: _("...") })` label so `.wftTitle` and
+   `staticLabels[0]` compare equal after `_()`. Do not add local title
+   lists in `block.js` or `activity/block-drag-controller.js`.
+   `KEY_MAPPING` is separate and only used by `closeBlkWidgets()`.
+
 **Hint:** When creating a new widget, look for an existing widget with
 similar features. It is sometimes easier to fork than start building
 from scratch.

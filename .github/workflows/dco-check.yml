@@ -26,6 +26,10 @@ jobs:
         name: Check DCO sign-off
         runs-on: ubuntu-latest
         timeout-minutes: 5
+        # Renovate adds Signed-off-by via :gitSignOff preset — skip the
+        # check for bot PRs. We use github.actor instead of branch name
+        # to ensure malicious PRs cannot bypass checks by forging branch names.
+        if: "github.actor != 'renovate[bot]'"
         steps:
             - name: Checkout code
               uses: actions/checkout@v4

@@ -184,9 +184,9 @@ function setupExtrasBlocks(activity) {
                 if (logo.svgBackground) {
                     logo.svgOutput =
                         '<rect x="0" y="0" height="' +
-                        logo.canvas.height +
+                        activity.canvas.height +
                         '" width="' +
-                        logo.canvas.width +
+                        activity.canvas.width +
                         '" fill="' +
                         (getComputedStyle(document.body)
                             .getPropertyValue("--color-bg-primary")
@@ -195,7 +195,7 @@ function setupExtrasBlocks(activity) {
                         logo.svgOutput;
                 }
 
-                activity.save.saveSVG(args[0]);
+                activity.save.saveSVG(activity, args[0]);
             }
         }
     }
@@ -732,7 +732,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPTwoArgMathBlock.
          */
         constructor() {
-            super("nopOneArgMathBlock", _("unknown"));
+            super("nopTwoArgMathBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({

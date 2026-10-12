@@ -53,6 +53,8 @@ global.Notation = jest.fn().mockImplementation(() => ({}));
 global.Synth = jest.fn().mockImplementation(() => ({}));
 global.Singer = {};
 global.last = arr => arr[arr.length - 1];
+const { getMeasurePosition, getMeterAnchor } = require("../utils/musicutils-rhythm");
+Object.assign(global, { getMeasurePosition, getMeterAnchor });
 
 jest.mock("tone", () => ({
     UserMedia: jest.fn().mockImplementation(() => ({

@@ -21,21 +21,17 @@ global._ = jest.fn(str => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 const {
     createDefaultStack,
+    GUIDEURL,
     LOGOJA1,
     NUMBERBLOCKDEFAULT,
     DEFAULTPALETTE,
     TITLESTRING
 } = require("../turtledefs");
 
-global.GUIDEURL = "guide url";
 global.RUNBUTTON = "RUNBUTTON";
 global.STOPBUTTON = "STOPBUTTON";
 global.HELPTURTLEBUTTON = "HELPTURTLEBUTTON";
 global.LANGUAGEBUTTON = "LANGUAGEBUTTON";
-
-if (GUIDEURL === "guide url") {
-    GUIDEURL = "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md";
-}
 
 describe("turtledefs.js", () => {
     test("LOGOJA1 should be properly initialized", () => {
@@ -52,10 +48,8 @@ describe("turtledefs.js", () => {
         expect(DEFAULTPALETTE).toBe("turtle");
     });
 
-    test("GUIDEURL should default to the correct URL", () => {
-        expect(GUIDEURL).toBe(
-            "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md"
-        );
+    test("GUIDEURL should default to the Turtle Blocks HTML guide", () => {
+        expect(GUIDEURL).toBe("TurtleDocs/guide/index.html");
     });
 
     test("TITLESTRING should be defined", () => {

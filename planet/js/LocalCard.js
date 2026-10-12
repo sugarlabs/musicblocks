@@ -33,11 +33,22 @@ class LocalCard {
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
                     <div class="card"> 
-                    <a class="published-cloud tooltipped" data-position="top" data-delay="50" data-tooltip="${_(
-                        "View published project"
-                    )}" style="display:none;" id="local-project-cloud-{ID}">
-                        <i class="material-icons small">cloud_done</i>
-                    </a>
+                        <div class="card-badges" id="local-project-badges-{ID}">
+                            <a class="published-cloud tooltipped" data-position="top" data-delay="50" data-tooltip="${_(
+                                "View published project"
+                            )}" style="display:none;" id="local-project-cloud-{ID}">
+                                <i class="material-icons small">cloud_done</i>
+                            </a>
+                            <span class="git-repo-badge tooltipped" data-position="top" data-delay="50" data-tooltip="${_(
+                                "Being tracked"
+                            )}" style="display:none;" id="local-project-git-{ID}">
+                                <!-- git-branch icon (Phosphor, bold weight, MIT licence) — inlined to avoid external CDN dependency -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"
+                                     class="git-repo-badge-icon" role="img" aria-label="GitHub repository">
+                                    <path d="M232,64a32,32,0,1,0-40,30.9V128a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V94.9a32,32,0,1,0-16,0V128a24,24,0,0,0,24,24h80v33.1a32,32,0,1,0,16,0V152h0V94.9A32.1,32.1,0,0,0,232,64ZM80,64a16,16,0,1,1-16-16A16,16,0,0,1,80,64ZM192,208a16,16,0,1,1-16-16A16,16,0,0,1,192,208ZM200,80a16,16,0,1,1,16-16A16,16,0,0,1,200,80Z"/>
+                                </svg>
+                            </span>
+                        </div>
                         
                         <div class="card-image"> 
                             <img class="project-image project-card-image" alt="${_(
@@ -117,8 +128,7 @@ class LocalCard {
 
         if (this.ProjectData.ProjectImage !== null) imageSrc = this.ProjectData.ProjectImage;
         else {
-            imageSrc =
-                Planet.IsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+            imageSrc = Planet.IsMusicBlocks ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
         const imageId = `local-project-image-${this.id}`;
@@ -181,14 +191,21 @@ class LocalCard {
             this.duplicate();
         });
 
+        // show git-repo badge (static indicator — no link) if project is linked to a GitHub repo
+        if (this.ProjectData.GitRepoData && this.ProjectData.GitRepoData.repoName) {
+            frag.getElementById(`local-project-git-${this.id}`).style.display = "inline-flex";
+        }
+
         // set published cloud listener
         if (this.ProjectData.PublishedData !== null) {
-            frag.getElementById(`local-project-cloud-${this.id}`).style.display = "initial";
+            const cloudBadge = frag.getElementById(`local-project-cloud-${this.id}`);
+            cloudBadge.style.display = "inline-flex";
 
-            frag.getElementById(`local-project-cloud-${this.id}`).addEventListener("click", evt => {
+            cloudBadge.addEventListener("click", evt => {
+                const publishedId = this.ProjectData.PublishedData.repoName || this.id;
                 document.getElementById("global-tab").click();
-                Planet.GlobalPlanet.forceAddToCache(this.id, () => {
-                    Planet.GlobalPlanet.ProjectViewer.open(this.id);
+                Planet.GlobalPlanet.forceAddToCache(publishedId, () => {
+                    Planet.GlobalPlanet.ProjectViewer.open(publishedId);
                 });
             });
         }

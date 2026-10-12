@@ -14,6 +14,10 @@ Object.assign(global, musicutils);
 global.debugLog = jest.fn();
 
 const ManagedTimer = require("../../utils/ManagedTimer");
+// The editing and drawing methods live in their own modules and are installed
+// by the constructor, so they must be global before a keyboard is made.
+global.MusicKeyboardEditing = require("../MusicKeyboardEditing.js");
+global.MusicKeyboardRendering = require("../MusicKeyboardRendering.js");
 const MusicKeyboard = require("../musickeyboard.js");
 
 describe("MusicKeyboard document key handler lifecycle", () => {
@@ -167,6 +171,8 @@ describe("MusicKeyboard add-row submenu", () => {
         ];
 
         keyboard._createAddRowPieSubmenu();
+        // wheelnav selects the clicked item before calling its navigateFunction.
+        keyboard._menuWheel.selectedNavItemIndex = 0;
 
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         expect(loadNewBlocks).toHaveBeenCalledWith([
@@ -187,12 +193,16 @@ describe("MusicKeyboard add-row submenu", () => {
             }
         });
 
+        // Real rows have real block numbers; only gap-fill padding rows are
+        // numbered at or above FAKEBLOCKNUMBER (100000).
         keyboard.layout = [
-            { noteName: "do", noteOctave: 5, blockNumber: 100001 },
-            { noteName: "hertz", noteOctave: 440, blockNumber: 100002 }
+            { noteName: "do", noteOctave: 5, blockNumber: 7 },
+            { noteName: "hertz", noteOctave: 440, blockNumber: 8 }
         ];
 
         keyboard._createAddRowPieSubmenu();
+        // wheelnav selects the clicked item before calling its navigateFunction.
+        keyboard._menuWheel.selectedNavItemIndex = 0;
 
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         // After 'do', next pitch in chromatic solfege is 'do♯', and octave 5 is inherited from previous pitch
@@ -215,9 +225,11 @@ describe("MusicKeyboard add-row submenu", () => {
         });
 
         // 'ti' is the 12th / last pitch label in default solfege scale
-        keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 100001 }];
+        keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 7 }];
 
         keyboard._createAddRowPieSubmenu();
+        // wheelnav selects the clicked item before calling its navigateFunction.
+        keyboard._menuWheel.selectedNavItemIndex = 0;
 
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         // When rolling over after 'ti', next is 'do' and octave increments from 4 to 5
@@ -225,6 +237,41 @@ describe("MusicKeyboard add-row submenu", () => {
             [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
             [1, ["solfege", { value: "do" }], 0, 0, [0]],
             [2, ["number", { value: 5 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("keeps no item selected in the Add Note wheel, before and after a pick", () => {
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks: jest.fn()
+            }
+        });
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+
+        // A selected item is redrawn on every mouseover, which moves it out from
+        // under the pointer and turns a real click into an outside click.
+        const wheel = keyboard._menuWheel;
+        expect(wheel.selectedNavItemIndex).toBeNull();
+        expect(wheel.navItems.some(item => item.selected)).toBe(false);
+
+        wheel.raphael = { canvas: {} };
+        wheel.refreshWheel = jest.fn();
+        wheel.selectedNavItemIndex = 0;
+        wheel.navItems[0].selected = true;
+        wheel.navItems[0].navigateFunction();
+
+        expect(wheel.selectedNavItemIndex).toBeNull();
+        expect(wheel.navItems.some(item => item.selected)).toBe(false);
+        expect(wheel.refreshWheel).toHaveBeenCalledWith(true);
+        expect(keyboard.activity.blocks.loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
     });
 
@@ -260,6 +307,148 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(global.debugLog).toHaveBeenCalledWith(
             "Could not find anywhere to insert new block."
         );
+    });
+
+    // With the chromatic gap-fill the layout mixes real rows (solfege names)
+    // with padding rows (letter names, block numbers >= FAKEBLOCKNUMBER). Add
+    // Note has to add the next semitone above the highest real row, once.
+    const addPitchRow = (noteNames, octaves) => {
+        jest.useFakeTimers();
+        const blockList = Array.from({ length: 30 }, () => ({}));
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            errorMsg: jest.fn(),
+            turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) },
+            blocks: {
+                blockList,
+                loadNewBlocks: jest.fn(stack => stack.forEach(() => blockList.push({})))
+            }
+        });
+        keyboard.noteNames = noteNames;
+        keyboard.octaves = octaves;
+        keyboard._rowBlocks = noteNames.map((_, i) => 10 + i);
+        keyboard.instruments = noteNames.map(() => "electronic synth");
+        keyboard._keysLayout();
+        keyboard._addNotesBlockBetween = jest.fn();
+        keyboard._createKeyboard = jest.fn();
+        keyboard._createTable = jest.fn();
+
+        try {
+            keyboard._createAddRowPieSubmenu();
+            keyboard._menuWheel.selectedNavItemIndex = 0;
+            keyboard._menuWheel.navItems[0].navigateFunction();
+            jest.advanceTimersByTime(500);
+        } finally {
+            jest.useRealTimers();
+        }
+
+        const added = keyboard.activity.blocks.loadNewBlocks.mock.calls[0][0];
+        return {
+            added: [added[1][1][1].value, added[2][1][1].value],
+            rows: keyboard.layout.map(note => note.noteName + note.noteOctave)
+        };
+    };
+
+    test("Add Note adds the next semitone above the highest real row, in its octave", () => {
+        const { added, rows } = addPitchRow(["sol", "mi", "re"], [4, 4, 4]);
+
+        expect(added).toEqual(["sol♯", 4]);
+        // The new row takes the place of the G♯4 padding row: no duplicate,
+        // and no jump past the padded range.
+        expect(rows).toEqual([
+            "C4",
+            "C♯4",
+            "re4",
+            "D♯4",
+            "mi4",
+            "F4",
+            "F♯4",
+            "sol4",
+            "sol♯4",
+            "A4",
+            "A♯4",
+            "B4",
+            "C5"
+        ]);
+    });
+
+    // Only checks which pitch block Add Note creates. The row insertion it
+    // schedules for 500 ms later is cancelled so it can't run after the test.
+    const addPitchToLayout = layout => {
+        jest.useFakeTimers();
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            errorMsg: jest.fn(),
+            blocks: { blockList: [], loadNewBlocks }
+        });
+        try {
+            keyboard.layout = layout;
+            keyboard._createAddRowPieSubmenu();
+            keyboard._menuWheel.selectedNavItemIndex = 0;
+            keyboard._menuWheel.navItems[0].navigateFunction();
+            keyboard._clearWidgetTimers();
+            expect(jest.getTimerCount()).toBe(0);
+        } finally {
+            keyboard._clearWidgetTimers();
+            jest.useRealTimers();
+        }
+        return { keyboard, loadNewBlocks };
+    };
+
+    test("Add Note wraps to the lowest free pitch when the top row is ti8", () => {
+        const { loadNewBlocks } = addPitchToLayout([
+            { noteName: "re", noteOctave: 4, blockNumber: 7 },
+            { noteName: "ti", noteOctave: 8, blockNumber: 8 }
+        ]);
+
+        expect(loadNewBlocks.mock.calls[0][0].slice(1)).toEqual([
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 1 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("Add Note adds nothing when every pitch from C1 to B8 is taken", () => {
+        const solfege = [
+            "do",
+            "do♯",
+            "re",
+            "re♯",
+            "mi",
+            "fa",
+            "fa♯",
+            "sol",
+            "sol♯",
+            "la",
+            "la♯",
+            "ti"
+        ];
+        const layout = [];
+        for (let octave = 1; octave <= 8; octave++) {
+            solfege.forEach(name => {
+                layout.push({ noteName: name, noteOctave: octave, blockNumber: layout.length });
+            });
+        }
+
+        const { keyboard, loadNewBlocks } = addPitchToLayout(layout);
+
+        expect(keyboard.activity.errorMsg).toHaveBeenCalledWith(
+            "There is no free pitch left to add to the keyboard."
+        );
+        expect(loadNewBlocks).not.toHaveBeenCalled();
+    });
+
+    test("Add Note after ti adds do in the next octave, over the padding row", () => {
+        const { added, rows } = addPitchRow(
+            ["do", "re", "mi", "fa", "sol", "la", "ti"],
+            [4, 4, 4, 4, 4, 4, 4]
+        );
+
+        expect(added).toEqual(["do", 5]);
+        expect(rows.filter(row => row === "do5" || row === "C5")).toEqual(["do5"]);
+        expect(rows).toHaveLength(13);
     });
 
     test("initializes noteToKeyMap and safely updates when inserting a new note block via pie menu", () => {
@@ -996,6 +1185,92 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         expect(c5Item).toBeDefined();
         expect(c5Item.voice).toBe("guitar");
     });
+
+    describe("accidentals with the real pitch tables", () => {
+        const constants = require("../../utils/musicutils-constants.js");
+        const { FIXEDSOLFEGE1 } = require("../../utils/musicutils-i18n.js");
+
+        const initKeyboard = (noteNames, keySignature = "C major") => {
+            document.body.innerHTML = "";
+            mockActivity.turtles.ithTurtle(0).singer.keySignature = keySignature;
+            global.PITCHES = constants.PITCHES;
+            global.PITCHES2 = constants.PITCHES2;
+            global.FIXEDSOLFEGE1 = FIXEDSOLFEGE1;
+            global.convertFromSolfege = musicutils.convertFromSolfege;
+            global.noteToFrequency = musicutils.noteToFrequency;
+
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.noteNames = noteNames;
+            keyboard.octaves = noteNames.map(() => 4);
+            keyboard._rowBlocks = noteNames.map((_, i) => 44 + i * 3);
+            keyboard.instruments = noteNames.map(() => "guitar");
+
+            const blockList = {};
+            noteNames.forEach((name, i) => {
+                const b = 44 + i * 3;
+                blockList[b] = { name: "pitch", connections: [null, b + 1, b + 2, null] };
+                blockList[b + 1] = { value: name };
+                blockList[b + 2] = { value: 4 };
+            });
+            mockActivity.blocks = {
+                blockList,
+                adjustDocks: jest.fn(),
+                clampBlocksToCheck: [],
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn()
+            };
+
+            keyboard.init();
+            return keyboard;
+        };
+
+        const keyLabelFor = blockNumber => {
+            const cell = [...document.querySelectorAll("td")].find(td =>
+                td.getAttribute("alt")?.endsWith("__" + blockNumber)
+            );
+            return cell ? cell.textContent : undefined;
+        };
+
+        test("keeps a flat lowest note (E♭4 in C minor) on its key", () => {
+            const keyboard = initKeyboard(["mi♭", "sol"]);
+
+            const eFlat = keyboard.layout.find(k => k.blockNumber === 44);
+            expect(eFlat).toMatchObject({ noteName: "mi♭", noteOctave: 4 });
+            expect(keyLabelFor(44)).toContain("E♭4");
+        });
+
+        test("labels sharp keys with their note name", () => {
+            initKeyboard(["re♯", "sol"]);
+
+            expect(keyLabelFor(44)).toContain("D♯4");
+        });
+
+        test("orders fixed-Do accidentals by pitch in a minor key", () => {
+            const keyboard = initKeyboard(["la♭", "sol"], "C minor");
+            const keyNames = () => keyboard.displayLayout.map(k => k.noteName + k.noteOctave);
+            const expected = [
+                "C4",
+                "C♯4",
+                "D4",
+                "D♯4",
+                "E4",
+                "F4",
+                "F♯4",
+                "G4",
+                "A♭4",
+                "A4",
+                "A♯4",
+                "B4",
+                "C5"
+            ];
+
+            expect(keyNames()).toEqual(expected);
+
+            keyboard._sortLayout();
+
+            expect(keyNames()).toEqual(expected);
+        });
+    });
 });
 
 describe("MusicKeyboard core logic", () => {
@@ -1230,6 +1505,117 @@ describe("MusicKeyboard core logic", () => {
             expect(keyboard.activity.blocks.clampBlocksToCheck).toEqual([[2, 0]]);
             expect(refreshCanvas).toHaveBeenCalled();
         });
+
+        test("safely ignores undefined, null, or missing block without throwing", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            keyboard.activity = {
+                blocks: {
+                    blockList: {},
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            expect(() => keyboard._removePitchBlock(undefined)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(null)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(1000005)).not.toThrow();
+            expect(sendStackToTrash).not.toHaveBeenCalled();
+        });
+
+        test("safely ignores block with invalid, empty, or single connection", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            keyboard.activity = {
+                blocks: {
+                    blockList: {
+                        5: { connections: [] },
+                        6: { connections: null },
+                        7: { connections: [2] }
+                    },
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            expect(() => keyboard._removePitchBlock(5)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(6)).not.toThrow();
+            expect(() => keyboard._removePitchBlock(7)).not.toThrow();
+            expect(sendStackToTrash).not.toHaveBeenCalled();
+        });
+
+        test("safely detaches surviving parent when child is missing", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            const blockList = {
+                10: { connections: [2, 999] },
+                2: { name: "musickeyboard", connections: [0, 10] }
+            };
+            keyboard.activity = {
+                blocks: {
+                    blockList,
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            keyboard._removePitchBlock(10);
+
+            expect(blockList[2].connections[1]).toBeNull();
+            expect(sendStackToTrash).toHaveBeenCalledWith(blockList[10]);
+        });
+
+        test("safely detaches surviving child when parent is missing", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            const blockList = {
+                10: { connections: [999, 20] },
+                20: { connections: [10, null] }
+            };
+            keyboard.activity = {
+                blocks: {
+                    blockList,
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            keyboard._removePitchBlock(10);
+
+            expect(blockList[20].connections[0]).toBeNull();
+            expect(sendStackToTrash).toHaveBeenCalledWith(blockList[10]);
+        });
+
+        test("safely handles musickeyboard parent with null or insufficient connections", () => {
+            const keyboard = new MusicKeyboard({});
+            const sendStackToTrash = jest.fn();
+            const blockList = {
+                10: { connections: [2, 20] },
+                2: { name: "musickeyboard", connections: null },
+                20: { connections: [10, null] }
+            };
+            keyboard.activity = {
+                blocks: {
+                    blockList,
+                    sendStackToTrash,
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn()
+            };
+
+            expect(() => keyboard._removePitchBlock(10)).not.toThrow();
+            expect(blockList[20].connections[0]).toBe(2);
+            expect(sendStackToTrash).toHaveBeenCalledWith(blockList[10]);
+        });
     });
 
     describe("_roundNoteDuration", () => {
@@ -1284,6 +1670,115 @@ describe("MusicKeyboard core logic", () => {
             expect(img.src).toContain("header-icons/play-button.svg");
             expect(img.title).toBe("Play");
             expect(img.alt).toBe("Play");
+        });
+    });
+
+    describe("the tempo it plays and saves at (#9337)", () => {
+        let origWidgetWindows, origSinger, turtles, mockActivity;
+
+        beforeEach(() => {
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({ append: jest.fn(), style: {} })
+            };
+            origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+            origSinger = global.Singer;
+            global.Singer = { masterBPM: 90 };
+            // After a project is loaded, turtle 0 is a trashed turtle of the old project and
+            // the project runs on turtle 1, which set 120 BPM.
+            turtles = [{ singer: { bpm: [] } }, { singer: { bpm: [120] } }];
+            mockActivity = {
+                turtles: { ithTurtle: jest.fn(i => turtles[i]) },
+                logo: { synth: { stopSound: jest.fn() } }
+            };
+        });
+
+        afterEach(() => {
+            global.window.widgetWindows = origWidgetWindows;
+            global.Singer = origSinger;
+        });
+
+        test("uses the tempo of the turtle that ran the block, not turtle 0", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(120);
+            expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+        });
+
+        test("uses that turtle's latest tempo", () => {
+            turtles[1].singer.bpm = [120, 75];
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(75);
+        });
+
+        test("uses the master tempo when that turtle hasn't set one", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[0];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(90);
+        });
+
+        test("uses turtle 0 when it doesn't know the turtle", () => {
+            turtles[0].singer.bpm = [100];
+            const keyboard = new MusicKeyboard(mockActivity);
+
+            keyboard._createWidgetWindow();
+
+            expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+            expect(keyboard.bpm).toBe(100);
+        });
+
+        test("lays out its keys in that turtle's key signature", () => {
+            const origNoteToFrequency = global.noteToFrequency;
+            const origConvertFromSolfege = global.convertFromSolfege;
+            global.noteToFrequency = jest.fn().mockReturnValue(392);
+            global.convertFromSolfege = jest.fn(name => name);
+            turtles[0].singer.keySignature = "C major";
+            turtles[1].singer.keySignature = "D minor";
+
+            try {
+                const keyboard = new MusicKeyboard(mockActivity);
+                keyboard.turtle = turtles[1];
+                keyboard.noteNames = ["sol"];
+                keyboard.octaves = [4];
+                keyboard._rowBlocks = [44];
+                keyboard.instruments = ["guitar"];
+
+                keyboard._keysLayout();
+
+                expect(global.noteToFrequency).toHaveBeenCalledWith("sol4", "D minor");
+                expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            } finally {
+                global.noteToFrequency = origNoteToFrequency;
+                global.convertFromSolfege = origConvertFromSolfege;
+            }
+        });
+
+        test("lets go of the turtle when it is closed", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+            keyboard._createWidgetWindow();
+
+            window.widgetWindows.windowFor().onclose();
+
+            expect(keyboard.turtle).toBeNull();
         });
     });
 
@@ -1529,19 +2024,107 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
     });
 
-    test("handles fallback timer calls when ManagedTimer is null", () => {
-        jest.useFakeTimers();
+    test("handles timer calls safely when ManagedTimer is null with native fallbacks", () => {
         const keyboard = new MusicKeyboard({});
         keyboard._timerManager = null;
 
         const callback = jest.fn();
-        const id = keyboard._setWidgetInterval(callback, 500);
+        const intervalId = keyboard._setWidgetInterval(callback, 500);
+        expect(typeof intervalId).toBe("number");
+        expect(keyboard._clearWidgetInterval(intervalId)).toBe(true);
 
-        jest.advanceTimersByTime(500);
-        expect(callback).toHaveBeenCalledTimes(1);
+        const timeoutId = keyboard._setWidgetTimeout(callback, 500);
+        expect(typeof timeoutId).toBe("number");
+        expect(keyboard._clearWidgetTimeout(timeoutId)).toBe(true);
+    });
 
-        expect(keyboard._clearWidgetInterval(id)).toBe(true);
-        jest.useRealTimers();
+    test("tracks widget timeouts and chords through ManagedTimer", () => {
+        jest.useFakeTimers();
+        try {
+            const keyboard = new MusicKeyboard({});
+            const callback = jest.fn();
+
+            keyboard._setWidgetTimeout(callback, 500);
+            expect(keyboard._timerManager).toBeInstanceOf(ManagedTimer);
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+
+            const cancelId = keyboard._setWidgetTimeout(() => {}, 1000);
+            expect(keyboard._clearWidgetTimeout(cancelId)).toBe(true);
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test("_playChord schedules voices through ManagedTimer", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.activity = {
+            logo: {
+                synth: {
+                    trigger: jest.fn()
+                }
+            }
+        };
+
+        keyboard._playChord(["C", "E", "G", "B"], [1], ["piano", "piano", "piano", "piano"]);
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(4);
+
+        keyboard._clearWidgetTimers();
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+    });
+
+    test("_playChord schedules and triggers every note of a chord larger than four", () => {
+        jest.useFakeTimers();
+        try {
+            const trigger = jest.fn();
+            const keyboard = new MusicKeyboard({});
+            keyboard.activity = { logo: { synth: { trigger } } };
+
+            const notes = ["C", "E", "G", "B", "D", "F"];
+            const instruments = notes.map(() => "piano");
+            keyboard._playChord(notes, [1], instruments);
+
+            // One scheduled timeout per note, not capped at four.
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(notes.length);
+
+            jest.advanceTimersByTime(1);
+
+            expect(trigger).toHaveBeenCalledTimes(notes.length);
+            expect(trigger).toHaveBeenCalledWith(0, "D", 1, "piano", null, null);
+            expect(trigger).toHaveBeenCalledWith(0, "F", 1, "piano", null, null);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test("_clearPlaybackTimers clears playback timeouts while preserving other widget timers", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.activity = {
+            logo: {
+                synth: {
+                    trigger: jest.fn()
+                }
+            }
+        };
+
+        keyboard._setWidgetTimeout(() => {}, 1000);
+        keyboard._playChord(["C", "E"], [1], ["piano", "piano"]);
+        keyboard._playOneTimeout = keyboard._setWidgetTimeout(() => {}, 2000);
+
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(4);
+
+        keyboard._clearPlaybackTimers();
+
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(1);
+        expect(keyboard._playOneTimeout).toBeNull();
+        expect(keyboard._chordTimeouts).toEqual([]);
+
+        keyboard._clearWidgetTimers();
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
     });
 
     test("shiftOctave shifts octaves up and down within bounds", () => {
@@ -1584,26 +2167,14 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
     test("triggers shiftOctave on Shift+ArrowUp and Shift+ArrowDown keydown events", () => {
         const keyboard = new MusicKeyboard({});
         keyboard.shiftOctave = jest.fn();
-
-        const __keyboarddown = event => {
-            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
-                event.preventDefault();
-                keyboard.shiftOctave(1);
-                return;
-            }
-            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
-                event.preventDefault();
-                keyboard.shiftOctave(-1);
-                return;
-            }
-        };
+        keyboard.addKeyboardShortcuts();
 
         const eventUp = {
             shiftKey: true,
             key: "ArrowUp",
             preventDefault: jest.fn()
         };
-        __keyboarddown(eventUp);
+        document.onkeydown(eventUp);
         expect(keyboard.shiftOctave).toHaveBeenCalledWith(1);
         expect(eventUp.preventDefault).toHaveBeenCalled();
 
@@ -1612,9 +2183,37 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
             key: "ArrowDown",
             preventDefault: jest.fn()
         };
-        __keyboarddown(eventDown);
+        document.onkeydown(eventDown);
         expect(keyboard.shiftOctave).toHaveBeenCalledWith(-1);
         expect(eventDown.preventDefault).toHaveBeenCalled();
+    });
+
+    test("does not intercept keyboard input while editing text", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.shiftOctave = jest.fn();
+        keyboard.addKeyboardShortcuts();
+
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        input.focus();
+        const event = {
+            shiftKey: true,
+            key: "ArrowUp",
+            keyCode: 38,
+            preventDefault: jest.fn()
+        };
+
+        document.onkeydown(event);
+        document.onkeyup(event);
+
+        expect(keyboard.shiftOctave).not.toHaveBeenCalled();
+        expect(event.preventDefault).not.toHaveBeenCalled();
+
+        const noteEvent = { key: "s", keyCode: 83 };
+        document.onkeydown(noteEvent);
+        document.onkeyup(noteEvent);
+
+        expect(keyboard._notesPlayed).toEqual([]);
     });
 
     test("shiftOctave updates DOM elements attributes and text nodes", () => {
@@ -1992,5 +2591,69 @@ describe("MusicKeyboard sequencer matrix, note tracking, and chord grouping", ()
             gridCell00.onmouseover();
             expect(gridCell00.style.backgroundColor).toBe("black"); // Stays unchanged
         });
+    });
+});
+
+describe("MusicKeyboard rest key pointer handler", () => {
+    let keyboard, element, originalPlatformColor;
+
+    const listener = type => element.addEventListener.mock.calls.find(call => call[0] === type)[1];
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 0, 1, 0, 0, 0));
+        originalPlatformColor = global.platformColor;
+        global.platformColor = { orange: "orange" };
+        delete localStorage.beginnerMode;
+
+        keyboard = new MusicKeyboard({
+            logo: { synth: { trigger: jest.fn(), stopSound: jest.fn() } }
+        });
+        keyboard._notesPlayed = [];
+        keyboard._createTable = jest.fn();
+        keyboard._updateWidgetWindowSize = jest.fn();
+        element = {
+            id: "rest",
+            addEventListener: jest.fn(),
+            style: {},
+            setPointerCapture: jest.fn(),
+            dispatchEvent: jest.fn()
+        };
+        keyboard.loadRestHandler(element);
+    });
+
+    afterEach(() => {
+        global.platformColor = originalPlatformColor;
+        jest.useRealTimers();
+    });
+
+    test("records a rest lasting as long as the key was held", () => {
+        const start = Date.now();
+        listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
+        expect(element.style.backgroundColor).toBe("orange");
+
+        jest.advanceTimersByTime(500);
+        listener("pointerup")();
+
+        expect(keyboard._notesPlayed).toEqual([
+            { startTime: start, noteOctave: "R", objId: null, duration: 0.5 }
+        ]);
+        expect(element.style.backgroundColor).toBe("white");
+        expect(keyboard._createTable).toHaveBeenCalled();
+        expect(keyboard.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("records the rest when the pointer is cancelled mid-press", () => {
+        listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
+        listener("pointercancel")();
+
+        expect(keyboard._notesPlayed).toHaveLength(1);
+        expect(keyboard._notesPlayed[0].noteOctave).toBe("R");
+    });
+
+    test("ignores a release that was not preceded by a press", () => {
+        listener("pointerup")();
+
+        expect(keyboard._notesPlayed).toEqual([]);
     });
 });

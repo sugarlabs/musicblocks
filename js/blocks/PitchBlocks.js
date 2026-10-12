@@ -959,7 +959,9 @@ function setupPitchBlocks(activity) {
         static _parseCents(value) {
             if (typeof value !== "string") return [value, 0];
             const match = value.match(
-                new RegExp(`^([A-Ga-g](?:[#b♯♭]|𝄪|𝄫)?)(\\(([+-]\\d+)${CENTSSYMBOL}\\))?$`)
+                new RegExp(
+                    `^([v^]{0,2}[A-Ga-g](?:[#b♯♭]{1,2}|𝄪|𝄫)?)(\\(([+-]?\\d+)(?:${CENTSSYMBOL}|c)?\\))?$`
+                )
             );
             if (match) {
                 return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];
@@ -1672,6 +1674,24 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+            } else if (logo.inPitchDrumMatrix) {
+                // The widget's rows are notes, so use the nearest note and octave. The pitch
+                // path would add the cents as semitones.
+                const note = obj;
+                if (tur.singer.drumStyle.length > 0) {
+                    logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    logo.pitchDrumMatrix.addColBlock(blk);
+                } else {
+                    logo.pitchDrumMatrix.addRowBlock(blk);
+                    if (!logo.pitchBlocks.includes(blk)) {
+                        logo.pitchBlocks.push(blk);
+                    }
+
+                    logo.pitchDrumMatrix.rowLabels.push(note[0]);
+                    logo.pitchDrumMatrix.rowArgs.push(note[1]);
+                    tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                    tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                }
             } else if (logo.inLegoWidget) {
                 logo.legoWidget.addRowBlock(blk);
                 if (!logo.pitchBlocks.includes(blk)) {
@@ -1692,36 +1712,8 @@ function setupPitchBlocks(activity) {
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inPitchStaircase) {
-                const frequency = arg;
                 const note = obj;
-                let flag = 0;
-
-                for (let i = 0; i < logo.pitchStaircase.Stairs.length; i++) {
-                    if (logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        logo.pitchStaircase.Stairs.splice(i, 0, [
-                            note[0],
-                            note[1],
-                            parseFloat(frequency)
-                        ]);
-                        flag = 1;
-                        return;
-                    }
-                    if (logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        logo.pitchStaircase.Stairs.splice(i, 1, [
-                            note[0],
-                            note[1],
-                            parseFloat(frequency)
-                        ]);
-                        flag = 1;
-                        return;
-                    }
-                }
-
-                if (flag === 0) {
-                    logo.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
-                }
-
-                logo.pitchStaircase.stairPitchBlocks.push(blk);
+                logo.pitchStaircase.addStair(note[0], note[1], parseFloat(arg), blk);
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequencies.push(args[0]);
             } else {
@@ -1947,7 +1939,11 @@ function setupPitchBlocks(activity) {
             this.setHelpString([
                 _(
                     "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
-                ),
+                ) +
+                    " " +
+                    _(
+                        "Changing the octave number keeps the pitch name but makes the note sound higher or lower."
+                    ),
                 "documentation",
                 null,
                 "note1"
@@ -2017,10 +2013,10 @@ function setupPitchBlocks(activity) {
                     }
                     scaledegree = Math.abs(scaledegree);
 
-                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                    if (obj[0].substr(1) === FLAT) {
+                    let ref = NOTESTEP[obj[0].slice(0, 1)] - 1;
+                    if (obj[0].slice(1) === FLAT) {
                         ref--;
-                    } else if (obj[0].substr(1) === SHARP) {
+                    } else if (obj[0].slice(1) === SHARP) {
                         ref++;
                     }
                     note = scaleDegreeToPitchMapping(
@@ -2127,7 +2123,7 @@ function setupPitchBlocks(activity) {
                     if (![SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(accSym)) {
                         accSym = NATURAL;
                     } else {
-                        arg0 = arg0.substr(0, arg0.length - 1);
+                        arg0 = arg0.slice(0, arg0.length - 1);
                     }
                     note = NOTENAMES.includes(arg0.toUpperCase())
                         ? SOLFEGECONVERSIONTABLE[arg0.toUpperCase()]

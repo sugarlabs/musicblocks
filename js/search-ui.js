@@ -189,6 +189,125 @@ class SearchUI {
     updateResultCounter() {}
 
     /**
+     * When a non-empty query matches nothing, keep the autocomplete menu
+     * visible with a disabled "No results found" row instead of closing it.
+     *
+     * @param {string} term - Lowercased, trimmed query used for matching.
+     * @param {Array} results - Items returned by the search source.
+     * @param {string} [displayTerm] - Original typed query for the message.
+     * @returns {Array}
+     */
+    wrapEmptySearchResults(term, results, displayTerm) {
+        if (results && results.length > 0) {
+            return results;
+        }
+        if (!term) {
+            return results || [];
+        }
+        const query = String(
+            displayTerm === undefined || displayTerm === null ? term : displayTerm
+        ).trim();
+        return [
+            {
+                label: _("No results found for %s").replace(/%s/g, query),
+                value: "",
+                artwork: "",
+                specialDict: null,
+                isEmptyState: true
+            }
+        ];
+    }
+
+    /**
+     * @param {object} item - Autocomplete item.
+     * @returns {boolean}
+     */
+    isEmptySearchResult(item) {
+        return !!(item && item.isEmptyState);
+    }
+
+    /**
+     * Renders the non-interactive empty-state row in an autocomplete menu.
+     *
+     * @param {object} $j - jQuery reference
+     * @param {object} ul - Autocomplete <ul>
+     * @param {object} item - Empty-state item
+     * @returns {object}
+     */
+    renderEmptySearchItem($j, ul, item) {
+        const li = $j("<li></li>");
+        this.decorateEmptySearchItem(li, item, $j);
+        const styled = typeof ul.css === "function" ? ul.css("z-index", 35000) : ul;
+        return li.appendTo(styled);
+    }
+
+    /**
+     * Marks an autocomplete row as the non-interactive empty-state message
+     * and exposes that message to assistive tech.
+     *
+     * @param {object} li - jQuery <li>
+     * @param {object} item - Empty-state item
+     * @param {object} $j - jQuery reference
+     * @returns {object} li
+     */
+    decorateEmptySearchItem(li, item, $j) {
+        if (typeof li.addClass === "function") {
+            li.addClass("ui-state-disabled search-no-results");
+        }
+        if (li[0]) {
+            const extra = "ui-state-disabled search-no-results";
+            li[0].className = li[0].className ? li[0].className + " " + extra : extra;
+            li[0].setAttribute("aria-disabled", "true");
+        }
+        const message = $j("<a>").text(item.label);
+        if (message[0]) {
+            message[0].setAttribute("role", "status");
+            message[0].setAttribute("aria-live", "polite");
+        }
+        li.append(message);
+        return li;
+    }
+
+    /**
+     * Appends a block suggestion's text to an autocomplete row: the block
+     * name, then its argument names in smaller, dimmed text. The row is laid
+     * out as a flex row so long text wraps beside the icon, not under it.
+     *
+     * @param {object} li - jQuery <li> that already holds the block icon
+     * @param {object} item - Search suggestion ({ label, argLabels })
+     * @returns {object} li
+     */
+    appendSuggestionLabel(li, item) {
+        const row = li[0];
+        if (row) {
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            const icon = row.querySelector("img");
+            if (icon) icon.style.flexShrink = "0";
+        }
+
+        const link = document.createElement("a");
+        link.style.flex = "1 1 auto";
+        link.style.minWidth = "0";
+        link.textContent = item.label;
+        if (item.argLabels) {
+            const args = document.createElement("span");
+            args.className = "search-item-args";
+            args.style.marginLeft = "0.25em";
+            args.style.fontSize = "0.85em";
+            args.style.opacity = "0.7";
+            args.textContent = item.argLabels;
+            // A real space keeps the name and arguments apart for screen
+            // readers and copied text, not just visually.
+            link.appendChild(document.createTextNode(" "));
+            link.appendChild(args);
+        }
+
+        li.append(link);
+        return li;
+    }
+
+    /**
      * Tears down the search UI: hides the helpful-search overlay and the
      * main search input.
      */
@@ -208,7 +327,7 @@ class SearchUI {
      * All callbacks are provided by SearchController so no logic lives here.
      *
      * @param {Function} sourceFn  (term:string) => Array  — returns filtered suggestions
-     * @param {Function} selectCb  (item, keyCode) => void — called when user picks a result
+     * @param {Function} selectCb  (item, key) => void — called when user picks a result
      * @param {Function} dropCb   (protoblk, x, y) => void — called when user drag-drops a result
      */
     setupMainAutocomplete(sourceFn, selectCb, dropCb) {
@@ -222,15 +341,18 @@ class SearchUI {
         $search.autocomplete({
             source: (request, response) => {
                 const term = (request.term || "").toLowerCase().trim();
-                response(sourceFn(term));
+                response(this.wrapEmptySearchResults(term, sourceFn(term), request.term));
             },
             appendTo: "body",
             select: (event, ui) => {
                 event.preventDefault();
+                if (this.isEmptySearchResult(ui.item)) {
+                    return false;
+                }
                 activity.searchWidget.value = ui.item.label;
                 activity.searchWidget.idInput_custom = ui.item.value;
                 activity.searchWidget.protoblk = ui.item.specialDict;
-                selectCb(ui.item, event.keyCode);
+                selectCb(ui.item, event.key);
             },
             focus: event => {
                 event.preventDefault();
@@ -328,11 +450,14 @@ class SearchUI {
         $helpfulSearch.autocomplete({
             source: (request, response) => {
                 const term = (request.term || "").toLowerCase().trim();
-                response(sourceFn(term));
+                response(this.wrapEmptySearchResults(term, sourceFn(term), request.term));
             },
             appendTo: "body",
             select: (event, ui) => {
                 event.preventDefault();
+                if (this.isEmptySearchResult(ui.item)) {
+                    return false;
+                }
                 activity.helpfulSearchWidget.value = ui.item.label;
                 activity.helpfulSearchWidget.idInput_custom = ui.item.value;
                 activity.helpfulSearchWidget.protoblk = ui.item.specialDict;
@@ -346,12 +471,15 @@ class SearchUI {
         const instance = $helpfulSearch.autocomplete("instance");
         if (instance) {
             instance._renderItem = (ul, item) => {
+                if (this.isEmptySearchResult(item)) {
+                    return this.renderEmptySearchItem($j, ul, item);
+                }
                 const li = $j("<li></li>");
                 const img = document.createElement("img");
                 img.src = item.artwork || "";
                 img.height = 20;
                 li.append(img);
-                li.append($j("<a>").text(" " + item.label));
+                this.appendSuggestionLabel(li, item);
                 return li.appendTo(ul.css("z-index", 35000));
             };
         }
@@ -464,6 +592,10 @@ class SearchUI {
      * @returns {jQuery}
      */
     _renderMainItem($j, ul, item, dropCb) {
+        if (this.isEmptySearchResult(item)) {
+            return this.renderEmptySearchItem($j, ul, item);
+        }
+
         const li = $j("<li></li>");
 
         const img = document.createElement("img");
@@ -534,7 +666,7 @@ class SearchUI {
         li[0].addEventListener("mousedown", down, true);
         li[0].addEventListener("touchstart", down, { capture: true, passive: false });
         li.append(img);
-        li.append($j("<a>").text(" " + item.label));
+        this.appendSuggestionLabel(li, item);
 
         return li.appendTo(
             ul.css({

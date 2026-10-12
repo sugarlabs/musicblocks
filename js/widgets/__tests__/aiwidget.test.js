@@ -9,14 +9,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global jest, describe, it, expect, beforeEach */
+/* global jest, describe, it, expect, beforeEach, afterEach */
 
 const {
     AIWidget,
     adjustPitch,
     abcToStandardValue,
     createPitchBlocks,
-    searchIndexForMusicBlock
+    searchIndexForMusicBlock,
+    getGroqApiKey,
+    setGroqApiKey
 } = require("../aiwidget");
 
 // Mock globals
@@ -193,6 +195,7 @@ describe("AIWidget Instance", () => {
     let originalWindowFor;
 
     beforeEach(() => {
+        sessionStorage.clear();
         mockActivity = {
             logo: {
                 synth: {
@@ -300,8 +303,11 @@ describe("AIWidget Instance", () => {
         const firstAnalysers = analysers.slice();
         aiWidget.init(mockActivity);
 
+        // Disposing analysers must never call disconnect(): Tone.js throws an
+        // InvalidAccessError when disconnecting a destination the synth is not
+        // connected to, which broke the widget on reopen (#6853).
+        expect(disconnectMock).not.toHaveBeenCalled();
         for (const analyser of firstAnalysers) {
-            expect(disconnectMock).toHaveBeenCalledWith(analyser);
             expect(analyser.dispose).toHaveBeenCalledTimes(1);
         }
         expect(aiWidget.pitchAnalysers[0]).toBe(analysers[2]);
@@ -393,11 +399,13 @@ describe("AIWidget Instance", () => {
     it("should clean up analysers and animation frames on widget close", () => {
         const cancelAnimationFrameMock = jest.fn();
         global.cancelAnimationFrame = cancelAnimationFrameMock;
-        const disposeMock = jest.fn();
         const disconnectMock = jest.fn();
-        global.Tone.Analyser = jest.fn(() => ({
-            dispose: disposeMock
-        }));
+        const analysers = [];
+        global.Tone.Analyser = jest.fn(() => {
+            const analyser = { dispose: jest.fn() };
+            analysers.push(analyser);
+            return analyser;
+        });
         global.instruments = [
             {
                 piano: {
@@ -438,28 +446,18 @@ describe("AIWidget Instance", () => {
             one: 11,
             two: 22
         };
-        const closingDisposeMock = jest.fn();
-        const closingAnalyser = {
-            dispose: closingDisposeMock
-        };
-        aiWidget.pitchAnalysers = {
-            0: {
-                dispose: disposeMock
-            }
-        };
         aiWidget.init(mockActivity);
         aiWidget.drawVisualIDs = {
             one: 11,
             two: 22
         };
-        aiWidget.pitchAnalysers = {
-            0: closingAnalyser
-        };
         widgetInstance.onclose();
         expect(cancelAnimationFrameMock).toHaveBeenCalledWith(11);
         expect(cancelAnimationFrameMock).toHaveBeenCalledWith(22);
-        expect(disconnectMock).toHaveBeenCalledWith(closingAnalyser);
-        expect(closingDisposeMock).toHaveBeenCalledTimes(1);
+        expect(disconnectMock).not.toHaveBeenCalled();
+        for (const analyser of analysers) {
+            expect(analyser.dispose).toHaveBeenCalledTimes(1);
+        }
         expect(widgetInstance.destroy).toHaveBeenCalled();
         expect(aiWidget.pitchAnalysers).toEqual({});
     });
@@ -972,7 +970,7 @@ describe("AIWidget Instance", () => {
         expect(aiWidget._waitAndEndPlaying).toHaveBeenCalled();
     });
 
-    it("should reconnect reference sample synth to analyser 0", () => {
+    it("should connect reference sample synth to analyser 0 without disconnecting", () => {
         const disconnectMock = jest.fn();
         const connectMock = jest.fn();
         global.instruments = [
@@ -990,11 +988,11 @@ describe("AIWidget Instance", () => {
             1: {}
         };
         aiWidget.reconnectSynthsToAnalyser();
-        expect(disconnectMock).toHaveBeenCalled();
+        expect(disconnectMock).not.toHaveBeenCalled();
         expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[0]);
     });
 
-    it("should reconnect custom sample synth to analyser 1", () => {
+    it("should connect custom sample synth to analyser 1 without disconnecting", () => {
         const disconnectMock = jest.fn();
         const connectMock = jest.fn();
         global.instruments = [
@@ -1013,7 +1011,126 @@ describe("AIWidget Instance", () => {
             1: {}
         };
         aiWidget.reconnectSynthsToAnalyser();
-        expect(disconnectMock).toHaveBeenCalled();
+        expect(disconnectMock).not.toHaveBeenCalled();
         expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[1]);
+    });
+
+    it("should not reconnect an already connected synth", () => {
+        const disconnectMock = jest.fn();
+        const connectMock = jest.fn();
+        global.instruments = [
+            {
+                piano: {
+                    disconnect: disconnectMock,
+                    connect: connectMock
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+        aiWidget.reconnectSynthsToAnalyser();
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(disconnectMock).not.toHaveBeenCalled();
+        expect(connectMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("should reconnect a replacement synth even when the analyser index is unchanged", () => {
+        const connectAMock = jest.fn();
+        const connectBMock = jest.fn();
+        const synthA = { connect: connectAMock };
+        const synthB = { connect: connectBMock };
+        global.instruments = [{ piano: synthA }];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(connectAMock).toHaveBeenCalledTimes(1);
+
+        // Replace the synth object under the same synth name.
+        global.instruments = [{ piano: synthB }];
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(connectBMock).toHaveBeenCalledTimes(1);
+
+        // Same synth object again must not reconnect.
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(connectBMock).toHaveBeenCalledTimes(1);
+        expect(connectAMock).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("Groq API key storage", () => {
+    beforeEach(() => {
+        sessionStorage.clear();
+    });
+
+    afterEach(() => {
+        sessionStorage.clear();
+    });
+
+    it("should keep a new key in session storage only", () => {
+        const activity = { storage: {} };
+
+        expect(setGroqApiKey("gsk_new")).toBe(true);
+
+        expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_new");
+        expect(activity.storage.groq_api_key).toBeUndefined();
+        expect(getGroqApiKey(activity)).toBe("gsk_new");
+    });
+
+    it("should move a key saved by an earlier build out of the persistent store", () => {
+        const activity = { storage: { groq_api_key: "gsk_legacy" } };
+
+        expect(getGroqApiKey(activity)).toBe("gsk_legacy");
+        expect(activity.storage.groq_api_key).toBeUndefined();
+        expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_legacy");
+    });
+
+    it("should drop the stored key even when the session already has one", () => {
+        const activity = { storage: { groq_api_key: "gsk_legacy" } };
+        setGroqApiKey("gsk_session");
+
+        expect(getGroqApiKey(activity)).toBe("gsk_session");
+        expect(activity.storage.groq_api_key).toBeUndefined();
+        expect(sessionStorage.getItem("groq_api_key")).toBe("gsk_session");
+    });
+
+    it("should keep the stored key when it cannot be copied to the session", () => {
+        jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+        jest.spyOn(console, "warn").mockImplementation(() => {});
+        const activity = { storage: { groq_api_key: "gsk_legacy" } };
+
+        expect(getGroqApiKey(activity)).toBe("gsk_legacy");
+        expect(activity.storage.groq_api_key).toBe("gsk_legacy");
+        expect(getGroqApiKey(activity)).toBe("gsk_legacy");
+        expect(console.warn).toHaveBeenCalled();
+    });
+
+    it("should return an empty string when no key is stored", () => {
+        expect(getGroqApiKey({ storage: {} })).toBe("");
+    });
+
+    it("should not throw when session storage is unavailable", () => {
+        jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+        jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+        jest.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(() => setGroqApiKey("gsk_unavailable")).not.toThrow();
+        expect(setGroqApiKey("gsk_unavailable")).toBe(false);
+        expect(getGroqApiKey({ storage: {} })).toBe("");
+        expect(console.warn).toHaveBeenCalled();
     });
 });

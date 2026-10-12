@@ -53,6 +53,7 @@ global.PALETTEICONS = {
     artwork: "<svg background_fill_color stroke_color fill_color></svg>"
 };
 global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
+global.MULTIPALETTENAMES = ["Music", "Logic", "Arts"];
 global.SKIPPALETTES = ["heap", "dictionary"];
 
 global.platformColor = {
@@ -241,6 +242,43 @@ describe("Palettes Class", () => {
             expect(appendSpy).toHaveBeenCalled();
             expect(palettes.showSelection).toHaveBeenCalled();
             expect(palettes.makePalettes).toHaveBeenCalled();
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("role", "tab");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[0]
+            );
+        });
+
+        test("sets aria-selected to false for a nonzero index tab", () => {
+            const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
+            const trMock = {
+                insertCell: jest.fn(() => tdMock),
+                children: [{}, { children: [] }],
+                setAttribute: jest.fn()
+            };
+            const paletteElement = {
+                children: [
+                    {
+                        children: [{ children: [{ children: [trMock] }] }, { children: [{}, {}] }],
+                        style: { border: "" }
+                    }
+                ]
+            };
+
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+            global.document.getElementById = jest.fn(() => null);
+            jest.spyOn(document.body, "appendChild");
+            palettes.showSelection = jest.fn();
+            palettes.makePalettes = jest.fn();
+
+            palettes._makeSelectorButton(2);
+
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "false");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[2]
+            );
         });
     });
 
@@ -391,6 +429,17 @@ describe("Palettes Class", () => {
             expect(pos).toHaveProperty("y");
             expect(typeof pos.x).toBe("number");
             expect(typeof pos.y).toBe("number");
+        });
+
+        test("includes toolbar height in search position", () => {
+            mockActivity.toolbarHeight = 53;
+
+            const pos = palettes.getSearchPos();
+
+            expect(pos.y).toBe(
+                (palettes.top + palettes.cellSize * 0.95 + mockActivity.toolbarHeight) *
+                    mockActivity.turtleBlocksScale
+            );
         });
     });
 
@@ -1435,7 +1484,7 @@ describe("Palettes Class", () => {
                 parentNode: { appendChild: jest.fn() }
             };
             const paletteBody = {
-                insertAdjacentHTML: jest.fn(),
+                appendChild: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, { style: {} }],
                 children: [
@@ -1488,7 +1537,7 @@ describe("Palettes Class", () => {
                 getBoundingClientRect: jest.fn(() => ({ top: 180 }))
             };
             const paletteBody = {
-                insertAdjacentHTML: jest.fn(),
+                appendChild: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, paletteItems],
                 children: [
@@ -1511,17 +1560,17 @@ describe("Palettes Class", () => {
                 parentNode: paletteParent
             };
 
-            global.document.createElement = jest.fn(tag =>
-                tag === "table"
-                    ? paletteBody
-                    : {
-                          style: {},
-                          children: [],
-                          appendChild: jest.fn(),
-                          removeAttribute: jest.fn(),
-                          setAttribute: jest.fn()
-                      }
-            );
+            global.document.createElement = jest.fn(tag => {
+                if (tag === "table") return paletteBody;
+                if (tag === "tbody") return paletteItems;
+                return {
+                    style: {},
+                    children: [],
+                    appendChild: jest.fn(),
+                    removeAttribute: jest.fn(),
+                    setAttribute: jest.fn()
+                };
+            });
             global.docById = jest.fn(id => {
                 if (id === "palette") return palDiv;
                 if (id === "PaletteBody") return null;
@@ -1536,10 +1585,10 @@ describe("Palettes Class", () => {
 
             palette.showMenu(true);
 
-            expect(paletteItems.style.height).toBe("720px");
-            const insertedMarkup = paletteBody.insertAdjacentHTML.mock.calls[0][1];
-            expect(insertedMarkup).toContain("overflow: auto");
-            expect(insertedMarkup).toContain("overflow-x: hidden");
+            expect(paletteItems.style.height).toBe("calc(100vh - 180px)");
+            expect(paletteItems.style.maxHeight).toBe("calc(100vh - 180px)");
+            expect(paletteItems.style.overflow).toBe("auto");
+            expect(paletteItems.style.overflowX).toBe("hidden");
         });
 
         test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
@@ -2150,7 +2199,8 @@ describe("Palettes Class", () => {
             };
             const tr = {
                 children: MULTIPALETTES.map(() => ({
-                    children: [{ src: "" }, { style: { background: "" } }]
+                    children: [{ src: "" }, { style: { background: "" } }],
+                    setAttribute: jest.fn()
                 }))
             };
 
@@ -2162,6 +2212,8 @@ describe("Palettes Class", () => {
             expect(tr.children[0].children[1].style.background).toBe(
                 platformColor.paletteLabelBackground
             );
+            expect(tr.children[1].setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tr.children[0].setAttribute).toHaveBeenCalledWith("aria-selected", "false");
         });
     });
 

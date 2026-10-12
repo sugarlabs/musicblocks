@@ -125,6 +125,8 @@ Object.assign(global, logoconstants);
 const musicUtils = require("../utils/musicutils");
 Object.assign(global, {
     pitchToNumber: musicUtils.pitchToNumber,
+    getMeasurePosition: musicUtils.getMeasurePosition,
+    getMeterAnchor: musicUtils.getMeterAnchor,
     getStepSizeUp: musicUtils.getStepSizeUp,
     getStepSizeDown: musicUtils.getStepSizeDown,
     calcOctave: musicUtils.calcOctave,
@@ -151,6 +153,8 @@ Object.assign(global, {
     isTrueEDO: musicUtils.isTrueEDO,
     TEMPERAMENT: musicUtils.TEMPERAMENT
 });
+global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
+global.NOTENAMES1 = musicUtils.NOTENAMES1;
 
 const { Queue, Logo } = require("../logo");
 

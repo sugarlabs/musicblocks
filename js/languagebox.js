@@ -203,6 +203,15 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    az_onclick() {
+        this._language = "az";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
     ayc_onclick() {
         this._language = "ayc";
         this.hide();
@@ -253,20 +262,42 @@ class LanguageBox {
     }
 
     /**
+     * @protected
+     * @returns {void}
+     */
+    _reloadWindow() {
+        window.location.reload();
+    }
+
+    /**
      * @public
      * @returns {void}
      */
     reload() {
         const reloadWindow = () => {
-            window.location.reload();
+            this._reloadWindow();
         };
 
-        if (!this.activity || typeof this.activity.saveLocally !== "function") {
+        if (
+            !this.activity ||
+            (typeof this.activity.saveLocally !== "function" &&
+                typeof this.activity.saveSessionAsync !== "function")
+        ) {
             reloadWindow();
             return;
         }
 
         try {
+            if (typeof this.activity.saveSessionAsync === "function") {
+                this.activity
+                    .saveSessionAsync()
+                    .then(() => reloadWindow())
+                    .catch(error => {
+                        console.error(error);
+                    });
+                return;
+            }
+
             const saveResult = this.activity.saveLocally();
             if (saveResult && typeof saveResult.then === "function") {
                 saveResult
@@ -307,6 +338,7 @@ class LanguageBox {
             ta: "உங்கள் மொழி விருப்பத்தை மாற்ற உலாவியை புதுப்பிக்கவும்.",
             te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
             tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
+            az: "dil seçiminizi dəyişmək üçün brauzerinizi yeniləyin",
             ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
             ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",

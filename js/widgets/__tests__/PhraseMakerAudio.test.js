@@ -16,6 +16,9 @@
  */
 
 const PhraseMakerAudio = require("../PhraseMakerAudio");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 
 // Mock dependencies that are expected to be globals
 global.PhraseMakerUtils = {
@@ -320,6 +323,44 @@ describe("PhraseMakerAudio", () => {
             expect(mockTurtle.painter.doSetXY).toHaveBeenCalledWith(100, 200);
         });
 
+        describe("the turtle it draws with (#9330)", () => {
+            let turtle0, ownTurtle;
+
+            const makeTurtle = () => ({
+                painter: { doForward: jest.fn(), doRight: jest.fn(), doSetColor: jest.fn() }
+            });
+
+            beforeEach(() => {
+                // After a project is loaded, turtle 0 is a hidden turtle of the old project.
+                turtle0 = makeTurtle();
+                ownTurtle = makeTurtle();
+                mockPM.activity.turtles.getTurtle = jest.fn(i => (i === 0 ? turtle0 : null));
+            });
+
+            test("draws with the turtle that ran the Phrase Maker block, not turtle 0", () => {
+                mockPM._turtle = ownTurtle;
+
+                PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+                PhraseMakerAudio._processGraphics(mockPM, ["right", 90]);
+                PhraseMakerAudio._processGraphics(mockPM, ["setcolor", 10]);
+
+                expect(ownTurtle.painter.doForward).toHaveBeenCalledWith(100);
+                expect(ownTurtle.painter.doRight).toHaveBeenCalledWith(90);
+                expect(ownTurtle.painter.doSetColor).toHaveBeenCalledWith(10);
+                expect(turtle0.painter.doForward).not.toHaveBeenCalled();
+                expect(turtle0.painter.doRight).not.toHaveBeenCalled();
+                expect(mockPM.activity.turtles.getTurtle).not.toHaveBeenCalled();
+            });
+
+            test("draws with turtle 0 when no turtle was kept", () => {
+                mockPM._turtle = undefined;
+
+                PhraseMakerAudio._processGraphics(mockPM, ["forward", 100]);
+
+                expect(turtle0.painter.doForward).toHaveBeenCalledWith(100);
+            });
+        });
+
         test("logs unknown commands", () => {
             const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
             PhraseMakerAudio._processGraphics(mockPM, ["unknown", 0]);
@@ -586,6 +627,41 @@ describe("PhraseMakerAudio", () => {
             delete mockPM._chordTimeouts;
 
             expect(() => PhraseMakerAudio.clearPlaybackTimers(mockPM)).not.toThrow();
+        });
+
+        test("routes clearPlaybackTimers through pm._timerManager when available", () => {
+            const timerManager = new ManagedTimer();
+            mockPM._timerManager = timerManager;
+            const clearTimeoutSpy = jest.spyOn(timerManager, "clearTimeout");
+
+            mockPM._playNoteTimeout = timerManager.setTimeout(() => {}, 1000);
+            mockPM._chordTimeouts = [
+                timerManager.setTimeout(() => {}, 1),
+                timerManager.setTimeout(() => {}, 1)
+            ];
+            expect(timerManager.activeTimeoutCount).toBe(3);
+
+            PhraseMakerAudio.clearPlaybackTimers(mockPM);
+
+            expect(clearTimeoutSpy).toHaveBeenCalledTimes(3);
+            expect(timerManager.activeTimeoutCount).toBe(0);
+            expect(mockPM._playNoteTimeout).toBeNull();
+            expect(mockPM._chordTimeouts).toEqual([]);
+        });
+
+        test("routes _playChord through _timerManager", () => {
+            const timerManager = new ManagedTimer();
+            mockPM._timerManager = timerManager;
+            const setTimeoutSpy = jest.spyOn(timerManager, "setTimeout");
+
+            PhraseMakerAudio._playChord(mockPM, [60, 64, 67, 72], 1);
+
+            expect(setTimeoutSpy).toHaveBeenCalledTimes(4);
+            expect(mockPM._chordTimeouts.length).toBe(4);
+            expect(timerManager.activeTimeoutCount).toBe(4);
+
+            PhraseMakerAudio.clearPlaybackTimers(mockPM);
+            expect(timerManager.activeTimeoutCount).toBe(0);
         });
     });
 });

@@ -12,7 +12,7 @@
 /*
    global
 
-   _, FlowBlock, LeftBlock, NOINPUTERRORMSG, Turtle
+   _, FlowBlock, LeftBlock, NOINPUTERRORMSG, Turtle, ValueBlock
 */
 
 /* exported setupDictBlocks */
@@ -449,12 +449,39 @@ function setupDictBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that picks one of the keys in a turtle's own dictionary. It stores
+     * the English key and only translates its label, so a project works in every language.
+     * @extends {ValueBlock}
+     */
+    class TurtleKeyBlock extends ValueBlock {
+        /**
+         * Constructs a TurtleKeyBlock.
+         */
+        constructor() {
+            super("turtlekey");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setPalette("dictionary", activity);
+            this.beginnerBlock(true);
+            this.setHelpString([
+                _(
+                    "The Turtle key block selects a key in the turtle dictionary, such as pen size or heading."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "anyout" });
+        }
+    }
+
     new DictBlock().setup(activity);
     new ShowDictBlock().setup(activity);
     new SetDictBlock().setup(activity);
     new GetDictBlock().setup(activity);
     new SetDictBlock2().setup(activity);
     new GetDictBlock2().setup(activity);
+    new TurtleKeyBlock().setup(activity);
 }
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { setupDictBlocks };

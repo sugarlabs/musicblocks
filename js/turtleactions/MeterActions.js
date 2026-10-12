@@ -17,7 +17,8 @@
  */
 
 /*
-   global _, Singer, rationalToFraction, TONEBPM, Queue, last, MusicBlocks, Mouse
+   global _, Singer, rationalToFraction, TONEBPM, Queue, last, MusicBlocks, Mouse,
+   getMeasurePosition, getMeterAnchor
 */
 
 /*
@@ -30,6 +31,8 @@
         DRUMNAMES,NOISENAMES
     js/utils/musicutils.js
         DEFAULTDRUM
+    js/utils/musicutils-rhythm.js
+        getMeasurePosition, getMeterAnchor
     js/logo.js
         DEFAULTVOLUME, TONEBPM, Queue
     js/js-export/export.js
@@ -69,8 +72,17 @@ function setupMeterActions(activity) {
         static setMeter(beatCount, noteValue, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            tur.singer.beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
-            tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
+            const beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
+            const noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
+            // Measures after a change are counted in the new meter from where it starts.
+            if (
+                beatsPerMeasure !== tur.singer.beatsPerMeasure ||
+                noteValuePerBeat !== tur.singer.noteValuePerBeat
+            ) {
+                tur.singer.meterAnchor = getMeterAnchor(tur.singer);
+            }
+            tur.singer.beatsPerMeasure = beatsPerMeasure;
+            tur.singer.noteValuePerBeat = noteValuePerBeat;
 
             // Clear previous default strong beats before setting new ones
             _clearDefaultStrongBeats(tur.singer);
@@ -107,8 +119,19 @@ function setupMeterActions(activity) {
         }
 
         static setBPM(bpm, beatValue, turtle, blk) {
+            // Guard: reject non-finite and non-positive BPM values before any
+            // arithmetic. A NaN or zero _bpm would cause every subsequent
+            // setTimeout delay to be NaN or 0 ms, hanging the audio scheduler
+            // silently. Negative values produce a negative delay with the same
+            // effect. Infinity would set an impossibly fast tempo.
+            if (!Number.isFinite(bpm) || bpm <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
+
             let _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
+
             if (_bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
@@ -131,8 +154,19 @@ function setupMeterActions(activity) {
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
+            if (Number.isNaN(bpm)) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return;
+            }
+
+            if (!Number.isFinite(beatValue) || beatValue <= 0) {
+                activity.errorMsg(_("Beat value must be a positive number."), blk);
+                return;
+            }
+
             const _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
+
             if (_bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
@@ -315,28 +349,19 @@ function setupMeterActions(activity) {
         static getBeatCount(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) return 0;
-
-            return (
-                (((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup) *
-                    tur.singer.noteValuePerBeat) %
-                    tur.singer.beatsPerMeasure) +
-                1
-            );
+            return getMeasurePosition(
+                tur.singer,
+                tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
+            ).beat;
         }
 
         static getMeasureCount(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) return 0;
-
-            return (
-                Math.floor(
-                    ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup) *
-                        tur.singer.noteValuePerBeat) /
-                        tur.singer.beatsPerMeasure
-                ) + 1
-            );
+            return getMeasurePosition(
+                tur.singer,
+                tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
+            ).measure;
         }
 
         static getBPM(turtle) {

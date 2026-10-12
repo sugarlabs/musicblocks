@@ -33,7 +33,8 @@
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
-   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
+   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
+   widgetWindows, Turtle, ManagedTimer
  */
 
 /*
@@ -165,42 +166,9 @@ class Block {
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
+        this._boundExitKeyPressed = this._exitKeyPressed.bind(this);
         this.text = null; // A dynamically generated text label on block itself.
-        this.valueInitialized = false;
-
-        let _value = null;
-        Object.defineProperty(this, "value", {
-            get: () => _value,
-            set: newVal => {
-                if (
-                    this.blocks &&
-                    this.blocks.actionHistory &&
-                    !this.blocks.isUndoingOrRedoing &&
-                    _value !== newVal &&
-                    this.valueInitialized &&
-                    this.loadComplete &&
-                    this.blockIndex !== undefined
-                ) {
-                    const historyItem = {
-                        type: "value_change",
-                        blockId: this.blockIndex,
-                        oldValue: _value,
-                        newValue: newVal,
-                        oldText: this.text ? this.text.text : null,
-                        newText: null
-                    };
-                    this.blocks.actionHistory.push(historyItem);
-                    Promise.resolve().then(() => {
-                        historyItem.newText = this.text ? this.text.text : null;
-                    });
-                    this.blocks.redoActionHistory = [];
-                }
-                this.valueInitialized = true;
-                _value = newVal;
-            },
-            enumerable: true,
-            configurable: true
-        }); // Value for number, text, and media blocks.
+        this.value = null; // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
@@ -251,6 +219,9 @@ class Block {
         // Don't trigger notes on top of each other.
         this._triggerLock = false;
 
+        // Manual accidental override from pitch pie menu (Issue #9003)
+        this.manualAccidental = null;
+
         // If we update the parameters of a meter block, we have extra
         // actions to attend to.
         this._check_meter_block = null;
@@ -263,6 +234,7 @@ class Block {
         this._trashHoverScaled = false;
         this._trashHoverGroupState = null;
         this._dragPointerDown = false;
+        this.accessibleElement = null;
     }
 
     /**
@@ -479,7 +451,7 @@ class Block {
         if (this.disconnectedBitmap !== null && this.disconnectedHighlightBitmap !== null) {
             if (
                 !this.bitmap.visible &&
-                !this.highlightBitmap.visible &&
+                (this.highlightBitmap === null || !this.highlightBitmap.visible) &&
                 !this.disconnectedBitmap.visible &&
                 !this.disconnectedHighlightBitmap.visible
             ) {
@@ -487,18 +459,23 @@ class Block {
                     return true;
                 } else if (
                     !this.collapseBlockBitmap.visible &&
-                    !this.highlightCollapseBlockBitmap.visible
+                    (this.highlightCollapseBlockBitmap === null ||
+                        !this.highlightCollapseBlockBitmap.visible)
                 ) {
                     return true;
                 }
             }
         } else {
-            if (!this.bitmap.visible && !this.highlightBitmap.visible) {
+            if (
+                !this.bitmap.visible &&
+                (this.highlightBitmap === null || !this.highlightBitmap.visible)
+            ) {
                 if (this.collapseBlockBitmap === null) {
                     return true;
                 } else if (
                     !this.collapseBlockBitmap.visible &&
-                    !this.highlightCollapseBlockBitmap.visible
+                    (this.highlightCollapseBlockBitmap === null ||
+                        !this.highlightCollapseBlockBitmap.visible)
                 ) {
                     return true;
                 }
@@ -617,6 +594,7 @@ class Block {
         }
         this.label = null;
         this.labelattr = null;
+        this._removeAccessibleElement();
 
         if (this.container) {
             if (typeof this.container.removeAllEventListeners === "function") {
@@ -672,8 +650,8 @@ class Block {
             return;
         }
 
-        if (!this.container.visible) {
-            // block is hidden, so do nothing.
+        if (this.container === null || !this.container.visible) {
+            // block is hidden or uninitialized, so do nothing.
             return;
         }
 
@@ -687,8 +665,12 @@ class Block {
         }
 
         // Always hide the non-highlighted artwork.
-        this.container.visible = true;
-        this.bitmap.visible = false;
+        if (this.container !== null) {
+            this.container.visible = true;
+        }
+        if (this.bitmap !== null) {
+            this.bitmap.visible = false;
+        }
         if (this.disconnectedBitmap !== null) {
             this.disconnectedBitmap.visible = false;
         }
@@ -710,24 +692,30 @@ class Block {
             }
 
             // but not the uncollapsed highlighted artwork.
-            this.highlightBitmap.visible = false;
+            if (this.highlightBitmap !== null) {
+                this.highlightBitmap.visible = false;
+            }
             if (this.disconnectedHighlightBitmap !== null) {
                 this.disconnectedHighlightBitmap.visible = false;
             }
-
-            this.highlightBitmap.visible = false;
         } else {
             // Show the highlighted artwork.
             // If the block is disconnected, use the disconnected bitmap.
             if (this.isDisconnected()) {
-                this.disconnectedHighlightBitmap.visible = true;
-                this.highlightBitmap.visible = false;
+                if (this.disconnectedHighlightBitmap !== null) {
+                    this.disconnectedHighlightBitmap.visible = true;
+                }
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = false;
+                }
             } else {
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
 
-                this.highlightBitmap.visible = true;
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = true;
+                }
             }
 
             // If it is an uncollapsed collapsable, make sure the
@@ -775,12 +763,16 @@ class Block {
         }
 
         // Always hide the highlighted artwork.
-        this.highlightBitmap.visible = false;
+        if (this.highlightBitmap !== null) {
+            this.highlightBitmap.visible = false;
+        }
         if (this.disconnectedHighlightBitmap !== null) {
             this.disconnectedHighlightBitmap.visible = false;
         }
 
-        this.container.visible = true;
+        if (this.container !== null) {
+            this.container.visible = true;
+        }
 
         // If it is a collapsed collapsable, unhighlight the collapsed state.
         if (this.collapsed) {
@@ -800,21 +792,31 @@ class Block {
             }
 
             // and not the uncollapsed artwork.
-            this.bitmap.visible = false;
+            if (this.bitmap !== null) {
+                this.bitmap.visible = false;
+            }
         } else {
             // If the block is disconnected, use the disconnected bitmap.
             if (this.isDisconnected()) {
-                this.disconnectedBitmap.visible = true;
-                this.bitmap.visible = false;
+                if (this.disconnectedBitmap !== null) {
+                    this.disconnectedBitmap.visible = true;
+                }
+                if (this.bitmap !== null) {
+                    this.bitmap.visible = false;
+                }
             } else {
                 if (this.disconnectedBitmap !== null) {
                     this.disconnectedBitmap.visible = false;
                 }
 
-                this.bitmap.visible = true;
+                if (this.bitmap !== null) {
+                    this.bitmap.visible = true;
+                }
             }
 
-            this.container.visible = true;
+            if (this.container !== null) {
+                this.container.visible = true;
+            }
 
             if (this.isCollapsible()) {
                 // There could be a race condition when making a
@@ -841,7 +843,7 @@ class Block {
     unhighlightSelectedBlocks(blk, selection) {
         if (selection) {
             this.blocks.unhighlight(blk, true);
-            if (!this.collapsed) {
+            if (!this.collapsed && this.disconnectedBitmap !== null) {
                 this.disconnectedBitmap.visible = true;
             }
             this.updateCache();
@@ -1401,7 +1403,7 @@ class Block {
             ) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt Sans") > TEXTWIDTH) {
-                    block_label = block_label.substr(0, STRINGLEN) + "...";
+                    block_label = block_label.slice(0, STRINGLEN) + "...";
                 }
             } else {
                 block_label = this.overrideName;
@@ -1542,6 +1544,9 @@ class Block {
                         break;
                     case "wrapmode":
                         this.value = "on";
+                        break;
+                    case "turtlekey":
+                        this.value = "pen size";
                 }
             }
 
@@ -1605,7 +1610,7 @@ class Block {
             }
 
             if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                label = label.substr(0, STRINGLEN) + "...";
+                label = label.slice(0, STRINGLEN) + "...";
             }
 
             this.text.text = label;
@@ -1991,6 +1996,7 @@ class Block {
 
         this.updateCache();
         this.activity.refreshCanvas();
+        this._removeAccessibleElement();
     }
 
     /**
@@ -2042,13 +2048,27 @@ class Block {
             this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
-                    this.bitmap.visible = false;
-                    this.highlightBitmap.visible = false;
-                    this.collapseBlockBitmap.visible = true;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = true;
-                    this.expandButtonBitmap.visible = true;
-                    this.collapseButtonBitmap.visible = false;
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = false;
+                    }
+                    if (this.highlightBitmap !== null) {
+                        this.highlightBitmap.visible = false;
+                    }
+                    if (this.collapseBlockBitmap !== null) {
+                        this.collapseBlockBitmap.visible = true;
+                    }
+                    if (this.highlightCollapseBlockBitmap !== null) {
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    }
+                    if (this.collapseText !== null) {
+                        this.collapseText.visible = true;
+                    }
+                    if (this.expandButtonBitmap !== null) {
+                        this.expandButtonBitmap.visible = true;
+                    }
+                    if (this.collapseButtonBitmap !== null) {
+                        this.collapseButtonBitmap.visible = false;
+                    }
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
@@ -2060,41 +2080,67 @@ class Block {
                     // If the block is disconnected, use the
                     // disconnected bitmap.
                     if (this.isDisconnected()) {
-                        this.disconnectedBitmap.visible = true;
-                        this.bitmap.visible = false;
+                        if (this.disconnectedBitmap !== null) {
+                            this.disconnectedBitmap.visible = true;
+                        }
+                        if (this.bitmap !== null) {
+                            this.bitmap.visible = false;
+                        }
                     } else {
                         if (this.disconnectedBitmap !== null) {
                             this.disconnectedBitmap.visible = false;
                         }
 
-                        this.bitmap.visible = true;
+                        if (this.bitmap !== null) {
+                            this.bitmap.visible = true;
+                        }
                     }
 
-                    this.highlightBitmap.visible = false;
+                    if (this.highlightBitmap !== null) {
+                        this.highlightBitmap.visible = false;
+                    }
                     if (this.disconnectedHighlightBitmap !== null) {
                         this.disconnectedHighlightBitmap.visible = false;
                     }
 
-                    this.collapseBlockBitmap.visible = false;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = false;
-                    this.expandButtonBitmap.visible = false;
-                    this.collapseButtonBitmap.visible = true;
+                    if (this.collapseBlockBitmap !== null) {
+                        this.collapseBlockBitmap.visible = false;
+                    }
+                    if (this.highlightCollapseBlockBitmap !== null) {
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    }
+                    if (this.collapseText !== null) {
+                        this.collapseText.visible = false;
+                    }
+                    if (this.expandButtonBitmap !== null) {
+                        this.expandButtonBitmap.visible = false;
+                    }
+                    if (this.collapseButtonBitmap !== null) {
+                        this.collapseButtonBitmap.visible = true;
+                    }
                 }
             } else {
                 // If the block is disconnected, use the disconnected bitmap.
                 if (this.isDisconnected()) {
-                    this.disconnectedBitmap.visible = true;
-                    this.bitmap.visible = false;
+                    if (this.disconnectedBitmap !== null) {
+                        this.disconnectedBitmap.visible = true;
+                    }
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = false;
+                    }
                 } else {
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
 
-                    this.bitmap.visible = true;
+                    if (this.bitmap !== null) {
+                        this.bitmap.visible = true;
+                    }
                 }
 
-                this.highlightBitmap.visible = false;
+                if (this.highlightBitmap !== null) {
+                    this.highlightBitmap.visible = false;
+                }
                 if (this.disconnectedHighlightBitmap !== null) {
                     this.disconnectedHighlightBitmap.visible = false;
                 }
@@ -2102,6 +2148,7 @@ class Block {
 
             this.updateCache();
             this.activity.refreshCanvas();
+            this._setupAccessibleElement();
         }
     }
 
@@ -2322,20 +2369,29 @@ class Block {
     /**
      * Loads a thumbnail image onto the block.
      * @param {string} imagePath - The path to the image to load as a thumbnail.
+     * @param {object} [valueChangeReservation] - Reserved user-selection history entry.
      */
-    loadThumbnail(imagePath) {
+    loadThumbnail(imagePath, valueChangeReservation) {
         // Load an image thumbnail onto block.
         const thisBlock = this.blockIndex;
         const that = this;
+        this._thumbnailLoadGeneration = (this._thumbnailLoadGeneration || 0) + 1;
+        const loadGeneration = this._thumbnailLoadGeneration;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
+            this.removeChildBitmap("media");
+            this.imageBitmap = null;
+            this.image = "images/load-media.svg";
+            this.updateCache();
+            this._addImage();
             return;
         }
         const image = new Image();
 
         image.onload = () => {
-            // Before adding new artwork, remove any old artwork.
-            that.removeChildBitmap("media");
+            if (loadGeneration !== that._thumbnailLoadGeneration) {
+                return;
+            }
 
             const bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
@@ -2357,11 +2413,11 @@ class Block {
             }
             // CRITICAL FIX: PRESERVE GIF
             const src = image.src || "";
+            let effectiveValue;
 
             if (src.startsWith("data:image/gif") || src.toLowerCase().endsWith(".gif")) {
                 // DO NOT cache GIF , keeps animation
-                that.value = src;
-                that.imageBitmap = bitmap;
+                effectiveValue = src;
             } else {
                 let bounds = myContainer.getBounds();
                 if (!bounds) {
@@ -2373,9 +2429,30 @@ class Block {
                     };
                 }
                 myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                that.value = myContainer.bitmapCache.getCacheDataURL();
-                that.imageBitmap = bitmap;
+                effectiveValue = myContainer.bitmapCache.getCacheDataURL();
             }
+
+            if (valueChangeReservation) {
+                if (!that._completeValueChange(valueChangeReservation, effectiveValue)) {
+                    if (loadGeneration === that._thumbnailLoadGeneration) {
+                        that.value = valueChangeReservation.action.oldValue;
+                    }
+                    return;
+                }
+            }
+
+            if (
+                valueChangeReservation &&
+                !that.blocks.actionHistory.includes(valueChangeReservation.action)
+            ) {
+                return;
+            }
+
+            // Before adding new artwork, remove any old artwork.
+            that.removeChildBitmap("media");
+            that.value = effectiveValue;
+            that.imageBitmap = bitmap;
+
             // Next, scale the bitmap for the thumbnail.
             that._positionMedia(
                 bitmap,
@@ -2386,11 +2463,124 @@ class Block {
             that.container.addChild(bitmap);
             that.updateCache();
         };
+        image.onerror = () => {
+            if (loadGeneration !== that._thumbnailLoadGeneration) {
+                return;
+            }
+
+            if (valueChangeReservation) {
+                that._cancelValueChange(valueChangeReservation);
+                that.value = valueChangeReservation.action.oldValue;
+            }
+        };
 
         if (imagePath === null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
+        }
+    }
+
+    /**
+     * Records one completed user value change.
+     * @param {*} oldValue - Value before the edit.
+     * @param {*} newValue - Value after the edit.
+     * @param {string|null} oldText - Displayed text before the edit.
+     * @param {string|null} newText - Displayed text after the edit.
+     */
+    _recordValueChange(oldValue, newValue, oldText = null, newText = null) {
+        const valuesMatch =
+            oldValue === newValue ||
+            (Array.isArray(oldValue) &&
+                Array.isArray(newValue) &&
+                oldValue.length === newValue.length &&
+                oldValue.every((value, index) => value === newValue[index]));
+
+        if (
+            valuesMatch ||
+            !this.blocks.actionHistory ||
+            this.blocks.isUndoingOrRedoing ||
+            this.blockIndex < 0
+        ) {
+            return;
+        }
+
+        this.blocks.actionHistory.push({
+            type: "value_change",
+            blockId: this.blockIndex,
+            oldValue,
+            newValue,
+            oldText,
+            newText
+        });
+        this.blocks.redoActionHistory = [];
+    }
+
+    /**
+     * Reserves a history position while an asynchronous user edit completes.
+     * @param {*} oldValue - Value before the edit.
+     * @param {*} newValue - Provisional value selected by the user.
+     * @returns {object|null} Reserved action and prior redo history.
+     */
+    _reserveValueChange(oldValue, newValue) {
+        if (!this.blocks.actionHistory || this.blocks.isUndoingOrRedoing || this.blockIndex < 0) {
+            return null;
+        }
+
+        const action = {
+            type: "value_change",
+            blockId: this.blockIndex,
+            oldValue,
+            newValue,
+            oldText: null,
+            newText: null
+        };
+        const reservation = {
+            action,
+            redoActionHistory: this.blocks.redoActionHistory
+        };
+        this.blocks.actionHistory.push(action);
+        this.blocks.redoActionHistory = [];
+        return reservation;
+    }
+
+    /**
+     * Completes a reserved value change.
+     * @param {object} reservation - Reservation returned by _reserveValueChange.
+     * @param {*} newValue - Effective value after asynchronous processing.
+     * @returns {boolean} Whether the effective value changed.
+     */
+    _completeValueChange(reservation, newValue) {
+        if (reservation.action.oldValue === newValue) {
+            this._cancelValueChange(reservation);
+            return false;
+        }
+
+        reservation.action.newValue = newValue;
+        return true;
+    }
+
+    /**
+     * Removes an unused reservation and restores redo history when still safe.
+     * @param {object} reservation - Reservation returned by _reserveValueChange.
+     */
+    _cancelValueChange(reservation) {
+        const actionIndex = this.blocks.actionHistory.indexOf(reservation.action);
+        if (actionIndex === -1) {
+            const redoIndex = this.blocks.redoActionHistory.indexOf(reservation.action);
+            if (redoIndex !== -1) {
+                this.blocks.redoActionHistory.splice(redoIndex, 1);
+                if (this.blocks.redoActionHistory.length === 0) {
+                    this.blocks.redoActionHistory = reservation.redoActionHistory;
+                }
+            }
+            return;
+        }
+
+        const wasLatestAction = actionIndex === this.blocks.actionHistory.length - 1;
+        this.blocks.actionHistory.splice(actionIndex, 1);
+        if (wasLatestAction && this.blocks.redoActionHistory.length === 0) {
+            this.blocks.redoActionHistory = reservation.redoActionHistory;
         }
     }
 
@@ -2415,8 +2605,10 @@ class Block {
             openSvgAssetSelector(
                 // Callback when a built-in image is selected
                 function (dataURL) {
+                    const oldValue = that.value;
+                    const reservation = that._reserveValueChange(oldValue, dataURL);
                     that.value = dataURL;
-                    that.loadThumbnail(null);
+                    that.loadThumbnail(null, reservation);
                 },
                 // Callback when the user chooses to upload from device
                 function () {
@@ -2437,7 +2629,14 @@ class Block {
      */
     _doOpenMediaFromDevice(thisBlock) {
         const that = this;
-        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
+        let fileChooser;
+        if (that.name === "media") {
+            fileChooser = docById("myMedia");
+        } else if (that.name === "audiofile") {
+            fileChooser = docById("audioInput");
+        } else {
+            fileChooser = docById("myOpenAll");
+        }
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2446,12 +2645,17 @@ class Block {
             reader.onloadend = () => {
                 if (reader.result) {
                     if (that.name === "media") {
+                        const oldValue = that.value;
+                        const reservation = that._reserveValueChange(oldValue, reader.result);
                         that.value = reader.result;
-                        that.loadThumbnail(null);
+                        that.loadThumbnail(null, reservation);
                         fileChooser.value = "";
                         return;
                     }
-                    that.value = [fileChooser.files[0].name, reader.result];
+                    const oldValue = that.value;
+                    const newValue = [fileChooser.files[0].name, reader.result];
+                    that.value = newValue;
+                    that._recordValueChange(oldValue, newValue);
                     that.blocks.updateBlockText(thisBlock);
                     fileChooser.value = "";
                 }
@@ -2519,15 +2723,25 @@ class Block {
         this.collapsed = !isCollapsed;
 
         // These are the buttons to collapse/expand the stack.
-        this.collapseButtonBitmap.visible = isCollapsed;
-        this.expandButtonBitmap.visible = !isCollapsed;
+        if (this.collapseButtonBitmap !== null) {
+            this.collapseButtonBitmap.visible = isCollapsed;
+        }
+        if (this.expandButtonBitmap !== null) {
+            this.expandButtonBitmap.visible = !isCollapsed;
+        }
 
         // These are the collapse-state bitmaps.
-        this.collapseBlockBitmap.visible = !isCollapsed;
-        this.highlightCollapseBlockBitmap.visible = false;
-        this.collapseText.visible = !isCollapsed;
+        if (this.collapseBlockBitmap !== null) {
+            this.collapseBlockBitmap.visible = !isCollapsed;
+        }
+        if (this.highlightCollapseBlockBitmap !== null) {
+            this.highlightCollapseBlockBitmap.visible = false;
+        }
+        if (this.collapseText !== null) {
+            this.collapseText.visible = !isCollapsed;
+        }
 
-        if (this.isInlineCollapsible() && this.collapseText.visible) {
+        if (this.isInlineCollapsible() && this.collapseText !== null && this.collapseText.visible) {
             switch (this.name) {
                 case "newnote":
                     this._newNoteLabel();
@@ -2544,8 +2758,12 @@ class Block {
             }
         }
 
-        this.bitmap.visible = this.collapsed;
-        this.highlightBitmap.visible = false;
+        if (this.bitmap !== null) {
+            this.bitmap.visible = this.collapsed;
+        }
+        if (this.highlightBitmap !== null) {
+            this.highlightBitmap.visible = false;
+        }
         if (this.disconnectedBitmap !== null) {
             this.disconnectedBitmap.visible = false;
         }
@@ -2554,29 +2772,31 @@ class Block {
             this.disconnectedHighlightBitmap.visible = false;
         }
 
-        if (this.name === "action") {
-            // Label the collapsed block with the action label.
-            if (this.connections[1] !== null) {
-                let text = this.blocks.blockList[this.connections[1]].value;
-                if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
-                    text = text.substr(0, STRINGLEN) + "...";
+        if (this.collapseText !== null) {
+            if (this.name === "action") {
+                // Label the collapsed block with the action label.
+                if (this.connections[1] !== null) {
+                    let text = this.blocks.blockList[this.connections[1]].value;
+                    if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
+                        text = text.slice(0, STRINGLEN) + "...";
+                    }
+
+                    this.collapseText.text = text;
+                } else {
+                    this.collapseText.text = "";
                 }
-
-                this.collapseText.text = text;
-            } else {
-                this.collapseText.text = "";
             }
-        }
 
-        // Make sure the text is on top.
-        this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
+            // Make sure the text is on top.
+            this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
+        }
 
         if (this.isInlineCollapsible()) {
             // Only collapse the contents of the note block.
             this._toggle_inline(thisBlock, isCollapsed);
         } else {
             // Set collapsed state of all of the blocks in the drag group.
-            if (this.blocks.dragGroup.length > 0) {
+            if (this.blocks.dragGroup && this.blocks.dragGroup.length > 0) {
                 for (let b = 1; b < this.blocks.dragGroup.length; b++) {
                     const blk = this.blocks.dragGroup[b];
                     if (this.collapsed) {
@@ -2955,11 +3175,20 @@ class Block {
             this.blocks.findDragGroup(this.connections[1]);
             for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                 const blk = this.blocks.dragGroup[b];
-                this.blocks.blockList[blk].container.visible = collapse;
-                if (collapse) {
-                    this.blocks.blockList[blk].inCollapsed = false;
-                } else {
-                    this.blocks.blockList[blk].inCollapsed = true;
+                const targetBlock = this.blocks.blockList[blk];
+                if (targetBlock) {
+                    targetBlock.container.visible = collapse;
+                    if (collapse) {
+                        targetBlock.inCollapsed = false;
+                        if (typeof targetBlock._setupAccessibleElement === "function") {
+                            targetBlock._setupAccessibleElement();
+                        }
+                    } else {
+                        targetBlock.inCollapsed = true;
+                        if (typeof targetBlock._removeAccessibleElement === "function") {
+                            targetBlock._removeAccessibleElement();
+                        }
+                    }
                 }
             }
         }
@@ -2969,19 +3198,31 @@ class Block {
             this.blocks.findDragGroup(this.connections[2]);
             for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                 const blk = this.blocks.dragGroup[b];
-                // Look to see if the local parent block is collapsed.
-                const parent = this.blocks.insideInlineCollapsibleBlock(blk);
-                if (parent === null || !this.blocks.blockList[parent].collapsed) {
-                    this.blocks.blockList[blk].container.visible = collapse;
-                    if (collapse) {
-                        this.blocks.blockList[blk].inCollapsed = false;
+                const targetBlock = this.blocks.blockList[blk];
+                if (targetBlock) {
+                    // Look to see if the local parent block is collapsed.
+                    const parent = this.blocks.insideInlineCollapsibleBlock(blk);
+                    if (parent === null || !this.blocks.blockList[parent].collapsed) {
+                        targetBlock.container.visible = collapse;
+                        if (collapse) {
+                            targetBlock.inCollapsed = false;
+                            if (typeof targetBlock._setupAccessibleElement === "function") {
+                                targetBlock._setupAccessibleElement();
+                            }
+                        } else {
+                            targetBlock.inCollapsed = true;
+                            if (typeof targetBlock._removeAccessibleElement === "function") {
+                                targetBlock._removeAccessibleElement();
+                            }
+                        }
                     } else {
-                        this.blocks.blockList[blk].inCollapsed = true;
+                        // Parent is collapsed, so keep hidden.
+                        targetBlock.container.visible = false;
+                        targetBlock.inCollapsed = true;
+                        if (typeof targetBlock._removeAccessibleElement === "function") {
+                            targetBlock._removeAccessibleElement();
+                        }
                     }
-                } else {
-                    // Parent is collapsed, so keep hidden.
-                    this.blocks.blockList[blk].container.visible = false;
-                    this.blocks.blockList[blk].inCollapsed = true;
                 }
             }
         }
@@ -3139,6 +3380,7 @@ class Block {
         const thisBlock = this.blockIndex;
 
         this._calculateBlockHitArea();
+        this._setupAccessibleElement();
 
         this.container.on("mouseover", () => {
             _getStatic("contextWheelDiv").style.display = "none";
@@ -3170,7 +3412,35 @@ class Block {
          */
         this.container.on("click", event => {
             that.activity.closeHelpfulWheel();
+            const _scheduleDelayedRun = topBlock => {
+                const runCmd = () => {
+                    that.activity.logo.runLogoCommands(topBlock);
+                    that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
+                };
+                const timerManager =
+                    that.activity && that.activity.logo && that.activity.logo._timerManager;
+                if (timerManager && typeof timerManager.setTimeout === "function") {
+                    timerManager.setTimeout(runCmd, 250);
+                } else if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                    that.blocks.setTimeout(runCmd, 250);
+                } else {
+                    setTimeout(runCmd, 250);
+                }
+            };
             // We might be able to check which button was clicked.
+            if (that._triggerLongPress) {
+                that._triggerLongPress = false;
+                if (
+                    event.nativeEvent &&
+                    typeof event.nativeEvent.stopImmediatePropagation === "function"
+                ) {
+                    event.nativeEvent.stopImmediatePropagation();
+                } else if (typeof event.stopPropagation === "function") {
+                    event.stopPropagation();
+                }
+                return;
+            }
+
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
@@ -3187,10 +3457,7 @@ class Block {
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
-                        setTimeout(() => {
-                            that.activity.logo.runLogoCommands(topBlock);
-                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                        }, 250);
+                        _scheduleDelayedRun(topBlock);
                     } else {
                         that.activity.logo.runLogoCommands(topBlock);
                         that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
@@ -3212,9 +3479,15 @@ class Block {
             }
 
             locked = true;
-            setTimeout(() => {
-                locked = false;
-            }, 500);
+            if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                that.blocks.setTimeout(() => {
+                    locked = false;
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    locked = false;
+                }, 500);
+            }
 
             hideDOMLabel();
             that._checkWidgets(false);
@@ -3245,10 +3518,7 @@ class Block {
                         if (that.activity.turtles.running()) {
                             that.activity.logo.doStopTurtles();
 
-                            setTimeout(() => {
-                                that.activity.logo.runLogoCommands(topBlk);
-                                that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                            }, 250);
+                            _scheduleDelayedRun(topBlk);
                         } else {
                             that.activity.logo.runLogoCommands(topBlk);
                             that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
@@ -3265,10 +3535,7 @@ class Block {
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
-                        setTimeout(() => {
-                            that.activity.logo.runLogoCommands(topBlk);
-                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
-                        }, 250);
+                        _scheduleDelayedRun(topBlk);
                     } else {
                         that.activity.logo.runLogoCommands(topBlk);
                         that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
@@ -3296,11 +3563,18 @@ class Block {
             that.blocks.dragStartX = that.container.x;
             that.blocks.dragStartY = that.container.y;
 
-            that.blocks.longPressTimeout = setTimeout(() => {
+            const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
+                window._contextWheelIgnoreNextClick = true;
+                window._contextWheelIgnoreNextMouseUp = true;
                 that.blocks.triggerLongPress();
-            }, LONGPRESSTIME);
+            };
+            if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                that.blocks.longPressTimeout = that.blocks.setTimeout(onLongPress, LONGPRESSTIME);
+            } else {
+                that.blocks.longPressTimeout = setTimeout(onLongPress, LONGPRESSTIME);
+            }
 
             //hide the trash when block is being collapse or expand
             const hasColExpBtns = this.collapseButtonBitmap && this.expandButtonBitmap;
@@ -3387,6 +3661,11 @@ class Block {
             // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
 
+            // A long press opens the context menu instead of starting a drag.
+            if (that._triggerLongPress || that.blocks.getLongPressStatus()) {
+                return;
+            }
+
             // Don't allow silence block to be dragged out of a note.
             if (that.name === "rest2") {
                 return;
@@ -3427,7 +3706,7 @@ class Block {
                 }
             } else {
                 // Make it easier to select text on mobile.
-                setTimeout(() => {
+                const checkMoved = () => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
                             Math.abs(
@@ -3435,7 +3714,12 @@ class Block {
                             ) >
                             20 && !window.hasMouse;
                     getInput = !moved;
-                }, 200);
+                };
+                if (that.blocks && typeof that.blocks.setTimeout === "function") {
+                    that.blocks.setTimeout(checkMoved, 200);
+                } else {
+                    setTimeout(checkMoved, 200);
+                }
             }
 
             const oldX = that.container.x;
@@ -3476,7 +3760,11 @@ class Block {
             }
 
             if (that.blocks.longPressTimeout !== null) {
-                clearTimeout(that.blocks.longPressTimeout);
+                if (typeof that.blocks.clearTimeout === "function") {
+                    that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                } else {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
@@ -3568,7 +3856,11 @@ class Block {
             if (that._dragPointerDown) {
                 // eslint-disable-next-line eqeqeq
                 if (that.blocks.longPressTimeout != null) {
-                    clearTimeout(that.blocks.longPressTimeout);
+                    if (typeof that.blocks.clearTimeout === "function") {
+                        that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                    } else {
+                        clearTimeout(that.blocks.longPressTimeout);
+                    }
                     that.blocks.longPressTimeout = null;
                 }
                 that.blocks.clearLongPress();
@@ -3582,7 +3874,11 @@ class Block {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
-                clearTimeout(that.blocks.longPressTimeout);
+                if (typeof that.blocks.clearTimeout === "function") {
+                    that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                } else {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
@@ -3617,7 +3913,11 @@ class Block {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
             } else {
-                clearTimeout(that.blocks.longPressTimeout);
+                if (typeof that.blocks.clearTimeout === "function") {
+                    that.blocks.clearTimeout(that.blocks.longPressTimeout);
+                } else {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
@@ -3633,31 +3933,6 @@ class Block {
             _dragSpatialGridDirty = false;
             moved = false;
             that._announced = false;
-        });
-        // Touch long-press to open context menu
-        this.container.on("touchstart", () => {
-            that.blocks.mouseDownTime = new Date().getTime();
-            that.blocks.longPressTimeout = setTimeout(() => {
-                that.blocks.activeBlock = thisBlock;
-                that._triggerLongPress = true;
-                that.blocks.triggerLongPress();
-            }, LONGPRESSTIME);
-        });
-
-        this.container.on("touchmove", () => {
-            if (that.blocks.longPressTimeout !== null) {
-                clearTimeout(that.blocks.longPressTimeout);
-                that.blocks.longPressTimeout = null;
-                that.blocks.clearLongPress();
-            }
-        });
-
-        this.container.on("touchend", () => {
-            if (that.blocks.longPressTimeout !== null) {
-                clearTimeout(that.blocks.longPressTimeout);
-                that.blocks.longPressTimeout = null;
-                that.blocks.clearLongPress();
-            }
         });
     }
 
@@ -3696,12 +3971,16 @@ class Block {
         }
 
         // Always hide the trash when there is no block selected.
-        if (!moved) {
+        if (!moved || dragEnded) {
             this.activity.trashcan.hide();
         }
 
         if (this.blocks.longPressTimeout !== null) {
-            clearTimeout(this.blocks.longPressTimeout);
+            if (typeof this.blocks.clearTimeout === "function") {
+                this.blocks.clearTimeout(this.blocks.longPressTimeout);
+            } else {
+                clearTimeout(this.blocks.longPressTimeout);
+            }
             this.blocks.longPressTimeout = null;
             this.blocks.clearLongPress();
         }
@@ -3942,6 +4221,7 @@ class Block {
     _changeLabel() {
         const that = this;
         this._capturedInitialValue = this.value;
+        this._capturedInitialText = this.text ? this.text.text : null;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4040,51 +4320,65 @@ class Block {
                 piemenuPitches(this, scalenotes_, SCALENOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "customNote") {
-            if (!this.activity.logo.customTemperamentDefined) {
-                // If custom temperament is not defined by user, then
-                // custom temperament is supposed to be equal
-                // temperament.
-                obj = splitSolfege(this.value);
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-
-                if (this.piemenuOKtoLaunch()) {
-                    piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+            const keys = getTemperamentKeys();
+            const noteLabels = {};
+            const customLabels = [];
+            for (let i = 0; i < keys.length; i++) {
+                const temperament = getTemperament(keys[i]);
+                // Only add valid custom temperaments with note definitions to noteLabels
+                if (
+                    isCustomTemperament(keys[i]) &&
+                    temperament &&
+                    !isEquallyTempered(keys[i]) &&
+                    temperament["0"] &&
+                    Array.isArray(temperament["0"])
+                ) {
+                    customLabels.push(keys[i]);
+                    noteLabels[keys[i]] = temperament;
                 }
+            }
+            if (!customLabels.length) {
+                const defaultCustom = {
+                    0: [1, "C", 4],
+                    1: [1.189, "D#", 4],
+                    2: [1.334, "F", 4],
+                    3: [1.498, "G", 4],
+                    4: [1.781, "A#", 4],
+                    pitchNumber: 5
+                };
+                customLabels.push("custom");
+                noteLabels["custom"] = defaultCustom;
+                const currentCustom = getTemperament("custom");
+                if (!currentCustom || !currentCustom["0"] || !Array.isArray(currentCustom["0"])) {
+                    addTemperamentToDictionary("custom", defaultCustom);
+                }
+            }
+            let selectedCustom;
+            if (this.customID !== null && customLabels.includes(this.customID)) {
+                selectedCustom = this.customID;
             } else {
-                const keys = getTemperamentKeys();
-                const noteLabels = {};
-                const customLabels = [];
-                for (let i = 0; i < keys.length; i++) {
-                    const temperament = getTemperament(keys[i]);
-                    // Only add valid temperaments to noteLabels
-                    if (temperament && typeof temperament === "object") {
-                        noteLabels[keys[i]] = temperament;
-                    }
-                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
-                        customLabels.push(keys[i]);
-                }
-                if (!customLabels.length) return;
-                let selectedCustom;
-                if (this.customID !== null) selectedCustom = this.customID;
-                else selectedCustom = customLabels[0];
+                selectedCustom = customLabels[0];
+            }
 
-                if (this.value !== null) {
-                    selectedNote = this.value;
+            if (this.value !== null) {
+                selectedNote = this.value;
+            } else {
+                // Ensure we have a valid temperament before accessing its properties
+                const selectedTemperament =
+                    noteLabels[selectedCustom] || getTemperament(selectedCustom);
+                if (
+                    selectedTemperament &&
+                    selectedTemperament["0"] &&
+                    selectedTemperament["0"][1]
+                ) {
+                    selectedNote = selectedTemperament["0"][1];
                 } else {
-                    // Ensure we have a valid temperament before accessing its properties
-                    const selectedTemperament = getTemperament(selectedCustom);
-                    if (
-                        selectedTemperament &&
-                        selectedTemperament["0"] &&
-                        selectedTemperament["0"][1]
-                    ) {
-                        selectedNote = selectedTemperament["0"][1];
-                    } else {
-                        // Fallback to a default note
-                        selectedNote = "C";
-                    }
+                    // Fallback to a default note
+                    selectedNote = "C";
                 }
+            }
 
+            if (this.piemenuOKtoLaunch()) {
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
             }
         } else if (this.name === "eastindiansolfege") {
@@ -4187,7 +4481,7 @@ class Block {
                 if (!EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "bold 30pt Sans") > 400) {
-                        drumLabels.push(label.substr(0, 8) + "...");
+                        drumLabels.push(label.slice(0, 8) + "...");
                     } else {
                         drumLabels.push(label);
                     }
@@ -4218,7 +4512,7 @@ class Block {
                 if (EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "Bold 30pt Sans") > 400) {
-                        effectLabels.push(label.substr(0, 8) + "...");
+                        effectLabels.push(label.slice(0, 8) + "...");
                     } else {
                         effectLabels.push(label);
                     }
@@ -4289,7 +4583,7 @@ class Block {
 
                 const label = _(VOICENAMES[i][1]);
                 if (getTextWidth(label, "bold 30pt Sans") > 400) {
-                    voiceLabels.push(label.substr(0, 8) + "...");
+                    voiceLabels.push(label.slice(0, 8) + "...");
                 } else {
                     voiceLabels.push(label);
                 }
@@ -4318,7 +4612,7 @@ class Block {
             for (let i = 0; i < NOISENAMES.length; i++) {
                 const label = NOISENAMES[i][0];
                 if (getTextWidth(label, "bold 30pt Sans") > 600) {
-                    noiseLabels.push(label.substr(0, 16) + "...");
+                    noiseLabels.push(label.slice(0, 16) + "...");
                 } else {
                     noiseLabels.push(label);
                 }
@@ -4449,6 +4743,14 @@ class Block {
                 wrapValues.push(WRAPMODES[i][1]);
             }
             piemenuBasic(this, wrapLabels, wrapValues, selectedWrap);
+        } else if (this.name === "turtlekey") {
+            const keys = Turtle.DictActions.TurtleKeys();
+            piemenuBasic(
+                this,
+                keys.map(key => _(key)),
+                keys,
+                this.value !== null ? this.value : "pen size"
+            );
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
@@ -4537,7 +4839,7 @@ class Block {
                         let temperament;
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
-                                this.blocks.blockList[i].name === "settemperament" &&
+                                this.blocks.blockList[i]?.name === "settemperament" &&
                                 this.blocks.blockList[i].connections[0] !== null
                             ) {
                                 const index = this.blocks.blockList[i].connections[1];
@@ -4655,7 +4957,7 @@ class Block {
              * @returns {void}
              */
             let __keypress = event => {
-                if ([13, 10, 9].includes(event.keyCode)) {
+                if (["Enter", "Tab"].includes(event.key)) {
                     __blur(event);
                 }
             };
@@ -4690,11 +4992,16 @@ class Block {
             }
 
             // Firefox fix
-            setTimeout(() => {
+            const focusLabel = () => {
                 that.label.style.display = "";
                 that.label.focus();
                 focused = true;
-            }, 100);
+            };
+            if (this.blocks && typeof this.blocks.setTimeout === "function") {
+                this.blocks.setTimeout(focusLabel, 100);
+            } else {
+                setTimeout(focusLabel, 100);
+            }
         }
     }
 
@@ -4705,10 +5012,13 @@ class Block {
      * @returns {void}
      */
     _exitKeyPressed(event) {
-        if ([13, 10, 9].includes(event.keyCode)) {
+        if (["Enter", "Tab"].includes(event.key)) {
             this._labelChanged(true, false);
             event.preventDefault();
-            this.label.removeEventListener("keypress", this._exitKeyPressed);
+            this.label.removeEventListener(
+                "keypress",
+                this._boundExitKeyPressed || this._exitKeyPressed
+            );
             docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
@@ -4735,44 +5045,28 @@ class Block {
     }
 
     /**
-     * Checks and reinitializes widget windows if their labels are changed.
-     * @param {boolean} closeInput - Flag indicating whether to close input.
+     * Reinitialize an open widget when a block in its stack changes.
+     * Uses widgetWindows.REINIT_WIDGET_TITLES; only locks after a real
+     * title/staticLabels match so unrelated open widgets cannot block.
+     * @param {boolean} closeInput - Skip when true.
      */
     _checkWidgets(closeInput) {
-        // Detect if label is changed, then reinit widget windows
-        // if they are open.
         const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
         if (closeInput === false) {
+            const topProto = this.blocks.blockList[topBlock].protoblock;
+            const topLabel =
+                topProto && topProto.staticLabels ? topProto.staticLabels[0] : undefined;
             for (let i = 0; i < widgetTitle.length; i++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[i].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "lego bricks":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "mode":
-                        case "timbre":
-                            lockInit = true;
-                            if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[i].innerHTML
-                            ) {
-                                this.blocks.reInitWidget(topBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[i].textContent;
+                if (widgetWindows.isReinitWidgetTitle(title) && topLabel === title) {
+                    lockInit = true;
+                    this.blocks.reInitWidget(topBlock, 1500);
                 }
             }
         }
@@ -4798,6 +5092,12 @@ class Block {
 
         const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
         const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
+        const oldText = hasInitialValue
+            ? this._capturedInitialText
+            : this.text
+              ? this.text.text
+              : null;
+        const commitLabelEdit = closeInput || notPieMenu === false;
 
         if (closeInput) {
             this.label.style.display = "none";
@@ -4841,11 +5141,18 @@ class Block {
             const requiresUpdate = isText && (parentName === "storein" || parentName === "action");
 
             if (!requiresUpdate) {
+                if (commitLabelEdit) {
+                    delete this._capturedInitialValue;
+                    delete this._capturedInitialText;
+                }
                 return;
             }
         }
 
         c = this.connections[0];
+        // Capture the value the user actually typed before any collision resolution
+        // so the second action switch can always detect a user-initiated rename.
+        const typedActionValue = newValue;
         if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             let uniqueValue;
@@ -4853,22 +5160,28 @@ class Block {
                 case "action":
                     {
                         const isNameChanged = oldValue !== newValue;
-                        if (isNameChanged) {
+                        if (isNameChanged && commitLabelEdit) {
                             this.blocks.palettes.removeActionPrototype(oldValue);
                         }
 
-                        // Ensure new name is unique.
-                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
-                        if (validatedName !== newValue) {
-                            newValue = validatedName;
-                            this.value = newValue;
-                            let label = this.value.toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                label = label.substr(0, STRINGLEN) + "...";
+                        // Ensure new name is unique upon committing the edit.
+                        if (commitLabelEdit) {
+                            const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                            if (validatedName !== newValue) {
+                                // Notify the user that their chosen name was already taken.
+                                this.activity.errorMsg(
+                                    `${_("Renaming")} "${newValue}" ${_("to avoid name collision")}: "${validatedName}"`
+                                );
+                                newValue = validatedName;
+                                this.value = newValue;
+                                let label = this.value.toString();
+                                if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                    label = label.slice(0, STRINGLEN) + "...";
+                                }
+                                this.text.text = label;
+                                this.label.value = newValue;
+                                this.updateCache();
                             }
-                            this.text.text = label;
-                            this.label.value = newValue;
-                            this.updateCache();
                         }
                     }
                     break;
@@ -4897,7 +5210,7 @@ class Block {
                     // eslint-disable-next-line no-case-declarations
                     let label = this.value.toString();
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                        label = label.substr(0, STRINGLEN) + "...";
+                        label = label.slice(0, STRINGLEN) + "...";
                     }
                     this.text.text = label;
                     this.label.value = newValue;
@@ -4991,10 +5304,10 @@ class Block {
 
         if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
             let slen = label.length - 5;
-            let nlabel = "" + label.substr(0, slen) + "...";
+            let nlabel = "" + label.slice(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
                 slen -= 1;
-                nlabel = "" + label.substr(0, slen) + "...";
+                nlabel = "" + label.slice(0, slen) + "...";
                 // const foo = getTextWidth(nlabel, "bold 20pt Sans");
                 if (slen <= STRINGLEN) {
                     break;
@@ -5021,7 +5334,9 @@ class Block {
             switch (cblock.name) {
                 case "action":
                     {
-                        const isNameChanged = oldValue !== newValue;
+                        // Use typedActionValue so a collision-resolved rename (where the
+                        // resolved name equals oldValue) still triggers a palette refresh.
+                        const isNameChanged = oldValue !== typedActionValue;
                         if (isNameChanged && closeInput) {
                             this.blocks.renameDos(oldValue, newValue);
 
@@ -5119,6 +5434,168 @@ class Block {
         if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
         }
+
+        if (commitLabelEdit) {
+            this._recordValueChange(
+                oldValue,
+                this.value,
+                oldText,
+                this.text ? this.text.text : null
+            );
+            delete this._capturedInitialValue;
+            delete this._capturedInitialText;
+        }
+        this._updateAccessibleElement();
+    }
+
+    /**
+     * Get or create the accessible container for workspace blocks.
+     * @static
+     * @returns {HTMLElement|null}
+     */
+    static getAccessibleContainer() {
+        if (typeof document === "undefined" || !document.getElementById) {
+            return null;
+        }
+        let container = document.getElementById("accessibleBlocks");
+        if (!container && typeof document.createElement === "function") {
+            container = document.createElement("div");
+            container.id = "accessibleBlocks";
+            container.className = "visually-hidden";
+            container.setAttribute("role", "region");
+            container.setAttribute("aria-label", "Workspace Blocks");
+            container.style.cssText =
+                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+            const parent = document.getElementById("canvasContainer") || document.body;
+            if (parent && typeof parent.appendChild === "function") {
+                parent.appendChild(container);
+            }
+        }
+        return container;
+    }
+
+    /**
+     * Get an accessible descriptive label for assistive technology.
+     * @returns {string}
+     */
+    getAccessibleLabel() {
+        const name =
+            (this.overrideName && this.name !== "outputtools" && this.overrideName) ||
+            (this.protoblock && this.protoblock.staticLabels && this.protoblock.staticLabels[0]) ||
+            this.name ||
+            "block";
+        if (
+            this.value !== null &&
+            this.value !== undefined &&
+            this.value !== "" &&
+            !(typeof this.value === "string" && this.value.startsWith("data:"))
+        ) {
+            return `${name}, value: ${this.value}`;
+        }
+        return `${name} block`;
+    }
+
+    /**
+     * Programmatically activate this block (simulates canvas click).
+     * @returns {void}
+     */
+    activate() {
+        if (!this.container) {
+            return;
+        }
+        const scale =
+            this.activity && typeof this.activity.getStageScale === "function"
+                ? this.activity.getStageScale()
+                : 1;
+        const event = {
+            type: "click",
+            stageX: ((this.container.x || 0) + 50) * scale,
+            stageY: ((this.container.y || 0) + 10) * scale,
+            nativeEvent: {}
+        };
+        if (typeof this.container.dispatchEvent === "function") {
+            this.container.dispatchEvent(event);
+        }
+    }
+
+    /**
+     * Set up an off-screen accessible mirror element for this block.
+     * @private
+     * @returns {HTMLElement|null}
+     */
+    _setupAccessibleElement() {
+        if (typeof document === "undefined" || !document.createElement) {
+            return null;
+        }
+        this._removeAccessibleElement();
+
+        const container = Block.getAccessibleContainer();
+        if (!container || typeof container.appendChild !== "function") {
+            return null;
+        }
+
+        const el = document.createElement("div");
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.className = "accessible-workspace-block";
+        if (this.blockIndex !== -1 && this.blockIndex !== undefined) {
+            el.id = "accessible-block-" + this.blockIndex;
+        }
+
+        el.setAttribute("aria-label", this.getAccessibleLabel());
+
+        el.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+                event.preventDefault();
+                event.stopPropagation();
+                this.activate();
+            } else if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+                event.preventDefault();
+                const next = el.nextElementSibling;
+                if (next && typeof next.focus === "function") {
+                    next.focus();
+                }
+            } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+                event.preventDefault();
+                const prev = el.previousElementSibling;
+                if (prev && typeof prev.focus === "function") {
+                    prev.focus();
+                }
+            }
+        });
+
+        container.appendChild(el);
+        this.accessibleElement = el;
+        return el;
+    }
+
+    /**
+     * Remove the accessible mirror element from the DOM.
+     * @private
+     * @returns {void}
+     */
+    _removeAccessibleElement() {
+        if (this.accessibleElement) {
+            if (this.accessibleElement.parentNode) {
+                this.accessibleElement.parentNode.removeChild(this.accessibleElement);
+            }
+            this.accessibleElement = null;
+        }
+    }
+
+    /**
+     * Update the accessible mirror element's attributes.
+     * @private
+     * @returns {void}
+     */
+    _updateAccessibleElement() {
+        if (!this.accessibleElement) {
+            return;
+        }
+        if (this.blockIndex !== -1 && this.blockIndex !== undefined) {
+            this.accessibleElement.id = "accessible-block-" + this.blockIndex;
+        }
+        this.accessibleElement.setAttribute("aria-label", this.getAccessibleLabel());
     }
 }
 

@@ -160,7 +160,9 @@ describe("MeterBlocks setup", () => {
             },
             tempo: {
                 BPMBlocks: [],
-                BPMs: []
+                BPMs: [],
+                BPMTurtles: [],
+                beatValues: []
             },
             inTempo: false,
             insideMeterWidget: false,
@@ -451,7 +453,7 @@ describe("MeterBlocks setup", () => {
         expect(Singer.MeterActions.setMasterBPM).toHaveBeenCalledWith(120, 0.5, "master");
         expect(logo.notation.notationTempo).toHaveBeenCalledWith(0, 120, 0.5);
         expect(logo.tempo.BPMBlocks).toContain("master");
-        expect(logo.tempo.BPMs).toContain("90");
+        expect(logo.tempo.BPMs).toEqual([120]);
     });
 
     it("clamps legacy master BPM values and records tempo entries", () => {
@@ -476,7 +478,8 @@ describe("MeterBlocks setup", () => {
         expect(Singer.masterBPM).toBe(120);
         expect(Singer.defaultBPMFactor).toBe(TONEBPM / 120);
         expect(logo.tempo.BPMBlocks).toContain("legacy");
-        expect(logo.tempo.BPMs).toContain("legacy");
+        // The clamped tempo the block actually set.
+        expect(logo.tempo.BPMs).toEqual([30, 1000, 120]);
     });
 
     it("sets per-turtle BPM values and tempo metadata", () => {
@@ -490,7 +493,113 @@ describe("MeterBlocks setup", () => {
         expect(Singer.MeterActions.setBPM).toHaveBeenCalledWith(100, 0.25, 1, "bpm3");
         expect(logo.notation.notationTempo).toHaveBeenCalledWith(1, 100, 0.25);
         expect(logo.tempo.BPMBlocks).toContain("bpm3");
-        expect(logo.tempo.BPMs).toContain("text");
+        expect(logo.tempo.BPMs).toEqual([100]);
+    });
+
+    describe("the BPM given to the Tempo widget", () => {
+        beforeEach(() => {
+            logo.inTempo = true;
+            // An operator block in the BPM slot has no number in its label.
+            activity.blocks.blockList.slotBlock = { name: "multiply", text: { text: "" } };
+        });
+
+        it.each([
+            ["setmasterbpm2", [120, 0.25]],
+            ["setmasterbpm", [120]],
+            ["setbpm3", [120, 0.25]]
+        ])("%s gives the evaluated BPM, not the label of the block in the slot", (name, args) => {
+            const block = getBlock(name);
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+
+            block.flow(args, logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([120]);
+            expect(logo.tempo.BPMBlocks).toEqual(["bpmBlock"]);
+        });
+
+        it.each([Infinity, NaN])("treats a %s BPM like an empty label", bpm => {
+            const block = getBlock("setmasterbpm2");
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+
+            block.flow([bpm, 0.25], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([""]);
+        });
+
+        it("falls back to the slot's label when the BPM isn't a number", () => {
+            const block = getBlock("setmasterbpm2");
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+            activity.blocks.blockList.slotBlock.text.text = "90";
+
+            block.flow(["90", 0.25], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual(["90"]);
+        });
+    });
+
+    it("records the turtle that ran each BPM block for the Tempo widget", () => {
+        activity.blocks.blockList.bpmBlock = { connections: [null, "num"] };
+        activity.blocks.blockList.num = { text: { text: "120" } };
+        const turtles = [{ name: "t0" }, { name: "t1" }, { name: "t2" }];
+        activity.turtles.ithTurtle.mockImplementation(i => turtles[i]);
+        logo.inTempo = true;
+
+        getBlock("setmasterbpm2").flow([120, 0.25], logo, 0, "bpmBlock");
+        getBlock("setbpm3").flow([200, 0.25], logo, 2, "bpmBlock");
+        getBlock("setmasterbpm").flow([90], logo, 1, "bpmBlock");
+
+        // One turtle per row, in step with BPMBlocks and BPMs. The turtle itself, not its index,
+        // which shifts when a turtle is removed.
+        expect(logo.tempo.BPMTurtles).toEqual([turtles[0], turtles[2], turtles[1]]);
+        expect(logo.tempo.BPMTurtles[1]).toBe(turtles[2]);
+        expect(logo.tempo.BPMBlocks).toHaveLength(3);
+        expect(logo.tempo.BPMs).toHaveLength(3);
+    });
+
+    it("records no turtle outside a Tempo block", () => {
+        activity.blocks.blockList.bpmBlock = { connections: [null, "num"] };
+        activity.blocks.blockList.num = { text: { text: "120" } };
+        logo.inTempo = false;
+
+        getBlock("setbpm3").flow([200, 0.25], logo, 2, "bpmBlock");
+
+        expect(logo.tempo.BPMTurtles).toEqual([]);
+    });
+
+    describe("the beat value given to the Tempo widget", () => {
+        beforeEach(() => {
+            logo.inTempo = true;
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+            activity.blocks.blockList.slotBlock = { name: "number", text: { text: "120" } };
+        });
+
+        it.each(["setmasterbpm2", "setbpm3"])("%s gives its evaluated beat value", name => {
+            getBlock(name).flow([120, 1 / 8], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([120]);
+            expect(logo.tempo.beatValues).toEqual([1 / 8]);
+        });
+
+        it.each([0, -0.25, NaN, Infinity, "1/8"])("gives 1/4 for a beat value of %s", beatValue => {
+            getBlock("setmasterbpm2").flow([120, beatValue], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.beatValues).toEqual([0.25]);
+        });
+
+        it("gives 1/4 for the legacy master BPM block, which has no beat value", () => {
+            getBlock("setmasterbpm").flow([120], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.beatValues).toEqual([0.25]);
+        });
+
+        it("keeps one beat value for each recorded BPM block", () => {
+            getBlock("setmasterbpm").flow([90], logo, 0, "bpmBlock");
+            getBlock("setbpm3").flow([120, 1 / 8], logo, 0, "bpmBlock");
+            getBlock("setmasterbpm2").flow([60, 1 / 2], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([90, 120, 60]);
+            expect(logo.tempo.beatValues).toEqual([0.25, 1 / 8, 1 / 2]);
+        });
     });
 
     it("clamps BPM ranges inside FlowClamp blocks and cleans up listeners", () => {

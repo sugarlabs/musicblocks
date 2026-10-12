@@ -276,6 +276,13 @@ class PhraseMaker {
          * @type {boolean}
          */
         this.lyricsON = false;
+
+        /**
+         * Array of lyrics input elements for cleanup.
+         * @type {HTMLInputElement[]}
+         * @private
+         */
+        this._lyricsInputs = [];
     }
 
     /**
@@ -569,9 +576,11 @@ class PhraseMaker {
      * Initializes the PhraseMaker matrix widget.
      * This method sets up the PhraseMaker matrix in the DOM (Document Object Model) and initializes its functionality.
      * @param {Activity} activity - The activity instance associated with the PhraseMaker widget.
-     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
+     * @param {number} [turtleIndex] - Index of the turtle that triggered this widget. Left out
+     * when the widget rebuilds itself (sort, add row, ...), which keeps the turtle it has; turtle
+     * 0 if it has none.
      */
-    init(activity, turtleIndex = 0) {
+    init(activity, turtleIndex) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
         let tempTable;
@@ -581,7 +590,13 @@ class PhraseMaker {
 
         // Read the meter from the turtle that triggered this widget so that
         // bar-line separators reflect the correct time signature.
-        const turtle = activity.turtles.ithTurtle(turtleIndex);
+        // Graphics rows draw with this turtle when played. Not turtle 0: after a project is
+        // loaded, turtle 0 is a hidden turtle of the old project.
+        const turtle =
+            turtleIndex === undefined && this._turtle
+                ? this._turtle
+                : activity.turtles.ithTurtle(turtleIndex === undefined ? 0 : turtleIndex);
+        this._turtle = turtle;
         const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
         const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4;
 
@@ -1105,6 +1120,7 @@ class PhraseMaker {
                 lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
+                this._lyricsInputs.push(lyricsInput);
                 inputCell.addEventListener("mouseover", event => {
                     event.target.style.backgroundColor = this.platformColor.selectorSelected;
                 });
@@ -1213,6 +1229,16 @@ class PhraseMaker {
         this._rowOffset = [];
         for (let i = 0; i < this._rowMap.length; i++) {
             this._rowMap[i] = i;
+        }
+
+        // Clean up lyrics input event listeners
+        if (this._lyricsInputs && this._lyricsInputs.length > 0) {
+            this._lyricsInputs.forEach(input => {
+                // Remove event listeners by cloning and replacing (since we can't easily
+                // remove anonymous listeners, we rely on widget destruction to clean up DOM)
+                // The inputs are in the widget body which gets destroyed
+            });
+            this._lyricsInputs = [];
         }
 
         if (this.activity && this.activity.logo && this.activity.logo.synth) {
@@ -1819,7 +1845,7 @@ class PhraseMaker {
             leftRightLabel = ["15", "30", "45", "60", "90", "180"];
             setHeadingLabel = ["0", "45", "90", "135", "180", "225", "270", "315"];
             setPenSizeLabel = ["1", "5", "10", "25", "50"];
-            setLabel = ["0", "10", "20", "30", "40", "5n0", "60", "70", "80", "90", "100"];
+            setLabel = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"];
         }
 
         this._pitchWheel = new this.wheelnav("wheelDivptm", null, 800, 800);
@@ -2311,7 +2337,7 @@ class PhraseMaker {
                     for (let i = 0; i < accidentals.length; i++) {
                         if (noteValue.includes(accidentals[i])) {
                             accidentalsValue = i;
-                            noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                            noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                             break;
                         }
                     }
@@ -3066,7 +3092,7 @@ class PhraseMaker {
             newNote = this._deps.SOLFEGECONVERSIONTABLE[note[0]];
         } else {
             octave = note[2];
-            newNote = this._deps.SOLFEGECONVERSIONTABLE[note.substr(0, 2)];
+            newNote = this._deps.SOLFEGECONVERSIONTABLE[note.slice(0, 2)];
         }
         this.rowLabels[index] = newNote;
         this.rowArgs[index] = octave;
@@ -3914,12 +3940,23 @@ class PhraseMaker {
         noteToDivide = parseInt(noteToDivide, 10);
         oldTupletValue = parseInt(oldTupletValue, 10);
         newTupletValue = parseInt(newTupletValue, 10);
+        if (
+            !this.activity ||
+            !this.activity.logo ||
+            !Array.isArray(this.activity.logo.tupletRhythms) ||
+            isNaN(noteToDivide) ||
+            noteToDivide < 0 ||
+            noteToDivide >= this.activity.logo.tupletRhythms.length ||
+            !this.activity.logo.tupletRhythms[noteToDivide]
+        ) {
+            return;
+        }
         this._blockMapHelper = [];
 
         let k = 0;
         let l;
         if (oldTupletValue < newTupletValue) {
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -3955,7 +3992,7 @@ class PhraseMaker {
             }
         } else {
             k = 0;
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -4605,7 +4642,7 @@ class PhraseMaker {
             graphicsBlock = false;
             graphicNote = note.split(": ");
             if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 &&
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 ||
                 PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) !== -1
             ) {
                 graphicsBlock = true;

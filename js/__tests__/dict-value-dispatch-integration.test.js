@@ -77,8 +77,32 @@ const { Logo } = require("../logo");
 // production code is mocked: setValue and getValue run for real.
 const setupDictActions = require("../turtleactions/DictActions");
 
+// setValue/getValue check whether the dictionary name is a turtle name, so use the real lookup.
+global.getTargetTurtle = require("../blocks/EnsembleBlocks").getTargetTurtle;
+
+// Minimal protoblock bases so the real one-argument "get value" block (GetDictBlock2,
+// js/blocks/DictBlocks.js) can be instantiated and its own arg() dispatched.
+const dictBlocks = {};
+class StubProtoBlock {
+    constructor(name) {
+        dictBlocks[name] = this;
+    }
+    setCapability() {}
+    setPalette() {}
+    beginnerBlock() {}
+    setHelpString() {}
+    formBlock() {}
+    setup() {}
+}
+global.FlowBlock = StubProtoBlock;
+global.LeftBlock = StubProtoBlock;
+global.ValueBlock = StubProtoBlock;
+const { setupDictBlocks } = require("../blocks/DictBlocks");
+
 function createTurtle() {
     return {
+        name: "Mr. Mouse",
+        inTrash: false,
         singer: {
             inNoteBlock: [],
             inDuplicate: false,
@@ -86,7 +110,7 @@ function createTurtle() {
             suppressOutput: true,
             justCounting: []
         },
-        painter: { closeSVG: jest.fn() },
+        painter: { closeSVG: jest.fn(), stroke: 5 },
         queue: [],
         parentFlowQueue: [],
         listeners: {},
@@ -234,5 +258,65 @@ describe("Logo dispatch drives the real Turtle.DictActions.setValue/getValue", (
         // The real getValue, reached through a completely different Logo seam (parseArg -> the
         // arg block's own .arg(), not .flow()), read back the same value.
         expect(readBackValue).toBe("green");
+    });
+
+    test("a key set on a turtle-named dictionary is read back from the same turtle dictionary", () => {
+        activity.blocks.blockList[1].value = "Mr. Mouse";
+        activity.blocks.blockList[2].value = "score";
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        expect(logo.turtleDicts[0]["0"].score).toBe("green");
+        expect(logo.turtleDicts[0]["Mr. Mouse"]).toBeUndefined();
+        expect(readBackValue).toBe("green");
+    });
+
+    test("the real one-argument get value block reads its own turtle's dictionary", () => {
+        setupDictBlocks(activity);
+        // Seeded at the turtle index, where Load dictionary stores a turtle's custom keys.
+        logo.turtleDicts[0] = { 0: { level: 3 } };
+        // Swap the stand-in for the real GetDictBlock2, wired to a "level" key block (6).
+        activity.blocks.blockList[5] = {
+            name: "getDict2",
+            connections: [null, 6],
+            protoblock: dictBlocks.getDict2,
+            isValueBlock: () => false,
+            isArgBlock: () => true
+        };
+        activity.blocks.blockList[6] = { ...activity.blocks.blockList[2], value: "level" };
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        expect(readBackValue).toBe(3);
+    });
+
+    test("a turtle key block reads the turtle's pen size in any language", () => {
+        setupDictBlocks(activity);
+        // The turtle key block stores the English key; in Spanish only its label changes.
+        const english = global._;
+        global._ = key => (key === "pen size" ? "tamaño de la pluma" : key);
+        activity.blocks.blockList[5] = {
+            name: "getDict2",
+            connections: [null, 6],
+            protoblock: dictBlocks.getDict2,
+            isValueBlock: () => false,
+            isArgBlock: () => true
+        };
+        activity.blocks.blockList[6] = {
+            name: "turtlekey",
+            value: "pen size",
+            connections: [5],
+            protoblock: dictBlocks.turtlekey,
+            isValueBlock: () => true,
+            isArgBlock: () => false
+        };
+
+        try {
+            logo.runFromBlockNow(logo, 0, 0, 1, null);
+        } finally {
+            global._ = english;
+        }
+
+        expect(readBackValue).toBe(5);
     });
 });

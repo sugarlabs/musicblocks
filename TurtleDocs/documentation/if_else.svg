@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="72"
+   height="256"
+   id="svg2">
+  <path
+     d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 18,0 8,0 a 8,8 0 0 1 8,8 l 0,8 0,18 A 16,16 0 0 0 55,51 16,16 0 0 0 71,67 l 0,8 a 8,8 0 0 1 -8,8 l -8,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 10,10 0 0 0 17,93 l 0,8 0,8 0,8 a 10,10 0 0 0 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,24 0,8 a 8,8 0 0 1 -8,8 l -8,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 10,10 0 0 0 -10,10 l 0,8 0,8 0,8 a 10,10 0 0 0 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 a 8,8 0 0 1 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 z"
+     id="path21"
+     style="fill:#e37a00;fill-opacity:1;stroke:#a34600;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23"
+     style="font-size:20px;text-anchor:start;fill:#000000;font-family:sans-serif">
+    <tspan
+       x="8"
+       y="35.5"
+       id="tspan25">if</tspan>
+  </text>
+  <text
+     id="text27"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:sans-serif">
+    <tspan
+       x="64"
+       y="78"
+       id="tspan29">then</tspan>
+  </text>
+  <text
+     id="text31"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:sans-serif">
+    <tspan
+       x="64"
+       y="162"
+       id="tspan33">else</tspan>
+  </text>
+</svg>

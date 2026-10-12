@@ -15,15 +15,12 @@
    global
 
    docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, ManagedTimer, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
-   MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
-   wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
-   PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
-   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, announceToScreenReader */
+   last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
+   DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
+   PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
+   MusicKeyboardRendering, getCurrentEDO, generateNoteNames */
 /*
    Global Locations
-    - lib/wheelnav
-        slicePath, wheelnav
     - js/utils/utils.js
         _, docById, last, debugLog
     - js/utils/ManagedTimer.js
@@ -31,19 +28,25 @@
     - js/turtle-singer.js
         Singer
     - js/utils/musicutils.js
-        noteToFrequency, getNote, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-        EIGHTHNOTEWIDTH, MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH,
-        toFraction, DEFAULTVOICE, PITCHES, PITCHES2, PITCHES3, SOLFEGENAMES,
-        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege
+        noteToFrequency, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
+        i18nSolfege, toFraction, DEFAULTVOICE, PITCHES, PITCHES2,
+        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege,
+        getCurrentEDO, generateNoteNames
     - js/utils/platformstyle.js
         platformColor
-    - js/logo.js
-        PREVIEWVOLUME
+    - js/widgets/MusicKeyboardEditing.js
+        MusicKeyboardEditing
+    - js/widgets/MusicKeyboardRendering.js
+        MusicKeyboardRendering
 */
 /* exported MusicKeyboard */
 
 /** AMD module dependencies for lazy loading. */
-MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+MusicKeyboard.dependencies = [
+    "widgets/MusicKeyboardEditing",
+    "widgets/MusicKeyboardRendering",
+    "widgets/musickeyboard"
+];
 
 /**
  * Represents a Music Keyboard interface.
@@ -61,32 +64,6 @@ function MusicKeyboard(activity) {
     const HERTZKEYS = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
-    // Black-key column indices that are gaps in the piano layout (no black
-    // key between E-F and B-C) and are rendered as invisible spacers.
-    const BLACKKEY_SPACER_INDICES = [
-        2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62
-    ];
-
-    const setKeyboardCellLabel = (cell, label, octave, prefix = null) => {
-        cell.replaceChildren();
-        if (prefix !== null) {
-            const small = document.createElement("small");
-            small.textContent = `(${prefix})`;
-            cell.append(small, document.createElement("br"));
-        }
-        cell.append(document.createTextNode(`${label}${octave}`));
-    };
-
-    // Appends an already-created (id already set) <td> to a black-key row as
-    // an invisible spacer occupying a gap position in the piano layout.
-    const appendSpacerKey = (parentEl, keyElement) => {
-        parentEl.appendChild(keyElement);
-        keyElement.style.background = "transparent";
-        keyElement.style.border = "none";
-        keyElement.style.zIndex = "10";
-        keyElement.style.position = "relative";
-    };
-
     // Converts a solfege (or letter) note name plus octave into the note
     // name form the synth expects, e.g. "sol" + 4 -> "sol4", "do" + 4 -> "do4",
     // with solfege names that have a FIXEDSOLFEGE1 alias translated first and
@@ -155,7 +132,22 @@ function MusicKeyboard(activity) {
 
     this._savedDocumentOnKeyDown = undefined;
     this._savedDocumentOnKeyUp = undefined;
-    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+    if (typeof ManagedTimer !== "undefined") {
+        this._timerManager = new ManagedTimer();
+    } else if (typeof require !== "undefined") {
+        try {
+            const ManagedTimerCtor = require("../utils/ManagedTimer");
+            this._timerManager = new ManagedTimerCtor();
+        } catch (e) {
+            this._timerManager = null;
+        }
+    } else {
+        this._timerManager = null;
+    }
+    this._activeIntervals = new Set();
+    this._activeTimeouts = new Set();
+    this._playOneTimeout = null;
+    this._chordTimeouts = [];
 
     /**
      * Flag indicating whether playback is currently active.
@@ -193,27 +185,87 @@ function MusicKeyboard(activity) {
         if (this._timerManager !== null) {
             return this._timerManager.setInterval(callback, interval);
         }
-
-        return setInterval(callback, interval);
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
     };
 
     this._clearWidgetInterval = function (id) {
-        if (id === null || id === undefined || id === false) {
+        if (id === null || id === undefined) {
             return false;
         }
 
-        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+        if (this._timerManager !== null) {
+            return this._timerManager.clearInterval(id);
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
             return true;
         }
 
-        clearInterval(id);
-        return true;
+        return false;
+    };
+
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        const id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    this._clearPlaybackTimers = function () {
+        if (this._playOneTimeout) {
+            this._clearWidgetTimeout(this._playOneTimeout);
+            this._playOneTimeout = null;
+        }
+        if (Array.isArray(this._chordTimeouts)) {
+            for (let i = 0; i < this._chordTimeouts.length; i++) {
+                this._clearWidgetTimeout(this._chordTimeouts[i]);
+            }
+            this._chordTimeouts = [];
+        }
     };
 
     this._clearWidgetTimers = function () {
+        this._clearPlaybackTimers();
         if (this._timerManager !== null) {
             return this._timerManager.clearAll();
         }
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+        }
+        this._activeIntervals.clear();
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+        }
+        this._activeTimeouts.clear();
 
         return 0;
     };
@@ -454,6 +506,16 @@ function MusicKeyboard(activity) {
         let extraNoteCount = 0;
         let startTimeNotes = 0;
 
+        const isTextEntryActive = () => {
+            const activeElement = document.activeElement;
+            return (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            );
+        };
+
         /**
          * Gets the ID of the musical note associated with a keyboard event.
          * @param {KeyboardEvent} event - The keyboard event.
@@ -553,6 +615,8 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
          */
         const __keyboarddown = event => {
+            if (isTextEntryActive()) return;
+
             if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
                 event.preventDefault();
                 this.shiftOctave(1);
@@ -652,6 +716,8 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __keyboardup = function (event) {
+            if (isTextEntryActive() && !current.has(event.keyCode)) return;
+
             current.delete(event.keyCode);
             __endNote(event);
         };
@@ -686,13 +752,6 @@ function MusicKeyboard(activity) {
         let startDate = new Date();
         let startTime = 0;
 
-        // Prevent the browser from scrolling or showing a context menu when the
-        // user presses a key on a touch device.
-        // Use pan-x instead of none so that the 700 px-wide keyboard can
-        // still be scrolled horizontally on narrow mobile viewports by
-        // dragging on a key; pinch-zoom is still suppressed.
-        element.style.touchAction = "pan-x";
-
         /**
          * Start a musical note when the element is pressed (mouse or touch).
          */
@@ -709,16 +768,6 @@ function MusicKeyboard(activity) {
                 null
             );
         };
-
-        // Use Pointer Events so that mouse clicks, touchscreen taps, and stylus
-        // presses all trigger the same note-start behaviour.  The legacy
-        // onmousedown handler was silently ignored on touch devices.
-        element.addEventListener("pointerdown", function (e) {
-            e.preventDefault(); // prevent ghost mouse events on touch screens
-            element.setPointerCapture(e.pointerId); // keep events even if finger slides off
-            activeKey = element;
-            __startNote(element);
-        });
 
         /**
          * End a musical note when the element is released.
@@ -753,9 +802,64 @@ function MusicKeyboard(activity) {
             this._updateWidgetWindowSize();
         };
 
+        this._addKeyPointerHandlers(element, __startNote, __endNote);
+    };
+
+    /**
+     * Makes the (rest) key record a rest when it is pressed and released,
+     * the same way the spacebar does, with the press length as its duration.
+     * @param {HTMLElement} element - The rest key cell.
+     */
+    this.loadRestHandler = function (element) {
+        let startTime = 0;
+
+        const __startRest = element => {
+            startTime = new Date().getTime();
+            element.style.backgroundColor = platformColor.orange;
+        };
+
+        const __endRest = element => {
+            element.style.backgroundColor = "white";
+            const duration = this._roundNoteDuration((new Date().getTime() - startTime) / 1000);
+            this._notesPlayed.push({
+                startTime: startTime,
+                noteOctave: "R",
+                objId: null,
+                duration: duration
+            });
+            this._createTable();
+            this._updateWidgetWindowSize();
+        };
+
+        this._addKeyPointerHandlers(element, __startRest, __endRest);
+    };
+
+    /**
+     * Wires pointer handlers onto a keyboard key. Uses Pointer Events so that
+     * mouse clicks, touchscreen taps, and stylus presses all behave the same;
+     * the legacy onmousedown handler was silently ignored on touch devices.
+     * @param {HTMLElement} element - The key cell.
+     * @param {Function} onStart - Called with the element when it is pressed.
+     * @param {Function} onEnd - Called with the element when it is released.
+     */
+    this._addKeyPointerHandlers = function (element, onStart, onEnd) {
+        // Prevent the browser from scrolling or showing a context menu when the
+        // user presses a key on a touch device.
+        // Use pan-x instead of none so that the 700 px-wide keyboard can
+        // still be scrolled horizontally on narrow mobile viewports by
+        // dragging on a key; pinch-zoom is still suppressed.
+        element.style.touchAction = "pan-x";
+
+        element.addEventListener("pointerdown", function (e) {
+            e.preventDefault(); // prevent ghost mouse events on touch screens
+            element.setPointerCapture(e.pointerId); // keep events even if finger slides off
+            activeKey = element;
+            onStart(element);
+        });
+
         element.addEventListener("pointerup", function () {
             if (activeKey === element) {
-                __endNote(element);
+                onEnd(element);
                 activeKey = null;
             } else if (activeKey !== null) {
                 activeKey.dispatchEvent(new Event("pointerup"));
@@ -766,7 +870,7 @@ function MusicKeyboard(activity) {
         // (e.g., an incoming phone call dismisses the touch).
         element.addEventListener("pointercancel", function () {
             if (activeKey === element) {
-                __endNote(element);
+                onEnd(element);
                 activeKey = null;
             } else if (activeKey !== null) {
                 activeKey.dispatchEvent(new Event("pointerup"));
@@ -793,7 +897,9 @@ function MusicKeyboard(activity) {
          * Beats per minute (BPM) for the MusicKeyboard.
          * @type {number}
          */
-        const tur = this.activity.turtles.ithTurtle(0);
+        // The tempo of the turtle that ran the Music Keyboard block. Not turtle 0: after a
+        // project is loaded, turtle 0 is a trashed turtle of the old project.
+        const tur = this.turtle || this.activity.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
         /**
@@ -822,6 +928,19 @@ function MusicKeyboard(activity) {
             myNode = document.getElementById("myrow2");
             if (myNode !== null) {
                 myNode.replaceChildren();
+            }
+
+            // Remove wheel event listeners from keyboard and table
+            if (this.keyboardDiv && this._stopPropagationHandler) {
+                this.keyboardDiv.removeEventListener("wheel", this._stopPropagationHandler);
+                this.keyboardDiv.removeEventListener(
+                    "DOMMouseScroll",
+                    this._stopPropagationHandler
+                );
+            }
+            if (this.keyTable && this._stopPropagationHandler) {
+                this.keyTable.removeEventListener("wheel", this._stopPropagationHandler);
+                this.keyTable.removeEventListener("DOMMouseScroll", this._stopPropagationHandler);
             }
 
             this.stopMetronome();
@@ -855,6 +974,8 @@ function MusicKeyboard(activity) {
                 });
             }
             this.midiON = false;
+            // Don't hold on to the turtle once the keyboard is closed.
+            this.turtle = null;
 
             selectedNotes = [];
             const wheelDiv = docById("wheelDivptm");
@@ -1017,13 +1138,13 @@ function MusicKeyboard(activity) {
          */
         this.keyTable = document.createElement("div");
 
-        const stopPropagationHandler = e => {
+        this._stopPropagationHandler = e => {
             e.stopPropagation();
         };
-        this.keyboardDiv.addEventListener("wheel", stopPropagationHandler);
-        this.keyboardDiv.addEventListener("DOMMouseScroll", stopPropagationHandler);
-        this.keyTable.addEventListener("wheel", stopPropagationHandler);
-        this.keyTable.addEventListener("DOMMouseScroll", stopPropagationHandler);
+        this.keyboardDiv.addEventListener("wheel", this._stopPropagationHandler);
+        this.keyboardDiv.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
+        this.keyTable.addEventListener("wheel", this._stopPropagationHandler);
+        this.keyTable.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
 
         /**
          * Appends keyboard and table divs to the widget window body.
@@ -1103,6 +1224,7 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = false;
+            this._clearPlaybackTimers();
 
             // Convert durations to seconds based on BPM
             const durationInSeconds = selectedNotes[0].duration.map(
@@ -1119,6 +1241,7 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = true;
+            this._clearPlaybackTimers();
             this._updatePlayButtonIcon(playButtonCell, false);
         }
     };
@@ -1131,7 +1254,12 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
-        setTimeout(() => {
+        if (this._playOneTimeout) {
+            this._clearWidgetTimeout(this._playOneTimeout);
+            this._playOneTimeout = null;
+        }
+        this._playOneTimeout = this._setWidgetTimeout(() => {
+            this._playOneTimeout = null;
             let cell, eleid, ele, notes, zx, res, maxDuration;
             if (counter < selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
@@ -1218,47 +1346,20 @@ function MusicKeyboard(activity) {
             return;
         }
 
-        setTimeout(() => {
-            this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
-        }, 1);
-
-        if (notes.length > 1) {
-            setTimeout(() => {
+        for (let i = 0; i < notes.length; i++) {
+            const id = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
-                    notes[1],
+                    notes[i],
                     noteValue[0],
-                    instruments[1],
+                    instruments[i],
                     null,
                     null
                 );
             }, 1);
-        }
-
-        if (notes.length > 2) {
-            setTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[2],
-                    noteValue[0],
-                    instruments[2],
-                    null,
-                    null
-                );
-            }, 1);
-        }
-
-        if (notes.length > 3) {
-            setTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[3],
-                    noteValue[0],
-                    instruments[3],
-                    null,
-                    null
-                );
-            }, 1);
+            if (id) {
+                this._chordTimeouts.push(id);
+            }
         }
     };
 
@@ -1302,15 +1403,15 @@ function MusicKeyboard(activity) {
         if (obj[0] !== "C") {
             // Pad the left side.
             for (let i = 0; i < PITCHES2.length; i++) {
+                const isFirstNote = PITCHES2[i] === obj[0] || PITCHES[i] === obj[0];
                 newList.push({
-                    noteName: PITCHES2[i],
+                    noteName: isFirstNote ? obj[0] : PITCHES2[i],
                     noteOctave: obj[1],
                     blockNumber: noteList[0].blockNumber,
                     voice: noteList[0].voice
                 });
                 j = i;
-                if (PITCHES2[i] === obj[0]) break;
-                if (PITCHES[i] === obj[0]) break;
+                if (isFirstNote) break;
                 newList[i].blockNumber = fakeBlockNumber;
                 fakeBlockNumber += 1;
             }
@@ -1451,8 +1552,8 @@ function MusicKeyboard(activity) {
             } else {
                 sortableList.push({
                     frequency: noteToFrequency(
-                        this.noteNames[i] + this.octaves[i],
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
+                        convertFromSolfege(this.noteNames[i]) + this.octaves[i],
+                        (this.turtle || this.activity.turtles.ithTurtle(0)).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
@@ -1483,12 +1584,21 @@ function MusicKeyboard(activity) {
                 return true;
             }
 
-            this.remove.push(item.blockNumber);
+            if (
+                item.blockNumber !== undefined &&
+                item.blockNumber !== null &&
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.blockList &&
+                this.activity.blocks.blockList[item.blockNumber]
+            ) {
+                this.remove.push(item.blockNumber);
+            }
             return false;
         });
 
         function removeBlock(that, i) {
-            setTimeout(() => {
+            that._setWidgetTimeout(() => {
                 that._removePitchBlock(that.remove[i]);
             }, 200);
         }
@@ -1532,1825 +1642,26 @@ function MusicKeyboard(activity) {
         return newList;
     };
 
-    /**
-     * Sets notes in a specified column based on cell color markings.
-     * Removes existing notes starting at the specified start time.
-     *
-     * @param {number} colIndex - The index of the column to set notes in.
-     * @param {boolean} playNote - Indicates whether to trigger note playback.
-     */
-    this._setNotes = function (colIndex, playNote) {
-        const start = docById("cells-" + colIndex).getAttribute("start");
-
-        this._notesPlayed = this._notesPlayed.filter(function (ele) {
-            return ele.startTime !== parseInt(start, 10);
-        });
-
-        // Look for each cell that is marked in this column.
-        let silence = true;
-        let row, cell, ele, dur;
-        for (let j = 0; j < this.layout.length; j++) {
-            row = docById("mkb" + j);
-            cell = row.cells[colIndex];
-            if (cell.style.backgroundColor === "black") {
-                this._setNoteCell(j, colIndex, start, playNote);
-                silence = false;
-            }
-        }
-
-        if (silence) {
-            ele = docById("cells-" + colIndex);
-            dur = ele.getAttribute("dur");
-            this._notesPlayed.push({
-                startTime: parseInt(start, 10),
-                noteOctave: "R",
-                objId: null,
-                duration: parseFloat(dur)
-            });
-            this._notesPlayed.sort(function (a, b) {
-                return a.startTime - b.startTime;
-            });
-        }
-    };
-
-    /**
-     * Sets a note cell based on the provided parameters.
-     *
-     * @param {number} j - The row index of the note cell.
-     * @param {number} colIndex - The column index of the note cell.
-     * @param {string} start - The start time of the note.
-     * @param {boolean} playNote - Indicates whether to trigger note playback.
-     */
-    this._setNoteCell = function (j, colIndex, start, playNote) {
-        const n = this.layout.length;
-        const temp1 = this.layout[n - j - 1].noteName;
-        let temp2;
-        if (temp1 === "hertz") {
-            temp2 = this.layout[n - j - 1].noteOctave;
-        } else if (temp1 === "drum") {
-            temp2 = "c2";
-        } else {
-            temp2 = resolveSynthNoteName(temp1, this.layout[n - j - 1].noteOctave);
-        }
-
-        const ele = docById(j + ":" + colIndex);
-        this._notesPlayed.push({
-            startTime: parseInt(start, 10),
-            noteOctave: temp2,
-            blockNumber: this.layout[n - j - 1].blockNumber,
-            duration: parseFloat(ele.getAttribute("alt")),
-            objId: this.displayLayout[n - j - 1].objId,
-            voice: this.displayLayout[n - j - 1].voice
-        });
-
-        this._notesPlayed.sort(function (a, b) {
-            return a.startTime - b.startTime;
-        });
-
-        if (playNote) {
-            this.activity.logo.synth.trigger(
-                0,
-                temp2,
-                ele.getAttribute("alt"),
-                this.instruments[0],
-                null,
-                null
-            );
-        }
-    };
-
-    /**
-     * Makes the music keyboard cells clickable for interaction.
-     * Handles mouse events such as click, mouseover, and mouseup on the keyboard cells.
-     * Triggers the creation of pie submenu based on the clicked cell attributes.
-     */
-    this.makeClickable = function () {
-        const rowNote = docById("mkbNoteDurationRow");
-        let cell;
-
-        for (let i = 0; i < selectedNotes.length; i++) {
-            cell = rowNote.cells[i];
-
-            cell.onclick = event => {
-                cell = event.target;
-                this._createpiesubmenu(
-                    cell.getAttribute("id"),
-                    cell.getAttribute("start"),
-                    cell.getAttribute("dur")
-                );
-            };
-        }
-
-        let row, isMouseDown;
-        for (let i = 0; i < this.layout.length; i++) {
-            // The buttons get added to the embedded table.
-            row = docById("mkb" + i);
-            for (let j = 0; j < row.cells.length; j++) {
-                cell = row.cells[j];
-                // Give each clickable cell a unique id
-                cell.setAttribute("id", i + ":" + j);
-
-                isMouseDown = false;
-
-                cell.onmousedown = e => {
-                    cell = e.target;
-                    isMouseDown = true;
-                    const obj = cell.id.split(":");
-                    const j = Number(obj[1]);
-                    if (cell.style.backgroundColor === "black") {
-                        cell.style.backgroundColor = cell.getAttribute("cellColor");
-                        this._setNotes(j, false);
-                    } else {
-                        cell.style.backgroundColor = "black";
-                        this._setNotes(j, true);
-                    }
-                };
-
-                cell.onmouseover = () => {
-                    if (isMouseDown) {
-                        if (cell.style.backgroundColor === "black") {
-                            cell.style.backgroundColor = cell.getAttribute("cellColor");
-                            this._setNotes(j, false);
-                        } else {
-                            cell.style.backgroundColor = "black";
-                            this._setNotes(j, true);
-                        }
-                    }
-                };
-
-                cell.onmouseup = function () {
-                    isMouseDown = false;
-                };
-            }
-        }
-    };
-
-    /**
-     * Update the widget window size based on whether it is maximized or not.
-     */
-    this._updateWidgetWindowSize = function () {
-        const outerDiv = docById("mkbOuterDiv");
-        if (!outerDiv) return;
-
-        if (this.widgetWindow._maximized) {
-            this.widgetWindow.getWidgetBody().style.position = "absolute";
-            this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-            this.widgetWindow.getWidgetBody().style.width = "200vh";
-            outerDiv.style.maxHeight = "725px";
-            outerDiv.style.height = "calc(100vh - 64px)";
-            outerDiv.style.width = "calc(200vh - 64px)";
-
-            const keyboardHolder = docById("keyboardHolder2");
-            if (keyboardHolder) {
-                keyboardHolder.style.width = "calc(200vh - 64px)";
-            }
-
-            const innerDiv = docById("mkbInnerDiv");
-            if (innerDiv) {
-                innerDiv.style.width = "95.5vw";
-                innerDiv.style.height = "auto";
-                innerDiv.scrollLeft = innerDiv.scrollWidth;
-            }
-
-            this.widgetWindow.getWidgetBody().style.left = "60px";
-        } else {
-            outerDiv.style.maxHeight = "400px";
-            this.widgetWindow.getWidgetBody().style.position = "relative";
-            this.widgetWindow.getWidgetBody().style.left = "0px";
-            this.widgetWindow.getWidgetBody().style.height = "550px";
-            this.widgetWindow.getWidgetBody().style.width = "1000px";
-            outerDiv.style.width = w + "px";
-
-            const innerDiv = docById("mkbInnerDiv");
-            if (innerDiv) {
-                innerDiv.style.height = "auto";
-            }
-        }
-    };
-
-    /**
-     * Calculates the width of a note based on its value.
-     * @param {number} noteValue - The value of the note.
-     * @returns {number} The width of the note.
-     */
-    this._noteWidth = function (noteValue) {
-        return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 * noteValue) * this._cellScale), 15);
-    };
-
-    /**
-     * Creates the table structure for the music keyboard interface based on the selected notes.
-     * Updates the display of the keyboard layout with appropriate styles and dimensions.
-     */
-    this._createTable = function () {
-        this.processSelected();
-        const mkbTableDiv = this.keyTable;
-        mkbTableDiv.style.display = "inline";
-        mkbTableDiv.style.visibility = "visible";
-        mkbTableDiv.style.border = "0px";
-        mkbTableDiv.style.width = "700px";
-
-        mkbTableDiv.replaceChildren();
-        const outerDiv = document.createElement("div");
-        outerDiv.id = "mkbOuterDiv";
-        const innerDiv = document.createElement("div");
-        innerDiv.id = "mkbInnerDiv";
-        const mkbTable = document.createElement("table");
-        mkbTable.id = "mkbTable";
-        mkbTable.setAttribute("cellpadding", "0px");
-        innerDiv.append(mkbTable);
-        outerDiv.append(innerDiv);
-        mkbTableDiv.append(outerDiv);
-
-        let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-
-        outerDiv.style.overflowY = "auto";
-        outerDiv.style.overflowX = "auto";
-        if (this.displayLayout.length > n) {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
-        } else {
-            outerDiv.style.height =
-                this._cellScale * MATRIXSOLFEHEIGHT * (this.displayLayout.length + 4) + "px";
-        }
-
-        outerDiv.style.backgroundColor = "white";
-        outerDiv.style.marginTop = "15px";
-
-        docById("mkbInnerDiv").style.marginLeft = 0;
-
-        if (selectedNotes.length < 1) {
-            outerDiv.replaceChildren();
-            return;
-        }
-
-        let j = 0;
-        n = this.displayLayout.length;
-        let mkbTableRow, cell, mkbCell, mkbCellTable;
-        for (let i = this.displayLayout.length - 1; i >= 0; i--) {
-            mkbTableRow = mkbTable.insertRow();
-            cell = mkbTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.graphicsLabelBackground;
-            cell.style.fontSize = this._cellScale * 100 + "%";
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
-            cell.style.maxWidth = cell.style.minWidth;
-            cell.style.position = "sticky";
-            cell.style.left = "0px";
-            cell.className = "headcol"; // This cell is fixed horizontally.
-            if (this.displayLayout[i].noteName === "drum") {
-                cell.textContent = this.displayLayout[i].voice;
-            } else if (this.displayLayout[i].noteName === "hertz") {
-                cell.textContent = this.displayLayout[i].noteOctave.toString() + "HZ";
-            } else {
-                cell.textContent = `${i18nSolfege(
-                    this.displayLayout[i].noteName
-                )}${this.displayLayout[i].noteOctave.toString()}`;
-            }
-
-            cell.setAttribute("id", "labelcol" + (n - i - 1));
-            if (this.displayLayout[i].noteName === "hertz") {
-                cell.setAttribute("alt", n - i - 1 + "__" + "synthsblocks");
-            } else {
-                cell.setAttribute("alt", n - i - 1 + "__" + "pitchblocks");
-            }
-
-            cell.onclick = event => {
-                cell = event.target;
-                if (cell.getAttribute("alt") === null) {
-                    cell = cell.parentNode;
-                }
-
-                const index = cell.getAttribute("alt").split("__")[0];
-                const condition = cell.getAttribute("alt").split("__")[1];
-                this._createColumnPieSubmenu(index, condition);
-            };
-
-            mkbCell = mkbTableRow.insertCell();
-            // Create tables to store individual notes.
-            const cellTable = document.createElement("table");
-            cellTable.setAttribute("cellpadding", "0px");
-            cellTable.id = `mkbCellTable${j}`;
-            mkbCell.append(cellTable);
-            mkbCellTable = docById("mkbCellTable" + j);
-            mkbCellTable.style.marginTop = "-1px";
-
-            // We'll use this element to put the clickable notes for this row.
-            const mkbRow = mkbCellTable.insertRow();
-            mkbRow.setAttribute("id", "mkb" + j);
-            j += 1;
-        }
-
-        mkbTableRow = mkbTable.insertRow();
-        mkbTableRow.style.position = "sticky";
-        mkbTableRow.style.bottom = "0px";
-        cell = mkbTableRow.insertCell();
-        cell.style.backgroundColor = platformColor.graphicsLabelBackground;
-        cell.style.fontSize = this._cellScale * 100 + "%";
-        cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
-        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
-        cell.style.maxWidth = cell.style.minWidth;
-        cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.textContent = _("Note value");
-        cell.style.position = "sticky";
-        cell.style.left = "0px";
-        cell.style.zIndex = "1";
-
-        const newCell = mkbTableRow.insertCell();
-        const noteDurationTable = document.createElement("table");
-        noteDurationTable.className = "mkbTable";
-        noteDurationTable.setAttribute("cellpadding", "0px");
-        const noteDurationRow = document.createElement("tr");
-        noteDurationRow.id = "mkbNoteDurationRow";
-        noteDurationTable.append(noteDurationRow);
-        newCell.append(noteDurationTable);
-        const cellColor = "lightgrey";
-        let maxWidth, noteMaxWidth, row, ind, dur;
-        for (let j = 0; j < selectedNotes.length; j++) {
-            maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
-            noteMaxWidth =
-                this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + "px";
-            n = this.displayLayout.length;
-            for (let i = 0; i < this.displayLayout.length; i++) {
-                row = docById("mkb" + i);
-                cell = row.insertCell();
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-                cell.style.width = noteMaxWidth;
-                cell.style.minWidth = cell.style.width;
-                cell.style.maxWidth = cell.style.width;
-
-                if (
-                    selectedNotes[j].blockNumber.includes(this.displayLayout[n - i - 1].blockNumber)
-                ) {
-                    ind = selectedNotes[j].blockNumber.indexOf(
-                        this.displayLayout[n - i - 1].blockNumber
-                    );
-                    cell.setAttribute("alt", selectedNotes[j].duration[ind]);
-                    cell.style.backgroundColor = "black";
-                    cell.style.border = "2px solid white";
-                    cell.style.borderRadius = "10px";
-                } else {
-                    cell.setAttribute("alt", maxWidth);
-                    cell.style.backgroundColor = cellColor;
-                    cell.style.border = "2px solid white";
-                    cell.style.borderRadius = "10px";
-                }
-
-                cell.setAttribute("cellColor", cellColor);
-            }
-
-            dur = toFraction(Math.max.apply(Math, selectedNotes[j].duration));
-            row = docById("mkbNoteDurationRow");
-            cell = row.insertCell();
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-            cell.style.width = noteMaxWidth;
-            cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.width;
-            cell.style.lineHeight = 60 + "%";
-            cell.style.textAlign = "center";
-            cell.textContent = `${dur[0].toString()}/${dur[1].toString()}`;
-            cell.setAttribute("id", "cells-" + j);
-            cell.setAttribute("start", selectedNotes[j].startTime);
-            cell.setAttribute("dur", maxWidth);
-            cell.style.backgroundColor = platformColor.rhythmcellcolor;
-            cell.style.color = platformColor.textColor;
-        }
-
-        innerDiv.scrollLeft = innerDiv.scrollWidth; // Force to the right.
-        this.makeClickable();
-        this._updateWidgetWindowSize();
-    };
-
-    /**
-     * Creates and configures a wheelnav "exit" (close) wheel sharing the given
-     * Raphael canvas. Does not call createWheel() or attach a navigateFunction;
-     * callers finish setup with their own labels and close behavior, since
-     * those differ slightly between call sites.
-     * @param {Object} raphael - The Raphael canvas shared with the parent wheel(s).
-     * @param {number} maxRadiusPercent - The outer radius percent for this wheel.
-     * @returns {Object} The configured (but not yet built) wheelnav instance.
-     */
-    this._createExitWheel = (raphael, maxRadiusPercent) => {
-        const exitWheel = new wheelnav("_exitWheel", raphael);
-        exitWheel.colors = platformColor.exitWheelcolors;
-        exitWheel.slicePathFunction = slicePath().DonutSlice;
-        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        exitWheel.slicePathCustom.maxRadiusPercent = maxRadiusPercent;
-        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
-        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
-        exitWheel.clickModeRotate = false;
-        exitWheel.selectedNavItemIndex = null;
-        return exitWheel;
-    };
-
-    this._configureExitWheel = exitWheel => {
-        if (typeof window.configureExitWheel === "function") {
-            window.configureExitWheel(exitWheel);
-        }
-    };
-
-    /**
-     * Creates a pie submenu based on the cell's attributes.
-     * @param {string} cellId - The ID of the cell triggering the submenu.
-     * @param {string} start - The start attribute of the cell.
-     */
-    this._createpiesubmenu = function (cellId, start) {
-        docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "10001";
-
-        this._menuWheel = new wheelnav("wheelDivptm", null, 600, 600);
-        this._exitWheel = this._createExitWheel(this._menuWheel.raphael, 0.2);
-        this._exitWheel.keynavigateEnabled = false;
-
-        this._tabsWheel = new wheelnav("_tabsWheel", this._menuWheel.raphael);
-        this._durationWheel = new wheelnav("_durationWheel", this._menuWheel.raphael);
-        this.newNoteValue = 2;
-        const mainTabsLabels = ["divide", "delete", "add", String(this.newNoteValue)];
-        const editDurationLabels = ["1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8", "1/1"];
-
-        wheelnav.cssMode = true;
-        this._menuWheel.keynavigateEnabled = false;
-        this._menuWheel.clickModeRotate = false;
-        this._menuWheel.colors = platformColor.pitchWheelcolors;
-        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
-        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.titleRotateAngle = 90;
-        this._menuWheel.animatetime = 0; // 300;
-
-        const tabsLabels = [
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            ""
-        ];
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.5;
-
-        this._tabsWheel.colors = platformColor.pitchWheelcolors;
-        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
-        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.5;
-        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.7;
-        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.clickModeRotate = false;
-        this._tabsWheel.createWheel(tabsLabels);
-
-        this._durationWheel.colors = platformColor.pitchWheelcolors;
-        this._durationWheel.keynavigateEnabled = false;
-        this._durationWheel.slicePathFunction = slicePath().DonutSlice;
-        this._durationWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._durationWheel.slicePathCustom.minRadiusPercent = 0.7;
-        this._durationWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._durationWheel.sliceSelectedPathCustom = this._durationWheel.slicePathCustom;
-        this._durationWheel.sliceInitPathCustom = this._durationWheel.slicePathCustom;
-        this._durationWheel.clickModeRotate = false;
-        this._durationWheel.createWheel(editDurationLabels);
-
-        for (let i = 0; i < tabsLabels.length; i++) {
-            this._tabsWheel.navItems[i].navItem.hide();
-        }
-
-        this._menuWheel.createWheel(mainTabsLabels);
-        this._exitWheel.createWheel(["x", ""]);
-        this._exitWheel.navItems[1].enabled = false;
-        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
-            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
-        }
-        this._configureExitWheel(this._exitWheel);
-
-        docById("wheelDivptm").style.position = "absolute";
-        docById("wheelDivptm").style.height = "250px";
-        docById("wheelDivptm").style.width = "250px";
-
-        const x = docById(cellId).getBoundingClientRect().x;
-        const y = docById(cellId).getBoundingClientRect().y;
-
-        docById("wheelDivptm").style.left =
-            Math.min(
-                this.activity.canvas.width - 200,
-                Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        docById("wheelDivptm").style.top =
-            Math.min(
-                this.activity.canvas.height - 250,
-                Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
-
-        this._exitWheel.navItems[0].navigateFunction = () => {
-            docById("wheelDivptm").style.display = "none";
-            this._menuWheel.removeWheel();
-            this._exitWheel.removeWheel();
-        };
-
-        let flag = 0;
-        this._menuWheel.navItems[0].navigateFunction = () => {
-            this._divideNotes(start, this.newNoteValue);
-        };
-
-        this._menuWheel.navItems[1].navigateFunction = () => {
-            this._deleteNotes(start);
-        };
-
-        this._menuWheel.navItems[2].navigateFunction = () => {
-            this._addNotes(cellId, start, this.newNoteValue);
-        };
-
-        this._menuWheel.navItems[3].navigateFunction = () => {
-            if (!flag) {
-                for (let i = 12; i < 19; i++) {
-                    docById("wheelnav-wheelDivptm-title-3").children[0].textContent =
-                        this.newNoteValue;
-                    this._tabsWheel.navItems[i].navItem.show();
-                }
-
-                flag = 1;
-            } else {
-                for (let i = 12; i < 19; i++) {
-                    docById("wheelnav-wheelDivptm-title-3").children[0].textContent =
-                        this.newNoteValue;
-                    this._tabsWheel.navItems[i].navItem.hide();
-                }
-
-                flag = 0;
-            }
-        };
-
-        const __selectValue = () => {
-            const i = this._durationWheel.selectedNavItemIndex;
-            const value = editDurationLabels[i];
-            const duration = value.split("/");
-            this._updateDuration(start, duration);
-        };
-
-        for (let i = 0; i < editDurationLabels.length; i++) {
-            this._durationWheel.navItems[i].navigateFunction = __selectValue;
-        }
-
-        for (let i = 12; i < 19; i++) {
-            this._tabsWheel.navItems[i].navigateFunction = () => {
-                const j = this._tabsWheel.selectedNavItemIndex;
-                this.newNoteValue = tabsLabels[j];
-                docById("wheelnav-wheelDivptm-title-3").children[0].textContent = tabsLabels[j];
-            };
-        }
-    };
-
-    /**
-     * Updates the duration of notes with the specified start time.
-     * @param {string} start - The start time of the notes to update.
-     * @param {number[]} duration - The new duration expressed as a fraction [numerator, denominator].
-     */
-    this._updateDuration = function (start, duration) {
-        start = parseInt(start, 10);
-        duration = parseInt(duration[0], 10) / parseInt(duration[1], 10);
-        const newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-        this._notesPlayed = this._notesPlayed.map(function (item) {
-            if (item.startTime === start) {
-                item.duration = newduration;
-            }
-
-            return item;
-        });
-        this._createTable();
-    };
-
-    /**
-     * Adds notes by dividing the existing note at the specified start time.
-     * @param {string} cellId - The ID of the cell where notes will be added.
-     * @param {string} start - The start time of the note to divide.
-     * @param {number} divideNoteBy - The number of divisions to create from the note.
-     */
-    this._addNotes = function (cellId, start, divideNoteBy) {
-        start = parseInt(start, 10);
-        const cell = docById(cellId);
-        const dur = cell.getAttribute("dur");
-
-        this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
-            let oldcurValue, newcurValue;
-            if (parseInt(curValue.startTime, 10) === start) {
-                prevValue = prevValue.concat([curValue]);
-                oldcurValue = Object.assign({}, curValue);
-                for (let i = 0; i < divideNoteBy; i++) {
-                    newcurValue = Object.assign({}, oldcurValue);
-                    newcurValue.startTime = oldcurValue.startTime + oldcurValue.duration * 1000;
-                    prevValue = prevValue.concat([newcurValue]);
-                    oldcurValue = newcurValue;
-                }
-
-                return prevValue;
-            } else if (parseInt(curValue.startTime, 10) > start) {
-                curValue.startTime = curValue.startTime + dur * 1000 * divideNoteBy;
-                return prevValue.concat([curValue]);
-            }
-
-            return prevValue.concat([curValue]);
-        }, []);
-
-        this._createTable();
-    };
-
-    /**
-     * Deletes notes with the specified start time.
-     * @param {string} start - The start time of the notes to delete.
-     */
-    this._deleteNotes = function (start) {
-        start = parseInt(start, 10);
-
-        this._notesPlayed = this._notesPlayed.filter(function (ele) {
-            return parseInt(ele.startTime, 10) !== start;
-        });
-
-        this._createTable();
-    };
-
-    /**
-     * Divides a note at the specified start time into multiple notes.
-     * @param {string} start - The start time of the note to divide.
-     * @param {number} divideNoteBy - The number of divisions to create from the note.
-     */
-    this._divideNotes = function (start, divideNoteBy) {
-        start = parseInt(start, 10);
-
-        this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
-            let newcurValue, newcurValue2, oldcurValue;
-            if (parseInt(curValue.startTime, 10) === start) {
-                if (beginnerMode === "true") {
-                    if (curValue.duration / divideNoteBy < 0.125) {
-                        return prevValue.concat([curValue]);
-                    }
-                } else {
-                    if (curValue.duration / divideNoteBy < 0.0625) {
-                        return prevValue.concat([curValue]);
-                    }
-                }
-
-                newcurValue = Object.assign({}, curValue);
-                newcurValue.duration = curValue.duration / divideNoteBy;
-                prevValue = prevValue.concat([newcurValue]);
-                oldcurValue = newcurValue;
-                for (let i = 0; i < divideNoteBy - 1; i++) {
-                    newcurValue2 = Object.assign({}, oldcurValue);
-                    newcurValue2.startTime = parseInt(
-                        newcurValue2.startTime + newcurValue2.duration * 1000,
-                        10
-                    );
-                    prevValue = prevValue.concat([newcurValue2]);
-                    oldcurValue = newcurValue2;
-                }
-
-                return prevValue;
-            }
-
-            return prevValue.concat([curValue]);
-        }, []);
-
-        this._createTable();
-    };
-
-    /**
-     * Creates a submenu for adding a new row.
-     * The submenu allows selection between pitch and hertz options.
-     */
-    this._createAddRowPieSubmenu = function () {
-        docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "10001";
-        const pitchLabels = [
-            "do",
-            "do♯",
-            "re",
-            "re♯",
-            "mi",
-            "fa",
-            "fa♯",
-            "sol",
-            "sol♯",
-            "la",
-            "la♯",
-            "ti"
-        ];
-        const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
-        const VALUESLABEL = ["pitch", "hertz"];
-        const VALUES = ["imgsrc: images/chime.svg", "imgsrc: images/synth.svg"];
-        const valueLabel = [];
-        let label;
-        let creatingNewNote = false;
-        for (let i = 0; i < VALUES.length; i++) {
-            label = _(VALUES[i]);
-            valueLabel.push(label);
-        }
-
-        this._menuWheel = new wheelnav("wheelDivptm", null, 200, 200);
-        this._exitWheel = this._createExitWheel(this._menuWheel.raphael, 0.25);
-
-        wheelnav.cssMode = true;
-
-        this._menuWheel.keynavigateEnabled = false;
-        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
-        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._menuWheel.colors = [
-            platformColor.paletteColors["pitch"][0],
-            platformColor.paletteColors["pitch"][1]
-        ];
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
-
-        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.clickModeRotate = false;
-
-        this._menuWheel.animatetime = 0;
-        this._menuWheel.createWheel(valueLabel);
-        this._menuWheel.navItems[0].setTooltip(_("pitch"));
-        this._menuWheel.navItems[1].setTooltip(_("hertz"));
-
-        this._exitWheel.createWheel(["×", " "]);
-        this._exitWheel.navItems[1].enabled = false;
-        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
-            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
-        }
-        this._configureExitWheel(this._exitWheel);
-
-        const x = docById("addnotes").getBoundingClientRect().x;
-        const y = docById("addnotes").getBoundingClientRect().y;
-
-        docById("wheelDivptm").style.position = "absolute";
-        docById("wheelDivptm").style.height = "300px";
-        docById("wheelDivptm").style.width = "300px";
-        docById("wheelDivptm").style.left =
-            Math.min(
-                this.activity.canvas.width - 200,
-                Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        docById("wheelDivptm").style.top =
-            Math.min(
-                this.activity.canvas.height - 300,
-                Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
-
-        this._exitWheel.navItems[0].navigateFunction = () => {
-            docById("wheelDivptm").style.display = "none";
-            this._menuWheel.removeWheel();
-            this._exitWheel.removeWheel();
-        };
-
-        let rLabel;
-        let rArg;
-
-        const __selectionChanged = () => {
-            if (creatingNewNote) {
-                // Debounce
-                return;
-            }
-            const label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
-            const newBlock = this.activity.blocks.blockList.length;
-
-            if (label === "pitch") {
-                let i = -1;
-                let lastNote = null,
-                    c = this.layout.length - 1;
-                while (c > -1) {
-                    if (this.layout[c] && this.layout[c].noteName !== "hertz") {
-                        lastNote = this.layout[c].noteName;
-                        break;
-                    }
-                    c--;
-                }
-
-                if (lastNote !== null) {
-                    for (let idx = 0; idx < pitchLabels.length; idx++) {
-                        if (
-                            pitchLabels[idx].includes(lastNote) ||
-                            lastNote.includes(pitchLabels[idx])
-                        ) {
-                            i = idx;
-                            break;
-                        }
-                    }
-                }
-
-                let iterations = 0;
-                do {
-                    rLabel = pitchLabels[(i + 1) % pitchLabels.length];
-                    i = (i + 1) % pitchLabels.length;
-                    iterations++;
-                    if (iterations > pitchLabels.length) {
-                        this.activity.errorMsg(
-                            _("All 12 pitches are already in the keyboard. Adding duplicate.")
-                        );
-                        break;
-                    }
-                } while (this.layout.some(note => note.noteName === rLabel));
-
-                rArg = 4;
-                for (let j = this.layout.length; j > 0; j--) {
-                    const oct = Number(this.layout[j - 1].noteOctave);
-                    if (!isNaN(oct) && oct >= 1 && oct <= 8) {
-                        rArg = oct;
-                        break;
-                    }
-                }
-                if (lastNote !== null && i === 0 && rArg < 8) {
-                    rArg += 1;
-                }
-            } else {
-                rLabel = "hertz";
-                rArg = 392;
-                let flag = false;
-                for (let i = 0; i < hertzLabels.length; i++) {
-                    flag = false;
-                    for (let j = 0; j < this.layout.length; j++) {
-                        if (this.layout[j].noteName === "hertz") {
-                            if (this.layout[j].noteOctave === hertzLabels[i]) {
-                                flag = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (flag) {
-                        continue;
-                    }
-
-                    rArg = hertzLabels[i];
-                    break;
-                }
-            }
-
-            switch (label) {
-                case "pitch":
-                    this.activity.blocks.loadNewBlocks([
-                        [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
-                        [1, ["solfege", { value: rLabel }], 0, 0, [0]],
-                        [2, ["number", { value: rArg }], 0, 0, [0]]
-                    ]);
-                    break;
-                case "hertz":
-                    this.activity.blocks.loadNewBlocks([
-                        [0, ["hertz", {}], 0, 0, [null, 1, null]],
-                        [1, ["number", { value: rArg }], 0, 0, [0]]
-                    ]);
-                    break;
-                default:
-                    debugLog("Nothing to do for " + label);
-            }
-
-            let aboveBlock = -1;
-            for (let i = this.layout.length; i > 0; i--) {
-                if (this.layout[i - 1].blockNumber < FAKEBLOCKNUMBER) {
-                    aboveBlock = this.layout[i - 1].blockNumber;
-                    break;
-                }
-            }
-            if (aboveBlock !== -1) {
-                creatingNewNote = true;
-                setTimeout(() => {
-                    this._addNotesBlockBetween(aboveBlock, newBlock);
-                    creatingNewNote = false;
-                    this.layout.push({
-                        noteName: rLabel,
-                        noteOctave: rArg,
-                        blockNumber: newBlock,
-                        voice: this.layout[0].voice
-                    });
-                    this._sortLayout(this.layout);
-
-                    this._syncLayouts();
-
-                    this._createKeyboard();
-                    this._createTable();
-                    const n = this.layout.length;
-                    const key = this.layout[n - 1];
-                    if (!this.noteToKeyMap) {
-                        this.noteToKeyMap = {};
-                    }
-                    if (key) {
-                        this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] =
-                            key.objId;
-                        if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
-                            this.noteToKeyMap[
-                                FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
-                            ] = key.objId; //convet solfege to alphabetic.
-                        }
-                    }
-                }, 500);
-            } else {
-                debugLog("Could not find anywhere to insert new block.");
-            }
-        };
-
-        for (let i = 0; i < valueLabel.length; i++) {
-            this._menuWheel.navItems[i].navigateFunction = __selectionChanged;
-        }
-    };
-
-    /**
-     * Adds a new block between two existing blocks in the activity.
-     * @param {number} aboveBlock - The block number above which the new block will be inserted.
-     * @param {number} block - The block number of the new block to be inserted.
-     */
-    this._addNotesBlockBetween = function (aboveBlock, block) {
-        const belowBlock = last(this.activity.blocks.blockList[aboveBlock].connections);
-        this.activity.blocks.blockList[aboveBlock].connections[
-            this.activity.blocks.blockList[aboveBlock].connections.length - 1
-        ] = block;
-
-        if (belowBlock !== null) {
-            this.activity.blocks.blockList[belowBlock].connections[0] = block;
-        }
-
-        this.activity.blocks.blockList[block].connections[0] = aboveBlock;
-
-        this.activity.blocks.blockList[block].connections[
-            this.activity.blocks.blockList[block].connections.length - 1
-        ] = belowBlock;
-
-        if (this.blockNo !== undefined && this.blockNo !== null) {
-            this.activity.blocks.adjustDocks(this.blockNo, true);
-            this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        }
-        this.activity.blocks.adjustExpandableClampBlock();
-        this.activity.refreshCanvas();
-    };
-
-    /**
-     * Sorts the layout of notes based on their frequency values.
-     * Removes duplicate notes and adjusts connections accordingly.
-     */
-    this._sortLayout = function () {
-        this.layout.sort((a, b) => {
-            let aValue, bValue;
-            if (a.noteName === "hertz") {
-                if (b.noteName !== "hertz") return 1;
-                aValue = a.noteOctave;
-            } else {
-                aValue = noteToFrequency(
-                    a.noteName + a.noteOctave,
-                    this.activity.turtles.ithTurtle(0).singer.keySignature
-                );
-            }
-            if (b.noteName === "hertz") {
-                if (a.noteName !== "hertz") return -1;
-                bValue = b.noteOctave;
-            } else {
-                bValue = noteToFrequency(
-                    b.noteName + b.noteOctave,
-                    this.activity.turtles.ithTurtle(0).singer.keySignature
-                );
-            }
-
-            if (aValue === bValue) {
-                return a.blockNumber - b.blockNumber;
-            }
-            return aValue - bValue;
-        });
-
-        // Use Set for O(1) lookup instead of Array.includes() O(n)
-        const unique = new Set();
-        this.remove = [];
-        this.layout = this.layout.filter((item, pos) => {
-            const key = item.noteName + item.noteOctave;
-            if (!unique.has(key)) {
-                unique.add(key);
-                return true;
-            }
-
-            this.remove = [this.layout[pos - 1].blockNumber, this.layout[pos].blockNumber];
-            return false;
-        });
-
-        this._notesPlayed.map(item => {
-            if (item.objId === this.remove[1]) {
-                item.objId = this.remove[0];
-            }
-
-            return item;
-        });
-
-        if (this.remove.length) {
-            this._removePitchBlock(this.remove[1]);
-        }
-
-        this._syncLayouts();
-
-        if (this.keyboardShown) {
-            this._createKeyboard();
-        } else {
-            this._createTable();
-        }
-    };
-
-    /**
-     * Synchronizes this.layout and this.displayLayout, ensuring all notes
-     * are aligned, gap-filled, and that real note blocks preserve their
-     * original solfege names and blockNumbers.
-     */
-    this._syncLayouts = function () {
-        const originalLayout = this.layout.filter(note => note.blockNumber < FAKEBLOCKNUMBER);
-
-        this.displayLayout = this.layout.map(note => {
-            return { ...note, noteName: convertFromSolfege(note.noteName) };
-        });
-
-        const sortedHertzList = this.displayLayout.filter(note => note.noteName === "hertz");
-        const sortedNotesList = this.displayLayout.filter(note => note.noteName !== "hertz");
-        this.displayLayout = fillChromaticGaps(sortedNotesList);
-        this.displayLayout = this.displayLayout.concat(sortedHertzList);
-
-        const originalNotesMap = {};
-        for (const note of originalLayout) {
-            const alphaName = convertFromSolfege(note.noteName);
-            originalNotesMap[alphaName + note.noteOctave] = note;
-        }
-
-        this.displayLayout = this.displayLayout.map(note => {
-            const key = note.noteName + note.noteOctave;
-            if (originalNotesMap[key]) {
-                return {
-                    ...note,
-                    blockNumber: originalNotesMap[key].blockNumber
-                };
-            }
-            return { ...note };
-        });
-
-        this.layout = this.displayLayout.map(note => {
-            const key = note.noteName + note.noteOctave;
-            if (originalNotesMap[key]) {
-                return { ...originalNotesMap[key] };
-            }
-            return { ...note };
-        });
-    };
-
-    /**
-     * Removes a pitch block from the activity and adjusts connections.
-     * @param {number} blockNo - The block number of the pitch block to be removed.
-     */
-    this._removePitchBlock = function (blockNo) {
-        const c0 = this.activity.blocks.blockList[blockNo].connections[0];
-        const c1 = last(this.activity.blocks.blockList[blockNo].connections);
-        if (this.activity.blocks.blockList[c0].name === "musickeyboard") {
-            this.activity.blocks.blockList[c0].connections[1] = c1;
-        } else {
-            this.activity.blocks.blockList[c0].connections[
-                this.activity.blocks.blockList[c0].connections.length - 1
-            ] = c1;
-        }
-
-        if (c1) {
-            this.activity.blocks.blockList[c1].connections[0] = c0;
-        }
-
-        this.activity.blocks.blockList[blockNo].connections[
-            this.activity.blocks.blockList[blockNo].connections.length - 1
-        ] = null;
-        this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
-        if (this.blockNo !== undefined && this.blockNo !== null) {
-            this.activity.blocks.adjustDocks(this.blockNo, true);
-            this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        }
-        this.activity.refreshCanvas();
-    };
-
-    /**
-     * Creates a column pie submenu based on the provided index and condition.
-     * @param {number} index - The index used to retrieve block information.
-     * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').
-     */
-    this._createColumnPieSubmenu = function (index, condition) {
-        index = parseInt(index, 10);
-        const displayLayout = this.displayLayout || this.layout;
-        const layoutItem = displayLayout[displayLayout.length - index - 1];
-
-        if (!layoutItem) {
-            return;
-        }
-        if (this.activity.blocks.blockList[layoutItem.blockNumber] === undefined) {
-            return;
-        }
-
-        docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "10001";
-
-        const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
-        let noteLabels = ["ti", "la", "sol", "fa", "mi", "re", "do"];
-        const noteLabelsI18n = [];
-        for (let i = 0; i < noteLabels.length; i++) {
-            noteLabelsI18n.push(i18nSolfege(noteLabels[i]));
-        }
-
-        if (condition === "synthsblocks") {
-            noteLabels = ["261", "294", "327", "348", "392", "436", "490", "523"];
-        }
-
-        this._pitchWheel = new wheelnav("wheelDivptm", null, 600, 600);
-
-        this._exitWheel = this._createExitWheel(this._pitchWheel.raphael, 0.2);
-        if (condition === "pitchblocks") {
-            this._accidentalsWheel = new wheelnav("_accidentalsWheel", this._pitchWheel.raphael);
-            this._octavesWheel = new wheelnav("_octavesWheel", this._pitchWheel.raphael);
-        }
-
-        wheelnav.cssMode = true;
-
-        this._pitchWheel.keynavigateEnabled = false;
-        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
-        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        if (condition === "pitchblocks") {
-            this._pitchWheel.colors = platformColor.pitchWheelcolors;
-            this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
-            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
-        } else if (condition === "synthsblocks") {
-            this._pitchWheel.titleRotateAngle = 0;
-            this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
-            this._pitchWheel.slicePathCustom.minRadiusPercent = 0.6;
-            this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
-            this._pitchWheel.titleRotateAngle = 90;
-            this._pitchWheel.clickModeRotate = false;
-        }
-
-        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
-        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
-
-        this._pitchWheel.animatetime = 0; // 300;
-        if (condition === "synthsblocks") {
-            this._pitchWheel.createWheel(noteLabels);
-        } else {
-            this._pitchWheel.createWheel(noteLabelsI18n);
-        }
-
-        this._exitWheel.createWheel(["x", " "]);
-        this._exitWheel.navItems[1].enabled = false;
-        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
-            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
-            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
-        }
-        this._configureExitWheel(this._exitWheel);
-
-        const octaveLabels = [
-            "8",
-            "7",
-            "6",
-            "5",
-            "4",
-            "3",
-            "2",
-            "1",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ];
-
-        if (condition === "pitchblocks") {
-            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
-            this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
-            this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.5;
-            this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
-            this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
-            this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
-
-            const accidentalLabels = [];
-            for (let i = 0; i < accidentals.length; i++) {
-                accidentalLabels.push(accidentals[i]);
-            }
-
-            for (let i = 0; i < 9; i++) {
-                accidentalLabels.push(null);
-                this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
-            }
-
-            this._accidentalsWheel.animatetime = 0; // 300;
-            this._accidentalsWheel.createWheel(accidentalLabels);
-            if (typeof this._accidentalsWheel.setTooltips === "function") {
-                this._accidentalsWheel.setTooltips([
-                    _("double sharp"),
-                    _("sharp"),
-                    _("natural"),
-                    _("flat"),
-                    _("double flat")
-                ]);
-            }
-
-            this._octavesWheel.colors = platformColor.octavesWheelcolors;
-            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
-            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
-            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
-            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            this._octavesWheel.animatetime = 0; // 300;
-            this._octavesWheel.createWheel(octaveLabels);
-            if (typeof this._octavesWheel.setTooltips === "function") {
-                this._octavesWheel.setTooltips([
-                    _("Octave 8 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 7 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 6 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 5 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 4 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 3 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 2 (Shift+↑/↓ to shift octaves)"),
-                    _("Octave 1 (Shift+↑/↓ to shift octaves)")
-                ]);
-            }
-        }
-
-        const x = docById("labelcol" + index).getBoundingClientRect().x;
-        const y = docById("labelcol" + index).getBoundingClientRect().y;
-
-        docById("wheelDivptm").style.position = "absolute";
-        docById("wheelDivptm").style.height = "300px";
-        docById("wheelDivptm").style.width = "300px";
-        docById("wheelDivptm").style.left =
-            Math.min(
-                this.activity.canvas.width - 200,
-                Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        docById("wheelDivptm").style.top =
-            Math.min(
-                this.activity.canvas.height - 300,
-                Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
-
-        index = displayLayout.length - index - 1;
-        const block = displayLayout[index].blockNumber;
-
-        let noteValue =
-            this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
-                .value;
-
-        if (typeof noteValue === "string") {
-            if (noteValue.endsWith("##") || noteValue.endsWith("x")) {
-                noteValue = noteValue.replace(/(##|x)$/, "𝄪");
-            } else if (noteValue.endsWith("#")) {
-                noteValue = noteValue.replace(/#$/, "♯");
-            } else if (noteValue.endsWith("bb")) {
-                noteValue = noteValue.replace(/bb$/, "𝄫");
-            } else if (noteValue.endsWith("b")) {
-                noteValue = noteValue.replace(/b$/, "♭");
-            }
-        }
-
-        if (condition === "pitchblocks") {
-            const octaveValue =
-                this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[2]]
-                    .value;
-            let accidentalsValue = 2;
-
-            for (let i = 0; i < accidentals.length; i++) {
-                if (noteValue.includes(accidentals[i])) {
-                    accidentalsValue = i;
-                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
-                    break;
-                }
-            }
-
-            this._accidentalsWheel.navigateWheel(accidentalsValue);
-            this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
-
-            this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
-        }
-
-        this._exitWheel.navItems[0].navigateFunction = () => {
-            docById("wheelDivptm").style.display = "none";
-            this._pitchWheel.removeWheel();
-            this._exitWheel.removeWheel();
-            if (condition === "pitchblocks") {
-                this._accidentalsWheel.removeWheel();
-                this._octavesWheel.removeWheel();
-            }
-        };
-
-        /**
-         * Handles the hertz selection change for the pitch wheel.
-         */
-        const __hertzSelectionChanged = () => {
-            const blockValue =
-                this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            const argBlock = this.activity.blocks.blockList[block].connections[1];
-            this.activity.blocks.blockList[argBlock].text.text = blockValue;
-            this.activity.blocks.blockList[argBlock].value = parseInt(blockValue, 10);
-
-            const z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
-            this.activity.blocks.blockList[argBlock].container.setChildIndex(
-                this.activity.blocks.blockList[argBlock].text,
-                z
-            );
-            this.activity.blocks.blockList[argBlock].updateCache();
-
-            const cell = docById("labelcol" + (displayLayout.length - index - 1));
-            displayLayout[index].noteOctave = parseInt(blockValue, 10);
-            if (this.layout[index]) {
-                this.layout[index].noteOctave = parseInt(blockValue, 10);
-            }
-            cell.textContent =
-                displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
-            this._notesPlayed.map(item => {
-                if (item.objId === displayLayout[index].blockNumber) {
-                    item.noteOctave = parseInt(blockValue, 10);
-                }
-                return item;
-            });
-        };
-
-        if (condition === "synthsblocks") {
-            for (let i = 0; i < noteLabels.length; i++) {
-                this._pitchWheel.navItems[i].navigateFunction = __hertzSelectionChanged;
-            }
-        }
-
-        /**
-         * Handles the selection change event for the pitch wheel.
-         * Updates the note label and octave based on the selected wheel values.
-         */
-        const __selectionChanged = () => {
-            let label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            let labelValue, i, attr;
-            if (condition === "pitchblocks") {
-                i = noteLabelsI18n.indexOf(label);
-                labelValue = noteLabels[i];
-                attr =
-                    this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex]
-                        .title;
-                if (attr !== "♮") {
-                    label += attr;
-                }
-            } else {
-                i = noteLabels.indexOf(label);
-                labelValue = label;
-            }
-
-            const noteLabelBlock = this.activity.blocks.blockList[block].connections[1];
-            this.activity.blocks.blockList[noteLabelBlock].text.text = label;
-            this.activity.blocks.blockList[noteLabelBlock].value = labelValue;
-
-            const z = this.activity.blocks.blockList[noteLabelBlock].container.children.length - 1;
-            this.activity.blocks.blockList[noteLabelBlock].container.setChildIndex(
-                this.activity.blocks.blockList[noteLabelBlock].text,
-                z
-            );
-            this.activity.blocks.blockList[noteLabelBlock].updateCache();
-
-            let octave;
-            if (condition === "pitchblocks") {
-                octave = Number(
-                    this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
-                );
-                this.activity.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
-                    this.activity.blocks.blockList[noteLabelBlock].connections[0],
-                    octave
-                );
-            }
-
-            const cell = docById("labelcol" + (displayLayout.length - index - 1));
-            displayLayout[index].noteName = label;
-            displayLayout[index].noteOctave = octave;
-            if (this.layout[index]) {
-                this.layout[index].noteName = label;
-                this.layout[index].noteOctave = octave;
-            }
-            cell.textContent =
-                displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
-            const temp1 = label;
-            const temp2 = resolveSynthNoteName(temp1, octave);
-
-            this._notesPlayed.map(item => {
-                if (item.objId === displayLayout[index].blockNumber) {
-                    item.noteOctave = temp2;
-                }
-                return item;
-            });
-        };
-
-        /**
-         * Executes a pitch preview based on the current selection in the pitch wheel.
-         * This function triggers a synthesized sound preview of the selected note.
-         * After triggering the preview, it calls the __selectionChanged function to update UI elements.
-         */
-        const __pitchPreview = () => {
-            const label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            const i = noteLabelsI18n.indexOf(label);
-            let labelValue = noteLabels[i];
-
-            const attr =
-                this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
-            if (attr !== "♮") {
-                labelValue += attr;
-            }
-
-            const octave = Number(
-                this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
-            );
-            const obj = getNote(
-                labelValue,
-                octave,
-                0,
-                this.activity.turtles.ithTurtle(0).singer.keySignature,
-                false,
-                null,
-                this.activity.logo.errorMsg,
-                this.activity.logo.synth.inTemperament
-            );
-            this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(this.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-            this.activity.logo.synth.trigger(
-                0,
-                [normalizeNoteAccidentals(obj[0] + obj[1])],
-                1 / 8,
-                DEFAULTVOICE,
-                null,
-                null
-            );
-
-            __selectionChanged();
-        };
-
-        if (condition === "pitchblocks") {
-            for (let i = 0; i < noteLabels.length; i++) {
-                this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
-            }
-
-            for (let i = 0; i < accidentals.length; i++) {
-                this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
-            }
-
-            for (let i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
-            }
-        }
-    };
-
-    /**
-     * Creates a virtual musical keyboard interface.
-     * This function generates and displays a keyboard layout with keys represented as HTML elements.
-     * It sets up event handling for key presses on the keyboard.
-     */
-    this._createKeyboard = function () {
-        this._cacheDocumentKeyHandlers();
-        document.onkeydown = null;
-        const mkbKeyboardDiv = this.keyboardDiv;
-        mkbKeyboardDiv.style.display = "flex";
-        mkbKeyboardDiv.style.visibility = "visible";
-        mkbKeyboardDiv.style.border = "0px";
-        mkbKeyboardDiv.style.width = "100%";
-        mkbKeyboardDiv.style.top = "0px";
-        mkbKeyboardDiv.style.overflow = "auto";
-        mkbKeyboardDiv.style.userSelect = "none";
-        mkbKeyboardDiv.style.webkitUserSelect = "none"; // Safari/Chrome
-        mkbKeyboardDiv.style.msUserSelect = "none"; // Edge
-        mkbKeyboardDiv.replaceChildren();
-        const keyboardHolder2 = document.createElement("div");
-        keyboardHolder2.id = "keyboardHolder2";
-        const whiteTable = document.createElement("table");
-        whiteTable.className = "white";
-        const whiteRow = document.createElement("tr");
-        whiteRow.id = "myrow";
-        whiteTable.createTBody().append(whiteRow);
-        const blackTable = document.createElement("table");
-        blackTable.className = "black";
-        const blackRowElement = document.createElement("tr");
-        blackRowElement.id = "myrow2";
-        blackTable.createTBody().append(blackRowElement);
-        keyboardHolder2.append(whiteTable, blackTable);
-        mkbKeyboardDiv.append(keyboardHolder2);
-
-        keyboardHolder2.style.bottom = "10px";
-        keyboardHolder2.style.left = "0px";
-        keyboardHolder2.style.height = "145px";
-        keyboardHolder2.style.backgroundColor = "white";
-        const blackTables = document.getElementsByClassName("black");
-        blackTables[0].style.top = "1px";
-        blackTables[0].style.borderSpacing = "0px 0px 20px";
-        blackTables[0].style.borderCollapse = "separate";
-
-        whiteRow.replaceChildren();
-        blackRowElement.replaceChildren();
-
-        // For the button callbacks
-
-        if (this.noteNames.length === 0) {
-            for (let i = 0; i < PITCHES3.length; i++) {
-                this.noteNames.push(PITCHES3[i]);
-                this.octaves.push(4);
-                if (i === 4) {
-                    this.noteNames.push(null); // missing black key
-                    this.octaves.push(4);
-                }
-            }
-
-            this.noteNames.push(PITCHES3[0]);
-            this.octaves.push(5);
-        }
-        this.idContainer = [];
-        let myrowId = 0;
-        let myrow2Id = 0;
-        let myrow3Id = 0;
-
-        let parenttbl = document.getElementById("myrow");
-        let parenttbl2 = document.getElementById("myrow2");
-        let newel, newel2, nname;
-
-        for (let p = 0; p < this.displayLayout.length; p++) {
-            // If the blockNumber is null, don't add a label.
-            if (this.displayLayout[p].noteName > FAKEBLOCKNUMBER) {
-                newel2 = document.createElement("td");
-                newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
-                    appendSpacerKey(parenttbl2, newel2);
-                    p--;
-                    myrow2Id++;
-                    continue;
-                }
-
-                newel2.setAttribute(
-                    "alt",
-                    this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
-                );
-                this.idContainer.push([
-                    "blackRow" + myrow2Id.toString(),
-                    this.displayLayout[p].blockNumber
-                ]);
-
-                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
-                if (this.layout[p]) {
-                    this.layout[p].objId = "blackRow" + myrow2Id.toString();
-                }
-
-                myrow2Id++;
-                newel2.textContent = "";
-                newel2.style.visibility = "hidden";
-                parenttbl2.appendChild(newel2);
-            } else if (this.displayLayout[p].noteName === "drum") {
-                newel = document.createElement("td");
-                newel.style.textAlign = "center";
-                newel.setAttribute("id", "whiteRow" + myrowId.toString());
-                newel.setAttribute(
-                    "alt",
-                    this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].voice +
-                        "__" +
-                        this.displayLayout[p].blockNumber
-                );
-                this.idContainer.push([
-                    "whiteRow" + myrowId.toString(),
-                    this.displayLayout[p].blockNumber
-                ]);
-                setKeyboardCellLabel(
-                    newel,
-                    this.displayLayout[p].voice,
-                    "",
-                    myrowId < WHITEKEYS.length ? String.fromCharCode(WHITEKEYS[myrowId]) : null
-                );
-
-                this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
-
-                myrowId++;
-                newel.style.position = "relative";
-                newel.style.zIndex = "100";
-                parenttbl.appendChild(newel);
-            } else if (this.displayLayout[p].noteName === "hertz") {
-                newel = document.createElement("td");
-                newel.style.textAlign = "center";
-                newel.setAttribute("id", "hertzRow" + myrow3Id.toString());
-                newel.setAttribute(
-                    "alt",
-                    this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
-                );
-                this.idContainer.push([
-                    "hertzRow" + myrow3Id.toString(),
-                    this.displayLayout[p].blockNumber
-                ]);
-                setKeyboardCellLabel(
-                    newel,
-                    "",
-                    this.displayLayout[p].noteOctave,
-                    myrow3Id < HERTZKEYS.length ? String.fromCharCode(HERTZKEYS[myrow3Id]) : null
-                );
-
-                this.displayLayout[p].objId = "hertzRow" + myrow3Id.toString();
-
-                myrow3Id++;
-                newel.style.position = "relative";
-                newel.style.zIndex = "100";
-                parenttbl.appendChild(newel);
-            } else if (
-                this.displayLayout[p].noteName.includes(SHARP) ||
-                this.displayLayout[p].noteName.includes("#")
-            ) {
-                newel2 = document.createElement("td");
-                newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                newel2.style.textAlign = "center";
-                if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
-                    appendSpacerKey(parenttbl2, newel2);
-                    p--;
-                    myrow2Id++;
-                    continue;
-                }
-
-                newel2.setAttribute(
-                    "alt",
-                    this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
-                );
-                this.idContainer.push([
-                    "blackRow" + myrow2Id.toString(),
-                    this.displayLayout[p].blockNumber
-                ]);
-
-                nname = this.displayLayout[p].noteName.replace(SHARP, "").replace("#", "");
-                if (this.displayLayout[p].blockNumber >= FAKEBLOCKNUMBER) {
-                    setKeyboardCellLabel(
-                        newel2,
-                        "",
-                        "",
-                        myrow2Id < BLACKKEYS.length
-                            ? String.fromCharCode(BLACKKEYS[myrow2Id])
-                            : null
-                    );
-                }
-                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
-                if (this.layout[p]) {
-                    this.layout[p].objId = "blackRow" + myrow2Id.toString();
-                }
-
-                myrow2Id++;
-                newel2.style.position = "relative";
-                newel2.style.zIndex = "200";
-                parenttbl2.appendChild(newel2);
-            } else if (
-                this.displayLayout[p].noteName.includes(FLAT) ||
-                this.displayLayout[p].noteName.includes("b")
-            ) {
-                newel2 = document.createElement("td");
-                newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                newel2.style.textAlign = "center";
-                if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
-                    appendSpacerKey(parenttbl2, newel2);
-                    p--;
-                    myrow2Id++;
-                    continue;
-                }
-
-                /**
-                 * Sets up the HTML elements for the virtual musical keyboard layout.
-                 * This function creates HTML elements to represent the keys of a musical keyboard based on the specified display layout.
-                 * Each key element is configured with appropriate attributes and content based on note information.
-                 */
-                newel2.setAttribute(
-                    "alt",
-                    this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
-                );
-                this.idContainer.push([
-                    "blackRow" + myrow2Id.toString(),
-                    this.displayLayout[p].blockNumber
-                ]);
-                nname = this.displayLayout[p].noteName.replace(FLAT, "").replace("b", "");
-                if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
-                    if (SOLFEGENAMES.includes(nname)) {
-                        setKeyboardCellLabel(
-                            newel2,
-                            `${i18nSolfege(nname)}${FLAT}`,
-                            this.displayLayout[p].noteOctave,
-                            String.fromCharCode(BLACKKEYS[myrow2Id])
-                        );
-                    } else {
-                        setKeyboardCellLabel(
-                            newel2,
-                            this.displayLayout[p].noteName,
-                            this.displayLayout[p].noteOctave,
-                            String.fromCharCode(BLACKKEYS[myrow2Id])
-                        );
-                    }
-                }
-                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
-                if (this.layout[p]) {
-                    this.layout[p].objId = "blackRow" + myrow2Id.toString();
-                }
-
-                myrow2Id++;
-                newel2.style.position = "relative";
-                newel2.style.zIndex = "200";
-                parenttbl2.appendChild(newel2);
-            } else {
-                newel = document.createElement("td");
-                newel.setAttribute("id", "whiteRow" + myrowId.toString());
-                newel.style.textAlign = "center";
-                newel.setAttribute(
-                    "alt",
-                    this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
-                );
-                this.idContainer.push([
-                    "whiteRow" + myrowId.toString(),
-                    this.displayLayout[p].blockNumber
-                ]);
-
-                if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
-                    if (SOLFEGENAMES.includes(this.displayLayout[p].noteName)) {
-                        setKeyboardCellLabel(
-                            newel,
-                            i18nSolfege(this.displayLayout[p].noteName),
-                            this.displayLayout[p].noteOctave,
-                            myrowId < WHITEKEYS.length
-                                ? String.fromCharCode(WHITEKEYS[myrowId])
-                                : null
-                        );
-                    } else {
-                        setKeyboardCellLabel(
-                            newel,
-                            this.displayLayout[p].noteName,
-                            this.displayLayout[p].noteOctave,
-                            myrowId < WHITEKEYS.length
-                                ? String.fromCharCode(WHITEKEYS[myrowId])
-                                : null
-                        );
-                    }
-                }
-                this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
-                if (this.layout[p]) {
-                    this.layout[p].objId = "whiteRow" + myrowId.toString();
-                }
-
-                myrowId++;
-                newel.style.position = "relative";
-                newel.style.zIndex = "100";
-                parenttbl.appendChild(newel);
-            }
-        }
-        newel = document.createElement("td");
-        parenttbl.appendChild(newel);
-        newel.style.textAlign = "center";
-        newel.setAttribute("id", "rest");
-        newel.setAttribute("alt", "R__");
-        setKeyboardCellLabel(newel, "", "", _("rest"));
-        newel.style.position = "relative";
-        newel.style.zIndex = "100";
-
-        for (let i = 0; i < this.idContainer.length; i++) {
-            // If the blockNumber is null, don't make the key clickable.
-            if (this.displayLayout[i].blockNumber === null) {
-                continue;
-            }
-            this.loadHandler(
-                document.getElementById(this.idContainer[i][0]),
-                i,
-                this.idContainer[i][1],
-                this.displayLayout
-            );
-        }
-
-        this.addKeyboardShortcuts();
-    };
+    // Drawing lives in MusicKeyboardRendering.js: the piano keys, the note
+    // table under them, and sizing the widget window around both.
+    MusicKeyboardRendering.install.call(this, {
+        FAKEBLOCKNUMBER,
+        BLACKKEYS,
+        WHITEKEYS,
+        HERTZKEYS,
+        resolveSynthNoteName,
+        w,
+        getSelectedNotes: () => selectedNotes
+    });
+
+    // Note editing lives in MusicKeyboardEditing.js: the pie menus, adding and
+    // removing rows and columns, and keeping the layout in step with the blocks.
+    MusicKeyboardEditing.install.call(this, {
+        FAKEBLOCKNUMBER,
+        beginnerMode,
+        resolveSynthNoteName,
+        fillChromaticGaps
+    });
 
     this._save = function () {
         this.processSelected();

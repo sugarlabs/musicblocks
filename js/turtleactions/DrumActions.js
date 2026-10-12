@@ -58,7 +58,7 @@ function setupDrumActions(activity) {
          * @returns {String}
          */
         static GetDrumname(drum) {
-            if (drum.slice(0, 4) === "http") return drum;
+            if (typeof drum === "string" && drum.slice(0, 4) === "http") return drum;
 
             for (const [, value] of Object.entries(DRUMNAMES)) {
                 if (value[0] === drum) {
@@ -180,6 +180,10 @@ function setupDrumActions(activity) {
                 } else if (DRUMNAMES[d][1] === drum) {
                     drumname = drum;
                 }
+            }
+            // A drum played from a URL, as Play Drum allows.
+            if (typeof drum === "string" && drum.slice(0, 4) === "http") {
+                drumname = drum;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);

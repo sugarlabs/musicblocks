@@ -83,7 +83,7 @@ describe("processABCNotes - Basic Note Processing", () => {
     it("should write a note with no pitches as a rest", () => {
         logo.notation.notationStaging["0"] = [[[], 4, 0, null, null, -1, false]];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("R4 ");
+        expect(logo.notationNotes["0"]).toBe("z4 ");
     });
 
     it("should insert a newline after every 8 notes", () => {
@@ -118,7 +118,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
     it("should handle staccato and dots", () => {
         logo.notation.notationStaging["0"] = [[["C4"], 4, 2, null, null, -1, true]];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe(".C4.. ");
+        expect(logo.notationNotes["0"]).toBe(".C7 ");
     });
 
     it("should convert durations using the map and fallback to string", () => {
@@ -133,7 +133,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
         expect(output).toContain("C1/4");
         expect(output).toContain("D1/2");
         expect(output).toContain("E16");
-        expect(output).toContain("F5");
+        expect(output).toContain("F16/5");
     });
 
     it("should write accidental markers before the ABC pitch", () => {
@@ -159,7 +159,9 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("^G4 _B4 B4 ");
+        // The natural cancels the B flat, which is still in force: this exporter writes no
+        // bar line to end its reach, so a bare B would sound flat too.
+        expect(logo.notationNotes["0"]).toBe("^G4 _B4 =B4 ");
     });
 
     it("should preserve rests without accidental matching", () => {
@@ -167,7 +169,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("R4 ");
+        expect(logo.notationNotes["0"]).toBe("z4 ");
     });
 });
 describe("processABCNotes - Control Strings", () => {
@@ -226,6 +228,53 @@ describe("processABCNotes - Control Strings", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).not.toContain("K:");
     });
+
+    it("should handle slurs beginning before the first note", () => {
+        logo.notation.notationStaging["0"] = [
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("(C4 D4) ");
+    });
+
+    it("should attach tie directly to preceding note without whitespace", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 0, null, null, -1, false],
+            "tie",
+            [["C4"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("C4- C4 ");
+    });
+
+    it("should place opening slur on the correct note when preceded by another note", () => {
+        logo.notation.notationStaging["0"] = [
+            [["B3"], 4, 0, null, null, -1, false],
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("B,4 (C4 D4) ");
+    });
+
+    it("should handle nested slurs with consecutive begin slur markers", () => {
+        logo.notation.notationStaging["0"] = [
+            "begin slur",
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur",
+            [["E4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("((C4 D4) E4) ");
+    });
 });
 
 describe("processABCNotes - Chords", () => {
@@ -245,7 +294,7 @@ describe("processABCNotes - Chords", () => {
 
         processABCNotes(logo, "0");
         const out = logo.notationNotes["0"];
-        expect(out).toBe("[C E G]4  [A]4  ");
+        expect(out).toBe("[C E G]4 [A]4 ");
     });
 
     it("should handle articulation inside chords", () => {
@@ -258,7 +307,7 @@ describe("processABCNotes - Chords", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("!accent![C E]4  ");
+        expect(logo.notationNotes["0"]).toBe("!accent![C E]4 ");
     });
 });
 
@@ -388,7 +437,7 @@ describe("processABCNotes - Edge Cases for 100% Coverage", () => {
             [["G4"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain(" ");
+        expect(logo.notationNotes["0"]).toContain("[C E]7 G4 ");
     });
 });
 describe("saveAbcOutput", () => {
@@ -422,7 +471,7 @@ describe("saveAbcOutput", () => {
 
         const result = saveAbcOutput(activity);
 
-        expect(result).toContain("K:Bb MAJOR");
+        expect(result).toContain("K:Bb\n");
         expect(result).toContain("b");
     });
 });
@@ -565,8 +614,6 @@ describe("processABCNotes - notation markers", () => {
         ["end crescendo"],
         ["end decrescendo"],
         ["begin slur"],
-        ["end slur"],
-        ["tie"],
         ["begin harmonics"],
         ["end harmonics"]
     ].flat();
@@ -575,8 +622,12 @@ describe("processABCNotes - notation markers", () => {
         const body = exportBody([
             ...EVERY_MARKER,
             note("C4"),
+            "tie",
+            "end slur",
             ...EVERY_MARKER,
             note("D4"),
+            "tie",
+            "end slur",
             ...EVERY_MARKER
         ]);
 
@@ -730,11 +781,12 @@ describe("processABCNotes - notation markers", () => {
         expect(parseNotes(body)).toHaveLength(2);
     });
 
-    it("writes no key change, which would re-sharpen or re-flatten the notes after it", () => {
+    it("writes a key change, and the accidentals the new key calls for", () => {
         const body = exportBody([note("C4"), "key", "G", "major", note("F4")]);
 
-        expect(body).not.toContain("K:");
-        expect(parseNotes(body).map(n => n.pitches[0].accidental)).toEqual([undefined, undefined]);
+        expect(body).toContain("[K:G]");
+        // Staged pitches are absolute, so the F stays an F natural under the new key.
+        expect(parseNotes(body).map(n => n.pitches[0].accidental)).toEqual([undefined, "natural"]);
     });
 
     describe("annotations", () => {
@@ -860,5 +912,323 @@ describe("processABCNotes - notation markers", () => {
 
             expect(decorationsOf(notes[0]).sort()).toEqual(["accent", "staccato"]);
         });
+    });
+});
+
+describe("processABCNotes - key signatures", () => {
+    const abcjs = require("abcjs");
+    const { Midi } = require("@tonejs/midi");
+    const { abcKeySignature } = require("../abc");
+
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const exportInKey = (keySignature, staged) => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0", keySignature);
+        return logo.notationNotes["0"];
+    };
+
+    const exportTune = (keySignature, staged) =>
+        saveAbcOutput({
+            turtles: { ithTurtle: () => ({ singer: { keySignature } }) },
+            logo: { notationNotes: {}, notation: { notationStaging: { 0: staged } } }
+        });
+
+    // The pitches the exported tune sounds, as abcjs plays it: the key signature and the
+    // accidentals still in force applied, in the order they are played.
+    const soundedPitches = (keySignature, staged) => {
+        const [file] = abcjs.synth.getMidiFile(exportTune(keySignature, staged), {
+            midiOutputType: "binary"
+        });
+        return new Midi(file instanceof Uint8Array ? file : new Uint8Array(file)).tracks
+            .flatMap(track => track.notes)
+            .sort((a, b) => a.ticks - b.ticks)
+            .map(n => n.midi);
+    };
+
+    describe("abcKeySignature", () => {
+        it("names the modes ABC knows", () => {
+            expect(abcKeySignature("C major").field).toBe("C");
+            expect(abcKeySignature("B♭ major").field).toBe("Bb");
+            expect(abcKeySignature("F♯ minor").field).toBe("F#m");
+            expect(abcKeySignature("A natural minor").field).toBe("Am");
+            expect(abcKeySignature("D dorian").field).toBe("DDor");
+            expect(abcKeySignature("G mixolydian").field).toBe("GMix");
+            expect(abcKeySignature("E♭ lydian").field).toBe("EbLyd");
+            expect(abcKeySignature("B locrian").field).toBe("BLoc");
+            // An alias Music Blocks offers for the natural minor.
+            expect(abcKeySignature("C geez").field).toBe("Cm");
+        });
+
+        it("counts the alterations a signature makes", () => {
+            expect(abcKeySignature("C major").alterations).toEqual({
+                C: 0,
+                D: 0,
+                E: 0,
+                F: 0,
+                G: 0,
+                A: 0,
+                B: 0
+            });
+            expect(abcKeySignature("D major").alterations).toMatchObject({ F: 1, C: 1, G: 0 });
+            expect(abcKeySignature("E♭ major").alterations).toMatchObject({ B: -1, E: -1, A: -1 });
+            expect(abcKeySignature("A minor").alterations).toMatchObject({ F: 0, B: 0 });
+            expect(abcKeySignature("D dorian").alterations).toMatchObject({ F: 0, B: 0, C: 0 });
+            expect(abcKeySignature("C♯ major").alterations).toEqual({
+                C: 1,
+                D: 1,
+                E: 1,
+                F: 1,
+                G: 1,
+                A: 1,
+                B: 1
+            });
+        });
+
+        it("falls back to the signature the mode's own name points at", () => {
+            // ABC cannot name these modes; the notes carry the rest as accidentals.
+            expect(abcKeySignature("G harmonic minor").field).toBe("Gm");
+            expect(abcKeySignature("A romanian minor").field).toBe("Am");
+            expect(abcKeySignature("C major pentatonic").field).toBe("C");
+            expect(abcKeySignature("D chromatic").field).toBe("D");
+            expect(abcKeySignature("F bebop").field).toBe("F");
+        });
+
+        it("writes no signature where ABC has none to write", () => {
+            // A♯ major would need ten sharps; ABC prints at most seven.
+            expect(abcKeySignature("A♯ major").field).toBe("none");
+            expect(abcKeySignature("A♯ major").alterations).toMatchObject({ A: 0, B: 0 });
+        });
+
+        it("reads the key signature as Music Blocks writes it", () => {
+            expect(abcKeySignature("B ♭ major").field).toBe("Bb");
+            expect(abcKeySignature("Bb major").field).toBe("Bb");
+            expect(abcKeySignature("Bbm").field).toBe("Bbm");
+            expect(abcKeySignature("C").field).toBe("C");
+            expect(abcKeySignature("").field).toBe("C");
+            expect(abcKeySignature(null).field).toBe("C");
+        });
+    });
+
+    describe("accidentals against the key", () => {
+        it("writes a natural where the key would alter the note", () => {
+            // Staged pitches are absolute: "F4" is F natural even in G major.
+            expect(exportInKey("G major", [note("F4")])).toContain("=F");
+            expect(exportInKey("E♭ major", [note("B4")])).toContain("=B");
+        });
+
+        it("leaves a note the key already alters unmarked", () => {
+            expect(exportInKey("G major", [note("F♯4")]).trim()).toBe("F4");
+            expect(exportInKey("E♭ major", [note("B♭4")]).trim()).toBe("B4");
+        });
+
+        it("writes an accidental the key does not make", () => {
+            expect(exportInKey("C major", [note("F♯4")])).toContain("^F");
+            expect(exportInKey("C major", [note("B♭4")])).toContain("_B");
+            expect(exportInKey("C major", [note("F𝄪4")])).toContain("^^F");
+            expect(exportInKey("C major", [note("B𝄫4")])).toContain("__B");
+        });
+
+        it("reads a courtesy natural staged after the octave", () => {
+            // turtle-singer.js stages one as "F4♮", the accidental after the octave.
+            const body = exportInKey("G major", [note("F4♮")]);
+
+            expect(body).toContain("=F");
+            expect(body).not.toContain("♮");
+        });
+
+        it("cancels an accidental still in force", () => {
+            // No bar line ends its reach, so the F natural has to say so.
+            expect(exportInKey("C major", [note("F♯4"), note("F4")]).trim()).toBe("^F4 =F4");
+        });
+
+        it("keeps an accidental for a note in another octave to itself", () => {
+            expect(exportInKey("C major", [note("F♯4"), note("F5")]).trim()).toBe("^F4 f4");
+        });
+
+        it("writes an accidental again rather than lean on the one in force", () => {
+            // Bar lines added to the tune later would otherwise change its pitches.
+            expect(exportInKey("C major", [note("F♯4"), note("F♯4")]).trim()).toBe("^F4 ^F4");
+        });
+
+        it("writes the accidentals of a chord and of a tuplet against the key too", () => {
+            expect(exportInKey("G major", [[["F4", "A4"], 4, 0, null, null, -1, false]])).toContain(
+                "[=FA]"
+            );
+            expect(exportInKey("G major", [[["F4"], 1, 0, [3, 1], 2, -1, false]])).toContain("=F");
+        });
+
+        it("states the accidentals in force again after a voice change", () => {
+            // Voices carry their own accidentals in ABC readers that keep them apart.
+            const body = exportInKey("C major", [note("F♯4"), note("F4"), "voice two", note("F4")]);
+
+            expect(body).toContain("[V:2]=F");
+        });
+    });
+
+    describe("a key change mid-tune", () => {
+        it("writes the new signature and the accidentals it calls for", () => {
+            const body = exportInKey("C major", [note("F4"), "key", "G", "major", note("F4")]);
+
+            expect(body).toBe("F4 [K:G]=F4 ");
+        });
+
+        it("leaves a key change to the key already in force out", () => {
+            expect(
+                exportInKey("C major", [note("C4"), "key", "C", "major", note("C4")])
+            ).not.toContain("[K:");
+        });
+    });
+
+    describe("the pitches the tune sounds", () => {
+        // C4 is middle C, MIDI 60.
+        const C4 = 60;
+        const scale = ["C4", "D4", "E4", "F4", "G4", "A4", "B4"].map(note);
+        const cMajorScale = [C4, C4 + 2, C4 + 4, C4 + 5, C4 + 7, C4 + 9, C4 + 11];
+
+        it.each([
+            ["C major"],
+            ["G major"],
+            ["D major"],
+            ["F major"],
+            ["B♭ major"],
+            ["F♯ minor"],
+            ["E♭ harmonic minor"],
+            ["D dorian"],
+            ["C major pentatonic"],
+            ["A♯ major"]
+        ])("sounds C D E F G A B as written in %s", keySignature => {
+            expect(soundedPitches(keySignature, scale)).toEqual(cMajorScale);
+        });
+
+        it("sounds the accidentals a mode outside ABC calls for", () => {
+            // G harmonic minor: G A B♭ C D E♭ F♯.
+            const staged = ["G4", "A4", "B♭4", "C5", "D5", "E♭5", "F♯5"].map(note);
+
+            expect(soundedPitches("G harmonic minor", staged)).toEqual([
+                67, 69, 70, 72, 74, 75, 78
+            ]);
+        });
+
+        it("sounds a courtesy natural as a natural", () => {
+            expect(soundedPitches("D major", [note("F4♮"), note("C4♮")])).toEqual([65, 60]);
+        });
+
+        it("sounds the pitches on either side of a key change", () => {
+            const staged = [note("F4"), "key", "G", "major", note("F♯4"), note("F4")];
+
+            expect(soundedPitches("C major", staged)).toEqual([65, 66, 65]);
+        });
+    });
+});
+
+describe("saveAbcOutput - one K: field per turtle", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const build = staging => ({
+        logo: {
+            notationOutput: "",
+            notationNotes: Object.fromEntries(Object.keys(staging).map(t => [t, ""])),
+            notation: { notationStaging: staging }
+        },
+        turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
+    });
+
+    it("starts each turtle's K: field on its own line", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("K:"))).toHaveLength(2);
+        expect(result).not.toMatch(/\S +K:/);
+    });
+
+    it("does not leave a blank line after an empty turtle", () => {
+        const result = saveAbcOutput(build({ 0: [], 1: [note("D4")] }));
+
+        expect(result.replace(/\n+$/, "")).not.toContain("\n\n");
+    });
+});
+
+describe("saveAbcOutput - one voice per turtle", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const build = staging => ({
+        logo: {
+            notationOutput: "",
+            notationNotes: Object.fromEntries(Object.keys(staging).map(t => [t, ""])),
+            notation: { notationStaging: staging }
+        },
+        turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
+    });
+
+    it("gives each turtle its own V: field", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1", "V:t2"]);
+    });
+
+    it("writes a staged voice change inside the turtle it belongs to", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: ["voice one", note("D4")] }));
+
+        // A note block inside a note block stages "voice one". Written as a
+        // bare [V:1] it would move these notes onto the first turtle's staff.
+        expect(result).toContain("[V:t2v1]");
+        expect(result).not.toContain("[V:1]");
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1", "V:t2"]);
+    });
+
+    it("returns to the turtle's own voice when the nesting ends", () => {
+        const result = saveAbcOutput(
+            build({ 0: [note("C4")], 1: ["voice one", note("D4"), "one voice", note("E4")] })
+        );
+
+        expect(result).toContain("[V:t2v1]");
+        expect(result).toContain("[V:t2]");
+    });
+
+    it("skips a turtle that staged fields but no notes", () => {
+        const result = saveAbcOutput(build({ 0: ["meter", 3, 4], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1"]);
+    });
+
+    it("starts each V: field on its own line", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result).not.toMatch(/\S +V:/);
+    });
+});
+
+describe("saveAbcOutput - forever repeats", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const notesOf = staged => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: staged } }
+        };
+        processABCNotes(logo, "0");
+        return logo.notationNotes[0];
+    };
+
+    it("wraps the notes after a forever in repeat bars", () => {
+        expect(notesOf(["begin repeat", note("G4"), note("E4")])).toBe("|: G4 E4 :|");
+    });
+
+    it("starts the repeat where the forever starts", () => {
+        expect(notesOf([note("C4"), "begin repeat", note("G4")])).toBe("C4 |: G4 :|");
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        expect(notesOf(["begin repeat", note("C4"), "begin repeat", note("G4")])).toBe(
+            "C4 |: G4 :|"
+        );
+    });
+
+    it("writes no repeat bars when no notes follow the forever", () => {
+        expect(notesOf([note("C4"), "begin repeat"])).toBe("C4 ");
+    });
+
+    it("writes no repeat bars without a forever", () => {
+        expect(notesOf([note("C4"), note("G4")])).toBe("C4 G4 ");
     });
 });

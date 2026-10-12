@@ -355,6 +355,31 @@ describe("IndexedDB CacheManager integration", () => {
             expect(await cacheManager.getProject("p-alive")).toEqual(data);
             jest.useRealTimers();
         });
+
+        test("caches and retrieves project when expectedUpdatedAt matches", async () => {
+            const data = { blocks: [1] };
+            await cacheManager.cacheProject("p-ver", data, "2026-10-01T12:00:00Z");
+            expect(await cacheManager.getProject("p-ver", "2026-10-01T12:00:00Z")).toEqual(data);
+        });
+
+        test("returns null when expectedUpdatedAt does not match cached updatedAt", async () => {
+            const data = { blocks: [1] };
+            await cacheManager.cacheProject("p-stale", data, "2026-10-01T10:00:00Z");
+            expect(await cacheManager.getProject("p-stale", "2026-10-01T12:00:00Z")).toBeNull();
+        });
+
+        test("returns null when expectedUpdatedAt is provided but cache has no updatedAt", async () => {
+            const data = { blocks: [1] };
+            await cacheManager.cacheProject("p-nover", data);
+            expect(await cacheManager.getProject("p-nover", "2026-10-01T12:00:00Z")).toBeNull();
+        });
+
+        test("returns cached project when expectedUpdatedAt is null or undefined", async () => {
+            const data = { blocks: [1] };
+            await cacheManager.cacheProject("p-any", data, "2026-10-01T10:00:00Z");
+            expect(await cacheManager.getProject("p-any")).toEqual(data);
+            expect(await cacheManager.getProject("p-any", null)).toEqual(data);
+        });
     });
 
     describe("cacheThumbnail / getThumbnail", () => {

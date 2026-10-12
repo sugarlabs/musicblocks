@@ -67,6 +67,62 @@ describe("MathUtility", () => {
             expect(result).toBeLessThanOrEqual(5);
         });
 
+        describe("decimal bounds", () => {
+            // Math.random() at its two extremes gives the lowest and highest result.
+            const extremes = (a, b) => {
+                const spy = jest.spyOn(Math, "random");
+                spy.mockReturnValue(0);
+                const lowest = MathUtility.doRandom(a, b);
+                spy.mockReturnValue(0.9999999);
+                const highest = MathUtility.doRandom(a, b);
+                spy.mockRestore();
+                return [lowest, highest];
+            };
+
+            test("stays inside 0.5 to 1.5", () => {
+                expect(extremes(0.5, 1.5)).toEqual([1, 1]);
+            });
+
+            test("stays inside 1.5 to 3", () => {
+                expect(extremes(1.5, 3)).toEqual([2, 3]);
+            });
+
+            test("stays inside a negative decimal range", () => {
+                expect(extremes(-2.5, -0.5)).toEqual([-2, -1]);
+            });
+
+            test("stays inside swapped decimal bounds", () => {
+                expect(extremes(3, 1.5)).toEqual([2, 3]);
+            });
+
+            test("returns min when no whole number is in the range", () => {
+                expect(extremes(2.2, 2.8)).toEqual([2.2, 2.2]);
+                expect(extremes(2.8, 2.2)).toEqual([2.2, 2.2]);
+            });
+
+            test("keeps the full range for whole number bounds", () => {
+                expect(extremes(1, 6)).toEqual([1, 6]);
+                expect(extremes(-5, 5)).toEqual([-5, 5]);
+            });
+
+            test("stays inside the range for large bounds", () => {
+                // Adding the random offset to low before flooring rounds up to 2 ** 51 + 2 here.
+                const spy = jest.spyOn(Math, "random").mockReturnValue(0.9);
+                const result = MathUtility.doRandom(2 ** 51 + 0.5, 2 ** 51 + 1.5);
+                spy.mockRestore();
+                expect(result).toBe(2 ** 51 + 1);
+            });
+
+            test("never leaves the range over many draws", () => {
+                for (let i = 0; i < 2000; i++) {
+                    const result = MathUtility.doRandom(0.5, 3.7);
+                    expect(Number.isInteger(result)).toBe(true);
+                    expect(result).toBeGreaterThanOrEqual(1);
+                    expect(result).toBeLessThanOrEqual(3);
+                }
+            });
+        });
+
         test("returns solfege with swapped order (n1 > n2 in solfege)", () => {
             const result = MathUtility.doRandom("sol", "do", 4);
             expect(result).toHaveLength(2);
@@ -94,6 +150,10 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doRandom("do", "sol", NaN)).toThrow("NanError");
         });
 
+        test.each([Infinity, -Infinity])("rejects a non-finite octave %p", octave => {
+            expect(() => MathUtility.doRandom("do", "sol", octave)).toThrow("NanError");
+        });
+
         test("still accepts an undefined octave after the NaN guard", () => {
             const result = MathUtility.doRandom("do", "mi", undefined);
             expect(result).toHaveLength(2);
@@ -105,6 +165,18 @@ describe("MathUtility", () => {
         test("returns either a or b", () => {
             const result = MathUtility.doOneOf("a", "b");
             expect(["a", "b"]).toContain(result);
+        });
+
+        test("returns a when Math.random is below 0.5", () => {
+            const spy = jest.spyOn(Math, "random").mockReturnValue(0.4);
+            expect(MathUtility.doOneOf("a", "b")).toBe("a");
+            spy.mockRestore();
+        });
+
+        test("returns b when Math.random is 0.5 or above", () => {
+            const spy = jest.spyOn(Math, "random").mockReturnValue(0.5);
+            expect(MathUtility.doOneOf("a", "b")).toBe("b");
+            spy.mockRestore();
         });
 
         // Edge case tests
@@ -172,6 +244,12 @@ describe("MathUtility", () => {
 
         test("throws error when second arg is string", () => {
             expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
+        });
+
+        test("throws NanError when divisor is null (not a typeof number)", () => {
+            // Number(null) === 0, but null is not typeof 'number',
+            // so the DivByZeroError branch must NOT fire; NanError must be thrown.
+            expect(() => MathUtility.doMod(5, null)).toThrow("NanError");
         });
     });
 
@@ -250,10 +328,14 @@ describe("MathUtility", () => {
 
         test("throws NanError when the non-string operand is null", () => {
             expect(() => MathUtility.doPlus(null, "5")).toThrow("NanError");
+            // Symmetric: null on the right-hand side must also throw.
+            expect(() => MathUtility.doPlus("5", null)).toThrow("NanError");
         });
 
         test("throws NanError when the non-string operand is undefined", () => {
             expect(() => MathUtility.doPlus("5", undefined)).toThrow("NanError");
+            // Symmetric: undefined on the left-hand side must also throw.
+            expect(() => MathUtility.doPlus(undefined, "5")).toThrow("NanError");
         });
     });
 
@@ -421,6 +503,14 @@ describe("MathUtility", () => {
 
         test("throws NanError for string divisor", () => {
             expect(() => MathUtility.doDivide(6, "2")).toThrow("NanError");
+        });
+
+        test("throws NanError for valid number divided by missing argument", () => {
+            expect(() => MathUtility.doDivide(10)).toThrow("NanError");
+        });
+
+        test("throws NanError when divisor is null (not a typeof number)", () => {
+            expect(() => MathUtility.doDivide(5, null)).toThrow("NanError");
         });
     });
 
@@ -602,20 +692,32 @@ describe("MathUtility", () => {
             expect(MathUtility.doInt(4.4)).toBe(4);
         });
 
-        test("rounds up for .5", () => {
+        test("rounds up for .5 (positive half-point)", () => {
             expect(MathUtility.doInt(4.5)).toBe(5);
+            expect(MathUtility.doInt(2.5)).toBe(3);
         });
 
         test("handles already integer value", () => {
             expect(MathUtility.doInt(5)).toBe(5);
         });
 
-        test("handles negative with rounding up (towards zero)", () => {
+        test("handles negative with rounding up (towards zero) for .4", () => {
             expect(MathUtility.doInt(-4.4)).toBe(-4);
         });
 
-        test("handles negative with rounding down (away from zero)", () => {
+        test("handles negative with rounding down (away from zero) for .6", () => {
             expect(MathUtility.doInt(-4.6)).toBe(-5);
+        });
+
+        // Regression: half-point negatives must round away from zero (symmetric)
+        // Old formula `Math.floor(n + 0.5)` gave -2 for -2.5 and 0 for -0.5,
+        // which is asymmetric with the positive behaviour (2.5 → 3, 0.5 → 1).
+        test("rounds -2.5 away from zero to -3 (symmetric with +2.5 → 3)", () => {
+            expect(MathUtility.doInt(-2.5)).toBe(-3);
+        });
+
+        test("rounds -0.5 away from zero to -1 (symmetric with +0.5 → 1)", () => {
+            expect(MathUtility.doInt(-0.5)).toBe(-1);
         });
 
         test("handles zero", () => {
@@ -629,6 +731,31 @@ describe("MathUtility", () => {
 
         test("returns NaN for non-numeric string", () => {
             expect(MathUtility.doInt("abc")).toBeNaN();
+        });
+    });
+
+    describe("doRepeatCount", () => {
+        test("keeps whole counts", () => {
+            expect(MathUtility.doRepeatCount(4)).toBe(4);
+            expect(MathUtility.doRepeatCount(1)).toBe(1);
+        });
+
+        test("rounds fractional counts down", () => {
+            expect(MathUtility.doRepeatCount(3.5)).toBe(3);
+            expect(MathUtility.doRepeatCount(2.9)).toBe(2);
+        });
+
+        test("returns 0 for counts below 1", () => {
+            expect(MathUtility.doRepeatCount(0.5)).toBe(0);
+            expect(MathUtility.doRepeatCount(0)).toBe(0);
+            expect(MathUtility.doRepeatCount(-3)).toBe(0);
+        });
+
+        test("returns 0 for values that are not numbers", () => {
+            expect(MathUtility.doRepeatCount("4")).toBe(0);
+            expect(MathUtility.doRepeatCount(null)).toBe(0);
+            expect(MathUtility.doRepeatCount(undefined)).toBe(0);
+            expect(MathUtility.doRepeatCount(NaN)).toBe(0);
         });
     });
 
@@ -664,8 +791,13 @@ describe("MathUtility", () => {
     });
 
     describe("doCalculateDistance", () => {
-        test("returns 0 when both points are the same", () => {
+        test("returns 0 when both points are the same without invoking Math.hypot", () => {
+            // The early-return optimisation (x1===x2 && y1===y2) must execute
+            // before Math.hypot is called so that the branch is not dead code.
+            const spy = jest.spyOn(Math, "hypot");
             expect(MathUtility.doCalculateDistance(3, 4, 3, 4)).toBe(0);
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
         });
 
         test("calculates distance for a 3-4-5 right triangle", () => {

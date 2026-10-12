@@ -96,9 +96,11 @@ const createTransportMock = () => ({
 global.Singer = {
     setSynthVolume: jest.fn(),
     setMasterVolume: jest.fn(),
+    resetMasterVolume: jest.fn(),
     clearPitchToFrequencyCache: jest.fn(),
     masterBPM: 90,
-    defaultBPMFactor: 1
+    defaultBPMFactor: 1,
+    masterVolume: [50]
 };
 global.instruments = {};
 global.instrumentsFilters = {};
@@ -110,6 +112,7 @@ global.getIntervalDirection = jest.fn(() => 1);
 global.getIntervalNumber = jest.fn(() => 5);
 global.mixedNumber = jest.fn(n => n.toString());
 global.rationalToFraction = jest.fn(n => [1, Math.round(1 / n)]);
+global.getMeasurePosition = require("../utils/musicutils-rhythm").getMeasurePosition;
 global.doStopVideoCam = jest.fn();
 global.CAMERAVALUE = "camera:";
 global.VIDEOVALUE = "video:";
@@ -788,6 +791,16 @@ describe("Logo initTurtle", () => {
         expect(logo.returns[0]).toEqual([]);
         expect(logo.returns[1]).toEqual([]);
     });
+
+    test("delegates turtle-owned initialization to Turtle.initTurtle", () => {
+        const turtleInit = jest.fn();
+        mockActivity.turtles.ithTurtle.mockReturnValue({ initTurtle: turtleInit });
+
+        logo.initTurtle(3);
+
+        expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(3);
+        expect(turtleInit).toHaveBeenCalledWith(false);
+    });
 });
 
 // ─── Logo step ───────────────────────────────────────────────────────────────
@@ -973,6 +986,43 @@ describe("Logo synth lifecycle", () => {
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
     });
 
+    test("prepSynths leaves the master volume alone so a mid-project call cannot reset it", () => {
+        logo.prepSynths();
+
+        expect(Singer.resetMasterVolume).not.toHaveBeenCalled();
+    });
+
+    test("prepSynths re-initialization uses current masterVolume for new turtles", () => {
+        logo.prepSynths();
+        jest.clearAllMocks();
+
+        Singer.masterVolume = [80];
+
+        const newTurtle = createMockTurtle();
+        mockActivity.turtles.turtleList.push(newTurtle);
+        mockActivity.turtles.ithTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtle = jest.fn(i => {
+            if (String(i) === "2") return newTurtle;
+            if (String(i) === "1") return turtle1;
+            return turtle0;
+        });
+        mockActivity.turtles.getTurtleCount = jest.fn(() => 3);
+        mockActivity.turtles.turtleCount = jest.fn(() => 3);
+
+        logo.prepSynths();
+
+        expect(newTurtle.singer.synthVolume["electronic synth"]).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise1).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise2).toEqual([80]);
+        expect(newTurtle.singer.synthVolume.noise3).toEqual([80]);
+        expect(newTurtle.singer.synthVolume[DEFAULTVOICE]).toEqual([80]);
+        expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "2", "electronic synth", 80);
+    });
+
     test("resetSynth creates default synth, resets volumes, and starts synth engine", () => {
         turtle0.singer.synthVolume = { "electronic synth": [40], "flute": [22] };
         turtle1.singer.synthVolume = { "electronic synth": [50] };
@@ -980,7 +1030,7 @@ describe("Logo synth lifecycle", () => {
         logo.resetSynth(0);
 
         expect(logo.synth.createDefaultSynth).toHaveBeenCalledWith(0);
-        expect(Singer.setMasterVolume).toHaveBeenCalledWith(logo, 50);
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "electronic synth", 50);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(logo, "0", "flute", 50);
         expect(logo.synth.start).toHaveBeenCalled();
@@ -1035,6 +1085,17 @@ describe("Logo doStopTurtles", () => {
         logo.doStopTurtles();
 
         expect(logo.stepQueue).toEqual({});
+    });
+
+    test("clears blocks long-press timeout if available", () => {
+        logo.blocks = {
+            clearLongPressTimeout: jest.fn(),
+            bringToTop: jest.fn()
+        };
+
+        logo.doStopTurtles();
+
+        expect(logo.blocks.clearLongPressTimeout).toHaveBeenCalledTimes(1);
     });
 
     test("executes ONSTOP plugin hooks", () => {
@@ -1304,6 +1365,29 @@ describe("Logo runLogoCommands", () => {
         });
     });
 
+    test("a turtle added because every turtle is in the trash gets its synth set up", () => {
+        // With the start block trashed, clicking a lone stack adds a fresh
+        // turtle. It must exist before prepSynths() runs, or its first note
+        // has no instrument to play on.
+        const newTurtle = createMockTurtle();
+        const seenByPrepSynths = [];
+        mockActivity.turtles.turtleCount = jest.fn(() => 0);
+        mockActivity.turtles.addTurtle = jest.fn(() => {
+            mockActivity.turtles.turtleList.push(newTurtle);
+        });
+        logo.prepSynths = jest.fn(() => {
+            seenByPrepSynths.push(...mockActivity.turtles.turtleList);
+        });
+        logo._restoreConnections = jest.fn();
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [{ name: "newnote", trash: false, connections: [null] }];
+
+        logo.runLogoCommands(0, null);
+
+        expect(mockActivity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(seenByPrepSynths).toContain(newTurtle);
+    });
+
     describe("the Stop button is shown however a project is started", () => {
         // walterbender asked how #8494 was tested, given the many ways a run
         // can begin. These drive runLogoCommands the way each of those ways
@@ -1390,6 +1474,17 @@ describe("Logo runLogoCommands", () => {
         expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 1, 1, 0, null);
     });
 
+    test("stops recording BPM blocks for the Tempo widget left from the last run", () => {
+        // A run stopped inside a Tempo block never reaches the block's listener.
+        logo.inTempo = true;
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.inTempo).toBe(false);
+    });
+
     test("falls back to default cursor when no start stacks", () => {
         mockActivity.blocks.stackList = [];
         logo.blockList = [];
@@ -1397,6 +1492,58 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(document.body.style.cursor).toBe("default");
+    });
+
+    test("widget capture modes left on by an earlier run are cleared", () => {
+        // A run stopped inside a widget clamp never reaches the listener that
+        // turns its mode off, so the next run must not inherit it.
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+        const modes = [
+            "inSample",
+            "inTempo",
+            "inPitchSlider",
+            "inPitchStaircase",
+            "inReflectionMatrix",
+            "inOscilloscope"
+        ];
+        for (const mode of modes) logo[mode] = true;
+
+        logo.runLogoCommands(null, null);
+
+        for (const mode of modes) expect(logo[mode]).toBe(false);
+    });
+
+    describe("temperament carried over from an earlier run", () => {
+        beforeEach(() => {
+            mockActivity.blocks.stackList = [];
+            logo._userTemperament = "just intonation";
+            logo.temperamentSelected = ["just intonation"];
+            logo.synth.startingPitch = "D4";
+        });
+
+        test("is kept while the project still has a set temperament block", () => {
+            logo.blockList = [{ name: "settemperament", trash: false, connections: [] }];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("just intonation");
+            expect(logo.synth.startingPitch).toBe("D4");
+        });
+
+        test("is dropped once no set temperament block is left", () => {
+            logo.blockList = [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "settemperament", trash: true, connections: [] }
+            ];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("equal");
+            expect(logo.synth.startingPitch).toBe("C4");
+            expect(logo._userTemperament).toBeNull();
+            expect(logo.temperamentSelected).toEqual([]);
+        });
     });
 
     test("executes each evalOnStartList plugin at run startup", () => {
@@ -1427,6 +1574,26 @@ describe("Logo runLogoCommands", () => {
             oldListener,
             false
         );
+    });
+
+    test("resets the master volume on every run", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
+    });
+
+    test("resets the master volume on a restart with no stop in between", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+        // prepSynths() bails out early in this state, so the reset cannot live in there.
+        logo._synthsInitialized = true;
+
+        logo.runLogoCommands(null, null);
+
+        expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
     });
 
     test("drum block is included in startBlocks", () => {
@@ -1970,6 +2137,27 @@ describe("Logo runFromBlockNow", () => {
             expect(logo.stopTurtle).toBe(true);
         });
 
+        test("a value clamp block with no flow() shows its value instead of throwing", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 6;
+            });
+            logo.parseArg = jest.fn(() => 3);
+            logo.blockList = [
+                {
+                    name: "notecounter",
+                    value: 3,
+                    protoblock: { args: 1, dockTypes: ["anyout", "in"], arg: jest.fn() },
+                    connections: [null, null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            expect(() => logo.runFromBlockNow(logo, 0, 0, 0, null)).not.toThrow();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("3");
+        });
+
         test("standalone arg-block echo forwards the real receivedArg, not a stale logo.receivedArg (#8690)", () => {
             timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
                 fn();
@@ -2280,6 +2468,27 @@ describe("Logo runFromBlockNow", () => {
             expect(logo.recordingBuffer.hasData).toBe(true);
         });
 
+        test("does not buffer notation on interactive completion if staging is empty", () => {
+            logo._exportNotationFinished = false;
+            logo.runningLilypond = false;
+            logo.runningAbc = false;
+            logo.runningMxml = false;
+            logo.runningMIDI = false;
+            logo.notationOutput = "leftover_export_text";
+            logo.notation.notationStaging = {};
+            logo.recordingBuffer = {
+                hasData: false,
+                notationOutput: "",
+                notationNotes: {},
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.recordingBuffer.hasData).toBe(false);
+        });
+
         test("triggers afterSaveAbc, afterSaveMxml, and playback-ready message", () => {
             logo.runningAbc = true;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -2366,6 +2575,33 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
+        test("a note counter's silent run does not end the turtle's run", () => {
+            logo._cleanupAfterCompletion = jest.fn();
+            logo.onStopTurtle = jest.fn();
+            turtle0.running = true;
+            turtle0.singer.justCounting = [true];
+            turtle0.endOfClampSignals = { 7: ["_transposition_0", "_tie_0"] };
+            turtle0.butNotThese = { 7: [0] };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_transposition_0");
+            expect(turtle0.running).toBe(true);
+            expect(logo.onStopTurtle).not.toHaveBeenCalled();
+            expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
+        test("a note counter's silent run keeps its signals on a premature restart", () => {
+            logo._prematureRestart = true;
+            turtle0.singer.justCounting = [true];
+            turtle0.endOfClampSignals = { 7: ["_tie_0"] };
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_tie_0");
         });
 
         test("_cleanupAfterCompletion does not stop WAV recorder", () => {
@@ -2576,6 +2812,20 @@ describe("Logo parseArg", () => {
             logo.parseArg(logo, 0, 0, null, null);
 
             expect(getIntervalNumber).toHaveBeenCalledWith("fifth");
+        });
+
+        test("handles non-string interval name blocks safely", () => {
+            logo.blockList = [
+                {
+                    name: "intervalname",
+                    value: null,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => false
+                }
+            ];
+
+            const result = logo.parseArg(logo, 0, 0, null, null);
+            expect(result).toBe(0);
         });
     });
 
@@ -2850,6 +3100,33 @@ describe("Logo safePluginExecute", () => {
         expect(logo.blockList[0].value).toBe(Math.E);
     });
 
+    test("executes whitelisted unit conversion pattern (degrees)", () => {
+        logo.blockList = [{ name: "degrees", value: null, connections: [null, 1] }];
+        logo.parseArg = jest.fn((lg, tur, cblk, parentBlk, receivedArg) => {
+            expect(receivedArg).toBe("testArg");
+            return Math.PI;
+        });
+        const code =
+            "const mathBlock = globalActivity.logo.blockList[blk];" +
+            "const conns = mathBlock.connections;" +
+            "mathBlock.value = logo.parseArg(logo, turtle, conns[1]) * (180/Math.PI);";
+        const result = logo.safePluginExecute(code, logo, 0, 0, null, "testArg");
+        expect(result).toBeCloseTo(180);
+        expect(logo.blockList[0].value).toBeCloseTo(180);
+    });
+
+    test("executes whitelisted unit conversion pattern (radians)", () => {
+        logo.blockList = [{ name: "radians", value: null, connections: [null, 1] }];
+        logo.parseArg = jest.fn(() => 180);
+        const code =
+            "const mathBlock = globalActivity.logo.blockList[blk];" +
+            "const conns = mathBlock.connections;" +
+            "mathBlock.value = logo.parseArg(logo, turtle, conns[1]) * (Math.PI/180);";
+        const result = logo.safePluginExecute(code, logo, 0, 0, null);
+        expect(result).toBeCloseTo(Math.PI);
+        expect(logo.blockList[0].value).toBeCloseTo(Math.PI);
+    });
+
     test("blocks arbitrary string code and emits console warning", () => {
         const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
         const result = logo.safePluginExecute("eval('alert(1)')", logo, 0, 0, null);
@@ -2978,6 +3255,70 @@ describe("Logo updateNotation", () => {
         logo.updateNotation(["C4"], 0.5, 0, false, null, true);
         expect(logo.notation.notationInsertTie).toHaveBeenCalledWith(0);
         expect(logo.notation.doUpdateNotation).toHaveBeenCalled();
+    });
+
+    test("finds barlines from the latest meter change", () => {
+        const singer = mockActivity.turtles.ithTurtle().singer;
+        logo.notation.notationDrumStaging[0] = [];
+        // Three beats of 3/4, then a whole note starting on the downbeat of 4/4.
+        Object.assign(singer, {
+            notesPlayed: [7, 4],
+            pickup: 0,
+            noteValuePerBeat: 4,
+            beatsPerMeasure: 4,
+            meterAnchor: { wholeNotes: 0.75, measures: 1 }
+        });
+
+        logo.updateNotation(["C4"], 1, 0, false, null, true);
+
+        expect(logo.notation.notationInsertTie).not.toHaveBeenCalled();
+        expect(logo.notation.doUpdateNotation).toHaveBeenCalledTimes(1);
+    });
+
+    describe("notes longer than the rest of the measure", () => {
+        const { rationalToFraction } = require("../utils/utils-logic");
+        let singer;
+
+        // Plays a note of `wholeNotes` starting at `start` and returns the staged pieces
+        // (in whole notes) and the number of ties.
+        const stage = (note, start, wholeNotes) => {
+            singer.notesPlayed = [start + wholeNotes, 1];
+            logo.updateNotation(note, 1 / wholeNotes, 0, false, null, true);
+            return {
+                pieces: logo.notation.doUpdateNotation.mock.calls.map(call => 1 / call[1]),
+                ties: logo.notation.notationInsertTie.mock.calls.length
+            };
+        };
+
+        beforeEach(() => {
+            logo.deps.utils.rationalToFraction = rationalToFraction;
+            logo.notation.notationDrumStaging[0] = [];
+            singer = mockActivity.turtles.ithTurtle().singer;
+            Object.assign(singer, { pickup: 0, meterAnchor: null });
+        });
+
+        test("splits at every barline the note crosses", () => {
+            // 2/4, a whole note starting on beat 2
+            Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 2 });
+        });
+
+        test("splits after a pickup", () => {
+            // 3/4 with a 1/8 pickup, a whole note from the start
+            Object.assign(singer, { beatsPerMeasure: 3, noteValuePerBeat: 4, pickup: 0.125 });
+            expect(stage(["C4"], 0, 1)).toEqual({ pieces: [0.125, 0.75, 0.125], ties: 2 });
+        });
+
+        test("writes one full measure per measure spanned", () => {
+            // 4/4, a note of two whole notes from a downbeat
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 1, 2)).toEqual({ pieces: [1, 1], ties: 1 });
+        });
+
+        test("does not tie rests", () => {
+            Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
+            expect(stage(["R"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 0 });
+        });
     });
 });
 

@@ -174,6 +174,22 @@ describe("themes.css colour tokens", () => {
         expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     });
 
+    it("keeps the new project confirmation readable in the highcontrast theme", () => {
+        const dialogRule = rules.find(r => r.selector.trim() === ".highcontrast #newdropdown");
+        const messageRule = rules.find(
+            r => r.selector.trim() === ".highcontrast #confirmation-message"
+        );
+        expect(dialogRule).toBeDefined();
+        expect(messageRule).toBeDefined();
+
+        const tokens = THEMES.highcontrast;
+        const foreground = resolveColor(declaration(messageRule.body, "color"), tokens);
+        const background = resolveColor(declaration(dialogRule.body, "background-color"), tokens);
+        expect(foreground).not.toBeNull();
+        expect(background).not.toBeNull();
+        expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+    });
+
     it.each(["dark", "highcontrast"])("keeps modal content readable in the %s theme", theme => {
         const rule = rules.find(r => r.selector.trim() === ".modal-content");
         expect(rule).toBeDefined();
@@ -187,6 +203,32 @@ describe("themes.css colour tokens", () => {
         expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     });
 
+    it("keeps widget title bar buttons and icons visible and accessible in dark mode", () => {
+        const buttonRule = rules.find(
+            r =>
+                r.selector.includes(".wftButton") &&
+                !r.selector.includes("::") &&
+                !r.selector.includes(":") &&
+                themeOf(r.selector) === "dark"
+        );
+        expect(buttonRule).toBeDefined();
+
+        const iconRule = rules.find(
+            r => r.selector.includes(".wftButton.close::before") && themeOf(r.selector) === "dark"
+        );
+        expect(iconRule).toBeDefined();
+
+        const tokens = THEMES.dark;
+        const buttonBg = resolveColor(declaration(buttonRule.body, "background-color"), tokens);
+        const iconColor = resolveColor(declaration(iconRule.body, "background-color"), tokens);
+
+        expect(buttonBg).not.toBeNull();
+        expect(iconColor).not.toBeNull();
+
+        // WCAG 2.1 AA requirement for UI icons/controls (3:1) and text (4.5:1).
+        expect(contrastRatio(iconColor, buttonBg)).toBeGreaterThanOrEqual(4.5);
+    });
+
     it("ensures themes.css does not declare or reference deleted legacy properties", () => {
         const legacyNames = ["--bg", "--fg", "--border", "--panel-bg", "--overlay-bg", "--accent"];
         legacyNames.forEach(depName => {
@@ -195,5 +237,84 @@ describe("themes.css colour tokens", () => {
             expect(declRegex.test(themesCss)).toBe(false);
             expect(varRegex.test(themesCss)).toBe(false);
         });
+    });
+
+    it.each(["dark", "highcontrast"])(
+        "keeps reflection chat messages readable in the %s theme",
+        theme => {
+            const botRule = rules.find(r => r.selector.trim() === `.${theme} .message-container`);
+            const userRule = rules.find(
+                r => r.selector.trim() === `.${theme} .message-container.user`
+            );
+            expect(botRule).toBeDefined();
+            expect(userRule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const botFg = resolveColor(declaration(botRule.body, "color"), tokens);
+            const botBg = resolveColor(declaration(botRule.body, "background-color"), tokens);
+            expect(botFg).not.toBeNull();
+            expect(botBg).not.toBeNull();
+            expect(contrastRatio(botFg, botBg)).toBeGreaterThanOrEqual(4.5);
+
+            const userFg = resolveColor(declaration(userRule.body, "color"), tokens);
+            const userBg = resolveColor(declaration(userRule.body, "background-color"), tokens);
+            expect(userFg).not.toBeNull();
+            expect(userBg).not.toBeNull();
+            expect(contrastRatio(userFg, userBg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])(
+        "keeps reflection mentor select readable in the %s theme",
+        theme => {
+            const rule = rules.find(r => r.selector.trim() === `.${theme} .select-mentor`);
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])(
+        "keeps debugger chat messages readable in the %s theme",
+        theme => {
+            const botRule = rules.find(
+                r => r.selector.trim() === `.${theme} .aidebugger-message-bot`
+            );
+            const userRule = rules.find(
+                r => r.selector.trim() === `.${theme} .aidebugger-message-user`
+            );
+            expect(botRule).toBeDefined();
+            expect(userRule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const botFg = resolveColor(declaration(botRule.body, "color"), tokens);
+            const botBg = resolveColor(declaration(botRule.body, "background-color"), tokens);
+            expect(botFg).not.toBeNull();
+            expect(botBg).not.toBeNull();
+            expect(contrastRatio(botFg, botBg)).toBeGreaterThanOrEqual(4.5);
+
+            const userFg = resolveColor(declaration(userRule.body, "color"), tokens);
+            const userBg = resolveColor(declaration(userRule.body, "background-color"), tokens);
+            expect(userFg).not.toBeNull();
+            expect(userBg).not.toBeNull();
+            expect(contrastRatio(userFg, userBg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])("keeps debugger input readable in the %s theme", theme => {
+        const rule = rules.find(r => r.selector.trim() === `.${theme} .aidebugger-input`);
+        expect(rule).toBeDefined();
+
+        const tokens = THEMES[theme];
+        const fg = resolveColor(declaration(rule.body, "color"), tokens);
+        const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+        expect(fg).not.toBeNull();
+        expect(bg).not.toBeNull();
+        expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
     });
 });

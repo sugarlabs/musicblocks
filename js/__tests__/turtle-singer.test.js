@@ -24,6 +24,9 @@ global.DEFAULTVOICE = "DEFAULTVOICE";
 global.DEFAULTVOICES = ["DEFAULTVOICE"];
 global.MIN_HIGHLIGHT_DURATION_MS = 100;
 global.clampNumber = require("../utils/utils-logic").clampNumber;
+const { saveMeterState, restoreMeterState } = require("../utils/musicutils-rhythm");
+global.saveMeterState = saveMeterState;
+global.restoreMeterState = restoreMeterState;
 
 const Singer = require("../turtle-singer");
 
@@ -69,6 +72,8 @@ global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 const musicUtils = require("../utils/musicutils");
 global.keySignatureToMode = musicUtils.keySignatureToMode;
 global.getSavedCustomModes = musicUtils.getSavedCustomModes;
+global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
+global.NOTENAMES1 = musicUtils.NOTENAMES1;
 global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
@@ -172,6 +177,7 @@ const createLogoMock = activityMock => ({
     activity: activityMock,
     synth: {
         setMasterVolume: jest.fn(),
+        resetMasterVolume: jest.fn(),
         setVolume: jest.fn(),
         rampTo: jest.fn(),
         getFrequency: jest.fn(),
@@ -203,6 +209,80 @@ describe("Singer Class", () => {
         expect(singer.register).toBe(0);
         expect(singer.beatFactor).toBe(1);
         expect(singer.currentOctave).toBe(4);
+    });
+
+    test("keeps representative music state isolated between turtles", () => {
+        const secondSinger = new Singer(createTurtleMock());
+
+        singer.currentOctave = 7;
+        singer.swing = [0.5];
+        singer.vibratoRate = [12];
+        singer.suppressOutput = true;
+
+        expect(secondSinger.currentOctave).toBe(4);
+        expect(secondSinger.swing).toEqual([]);
+        expect(secondSinger.vibratoRate).toEqual([]);
+        expect(secondSinger.suppressOutput).toBe(false);
+    });
+
+    describe("reset()", () => {
+        test("should restore all musical runtime state to canonical defaults", () => {
+            singer.register = 3;
+            singer.currentOctave = 7;
+            singer.beatFactor = 4;
+            singer.swing = [0.5];
+            singer.tie = true;
+            singer.staccato = [0.25];
+            singer.instrumentNames = ["piano", "drum"];
+            singer.inCrescendo = [true];
+            singer.notesPlayed = [5, 10];
+            singer.activeVoices.add("piano");
+
+            singer.reset(false);
+
+            expect(singer.register).toBe(0);
+            expect(singer.currentOctave).toBe(4);
+            expect(singer.beatFactor).toBe(1);
+            expect(singer.swing).toEqual([]);
+            expect(singer.tie).toBe(false);
+            expect(singer.staccato).toEqual([]);
+            expect(singer.instrumentNames).toEqual([]);
+            expect(singer.inCrescendo).toEqual([]);
+            expect(singer.notesPlayed).toEqual([0, 1]);
+            expect(singer.activeVoices.size).toBe(0);
+            expect(singer.suppressOutput).toBe(false);
+        });
+
+        test("should respect suppressOutput parameter when passed true", () => {
+            singer.reset(true);
+            expect(singer.suppressOutput).toBe(true);
+
+            singer.reset(false);
+            expect(singer.suppressOutput).toBe(false);
+        });
+
+        test("re-calling reset() produces isolated reference structures", () => {
+            singer.reset(false);
+            const notes1 = singer.notesPlayed;
+            const instruments1 = singer.instrumentNames;
+
+            singer.reset(false);
+            expect(singer.notesPlayed).not.toBe(notes1);
+            expect(singer.instrumentNames).not.toBe(instruments1);
+            expect(singer.notesPlayed).toEqual([0, 1]);
+        });
+
+        test("should not invoke killAllVoices() during pure state reset", () => {
+            singer.killAllVoices = jest.fn();
+            singer.reset(false);
+            expect(singer.killAllVoices).not.toHaveBeenCalled();
+        });
+
+        test("should preserve pre-configured synthVolume across reset()", () => {
+            singer.synthVolume = { "guitar": [100], "electronic synth": [80] };
+            singer.reset(false);
+            expect(singer.synthVolume).toEqual({ "guitar": [100], "electronic synth": [80] });
+        });
     });
 
     test("should correctly add scalar transposition", () => {
@@ -545,6 +625,16 @@ describe("State initialization — effects parameters", () => {
     test("should initialize panner to null", () => {
         expect(singer.panner).toBeNull();
     });
+
+    test("should dispose the panner when a new run resets the singer", () => {
+        const panner = { dispose: jest.fn() };
+        singer.panner = panner;
+
+        singer.reset();
+
+        expect(panner.dispose).toHaveBeenCalled();
+        expect(singer.panner).toBeNull();
+    });
 });
 
 describe("State initialization — crescendo", () => {
@@ -655,6 +745,61 @@ describe("setMasterVolume edge cases", () => {
         turtleMock.singer.synthVolume = { DEFAULTVOICE: [100] };
         Singer.setMasterVolume(logoMock, 75);
         expect(turtleMock.singer.synthVolume.DEFAULTVOICE).toContain(75);
+    });
+});
+
+describe("resetMasterVolume", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+    });
+
+    test("should discard a level left behind by an interrupted clamp", () => {
+        Singer.masterVolume.push(10);
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should discard every level when several were left behind", () => {
+        Singer.masterVolume.push(30, 10);
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should restore the base level when it was overwritten in place", () => {
+        Singer.masterVolume[0] = 10;
+        Singer.resetMasterVolume(logoMock);
+        expect(Singer.masterVolume).toEqual([100]);
+    });
+
+    test("should put the output back to its fresh load level", () => {
+        Singer.masterVolume.push(0);
+        Singer.resetMasterVolume(logoMock);
+        expect(logoMock.synth.resetMasterVolume).toHaveBeenCalled();
+    });
+
+    test("should leave the output alone rather than ramping it to the default level", () => {
+        Singer.masterVolume.push(10);
+        Singer.resetMasterVolume(logoMock);
+        expect(logoMock.synth.setMasterVolume).not.toHaveBeenCalled();
+    });
+
+    test("should return each synth to the default level", () => {
+        turtleMock.singer.synthVolume = { "electronic synth": [30, 10] };
+        Singer.resetMasterVolume(logoMock);
+        expect(turtleMock.singer.synthVolume["electronic synth"]).toEqual([100, 100]);
+    });
+
+    test("should keep the synth stack depth so a pending clamp can still unwind", () => {
+        turtleMock.singer.synthVolume = { "electronic synth": [30, 20, 10] };
+        Singer.resetMasterVolume(logoMock);
+        expect(turtleMock.singer.synthVolume["electronic synth"]).toHaveLength(3);
     });
 });
 
@@ -878,6 +1023,19 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
     });
 
+    test("should hold back the enclosing clamp signals by index", () => {
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        let skipped;
+        logoMock.runFromBlockNow = jest.fn(() => {
+            skipped = JSON.parse(JSON.stringify(turtleMock.butNotThese));
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(skipped).toEqual({ 7: [0, 1] });
+        expect(turtleMock.butNotThese).toEqual({});
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -910,6 +1068,38 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         Singer.numberOfNotes(logoMock, 0, 123);
 
         expect(logoMock.turtleHeaps[0]).toEqual([1, 2, 3]);
+    });
+
+    test("should restore the meter state along with notesPlayed", () => {
+        const anchor = { wholeNotes: 0.75, measures: 1 };
+        Object.assign(turtleMock.singer, {
+            notesPlayed: [1, 1],
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            meterAnchor: anchor,
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+        // The counted stack changes to 3/4 and stays there.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            Object.assign(turtleMock.singer, {
+                notesPlayed: [2, 1],
+                beatsPerMeasure: 3,
+                meterAnchor: { wholeNotes: 1, measures: 2 },
+                beatList: [1]
+            });
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(turtleMock.singer).toMatchObject({
+            notesPlayed: [1, 1],
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            meterAnchor: anchor,
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
     });
 });
 
@@ -955,6 +1145,226 @@ describe("processPitch — note block execution path", () => {
         expect(turtleMock.singer.noteOctaves[0].length).toBe(1);
         expect(turtleMock.singer.noteBeatValues[0].length).toBe(1);
         expect(turtleMock.singer.pushedNote).toBe(true);
+    });
+});
+
+describe("processPitch widget-row definition adds one row per visit", () => {
+    // The Duplicate block re-queues each block in its clamp `factor` times
+    // (see DuplicateBlock.flow), so a pitch block is already visited once per
+    // duplicate. These guard against re-introducing a per-visit multiplier
+    // here, which would add factor x factor rows.
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            noteIsSolfege: global.noteIsSolfege,
+            getSolfege: global.getSolfege,
+            getNote: global.getNote
+        };
+        global.noteIsSolfege = jest.fn().mockReturnValue(false);
+        global.getSolfege = jest.fn(note => note);
+        // A fresh array per call: processPitch writes back into the returned
+        // note (noteObj[0] = ...), which would otherwise mutate a shared mock
+        // return value and leak into later suites.
+        global.getNote = jest.fn(() => ["C", 4]);
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.duplicateFactor = 3;
+
+        activityMock = {
+            turtles: { ithTurtle: jest.fn().mockReturnValue(turtleMock) },
+            errorMsg: jest.fn(),
+            logo: {
+                synth: { inTemperament: false },
+                clearNoteParams: jest.fn(),
+                pitchBlocks: [],
+                inPitchDrumMatrix: false,
+                inMatrix: false,
+                inLegoWidget: false,
+                pitchDrumMatrix: {
+                    addRowBlock: jest.fn(),
+                    addColBlock: jest.fn(),
+                    rowLabels: [],
+                    rowArgs: [],
+                    drums: []
+                },
+                phraseMaker: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] },
+                legoWidget: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] }
+            }
+        };
+    });
+
+    afterEach(() => {
+        global.noteIsSolfege = savedGlobals.noteIsSolfege;
+        global.getSolfege = savedGlobals.getSolfege;
+        global.getNote = savedGlobals.getNote;
+    });
+
+    test("pitch-drum matrix adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.pitchDrumMatrix.rowArgs).toHaveLength(1);
+    });
+
+    test("pitch-drum matrix keeps the row as the last note, for Step Pitch", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+
+        Singer.processPitch(activityMock, "re", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["C4", 4]);
+    });
+
+    test.each([
+        ["a rest", "rest", []],
+        ["a pitch inside Set Drum", "re", ["snare drum"]]
+    ])("pitch-drum matrix keeps the last note for %s", (name, note, drumStyle) => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        global.getNote = jest.fn(() => ["D", 4]);
+        turtleMock.singer.drumStyle = drumStyle;
+        turtleMock.singer.lastNotePlayed = ["C4", 4];
+        turtleMock.singer.previousNotePlayed = ["B3", 4];
+
+        Singer.processPitch(activityMock, note, 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["C4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["B3", 4]);
+    });
+
+    test("phrase maker adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inMatrix = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.phraseMaker.rowArgs).toHaveLength(1);
+    });
+
+    test("row count stays at one for a fractional duplicateFactor", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.duplicateFactor = 0.5;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toHaveLength(1);
+    });
+
+    test("LEGO widget adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inLegoWidget = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.legoWidget.rowArgs).toHaveLength(1);
+    });
+
+    test("LEGO widget row count stays at one for a fractional duplicateFactor", () => {
+        activityMock.logo.inLegoWidget = true;
+        turtleMock.singer.duplicateFactor = 0.5;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toHaveLength(1);
+    });
+
+    test.each([
+        { name: "pitch-drum matrix", flag: "inPitchDrumMatrix", widget: "pitchDrumMatrix" },
+        { name: "phrase maker", flag: "inMatrix", widget: "phraseMaker" },
+        { name: "LEGO widget", flag: "inLegoWidget", widget: "legoWidget" }
+    ])("$name consults the arpeggio once per visit", ({ flag, widget }) => {
+        activityMock.logo[flag] = true;
+        // Real entries are [scalar step, semitones] pairs from CHORDVALUES.
+        turtleMock.singer.arpeggio = [
+            [2, 0],
+            [4, 0],
+            [7, 0]
+        ];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        // One visit, one note lookup, one row; later entries are unreachable
+        // here because each duplicate is a separate visit. The transposition
+        // value is deliberately not asserted: these branches add the raw pair
+        // instead of decoding it like the note-block path does, a pre-existing
+        // defect that is out of scope for this cleanup.
+        expect(global.getNote).toHaveBeenCalledTimes(1);
+        expect(activityMock.logo[widget].rowLabels).toHaveLength(1);
+    });
+
+    test("pitch staircase gets one complete stair per pitch, highest first", () => {
+        const PitchStaircaseSteps = require("../widgets/PitchStaircaseSteps");
+        activityMock.logo.inPitchStaircase = true;
+        activityMock.logo.pitchStaircase = {
+            Stairs: [],
+            stairPitchBlocks: [],
+            addStair: PitchStaircaseSteps.prototype.addStair
+        };
+        // Earlier tests may have cached C4; look both pitches up afresh.
+        Singer.clearPitchToFrequencyCache();
+        global.pitchToFrequency.mockReturnValueOnce(261.63).mockReturnValueOnce(392);
+        global.getNote = jest.fn().mockReturnValueOnce(["C", 4]).mockReturnValueOnce(["G", 4]);
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 101);
+        Singer.processPitch(activityMock, "G", 4, 0, 0, 102);
+
+        expect(activityMock.logo.pitchStaircase.Stairs).toEqual([
+            ["G", 4, 392, 1, 1, 392, 392],
+            ["C", 4, 261.63, 1, 1, 261.63, 261.63]
+        ]);
+        // The higher pitch goes in front of the lower one, and its block is still recorded.
+        expect(activityMock.logo.pitchStaircase.stairPitchBlocks).toEqual([101, 102]);
+    });
+
+    test("a setdrum clamp overrides the pitch-drum matrix row", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+        turtleMock.singer.drumStyle = ["kick drum"];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.pitchDrumMatrix.drums).toEqual(["kick drum"]);
+        expect(activityMock.logo.pitchDrumMatrix.addColBlock).toHaveBeenCalledWith(123);
+        expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(0);
+    });
+
+    test("a setdrum clamp overrides the phrase maker row", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.drumStyle = ["snare drum"];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toEqual(["snare drum"]);
+        expect(activityMock.logo.phraseMaker.rowArgs).toEqual([-1]);
+    });
+
+    test("a setdrum clamp overrides the LEGO widget row", () => {
+        activityMock.logo.inLegoWidget = true;
+        turtleMock.singer.drumStyle = ["hi hat"];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.legoWidget.rowLabels).toEqual(["hi hat"]);
+        expect(activityMock.logo.legoWidget.rowArgs).toEqual([-1]);
+    });
+
+    test("converts the label to solfege in C major when the note is solfege", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.keySignature = ["C", "major"];
+        global.noteIsSolfege.mockReturnValue(true);
+        global.getSolfege.mockReturnValue("do");
+
+        Singer.processPitch(activityMock, "do", 4, 0, 0, 123);
+
+        expect(global.getSolfege).toHaveBeenCalled();
+        expect(activityMock.logo.phraseMaker.rowLabels).toEqual(["do"]);
     });
 });
 
@@ -1013,6 +1423,21 @@ describe("noteCounter regression behavior", () => {
         expect(singer.justCounting.length).toBe(originalLength);
     });
 
+    test("should hold back the enclosing clamp signals by index", () => {
+        // Logo compares numeric indices when the counted run ends; anything
+        // else lets an enclosing transposition fire early and then again.
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        let skipped;
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            skipped = JSON.parse(JSON.stringify(turtleMock.butNotThese));
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(skipped).toEqual({ 7: [0, 1] });
+        expect(turtleMock.butNotThese).toEqual({});
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -1043,6 +1468,64 @@ describe("noteCounter regression behavior", () => {
         Singer.noteCounter(logoMock, 0, 1);
 
         expect(logoMock.turtleHeaps[0]).toEqual([4, 5]);
+    });
+
+    test("should not leave a meter change from the counted stack behind", () => {
+        const { getMeasurePosition, getMeterAnchor } = require("../utils/musicutils-rhythm");
+        // One quarter note played in 4/4.
+        Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4, notesPlayed: [1, 4] });
+        // The counted stack: 3/4, three quarter notes, 4/4.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            singer.meterAnchor = getMeterAnchor(singer);
+            singer.beatsPerMeasure = 3;
+            singer.notesPlayed = [1, 1];
+            singer.meterAnchor = getMeterAnchor(singer);
+            singer.beatsPerMeasure = 4;
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(singer.notesPlayed).toEqual([1, 4]);
+        expect(singer.meterAnchor).toBeNull();
+        const { beat, measure } = getMeasurePosition(singer, 1 / 4);
+        expect(beat).toBe(2);
+        expect(measure).toBe(1);
+    });
+
+    test("should restore the meter when the counted stack ends in another meter", () => {
+        const { getMeasurePosition } = require("../utils/musicutils-rhythm");
+        Object.assign(singer, {
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            notesPlayed: [1, 4],
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+        // The counted stack: a pickup, 6/8 and two eighth notes, left in 6/8.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            Object.assign(singer, {
+                pickup: 1 / 8,
+                beatsPerMeasure: 6,
+                noteValuePerBeat: 8,
+                meterAnchor: { wholeNotes: 1 / 4, measures: 1 },
+                notesPlayed: [1, 2],
+                beatList: [1, 4]
+            });
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(singer).toMatchObject({
+            beatsPerMeasure: 4,
+            noteValuePerBeat: 4,
+            pickup: 0,
+            meterAnchor: null,
+            beatList: [1, 3],
+            defaultStrongBeats: true
+        });
+        const { beat, measure } = getMeasurePosition(singer, 1 / 4);
+        expect(beat).toBe(2);
+        expect(measure).toBe(1);
     });
 });
 
@@ -1236,6 +1719,65 @@ describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)
     });
 });
 
+describe("processNote notation and MIDI emission guards against non-positive durations", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.runningMIDI = true;
+        activityMock.logo.notationMIDI = jest.fn();
+        activityMock.logo.updateNotation = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.synth.getFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.getCustomFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.start = jest.fn();
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        turtleMock.singer.suppressOutput = true;
+    });
+
+    test("does not emit notationMIDI or updateNotation when calculated duration d <= 0", () => {
+        const blk = "zeroNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        // When duration is 0, d is 0
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).not.toHaveBeenCalled();
+        expect(activityMock.logo.updateNotation).not.toHaveBeenCalled();
+    });
+
+    test("emits notationMIDI and updateNotation when calculated duration d > 0", () => {
+        const blk = "validNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(["C4"], [], 4, 0, 90, "piano");
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
+    });
+});
+
 describe("processNote playback path avoids discarded ratio computation", () => {
     let turtleMock;
     let activityMock;
@@ -1298,6 +1840,38 @@ describe("processNote playback path avoids discarded ratio computation", () => {
         // The ratio/fraction results were never consumed anywhere, so the
         // hot per-note path must not pay for computing them.
         expect(global.rationalToFraction).not.toHaveBeenCalled();
+    });
+
+    test.each([
+        ["sol𝄪", "G𝄪4"],
+        ["mi𝄫", "E𝄫4"]
+    ])("preserves %s through MusicXML staging", (pitch, expected) => {
+        const originalGetNote = global.getNote;
+        global.getNote = musicUtils.getNote;
+
+        turtleMock.singer.notePitches.mockBlk = [];
+        turtleMock.singer.noteOctaves.mockBlk = [];
+        turtleMock.singer.noteCents.mockBlk = [];
+        turtleMock.singer.noteHertz.mockBlk = [];
+        turtleMock.singer.noteBeatValues.mockBlk = [];
+        activityMock.logo.runningMxml = true;
+        activityMock.logo.notationMIDI = jest.fn();
+        activityMock.logo.updateNotation = jest.fn();
+
+        try {
+            Singer.processPitch(activityMock, pitch, 4, 0, 0, "pitchBlk");
+            Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        } finally {
+            global.getNote = originalGetNote;
+        }
+
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(
+            [expected],
+            expect.any(Number),
+            0,
+            -1,
+            []
+        );
     });
 });
 
@@ -1370,6 +1944,113 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
         // the 9th positional argument (index 8).
         expect(loopCalls.every(c => c[8] === false)).toBe(true);
         expect(loopCalls.every(c => c[9] === false)).toBe(true);
+    });
+});
+
+describe("processPitch music keyboard with movable Do", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    test.each([
+        // [key, typed solfege, expected fixed-do name, expected octave]
+        ["E in", "fa", "la", 4],
+        ["G major", "do", "sol", 3],
+        ["A aeolian", "la", "la", 4]
+    ])("in %s, %s is stored as the fixed-do pitch the keyboard shows", (key, solf, name, oct) => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = key;
+        turtleMock.singer.movable = true;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        activityMock.logo.musicKeyboard = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+
+        Singer.processPitch(activityMock, solf, 4, 0, 0, "blk");
+
+        expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
+        expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
+    });
+});
+
+describe("processPitch in the pitch-drum matrix", () => {
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getSolfege", "noteIsSolfege"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    const setup = drumStyle => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.drumStyle = drumStyle;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inPitchDrumMatrix = true;
+        activityMock.logo.pitchBlocks = [];
+        activityMock.logo.pitchDrumMatrix = {
+            rowLabels: [],
+            rowArgs: [],
+            drums: [],
+            addRowBlock: jest.fn(),
+            addColBlock: jest.fn()
+        };
+        return activityMock;
+    };
+
+    test("a pitch becomes a row tied to its block", () => {
+        const activityMock = setup([]);
+
+        Singer.processPitch(activityMock, "sol", 4, 0, 0, "blk");
+
+        const pdm = activityMock.logo.pitchDrumMatrix;
+        expect(pdm.rowLabels).toEqual(["sol"]);
+        expect(pdm.addRowBlock).toHaveBeenCalledWith("blk");
+        expect(pdm.addColBlock).not.toHaveBeenCalled();
+    });
+
+    test("a rest written as R doesn't add a row block", () => {
+        const activityMock = setup([]);
+
+        Singer.processPitch(activityMock, "R", 4, 0, 0, "blk");
+
+        expect(activityMock.logo.pitchDrumMatrix.addRowBlock).not.toHaveBeenCalled();
+    });
+
+    // A pitch inside Set Drum is a drum column, so it must not add a row block
+    // (the rows would shift) and must add a column block (the columns would).
+    test("a pitch inside Set Drum becomes a column tied to its block", () => {
+        const activityMock = setup(["snare drum"]);
+
+        Singer.processPitch(activityMock, "sol", 4, 0, 0, "blk");
+
+        const pdm = activityMock.logo.pitchDrumMatrix;
+        expect(pdm.drums).toEqual(["snare drum"]);
+        expect(pdm.rowLabels).toEqual([]);
+        expect(pdm.addColBlock).toHaveBeenCalledWith("blk");
+        expect(pdm.addRowBlock).not.toHaveBeenCalled();
     });
 });
 
@@ -1559,5 +2240,327 @@ describe("processNote unhighlight timers", () => {
 
         act.logo.doStopTurtles();
         expect(tur.singer._unhighlightTimers).toEqual({});
+    });
+});
+
+describe("Singer.processNote tuplet and legoWidget handling", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.beatFactor = 1;
+        activityMock = createActivityMock(turtleMock);
+    });
+
+    it("should not duplicate or mutate tupletRhythms when rhythm block calls processNote in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0, 4]] };
+        activityMock.blocks.blockList["blkRhythm"] = { name: "rhythm" };
+        turtleMock.singer.inNoteBlock = ["blkRhythm"];
+
+        Singer.processNote(activityMock, 4, false, "blkRhythm", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 4]]);
+    });
+
+    it("should accumulate tupletRhythms for non-rhythm note producers (e.g. STupletBlock) in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0]] };
+        activityMock.logo.addingNotesToTuplet = { 0: true };
+        activityMock.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+        turtleMock.singer.inNoteBlock = ["blkSTuplet"];
+
+        Singer.processNote(activityMock, 4, false, "blkSTuplet", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 4]]);
+    });
+
+    it("should not apply beatFactor twice for STupletBlock with non-default beatFactor in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0]] };
+        activityMock.logo.addingNotesToTuplet = { 0: true };
+        activityMock.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+        turtleMock.singer.inNoteBlock = ["blkSTuplet"];
+        turtleMock.singer.beatFactor = 2.5;
+
+        // NoteBeatValue was already scaled by beatFactor (4) by STupletBlock.flow before calling Singer.processNote
+        Singer.processNote(activityMock, 4, false, "blkSTuplet", 0, jest.fn());
+
+        // Value should remain 4, NOT 4 * 2.5 = 10
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 4]]);
+    });
+
+    it("should scale noteBeatValue by beatFactor for non-stuplet note blocks with non-default beatFactor in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0]] };
+        activityMock.logo.addingNotesToTuplet = { 0: true };
+        activityMock.blocks.blockList["blkNote"] = { name: "note" };
+        turtleMock.singer.inNoteBlock = ["blkNote"];
+        turtleMock.singer.beatFactor = 2;
+
+        Singer.processNote(activityMock, 3, false, "blkNote", 0, jest.fn());
+
+        // Standard note blocks do not pre-scale, so 3 is scaled by beatFactor 2 -> 6
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 6]]);
+    });
+
+    it("should create new tuplet entry when addingNotesToTuplet is false in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [] };
+        activityMock.logo.addingNotesToTuplet = { 0: false };
+        activityMock.blocks.blockList["blkNote"] = { name: "note" };
+        turtleMock.singer.inNoteBlock = ["blkNote"];
+
+        Singer.processNote(activityMock, 2, false, "blkNote", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 2]]);
+        expect(activityMock.logo.addingNotesToTuplet[0]).toBe(true);
+
+        // Also test legacy boolean format
+        activityMock.logo.tuplet = true;
+        activityMock.logo.addingNotesToTuplet = false;
+        activityMock.logo.tupletParams = [[1, 0.5]];
+        activityMock.logo.tupletRhythms = [];
+
+        Singer.processNote(activityMock, 3, false, "blkNote", 0, jest.fn());
+        expect(activityMock.logo.tupletRhythms).toEqual([["notes", 0, 3]]);
+        expect(activityMock.logo.addingNotesToTuplet).toBe(true);
+    });
+
+    it("should push individual rhythm when isTuplet is false in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: false };
+        activityMock.logo.tupletRhythms = { 0: [] };
+        activityMock.blocks.blockList["blkNote"] = { name: "note" };
+        turtleMock.singer.inNoteBlock = ["blkNote"];
+
+        Singer.processNote(activityMock, 2, false, "blkNote", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["", 1, 2]]);
+
+        // Also test legacy array format
+        activityMock.logo.tuplet = false;
+        activityMock.logo.tupletRhythms = [];
+        Singer.processNote(activityMock, 3, false, "blkNote", 0, jest.fn());
+        expect(activityMock.logo.tupletRhythms).toEqual([["", 1, 3]]);
+    });
+
+    it("should handle tuplet in phraseMaker when tuplet is active per turtle", () => {
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.pitchBlocks = ["pb1"];
+        activityMock.logo.drumBlocks = ["db1"];
+        activityMock.logo.phraseMaker = {
+            addColBlock: jest.fn(),
+            addNode: jest.fn(),
+            blockNo: 5
+        };
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.phraseMaker.addColBlock).toHaveBeenCalledWith("mockBlk", 1);
+        expect(activityMock.logo.phraseMaker.addNode).toHaveBeenCalledWith("pb1", "mockBlk", 0, 5);
+        expect(activityMock.logo.phraseMaker.addNode).toHaveBeenCalledWith("db1", "mockBlk", 0, 5);
+    });
+
+    it("should not invoke phraseMaker when tuplet is inactive for current turtle", () => {
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.tuplet = { 0: false, 1: true };
+        activityMock.logo.pitchBlocks = ["pb1"];
+        activityMock.logo.drumBlocks = ["db1"];
+        activityMock.logo.phraseMaker = {
+            addColBlock: jest.fn(),
+            addNode: jest.fn(),
+            blockNo: 5
+        };
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+        turtleMock.doWait = jest.fn();
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.phraseMaker.addColBlock).not.toHaveBeenCalled();
+        expect(activityMock.logo.phraseMaker.addNode).not.toHaveBeenCalled();
+    });
+
+    it("should handle tuplet in phraseMaker when tuplet is legacy boolean", () => {
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.tuplet = true;
+        activityMock.logo.pitchBlocks = [];
+        activityMock.logo.drumBlocks = [];
+        activityMock.logo.phraseMaker = {
+            addColBlock: jest.fn(),
+            addNode: jest.fn(),
+            blockNo: 5
+        };
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.phraseMaker.addColBlock).toHaveBeenCalledWith("mockBlk", 1);
+    });
+
+    it("should store note cells under the phrase maker block when it is block 0", () => {
+        const PhraseMakerGrid = require("../widgets/PhraseMakerGrid");
+        activityMock.logo.inMatrix = true;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.pitchBlocks = ["pb1"];
+        activityMock.logo.drumBlocks = ["db1"];
+        const phraseMaker = {
+            _blockMap: {},
+            blockNo: 0,
+            addColBlock: jest.fn(),
+            addNode: (rowBlock, rhythmBlock, n, blk) =>
+                PhraseMakerGrid.addNode(phraseMaker, rowBlock, rhythmBlock, n, blk)
+        };
+        activityMock.logo.phraseMaker = phraseMaker;
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(phraseMaker._blockMap[0]).toEqual([
+            ["pb1", ["mockBlk", 0], 0],
+            ["db1", ["mockBlk", 0], 0]
+        ]);
+        expect(phraseMaker._blockMap[-1]).toBeUndefined();
+    });
+
+    it("should restore volume for each synth using its own voice name when crescendo ends", () => {
+        turtleMock.singer.inCrescendo = [true];
+        turtleMock.singer.crescendoDelta = [];
+        turtleMock.singer.synthVolume = {
+            piano: [80],
+            flute: [30]
+        };
+        const setSynthVolumeSpy = jest.spyOn(Singer, "setSynthVolume");
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(turtleMock.singer.inCrescendo).toHaveLength(0);
+        expect(setSynthVolumeSpy).toHaveBeenCalledWith(activityMock.logo, 0, "piano", 80);
+        expect(setSynthVolumeSpy).toHaveBeenCalledWith(activityMock.logo, 0, "flute", 30);
+        setSynthVolumeSpy.mockRestore();
+    });
+});
+
+describe("processNote — custom timbre effects normalization (#9043)", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.inSetTimbre = true;
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.synth.trigger = jest.fn();
+        activityMock.logo.synth.start = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.stage = {
+            update: jest.fn()
+        };
+        singer = turtleMock.singer;
+
+        global.instrumentsEffects = {
+            0: {
+                customVoice: {
+                    vibratoActive: true,
+                    vibratoIntensity: 0.05,
+                    vibratoRate: 16,
+                    distortionActive: true,
+                    distortionAmount: 0.4,
+                    tremoloActive: true,
+                    tremoloFrequency: 10,
+                    tremoloDepth: 0.5,
+                    chorusActive: true,
+                    chorusRate: 1.5,
+                    delayTime: 3.5,
+                    chorusDepth: 0.7
+                }
+            }
+        };
+        global.instrumentsFilters = {
+            0: {}
+        };
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it("should pass normalized effect parameters from instrumentsEffects to synth.trigger", () => {
+        const blk = "mockBlk";
+        singer.inNoteBlock = [blk];
+        singer.instrumentNames = ["customVoice"];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+        const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+        const paramsEffects = callArgs[4];
+        expect(paramsEffects).toBeDefined();
+        expect(paramsEffects.vibratoIntensity).toBe(0.05);
+        expect(paramsEffects.vibratoFrequency).toBeGreaterThan(0);
+        expect(paramsEffects.distortionAmount).toBe(0.4);
+        expect(paramsEffects.tremoloDepth).toBe(0.5);
+        expect(paramsEffects.tremoloFrequency).toBe(10);
+        expect(paramsEffects.chorusDepth).toBe(0.7);
+        expect(paramsEffects.chorusRate).toBe(1.5);
+        expect(paramsEffects.delayTime).toBe(3.5);
+    });
+
+    it("should pass the turtle panner to synth.trigger", () => {
+        const blk = "mockBlk";
+        const panner = { name: "Panner" };
+        singer.panner = panner;
+        singer.inNoteBlock = [blk];
+        singer.instrumentNames = ["customVoice"];
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+        expect(callArgs[callArgs.length - 1]).toBe(panner);
     });
 });

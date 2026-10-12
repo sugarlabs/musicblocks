@@ -35,6 +35,15 @@
 
 .project-icon {
 	margin-right: 3px !important;
+	/* Reset browser-default button styles so <button class="project-icon"> matches <a class="project-icon"> */
+	background: none;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .projectscontainer {
@@ -338,13 +347,39 @@ a {
 	color: #f44337;
 }
 
-.published-cloud {
+/* badge strip — absolutely positioned row of icon badges on the card image */
+.card-badges {
 	position: absolute;
-	z-index: 100;
-	margin-left: 15px;
-	margin-top: 15px;
-	color: #fff;
+	z-index: 5;
+	top: 15px;
+	left: 22px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 6px;
 }
+
+/* shared style for both the published-cloud and git-repo badge */
+.published-cloud,
+.git-repo-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	color: #fff;
+	cursor: pointer;
+}
+
+/* git-branch badge icon — white Phosphor SVG */
+.git-repo-badge-icon {
+	width: 18px;
+	height: 18px;
+	/* turn the black Phosphor SVG white */
+	filter: brightness(0) invert(1);
+	display: block;
+}
+
 
 .centre-load {
 	left: calc(50% - 18px);
@@ -472,6 +507,17 @@ a {
 	visibility: visible;
 }
 
+/* Stop the report textarea from auto-growing (Materialize materialize-textarea
+   behaviour). Fixed height + scroll keeps the report card stable. */
+#reportdescription {
+	height: 100px !important;
+	min-height: 100px !important;
+	max-height: 100px !important;
+	overflow-y: auto !important;
+	resize: none;
+	box-sizing: border-box;
+}
+
 .reportprogress {
 	width: calc(100% + 48px);
 	left: -24px;
@@ -522,4 +568,53 @@ a {
 	cursor: pointer;
 	font-size: 16px;
 	outline: none;
+}
+
+/* ── Fork button ───────────────────────────────────────────────────────── */
+
+/* Spinner animation while the fork round-trip is in progress */
+@keyframes mb-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.project-icon.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.project-icon.disabled i.material-icons {
+    animation: mb-spin 0.8s linear infinite;
+}
+
+/* ── Lazy-loading thumbnail ────────────────────────────────────────────── */
+
+/* Shimmer placeholder shown while the thumbnail is being fetched */
+@keyframes mb-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+}
+
+.project-card-image.mb-thumb-loading {
+    /* The src is set to the placeholder; add a shimmer overlay via background */
+    background: linear-gradient(
+        90deg,
+        #dce3e8 25%,
+        #c8d4db 50%,
+        #dce3e8 75%
+    );
+    background-size: 800px 100%;
+    animation: mb-shimmer 1.4s infinite linear;
+    /* Keep image element sizing correct while the real src loads */
+    object-fit: cover;
+}
+
+.project-card-image.mb-thumb-loaded {
+    /* Smooth fade-in once the real thumbnail arrives */
+    animation: mb-fadein 0.3s ease-in;
+}
+
+@keyframes mb-fadein {
+    from { opacity: 0.3; }
+    to   { opacity: 1;   }
 }

@@ -63,8 +63,6 @@ describe("Utility Functions (logic-only)", () => {
         setVolume,
         getVolume,
         setMasterVolume,
-        getTunerFrequency,
-        stopTuner,
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
@@ -106,6 +104,18 @@ describe("Utility Functions (logic-only)", () => {
             "../utils.js",
             "../../logoconstants.js",
             "../platformstyle.js",
+            "../musicutils-constants.js",
+            "../musicutils-i18n.js",
+            "../musicutils-temperament.js",
+            "../musicutils-pitch.js",
+            "../musicutils-lookups.js",
+            "../musicutils-rhythm.js",
+            "../musicutils-solfege.js",
+            "../musicutils-modewheel.js",
+            "../musicutils-modecore.js",
+            "../musicutils-pitchscale.js",
+            "../musicutils-buildscale.js",
+            "../musicutils-pitchinfo.js",
             "../musicutils.js",
             "../../logo.js",
             "../../turtle-singer.js"
@@ -196,8 +206,6 @@ describe("Utility Functions (logic-only)", () => {
         setVolume = Synth.setVolume;
         getVolume = Synth.getVolume;
         setMasterVolume = Synth.setMasterVolume;
-        getTunerFrequency = Synth.getTunerFrequency;
-        stopTuner = Synth.stopTuner;
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
@@ -1433,6 +1441,8 @@ describe("Utility Functions (logic-only)", () => {
             expect(_parseSampleCenterNo("do", 5)).toBe("60");
             expect(_parseSampleCenterNo("A", 5)).toBe("69");
             expect(_parseSampleCenterNo("A", 2)).toBe("33");
+            expect(_parseSampleCenterNo("^G" + SHARP, 4)).toBe("56");
+            expect(_parseSampleCenterNo("vla" + FLAT, 4)).toBe("56");
         });
     });
 
@@ -1497,97 +1507,6 @@ describe("Utility Functions (logic-only)", () => {
 
             expect(result.attack).toBe(0.5);
             expect(result.unknownKey).toBeUndefined();
-        });
-    });
-
-    describe("getTunerFrequency", () => {
-        it("should return 440 when tunerAnalyser is null", () => {
-            Synth.tunerAnalyser = null;
-            Synth.detectPitch = jest.fn();
-            expect(getTunerFrequency()).toBe(440);
-            expect(Synth.detectPitch).not.toHaveBeenCalled();
-        });
-
-        it("should return 440 when detectPitch is null", () => {
-            Synth.tunerAnalyser = { getValue: jest.fn() };
-            Synth.detectPitch = null;
-            expect(getTunerFrequency()).toBe(440);
-        });
-
-        it("should return 440 when detected pitch is zero or negative", () => {
-            Synth.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
-            Synth.detectPitch = jest.fn(() => 0);
-            expect(getTunerFrequency()).toBe(440);
-
-            Synth.detectPitch = jest.fn(() => -1);
-            expect(getTunerFrequency()).toBe(440);
-        });
-
-        it("should return detected pitch when valid", () => {
-            Synth.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
-            Synth.detectPitch = jest.fn(() => 261.63);
-            expect(getTunerFrequency()).toBe(261.63);
-        });
-    });
-
-    describe("stopTuner", () => {
-        it("should not throw when tunerMic is null", () => {
-            Synth.tunerMic = null;
-            Synth.tunerAnalyser = null;
-            expect(() => stopTuner()).not.toThrow();
-        });
-
-        it("should call close on tunerMic and null it", () => {
-            const mockClose = jest.fn();
-            Synth.tunerMic = { close: mockClose };
-            Synth.tunerAnalyser = null;
-            stopTuner();
-            expect(mockClose).toHaveBeenCalledTimes(1);
-            expect(Synth.tunerMic).toBeNull();
-        });
-
-        it("should disconnect and dispose tunerAnalyser when both exist", () => {
-            const mockDisconnect = jest.fn();
-            const mockDispose = jest.fn();
-            const mockClose = jest.fn();
-            const analyser = { dispose: mockDispose };
-            Synth.tunerMic = { close: mockClose, disconnect: mockDisconnect };
-            Synth.tunerAnalyser = analyser;
-
-            stopTuner();
-
-            expect(mockDisconnect).toHaveBeenCalledWith(analyser);
-            expect(mockDispose).toHaveBeenCalled();
-            expect(mockClose).toHaveBeenCalled();
-            expect(Synth.tunerAnalyser).toBeNull();
-            expect(Synth.tunerMic).toBeNull();
-        });
-
-        it("should skip analyser disposal when tunerAnalyser is null", () => {
-            const mockDisconnect = jest.fn();
-            const mockClose = jest.fn();
-            Synth.tunerMic = { close: mockClose, disconnect: mockDisconnect };
-            Synth.tunerAnalyser = null;
-
-            stopTuner();
-
-            expect(mockDisconnect).not.toHaveBeenCalled();
-            expect(mockClose).toHaveBeenCalled();
-        });
-
-        it("should cancel any pending tuner animation frame", () => {
-            const originalCancel = global.cancelAnimationFrame;
-            const mockCancel = jest.fn();
-            global.cancelAnimationFrame = mockCancel;
-            Synth._tunerRafId = 123;
-            Synth._tunerActive = true;
-            Synth.tunerMic = null;
-            Synth.tunerAnalyser = null;
-            stopTuner();
-            expect(mockCancel).toHaveBeenCalledWith(123);
-            expect(Synth._tunerRafId).toBeNull();
-            expect(Synth._tunerActive).toBe(false);
-            global.cancelAnimationFrame = originalCancel;
         });
     });
 
@@ -1954,6 +1873,31 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.setNote).not.toHaveBeenCalled();
         });
 
+        it("should play a filtered note on a basic oscillator (paramsEffects null) without throwing", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            // Basic oscillators (sine/sawtooth/...) reach _performNotes with
+            // paramsEffects === null but a live filter. A non-empty filter forces
+            // the slow graph-rewire path, which must not dereference paramsEffects.
+            const paramsFilters = [
+                { filterType: "lowpass", filterRolloff: -12, filterFrequency: 400 }
+            ];
+
+            // Awaiting directly: if the slow path threw (as it did before the
+            // fix), the rejection fails the test. The triggerAttackRelease
+            // assertion then verifies the note actually played.
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, paramsFilters, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+        });
+
         it("should route plain (non-portamento) notes through the fast path unaffected", async () => {
             const mockSynth = {
                 toDestination: jest.fn().mockReturnThis(),
@@ -1976,7 +1920,7 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("_performNotes effects routing and cleanup", () => {
-        it("should reconnect synth to destination and disconnect old routing when effects complete", async () => {
+        it("should reconnect synth to its output and disconnect old routing when effects complete", async () => {
             jest.useFakeTimers();
 
             const mockSynth = {
@@ -2000,7 +1944,7 @@ describe("Utility Functions (logic-only)", () => {
             jest.advanceTimersByTime(2000);
 
             expect(mockSynth.disconnect).toHaveBeenCalled();
-            expect(mockSynth.toDestination).toHaveBeenCalled();
+            expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
 
             jest.useRealTimers();
         });
@@ -2078,7 +2022,7 @@ describe("Utility Functions (logic-only)", () => {
             jest.advanceTimersByTime(2000);
 
             expect(mockSynth.disconnect).toHaveBeenCalled();
-            expect(mockSynth.toDestination).toHaveBeenCalled();
+            expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
 
             jest.useRealTimers();
         });
@@ -2139,10 +2083,185 @@ describe("Utility Functions (logic-only)", () => {
                 const cleanupFn = mockTimerManager.setGuardedTimeout.mock.calls[0][0];
                 cleanupFn();
                 expect(mockSynth.disconnect).toHaveBeenCalled();
-                expect(mockSynth.toDestination).toHaveBeenCalled();
+                expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
             } finally {
                 Synth._timerManager = originalTimerManager;
                 Synth.activity = undefined;
+            }
+        });
+    });
+
+    describe("instrument output routing", () => {
+        const routeTurtle = "routeTurtle";
+        const panner = { name: "Panner" };
+        const vibrato = { doVibrato: true, vibratoFrequency: 5, vibratoIntensity: 1 };
+        const createMockSynth = () => ({
+            toDestination: jest.fn().mockReturnThis(),
+            triggerAttackRelease: jest.fn(),
+            disconnect: jest.fn(),
+            connect: jest.fn(),
+            chain: jest.fn().mockReturnThis()
+        });
+
+        beforeEach(() => {
+            Synth.inTemperament = "equal";
+        });
+
+        afterEach(() => {
+            delete instruments[routeTurtle];
+            jest.useRealTimers();
+        });
+
+        it("should leave a new instrument on the master output", () => {
+            const mockSynth = createMockSynth();
+
+            Synth.routeInstrument(mockSynth, Tone.Destination);
+
+            expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
+            expect(mockSynth.disconnect).not.toHaveBeenCalled();
+        });
+
+        it("should move an instrument from the master output to the panner", () => {
+            const mockSynth = createMockSynth();
+
+            Synth.routeInstrument(mockSynth, panner);
+
+            expect(mockSynth.disconnect).toHaveBeenCalledWith(Tone.Destination);
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+        });
+
+        it("should drop the panner when the output changes back", () => {
+            const mockSynth = createMockSynth();
+            Synth.routeInstrument(mockSynth, panner);
+
+            Synth.routeInstrument(mockSynth, Tone.Destination);
+
+            expect(mockSynth.disconnect).toHaveBeenLastCalledWith(panner);
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(Tone.Destination);
+        });
+
+        it("should not rewire an instrument already on its output", () => {
+            const mockSynth = createMockSynth();
+            Synth.routeInstrument(mockSynth, panner);
+            mockSynth.connect.mockClear();
+
+            Synth.routeInstrument(mockSynth, panner);
+
+            expect(mockSynth.connect).not.toHaveBeenCalled();
+        });
+
+        it("should play through the output passed to trigger", async () => {
+            const mockSynth = createMockSynth();
+            instruments[routeTurtle] = {};
+            Synth.createDefaultSynth(routeTurtle);
+            instruments[routeTurtle]["electronic synth"] = mockSynth;
+
+            await Synth.trigger(
+                routeTurtle,
+                "C4",
+                0.25,
+                "electronic synth",
+                null,
+                null,
+                false,
+                0,
+                panner
+            );
+
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+        });
+
+        it("should keep the panner after an effects note is cleaned up", async () => {
+            jest.useFakeTimers();
+            const mockSynth = createMockSynth();
+            Synth.routeInstrument(mockSynth, panner);
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, vibrato, null, false, 0, panner);
+            expect(mockSynth.chain.mock.calls[0].at(-1)).toBe(panner);
+
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+            expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
+        });
+
+        it("should wait for the effects chain before moving an instrument", async () => {
+            jest.useFakeTimers();
+            const mockSynth = createMockSynth();
+            Synth.routeInstrument(mockSynth, Tone.Destination);
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, vibrato, null, false, 0);
+            mockSynth.connect.mockClear();
+
+            Synth.routeInstrument(mockSynth, panner);
+            expect(mockSynth.connect).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.connect).toHaveBeenCalledTimes(1);
+            expect(mockSynth.connect).toHaveBeenCalledWith(panner);
+        });
+
+        it("should connect a newly loaded instrument to the master output", async () => {
+            const mockSynth = createMockSynth();
+            instruments[routeTurtle] = { "cow bell": mockSynth };
+            const createSpy = jest.spyOn(Synth, "createSynth").mockResolvedValue();
+            const volumeSpy = jest.spyOn(Synth, "setVolume").mockImplementation(() => {});
+
+            try {
+                await Synth.loadSynth(routeTurtle, "cow bell");
+
+                expect(mockSynth.connect).toHaveBeenCalledWith(Tone.Destination);
+            } finally {
+                createSpy.mockRestore();
+                volumeSpy.mockRestore();
+            }
+        });
+
+        it("should leave a reloaded instrument on its output", async () => {
+            const mockSynth = createMockSynth();
+            instruments[routeTurtle] = { guitar: mockSynth };
+            Synth.routeInstrument(mockSynth, panner);
+            mockSynth.connect.mockClear();
+            const createSpy = jest.spyOn(Synth, "createSynth").mockResolvedValue();
+            const volumeSpy = jest.spyOn(Synth, "setVolume").mockImplementation(() => {});
+
+            try {
+                await Synth.loadSynth(routeTurtle, "guitar");
+
+                expect(mockSynth.toDestination).not.toHaveBeenCalled();
+                expect(mockSynth.connect).not.toHaveBeenCalled();
+            } finally {
+                createSpy.mockRestore();
+                volumeSpy.mockRestore();
+            }
+        });
+
+        it("should return to the panner when the effects chain fails", async () => {
+            const mockSynth = createMockSynth();
+            mockSynth.chain.mockImplementation(() => {
+                throw new Error("chain failed");
+            });
+            Synth.routeInstrument(mockSynth, panner);
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            try {
+                await _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    "C4",
+                    0.25,
+                    vibrato,
+                    null,
+                    false,
+                    0,
+                    panner
+                );
+
+                expect(mockSynth.connect).toHaveBeenLastCalledWith(panner);
+                expect(mockSynth.connect).not.toHaveBeenCalledWith(Tone.Destination);
+            } finally {
+                errorSpy.mockRestore();
             }
         });
     });
@@ -2971,328 +3090,6 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
         expect(synthRef.disposed).toBe(true);
     });
 
-    describe("Synth Tuner and Pitch Detection", () => {
-        let synthInstance;
-        let mockActivity;
-        let tunerContainer;
-
-        function bufferForFrequency(freq, sampleRate = 44100) {
-            const buf = new Float32Array(2048);
-            if (freq <= 0) return buf;
-            for (let i = 0; i < 2048; i++) {
-                buf[i] = Math.sin((2 * Math.PI * freq * i) / sampleRate);
-            }
-            return buf;
-        }
-
-        beforeEach(() => {
-            synthInstance = new SynthClass();
-            document.body.innerHTML = "";
-
-            tunerContainer = document.createElement("div");
-            tunerContainer.id = "tunerContainer";
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            // Create 11 SVG path segments to simulate tuner display
-            for (let i = 0; i < 11; i++) {
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                svg.appendChild(path);
-            }
-            tunerContainer.appendChild(svg);
-            document.body.appendChild(tunerContainer);
-
-            mockActivity = {
-                logo: {
-                    synth: synthInstance,
-                    stopTurtle: false,
-                    errorMsg: jest.fn()
-                },
-                turtles: {
-                    _canvas: { width: 800, height: 600 },
-                    ithTurtle: () => ({
-                        singer: {
-                            instrumentNames: ["default"],
-                            activeVoices: new Set()
-                        }
-                    })
-                }
-            };
-            window.ActivityContext = {
-                getActivity: () => mockActivity
-            };
-            window.wheelnav = jest.fn();
-            window.Raphael = jest.fn();
-            global.wheelnav = jest.fn();
-            global.Raphael = jest.fn();
-            global.requestAnimationFrame = cb => setTimeout(cb, 0);
-            global.cancelAnimationFrame = id => clearTimeout(id);
-            global.piemenuPitches = jest.fn();
-            if (!global.instruments[0]) global.instruments[0] = {};
-            global.instruments[0]["electronic synth"] = new Tone.PolySynth();
-            global.instrumentsSource["electronic synth"] = [0, "electronic synth"];
-        });
-
-        afterEach(() => {
-            if (synthInstance) {
-                synthInstance.stopTuner();
-            }
-            document.body.innerHTML = "";
-            delete window.ActivityContext;
-        });
-
-        test("startTuner and updatePitch in chromatic mode across all pitch and cent ranges", async () => {
-            await synthInstance.startTuner();
-            expect(synthInstance._tunerActive).toBe(true);
-
-            // Test getTunerFrequency
-            const freq = synthInstance.getTunerFrequency();
-            expect(freq).toBeGreaterThan(0);
-
-            const noteText = document.getElementById("noteText");
-            const centsText = document.getElementById("centsText");
-            expect(noteText).not.toBeNull();
-            expect(centsText).not.toBeNull();
-
-            const segments = tunerContainer.querySelectorAll("svg path");
-            expect(segments.length).toBe(11);
-
-            // 1. Center in-tune (440Hz -> A4, near 0 cents, center green segment lit)
-            synthInstance.tunerAnalyser.getValue = jest
-                .fn()
-                .mockReturnValue(bufferForFrequency(440));
-            await new Promise(resolve => setTimeout(resolve, 5));
-            expect(noteText.textContent).toBe("A4");
-            expect(centsText.textContent).toMatch(/\+?[0-5] cents/);
-            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
-
-            // 2. Frequency sweep across various pitches (flat, sharp, silence)
-            const testFreqs = [
-                438, // slight flat
-                432, // flat
-                425, // flat
-                418, // flat
-                400, // deep flat
-                442, // slight sharp
-                448, // sharp
-                455, // sharp
-                462, // sharp
-                480, // deep sharp
-                0 // silence
-            ];
-            for (const f of testFreqs) {
-                synthInstance.tunerAnalyser.getValue = jest
-                    .fn()
-                    .mockReturnValue(bufferForFrequency(f));
-                await new Promise(resolve => setTimeout(resolve, 5));
-                if (f > 0) {
-                    expect(noteText.textContent).toBeTruthy();
-                    expect(centsText.textContent).toMatch(/cents/);
-                    // Verify at least one segment is active/colored
-                    const filledSegments = Array.from(segments).filter(
-                        s => s.getAttribute("fill") && s.getAttribute("fill") !== "#D3D3D3"
-                    );
-                    expect(filledSegments.length).toBeGreaterThan(0);
-                }
-            }
-        });
-
-        test("startTuner and updatePitch in target pitch mode with mode switching and pie menu", async () => {
-            await synthInstance.startTuner();
-
-            // Switch to target mode
-            const targetPitchButton = document.querySelector('div[title="Target pitch"]');
-            expect(targetPitchButton).not.toBeNull();
-            targetPitchButton.onclick();
-
-            const segments = tunerContainer.querySelectorAll("svg path");
-            const noteText = document.getElementById("noteText");
-            const centsText = document.getElementById("centsText");
-
-            // 1 octave above (+1200 cents, >50 cents sharp -> rightmost segment deep red)
-            synthInstance.tunerAnalyser.getValue = jest
-                .fn()
-                .mockReturnValue(bufferForFrequency(880));
-            await new Promise(resolve => setTimeout(resolve, 5));
-            expect(noteText.textContent).toBe("A5");
-            expect(centsText.textContent).toContain("+1 octave");
-            expect(segments[10].getAttribute("fill")).toBe("#FF0000");
-
-            // 1 octave below (-1200 cents, >50 cents flat -> leftmost segment deep red)
-            synthInstance.tunerAnalyser.getValue = jest
-                .fn()
-                .mockReturnValue(bufferForFrequency(220));
-            await new Promise(resolve => setTimeout(resolve, 5));
-            expect(noteText.textContent).toBe("A3");
-            expect(centsText.textContent).toContain("-1 octave");
-            expect(segments[0].getAttribute("fill")).toBe("#FF0000");
-
-            // Near target sharp (+20 cents)
-            synthInstance.tunerAnalyser.getValue = jest
-                .fn()
-                .mockReturnValue(bufferForFrequency(445));
-            await new Promise(resolve => setTimeout(resolve, 5));
-            expect(noteText.textContent).toBe("A4");
-            expect(centsText.textContent).toMatch(/\+?[0-9]+ cents/);
-
-            // Near target flat (-20 cents)
-            synthInstance.tunerAnalyser.getValue = jest
-                .fn()
-                .mockReturnValue(bufferForFrequency(435));
-            await new Promise(resolve => setTimeout(resolve, 5));
-            expect(noteText.textContent).toBe("A4");
-            expect(centsText.textContent).toMatch(/-[0-9]+ cents/);
-
-            // Inactive / zero frequency
-            synthInstance.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(0));
-            await new Promise(resolve => setTimeout(resolve, 5));
-
-            // Switch back to chromatic mode
-            await new Promise(r => setTimeout(r, 250));
-            const chromaticButton = document.querySelector('div[title="Chromatic"]');
-            expect(chromaticButton).not.toBeNull();
-            chromaticButton.onclick();
-
-            // Switch to target mode again and click targetNoteSelector to open pie menu
-            await new Promise(r => setTimeout(r, 250));
-            targetPitchButton.onclick();
-            const targetNoteSelector = document.getElementById("targetNoteSelector");
-            expect(targetNoteSelector).not.toBeNull();
-
-            // Trigger hover events
-            targetNoteSelector.dispatchEvent(new Event("mouseenter"));
-            targetNoteSelector.dispatchEvent(new Event("mouseleave"));
-
-            // Set up piemenuPitches mock to simulate wheels
-            global.piemenuPitches = jest.fn(
-                (block, solfNotes, noteNotes, solfAttrs, selSolf, selAttr) => {
-                    block._pitchWheel = {
-                        navItems: [
-                            { title: "do" },
-                            { title: "re" },
-                            { title: "mi" },
-                            { title: "fa" },
-                            { title: "sol" },
-                            { title: "la" },
-                            { title: "ti" }
-                        ]
-                    };
-                    block._accidentalsWheel = {
-                        navItems: [
-                            { title: "♯" },
-                            { title: "♭" },
-                            { title: "𝄪" },
-                            { title: "𝄫" },
-                            { title: "♮" }
-                        ]
-                    };
-                    block._octavesWheel = {
-                        navItems: [{ title: "3" }, { title: "4" }, { title: "5" }]
-                    };
-                    block._exitWheel = {
-                        navItems: [
-                            {
-                                navigateFunction: jest.fn()
-                            }
-                        ],
-                        removeWheel: jest.fn()
-                    };
-                    block._pitchWheel.removeWheel = jest.fn();
-                    block._accidentalsWheel.removeWheel = jest.fn();
-                    block._octavesWheel.removeWheel = jest.fn();
-                }
-            );
-            window.piemenuPitches = global.piemenuPitches;
-
-            targetNoteSelector.click();
-            expect(global.piemenuPitches).toHaveBeenCalled();
-
-            // Exercise wheel navigation callbacks for all notes & accidentals
-            const tempBlock = global.piemenuPitches.mock.calls[0][0];
-            if (tempBlock._pitchWheel?.navItems) {
-                for (const item of tempBlock._pitchWheel.navItems) {
-                    if (item.navigateFunction) item.navigateFunction();
-                }
-            }
-            if (tempBlock._accidentalsWheel?.navItems) {
-                for (const item of tempBlock._accidentalsWheel.navItems) {
-                    if (item.navigateFunction) item.navigateFunction();
-                }
-            }
-            if (tempBlock._octavesWheel?.navItems) {
-                for (const item of tempBlock._octavesWheel.navItems) {
-                    if (item.navigateFunction) item.navigateFunction();
-                }
-            }
-            if (tempBlock._exitWheel?.navItems[0]?.navigateFunction) {
-                tempBlock._exitWheel.navItems[0].navigateFunction();
-            }
-
-            // Test stopTuner
-            synthInstance.stopTuner();
-            expect(synthInstance._tunerActive).toBe(false);
-            expect(synthInstance.tunerMic).toBeNull();
-            expect(synthInstance.tunerAnalyser).toBeNull();
-        });
-
-        test("getTunerFrequency returns 440 default when analyser is null", () => {
-            synthInstance.tunerAnalyser = null;
-            expect(synthInstance.getTunerFrequency()).toBe(440);
-        });
-    });
-
-    describe("Cents Slider Interface", () => {
-        let synthInstance;
-        let widgetBody;
-        let sliderBtn;
-
-        beforeEach(() => {
-            synthInstance = new SynthClass();
-            widgetBody = document.createElement("div");
-            const existingChild = document.createElement("p");
-            existingChild.textContent = "Previous content";
-            widgetBody.appendChild(existingChild);
-
-            sliderBtn = document.createElement("button");
-            const img = document.createElement("img");
-            sliderBtn.appendChild(img);
-
-            synthInstance.widgetWindow = {
-                getWidgetBody: () => widgetBody
-            };
-            synthInstance.centsSliderBtn = sliderBtn;
-            synthInstance.centsValue = 15;
-            synthInstance.applyCentsAdjustment = jest.fn();
-            synthInstance._calculateFrequency = jest.fn().mockReturnValue(440);
-            synthInstance.tunerDisplay = {
-                update: jest.fn()
-            };
-            global.TunerUtils = {
-                frequencyToPitch: jest.fn().mockReturnValue(["A", 0, 4])
-            };
-        });
-
-        test("creates and removes cents slider correctly, restoring prior content", () => {
-            synthInstance.createCentsSlider();
-            expect(synthInstance.sliderVisible).toBe(true);
-            expect(widgetBody.children.length).toBeGreaterThan(0);
-
-            const slider = widgetBody.querySelector('input[type="range"]');
-            expect(slider).not.toBeNull();
-            expect(slider.value).toBe("15");
-
-            // Trigger slider input
-            slider.value = "-20";
-            slider.oninput();
-            expect(synthInstance.centsValue).toBe(-20);
-            expect(synthInstance.applyCentsAdjustment).toHaveBeenCalled();
-            expect(synthInstance.tunerDisplay.update).toHaveBeenCalled();
-
-            // Remove slider and verify previous child restored
-            synthInstance.removeCentsSlider();
-            expect(synthInstance.sliderVisible).toBe(false);
-            expect(widgetBody.textContent).toContain("Previous content");
-        });
-    });
-
     describe("Instruments, Effects, and Filters Disposal", () => {
         test("disposeAllInstruments disposes all nodes and clears dictionaries", () => {
             const synth = new SynthClass();
@@ -3528,6 +3325,15 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth._parseSampleCenterNo("re", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("D", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("unknown", 4)).toBe("48");
+            // Non-zero chromatic degrees must strip the accidental glyph before
+            // the dictionary lookup, otherwise the lookup misses and the degree
+            // wrongly falls back to 0 (e.g. sol#4 -> C#4).
+            expect(synth._parseSampleCenterNo("sol" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("G" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("la" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("A" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("mi" + DOUBLEFLAT, 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("ti" + DOUBLESHARP, 4)).toBe("61");
         });
 
         test("resolveInstrumentName resolves translated names and internal keys", () => {
@@ -3538,8 +3344,21 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth.resolveInstrumentName(null)).toBeNull();
         });
 
+        test("loadSampleAsync safely initializes sample structures when loading before synth is fully initialized", async () => {
+            // Replicate the condition where a project loads before the synth calls initStructures
+            synth.sampleLoader.samples = null;
+            expect(synth.sampleLoader.samples).toBeNull();
+
+            // Calling loadSampleAsync should not crash, it should initialize samples automatically
+            await expect(
+                synth.sampleLoader.loadSampleAsync("unknown_sample")
+            ).resolves.toBeUndefined();
+            expect(synth.sampleLoader.samples).not.toBeNull();
+            expect(synth.sampleLoader.samples.voice).toBeDefined();
+        });
+
         test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
-            synth._loadSample = jest.fn().mockImplementation(name => {
+            synth.sampleLoader.loadSampleAsync = jest.fn().mockImplementation(name => {
                 if (name === "failing_sample")
                     return Promise.reject(new Error("Sample preload error"));
                 return Promise.resolve();
@@ -3556,8 +3375,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             ];
 
             await synth.preloadProjectSamples(blockList);
-            expect(synth._loadSample).toHaveBeenCalledWith("piano");
-            expect(synth._loadSample).toHaveBeenCalledWith("kick drum");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("piano");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("kick drum");
 
             // Empty or invalid block list
             await synth.preloadProjectSamples(null);
@@ -3788,7 +3607,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // 2. Trigger drum instrument with URL and file sources
             global.instruments[testTurtle]["http://example.com/drum.wav"] = {
-                start: jest.fn()
+                start: jest.fn(),
+                connect: jest.fn()
             };
             global.instrumentsSource["http://example.com/drum.wav"] = [
                 1,
@@ -3809,7 +3629,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             ).toHaveBeenCalled();
 
             global.instruments[testTurtle]["file:///local/drum.wav"] = {
-                start: jest.fn()
+                start: jest.fn(),
+                connect: jest.fn()
             };
             global.instrumentsSource["file:///local/drum.wav"] = [1, "file:///local/drum.wav"];
             await synth.trigger(
@@ -3826,6 +3647,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             // 3. Trigger voice sample instrument with cent adjustments
             synth.sampleCentAdjustments["piano"] = 12;
             global.instruments[testTurtle]["piano"] = {
+                connect: jest.fn(),
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn(),
                 playbackRate: { value: 1 }
@@ -3839,6 +3661,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // 4. Trigger builtin synth (flag 3)
             global.instruments[testTurtle]["sine"] = {
+                connect: jest.fn(),
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn()
             };
@@ -3847,6 +3670,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // 5. Trigger noise synth (flag 4)
             global.instruments[testTurtle]["noise1"] = {
+                connect: jest.fn(),
                 triggerAttackRelease: jest.fn()
             };
             global.instrumentsSource["noise1"] = [4, "noise1"];
@@ -4048,5 +3872,21 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             synth.stopPlayBackRecording();
             expect(synth.player).toBeNull();
         });
+    });
+});
+
+describe("DRUMNAMES Lilypond symbols", () => {
+    const { DRUMNAMES } = synthutilsModule;
+
+    const symbolFor = name => DRUMNAMES.find(drum => drum[1] === name)[3];
+
+    it("writes the kick drum and the bass drum as bd", () => {
+        expect(symbolFor("kick drum")).toBe("bd");
+        expect(symbolFor("bass drum")).toBe("bd");
+    });
+
+    it("leaves the snare drum and the hi hat alone", () => {
+        expect(symbolFor("snare drum")).toBe("sn");
+        expect(symbolFor("hi hat")).toBe("hh");
     });
 });

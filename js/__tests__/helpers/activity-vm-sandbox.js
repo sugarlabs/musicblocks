@@ -55,6 +55,7 @@ const createBaseSandbox = () => ({
     console: global.console,
     navigator: global.navigator,
     _: key => key,
+    announceToScreenReader: jest.fn(),
     define: () => {},
     require: () => {},
     setTimeout,

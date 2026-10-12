@@ -105,10 +105,16 @@ class GlobalTag {
 
         if (obj.id !== undefined) {
             this.specialTag = false;
+            // In the new backend the manifest key IS the lowercase topic string
+            // (e.g. "music", "math"). TagName is the display-capitalised version.
             this.id = obj.id;
-            this.name = Planet.TagsManifest[this.id].TagName;
+            const entry = Planet.TagsManifest[this.id];
+            this.name = entry
+                ? entry.TagName
+                : // Graceful fallback: capitalise the raw key
+                  this.id.charAt(0).toUpperCase() + this.id.slice(1);
             this.func = null;
-            this.IsDisplayTag = Planet.TagsManifest[this.id].IsDisplayTag === "1"; // ? "true":"false";
+            this.IsDisplayTag = entry ? entry.IsDisplayTag === "1" : true;
             this.selectedClass = "selected";
         } else {
             this.specialTag = true;

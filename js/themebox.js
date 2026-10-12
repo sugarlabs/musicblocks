@@ -203,7 +203,7 @@ class ThemeBox {
 
         // Refresh all blocks to update their colors
         if (this.activity.blocks) {
-            for (const blockId in this.activity.blocks.blockList) {
+            for (const blockId of Object.keys(this.activity.blocks.blockList)) {
                 const block = this.activity.blocks.blockList[blockId];
                 if (block && block.protoblock && block.protoblock.palette) {
                     // Redraw block to update other colors
@@ -254,7 +254,10 @@ class ThemeBox {
         if (themeSelectIcon) {
             const currentThemeElement = document.getElementById(this._theme);
             if (currentThemeElement) {
-                themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
+                themeSelectIcon.textContent = "";
+                currentThemeElement.childNodes.forEach(child => {
+                    themeSelectIcon.appendChild(child.cloneNode(true));
+                });
             }
         }
     }

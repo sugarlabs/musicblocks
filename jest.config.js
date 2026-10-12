@@ -11,10 +11,10 @@ module.exports = {
     collectCoverage: true,
     collectCoverageFrom: [
         "js/**/*.js",
-        "!js/__tests__/**",
+        "!js/**/__tests__/**",
         "!js/js-export/ast2blocks.config.js",
         "planet/js/**/*.js",
-        "!planet/js/__tests__/**"
+        "!planet/js/**/__tests__/**"
     ],
     coverageReporters: ["text-summary", "text", "lcov", "json-summary"]
     // No hard-coded coverageThreshold: CI's "Coverage delta vs base" job

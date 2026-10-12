@@ -20,8 +20,110 @@
 const saveMxmlOutput = require("../mxml");
 const { frequencyToPitch } = require("../utils/musicutils");
 global.frequencyToPitch = frequencyToPitch;
+global.getMidiDrum = () => ({ "snare drum": 38, "kick drum": 36 });
 
 describe("saveMxmlOutput", () => {
+    it("exports a drum-only note as unpitched percussion rather than only a rest", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: [[["R"], 4, 0, null, null, false, false, "snare drum"]] }
+            }
+        });
+
+        expect(output).toContain('<score-part id="D1">');
+        expect(output).toContain('<part id="D1">');
+        expect(output).not.toContain('<part id="P1">');
+        expect(output).toContain("<sign>percussion</sign>");
+        expect(output).toContain("<instrument-name>snare drum</instrument-name>");
+        expect(output).toContain("<midi-unpitched>39</midi-unpitched>");
+        expect(output).toMatch(
+            /<\/unpitched>\s*<duration>8<\/duration>\s*<instrument id="D1-X1"\/>/
+        );
+    });
+
+    it("writes instrument after each tie in a barline-split drum note", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"],
+                        "tie",
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(
+            /<\/unpitched>\s*<duration>16<\/duration>\s*<tie type="start"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toMatch(
+            /<\/unpitched>\s*<duration>16<\/duration>\s*<tie type="stop"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toContain('<measure number="2">');
+    });
+
+    it("keeps pitched notes and sequential drum identities in separate aligned parts", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, "snare drum"],
+                        [["D4"], 4, 0, null, null, false, false, "kick drum"]
+                    ]
+                }
+            }
+        });
+
+        const pitched = output.split('<part id="P1">')[1].split("</part>")[0];
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+        expect(pitched).toContain("<step>C</step>");
+        expect(pitched).toContain("<step>D</step>");
+        expect(pitched).not.toContain("<unpitched>");
+        expect(percussion.match(/<unpitched>/g)).toHaveLength(2);
+        expect(percussion).toContain('<instrument id="D1-X1"/>');
+        expect(percussion).toContain('<instrument id="D1-X2"/>');
+        expect(output).toContain("<midi-unpitched>37</midi-unpitched>");
+        expect(output.indexOf('<score-instrument id="D1-X2">')).toBeLessThan(
+            output.indexOf('<midi-instrument id="D1-X1">')
+        );
+    });
+
+    it("keeps a silent interval before a later drum hit", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["R"], 4, 0, null, null, false, false, null],
+                        [["R"], 4, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(/<rest\/>\s*<duration>8<\/duration>/);
+        expect(percussion).toMatch(/<\/unpitched>\s*<duration>8<\/duration>/);
+    });
+
+    it("exports an unmapped custom drum without an invalid MIDI assignment", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[["R"], 4, 0, null, null, false, false, "https://example.org/#12&x"]]
+                }
+            }
+        });
+
+        expect(output).toContain("<unpitched>");
+        expect(output).toContain("<instrument-name>Percussion</instrument-name>");
+        expect(output).not.toContain("<midi-unpitched>");
+        expect(output).not.toContain("example.org");
+    });
+
     it.each([
         [445, "A", "<alter>0.196</alter>"],
         [470, "B", "<alter>-0.858</alter>"],
@@ -64,6 +166,21 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain("<part-list>");
         expect(output).toContain('<score-part id="P1">');
         expect(output).toContain('<part id="P1">');
+    });
+
+    it("should export crescendo marks and stop them correctly", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["begin crescendo", [["C4"], 4, 0], "end crescendo"]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain('<wedge type="crescendo"/>');
+        expect(output).toContain('<wedge type="stop"/>');
     });
 
     it("should express a quarter note using divisions per quarter note", () => {
@@ -279,7 +396,7 @@ describe("saveMxmlOutput", () => {
 
         expect(output).not.toContain("<duration>32</duration>");
         // The internal divisions-per-whole-note resolution scales to 96, which MusicXML
-        // represents as 24 divisions per quarter note. The exact duration remains 8.
+        // represents as 24 divisions per quarter note (96 / 4 = 24). The exact duration remains 8.
         expect(output).toContain("<divisions>24</divisions>");
         expect(output).toContain("<duration>8</duration>");
         expect(output).toContain("<step>C</step>");
@@ -312,6 +429,7 @@ describe("saveMxmlOutput", () => {
         // A note reducing to a 3:2 tuplet and one reducing to a 5:2 tuplet in the same
         // voice both need to divide the voice's divisions-per-whole-note evenly;
         // scaling by their LCM (15) rather than just one of them keeps both exact.
+        // MusicXML divisions element expresses divisions per quarter note (480 / 4 = 120).
         const tripletEighth = [["C4"], 1, 0, [3, 4], 8];
         const quintupletEighth = [["D4"], 1, 0, [5, 4], 8];
         const logo = {
@@ -568,6 +686,90 @@ describe("saveMxmlOutput", () => {
         expect(output).not.toContain('<score-part id="P2">');
         expect(output).not.toContain('<part id="P2">');
     });
+
+    it("should emit divisions per quarter note (8) for standard non-tuplet notes", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<divisions>8</divisions>");
+        expect(output).toContain("<duration>8</duration>");
+    });
+
+    it("should maintain divisions per quarter note (8) and correct measure boundaries on meter change", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "meter",
+                        3,
+                        4,
+                        [["C4"], 4, 0],
+                        [["D4"], 4, 0],
+                        [["E4"], 4, 0],
+                        [["F4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        const measures = output.match(/<measure[\s\S]*?<\/measure>/g) || [];
+        expect(measures).toHaveLength(2);
+
+        const [measure1, measure2] = measures;
+
+        expect(measure1).toContain('<measure number="1">');
+        expect(measure1).toContain("<divisions>8</divisions>");
+        expect(measure1).toContain("<beats>3</beats>");
+        expect(measure1).toContain("<beat-type>4</beat-type>");
+        expect(measure1.match(/<note>/g) || []).toHaveLength(3);
+        expect(measure1).toContain("<step>C</step>");
+        expect(measure1).toContain("<step>D</step>");
+        expect(measure1).toContain("<step>E</step>");
+
+        expect(measure2).toContain('<measure number="2">');
+        expect(measure2.match(/<note>/g) || []).toHaveLength(1);
+        expect(measure2).toContain("<step>F</step>");
+    });
+
+    it.each([
+        ["C♯4", "C", "1", "4"],
+        ["D♭4", "D", "-1", "4"],
+        ["C𝄪4", "C", "2", "4"],
+        ["D𝄫4", "D", "-2", "4"],
+        ["F♯♯10", "F", "2", "10"],
+        ["G♭♭-1", "G", "-2", "-1"],
+        ["A##5", "A", "2", "5"],
+        ["Cx4", "C", "2", "4"],
+        ["C*4", "C", "2", "4"],
+        ["Bbb3", "B", "-2", "3"],
+        ["C♮4", "C", null, "4"],
+        ["C", "C", null, "4"]
+    ])("should preserve %s accidentals and octave in MusicXML", (note, step, alter, octave) => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[[note], 4, 0]]
+                }
+            }
+        });
+
+        expect(output).toContain(`<step>${step}</step>`);
+        expect(output).toContain(`<octave>${octave}</octave>`);
+        if (alter === null) {
+            expect(output).not.toContain("<alter>");
+        } else {
+            expect(output).toContain(`<alter>${alter}</alter>`);
+        }
+    });
 });
 
 describe("saveMxmlOutput notation markers", () => {
@@ -613,7 +815,8 @@ describe("saveMxmlOutput notation markers", () => {
         ["end slur"],
         ["tie"],
         ["begin harmonics"],
-        ["end harmonics"]
+        ["end harmonics"],
+        ["begin repeat"]
     ].flat();
 
     it("never renders a staged marker as a note", () => {
@@ -1034,5 +1237,272 @@ describe("saveMxmlOutput notation markers", () => {
         expect(doc.getElementsByTagName("score-part")).toHaveLength(1);
         expect(doc.getElementsByTagName("part")).toHaveLength(1);
         expect(measuresOf(doc).length).toBeGreaterThan(0);
+    });
+});
+
+describe("saveMxmlOutput - unpitched notes carry a staff position", () => {
+    const drumNote = drum => [["R"], 4, 0, null, null, false, false, drum];
+
+    it("gives every unpitched note a display step and octave", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: [drumNote("snare drum"), drumNote("kick drum")] }
+            }
+        });
+
+        const unpitched = output.match(/<unpitched>[\s\S]*?<\/unpitched>/g);
+        expect(unpitched).toHaveLength(2);
+        unpitched.forEach(element => {
+            expect(element).toMatch(/<display-step>[A-G]<\/display-step>/);
+            expect(element).toMatch(/<display-octave>\d<\/display-octave>/);
+        });
+    });
+
+    it("never writes an empty unpitched element", () => {
+        const output = saveMxmlOutput({
+            notation: { notationStaging: { 0: [drumNote("snare drum")] } }
+        });
+
+        expect(output).not.toContain("<unpitched/>");
+        expect(output).not.toMatch(/<unpitched>\s*<\/unpitched>/);
+    });
+});
+
+describe("saveMxmlOutput - key signature", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, false, false, null];
+    const fifthsIn = staging =>
+        (saveMxmlOutput({ notation: { notationStaging: { 0: staging } } }).match(
+            /<fifths>(-?\d+)<\/fifths>/
+        ) || [])[1];
+
+    it.each([
+        ["C", "major", "0"],
+        ["G", "major", "1"],
+        ["D", "major", "2"],
+        ["F", "major", "-1"],
+        ["Bb", "major", "-2"],
+        ["A", "minor", "0"],
+        ["A", "m", "0"],
+        ["E", "minor", "1"],
+        ["D", "dorian", "0"],
+        ["G", "mixolydian", "0"],
+        ["F", "lydian", "0"],
+        ["G#", "minor", "5"],
+        ["A#", "minor", "7"],
+        // Minor variants
+        ["A", "harmonic minor", "0"],
+        ["A", "melodic minor", "0"],
+        ["A", "jazz minor", "0"],
+        // Pentatonics
+        ["C", "major pentatonic", "0"],
+        ["A", "minor pentatonic", "0"],
+        ["A", "minyo", "0"],
+        ["C", "chinese", "0"],
+        ["C", "egyptian", "0"],
+        ["A", "hirajoshi", "0"],
+        ["A", "in", "0"],
+        // Blues
+        ["C", "major blues", "0"],
+        ["A", "minor blues", "0"]
+    ])("writes %s %s as fifths %s", (key, mode, expected) => {
+        expect(fifthsIn(["key", key, mode, note("C4")])).toBe(expected);
+    });
+
+    it("reads a flat written as a sign", () => {
+        expect(fifthsIn(["key", "B♭", "major", note("C4")])).toBe("-2");
+    });
+
+    it("stays where it was for a mode with no signature of its own", () => {
+        // whole tone has no key signature — should leave the score in C (0)
+        expect(fifthsIn(["key", "C", "whole tone", note("C4")])).toBe("0");
+    });
+
+    it("stays where it was for a key that cannot be written without double accidentals", () => {
+        expect(fifthsIn(["key", "G#", "major", note("C4")])).toBe("0");
+    });
+
+    it("defaults to C when nothing staged a key", () => {
+        expect(fifthsIn([note("C4")])).toBe("0");
+    });
+});
+
+describe("saveMxmlOutput - a key change part way through", () => {
+    const note = (pitch, value = 4) => [[pitch], value, 0, null, null, false, false, null];
+    const exportOf = staging => saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+
+    // Every <fifths> the export writes, in order.
+    const fifthsIn = output => [...output.matchAll(/<fifths>(-?\d+)<\/fifths>/g)].map(m => m[1]);
+
+    it("writes the new signature when a key changes at a measure boundary", () => {
+        const output = exportOf([
+            "key",
+            "C",
+            "major",
+            note("C4", 1),
+            "key",
+            "G",
+            "major",
+            note("D4", 1)
+        ]);
+
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+
+    it("writes the new signature when a key changes inside a measure", () => {
+        const output = exportOf(["key", "C", "major", note("C4"), "key", "G", "major", note("D4")]);
+
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+
+    it("writes the signature once when the key does not change", () => {
+        const output = exportOf(["key", "G", "major", note("C4"), note("D4"), note("E4")]);
+
+        expect(fifthsIn(output)).toEqual(["1"]);
+    });
+
+    it("writes a key change that lands on the same measure as a meter change", () => {
+        const output = exportOf([note("C4", 1), "key", "G", "major", "meter", 3, 4, note("D4", 1)]);
+
+        // The measure attributes carry the signature, so it is not written twice.
+        expect(fifthsIn(output)).toEqual(["0", "1"]);
+    });
+});
+
+describe("saveMxmlOutput - short notes keep whole-number durations", () => {
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato, drum]
+    const note = (value, dots = 0) => [["G4"], value, dots, null, null, false, false, null];
+
+    const durationsOf = staging => {
+        const output = saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+        return [...output.matchAll(/<duration>([^<]+)<\/duration>/g)].map(m => m[1]);
+    };
+
+    it("writes a sixty-fourth note as a whole number", () => {
+        expect(durationsOf([note(64)])).toEqual(["1"]);
+    });
+
+    it("writes a dotted thirty-second note as a whole number", () => {
+        expect(durationsOf([note(32, 1)])).toEqual(["3"]);
+    });
+
+    it("never writes a fractional duration", () => {
+        const staging = [note(4), note(8), note(16), note(32), note(64)];
+        durationsOf(staging).forEach(d => expect(d).toMatch(/^\d+$/));
+    });
+
+    it("keeps the durations in proportion", () => {
+        const [quarter, eighth, sixteenth, thirtySecond, sixtyFourth] = durationsOf([
+            note(4),
+            note(8),
+            note(16),
+            note(32),
+            note(64)
+        ]).map(Number);
+
+        expect(quarter).toBe(eighth * 2);
+        expect(eighth).toBe(sixteenth * 2);
+        expect(sixteenth).toBe(thirtySecond * 2);
+        expect(thirtySecond).toBe(sixtyFourth * 2);
+    });
+
+    it("leaves a voice of ordinary note values on the grid it already used", () => {
+        const output = saveMxmlOutput({
+            notation: { notationStaging: { 0: [note(4), note(8), note(16)] } }
+        });
+
+        expect(output).toContain("<divisions>8</divisions>");
+    });
+});
+
+describe("saveMxmlOutput - forever repeats", () => {
+    const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, false, false];
+    const drum = (name, noteValue = 4) => [[], noteValue, 0, null, null, false, false, name];
+
+    const exportVoice = staged => {
+        const xml = saveMxmlOutput({ notation: { notationStaging: { 0: staged } } });
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+        return doc;
+    };
+
+    // Each measure's barlines as "location:direction", in document order.
+    const barlinesOf = measure =>
+        Array.from(measure.getElementsByTagName("barline")).map(barline => {
+            const repeat = barline.getElementsByTagName("repeat")[0];
+            return `${barline.getAttribute("location") || "plain"}:${
+                repeat ? repeat.getAttribute("direction") : "none"
+            }`;
+        });
+    const measuresOf = doc => Array.from(doc.getElementsByTagName("measure"));
+    const stepsOf = measure =>
+        Array.from(measure.getElementsByTagName("step")).map(s => s.textContent);
+
+    it("wraps the notes after a forever in repeat barlines", () => {
+        const measures = measuresOf(exportVoice(["begin repeat", note("G4"), note("E4")]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["left:forward", "right:backward"]);
+        expect(stepsOf(measures[0])).toEqual(["G", "E"]);
+    });
+
+    it("splits the measure where a forever starts mid-measure", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat", note("G4")]));
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps later barlines on the beat after a mid-measure split", () => {
+        const measures = measuresOf(
+            exportVoice([
+                note("C4"),
+                note("C4"),
+                note("C4"),
+                "begin repeat",
+                note("D4"),
+                note("E4"),
+                note("F4"),
+                note("G4")
+            ])
+        );
+
+        // In 4/4 the D finishes the first measure, so E F G start the next one.
+        expect(measures.map(stepsOf)).toEqual([["C", "C", "C"], ["D"], ["E", "F", "G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes", null]);
+        expect(measures.map(barlinesOf)).toEqual([[], ["left:forward"], ["right:backward"]]);
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        const measures = measuresOf(
+            exportVoice(["begin repeat", note("C4"), "begin repeat", note("G4")])
+        );
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("gives a drum part the same repeat", () => {
+        const doc = exportVoice(["begin repeat", drum("snare drum"), drum("kick drum")]);
+        const part = doc.getElementsByTagName("part")[0];
+
+        expect(part.getAttribute("id")).toBe("D1");
+        expect(barlinesOf(measuresOf(doc)[0])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps the plain final barline when no notes follow the forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat"]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
+    });
+
+    it("writes no repeat barlines without a forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), note("G4")]));
+
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
     });
 });
