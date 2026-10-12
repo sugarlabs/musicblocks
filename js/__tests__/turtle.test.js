@@ -459,6 +459,20 @@ describe("Turtle stopBlink()", () => {
         jest.useRealTimers();
     });
 
+    it("restores visibility when a blink completes normally", () => {
+        jest.useFakeTimers();
+        turtle.listeners = {};
+
+        turtle.blink(16, 50);
+        jest.advanceTimersByTime(100);
+
+        expect(turtle._blinkTimeout).toBeNull();
+        expect(turtle._blinkFinished).toBe(true);
+        expect(turtle.container.visible).toBe(true);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
+        jest.useRealTimers();
+    });
+
     it("leaves a turtle that is not blinking untouched", () => {
         turtle._blinkTimeout = null;
         turtle._blinkFinished = true;
