@@ -3357,6 +3357,51 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth.sampleLoader.samples.voice).toBeDefined();
         });
 
+        test("loadSampleAsync shares one load between concurrent callers", async () => {
+            const originalRequirejs = global.requirejs;
+            try {
+                synth.loadSamples();
+                synth.samples.voice["violin"] = null;
+                window.VIOLIN_SAMPLE = () => "mock_violin_data";
+                let finish;
+                global.requirejs = jest.fn((deps, cb) => {
+                    finish = cb;
+                });
+
+                const first = synth.sampleLoader.loadSampleAsync("violin");
+                const second = synth.sampleLoader.loadSampleAsync("violin");
+
+                expect(second).toBe(first);
+                expect(global.requirejs).toHaveBeenCalledTimes(1);
+
+                finish();
+                await expect(first).resolves.toBeUndefined();
+                await Promise.resolve();
+                expect(synth.sampleLoader._pendingLoads.violin).toBeUndefined();
+            } finally {
+                global.requirejs = originalRequirejs;
+            }
+        });
+
+        test("loadSampleAsync tries again after a failed load", async () => {
+            const originalRequirejs = global.requirejs;
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            try {
+                synth.loadSamples();
+                synth.samples.voice["violin"] = null;
+                global.requirejs = jest.fn((deps, cb, errback) => errback("network"));
+
+                await expect(synth.sampleLoader.loadSampleAsync("violin")).rejects.toBe("network");
+                await Promise.resolve();
+                await expect(synth.sampleLoader.loadSampleAsync("violin")).rejects.toBe("network");
+
+                expect(global.requirejs).toHaveBeenCalledTimes(2);
+            } finally {
+                global.requirejs = originalRequirejs;
+                consoleSpy.mockRestore();
+            }
+        });
+
         test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
             synth.sampleLoader.loadSampleAsync = jest.fn().mockImplementation(name => {
                 if (name === "failing_sample")

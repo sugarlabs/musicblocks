@@ -522,6 +522,8 @@ const transport = {
 class SampleLoader {
     constructor() {
         this.samples = null;
+        // Loads still in flight, by sample name, so concurrent callers share one.
+        this._pendingLoads = {};
     }
 
     initStructures() {
@@ -539,7 +541,11 @@ class SampleLoader {
 
     loadSampleAsync(sampleName) {
         this.initStructures();
-        return new Promise((resolve, reject) => {
+        if (this._pendingLoads[sampleName]) {
+            return this._pendingLoads[sampleName];
+        }
+
+        const promise = new Promise((resolve, reject) => {
             let found = false;
             let sampleType = null;
             let sampleInfo = null;
@@ -592,6 +598,15 @@ class SampleLoader {
                 }
             );
         });
+
+        this._pendingLoads[sampleName] = promise;
+        const settle = () => {
+            if (this._pendingLoads[sampleName] === promise) {
+                delete this._pendingLoads[sampleName];
+            }
+        };
+        promise.then(settle, settle);
+        return promise;
     }
 
     async preloadProject(blockList) {
