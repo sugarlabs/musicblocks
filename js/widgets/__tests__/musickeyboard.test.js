@@ -1673,6 +1673,115 @@ describe("MusicKeyboard core logic", () => {
         });
     });
 
+    describe("the tempo it plays and saves at (#9337)", () => {
+        let origWidgetWindows, origSinger, turtles, mockActivity;
+
+        beforeEach(() => {
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({ append: jest.fn(), style: {} })
+            };
+            origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+            origSinger = global.Singer;
+            global.Singer = { masterBPM: 90 };
+            // After a project is loaded, turtle 0 is a trashed turtle of the old project and
+            // the project runs on turtle 1, which set 120 BPM.
+            turtles = [{ singer: { bpm: [] } }, { singer: { bpm: [120] } }];
+            mockActivity = {
+                turtles: { ithTurtle: jest.fn(i => turtles[i]) },
+                logo: { synth: { stopSound: jest.fn() } }
+            };
+        });
+
+        afterEach(() => {
+            global.window.widgetWindows = origWidgetWindows;
+            global.Singer = origSinger;
+        });
+
+        test("uses the tempo of the turtle that ran the block, not turtle 0", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(120);
+            expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+        });
+
+        test("uses that turtle's latest tempo", () => {
+            turtles[1].singer.bpm = [120, 75];
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(75);
+        });
+
+        test("uses the master tempo when that turtle hasn't set one", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[0];
+
+            keyboard._createWidgetWindow();
+
+            expect(keyboard.bpm).toBe(90);
+        });
+
+        test("uses turtle 0 when it doesn't know the turtle", () => {
+            turtles[0].singer.bpm = [100];
+            const keyboard = new MusicKeyboard(mockActivity);
+
+            keyboard._createWidgetWindow();
+
+            expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+            expect(keyboard.bpm).toBe(100);
+        });
+
+        test("lays out its keys in that turtle's key signature", () => {
+            const origNoteToFrequency = global.noteToFrequency;
+            const origConvertFromSolfege = global.convertFromSolfege;
+            global.noteToFrequency = jest.fn().mockReturnValue(392);
+            global.convertFromSolfege = jest.fn(name => name);
+            turtles[0].singer.keySignature = "C major";
+            turtles[1].singer.keySignature = "D minor";
+
+            try {
+                const keyboard = new MusicKeyboard(mockActivity);
+                keyboard.turtle = turtles[1];
+                keyboard.noteNames = ["sol"];
+                keyboard.octaves = [4];
+                keyboard._rowBlocks = [44];
+                keyboard.instruments = ["guitar"];
+
+                keyboard._keysLayout();
+
+                expect(global.noteToFrequency).toHaveBeenCalledWith("sol4", "D minor");
+                expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            } finally {
+                global.noteToFrequency = origNoteToFrequency;
+                global.convertFromSolfege = origConvertFromSolfege;
+            }
+        });
+
+        test("lets go of the turtle when it is closed", () => {
+            const keyboard = new MusicKeyboard(mockActivity);
+            keyboard.turtle = turtles[1];
+            keyboard._createWidgetWindow();
+
+            window.widgetWindows.windowFor().onclose();
+
+            expect(keyboard.turtle).toBeNull();
+        });
+    });
+
     describe("Web MIDI cleanup on widget close", () => {
         test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
             const mockInput1 = { onmidimessage: jest.fn() };
@@ -2482,5 +2591,69 @@ describe("MusicKeyboard sequencer matrix, note tracking, and chord grouping", ()
             gridCell00.onmouseover();
             expect(gridCell00.style.backgroundColor).toBe("black"); // Stays unchanged
         });
+    });
+});
+
+describe("MusicKeyboard rest key pointer handler", () => {
+    let keyboard, element, originalPlatformColor;
+
+    const listener = type => element.addEventListener.mock.calls.find(call => call[0] === type)[1];
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 0, 1, 0, 0, 0));
+        originalPlatformColor = global.platformColor;
+        global.platformColor = { orange: "orange" };
+        delete localStorage.beginnerMode;
+
+        keyboard = new MusicKeyboard({
+            logo: { synth: { trigger: jest.fn(), stopSound: jest.fn() } }
+        });
+        keyboard._notesPlayed = [];
+        keyboard._createTable = jest.fn();
+        keyboard._updateWidgetWindowSize = jest.fn();
+        element = {
+            id: "rest",
+            addEventListener: jest.fn(),
+            style: {},
+            setPointerCapture: jest.fn(),
+            dispatchEvent: jest.fn()
+        };
+        keyboard.loadRestHandler(element);
+    });
+
+    afterEach(() => {
+        global.platformColor = originalPlatformColor;
+        jest.useRealTimers();
+    });
+
+    test("records a rest lasting as long as the key was held", () => {
+        const start = Date.now();
+        listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
+        expect(element.style.backgroundColor).toBe("orange");
+
+        jest.advanceTimersByTime(500);
+        listener("pointerup")();
+
+        expect(keyboard._notesPlayed).toEqual([
+            { startTime: start, noteOctave: "R", objId: null, duration: 0.5 }
+        ]);
+        expect(element.style.backgroundColor).toBe("white");
+        expect(keyboard._createTable).toHaveBeenCalled();
+        expect(keyboard.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("records the rest when the pointer is cancelled mid-press", () => {
+        listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
+        listener("pointercancel")();
+
+        expect(keyboard._notesPlayed).toHaveLength(1);
+        expect(keyboard._notesPlayed[0].noteOctave).toBe("R");
+    });
+
+    test("ignores a release that was not preceded by a press", () => {
+        listener("pointerup")();
+
+        expect(keyboard._notesPlayed).toEqual([]);
     });
 });

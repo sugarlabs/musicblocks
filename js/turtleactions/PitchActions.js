@@ -84,6 +84,7 @@ function setupPitchActions(activity) {
             if (
                 !activity.logo.inMatrix &&
                 !activity.logo.inMusicKeyboard &&
+                !activity.logo.inPitchDrumMatrix &&
                 tur.singer.inNoteBlock.length === 0
             ) {
                 // If there was no previous pitch, use default.
@@ -784,7 +785,7 @@ function setupPitchActions(activity) {
                     direction === "up"
                         ? getStepSizeUp(tur.singer.keySignature, pitch, undefined, temp)
                         : getStepSizeDown(tur.singer.keySignature, pitch, undefined, temp);
-                return typeof step === "number" && !isNaN(step) ? step : 1;
+                return Number.isFinite(step) ? step : 1;
             };
 
             if (tur.singer.lastNotePlayed !== null) {

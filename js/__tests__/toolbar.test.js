@@ -801,6 +801,7 @@ describe("Toolbar Class", () => {
                 }
             },
             "toggleAuxBtn": {
+                onclick: null,
                 className: "tooltipped aux-toggle",
                 classList: {
                     add: jest.fn(),
@@ -820,8 +821,11 @@ describe("Toolbar Class", () => {
         const mockOnClick = jest.fn();
         toolbar.activity = {};
         toolbar.renderMenuIcon(mockOnClick);
-        expect(elements.menu.onclick).toBeInstanceOf(Function);
-        const clickHandler = elements.menu.onclick;
+
+        expect(elements.toggleAuxBtn.onclick).toBeInstanceOf(Function);
+        expect(elements.menu.onclick).toBeNull();
+
+        const clickHandler = elements.toggleAuxBtn.onclick;
 
         elements["aux-toolbar"].style.display = "none";
         clickHandler();

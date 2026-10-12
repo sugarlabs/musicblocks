@@ -65,6 +65,7 @@ const _KNOWN_URL_PARAMS = new Set([
     "music",
     "outurl",
     "performance",
+    "repo",
     "run",
     "show",
     "turtle"
@@ -206,8 +207,8 @@ class ProjectManager {
                         "font-size: 16px; font-family: sans-serif; font-weight: bold;"
                     );
                 }
-                that.keyboardEnableFlag = 1;
             }
+            that.keyboardEnableFlag = 1;
 
             pubsub.off("finishedLoading", __afterLoad);
         };
@@ -1203,6 +1204,7 @@ class ProjectManager {
             () => {
                 const reader = new FileReader();
                 const midiReader = new FileReader();
+                const abcReader = new FileReader();
 
                 reader.onload = () => {
                     that.loading = true;
@@ -1283,12 +1285,38 @@ class ProjectManager {
                     }
                 };
 
+                abcReader.onload = async event => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+                    try {
+                        const abcData =
+                            (event && event.target && event.target.result) || abcReader.result;
+
+                        await ensureABCJS();
+                        const tunebook = new ABCJS.parseOnly(abcData);
+
+                        debugLog(tunebook);
+                        await Promise.all(tunebook.map(tune => that.parseABC(tune)));
+                        finishLoading();
+                    } catch (e) {
+                        ErrorHandler.capture(e, { operation: "abcImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    }
+                };
+
                 const file = that.fileChooser.files[0];
                 if (file) {
                     const extension = file.name.split(".").pop().toLowerCase();
                     const isMidi = extension === "mid" || extension === "midi";
+                    const isABC = extension === "abc";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
+                    } else if (isABC) {
+                        abcReader.readAsText(file);
                     } else {
                         reader.readAsText(file);
                     }
@@ -1491,6 +1519,8 @@ class ProjectManager {
 
         if (params.has("id")) {
             that.projectID = params.get("id");
+        } else if (params.has("repo")) {
+            that.projectID = params.get("repo");
         }
 
         const isTrue = name => (params.get(name) || "").toLowerCase() === "true";

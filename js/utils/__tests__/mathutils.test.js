@@ -150,6 +150,10 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doRandom("do", "sol", NaN)).toThrow("NanError");
         });
 
+        test.each([Infinity, -Infinity])("rejects a non-finite octave %p", octave => {
+            expect(() => MathUtility.doRandom("do", "sol", octave)).toThrow("NanError");
+        });
+
         test("still accepts an undefined octave after the NaN guard", () => {
             const result = MathUtility.doRandom("do", "mi", undefined);
             expect(result).toHaveLength(2);
@@ -161,6 +165,18 @@ describe("MathUtility", () => {
         test("returns either a or b", () => {
             const result = MathUtility.doOneOf("a", "b");
             expect(["a", "b"]).toContain(result);
+        });
+
+        test("returns a when Math.random is below 0.5", () => {
+            const spy = jest.spyOn(Math, "random").mockReturnValue(0.4);
+            expect(MathUtility.doOneOf("a", "b")).toBe("a");
+            spy.mockRestore();
+        });
+
+        test("returns b when Math.random is 0.5 or above", () => {
+            const spy = jest.spyOn(Math, "random").mockReturnValue(0.5);
+            expect(MathUtility.doOneOf("a", "b")).toBe("b");
+            spy.mockRestore();
         });
 
         // Edge case tests
@@ -228,6 +244,12 @@ describe("MathUtility", () => {
 
         test("throws error when second arg is string", () => {
             expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
+        });
+
+        test("throws NanError when divisor is null (not a typeof number)", () => {
+            // Number(null) === 0, but null is not typeof 'number',
+            // so the DivByZeroError branch must NOT fire; NanError must be thrown.
+            expect(() => MathUtility.doMod(5, null)).toThrow("NanError");
         });
     });
 
@@ -306,10 +328,14 @@ describe("MathUtility", () => {
 
         test("throws NanError when the non-string operand is null", () => {
             expect(() => MathUtility.doPlus(null, "5")).toThrow("NanError");
+            // Symmetric: null on the right-hand side must also throw.
+            expect(() => MathUtility.doPlus("5", null)).toThrow("NanError");
         });
 
         test("throws NanError when the non-string operand is undefined", () => {
             expect(() => MathUtility.doPlus("5", undefined)).toThrow("NanError");
+            // Symmetric: undefined on the left-hand side must also throw.
+            expect(() => MathUtility.doPlus(undefined, "5")).toThrow("NanError");
         });
     });
 
@@ -477,6 +503,14 @@ describe("MathUtility", () => {
 
         test("throws NanError for string divisor", () => {
             expect(() => MathUtility.doDivide(6, "2")).toThrow("NanError");
+        });
+
+        test("throws NanError for valid number divided by missing argument", () => {
+            expect(() => MathUtility.doDivide(10)).toThrow("NanError");
+        });
+
+        test("throws NanError when divisor is null (not a typeof number)", () => {
+            expect(() => MathUtility.doDivide(5, null)).toThrow("NanError");
         });
     });
 
@@ -757,8 +791,13 @@ describe("MathUtility", () => {
     });
 
     describe("doCalculateDistance", () => {
-        test("returns 0 when both points are the same", () => {
+        test("returns 0 when both points are the same without invoking Math.hypot", () => {
+            // The early-return optimisation (x1===x2 && y1===y2) must execute
+            // before Math.hypot is called so that the branch is not dead code.
+            const spy = jest.spyOn(Math, "hypot");
             expect(MathUtility.doCalculateDistance(3, 4, 3, 4)).toBe(0);
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
         });
 
         test("calculates distance for a 3-4-5 right triangle", () => {

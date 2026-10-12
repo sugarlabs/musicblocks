@@ -580,7 +580,10 @@ const GitTutorial = (() => {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 0;
+    box-sizing: border-box;
     background: rgba(0,0,0,0.45);
     font-family: 'Nunito', sans-serif;
     animation: gt-fade-in 0.2s ease;
@@ -599,6 +602,15 @@ const GitTutorial = (() => {
     flex-direction: column;
     position: relative;
     animation: gt-slide-up 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@media (max-height: 640px) {
+    #git-tutorial-overlay {
+        padding: 16px 0;
+    }
+    #git-tutorial-shell {
+        margin: 0 auto;
+    }
 }
 
 /* Top bar */

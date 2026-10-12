@@ -540,4 +540,155 @@ describe("Activity Toolbar Integration", () => {
             expect(global.cancelAnimationFrame).toHaveBeenCalledWith(99);
         });
     });
+
+    describe("sendAllToTrash and pasted Object.keys loop execution", () => {
+        test("sendAllToTrash iterates Object.keys on palettes and blockList to move blocks to trash", () => {
+            const hideMenu = jest.fn();
+            activity.palettes = { dict: { rhythm: { hideMenu } } };
+            const mockBlock = {
+                connections: [null],
+                name: "pitch",
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            };
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [mockBlock],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(() => "preview"),
+                trashPreviews: {},
+                trashStacks: [],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+            activity.blocksContainer = { x: 50, y: 50 };
+            activity.refreshCanvas = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(activity.blocksContainer.x).toBe(0);
+            expect(activity.blocksContainer.y).toBe(0);
+            expect(hideMenu).toHaveBeenCalledWith(true);
+            expect(activity.blocks._beginDeferCheckBounds).toHaveBeenCalled();
+            expect(activity.blocks._endDeferCheckBounds).toHaveBeenCalled();
+            expect(mockBlock.trash).toBe(true);
+            expect(mockBlock.hide).toHaveBeenCalled();
+            expect(mockBlock.container.uncache).toHaveBeenCalled();
+            expect(activity.blocks.trashStacks).toContain("0");
+            expect(activity.blocks.trashPreviews["0"]).toBe("preview");
+        });
+
+        test("sendAllToTrash does not record blocks that are already in the trash again", () => {
+            activity.palettes = { dict: {} };
+            const makeBlock = trash => ({
+                connections: [null],
+                name: "pitch",
+                trash,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            });
+            const trashed = makeBlock(true);
+            const live = makeBlock(false);
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [trashed, null, live],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(() => "preview"),
+                trashPreviews: {},
+                trashStacks: ["0"],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+            activity.blocksContainer = { x: 0, y: 0 };
+            activity.refreshCanvas = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(activity.blocks.trashStacks).toEqual(["0", "2"]);
+            expect(activity.blocks.captureStackPreview).toHaveBeenCalledTimes(1);
+            expect(activity.blocks.moveBlockRelative).toHaveBeenCalledTimes(1);
+            expect(trashed.hide).not.toHaveBeenCalled();
+            expect(live.trash).toBe(true);
+        });
+
+        test("sendAllToTrash hides the turtle of a start block and removes an action", () => {
+            activity.palettes = { dict: {} };
+            const makeBlock = (name, value) => ({
+                connections: [null],
+                name,
+                value,
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            });
+            const start = makeBlock("start", 0);
+            const action = makeBlock("action", null);
+            const turtle = { inTrash: false, container: { visible: true }, companionTurtle: null };
+            activity.turtles = { getTurtle: jest.fn(() => turtle) };
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [start, action],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(),
+                deleteActionBlock: jest.fn(),
+                trashPreviews: {},
+                trashStacks: [],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+            activity.blocksContainer = { x: 0, y: 0 };
+            activity.refreshCanvas = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(turtle.inTrash).toBe(true);
+            expect(turtle.container.visible).toBe(false);
+            expect(activity.blocks.deleteActionBlock).toHaveBeenCalledWith(action);
+        });
+
+        test("clearCache skips empty and trashed slots in blockList", () => {
+            const makeBlock = trash => ({
+                trash,
+                container: { uncache: jest.fn(), cache: jest.fn() },
+                bitmap: { uncache: jest.fn(), cache: jest.fn() }
+            });
+            const live = makeBlock(false);
+            const trashed = makeBlock(true);
+            activity.blocks = { blockList: [null, live, trashed] };
+
+            expect(() => activity.clearCache()).not.toThrow();
+            expect(live.container.cache).toHaveBeenCalled();
+            expect(live.bitmap.cache).toHaveBeenCalled();
+            expect(trashed.container.cache).not.toHaveBeenCalled();
+        });
+
+        test("pasted iterates Object.keys on palettes.dict and loads blocks", () => {
+            const hideMenu = jest.fn();
+            activity.palettes = { dict: { rhythm: { hideMenu } } };
+            activity.blocks = { loadNewBlocks: jest.fn() };
+            activity.pasteBox = { hide: jest.fn() };
+            activity.refreshCanvas = jest.fn();
+
+            const pasteElem = { value: JSON.stringify([{ name: "pitch" }]) };
+            document.getElementById = jest.fn(id => (id === "paste" ? pasteElem : null));
+
+            activity.pasted();
+
+            expect(hideMenu).toHaveBeenCalledWith(true);
+            expect(activity.refreshCanvas).toHaveBeenCalled();
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "pitch" }]);
+            expect(activity.pasteBox.hide).toHaveBeenCalled();
+        });
+    });
 });

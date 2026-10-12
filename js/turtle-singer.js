@@ -131,6 +131,12 @@ class Singer {
         }
         this._unhighlightTimers = {};
 
+        // Each run sets its own panning.
+        if (this.panner) {
+            this.panner.dispose();
+            this.panner = null;
+        }
+
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
         /** @deprecated */ this.decay = [];
@@ -595,11 +601,9 @@ class Singer {
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
+        // Logo skips these signals by index once the counting run ends.
         for (const b in tur.endOfClampSignals) {
-            tur.butNotThese[b] = [];
-            for (const i of tur.endOfClampSignals[b]) {
-                tur.butNotThese[b].push(i);
-            }
+            tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
         }
 
         const actionArgs = [];
@@ -702,7 +706,7 @@ class Singer {
         tur.singer.justCounting.push(true);
 
         Object.keys(tur.endOfClampSignals).forEach(b => {
-            tur.butNotThese[b] = Object.keys(tur.endOfClampSignals[b]);
+            tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
         });
 
         tur.running = true;
@@ -992,6 +996,12 @@ class Singer {
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
+            // Step Pitch steps from the row before, as in the Phrase Maker. Only a pitch row
+            // counts, not a rest or a drum column.
+            if (!["rest", "r"].includes(note.toLowerCase()) && tur.singer.drumStyle.length === 0) {
+                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                tur.singer.lastNotePlayed = [nnote[0] + nnote[1], 4];
+            }
             nnote[0] = noteIsSolfege(note)
                 ? getSolfege(
                       nnote[0],
@@ -1345,39 +1355,12 @@ class Singer {
                 activity.logo.synth.inTemperament
             );
 
-            for (let i = 0; i < activity.logo.pitchStaircase.Stairs.length; i++) {
-                if (activity.logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                    activity.logo.pitchStaircase.Stairs.splice(i, 0, [
-                        noteObj1[0],
-                        noteObj1[1],
-                        parseFloat(frequency),
-                        1,
-                        1
-                    ]);
-                    return;
-                }
-
-                if (activity.logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                    activity.logo.pitchStaircase.Stairs.splice(i, 1, [
-                        noteObj1[0],
-                        noteObj1[1],
-                        parseFloat(frequency),
-                        1,
-                        1
-                    ]);
-                    return;
-                }
-            }
-
-            activity.logo.pitchStaircase.Stairs.push([
+            activity.logo.pitchStaircase.addStair(
                 noteObj1[0],
                 noteObj1[1],
                 parseFloat(frequency),
-                1,
-                1
-            ]);
-
-            activity.logo.pitchStaircase.stairPitchBlocks.push(blk);
+                blk
+            );
         } else if (activity.logo.inMusicKeyboard) {
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
@@ -2388,15 +2371,23 @@ class Singer {
                                 activity.logo.runningAbc ||
                                 activity.logo.runningMIDI
                             ) {
-                                activity.logo.notationMIDI(
-                                    chordNotes,
-                                    chordDrums,
-                                    d,
-                                    turtle,
-                                    bpmValue || 90,
-                                    last(tur.singer.instrumentNames)
-                                );
-                                activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
+                                if (typeof d === "number" && d > 0 && isFinite(d)) {
+                                    activity.logo.notationMIDI(
+                                        chordNotes,
+                                        chordDrums,
+                                        d,
+                                        turtle,
+                                        bpmValue || 90,
+                                        last(tur.singer.instrumentNames)
+                                    );
+                                    activity.logo.updateNotation(
+                                        chordNotes,
+                                        d,
+                                        turtle,
+                                        -1,
+                                        chordDrums
+                                    );
+                                }
                             }
                         }
                     }
@@ -2502,7 +2493,8 @@ class Singer {
                                             paramsEffects,
                                             null,
                                             false,
-                                            future
+                                            future,
+                                            tur.singer.panner
                                         );
                                     }
                                 } else if (
@@ -2519,7 +2511,8 @@ class Singer {
                                             null,
                                             null,
                                             false,
-                                            future
+                                            future,
+                                            tur.singer.panner
                                         );
                                     }
                                 } else {
@@ -2538,7 +2531,8 @@ class Singer {
                                                     null,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
@@ -2554,7 +2548,8 @@ class Singer {
                                                             paramsEffects,
                                                             filters,
                                                             true,
-                                                            future
+                                                            future,
+                                                            tur.singer.panner
                                                         );
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
@@ -2568,7 +2563,8 @@ class Singer {
                                                             paramsEffects,
                                                             filters,
                                                             false,
-                                                            future
+                                                            future,
+                                                            tur.singer.panner
                                                         );
                                                         tur.singer.glideOverride = 0;
                                                     }
@@ -2581,7 +2577,8 @@ class Singer {
                                                         paramsEffects,
                                                         filters,
                                                         false,
-                                                        future
+                                                        future,
+                                                        tur.singer.panner
                                                     );
                                                 }
                                             }
@@ -2598,7 +2595,8 @@ class Singer {
                                                     paramsEffects,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         } else {
@@ -2611,7 +2609,8 @@ class Singer {
                                                     paramsEffects,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         }
@@ -2671,7 +2670,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                tur.singer.panner
                                             );
                                         }
                                     } else {
@@ -2684,7 +2684,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                tur.singer.panner
                                             );
                                         }
                                     }

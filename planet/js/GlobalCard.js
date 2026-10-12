@@ -110,20 +110,8 @@ class GlobalCard {
     }
 
     showToast(message, isError = false) {
-        // Reuse existing SaveInterface.showToast but add error styling if needed
-        if (this.Planet && this.Planet.SaveInterface) {
-            this.Planet.SaveInterface.showToast(message);
-
-            // If it's an error, modify the toast to be red
-            if (isError) {
-                setTimeout(() => {
-                    const toasts = document.querySelectorAll(".toast");
-                    if (toasts.length > 0) {
-                        const lastToast = toasts[toasts.length - 1];
-                        lastToast.style.background = "#f44336"; // Red for errors
-                    }
-                }, 10);
-            }
+        if (this.Planet?.SaveInterface?.showToast) {
+            this.Planet.SaveInterface.showToast(message, isError);
         }
     }
 

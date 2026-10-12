@@ -1541,6 +1541,10 @@ class Painter {
      * @param color - hex code specifying color
      */
     doSetColor(color) {
+        if (!Number.isFinite(Number(color))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.color = Number(color);
         const results = getcolor(this.color);
@@ -1558,6 +1562,10 @@ class Painter {
      * @param chroma - chroma hex code
      */
     doSetChroma(chroma) {
+        if (!Number.isFinite(Number(chroma))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.chroma = Number(chroma);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1570,6 +1578,10 @@ class Painter {
      * @param shade - shade hex code
      */
     doSetValue(shade) {
+        if (!Number.isFinite(Number(shade))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.value = Number(shade);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1582,6 +1594,10 @@ class Painter {
      * @param hue - hue hex code
      */
     doSetHue(hue) {
+        if (!Number.isFinite(Number(hue))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.color = Number(hue);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);

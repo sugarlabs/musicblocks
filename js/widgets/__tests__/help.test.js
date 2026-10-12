@@ -68,7 +68,11 @@ function createMockWidgetWindow() {
         isMaximized: jest.fn(() => false),
         destroy: jest.fn(),
         updateTitle: jest.fn(),
-        takeFocus: jest.fn(),
+        takeFocus: jest.fn(function () {
+            if (window.widgetWindows) {
+                window.widgetWindows.focused = this;
+            }
+        }),
         _widgetBody: widgetBody
     };
 }
@@ -1086,6 +1090,337 @@ describe("HelpWidget", () => {
             hw._blockHelp(block);
 
             const rightArrow = document.getElementById("right-arrow");
+            expect(rightArrow.classList.contains("disabled")).toBe(true);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("true");
+        });
+    });
+
+    describe("keyboard navigation and focus guards", () => {
+        function createBlockMock(overrides = {}) {
+            return {
+                name: "forward",
+                staticLabels: ["Forward"],
+                helpString: ["Move forward"],
+                beginnerModeBlock: true,
+                palette: {
+                    name: "turtle",
+                    palettes: { showPalette: jest.fn() }
+                },
+                ...overrides
+            };
+        }
+
+        test("arrow keys navigate when widget window is focused", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const leftArrow = document.getElementById("left-arrow");
+            const rightClickSpy = jest.spyOn(rightArrow, "click");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const rightEvent = new KeyboardEvent("keydown", {
+                key: "ArrowRight",
+                cancelable: true
+            });
+            document.dispatchEvent(rightEvent);
+            expect(rightClickSpy).toHaveBeenCalled();
+            expect(rightEvent.defaultPrevented).toBe(true);
+
+            const leftEvent = new KeyboardEvent("keydown", {
+                key: "ArrowLeft",
+                cancelable: true
+            });
+            document.dispatchEvent(leftEvent);
+            expect(leftClickSpy).toHaveBeenCalled();
+            expect(leftEvent.defaultPrevented).toBe(true);
+        });
+
+        test("arrow keys are ignored when another widget window has focus", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            const otherWindow = createMockWidgetWindow();
+            window.widgetWindows.focused = otherWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        test("arrow keys are ignored when no widget window has focus", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = null;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const leftArrow = document.getElementById("left-arrow");
+            const rightClickSpy = jest.spyOn(rightArrow, "click");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const rightEvent = new KeyboardEvent("keydown", {
+                key: "ArrowRight",
+                cancelable: true
+            });
+            document.dispatchEvent(rightEvent);
+
+            const leftEvent = new KeyboardEvent("keydown", {
+                key: "ArrowLeft",
+                cancelable: true
+            });
+            document.dispatchEvent(leftEvent);
+
+            expect(rightClickSpy).not.toHaveBeenCalled();
+            expect(leftClickSpy).not.toHaveBeenCalled();
+            expect(rightEvent.defaultPrevented).toBe(false);
+            expect(leftEvent.defaultPrevented).toBe(false);
+        });
+
+        test("arrow keys are ignored when focus is inside text input or textarea", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            input.focus();
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+
+            input.remove();
+
+            const textarea = document.createElement("textarea");
+            document.body.appendChild(textarea);
+            textarea.focus();
+
+            const leftArrow = document.getElementById("left-arrow");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const leftEvent = new KeyboardEvent("keydown", { key: "ArrowLeft" });
+            document.dispatchEvent(leftEvent);
+
+            expect(leftClickSpy).not.toHaveBeenCalled();
+
+            textarea.remove();
+        });
+
+        test("arrow keys are ignored when focus is inside a contentEditable element", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const editableDiv = document.createElement("div");
+            editableDiv.setAttribute("contenteditable", "true");
+            editableDiv.tabIndex = 0;
+            document.body.appendChild(editableDiv);
+            editableDiv.focus();
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+
+            editableDiv.remove();
+        });
+
+        test("arrow keys are ignored when a workspace block is active", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block },
+                activeBlock: "active_block_1"
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        test("arrow keys are ignored in standalone block help mode", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw._standaloneBlockHelp = true;
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+            expect(hw._keydownHandler).toBeNull();
+        });
+
+        test("keydown listener is removed when widget window closes", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            expect(hw._keydownHandler).not.toBeNull();
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            hw.widgetWindow.onclose();
+
+            expect(hw._keydownHandler).toBeNull();
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        test("Enter and Space keys activate arrow buttons", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            const rightArrow = document.getElementById("right-arrow");
+            const leftArrow = document.getElementById("left-arrow");
+
+            const rightClickSpy = jest.spyOn(rightArrow, "click");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                cancelable: true,
+                bubbles: true
+            });
+            rightArrow.dispatchEvent(enterEvent);
+            expect(rightClickSpy).toHaveBeenCalledTimes(1);
+            expect(enterEvent.defaultPrevented).toBe(true);
+
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                cancelable: true,
+                bubbles: true
+            });
+            leftArrow.dispatchEvent(spaceEvent);
+            expect(leftClickSpy).toHaveBeenCalledTimes(1);
+            expect(spaceEvent.defaultPrevented).toBe(true);
+
+            const otherKeyEvent = new KeyboardEvent("keydown", {
+                key: "Tab",
+                cancelable: true,
+                bubbles: true
+            });
+            rightArrow.dispatchEvent(otherKeyEvent);
+            expect(rightClickSpy).toHaveBeenCalledTimes(1);
+            expect(otherKeyEvent.defaultPrevented).toBe(false);
+        });
+
+        test("aria-disabled reflects page boundaries during tour display", () => {
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            const leftArrow = document.getElementById("left-arrow");
+            const rightArrow = document.getElementById("right-arrow");
+
+            // Page 0 (initial)
+            hw._showPage(0);
+            expect(leftArrow.getAttribute("aria-disabled")).toBe("true");
+            expect(leftArrow.classList.contains("disabled")).toBe(true);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(rightArrow.classList.contains("disabled")).toBe(false);
+
+            // Middle page
+            hw._showPage(1);
+            expect(leftArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(leftArrow.classList.contains("disabled")).toBe(false);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(rightArrow.classList.contains("disabled")).toBe(false);
+
+            // Last page
+            hw._showPage(HELPCONTENT.length - 1);
+            expect(leftArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(leftArrow.classList.contains("disabled")).toBe(false);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("true");
             expect(rightArrow.classList.contains("disabled")).toBe(true);
         });
     });

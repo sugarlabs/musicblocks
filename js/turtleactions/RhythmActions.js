@@ -394,7 +394,7 @@ function setupRhythmActions(activity) {
         static multiplyNoteValue(factor, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (typeof factor !== "number" || isNaN(factor) || factor === 0) {
+            if (!Number.isFinite(factor) || factor === 0) {
                 return;
             }
 
@@ -430,10 +430,10 @@ function setupRhythmActions(activity) {
             if (tur.singer.suppressOutput) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
-                if (typeof swingValue !== "number" || isNaN(swingValue) || swingValue === 0) {
+                if (!Number.isFinite(swingValue) || swingValue === 0) {
                     return;
                 }
-                if (typeof noteValue !== "number" || isNaN(noteValue) || noteValue === 0) {
+                if (!Number.isFinite(noteValue) || noteValue === 0) {
                     return;
                 }
                 tur.singer.swing.push(1 / swingValue);

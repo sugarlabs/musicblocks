@@ -36,6 +36,7 @@ module.exports = {
     mutate: [
         "js/turtleactions/*.js",
         "js/piemenu-block-context.js",
+        "js/utils/mathutils.js",
         "!js/turtleactions/**/__tests__/**"
     ],
     coverageAnalysis: "perTest",

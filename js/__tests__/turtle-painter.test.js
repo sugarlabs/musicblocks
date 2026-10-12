@@ -351,6 +351,27 @@ describe("Pen operations", () => {
         expect(getMunsellColor).toHaveBeenCalledWith(120, painter.value, painter.chroma);
     });
 
+    test.each([
+        ["doSetColor", "color"],
+        ["doSetHue", "color"],
+        ["doSetValue", "value"],
+        ["doSetChroma", "chroma"]
+    ])("%s should reject a non-finite value and keep the pen colour", (method, field) => {
+        for (const bad of [-Infinity, Infinity, NaN]) {
+            const before = painter[field];
+            getcolor.mockClear();
+            getMunsellColor.mockClear();
+            mockTurtle.turtles.activity.errorMsg.mockClear();
+
+            painter[method](bad);
+
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter[field]).toBe(before);
+            expect(getcolor).not.toHaveBeenCalled();
+            expect(getMunsellColor).not.toHaveBeenCalled();
+        }
+    });
+
     test("doSetPenAlpha should update canvas alpha", () => {
         painter.doSetPenAlpha(0.5);
         expect(painter.canvasAlpha).toBe(0.5);

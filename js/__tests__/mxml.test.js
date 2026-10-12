@@ -815,7 +815,8 @@ describe("saveMxmlOutput notation markers", () => {
         ["end slur"],
         ["tie"],
         ["begin harmonics"],
-        ["end harmonics"]
+        ["end harmonics"],
+        ["begin repeat"]
     ].flat();
 
     it("never renders a staged marker as a note", () => {
@@ -1410,5 +1411,98 @@ describe("saveMxmlOutput - short notes keep whole-number durations", () => {
         });
 
         expect(output).toContain("<divisions>8</divisions>");
+    });
+});
+
+describe("saveMxmlOutput - forever repeats", () => {
+    const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, false, false];
+    const drum = (name, noteValue = 4) => [[], noteValue, 0, null, null, false, false, name];
+
+    const exportVoice = staged => {
+        const xml = saveMxmlOutput({ notation: { notationStaging: { 0: staged } } });
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+        return doc;
+    };
+
+    // Each measure's barlines as "location:direction", in document order.
+    const barlinesOf = measure =>
+        Array.from(measure.getElementsByTagName("barline")).map(barline => {
+            const repeat = barline.getElementsByTagName("repeat")[0];
+            return `${barline.getAttribute("location") || "plain"}:${
+                repeat ? repeat.getAttribute("direction") : "none"
+            }`;
+        });
+    const measuresOf = doc => Array.from(doc.getElementsByTagName("measure"));
+    const stepsOf = measure =>
+        Array.from(measure.getElementsByTagName("step")).map(s => s.textContent);
+
+    it("wraps the notes after a forever in repeat barlines", () => {
+        const measures = measuresOf(exportVoice(["begin repeat", note("G4"), note("E4")]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["left:forward", "right:backward"]);
+        expect(stepsOf(measures[0])).toEqual(["G", "E"]);
+    });
+
+    it("splits the measure where a forever starts mid-measure", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat", note("G4")]));
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps later barlines on the beat after a mid-measure split", () => {
+        const measures = measuresOf(
+            exportVoice([
+                note("C4"),
+                note("C4"),
+                note("C4"),
+                "begin repeat",
+                note("D4"),
+                note("E4"),
+                note("F4"),
+                note("G4")
+            ])
+        );
+
+        // In 4/4 the D finishes the first measure, so E F G start the next one.
+        expect(measures.map(stepsOf)).toEqual([["C", "C", "C"], ["D"], ["E", "F", "G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes", null]);
+        expect(measures.map(barlinesOf)).toEqual([[], ["left:forward"], ["right:backward"]]);
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        const measures = measuresOf(
+            exportVoice(["begin repeat", note("C4"), "begin repeat", note("G4")])
+        );
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("gives a drum part the same repeat", () => {
+        const doc = exportVoice(["begin repeat", drum("snare drum"), drum("kick drum")]);
+        const part = doc.getElementsByTagName("part")[0];
+
+        expect(part.getAttribute("id")).toBe("D1");
+        expect(barlinesOf(measuresOf(doc)[0])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps the plain final barline when no notes follow the forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat"]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
+    });
+
+    it("writes no repeat barlines without a forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), note("G4")]));
+
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
     });
 });

@@ -1373,9 +1373,13 @@ class ModeWidget {
         this.refreshCanvas();
     }
 
+    // Only the mode table's label cell shows the current mode name; the window
+    // title stays "custom mode" (set once in the constructor). Updating it here
+    // used to overwrite that title, which also broke isReinitWidgetTitle()'s
+    // title === "custom mode" check once any mode had been displayed, silently
+    // disabling reinitialization when the connected block changes.
     _updateModeDisplay(name) {
         this._modeLabelCell.textContent = name;
-        this.widgetWindow.updateTitle(name);
     }
 
     // ── Save / export ─────────────────────────────────────────────

@@ -60,7 +60,8 @@
    piemenuIntervals, piemenuVoices, piemenuBoolean,
    piemenuBasic, piemenuColor, piemenuNumber,
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
-   piemenuDissectNumber, getTemperamentSliceFont
+   piemenuDissectNumber, getTemperamentSliceFont,
+   getWheelSafeBounds, positionWheelDiv
 */
 
 /**
@@ -117,9 +118,28 @@ const getPieMenuSize = block => {
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
 let activeExitWheel = null;
+let activeWheelPositioning = null;
+
+const handleWheelResize = () => {
+    if (
+        activeWheelPositioning &&
+        docById("wheelDiv") &&
+        docById("wheelDiv").style.display !== "none"
+    ) {
+        positionWheelDiv(
+            activeWheelPositioning.block,
+            activeWheelPositioning.displaySize,
+            activeWheelPositioning.desiredLeft,
+            activeWheelPositioning.desiredTop
+        );
+    } else {
+        setWheelSize(lastWheelSize);
+    }
+};
+
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
-    wheelResizeTimeout = setTimeout(() => setWheelSize(lastWheelSize), 150);
+    wheelResizeTimeout = setTimeout(handleWheelResize, 150);
 };
 
 const enableWheelResizeHandling = () => {
@@ -134,6 +154,148 @@ const disableWheelResizeHandling = () => {
     wheelResizeListenerAttached = false;
     window.removeEventListener("resize", debouncedSetWheelSize);
     clearTimeout(wheelResizeTimeout);
+};
+
+/**
+ * Workspace rectangle a #wheelDiv pie menu may occupy.
+ * Stays clear of the top toolbar and the left palette, and does not extend
+ * past the viewport or the turtle canvas.
+ *
+ * @param {object} block Block that opened the menu
+ * @returns {{safeLeft: number, safeTop: number, rightBound: number, bottomBound: number}}
+ */
+const getWheelSafeBounds = block => {
+    let topBarBottom = 0;
+    if (typeof document !== "undefined") {
+        const toolbars = document.getElementById("toolbars");
+        if (
+            toolbars &&
+            toolbars.style.display !== "none" &&
+            toolbars.style.visibility !== "hidden"
+        ) {
+            const tbRect =
+                typeof toolbars.getBoundingClientRect === "function"
+                    ? toolbars.getBoundingClientRect()
+                    : null;
+            if (tbRect && tbRect.bottom > 0) {
+                topBarBottom = Math.max(topBarBottom, tbRect.bottom);
+            } else if (toolbars.offsetHeight > 0) {
+                topBarBottom = Math.max(
+                    topBarBottom,
+                    (toolbars.offsetTop || 0) + toolbars.offsetHeight
+                );
+            }
+        }
+    }
+    if (block && block.activity) {
+        if (block.activity.toolbarHeight) {
+            topBarBottom = Math.max(topBarBottom, block.activity.toolbarHeight);
+        }
+        if (block.activity.canvas && block.activity.canvas.offsetTop) {
+            topBarBottom = Math.max(topBarBottom, block.activity.canvas.offsetTop);
+        }
+    }
+
+    let leftBarRight = 0;
+    if (typeof document !== "undefined") {
+        const palette = document.getElementById("palette");
+        if (
+            palette &&
+            palette.style.display !== "none" &&
+            palette.style.visibility !== "hidden" &&
+            (!palette.style.transform || !palette.style.transform.includes("-100%"))
+        ) {
+            const pRect =
+                typeof palette.getBoundingClientRect === "function"
+                    ? palette.getBoundingClientRect()
+                    : null;
+            if (pRect && pRect.right > 0) {
+                leftBarRight = Math.max(leftBarRight, pRect.right);
+            } else if (palette.offsetWidth > 0) {
+                leftBarRight = Math.max(
+                    leftBarRight,
+                    (palette.offsetLeft || 0) + palette.offsetWidth
+                );
+            }
+        }
+    }
+    if (block && block.activity) {
+        if (
+            block.activity.palettes &&
+            !block.activity.palettes.collapsed &&
+            block.activity.palettes.paletteWidth
+        ) {
+            leftBarRight = Math.max(leftBarRight, block.activity.palettes.paletteWidth);
+        }
+        if (block.activity.canvas && block.activity.canvas.offsetLeft) {
+            leftBarRight = Math.max(leftBarRight, block.activity.canvas.offsetLeft);
+        }
+    }
+
+    const safeTop = topBarBottom > 0 ? topBarBottom + 8 : 8;
+    const safeLeft = leftBarRight > 0 ? leftBarRight + 8 : 8;
+
+    const turtleCanvas =
+        (block && block.blocks && block.blocks.turtles && block.blocks.turtles._canvas) || null;
+    const canvasWidth =
+        (turtleCanvas && turtleCanvas.width) ||
+        (block && block.activity && block.activity.canvas && block.activity.canvas.width) ||
+        1200;
+    const canvasHeight =
+        (turtleCanvas && turtleCanvas.height) ||
+        (block && block.activity && block.activity.canvas && block.activity.canvas.height) ||
+        900;
+
+    const viewportWidth = (typeof window !== "undefined" && window.innerWidth) || canvasWidth;
+    const viewportHeight = (typeof window !== "undefined" && window.innerHeight) || canvasHeight;
+
+    const canvasLeftEdge =
+        (block && block.activity && block.activity.canvas && block.activity.canvas.offsetLeft) || 0;
+    const canvasTopEdge =
+        (block && block.activity && block.activity.canvas && block.activity.canvas.offsetTop) || 0;
+
+    const rightBound = Math.min(viewportWidth, canvasLeftEdge + canvasWidth);
+    const bottomBound = Math.min(viewportHeight, canvasTopEdge + canvasHeight);
+
+    return { safeLeft, safeTop, rightBound, bottomBound };
+};
+
+/**
+ * Sizes #wheelDiv and clamps the desired position to the safe workspace rectangle.
+ * Preserves the caller's desired anchor coordinates while ensuring the menu
+ * remains within the safe boundary.
+ *
+ * @param {object} block Block that opened the menu
+ * @param {number} displaySize Diameter passed to setWheelSize
+ * @param {number} desiredLeft Preferred left position in pixels
+ * @param {number} desiredTop Preferred top position in pixels
+ * @param {{safeLeft: number, safeTop: number, rightBound: number, bottomBound: number}} [bounds] Precomputed safe bounds
+ * @returns {{size: number, left: number, top: number, desiredLeft: number, desiredTop: number}}
+ */
+const positionWheelDiv = (block, displaySize, desiredLeft, desiredTop, bounds = null) => {
+    activeWheelPositioning = { block, displaySize, desiredLeft, desiredTop };
+    const safe = bounds || getWheelSafeBounds(block);
+    const wheelDiv = docById("wheelDiv");
+    if (wheelDiv) {
+        wheelDiv.style.position = "absolute";
+    }
+    setWheelSize(displaySize);
+
+    const size = (wheelDiv && parseInt(wheelDiv.style.width, 10)) || displaySize;
+    const minLeft = safe.safeLeft;
+    const maxLeft = Math.max(minLeft, safe.rightBound - size - 8);
+    const minTop = safe.safeTop;
+    const maxTop = Math.max(minTop, safe.bottomBound - size - 8);
+
+    const left = Math.min(maxLeft, Math.max(minLeft, desiredLeft));
+    const top = Math.min(maxTop, Math.max(minTop, desiredTop));
+
+    if (wheelDiv) {
+        wheelDiv.style.left = left + "px";
+        wheelDiv.style.top = top + "px";
+    }
+
+    return { size, left, top, desiredLeft, desiredTop };
 };
 
 /**
@@ -213,6 +375,7 @@ const dismissActivePieMenu = () => {
     document.removeEventListener("mousedown", handleOutsideClick);
     document.removeEventListener("keydown", handleEscapeKey, true);
     activeExitWheel = null;
+    activeWheelPositioning = null;
 };
 
 const handleOutsideClick = event => {
@@ -271,6 +434,7 @@ const hideWheelDiv = () => {
         document.removeEventListener("keydown", handleEscapeKey, true);
         activeExitWheel = null;
     }
+    activeWheelPositioning = null;
 
     return wheelDiv;
 };
@@ -599,32 +763,18 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
     const displaySize = 400;
-    setWheelSize(displaySize);
     const halfWheelSize = displaySize / 2;
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - displaySize,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - halfWheelSize
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - displaySize,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - halfWheelSize
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - halfWheelSize;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - halfWheelSize;
+
+    positionWheelDiv(block, displaySize, desiredLeft, desiredTop);
 
     // Navigate to the current note value.
     let i = noteValues.indexOf(note);
@@ -1215,7 +1365,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     // both at once.
     const hasOctaveWheel =
         block.connections[0] !== null &&
-        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].includes(
+        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "custompitch"].includes(
             block.blocks.blockList[block.connections[0]].name
         );
 
@@ -1286,9 +1436,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         block._octavesWheel.createWheel(octaveLabels);
     }
 
-    //Disable rotation, set navAngle and create the menus
-    block._cusNoteWheel.clickModeRotate = false;
-    block._cusNoteWheel.titleRotateAngle = 180;
+    block._cusNoteWheel.titleRotateAngle = 0;
     block._cusNoteWheel.animatetime = 0; // 300;
     const labelsDict = {};
     let labels = [];
@@ -1303,19 +1451,18 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     for (const t of customLabels) {
         labelsDict[t] = [];
         for (const k in noteLabels[t]) {
-            if (k !== "pitchNumber" && k !== "interval") {
+            if (k !== "pitchNumber" && k !== "interval" && k !== "octaveRatio") {
                 if (typeof noteLabels[t][k] === "number") {
-                    // labels.push(k);
-                    labelsDict[t].push(k);
-                    blockCustom++;
+                    if (!isNaN(Number(k))) {
+                        labelsDict[t].push(k);
+                        blockCustom++;
+                    }
                 } else {
                     if (noteLabels[t][k].length === 3) {
-                        // labels.push(noteLabels[t][k][1]);
                         labelsDict[t].push(noteLabels[t][k][1]);
                         blockCustom++;
                     } else {
                         for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
-                            // labels.push(noteLabels[t][k][ii][1]);
                             labelsDict[t].push(noteLabels[t][k][1]);
                             blockCustom++;
                         }
@@ -1327,9 +1474,12 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             // labels.push("");
         }
         blockCustom = 0;
+        // Order notes descending (highest pitch to lowest / tonic),
+        // matching notename, solfege, and scaledegree pie menus.
+        labelsDict[t].reverse();
     }
     if (!(selectedCustom in labelsDict)) {
-        selectedCustom = labelsDict[0];
+        selectedCustom = customLabels[0];
     }
     for (let i = 0; i < max; i++) {
         if (i < labelsDict[selectedCustom].length) {
@@ -1369,30 +1519,15 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(400);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 400,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 450,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
+    positionWheelDiv(block, 400, desiredLeft, desiredTop);
 
     if (hasOctaveWheel) {
         // Use the octave associated with the block, if available.
@@ -1402,6 +1537,8 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         block._octavesWheel.navigateWheel(8 - pitchOctave);
     }
 
+    let prevPitch = 0;
+
     // Add function to each main menu for show/hide sub menus
     const __setupAction = i => {
         that._customWheel.navItems[i].navigateFunction = () => {
@@ -1409,8 +1546,8 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
             labels = [];
             for (let ii = 0; ii < max; ii++) {
-                if (ii < labelsDict[that._customWheel.navItems[i].title].length) {
-                    labels.push(labelsDict[that._customWheel.navItems[i].title][ii]);
+                if (ii < labelsDict[that.customID].length) {
+                    labels.push(labelsDict[that.customID][ii]);
                 } else {
                     labels.push("");
                 }
@@ -1434,6 +1571,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             }
             that._customWheel.refreshWheel();
             that._cusNoteWheel.navigateWheel(0);
+            prevPitch = 0;
         };
     };
 
@@ -1457,38 +1595,73 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     }
 
     block._customWheel.navigateWheel(ii);
+    that.customID = selectedCustom;
 
-    let j = selectedNote;
-    for (const x in noteLabels[selectedCustom]) {
-        if (x !== "pitchNumber" && noteLabels[selectedCustom][x][1] === j) {
-            j = +x;
-            break;
-        }
+    const cleanSelectedNote = (selectedNote || "").replace(/\([+-]?\d+¢\)/g, "");
+    let initialIndex = labels.findIndex(
+        l => l && l.replace(/\([+-]?\d+¢\)/g, "") === cleanSelectedNote
+    );
+    if (initialIndex === -1) {
+        initialIndex = 0;
     }
 
-    if (typeof j === "number" && !isNaN(j)) {
-        block._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
-    }
+    block._cusNoteWheel.navigateWheel(initialIndex);
+    prevPitch = initialIndex;
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         hideWheelDiv();
     };
 
-    const __selectionChanged = () => {
+    const __selectionChanged = async () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
+        that.customID = label;
         const rawNote = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
         const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
         const note = (rawNote || "").replace(/\([+-]?\d+¢\)/g, "");
         that.value = centsMatch ? note + centsMatch[0] : note;
         that.text.text = centsMatch ? note + centsMatch[0] : note;
-        let octave = 4;
 
+        let octave = 4;
         if (hasOctaveWheel) {
-            // Set the octave of the pitch block if available
             octave = Number(
                 that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
             );
+        }
+
+        const i = that._cusNoteWheel.selectedNavItemIndex;
+        const currentLabels = labelsDict[label] || labels.filter(l => l.length > 0);
+        const noteCount = currentLabels.length;
+        let deltaOctave = 0;
+        if (noteCount > 1 && prevPitch !== undefined && prevPitch !== -1) {
+            const halfSpan = noteCount / 2;
+            const deltaPitch = i - prevPitch;
+            let delta;
+            if (deltaPitch > halfSpan) {
+                delta = deltaPitch - noteCount;
+            } else if (deltaPitch < -halfSpan) {
+                delta = deltaPitch + noteCount;
+            } else {
+                delta = deltaPitch;
+            }
+
+            if (prevPitch + delta > noteCount - 1) {
+                deltaOctave = -1;
+            } else if (prevPitch + delta < 0) {
+                deltaOctave = 1;
+            }
+        }
+        prevPitch = i;
+
+        octave += deltaOctave;
+        if (octave < 1) {
+            octave = 1;
+        } else if (octave > 8) {
+            octave = 8;
+        }
+
+        if (hasOctaveWheel && deltaOctave !== 0) {
+            that._octavesWheel.navigateWheel(8 - octave);
             that.blocks.setPitchOctave(that.connections[0], octave);
         }
 
@@ -1496,34 +1669,67 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
-        const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, label);
-        const tur = that.activity.turtles.ithTurtle(0);
-
-        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+        try {
+            await Tone.start();
+        } catch (e) {
+            console.debug("Tone.start() skipped or failed", e);
         }
 
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
-
-        if (!that._triggerLock) {
-            that._triggerLock = true;
-            // Get the frequency of the custom note for the preview.
-            const no = that.activity.logo.synth.getCustomFrequency([note + obj[1]], that.customID);
-            if (no !== undefined && no !== "undefined") {
-                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1 / 8);
+        if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
+            try {
+                that.activity.logo.synth.createDefaultSynth(0);
+                await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            } catch (e) {
+                console.debug(e);
             }
         }
 
-        setTimeout(() => {
-            that._triggerLock = false;
-        }, 125); // 1/8 second in milliseconds
+        if (!that.activity.logo.synth.tone) {
+            that.activity.logo.synth.newTone();
+        }
+
+        try {
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        } catch (e) {
+            console.debug(e);
+        }
+
+        if (!that._triggerLock) {
+            that._triggerLock = true;
+            try {
+                const customID = that.customID || label || selectedCustom;
+                const no = that.activity.logo.synth.getCustomFrequency([note + octave], customID);
+                await that.activity.logo.synth.trigger(
+                    0,
+                    no !== undefined && no !== "undefined" ? no : [note + octave],
+                    1 / 8,
+                    DEFAULTVOICE,
+                    null,
+                    null,
+                    false
+                );
+                announceToScreenReader(_("played") + " " + note + octave);
+            } catch (e) {
+                console.error("Synth trigger error:", e);
+            }
+            setTimeout(() => {
+                that._triggerLock = false;
+            }, 125);
+        }
+    };
+
+    const __selectionChangedOctave = () => {
+        const octave = Number(
+            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
+        );
+        that.blocks.setPitchOctave(that.connections[0], octave);
+        __selectionChanged();
     };
 
     if (hasOctaveWheel) {
         for (let i = 0; i < 8; i++) {
-            block._octavesWheel.navItems[i].navigateFunction = __selectionChanged;
+            block._octavesWheel.navItems[i].navigateFunction = __selectionChangedOctave;
         }
     }
 
@@ -1632,30 +1838,15 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 300,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 350,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
+    positionWheelDiv(block, 300, desiredLeft, desiredTop);
 
     // Navigate to the current accidental value.
     let i = accidentalValues.indexOf(accidental);
@@ -1845,9 +2036,6 @@ const piemenuNoteValue = (block, noteValue) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-    const halfWheelSize = wheelSize / 2;
     const selectorWidth = 150;
     const left = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
@@ -1858,16 +2046,16 @@ const piemenuNoteValue = (block, noteValue) => {
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
-    docById("wheelDiv").style.left =
-        Math.min(
-            Math.max(left - (halfWheelSize - selectorWidth / 2), 0),
-            block.blocks.turtles._canvas.width - wheelSize
-        ) + "px";
-    if (top - wheelSize < 0) {
-        docById("wheelDiv").style.top = top + 40 + "px";
+    const bounds = getWheelSafeBounds(block);
+    let desiredTop;
+    if (top - 300 < bounds.safeTop) {
+        desiredTop = top + 40;
     } else {
-        docById("wheelDiv").style.top = top - wheelSize + "px";
+        desiredTop = top - 300;
     }
+    const desiredLeft = left - (300 - selectorWidth) / 2;
+
+    positionWheelDiv(block, 300, desiredLeft, desiredTop, bounds);
 
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
@@ -2074,8 +2262,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.replaceChildren(createNumberLabelInput(selectedValue));
-    labelElem.classList.add("hasKeyboard");
+    if (labelElem && typeof labelElem.replaceChildren === "function") {
+        labelElem.replaceChildren(createNumberLabelInput(selectedValue));
+    }
+    if (labelElem && labelElem.classList) {
+        labelElem.classList.add("hasKeyboard");
+    }
     block.label = docById("numberLabel");
 
     block.label.addEventListener(
@@ -2094,9 +2286,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-
     const selectorWidth = 150;
     const left = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
@@ -2107,16 +2296,15 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
-    docById("wheelDiv").style.left =
-        Math.min(
-            Math.max(left - (300 - selectorWidth) / 2, 0),
-            block.blocks.turtles._canvas.width - 300
-        ) + "px";
-    if (top - 300 < 0) {
-        docById("wheelDiv").style.top = top + 40 + "px";
+    const bounds = getWheelSafeBounds(block);
+    let desiredTop;
+    if (top - 300 < bounds.safeTop) {
+        desiredTop = top + 40;
     } else {
-        docById("wheelDiv").style.top = top - 300 + "px";
+        desiredTop = top - 300;
     }
+    const desiredLeft = left - (300 - selectorWidth) / 2;
+    positionWheelDiv(block, 300, desiredLeft, desiredTop, bounds);
 
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
@@ -2143,7 +2331,9 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         Math.round((20 * block.blocks.blockScale * block.protoblock.scale) / 2) + "px";
 
     block.label.style.display = "";
-    block.label.focus();
+    if (block.label && typeof block.label.focus === "function") {
+        block.label.focus();
+    }
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
         block._numberWheel.navItems[i].navigateFunction = () => {
@@ -2277,7 +2467,11 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     // Handler for pitchnumber preview. Block is to ensure that
     // only pitchnumber block's pie menu gets a sound preview
     if (
+        typeof block._usePieNumberC1 === "function" &&
         block._usePieNumberC1() &&
+        block.blocks &&
+        block.blocks.blockList &&
+        block.blocks.blockList[block.connections[0]] &&
         block.blocks.blockList[block.connections[0]].name === "pitchnumber"
     ) {
         for (let i = 0; i < wheelValues.length; i++) {
@@ -2286,7 +2480,14 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
     // Handler for Hertz preview. Need to also ensure that
     // only hertz block gets a different sound preview
-    if (block._usePieNumberC1() && block.blocks.blockList[block.connections[0]].name === "hertz") {
+    if (
+        typeof block._usePieNumberC1 === "function" &&
+        block._usePieNumberC1() &&
+        block.blocks &&
+        block.blocks.blockList &&
+        block.blocks.blockList[block.connections[0]] &&
+        block.blocks.blockList[block.connections[0]].name === "hertz"
+    ) {
         for (let i = 0; i < wheelValues.length; i++) {
             block._numberWheel.navItems[i].navigateFunction = __hertzPreview;
         }
@@ -2426,8 +2627,12 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.replaceChildren(createNumberLabelInput(selectedValue));
-    labelElem.classList.add("hasKeyboard");
+    if (labelElem && typeof labelElem.replaceChildren === "function") {
+        labelElem.replaceChildren(createNumberLabelInput(selectedValue));
+    }
+    if (labelElem && labelElem.classList) {
+        labelElem.classList.add("hasKeyboard");
+    }
     block.label = docById("numberLabel");
 
     block.label.addEventListener(
@@ -2446,9 +2651,6 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-
     const selectorWidth = 150;
     const left = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
@@ -2459,16 +2661,15 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
-    docById("wheelDiv").style.left =
-        Math.min(
-            Math.max(left - (300 - selectorWidth) / 2, 0),
-            block.blocks.turtles._canvas.width - 300
-        ) + "px";
-    if (top - 300 < 0) {
-        docById("wheelDiv").style.top = top + 40 + "px";
+    const bounds = getWheelSafeBounds(block);
+    let desiredTop;
+    if (top - 300 < bounds.safeTop) {
+        desiredTop = top + 40;
     } else {
-        docById("wheelDiv").style.top = top - 300 + "px";
+        desiredTop = top - 300;
     }
+    const desiredLeft = left - (300 - selectorWidth) / 2;
+    positionWheelDiv(block, 300, desiredLeft, desiredTop, bounds);
 
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
@@ -2485,7 +2686,9 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block.label.style.fontSize =
         Math.round((20 * block.blocks.blockScale * block.protoblock.scale) / 2) + "px";
     block.label.style.display = "";
-    block.label.focus();
+    if (block.label && typeof block.label.focus === "function") {
+        block.label.focus();
+    }
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
@@ -2639,107 +2842,12 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-
-    // Determine top toolbar exclusion bar height
-    let topBarBottom = 0;
-    if (typeof document !== "undefined") {
-        const toolbars = document.getElementById("toolbars");
-        if (
-            toolbars &&
-            toolbars.style.display !== "none" &&
-            toolbars.style.visibility !== "hidden"
-        ) {
-            const tbRect =
-                typeof toolbars.getBoundingClientRect === "function"
-                    ? toolbars.getBoundingClientRect()
-                    : null;
-            if (tbRect && tbRect.bottom > 0) {
-                topBarBottom = Math.max(topBarBottom, tbRect.bottom);
-            } else if (toolbars.offsetHeight > 0) {
-                topBarBottom = Math.max(
-                    topBarBottom,
-                    (toolbars.offsetTop || 0) + toolbars.offsetHeight
-                );
-            }
-        }
-    }
-    if (block.activity) {
-        if (block.activity.toolbarHeight) {
-            topBarBottom = Math.max(topBarBottom, block.activity.toolbarHeight);
-        }
-        if (block.activity.canvas && block.activity.canvas.offsetTop) {
-            topBarBottom = Math.max(topBarBottom, block.activity.canvas.offsetTop);
-        }
-    }
-
-    // Determine left palette bar exclusion width
-    let leftBarRight = 0;
-    if (typeof document !== "undefined") {
-        const palette = document.getElementById("palette");
-        if (
-            palette &&
-            palette.style.display !== "none" &&
-            palette.style.visibility !== "hidden" &&
-            (!palette.style.transform || !palette.style.transform.includes("-100%"))
-        ) {
-            const pRect =
-                typeof palette.getBoundingClientRect === "function"
-                    ? palette.getBoundingClientRect()
-                    : null;
-            if (pRect && pRect.right > 0) {
-                leftBarRight = Math.max(leftBarRight, pRect.right);
-            } else if (palette.offsetWidth > 0) {
-                leftBarRight = Math.max(
-                    leftBarRight,
-                    (palette.offsetLeft || 0) + palette.offsetWidth
-                );
-            }
-        }
-    }
-    if (block.activity) {
-        if (
-            block.activity.palettes &&
-            !block.activity.palettes.collapsed &&
-            block.activity.palettes.paletteWidth
-        ) {
-            leftBarRight = Math.max(leftBarRight, block.activity.palettes.paletteWidth);
-        }
-        if (block.activity.canvas && block.activity.canvas.offsetLeft) {
-            leftBarRight = Math.max(leftBarRight, block.activity.canvas.offsetLeft);
-        }
-    }
-
-    const safeTop = topBarBottom > 0 ? topBarBottom + 8 : 8;
-    const safeLeft = leftBarRight > 0 ? leftBarRight + 8 : 8;
-
-    const viewportWidth =
-        (typeof window !== "undefined" && window.innerWidth) ||
-        block.blocks.turtles._canvas.width ||
-        1200;
-    const viewportHeight =
-        (typeof window !== "undefined" && window.innerHeight) ||
-        block.blocks.turtles._canvas.height ||
-        900;
-
-    const canvasLeftEdge =
-        (block.activity && block.activity.canvas && block.activity.canvas.offsetLeft) || 0;
-    const canvasTopEdge =
-        (block.activity && block.activity.canvas && block.activity.canvas.offsetTop) || 0;
-
-    const rightBound = Math.min(
-        viewportWidth,
-        canvasLeftEdge + (block.blocks.turtles._canvas.width || viewportWidth)
-    );
-    const bottomBound = Math.min(
-        viewportHeight,
-        canvasTopEdge + (block.blocks.turtles._canvas.height || viewportHeight)
-    );
-
     let displaySize = 300;
+    let bounds = null;
     if (block.name === "temperamentname") {
-        const availableW = Math.max(160, rightBound - safeLeft - 8);
-        const availableH = Math.max(160, bottomBound - safeTop - 8);
+        bounds = getWheelSafeBounds(block);
+        const availableW = Math.max(160, bounds.rightBound - bounds.safeLeft - 8);
+        const availableH = Math.max(160, bounds.bottomBound - bounds.safeTop - 8);
         const maxAvailable = Math.min(availableW, availableH);
         const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
         if (screenWidth >= 1200) {
@@ -2755,28 +2863,17 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
         displaySize = 400;
     }
 
-    setWheelSize(displaySize);
-
-    const actualDisplaySize = parseInt(docById("wheelDiv").style.width, 10) || displaySize;
-    const halfWheelSize = Math.round(actualDisplaySize / 2);
-
+    const half = Math.round(displaySize / 2);
     const blockCenterX = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
     );
     const blockCenterY = Math.round(
         (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
     );
+    const desiredLeft = blockCenterX - half;
+    const desiredTop = blockCenterY - half;
 
-    const minLeft = safeLeft;
-    const maxLeft = Math.max(minLeft, rightBound - actualDisplaySize - 8);
-    const minTop = safeTop;
-    const maxTop = Math.max(minTop, bottomBound - actualDisplaySize - 8);
-
-    const left = Math.min(maxLeft, Math.max(minLeft, blockCenterX - halfWheelSize));
-    const top = Math.min(maxTop, Math.max(minTop, blockCenterY - halfWheelSize));
-
-    docById("wheelDiv").style.left = left + "px";
-    docById("wheelDiv").style.top = top + "px";
+    positionWheelDiv(block, displaySize, desiredLeft, desiredTop, bounds);
 
     // Navigate to the current selectedValue value.
     let i = menuValues.indexOf(selectedValue);
@@ -2871,30 +2968,15 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 300,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 350,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
+    positionWheelDiv(block, 300, desiredLeft, desiredTop);
 
     // Navigate to the current boolean value.
     let i = booleanValues.indexOf(boolean);
@@ -3006,30 +3088,16 @@ const piemenuChords = (block, selectedChord) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(400);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 300,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 350,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
+
+    positionWheelDiv(block, 400, desiredLeft, desiredTop);
 
     // Navigate to the current chord value.
     let i = chordLabels.indexOf(selectedChord);
@@ -3203,30 +3271,16 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(400);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 400,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 450,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
+
+    positionWheelDiv(block, 400, desiredLeft, desiredTop);
 
     // navigate to a specific starting point
     let i = voiceValues.indexOf(voice);
@@ -3362,30 +3416,15 @@ const piemenuIntervals = (block, selectedInterval) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(400);
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 400,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 450,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
+    positionWheelDiv(block, 400, desiredLeft, desiredTop);
 
     let isInitialized = false;
     // Add function to each main menu for show/hide sub menus
@@ -3852,32 +3891,16 @@ const piemenuModes = (block, selectedMode, onSelect) => {
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(600);
+    const desiredLeft =
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) - 200;
+    const desiredTop =
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) - 200;
 
-    // Block widget is large. Be sure it fits on the screen.
-    docById("wheelDiv").style.left =
-        Math.min(
-            block.blocks.turtles._canvas.width - 600,
-            Math.max(
-                0,
-                Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
-                ) - 200
-            )
-        ) + "px";
-    docById("wheelDiv").style.top =
-        Math.min(
-            block.blocks.turtles._canvas.height - 650,
-            Math.max(
-                0,
-                Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
-                ) - 200
-            )
-        ) + "px";
+    positionWheelDiv(block, 600, desiredLeft, desiredTop);
 
     for (let i = 0; i < currentEDO; i++) {
         that._modeWheel.navItems[i].navigateFunction = __playNote;
@@ -4065,7 +4088,8 @@ const syncKeySignatureBlocks = activity => {
     if (setKeyBlock === null) {
         activity.blocks.findStacks();
         const stacks = activity.blocks.stackList;
-        stacks.sort();
+        // Block ids are numbers; the default sort would put 10 before 9.
+        stacks.sort((a, b) => a - b);
         for (const stackId of stacks) {
             if (activity.blocks.blockList[stackId].name === "start") {
                 const bottomBlock = activity.blocks.blockList[stackId].connections[1];
@@ -4102,7 +4126,10 @@ const syncKeySignatureBlocks = activity => {
                     null
                 );
                 const setKey = activity.blocks.blockList.length - 1;
-                activity.blocks.blockList[bottomBlock].connections[0] = setKey;
+                // An empty start block has no first child to re-parent.
+                if (bottomBlock !== null) {
+                    activity.blocks.blockList[bottomBlock].connections[0] = setKey;
+                }
 
                 if (activity.KeySignatureEnv[2]) {
                     activity.blocks.blockList[stackId].connections[1] = movable;
@@ -4263,11 +4290,46 @@ const piemenuKey = activity => {
 
     const x = event.clientX;
     const y = event.clientY;
+    const bounds = getWheelSafeBounds({ activity });
+    const chooseKeyDiv = docById("chooseKeyDiv");
+    const movableDiv = docById("movable");
+    const movableRect =
+        typeof movableDiv.getBoundingClientRect === "function"
+            ? movableDiv.getBoundingClientRect()
+            : null;
+    const movableHeight = movableDiv.offsetHeight || (movableRect && movableRect.height) || 0;
+    const availableHeight = bounds.bottomBound - bounds.safeTop - movableHeight - 8;
+    const wheelSize = Math.max(
+        0,
+        Math.min(350, bounds.rightBound - bounds.safeLeft - 8, availableHeight)
+    );
+    chooseKeyDiv.style.width = wheelSize + "px";
+    chooseKeyDiv.style.height = wheelSize + "px";
+    const maxLeft = Math.max(bounds.safeLeft, bounds.rightBound - wheelSize - 8);
+    const maxTop = Math.max(bounds.safeTop, bounds.bottomBound - wheelSize - movableHeight - 8);
+    const left = Math.min(maxLeft, Math.max(bounds.safeLeft, x - wheelSize / 2));
+    const top = Math.min(maxTop, Math.max(bounds.safeTop, y + 50));
 
-    docById("chooseKeyDiv").style.left = x - 175 + "px";
-    docById("chooseKeyDiv").style.top = y + 50 + "px";
-    docById("movable").style.left = x - 110 + "px";
-    docById("movable").style.top = y + 400 + "px";
+    chooseKeyDiv.style.left = left + "px";
+    chooseKeyDiv.style.top = top + "px";
+
+    const movableWidth = movableDiv.offsetWidth || (movableRect && movableRect.width) || 0;
+    let marginLeft = parseFloat(movableDiv.style.marginLeft);
+    let marginRight = parseFloat(movableDiv.style.marginRight);
+    if (movableDiv.nodeType === 1 && typeof window.getComputedStyle === "function") {
+        const computedStyle = window.getComputedStyle(movableDiv);
+        const computedLeft = parseFloat(computedStyle.marginLeft);
+        const computedRight = parseFloat(computedStyle.marginRight);
+        if (!Number.isNaN(computedLeft)) marginLeft = computedLeft;
+        if (!Number.isNaN(computedRight)) marginRight = computedRight;
+    }
+    if (Number.isNaN(marginLeft)) marginLeft = 0;
+    if (Number.isNaN(marginRight)) marginRight = 0;
+    const movableOuter = marginLeft + movableWidth + marginRight;
+    const movableLeft = Math.min(left + 65, bounds.rightBound - 8 - movableOuter);
+
+    movableDiv.style.left = movableLeft + "px";
+    movableDiv.style.top = top + wheelSize + "px";
 
     const __exitMenu = () => {
         docById("chooseKeyDiv").style.display = "none";
@@ -4503,18 +4565,15 @@ const piemenuDissectNumber = widget => {
     const canvasLeft = widget.activity.canvas.offsetLeft + 28;
     const canvasTop = widget.activity.canvas.offsetTop + 6;
 
-    // Position the wheel
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-
     const left = Math.round(buttonRect.left - canvasLeft);
     const top = Math.round(buttonRect.top - canvasTop);
 
     // Position to the left of the button as shown in user image
     // left - 300 (wheel size) - 10px padding
     // top + half button height - 150 (half wheel size) for vertical centering
-    docById("wheelDiv").style.left = Math.max(0, left - 300 - 10) + "px";
-    docById("wheelDiv").style.top = Math.max(0, top + buttonRect.height / 2 - 150) + "px";
+    const desiredLeft = left - 300 - 10;
+    const desiredTop = top + buttonRect.height / 2 - 150;
+    positionWheelDiv(widget, 300, desiredLeft, desiredTop);
 
     // Navigate to current value
     const currentIndex = wheelValues.indexOf(currentValue);
@@ -4563,19 +4622,28 @@ const piemenuDissectNumber = widget => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         piemenuPitches,
+        piemenuAccidentals,
+        piemenuCustomNotes,
+        piemenuChords,
+        piemenuNoteValue,
         piemenuIntervals,
         piemenuKey,
         piemenuNumber,
+        piemenuColor,
+        piemenuBoolean,
         piemenuModes,
         piemenuVoices,
         piemenuBasic,
+        piemenuDissectNumber,
         getTemperamentSliceFont,
+        getWheelSafeBounds,
+        positionWheelDiv,
         handleEscapeKey,
         dismissActivePieMenu,
         showWheelDiv,
         hideWheelDiv,
-        syncKeySignatureBlocks,
-        piemenuNoteValue,
-        piemenuColor
+        handleWheelResize,
+        debouncedSetWheelSize,
+        syncKeySignatureBlocks
     };
 }

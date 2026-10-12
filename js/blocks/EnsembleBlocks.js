@@ -29,7 +29,7 @@ function getTargetTurtle(turtles, targetTurtle) {
     // We'll compare the names as strings so convert to "string" if "number".
     targetTurtle = targetTurtle.toString();
 
-    for (const i in turtles.turtleList) {
+    for (const i of Object.keys(turtles.turtleList)) {
         const turtle = turtles.ithTurtle(i);
         if (!turtle.inTrash) {
             // Convert to string incase of type "number".
@@ -141,7 +141,21 @@ function setupEnsembleBlocks(activity) {
                         logo.turtleHeaps[i] = [];
                     }
 
-                    if (a < 1) {
+                    a = Math.floor(a);
+                    const heapLen = logo.turtleHeaps[i].length;
+
+                    if (a < 0) {
+                        if (heapLen === 0) {
+                            activity.errorMsg(_("empty heap"));
+                            return 0;
+                        }
+                        if (-a <= heapLen) {
+                            a = heapLen + a + 1;
+                        } else {
+                            a = 1;
+                            activity.errorMsg(_("Index must be > 0."));
+                        }
+                    } else if (a < 1) {
                         a = 1;
                         activity.errorMsg(_("Index must be > 0."));
                     }
@@ -1093,7 +1107,8 @@ function setupEnsembleBlocks(activity) {
 
             let fillColor;
             let strokeColor;
-            if (typeof args[0] === "number") {
+            // A non-finite number gets the default colour, like a non-number.
+            if (Number.isFinite(args[0])) {
                 fillColor = getMunsellColor(args[0], 50, 100);
                 strokeColor = getMunsellColor(args[0], 70, 80);
             } else {

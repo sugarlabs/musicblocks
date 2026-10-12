@@ -1292,6 +1292,54 @@ describe("Blocks Foundation", () => {
             expect(() => blocks._findTwoArgs()).not.toThrow();
             expect(blocks._expandablesList).toEqual([1]);
         });
+
+        describe("after disposeBlock evicts a trashed stack", () => {
+            let blocks;
+
+            beforeEach(() => {
+                mockActivity.palettes.dict.action = { protoList: [] };
+                blocks = new Blocks(mockActivity);
+                blocks.boundary = { hide: jest.fn() };
+                blocks.blockList = [{ trash: true, dispose: jest.fn() }];
+                blocks.disposeBlock(0);
+            });
+
+            it("leaves a null slot in blockList", () => {
+                expect(blocks.blockList).toEqual([null]);
+            });
+
+            it.each([
+                ["updateBlockPositions", b => b.updateBlockPositions()],
+                ["bringToTop", b => b.bringToTop()],
+                ["checkBounds", b => b.checkBounds()],
+                ["unhighlightAll", b => b.unhighlightAll()],
+                ["hide", b => b.hide()],
+                ["show", b => b.show()],
+                ["changeDisabledStatus", b => b.changeDisabledStatus("start", true)],
+                ["findUniqueActionName", b => b.findUniqueActionName("action")],
+                ["findUniqueCustomName", b => b.findUniqueCustomName("custom")],
+                ["findUniqueTemperamentName", b => b.findUniqueTemperamentName("custom")],
+                ["_findDrumURLs", b => b._findDrumURLs()],
+                ["renameBoxes", b => b.renameBoxes("box1", "box2")],
+                ["renameStoreinBoxes", b => b.renameStoreinBoxes("box1", "box2")],
+                ["renameStorein2Boxes", b => b.renameStorein2Boxes("box1", "box2")],
+                ["renameNamedboxes", b => b.renameNamedboxes("box1", "box2")],
+                ["findBlockInstance", b => b.findBlockInstance("start")],
+                ["clearParameterBlocks", b => b.clearParameterBlocks()],
+                ["isCoordinateOnBlock", b => b.isCoordinateOnBlock(0, 0)]
+            ])("%s skips the empty slot", (_, run) => {
+                expect(() => run(blocks)).not.toThrow();
+            });
+
+            it("deleteActionBlock skips the empty slot", async () => {
+                mockActivity.palettes.removeActionPrototype = jest.fn();
+                blocks.blockList.push({ name: "text", value: "chorus", trash: false });
+                const action = { name: "action", connections: [null, 1, null] };
+
+                await expect(blocks.deleteActionBlock(action)).resolves.toBeUndefined();
+                expect(mockActivity.palettes.removeActionPrototype).toHaveBeenCalledWith("chorus");
+            });
+        });
     });
 
     describe("Stack Cleanup And Dock Adjustment", () => {
@@ -1756,6 +1804,78 @@ describe("Blocks Foundation", () => {
             });
         });
 
+        // Merging a project whose actions use the default names "action" and
+        // "action1" into a workspace that already has an "action" renames the
+        // incoming ones to "action1" and "action11". Each do block must follow
+        // the action it called, and not be renamed twice along the way.
+        describe("action renames when merging", () => {
+            const merge = project => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [
+                    { name: "action", trash: false, connections: [null, 1, null, null] },
+                    { name: "text", value: "action", trash: false, connections: [0] }
+                ];
+                blocks.protoBlockDict = {};
+                for (const name of ["start", "action", "text", "nameddo", "do"]) {
+                    blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
+                }
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+                mockActivity._suppressRefresh = true;
+                blocks.loadNewBlocks(project);
+                return project;
+            };
+
+            const actionsNamedByDefault = () => [
+                [0, ["action", { collapsed: false }], 0, 0, [null, 1, null, null]],
+                [1, ["text", { value: "action" }], 0, 0, [0]],
+                [2, ["action", { collapsed: false }], 0, 0, [null, 3, null, null]],
+                [3, ["text", { value: "action1" }], 0, 0, [2]]
+            ];
+
+            it("keeps each nameddo block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, ["nameddo", { value: "action" }], 0, 0, [4, 6]]);
+                project.push([6, ["nameddo", { value: "action1" }], 0, 0, [5, null]]);
+
+                merge(project);
+
+                expect(project[1][1][1]).toEqual({ value: "action1" });
+                expect(project[3][1][1]).toEqual({ value: "action11" });
+                expect(project[5][1][1]).toEqual({ value: "action1" });
+                expect(project[6][1][1]).toEqual({ value: "action11" });
+            });
+
+            it("keeps each do block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, 7]]);
+                project.push([6, ["text", { value: "action" }], 0, 0, [5]]);
+                project.push([7, "do", 0, 0, [5, 8, null]]);
+                project.push([8, ["text", { value: "action1" }], 0, 0, [7]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+                expect(project[8][1][1]).toEqual({ value: "action11" });
+            });
+
+            it("leaves do blocks alone when no action is renamed", () => {
+                const project = [
+                    [0, ["action", { collapsed: false }], 0, 0, [null, 1, null, null]],
+                    [1, ["text", { value: "chorus" }], 0, 0, [0]],
+                    [2, "start", 0, 0, [null, 3, null]],
+                    [3, ["nameddo", { value: "chorus" }], 0, 0, [2, null]]
+                ];
+
+                merge(project);
+
+                expect(project[1][1][1]).toEqual({ value: "chorus" });
+                expect(project[3][1][1]).toEqual({ value: "chorus" });
+            });
+        });
+
         it("accepts valid parent-child stacks without false cycle detection", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
@@ -1922,6 +2042,13 @@ describe("Blocks Foundation", () => {
             await new Promise(r => setTimeout(r, 50));
             loadContainer.remove();
             delete global.pubsub;
+        });
+
+        it("loads a project when an evicted trash stack left a null slot in blockList", () => {
+            blocks.blockList = [null];
+
+            expect(() => blocks.loadNewBlocks(makeBatch(2))).not.toThrow();
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
         });
 
         it("does not start a second call while a first call is still processing", () => {
@@ -4006,5 +4133,73 @@ describe("ManagedTimer Integration", () => {
         blocks.clearLongPressTimeout();
         expect(blocks.longPressTimeout).toBeNull();
         expect(blocks._timerManager.activeTimeoutCount).toBe(0);
+    });
+
+    it("findBlockInstance returns true if named block exists and is not in trash", () => {
+        blocks.blockList = [{ name: "pitch", trash: false }];
+        expect(blocks.findBlockInstance("pitch")).toBe(true);
+        expect(blocks.findBlockInstance("rhythm")).toBe(false);
+    });
+
+    it("clearParameterBlocks clears text on parameter blocks", () => {
+        blocks.blockList = [
+            {
+                protoblock: { parameter: true },
+                text: { text: "hello" },
+                name: "pitch",
+                container: { cacheCanvas: null }
+            }
+        ];
+        blocks.clearParameterBlocks();
+        expect(blocks.blockList[0].text.text).toBe("");
+    });
+});
+
+describe("findPitchOctave and setPitchOctave with custompitch", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("reads octave from slot 2 of custompitch", () => {
+        blocks.blockList[0] = { name: "custompitch", connections: [null, 1, 2, null] };
+        blocks.blockList[2] = { name: "number", value: 5 };
+        expect(blocks.findPitchOctave(0)).toBe(5);
+    });
+
+    it("updates octave in slot 2 of custompitch", () => {
+        const numberBlock = {
+            name: "number",
+            value: 4,
+            text: { text: "4" },
+            container: {
+                children: [{}],
+                setChildIndex: jest.fn(),
+                updateCache: jest.fn()
+            }
+        };
+        blocks.blockList[0] = { name: "custompitch", connections: [null, 1, 2, null] };
+        blocks.blockList[2] = numberBlock;
+        blocks.setPitchOctave(0, 6);
+        expect(numberBlock.value).toBe(6);
+        expect(numberBlock.text.text).toBe("6");
     });
 });

@@ -151,3 +151,46 @@ describe("musicutils-pitchscale", () => {
         });
     });
 });
+
+describe("getNoteFromInterval - diminished intervals", () => {
+    const { getNoteFromInterval, pitchToNumber } = pitchscale;
+    const { INTERVALVALUES } = require("../musicutils-constants");
+
+    // Distance in half steps from the root to what the function spells.
+    const semitonesOf = (root, interval) => {
+        const spelled = getNoteFromInterval(`${root}4`, interval);
+        return pitchToNumber(spelled[0], spelled[1], "C major") - pitchToNumber(root, 4, "C major");
+    };
+
+    // A diminished interval is a half step below a perfect one but a whole step
+    // below a major one, because the minor sits between them. These are the four
+    // built on major intervals, and INTERVALVALUES is the reference.
+    it.each(["3", "6", "7"])("spells diminished %s the width the table gives it", num => {
+        const interval = `diminished ${num}`;
+        expect(semitonesOf("C", interval)).toBe(INTERVALVALUES[interval][0]);
+    });
+
+    it.each(["4", "5", "8"])("leaves the perfect-based diminished %s alone", num => {
+        const interval = `diminished ${num}`;
+        expect(semitonesOf("C", interval)).toBe(INTERVALVALUES[interval][0]);
+    });
+
+    it("does not confuse a diminished interval with the minor one above it", () => {
+        expect(semitonesOf("C", "diminished 3")).toBe(semitonesOf("C", "minor 3") - 1);
+        expect(semitonesOf("C", "diminished 6")).toBe(semitonesOf("C", "minor 6") - 1);
+        expect(semitonesOf("C", "diminished 7")).toBe(semitonesOf("C", "minor 7") - 1);
+    });
+
+    it("keeps the width from every root, not just C", () => {
+        for (const root of ["C", "D", "E", "F", "G", "A", "B"]) {
+            for (const num of ["3", "6", "7"]) {
+                const interval = `diminished ${num}`;
+                expect([root, interval, semitonesOf(root, interval)]).toEqual([
+                    root,
+                    interval,
+                    INTERVALVALUES[interval][0]
+                ]);
+            }
+        }
+    });
+});

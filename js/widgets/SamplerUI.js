@@ -132,7 +132,7 @@ const SamplerUI = {
                 }
 
                 if (tunerOn) {
-                    this.activity.logo.synth.stopTuner();
+                    this.tuner.stopTuner();
                     tunerOn = false;
                 }
 
@@ -208,7 +208,7 @@ const SamplerUI = {
             const stopTuner = () => {
                 if (tunerOn) {
                     activity.textMsg(_("Tuner stopped."), 3000);
-                    this.activity.logo.synth.stopTuner();
+                    this.tuner.stopTuner();
                     tunerOn = false;
                     const tunerContainer = docById("tunerContainer");
                     if (tunerContainer) {
@@ -658,11 +658,11 @@ const SamplerUI = {
 
                     this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
-                    await this.activity.logo.synth.startTuner(this.pitchName);
+                    await this.tuner.startTuner(this.pitchName);
                     activity.textMsg(_("Tuner started."), 3000);
                 } else {
                     activity.textMsg(_("Tuner stopped."), 3000);
-                    this.activity.logo.synth.stopTuner();
+                    this.tuner.stopTuner();
                     tunerOn = false;
                 }
             };
@@ -695,7 +695,7 @@ const SamplerUI = {
                 const tunerContainer = docById("tunerContainer");
                 if (tunerContainer) {
                     tunerContainer.remove();
-                    this.activity.logo.synth.stopTuner();
+                    this.tuner.stopTuner();
                     tunerOn = false;
                 }
 

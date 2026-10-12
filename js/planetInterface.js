@@ -154,6 +154,7 @@ class PlanetInterface {
             this.closePlanet();
             if (!merge) {
                 this.activity.sendAllToTrash(false, true);
+                this._resetTrashHistory();
             }
 
             if (data === undefined) {
@@ -223,10 +224,18 @@ class PlanetInterface {
                 this.activity.sendAllToTrash();
                 this.activity.refreshCanvas();
             }
+            this._resetTrashHistory();
+            return initialization;
+        };
+
+        /**
+         * Forgets the trash and undo history of the project being replaced, so
+         * it cannot be restored into the next one or grow across project switches.
+         */
+        this._resetTrashHistory = () => {
             this.activity.blocks.trashStacks = [];
             this.activity.blocks.actionHistory = [];
             this.activity.blocks.redoActionHistory = [];
-            return initialization;
         };
 
         /**
@@ -478,8 +487,8 @@ class PlanetInterface {
             try {
                 const palettes = this.activity.blocks.palettes;
                 const nameMap = {};
-                for (const palette in palettes.dict) {
-                    for (const blk in palettes.dict[palette].protoList) {
+                for (const palette of Object.keys(palettes.dict)) {
+                    for (const blk of Object.keys(palettes.dict[palette].protoList)) {
                         const proto = palettes.dict[palette].protoList[blk];
                         if (proto.name && proto.staticLabels && proto.staticLabels[0]) {
                             nameMap[proto.name] = proto.staticLabels[0];

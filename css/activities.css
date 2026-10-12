@@ -104,12 +104,12 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 /* confirm and cancel buttons align horizontally (for newproject dropdown)*/
 #newdropdown .button-row {
-    display: flex;
+    display: flex !important;
     gap: 16px;
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 16px;
+    margin-top: 16px !important;
 }
 
 .new-project-title {
@@ -254,6 +254,12 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     align-items: center;
 }
 
+.plugin-modal-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .plugin-upload-button {
     border: 2px solid var(--color-brand-primary);
     border-radius: 4px;
@@ -357,11 +363,6 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 #search:focus {
     border-color: var(--color-brand-primary-hover);
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
-}
-
-#search:focus-visible {
-    outline: 2px solid var(--color-brand-primary);
-    outline-offset: 2px;
 }
 
 #search.open {
@@ -3228,8 +3229,8 @@ table {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: "10px";
-    background-color: white;
+    padding: 10px;
+    background-color: var(--color-bg-primary);
 }
 
 .chatLog {
@@ -3240,25 +3241,29 @@ table {
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;
+    background-color: var(--color-bg-primary);
 }
 
 .select-mentor {
     width: 80px;
-    background: white;
-    border-width: 1px;
-    border-style: solid;
-    border-color: black;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
 }
 
 .input-query {
     flex: 1;
     padding: 10px;
     margin-right: 10px;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 6px;
 }
 
 .message-container {
     align-self: flex-start;
-    background: #dfdfdf;
+    background-color: var(--color-bg-tertiary);
     color: var(--color-text-primary);
     padding: 10px;
     border-radius: 12px;
@@ -3272,6 +3277,60 @@ table {
 .message-container.user {
     align-self: flex-end;
     background-color: #dcf8c6;
+}
+
+.message-container .sender-name {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: var(--color-text-secondary);
+    align-self: flex-start;
+}
+
+/* AI Debugger Widget */
+.aidebugger-chat-log {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}
+
+.aidebugger-input-container {
+    background-color: var(--color-bg-primary);
+    border-top: 1px solid var(--color-border-primary);
+}
+
+.aidebugger-input {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+}
+
+.aidebugger-message-bot {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+}
+
+.aidebugger-message-user {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
+}
+
+.aidebugger-message-system {
+    background-color: var(--color-warning-bg);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+}
+
+.aidebugger-typing-indicator {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-primary);
+}
+
+.aidebugger-consent-banner {
+    background-color: var(--color-warning-bg);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
 }
 
 .lego-brick {

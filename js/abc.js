@@ -206,6 +206,12 @@ class AbcExporter {
         this.keySignature = keySignature;
         this.voiceId = voiceId;
         this.staging = logo.notation.notationStaging[turtle] || [];
+        // With nested forevers, only the innermost one ever repeats, and a
+        // forever with no notes after it has nothing to repeat.
+        const repeatStart = this.staging.lastIndexOf("begin repeat");
+        this.repeatStart = this.staging.slice(repeatStart + 1).some(Array.isArray)
+            ? repeatStart
+            : -1;
 
         this.parts = [];
         this.counter = 0;
@@ -389,6 +395,11 @@ class AbcExporter {
                 break;
             case "begin slur":
                 this.queueSlur++;
+                break;
+            case "begin repeat":
+                if (i === this.repeatStart) {
+                    this.parts.push("|: ");
+                }
                 break;
             case "end slur":
                 if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
@@ -645,6 +656,9 @@ class AbcExporter {
             } else if (Array.isArray(obj)) {
                 i = this.processNoteArray(obj, i);
             }
+        }
+        if (this.repeatStart !== -1) {
+            this.parts.push(":|");
         }
         this.logo.notationNotes[this.turtle] = this.parts.join("");
     }

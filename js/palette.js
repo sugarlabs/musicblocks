@@ -855,7 +855,9 @@ class Palettes {
     getSearchPos() {
         return {
             x: this.cellSize * this.activity.turtleBlocksScale * 1.5,
-            y: (this.top + this.cellSize * 0.95) * this.activity.turtleBlocksScale
+            y:
+                (this.top + this.cellSize * 0.95 + (this.activity.toolbarHeight || 0)) *
+                this.activity.turtleBlocksScale
         };
     }
 
@@ -2162,7 +2164,7 @@ class Palette {
                 // Check if a status block already exists
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
-                    if (block.name === "status" && !block.trash) {
+                    if (block?.name === "status" && !block.trash) {
                         return;
                     }
                 }
