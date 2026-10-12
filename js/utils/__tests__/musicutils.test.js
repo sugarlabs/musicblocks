@@ -3598,6 +3598,8 @@ describe("getPitchInfo", () => {
 
     it("returns correct pitch for 'alphabet'", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
+        // lowercase octave-free 'c' should default to octave 4, capitalize, and return "C" (#9430)
+        expect(getPitchInfo(activity, "alphabet", "c", tur)).toBe("C");
     });
 
     it("should correctly parse string inputs", () => {

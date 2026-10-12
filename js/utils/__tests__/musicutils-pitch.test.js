@@ -123,6 +123,33 @@ describe("musicutils-pitch", () => {
         expect(pitch.calcOctaveInterval(undefined)).toBe(0);
     });
 
+    describe("_parse_pitch_string (#9430)", () => {
+        const { SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
+        const fn = pitch._parse_pitch_string;
+
+        it("normalizes double accidentals without an octave", () => {
+            expect(fn("Cx")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(fn("Bbb")).toEqual(["B" + DOUBLEFLAT, 4]);
+            expect(fn("C#b")).toEqual(["C", 4]);
+        });
+
+        it("capitalizes and defaults octave to 4 for bare letter", () => {
+            expect(fn("c")).toEqual(["C", 4]);
+            expect(fn("C#")).toEqual(["C" + SHARP, 4]);
+        });
+
+        it("trims leading and trailing whitespace before parsing", () => {
+            expect(fn("  C4  ")).toEqual(["C", 4]);
+            expect(fn("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(fn("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+        });
+
+        it("keeps existing behaviour with octave present", () => {
+            expect(fn("C4")).toEqual(["C", 4]);
+            expect(fn("Bb-1")).toEqual(["B" + FLAT, -1]);
+        });
+    });
+
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
             "musicutils-constants.js",
