@@ -561,10 +561,40 @@ describe("Utility Functions (logic-only)", () => {
             // is missing too, trigger() must create it before reloading the sample.
             await trigger(turtle, ["C4"], beatValue, sourceName, null, null, false, 0);
 
-            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Sampler);
-            expect(instruments[turtle][sourceName].playbackRate.value).toBeCloseTo(
-                Math.pow(2, 50 / 1200)
-            );
+            const sampler = instruments[turtle][sourceName];
+            expect(sampler).toBeInstanceOf(Tone.Sampler);
+            const [notes] = sampler.triggerAttackRelease.mock.calls[0];
+            expect(notes[0]).toBeCloseTo(261.6256 * Math.pow(2, 50 / 1200), 2);
+        });
+
+        test("should play a custom sample at the pitch tuned in the sampler widget", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {};
+            }
+
+            CUSTOMSAMPLES["customsample_tuned"] = ["data:audio/wav;base64,AAAA", "la", 4, 50];
+            await loadSynth(turtle, "customsample_tuned");
+            await trigger(turtle, ["A4"], beatValue, "customsample_tuned", null, null, false, 0);
+
+            const sampler = instruments[turtle]["customsample_tuned"];
+            const [notes] = sampler.triggerAttackRelease.mock.calls[0];
+            expect(notes[0]).toBeCloseTo(440 * Math.pow(2, 50 / 1200), 2);
+        });
+
+        test("should drop the cent adjustment once a custom sample is retuned to zero", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {};
+            }
+
+            CUSTOMSAMPLES["customsample_retuned"] = ["data:audio/wav;base64,AAAA", "la", 4, 50];
+            await loadSynth(turtle, "customsample_retuned");
+            Synth.disposeAllInstruments();
+
+            CUSTOMSAMPLES["customsample_retuned"] = ["data:audio/wav;base64,AAAA", "la", 4, 0];
+            await trigger(turtle, ["A4"], beatValue, "customsample_retuned", null, null, false, 0);
+
+            const sampler = instruments[turtle]["customsample_retuned"];
+            expect(sampler.triggerAttackRelease.mock.calls[0][0]).toEqual(["A4"]);
         });
 
         test("should bail out of the reload if instruments are disposed mid-load (#7996)", async () => {
@@ -3301,7 +3331,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             // Custom sample with cent adjustment and initial null sampleCentAdjustments
             synth.sampleCentAdjustments = null;
-            CUSTOMSAMPLES["custom1"] = ["sample_data", "do", 4, 1, 10];
+            CUSTOMSAMPLES["custom1"] = ["sample_data", "do", 4, 10];
             const customSynth = synth._createSampleSynth("turtle0", "custom1", "custom1");
             expect(customSynth).toBeDefined();
             expect(synth.sampleCentAdjustments["custom1"]).toBe(10);
@@ -3419,7 +3449,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             synth.___createSynth("turtle0", "amsynth", "amsynth", {});
             expect(mockDispose).toHaveBeenCalled();
 
-            CUSTOMSAMPLES["custom1"] = ["sample_data", "do", 4, 1, 0];
+            CUSTOMSAMPLES["custom1"] = ["sample_data", "do", 4, 0];
             instruments["turtle0"]["custom1"] = { dispose: mockDispose };
             synth.___createSynth("turtle0", "custom1", "custom1", {});
             expect(mockDispose).toHaveBeenCalled();
@@ -3649,15 +3679,13 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             global.instruments[testTurtle]["piano"] = {
                 connect: jest.fn(),
                 toDestination: jest.fn().mockReturnThis(),
-                triggerAttackRelease: jest.fn(),
-                playbackRate: { value: 1 }
+                triggerAttackRelease: jest.fn()
             };
             global.instrumentsSource["piano"] = [2, "piano"];
             await synth.trigger(testTurtle, "C4", 0.25, "piano", null, null, false, 0);
-            expect(global.instruments[testTurtle]["piano"].playbackRate.value).toBeCloseTo(
-                Math.pow(2, 12 / 1200),
-                4
-            );
+            const [pianoNote] =
+                global.instruments[testTurtle]["piano"].triggerAttackRelease.mock.calls[0];
+            expect(pianoNote).toBeCloseTo(261.6256 * Math.pow(2, 12 / 1200), 2);
 
             // 4. Trigger builtin synth (flag 3)
             global.instruments[testTurtle]["sine"] = {

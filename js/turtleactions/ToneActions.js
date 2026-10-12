@@ -74,7 +74,13 @@ function setupToneActions(activity) {
             if (!accounted && typeof instrument === "object") {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
-                    CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
+                    // data, pitch, octave and the cent adjustment from the sampler
+                    CUSTOMSAMPLES[synth] = [
+                        instrument[1],
+                        instrument[2],
+                        instrument[3],
+                        instrument[4] || 0
+                    ];
                 } else {
                     synth = DEFAULTVOICE;
                 }

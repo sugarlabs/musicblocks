@@ -846,6 +846,16 @@ class ProjectManager {
                             value: myBlock.value
                         };
                         break;
+                    case "customsample":
+                        if (Array.isArray(myBlock.value)) {
+                            // The connected audiofile block already saves the sample data.
+                            const value = myBlock.value.slice();
+                            if (myBlock.connections[1] !== null) {
+                                value[1] = "";
+                            }
+                            args = { value: value };
+                        }
+                        break;
                     default:
                         break;
                 }
