@@ -228,9 +228,15 @@ describe("setupToneActions", () => {
             expect(global.CUSTOMSAMPLES["customsample_custom1"]).toEqual([
                 "sample1",
                 "sample2",
-                "sample3"
+                "sample3",
+                0
             ]);
             expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
+        });
+
+        it("should keep the cent adjustment of a custom sample", () => {
+            Singer.ToneActions.setTimbre(["tuned", "data", "la", 4, 50], 0, 1);
+            expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
         });
 
         it("should handle empty custom sample name", () => {

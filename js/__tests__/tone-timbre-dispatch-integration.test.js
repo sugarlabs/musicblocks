@@ -236,7 +236,8 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         expect(CUSTOMSAMPLES["customsample_mysample"]).toEqual([
             "data:audio/wav;base64,AAAA",
             "sol",
-            4
+            4,
+            0
         ]);
 
         expect(turtle.singer.instrumentNames).toEqual([]);

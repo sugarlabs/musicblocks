@@ -1471,16 +1471,11 @@ function Synth() {
             // Get the base center note
             const center = this._parseSampleCenterNo(params[1], params[2]);
 
-            // Check if there's a cent adjustment (stored as the fifth parameter)
-            const centAdjustment = params[4] || 0;
-
-            // Store the cent adjustment for later use
-            if (centAdjustment !== 0) {
-                if (!this.sampleCentAdjustments) {
-                    this.sampleCentAdjustments = {};
-                }
-                this.sampleCentAdjustments[sourceName] = centAdjustment;
+            // The fourth parameter is the cent adjustment set in the sampler widget.
+            if (!this.sampleCentAdjustments) {
+                this.sampleCentAdjustments = {};
             }
+            this.sampleCentAdjustments[sourceName] = params[3] || 0;
 
             noteDict[center] = params[0];
             tempSynth = new Tone.Sampler(noteDict);
@@ -1841,6 +1836,7 @@ function Synth() {
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
      * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. a panner.
+     * @param {number} [cents] - Detune applied to every note, e.g. a custom sample's tuning.
      */
     this._performNotes = async (
         synth,
@@ -1850,7 +1846,8 @@ function Synth() {
         paramsFilters,
         setNote,
         future,
-        output = Tone.Destination
+        output = Tone.Destination,
+        cents = 0
     ) => {
         const isStandardNote = note => {
             if (typeof note !== "string") return true;
@@ -1900,6 +1897,16 @@ function Synth() {
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
+        }
+
+        const detune = value => {
+            const ratio = Math.pow(2, cents / 1200);
+            const hertz = this._getFrequency(value, false);
+            return Array.isArray(hertz) ? hertz.map(f => f * ratio) : hertz * ratio;
+        };
+
+        if (cents) {
+            notes = detune(notes);
         }
 
         let numFilters;
@@ -2082,12 +2089,16 @@ function Synth() {
                         // for each note.
                         const obj = [];
                         for (let i = 0; i < paramsEffects["neighborArgNote1"].length; i++) {
-                            const note1 = normalizeNoteAccidentals(
+                            let note1 = normalizeNoteAccidentals(
                                 paramsEffects["neighborArgNote1"][i]
                             );
-                            const note2 = normalizeNoteAccidentals(
+                            let note2 = normalizeNoteAccidentals(
                                 paramsEffects["neighborArgNote2"][i]
                             );
+                            if (cents) {
+                                note1 = detune(note1);
+                                note2 = detune(note2);
+                            }
                             obj.push(
                                 { time: 0, note: note1, duration: firstTwoBeats },
                                 { time: firstTwoBeats, note: note2, duration: firstTwoBeats },
@@ -2355,24 +2366,6 @@ function Synth() {
             if (instrumentName in instruments[turtle]) {
                 tempSynth = instruments[turtle][instrumentName];
                 flag = instrumentsSource[instrumentName][0];
-                if (flag === 1 || flag === 2) {
-                    const sampleName = instrumentsSource[instrumentName][1];
-
-                    // Check if there's a cent adjustment for this sample
-                    if (
-                        flag === 2 &&
-                        this.sampleCentAdjustments &&
-                        this.sampleCentAdjustments[sampleName]
-                    ) {
-                        const centAdjustment = this.sampleCentAdjustments[sampleName];
-                        // Apply cent adjustment to playback rate
-                        // Formula: playbackRate = 2^(cents/1200)
-                        const playbackRate = Math.pow(2, centAdjustment / 1200);
-                        if (tempSynth && tempSynth.playbackRate) {
-                            tempSynth.playbackRate.value = playbackRate;
-                        }
-                    }
-                }
             }
 
             // Get note values as per the source of the synth.
@@ -2414,16 +2407,6 @@ function Synth() {
                         console.debug("Error waiting for sample to load:", e);
                     }
                 }
-
-                // Apply any cent adjustment to the freshly loaded sample
-                if (flag === 2 && tempSynth && tempSynth.playbackRate) {
-                    const sampleName = instrumentsSource[instrumentName][1];
-                    if (this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
-                        const centAdjustment = this.sampleCentAdjustments[sampleName];
-                        const playbackRate = Math.pow(2, centAdjustment / 1200);
-                        tempSynth.playbackRate.value = playbackRate;
-                    }
-                }
             }
 
             // Final validation: ensure synth still exists and is valid
@@ -2463,7 +2446,8 @@ function Synth() {
                         paramsFilters,
                         setNote,
                         future,
-                        output
+                        output,
+                        this.sampleCentAdjustments[instrumentsSource[instrumentName][1]]
                     );
                     break;
                 case 3: // builtin synth

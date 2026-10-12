@@ -6635,6 +6635,22 @@ class Blocks {
                             [thisBlock, value]
                         );
                         break;
+                    case "customsample":
+                        /** The value carries the cent adjustment set in the sampler. */
+                        postProcess = args => {
+                            that.blockList[args[0]].value = Array.isArray(args[1])
+                                ? args[1].slice()
+                                : null;
+                        };
+
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, value]
+                        );
+                        break;
                     default:
                         /** Check that name is in the proto list */
                         if (!(name in this.protoBlockDict) || this.protoBlockDict[name] === null) {

@@ -1740,6 +1740,36 @@ describe("Blocks Foundation", () => {
             expect(blocks.updateBlockText).toHaveBeenCalledWith(0);
         });
 
+        it("keeps the cent adjustment of a loaded customsample block", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                customsample: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        value: null,
+                        connections: [null, null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const value = ["tuned", "", "la", 4, 50];
+            blocks.loadNewBlocks([
+                [0, ["customsample", { value }], 0, 0, [null, null, null, null]]
+            ]);
+
+            expect(blocks.blockList[0].value).toEqual(["tuned", "", "la", 4, 50]);
+            // The block gets its own copy, so running it can't change the project data.
+            expect(blocks.blockList[0].value).not.toBe(value);
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is

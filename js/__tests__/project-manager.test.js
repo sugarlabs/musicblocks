@@ -1047,6 +1047,38 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["rhythmruler2", { collapsed: true }]);
     });
 
+    describe("customsample", () => {
+        const exportSample = connections => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                {
+                    name: "customsample",
+                    trash: false,
+                    value: ["tuned", "data:audio/wav;base64,AAAA", "la", 4, 50],
+                    container: { x: 0, y: 0 },
+                    connections,
+                    isValueBlock: () => false
+                }
+            ];
+            return JSON.parse(new ProjectManager(activity).prepareExport())[0][1];
+        };
+
+        it("saves the cent adjustment and leaves the sample data to its audiofile block", () => {
+            // Dock 1 points at itself only so the export keeps a non-null connection.
+            expect(exportSample([null, 0, null, null])).toEqual([
+                "customsample",
+                { value: ["tuned", "", "la", 4, 50] }
+            ]);
+        });
+
+        it("keeps the sample data when no audiofile block is attached", () => {
+            expect(exportSample([null, null, null, null])).toEqual([
+                "customsample",
+                { value: ["tuned", "data:audio/wav;base64,AAAA", "la", 4, 50] }
+            ]);
+        });
+    });
+
     it("remaps connections to dense indices", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
