@@ -4491,9 +4491,21 @@ describe("actual drum lookup helpers", () => {
             expect(_parse_pitch_string("Ebbb2")).toEqual(["E" + FLAT + FLAT + FLAT, 2]);
         });
 
-        it("should fallback when regex fails to match (e.g., missing octave)", () => {
+        it("should fallback when regex fails to match", () => {
             expect(_parse_pitch_string("x")).toEqual(["x", 4]);
             expect(_parse_pitch_string("X#")).toEqual(["X" + SHARP, 4]);
+        });
+
+        it("should parse and normalize pitches when octave is omitted (#9430)", () => {
+            expect(_parse_pitch_string("C")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("c")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("C#")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("Bb")).toEqual(["B" + FLAT, 4]);
+            expect(_parse_pitch_string("Cx")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("F" + DOUBLESHARP)).toEqual(["F" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("Bbb")).toEqual(["B" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("C" + DOUBLEFLAT)).toEqual(["C" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("C#b")).toEqual(["C", 4]);
         });
     });
 });

@@ -274,11 +274,11 @@ var getNumber = (notename, octave, temperament, edo) => {
  * @returns {Array} An array containing [normalizedNoteName, octave].
  */
 function _parse_pitch_string(str) {
-    const match = str.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)$/u);
+    const match = str.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)?$/u);
     if (match) {
         const baseLetter = match[1].toUpperCase();
         const accidentalStr = match[2];
-        const octave = parseInt(match[3], 10);
+        const octave = match[3] !== undefined ? parseInt(match[3], 10) : 4;
 
         if (!accidentalStr) {
             // No accidentals; return as-is
