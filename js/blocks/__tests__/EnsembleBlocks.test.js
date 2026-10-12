@@ -361,10 +361,19 @@ describe("setupEnsembleBlocks", () => {
             expect(result).toBe(-1);
         });
 
-        it("should return error if target turtle not found", () => {
-            logo.parseArg.mockReturnValue("NonExistent");
+        it("should report an error if target turtle is not found", () => {
+            logo.parseArg.mockReturnValueOnce("NonExistent").mockReturnValueOnce(1);
             const result = turtleHeapBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // null < 0 is false, reaches end of function
+            expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle NonExistent", blk);
+            expect(result).toBe(-1);
+            expect(logo.turtleHeaps).not.toHaveProperty("null");
+        });
+
+        it("should return an error value if the turtle name evaluates to null", () => {
+            logo.parseArg.mockReturnValueOnce(null);
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(result).toBe(-1);
+            expect(logo.turtleHeaps).not.toHaveProperty("null");
         });
 
         it("should return error if index connection is null", () => {
