@@ -194,6 +194,8 @@ class TimbreWidget {
             this.isActive[this.activeParams[i]] = false;
         }
 
+        this._undoStack = [];
+
         this.blockNo = null; // index no. of the timbre widget block
         this.instrumentName = "custom";
         this.lastSelectedEffect = null;
@@ -230,6 +232,7 @@ class TimbreWidget {
         this._delta = 0;
 
         this._playing = false;
+        this._undoStack = [];
 
         const widgetWindow = window.widgetWindows.windowFor(this, "timbre", "timbre", true);
         announceToScreenReader(_("Timbre Widget opened"));
@@ -250,7 +253,10 @@ class TimbreWidget {
             this._clearWidgetTimers();
             // Clean up all event listeners
             this._cleanupEventListeners();
-            this.activity.hideMsgs();
+            this._undoStack = [];
+            if (this.activity && this.activity.hideMsgs) {
+                this.activity.hideMsgs();
+            }
             announceToScreenReader(_("Timbre Widget closed"));
             widgetWindow.destroy();
         };
