@@ -13,10 +13,11 @@
 
 /* exported setupActivityMxmlParser */
 
-// PR 2 of 4 for MusicXML import: multi-part scores, real key-signature extraction
-// from <attributes><key><fifths>, and an initial tempo from <sound tempo>. Repeats,
-// ties/slurs and drum/unpitched parts are still out of scope and land in PR 3; wiring
-// this into the app's Load menu is PR 4.
+// PR 3 of 4 for MusicXML import: repeats, ties, and drum/unpitched parts. Slurs
+// are intentionally not imported -- they're purely expressive in MusicXML (no
+// pitch/duration/timing effect) and Music Blocks has no block that represents
+// one; writing something half-equivalent would be worse than writing nothing.
+// Wiring this into the app's Load menu is PR 4.
 
 // Maps a MusicXML <alter> value to the Music Blocks Unicode accidental suffix
 // appended to the bare step letter. Double sharp/flat use the standard MB symbols.
@@ -43,6 +44,13 @@ const _MXML_TYPE_DENOMINATOR = {
 };
 
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
+
+// Adds two [numerator, denominator] fractions without reducing the result --
+// same choice as js/utils/utils-logic.js's rationalSum, whose own doc comment
+// explains why: the "divide" block computes the reduction at runtime anyway,
+// so there's nothing to gain from doing it here, and an unreduced result is
+// just as correct.
+const _addFractions = ([n1, d1], [n2, d2]) => [n1 * d2 + n2 * d1, d1 * d2];
 
 /**
  * A note's length as a Music Blocks [numerator, denominator] fraction.
@@ -91,6 +99,36 @@ function _pitchToNoteName(pitchEl) {
     const octave = Number(_text(pitchEl, "octave") ?? "4");
     const suffix = _MXML_ALTER_SUFFIX[alter] ?? "";
     return { name: step + suffix, octave };
+}
+
+/**
+ * The Music Blocks drum name for an unpitched <note>, from the
+ * <score-instrument><instrument-name> its <instrument id> references.
+ *
+ * js/mxml.js writes <instrument-name> as the drum name directly (e.g. "snare
+ * drum") for any drum it recognizes, so no MIDI-number round trip is needed --
+ * the text is already what a drumname block's value should be. Falls back to
+ * "kick drum" when the note has no <instrument> reference or the id doesn't
+ * resolve, the same default js/midi.js's own importer uses for the same reason.
+ *
+ * @param {Element} noteEl - a MusicXML <note> element with an <unpitched> child
+ * @param {Document} doc - the whole document, since <score-instrument> lives in
+ *     <part-list>, not inside the part being walked
+ * @returns {string}
+ */
+function _drumName(noteEl, doc) {
+    const instrumentId = noteEl.querySelector(":scope > instrument")?.getAttribute("id");
+    if (!instrumentId) return "kick drum";
+    // Matched by comparing the id in JS, not interpolated into a CSS attribute
+    // selector -- an id containing a quote or other selector-special character
+    // would otherwise produce a malformed (or, worse, unintended) selector.
+    for (const scoreInstrument of doc.querySelectorAll("score-instrument")) {
+        if (scoreInstrument.getAttribute("id") === instrumentId) {
+            const name = _text(scoreInstrument, "instrument-name")?.trim();
+            return name || "kick drum";
+        }
+    }
+    return "kick drum";
 }
 
 // Inverse of js/mxml.js's _MAJOR_FIFTHS: a <fifths> count -> the major-key tonic
@@ -204,19 +242,28 @@ function _findTempo(doc) {
 }
 
 /**
- * Builds the block literals for one note or rest, in the same shape
+ * Builds the block literals for one note, drum hit or rest, in the same shape
  * js/activity/abc-parser.js's _createPitchBlocks uses: a newnote wrapper
- * (divide/number/number for the fraction, vspace), then either a pitch
- * (notename/number) or a rest2, then a trailing hidden spacer.
+ * (divide/number/number for the fraction, vspace), then the note's content,
+ * then a trailing hidden spacer.
+ *
+ * The content is pitch/notename/number for a pitched note, playdrum/drumname
+ * for a drum hit -- js/blocks/DrumBlocks.js's PlayDrumBlock help string says
+ * directly "You can use multiple Drum blocks within a Note block", and
+ * js/midi.js's own importer nests playdrum inside newnote's clamp the same
+ * way (patching the drum block's prev to the newnote's vspace) -- or just
+ * rest2 for a rest.
  *
  * @param {number} blockId - this note's own starting block id
  * @param {[number, number]} duration - [numerator, denominator]
- * @param {{name: string, octave: number}|null} pitch - null for a rest
+ * @param {{type: "pitch", name: string, octave: number}
+ *     | {type: "drum", name: string} | null} content - null for a rest
  * @param {number} prevId - the previous block's id, for this note's top connection
  * @returns {Array} the pushed block literals
  */
-function _createNoteBlocks(blockId, duration, pitch, prevId) {
-    const hiddenId = blockId + (pitch ? 8 : 6);
+function _createNoteBlocks(blockId, duration, content, prevId) {
+    const contentBlockCount = content === null ? 1 : content.type === "pitch" ? 3 : 2;
+    const hiddenId = blockId + 5 + contentBlockCount;
     const blocks = [
         [
             blockId,
@@ -231,14 +278,19 @@ function _createNoteBlocks(blockId, duration, pitch, prevId) {
         [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
     ];
 
-    if (pitch) {
+    if (content === null) {
+        blocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
+    } else if (content.type === "pitch") {
         blocks.push(
             [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: pitch.name }], 0, 0, [blockId + 5]],
-            [blockId + 7, ["number", { value: pitch.octave }], 0, 0, [blockId + 5]]
+            [blockId + 6, ["notename", { value: content.name }], 0, 0, [blockId + 5]],
+            [blockId + 7, ["number", { value: content.octave }], 0, 0, [blockId + 5]]
         );
     } else {
-        blocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
+        blocks.push(
+            [blockId + 5, "playdrum", 0, 0, [blockId + 4, blockId + 6, null]],
+            [blockId + 6, ["drumname", { value: content.name }], 0, 0, [blockId + 5]]
+        );
     }
 
     blocks.push([hiddenId, "hidden", 0, 0, [blockId, hiddenId + 1]]);
@@ -331,24 +383,116 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
 }
 
 /**
- * Walks one <part>'s <measure> elements in document order, building a note/rest
- * block chain. Stops processing a measure at the first <backup> (a second voice
- * sharing the part): multi-voice parts are a follow-up PR, and taking only the
- * first voice is the safe reading rather than misinterpreting the backed-up time
- * as forward motion. <chord/>-marked notes (chord members after the first) are
- * skipped for the same reason -- melody-only is correct-but-incomplete, where
- * including them without chord support would just be wrong.
+ * Wraps each repeat range in a "repeat" FlowClampBlock, rewiring the flat note
+ * chain -- the same kind of rewiring js/activity/abc-parser.js's
+ * _processRepeatFromStart/_processRepeatMid do for ABC's per-line nameddo
+ * chain, simplified here since this file builds one flat newnote chain per
+ * part rather than a chain of per-line action blocks.
+ *
+ * Deliberately simple: ranges are assumed non-overlapping and non-nested (a
+ * second forward repeat seen before a backward one just moves the pending
+ * start forward, rather than stacking); MusicXML's multiple-ending ("volta")
+ * repeats are not handled, the same gap js/activity/abc-parser.js's own
+ * header comment already documents for ABC's alternate endings.
+ *
+ * @param {Array<{startIndex: number, endIndex: number, times: number}>} repeats
+ * @param {Array} noteBlocks - every note/rest/drum block literal for this
+ *     part, already with the final note's trailing connection nulled
+ *     (mutated in place: connections are redirected around each range)
+ * @param {Array<number>} noteStartIds - each note's own wrapper block id, in
+ *     the order notes were emitted
+ * @param {Array<number>} noteEndIds - each note's own trailing hidden
+ *     spacer's id, parallel to noteStartIds
+ * @param {number} blockId - the next free block id
+ * @returns {{blocks: Array, nextBlockId: number, firstBlockId: number}}
+ *     firstBlockId is noteStartIds[0] unless a repeat covers index 0, in
+ *     which case it's that repeat block's own id -- the caller's settimbre
+ *     link must point to whichever one actually starts the flow now.
+ */
+function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
+    let firstBlockId = noteStartIds[0];
+    if (repeats.length === 0) return { blocks: [], nextBlockId: blockId, firstBlockId };
+
+    const byId = new Map(noteBlocks.map(block => [block[0], block]));
+    const repeatBlocks = [];
+
+    for (const { startIndex, endIndex, times } of repeats) {
+        const startNote = byId.get(noteStartIds[startIndex]);
+        const endHidden = byId.get(noteEndIds[endIndex]);
+        const prevId = startNote[4][0];
+        const nextNoteId = endIndex + 1 < noteStartIds.length ? noteStartIds[endIndex + 1] : null;
+
+        const repeatId = blockId;
+        const countId = blockId + 1;
+        blockId += 2;
+
+        repeatBlocks.push(
+            [repeatId, "repeat", 0, 0, [prevId, countId, startNote[0], nextNoteId]],
+            [countId, ["number", { value: times }], 0, 0, [repeatId]]
+        );
+
+        if (startIndex === 0) {
+            firstBlockId = repeatId;
+        } else {
+            byId.get(prevId)[4][1] = repeatId;
+        }
+        startNote[4][0] = repeatId;
+        endHidden[4][1] = null;
+        if (nextNoteId !== null) {
+            byId.get(nextNoteId)[4][0] = repeatId;
+        }
+    }
+
+    return { blocks: repeatBlocks, nextBlockId: blockId, firstBlockId };
+}
+
+/**
+ * Walks one <part>'s <measure> elements in document order, building a
+ * note/rest/drum block chain. Stops processing a measure at the first
+ * <backup> (a second voice sharing the part): multi-voice parts are a
+ * follow-up PR, and taking only the first voice is the safe reading rather
+ * than misinterpreting the backed-up time as forward motion. <chord/>-marked
+ * notes (chord members after the first) are skipped for the same reason --
+ * melody-only is correct-but-incomplete, where including them without chord
+ * support would just be wrong. A grace note (<grace/>, a <type> but no
+ * <duration>) is skipped outright: it doesn't take up measure time, and
+ * importing it as a full-length note would make every later note start late.
+ *
+ * Tied notes (<tie type="start"/> .. <tie type="stop"/>, possibly spanning
+ * more than two notes) are merged into one note block with their durations
+ * summed, rather than built as separate notes wrapped in a "tie" clamp block
+ * (js/blocks/RhythmBlocks.js's TieBlock) -- musically equivalent for the
+ * common case of a sustained same-pitch note, and avoids needing a second,
+ * less-precedented block-wrapping mechanism alongside repeat's.
  *
  * @param {Element} partEl - a MusicXML <part> element
  * @param {number} blockId - the next free block id (the preamble's last id + 1)
  * @param {number} chainPrevId - the block id the first note should connect from
- * @returns {{noteBlocks: Array, lastBlockId: number, producedNotes: boolean}}
+ * @param {Document} doc - the whole document, for drum-name lookups
+ * @returns {{noteBlocks: Array, lastBlockId: number, producedNotes: boolean,
+ *     firstBlockId: number}}
  */
-function _processPart(partEl, blockId, chainPrevId) {
+function _processPart(partEl, blockId, chainPrevId, doc) {
     const noteBlocks = [];
+    const noteStartIds = [];
+    const noteEndIds = [];
+    const repeats = [];
+    let repeatPendingStart = null;
     let divisions = 1;
     let prevId = chainPrevId;
     let producedNotes = false;
+    let tieDuration = null;
+    let tieContent = null;
+
+    const emitNote = (duration, content) => {
+        const blocks = _createNoteBlocks(blockId, duration, content, prevId);
+        noteBlocks.push(...blocks);
+        noteStartIds.push(blockId);
+        noteEndIds.push(blocks[blocks.length - 1][0]);
+        producedNotes = true;
+        prevId = blocks[blocks.length - 1][0];
+        blockId = prevId + 1;
+    };
 
     for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
         const divisionsText = measureEl.querySelector(
@@ -358,27 +502,95 @@ function _processPart(partEl, blockId, chainPrevId) {
 
         for (const child of measureEl.children) {
             if (child.tagName === "backup") break;
+
+            if (child.tagName === "barline") {
+                const repeatEl = child.querySelector(":scope > repeat");
+                const direction = repeatEl?.getAttribute("direction");
+                if (direction === "forward") {
+                    repeatPendingStart = noteStartIds.length;
+                } else if (direction === "backward") {
+                    const times = Number(repeatEl.getAttribute("times")) || 2;
+                    const startIndex = repeatPendingStart ?? 0;
+                    const endIndex = noteStartIds.length - 1;
+                    if (endIndex >= startIndex) {
+                        repeats.push({ startIndex, endIndex, times });
+                    }
+                    repeatPendingStart = null;
+                }
+                continue;
+            }
+
             if (child.tagName !== "note") continue;
             if (child.querySelector(":scope > chord") !== null) continue;
+            if (child.querySelector(":scope > grace") !== null) continue;
 
             const duration = _noteDuration(child, divisions);
+            const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
-            const isRest = child.querySelector(":scope > rest") !== null || pitchEl === null;
-            const pitch = isRest ? null : _pitchToNoteName(pitchEl);
+            const isRest =
+                child.querySelector(":scope > rest") !== null ||
+                (pitchEl === null && unpitchedEl === null);
 
-            const blocks = _createNoteBlocks(blockId, duration, pitch, prevId);
-            noteBlocks.push(...blocks);
-            producedNotes = true;
-            prevId = blocks[blocks.length - 1][0];
-            blockId = prevId + 1;
+            let content;
+            if (isRest) {
+                content = null;
+            } else if (unpitchedEl !== null) {
+                content = { type: "drum", name: _drumName(child, doc) };
+            } else {
+                content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
+            }
+
+            let hasTieStart = false;
+            let hasTieStop = false;
+            for (const tieEl of child.querySelectorAll(":scope > tie")) {
+                const type = tieEl.getAttribute("type");
+                if (type === "start") hasTieStart = true;
+                if (type === "stop") hasTieStop = true;
+            }
+
+            if (tieDuration !== null) {
+                const combined = _addFractions(tieDuration, duration);
+                if (hasTieStart) {
+                    tieDuration = combined;
+                } else {
+                    emitNote(combined, tieContent);
+                    tieDuration = null;
+                    tieContent = null;
+                }
+            } else if (hasTieStart && !hasTieStop) {
+                tieDuration = duration;
+                tieContent = content;
+            } else {
+                emitNote(duration, content);
+            }
         }
     }
 
-    if (noteBlocks.length > 0) {
-        noteBlocks[noteBlocks.length - 1][4][1] = null;
+    // A file that ends mid-tie (a <tie type="start"/> with no matching stop)
+    // is malformed, but the accumulated duration is still real music: emit it
+    // rather than silently dropping it.
+    if (tieDuration !== null) {
+        emitNote(tieDuration, tieContent);
     }
 
-    return { noteBlocks, lastBlockId: blockId, producedNotes };
+    if (noteBlocks.length === 0) {
+        return { noteBlocks, lastBlockId: blockId, producedNotes, firstBlockId: null };
+    }
+
+    noteBlocks[noteBlocks.length - 1][4][1] = null;
+
+    const {
+        blocks: repeatBlocks,
+        nextBlockId,
+        firstBlockId
+    } = _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId);
+
+    return {
+        noteBlocks: [...noteBlocks, ...repeatBlocks],
+        lastBlockId: nextBlockId,
+        producedNotes,
+        firstBlockId
+    };
 }
 
 /**
@@ -391,7 +603,7 @@ function _processPart(partEl, blockId, chainPrevId) {
  *     file's tempo applies to every track
  * @returns {{blocks: Array, nextBlockId: number}}
  */
-function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm) {
+function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, doc) {
     const timeSignature = _initialTimeSignature(partEl);
     const keySignature = _keySignature(partEl);
     const { preamble, settimbreId, nextBlockId } = _buildPreamble(
@@ -402,18 +614,24 @@ function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm) {
         keySignature,
         tempoBpm
     );
-    const { noteBlocks, producedNotes, lastBlockId } = _processPart(
+    const { noteBlocks, producedNotes, lastBlockId, firstBlockId } = _processPart(
         partEl,
         nextBlockId,
-        settimbreId
+        settimbreId,
+        doc
     );
 
     if (producedNotes) {
-        // Link settimbre -> first note (forward), and back-link the first
-        // note's top dock -> settimbre, same as abc-parser.js's _finalizeStaffBlocks.
+        // Link settimbre -> whatever actually starts the flow (forward), and
+        // back-link that block's top dock -> settimbre, same as
+        // abc-parser.js's _finalizeStaffBlocks. firstBlockId is the first
+        // note's own id unless a repeat wraps starting at the very first
+        // note, in which case it's that repeat block's id instead -- settimbre
+        // must connect to whichever one actually comes first in the flow now.
         const settimbreBlock = preamble.find(block => block[0] === settimbreId);
-        settimbreBlock[4][2] = noteBlocks[0][0];
-        noteBlocks[0][4][0] = settimbreId;
+        settimbreBlock[4][2] = firstBlockId;
+        const firstBlock = noteBlocks.find(block => block[0] === firstBlockId);
+        firstBlock[4][0] = settimbreId;
     }
 
     return { blocks: [...preamble, ...noteBlocks], nextBlockId: lastBlockId };
@@ -455,7 +673,8 @@ const setupActivityMxmlParser = activityInstance => {
                 blockId,
                 title,
                 `Voice ${index + 1}`,
-                tempoBpm
+                tempoBpm,
+                doc
             );
             allBlocks.push(...blocks);
             blockId = nextBlockId;
