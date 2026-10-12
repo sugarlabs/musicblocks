@@ -42,6 +42,7 @@ describe("setupVolumeActions", () => {
 
         global.instruments = {
             0: {
+                default: { connect: jest.fn() },
                 synth1: { connect: jest.fn() },
                 piano: { connect: jest.fn() }
             }
@@ -746,13 +747,36 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
         });
 
-        it("should load synth when not in instrumentNames", () => {
+        it("loads a synth the turtle doesn't have yet", () => {
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+
+            expect(loadSynthSpy).toHaveBeenCalledWith(0, "violin");
+        });
+
+        it("does not reload a synth the turtle already has", () => {
             targetTurtle.singer.instrumentNames = ["default"];
 
             Singer.VolumeActions.setSynthVolume("piano", 70, 0, "testBlock");
 
-            expect(targetTurtle.singer.instrumentNames).toContain("piano");
-            expect(loadSynthSpy).toHaveBeenCalledWith(0, "piano");
+            expect(loadSynthSpy).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.synthVolume.piano).toContain(70);
+        });
+
+        it("does not make the volume target the current instrument", () => {
+            targetTurtle.singer.instrumentNames = ["default"];
+
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+            Singer.VolumeActions.setSynthVolume("Kick", 50, 0, "testBlock");
+
+            expect(targetTurtle.singer.instrumentNames).toEqual(["default"]);
+        });
+
+        it("leaves the instrument set by an enclosing set instrument on top", () => {
+            targetTurtle.singer.instrumentNames = ["default", "piano"];
+
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+
+            expect(last(targetTurtle.singer.instrumentNames)).toBe("piano");
         });
 
         it("should initialize synthVolume and crescendoInitialVolume when undefined", () => {
@@ -778,7 +802,7 @@ describe("setupVolumeActions", () => {
             ).not.toThrow();
 
             expect(targetTurtle.singer.synthVolume.violin).toEqual([DEFAULTVOLUME, 70]);
-            expect(loadSynthSpy).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["default", "violin"]);
         });
 
         it("does not reset an already-tracked synth volume when the instrument is newly added", () => {
