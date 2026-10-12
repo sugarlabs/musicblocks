@@ -79,6 +79,7 @@ class ProjectManager {
     constructor(activity) {
         this.activity = activity;
         this._loadAnimationIntervalId = null;
+        this._saveAfterLoad = () => this.saveLocally();
     }
 
     // -----------------------------------------------------------------------
@@ -887,6 +888,13 @@ class ProjectManager {
 
     saveLocally(options = {}) {
         const activity = this.activity;
+
+        // Don't replace the saved session with a partly loaded project.
+        if (activity.blocks.isLoading()) {
+            activity.blocks.runAfterLoad(this._saveAfterLoad);
+            return;
+        }
+
         const data = this.prepareExport();
         const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
 
