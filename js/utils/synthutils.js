@@ -1884,10 +1884,14 @@ function Synth() {
             }
         }
 
-        if (cents) {
+        const detune = value => {
             const ratio = Math.pow(2, cents / 1200);
-            const hertz = this._getFrequency(notes, false);
-            notes = Array.isArray(hertz) ? hertz.map(f => f * ratio) : hertz * ratio;
+            const hertz = this._getFrequency(value, false);
+            return Array.isArray(hertz) ? hertz.map(f => f * ratio) : hertz * ratio;
+        };
+
+        if (cents) {
+            notes = detune(notes);
         }
 
         let numFilters;
@@ -2070,12 +2074,16 @@ function Synth() {
                         // for each note.
                         const obj = [];
                         for (let i = 0; i < paramsEffects["neighborArgNote1"].length; i++) {
-                            const note1 = normalizeNoteAccidentals(
+                            let note1 = normalizeNoteAccidentals(
                                 paramsEffects["neighborArgNote1"][i]
                             );
-                            const note2 = normalizeNoteAccidentals(
+                            let note2 = normalizeNoteAccidentals(
                                 paramsEffects["neighborArgNote2"][i]
                             );
+                            if (cents) {
+                                note1 = detune(note1);
+                                note2 = detune(note2);
+                            }
                             obj.push(
                                 { time: 0, note: note1, duration: firstTwoBeats },
                                 { time: firstTwoBeats, note: note2, duration: firstTwoBeats },

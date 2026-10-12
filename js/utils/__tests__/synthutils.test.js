@@ -597,6 +597,30 @@ describe("Utility Functions (logic-only)", () => {
             expect(sampler.triggerAttackRelease.mock.calls[0][0]).toEqual(["A4"]);
         });
 
+        test("should apply the cent adjustment to neighbor notes", async () => {
+            const sampler = {
+                chain: jest.fn(),
+                disconnect: jest.fn(),
+                triggerAttackRelease: jest.fn()
+            };
+            const neighbor = {
+                doNeighbor: true,
+                neighborArgBeat: 0.125,
+                neighborArgCurrentBeat: 0.25,
+                neighborArgNote1: ["A4"],
+                neighborArgNote2: ["B4"]
+            };
+            Tone.Part.mockClear();
+
+            await _performNotes(sampler, "A4", 0.5, neighbor, null, false, 0, undefined, 50);
+
+            const ratio = Math.pow(2, 50 / 1200);
+            const [, events] = Tone.Part.mock.calls[0];
+            expect(events[0].note).toBeCloseTo(440 * ratio, 2);
+            expect(events[1].note).toBeCloseTo(493.8833 * ratio, 2);
+            expect(events[2].note).toBeCloseTo(440 * ratio, 2);
+        });
+
         test("should bail out of the reload if instruments are disposed mid-load (#7996)", async () => {
             if (!instruments[turtle]) {
                 instruments[turtle] = {}; // Initialize instruments for the turtle
