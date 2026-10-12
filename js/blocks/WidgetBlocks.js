@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, ChordBuilderWidget
  */
 
 /*
@@ -860,6 +860,80 @@ function setupWidgetBlocks(activity) {
                         "widgets/modewidget"
                     ]),
                     () => new ModeWidget(activity)
+                );
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+    /**
+     * Represents a block for creating and exploring chord progressions.
+     * @extends StackClampBlock
+     */
+    class ChordBuilderBlock extends StackClampBlock {
+        /**
+         * Creates a ChordBuilderBlock instance.
+         */
+        constructor() {
+            super("chordbuilder");
+            this.setCapability("collapsible");
+            this.setPalette("widgets", activity);
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Chord progression block opens a tool to explore diatonic chords and build musical progressions."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            //.TRANS: musical chord progression builder
+            this.formBlock({ name: _("chord progression"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "chordbuilder", x, y, [null, 1, 4]],
+                [1, "setkey2", 0, 0, [0, 2, 3, null]],
+                [2, ["notename", { value: "C" }], 0, 0, [1]],
+                [3, ["modename", { value: DEFAULTMODE }], 0, 0, [1]],
+                [4, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        }
+
+        /**
+         * Handles the flow of data for the ChordBuilder block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
+        flow(args, logo, turtle, blk) {
+            logo.insideChordBuilder = true;
+
+            const listenerName = "_chordbuilder_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const resetFlag = () => {
+                logo.insideChordBuilder = false;
+            };
+
+            const __listener = () => {
+                if (logo.chordBuilderWidget && logo.chordBuilderWidget !== "loading") {
+                    logo.chordBuilderWidget.widgetWindow.show();
+                    resetFlag();
+                    return;
+                }
+                _lazyLoadWidget(
+                    logo,
+                    "chordBuilderWidget",
+                    _getWidgetDependencies(
+                        typeof ChordBuilderWidget !== "undefined" ? ChordBuilderWidget : null,
+                        ["widgets/ChordBuilderAudio", "widgets/chordbuilder"]
+                    ),
+                    () => new ChordBuilderWidget(activity)
                 );
             };
 
@@ -2347,6 +2421,7 @@ function setupWidgetBlocks(activity) {
         new TimbreBlock().setup(activity);
         new TemperamentBlock().setup(activity);
         new ModeWidgetBlock().setup(activity);
+        new ChordBuilderBlock().setup(activity);
         new MeterWidgetBlock().setup(activity);
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);

@@ -98,6 +98,8 @@ global.Oscilloscope = jest.fn();
 global.Oscilloscope.dependencies = ["widgets/oscilloscope"];
 global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
+global.ChordBuilderWidget = jest.fn();
+global.ChordBuilderWidget.dependencies = ["widgets/ChordBuilderAudio", "widgets/chordbuilder"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
 global.Tempo.dependencies = [
@@ -338,6 +340,7 @@ describe("setupWidgetBlocks", () => {
             expect(getBlock("timbre")).toBeDefined();
             expect(getBlock("tempo")).toBeDefined();
             expect(getBlock("meterwidget")).toBeDefined();
+            expect(getBlock("chordbuilder")).toBeDefined();
             expect(activity.blockTypes).toEqual([
                 "aidebugger",
                 "envelope",
@@ -348,6 +351,7 @@ describe("setupWidgetBlocks", () => {
                 "timbre",
                 "temperament",
                 "modewidget",
+                "chordbuilder",
                 "meterwidget",
                 "tempo",
                 "sampler",
@@ -535,6 +539,15 @@ describe("setupWidgetBlocks", () => {
             const modeWidget = getBlock("modewidget");
             const result = modeWidget.flow(["childBlk"], logo, 0, "modeBlk");
             expect(logo.insideModeWidget).toBe(true);
+            expect(result).toEqual(["childBlk", 1]);
+        });
+    });
+
+    describe("ChordBuilderBlock", () => {
+        it("sets insideChordBuilder and returns child block", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            const result = chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+            expect(logo.insideChordBuilder).toBe(true);
             expect(result).toEqual(["childBlk", 1]);
         });
     });
@@ -853,7 +866,8 @@ describe("setupWidgetBlocks", () => {
             const lazyLoadWidgetSites = [
                 ["meterWidget", "MeterWidget"],
                 ["Oscilloscope", "Oscilloscope"],
-                ["modeWidget", "ModeWidget"]
+                ["modeWidget", "ModeWidget"],
+                ["chordBuilderWidget", "ChordBuilderWidget"]
             ];
 
             const notWired = [];
@@ -902,7 +916,8 @@ describe("setupWidgetBlocks", () => {
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
-            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
+            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget],
+            ["chordbuilder", "chordBlk", "chordBuilderWidget", global.ChordBuilderWidget]
         ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
             if (type === "meterwidget") {
                 activity.blocks.blockList = {
