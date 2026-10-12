@@ -276,46 +276,28 @@ var getNumber = (notename, octave, temperament, edo) => {
 function _parse_pitch_string(str) {
     const trimmed = typeof str === "string" ? str.trim() : str;
     const match = trimmed.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)?$/u);
-    if (match) {
-        const baseLetter = match[1].toUpperCase();
-        const accidentalStr = match[2];
-        const octave = match[3] !== undefined ? parseInt(match[3], 10) : 4;
-
-        if (!accidentalStr) {
-            // No accidentals; return as-is
-            return [baseLetter, octave];
-        }
-
-        // Sum up semitone offsets for all accidental characters.
-        // 𝄪 and 𝄫 are multi-byte but treated as single code points by spread.
-        const accidentalChars = [...accidentalStr];
-        const semitoneOffset = accidentalChars.reduce(
-            (sum, char) => sum + (ACCIDENTAL_SEMITONE_MAP[char] || 0),
-            0
-        );
-
-        // Build a normalized name using canonical SHARP/FLAT symbols.
-        let normalizedName;
-        if (semitoneOffset === 0) {
-            normalizedName = baseLetter;
-        } else if (semitoneOffset === 1) {
-            normalizedName = baseLetter + SHARP;
-        } else if (semitoneOffset === -1) {
-            normalizedName = baseLetter + FLAT;
-        } else if (semitoneOffset === 2) {
-            normalizedName = baseLetter + DOUBLESHARP;
-        } else if (semitoneOffset === -2) {
-            normalizedName = baseLetter + DOUBLEFLAT;
-        } else {
-            // For unusual combinations, keep semitone representation as extra sharps/flats
-            const sym = semitoneOffset > 0 ? SHARP : FLAT;
-            normalizedName = baseLetter + sym.repeat(Math.abs(semitoneOffset));
-        }
-
-        return [normalizedName, octave];
+    if (!match) {
+        // Fallback: unrecognized format – normalize accidentals and default octave to 4
+        return [trimmed.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
     }
-    // Fallback: unrecognized format – normalize accidentals and default octave to 4
-    return [trimmed.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
+
+    const baseLetter = match[1].toUpperCase();
+    const accidentalStr = match[2];
+    const octave = match[3] !== undefined ? parseInt(match[3], 10) : 4;
+
+    let semitoneOffset = 0;
+    for (const char of accidentalStr) {
+        semitoneOffset += ACCIDENTAL_SEMITONE_MAP[char] || 0;
+    }
+
+    // Direct O(1) mapping for semitone offsets in [-2, 2]
+    const CANONICAL_ACCIDENTALS = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
+    const accidental =
+        CANONICAL_ACCIDENTALS[semitoneOffset + 2] !== undefined
+            ? CANONICAL_ACCIDENTALS[semitoneOffset + 2]
+            : (semitoneOffset > 0 ? SHARP : FLAT).repeat(Math.abs(semitoneOffset));
+
+    return [baseLetter + accidental, octave];
 }
 
 /**
