@@ -2432,6 +2432,48 @@ describe("Blocks Foundation", () => {
 
             expect(callback).not.toHaveBeenCalled();
         });
+
+        it("runAfterLoad drops its callbacks when a load fails and a queued one then succeeds", async () => {
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("deferred chunk failure");
+                }
+                blocks.blockList[blockOffset + b] = { connections: null, trash: false };
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+            const callback = jest.fn();
+
+            try {
+                blocks.loadNewBlocks(makeBatch(25));
+                blocks.loadNewBlocks(makeBatch(2));
+                blocks.runAfterLoad(callback);
+                await new Promise(r => setTimeout(r, 50));
+            } finally {
+                window.removeEventListener("error", onWindowError);
+            }
+
+            expect(blocks._lastLoadFailed).toBe(false);
+            expect(blocks.isLoading()).toBe(false);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        it("runAfterLoad drops its callbacks when a queued project is rejected", async () => {
+            const callback = jest.fn();
+            const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
+
+            blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(circularBatch);
+            blocks.runAfterLoad(callback);
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(blocks.isLoading()).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            expect(callback).not.toHaveBeenCalled();
+        });
     });
 
     describe("ProjectManager recovery keeps _loadInProgress correct end to end (#8855)", () => {

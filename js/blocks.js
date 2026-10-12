@@ -5051,6 +5051,13 @@ class Blocks {
         this._advanceLoadQueue = () => {
             this._loadInProgress = false;
 
+            // A failed load leaves only part of the project behind, which is
+            // exactly what the waiting callbacks were held back from seeing.
+            // Drop them now, since a queued load clears _lastLoadFailed.
+            if (this._lastLoadFailed) {
+                this._afterLoadCallbacks.clear();
+            }
+
             if (this._loadQueue.length > 0) {
                 const next = this._loadQueue.shift();
                 this._loadInProgress = true;
@@ -5060,10 +5067,6 @@ class Blocks {
 
             const callbacks = [...this._afterLoadCallbacks];
             this._afterLoadCallbacks.clear();
-
-            // A failed load leaves only part of the project behind, which is
-            // exactly what the waiting callbacks were held back from seeing.
-            if (this._lastLoadFailed) return;
 
             for (const callback of callbacks) {
                 try {
@@ -5261,6 +5264,9 @@ class Blocks {
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
+                    // Nothing was loaded, so a waiting save would only store
+                    // the cleared workspace over the project.
+                    this._afterLoadCallbacks.clear();
                     this._advanceLoadQueue();
                 };
 
