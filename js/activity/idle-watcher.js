@@ -177,12 +177,24 @@ const setupActivityIdleWatcher = activityInstance => {
 
                         // A restart loads the Planet copy ahead of these session
                         // copies, so keep it current too. That save rewrites every
-                        // stored project, so only make it when something changed.
+                        // stored project, so only repeat it once something changed
+                        // or the last one was not written (null or false).
                         if (activity.planet) {
                             const data = activity.prepareExport();
                             if (data !== lastPlanetSave) {
-                                activity.saveLocally();
-                                lastPlanetSave = data;
+                                Promise.resolve(
+                                    activity.saveLocally({ rejectOnProjectSaveError: true })
+                                )
+                                    .then(result => {
+                                        if (result !== null && result !== false) {
+                                            lastPlanetSave = data;
+                                        }
+                                    })
+                                    .catch(e => {
+                                        ErrorHandler.recoverable(e, {
+                                            operation: "autoSavePlanet"
+                                        });
+                                    });
                             }
                         }
                     } else if (

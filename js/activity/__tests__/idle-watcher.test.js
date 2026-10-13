@@ -320,30 +320,83 @@ describe("setupActivityIdleWatcher", () => {
             expect(mockActivity.gitDropdownUI.onSaveLocally).toHaveBeenCalled();
         });
 
-        it("also saves the project to Planet, the copy a restart loads", () => {
+        it("also saves the project to Planet, the copy a restart loads", async () => {
             setupActivityIdleWatcher(mockActivity);
             mockActivity.planet = {};
             mockActivity.prepareExport = jest.fn().mockReturnValue("[project]");
             mockActivity._initAutoSave();
 
-            jest.advanceTimersByTime(15 * 1000);
+            await jest.advanceTimersByTimeAsync(15 * 1000);
 
             expect(mockActivity.saveSessionAsync).toHaveBeenCalledTimes(1);
             expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+            expect(mockActivity.saveLocally).toHaveBeenCalledWith({
+                rejectOnProjectSaveError: true
+            });
         });
 
-        it("saves to Planet again only after the project changes", () => {
+        it("saves to Planet again only after the project changes", async () => {
             setupActivityIdleWatcher(mockActivity);
             mockActivity.planet = {};
             mockActivity.prepareExport = jest.fn().mockReturnValue("[a]");
             mockActivity._initAutoSave();
 
-            jest.advanceTimersByTime(30 * 1000);
+            await jest.advanceTimersByTimeAsync(30 * 1000);
             expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
 
             mockActivity.prepareExport.mockReturnValue("[b]");
-            jest.advanceTimersByTime(15 * 1000);
+            await jest.advanceTimersByTimeAsync(15 * 1000);
             expect(mockActivity.saveLocally).toHaveBeenCalledTimes(2);
+        });
+
+        it.each([null, false])("retries a Planet save that resolved to %p", async result => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.planet = {};
+            mockActivity.prepareExport = jest.fn().mockReturnValue("[a]");
+            mockActivity.saveLocally.mockResolvedValue(result);
+            mockActivity._initAutoSave();
+
+            await jest.advanceTimersByTimeAsync(30 * 1000);
+
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(2);
+        });
+
+        it("reports a rejected Planet save and retries it", async () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.planet = {};
+            mockActivity.prepareExport = jest.fn().mockReturnValue("[a]");
+            const error = new Error("Not enough space to save locally");
+            mockActivity.saveLocally.mockRejectedValue(error);
+            mockActivity._initAutoSave();
+
+            await jest.advanceTimersByTimeAsync(30 * 1000);
+
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+                operation: "autoSavePlanet"
+            });
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(2);
+        });
+
+        it("reports a failed export and saves to Planet on the next tick", async () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.planet = {};
+            const error = new Error("Export failed");
+            mockActivity.prepareExport = jest
+                .fn()
+                .mockImplementationOnce(() => {
+                    throw error;
+                })
+                .mockReturnValue("[a]");
+            mockActivity._initAutoSave();
+
+            await jest.advanceTimersByTimeAsync(15 * 1000);
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+                operation: "autoSave"
+            });
+
+            await jest.advanceTimersByTimeAsync(15 * 1000);
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
         });
 
         it("calls saveLocally after 15 seconds if saveSessionAsync is missing", () => {
