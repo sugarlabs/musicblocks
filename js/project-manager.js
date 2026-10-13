@@ -1374,7 +1374,7 @@ class ProjectManager {
                                 that.palettes.dict[name].hideMenu(true);
                             }
 
-                            await replaceProjectFromFile(obj, files[0], "loadFromFile", false);
+                            await replaceProjectFromFile(obj, files[0], "loadFromFile", true);
                         } catch (e) {
                             ErrorHandler.capture(e, { operation: "loadFromFile" });
                             that.errorMsg(

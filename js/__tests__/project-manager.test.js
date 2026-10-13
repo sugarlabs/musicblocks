@@ -3002,6 +3002,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(planet.saveLocally).toHaveBeenCalledTimes(1);
         expect(planet.initialiseNewProject).toHaveBeenCalledWith("dropped-project", false);
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(activity._allClear).toHaveBeenCalledWith(false, true);
         expect(activity.saveLocally).toHaveBeenCalledTimes(1);
         expect(activity.saveLocally.mock.invocationCallOrder[0]).toBeGreaterThan(
             blocks.loadNewBlocks.mock.invocationCallOrder[0]
