@@ -1502,6 +1502,15 @@ class ASTUtils {
                     ASTs.push(ASTUtils._getActionCallAST(idName, flow[1]));
                 } else if (instruction === "nameddoArg") {
                     ASTs.push(ASTUtils._getActionCallAST(idName, flow[1]));
+                } else {
+                    ASTUtils.skippedBlocks.add(String(flow[0]));
+                    if (Array.isArray(flow[2])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[2], iterMax));
+                    }
+                    if (Array.isArray(flow[3])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[3], iterMax));
+                    }
+                    continue;
                 }
             } else {
                 if (JSInterface.isSetter(flow[0])) {
@@ -1521,9 +1530,13 @@ class ASTUtils {
                     ASTUtils.skippedBlocks.add(String(flow[0]));
                     // A clamp holds its inner flow in flow[2], the same slot the mapped clamps
                     // above read. Exporting that flow keeps the blocks the user put inside an
-                    // unsupported clamp, which would otherwise go with it.
+                    // unsupported clamp, which would otherwise go with it. For double clamps,
+                    // flow[3] holds the secondary flow.
                     if (Array.isArray(flow[2])) {
                         ASTs.push(...ASTUtils._getBlockAST(flow[2], iterMax));
+                    }
+                    if (Array.isArray(flow[3])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[3], iterMax));
                     }
                     continue;
                 }
