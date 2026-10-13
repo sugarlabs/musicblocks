@@ -274,8 +274,11 @@ var getNumber = (notename, octave, temperament, edo) => {
  * @returns {Array} An array containing [normalizedNoteName, octave].
  */
 function _parse_pitch_string(str) {
-    if (typeof str !== "string") {
+    if (typeof str === "number" && str > 0) {
         return [str, 4];
+    }
+    if (typeof str !== "string") {
+        return [null, null];
     }
 
     const trimmed = str.trim();

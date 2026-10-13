@@ -150,10 +150,12 @@ describe("musicutils-pitch", () => {
             expect(fn("Bb-1")).toEqual(["B" + FLAT, -1]);
         });
 
-        it("handles non-string inputs safely by returning [str, 4]", () => {
-            expect(fn(null)).toEqual([null, 4]);
-            expect(fn(undefined)).toEqual([undefined, 4]);
+        it("handles non-string inputs safely", () => {
             expect(fn(440)).toEqual([440, 4]);
+            expect(fn(null)).toEqual([null, null]);
+            expect(fn(undefined)).toEqual([null, null]);
+            expect(fn(-1)).toEqual([null, null]);
+            expect(fn(0)).toEqual([null, null]);
         });
     });
 
