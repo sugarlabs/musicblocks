@@ -1135,10 +1135,10 @@ const TemperamentUI = {
 
         divAppend.onclick = function () {
             if (!docById("startNote") || !docById("endNote")) return;
-            const startRatio = docById("startNote").value;
-            const endRatio = docById("endNote").value;
+            const startRatio = Number(docById("startNote").value);
+            const endRatio = Number(docById("endNote").value);
             const ratio = startRatio / endRatio;
-            if (!Number.isFinite(ratio) || ratio <= 1) {
+            if (!(startRatio > 0) || !(endRatio > 0) || !Number.isFinite(ratio) || ratio <= 1) {
                 tw.activity.errorMsg(
                     _("Please enter an octave ratio greater than 1 (e.g. 2:1)."),
                     3000

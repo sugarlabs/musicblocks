@@ -1110,7 +1110,11 @@ describe("TemperamentUI module", () => {
             ["3", "0"],
             ["x", "1"],
             ["1", "2"],
-            ["1", "1"]
+            ["1", "1"],
+            ["-4", "-2"],
+            ["-3", "-1"],
+            ["4", "-2"],
+            ["-4", "2"]
         ])("octaveSpaceEdit rejects the octave ratio %s:%s", (start, end) => {
             const ratios = mockTW.ratios.slice();
             const frequencies = mockTW.frequencies.slice();
