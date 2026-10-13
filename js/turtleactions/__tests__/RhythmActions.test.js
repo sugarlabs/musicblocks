@@ -137,34 +137,54 @@ describe("setupRhythmActions", () => {
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_1_0__");
     });
 
-    it("keeps 'every N beats' counting the beats played across a meter change", () => {
-        // Three quarter notes in 3/4, then eight in 4/4, with an "every 4 beats" event.
-        Object.assign(targetTurtle.singer, {
-            pickup: 0,
-            noteValuePerBeat: 4,
-            beatsPerMeasure: 3,
-            meterAnchor: null,
-            beatList: [],
-            factorList: [4]
-        });
-        const fired = [];
-        for (let n = 0; n < 11; n++) {
-            if (n === 3) {
-                targetTurtle.singer.meterAnchor = getMeterAnchor(targetTurtle.singer);
-                targetTurtle.singer.beatsPerMeasure = 4;
-            }
-            targetTurtle.singer.notesPlayed = [n, 4];
-            targetTurtle.singer.inNoteBlock = [];
-            activity.stage.dispatchEvent.mockClear();
+    // Each case plays one note per beat: an optional quarter-note pickup, then the first
+    // meter, then the second. fired lists the beats after the pickup the event fires on.
+    it.each([
+        { from: [3, 4], to: [4, 4], pickup: 0, notes: [3, 8], every: 4, fired: [4, 8] },
+        { from: [3, 4], to: [4, 4], pickup: 1 / 4, notes: [3, 8], every: 4, fired: [4, 8] },
+        { from: [4, 4], to: [6, 8], pickup: 0, notes: [4, 12], every: 6, fired: [6, 12] },
+        { from: [4, 4], to: [6, 8], pickup: 1 / 4, notes: [4, 12], every: 6, fired: [6, 12] }
+    ])(
+        "keeps 'every $every beats' counting the beats played from $from to $to, pickup $pickup",
+        ({ from, to, pickup, notes, every, fired }) => {
+            Object.assign(targetTurtle.singer, {
+                pickup,
+                beatsPerMeasure: from[0],
+                noteValuePerBeat: from[1],
+                meterAnchor: null,
+                beatList: [],
+                factorList: [every]
+            });
+            const durations = [
+                ...(pickup ? [pickup] : []),
+                ...Array(notes[0]).fill(1 / from[1]),
+                ...Array(notes[1]).fill(1 / to[1])
+            ];
+            const firstBeat = pickup ? 1 : 0;
+            const changeAt = firstBeat + notes[0];
+            const firedOn = [];
+            let wholeNotes = 0;
+            durations.forEach((duration, n) => {
+                targetTurtle.singer.notesPlayed = [wholeNotes * 64, 64];
+                if (n === changeAt) {
+                    targetTurtle.singer.meterAnchor = getMeterAnchor(targetTurtle.singer);
+                    targetTurtle.singer.beatsPerMeasure = to[0];
+                    targetTurtle.singer.noteValuePerBeat = to[1];
+                }
+                targetTurtle.singer.inNoteBlock = [];
+                activity.stage.dispatchEvent.mockClear();
 
-            Singer.RhythmActions.playNote(1 / 4, "note", 0, 1);
+                Singer.RhythmActions.playNote(duration, "note", 0, 1);
 
-            if (activity.stage.dispatchEvent.mock.calls.some(call => call[0] === "__beat_4_0__")) {
-                fired.push(n + 1);
-            }
+                const calls = activity.stage.dispatchEvent.mock.calls;
+                if (calls.some(call => call[0] === "__beat_" + every + "_0__")) {
+                    firedOn.push(n + 1 - firstBeat);
+                }
+                wholeNotes += duration;
+            });
+            expect(firedOn).toEqual(fired);
         }
-        expect(fired).toEqual([4, 8]);
-    });
+    );
 
     it("triggers everybeat event when beatList contains 'everybeat'", () => {
         targetTurtle.singer.notesPlayed = [1, 1]; // pickup crossed
