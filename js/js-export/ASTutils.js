@@ -858,6 +858,14 @@ class ASTUtils {
             log: ["method", "MathUtility.doLog"]
         };
 
+        /**
+         * Builds an AST for a binary or logical expression.
+         *
+         * @param {string} operator - Operator symbol.
+         * @param {*} operand1 - Left operand.
+         * @param {*} operand2 - Right operand.
+         * @returns {Object} AST node for binary or logical expression.
+         */
         function getBinaryExpAST(operator, operand1, operand2) {
             return {
                 type:
@@ -870,6 +878,13 @@ class ASTUtils {
             };
         }
 
+        /**
+         * Builds an AST for a unary expression.
+         *
+         * @param {string} operator - Unary operator symbol.
+         * @param {*} operand - Argument operand.
+         * @returns {Object} AST node for unary expression.
+         */
         function getUnaryExpAST(operator, operand) {
             return {
                 type: "UnaryExpression",
@@ -879,6 +894,13 @@ class ASTUtils {
             };
         }
 
+        /**
+         * Builds an AST for a function call expression.
+         *
+         * @param {string} methodName - Callee method name.
+         * @param {Array} args - Arguments to the call.
+         * @returns {Object} AST node for call expression.
+         */
         function getCallExpAST(methodName, args) {
             return {
                 type: "CallExpression",
