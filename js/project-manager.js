@@ -1331,18 +1331,72 @@ class ProjectManager {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     that.doLoadAnimation();
-                    try {
-                        const mxmlData =
-                            (event && event.target && event.target.result) || mxmlReader.result;
 
-                        await that.parseMXML(mxmlData);
+                    // loadNewBlocks() (js/blocks.js) processes blocks in
+                    // chunks across setTimeout(0) boundaries and reports
+                    // completion asynchronously via the "finishedLoading"/
+                    // "loadFailed" pubsub events (tagged with the token it
+                    // returns), rather than returning only once every block
+                    // is in place. parseMXML's own promise resolving is not
+                    // enough to know the import is actually finished.
+                    // Listeners are registered before parseMXML runs so a
+                    // load that happens to finish synchronously (small
+                    // scores) is still observed.
+                    let loadToken = null;
+                    let settled = false;
+                    const belongsToThisLoad = payload =>
+                        loadToken === null || !payload || payload.token === loadToken;
+                    const stopWatching = () => {
+                        pubsub.off("finishedLoading", onFinished);
+                        pubsub.off("loadFailed", onFailed);
+                    };
+                    const onFinished = payload => {
+                        if (settled || !belongsToThisLoad(payload)) return;
+                        settled = true;
+                        stopWatching();
                         finishLoading();
-                    } catch (e) {
-                        ErrorHandler.capture(e, { operation: "mxmlImport" });
+                    };
+                    const onFailed = payload => {
+                        if (settled || !belongsToThisLoad(payload)) return;
+                        settled = true;
+                        stopWatching();
+                        const error =
+                            (payload && payload.error) || new Error("loadNewBlocks failed");
+                        ErrorHandler.capture(error, { operation: "mxmlImport" });
                         that.errorMsg(
                             _("Cannot load project from the file. Please check the file type.")
                         );
                         finishLoading();
+                    };
+
+                    pubsub.on("finishedLoading", onFinished);
+                    pubsub.on("loadFailed", onFailed);
+
+                    try {
+                        const mxmlData =
+                            (event && event.target && event.target.result) || mxmlReader.result;
+
+                        loadToken = await that.parseMXML(mxmlData);
+
+                        // A null token means parseMXML never reached
+                        // loadNewBlocks() (malformed XML, no part found) --
+                        // it already reported that via its own errorMsg
+                        // call, so no pubsub event is coming for it.
+                        if (loadToken === null && !settled) {
+                            settled = true;
+                            stopWatching();
+                            finishLoading();
+                        }
+                    } catch (e) {
+                        if (!settled) {
+                            settled = true;
+                            stopWatching();
+                            ErrorHandler.capture(e, { operation: "mxmlImport" });
+                            that.errorMsg(
+                                _("Cannot load project from the file. Please check the file type.")
+                            );
+                            finishLoading();
+                        }
                     }
                 };
 
@@ -1459,17 +1513,61 @@ class ProjectManager {
             mxmlReader.onload = async event => {
                 that.loading = true;
                 document.body.style.cursor = "wait";
-                try {
-                    const mxmlData = event.target.result;
 
-                    await that.parseMXML(mxmlData);
+                // See the matching comment on the file-chooser's mxmlReader
+                // handler above: loadNewBlocks() finishes asynchronously, so
+                // completion is tracked via the "finishedLoading"/
+                // "loadFailed" pubsub events rather than parseMXML's own
+                // promise resolving.
+                let loadToken = null;
+                let settled = false;
+                const belongsToThisLoad = payload =>
+                    loadToken === null || !payload || payload.token === loadToken;
+                const stopWatching = () => {
+                    pubsub.off("finishedLoading", onFinished);
+                    pubsub.off("loadFailed", onFailed);
+                };
+                const onFinished = payload => {
+                    if (settled || !belongsToThisLoad(payload)) return;
+                    settled = true;
+                    stopWatching();
                     finishLoading();
-                } catch (e) {
-                    ErrorHandler.capture(e, { operation: "mxmlImport" });
+                };
+                const onFailed = payload => {
+                    if (settled || !belongsToThisLoad(payload)) return;
+                    settled = true;
+                    stopWatching();
+                    const error = (payload && payload.error) || new Error("loadNewBlocks failed");
+                    ErrorHandler.capture(error, { operation: "mxmlImport" });
                     that.errorMsg(
                         _("Cannot load project from the file. Please check the file type.")
                     );
                     finishLoading();
+                };
+
+                pubsub.on("finishedLoading", onFinished);
+                pubsub.on("loadFailed", onFailed);
+
+                try {
+                    const mxmlData = event.target.result;
+
+                    loadToken = await that.parseMXML(mxmlData);
+
+                    if (loadToken === null && !settled) {
+                        settled = true;
+                        stopWatching();
+                        finishLoading();
+                    }
+                } catch (e) {
+                    if (!settled) {
+                        settled = true;
+                        stopWatching();
+                        ErrorHandler.capture(e, { operation: "mxmlImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    }
                 }
             };
 
