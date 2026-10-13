@@ -198,10 +198,10 @@ describe("musicutils-pitch", () => {
 
         it("handles non-string inputs safely", () => {
             expect(fn(440)).toEqual([440, 4]);
-            expect(fn(null)).toEqual([null, null]);
-            expect(fn(undefined)).toEqual([null, null]);
-            expect(fn(-1)).toEqual([null, null]);
-            expect(fn(0)).toEqual([null, null]);
+            expect(fn(null)).toEqual(["", 4]);
+            expect(fn(undefined)).toEqual(["", 4]);
+            expect(fn(-1)).toEqual(["", 4]);
+            expect(fn(0)).toEqual(["", 4]);
         });
     });
 

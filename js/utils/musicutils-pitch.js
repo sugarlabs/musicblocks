@@ -278,7 +278,7 @@ function _parse_pitch_string(str) {
         return [str, 4];
     }
     if (typeof str !== "string") {
-        return [null, null];
+        return ["", 4];
     }
 
     const trimmed = str.trim();
