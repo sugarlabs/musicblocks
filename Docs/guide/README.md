@@ -89,6 +89,7 @@ This guide details the many musical features of the language.
     15. [Arpeggio](#415-arpeggio)
 5. [Beyond Music Blocks](#5-beyond-music-blocks)
     1. [LilyPond (or How to Generate Sheet Music)](#51-lilypond)
+       1. [Recording Notation from a Program](#511-recording-notation-from-a-program)
     2. [Other Exports](#52-other-exports)
     3. [The JavaScript Editor](#53-the-javascript-editor)
 6. [Appendix](#6-appendix)
@@ -2593,6 +2594,24 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 ![sheet music](./hotdog.png "sheet music")
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
+
+### <a name="RECORD-NOTATION">5.1.1 Recording Notation from a Program</a>
+
+![record notation](./lilypond3.svg "Using the Record notation and Save as Lilypond blocks")
+
+The *Save as Lilypond* option in the Save menu writes out your whole
+project. To keep the music a program actually plays, such as a game
+where each level has its own theme, use the *Record notation* block.
+From where it runs, the notes that mouse plays are recorded. In the
+example above, the two notes after *Record notation* are recorded, and
+the *Save as Lilypond* block saves them to `song.ly`.
+
+The *Save as Lilypond*, *Save as ABC* and *Save as MusicXML* blocks
+save what has been recorded so far, under the file name in the block.
+A program can save more than once, for example at the end of each
+level. Each mouse records its own part, and every run starts a new
+recording. The *Save as SVG* block saves the mouse artwork. These
+blocks are on the *Extras* palette (Only available in Advanced Mode).
 
 ## <a name="EXPORTS">5.2 Other Exports</a>
 
