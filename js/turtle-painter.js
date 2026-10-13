@@ -944,6 +944,18 @@ class Painter {
     }
 
     /**
+     * Maps any finite angle into [0, 360). A loop adding 360 per turn hangs on a
+     * large negative angle, and never ends once 360 is below the number's precision.
+     *
+     * @private
+     * @param {Number} degrees - finite angle in degrees
+     * @returns {Number} the same heading in [0, 360)
+     */
+    static _normalizeHeading(degrees) {
+        return ((degrees % 360) + 360) % 360;
+    }
+
+    /**
      * Turn right and display corresponding turtle graphic by rotating bitmap.
      *
      * @param degrees - degrees for right turn
@@ -955,12 +967,7 @@ class Painter {
             return;
         }
 
-        this.turtle.orientation += degrees;
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
+        this.turtle.orientation = Painter._normalizeHeading(this.turtle.orientation + degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
         // We cannot update the cache during the 'tween'
@@ -1023,12 +1030,7 @@ class Painter {
             return;
         }
 
-        this.turtle.orientation = degrees;
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
+        this.turtle.orientation = Painter._normalizeHeading(degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
         // We cannot update the cache during the 'tween'
@@ -1614,11 +1616,33 @@ class Painter {
     }
 
     /**
+     * Sets the pen's translucency as the Set Translucency block takes it:
+     * 0 is opaque and 100 is invisible.
+     *
+     * @param translucency - translucency from 0 to 100
+     */
+    doSetTranslucency(translucency) {
+        this.doSetPenAlpha(1.0 - (translucency % 101) / 100);
+    }
+
+    /**
      * Sets pen size/thickness.
      *
      * @param size - pen size which is assigned to pen stroke
      */
     doSetPensize(size) {
+        size = Number(size);
+        if (!Number.isFinite(size)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        // A canvas ignores a lineWidth of 0 or less and keeps the old width, so
+        // storing it would leave the Pen size block and SVG export out of step.
+        if (size <= 0) {
+            this.turtles.activity.errorMsg(_("Pen size must be greater than 0."));
+            return;
+        }
+
         this.closeSVG();
         this.stroke = size;
         if (this.turtle.ctx.lineWidth !== this.stroke) {
