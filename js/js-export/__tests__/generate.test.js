@@ -172,6 +172,7 @@ describe("JSGenerate Class", () => {
         };
 
         expect(() => JSGenerate.generateStacksTree()).not.toThrow();
+        expect(JSGenerate.startTrees).toEqual([[["forward", null, null]]]);
     });
 
     test("should run code generator with print options", () => {

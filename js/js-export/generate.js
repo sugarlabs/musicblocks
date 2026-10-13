@@ -118,6 +118,11 @@ class JSGenerate {
                         continue;
                     }
 
+                    if (!arg.protoblock) {
+                        args.push(null);
+                        continue;
+                    }
+
                     if (
                         arg.protoblock.style === "clamp" &&
                         arg.protoblock._style.flows.left === true
@@ -128,8 +133,13 @@ class JSGenerate {
                     }
 
                     // ignore horizontal spacers
-                    while (arg.name === "hspace") {
+                    while (arg && arg.name === "hspace") {
                         arg = globalActivity.blocks.blockList[arg.connections[1]];
+                    }
+
+                    if (!arg || !arg.protoblock) {
+                        args.push(null);
+                        continue;
                     }
 
                     if (arg.protoblock.style === "value") {
