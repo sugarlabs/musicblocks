@@ -1423,6 +1423,36 @@ describe("Block Foundation", () => {
             expect(block.container.updateCache).toHaveBeenCalled();
             expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
         });
+
+        it("_createCache should resolve immediately without retry if container is null or block is trashed", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+
+            const res1 = await block._createCache(jest.fn(), []);
+            expect(res1).toBeUndefined();
+
+            block.container = { getBounds: jest.fn(), cache: jest.fn() };
+            block.trash = true;
+
+            const res2 = await block._createCache(jest.fn(), []);
+            expect(res2).toBeUndefined();
+            expect(block.container.cache).not.toHaveBeenCalled();
+        });
+
+        it("updateCache should resolve immediately without retry if container is null or block is trashed", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+
+            const res1 = await block.updateCache();
+            expect(res1).toBeUndefined();
+
+            block.container = { bitmapCache: {}, updateCache: jest.fn() };
+            block.trash = true;
+
+            const res2 = await block.updateCache();
+            expect(res2).toBeUndefined();
+            expect(block.container.updateCache).not.toHaveBeenCalled();
+        });
     });
 
     describe("drag spatial-grid deferral", () => {

@@ -111,6 +111,10 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
+    img.onerror = () => {
+        console.debug("Failed to load SVG bitmap from SVG data");
+    };
+
     img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
 };
 
@@ -372,24 +376,40 @@ class Block {
      */
     _createCache(callback, args) {
         const that = this;
+
+        if (!that.container || that.trash) {
+            return Promise.resolve();
+        }
+
         const MAX_RETRIES = 20;
         const INITIAL_DELAY = 50;
 
         return retryWithBackoff({
             check: () => {
+                if (!that.container || that.trash) {
+                    return null;
+                }
                 that.bounds = that.container.getBounds();
                 return that.bounds;
             },
             onSuccess: bounds => {
+                if (!that.container || that.trash) {
+                    return;
+                }
                 that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 callback(that, args);
             },
             onRetry: () => {
+                if (!that.container || that.trash) {
+                    return;
+                }
                 that.regenerateArtwork(true, []);
             },
             maxRetries: MAX_RETRIES,
             initialDelay: INITIAL_DELAY,
             errorMessage: "COULD NOT CREATE CACHE"
+        }).catch(err => {
+            console.debug(err.message || err);
         });
     }
 
@@ -403,8 +423,8 @@ class Block {
         const that = this;
 
         // If the container has no active bitmap cache (e.g., trashed
-        // blocks whose cache was freed), skip the update silently.
-        if (that.container && !that.container.bitmapCache) {
+        // or disposed blocks whose cache was freed), skip the update silently.
+        if (!that.container || !that.container.bitmapCache || that.trash) {
             return Promise.resolve();
         }
 
@@ -412,14 +432,24 @@ class Block {
         const INITIAL_DELAY = 100;
 
         return retryWithBackoff({
-            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
+            check: () =>
+                that.bounds !== null &&
+                that.container !== null &&
+                Boolean(that.container.bitmapCache) &&
+                !that.trash,
             onSuccess: () => {
-                that.container.updateCache();
-                that.activity.refreshCanvas();
+                if (that.container && that.container.bitmapCache && !that.trash) {
+                    that.container.updateCache();
+                    if (that.activity && typeof that.activity.refreshCanvas === "function") {
+                        that.activity.refreshCanvas();
+                    }
+                }
             },
             maxRetries: MAX_RETRIES,
             initialDelay: INITIAL_DELAY,
             errorMessage: "COULD NOT UPDATE CACHE"
+        }).catch(err => {
+            console.debug(err.message || err);
         });
     }
 
