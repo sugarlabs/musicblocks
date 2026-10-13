@@ -95,6 +95,16 @@ describe("musicutils-rhythm", () => {
             );
             expect(rhythm.calcNoteValueToDisplay(1 / 0.875, 1)).toBe(shown(7, 8, HALF + ".."));
         });
+
+        it("reduces the note values from the bug report", () => {
+            // A note of value 3. The float note value used to give a 16 digit ratio.
+            expect(rhythm.calcNoteValueToDisplay(1 / 3, 1)).toBe(shown(3, 1, WHOLE));
+            // Fifteen thirty-seconds tied together, which is not a dotted note.
+            expect(rhythm.calcNoteValueToDisplay(32 / 15, 1)).toBe("15<br>&mdash;<br>32<br><br>");
+            // A tuplet of five sixteenths. 16/5 * 1.5 truncates to a quarter note,
+            // whose dotted value is 3/8, so this used to be marked as dotted.
+            expect(rhythm.calcNoteValueToDisplay(16, 5)).toBe(shown(5, 16, SIXTEENTH));
+        });
     });
 
     describe("getMeasurePosition", () => {
