@@ -316,7 +316,7 @@ describe("GlobalPlanet", () => {
             expect(callback).toHaveBeenCalled();
         });
 
-        it("should not invoke callplanet/index.htmlback until loadCount reaches zero", () => {
+        it("should not invoke callback until loadCount reaches zero", () => {
             const callback = jest.fn();
             gp.loadCount = 3;
             gp.addProjectToCache("p1", { success: true, data: {} }, callback);
