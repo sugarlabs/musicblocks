@@ -730,6 +730,9 @@ describe("PhraseMaker Widget", () => {
         expect(phraseMaker.sorted).toBe(true);
         // Marked columns in the preserved row (original row index 0) should contain [0, 1] (column indices), NOT row index 1
         expect(phraseMaker._markedColsInRow[0]).toEqual([0, 1]);
+        expect(phraseMaker.rowLabels).toEqual(["sol"]);
+        expect(phraseMaker.rowArgs).toEqual([4]);
+        expect(phraseMaker.columnBlocksMap).toEqual([[0]]);
     });
     test("makeClickable safely handles sorted rows when cells are undefined", () => {
         phraseMaker.sorted = true;
@@ -2852,13 +2855,6 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._notesBlocks.length).toBe(2);
         });
 
-        test("_removePitchBlock removes specified pitch block index", () => {
-            phraseMaker._rowBlocks = [5, 6, 7];
-            phraseMaker._rowMap = [0, 1, 2];
-
-            expect(phraseMaker._rowBlocks).toContain(6);
-        });
-
         test("_deleteRhythmBlock and _addRhythmBlock manage rhythm stack", () => {
             phraseMaker._colBlocks = [
                 [10, 4],
@@ -3209,6 +3205,46 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._markedColsInRow).toBeDefined();
             expect(phraseMaker._markedColsInRow[0]).toEqual([0]);
             expect(phraseMaker._markedColsInRow[1]).toEqual([]);
+        });
+
+        test("_sort preserves separate octaves and their pitch blocks", () => {
+            phraseMaker.rowLabels = ["G", "G", "E"];
+            phraseMaker.rowArgs = [4, 5, 4];
+            phraseMaker._noteStored = ["G4", "G5", "E4"];
+            phraseMaker.columnBlocksMap = [[1], [2], [3]];
+            phraseMaker._rows = [
+                { cells: [{ style: { backgroundColor: "black" } }] },
+                { cells: [{ style: { backgroundColor: "white" } }] },
+                { cells: [{ style: { backgroundColor: "black" } }] }
+            ];
+            phraseMaker._deps.noteToFrequency = note => ({ G4: 392, G5: 784, E4: 330 })[note];
+            const blockList = [
+                { name: "matrix", connections: [null, 1, null] },
+                { name: "pitch", connections: [0, 4, 5, 2], trash: false },
+                { name: "pitch", connections: [1, 6, 7, 3], trash: false },
+                { name: "pitch", connections: [2, 8, 9, null], trash: false }
+            ];
+            const originalBlocks = JSON.parse(JSON.stringify(blockList));
+            phraseMaker.activity.blocks = {
+                blockList,
+                sendStackToTrash: block => {
+                    block.trash = true;
+                },
+                adjustDocks: jest.fn(),
+                clampBlocksToCheck: []
+            };
+            phraseMaker.activity.refreshCanvas = jest.fn();
+
+            expect(() => phraseMaker._sort()).not.toThrow();
+
+            expect(phraseMaker.rowLabels).toEqual(["G", "G", "E"]);
+            expect(phraseMaker.rowArgs).toEqual([5, 4, 4]);
+            expect(phraseMaker._rowMap).toEqual([1, 0, 2]);
+            expect(phraseMaker._sortedRowMap).toEqual([0, 1, 2]);
+            expect(phraseMaker._noteStored).toEqual(["G5", "G4", "E4"]);
+            expect(phraseMaker.columnBlocksMap).toEqual([[2], [1], [3]]);
+            expect(phraseMaker._markedColsInRow).toEqual([[0], [], [0]]);
+            expect(blockList).toEqual(originalBlocks);
         });
     });
 

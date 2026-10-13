@@ -2635,27 +2635,6 @@ class PhraseMaker {
     }
 
     /**
-     * Removes a pitch block and updates connections, adjusting docks, and refreshing the canvas.
-     * @param {string} blockNo - The ID of the pitch block to be removed.
-     */
-    _removePitchBlock(blockNo) {
-        const c0 = this.activity.blocks.blockList[blockNo].connections[0];
-        const c1 = this._deps.last(this.activity.blocks.blockList[blockNo].connections);
-        this.activity.blocks.blockList[c0].connections[
-            this.activity.blocks.blockList[c0].connections.length - 1
-        ] = c1;
-        this.activity.blocks.blockList[c1].connections[0] = c0;
-
-        this.activity.blocks.blockList[blockNo].connections[
-            this.activity.blocks.blockList[blockNo].connections.length - 1
-        ] = null;
-        this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
-        this.activity.blocks.adjustDocks(this.blockNo, true);
-        this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        this.activity.refreshCanvas();
-    }
-
-    /**
      * Generates a data URI from the provided file content.
      * @param {string} file - The file content to be converted into a data URI.
      * @returns {string} The data URI representing the file content.
@@ -2803,12 +2782,10 @@ class PhraseMaker {
             this._rowMapper.push(sortedList[i][3]);
         }
         const newColumnBlockMap = [];
-        const oldColumnBlockMap = this.columnBlocksMap;
         for (let i = 0; i < this._rowMapper.length; i++) {
             newColumnBlockMap.push(this.columnBlocksMap[this._rowMapper[i]]);
         }
         this.columnBlocksMap = newColumnBlockMap;
-        let lastObj = 0;
         let obj;
         for (let i = 0; i < sortedList.length; i++) {
             obj = sortedList[i];
@@ -2818,28 +2795,8 @@ class PhraseMaker {
 
             if (i === 0) {
                 this._sortedRowMap.push(0);
-            } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
-                if (oldColumnBlockMap[sortedList[lastObj][3]] !== undefined) {
-                    setTimeout(
-                        this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
-                        500
-                    );
-                    this.columnBlocksMap = this.columnBlocksMap.filter(ele => {
-                        return ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0];
-                    });
-                    lastObj = i;
-                }
-                // skip duplicates
-                for (let j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                    this._rowOffset[j] -= 1;
-                }
-
-                this._rowMap[i] = this._rowMap[i - 1];
-                continue;
             } else {
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
-                lastObj = i;
                 this.stylePhraseMaker();
             }
 
