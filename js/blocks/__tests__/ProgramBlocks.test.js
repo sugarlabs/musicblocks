@@ -963,6 +963,14 @@ describe("ProgramBlocks", () => {
             block.flow(args, logo, 0, 5);
             expect(args[0]).toBe(0);
         });
+
+        test("reports an error instead of throwing when the slot is empty", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [{ name: "start", value: 0 }];
+            expect(() => block.flow([null], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(logo.runFromBlock).not.toHaveBeenCalled();
+        });
     });
 
     describe("DockBlock", () => {
@@ -998,6 +1006,22 @@ describe("ProgramBlocks", () => {
             const block = getBlock("dockblock");
             block.flow([], logo, 0, 5);
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+        });
+
+        test("reports an error instead of throwing when the target slot is empty", () => {
+            const block = getBlock("dockblock");
+            activity.blocks.blockList = [{ connections: [null, null] }, { connections: [null] }];
+            expect(() => block.flow([null, 1, 1], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(activity.blocks.adjustDocks).not.toHaveBeenCalled();
+        });
+
+        test("reports an error instead of throwing when the block to connect is empty", () => {
+            const block = getBlock("dockblock");
+            activity.blocks.blockList = [{ connections: [null, null] }, { connections: [null] }];
+            expect(() => block.flow([0, 1, null], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(activity.blocks.adjustDocks).not.toHaveBeenCalled();
         });
     });
 

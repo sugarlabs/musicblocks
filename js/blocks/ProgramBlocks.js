@@ -1056,7 +1056,11 @@ function setupProgramBlocks(activity) {
                 args[0] = -1;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1126,7 +1130,11 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1136,7 +1144,11 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[2]) ||
+                args[2] < 0 ||
+                args[2] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
