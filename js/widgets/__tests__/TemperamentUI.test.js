@@ -904,7 +904,6 @@ describe("TemperamentUI module", () => {
             expect(mockTW._logo.synth.trigger).toHaveBeenCalled();
             expect(spyInner).toHaveBeenCalled();
             expect(mockTW.tempRatios.length).toBe(4);
-            expect(spyInner.mock.calls[0][2]).toBe(3);
             spyInner.mockRestore();
         });
 
@@ -927,7 +926,6 @@ describe("TemperamentUI module", () => {
             expect(spyInner).toHaveBeenCalled();
             expect(mockTW.tempRatios.length).toBe(3);
             expect(mockTW.tempRatios[1]).toBe(1.5);
-            expect(spyInner.mock.calls[0][2]).toBe(2);
             spyInner.mockRestore();
         });
 

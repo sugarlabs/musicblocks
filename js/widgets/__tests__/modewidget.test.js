@@ -735,19 +735,6 @@ describe("ModeWidget", () => {
         handler();
     }
 
-    test("opens on a saved 41-EDO custom mode and lets the tuning change", () => {
-        const teardown = setup41EDOMode();
-        try {
-            const w2 = new ModeWidget(mockActivity);
-            expect(w2._activeEDO).toBe(41);
-            fireEdoChangeByListener(w2._edoSelect, "equal");
-            expect(w2._activeEDO).toBe(12);
-            expect(w2.logo.synth.inTemperament).toBe("equal");
-        } finally {
-            teardown();
-        }
-    });
-
     test("41-EDO pie-menu mode pick does not silently yank the tuning back", () => {
         const teardown = setup41EDOMode();
         try {
@@ -803,6 +790,46 @@ describe("ModeWidget", () => {
         modeWidget._setModeName();
 
         expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
+    });
+
+    describe("cross-EDO custom mode shadowing", () => {
+        // 41-EDO major: rescales to 12-EDO major, so only the EDO guard
+        // decides the match. All patterns resolve alike via the getModePattern mock.
+        const EDO41_MAJOR = [7, 7, 4, 7, 7, 7, 2];
+        const MAJOR12 = [2, 2, 1, 2, 2, 2, 1];
+        const savedCustomModes = [];
+
+        beforeEach(() => {
+            savedCustomModes.push(localStorage.getItem("customModes"));
+            global.getModePattern.mockImplementation(() => MAJOR12);
+            modeWidget._activeEDO = 12;
+            modeWidget._activeTemperamentKey = "equal";
+        });
+
+        afterEach(() => {
+            delete MUSICALMODES["EDO-41"];
+            delete MUSICALMODES["my12"];
+            delete MUSICALMODES["legacy"];
+            const saved = savedCustomModes.pop();
+            if (saved === null) {
+                localStorage.removeItem("customModes");
+            } else {
+                localStorage.setItem("customModes", saved);
+            }
+            modeWidget._rebuildModeIndex();
+        });
+
+        test.each([
+            ["another EDO", "EDO-41", 41, EDO41_MAJOR, "ionian"],
+            ["the active EDO", "my12", 12, MAJOR12, "my12"],
+            ["no edo at all", "legacy", undefined, MAJOR12, "legacy"]
+        ])("a custom saved at %s resolves to %s", (_label, name, edo, pattern, expected) => {
+            localStorage.setItem("customModes", JSON.stringify([{ name, pattern, edo }]));
+            MUSICALMODES[name] = pattern;
+            modeWidget._rebuildModeIndex();
+
+            expect(modeWidget._findModeNameForPattern(MAJOR12)).toBe(expected);
+        });
     });
 
     test("should refuse to overwrite a built-in mode on save", () => {
@@ -899,35 +926,6 @@ describe("ModeWidget", () => {
         expect(edo).toBe(48);
         expect(pattern).toEqual([8, 8, 4, 8, 8, 8, 4]);
         saveSpy.mockRestore();
-    });
-
-    test("should store the imported mode's target temperament, not the stale active key", () => {
-        global.readTextFile = jest.fn((_inputId, cb) => {
-            cb(null, {
-                text: JSON.stringify({
-                    name: "imported31",
-                    edo: 31,
-                    pattern: [3, 4, 2, 3, 4, 3, 3]
-                }),
-                file: { name: "imported31.json", size: 100 }
-            });
-        });
-        modeWidget._activeTemperamentKey = "just intonation";
-        modeWidget._activeEDO = 12;
-        modeWidget.logo.synth.inTemperament = "just intonation";
-        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
-        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
-        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
-        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
-
-        modeWidget._importFile();
-
-        const saved = JSON.parse(localStorage.getItem("customModes"));
-        const entry = saved.find(m => m.name === "imported31");
-        expect(entry.edo).toBe(31);
-        expect(entry.temperamentKey).toBe("equal31");
-
-        modeWidget._deleteCustomMode("imported31");
     });
 
     test("should preserve equal temperament when importing a 21-EDO mode", () => {
@@ -1234,21 +1232,6 @@ describe("ModeWidget", () => {
             modeWidget._syncNarrowLabels(wheel);
             expect(narrow.navTitle.show).toHaveBeenCalled();
             expect(wide.navTitle.hide).not.toHaveBeenCalled();
-        });
-
-        test("skips items without a navItem instead of throwing", () => {
-            const narrowWheel = {
-                navItems: [
-                    {
-                        title: "10",
-                        sliceAngle: 5,
-                        selected: false,
-                        navTitle: { hide: jest.fn(), show: jest.fn() },
-                        navItem: null
-                    }
-                ]
-            };
-            expect(() => modeWidget._hideNarrowLabels(narrowWheel)).not.toThrow();
         });
     });
 

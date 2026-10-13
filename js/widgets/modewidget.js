@@ -49,8 +49,6 @@ class ModeWidget {
     static MAX_TITLE_FONT_SIZE = 48;
     static MIN_TITLE_FONT_SIZE = 10;
     static TITLE_FONT_SCALE = 580;
-    static MIN_RADIUS_PERCENT = 0.4;
-    static MAX_RADIUS_PERCENT = 0.75;
     static MIN_SLICE_DEGREES = 12;
 
     /**
@@ -1325,8 +1323,17 @@ class ModeWidget {
 
         // Check custom modes first — they take priority over built-in modes
         // when patterns match, since they are EDO-specific.
+        const savedByName = new Map(getSavedCustomModes().map(m => [m.name, m]));
         for (const mode of this._customModeNames) {
             if (!(mode in MUSICALMODES)) {
+                continue;
+            }
+            // Customs are EDO-specific: a rescaled cross-EDO pattern can
+            // collapse onto a built-in (e.g. 41-EDO major onto 12-EDO major),
+            // so only match customs authored at the active EDO. Entries
+            // without edo predate that field and keep matching as before.
+            const nativeEDO = savedByName.get(mode)?.edo;
+            if (nativeEDO && nativeEDO !== this._activeEDO) {
                 continue;
             }
             const modePattern = this._modeStepPattern(mode, null);
@@ -1859,8 +1866,8 @@ class ModeWidget {
         const titleFontSize = this._titleFontSize(n);
         configureWheel(this._modeWheel, {
             colors: platformColor.modeWheelcolors,
-            minRadius: ModeWidget.MIN_RADIUS_PERCENT,
-            maxRadius: ModeWidget.MAX_RADIUS_PERCENT,
+            minRadius: 0.4,
+            maxRadius: 0.75,
             clickModeRotate: false,
             selectionPaths: true,
             titleFont: "400 " + titleFontSize + "px sans-serif",

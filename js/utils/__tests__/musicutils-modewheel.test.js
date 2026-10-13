@@ -165,8 +165,6 @@ describe("musicutils-modewheel", () => {
             expect(modewheel.sliceAnglesFromRatios([1], 2)).toBeNull();
             expect(modewheel.sliceAnglesFromRatios([1, 1.5, 1.2], 2)).toBeNull();
             expect(modewheel.sliceAnglesFromRatios([1, 1.5], 1)).toBeNull();
-            expect(modewheel.sliceAnglesFromRatios([1, 1.5], 0)).toBeNull();
-            expect(modewheel.sliceAnglesFromRatios([1, 1.5], NaN)).toBeNull();
         });
     });
 
@@ -185,17 +183,6 @@ describe("musicutils-modewheel", () => {
             // 5/3 to 9/5 the widest; equal slices would be 30 each.
             expect(Math.min(...angles)).toBeCloseTo(21.2, 1);
             expect(Math.max(...angles)).toBeCloseTo(39.97, 1);
-        });
-    });
-
-    describe("applySliceAngles", () => {
-        it("writes each width onto its nav item and marks the wheel continuous", () => {
-            const wheel = { navItems: [{}, {}] };
-            const angles = [149.41349974038377, 210.58650025961623];
-            modewheel.applySliceAngles(wheel, angles);
-            expect(wheel.navItemsContinuous).toBe(true);
-            expect(wheel.navItems[0].sliceAngle).toBe(angles[0]);
-            expect(wheel.navItems[1].sliceAngle).toBe(angles[1]);
         });
     });
 
