@@ -2685,4 +2685,16 @@ describe("AST2BlockList Class", () => {
             "e"
         ]);
     });
+
+    test("should reject computed property access such as Math['PI']", () => {
+        const code = `
+        new Mouse(async mouse => {
+            var box1 = Math["PI"];
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        expect(() => AST2BlockList.toBlockList(AST, config)).toThrow();
+    });
 });

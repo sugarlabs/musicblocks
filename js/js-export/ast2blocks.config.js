@@ -171,7 +171,8 @@ window.ast2blocklist_config = {
                 identifiers: [
                     { property: "type", value: "MemberExpression" },
                     { property: "object.type", value: "Identifier" },
-                    { property: "object.name", value: "Math" }
+                    { property: "object.name", value: "Math" },
+                    { property: "computed", value: false }
                 ],
                 name_property: "property.name",
                 argument_properties: []

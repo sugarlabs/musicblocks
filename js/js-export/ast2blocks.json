@@ -342,6 +342,10 @@
                     {
                         "property": "object.name",
                         "value": "Math"
+                    },
+                    {
+                        "property": "computed",
+                        "value": false
                     }
                 ],
                 "name_property": "property.name",
