@@ -922,6 +922,9 @@ function setupWidgetBlocks(activity) {
 
             const __listener = () => {
                 if (logo.chordBuilderWidget && logo.chordBuilderWidget !== "loading") {
+                    if (typeof logo.chordBuilderWidget.syncKeyAndModeFromTurtle === "function") {
+                        logo.chordBuilderWidget.syncKeyAndModeFromTurtle(turtle);
+                    }
                     logo.chordBuilderWidget.widgetWindow.show();
                     resetFlag();
                     return;
@@ -938,7 +941,7 @@ function setupWidgetBlocks(activity) {
                         typeof ChordBuilderWidget !== "undefined" ? ChordBuilderWidget : null,
                         ["widgets/ChordBuilderAudio", "widgets/chordbuilder"]
                     ),
-                    () => new ChordBuilderWidget(activity),
+                    () => new ChordBuilderWidget(activity, { turtle }),
                     () => resetFlag()
                 );
             };

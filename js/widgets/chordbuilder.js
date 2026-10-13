@@ -112,8 +112,10 @@ class ChordBuilderWidget {
             (activity && activity.errorMsg ? activity.errorMsg.bind(activity) : () => {});
 
         // Initial musical configuration
-        this.rootKey = "C";
-        this.mode = "major";
+        this.turtleIndex = deps.turtle !== undefined ? deps.turtle : 0;
+        const activeKeyMode = this._resolveActiveKeyAndMode();
+        this.rootKey = activeKeyMode.key;
+        this.mode = activeKeyMode.mode;
         this.tempo = 120;
         this.octave = 4;
         this.progression = [];
@@ -265,12 +267,14 @@ class ChordBuilderWidget {
     _buildDiatonicChords(rootKey, mode) {
         const scaleNotes = this._getScaleNotes(rootKey, mode);
         const chords = [];
+        const scaleLen = scaleNotes.length || 7;
+        const count = Math.min(scaleLen, 7);
 
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < count; i++) {
             const root = scaleNotes[i];
-            const third = scaleNotes[(i + 2) % 7];
-            const fifth = scaleNotes[(i + 4) % 7];
-            const seventh = scaleNotes[(i + 6) % 7];
+            const third = scaleNotes[(i + 2) % scaleLen];
+            const fifth = scaleNotes[(i + 4) % scaleLen];
+            const seventh = scaleNotes[(i + 6) % scaleLen];
 
             const semitoneRoot = this._noteToSemitone(root);
             const semitoneThird = this._noteToSemitone(third);
@@ -281,24 +285,24 @@ class ChordBuilderWidget {
 
             let quality = "major";
             let symbol = "";
-            let roman = ChordBuilderWidget.ROMAN_NUMERALS_UPPER[i];
+            let roman = ChordBuilderWidget.ROMAN_NUMERALS_UPPER[i] || String(i + 1);
 
             if (intervalThird === 3 && intervalFifth === 7) {
                 quality = "minor";
                 symbol = "m";
-                roman = ChordBuilderWidget.ROMAN_NUMERALS_LOWER[i];
+                roman = ChordBuilderWidget.ROMAN_NUMERALS_LOWER[i] || String(i + 1);
             } else if (intervalThird === 3 && intervalFifth === 6) {
                 quality = "diminished";
                 symbol = "°";
-                roman = `${ChordBuilderWidget.ROMAN_NUMERALS_LOWER[i]}°`;
+                roman = `${ChordBuilderWidget.ROMAN_NUMERALS_LOWER[i] || String(i + 1)}°`;
             } else if (intervalThird === 4 && intervalFifth === 8) {
                 quality = "augmented";
                 symbol = "+";
-                roman = `${ChordBuilderWidget.ROMAN_NUMERALS_UPPER[i]}+`;
+                roman = `${ChordBuilderWidget.ROMAN_NUMERALS_UPPER[i] || String(i + 1)}+`;
             } else {
                 quality = "major";
                 symbol = "";
-                roman = ChordBuilderWidget.ROMAN_NUMERALS_UPPER[i];
+                roman = ChordBuilderWidget.ROMAN_NUMERALS_UPPER[i] || String(i + 1);
             }
 
             chords.push({
@@ -317,6 +321,47 @@ class ChordBuilderWidget {
     }
 
     /**
+     * Resolves the active key and mode from turtle state or activity context,
+     * defaulting to "C" and "major" if none are set.
+     * @private
+     * @returns {{ key: string, mode: string }}
+     */
+    _resolveActiveKeyAndMode() {
+        const turtleIndex = this.turtleIndex !== undefined ? this.turtleIndex : 0;
+        const turtleObj =
+            (this.turtles &&
+                typeof this.turtles.ithTurtle === "function" &&
+                this.turtles.ithTurtle(turtleIndex)) ||
+            (this.activity &&
+                this.activity.turtles &&
+                typeof this.activity.turtles.ithTurtle === "function" &&
+                this.activity.turtles.ithTurtle(turtleIndex)) ||
+            null;
+
+        if (turtleObj && turtleObj.singer && turtleObj.singer.keySignature) {
+            const parts = turtleObj.singer.keySignature.trim().split(/\s+/);
+            if (parts[0]) {
+                const k = parts[0];
+                const m = parts.slice(1).join(" ").toLowerCase() || "major";
+                return { key: k, mode: m };
+            }
+        }
+        return { key: "C", mode: "major" };
+    }
+
+    /**
+     * Synchronizes key and mode from the specified turtle's key signature.
+     * @param {number} [turtleIndex=0]
+     */
+    syncKeyAndModeFromTurtle(turtleIndex = 0) {
+        this.turtleIndex = turtleIndex;
+        const resolved = this._resolveActiveKeyAndMode();
+        if (resolved.key !== this.rootKey || resolved.mode !== this.mode) {
+            this.setKeyAndMode(resolved.key, resolved.mode);
+        }
+    }
+
+    /**
      * Updates key and/or mode and recalculates diatonic chords.
      * @param {string} newKey
      * @param {string} newMode
@@ -325,7 +370,33 @@ class ChordBuilderWidget {
         if (newKey) this.rootKey = newKey;
         if (newMode) this.mode = newMode;
         this.diatonicChords = this._buildDiatonicChords(this.rootKey, this.mode);
+        this._updateKeyModeDisplay();
         this._renderDiatonicChords();
+    }
+
+    /**
+     * Updates the Key & Mode UI display text.
+     * @private
+     */
+    _updateKeyModeDisplay() {
+        if (this.keyDisplay) {
+            this.keyDisplay.textContent = this.rootKey;
+        }
+        if (this.modeDisplay) {
+            const modeCap = this.mode ? this.mode.charAt(0).toUpperCase() + this.mode.slice(1) : "";
+            this.modeDisplay.textContent = modeCap;
+        }
+    }
+
+    /**
+     * Auditions a chord sound without adding it to the progression sequence.
+     * @param {object} chord
+     */
+    auditionChord(chord) {
+        if (!chord) return;
+        if (this.audio) {
+            this.audio.playChord(chord, 0.4, { octave: this.octave });
+        }
     }
 
     /**
@@ -536,78 +607,65 @@ class ChordBuilderWidget {
         container.style.fontFamily = "inherit";
         container.style.userSelect = "none";
 
-        // Top Toolbar: Key, Mode, Tempo, Presets
+        // Top Toolbar: Key & Scale info badge, Presets
         const controlsRow = document.createElement("div");
         controlsRow.style.display = "flex";
         controlsRow.style.flexWrap = "wrap";
         controlsRow.style.alignItems = "center";
-        controlsRow.style.gap = "12px";
+        controlsRow.style.justifyContent = "space-between";
+        controlsRow.style.gap = "10px";
         controlsRow.style.padding = "8px 12px";
-        controlsRow.style.background = "rgba(0, 0, 0, 0.05)";
+        controlsRow.style.background = "rgba(0, 0, 0, 0.04)";
         controlsRow.style.borderRadius = "8px";
 
-        // Key selector
-        const keyLabel = document.createElement("label");
-        keyLabel.textContent = `${_("Key")}: `;
-        keyLabel.style.fontWeight = "bold";
-        const keySelect = document.createElement("select");
-        keySelect.id = "chordKeySelect";
-        keySelect.style.padding = "4px 8px";
-        keySelect.style.borderRadius = "4px";
-        ChordBuilderWidget.ROOT_KEYS.forEach(k => {
-            const opt = document.createElement("option");
-            opt.value = k;
-            opt.textContent = k;
-            if (k === this.rootKey) opt.selected = true;
-            keySelect.appendChild(opt);
-        });
-        keySelect.onchange = e => this.setKeyAndMode(e.target.value, this.mode);
-        keyLabel.appendChild(keySelect);
+        // Display user-specified key and scale/mode
+        const keyModeGroup = document.createElement("div");
+        keyModeGroup.style.display = "flex";
+        keyModeGroup.style.alignItems = "center";
+        keyModeGroup.style.gap = "8px";
 
-        // Mode selector
-        const modeLabel = document.createElement("label");
-        modeLabel.textContent = `${_("Scale")}: `;
-        modeLabel.style.fontWeight = "bold";
-        const modeSelect = document.createElement("select");
-        modeSelect.id = "chordModeSelect";
-        modeSelect.style.padding = "4px 8px";
-        modeSelect.style.borderRadius = "4px";
-        ChordBuilderWidget.SUPPORTED_MODES.forEach(m => {
-            const opt = document.createElement("option");
-            opt.value = m;
-            opt.textContent = m.charAt(0).toUpperCase() + m.slice(1);
-            if (m === this.mode) opt.selected = true;
-            modeSelect.appendChild(opt);
-        });
-        modeSelect.onchange = e => this.setKeyAndMode(this.rootKey, e.target.value);
-        modeLabel.appendChild(modeSelect);
+        const badgeStyle =
+            "display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(0, 0, 0, 0.06); border-radius: 4px; font-size: 13px;";
 
-        // Tempo input
-        const tempoLabel = document.createElement("label");
-        tempoLabel.textContent = `${_("BPM")}: `;
-        tempoLabel.style.fontWeight = "bold";
-        const tempoInput = document.createElement("input");
-        tempoInput.id = "chordTempoInput";
-        tempoInput.type = "number";
-        tempoInput.min = "40";
-        tempoInput.max = "240";
-        tempoInput.value = String(this.tempo);
-        tempoInput.style.width = "60px";
-        tempoInput.style.padding = "4px";
-        tempoInput.style.borderRadius = "4px";
-        tempoInput.onchange = e => {
-            this.tempo = Math.max(40, Math.min(240, Number(e.target.value) || 120));
-        };
-        tempoLabel.appendChild(tempoInput);
+        const keyBadge = document.createElement("span");
+        keyBadge.style.cssText = badgeStyle;
+        const keyLabel = document.createElement("span");
+        keyLabel.style.color = "#666";
+        keyLabel.textContent = `${_("Key")}:`;
+        this.keyDisplay = document.createElement("strong");
+        this.keyDisplay.id = "chordKeyDisplay";
+        this.keyDisplay.textContent = this.rootKey;
+        keyBadge.append(keyLabel, this.keyDisplay);
+
+        const modeBadge = document.createElement("span");
+        modeBadge.style.cssText = badgeStyle;
+        const modeLabel = document.createElement("span");
+        modeLabel.style.color = "#666";
+        modeLabel.textContent = `${_("Scale")}:`;
+        this.modeDisplay = document.createElement("strong");
+        this.modeDisplay.id = "chordModeDisplay";
+        const modeCap = this.mode ? this.mode.charAt(0).toUpperCase() + this.mode.slice(1) : "";
+        this.modeDisplay.textContent = modeCap;
+        modeBadge.append(modeLabel, this.modeDisplay);
+
+        keyModeGroup.append(keyBadge, modeBadge);
 
         // Presets selector
-        const presetLabel = document.createElement("label");
-        presetLabel.textContent = `${_("Presets")}: `;
-        presetLabel.style.fontWeight = "bold";
+        const presetGroup = document.createElement("div");
+        presetGroup.style.display = "flex";
+        presetGroup.style.alignItems = "center";
+        presetGroup.style.gap = "6px";
+
+        const presetLabel = document.createElement("span");
+        presetLabel.textContent = `${_("Preset")}:`;
+        presetLabel.style.fontSize = "13px";
+        presetLabel.style.color = "#555";
+
         const presetSelect = document.createElement("select");
         presetSelect.id = "chordPresetSelect";
         presetSelect.style.padding = "4px 8px";
         presetSelect.style.borderRadius = "4px";
+        presetSelect.style.fontSize = "12px";
 
         const defaultPresetOpt = document.createElement("option");
         defaultPresetOpt.value = "";
@@ -626,19 +684,31 @@ class ChordBuilderWidget {
                 presetSelect.value = "";
             }
         };
-        presetLabel.appendChild(presetSelect);
+        presetGroup.append(presetLabel, presetSelect);
 
-        controlsRow.append(keyLabel, modeLabel, tempoLabel, presetLabel);
+        controlsRow.append(keyModeGroup, presetGroup);
         container.appendChild(controlsRow);
 
         // Section 1: Diatonic Chords Panel
         const chordsSection = document.createElement("div");
+        const chordsHeaderRow = document.createElement("div");
+        chordsHeaderRow.style.display = "flex";
+        chordsHeaderRow.style.justifyContent = "space-between";
+        chordsHeaderRow.style.alignItems = "center";
+        chordsHeaderRow.style.marginBottom = "6px";
+
         const chordsTitle = document.createElement("div");
         chordsTitle.style.fontWeight = "bold";
-        chordsTitle.style.fontSize = "14px";
-        chordsTitle.style.marginBottom = "6px";
-        chordsTitle.textContent = _("Diatonic Chords (Click to Audition & Add):");
-        chordsSection.appendChild(chordsTitle);
+        chordsTitle.style.fontSize = "13px";
+        chordsTitle.textContent = _("Diatonic Chords");
+
+        const chordsHint = document.createElement("div");
+        chordsHint.style.fontSize = "11px";
+        chordsHint.style.color = "#888";
+        chordsHint.textContent = _("Click card to audition · Click + to add");
+
+        chordsHeaderRow.append(chordsTitle, chordsHint);
+        chordsSection.appendChild(chordsHeaderRow);
 
         this.chordsGrid = document.createElement("div");
         this.chordsGrid.id = "diatonicChordsGrid";
@@ -650,19 +720,31 @@ class ChordBuilderWidget {
 
         // Section 2: Progression Timeline
         const progressionSection = document.createElement("div");
+        const progressionHeaderRow = document.createElement("div");
+        progressionHeaderRow.style.display = "flex";
+        progressionHeaderRow.style.justifyContent = "space-between";
+        progressionHeaderRow.style.alignItems = "center";
+        progressionHeaderRow.style.marginBottom = "6px";
+
         const progressionTitle = document.createElement("div");
         progressionTitle.style.fontWeight = "bold";
-        progressionTitle.style.fontSize = "14px";
-        progressionTitle.style.marginBottom = "6px";
-        progressionTitle.textContent = _("Progression Sequence:");
-        progressionSection.appendChild(progressionTitle);
+        progressionTitle.style.fontSize = "13px";
+        progressionTitle.textContent = _("Progression");
+
+        const barCountLabel = document.createElement("div");
+        barCountLabel.id = "chordBarCountLabel";
+        barCountLabel.style.fontSize = "11px";
+        barCountLabel.style.color = "#888";
+
+        progressionHeaderRow.append(progressionTitle, barCountLabel);
+        progressionSection.appendChild(progressionHeaderRow);
 
         this.timelineContainer = document.createElement("div");
         this.timelineContainer.id = "progressionTimeline";
         this.timelineContainer.style.display = "flex";
         this.timelineContainer.style.flexWrap = "wrap";
         this.timelineContainer.style.gap = "8px";
-        this.timelineContainer.style.minHeight = "48px";
+        this.timelineContainer.style.minHeight = "46px";
         this.timelineContainer.style.padding = "8px";
         this.timelineContainer.style.border = "1px dashed rgba(0, 0, 0, 0.2)";
         this.timelineContainer.style.borderRadius = "8px";
@@ -674,12 +756,12 @@ class ChordBuilderWidget {
         const actionsRow = document.createElement("div");
         actionsRow.style.display = "flex";
         actionsRow.style.gap = "10px";
-        actionsRow.style.marginTop = "4px";
+        actionsRow.style.marginTop = "2px";
 
         this.playBtn = document.createElement("button");
         this.playBtn.id = "chordPlayBtn";
         this.playBtn.textContent = `▶ ${_("Play")}`;
-        this.playBtn.style.padding = "8px 16px";
+        this.playBtn.style.padding = "7px 16px";
         this.playBtn.style.fontWeight = "bold";
         this.playBtn.style.borderRadius = "6px";
         this.playBtn.style.cursor = "pointer";
@@ -694,7 +776,7 @@ class ChordBuilderWidget {
         const clearBtn = document.createElement("button");
         clearBtn.id = "chordClearBtn";
         clearBtn.textContent = `🗑 ${_("Clear")}`;
-        clearBtn.style.padding = "8px 14px";
+        clearBtn.style.padding = "7px 14px";
         clearBtn.style.borderRadius = "6px";
         clearBtn.style.cursor = "pointer";
         clearBtn.onclick = () => this.clearProgression();
@@ -702,7 +784,7 @@ class ChordBuilderWidget {
         const saveBtn = document.createElement("button");
         saveBtn.id = "chordSaveBtn";
         saveBtn.textContent = `💾 ${_("Save to Canvas")}`;
-        saveBtn.style.padding = "8px 16px";
+        saveBtn.style.padding = "7px 16px";
         saveBtn.style.fontWeight = "bold";
         saveBtn.style.borderRadius = "6px";
         saveBtn.style.cursor = "pointer";
@@ -727,17 +809,21 @@ class ChordBuilderWidget {
         this.chordsGrid.innerHTML = "";
 
         this.diatonicChords.forEach(chord => {
-            const card = document.createElement("button");
+            const card = document.createElement("div");
             card.className = "diatonic-chord-card";
+            card.setAttribute("role", "button");
+            card.setAttribute("tabindex", "0");
             card.style.display = "flex";
             card.style.flexDirection = "column";
             card.style.alignItems = "center";
-            card.style.padding = "10px 6px";
+            card.style.padding = "8px 6px";
             card.style.border = "1px solid rgba(0, 0, 0, 0.15)";
             card.style.borderRadius = "6px";
-            card.style.background = "rgba(255, 255, 255, 0.9)";
+            card.style.background = "rgba(255, 255, 255, 0.95)";
             card.style.cursor = "pointer";
-            card.style.transition = "transform 0.1s, box-shadow 0.1s";
+            card.style.transition = "transform 0.1s, box-shadow 0.1s, background-color 0.15s";
+            card.style.position = "relative";
+            card.title = _("Click to audition");
 
             const romanSpan = document.createElement("span");
             romanSpan.style.fontSize = "16px";
@@ -754,9 +840,41 @@ class ChordBuilderWidget {
             notesSpan.style.color = "#777";
             notesSpan.textContent = chord.notes.join(" ");
 
-            card.append(romanSpan, nameSpan, notesSpan);
+            const addBtn = document.createElement("button");
+            addBtn.className = "chord-card-add-btn";
+            addBtn.textContent = "+";
+            addBtn.title = _("Add to progression");
+            addBtn.style.marginTop = "6px";
+            addBtn.style.padding = "2px 10px";
+            addBtn.style.fontSize = "12px";
+            addBtn.style.fontWeight = "bold";
+            addBtn.style.borderRadius = "10px";
+            addBtn.style.border = "1px solid #4a90e2";
+            addBtn.style.background = "#eef4fd";
+            addBtn.style.color = "#2a62a7";
+            addBtn.style.cursor = "pointer";
+            addBtn.onclick = e => {
+                e.stopPropagation();
+                this.addChord(chord);
+            };
 
-            card.onclick = () => this.addChord(chord);
+            card.append(romanSpan, nameSpan, notesSpan, addBtn);
+
+            // Clicking card auditions chord without adding
+            card.onclick = () => {
+                this.auditionChord(chord);
+                card.style.background = "#eef7ff";
+                setTimeout(() => {
+                    card.style.background = "rgba(255, 255, 255, 0.95)";
+                }, 200);
+            };
+
+            card.onkeydown = e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    this.auditionChord(chord);
+                }
+            };
 
             this.chordsGrid.appendChild(card);
         });
@@ -770,12 +888,21 @@ class ChordBuilderWidget {
         if (!this.timelineContainer) return;
         this.timelineContainer.innerHTML = "";
 
+        const barCountLabel = document.getElementById("chordBarCountLabel");
+        if (barCountLabel) {
+            const count = this.progression.length;
+            barCountLabel.textContent =
+                count > 0 ? `${count} ${count === 1 ? _("bar") : _("bars")}` : "";
+        }
+
         if (this.progression.length === 0) {
             const emptyNotice = document.createElement("div");
             emptyNotice.style.color = "#888";
-            emptyNotice.style.fontSize = "13px";
+            emptyNotice.style.fontSize = "12px";
             emptyNotice.style.fontStyle = "italic";
-            emptyNotice.textContent = _("Click chords above or pick a preset to build a sequence.");
+            emptyNotice.textContent = _(
+                "Empty progression. Click + on chords above or select a preset."
+            );
             this.timelineContainer.appendChild(emptyNotice);
             return;
         }
@@ -787,11 +914,22 @@ class ChordBuilderWidget {
             chip.style.display = "inline-flex";
             chip.style.alignItems = "center";
             chip.style.gap = "6px";
-            chip.style.padding = "6px 10px";
+            chip.style.padding = "4px 8px";
             chip.style.borderRadius = "16px";
             chip.style.background = idx === this.activeStep ? "#ffcc00" : "rgba(0, 0, 0, 0.08)";
             chip.style.border = "1px solid rgba(0, 0, 0, 0.12)";
-            chip.style.fontSize = "13px";
+            chip.style.fontSize = "12px";
+            chip.style.cursor = "pointer";
+            chip.title = _("Click to audition bar");
+
+            // Measure / bar indicator (e.g. "m.1", "m.2")
+            const barBadge = document.createElement("span");
+            barBadge.textContent = `m.${idx + 1}`;
+            barBadge.style.fontSize = "10px";
+            barBadge.style.color = "#666";
+            barBadge.style.padding = "1px 4px";
+            barBadge.style.background = "rgba(0, 0, 0, 0.06)";
+            barBadge.style.borderRadius = "3px";
 
             const text = document.createElement("span");
             text.textContent = `${chord.roman} (${chord.name})`;
@@ -803,16 +941,15 @@ class ChordBuilderWidget {
             delBtn.style.color = "#888";
             delBtn.style.fontWeight = "bold";
             delBtn.style.marginLeft = "4px";
+            delBtn.title = _("Remove from progression");
             delBtn.onclick = e => {
                 e.stopPropagation();
                 this.removeChord(idx);
             };
 
-            chip.append(text, delBtn);
+            chip.append(barBadge, text, delBtn);
             chip.onclick = () => {
-                if (this.audio) {
-                    this.audio.playChord(chord, 0.4, { octave: this.octave });
-                }
+                this.auditionChord(chord);
             };
 
             this.timelineContainer.appendChild(chip);

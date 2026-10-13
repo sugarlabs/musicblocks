@@ -85,6 +85,23 @@ describe("ChordBuilderWidget", () => {
             expect(widget.diatonicChords).toHaveLength(7);
         });
 
+        it("initializes key and mode from turtle keySignature when provided", () => {
+            const turtleActivity = {
+                ...mockActivity,
+                turtles: {
+                    ithTurtle: jest.fn().mockReturnValue({
+                        singer: { keySignature: "G dorian" }
+                    })
+                }
+            };
+            const customWidget = new ChordBuilderWidget(turtleActivity, {
+                ChordBuilderAudio: jest.fn().mockImplementation(() => mockAudio)
+            });
+            expect(customWidget.rootKey).toBe("G");
+            expect(customWidget.mode).toBe("dorian");
+            expect(customWidget.diatonicChords[0].name).toBe("Gm");
+        });
+
         it("opens widget window with chord progression title", () => {
             expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
                 widget,
@@ -204,6 +221,27 @@ describe("ChordBuilderWidget", () => {
     });
 
     describe("Progression Management", () => {
+        it("auditions chord without adding to progression", () => {
+            const chord = widget.diatonicChords[0];
+            widget.auditionChord(chord);
+
+            expect(widget.progression).toHaveLength(0);
+            expect(mockAudio.playChord).toHaveBeenCalledWith(chord, 0.4, { octave: 4 });
+        });
+
+        it("syncs key and mode from turtle state via syncKeyAndModeFromTurtle", () => {
+            widget.turtles = {
+                ithTurtle: jest.fn().mockReturnValue({
+                    singer: { keySignature: "D minor" }
+                })
+            };
+            widget.syncKeyAndModeFromTurtle(0);
+
+            expect(widget.rootKey).toBe("D");
+            expect(widget.mode).toBe("minor");
+            expect(widget.diatonicChords[0].name).toBe("Dm");
+        });
+
         it("adds chord to progression and plays audition sound", () => {
             const chord = widget.diatonicChords[0];
             widget.addChord(chord);
@@ -363,6 +401,59 @@ describe("ChordBuilderWidget", () => {
                 "New chord progression blocks generated.",
                 3000
             );
+        });
+    });
+
+    describe("UI and UX Interactions", () => {
+        let body;
+
+        beforeEach(() => {
+            body = mockWindow.getWidgetBody();
+        });
+
+        it("displays active key and scale/mode badges without dropdown selects or BPM input", () => {
+            const keyDisplay = body.querySelector("#chordKeyDisplay");
+            const modeDisplay = body.querySelector("#chordModeDisplay");
+            expect(keyDisplay).not.toBeNull();
+            expect(keyDisplay.textContent).toBe("C");
+            expect(modeDisplay).not.toBeNull();
+            expect(modeDisplay.textContent).toBe("Major");
+
+            // Redundant dropdowns and tempo inputs are removed
+            expect(body.querySelector("#chordKeySelect")).toBeNull();
+            expect(body.querySelector("#chordModeSelect")).toBeNull();
+            expect(body.querySelector("#chordTempoInput")).toBeNull();
+        });
+
+        it("clicking chord card auditions chord without adding it to progression", () => {
+            const card = body.querySelector(".diatonic-chord-card");
+            expect(card).not.toBeNull();
+
+            card.click();
+            expect(mockAudio.playChord).toHaveBeenCalledWith(widget.diatonicChords[0], 0.4, {
+                octave: 4
+            });
+            expect(widget.progression).toHaveLength(0);
+        });
+
+        it("clicking add button on card adds chord to progression", () => {
+            const addBtn = body.querySelector(".chord-card-add-btn");
+            expect(addBtn).not.toBeNull();
+
+            addBtn.click();
+            expect(widget.progression).toHaveLength(1);
+            expect(widget.progression[0].name).toBe("C");
+        });
+
+        it("renders measure/bar badges in progression timeline", () => {
+            widget.loadPreset("pop"); // 4 chords
+            const chips = body.querySelectorAll(".progression-chip");
+            expect(chips).toHaveLength(4);
+
+            expect(chips[0].textContent).toContain("m.1");
+            expect(chips[1].textContent).toContain("m.2");
+            expect(chips[2].textContent).toContain("m.3");
+            expect(chips[3].textContent).toContain("m.4");
         });
     });
 });
