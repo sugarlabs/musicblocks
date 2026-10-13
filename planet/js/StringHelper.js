@@ -32,7 +32,7 @@ class StringHelper {
             ["planet-new-project", _("New project"), "data-tooltip"],
             ["local-tab", _("Local")],
             ["global-tab", _("Global")],
-            ["global-search", _("Search for a project"), "placeholder"],
+            ["global-search", _("Search for projects..."), "placeholder"],
             ["localtitle", _("My Projects")],
             ["publisher-ptitle", _("Publish project")],
             ["publish-title-label", _("Project title")],

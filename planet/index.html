@@ -94,18 +94,7 @@
             <ul class="right tabs tabs-transparent" id="localglobal">
                 <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
                 <li class="tab"><a id="global-tab" href="#global"></a></li>
-                <li>
-                <li id="s_one">
-                    <div class="nav-content" id="searchcontainer-one">
-                        <div class="container">
-                            <div class="input-field search">
-                                <i class="material-icons prefix " id="searchicon">search</i><input
-                                    placeholder="Search here" id="global-search" type="text"><span><i
-                                        class="material-icons" id="search-close">clear</i></span>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+
             </ul>
         </div>
     </nav>
@@ -123,7 +112,18 @@
     <div id="local">
         <div class="section no-pad-bot">
             <div class="container">
-                <h3 class="header center light-green-text" id="localtitle"></h3>
+                <div class="projects-title-row">
+                    <h3 class="header light-green-text" id="localtitle"></h3>
+
+                    <div class="project-search-preview">
+                        <input
+                            id="local-search"
+                            type="text"
+                            placeholder="Search for projects..."
+                        />
+                        <i class="material-icons project-search-icon">search</i>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="container">
@@ -194,7 +194,21 @@
     <div id="global">
         <div class="section no-pad-bot">
             <div class="container">
-                <h3 class="header center light-green-text" id="globaltitle"></h3>
+                <div class="projects-title-row">
+                    <h3 class="header light-green-text" id="globaltitle"></h3>
+
+                    <div class="project-search-preview">
+                        <input
+                            id="global-search"
+                            type="text"
+                            placeholder="Search for a projects..."
+                        />
+                        <i class="material-icons project-search-icon">search</i>
+                        <span>
+                            <i class="material-icons" id="search-close">clear</i>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="globalcontents">

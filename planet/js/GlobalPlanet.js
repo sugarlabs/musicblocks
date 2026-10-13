@@ -52,6 +52,7 @@ class GlobalPlanet {
         this.oldSearchString = "";
         this._requestId = 0;
         this.remixPrefix = _("Remix of");
+        this.searchDebounce = null;
 
         /** @type {IntersectionObserver|null} */
         this._scrollObserver = null;
@@ -803,6 +804,16 @@ class GlobalPlanet {
                 }
             });
 
+            register("global-search", "input", function (evt) {
+                clearTimeout(this.searchDebounce);
+
+                this.searchString = evt.target.value.trim();
+
+                this.searchDebounce = setTimeout(() => {
+                    this.search();
+                }, 300);
+            });
+
             register("global-search", "keydown", function (evt) {
                 if (evt.key === "Enter") {
                     this.searchString = document.getElementById("global-search").value;
@@ -829,15 +840,6 @@ class GlobalPlanet {
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";
                 this.search();
-            });
-
-            register("global-tab", "click", function (evt) {
-                document.getElementById("searchcontainer-one").style.display = "block";
-            });
-
-            register("local-tab", "click", function (evt) {
-                document.getElementById("searchcontainer-one").style.display = "none";
-                // document.getElementById("two_header").style.display = "none";
             });
 
             this.ProjectViewer = new ProjectViewer(Planet);
