@@ -128,6 +128,37 @@ describe("ASTUtils", () => {
             expect([...ASTUtils.skippedBlocks]).toEqual(["clampWithNoMapping"]);
         });
 
+        it("keeps blocks from both inner flows of an unsupported double clamp", () => {
+            JSInterface.isSetter.mockImplementation(name => name === "setKey");
+            JSInterface.getSetterName.mockImplementation(name => name);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            const result = ASTUtils._getBlockAST(
+                [["doubleClampWithNoMapping", [], [["setKey", ["C"]]], [["setKey", ["D"]]]]],
+                1
+            );
+
+            expect(result).toHaveLength(2);
+            expect(result[0]).toEqual(ASTUtils._getSetAST("setKey", ["C"]));
+            expect(result[1]).toEqual(ASTUtils._getSetAST("setKey", ["D"]));
+            expect([...ASTUtils.skippedBlocks]).toEqual(["doubleClampWithNoMapping"]);
+        });
+
+        it("records unsupported blocks containing underscores and preserves nested flows", () => {
+            JSInterface.isSetter.mockImplementation(name => name === "setKey");
+            JSInterface.getSetterName.mockImplementation(name => name);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            const result = ASTUtils._getBlockAST(
+                [["unknown_custom_instruction", [], [["setKey", ["E"]]]]],
+                1
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0]).toEqual(ASTUtils._getSetAST("setKey", ["E"]));
+            expect([...ASTUtils.skippedBlocks]).toEqual(["unknown_custom_instruction"]);
+        });
+
         it("does not throw", () => {
             JSInterface.isSetter.mockReturnValue(false);
             JSInterface.isMethod.mockReturnValue(false);
