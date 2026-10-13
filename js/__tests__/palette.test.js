@@ -30,6 +30,22 @@ global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAcce
 
 const REAL_CREATE_ELEMENT = global.document.createElement;
 
+const createClassListMock = () => {
+    const classes = new Set();
+    return {
+        add: jest.fn((...cls) => cls.forEach(c => classes.add(c))),
+        remove: jest.fn((...cls) => cls.forEach(c => classes.delete(c))),
+        contains: jest.fn(c => classes.has(c)),
+        toggle: jest.fn((c, force) => {
+            const has = classes.has(c);
+            const next = force !== undefined ? !!force : !has;
+            if (next) classes.add(c);
+            else classes.delete(c);
+            return next;
+        })
+    };
+};
+
 global.LEADING = 10;
 global.DEFAULTPALETTE = "default";
 
@@ -1592,7 +1608,7 @@ describe("Palettes Class", () => {
                     setAttribute: jest.fn(),
                     appendChild: jest.fn(),
                     children: [],
-                    classList: { add: jest.fn() }
+                    classList: createClassListMock()
                 };
             };
             global.document.createElement = jest.fn(elementFactory);
@@ -1617,6 +1633,7 @@ describe("Palettes Class", () => {
         test("showMenu sizes the scrollable body from its rendered top", () => {
             const paletteItems = {
                 style: {},
+                classList: createClassListMock(),
                 getBoundingClientRect: jest.fn(() => ({ top: 180 }))
             };
             const paletteBody = {
@@ -1648,6 +1665,7 @@ describe("Palettes Class", () => {
                 if (tag === "tbody") return paletteItems;
                 return {
                     style: {},
+                    classList: createClassListMock(),
                     children: [],
                     appendChild: jest.fn(),
                     removeAttribute: jest.fn(),
@@ -1707,6 +1725,7 @@ describe("Palettes Class", () => {
                     ? paletteBody
                     : {
                           style: {},
+                          classList: createClassListMock(),
                           children: [],
                           appendChild: jest.fn(),
                           removeAttribute: jest.fn(),
