@@ -128,8 +128,13 @@ function setupEnsembleBlocks(activity) {
             }
 
             const targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            if (targetTurtle === null) return -1;
+
             const i = getTargetTurtle(activity.turtles, targetTurtle);
-            if (i < 0) return -1;
+            if (i === null) {
+                activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                return -1;
+            }
 
             const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk2 === null) {

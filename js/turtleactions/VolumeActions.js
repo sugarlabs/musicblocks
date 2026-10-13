@@ -18,7 +18,7 @@
 
 /*
    global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   Tone, DEFAULTVOLUME, DEFAULTVOICE, clampNumber
+   Tone, DEFAULTVOLUME, DEFAULTVOICE, clampNumber, instruments
 */
 
 /*
@@ -28,7 +28,7 @@
     js/turtle-singer.js
         Singer
     js/utils/synthutils.js
-        VOICENAMES, DRUMNAMES
+        VOICENAMES, DRUMNAMES, instruments
     js/logo.js
         DEFAULTVOLUME
     js/js-export/export.js
@@ -276,8 +276,10 @@ function setupVolumeActions(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (!tur.singer.instrumentNames.includes(synth)) {
-                tur.singer.instrumentNames.push(synth);
+            // Load the synth if this turtle doesn't have it yet, but leave
+            // instrumentNames alone: notes play with its last entry, so pushing
+            // here would switch the current instrument to the volume target.
+            if (!(instruments[turtle] && synth in instruments[turtle])) {
                 activity.logo.synth.loadSynth(turtle, synth);
             }
 

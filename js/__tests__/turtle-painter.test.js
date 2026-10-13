@@ -308,10 +308,27 @@ describe("Pen operations", () => {
         expect(mockTurtle.ctx.lineWidth).toBe(10);
     });
 
-    test("doSetPensize should handle zero", () => {
-        painter.doSetPensize(0);
-        expect(painter.stroke).toBe(0);
-        expect(mockTurtle.ctx.lineWidth).toBe(0);
+    test.each([0, -5])("doSetPensize rejects %s and keeps the current size", size => {
+        painter.doSetPensize(20);
+        painter.doSetPensize(size);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+            "Pen size must be greater than 0."
+        );
+        expect(painter.stroke).toBe(20);
+        expect(mockTurtle.ctx.lineWidth).toBe(20);
+    });
+
+    test.each([NaN, Infinity, "abc"])("doSetPensize rejects the non-number %s", size => {
+        painter.doSetPensize(20);
+        painter.doSetPensize(size);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.stroke).toBe(20);
+    });
+
+    test("doSetPensize accepts a fractional size", () => {
+        painter.doSetPensize(0.5);
+        expect(painter.stroke).toBe(0.5);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
     });
 
     test("doSetPensize should handle large values", () => {
@@ -386,6 +403,27 @@ describe("Pen operations", () => {
         painter.doSetPenAlpha(1);
         expect(painter.canvasAlpha).toBe(1);
     });
+
+    test.each([
+        [0, 1],
+        [25, 0.75],
+        [50, 0.5],
+        [100, 0],
+        [225, 1 - 23 / 100]
+    ])("doSetTranslucency(%s) sets the pen alpha to %s", (translucency, alpha) => {
+        painter.doSetTranslucency(translucency);
+        expect(painter.canvasAlpha).toBeCloseTo(alpha);
+    });
+
+    test.each([NaN, Infinity, "abc"])(
+        "doSetTranslucency rejects the non-number %s and keeps the alpha",
+        translucency => {
+            painter.doSetTranslucency(50);
+            painter.doSetTranslucency(translucency);
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter.canvasAlpha).toBe(0.5);
+        }
+    );
 
     test("doPenUp should set penDown to false", () => {
         painter.doPenUp();
@@ -726,6 +764,37 @@ describe("Heading and orientation", () => {
         mockTurtle.blinking.mockReturnValue(true);
         painter.doSetHeading(90);
         expect(mockTurtle.updateCache).not.toHaveBeenCalled();
+    });
+
+    test.each([-1e20, 1e20, -1e300, -Number.MAX_VALUE])(
+        "doSetHeading(%s) returns a heading in [0, 360) without looping",
+        degrees => {
+            painter.doSetHeading(degrees);
+            expect(mockTurtle.orientation).toBeGreaterThanOrEqual(0);
+            expect(mockTurtle.orientation).toBeLessThan(360);
+        }
+    );
+
+    test.each([-1e20, 1e20, -1e300])(
+        "doRight(%s) returns a heading in [0, 360) without looping",
+        degrees => {
+            mockTurtle.orientation = 90;
+            painter.doRight(degrees);
+            expect(mockTurtle.orientation).toBeGreaterThanOrEqual(0);
+            expect(mockTurtle.orientation).toBeLessThan(360);
+        }
+    );
+
+    test.each([
+        [-90, 270],
+        [-360, 0],
+        [-450, 270],
+        [-1e9, 80],
+        [720, 0],
+        [-0.5, 359.5]
+    ])("doSetHeading(%s) normalizes to %s", (degrees, expected) => {
+        painter.doSetHeading(degrees);
+        expect(mockTurtle.orientation).toBeCloseTo(expected);
     });
 
     test("doSetHeading should handle NaN or Infinity gracefully", () => {

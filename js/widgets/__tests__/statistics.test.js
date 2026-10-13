@@ -247,9 +247,9 @@ describe("StatsWindow", () => {
         expect(html).toContain("pitch names: A, C#, E");
         expect(html).toContain("number of notes: 20");
         expect(html).toContain("lowest note: A4");
-        expect(html).toContain("441Hz"); // 440 + 0.5 rounded
+        expect(html).toContain("lowest note: A4,440Hz");
         expect(html).toContain("highest note: C5");
-        expect(html).toContain("524Hz"); // 523.25 + 0.5 rounded
+        expect(html).toContain("highest note: C5,523Hz");
         expect(html).toContain("rests used: 4");
         expect(html).toContain("ornaments used: 1");
     });

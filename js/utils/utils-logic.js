@@ -208,10 +208,13 @@ var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
  */
 var toFixed2 = n => {
     if (typeof n !== "number") return n;
-    const s = n.toString();
-    const decimalIndex = s.indexOf(".");
-    if (decimalIndex === -1) return s;
-    return n.toFixed(2).replace(/\.?0+$/, "");
+    // Integers are shown as they are. Everything else is rounded, including values
+    // whose toString() has no "." because it is in exponent form: a turtle at x = 0
+    // after a quarter turn holds 6.1e-15, which used to be shown as "6.123...e-15".
+    if (Number.isInteger(n)) return n.toString();
+    const s = n.toFixed(2).replace(/\.?0+$/, "");
+    // A small negative value rounds to "-0.00", which should read as 0.
+    return s === "-0" ? "0" : s;
 };
 
 /**

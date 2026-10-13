@@ -254,7 +254,7 @@ var getNumber = (notename, octave, temperament, edo) => {
             const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
                 num -= 2;
-            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
+            } else if (delta === "##" || delta === "x" || delta === "*" || delta === DOUBLESHARP) {
                 num += 2;
             } else if (delta === "b" || delta === FLAT) {
                 num -= 1;

@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global globalActivity, JSInterface, last, ASTUtils, astring */
+/* global globalActivity, JSInterface, last, ASTUtils, astring, deepClone */
 
 /* exported JSGenerate */
 
@@ -325,7 +325,7 @@ class JSGenerate {
     static generateCode() {
         JSGenerate.generateFailed = false;
 
-        JSGenerate.AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
+        JSGenerate.AST = ASTUtils.BAREBONE_AST;
 
         try {
             ASTUtils.setActionNames(
@@ -363,7 +363,7 @@ class JSGenerate {
         }
 
         if (JSGenerate.generateFailed) {
-            const AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
+            const AST = ASTUtils.BAREBONE_AST;
             AST["body"].splice(0, 0, ASTUtils.getMouseAST([]));
             JSGenerate.code = astring.generate(AST);
         }
