@@ -156,7 +156,7 @@ describe("StringHelper", () => {
                 document.body.innerHTML = '<input id="global-search" />';
                 helper.init();
                 const elem = document.getElementById("global-search");
-                expect(elem.getAttribute("placeholder")).toBe("Search for a project");
+                expect(elem.getAttribute("placeholder")).toBe("Search for projects...");
             });
 
             it("should handle a mix of present and missing elements", () => {
