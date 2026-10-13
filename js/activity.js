@@ -2034,7 +2034,9 @@ class Activity {
                         const primaryTurtle = this.turtles.getTurtle(turtle);
 
                         primaryTurtle.inTrash = true;
-                        primaryTurtle.container.visible = false;
+                        if (primaryTurtle.container) {
+                            primaryTurtle.container.visible = false;
+                        }
 
                         const comp = primaryTurtle.companionTurtle;
 
@@ -2043,7 +2045,9 @@ class Activity {
 
                             if (companionTurtle) {
                                 companionTurtle.inTrash = true;
-                                companionTurtle.container.visible = false;
+                                if (companionTurtle.container) {
+                                    companionTurtle.container.visible = false;
+                                }
                             }
                         }
                     }
