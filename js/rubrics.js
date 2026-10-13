@@ -871,11 +871,15 @@ const getStatsFromNotation = activity => {
                 }
             }
 
-            if (item[1] === 2) {
+            // item[1] is the note value; the tuplet is item[3], e.g. [3, 4] for a
+            // triplet eighth (see doUpdateNotation and durationToNoteValue).
+            const tupletFactor =
+                typeof item === "object" && Array.isArray(item[3]) ? item[3][0] : null;
+            if (tupletFactor === 2) {
                 projectStats["duples"]++;
-            } else if (item[1] === 3) {
+            } else if (tupletFactor === 3) {
                 projectStats["triplets"]++;
-            } else if (item[1] === 5) {
+            } else if (tupletFactor === 5) {
                 projectStats["quintuplets"]++;
             }
 
