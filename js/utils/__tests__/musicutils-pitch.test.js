@@ -169,6 +169,15 @@ describe("musicutils-pitch", () => {
         expect(pitch.calcOctaveInterval(undefined)).toBe(0);
     });
 
+    describe("getNumber", () => {
+        it("handles double-sharp accidentals including 'x', '##', '*', and unicode '𝄪'", () => {
+            expect(pitch.getNumber("Cx", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C##", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C*", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C𝄪", 4, "equal")).toBe(39);
+        });
+    });
+
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
             "musicutils-constants.js",
