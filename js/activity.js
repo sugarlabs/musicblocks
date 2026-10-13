@@ -1900,10 +1900,22 @@ class Activity {
 
         this._handleWindowResize = () => {
             if (!resizeAnimationFrame) {
-                resizeAnimationFrame = requestAnimationFrame(() => {
-                    this._handleRepositionBlocksOnResize();
-                    resizeAnimationFrame = null;
-                });
+                const scheduleRaf =
+                    typeof requestAnimationFrame === "function"
+                        ? requestAnimationFrame
+                        : typeof window !== "undefined" &&
+                            typeof window.requestAnimationFrame === "function"
+                          ? window.requestAnimationFrame
+                          : null;
+
+                if (scheduleRaf) {
+                    resizeAnimationFrame = scheduleRaf(() => {
+                        if (typeof this._handleRepositionBlocksOnResize === "function") {
+                            this._handleRepositionBlocksOnResize();
+                        }
+                        resizeAnimationFrame = null;
+                    });
+                }
             }
 
             clearTimeout(resizeTimeout);
