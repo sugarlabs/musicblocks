@@ -145,6 +145,7 @@ const setupActivityIdleWatcher = activityInstance => {
         if (activity._autoSaveInterval !== null) {
             clearInterval(activity._autoSaveInterval);
         }
+        let lastPlanetSave = null;
         activity._autoSaveInterval = setInterval(
             () => {
                 try {
@@ -173,6 +174,29 @@ const setupActivityIdleWatcher = activityInstance => {
                         activity.saveSessionAsync().catch(e => {
                             ErrorHandler.recoverable(e, { operation: "autoSaveAsync" });
                         });
+
+                        // A restart loads the Planet copy ahead of these session
+                        // copies, so keep it current too. That save rewrites every
+                        // stored project, so only repeat it once something changed
+                        // or the last one was not written (null or false).
+                        if (activity.planet) {
+                            const data = activity.prepareExport();
+                            if (data !== lastPlanetSave) {
+                                Promise.resolve(
+                                    activity.saveLocally({ rejectOnProjectSaveError: true })
+                                )
+                                    .then(result => {
+                                        if (result !== null && result !== false) {
+                                            lastPlanetSave = data;
+                                        }
+                                    })
+                                    .catch(e => {
+                                        ErrorHandler.recoverable(e, {
+                                            operation: "autoSavePlanet"
+                                        });
+                                    });
+                            }
+                        }
                     } else if (
                         activity.saveLocally !== null &&
                         activity.saveLocally !== undefined
