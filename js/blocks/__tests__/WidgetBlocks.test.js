@@ -834,6 +834,28 @@ describe("setupWidgetBlocks", () => {
             ).not.toThrow();
             expect(logo.temperament.scale).toBeNull();
         });
+
+        it("sets the scale and starting pitch when the full pitch chain is docked", () => {
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", "pitchBlk", "hiddenBlk"]
+            };
+            activity.blocks.blockList["pitchBlk"] = {
+                name: "pitch",
+                connections: ["tempBlk", "noteBlk", "octaveBlk", "setKeyBlk"]
+            };
+            activity.blocks.blockList["noteBlk"] = { value: "D" };
+            activity.blocks.blockList["octaveBlk"] = { value: 4 };
+            activity.blocks.blockList["setKeyBlk"] = {
+                connections: ["pitchBlk", "keyNameBlk", "modeBlk"]
+            };
+            activity.blocks.blockList["keyNameBlk"] = { value: "C" };
+            activity.blocks.blockList["modeBlk"] = { value: "major" };
+
+            temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received");
+
+            expect(logo.temperament.scale).toEqual(["C", "major"]);
+            expect(logo.synth.startingPitch).toBe("D4");
+        });
     });
 
     describe("StatusBlock", () => {
