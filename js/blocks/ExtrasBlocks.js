@@ -71,6 +71,39 @@ function setupExtrasBlocks(activity) {
     }
 
     /**
+     * Represents a RecordNotationBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
+    class RecordNotationBlock extends FlowBlock {
+        /**
+         * Creates an instance of RecordNotationBlock.
+         */
+        constructor() {
+            super("recordnotation", _("record notation"));
+            this.setPalette("extras", activity);
+            this.setHelpString([
+                _(
+                    "The Record notation block captures music as it plays so that it can be saved as sheet music."
+                ),
+                "documentation",
+                ""
+            ]);
+        }
+
+        /**
+         * Handles the flow of the RecordNotationBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         */
+        flow(args, logo, turtle) {
+            activity.turtles.ithTurtle(turtle).singer.recordingNotation = true;
+        }
+    }
+
+    /**
      * Represents a SaveABCBlock.
      * Extends FlowBlock.
      * @class
@@ -184,9 +217,9 @@ function setupExtrasBlocks(activity) {
                 if (logo.svgBackground) {
                     logo.svgOutput =
                         '<rect x="0" y="0" height="' +
-                        logo.canvas.height +
+                        activity.canvas.height +
                         '" width="' +
-                        logo.canvas.width +
+                        activity.canvas.width +
                         '" fill="' +
                         (getComputedStyle(document.body)
                             .getPropertyValue("--color-bg-primary")
@@ -195,7 +228,7 @@ function setupExtrasBlocks(activity) {
                         logo.svgOutput;
                 }
 
-                activity.save.saveSVG(args[0]);
+                activity.save.saveSVG(activity, args[0]);
             }
         }
     }
@@ -888,6 +921,7 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    new RecordNotationBlock().setup(activity);
     new SaveABCBlock().setup(activity);
     new SaveLilypondBlock().setup(activity);
     new SaveSVGBlock().setup(activity);

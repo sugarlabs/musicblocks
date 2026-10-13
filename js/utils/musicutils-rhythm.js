@@ -23,6 +23,10 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof window !== "undefined" && window.MusicUtilsConstants) ||
         (typeof require !== "undefined" ? require("./musicutils-constants") : {});
     var { NSYMBOLS, POWER2 } = MusicUtilsConstants;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { toFraction } = UtilsLogic;
 }
 
 /**
@@ -65,44 +69,28 @@ var calcNoteValueToDisplay = (a, b) => {
         noteValueToDisplay = reducedFraction(b, a);
     }
 
-    let value;
-    let obj;
-    let d0, d1;
+    // A dotted note lasts 1.5 times its undotted value and a double-dotted note
+    // 1.75 times, so the undotted value is noteValue times that factor and has to
+    // come out whole. parseInt only truncated it, so durations in between were
+    // labelled dotted and the symbol then disagreed with the fraction beside it.
     if (parseInt(noteValue, 10) < noteValue) {
-        noteValueToDisplay = parseInt(noteValue * 1.5, 10);
-        if (noteValueToDisplay in NSYMBOLS) {
-            value = b / a; // * noteValueToDisplay;
-            obj = toFraction(value);
-            Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
-            Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
-            noteValueToDisplay =
-                // value.toFixed(2) +
-                obj[0].toFixed(d0) +
-                "<br>&mdash;<br>" +
-                // noteValueToDisplay.toString() +
-                obj[1].toFixed(d1) +
-                "<br>" +
-                NSYMBOLS[noteValueToDisplay] +
-                ".";
-        } else {
-            noteValueToDisplay = parseInt(noteValue * 1.75, 10);
-            if (noteValueToDisplay in NSYMBOLS) {
-                value = b / a; // * noteValueToDisplay;
-                obj = toFraction(value);
-                Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
-                Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
-                noteValueToDisplay =
-                    // value.toFixed(2) +
-                    obj[0].toFixed(d0) +
-                    "<br>&mdash;<br>" +
-                    // noteValueToDisplay.toString() +
-                    obj[1].toFixed(d1) +
-                    "<br>" +
-                    NSYMBOLS[noteValueToDisplay] +
-                    "..";
-            } else {
-                noteValueToDisplay = reducedFraction(b, a);
+        // Callers pass the note value as a float, which reducedFraction cannot
+        // reduce: its Euclid loop needs whole numbers. Go through toFraction.
+        const [numerator, denominator] = toFraction(b / a);
+        noteValueToDisplay = reducedFraction(numerator, denominator);
+
+        for (const [factor, dots] of [
+            [1.5, "."],
+            [1.75, ".."]
+        ]) {
+            const undotted = Math.round(noteValue * factor);
+            if (Math.abs(noteValue * factor - undotted) > 1e-9 || !(undotted in NSYMBOLS)) {
+                continue;
             }
+
+            noteValueToDisplay =
+                numerator + "<br>&mdash;<br>" + denominator + "<br>" + NSYMBOLS[undotted] + dots;
+            break;
         }
     }
 

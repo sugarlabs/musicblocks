@@ -815,7 +815,8 @@ describe("saveMxmlOutput notation markers", () => {
         ["end slur"],
         ["tie"],
         ["begin harmonics"],
-        ["end harmonics"]
+        ["end harmonics"],
+        ["begin repeat"]
     ].flat();
 
     it("never renders a staged marker as a note", () => {
@@ -1410,5 +1411,154 @@ describe("saveMxmlOutput - short notes keep whole-number durations", () => {
         });
 
         expect(output).toContain("<divisions>8</divisions>");
+    });
+});
+
+describe("saveMxmlOutput - forever repeats", () => {
+    const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, false, false];
+    const drum = (name, noteValue = 4) => [[], noteValue, 0, null, null, false, false, name];
+
+    const exportVoice = staged => {
+        const xml = saveMxmlOutput({ notation: { notationStaging: { 0: staged } } });
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+        return doc;
+    };
+
+    // Each measure's barlines as "location:direction", in document order.
+    const barlinesOf = measure =>
+        Array.from(measure.getElementsByTagName("barline")).map(barline => {
+            const repeat = barline.getElementsByTagName("repeat")[0];
+            return `${barline.getAttribute("location") || "plain"}:${
+                repeat ? repeat.getAttribute("direction") : "none"
+            }`;
+        });
+    const measuresOf = doc => Array.from(doc.getElementsByTagName("measure"));
+    const stepsOf = measure =>
+        Array.from(measure.getElementsByTagName("step")).map(s => s.textContent);
+
+    it("wraps the notes after a forever in repeat barlines", () => {
+        const measures = measuresOf(exportVoice(["begin repeat", note("G4"), note("E4")]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["left:forward", "right:backward"]);
+        expect(stepsOf(measures[0])).toEqual(["G", "E"]);
+    });
+
+    it("splits the measure where a forever starts mid-measure", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat", note("G4")]));
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps later barlines on the beat after a mid-measure split", () => {
+        const measures = measuresOf(
+            exportVoice([
+                note("C4"),
+                note("C4"),
+                note("C4"),
+                "begin repeat",
+                note("D4"),
+                note("E4"),
+                note("F4"),
+                note("G4")
+            ])
+        );
+
+        // In 4/4 the D finishes the first measure, so E F G start the next one.
+        expect(measures.map(stepsOf)).toEqual([["C", "C", "C"], ["D"], ["E", "F", "G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes", null]);
+        expect(measures.map(barlinesOf)).toEqual([[], ["left:forward"], ["right:backward"]]);
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        const measures = measuresOf(
+            exportVoice(["begin repeat", note("C4"), "begin repeat", note("G4")])
+        );
+
+        expect(measures.map(stepsOf)).toEqual([["C"], ["G"]]);
+        expect(measures.map(m => m.getAttribute("implicit"))).toEqual([null, "yes"]);
+        expect(barlinesOf(measures[0])).toEqual([]);
+        expect(barlinesOf(measures[1])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("gives a drum part the same repeat", () => {
+        const doc = exportVoice(["begin repeat", drum("snare drum"), drum("kick drum")]);
+        const part = doc.getElementsByTagName("part")[0];
+
+        expect(part.getAttribute("id")).toBe("D1");
+        expect(barlinesOf(measuresOf(doc)[0])).toEqual(["left:forward", "right:backward"]);
+    });
+
+    it("keeps the plain final barline when no notes follow the forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), "begin repeat"]));
+
+        expect(measures).toHaveLength(1);
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
+    });
+
+    it("writes no repeat barlines without a forever", () => {
+        const measures = measuresOf(exportVoice([note("C4"), note("G4")]));
+
+        expect(barlinesOf(measures[0])).toEqual(["plain:none"]);
+    });
+});
+
+describe("saveMxmlOutput - written note types", () => {
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato, drum]
+    const note = (value, dots = 0) => [["G4"], value, dots, null, null, false, false, null];
+    // durationToNoteValue()'s tuplet fallback: the sentinel note value, with the real
+    // shape in tupletValue and the power of two it rounds down to in roundDown.
+    const tuplet = (ratio, roundDown) => [["G4"], 1, 0, ratio, roundDown, false, false, null];
+
+    const exportOf = staging => saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+    const typesOf = staging =>
+        [...exportOf(staging).matchAll(/<type>([^<]+)<\/type>/g)].map(m => m[1]);
+    const dotsOf = staging => (exportOf(staging).match(/<dot\/>/g) || []).length;
+
+    it.each([
+        [1, "whole"],
+        [2, "half"],
+        [4, "quarter"],
+        [8, "eighth"],
+        [16, "16th"],
+        [32, "32nd"],
+        [64, "64th"]
+    ])("writes a note value of %i as %s", (value, type) => {
+        expect(typesOf([note(value)])).toEqual([type]);
+    });
+
+    it("writes one dot per dot the note carries", () => {
+        expect(dotsOf([note(2)])).toBe(0);
+        expect(dotsOf([note(2, 1)])).toBe(1);
+        expect(dotsOf([note(2, 2)])).toBe(2);
+    });
+
+    // A tuplet note's duration is scaled by its ratio, so a reader can only recover the
+    // written note from <type>. Lilypond's own importer stops on a tuplet note without one.
+    it("takes a tuplet note's type from the value it rounds down to", () => {
+        expect(typesOf([tuplet([3, 4], 8)])).toEqual(["eighth"]);
+        expect(typesOf([tuplet([5, 4], 16)])).toEqual(["16th"]);
+    });
+
+    it("leaves a tuplet note undotted", () => {
+        expect(dotsOf([tuplet([3, 4], 8)])).toBe(0);
+    });
+
+    it("writes the type before the time-modification, as the schema orders them", () => {
+        const output = exportOf([tuplet([3, 4], 8)]);
+
+        expect(output).toContain("<type>");
+        expect(output).toContain("<time-modification>");
+        expect(output.indexOf("<type>")).toBeLessThan(output.indexOf("<time-modification>"));
+    });
+
+    it("writes a type for a rest too", () => {
+        const rest = [["R"], 2, 0, null, null, false, false, null];
+
+        expect(typesOf([note(4), rest])).toEqual(["quarter", "half"]);
     });
 });

@@ -459,6 +459,247 @@ describe("transcribeMidi", () => {
         expect(pitchBlocks[0][4][3]).toBe(pitchBlocks[1][0]);
         expect(pitchBlocks[1][4][3]).toBeNull();
     });
+    describe("polyphonic note boundaries", () => {
+        const { Midi } = require("@tonejs/midi");
+
+        const importNotes = async notes => {
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            notes.forEach(([midi, start, end]) => {
+                track.addNote({ midi, time: start, duration: end - start });
+            });
+            const parsed = new Midi(file.toArray());
+            await transcribeMidi(parsed, 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const events = blocks
+                .filter(block => blockName(block) === "newnote")
+                .map(block => {
+                    const divide = byIndex.get(block[4][1]);
+                    const numerator = byIndex.get(divide[4][1])[1][1].value;
+                    const denominator = byIndex.get(divide[4][2])[1][1].value;
+                    const pitches = [];
+                    let child = byIndex.get(byIndex.get(block[4][2])[4][1]);
+                    while (child && blockName(child) === "pitch") {
+                        const pitch = byIndex.get(child[4][1])[1][1].value;
+                        const octave = byIndex.get(child[4][2])[1][1].value;
+                        pitches.push(`${pitch}${octave}`);
+                        child = byIndex.get(child[4][3]);
+                    }
+                    return [(numerator / denominator) * 2, pitches];
+                });
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            return { events, blocks, parsed };
+        };
+
+        it.each([
+            [
+                "a later note outlasting the held note",
+                [
+                    [60, 0, 4],
+                    [64, 1, 2],
+                    [67, 3, 5]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["C4", "E4"]],
+                    [1, ["C4"]],
+                    [1, ["C4", "G4"]],
+                    [1, ["G4"]]
+                ]
+            ],
+            [
+                "nested overlaps that begin before the previous tail",
+                [
+                    [60, 0, 4],
+                    [64, 1, 3],
+                    [67, 2, 4]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["C4", "E4"]],
+                    [1, ["C4", "E4", "G4"]],
+                    [1, ["C4", "G4"]]
+                ]
+            ],
+            [
+                "unequal-length notes starting together",
+                [
+                    [60, 0, 2],
+                    [64, 0, 1]
+                ],
+                [
+                    [1, ["C4", "E4"]],
+                    [1, ["C4"]]
+                ]
+            ],
+            [
+                "a chord with identical start and end times",
+                [
+                    [60, 0, 1],
+                    [64, 0, 1],
+                    [67, 0, 1]
+                ],
+                [[1, ["C4", "E4", "G4"]]]
+            ],
+            [
+                "a note ending exactly when the next begins",
+                [
+                    [60, 0, 1],
+                    [64, 1, 2]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["E4"]]
+                ]
+            ],
+            [
+                "independent overlapping instances of the same pitch",
+                [
+                    [60, 0, 2],
+                    [60, 1, 3]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["C4", "C4"]],
+                    [1, ["C4"]]
+                ]
+            ],
+            [
+                "leading silence and gaps after a chord",
+                [
+                    [60, 1, 2],
+                    [64, 1, 2],
+                    [67, 3, 4]
+                ],
+                [
+                    [1, []],
+                    [1, ["C4", "E4"]],
+                    [1, []],
+                    [1, ["G4"]]
+                ]
+            ],
+            [
+                "zero-duration notes before leading silence",
+                [
+                    [60, 0, 0],
+                    [64, 1, 2]
+                ],
+                [
+                    [1, []],
+                    [1, ["E4"]]
+                ]
+            ],
+            [
+                "notes collapsed by centisecond rounding",
+                [
+                    [60, 0, 0.001],
+                    [64, 1, 2]
+                ],
+                [
+                    [1, []],
+                    [1, ["E4"]]
+                ]
+            ]
+        ])(
+            "preserves %s through MIDI decoding and block generation",
+            async (_, notes, expected) => {
+                const { events } = await importNotes(notes);
+                expect(events).toEqual(expected);
+            }
+        );
+
+        it("does not create an empty action or start stack for a track with no playable notes", async () => {
+            const { events, blocks } = await importNotes([[60, 0, 0.001]]);
+            expect(events).toEqual([]);
+            expect(blocks).toEqual([]);
+        });
+
+        it("preserves overlapping notes and valid connections across action chunks", async () => {
+            const notes = Array.from({ length: 60 }, (_, index) => [
+                60 + (index % 12),
+                index * 0.5,
+                index * 0.5 + 1
+            ]);
+            const { events, blocks, parsed } = await importNotes(notes);
+            expect(blocks.filter(block => blockName(block) === "action").length).toBeGreaterThan(1);
+            expect(events).toHaveLength(61);
+            events.forEach(([duration, pitches], index) => {
+                const start = index * 0.5;
+                expect(duration).toBe(0.5);
+                expect([...pitches].sort()).toEqual(
+                    parsed.tracks[0].notes
+                        .filter(note => note.time <= start && note.time + note.duration > start)
+                        .map(note => note.name)
+                        .sort()
+                );
+            });
+        });
+
+        it("skips an unplayable track without mixing subsequent tracks or their instruments", async () => {
+            const file = new Midi();
+            file.header.setTempo(120);
+            file.addTrack().addNote({ midi: 60, time: 0, duration: 0.001 });
+            const piano = file.addTrack();
+            piano.instrument.number = 0;
+            piano.addNote({ midi: 60, time: 0, duration: 2 });
+            piano.addNote({ midi: 64, time: 1, duration: 2 });
+            const guitar = file.addTrack();
+            guitar.instrument.number = 24;
+            guitar.addNote({ midi: 67, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            expect(blocks.filter(block => blockName(block) === "start")).toHaveLength(2);
+            expect(
+                blocks
+                    .filter(block => blockName(block) === "voicename")
+                    .map(block => block[1][1].value)
+            ).toEqual(["piano", "guitar"]);
+            expect(blocks.filter(block => blockName(block) === "newnote")).toHaveLength(4);
+            expect(
+                blocks
+                    .filter(block => blockName(block) === "notename")
+                    .map(block => block[1][1].value)
+            ).toEqual(["C", "C", "E", "E", "G"]);
+        });
+
+        it("preserves active pitches for 100 deterministic overlapping tracks", async () => {
+            let seed = 12345;
+            const random = limit => {
+                seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+                return seed % limit;
+            };
+            for (let example = 0; example < 100; example++) {
+                loadNewBlocksSpy.mockClear();
+                const notes = Array.from({ length: 6 }, (_, index) => {
+                    const start = random(5) * 0.5;
+                    return [60 + index, start, start + (1 + random(4)) * 0.5];
+                });
+                const { events, parsed } = await importNotes(notes);
+                const source = parsed.tracks[0].notes;
+                const boundaries = [
+                    ...new Set([
+                        0,
+                        ...source.flatMap(note => [note.time, note.time + note.duration])
+                    ])
+                ].sort((a, b) => a - b);
+                const expected = boundaries.slice(0, -1).map((start, index) => {
+                    const end = boundaries[index + 1];
+                    const pitches = source
+                        .filter(note => note.time <= start && note.time + note.duration > start)
+                        .map(note => note.name)
+                        .sort();
+                    return [end - start, pitches];
+                });
+                expect(
+                    events.map(([duration, pitches]) => [duration, [...pitches].sort()])
+                ).toEqual(expected);
+            }
+        });
+    });
+
     describe("tempo and note values", () => {
         const { Midi } = require("@tonejs/midi");
         const PPQ = 480;

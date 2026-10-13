@@ -1134,7 +1134,7 @@ function setupFlowBlocks(activity) {
             // queued after a forever ever runs, so drop it and end the voice here.
             // A forever that can reach a Stop is unrolled as before.
             if (
-                logo.runningLilypond &&
+                (logo.runningLilypond || logo.runningAbc || logo.runningMxml) &&
                 tur.singer.justCounting.length === 0 &&
                 !canReachStop(args[0], logo)
             ) {

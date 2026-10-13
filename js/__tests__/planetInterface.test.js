@@ -36,7 +36,13 @@ const mockActivity = {
     textMsg: jest.fn(),
     errorMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
-    blocks: { loadNewBlocks: jest.fn(), palettes: { _hideMenus: jest.fn() }, trashStacks: [] },
+    blocks: {
+        loadNewBlocks: jest.fn(),
+        isLoading: jest.fn(() => false),
+        runAfterLoad: jest.fn(),
+        palettes: { _hideMenus: jest.fn() },
+        trashStacks: []
+    },
     logo: { doStopTurtles: jest.fn() },
     canvas: {},
     turtles: {},
@@ -226,6 +232,29 @@ describe("PlanetInterface", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    test("loadProjectFromData forgets the trash and undo history of the replaced project", () => {
+        planetInterface.closePlanet = jest.fn();
+        mockActivity.blocks.trashStacks = ["3", "7"];
+        mockActivity.blocks.actionHistory = [{ type: "trash", blockId: 3 }];
+        mockActivity.blocks.redoActionHistory = [{ type: "trash", blockId: 7 }];
+
+        planetInterface.loadProjectFromData(JSON.stringify([]));
+
+        expect(mockActivity.blocks.trashStacks).toEqual([]);
+        expect(mockActivity.blocks.actionHistory).toEqual([]);
+        expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+    });
+
+    test("loadProjectFromData keeps the trash history when merging", () => {
+        planetInterface.closePlanet = jest.fn();
+        mockActivity.blocks.trashStacks = ["3"];
+
+        planetInterface.loadProjectFromData(JSON.stringify([]), true);
+
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.trashStacks).toEqual(["3"]);
+    });
+
     test("loadProjectFromFile focuses, clicks, scrolls", () => {
         const input = document.getElementById("myOpenFile");
         input.focus = jest.fn();
@@ -250,6 +279,29 @@ describe("PlanetInterface", () => {
             expect(mockActivity.stage.update).toHaveBeenCalled();
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
+    });
+
+    test("saveLocally waits for a project load to finish instead of saving part of it", async () => {
+        const saveLocally = jest.fn().mockResolvedValue();
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally, getCurrentProjectID: () => "B" }
+        };
+        mockActivity.prepareExport.mockClear();
+        mockActivity.blocks.runAfterLoad.mockClear();
+        mockActivity.blocks.isLoading.mockReturnValueOnce(true);
+
+        await expect(planetInterface.saveLocally()).resolves.toBeNull();
+
+        expect(mockActivity.prepareExport).not.toHaveBeenCalled();
+        expect(saveLocally).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.runAfterLoad).toHaveBeenCalledWith(planetInterface.saveLocally);
+
+        const [saveAfterLoad] = mockActivity.blocks.runAfterLoad.mock.calls[0];
+        doSVG.mockReturnValue("");
+        mockActivity.prepareExport.mockReturnValue("[full project]");
+        await saveAfterLoad();
+
+        expect(saveLocally).toHaveBeenCalledWith("[full project]", null, "B");
     });
 
     test("saveLocally handles unavailable Planet storage according to its failure option", async () => {

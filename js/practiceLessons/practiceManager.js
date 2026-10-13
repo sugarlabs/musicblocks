@@ -25,6 +25,19 @@
 const STORAGE_KEY = "mb_practice_levels";
 const JOURNAL_STORAGE_KEY = "mb_explorer_journal";
 
+const getInitialProgress = () => {
+    try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (stored && typeof stored === "object" && !Array.isArray(stored)) {
+            return stored;
+        }
+    } catch (e) {
+        console.debug("Practice storage could not be read", e);
+    }
+
+    return {};
+};
+
 const getInitialJournal = () => {
     try {
         const stored = JSON.parse(localStorage.getItem(JOURNAL_STORAGE_KEY));
@@ -56,7 +69,7 @@ const normalizeGeneralNote = note => {
 };
 
 const PracticeManager = {
-    progress: JSON.parse(localStorage.getItem(STORAGE_KEY)) || {},
+    progress: getInitialProgress(),
     journal: (() => {
         const journal = getInitialJournal();
         if (!Array.isArray(journal.generalNotes)) {
@@ -79,11 +92,19 @@ const PracticeManager = {
     },
 
     save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.progress));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.progress));
+        } catch (e) {
+            console.debug("Practice storage could not be saved", e);
+        }
     },
 
     saveJournal() {
-        localStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(this.journal));
+        try {
+            localStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(this.journal));
+        } catch (e) {
+            console.debug("Explorer Journal storage could not be saved", e);
+        }
     },
 
     isLevelComplete(level) {

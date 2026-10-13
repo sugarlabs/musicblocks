@@ -154,6 +154,7 @@ class PlanetInterface {
             this.closePlanet();
             if (!merge) {
                 this.activity.sendAllToTrash(false, true);
+                this._resetTrashHistory();
             }
 
             if (data === undefined) {
@@ -223,10 +224,18 @@ class PlanetInterface {
                 this.activity.sendAllToTrash();
                 this.activity.refreshCanvas();
             }
+            this._resetTrashHistory();
+            return initialization;
+        };
+
+        /**
+         * Forgets the trash and undo history of the project being replaced, so
+         * it cannot be restored into the next one or grow across project switches.
+         */
+        this._resetTrashHistory = () => {
             this.activity.blocks.trashStacks = [];
             this.activity.blocks.actionHistory = [];
             this.activity.blocks.redoActionHistory = [];
-            return initialization;
         };
 
         /**
@@ -244,6 +253,14 @@ class PlanetInterface {
                 );
                 console.error(error.message);
                 return rejectOnProjectSaveError ? Promise.reject(error) : Promise.resolve(null);
+            }
+
+            // The project being loaded is already the current one, so saving
+            // now would overwrite its stored copy with the blocks loaded so
+            // far. Its stored copy is still complete, so save once it is done.
+            if (this.activity.blocks.isLoading()) {
+                this.activity.blocks.runAfterLoad(this.saveLocally);
+                return Promise.resolve(null);
             }
 
             this.activity.stage.update();

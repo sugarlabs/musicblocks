@@ -815,3 +815,227 @@ describe("Test 9: Empty-voice and degenerate input guard", () => {
         expect(newnotes).toHaveLength(2);
     });
 });
+
+/** Return [notename, octave] for every pitch block, in stack order. */
+function pitchNames(blocks) {
+    return blocksOfType(blocks, "pitch").map(pitch => [
+        blocks.find(b => b[0] === pitch[4][1])[1][1].value,
+        blocks.find(b => b[0] === pitch[4][2])[1][1].value
+    ]);
+}
+
+/** Build a one-staff, one-voice tune in the given key. */
+function makeVoiceTune(key, voice) {
+    return makeTune({
+        staves: [{ meter: { value: [{ num: 4, den: 4 }] }, key, voices: [voice] }]
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Test 10 — Octave marks (",", "'") in note names
+// ---------------------------------------------------------------------------
+describe("Test 10: Octave marks in note names", () => {
+    // abcjs keeps every octave mark on pitch.name; pitch.pitch is the staff position.
+    const gMajorKey = {
+        root: "G",
+        acc: "",
+        mode: "",
+        accidentals: [{ acc: "sharp", note: "f", verticalPos: 10 }]
+    };
+
+    test("every comma and apostrophe is stripped from the notename", async () => {
+        const tune = makeVoiceTune({ root: "C", acc: "", mode: "", accidentals: [] }, [
+            makeNote("C,", -7),
+            makeNote("C,,", -14),
+            makeNote("c'", 14),
+            makeNote("c''", 21)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["C", 3],
+            ["C", 2],
+            ["C", 6],
+            ["C", 7]
+        ]);
+    });
+
+    test("key signature applies to notes with any number of octave marks", async () => {
+        const tune = makeVoiceTune(gMajorKey, [
+            makeNote("F", 3),
+            makeNote("F,", -4),
+            makeNote("F,,", -11),
+            makeNote("f", 10),
+            makeNote("f'", 17),
+            makeNote("f''", 24)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["F♯", 3],
+            ["F♯", 2],
+            ["F♯", 5],
+            ["F♯", 6],
+            ["F♯", 7]
+        ]);
+    });
+
+    test("inline accidental and octave marks together give a valid notename", async () => {
+        const tune = makeVoiceTune({ root: "C", acc: "", mode: "", accidentals: [] }, [
+            makeNote("_B,,", -8, 0.25, { accidental: "flat" }),
+            makeNote("^^g'", 18, 0.25, { accidental: "dblsharp" })
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["B♭", 2],
+            ["G𝄪", 6]
+        ]);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 11 — Inline accidentals hold until the next bar line
+// ---------------------------------------------------------------------------
+describe("Test 11: Inline accidentals last for the rest of the bar", () => {
+    const cMajorKey = { root: "C", acc: "", mode: "", accidentals: [] };
+    const gMajorKey = {
+        root: "G",
+        acc: "",
+        mode: "",
+        accidentals: [{ acc: "sharp", note: "f", verticalPos: 10 }]
+    };
+
+    test("a sharp carries to later notes of the same pitch in the bar", async () => {
+        const tune = makeVoiceTune(cMajorKey, [
+            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+            makeNote("F", 3),
+            makeNote("G", 4),
+            makeNote("F", 3)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["F♯", 4],
+            ["G", 4],
+            ["F♯", 4]
+        ]);
+    });
+
+    test("a natural cancels the key signature for the rest of the bar", async () => {
+        const tune = makeVoiceTune(gMajorKey, [
+            makeNote("=F", 3, 0.25, { accidental: "natural" }),
+            makeNote("F", 3),
+            makeBar(),
+            makeNote("F", 3)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F", 4],
+            ["F", 4],
+            ["F♯", 4]
+        ]);
+    });
+
+    test("a later accidental in the bar replaces the earlier one", async () => {
+        const tune = makeVoiceTune(cMajorKey, [
+            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+            makeNote("=F", 3, 0.25, { accidental: "natural" }),
+            makeNote("F", 3)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["F", 4],
+            ["F", 4]
+        ]);
+    });
+
+    test("the accidental is cleared at the bar line", async () => {
+        const tune = makeVoiceTune(cMajorKey, [
+            makeNote("^c", 7, 0.25, { accidental: "sharp" }),
+            makeBar(),
+            makeNote("c", 7)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["C♯", 5],
+            ["C", 5]
+        ]);
+    });
+
+    test("the accidental does not carry to the same letter in another octave", async () => {
+        const tune = makeVoiceTune(cMajorKey, [
+            makeNote("^c", 7, 0.25, { accidental: "sharp" }),
+            makeNote("C", 0),
+            makeNote("c", 7)
+        ]);
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["C♯", 5],
+            ["C", 4],
+            ["C♯", 5]
+        ]);
+    });
+
+    test("the accidental carries across a staff line break inside the bar", async () => {
+        // abcjs splits "^F F" / "F F|F" on two source lines into two staff
+        // lines with no bar between them.
+        const staffLine = voice => ({
+            meter: { value: [{ num: 4, den: 4 }] },
+            key: cMajorKey,
+            voices: [voice]
+        });
+        const tune = {
+            metaText: { title: "Test", instruction: "guitar" },
+            lines: [
+                {
+                    staff: [
+                        staffLine([
+                            makeNote("^F", 3, 0.25, { accidental: "sharp" }),
+                            makeNote("F", 3)
+                        ])
+                    ]
+                },
+                {
+                    staff: [
+                        staffLine([makeNote("F", 3), makeNote("F", 3), makeBar(), makeNote("F", 3)])
+                    ]
+                }
+            ]
+        };
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["F♯", 4],
+            ["F♯", 4],
+            ["F♯", 4],
+            ["F", 4]
+        ]);
+    });
+
+    test("the accidental does not carry into the next voice", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: cMajorKey,
+                    voices: [[makeNote("^F", 3, 0.25, { accidental: "sharp" })], [makeNote("F", 3)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["F", 4]
+        ]);
+    });
+});

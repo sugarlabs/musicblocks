@@ -366,3 +366,68 @@ describe("PracticeManager journal storage recovery", () => {
         expect(manager.journal.pages["1"]).toEqual({ level: 1 });
     });
 });
+
+describe("PracticeManager progress storage recovery", () => {
+    const loadFresh = () => {
+        let mod;
+        jest.isolateModules(() => {
+            mod = require("../practiceManager");
+        });
+        return mod.PracticeManager;
+    };
+
+    test("falls back to an empty progress object when stored data is not valid JSON", () => {
+        localStorage.setItem(STORAGE_KEY, "{not json");
+
+        const manager = loadFresh();
+
+        expect(manager.progress).toEqual({});
+    });
+
+    test("falls back to an empty progress object when stored data is an array or primitive", () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(["invalid", "structure"]));
+
+        const manager = loadFresh();
+
+        expect(manager.progress).toEqual({});
+    });
+
+    test("loads valid progress successfully from storage", () => {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ 1: { complete: true, badges: ["b1"] } })
+        );
+
+        const manager = loadFresh();
+
+        expect(manager.progress).toEqual({ 1: { complete: true, badges: ["b1"] } });
+    });
+});
+
+describe("PracticeManager save error tolerance", () => {
+    test("does not throw when localStorage.setItem fails during save", () => {
+        const setItem = jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+
+        expect(() => {
+            PracticeManager.save();
+        }).not.toThrow();
+        expect(setItem).toHaveBeenCalledWith(STORAGE_KEY, expect.any(String));
+
+        setItem.mockRestore();
+    });
+
+    test("does not throw when localStorage.setItem fails during saveJournal", () => {
+        const setItem = jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("QuotaExceededError");
+        });
+
+        expect(() => {
+            PracticeManager.saveJournal();
+        }).not.toThrow();
+        expect(setItem).toHaveBeenCalledWith(JOURNAL_STORAGE_KEY, expect.any(String));
+
+        setItem.mockRestore();
+    });
+});

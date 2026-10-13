@@ -36,6 +36,19 @@ const DIVISIONS_EPSILON = 1e-6;
 // constant alone could represent.
 const DIVISIONS_PER_WHOLE_NOTE = 32;
 
+// The <type> name MusicXML gives each note-value denominator.
+const MXML_NOTE_TYPES = new Map([
+    [1, "whole"],
+    [2, "half"],
+    [4, "quarter"],
+    [8, "eighth"],
+    [16, "16th"],
+    [32, "32nd"],
+    [64, "64th"],
+    [128, "128th"],
+    [256, "256th"]
+]);
+
 /**
  * Converts a LilyPond duration, the form notation.js stages pickups and tempo beats in
  * (convertFactor() in js/utils/musicutils.js), to a length in whole notes.
@@ -268,6 +281,15 @@ class MusicXMLExporter {
         this.add("</direction>");
     }
 
+    addRepeatBarline(location, style, direction) {
+        this.add(`<barline location="${location}">`);
+        this.indent++;
+        this.add(`<bar-style>${style}</bar-style>`);
+        this.add(`<repeat direction="${direction}"/>`);
+        this.indent--;
+        this.add("</barline>");
+    }
+
     addWords(text, placement) {
         this.add(`<direction placement="${placement}">`);
         this.indent++;
@@ -484,6 +506,13 @@ class MusicXMLExporter {
                     pendingDirections.forEach(write => write());
                     pendingDirections = [];
                 };
+                // With nested forevers, only the innermost one ever repeats.
+                const repeatStart = notes.lastIndexOf("begin repeat");
+                // A forward repeat waiting for the next measure to open.
+                let repeatPending = false;
+                // A repeat that starts mid-measure splits it. The second half is implicit and
+                // only holds what was left of the measure, so later barlines stay on the beat.
+                let splitMeasure = false;
                 this.indent++;
                 let divisionsLeft = divisions;
 
@@ -592,6 +621,11 @@ class MusicXMLExporter {
                         continue;
                     }
 
+                    if (obj === "begin repeat") {
+                        if (i === repeatStart) repeatPending = true;
+                        continue;
+                    }
+
                     // Anything else that isn't a staged note is a marker with no MusicXML
                     // counterpart here. Iterating it as a pitch list would turn its characters
                     // into notes, so it's skipped.
@@ -662,11 +696,16 @@ class MusicXMLExporter {
                             timeModification = null;
                         }
 
-                        if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
+                        // A forward repeat can only start a measure.
+                        if (
+                            (repeatPending || divisionsLeft < preciseDur - DIVISIONS_EPSILON) &&
+                            !isChordNote
+                        ) {
                             if (openedMeasureTag) {
                                 this.add("</measure>");
                                 currMeasure++;
-                                divisionsLeft = divisions;
+                                splitMeasure = divisionsLeft >= preciseDur - DIVISIONS_EPSILON;
+                                if (!splitMeasure) divisionsLeft = divisions;
                                 openedMeasureTag = false;
                             }
                         }
@@ -706,9 +745,16 @@ class MusicXMLExporter {
                                     beatsChanged = false;
                                     keyChanged = false;
                                 } else {
-                                    this.add(`<measure number="${currMeasure}">`);
+                                    this.add(
+                                        `<measure number="${currMeasure}"${splitMeasure ? ' implicit="yes"' : ""}>`
+                                    );
                                 }
                                 openedMeasureTag = true;
+                                splitMeasure = false;
+                                if (repeatPending) {
+                                    this.addRepeatBarline("left", "heavy-light", "forward");
+                                    repeatPending = false;
+                                }
                             }
 
                             // A measure that opened without new attributes, or one
@@ -777,6 +823,18 @@ class MusicXMLExporter {
                         if (part.isPercussion && obj[MXML_DRUM]) {
                             this.add(`<instrument id="${part.instruments.get(p)}"/>`);
                         }
+                        // A tuplet note's duration is scaled by its ratio, so the written
+                        // note only survives in <type>; Lilypond's importer stops without
+                        // one. That note is the power of two it was rounded down to.
+                        const noteType = MXML_NOTE_TYPES.get(
+                            timeModification ? obj[MXML_ROUNDDOWN] : obj[1]
+                        );
+                        if (noteType !== undefined) {
+                            this.add(`<type>${noteType}</type>`);
+                            if (!timeModification) {
+                                for (let d = 0; d < obj[2]; d++) this.add("<dot/>");
+                            }
+                        }
                         if (timeModification) {
                             this.add("<time-modification>");
                             this.indent++;
@@ -834,11 +892,16 @@ class MusicXMLExporter {
                     this.indent++;
                     // Markers staged after the last note still belong to the final measure.
                     flushPendingDirections();
-                    this.add("<barline>");
-                    this.indent++;
-                    this.add("<bar-style>light-heavy</bar-style>");
-                    this.indent--;
-                    this.add("</barline>");
+                    // A forever with no notes after it never opened a repeat.
+                    if (repeatStart !== -1 && !repeatPending) {
+                        this.addRepeatBarline("right", "light-heavy", "backward");
+                    } else {
+                        this.add("<barline>");
+                        this.indent++;
+                        this.add("<bar-style>light-heavy</bar-style>");
+                        this.indent--;
+                        this.add("</barline>");
+                    }
                     this.indent--;
                     this.add("</measure>");
                 }

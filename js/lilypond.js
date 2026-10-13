@@ -105,8 +105,11 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     let queueSlur = false;
     let queueCrescendo = false;
     let queueDecrescendo = false;
-    // With nested forevers, only the innermost one ever repeats.
-    const repeatStart = logo.notation.notationStaging[turtle].lastIndexOf("begin repeat");
+    // With nested forevers, only the innermost one ever repeats, and a
+    // forever with no notes after it has nothing to repeat.
+    const staged = logo.notation.notationStaging[turtle];
+    const lastRepeat = staged.lastIndexOf("begin repeat");
+    const repeatStart = staged.slice(lastRepeat + 1).some(Array.isArray) ? lastRepeat : -1;
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;

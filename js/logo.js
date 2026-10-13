@@ -254,6 +254,8 @@ class Logo {
         this.inMusicKeyboard = false;
         this._currentDrumBlock = null;
         this.inTimbre = false;
+        this.inSample = false;
+        this.inReflectionMatrix = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
@@ -1028,6 +1030,33 @@ class Logo {
     }
 
     /**
+     * Dispatches the end-of-clamp signals a finished flow never reached,
+     * except the ones listed by index in butNotThese.
+     *
+     * @param {Object} tur - Turtle object
+     * @returns {void}
+     */
+    dispatchUnissuedSignals(tur) {
+        for (const b in tur.endOfClampSignals) {
+            const signalsLength = tur.endOfClampSignals[b].length;
+            for (let i = 0; i < signalsLength; i++) {
+                // eslint-disable-next-line eqeqeq
+                if (tur.endOfClampSignals[b][i] != null) {
+                    if (
+                        // eslint-disable-next-line eqeqeq
+                        tur.butNotThese[b] == null ||
+                        tur.butNotThese[b].indexOf(i) === -1
+                    ) {
+                        if (!tur.singer.runningFromEvent) {
+                            this.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Evaluates a block connection and returns its resolved value for use by
      * the calling block.
      *
@@ -1764,8 +1793,15 @@ class Logo {
         this.inLegoWidget = false;
         this.inMusicKeyboard = false;
         this.inTimbre = false;
+        this.inSample = false;
+        this.inTempo = false;
+        this.inPitchSlider = false;
+        this.inPitchStaircase = false;
+        this.inReflectionMatrix = false;
+        this.inOscilloscope = false;
         this.inArpeggio = false;
         this.inRhythmRuler = false;
+        this.inTempo = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
@@ -2520,28 +2556,17 @@ class Logo {
             } else {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
+        } else if (tur.singer.justCounting.length > 0) {
+            // A note counter's silent run ends here, but the turtle is still
+            // running its program, so only flush the counted flow's signals.
+            if (!logo._prematureRestart) {
+                logo.dispatchUnissuedSignals(tur);
+            }
         } else {
             logo._alreadyRunning = false;
 
             if (!logo._prematureRestart) {
-                // Make sure any unissued signals are dispatched.
-                for (const b in tur.endOfClampSignals) {
-                    const signalsLength = tur.endOfClampSignals[b].length;
-                    for (let i = 0; i < signalsLength; i++) {
-                        // eslint-disable-next-line eqeqeq
-                        if (tur.endOfClampSignals[b][i] != null) {
-                            if (
-                                // eslint-disable-next-line eqeqeq
-                                tur.butNotThese[b] == null ||
-                                tur.butNotThese[b].indexOf(i) === -1
-                            ) {
-                                if (!tur.singer.runningFromEvent) {
-                                    logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
-                                }
-                            }
-                        }
-                    }
-                }
+                logo.dispatchUnissuedSignals(tur);
 
                 // Make sure SVG path is closed.
                 logo.turtles.getTurtle(turtle).painter.closeSVG();

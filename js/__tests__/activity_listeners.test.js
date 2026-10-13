@@ -117,7 +117,24 @@ describe("Activity Event Listener Management", () => {
         // This keeps Istanbul's source line numbers aligned with activity.js.
         const preserveLines = source => source.replace(/[^\n]/g, " ");
 
-        const beforeInit = preserveLines(code.slice(constructorBodyStart, initStart));
+        const beforeInitSource = code.slice(constructorBodyStart, initStart);
+
+        const resizeSectionStart = beforeInitSource.indexOf(
+            'const container = document.getElementById("canvasContainer");'
+        );
+        const resizeSectionEndMarker = "this._handleOrientationChangeResize = handleResize;";
+        const resizeSectionEnd =
+            beforeInitSource.indexOf(resizeSectionEndMarker, resizeSectionStart) +
+            resizeSectionEndMarker.length;
+
+        if (resizeSectionStart === -1 || resizeSectionEnd < resizeSectionEndMarker.length) {
+            throw new Error("Could not locate window resize handler in activity.js");
+        }
+
+        const beforeInit =
+            preserveLines(beforeInitSource.slice(0, resizeSectionStart)) +
+            beforeInitSource.slice(resizeSectionStart, resizeSectionEnd) +
+            preserveLines(beforeInitSource.slice(resizeSectionEnd));
         const afterInit = preserveLines(code.slice(initEnd, constructorClosingBrace));
 
         code =
@@ -134,10 +151,11 @@ describe("Activity Event Listener Management", () => {
             window: global.window,
             document: global.document,
             console: global.console,
-            _: key => key, // Mock translation function
+            _: key => key,
             define: () => {},
             require: () => {},
-            setTimeout: setTimeout,
+            setTimeout: (...args) => setTimeout(...args),
+            clearTimeout: (...args) => clearTimeout(...args),
             createjs: {},
 
             // Mock classes instantiated in constructor
@@ -343,6 +361,26 @@ describe("Activity Event Listener Management", () => {
         delete sandbox.doHardStopButton;
     });
 
+    test("should update the stage canvas during a window resize", () => {
+        jest.useFakeTimers();
+
+        Object.defineProperty(document, "hidden", {
+            configurable: true,
+            value: true
+        });
+
+        activity._onResize = jest.fn();
+        activity.setupPaletteMenu = jest.fn();
+
+        activity._handleWindowResize();
+
+        jest.advanceTimersByTime(200);
+
+        expect(activity._onResize).toHaveBeenCalledWith(false);
+        expect(activity.setupPaletteMenu).toHaveBeenCalledTimes(1);
+
+        jest.useRealTimers();
+    });
     test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {
         activity._setupBlocksContainerEvents();
         activity._setupBlocksContainerEvents();

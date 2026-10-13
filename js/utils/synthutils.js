@@ -447,6 +447,9 @@ const instrumentsSource = {};
 // effects chain is still active on the same synth.
 const _effectsInFlight = new WeakMap();
 
+// The output each synth should play into, as last set by routeInstrument().
+const _routedOutput = new WeakMap();
+
 /**
  * Object containing effects associated with instruments in the timbre widget.
  * @type {Object.<number, Object>}
@@ -519,6 +522,8 @@ const transport = {
 class SampleLoader {
     constructor() {
         this.samples = null;
+        // Loads still in flight, by sample name, so concurrent callers share one.
+        this._pendingLoads = {};
     }
 
     initStructures() {
@@ -536,7 +541,11 @@ class SampleLoader {
 
     loadSampleAsync(sampleName) {
         this.initStructures();
-        return new Promise((resolve, reject) => {
+        if (this._pendingLoads[sampleName]) {
+            return this._pendingLoads[sampleName];
+        }
+
+        const promise = new Promise((resolve, reject) => {
             let found = false;
             let sampleType = null;
             let sampleInfo = null;
@@ -589,6 +598,15 @@ class SampleLoader {
                 }
             );
         });
+
+        this._pendingLoads[sampleName] = promise;
+        const settle = () => {
+            if (this._pendingLoads[sampleName] === promise) {
+                delete this._pendingLoads[sampleName];
+            }
+        };
+        promise.then(settle, settle);
+        return promise;
     }
 
     async preloadProject(blockList) {
@@ -1459,16 +1477,11 @@ function Synth() {
             // Get the base center note
             const center = this._parseSampleCenterNo(params[1], params[2]);
 
-            // Check if there's a cent adjustment (stored as the fifth parameter)
-            const centAdjustment = params[4] || 0;
-
-            // Store the cent adjustment for later use
-            if (centAdjustment !== 0) {
-                if (!this.sampleCentAdjustments) {
-                    this.sampleCentAdjustments = {};
-                }
-                this.sampleCentAdjustments[sourceName] = centAdjustment;
+            // The fourth parameter is the cent adjustment set in the sampler widget.
+            if (!this.sampleCentAdjustments) {
+                this.sampleCentAdjustments = {};
             }
+            this.sampleCentAdjustments[sourceName] = params[3] || 0;
 
             noteDict[center] = params[0];
             tempSynth = new Tone.Sampler(noteDict);
@@ -1809,7 +1822,9 @@ function Synth() {
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return instruments[turtle][sourceName].toDestination();
+            const synth = instruments[turtle][sourceName];
+            // A new instrument plays into the master output until a note routes it elsewhere.
+            return _routedOutput.has(synth) ? synth : this.routeInstrument(synth, Tone.Destination);
         }
 
         return null;
@@ -1826,6 +1841,8 @@ function Synth() {
      * @param {Object|null} paramsFilters - Parameters for filters.
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
+     * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. a panner.
+     * @param {number} [cents] - Detune applied to every note, e.g. a custom sample's tuning.
      */
     this._performNotes = async (
         synth,
@@ -1834,7 +1851,9 @@ function Synth() {
         paramsEffects,
         paramsFilters,
         setNote,
-        future
+        future,
+        output = Tone.Destination,
+        cents = 0
     ) => {
         const isStandardNote = note => {
             if (typeof note !== "string") return true;
@@ -1884,6 +1903,16 @@ function Synth() {
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
+        }
+
+        const detune = value => {
+            const ratio = Math.pow(2, cents / 1200);
+            const hertz = this._getFrequency(value, false);
+            return Array.isArray(hertz) ? hertz.map(f => f * ratio) : hertz * ratio;
+        };
+
+        if (cents) {
+            notes = detune(notes);
         }
 
         let numFilters;
@@ -2066,12 +2095,16 @@ function Synth() {
                         // for each note.
                         const obj = [];
                         for (let i = 0; i < paramsEffects["neighborArgNote1"].length; i++) {
-                            const note1 = normalizeNoteAccidentals(
+                            let note1 = normalizeNoteAccidentals(
                                 paramsEffects["neighborArgNote1"][i]
                             );
-                            const note2 = normalizeNoteAccidentals(
+                            let note2 = normalizeNoteAccidentals(
                                 paramsEffects["neighborArgNote2"][i]
                             );
+                            if (cents) {
+                                note1 = detune(note1);
+                                note2 = detune(note2);
+                            }
                             obj.push(
                                 { time: 0, note: note1, duration: firstTwoBeats },
                                 { time: firstTwoBeats, note: note2, duration: firstTwoBeats },
@@ -2086,7 +2119,7 @@ function Synth() {
                     }
                 }
 
-                synth.chain(...chainNodes, Tone.Destination);
+                synth.chain(...chainNodes, output);
 
                 if (!paramsEffects || !paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
@@ -2142,7 +2175,7 @@ function Synth() {
                             } catch (_) {
                                 // Already disconnected — safe to ignore.
                             }
-                            synth.toDestination();
+                            synth.connect(_routedOutput.get(synth) || output);
                         }
                     } catch (e) {
                         console.debug("Error disposing effects:", e);
@@ -2180,7 +2213,7 @@ function Synth() {
             const remaining = (_effectsInFlight.get(synth) || 1) - 1;
             _effectsInFlight.set(synth, remaining);
             if (remaining === 0 && synth && typeof synth.toDestination === "function") {
-                synth.toDestination();
+                synth.connect(_routedOutput.get(synth) || output);
             }
         }
     };
@@ -2210,6 +2243,42 @@ function Synth() {
         }
     };
 
+    /**
+     * Moves a synth onto the given output, dropping its previous route. Does
+     * nothing if it already plays there, so it is cheap to call before every
+     * note. While an effects chain owns the synth, the move waits for the
+     * chain's cleanup.
+     * @function
+     * @memberof Synth
+     * @param {Tone.ToneAudioNode} synth - The instrument to route.
+     * @param {Tone.ToneAudioNode} output - The node to play into, e.g. a panner.
+     * @returns {Tone.ToneAudioNode} The same synth.
+     */
+    this.routeInstrument = (synth, output) => {
+        const current = _routedOutput.get(synth);
+        if (current === output) {
+            return synth;
+        }
+
+        _routedOutput.set(synth, output);
+        if ((_effectsInFlight.get(synth) || 0) > 0) {
+            return synth;
+        }
+
+        // A synth that was never routed plays into Tone.Destination (see loadSynth).
+        const previous = current || Tone.Destination;
+        if (previous !== output) {
+            try {
+                synth.disconnect(previous);
+            } catch (e) {
+                // Not connected there.
+            }
+        }
+
+        synth.connect(output);
+        return synth;
+    };
+
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     /**
      * Triggers notes on a specified turtle with the given parameters.
@@ -2223,6 +2292,7 @@ function Synth() {
      * @param {Object|null} paramsFilters - Parameters for filters.
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
+     * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. the turtle's panner.
      */
     this.trigger = async (
         turtle,
@@ -2232,7 +2302,8 @@ function Synth() {
         paramsEffects,
         paramsFilters,
         setNote,
-        future
+        future,
+        output
     ) => {
         // Capture the current instrument epoch to detect disposal during async operations
         const epoch = this._instrumentEpoch;
@@ -2248,11 +2319,15 @@ function Synth() {
                 // If it is STILL suspended after 2 seconds, it is definitely blocked
                 if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
                     window.hasShownAudioWarning = true;
-                    alert(
-                        _(
-                            "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-                        )
+                    const notice = _(
+                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
                     );
+
+                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                        window.MBDialog.alert(notice);
+                    } else {
+                        alert(notice);
+                    }
                 }
             }, 2000);
         }
@@ -2297,29 +2372,15 @@ function Synth() {
             if (instrumentName in instruments[turtle]) {
                 tempSynth = instruments[turtle][instrumentName];
                 flag = instrumentsSource[instrumentName][0];
-                if (flag === 1 || flag === 2) {
-                    const sampleName = instrumentsSource[instrumentName][1];
-
-                    // Check if there's a cent adjustment for this sample
-                    if (
-                        flag === 2 &&
-                        this.sampleCentAdjustments &&
-                        this.sampleCentAdjustments[sampleName]
-                    ) {
-                        const centAdjustment = this.sampleCentAdjustments[sampleName];
-                        // Apply cent adjustment to playback rate
-                        // Formula: playbackRate = 2^(cents/1200)
-                        const playbackRate = Math.pow(2, centAdjustment / 1200);
-                        if (tempSynth && tempSynth.playbackRate) {
-                            tempSynth.playbackRate.value = playbackRate;
-                        }
-                    }
-                }
             }
 
             // Get note values as per the source of the synth.
             if (future === undefined) {
                 future = 0.0;
+            }
+
+            if (!output) {
+                output = Tone.Destination;
             }
 
             // Ensure the requested instrument is properly initialized. It may be
@@ -2352,22 +2413,14 @@ function Synth() {
                         console.debug("Error waiting for sample to load:", e);
                     }
                 }
-
-                // Apply any cent adjustment to the freshly loaded sample
-                if (flag === 2 && tempSynth && tempSynth.playbackRate) {
-                    const sampleName = instrumentsSource[instrumentName][1];
-                    if (this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
-                        const centAdjustment = this.sampleCentAdjustments[sampleName];
-                        const playbackRate = Math.pow(2, centAdjustment / 1200);
-                        tempSynth.playbackRate.value = playbackRate;
-                    }
-                }
             }
 
             // Final validation: ensure synth still exists and is valid
             if (!tempSynth || !instruments[turtle] || !instruments[turtle][instrumentName]) {
                 return; // Exit gracefully - synth is no longer available
             }
+
+            this.routeInstrument(tempSynth, output);
 
             switch (flag) {
                 case 1: // drum
@@ -2392,13 +2445,15 @@ function Synth() {
                 case 2: // voice sample
                     this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        tempSynth,
                         notes,
                         beatValue,
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future
+                        future,
+                        output,
+                        this.sampleCentAdjustments[instrumentsSource[instrumentName][1]]
                     );
                     break;
                 case 3: // builtin synth
@@ -2408,13 +2463,14 @@ function Synth() {
 
                     this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        tempSynth,
                         tempNotes,
                         beatValue,
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future
+                        future,
+                        output
                     );
                     break;
                 case 4:
@@ -2425,13 +2481,14 @@ function Synth() {
                 default:
                     this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        tempSynth,
                         tempNotes,
                         beatValue,
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future
+                        future,
+                        output
                     );
                     break;
             }

@@ -100,6 +100,8 @@ const makeActivity = (overrides = {}) => ({
     blocks: {
         blockList: [],
         loadNewBlocks: jest.fn(),
+        isLoading: jest.fn(() => false),
+        runAfterLoad: jest.fn(),
         palettes: { dict: {} },
         customTemperamentDefined: false
     },
@@ -543,6 +545,16 @@ describe("_loadStart", () => {
         expect(activity.keyboardEnableFlag).toBe(0); // disabled during load
         global.pubsub.emit("finishedLoading");
         expect(activity.keyboardEnableFlag).toBe(1); // re-enabled once load is done
+    });
+
+    it("re-enables keyboard input after finishedLoading fires even when turtles are running", async () => {
+        const activity = makeActivity();
+        activity.turtles.running = jest.fn(() => true);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+        expect(activity.keyboardEnableFlag).toBe(0);
+        global.pubsub.emit("finishedLoading");
+        expect(activity.keyboardEnableFlag).toBe(1);
     });
 
     it("post-load callback fires only once — self-unsubscribes after first event", async () => {
@@ -1035,6 +1047,38 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["rhythmruler2", { collapsed: true }]);
     });
 
+    describe("customsample", () => {
+        const exportSample = connections => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                {
+                    name: "customsample",
+                    trash: false,
+                    value: ["tuned", "data:audio/wav;base64,AAAA", "la", 4, 50],
+                    container: { x: 0, y: 0 },
+                    connections,
+                    isValueBlock: () => false
+                }
+            ];
+            return JSON.parse(new ProjectManager(activity).prepareExport())[0][1];
+        };
+
+        it("saves the cent adjustment and leaves the sample data to its audiofile block", () => {
+            // Dock 1 points at itself only so the export keeps a non-null connection.
+            expect(exportSample([null, 0, null, null])).toEqual([
+                "customsample",
+                { value: ["tuned", "", "la", 4, 50] }
+            ]);
+        });
+
+        it("keeps the sample data when no audiofile block is attached", () => {
+            expect(exportSample([null, null, null, null])).toEqual([
+                "customsample",
+                { value: ["tuned", "data:audio/wav;base64,AAAA", "la", 4, 50] }
+            ]);
+        });
+    });
+
     it("remaps connections to dense indices", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
@@ -1113,6 +1157,30 @@ describe("saveLocally", () => {
         expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
             operation: "saveLocally_saveSession"
         });
+    });
+
+    it("keeps the saved session until a project load has finished", () => {
+        const storage = { "currentProject": "My Project", "SESSIONMy Project": "[saved]" };
+        const activity = makeActivity({ storage, canvas: { width: 100 } });
+        activity.blocks.isLoading.mockReturnValue(true);
+        const pm = new ProjectManager(activity);
+        pm.prepareExport = jest.fn(() => "[partial]");
+
+        pm.saveLocally();
+        pm.saveLocally();
+
+        expect(pm.prepareExport).not.toHaveBeenCalled();
+        expect(storage["SESSIONMy Project"]).toBe("[saved]");
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(2);
+        expect(activity.blocks.runAfterLoad.mock.calls[1][0]).toBe(
+            activity.blocks.runAfterLoad.mock.calls[0][0]
+        );
+
+        activity.blocks.isLoading.mockReturnValue(false);
+        pm.prepareExport.mockReturnValue("[full]");
+        activity.blocks.runAfterLoad.mock.calls[0][0]();
+
+        expect(storage["SESSIONMy Project"]).toBe("[full]");
     });
 });
 
@@ -1343,6 +1411,21 @@ describe("start() URL parameter parsing", () => {
 
         expect(activity.projectID).toBe("project-42");
         expect(activity.loadStartWrapper).toHaveBeenCalled();
+    });
+
+    it("parses ?repo= URL param and schedules _loadProject without warning", () => {
+        setURL("/?repo=project-1588145070717097&run=True");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+
+        pm.start();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.projectID).toBe("project-1588145070717097");
+        expect(activity.loadStartWrapper).toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
     });
 
     it("parses run=true flag from multi-param URL", () => {
@@ -2721,6 +2804,102 @@ describe("_setupFileHandlers inner callbacks", () => {
 
         activity.fileChooser.files = [];
         expect(() => handlers.change()).not.toThrow();
+    });
+
+    it("change handler parses ABC files through ABCJS and activity.parseABC", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC \\ D";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.ensureABCJS.mockResolvedValueOnce(undefined);
+        const mockTune = {
+            metaText: { title: "Test Tune" },
+            lines: [
+                {
+                    staff: [
+                        {
+                            voices: [
+                                [
+                                    {
+                                        el_type: "note",
+                                        pitches: [{ name: "C", pitch: 0 }]
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+        global.ABCJS.parseOnly.mockReturnValueOnce([mockTune]);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.abc" }];
+        handlers.change();
+        await readers[2].promise;
+
+        expect(global.ensureABCJS).toHaveBeenCalledTimes(1);
+        expect(global.ABCJS.parseOnly).toHaveBeenCalledWith("X:1\nK:C\nC \\ D");
+        expect(activity.parseABC).toHaveBeenCalledWith(mockTune);
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler reports rejected ABCJS loading and restores state", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        const abcError = new Error("ABCJS unavailable");
+        global.ensureABCJS.mockRejectedValueOnce(abcError);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.abc" }];
+        handlers.change();
+        await readers[2].promise;
+
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(abcError, {
+            operation: "abcImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(activity.parseABC).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
     it("drop handler cleans up when file is empty", () => {

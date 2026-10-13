@@ -30,7 +30,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NP | 32 | 0 | 0 | C, G, A, F, E, D | 48 | C4, 262Hz | A4, 441Hz |
+| NP | 32 | 0 | 0 | C, G, A, F, E, D | 48 | C4, 262Hz | A4, 440Hz |
 
 | Example | Description |
 | --- | --- |
@@ -38,7 +38,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Interactive, Math, Examples | 4 | 1 | 2 | A, B, C, D, E, F, G | 20 | A3, 221Hz | E5, 660Hz |
+| Music, Interactive, Math, Examples | 4 | 1 | 2 | A, B, C, D, E, F, G | 20 | A3, 220Hz | E5, 659Hz |
 
 | Example | Description |
 | --- | --- |
@@ -66,7 +66,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 3 | 0 | 0 | G, R, C, D, E, F, A, B | 196 | C4, 262Hz | A5, 881 Hz |
+| Music, Examples | 3 | 0 | 0 | G, R, C, D, E, F, A, B | 196 | C4, 262Hz | A5, 880Hz |
 
 | Example | Description |
 | --- | --- |
@@ -90,7 +90,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 24 | 0 | 0 | D, A, B, E, C, F, G | 48 | D3, 147H | F5, 699Hz |
+| Music, Examples | 24 | 0 | 0 | D, A, B, E, C, F, G | 48 | D3, 147H | F5, 698Hz |
 
 | Example | Description |
 | --- | --- |
@@ -118,7 +118,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 15 | C4, 262Hz | C5, 524Hz |
+| Music, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 15 | C4, 262Hz | C5, 523Hz |
 
 | Example | Description |
 | --- | --- |
@@ -142,7 +142,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Math, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 8 | C4, 262Hz | C5, 524Hz |
+| Music, Math, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 8 | C4, 262Hz | C5, 523Hz |
 
 | Example | Description |
 | --- | --- |
@@ -183,7 +183,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music | 5 | 0 | 0 | E, A, C, B, G, F, D, R | 69 | C3, 131Hz | C♯5, 555Hz |
+| Music | 5 | 0 | 0 | E, A, C, B, G, F, D, R | 69 | C3, 131Hz | C♯5, 554Hz |
 
 | Example | Description |
 | --- | --- |
@@ -211,7 +211,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | A, D, E, R, F, G, B, C | 34 | C♯4, 278Hz | B♭5, 933Hz |
+| Music, Examples | 0 | 0 | 0 | A, D, E, R, F, G, B, C | 34 | C♯4, 277Hz | B♭5, 932Hz |
 
 | Example | Description |
 | --- | --- |
@@ -219,7 +219,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Media, Examples | 6 | 0 | 0 | F, C, D, R, A, G | 167 | C4, 262Hz | A4, 441Hz |
+| Music, Media, Examples | 6 | 0 | 0 | F, C, D, R, A, G | 167 | C4, 262Hz | A4, 440Hz |
 
 | Example | Description |
 | --- | --- |
@@ -227,7 +227,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | G, F, E, B, D, A, C | 196 | C4, 262Hz | C5, 524Hz |
+| Music, Examples | 0 | 0 | 0 | G, F, E, B, D, A, C | 196 | C4, 262Hz | C5, 523Hz |
 
 | Example | Description |
 | --- | --- |
@@ -235,7 +235,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 588Hz |
+| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 587Hz |
 
 | Example | Description |
 | --- | --- |
@@ -243,7 +243,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 588Hz |
+| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 587Hz |
 
 | Example | Description |
 | --- | --- |
@@ -259,7 +259,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 34 | 0 | 0 | G, A, E, D, B, C, F | 93 | G2, 98Hz | A4, 441Hz |
+| Music, Examples | 34 | 0 | 0 | G, A, E, D, B, C, F | 93 | G2, 98Hz | A4, 440Hz |
 
 | Example | Description |
 | --- | --- |
@@ -267,7 +267,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 34 | 0 | 0 | G, A, E, D, B, C, F | 93 | G2, 98Hz | A4, 441Hz |
+| Music, Examples | 34 | 0 | 0 | G, A, E, D, B, C, F | 93 | G2, 98Hz | A4, 440Hz |
 
 | Example | Description |
 | --- | --- |
@@ -283,7 +283,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | C, G, A, F, E, D | 42 | C4, 262Hz | A4, 441Hz |
+| Music, Examples | 0 | 0 | 0 | C, G, A, F, E, D | 42 | C4, 262Hz | A4, 440Hz |
 
 | Example | Description |
 | --- | --- |
@@ -315,7 +315,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 36 | 0 | 0 | C, G, A, D, F, R, E | 1047 | F2, 88Hz | C5, 524Hz |
+| Music, Examples | 36 | 0 | 0 | C, G, A, D, F, R, E | 1047 | F2, 87Hz | C5, 523Hz |
 
 | Example | Description |
 | --- | --- |
@@ -323,7 +323,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Math | 1 | 0 | 0 | A, F, G, D, E, B, C | 356 | G4, 392Hz | A6, 1761Hz |
+| Music, Math | 1 | 0 | 0 | A, F, G, D, E, B, C | 356 | G4, 392Hz | A6, 1760Hz |
 
 | Example | Description |
 | --- | --- |
@@ -331,7 +331,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Example | 0 | 0 | 0 | A, D, E, R, F, G, B, C | 34 | C♯4, 278Hz | B♭5, 933Hz |
+| Music, Example | 0 | 0 | 0 | A, D, E, R, F, G, B, C | 34 | C♯4, 277Hz | B♭5, 932Hz |
 
 | Example | Description |
 | --- | --- |
@@ -347,7 +347,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Math, Art, Example | 7 | 0 | 0 | A, B, C, G, F, E, D | 59 | A3, 221Hz | C5, 524Hz |
+| Music, Math, Art, Example | 7 | 0 | 0 | A, B, C, G, F, E, D | 59 | A3, 220Hz | C5, 523Hz |
 
 | Example | Description |
 | --- | --- |
@@ -355,7 +355,7 @@ Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music | 0 | 0 | 0 | C, D, F, E, R, G, A | 52 | C4, 262Hz | A4, 441Hz |
+| Music | 0 | 0 | 0 | C, D, F, E, R, G, A | 52 | C4, 262Hz | A4, 440Hz |
 
 | Example | Description |
 | --- | --- |
