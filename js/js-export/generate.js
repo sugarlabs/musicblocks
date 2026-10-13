@@ -332,6 +332,7 @@ class JSGenerate {
                 JSGenerate.actionNames,
                 ASTUtils.getBoxNames([...JSGenerate.actionTrees, ...JSGenerate.startTrees])
             );
+            ASTUtils.setStoppingActions(JSGenerate.actionNames, JSGenerate.actionTrees);
             for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
                 JSGenerate.AST["body"].splice(
                     i,

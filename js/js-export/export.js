@@ -399,6 +399,15 @@ class MusicBlocks {
     }
 
     /**
+     * Returns a Promise for ending an action that ended with a Stop block. The caller
+     * reads the "STOPFLOW" value and stops like a Stop block at the call would.
+     * @returns {Promise}
+     */
+    get STOPFLOW() {
+        return new Promise(resolve => resolve("STOPFLOW"));
+    }
+
+    /**
      * Returns a Promise for ending a clamp block command.
      * Executes the listener created at the initiation of the corresponding command.
      * @returns {Promise}
