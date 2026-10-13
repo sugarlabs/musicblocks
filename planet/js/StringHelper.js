@@ -33,6 +33,8 @@ class StringHelper {
             ["local-tab", _("Local")],
             ["global-tab", _("Global")],
             ["global-search", _("Search for projects..."), "placeholder"],
+            ["local-search", _("Search for projects"), "aria-label"],
+            ["global-search", _("Search for projects"), "aria-label"],
             ["localtitle", _("My Projects")],
             ["publisher-ptitle", _("Publish project")],
             ["publish-title-label", _("Project title")],
