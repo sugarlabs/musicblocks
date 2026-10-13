@@ -145,6 +145,7 @@ const setupActivityIdleWatcher = activityInstance => {
         if (activity._autoSaveInterval !== null) {
             clearInterval(activity._autoSaveInterval);
         }
+        let lastPlanetSave = null;
         activity._autoSaveInterval = setInterval(
             () => {
                 try {
@@ -173,6 +174,17 @@ const setupActivityIdleWatcher = activityInstance => {
                         activity.saveSessionAsync().catch(e => {
                             ErrorHandler.recoverable(e, { operation: "autoSaveAsync" });
                         });
+
+                        // A restart loads the Planet copy ahead of these session
+                        // copies, so keep it current too. That save rewrites every
+                        // stored project, so only make it when something changed.
+                        if (activity.planet) {
+                            const data = activity.prepareExport();
+                            if (data !== lastPlanetSave) {
+                                activity.saveLocally();
+                                lastPlanetSave = data;
+                            }
+                        }
                     } else if (
                         activity.saveLocally !== null &&
                         activity.saveLocally !== undefined

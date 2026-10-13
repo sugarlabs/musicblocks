@@ -316,7 +316,34 @@ describe("setupActivityIdleWatcher", () => {
             jest.advanceTimersByTime(15 * 1000);
 
             expect(mockActivity.saveSessionAsync).toHaveBeenCalledTimes(1);
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
             expect(mockActivity.gitDropdownUI.onSaveLocally).toHaveBeenCalled();
+        });
+
+        it("also saves the project to Planet, the copy a restart loads", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.planet = {};
+            mockActivity.prepareExport = jest.fn().mockReturnValue("[project]");
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(15 * 1000);
+
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalledTimes(1);
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+        });
+
+        it("saves to Planet again only after the project changes", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.planet = {};
+            mockActivity.prepareExport = jest.fn().mockReturnValue("[a]");
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(30 * 1000);
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+
+            mockActivity.prepareExport.mockReturnValue("[b]");
+            jest.advanceTimersByTime(15 * 1000);
+            expect(mockActivity.saveLocally).toHaveBeenCalledTimes(2);
         });
 
         it("calls saveLocally after 15 seconds if saveSessionAsync is missing", () => {
