@@ -1534,6 +1534,7 @@ describe("Palettes Class", () => {
         test("showMenu sizes the scrollable body from its rendered top", () => {
             const paletteItems = {
                 style: {},
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
                 getBoundingClientRect: jest.fn(() => ({ top: 180 }))
             };
             const paletteBody = {
@@ -1565,6 +1566,7 @@ describe("Palettes Class", () => {
                 if (tag === "tbody") return paletteItems;
                 return {
                     style: {},
+                    classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
                     children: [],
                     appendChild: jest.fn(),
                     removeAttribute: jest.fn(),

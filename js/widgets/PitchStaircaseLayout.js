@@ -131,7 +131,7 @@ class PitchStaircaseLayout {
             this._stopRow();
         }
         pscTable.replaceChildren();
-        pscTable.style.textAlign = "center";
+        pscTable.classList.add("mb-text-center");
 
         for (let i = 0; i < this.Stairs.length; i++) {
             const pscTableRow = pscTable.insertRow();
