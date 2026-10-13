@@ -695,21 +695,21 @@ function setupPitchActions(activity) {
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {
-                let obj = noteToObj(tur.singer.previousNotePlayed[0]);
+                const prevObj = noteToObj(tur.singer.previousNotePlayed[0]);
                 const previousValue = pitchToNumber(
-                    obj[0],
-                    obj[1],
+                    prevObj[0],
+                    prevObj[1],
                     tur.singer.keySignature,
                     activity.logo.synth.inTemperament
                 );
 
-                obj = noteToObj(tur.singer.lastNotePlayed[0]);
-                let [pitch, octave] = obj;
+                let [pitch, octave] = prevObj;
 
+                const lastObj = noteToObj(tur.singer.lastNotePlayed[0]);
                 let delta =
                     pitchToNumber(
-                        obj[0],
-                        obj[1],
+                        lastObj[0],
+                        lastObj[1],
                         tur.singer.keySignature,
                         activity.logo.synth.inTemperament
                     ) - previousValue;
@@ -739,7 +739,7 @@ function setupPitchActions(activity) {
                                   );
                         delta -= nhalf;
                         scalarDelta += type === "up" ? 1 : -1;
-                        obj = getNote(
+                        const nextObj = getNote(
                             pitch,
                             octave,
                             nhalf,
@@ -749,7 +749,7 @@ function setupPitchActions(activity) {
                             activity.errorMsg,
                             activity.logo.synth.inTemperament
                         );
-                        [pitch, octave] = obj;
+                        [pitch, octave] = nextObj;
 
                         if (i > 100) return;
                     };
