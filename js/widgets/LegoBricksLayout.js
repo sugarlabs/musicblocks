@@ -167,7 +167,7 @@ function LegoBricksLayout() {
         // Create matrix table (just for row headers)
         this.rowHeaderTable = document.createElement("table");
         this.rowHeaderTable.style.borderCollapse = "collapse";
-        this.rowHeaderTable.style.width = "100%";
+        this.rowHeaderTable.classList.add("mb-w-full");
 
         rowHeaderContainer.appendChild(this.rowHeaderTable);
 
@@ -195,7 +195,7 @@ function LegoBricksLayout() {
         this.imagePlaceholder = document.createElement("div");
         this.imagePlaceholder.style.color = "#888";
         this.imagePlaceholder.style.fontSize = "16px";
-        this.imagePlaceholder.style.textAlign = "center";
+        this.imagePlaceholder.classList.add("mb-text-center");
         this.imagePlaceholder.style.fontStyle = "italic";
         this.imagePlaceholder.textContent = "Click upload button to add an image";
 
@@ -381,7 +381,7 @@ function LegoBricksLayout() {
             this.selectedBackgroundColor.name
         );
         this.backgroundColorDisplay.style.minWidth = "60px";
-        this.backgroundColorDisplay.style.textAlign = "center";
+        this.backgroundColorDisplay.classList.add("mb-text-center");
 
         return [backgroundLabel, this.backgroundColorDisplay];
     };

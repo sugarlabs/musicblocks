@@ -201,7 +201,7 @@ class ModeWidget {
         labelCell.textContent = "\u00a0";
         labelCell.style.fontSize = "14px";
         labelCell.style.fontWeight = "bold";
-        labelCell.style.textAlign = "center";
+        labelCell.classList.add("mb-text-center");
         labelCell.style.padding = "6px 0";
         labelCell.style.verticalAlign = "middle";
         this._modeLabelCell = labelCell;

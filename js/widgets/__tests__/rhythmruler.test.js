@@ -440,6 +440,7 @@ describe("RhythmRuler Widget", () => {
             const rows = [];
             const createTable = () => ({
                 style: {},
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
                 insertRow: () => {
                     const row = {
                         cells: [],
@@ -460,7 +461,12 @@ describe("RhythmRuler Widget", () => {
                 }
             });
             jest.spyOn(document, "createElement").mockImplementation(tag =>
-                tag === "table" ? createTable() : { style: {} }
+                tag === "table"
+                    ? createTable()
+                    : {
+                          style: {},
+                          classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() }
+                      }
             );
             rhythmRuler._buildRulerTable({ getWidgetBody: () => ({ append: jest.fn() }) });
             expect(rhythmRuler._setButtonIcon).toHaveBeenCalledTimes(showPlay ? 1 : 0);

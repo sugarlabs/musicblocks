@@ -36,6 +36,7 @@ global.platformColor = {
 const createMockElement = tagName => ({
     tagName,
     style: {},
+    classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
     append: jest.fn(),
     innerHTML: "",
     textContent: "",
