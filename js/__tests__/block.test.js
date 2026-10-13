@@ -1518,6 +1518,40 @@ describe("Block Foundation", () => {
             expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
         });
 
+        it("waits for asynchronous blockMoved resolution before adjusting docks at stack top", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 2;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                overTrashcan: jest.fn().mockReturnValue(false)
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.adjustDocks = jest.fn();
+
+            let resolveMove;
+            const movePromise = new Promise(resolve => {
+                resolveMove = resolve;
+            });
+            mockBlocks.blockMoved = jest.fn(() => movePromise);
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
+
+            // While blockMoved is still pending, adjustDocks should not have been called yet
+            expect(mockBlocks.adjustDocks).not.toHaveBeenCalled();
+
+            resolveMove();
+            await movePromise;
+
+            expect(mockBlocks.findTopBlock).toHaveBeenCalledWith(2);
+            expect(mockBlocks.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
         it("sends a moved block to trash without waiting for the highlight", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
             block.blockIndex = 0;
