@@ -30,6 +30,8 @@ const buildPainter = () => ({
     doSetHue: jest.fn(),
     doSetValue: jest.fn(),
     doSetPenAlpha: jest.fn(),
+    doSetTranslucency: jest.fn(),
+    doClear: jest.fn(),
     doSetChroma: jest.fn(),
     doSetPensize: jest.fn(),
     doSetXY: jest.fn(),
@@ -114,12 +116,50 @@ describe("EmbeddedGraphicsScheduler", () => {
 
         turtle0.singer.embeddedGraphics = { 3: [1] };
         mockLogo.blockList = [null, { name: "clear", connections: [] }];
+        mockLogo.svgBackground = false;
         await scheduler.schedule(0, 0.5, 3, 0.1);
 
-        expect(turtle0.painter.doSetHeading).toHaveBeenCalledWith(0);
-        expect(turtle0.painter.doSetXY).toHaveBeenCalledWith(0, 0);
+        expect(turtle0.painter.doClear).toHaveBeenCalledWith(true, true, true);
+        expect(mockLogo.svgBackground).toBe(true);
         expect(mockLogo.deps.utils.delayExecution).toHaveBeenCalledWith(500);
         expect(turtle0.embeddedGraphicsPending).toBe(0);
+    });
+
+    test("set translucency in a note passes the block value, not an alpha, to the painter", async () => {
+        mockLogo.parseArg = jest.fn(() => 50);
+        mockLogo.blockList = [null, { name: "settranslucency", connections: [null, 7] }];
+        turtle0.singer.embeddedGraphics = { 3: [1] };
+
+        await scheduler.schedule(0, 0.5, 3, 0);
+
+        expect(turtle0.painter.doSetTranslucency).toHaveBeenCalledWith(50);
+        expect(turtle0.painter.doSetPenAlpha).not.toHaveBeenCalled();
+    });
+
+    test("clear in a note is scheduled after the note's earlier graphics", async () => {
+        const calls = [];
+        const timers = [];
+        mockLogo._timerManager.setGuardedTimeout = jest.fn((fn, ms) => {
+            timers.push([ms, fn]);
+            return timers.length;
+        });
+        turtle0.painter.doForward = jest.fn(() => calls.push("forward"));
+        turtle0.painter.doClear = jest.fn(() => calls.push("clear"));
+        mockLogo.blockList = [
+            null,
+            { name: "forward", connections: [null, 7] },
+            { name: "clear", connections: [] }
+        ];
+        turtle0.singer.embeddedGraphics = { 3: [1, 2] };
+
+        await scheduler.schedule(0, 1, 3, 0);
+
+        // Nothing runs before the timers fire.
+        expect(calls).toEqual([]);
+        timers.sort((a, b) => a[0] - b[0]).forEach(([, fn]) => fn());
+        expect(calls[calls.length - 1]).toBe("clear");
+        expect(calls.filter(c => c === "forward").length).toBeGreaterThan(0);
+        expect(turtle0.painter.doSetXY).not.toHaveBeenCalled();
     });
 
     test("schedule covers broad graphics switch with deterministic timers", async () => {
@@ -169,7 +209,7 @@ describe("EmbeddedGraphicsScheduler", () => {
         expect(turtle0.painter.doSetColor).toHaveBeenCalled();
         expect(turtle0.painter.doSetHue).toHaveBeenCalled();
         expect(turtle0.painter.doSetValue).toHaveBeenCalled();
-        expect(turtle0.painter.doSetPenAlpha).toHaveBeenCalled();
+        expect(turtle0.painter.doSetTranslucency).toHaveBeenCalledWith(9);
         expect(turtle0.painter.doSetChroma).toHaveBeenCalled();
         expect(turtle0.painter.doSetPensize).toHaveBeenCalled();
         expect(turtle0.painter.doPenUp).toHaveBeenCalled();

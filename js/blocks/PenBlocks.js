@@ -963,10 +963,7 @@ function setupPenBlocks(activity) {
                 // If in note block, push block to singer's embedded graphics.
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
-                // Calculate alpha value and set pen translucency.
-                const arg = args[0] % 101;
-                const alpha = 1.0 - arg / 100;
-                tur.painter.doSetPenAlpha(alpha);
+                tur.painter.doSetTranslucency(args[0]);
             }
         }
     }
