@@ -636,6 +636,18 @@ describe("setupIntervalsActions", () => {
         expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("Db");
         expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("dorian");
         expect(Singer.IntervalsActions.getModeLength(0)).toBe(7);
+
+        turtle.singer.keySignature = "C harmonic minor";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("C");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("harmonic minor");
+
+        turtle.singer.keySignature = "A natural minor";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("A");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("natural minor");
+
+        turtle.singer.keySignature = "E major pentatonic";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("E");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("major pentatonic");
     });
 
     test("setMovableDo", () => {
