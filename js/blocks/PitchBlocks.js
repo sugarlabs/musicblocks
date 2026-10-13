@@ -249,6 +249,14 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
             super("deltapitch2", _("scalar change in pitch"));
+            this.setHelpString([
+                _(
+                    "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played."
+                ),
+                "documentation",
+                null,
+                "deltapitch2help"
+            ]);
         }
     }
 

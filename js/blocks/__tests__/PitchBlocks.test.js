@@ -47,7 +47,8 @@ describe("setupPitchBlocks", () => {
         beginnerBlock() {
             return this;
         }
-        setHelpString() {
+        setHelpString(helpString) {
+            this.helpString = helpString;
             return this;
         }
         formBlock() {
@@ -428,6 +429,14 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print", connections: [null] };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
+        });
+        it("Scalar change in pitch has its own help text and example", () => {
+            const half = createdBlocks["deltapitch"].helpString;
+            const scalar = createdBlocks["deltapitch2"].helpString;
+            expect(half[0]).toContain("in half steps");
+            expect(half[3]).toBe("deltapitchhelp");
+            expect(scalar[0]).toContain("in scale steps");
+            expect(scalar[3]).toBe("deltapitch2help");
         });
         it("Generic check for all blocks updateParameter", () => {
             // This loop ensures that all updateParameter methods are called at least once
