@@ -326,7 +326,13 @@ div.select-wrapper * {
 }
 
 #localglobal {
-	top: 7px;
+    top: 7px;
+
+    transition:
+        transform 0.32s ease,
+        translate 0.25s ease;
+
+    will-change: transform, translate;
 }
 
 #logo-container {
@@ -337,7 +343,11 @@ div.select-wrapper * {
 }
 
 #two_header {
-	display: none;
+    display: none !important;
+}
+
+#searchcontainer {
+    display: none !important;
 }
 
 @media only screen and (max-width: 655px) {
@@ -656,4 +666,155 @@ a {
 @keyframes mb-fadein {
     from { opacity: 0.3; }
     to   { opacity: 1;   }
+}
+
+.projects-title-row {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 26px;
+    min-height: 90px;
+}
+
+.projects-title-row h3 {
+    margin: 0;
+}
+
+.project-search-preview {
+    position: absolute;
+    top: calc(50% + -2px);
+    right: 109px;
+
+    transform: translateY(-50%);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 40px;
+    height: 40px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #e9ecef;
+    border: 1px solid #d0d0d0;
+
+    flex-shrink: 0;
+
+    /*
+     * Only animate the opening/closing of the search field.
+     * Do not animate top/left/right positioning.
+     */
+	transition: width 0.25s ease;
+}
+
+/* Open toward the LEFT */
+.project-search-preview:hover,
+.project-search-preview:has(input:not(:placeholder-shown)) {
+    width: 230px;
+}
+
+.project-search-preview input {
+    width: 0 !important;
+    height: 40px !important;
+
+    opacity: 0;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+
+    background: transparent !important;
+
+    color: #333 !important;
+    font-size: 16px;
+
+    flex-shrink: 0;
+
+    transition:
+        width 0.25s ease,
+        opacity 0.15s ease;
+}
+
+.project-search-preview:hover input,
+.project-search-preview:has(input:not(:placeholder-shown)) input {
+    width: 165px !important;
+    opacity: 1;
+
+    padding-left: 18px !important;
+    padding-right: 8px !important;
+}
+
+.project-search-preview input:focus {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+.project-search-preview input::placeholder {
+    color: #777;
+    opacity: 1;
+}
+
+/* Keep the lens fixed on the RIGHT side */
+.project-search-preview .project-search-icon {
+	width: 34px !important;
+	min-width: 34px !important;
+	height: 34px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 1px !important;
+    padding: 0 !important;
+
+    border-radius: 50%;
+
+    background: #ffffff !important;
+    color: #000000 !important;
+
+    font-family: "Material Icons" !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-size: 19px !important;
+    line-height: 34px !important;
+
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+
+    flex-shrink: 0;
+    cursor: pointer;
+
+    z-index: 10;
+}
+
+/* Search can still be placed in the navbar by JS */
+.project-search-preview.project-search-floating {
+    position: fixed;
+    z-index: 250;
+}
+
+@media screen and (max-width: 700px) {
+    .projects-title-row .project-search-preview:not(.project-search-floating) {
+        right: 10px;
+    }
 }
