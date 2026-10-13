@@ -35,7 +35,17 @@ global.platformColor = { selectorBackgroundHOVER: "#e0e0e0" };
 global.DEFAULTVOICE = "electronic synth";
 
 const PitchStaircaseLayout = global.PitchStaircaseLayout;
-const METHODS = ["_addButton", "_setButtonIcon", "_makeStairs", "_refresh"];
+const METHODS = [
+    "_addButton",
+    "_setButtonIcon",
+    "_makeStairs",
+    "_refresh",
+    "_findFraction",
+    "_gcd",
+    "_lcm",
+    "_calculateCycles",
+    "_generateWaveSVG"
+];
 
 describe("PitchStaircaseLayout", () => {
     let psc;
@@ -109,11 +119,60 @@ describe("PitchStaircaseLayout", () => {
         expect(playCellOf(1).getAttribute("id")).toBe("1");
     });
 
-    test("_makeStairs draws higher stairs narrower", () => {
+    test("_makeStairs draws all stairs with equal total width", () => {
         psc._makeStairs();
 
         const width = i => parseFloat(stepCellOf(i).style.width);
-        expect(width(0)).toBeLessThan(width(1));
+        expect(width(0)).toBe(width(1));
+        expect(width(0)).toBe(PitchStaircase.INNERWINDOWWIDTH);
+    });
+
+    test("_calculateCycles correctly determines integer cycle ratios", () => {
+        // 3:2 ratio: 330 Hz and 220 Hz
+        psc.Stairs = [
+            ["E", 4, 330],
+            ["A", 3, 220]
+        ];
+        expect(psc._calculateCycles(220)).toBe(2);
+        expect(psc._calculateCycles(330)).toBe(3);
+
+        // Single stair defaults to 2 cycles
+        psc.Stairs = [["A", 3, 220]];
+        expect(psc._calculateCycles(220)).toBe(2);
+
+        // 4:3 ratio: 320 Hz and 240 Hz
+        psc.Stairs = [
+            ["F", 4, 320],
+            ["C", 4, 240]
+        ];
+        expect(psc._calculateCycles(240)).toBe(3);
+        expect(psc._calculateCycles(320)).toBe(4);
+    });
+
+    test("_generateWaveSVG creates svg with wave path and dashed partition lines", () => {
+        const svg = psc._generateWaveSVG(600, 53, 3);
+        expect(svg).toContain('<svg xmlns="http://www.w3.org/2000/svg"');
+        expect(svg).toContain('width="600"');
+        expect(svg).toContain('height="53"');
+        expect(svg).toContain('<path d="M ');
+        expect(svg).toContain('stroke-dasharray="6,4"');
+        expect(svg).toContain('stroke="#e74c3c"');
+        expect(svg).toContain('stroke="#90c100"');
+    });
+
+    test("_findFraction, _gcd, and _lcm calculate mathematical helpers correctly", () => {
+        expect(psc._gcd(12, 18)).toBe(6);
+        expect(psc._lcm(4, 6)).toBe(12);
+        expect(psc._lcm(0, 5)).toBe(0);
+
+        const frac32 = psc._findFraction(1.5);
+        expect(frac32).toEqual({ num: 3, den: 2 });
+
+        const frac43 = psc._findFraction(4 / 3);
+        expect(frac43).toEqual({ num: 4, den: 3 });
+
+        expect(psc._findFraction(-1)).toBeNull();
+        expect(psc._findFraction(NaN)).toBeNull();
     });
 
     test("_makeStairs replaces the old rows when rebuilt", () => {
