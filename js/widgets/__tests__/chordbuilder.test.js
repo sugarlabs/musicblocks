@@ -497,6 +497,15 @@ describe("ChordBuilderWidget", () => {
             expect(mockAudio.playChord).toHaveBeenCalledWith(widget.diatonicChords[0], 0.4, {
                 octave: 4
             });
+
+            mockAudio.playChord.mockClear();
+            const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+            Object.defineProperty(spaceEvent, "target", { value: card });
+            card.dispatchEvent(spaceEvent);
+
+            expect(mockAudio.playChord).toHaveBeenCalledWith(widget.diatonicChords[0], 0.4, {
+                octave: 4
+            });
         });
 
         it("does not hijack keyboard events when child element inside card is focused", () => {
