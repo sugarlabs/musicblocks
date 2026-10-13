@@ -187,10 +187,10 @@ class StatsWindow {
         const lowestNote = stats["lowestNote"];
         const highestNote = stats["highestNote"];
         const lowestNoteLabel = lowestNote
-            ? `${lowestNote[0]},${(lowestNote[2] + 0.5).toFixed(0)}Hz`
+            ? `${lowestNote[0]},${lowestNote[2].toFixed(0)}Hz`
             : "N/A";
         const highestNoteLabel = highestNote
-            ? `${highestNote[0]},${(highestNote[2] + 0.5).toFixed(0)}Hz`
+            ? `${highestNote[0]},${highestNote[2].toFixed(0)}Hz`
             : "N/A";
         const items = [
             ["duples", stats["duples"]],
