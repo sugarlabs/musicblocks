@@ -2602,8 +2602,8 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 The *Save as Lilypond* option from the Save menu works for a program
 that plays the same music every time. For an interactive program, such
 as a game, use the *Record notation* block to record the music as it is
-played. In the example above, the two notes after *Record notation* are
-recorded, and the *Save as Lilypond* block saves them to `song.ly`.
+played. In the example above, each note's pitch follows the cursor, so
+what is recorded and saved to `song.ly` is what you played.
 
 The *Save as Lilypond*, *Save as ABC* and *Save as MusicXML* blocks
 save what has been recorded so far, under the file name in the block.
