@@ -74,7 +74,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { noteToPitchOctave } = MusicUtilsPitch;
+    var { noteToPitchOctave, normalizeNoteAccidentals } = MusicUtilsPitch;
     var MusicUtilsPitchScale =
         (typeof window !== "undefined" && window.MusicUtilsPitchScale) ||
         (typeof require !== "undefined" ? require("./musicutils-pitchscale") : {});
@@ -1118,7 +1118,14 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
     const t = getTemperament(temperament);
     if (t && !t.isEDO && t.noteLabels && t.ratios) {
-        const noteIdx = t.noteLabels.indexOf(pitch);
+        let noteIdx = t.noteLabels.indexOf(pitch);
+        if (noteIdx === -1) {
+            noteIdx = t.noteLabels.indexOf(normalizeNoteAccidentals(pitch));
+        }
+        if (noteIdx === -1 && t.edo === 12) {
+            const pitchClass = _notePitchClass(pitch);
+            noteIdx = t.noteLabels.findIndex(label => _notePitchClass(label) === pitchClass);
+        }
         if (noteIdx !== -1) {
             const aIdx = t.noteLabels.indexOf("A");
             const baseRefFreq = A0 / t.ratios[aIdx];

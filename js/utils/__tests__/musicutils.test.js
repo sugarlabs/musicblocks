@@ -2807,6 +2807,14 @@ describe("pitchToFrequency", () => {
         const pyE = pitchToFrequency("E", 4, 0, "C", "Pythagorean");
         expect(pyE / pyC).toBeCloseTo(81 / 64, 4);
     });
+
+    it("resolves accidental spellings against 12-note ratio temperaments", () => {
+        expect(pitchToFrequency("C♯", 4, 0, "C major", "just intonation")).toBeCloseTo(281.6, 5);
+        expect(pitchToFrequency("D♭", 4, 0, "C major", "Pythagorean")).toBeCloseTo(
+            pitchToFrequency("C#", 4, 0, "C major", "Pythagorean"),
+            5
+        );
+    });
 });
 
 describe("noteToFrequency", () => {
