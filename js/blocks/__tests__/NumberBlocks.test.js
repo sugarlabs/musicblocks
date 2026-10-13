@@ -162,7 +162,15 @@ global.MathUtility = {
     doOneOf: (a, b) => a,
     doRandom: (a, b, octave) => a,
     doMinus: (a, b) => Number(a) - Number(b),
-    clampNumber: (a, min, max) => Math.max(min, Math.min(a, max))
+    clampNumber: (a, min, max) => Math.max(min, Math.min(a, max)),
+    doSin: a => Math.sin((Number(a) * Math.PI) / 180),
+    doCos: a => Math.cos((Number(a) * Math.PI) / 180),
+    doTan: a => Math.tan((Number(a) * Math.PI) / 180),
+    doArcSin: a => (Math.asin(Number(a)) * 180) / Math.PI,
+    doArcCos: a => (Math.acos(Number(a)) * 180) / Math.PI,
+    doArcTan: a => (Math.atan(Number(a)) * 180) / Math.PI,
+    doLn: a => Math.log(Number(a)),
+    doLog: a => Math.log10(Number(a))
 };
 
 global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
@@ -1285,6 +1293,73 @@ describe("setupNumberBlocks", () => {
             activity.blocks.blockList[190] = { value: 6.789 };
             const result = createdBlocks["minus"].updateParameter(logo, 0, 190);
             expect(result).toEqual(Number(6.789).toFixed(2));
+        });
+
+        it("Trig and Log blocks updateParameter should return toFixed2", () => {
+            ["sin", "cos", "tan", "arcsin", "arccos", "arctan", "ln", "log"].forEach(name => {
+                activity.blocks.blockList[200] = { value: 3.14159 };
+                const result = createdBlocks[name].updateParameter(logo, 0, 200);
+                expect(result).toEqual(Number(3.14159).toFixed(2));
+            });
+        });
+    });
+
+    describe("Trig and Log blocks execution", () => {
+        const blocksToTest = [
+            { name: "sin", method: "doSin", input: 90, expected: 1 },
+            { name: "cos", method: "doCos", input: 0, expected: 1 },
+            { name: "tan", method: "doTan", input: 45, expected: 1 },
+            { name: "arcsin", method: "doArcSin", input: 1, expected: 90 },
+            { name: "arccos", method: "doArcCos", input: 1, expected: 0 },
+            { name: "arctan", method: "doArcTan", input: 1, expected: 45 },
+            { name: "ln", method: "doLn", input: Math.E, expected: 1 },
+            { name: "log", method: "doLog", input: 100, expected: 2 }
+        ];
+
+        blocksToTest.forEach(({ name, method, input, expected }) => {
+            describe(`${name} block`, () => {
+                it(`should calculate correct value for ${input}`, () => {
+                    activity.blocks.blockList[210] = { name, connections: [null, "c1"] };
+                    logo.parseArg = jest.fn(() => input);
+                    const block = createdBlocks[name];
+                    const result = block.arg(logo, 0, 210, null);
+                    expect(result).toBeCloseTo(expected);
+                });
+
+                it("should report NOINPUTERRORMSG and return 0 when connection is null", () => {
+                    activity.blocks.blockList[210] = { name, connections: [null, null] };
+                    const block = createdBlocks[name];
+                    const result = block.arg(logo, 0, 210, null);
+                    expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 210);
+                    expect(result).toEqual(0);
+                });
+
+                it("should report NANERRORMSG and return 0 when math utility throws NanError", () => {
+                    activity.blocks.blockList[210] = { name, connections: [null, "c1"] };
+                    logo.parseArg = jest.fn(() => "invalid");
+                    const origFn = global.MathUtility[method];
+                    global.MathUtility[method] = () => {
+                        throw new Error("NanError");
+                    };
+                    const block = createdBlocks[name];
+                    const result = block.arg(logo, 0, 210, null);
+                    expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 210);
+                    expect(result).toEqual(0);
+                    global.MathUtility[method] = origFn;
+                });
+
+                it("should return 0 and push to statusFields in status matrix context", () => {
+                    activity.blocks.blockList[210] = { name, connections: [10, "c1"] };
+                    activity.blocks.blockList[10] = { name: "print", connections: [null] };
+                    logo.inStatusMatrix = true;
+                    logo.statusFields = [];
+                    const block = createdBlocks[name];
+                    const result = block.arg(logo, 0, 210, null);
+                    expect(result).toEqual(0);
+                    expect(logo.statusFields).toContainEqual([210, name]);
+                    logo.inStatusMatrix = false;
+                });
+            });
         });
     });
 });

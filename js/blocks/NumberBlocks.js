@@ -1033,6 +1033,310 @@ function setupNumberBlocks(activity) {
         }
     }
 
+    class SinBlock extends LeftBlock {
+        constructor() {
+            super("sin");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Sin block returns the sine of an angle in degrees."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["sin", "sine", "trigonometry"];
+            this.formBlock({
+                name: _("sin"),
+                args: 1,
+                defaults: [90]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doSin(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class CosBlock extends LeftBlock {
+        constructor() {
+            super("cos");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Cos block returns the cosine of an angle in degrees."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["cos", "cosine", "trigonometry"];
+            this.formBlock({
+                name: _("cos"),
+                args: 1,
+                defaults: [0]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doCos(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class TanBlock extends LeftBlock {
+        constructor() {
+            super("tan");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Tan block returns the tangent of an angle in degrees."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["tan", "tangent", "trigonometry"];
+            this.formBlock({
+                name: _("tan"),
+                args: 1,
+                defaults: [45]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doTan(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class ArcSinBlock extends LeftBlock {
+        constructor() {
+            super("arcsin");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The ArcSin block returns the arcsine (in degrees) of a number."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["arcsin", "asin", "inverse sine"];
+            this.formBlock({
+                name: _("arcsin"),
+                args: 1,
+                defaults: [1]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doArcSin(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class ArcCosBlock extends LeftBlock {
+        constructor() {
+            super("arccos");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The ArcCos block returns the arccosine (in degrees) of a number."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["arccos", "acos", "inverse cosine"];
+            this.formBlock({
+                name: _("arccos"),
+                args: 1,
+                defaults: [1]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doArcCos(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class ArcTanBlock extends LeftBlock {
+        constructor() {
+            super("arctan");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The ArcTan block returns the arctangent (in degrees) of a number."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["arctan", "atan", "inverse tangent"];
+            this.formBlock({
+                name: _("arctan"),
+                args: 1,
+                defaults: [1]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doArcTan(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class LnBlock extends LeftBlock {
+        constructor() {
+            super("ln");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Ln block returns the natural logarithm of a number."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["ln", "natural log", "logarithm"];
+            this.formBlock({
+                name: _("ln"),
+                args: 1,
+                defaults: [10]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doLn(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class LogBlock extends LeftBlock {
+        constructor() {
+            super("log");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Log block returns the base-10 logarithm of a number."),
+                "documentation",
+                ""
+            ]);
+            this.extraSearchTerms = ["log", "log10", "logarithm"];
+            this.formBlock({
+                name: _("log"),
+                args: 1,
+                defaults: [100]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, activity.blocks.blockList[blk].name)) return 0;
+
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const a = getValidatedArg(logo, turtle, cblk, blk, receivedArg);
+
+            if (a === null) return 0;
+
+            try {
+                return MathUtility.doLog(a);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
     new DistanceBlock().setup(activity);
     new ClampBlock().setup(activity);
     new IntBlock().setup(activity);
@@ -1040,6 +1344,14 @@ function setupNumberBlocks(activity) {
     new PowerBlock().setup(activity);
     new SqrtBlock().setup(activity);
     new AbsBlock().setup(activity);
+    new SinBlock().setup(activity);
+    new CosBlock().setup(activity);
+    new TanBlock().setup(activity);
+    new ArcSinBlock().setup(activity);
+    new ArcCosBlock().setup(activity);
+    new ArcTanBlock().setup(activity);
+    new LnBlock().setup(activity);
+    new LogBlock().setup(activity);
     new DivideBlock().setup(activity);
     new MultiplyBlock().setup(activity);
     new NegBlock().setup(activity);

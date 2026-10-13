@@ -404,6 +404,126 @@ class MathUtility {
     static doRepeatCount(a) {
         return typeof a === "number" && a >= 1 ? Math.floor(a) : 0;
     }
+
+    /**
+     * Returns the sine of a (angle in degrees).
+     *
+     * @static
+     * @param {number} a - Angle in degrees.
+     * @returns {number} - Sine of a.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doSin(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return Math.sin((Number(a) * Math.PI) / 180);
+    }
+
+    /**
+     * Returns the cosine of a (angle in degrees).
+     *
+     * @static
+     * @param {number} a - Angle in degrees.
+     * @returns {number} - Cosine of a.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doCos(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return Math.cos((Number(a) * Math.PI) / 180);
+    }
+
+    /**
+     * Returns the tangent of a (angle in degrees).
+     *
+     * @static
+     * @param {number} a - Angle in degrees.
+     * @returns {number} - Tangent of a.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doTan(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return Math.tan((Number(a) * Math.PI) / 180);
+    }
+
+    /**
+     * Returns the arcsine of a (result in degrees).
+     *
+     * @static
+     * @param {number} a - Value between -1 and 1.
+     * @returns {number} - Arcsine in degrees.
+     * @throws {string} NanError if the argument is not a valid number or out of [-1, 1].
+     */
+    static doArcSin(a) {
+        if (!MathUtility._isNumber(a) || a < -1 || a > 1) {
+            throw new Error("NanError");
+        }
+        return (Math.asin(Number(a)) * 180) / Math.PI;
+    }
+
+    /**
+     * Returns the arccosine of a (result in degrees).
+     *
+     * @static
+     * @param {number} a - Value between -1 and 1.
+     * @returns {number} - Arccosine in degrees.
+     * @throws {string} NanError if the argument is not a valid number or out of [-1, 1].
+     */
+    static doArcCos(a) {
+        if (!MathUtility._isNumber(a) || a < -1 || a > 1) {
+            throw new Error("NanError");
+        }
+        return (Math.acos(Number(a)) * 180) / Math.PI;
+    }
+
+    /**
+     * Returns the arctangent of a (result in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Arctangent in degrees.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doArcTan(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return (Math.atan(Number(a)) * 180) / Math.PI;
+    }
+
+    /**
+     * Returns the natural logarithm (base e) of a.
+     *
+     * @static
+     * @param {number} a - Positive number.
+     * @returns {number} - Natural logarithm of a.
+     * @throws {string} NanError if the argument is not a valid positive number.
+     */
+    static doLn(a) {
+        if (!MathUtility._isNumber(a) || a <= 0) {
+            throw new Error("NanError");
+        }
+        return Math.log(Number(a));
+    }
+
+    /**
+     * Returns the base-10 logarithm of a.
+     *
+     * @static
+     * @param {number} a - Positive number.
+     * @returns {number} - Base-10 logarithm of a.
+     * @throws {string} NanError if the argument is not a valid positive number.
+     */
+    static doLog(a) {
+        if (!MathUtility._isNumber(a) || a <= 0) {
+            throw new Error("NanError");
+        }
+        return Math.log10(Number(a));
+    }
 }
 // Ensure mathutils.js exports the MathUtility class
 if (typeof module !== "undefined" && module.exports) {

@@ -178,10 +178,18 @@ window.ast2blocklist_config = {
                 arguments_property: "arguments"
             },
             name_map: {
+                doArcCos: "arccos",
+                doArcSin: "arcsin",
+                doArcTan: "arctan",
                 doCalculateDistance: "distance",
+                doCos: "cos",
                 doInt: "int",
+                doLn: "ln",
+                doLog: "log",
                 doOneOf: "oneOf",
                 doRandom: "random",
+                doSin: "sin",
+                doTan: "tan",
                 doXor: "xor"
             }
         },

@@ -847,7 +847,15 @@ class ASTUtils {
             neg: ["unexp", "-"],
             abs: ["method", "Math.abs"],
             sqrt: ["method", "Math.sqrt"],
-            power: ["method", "Math.pow"]
+            power: ["method", "Math.pow"],
+            sin: ["method", "MathUtility.doSin"],
+            cos: ["method", "MathUtility.doCos"],
+            tan: ["method", "MathUtility.doTan"],
+            arcsin: ["method", "MathUtility.doArcSin"],
+            arccos: ["method", "MathUtility.doArcCos"],
+            arctan: ["method", "MathUtility.doArcTan"],
+            ln: ["method", "MathUtility.doLn"],
+            log: ["method", "MathUtility.doLog"]
         };
 
         function getBinaryExpAST(operator, operand1, operand2) {
