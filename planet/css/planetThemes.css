@@ -535,3 +535,19 @@
     border: 2px solid #ffff00 !important;
     box-shadow: 0 0 10px #ffff00 !important;
 }
+
+.project-search-preview .project-search-icon {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+.project-search-preview input::placeholder {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
+}
+
+.project-search-preview input {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
