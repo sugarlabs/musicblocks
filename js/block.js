@@ -4004,12 +4004,21 @@ class Block {
                 // Otherwise, process move.
                 // Also, keep track of the time of the last move.
                 this.blocks.mouseDownTime = new Date().getTime();
-                this.blocks.blockMoved(thisBlock);
-
-                // Just in case the blocks are not properly docked after
-                // the move (workaround for issue #38 -- Blocks fly
-                // apart). Still need to get to the root cause.
-                this.blocks.adjustDocks(this.blockIndex, true);
+                const moveResult = this.blocks.blockMoved(thisBlock);
+                if (moveResult && typeof moveResult.then === "function") {
+                    moveResult.then(() => {
+                        if (!this.blocks || !this.blocks.blockList || this.blockIndex < 0) {
+                            return;
+                        }
+                        const topBlock =
+                            typeof this.blocks.findTopBlock === "function"
+                                ? this.blocks.findTopBlock(this.blockIndex)
+                                : this.blockIndex;
+                        this.blocks.adjustDocks(topBlock ?? this.blockIndex, true);
+                    });
+                } else {
+                    this.blocks.adjustDocks(this.blockIndex, true);
+                }
             }
         } else if (this.hasValueDrivenLabel() || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
