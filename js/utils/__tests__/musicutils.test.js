@@ -2613,7 +2613,9 @@ describe("calcNoteValueToDisplay", () => {
 
     it("should return a reduced fraction when note value is not in NSYMBOLS", () => {
         const result = calcNoteValueToDisplay(3, 4); // Result will not be in NSYMBOLS
-        expect(result).toBe("4<br>&mdash;<br>3<br>𝅝.");
+        // 4/3 is not a dotted note, so it gets no note symbol: a dotted whole
+        // note would be 3/2.
+        expect(result).toBe("4<br>&mdash;<br>3<br><br>");
     });
 
     it("should handle note values with fractional components and display them correctly", () => {
@@ -2623,7 +2625,8 @@ describe("calcNoteValueToDisplay", () => {
 
     it("should handle cases where note value cannot be found in NSYMBOLS and returns a reduced fraction", () => {
         const result = calcNoteValueToDisplay(5, 6); // Not in NSYMBOLS
-        expect(result).toBe("6<br>&mdash;<br>5<br>𝅝.");
+        // 6/5 is not a dotted note either.
+        expect(result).toBe("6<br>&mdash;<br>5<br><br>");
     });
 
     it("should return a note value with a symbol for valid inputs that map to an NSYMBOL", () => {

@@ -47,6 +47,56 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("4");
     });
 
+    describe("calcNoteValueToDisplay dotted notes", () => {
+        // The symbol and its dots describe the whole fraction shown beside them:
+        // a dotted quarter lasts 3/8, a double-dotted half 7/8.
+        const { NSYMBOLS } = require("../musicutils-constants");
+        const WHOLE = NSYMBOLS[1];
+        const HALF = NSYMBOLS[2];
+        const QUARTER = NSYMBOLS[4];
+        const EIGHTH = NSYMBOLS[8];
+        const SIXTEENTH = NSYMBOLS[16];
+        const shown = (num, den, symbol) => num + "<br>&mdash;<br>" + den + "<br>" + symbol;
+
+        it("marks a duration that is exactly a dotted note", () => {
+            expect(rhythm.calcNoteValueToDisplay(8, 3)).toBe(shown(3, 8, QUARTER + "."));
+            expect(rhythm.calcNoteValueToDisplay(4, 3)).toBe(shown(3, 4, HALF + "."));
+            expect(rhythm.calcNoteValueToDisplay(16, 3)).toBe(shown(3, 16, EIGHTH + "."));
+        });
+
+        it("marks a duration that is exactly a double-dotted note", () => {
+            expect(rhythm.calcNoteValueToDisplay(16, 7)).toBe(shown(7, 16, QUARTER + ".."));
+            expect(rhythm.calcNoteValueToDisplay(4, 7)).toBe(shown(7, 4, WHOLE + ".."));
+        });
+
+        it("prefers two dots over a truncated one-dot match", () => {
+            // 7/8 is a double-dotted half. Truncating 8/7 * 1.5 to 1 labelled it a
+            // dotted whole note, which lasts 3/2.
+            expect(rhythm.calcNoteValueToDisplay(8, 7)).toBe(shown(7, 8, HALF + ".."));
+        });
+
+        it("counts the notes of a duration that is not a dotted note", () => {
+            // Neither 5/8 nor 9/16 is a dotted note: 8/5 * 1.5 and 16/9 * 1.5 only
+            // truncate to a half note, whose dotted value is 3/4. The plain fraction
+            // names the note it counts, so 5/8 is five eighth notes.
+            expect(rhythm.calcNoteValueToDisplay(8, 5)).toBe(shown(5, 8, EIGHTH));
+            expect(rhythm.calcNoteValueToDisplay(16, 9)).toBe(shown(9, 16, SIXTEENTH));
+            // A denominator with no note symbol gets none.
+            expect(rhythm.calcNoteValueToDisplay(5, 4)).toBe("4<br>&mdash;<br>5<br><br>");
+        });
+
+        it("reduces a note value that arrives as a float", () => {
+            // The note block and the tie in both widgets divide to get the note
+            // value, so the widgets call this with (float, 1). reducedFraction
+            // cannot reduce a float: its Euclid loop needs whole numbers.
+            expect(rhythm.calcNoteValueToDisplay(1 / 0.625, 1)).toBe(shown(5, 8, EIGHTH));
+            expect(rhythm.calcNoteValueToDisplay(1 / (0.25 + 0.125), 1)).toBe(
+                shown(3, 8, QUARTER + ".")
+            );
+            expect(rhythm.calcNoteValueToDisplay(1 / 0.875, 1)).toBe(shown(7, 8, HALF + ".."));
+        });
+    });
+
     describe("getMeasurePosition", () => {
         const singer = overrides => ({
             pickup: 0,
