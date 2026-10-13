@@ -1622,6 +1622,11 @@ class Painter {
      * @param translucency - translucency from 0 to 100
      */
     doSetTranslucency(translucency) {
+        translucency = Number(translucency);
+        if (!Number.isFinite(translucency)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.doSetPenAlpha(1.0 - (translucency % 101) / 100);
     }
 

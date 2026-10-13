@@ -415,6 +415,16 @@ describe("Pen operations", () => {
         expect(painter.canvasAlpha).toBeCloseTo(alpha);
     });
 
+    test.each([NaN, Infinity, "abc"])(
+        "doSetTranslucency rejects the non-number %s and keeps the alpha",
+        translucency => {
+            painter.doSetTranslucency(50);
+            painter.doSetTranslucency(translucency);
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter.canvasAlpha).toBe(0.5);
+        }
+    );
+
     test("doPenUp should set penDown to false", () => {
         painter.doPenUp();
         expect(painter._penDown).toBe(false);
