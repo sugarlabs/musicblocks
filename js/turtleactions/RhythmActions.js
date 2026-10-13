@@ -102,17 +102,16 @@ function setupRhythmActions(activity) {
                     activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
 
-                // Count the beats actually played, so "every N beats" keeps its rhythm across
-                // a meter change; during the pickup the count is unchanged.
-                const thisBeat =
-                    measureValue === 0
-                        ? beatValue + tur.singer.beatsPerMeasure * (tur.singer.currentMeasure - 1)
-                        : 1 + beatsPlayed;
-                for (let f = 0; f < tur.singer.factorList.length; f++) {
-                    if (thisBeat % tur.singer.factorList[f] === 0) {
-                        const eventName =
-                            "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
-                        activity.stage.dispatchEvent(eventName);
+                // Count the beats actually played since the pickup, so "every N beats" keeps
+                // its rhythm across a meter change. Pickup notes are not counted.
+                if (measureValue !== 0) {
+                    const thisBeat = 1 + beatsPlayed;
+                    for (let f = 0; f < tur.singer.factorList.length; f++) {
+                        if (thisBeat % tur.singer.factorList[f] === 0) {
+                            const eventName =
+                                "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
+                            activity.stage.dispatchEvent(eventName);
+                        }
                     }
                 }
             }

@@ -143,7 +143,8 @@ describe("setupRhythmActions", () => {
         { from: [3, 4], to: [4, 4], pickup: 0, notes: [3, 8], every: 4, fired: [4, 8] },
         { from: [3, 4], to: [4, 4], pickup: 1 / 4, notes: [3, 8], every: 4, fired: [4, 8] },
         { from: [4, 4], to: [6, 8], pickup: 0, notes: [4, 12], every: 6, fired: [6, 12] },
-        { from: [4, 4], to: [6, 8], pickup: 1 / 4, notes: [4, 12], every: 6, fired: [6, 12] }
+        { from: [4, 4], to: [6, 8], pickup: 1 / 4, notes: [4, 12], every: 6, fired: [6, 12] },
+        { from: [4, 4], to: [6, 8], pickup: 1 / 4, notes: [4, 12], every: 4, fired: [4, 8, 12, 16] }
     ])(
         "keeps 'every $every beats' counting the beats played from $from to $to, pickup $pickup",
         ({ from, to, pickup, notes, every, fired }) => {
