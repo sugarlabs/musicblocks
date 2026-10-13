@@ -203,18 +203,20 @@ var convertFactor = factor => {
  * @function
  * @param {Object} singer - A turtle's singer.
  * @param {number} wholeNotes - The moment, in whole notes from the start.
- * @returns {{beat: number, measure: number, timeLeftInMeasure: number}} beat and
- *   measure count from 1 (both 0 during the pickup); timeLeftInMeasure is in whole notes.
+ * @returns {{beat: number, measure: number, timeLeftInMeasure: number, beats: number}} beat
+ *   and measure count from 1 (both 0 during the pickup); timeLeftInMeasure is in whole notes;
+ *   beats is how many beats have been played since the pickup, across meter changes, each
+ *   meter counting in its own beat value (0 during the pickup).
  */
 var getMeasurePosition = (singer, wholeNotes) => {
     if (wholeNotes < singer.pickup) {
-        return { beat: 0, measure: 0, timeLeftInMeasure: singer.pickup - wholeNotes };
+        return { beat: 0, measure: 0, timeLeftInMeasure: singer.pickup - wholeNotes, beats: 0 };
     }
 
     const anchor =
         singer.meterAnchor && singer.meterAnchor.wholeNotes > singer.pickup
             ? singer.meterAnchor
-            : { wholeNotes: singer.pickup, measures: 0 };
+            : { wholeNotes: singer.pickup, measures: 0, beats: 0 };
     let beats = (wholeNotes - anchor.wholeNotes) * singer.noteValuePerBeat;
     // Keep float error in note durations from being read as a sliver of a beat.
     if (Math.abs(beats - Math.round(beats)) < 1e-9) {
@@ -224,17 +226,19 @@ var getMeasurePosition = (singer, wholeNotes) => {
     return {
         beat: 1 + beatInMeasure,
         measure: anchor.measures + 1 + Math.floor(beats / singer.beatsPerMeasure),
-        timeLeftInMeasure: (singer.beatsPerMeasure - beatInMeasure) / singer.noteValuePerBeat
+        timeLeftInMeasure: (singer.beatsPerMeasure - beatInMeasure) / singer.noteValuePerBeat,
+        beats: (anchor.beats ?? 0) + beats
     };
 };
 
 /**
- * The anchor a meter change starts counting from: the moment of the change and
- * the measures before it. A meter change starts a new measure, so a measure it
- * cuts short still counts.
+ * The anchor a meter change starts counting from: the moment of the change, the
+ * measures before it and the beats played before it. A meter change starts a new
+ * measure, so a measure it cuts short still counts.
  * @function
  * @param {Object} singer - A turtle's singer, still in the old meter.
- * @returns {{wholeNotes: number, measures: number}|null} null before the pickup ends.
+ * @returns {{wholeNotes: number, measures: number, beats: number}|null} null before the
+ *   pickup ends.
  */
 var getMeterAnchor = singer => {
     const wholeNotes = singer.notesPlayed[0] / singer.notesPlayed[1];
@@ -242,8 +246,8 @@ var getMeterAnchor = singer => {
         return null;
     }
 
-    const { beat, measure } = getMeasurePosition(singer, wholeNotes);
-    return { wholeNotes, measures: beat > 1 ? measure : measure - 1 };
+    const { beat, measure, beats } = getMeasurePosition(singer, wholeNotes);
+    return { wholeNotes, measures: beat > 1 ? measure : measure - 1, beats };
 };
 
 /**

@@ -18,7 +18,7 @@
  */
 
 const setupRhythmActions = require("../RhythmActions");
-const { getMeasurePosition } = require("../../utils/musicutils-rhythm");
+const { getMeasurePosition, getMeterAnchor } = require("../../utils/musicutils-rhythm");
 
 describe("setupRhythmActions", () => {
     let activity;
@@ -135,6 +135,35 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.currentBeat).toBe(1);
         expect(targetTurtle.singer.currentMeasure).toBe(2);
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_1_0__");
+    });
+
+    it("keeps 'every N beats' counting the beats played across a meter change", () => {
+        // Three quarter notes in 3/4, then eight in 4/4, with an "every 4 beats" event.
+        Object.assign(targetTurtle.singer, {
+            pickup: 0,
+            noteValuePerBeat: 4,
+            beatsPerMeasure: 3,
+            meterAnchor: null,
+            beatList: [],
+            factorList: [4]
+        });
+        const fired = [];
+        for (let n = 0; n < 11; n++) {
+            if (n === 3) {
+                targetTurtle.singer.meterAnchor = getMeterAnchor(targetTurtle.singer);
+                targetTurtle.singer.beatsPerMeasure = 4;
+            }
+            targetTurtle.singer.notesPlayed = [n, 4];
+            targetTurtle.singer.inNoteBlock = [];
+            activity.stage.dispatchEvent.mockClear();
+
+            Singer.RhythmActions.playNote(1 / 4, "note", 0, 1);
+
+            if (activity.stage.dispatchEvent.mock.calls.some(call => call[0] === "__beat_4_0__")) {
+                fired.push(n + 1);
+            }
+        }
+        expect(fired).toEqual([4, 8]);
     });
 
     it("triggers everybeat event when beatList contains 'everybeat'", () => {
