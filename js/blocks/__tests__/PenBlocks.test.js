@@ -64,6 +64,7 @@ describe("setupPenBlocks", () => {
             doSetChroma: jest.fn(),
             doSetPensize: jest.fn(),
             doSetPenAlpha: jest.fn(),
+            doSetTranslucency: jest.fn(),
             doSetFont: jest.fn(),
             doPenUp: jest.fn(),
             doPenDown: jest.fn(),
@@ -257,7 +258,7 @@ describe("setupPenBlocks", () => {
 
     test("settranslucency runtime path", () => {
         activity.blocks.blockList.settranslucency.flow([25], logo, 0, "settranslucency");
-        expect(painter.doSetPenAlpha).toHaveBeenCalledWith(0.75);
+        expect(painter.doSetTranslucency).toHaveBeenCalledWith(25);
     });
 
     test("fillscreen ignores wrong args and works with 3 args", () => {
@@ -301,7 +302,7 @@ describe("setupPenBlocks", () => {
     test("settranslucency handles modulo > 100 branch", () => {
         activity.blocks.blockList.settranslucency.flow([225], logo, 0, "settranslucency");
 
-        expect(painter.doSetPenAlpha).toHaveBeenCalledWith(1 - 23 / 100);
+        expect(painter.doSetTranslucency).toHaveBeenCalledWith(225);
     });
 
     test("shade arg returns value when not connected to print", () => {

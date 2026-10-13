@@ -262,6 +262,32 @@ describe("TrashController.restoreTrashById", () => {
         expect(primaryTurtle.inTrash).toBe(false);
     });
 
+    test("restores a trashed start block whose primary turtle has a null container", () => {
+        const activity = makeActivity();
+        const block = makeBlock({ name: "start" });
+        block.value = "turtle1";
+        activity.blocks.blockList.blk1 = block;
+        activity.blocks.trashStacks = ["blk1"];
+
+        const companionTurtle = { inTrash: true, container: null };
+        const primaryTurtle = {
+            inTrash: true,
+            container: null,
+            companionTurtle: "turtle2"
+        };
+        activity.turtles.getTurtle.mockImplementation(id => {
+            if (id === "turtle1") return primaryTurtle;
+            if (id === "turtle2") return companionTurtle;
+            return undefined;
+        });
+
+        const controller = new TrashController(activity);
+
+        expect(() => controller.restoreTrashById("blk1")).not.toThrow();
+        expect(primaryTurtle.inTrash).toBe(false);
+        expect(companionTurtle.inTrash).toBe(false);
+    });
+
     test("re-registers a trashed action block under a unique name", () => {
         const activity = makeActivity();
         const actionArg = {

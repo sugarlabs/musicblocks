@@ -156,6 +156,8 @@ describe("Activity Event Listener Management", () => {
             require: () => {},
             setTimeout: (...args) => setTimeout(...args),
             clearTimeout: (...args) => clearTimeout(...args),
+            requestAnimationFrame: callback => setTimeout(callback, 16),
+            cancelAnimationFrame: id => clearTimeout(id),
             createjs: {},
 
             // Mock classes instantiated in constructor
@@ -371,11 +373,13 @@ describe("Activity Event Listener Management", () => {
 
         activity._onResize = jest.fn();
         activity.setupPaletteMenu = jest.fn();
+        activity._handleRepositionBlocksOnResize = jest.fn();
 
         activity._handleWindowResize();
 
         jest.advanceTimersByTime(200);
 
+        expect(activity._handleRepositionBlocksOnResize).toHaveBeenCalledTimes(1);
         expect(activity._onResize).toHaveBeenCalledWith(false);
         expect(activity.setupPaletteMenu).toHaveBeenCalledTimes(1);
 

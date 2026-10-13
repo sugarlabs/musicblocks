@@ -19,7 +19,7 @@
  * Private members' names begin with underscore '_".
  */
 
-/* global JSInterface, last */
+/* global JSInterface, last, deepClone */
 
 /* exported ASTUtils */
 
@@ -268,7 +268,7 @@ class ASTUtils {
      * @returns {Object} barebone Abstract Syntax Tree for JavaScript based Music Blocks programs
      */
     static get BAREBONE_AST() {
-        return JSON.parse(JSON.stringify(ASTUtils._bareboneAST));
+        return deepClone(ASTUtils._bareboneAST);
     }
 
     /**
@@ -477,13 +477,26 @@ class ASTUtils {
      * @returns {Object} Abstract Syntax Tree of do-while-loop
      */
     static _getDoWhileLoopAST(args, flow, iteratorNum) {
+        // The `until` block repeats while its condition is FALSE, so it maps to
+        // `do { ... } while (!condition)`. Emit the negated condition, collapsing
+        // an existing `!x` back to `x` to avoid a double negation.
+        const condition = ASTUtils._getArgsAST(args)[0];
+        const test =
+            condition && condition.type === "UnaryExpression" && condition.operator === "!"
+                ? condition.argument
+                : {
+                      type: "UnaryExpression",
+                      operator: "!",
+                      prefix: true,
+                      argument: condition
+                  };
         return {
             type: "DoWhileStatement",
             body: {
                 type: "BlockStatement",
                 body: ASTUtils._getBlockAST(flow, iteratorNum)
             },
-            test: ASTUtils._getArgsAST(args)[0]
+            test
         };
     }
 
@@ -1235,7 +1248,13 @@ class ASTUtils {
                 ASTs.push({
                     type: "SwitchCase",
                     test: null,
-                    consequent: ASTUtils._getBlockAST(flow[2], iterMax)
+                    consequent: [
+                        ...ASTUtils._getBlockAST(flow[2], iterMax),
+                        {
+                            type: "BreakStatement",
+                            label: null
+                        }
+                    ]
                 });
             } else if (flow[0] === "increment") {
                 ASTs.push(ASTUtils._getIncrementStmntAST(flow[1], true));
@@ -1365,7 +1384,7 @@ class ASTUtils {
      * @returns {Object} mouse Abstract Syntax Tree for the tree
      */
     static getMouseAST(tree) {
-        const AST = JSON.parse(JSON.stringify(ASTUtils._mouseAST));
+        const AST = deepClone(ASTUtils._mouseAST);
 
         const ASTs = ASTUtils._getBlockAST(tree);
         for (const i in ASTs) {
