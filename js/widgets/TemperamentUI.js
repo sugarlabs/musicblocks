@@ -239,6 +239,18 @@ const _buildCompareRatios = ratios => {
     return compareRatios;
 };
 
+/**
+ * Returns the wheel pitch count for a ratios array, excluding a trailing
+ * octave entry (last ratio equal to the power base) when present.
+ * @param {number[]} ratios - Array of numeric ratio values.
+ * @param {number} powerBase - Base of the octave ratio space (e.g. 2).
+ * @returns {number} Pitch count excluding the trailing octave.
+ */
+const _pitchCountExcludingOctave = (ratios, powerBase) => {
+    const n = ratios.length;
+    return n > 1 && Math.abs(ratios[n - 1] - powerBase) < 1e-6 ? n - 1 : n;
+};
+
 // ---------------------------------------------------------------------------
 // TemperamentUI plain-object module
 // Each method receives the TemperamentWidget instance as `tw`.
@@ -520,14 +532,12 @@ const TemperamentUI = {
                     tw.tempRatios1 = tw.tempRatios.slice();
                     // tempRatios1 carries a trailing octave entry; the wheel
                     // pitch count excludes it.
-                    const n = tw.tempRatios1.length;
-                    const pn =
-                        n > 1 && Math.abs(tw.tempRatios1[n - 1] - tw.powerBase) < 1e-6 ? n - 1 : n;
+                    const pn = _pitchCountExcludingOctave(tw.tempRatios1, tw.powerBase);
                     TemperamentUI.createOuterWheel(tw, tw.tempRatios1, pn);
                 };
                 docById("close").onclick = function () {
                     tw.tempRatios = tw.tempRatios1.slice();
-                    const pn = tw.tempRatios.length;
+                    const pn = _pitchCountExcludingOctave(tw.tempRatios, tw.powerBase);
                     TemperamentUI.createInnerWheel(tw, tw.tempRatios, pn);
                     docById("noteInfo1").remove();
                 };
@@ -560,7 +570,7 @@ const TemperamentUI = {
                 break;
             }
         }
-        const pitchNumber = tw.tempRatios.length;
+        const pitchNumber = _pitchCountExcludingOctave(tw.tempRatios, tw.powerBase);
         tw._logo.resetSynth(0);
         tw._logo.synth.trigger(
             0,

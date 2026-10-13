@@ -872,11 +872,12 @@ describe("TemperamentUI module", () => {
             document.getElementById("done").onclick();
             expect(mockTW.tempRatios1).toEqual([1, 1.4, 2]);
             expect(spyOuter).toHaveBeenCalled();
-
+            expect(spyOuter.mock.calls[0][2]).toBe(2); // tempRatios1 was [1, 1.4, 2]
             mockTW.tempRatios1 = [1, 1.5, 2];
             document.getElementById("close").onclick();
             expect(mockTW.tempRatios).toEqual([1, 1.5, 2]);
             expect(spyInner).toHaveBeenCalled();
+            expect(spyInner.mock.calls[0][2]).toBe(2);
             expect(document.getElementById("noteInfo1")).toBeNull();
 
             spyRefresh.mockRestore();
@@ -903,6 +904,7 @@ describe("TemperamentUI module", () => {
             expect(mockTW._logo.synth.trigger).toHaveBeenCalled();
             expect(spyInner).toHaveBeenCalled();
             expect(mockTW.tempRatios.length).toBe(4);
+            expect(spyInner.mock.calls[0][2]).toBe(3);
             spyInner.mockRestore();
         });
 
@@ -925,6 +927,7 @@ describe("TemperamentUI module", () => {
             expect(spyInner).toHaveBeenCalled();
             expect(mockTW.tempRatios.length).toBe(3);
             expect(mockTW.tempRatios[1]).toBe(1.5);
+            expect(spyInner.mock.calls[0][2]).toBe(2);
             spyInner.mockRestore();
         });
 
@@ -1044,7 +1047,7 @@ describe("TemperamentUI module", () => {
         });
     });
 
-    describe("Wheel Characterization tests (Master vs Refactor)", () => {
+    describe("Proportional wheel geometry", () => {
         function getWheelSnapshot(wheelInstance, count) {
             return {
                 divId: wheelInstance.divId,
@@ -1059,7 +1062,7 @@ describe("TemperamentUI module", () => {
             };
         }
 
-        test("Case 1: 12 equal pitches matches master values exactly", () => {
+        test("Case 1: 12 equal pitches pins proportional widths", () => {
             const ratios = Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12));
             const tw = { pitchNumber: 12, ratios, powerBase: 2 };
 
@@ -1125,7 +1128,7 @@ describe("TemperamentUI module", () => {
             expect(outerSnap.sliceAngles.slice(0, 11)).toEqual(Array(11).fill(30));
         });
 
-        test("Case 2: 7 pitches matches master values exactly", () => {
+        test("Case 2: 7 pitches pins proportional widths", () => {
             const ratios = [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8];
             const tw = { pitchNumber: 7, ratios, powerBase: 2 };
 
@@ -1171,7 +1174,7 @@ describe("TemperamentUI module", () => {
             ]);
         });
 
-        test("Case 3: Clustered set with gap < 11 deg matches master values exactly", () => {
+        test("Case 3: Clustered set with gap < 11 deg pins proportional widths", () => {
             const ratios = [1.0, 1.15, 1.3, 1.45, 1.6, 1.75, 1.98];
             const tw = { pitchNumber: 7, ratios, powerBase: 2 };
 
@@ -1217,11 +1220,11 @@ describe("TemperamentUI module", () => {
             ]);
         });
 
-        test("Case 4: Supplied pitchNumber different (tw=12, supplied=7) matches master except inner wheel pitchNumber fix", () => {
+        test("Case 4: Supplied pitchNumber different (tw=12, supplied=7) pins proportional widths", () => {
             const ratios = [1.0, 1.15, 1.3, 1.45, 1.6, 1.75, 1.98];
             const tw = { pitchNumber: 12, ratios, powerBase: 2 };
 
-            // 1. createMainWheel matches master exactly
+            // 1. createMainWheel pins proportional widths
             capturedWheelnavInstances = [];
             TemperamentUI.createMainWheel(tw, ratios, 7);
             const mainSnap = getWheelSnapshot(
@@ -1233,7 +1236,7 @@ describe("TemperamentUI module", () => {
                 5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
-            // 2. createOuterWheel matches master exactly
+            // 2. createOuterWheel pins proportional widths
             capturedWheelnavInstances = [];
             TemperamentUI.createOuterWheel(tw, ratios, 7);
             const outerSnap = getWheelSnapshot(

@@ -118,6 +118,7 @@ var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
 
 /** Per-slice wheelnav angles: slice i spans pitch i-1 to i, slice 0 wrapping the last pitch to the octave. Null for unusable input. */
 var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
+    if (!Number.isFinite(octaveRatio) || octaveRatio <= 1) return null;
     if (!Array.isArray(ratios) || ratios.length < 2) {
         return null;
     }

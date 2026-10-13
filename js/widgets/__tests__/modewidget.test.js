@@ -100,9 +100,7 @@ const {
     getNonEDOModeSteps,
     getNonEDOFrequency,
     isEquallyTempered,
-    pitchToFrequency,
-    getTemperamentSliceAngles,
-    enforceMinSliceAngles
+    pitchToFrequency
 } = require("../../utils/musicutils.js");
 const { configureWheel, updateWheelItems } = require("../../utils/piemenu.js");
 global.getSavedCustomModes = getSavedCustomModes;
@@ -119,8 +117,6 @@ global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
 global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
-global.getTemperamentSliceAngles = getTemperamentSliceAngles;
-global.enforceMinSliceAngles = enforceMinSliceAngles;
 global.applySliceAngles = jest.fn(global.applySliceAngles);
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
 global.TuningFormats = require("../../utils/tuningformats");
@@ -704,6 +700,67 @@ describe("ModeWidget", () => {
         modeNameSpy.mockRestore();
     });
 
+    // Shared 41-EDO custom-mode fixture for the tuning-persistence tests.
+    function setup41EDOMode() {
+        MUSICALMODES["m41"] = Array(41).fill(1);
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([
+                { name: "m41", pattern: Array(41).fill(1), edo: 41, temperamentKey: "equal41" }
+            ])
+        );
+        global.TEMPERAMENT.equal41 = { isEDO: true, edo: 41, pitchNumber: 41 };
+        // Fidelity note: global.isEquallyTempered here is the REAL function and the
+        // real temperament dict has no equal41, so without this override the widget
+        // takes the non-equal path and the repro is unfaithful:
+        const savedIsEquallyTempered = global.isEquallyTempered;
+        global.isEquallyTempered = k => k === "equal" || k === "equal41";
+        const savedGetCurrentEDO = global.getCurrentEDO;
+        global.getCurrentEDO = k => (k === "equal41" ? 41 : 12);
+        const savedKeySignatureToMode = global.keySignatureToMode;
+        global.keySignatureToMode = jest.fn().mockReturnValue(["C", "m41"]);
+        return () => {
+            delete MUSICALMODES["m41"];
+            delete global.TEMPERAMENT.equal41;
+            localStorage.removeItem("customModes");
+            delete mockActivity.logo.synth.inTemperament; // shared mock: restore pristine shape
+            global.isEquallyTempered = savedIsEquallyTempered;
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.keySignatureToMode = savedKeySignatureToMode;
+        };
+    }
+
+    function fireEdoChangeByListener(select, value) {
+        select.value = value;
+        const handler = select.addEventListener.mock.calls.find(call => call[0] === "change")[1];
+        handler();
+    }
+
+    test("opens on a saved 41-EDO custom mode and lets the tuning change", () => {
+        const teardown = setup41EDOMode();
+        try {
+            const w2 = new ModeWidget(mockActivity);
+            expect(w2._activeEDO).toBe(41);
+            fireEdoChangeByListener(w2._edoSelect, "equal");
+            expect(w2._activeEDO).toBe(12);
+            expect(w2.logo.synth.inTemperament).toBe("equal");
+        } finally {
+            teardown();
+        }
+    });
+
+    test("41-EDO pie-menu mode pick does not silently yank the tuning back", () => {
+        const teardown = setup41EDOMode();
+        try {
+            const w2 = new ModeWidget(mockActivity);
+            fireEdoChangeByListener(w2._edoSelect, "equal");
+            w2._loadMode("m41", Array(41).fill(1), w2._edoSelect); // exact pie-menu onSelect call
+            expect(w2._activeEDO).toBe(12);
+        } finally {
+            teardown();
+        }
+    });
+
     test("should persist and restore the temperament key with a custom mode", () => {
         const pattern = Array(12).fill(1);
         modeWidget._activeTemperamentKey = "just intonation";
@@ -1178,6 +1235,21 @@ describe("ModeWidget", () => {
             modeWidget._syncNarrowLabels(wheel);
             expect(narrow.navTitle.show).toHaveBeenCalled();
             expect(wide.navTitle.hide).not.toHaveBeenCalled();
+        });
+
+        test("skips items without a navItem instead of throwing", () => {
+            const narrowWheel = {
+                navItems: [
+                    {
+                        title: "10",
+                        sliceAngle: 5,
+                        selected: false,
+                        navTitle: { hide: jest.fn(), show: jest.fn() },
+                        navItem: null
+                    }
+                ]
+            };
+            expect(() => modeWidget._hideNarrowLabels(narrowWheel)).not.toThrow();
         });
     });
 

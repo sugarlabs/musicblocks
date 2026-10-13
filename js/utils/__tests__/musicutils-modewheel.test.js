@@ -114,6 +114,9 @@ describe("musicutils-modewheel", () => {
         it("returns null for unusable input", () => {
             expect(modewheel.sliceAnglesFromRatios([1], 2)).toBeNull();
             expect(modewheel.sliceAnglesFromRatios([1, 1.5, 1.2], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5], 1)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5], 0)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5], NaN)).toBeNull();
         });
     });
 

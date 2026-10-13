@@ -84,6 +84,9 @@ class ModeWidget {
         // that count, and changing the tuning below replaces the temperament.
         this._activeEDO = getCurrentEDO(this.logo.synth.inTemperament);
         this._activeTemperamentKey = this.logo.synth.inTemperament;
+        // Set once the user picks a tuning from the dropdown: later mode
+        // loads must keep that tuning instead of restoring a saved EDO.
+        this._userSetTuning = false;
         this._selectedModeName = "major";
         this._modePiemenuOpen = false;
         this._customModeNames = new Set();
@@ -425,6 +428,9 @@ class ModeWidget {
 
             this.logo.synth.inTemperament = key;
             this._activeTemperamentKey = key;
+            // The user explicitly chose this tuning; later mode loads must
+            // not snap it back to a saved custom mode's temperament.
+            this._userSetTuning = true;
 
             // _translateNotesToEDO() and _restoreState() must run while
             // this._activeEDO still holds the OLD EDO: _translateNotesToEDO
@@ -934,9 +940,13 @@ class ModeWidget {
         const custom = getSavedCustomModes().find(m => m.name === modeName);
         const nativeEDO = custom && custom.edo ? custom.edo : null;
         // A restored temperament already rebuilt the wheel; otherwise rebuild
-        // for a different native EDO.
-        const restored = this._restoreSavedTemperament(custom, modeName, edoSelect);
-        if (!restored && nativeEDO && nativeEDO !== this._activeEDO) {
+        // for a different native EDO. Once the user has explicitly picked a
+        // tuning from the dropdown, mode loads must keep it instead of
+        // snapping back to the saved mode's temperament.
+        const maySwitchTuning = !this._userSetTuning;
+        const restored =
+            maySwitchTuning && this._restoreSavedTemperament(custom, modeName, edoSelect);
+        if (maySwitchTuning && !restored && nativeEDO && nativeEDO !== this._activeEDO) {
             // The saved mode was authored in a different tuning, so sync the
             // tuning dropdown and rebuild the wheel before selecting intervals.
             // Cache the outgoing state exactly like the dropdown handler so
@@ -1770,7 +1780,12 @@ class ModeWidget {
         const fontSize = this._titleFontSize(wheel.navItems.length);
         for (const item of wheel.navItems) {
             const title = typeof item.title === "string" ? item.title.trim() : "";
-            if (!Number.isFinite(item.sliceAngle) || title.length === 0 || !item.navTitle) {
+            if (
+                !Number.isFinite(item.sliceAngle) ||
+                title.length === 0 ||
+                !item.navTitle ||
+                !item.navItem
+            ) {
                 continue;
             }
             const available =
