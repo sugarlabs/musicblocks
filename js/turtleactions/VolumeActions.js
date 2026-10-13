@@ -209,6 +209,10 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setPanning(value, turtle) {
+            if (!Number.isFinite(value)) {
+                return;
+            }
+
             value = clampNumber(value, -100, 100) / 100;
 
             const tur = activity.turtles.ithTurtle(turtle);
