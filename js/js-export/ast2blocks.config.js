@@ -166,6 +166,19 @@ window.ast2blocklist_config = {
             name_map: { abs: "abs", pow: "power", sqrt: "sqrt" }
         },
         {
+            comment: "Math constants such as PI or E",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "MemberExpression" },
+                    { property: "object.type", value: "Identifier" },
+                    { property: "object.name", value: "Math" }
+                ],
+                name_property: "property.name",
+                argument_properties: []
+            },
+            name_map: { PI: "pi", E: "e" }
+        },
+        {
             comment: "Math utility operators such as distance or random",
             ast: {
                 identifiers: [
@@ -305,7 +318,8 @@ window.ast2blocklist_config = {
                     { property: "declarations[0].init.type", value: "BinaryExpression" },
                     { property: "declarations[0].init.type", value: "UnaryExpression" },
                     { property: "declarations[0].init.type", value: "CallExpression" },
-                    { property: "declarations[0].init.type", value: "AwaitExpression" }
+                    { property: "declarations[0].init.type", value: "AwaitExpression" },
+                    { property: "declarations[0].init.type", value: "MemberExpression" }
                 ],
                 name_property: "declarations[0].id.name",
                 argument_properties: ["declarations[0].init"]

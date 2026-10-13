@@ -524,6 +524,26 @@ class MathUtility {
         }
         return Math.log10(Number(a));
     }
+
+    /**
+     * Returns the mathematical constant π.
+     *
+     * @static
+     * @returns {number} - Mathematical constant π.
+     */
+    static doPi() {
+        return Math.PI;
+    }
+
+    /**
+     * Returns Euler's number e.
+     *
+     * @static
+     * @returns {number} - Euler's number e.
+     */
+    static doE() {
+        return Math.E;
+    }
 }
 // Ensure mathutils.js exports the MathUtility class
 if (typeof module !== "undefined" && module.exports) {

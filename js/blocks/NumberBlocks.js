@@ -1337,6 +1337,94 @@ function setupNumberBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that returns the mathematical constant π.
+     * @class
+     * @extends ValueBlock
+     */
+    class PiBlock extends ValueBlock {
+        /**
+         * Constructs a PiBlock instance.
+         */
+        constructor() {
+            super("pi", "π");
+            this.setPalette("number", activity);
+            this.parameter = true;
+            this.extraSearchTerms = ["pi", "constant", "trigonometry"];
+            this.setHelpString([
+                _("The Pi block returns the mathematical constant π (approx. 3.14159)."),
+                "documentation",
+                ""
+            ]);
+        }
+
+        /**
+         * Updates parameter label for display.
+         *
+         * @returns {string} - Formatted parameter string.
+         */
+        updateParameter() {
+            return toFixed2(MathUtility.doPi());
+        }
+
+        /**
+         * Returns the mathematical constant π.
+         *
+         * @param {Object} logo - Logo execution engine.
+         * @param {number} turtle - Turtle ID.
+         * @param {number} blk - Block ID.
+         * @returns {number} Math.PI
+         */
+        arg(logo, turtle, blk) {
+            if (isInStatusMatrix(logo, blk, "pi")) return 0;
+            return MathUtility.doPi();
+        }
+    }
+
+    /**
+     * Represents a block that returns Euler's number e.
+     * @class
+     * @extends ValueBlock
+     */
+    class EBlock extends ValueBlock {
+        /**
+         * Constructs an EBlock instance.
+         */
+        constructor() {
+            super("e", "e");
+            this.setPalette("number", activity);
+            this.parameter = true;
+            this.extraSearchTerms = ["e", "euler", "constant", "logarithm"];
+            this.setHelpString([
+                _("The E block returns Euler's number e (approx. 2.71828)."),
+                "documentation",
+                ""
+            ]);
+        }
+
+        /**
+         * Updates parameter label for display.
+         *
+         * @returns {string} - Formatted parameter string.
+         */
+        updateParameter() {
+            return toFixed2(MathUtility.doE());
+        }
+
+        /**
+         * Returns Euler's number e.
+         *
+         * @param {Object} logo - Logo execution engine.
+         * @param {number} turtle - Turtle ID.
+         * @param {number} blk - Block ID.
+         * @returns {number} Math.E
+         */
+        arg(logo, turtle, blk) {
+            if (isInStatusMatrix(logo, blk, "e")) return 0;
+            return MathUtility.doE();
+        }
+    }
+
     new DistanceBlock().setup(activity);
     new ClampBlock().setup(activity);
     new IntBlock().setup(activity);
@@ -1352,6 +1440,8 @@ function setupNumberBlocks(activity) {
     new ArcTanBlock().setup(activity);
     new LnBlock().setup(activity);
     new LogBlock().setup(activity);
+    new PiBlock().setup(activity);
+    new EBlock().setup(activity);
     new DivideBlock().setup(activity);
     new MultiplyBlock().setup(activity);
     new NegBlock().setup(activity);

@@ -831,6 +831,36 @@ class ASTUtils {
             return ASTUtils._getMouseCallExpression("getBox", [nameAst]);
         }
 
+        if (methodName === "pi") {
+            return {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "Math"
+                },
+                property: {
+                    type: "Identifier",
+                    name: "PI"
+                },
+                computed: false
+            };
+        }
+
+        if (methodName === "e") {
+            return {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "Math"
+                },
+                property: {
+                    type: "Identifier",
+                    name: "E"
+                },
+                computed: false
+            };
+        }
+
         const mathOps = {
             plus: ["binexp", "+"],
             minus: ["binexp", "-"],

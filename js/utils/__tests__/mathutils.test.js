@@ -983,6 +983,18 @@ describe("MathUtility", () => {
         });
     });
 
+    describe("doPi", () => {
+        test("returns Math.PI", () => {
+            expect(MathUtility.doPi()).toBe(Math.PI);
+        });
+    });
+
+    describe("doE", () => {
+        test("returns Math.E", () => {
+            expect(MathUtility.doE()).toBe(Math.E);
+        });
+    });
+
     describe("NaN is rejected the same way everywhere", () => {
         // doInt is the reachable source: it is documented to hand back NaN for a
         // non-numeric argument, and typeof NaN === "number", so any guard written

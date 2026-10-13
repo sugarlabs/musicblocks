@@ -2665,4 +2665,24 @@ describe("AST2BlockList Class", () => {
             ["text", { value: "piano" }]
         ]);
     });
+
+    test("should import Math.PI and Math.E into pi and e blocks", () => {
+        const code = `
+        new Mouse(async mouse => {
+            var box1 = Math.PI;
+            var box2 = Math.E;
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList.map(block => block[1])).toEqual([
+            "start",
+            ["storein2", { value: "box1" }],
+            "pi",
+            ["storein2", { value: "box2" }],
+            "e"
+        ]);
+    });
 });

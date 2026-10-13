@@ -170,7 +170,9 @@ global.MathUtility = {
     doArcCos: a => (Math.acos(Number(a)) * 180) / Math.PI,
     doArcTan: a => (Math.atan(Number(a)) * 180) / Math.PI,
     doLn: a => Math.log(Number(a)),
-    doLog: a => Math.log10(Number(a))
+    doLog: a => Math.log10(Number(a)),
+    doPi: () => Math.PI,
+    doE: () => Math.E
 };
 
 global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
@@ -1359,6 +1361,52 @@ describe("setupNumberBlocks", () => {
                     expect(logo.statusFields).toContainEqual([210, name]);
                     logo.inStatusMatrix = false;
                 });
+            });
+        });
+
+        describe("Pi and E blocks execution", () => {
+            it("PiBlock should return Math.PI", () => {
+                activity.blocks.blockList[220] = { name: "pi", connections: [null] };
+                const block = createdBlocks["pi"];
+                expect(block.arg(logo, 0, 220)).toBe(Math.PI);
+            });
+
+            it("PiBlock updateParameter should return toFixed2", () => {
+                const block = createdBlocks["pi"];
+                expect(block.updateParameter()).toEqual(toFixed2(Math.PI));
+            });
+
+            it("PiBlock should return 0 and push to statusFields in status matrix context", () => {
+                activity.blocks.blockList[220] = { name: "pi", connections: [10] };
+                activity.blocks.blockList[10] = { name: "print", connections: [null] };
+                logo.inStatusMatrix = true;
+                logo.statusFields = [];
+                const block = createdBlocks["pi"];
+                expect(block.arg(logo, 0, 220)).toBe(0);
+                expect(logo.statusFields).toContainEqual([220, "pi"]);
+                logo.inStatusMatrix = false;
+            });
+
+            it("EBlock should return Math.E", () => {
+                activity.blocks.blockList[221] = { name: "e", connections: [null] };
+                const block = createdBlocks["e"];
+                expect(block.arg(logo, 0, 221)).toBe(Math.E);
+            });
+
+            it("EBlock updateParameter should return toFixed2", () => {
+                const block = createdBlocks["e"];
+                expect(block.updateParameter()).toEqual(toFixed2(Math.E));
+            });
+
+            it("EBlock should return 0 and push to statusFields in status matrix context", () => {
+                activity.blocks.blockList[221] = { name: "e", connections: [10] };
+                activity.blocks.blockList[10] = { name: "print", connections: [null] };
+                logo.inStatusMatrix = true;
+                logo.statusFields = [];
+                const block = createdBlocks["e"];
+                expect(block.arg(logo, 0, 221)).toBe(0);
+                expect(logo.statusFields).toContainEqual([221, "e"]);
+                logo.inStatusMatrix = false;
             });
         });
     });
