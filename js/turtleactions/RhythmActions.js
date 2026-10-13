@@ -66,7 +66,11 @@ function setupRhythmActions(activity) {
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
-                const { beat: beatValue, measure: measureValue } = getMeasurePosition(
+                const {
+                    beat: beatValue,
+                    measure: measureValue,
+                    beats: beatsPlayed
+                } = getMeasurePosition(
                     tur.singer,
                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
                 );
@@ -98,13 +102,16 @@ function setupRhythmActions(activity) {
                     activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
 
-                const thisBeat =
-                    beatValue + tur.singer.beatsPerMeasure * (tur.singer.currentMeasure - 1);
-                for (let f = 0; f < tur.singer.factorList.length; f++) {
-                    if (thisBeat % tur.singer.factorList[f] === 0) {
-                        const eventName =
-                            "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
-                        activity.stage.dispatchEvent(eventName);
+                // Count the beats actually played since the pickup, so "every N beats" keeps
+                // its rhythm across a meter change. Pickup notes are not counted.
+                if (measureValue !== 0) {
+                    const thisBeat = 1 + beatsPlayed;
+                    for (let f = 0; f < tur.singer.factorList.length; f++) {
+                        if (thisBeat % tur.singer.factorList[f] === 0) {
+                            const eventName =
+                                "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
+                            activity.stage.dispatchEvent(eventName);
+                        }
                     }
                 }
             }
