@@ -952,8 +952,8 @@ function setupExtrasBlocks(activity) {
 
     new SaveABCBlock().setup(activity);
     new SaveLilypondBlock().setup(activity);
-    new SaveSVGBlock().setup(activity);
     new SaveMxmlBlock().setup(activity);
+    new SaveSVGBlock().setup(activity);
     new NoBackgroundBlock().setup(activity);
     new ShowBlocksBlock().setup(activity);
     new HideBlocksBlock().setup(activity);
