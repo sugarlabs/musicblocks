@@ -1927,7 +1927,7 @@ function TemperamentWidget() {
                 octaveRatio: this.powerBase
             };
             for (let i = 0; i < this.pitchNumber; i++) {
-                if (!Number.isFinite(parsedNotes[i][1])) {
+                if (!parsedNotes[i] || !Number.isFinite(parsedNotes[i][1])) {
                     this.activity.errorMsg(
                         _(`Cannot save temperament: pitch ${i + 1} has no valid octave.`),
                         3000

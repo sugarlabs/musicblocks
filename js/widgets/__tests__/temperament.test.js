@@ -614,6 +614,50 @@ describe("TemperamentWidget basic tests", () => {
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
     });
 
+    test("_save shows an error instead of throwing when pitch data is sparse", () => {
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+        global.Singer.clearPitchToFrequencyCache = jest.fn();
+
+        widget.inTemperament = "custom1";
+        widget.ratios = [1, 1.059463, 1.122462];
+        widget.frequencies = ["261.63", "277.18", "293.66"];
+        widget.cents = [0, 100, 200];
+        widget.pitchNumber = 5;
+        widget.powerBase = 2;
+
+        widget._logo = {
+            synth: {
+                stop: jest.fn(),
+                startingPitch: "C4"
+            },
+            customTemperamentDefined: false
+        };
+
+        widget.activity = {
+            errorMsg: jest.fn(),
+            textMsg: jest.fn(),
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        expect(() => widget._save()).not.toThrow();
+        expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("pitch 4 has no valid octave"),
+            3000
+        );
+        expect(global.addTemperamentToDictionary).not.toHaveBeenCalled();
+    });
+
     test("_save skips the dictionary write when the rename flips the custom check", () => {
         // Predefined at build time (no replacement entry is constructed),
         // but the rename collides so the final name classifies as custom:
