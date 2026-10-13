@@ -882,6 +882,13 @@ describe("MathUtility", () => {
             expect(MathUtility.doTan(-45)).toBeCloseTo(-1);
         });
 
+        test("throws NanError for angles equivalent to 90 degrees modulo 180", () => {
+            expect(() => MathUtility.doTan(90)).toThrow("NanError");
+            expect(() => MathUtility.doTan(270)).toThrow("NanError");
+            expect(() => MathUtility.doTan(-90)).toThrow("NanError");
+            expect(() => MathUtility.doTan(450)).toThrow("NanError");
+        });
+
         test("throws NanError for non-numeric input", () => {
             expect(() => MathUtility.doTan("abc")).toThrow("NanError");
             expect(() => MathUtility.doTan(null)).toThrow("NanError");

@@ -146,7 +146,6 @@ class StatusMatrix {
                 case "sqrt":
                 case "int":
                 case "mod":
-                case "abs":
                 case "sin":
                 case "cos":
                 case "tan":

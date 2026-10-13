@@ -441,10 +441,10 @@ class MathUtility {
      * @static
      * @param {number} a - Angle in degrees.
      * @returns {number} - Tangent of a.
-     * @throws {string} NanError if the argument is not a valid number.
+     * @throws {string} NanError if the argument is not a valid number or angle is equivalent to 90 degrees modulo 180.
      */
     static doTan(a) {
-        if (!MathUtility._isNumber(a)) {
+        if (!MathUtility._isNumber(a) || (Number(a) - 90) % 180 === 0) {
             throw new Error("NanError");
         }
         return Math.tan((Number(a) * Math.PI) / 180);
