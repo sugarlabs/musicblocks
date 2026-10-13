@@ -716,6 +716,7 @@ a {
 
 /* Open toward the LEFT */
 .project-search-preview:hover,
+.project-search-preview:focus-within,
 .project-search-preview:has(input:not(:placeholder-shown)) {
     width: 230px;
 }
@@ -747,6 +748,7 @@ a {
 }
 
 .project-search-preview:hover input,
+.project-search-preview:focus-within input,
 .project-search-preview:has(input:not(:placeholder-shown)) input {
     width: 165px !important;
     opacity: 1;
