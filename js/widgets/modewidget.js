@@ -1775,8 +1775,8 @@ class ModeWidget {
         if (!Array.isArray(wheel.navItems)) {
             return;
         }
-        const midRadiusPercent =
-            (ModeWidget.MIN_RADIUS_PERCENT + ModeWidget.MAX_RADIUS_PERCENT) / 2;
+        // Same 0.575 arc factor as getModeSliceFont: midpoint of the 0.4-0.75 ring.
+        const midRadiusPercent = 0.575;
         const fontSize = this._titleFontSize(wheel.navItems.length);
         for (const item of wheel.navItems) {
             const title = typeof item.title === "string" ? item.title.trim() : "";

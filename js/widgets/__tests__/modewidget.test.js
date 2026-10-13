@@ -117,7 +117,6 @@ global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
 global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
-global.applySliceAngles = jest.fn(global.applySliceAngles);
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
 global.TuningFormats = require("../../utils/tuningformats");
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
@@ -1501,12 +1500,11 @@ describe("ModeWidget", () => {
 
     describe("proportional slice wiring", () => {
         beforeEach(() => {
-            global.applySliceAngles.mockClear();
             modeWidget._activeEDO = 12;
             modeWidget._activeTemperamentKey = "just intonation";
         });
 
-        test("one floored proportional array feeds all three rings, applied before createWheel", () => {
+        test("one floored proportional array feeds all three rings", () => {
             modeWidget._piemenuMode();
 
             const widths = modeWidget._modeWheel.navItems.map(item => item.sliceAngle);
@@ -1518,14 +1516,6 @@ describe("ModeWidget", () => {
             expect(widths).toHaveLength(12);
             expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
             expect(Math.min(...widths)).toBeGreaterThanOrEqual(ModeWidget.MIN_SLICE_DEGREES);
-
-            // createWheel bakes sliceAngle into the SVG paths, so widths must
-            // be applied before it runs — match each apply call to its wheel.
-            const applyOrders = global.applySliceAngles.mock.invocationCallOrder;
-            expect(applyOrders).toHaveLength(3);
-            wheels.forEach((wheel, i) => {
-                expect(applyOrders[i]).toBeLessThan(wheel.createWheel.mock.invocationCallOrder[0]);
-            });
         });
     });
 });

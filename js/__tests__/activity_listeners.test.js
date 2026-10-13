@@ -156,6 +156,8 @@ describe("Activity Event Listener Management", () => {
             require: () => {},
             setTimeout: (...args) => setTimeout(...args),
             clearTimeout: (...args) => clearTimeout(...args),
+            requestAnimationFrame: (...args) => global.requestAnimationFrame(...args),
+            cancelAnimationFrame: (...args) => clearTimeout(...args),
             createjs: {},
 
             // Mock classes instantiated in constructor
@@ -371,6 +373,7 @@ describe("Activity Event Listener Management", () => {
 
         activity._onResize = jest.fn();
         activity.setupPaletteMenu = jest.fn();
+        activity._handleRepositionBlocksOnResize = jest.fn();
 
         activity._handleWindowResize();
 

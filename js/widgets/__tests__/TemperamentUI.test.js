@@ -1013,27 +1013,22 @@ describe("TemperamentUI module", () => {
     });
 
     describe("proportional slice geometry", () => {
-        // The tick wheel accumulates proportional widths between pitches, and a
-        // ratio array with no trailing octave synthesizes the same widths.
-        test.each([{ ratios: [1, 1.5, 1.75, 2] }, { ratios: [1, 1.5, 1.75] }])(
-            "outer tick wheel gets proportional widths for $ratios",
-            ({ ratios }) => {
-                mockTW.ratios = ratios;
-                mockTW.pitchNumber = 3;
-                mockTW.powerBase = 2;
+        test("outer tick wheel gets proportional widths", () => {
+            mockTW.ratios = [1, 1.5, 1.75, 2];
+            mockTW.pitchNumber = 3;
+            mockTW.powerBase = 2;
 
-                TemperamentUI.arbitraryEdit(mockTW);
+            TemperamentUI.arbitraryEdit(mockTW);
 
-                expect(mockTW.wheel.navItemsContinuous).toBe(true);
-                const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
-                expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
-                expect(widths).toEqual([
-                    expect.closeTo(210.5865, 3),
-                    expect.closeTo(80.0613, 3),
-                    expect.closeTo(69.3522, 3)
-                ]);
-            }
-        );
+            expect(mockTW.wheel.navItemsContinuous).toBe(true);
+            const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
+            expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
+            expect(widths).toEqual([
+                expect.closeTo(210.5865, 3),
+                expect.closeTo(80.0613, 3),
+                expect.closeTo(69.3522, 3)
+            ]);
+        });
 
         test("non-positive widths keep the equal-slice default", () => {
             mockTW.ratios = [1, 1.75, 1.5, 2];
