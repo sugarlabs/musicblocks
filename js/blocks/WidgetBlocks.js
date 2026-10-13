@@ -400,19 +400,20 @@ function setupWidgetBlocks(activity) {
             logo.synth.temperamentChanged(args[0], logo.synth.startingPitch);
             const scale = [];
 
-            if (
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]].name ===
-                "pitch"
-            ) {
-                const pitchBlock =
-                    activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
-                const note = activity.blocks.blockList[pitchBlock.connections[1]].value;
-                const octave = activity.blocks.blockList[pitchBlock.connections[2]].value;
+            const pitchBlock =
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
+            if (pitchBlock && pitchBlock.name === "pitch") {
+                const noteBlock = activity.blocks.blockList[pitchBlock.connections[1]];
+                const octaveBlock = activity.blocks.blockList[pitchBlock.connections[2]];
                 const setKey = activity.blocks.blockList[pitchBlock.connections[3]];
-                scale[0] = activity.blocks.blockList[setKey.connections[1]].value;
-                scale[1] = activity.blocks.blockList[setKey.connections[2]].value;
-                logo.synth.startingPitch = note + octave;
-                logo.temperament.scale = scale;
+                const keyNameBlock = setKey && activity.blocks.blockList[setKey.connections[1]];
+                const keyModeBlock = setKey && activity.blocks.blockList[setKey.connections[2]];
+                if (noteBlock && octaveBlock && keyNameBlock && keyModeBlock) {
+                    scale[0] = keyNameBlock.value;
+                    scale[1] = keyModeBlock.value;
+                    logo.synth.startingPitch = noteBlock.value + octaveBlock.value;
+                    logo.temperament.scale = scale;
+                }
             }
 
             const listenerName = "_temperament_" + turtle;
