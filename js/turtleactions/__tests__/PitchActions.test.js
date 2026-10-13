@@ -352,9 +352,9 @@ describe("Tests for Singer.PitchActions setup", () => {
             }).not.toThrow();
         });
 
-        // Ground-truth values below were obtained by running the real
-        // Singer.PitchActions.playNthModalPitch (via the real musicUtils.keySignatureToMode,
-        // not the per-test override used above) against these inputs, not derived by hand.
+        // These use the real musicUtils.keySignatureToMode, not the per-test override used
+        // above. Octave numbers change at C, as in the examples at the top of
+        // playNthModalPitch: (-1, 4) --> ti 3, (7, 4) --> do 5.
         test("C major: exact scale-degree and octave-crossing boundaries", () => {
             global.keySignatureToMode = musicUtils.keySignatureToMode;
             turtle.singer.keySignature = "C major";
@@ -362,7 +362,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             const cases = [
                 { number: 0, expected: ["C", 4] }, // identity: deltaOctave=0, deltaSemi=0
                 { number: 7, expected: ["C", 5] }, // one full octave up (modeLength=7)
-                { number: -1, expected: ["B", 4] }, // isNegativeArg branch, no octave change
+                { number: -1, expected: ["B", 3] }, // isNegativeArg branch, one step below C4
                 { number: -7, expected: ["C", 3] } // one full octave down
             ];
             for (const { number, expected } of cases) {
@@ -373,15 +373,34 @@ describe("Tests for Singer.PitchActions setup", () => {
             spy.mockRestore();
         });
 
-        test("G major: deltaSemi crosses the reference boundary on the very first upward step", () => {
-            // In G major the key note (ref) sits at semitone 7; stepping to scale degree 1
-            // (A) already crosses that boundary, so the octave increments on the very first
-            // step — a non-obvious case that exercises the semitones/ref comparison directly.
+        test("G major: the octave goes up at C, not at the first step above the key note", () => {
             global.keySignatureToMode = musicUtils.keySignatureToMode;
             turtle.singer.keySignature = "G major";
             const spy = jest.spyOn(Singer, "processPitch");
             Singer.PitchActions.playNthModalPitch(1, 4, 0, blkId);
-            expect([spy.mock.calls[0][1], spy.mock.calls[0][2]]).toEqual(["A", 5]);
+            expect([spy.mock.calls[0][1], spy.mock.calls[0][2]]).toEqual(["A", 4]);
+            spy.mockRestore();
+        });
+
+        test.each([
+            ["C major", [0, 1, 2, 3, 4, 5, 6, 7], "C4 D4 E4 F4 G4 A4 B4 C5"],
+            ["C major", [0, -1, -2, -3, -4, -5, -6, -7], "C4 B3 A3 G3 F3 E3 D3 C3"],
+            ["G major", [0, 1, 2, 3, 4, 5, 6, 7], "G4 A4 B4 C5 D5 E5 F#5 G5"],
+            ["D major", [0, 1, 2, 3, 4, 5, 6, 7], "D4 E4 F#4 G4 A4 B4 C#5 D5"],
+            ["F major", [0, 1, 2, 3, 4, 5, 6, 7], "F4 G4 A4 Bb4 C5 D5 E5 F5"],
+            ["A minor", [0, 1, 2, 3, 4, 5, 6, 7], "A4 B4 C5 D5 E5 F5 G5 A5"],
+            ["A minor", [0, -1, -2, -7], "A4 G4 F4 A3"]
+        ])("%s scale in octave 4, degrees %j, plays %s", (keySignature, degrees, expected) => {
+            global.keySignatureToMode = musicUtils.keySignatureToMode;
+            turtle.singer.keySignature = keySignature;
+            const spy = jest.spyOn(Singer, "processPitch");
+            const played = degrees.map(number => {
+                spy.mockClear();
+                Singer.PitchActions.playNthModalPitch(number, 4, 0, blkId);
+                const [, note, octave] = spy.mock.calls[0];
+                return note.replace(SHARP, "#").replace(FLAT, "b") + octave;
+            });
+            expect(played.join(" ")).toBe(expected);
             spy.mockRestore();
         });
     });
