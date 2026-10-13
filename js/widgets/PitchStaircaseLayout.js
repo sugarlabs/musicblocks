@@ -123,13 +123,14 @@ class PitchStaircaseLayout {
      * @returns {{num: number, den: number}|null}
      */
     _findFraction(val, maxDen = 8) {
-        if (!Number.isFinite(val) || val <= 0) {
+        if (typeof val !== "number" || !Number.isFinite(val) || val <= 0) {
             return null;
         }
         for (let d = 1; d <= maxDen; d++) {
             const num = Math.round(val * d);
-            if (Math.abs(val - num / d) < 0.015) {
-                return { num, den: d };
+            if (Math.abs(val - num / d) < 0.02) {
+                const g = this._gcd(num, d);
+                return { num: num / g, den: d / g };
             }
         }
         return null;
@@ -143,8 +144,8 @@ class PitchStaircaseLayout {
      * @returns {number}
      */
     _gcd(a, b) {
-        let x = Math.round(Math.abs(a));
-        let y = Math.round(Math.abs(b));
+        let x = Math.round(Math.abs(Number(a) || 0));
+        let y = Math.round(Math.abs(Number(b) || 0));
         while (y) {
             const t = y;
             y = x % y;
@@ -161,8 +162,8 @@ class PitchStaircaseLayout {
      * @returns {number}
      */
     _lcm(a, b) {
-        const x = Math.round(Math.abs(a));
-        const y = Math.round(Math.abs(b));
+        const x = Math.round(Math.abs(Number(a) || 0));
+        const y = Math.round(Math.abs(Number(b) || 0));
         if (x === 0 || y === 0) {
             return 0;
         }
@@ -174,7 +175,7 @@ class PitchStaircaseLayout {
      * baseline frequency in the staircase.
      * @private
      * @param {number} frequency - Frequency in Hz.
-     * @returns {number} Number of cycles (clamped to 1 - 16).
+     * @returns {number} Number of cycles (clamped to 0.1 - 16).
      */
     _calculateCycles(frequency) {
         const safeFreq =
@@ -183,24 +184,68 @@ class PitchStaircaseLayout {
                 : PitchStaircase.DEFAULTFREQUENCY;
 
         const validFreqs = (this.Stairs || [])
-            .map(stair => stair[2])
+            .map(stair => stair && stair[2])
             .filter(f => typeof f === "number" && Number.isFinite(f) && f > 0);
 
-        const minFreq = validFreqs.length > 0 ? Math.min(...validFreqs) : safeFreq;
-        const maxFreq = validFreqs.length > 0 ? Math.max(...validFreqs) : safeFreq;
+        if (validFreqs.length <= 1) {
+            this._ratioExceedsLimit = false;
+            return 2;
+        }
 
-        let baseCycles = 2; // Default baseline cycles per maintainer feedback
-        // If there are two stairs with a small ratio (e.g. 4:3), set baseCycles = denominator
-        // as long as the max cycles stays <= 6.
-        if (validFreqs.length === 2) {
-            const ratio = maxFreq / minFreq;
-            const frac = this._findFraction(ratio, 4);
-            if (frac && frac.den >= 2 && frac.num <= 6) {
-                baseCycles = frac.den;
+        const minFreq = Math.min(...validFreqs);
+        const maxFreq = Math.max(...validFreqs);
+        const maxRatio = maxFreq / minFreq;
+
+        // When the frequency ratio exceeds 16, a 16-cycle cap cannot represent the full
+        // ratio with integer cycles without distorting relative repeats. We flag this
+        // condition and scale uniformly so relative frequency ratios are preserved.
+        if (maxRatio > 16) {
+            this._ratioExceedsLimit = true;
+            const scale = 16 / maxRatio;
+            const rawCycles = (safeFreq / minFreq) * scale;
+            return clampNumber(rawCycles, 0.1, 16);
+        }
+
+        this._ratioExceedsLimit = false;
+
+        let commonDen = 1;
+        let allRational = true;
+
+        for (const f of validFreqs) {
+            const ratio = f / minFreq;
+            const frac = this._findFraction(ratio, 8);
+            if (frac) {
+                commonDen = this._lcm(commonDen, frac.den);
+            } else {
+                allRational = false;
+                break;
             }
         }
 
-        const rawCycles = baseCycles * (safeFreq / minFreq);
+        let baseCycles = 2; // Default baseline cycles per maintainer feedback
+        if (allRational && commonDen >= 1) {
+            if (commonDen * maxRatio <= 16) {
+                baseCycles = commonDen;
+                // If common denominator is 1 (e.g. unison or octaves) and doubling fits,
+                // prefer 2 cycles for better visual clarity.
+                if (baseCycles === 1 && 2 * maxRatio <= 16) {
+                    baseCycles = 2;
+                }
+            } else {
+                // If commonDen * maxRatio exceeds 16, scale baseline down so the full ratio
+                // fits within 16 cycles without per-row clamping distortion.
+                baseCycles = 2 * maxRatio <= 16 ? 2 : 1;
+            }
+        } else {
+            // Fallback for irrational frequency ratios
+            baseCycles = 2 * maxRatio <= 16 ? 2 : 1;
+        }
+
+        let rawCycles = baseCycles * (safeFreq / minFreq);
+        if (Math.abs(rawCycles - Math.round(rawCycles)) < 0.01) {
+            rawCycles = Math.round(rawCycles);
+        }
+
         return clampNumber(rawCycles, 1, 16);
     }
 
@@ -334,6 +379,9 @@ class PitchStaircaseLayout {
             stepCell.classList.add("pitch-staircase-step");
 
             const cycles = this._calculateCycles(safeFreq);
+            if (this._ratioExceedsLimit) {
+                stepCell.title = _("Frequency ratio exceeds displayable range");
+            }
             const svgString = this._generateWaveSVG(cellWidth, PitchStaircase.BUTTONSIZE, cycles);
 
             let encodedSvg = "";
