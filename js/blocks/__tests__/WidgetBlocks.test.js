@@ -576,6 +576,20 @@ describe("setupWidgetBlocks", () => {
             expect(global.ChordBuilderWidget).not.toHaveBeenCalled();
             expect(logo.insideChordBuilder).toBe(false);
         });
+
+        it("clears loading placeholder and resets insideChordBuilder if widget construction fails", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            global.ChordBuilderWidget.mockImplementationOnce(() => {
+                throw new Error("Load failed");
+            });
+
+            listener();
+            expect(logo.chordBuilderWidget).toBeNull();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
     });
 
     describe("OscilloscopeWidgetBlock", () => {

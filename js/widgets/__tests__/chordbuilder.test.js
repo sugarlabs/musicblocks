@@ -102,6 +102,26 @@ describe("ChordBuilderWidget", () => {
             expect(customWidget.diatonicChords[0].name).toBe("Gm");
         });
 
+        it("falls back to major and notifies user when turtle mode is not a supported diatonic mode", () => {
+            const turtleActivity = {
+                ...mockActivity,
+                turtles: {
+                    ithTurtle: jest.fn().mockReturnValue({
+                        singer: { keySignature: "C pentatonic" }
+                    })
+                }
+            };
+            const customWidget = new ChordBuilderWidget(turtleActivity, {
+                ChordBuilderAudio: jest.fn().mockImplementation(() => mockAudio)
+            });
+            expect(customWidget.rootKey).toBe("C");
+            expect(customWidget.mode).toBe("major");
+            expect(turtleActivity.textMsg).toHaveBeenCalledWith(
+                "Mode not supported by chord progression widget. Defaulting to major.",
+                3000
+            );
+        });
+
         it("opens widget window with chord progression title", () => {
             expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
                 widget,
@@ -217,6 +237,16 @@ describe("ChordBuilderWidget", () => {
             expect(widget.rootKey).toBe("G");
             expect(widget.diatonicChords[0].name).toBe("G");
             expect(widget.diatonicChords[4].name).toBe("D"); // V of G is D
+        });
+
+        it("rejects non-diatonic mode in setKeyAndMode and defaults to major", () => {
+            widget.setKeyAndMode("D", "blues");
+            expect(widget.rootKey).toBe("D");
+            expect(widget.mode).toBe("major");
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Mode not supported by chord progression widget. Defaulting to major.",
+                3000
+            );
         });
     });
 
@@ -454,6 +484,36 @@ describe("ChordBuilderWidget", () => {
             expect(chips[1].textContent).toContain("m.2");
             expect(chips[2].textContent).toContain("m.3");
             expect(chips[3].textContent).toContain("m.4");
+        });
+
+        it("allows keyboard activation on chord card via Enter and Space", () => {
+            const card = body.querySelector(".diatonic-chord-card");
+            expect(card).not.toBeNull();
+
+            const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+            Object.defineProperty(enterEvent, "target", { value: card });
+            card.dispatchEvent(enterEvent);
+
+            expect(mockAudio.playChord).toHaveBeenCalledWith(widget.diatonicChords[0], 0.4, {
+                octave: 4
+            });
+        });
+
+        it("does not hijack keyboard events when child element inside card is focused", () => {
+            const card = body.querySelector(".diatonic-chord-card");
+            const addBtn = body.querySelector(".chord-card-add-btn");
+            mockAudio.playChord.mockClear();
+
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            Object.defineProperty(enterEvent, "target", { value: addBtn });
+            card.dispatchEvent(enterEvent);
+
+            expect(enterEvent.defaultPrevented).toBe(false);
+            expect(mockAudio.playChord).not.toHaveBeenCalled();
         });
     });
 });

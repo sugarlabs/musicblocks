@@ -342,8 +342,15 @@ class ChordBuilderWidget {
             const parts = turtleObj.singer.keySignature.trim().split(/\s+/);
             if (parts[0]) {
                 const k = parts[0];
-                const m = parts.slice(1).join(" ").toLowerCase() || "major";
-                return { key: k, mode: m };
+                const rawMode = parts.slice(1).join(" ").toLowerCase() || "major";
+                if (!ChordBuilderWidget.SUPPORTED_MODES.includes(rawMode)) {
+                    this.textMsg(
+                        _("Mode not supported by chord progression widget. Defaulting to major."),
+                        3000
+                    );
+                    return { key: k, mode: "major" };
+                }
+                return { key: k, mode: rawMode };
             }
         }
         return { key: "C", mode: "major" };
@@ -368,7 +375,18 @@ class ChordBuilderWidget {
      */
     setKeyAndMode(newKey, newMode) {
         if (newKey) this.rootKey = newKey;
-        if (newMode) this.mode = newMode;
+        if (newMode) {
+            const rawMode = newMode.toLowerCase();
+            if (!ChordBuilderWidget.SUPPORTED_MODES.includes(rawMode)) {
+                this.textMsg(
+                    _("Mode not supported by chord progression widget. Defaulting to major."),
+                    3000
+                );
+                this.mode = "major";
+            } else {
+                this.mode = rawMode;
+            }
+        }
         this.diatonicChords = this._buildDiatonicChords(this.rootKey, this.mode);
         this._updateKeyModeDisplay();
         this._renderDiatonicChords();
@@ -857,6 +875,9 @@ class ChordBuilderWidget {
                 e.stopPropagation();
                 this.addChord(chord);
             };
+            addBtn.onkeydown = e => {
+                e.stopPropagation();
+            };
 
             card.append(romanSpan, nameSpan, notesSpan, addBtn);
 
@@ -870,6 +891,7 @@ class ChordBuilderWidget {
             };
 
             card.onkeydown = e => {
+                if (e.target !== card) return;
                 if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     this.auditionChord(chord);

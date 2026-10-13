@@ -77,9 +77,9 @@ function setupWidgetBlocks(activity) {
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
      */
-    function _lazyRequire(modules, callback) {
+    function _lazyRequire(modules, callback, errback) {
         if (typeof define === "function" && define.amd) {
-            require(Array.isArray(modules) ? modules : [modules], callback);
+            require(Array.isArray(modules) ? modules : [modules], callback, errback);
         } else {
             callback();
         }
@@ -141,11 +141,23 @@ function setupWidgetBlocks(activity) {
      * @param {Function} factory - Builds the widget instance.
      * @param {Function} [onReady] - Optional callback run after assignment.
      */
-    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, () => {
-            logo[widgetKey] = factory();
-            onReady?.();
-        });
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady, onError) {
+        _lazyRequire(
+            modules,
+            () => {
+                try {
+                    logo[widgetKey] = factory();
+                    onReady?.();
+                } catch (e) {
+                    logo[widgetKey] = null;
+                    onError?.(e);
+                }
+            },
+            err => {
+                logo[widgetKey] = null;
+                onError?.(err);
+            }
+        );
     }
 
     function _hasValidMeterWidgetInput(logo) {
@@ -920,6 +932,11 @@ function setupWidgetBlocks(activity) {
                 logo.insideChordBuilder = false;
             };
 
+            const cleanupOnError = () => {
+                logo.chordBuilderWidget = null;
+                resetFlag();
+            };
+
             const __listener = () => {
                 if (logo.chordBuilderWidget && logo.chordBuilderWidget !== "loading") {
                     if (typeof logo.chordBuilderWidget.syncKeyAndModeFromTurtle === "function") {
@@ -942,7 +959,8 @@ function setupWidgetBlocks(activity) {
                         ["widgets/ChordBuilderAudio", "widgets/chordbuilder"]
                     ),
                     () => new ChordBuilderWidget(activity, { turtle }),
-                    () => resetFlag()
+                    () => resetFlag(),
+                    cleanupOnError
                 );
             };
 
