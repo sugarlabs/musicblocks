@@ -1108,3 +1108,75 @@ describe("Test 17: Repeats", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 });
+
+describe("Test 11: Tuplets are played at their time-modification ratio", () => {
+    const TUPLET_NOTE = (step, type, actual, normal) =>
+        `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>1</duration>` +
+        `<type>${type}</type><time-modification><actual-notes>${actual}</actual-notes>` +
+        `<normal-notes>${normal}</normal-notes></time-modification></note>`;
+
+    const total = values => values.reduce((sum, [n, d]) => sum + n / d, 0);
+
+    it("shortens an eighth-note triplet to a third of a quarter each", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                TUPLET_NOTE("C", "eighth", 3, 2) +
+                    TUPLET_NOTE("D", "eighth", 3, 2) +
+                    TUPLET_NOTE("E", "eighth", 3, 2)
+            )
+        );
+
+        // Written as eighths, played three in the time of two, so each is a
+        // twelfth of a whole note and the three together fill one quarter.
+        expect(noteValues(blocks)).toEqual([
+            [2, 24],
+            [2, 24],
+            [2, 24]
+        ]);
+        expect(total(noteValues(blocks))).toBeCloseTo(1 / 4);
+    });
+
+    it("handles a ratio other than three in the time of two", async () => {
+        const { blocks } = await parseAndCapture(scorePartwise(TUPLET_NOTE("C", "16th", 5, 4)));
+
+        expect(noteValues(blocks)).toEqual([[4, 80]]);
+    });
+
+    it("keeps the dots on a dotted tuplet note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>` +
+                    `<type>eighth</type><dot/><time-modification><actual-notes>3</actual-notes>` +
+                    `<normal-notes>2</normal-notes></time-modification></note>`
+            )
+        );
+
+        // A dotted eighth is 3/16; three in the time of two makes it 3/24.
+        expect(noteValues(blocks)).toEqual([[6, 48]]);
+    });
+
+    it("leaves a note with no time-modification at its written length", async () => {
+        const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("ignores a malformed time-modification rather than producing a zero length", async () => {
+        const { blocks } = await parseAndCapture(scorePartwise(TUPLET_NOTE("C", "quarter", 0, 2)));
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("does not touch a note that falls back to duration, which already has the ratio", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                `<note><pitch><step>C</step><octave>4</octave></pitch><duration>8</duration>` +
+                    `<time-modification><actual-notes>3</actual-notes>` +
+                    `<normal-notes>2</normal-notes></time-modification></note>`,
+                "<divisions>24</divisions>"
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[8, 96]]);
+    });
+});
