@@ -1039,3 +1039,100 @@ describe("Test 11: Inline accidentals last for the rest of the bar", () => {
         ]);
     });
 });
+
+/**
+ * Walks the imported start stack the way Logo runs it and returns the note
+ * letters in play order: repeat blocks play their clamp twice and nameddo
+ * blocks run their action.
+ */
+function playOrder(blocks) {
+    const byId = new Map(blocks.map(b => [b[0], b]));
+    const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
+    const value = id => byId.get(id)[1][1].value;
+    const actions = new Map(
+        blocksOfType(blocks, "action").map(a => [value(a[4][1]), byId.get(a[4][2])])
+    );
+    const notes = [];
+    const run = block => {
+        for (; block; block = byId.get(block[4][block[4].length - 1])) {
+            if (type(block) === "repeat") {
+                run(byId.get(block[4][2]));
+                run(byId.get(block[4][2]));
+            } else if (type(block) === "nameddo") {
+                run(byId.get(actions.get(value(block[0]))[4][1]));
+            } else if (type(block) === "newnote") {
+                const pitch = byId.get(byId.get(block[4][2])[4][1]);
+                notes.push(value(pitch[4][1]));
+            }
+        }
+    };
+    const settimbre = blocksOfType(blocks, "settimbre")[0];
+    run(byId.get(settimbre[4][2]));
+    return notes.join("");
+}
+
+// ---------------------------------------------------------------------------
+// Test 12 — Repeat bars wrap only their own bars
+// ---------------------------------------------------------------------------
+describe("Test 12: Repeat bars wrap only their own bars", () => {
+    const key = { root: "C", acc: "", mode: "", accidentals: [] };
+    const melody = (letters, pitch = 0) => [...letters].map((l, i) => makeNote(l, pitch + i));
+    const parseLines = lines =>
+        parseAndCapture({
+            metaText: { title: "Repeats", instruction: "guitar" },
+            lines: lines.map(voice => ({
+                staff: [{ meter: { value: [{ num: 4, den: 4 }] }, key, voices: [voice] }]
+            }))
+        });
+
+    test("a repeat that ends mid-line repeats only its own bars", async () => {
+        const blocks = await parseLines([
+            [
+                makeBar("bar_left_repeat"),
+                ...melody("CDEF"),
+                makeBar("bar_right_repeat"),
+                ...melody("GABC", 4),
+                makeBar()
+            ]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABC");
+    });
+
+    test("a :| with no |: repeats from the start of the tune", async () => {
+        const blocks = await parseLines([
+            [...melody("CDEF"), makeBar(), ...melody("GABC", 4), makeBar("bar_right_repeat")]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFGABCCDEFGABC");
+    });
+
+    test(":: ends one repeat and starts the next", async () => {
+        const blocks = await parseLines([
+            [
+                makeBar("bar_left_repeat"),
+                ...melody("CDEF"),
+                makeBar("bar_dbl_repeat"),
+                ...melody("GABC", 4),
+                makeBar("bar_right_repeat")
+            ]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABCGABC");
+    });
+
+    test("music after a repeated line plays once, after the repeat", async () => {
+        const blocks = await parseLines([
+            [makeBar("bar_left_repeat"), ...melody("CDEF"), makeBar("bar_right_repeat")],
+            [...melody("GABC", 4), makeBar()],
+            [makeBar("bar_left_repeat"), ...melody("DEFG", 8), makeBar("bar_right_repeat")],
+            [...melody("ABC", 12), makeBar()]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABCDEFGDEFGABC");
+    });
+
+    test("a repeat can span two lines", async () => {
+        const blocks = await parseLines([
+            [makeBar("bar_left_repeat"), ...melody("CD"), makeBar()],
+            [...melody("EF", 2), makeBar("bar_right_repeat"), ...melody("G", 4), makeBar()]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFG");
+    });
+});
