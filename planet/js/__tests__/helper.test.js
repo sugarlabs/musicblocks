@@ -324,9 +324,9 @@ describe("helper.js", () => {
 
                 <div id="view-more-chips">Show more tags ▼</div>
                 <div id="morechips" class="flexchips"></div>
-
                 <div id="local" style="display:block;">
                     <div class="projects-title-row">
+                        <h3 id="localtitle">My Projects</h3>
                         <div class="project-search-preview">
                             <input id="local-search" value="" />
                             <i class="project-search-icon"></i>
@@ -336,6 +336,7 @@ describe("helper.js", () => {
 
                 <div id="global" style="display:none;">
                     <div class="projects-title-row">
+                        <h3 id="globaltitle">Explore Projects</h3>
                         <div class="project-search-preview">
                             <input id="global-search" value="" />
                             <i class="project-search-icon"></i>
@@ -464,6 +465,73 @@ describe("helper.js", () => {
             window.dispatchEvent(new Event("resize"));
 
             expect(search.style.right).not.toBe("");
+        });
+        it("should move the title left when expanded search would overlap it", () => {
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const title = document.getElementById("localtitle");
+            const input = document.getElementById("local-search");
+
+            // Move the title row below the navbar so the search is not docked.
+            titleRow.getBoundingClientRect = jest.fn(() => ({
+                top: 100,
+                bottom: 190,
+                left: 0,
+                right: 1000,
+                width: 1000,
+                height: 90
+            }));
+
+            title.getBoundingClientRect = jest.fn(() => ({
+                left: 400,
+                right: 650,
+                top: 100,
+                bottom: 140,
+                width: 250,
+                height: 40
+            }));
+
+            window.dispatchEvent(new Event("scroll"));
+
+            input.value = "music";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(title.style.translate).toBe("-60px 0");
+        });
+
+        it("should restore the title position when search collapses", () => {
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const title = document.getElementById("localtitle");
+            const input = document.getElementById("local-search");
+
+            titleRow.getBoundingClientRect = jest.fn(() => ({
+                top: 100,
+                bottom: 190,
+                left: 0,
+                right: 1000,
+                width: 1000,
+                height: 90
+            }));
+
+            title.getBoundingClientRect = jest.fn(() => ({
+                left: 400,
+                right: 650,
+                top: 100,
+                bottom: 140,
+                width: 250,
+                height: 40
+            }));
+
+            window.dispatchEvent(new Event("scroll"));
+
+            input.value = "music";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(title.style.translate).toBe("-60px 0");
+
+            input.value = "";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(title.style.translate).toBe("");
         });
     });
 });

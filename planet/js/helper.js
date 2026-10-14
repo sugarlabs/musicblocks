@@ -247,6 +247,91 @@ $(document).ready(() => {
         tabs.style.translate = requiredShift > 0 ? `${-requiredShift}px 0` : "";
     };
 
+    const updateTitleSearchSpacing = () => {
+        const localSection = document.getElementById("local");
+        const globalSection = document.getElementById("global");
+
+        const activeSection =
+            globalSection && getComputedStyle(globalSection).display !== "none"
+                ? globalSection
+                : localSection;
+
+        if (!activeSection) return;
+
+        const titleRow = activeSection.querySelector(".projects-title-row");
+        const search = activeSection.querySelector(".project-search-preview");
+
+        if (!titleRow || !search) return;
+
+        const title = titleRow.querySelector("h3");
+
+        if (!title) return;
+
+        // The navbar has its own overlap handling.
+        // Restore the title to its normal centered position while search is docked.
+        if (search.classList.contains("project-search-floating")) {
+            title.style.translate = "";
+            return;
+        }
+
+        const input = search.querySelector("input");
+
+        const isExpanded =
+            search.matches(":hover") ||
+            search.matches(":focus-within") ||
+            (input && input.value.trim() !== "");
+
+        // Collapsed search does not need extra title spacing.
+        if (!isExpanded) {
+            title.style.translate = "";
+            return;
+        }
+
+        const titleRect = title.getBoundingClientRect();
+        const searchRect = search.getBoundingClientRect();
+        const rowRect = titleRow.getBoundingClientRect();
+
+        /*
+         * Recover the title's original centered position before our translate.
+         * This prevents repeated measurements from making the title drift.
+         */
+        const computedTranslate = getComputedStyle(title).translate;
+
+        let currentTranslateX = 0;
+
+        if (computedTranslate && computedTranslate !== "none") {
+            currentTranslateX = parseFloat(computedTranslate.split(" ")[0]) || 0;
+        }
+
+        const originalTitleLeft = titleRect.left - currentTranslateX;
+        const originalTitleRight = titleRect.right - currentTranslateX;
+
+        // Search expands toward the left and reaches 230px.
+        const expandedSearchWidth = 230;
+        const searchLeft = searchRect.right - expandedSearchWidth;
+
+        // Keep visible breathing room between the heading and search.
+        const minimumGap = 20;
+
+        const overlap = originalTitleRight + minimumGap - searchLeft;
+
+        /*
+         * Never move the heading outside its title row.
+         * Keep at least 12px available on the left.
+         */
+        const edgeGap = 12;
+        const maxShift = Math.max(0, originalTitleLeft - (rowRect.left + edgeGap));
+
+        const requiredShift = Math.min(Math.max(0, overlap), maxShift);
+
+        title.style.translate = requiredShift > 0 ? `${-requiredShift}px 0` : "";
+    };
+
+    const updateSearchSpacing = () => {
+        updateNavbarTabSpacing();
+        updateTitleSearchSpacing();
+    };
+
     const updateSearchDocking = () => {
         const localSection = document.getElementById("local");
         const globalSection = document.getElementById("global");
@@ -318,37 +403,37 @@ $(document).ready(() => {
                 easing: "cubic-bezier(0.22, 1, 0.36, 1)"
             }
         );
-        requestAnimationFrame(updateNavbarTabSpacing);
+        requestAnimationFrame(updateSearchSpacing);
     };
 
     document.querySelectorAll(".project-search-preview").forEach(search => {
         const input = search.querySelector("input");
 
         search.addEventListener("mouseenter", () => {
-            requestAnimationFrame(updateNavbarTabSpacing);
+            requestAnimationFrame(updateSearchSpacing);
         });
 
         search.addEventListener("mouseleave", () => {
-            requestAnimationFrame(updateNavbarTabSpacing);
+            requestAnimationFrame(updateSearchSpacing);
         });
 
         search.addEventListener("focusin", () => {
-            requestAnimationFrame(updateNavbarTabSpacing);
+            requestAnimationFrame(updateSearchSpacing);
         });
 
         search.addEventListener("focusout", () => {
-            requestAnimationFrame(updateNavbarTabSpacing);
+            requestAnimationFrame(updateSearchSpacing);
         });
 
         if (input) {
             input.addEventListener("input", () => {
-                requestAnimationFrame(updateNavbarTabSpacing);
+                requestAnimationFrame(updateSearchSpacing);
             });
         }
 
         search.addEventListener("transitionend", evt => {
             if (evt.propertyName === "width") {
-                updateNavbarTabSpacing();
+                updateSearchSpacing();
             }
         });
     });
@@ -383,7 +468,7 @@ $(document).ready(() => {
                     search.style.left = "";
                     search.style.right = "";
 
-                    updateNavbarTabSpacing();
+                    updateSearchSpacing();
                     return;
                 }
 
@@ -396,7 +481,7 @@ $(document).ready(() => {
 
                 search.style.left = "auto";
                 search.style.right = `${window.innerWidth - (newBtnRect.left - 1)}px`;
-                updateNavbarTabSpacing();
+                updateSearchSpacing();
             });
         },
         { passive: true }
@@ -404,17 +489,24 @@ $(document).ready(() => {
 
     document.getElementById("local-tab").addEventListener("click", () => {
         requestAnimationFrame(() => {
-            requestAnimationFrame(updateSearchDocking);
+            requestAnimationFrame(() => {
+                updateSearchDocking();
+                updateSearchSpacing();
+            });
         });
     });
 
     document.getElementById("global-tab").addEventListener("click", () => {
         requestAnimationFrame(() => {
-            requestAnimationFrame(updateSearchDocking);
+            requestAnimationFrame(() => {
+                updateSearchDocking();
+                updateSearchSpacing();
+            });
         });
     });
 
     updateSearchDocking();
+    requestAnimationFrame(updateSearchSpacing);
 });
 
 if (typeof module !== "undefined" && module.exports) {
