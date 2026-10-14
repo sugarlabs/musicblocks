@@ -1583,6 +1583,7 @@ function setupWidgetBlocks(activity) {
 
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
+            logo.rhythmRuler.rulerBlock = blk;
             logo.inRhythmRuler = true;
 
             const listenerName = "_rhythmruler_" + turtle;

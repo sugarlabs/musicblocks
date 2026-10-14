@@ -1047,6 +1047,37 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["rhythmruler2", { collapsed: true }]);
     });
 
+    it("exports the Rhythm Maker edits with drum ids renumbered like connections", () => {
+        const activity = makeActivity();
+        const block = (name, extra = {}) => ({
+            name,
+            trash: false,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections: [null],
+            isValueBlock: () => false,
+            ...extra
+        });
+        activity.blocks.blockList = [
+            block("setdrum", { trash: true }),
+            block("rhythmruler2", {
+                rulerHistory: [
+                    [[[0, 2]], 2],
+                    [[3], 0]
+                ]
+            }),
+            block("setdrum")
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        // The trashed drum (block 0) is dropped and block 2 becomes block 1.
+        expect(result[0][1]).toEqual([
+            "rhythmruler2",
+            { collapsed: false, rulerHistory: [[[[0, 2]], 1]] }
+        ]);
+    });
+
     describe("customsample", () => {
         const exportSample = connections => {
             const activity = makeActivity();

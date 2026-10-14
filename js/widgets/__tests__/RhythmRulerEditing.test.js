@@ -132,7 +132,8 @@ describe("RhythmRulerEditing", () => {
                 __addCellEventHandlers: jest.fn(),
                 __toggleRestState: jest.fn(),
                 _calculateZebraStripes: jest.fn(),
-                _refreshCircularView: jest.fn()
+                _refreshCircularView: jest.fn(),
+                saveDissectHistory: jest.fn()
             };
         };
 
@@ -161,6 +162,8 @@ describe("RhythmRulerEditing", () => {
             expect(widget._rulers[0].cells[0].style.width).toBe("50px");
             expect(widget._calculateZebraStripes).toHaveBeenCalledWith(0);
             expect(widget._refreshCircularView).toHaveBeenCalled();
+            // So the project saves the ruler without the undone edit.
+            expect(widget.saveDissectHistory).toHaveBeenCalled();
         });
 
         test("merges tapped cells back into one", () => {

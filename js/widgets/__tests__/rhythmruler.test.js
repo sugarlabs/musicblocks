@@ -1356,6 +1356,20 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(mockRuler.deleteCell).not.toHaveBeenCalled();
         });
 
+        test("__divideFromList does not save the history while replaying a tap", () => {
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+
+            rhythmRuler.__divideFromList(cell, [8, 16, 16], false);
+            expect(rhythmRuler.saveDissectHistory).not.toHaveBeenCalled();
+        });
+
+        test("__divideFromList saves the history after a tap by the user", () => {
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+
+            rhythmRuler.__divideFromList(cell, [8, 16, 16], true);
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalledTimes(1);
+        });
+
         test("__divideFromList divides cell into custom list of subdivisions", () => {
             rhythmRuler.__divideFromList(cell, [8, 16, 16], true);
 
@@ -1511,6 +1525,39 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
 
             rhythmRuler.__toggleRestState(cellA, true);
             expect(rhythmRuler.Rulers[0][0][0]).toBe(8);
+        });
+
+        test("does not save the history while replaying a rest or tie", () => {
+            cellA.removeEventListener = jest.fn();
+            cellA.addEventListener = jest.fn();
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+
+            rhythmRuler.__toggleRestState(cellA, false);
+            rhythmRuler._mouseDownCell = cellA;
+            rhythmRuler._mouseUpCell = cellB;
+            rhythmRuler.__tie(false);
+
+            expect(rhythmRuler.saveDissectHistory).not.toHaveBeenCalled();
+        });
+
+        test("saves the history after a rest by the user", () => {
+            cellA.removeEventListener = jest.fn();
+            cellA.addEventListener = jest.fn();
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+
+            rhythmRuler.__toggleRestState(cellA, true);
+
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalledTimes(1);
+        });
+
+        test("saves the history after a tie by the user", () => {
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+            rhythmRuler._mouseDownCell = cellA;
+            rhythmRuler._mouseUpCell = cellB;
+
+            rhythmRuler.__tie(true);
+
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalledTimes(1);
         });
     });
 

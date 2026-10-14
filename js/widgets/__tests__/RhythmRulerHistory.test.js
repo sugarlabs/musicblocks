@@ -109,5 +109,103 @@ describe("RhythmRulerHistory", () => {
 
             expect(widget._dissectHistory[0][0][0]).toEqual([0, 2]);
         });
+
+        test("keeps this ruler's entries on its block, so the project saves them", () => {
+            const block = {};
+            const widget = makeWidget([[[1], [[0, 2]]]], [11], [[[[1, 4]], 99]]);
+            widget.rulerBlock = 5;
+            widget.activity = { blocks: { blockList: { 5: block } } };
+
+            RhythmRulerHistory.prototype.saveDissectHistory.call(widget);
+
+            // The drum that isn't in this ruler stays out of its block.
+            expect(block.rulerHistory).toEqual([[[[0, 2]], 11]]);
+        });
+    });
+
+    describe("_restoreDissectHistory", () => {
+        beforeEach(() => {
+            global.deepClone = value => JSON.parse(JSON.stringify(value));
+            global.last = list => list[list.length - 1];
+        });
+
+        // One ruler with three cells, for drum block 11. Each replayed dissect is recorded in the
+        // ruler's history, as __dissectByNumber does.
+        const makeWidget = (rulerHistory, sessionHistory = []) => {
+            const widget = {
+                Drums: [11],
+                Rulers: [[[4, 4, 4], []]],
+                _rulers: [{ cells: [{}, {}, {}] }],
+                _dissectHistory: sessionHistory,
+                _undoList: [],
+                rulerBlock: 5,
+                activity: { blocks: { blockList: { 5: { rulerHistory } } } }
+            };
+            widget.__dissectByNumber = jest.fn((cell, inputNum) => {
+                if (inputNum <= 4) {
+                    widget.Rulers[0][1].push([0, inputNum]);
+                }
+            });
+            return widget;
+        };
+
+        const restore = widget => RhythmRulerHistory.prototype._restoreDissectHistory.call(widget);
+
+        test("replays the edits saved with the project, and makes them undoable", () => {
+            const widget = makeWidget([[[[0, 2]], 11]]);
+
+            restore(widget);
+
+            expect(widget.__dissectByNumber).toHaveBeenCalledWith(
+                widget._rulers[0].cells[0],
+                2,
+                false
+            );
+            expect(widget._dissectHistory).toEqual([[[[0, 2]], 11]]);
+            expect(widget._undoList).toEqual([["dissect", 0]]);
+        });
+
+        test("prefers this session's edits for a drum over the saved ones", () => {
+            const widget = makeWidget([[[[0, 2]], 11]], [[[[1, 3]], 11]]);
+
+            restore(widget);
+
+            expect(widget.__dissectByNumber).toHaveBeenCalledTimes(1);
+            expect(widget.__dissectByNumber).toHaveBeenCalledWith(
+                widget._rulers[0].cells[1],
+                3,
+                false
+            );
+            // This session's edits already have their undo entries.
+            expect(widget._undoList).toEqual([]);
+        });
+
+        test("adds no undo entry for a saved edit that could not be applied", () => {
+            const widget = makeWidget([[[[0, 8]], 11]]);
+
+            restore(widget);
+
+            expect(widget.__dissectByNumber).toHaveBeenCalled();
+            expect(widget._undoList).toEqual([]);
+        });
+
+        test("skips a saved rest on a cell the rhythm blocks no longer make", () => {
+            const widget = makeWidget([[[7], 11]]);
+            widget.__toggleRestState = jest.fn();
+
+            restore(widget);
+
+            expect(widget.__toggleRestState).not.toHaveBeenCalled();
+            expect(widget._undoList).toEqual([]);
+        });
+
+        test("does nothing extra when the block has no saved edits", () => {
+            const widget = makeWidget(undefined);
+
+            restore(widget);
+
+            expect(widget._dissectHistory).toEqual([]);
+            expect(widget.__dissectByNumber).not.toHaveBeenCalled();
+        });
     });
 });

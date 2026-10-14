@@ -17,6 +17,8 @@
  *  5. Confirming all toolbar action buttons are present.
  *  6. Clicking a ruler cell to dissect it and verifying the cell count increases.
  *  7. Closing the widget and confirming the frame is fully removed from the DOM.
+ *  8. Dissecting a cell, reloading the page, and confirming the cell is still
+ *     divided, and that the restored edit can still be undone.
  *
  * NOTE ON SELECTORS
  * RhythmRulerLayout._createWidgetWindow() calls
@@ -38,15 +40,10 @@
 // ---------------------------------------------------------------------------
 
 /**
- * Loads a fixture project file and waits until the `rhythmruler2` block is
- * fully in the block list with a stable _loadCounter of 0 (same stability
- * pattern as meter-widget.cy.js and mode-widget.cy.js).
- * @param {string} fixtureName - Filename inside cypress/fixtures/.
+ * Waits until the `rhythmruler2` block is fully in the block list with a
+ * stable _loadCounter of 0.
  */
-const loadFixtureProject = fixtureName => {
-    cy.get("#load").click();
-    cy.get("#myOpenFile").selectFile(`cypress/fixtures/${fixtureName}`, { force: true });
-
+const waitForRhythmRulerBlock = () => {
     let stableObservations = 0;
     cy.window({ timeout: 30000 }).should(win => {
         const { blocks } = win.ActivityContext.getActivity();
@@ -59,6 +56,19 @@ const loadFixtureProject = fixtureName => {
             "fixture rhythmruler2 block should remain fully loaded"
         ).to.be.at.least(5);
     });
+};
+
+/**
+ * Loads a fixture project file and waits until the `rhythmruler2` block is
+ * fully in the block list with a stable _loadCounter of 0 (same stability
+ * pattern as meter-widget.cy.js and mode-widget.cy.js).
+ * @param {string} fixtureName - Filename inside cypress/fixtures/.
+ */
+const loadFixtureProject = fixtureName => {
+    cy.get("#load").click();
+    cy.get("#myOpenFile").selectFile(`cypress/fixtures/${fixtureName}`, { force: true });
+
+    waitForRhythmRulerBlock();
     cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
     cy.get("#errorText").should("not.be.visible");
 };
@@ -270,5 +280,30 @@ describe("Rhythm Ruler widget", () => {
             // The per-ruler play button cells should also be gone.
             cy.get(".headcol").should("not.exist");
         });
+    });
+
+    // 8. Saving — the edits survive a page reload
+
+    it("keeps a dissected cell after the page is reloaded", () => {
+        openRhythmRuler();
+
+        cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td').should("have.length", 1);
+        cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td').first().click({ force: true });
+        cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td').should("have.length", 2);
+
+        // Reloading saves the project to localStorage (beforeunload) and loads it again.
+        cy.reload();
+        cy.waitForAppReady();
+        waitForRhythmRulerBlock();
+
+        cy.get("#play").click();
+        cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td', { timeout: 30000 }).should(
+            "have.length",
+            2
+        );
+
+        // The restored edit is on the undo list like one made in this session.
+        cy.get('[aria-label="rhythm maker"] [role="button"][aria-label="Undo"]').click();
+        cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td').should("have.length", 1);
     });
 });

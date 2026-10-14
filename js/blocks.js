@@ -6051,6 +6051,34 @@ class Blocks {
                             [thisBlock, blkInfo[1]]
                         );
                         break;
+                    case "rhythmruler2":
+                        /** Restore the widget edits, moving the drum ids like connections. */
+                        postProcess = args => {
+                            const rulerHistory = args[1]?.rulerHistory;
+                            if (Array.isArray(rulerHistory)) {
+                                that.blockList[args[0]].rulerHistory = rulerHistory
+                                    .filter(
+                                        entry =>
+                                            Array.isArray(entry) &&
+                                            Array.isArray(entry[0]) &&
+                                            entry[0].every(
+                                                edit =>
+                                                    typeof edit === "number" ||
+                                                    (Array.isArray(edit) && !edit.includes(null))
+                                            ) &&
+                                            Number.isInteger(entry[1])
+                                    )
+                                    .map(entry => [entry[0], entry[1] + blockOffset]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
                     case "storein2":
                         /** Named boxes and dos need private data. */
                         postProcess = args => {

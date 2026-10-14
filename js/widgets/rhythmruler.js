@@ -172,6 +172,13 @@ class RhythmRuler {
         this.Rulers = [];
 
         /**
+         * Index of the Rhythm Maker block that opened the widget. Not named blockNo, since
+         * widgetWindows would then key the window by it.
+         * @type {number|null}
+         */
+        this.rulerBlock = null;
+
+        /**
          * Array to save the history of divisions so they can be restored.
          * @type {Array}
          * @private
