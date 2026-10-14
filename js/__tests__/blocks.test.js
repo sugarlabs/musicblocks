@@ -1795,6 +1795,7 @@ describe("Blocks Foundation", () => {
                 "not an entry",
                 [[3], "not a block"],
                 [[null], 1],
+                [[[]], 1],
                 [[[0, 2], [null]], 1]
             ];
             blocks.loadNewBlocks([

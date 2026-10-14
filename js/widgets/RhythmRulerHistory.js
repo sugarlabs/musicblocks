@@ -190,10 +190,13 @@ class RhythmRulerHistory {
         this._dissectHistory = deepClone(dissectHistory);
 
         // Keep this ruler's own entries (the first drums.length) on its block, so they are saved
-        // with the project.
+        // with the project. Drums this run didn't reach keep their saved edits.
         const block = this.activity?.blocks?.blockList?.[this.rulerBlock];
         if (block) {
-            block.rulerHistory = deepClone(dissectHistory.slice(0, drums.length));
+            const notReached = (block.rulerHistory || []).filter(entry => !drumsSet.has(entry[1]));
+            block.rulerHistory = deepClone(
+                dissectHistory.slice(0, drums.length).concat(notReached)
+            );
         }
     }
 }

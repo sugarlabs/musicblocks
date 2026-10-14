@@ -6064,7 +6064,9 @@ class Blocks {
                                             entry[0].every(
                                                 edit =>
                                                     typeof edit === "number" ||
-                                                    (Array.isArray(edit) && !edit.includes(null))
+                                                    (Array.isArray(edit) &&
+                                                        edit.length > 0 &&
+                                                        !edit.includes(null))
                                             ) &&
                                             Number.isInteger(entry[1])
                                     )

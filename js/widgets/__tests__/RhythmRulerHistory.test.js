@@ -121,6 +121,21 @@ describe("RhythmRulerHistory", () => {
             // The drum that isn't in this ruler stays out of its block.
             expect(block.rulerHistory).toEqual([[[[0, 2]], 11]]);
         });
+
+        test("keeps the saved edits of drums this run didn't reach", () => {
+            // Drum 12 is in the block's saved edits but wasn't run this time (an if block).
+            const block = { rulerHistory: [[[[0, 3]], 12]] };
+            const widget = makeWidget([[[1], [[0, 2]]]], [11]);
+            widget.rulerBlock = 5;
+            widget.activity = { blocks: { blockList: { 5: block } } };
+
+            RhythmRulerHistory.prototype.saveDissectHistory.call(widget);
+
+            expect(block.rulerHistory).toEqual([
+                [[[0, 2]], 11],
+                [[[0, 3]], 12]
+            ]);
+        });
     });
 
     describe("_restoreDissectHistory", () => {
@@ -141,8 +156,9 @@ describe("RhythmRulerHistory", () => {
                 rulerBlock: 5,
                 activity: { blocks: { blockList: { 5: { rulerHistory } } } }
             };
+            // Like the real one, it refuses to divide a cell past 1/256.
             widget.__dissectByNumber = jest.fn((cell, inputNum) => {
-                if (inputNum <= 4) {
+                if (inputNum * widget.Rulers[0][0][0] <= 256) {
                     widget.Rulers[0][1].push([0, inputNum]);
                 }
             });
@@ -181,7 +197,7 @@ describe("RhythmRulerHistory", () => {
         });
 
         test("adds no undo entry for a saved edit that could not be applied", () => {
-            const widget = makeWidget([[[[0, 8]], 11]]);
+            const widget = makeWidget([[[[0, 100]], 11]]);
 
             restore(widget);
 
