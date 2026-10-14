@@ -2332,6 +2332,27 @@ describe("PhraseMaker Widget", () => {
             phraseMaker._rows = [firstRow];
         });
 
+        test("addTuplet paints arc and setxy cells with the graphics background", () => {
+            global.PhraseMakerUtils.MATRIXGRAPHICS2 = ["arc", "setxy"];
+            const arcRow = mockTable.insertRow();
+            arcRow.insertCell();
+            const setxyRow = mockTable.insertRow();
+            setxyRow.insertCell();
+            phraseMaker.rowLabels = ["arc", "setxy"];
+            phraseMaker._rows = [arcRow, setxyRow];
+
+            phraseMaker.addTuplet([[1, 4], [8]]);
+
+            const arcCell = arcRow.cells[arcRow.cells.length - 1];
+            const setxyCell = setxyRow.cells[setxyRow.cells.length - 1];
+            expect(arcCell.getAttribute("cellColor")).toBe(
+                phraseMaker.platformColor.graphicsBackground
+            );
+            expect(setxyCell.getAttribute("cellColor")).toBe(
+                phraseMaker.platformColor.graphicsBackground
+            );
+        });
+
         test("addTuplet initializes tuplet labels and inserts filler cells on first invocation", () => {
             const tupletParam = [
                 [1, 4],
