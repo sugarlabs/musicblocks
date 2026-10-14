@@ -119,10 +119,65 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a tempo change correctly", () => {
-        logo.notation.notationStaging[turtle] = ["tempo", 120, "Allegro"];
+        logo.notation.notationStaging[turtle] = ["tempo", 120, "4"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\tempo Allegro = 120");
+        expect(logo.notationNotes[turtle]).toContain("\\tempo 4 = 120");
     });
+
+    test.each([
+        ["4", "\\tempo 4 = 90\n"],
+        ["4.", "\\tempo 4. = 90\n"],
+        ["8..", "\\tempo 8.. = 90\n"],
+        // Five sixteenths, which Lilypond cannot write as one note: 90 of them a minute is
+        // 450 sixteenths a minute.
+        ["4 16", "\\tempo 16 = 450\n"],
+        // Fifteen sixteenths.
+        ["2 4 8 16", "\\tempo 16 = 1350\n"]
+    ])("should count a tempo of 90 beats per %s in a note Lilypond reads", (beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["tempo", 90, beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([["Allegro"], ["0"], ["4 0"], [""], ["3"], ["4 3"]])(
+        "should skip a tempo whose beat is not a note value Lilypond reads (%s)",
+        beat => {
+            logo.notation.notationStaging[turtle] = ["tempo", 120, beat];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
+
+    // \tempo takes an unsigned whole number of beats per minute.
+    test.each([[0], [-90], [0.4], ["fast"], [Infinity]])(
+        "should skip a tempo of %s beats per minute",
+        bpm => {
+            logo.notation.notationStaging[turtle] = ["tempo", bpm, "4"];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
+
+    // It is the count after the "=" that has to be a whole number, not the beats per
+    // minute: 0.4 beats of five sixteenths a minute is exactly 2 sixteenths a minute.
+    test.each([
+        [0.4, "4 16", "\\tempo 16 = 2\n"],
+        [0.1, "4 16", "\\tempo 16 = 1\n"],
+        [0.2, "2 4 8 16", "\\tempo 16 = 3\n"]
+    ])("should write %s beats per %s a minute as a whole count", (bpm, beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["tempo", bpm, beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([[-90], [NaN], [Infinity], [0.01]])(
+        "should skip a tempo of %s beats per minute on a tied beat too",
+        bpm => {
+            logo.notation.notationStaging[turtle] = ["tempo", bpm, "4 16"];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
 
     test("should process a slur correctly", () => {
         logo.notation.notationStaging[turtle] = [
@@ -351,6 +406,29 @@ describe("processLilypondNotes", () => {
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\partial 4\n");
     });
+
+    test.each([
+        ["8", "\\partial 8\n"],
+        ["4.", "\\partial 4.\n"],
+        // Five sixteenths. \\partial takes one duration, with a multiplier for the rest.
+        ["4 16", "\\partial 16*5\n"],
+        ["2 4 8 16", "\\partial 16*15\n"],
+        // Two eighths add up to a quarter, which needs no multiplier.
+        ["8 8", "\\partial 4\n"]
+    ])("should write a pickup of %s as a duration Lilypond reads", (beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["pickup", beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([["half a bar"], ["0"], ["3"], [""]])(
+        "should skip a pickup that is not a note value Lilypond reads (%s)",
+        beat => {
+            logo.notation.notationStaging[turtle] = ["pickup", beat];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\partial");
+        }
+    );
 
     test("should process voice commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
