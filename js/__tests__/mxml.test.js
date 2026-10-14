@@ -1562,3 +1562,76 @@ describe("saveMxmlOutput - written note types", () => {
         expect(typesOf([note(4), rest])).toEqual(["quarter", "half"]);
     });
 });
+
+describe("saveMxmlOutput - key mode", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, false, false, null];
+    const exportOf = staging => saveMxmlOutput({ notation: { notationStaging: { 0: staging } } });
+    const modesIn = staging =>
+        [...exportOf(staging).matchAll(/<mode>([^<]+)<\/mode>/g)].map(m => m[1]);
+
+    // A minor and C major share a signature, so <fifths> alone cannot tell a
+    // reader which one the piece is in.
+    it.each([
+        ["C", "major", "major"],
+        ["A", "minor", "minor"],
+        ["A", "m", "minor"],
+        ["A", "aeolian", "minor"],
+        ["A", "natural minor", "minor"],
+        ["D", "dorian", "dorian"],
+        ["E", "phrygian", "phrygian"],
+        ["F", "lydian", "lydian"],
+        ["G", "mixolydian", "mixolydian"],
+        ["B", "locrian", "locrian"],
+        ["C", "ionian", "major"]
+    ])("writes %s %s as mode %s", (key, mode, written) => {
+        expect(modesIn(["key", key, mode, note("C4")])).toEqual([written]);
+    });
+
+    // These carry a signature of their own, so the key is still written, but
+    // <mode> was never meant to name them.
+    it.each(["major pentatonic", "minor pentatonic", "major blues", "minor blues", "hirajoshi"])(
+        "writes a signature but no mode for %s",
+        mode => {
+            const output = exportOf(["key", "C", mode, note("C4")]);
+
+            expect(output).toContain("<fifths>");
+            expect(modesIn(["key", "C", mode, note("C4")])).toEqual([]);
+        }
+    );
+
+    // These have no signature at all, so the key is left where it was, which is
+    // the C major the score opens in.
+    it.each(["whole tone", "chromatic"])("leaves the opening key alone for %s", mode => {
+        expect(modesIn(["key", "C", mode, note("C4")])).toEqual(["major"]);
+    });
+
+    it("writes the mode in the measure header as well as on a later change", () => {
+        const modes = modesIn(["key", "A", "minor", note("C4"), "key", "D", "dorian", note("D4")]);
+
+        expect(modes).toEqual(["minor", "dorian"]);
+    });
+
+    it("writes a change of mode that keeps the same signature", () => {
+        // C major to A minor is still a key change, though <fifths> stays 0.
+        const output = exportOf(["key", "C", "major", note("C4"), "key", "A", "minor", note("D4")]);
+
+        expect([...output.matchAll(/<mode>([^<]+)<\/mode>/g)].map(m => m[1])).toEqual([
+            "major",
+            "minor"
+        ]);
+    });
+
+    it("keeps the mode out of a percussion part, which carries no key", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: ["key", "A", "minor", note("C4")] },
+                notationDrumStaging: {
+                    0: [[["snare drum"], 4, 0, null, null, false, false, "snare drum"]]
+                }
+            }
+        });
+        const percussion = output.slice(output.indexOf('<part id="D1"'));
+
+        expect(percussion).not.toContain("<mode>");
+    });
+});
