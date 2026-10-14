@@ -20,7 +20,12 @@ global.MusicKeyboardEditing = require("../MusicKeyboardEditing.js");
 global.MusicKeyboardRendering = require("../MusicKeyboardRendering.js");
 const MusicKeyboard = require("../musickeyboard.js");
 
-describe("MusicKeyboard document key handler lifecycle", () => {
+// Shared across instances. reset between tests.
+afterEach(() => {
+    MusicKeyboard._keyHandlerStack.length = 0;
+});
+
+describe("MusicKeyboard document key handler ownership", () => {
     let originalOnKeyDown;
     let originalOnKeyUp;
 
@@ -29,67 +34,112 @@ describe("MusicKeyboard document key handler lifecycle", () => {
         originalOnKeyUp = document.onkeyup;
         document.onkeydown = null;
         document.onkeyup = null;
+        MusicKeyboard._keyHandlerStack.length = 0;
     });
 
     afterEach(() => {
         document.onkeydown = originalOnKeyDown;
         document.onkeyup = originalOnKeyUp;
+        MusicKeyboard._keyHandlerStack.length = 0;
     });
 
-    test("captures the handlers active when the keyboard is opened", () => {
-        const firstHandler = jest.fn();
-        const newerHandler = jest.fn();
-        const newerKeyUpHandler = jest.fn();
-
-        document.onkeydown = firstHandler;
+    test("an open keyboard owns the document key handlers", () => {
         const keyboard = new MusicKeyboard({});
+        keyboard.addKeyboardShortcuts();
 
-        document.onkeydown = newerHandler;
-        document.onkeyup = newerKeyUpHandler;
-
-        keyboard._cacheDocumentKeyHandlers();
-
-        document.onkeydown = jest.fn();
-        document.onkeyup = jest.fn();
-        keyboard._restoreDocumentKeyHandlers();
-
-        expect(document.onkeydown).toBe(newerHandler);
-        expect(document.onkeyup).toBe(newerKeyUpHandler);
+        expect(document.onkeydown).toBe(keyboard._boundKeyDown);
+        expect(document.onkeyup).toBe(keyboard._boundKeyUp);
     });
 
-    test("does not overwrite the saved handlers after the first snapshot", () => {
-        const preservedOnKeyDown = jest.fn();
-        const preservedOnKeyUp = jest.fn();
+    test("a newer keyboard takes over and hands input back when it closes", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        const firstDown = first._boundKeyDown;
+        const firstUp = first._boundKeyUp;
 
-        document.onkeydown = preservedOnKeyDown;
-        document.onkeyup = preservedOnKeyUp;
+        second.addKeyboardShortcuts();
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+        expect(document.onkeyup).toBe(second._boundKeyUp);
 
-        const keyboard = new MusicKeyboard({});
+        second._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(firstDown);
+        expect(document.onkeyup).toBe(firstUp);
 
-        keyboard._cacheDocumentKeyHandlers();
-        document.onkeydown = null;
-        document.onkeyup = jest.fn();
-        keyboard._cacheDocumentKeyHandlers();
-        keyboard._restoreDocumentKeyHandlers();
-
-        expect(document.onkeydown).toBe(preservedOnKeyDown);
-        expect(document.onkeyup).toBe(preservedOnKeyUp);
+        first._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBeNull();
+        expect(document.onkeyup).toBeNull();
     });
 
-    test("clears the saved snapshot after restoring handlers", () => {
-        const previousOnKeyDown = jest.fn();
-        const previousOnKeyUp = jest.fn();
+    test("closing the elder keyboard leaves the newer one in control", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
 
-        document.onkeydown = previousOnKeyDown;
-        document.onkeyup = previousOnKeyUp;
+        first._releaseDocumentKeyHandlers();
+
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+        expect(document.onkeyup).toBe(second._boundKeyUp);
+    });
+
+    test("restores the handler that was active before any keyboard opened", () => {
+        const preexisting = jest.fn();
+        document.onkeydown = preexisting;
 
         const keyboard = new MusicKeyboard({});
+        keyboard.addKeyboardShortcuts();
+        expect(document.onkeydown).not.toBe(preexisting);
 
-        keyboard._cacheDocumentKeyHandlers();
-        keyboard._restoreDocumentKeyHandlers();
+        keyboard._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(preexisting);
+    });
 
-        expect(keyboard._savedDocumentOnKeyDown).toBeUndefined();
-        expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
+    test("re-registering an open keyboard keeps the original handler as the base", () => {
+        const preexisting = jest.fn();
+        document.onkeydown = preexisting;
+
+        const keyboard = new MusicKeyboard({});
+        keyboard.addKeyboardShortcuts();
+        // A re-render must not set its own handler as the base.
+        keyboard.addKeyboardShortcuts();
+        expect(keyboard._boundKeyDown).not.toBe(preexisting);
+
+        keyboard._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(preexisting);
+    });
+
+    test("re-rendering an older keyboard does not steal input from the newer one", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+        const secondDown = second._boundKeyDown;
+
+        first.addKeyboardShortcuts();
+
+        expect(document.onkeydown).toBe(secondDown);
+    });
+
+    test("focusing a keyboard gives it the document handlers", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+
+        first._focusKeyboardInput();
+
+        expect(document.onkeydown).toBe(first._boundKeyDown);
+        expect(MusicKeyboard._keyHandlerStack[MusicKeyboard._keyHandlerStack.length - 1]).toBe(
+            first
+        );
+    });
+
+    test("focusing a keyboard that is not open does nothing", () => {
+        const orphan = new MusicKeyboard({});
+        orphan._focusKeyboardInput();
+        expect(document.onkeydown).toBeNull();
     });
 });
 
@@ -180,6 +230,45 @@ describe("MusicKeyboard add-row submenu", () => {
             [1, ["solfege", { value: "do" }], 0, 0, [0]],
             [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
+    });
+
+    test("positions the Add Note wheel from its own toolbar button, not a sibling window", () => {
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: { blockList: [], loadNewBlocks: jest.fn() }
+        });
+        // The toolbar button lives outside the scoped window body.
+        const ownButton = document.createElement("div");
+        ownButton.getBoundingClientRect = () => ({ x: 10, y: 20 });
+        const otherButton = document.createElement("div");
+        otherButton.id = "addnotes";
+        otherButton.getBoundingClientRect = () => ({ x: 999, y: 999 });
+        keyboard._widgetBody = document.createElement("div");
+        keyboard._widgetBody.append(otherButton);
+        document.body.append(ownButton);
+
+        keyboard._addNoteButton = ownButton;
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+
+        // 999 would clamp to the 800-wide canvas edge (600px).
+        expect(docById("wheelDivptm").style.left).toBe("10px");
+    });
+
+    test("falls back to the document Add Note button when no toolbar reference is kept", () => {
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: { blockList: [], loadNewBlocks: jest.fn() }
+        });
+        // A scoped body that does not contain the toolbar button.
+        keyboard._widgetBody = document.createElement("div");
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+
+        expect(() => keyboard._createAddRowPieSubmenu()).not.toThrow();
+        expect(docById("wheelDivptm").style.left).toBe("0px");
     });
 
     test("adds next sequential pitch when layout contains existing pitch rows and inherits octave", () => {
@@ -1998,30 +2087,18 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._roundNoteDuration(0)).toBe(0.125);
     });
 
-    test("caches and restores document key handlers safely", () => {
+    test("tracks keyboard ownership of the document key handlers", () => {
         const keyboard = new MusicKeyboard({});
-        const dummyKeyDown = jest.fn();
-        const dummyKeyUp = jest.fn();
+        const original = MusicKeyboard._keyHandlerStack.length;
 
-        document.onkeydown = dummyKeyDown;
-        document.onkeyup = dummyKeyUp;
+        keyboard.addKeyboardShortcuts();
+        expect(MusicKeyboard._keyHandlerStack[MusicKeyboard._keyHandlerStack.length - 1]).toBe(
+            keyboard
+        );
 
-        // First cache
-        keyboard._cacheDocumentKeyHandlers();
-        expect(keyboard._savedDocumentOnKeyDown).toBe(dummyKeyDown);
-        expect(keyboard._savedDocumentOnKeyUp).toBe(dummyKeyUp);
-
-        // Re-caching should not overwrite original
-        document.onkeydown = jest.fn();
-        keyboard._cacheDocumentKeyHandlers();
-        expect(keyboard._savedDocumentOnKeyDown).toBe(dummyKeyDown);
-
-        // Restore
-        keyboard._restoreDocumentKeyHandlers();
-        expect(document.onkeydown).toBe(dummyKeyDown);
-        expect(document.onkeyup).toBe(dummyKeyUp);
-        expect(keyboard._savedDocumentOnKeyDown).toBeUndefined();
-        expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
+        keyboard._releaseDocumentKeyHandlers();
+        expect(MusicKeyboard._keyHandlerStack.length).toBe(original);
+        expect(keyboard._releaseDocumentKeyHandlers()).toBeUndefined();
     });
 
     test("handles timer calls safely when ManagedTimer is null with native fallbacks", () => {
