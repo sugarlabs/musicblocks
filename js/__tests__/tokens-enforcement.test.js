@@ -492,4 +492,37 @@ describe("Theme Switching & Inline Styles Purity", () => {
         );
         expect(focusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
     });
+
+    it("ensures highcontrast bright accent surfaces (cyan) do not use white text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast elements with cyan/bright background (var(--color-brand-secondary))
+        // do not set color to var(--color-text-primary) (which is white, failing WCAG contrast)
+        const brightBgRules = [
+            "#submitLilypond",
+            "\\.dropdown-content li:hover > a",
+            "\\.ui-autocomplete .ui-menu-item a:hover"
+        ];
+        brightBgRules.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+[^}]*${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-primary\\)`,
+                "i"
+            );
+            expect(themesCss).not.toMatch(regex);
+        });
+
+        // Contrast compliance check: var(--color-brand-secondary) with var(--color-text-inverse)
+        // must exceed WCAG AAA (>= 7:1), while var(--color-brand-secondary) with var(--color-text-primary) fails (< 4.5:1)
+        const hcTokens = THEMES.highcontrast;
+        const compliantContrast = contrastRatio(
+            hcTokens["--color-text-inverse"],
+            hcTokens["--color-brand-secondary"]
+        );
+        const failingContrast = contrastRatio(
+            hcTokens["--color-text-primary"],
+            hcTokens["--color-brand-secondary"]
+        );
+        expect(compliantContrast).toBeGreaterThanOrEqual(7);
+        expect(failingContrast).toBeLessThan(4.5);
+    });
 });
