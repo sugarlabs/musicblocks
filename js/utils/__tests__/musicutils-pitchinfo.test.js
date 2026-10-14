@@ -51,9 +51,43 @@ describe("musicutils-pitchinfo", () => {
         expect(pitchinfo.getPitchInfo("C4")).toEqual({ name: "C", octave: 4, pitchNumber: 60 });
     });
 
+    it("handles negative and zero pitch numbers without crashing in 1-arg form", () => {
+        expect(pitchinfo.getPitchInfo(0)).toEqual({ name: "C", octave: -1, pitchNumber: 0 });
+        expect(pitchinfo.getPitchInfo(-9)).toEqual({ name: "D#", octave: -2, pitchNumber: -9 });
+        expect(pitchinfo.getPitchInfo(-21)).toEqual({ name: "D#", octave: -3, pitchNumber: -21 });
+    });
+
+    it("returns INVALIDPITCH for non-finite numbers in 1-arg form", () => {
+        expect(pitchinfo.getPitchInfo(NaN)).toEqual(["INVALIDPITCH"]);
+        expect(pitchinfo.getPitchInfo(Infinity)).toEqual(["INVALIDPITCH"]);
+        expect(pitchinfo.getPitchInfo(-Infinity)).toEqual(["INVALIDPITCH"]);
+    });
+
     it("still resolves pitch info for a turtle/type/note (4-arg legacy form)", () => {
         expect(pitchinfo.getPitchInfo({}, "alphabet", "C4", singerTur())).toBe("C");
         expect(pitchinfo.getPitchInfo({}, "pitch number", "C4", singerTur())).toBe(60);
+    });
+
+    it("resolves pitch class to non-negative [0, EDO-1] matching across all octaves", () => {
+        const tur = singerTur();
+        // A0 (piano bottom note) and A4 must share the same pitch class (9)
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "A4", tur)).toBe(9);
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "A0", tur)).toBe(9);
+
+        // C0 and C4 must share pitch class 0 (not -0)
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "C4", tur)).toBe(0);
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "C0", tur)).toBe(0);
+        expect(Object.is(pitchinfo.getPitchInfo({}, "pitch class", "C0", tur), 0)).toBe(true);
+
+        // Negative octaves must wrap into [0, 11]
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "D-1", tur)).toBe(2);
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "D4", tur)).toBe(2);
+
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "B0", tur)).toBe(11);
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "B4", tur)).toBe(11);
+
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "Bb0", tur)).toBe(10);
+        expect(pitchinfo.getPitchInfo({}, "pitch class", "Bb4", tur)).toBe(10);
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
