@@ -178,16 +178,18 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
             pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
         }
     }
-    // Map the pitch to the current scale.
+    // Map the pitch to the current scale: an off-scale spelling whose enharmonic is in the
+    // scale takes that spelling (A♯ is B♭ in F major). One whose enharmonic is off the scale
+    // too keeps the spelling it was given; swapping it anyway turned E♭ in F major into D♯.
     pitch = pitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
-    if (
-        getCurrentEDO(temperament) === 12 &&
-        !buildScale(tur.singer.keySignature)[0].includes(pitch)
-    ) {
-        if (pitch in EQUIVALENTFLATS) {
-            pitch = EQUIVALENTFLATS[pitch];
-        } else if (pitch in EQUIVALENTSHARPS) {
-            pitch = EQUIVALENTSHARPS[pitch];
+    if (getCurrentEDO(temperament) === 12) {
+        const scale = buildScale(tur.singer.keySignature)[0];
+        if (!scale.includes(pitch)) {
+            const enharmonic =
+                pitch in EQUIVALENTFLATS ? EQUIVALENTFLATS[pitch] : EQUIVALENTSHARPS[pitch];
+            if (enharmonic !== undefined && scale.includes(enharmonic)) {
+                pitch = enharmonic;
+            }
         }
     }
 
