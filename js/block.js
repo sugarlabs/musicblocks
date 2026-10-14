@@ -2849,8 +2849,8 @@ class Block {
         while (c !== null) {
             lastIntervalBlock = c;
             const n = this.blocks.blockList[c].connections[1];
-            const cblock = this.blocks.blockList[n];
-            if (cblock.name === "number") {
+            const cblock = n === null ? null : this.blocks.blockList[n];
+            if (cblock !== null && cblock.name === "number") {
                 if (Math.abs(cblock.value) in intervalLabels) {
                     if (cblock.value < 0) {
                         intervals.push("-" + intervalLabels[-cblock.value]);
@@ -2894,6 +2894,8 @@ class Block {
                     const c1 = this.blocks.blockList[c].connections[1];
                     const c2 = this.blocks.blockList[c].connections[2];
                     if (
+                        c1 !== null &&
+                        c2 !== null &&
                         this.blocks.blockList[c1].name === "number" &&
                         this.blocks.blockList[c2].name === "number"
                     ) {
@@ -2937,6 +2939,8 @@ class Block {
                 const c1 = this.blocks.blockList[c].connections[1];
                 const c2 = this.blocks.blockList[c].connections[2];
                 if (
+                    c1 !== null &&
+                    c2 !== null &&
                     this.blocks.blockList[c1].name === "number" &&
                     this.blocks.blockList[c2].name === "number"
                 ) {
