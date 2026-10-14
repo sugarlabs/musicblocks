@@ -846,6 +846,14 @@ describe("setupVolumeActions", () => {
             );
         });
 
+        it("should trigger tone with resolved synth when firstConnection and lastConnection are null", () => {
+            Singer.VolumeActions.setSynthVolume("Piano", 70, 0, null);
+
+            jest.advanceTimersByTime(250);
+
+            expect(triggerSpy).toHaveBeenCalledWith(0, "G4", 1 / 4, "piano", null, null, false);
+        });
+
         it("should not trigger tone when connections exist", () => {
             Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
 
