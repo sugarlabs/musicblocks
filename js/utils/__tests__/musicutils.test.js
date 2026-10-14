@@ -479,9 +479,53 @@ describe("Temperament Functions", () => {
         it("1/4 comma meantone labels each ratio with a distinct note", () => {
             const t = getTemperament("1/4 comma meantone");
             expect(new Set(t.noteLabels).size).toBe(t.noteLabels.length);
-            // the perfect fifth must be the 3/2 the table already stores
+            // the fifth is tempered to 5^(1/4), about 696.578 cents, not a pure 3/2
             const g = t.noteLabels.indexOf("G");
-            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(701.955, 2);
+            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(696.578, 2);
+        });
+
+        it("1/4 comma meantone stacks tempered fifths into pure major thirds", () => {
+            const key = "1/4 comma meantone";
+            const t = getTemperament(key);
+            const fifth = Math.pow(5, 1 / 4);
+            // each label sits at its place on the chain of fifths from C
+            const chain = {
+                "C": 0,
+                "G": 1,
+                "D": 2,
+                "A": 3,
+                "E": 4,
+                "B": 5,
+                "F♯": 6,
+                "C♯": 7,
+                "G♯": 8,
+                "D♯": 9,
+                "A♯": 10,
+                "E♯": 11,
+                "B♯": 12,
+                "F": -1,
+                "B♭": -2,
+                "E♭": -3,
+                "A♭": -4,
+                "D♭": -5,
+                "G♭": -6,
+                "C♭": -7,
+                "F♭": -8
+            };
+            t.noteLabels.forEach((label, i) => {
+                const expected =
+                    Math.pow(fifth, chain[label]) /
+                    Math.pow(2, Math.floor(chain[label] * Math.log2(fifth)));
+                expect({ label, ratio: t.ratios[i] }).toEqual({
+                    label,
+                    ratio: expect.closeTo(expected, 6)
+                });
+            });
+            const c4 = pitchToFrequency("C", 4, 0, "C major", key);
+            expect(pitchToFrequency("E", 4, 0, "C major", key) / c4).toBeCloseTo(5 / 4, 6);
+            expect(pitchToFrequency("G", 4, 0, "C major", key) / c4).toBeCloseTo(fifth, 6);
+            // A4 stays at 440, so C4 is a meantone major sixth, 5^(3/4) / 2, below it
+            expect(c4).toBeCloseTo(440 / (Math.pow(5, 3 / 4) / 2), 3);
         });
     });
 
