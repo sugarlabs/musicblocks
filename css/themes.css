@@ -1679,3 +1679,38 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     color: var(--color-text-primary) !important;
     border: 1px solid var(--color-border-primary) !important;
 }
+
+/* Music Keyboard Widget & Keys across themes */
+table.white > tbody > tr > td {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+table.black > tbody > tr > td:not(.spacer) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+table.black > tbody > tr > td.spacer {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.dark #mkbKeyboardDiv,
+.dark #mkbTableDiv,
+.dark #mkbButtonsDiv,
+.dark #keyboardHolder2,
+.dark #mkbOuterDiv {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.highcontrast #mkbKeyboardDiv,
+.highcontrast #mkbTableDiv,
+.highcontrast #mkbButtonsDiv,
+.highcontrast #keyboardHolder2,
+.highcontrast #mkbOuterDiv {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+}
