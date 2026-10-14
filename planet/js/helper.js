@@ -402,7 +402,7 @@ $(document).ready(() => {
         const deltaX = first.left - last.left;
         const deltaY = first.top - last.top;
 
-        search.animate(
+        const animation = search.animate(
             [
                 {
                     transform: `translate(${deltaX}px, ${deltaY}px)`
@@ -416,7 +416,10 @@ $(document).ready(() => {
                 easing: "cubic-bezier(0.22, 1, 0.36, 1)"
             }
         );
+
         requestAnimationFrame(updateSearchSpacing);
+
+        animation.addEventListener("finish", updateSearchSpacing);
     };
 
     document.querySelectorAll(".project-search-preview").forEach(search => {
