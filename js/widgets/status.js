@@ -146,6 +146,14 @@ class StatusMatrix {
                 case "sqrt":
                 case "int":
                 case "mod":
+                case "sin":
+                case "cos":
+                case "tan":
+                case "arcsin":
+                case "arccos":
+                case "arctan":
+                case "ln":
+                case "log":
                     label = "";
                     break;
                 case "namedbox":

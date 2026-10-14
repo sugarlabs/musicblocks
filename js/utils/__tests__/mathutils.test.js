@@ -834,6 +834,194 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doCalculateDistance(0, 0, 3, "b")).toThrow("NanError");
         });
     });
+
+    describe("doSin", () => {
+        test("calculates sine for 0, 30, 90, 180, 270, 360, 720 degrees with exact values", () => {
+            expect(MathUtility.doSin(0)).toBe(0);
+            expect(MathUtility.doSin(30)).toBe(0.5);
+            expect(MathUtility.doSin(90)).toBe(1);
+            expect(MathUtility.doSin(180)).toBe(0);
+            expect(MathUtility.doSin(270)).toBe(-1);
+            expect(MathUtility.doSin(360)).toBe(0);
+            expect(MathUtility.doSin(720)).toBe(0);
+        });
+
+        test("handles negative angles with normalized zero", () => {
+            expect(MathUtility.doSin(-90)).toBe(-1);
+            expect(MathUtility.doSin(-30)).toBe(-0.5);
+            expect(MathUtility.doSin(-180)).toBe(0);
+            expect(Object.is(MathUtility.doSin(-180), 0)).toBe(true);
+            expect(MathUtility.doSin(-360)).toBe(0);
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doSin("abc")).toThrow("NanError");
+            expect(() => MathUtility.doSin(null)).toThrow("NanError");
+            expect(() => MathUtility.doSin(undefined)).toThrow("NanError");
+        });
+    });
+
+    describe("doCos", () => {
+        test("calculates cosine for 0, 60, 90, 180, 360 degrees with exact values", () => {
+            expect(MathUtility.doCos(0)).toBe(1);
+            expect(MathUtility.doCos(60)).toBe(0.5);
+            expect(MathUtility.doCos(90)).toBe(0);
+            expect(MathUtility.doCos(180)).toBe(-1);
+            expect(MathUtility.doCos(360)).toBe(1);
+        });
+
+        test("handles negative angles with normalized zero", () => {
+            expect(MathUtility.doCos(-180)).toBe(-1);
+            expect(MathUtility.doCos(-90)).toBe(0);
+            expect(Object.is(MathUtility.doCos(-90), 0)).toBe(true);
+            expect(MathUtility.doCos(-60)).toBe(0.5);
+            expect(MathUtility.doCos(-360)).toBe(1);
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doCos("abc")).toThrow("NanError");
+            expect(() => MathUtility.doCos(null)).toThrow("NanError");
+        });
+    });
+
+    describe("doTan", () => {
+        test("calculates tangent for 0, 45, 180, 360 degrees with exact values", () => {
+            expect(MathUtility.doTan(0)).toBe(0);
+            expect(MathUtility.doTan(45)).toBe(1);
+            expect(MathUtility.doTan(-45)).toBe(-1);
+            expect(MathUtility.doTan(180)).toBe(0);
+            expect(MathUtility.doTan(360)).toBe(0);
+            expect(MathUtility.doTan(-180)).toBe(0);
+            expect(Object.is(MathUtility.doTan(-180), 0)).toBe(true);
+        });
+
+        test("throws NanError for angles equivalent to 90 degrees modulo 180", () => {
+            expect(() => MathUtility.doTan(90)).toThrow("NanError");
+            expect(() => MathUtility.doTan(270)).toThrow("NanError");
+            expect(() => MathUtility.doTan(-90)).toThrow("NanError");
+            expect(() => MathUtility.doTan(450)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doTan("abc")).toThrow("NanError");
+            expect(() => MathUtility.doTan(null)).toThrow("NanError");
+        });
+    });
+
+    describe("doArcSin", () => {
+        test("calculates arcsine in degrees with exact values for common inputs", () => {
+            expect(MathUtility.doArcSin(0)).toBe(0);
+            expect(MathUtility.doArcSin(0.5)).toBe(30);
+            expect(MathUtility.doArcSin(-0.5)).toBe(-30);
+            expect(MathUtility.doArcSin(1)).toBe(90);
+            expect(MathUtility.doArcSin(-1)).toBe(-90);
+        });
+
+        test("throws NanError for values outside [-1, 1]", () => {
+            expect(() => MathUtility.doArcSin(1.5)).toThrow("NanError");
+            expect(() => MathUtility.doArcSin(-1.1)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doArcSin("abc")).toThrow("NanError");
+            expect(() => MathUtility.doArcSin(null)).toThrow("NanError");
+        });
+    });
+
+    describe("doArcCos", () => {
+        test("calculates arccosine in degrees with exact values for common inputs", () => {
+            expect(MathUtility.doArcCos(1)).toBe(0);
+            expect(MathUtility.doArcCos(0.5)).toBe(60);
+            expect(MathUtility.doArcCos(0)).toBe(90);
+            expect(MathUtility.doArcCos(-0.5)).toBe(120);
+            expect(MathUtility.doArcCos(-1)).toBe(180);
+        });
+
+        test("throws NanError for values outside [-1, 1]", () => {
+            expect(() => MathUtility.doArcCos(1.1)).toThrow("NanError");
+            expect(() => MathUtility.doArcCos(-2)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doArcCos("abc")).toThrow("NanError");
+            expect(() => MathUtility.doArcCos(null)).toThrow("NanError");
+        });
+    });
+
+    describe("doArcTan", () => {
+        test("calculates arctangent in degrees with exact values for common inputs", () => {
+            expect(MathUtility.doArcTan(0)).toBe(0);
+            expect(MathUtility.doArcTan(1)).toBe(45);
+            expect(MathUtility.doArcTan(-1)).toBe(-45);
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doArcTan("abc")).toThrow("NanError");
+            expect(() => MathUtility.doArcTan(null)).toThrow("NanError");
+        });
+    });
+
+    describe("_round10", () => {
+        test("preserves non-finite values", () => {
+            expect(MathUtility._round10(Infinity)).toBe(Infinity);
+            expect(MathUtility._round10(-Infinity)).toBe(-Infinity);
+            expect(Number.isNaN(MathUtility._round10(NaN))).toBe(true);
+        });
+
+        test("normalizes negative zero to positive zero", () => {
+            expect(Object.is(MathUtility._round10(-0), 0)).toBe(true);
+        });
+    });
+
+    describe("doLn", () => {
+        test("calculates natural logarithm", () => {
+            expect(MathUtility.doLn(1)).toBeCloseTo(0);
+            expect(MathUtility.doLn(Math.E)).toBeCloseTo(1);
+            expect(MathUtility.doLn(Math.E * Math.E)).toBeCloseTo(2);
+        });
+
+        test("throws NanError for zero or negative input", () => {
+            expect(() => MathUtility.doLn(0)).toThrow("NanError");
+            expect(() => MathUtility.doLn(-1)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doLn("abc")).toThrow("NanError");
+            expect(() => MathUtility.doLn(null)).toThrow("NanError");
+        });
+    });
+
+    describe("doLog", () => {
+        test("calculates base-10 logarithm", () => {
+            expect(MathUtility.doLog(1)).toBeCloseTo(0);
+            expect(MathUtility.doLog(10)).toBeCloseTo(1);
+            expect(MathUtility.doLog(100)).toBeCloseTo(2);
+            expect(MathUtility.doLog(1000)).toBeCloseTo(3);
+        });
+
+        test("throws NanError for zero or negative input", () => {
+            expect(() => MathUtility.doLog(0)).toThrow("NanError");
+            expect(() => MathUtility.doLog(-10)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric input", () => {
+            expect(() => MathUtility.doLog("abc")).toThrow("NanError");
+            expect(() => MathUtility.doLog(null)).toThrow("NanError");
+        });
+    });
+
+    describe("doPi", () => {
+        test("returns Math.PI", () => {
+            expect(MathUtility.doPi()).toBe(Math.PI);
+        });
+    });
+
+    describe("doE", () => {
+        test("returns Math.E", () => {
+            expect(MathUtility.doE()).toBe(Math.E);
+        });
+    });
+
     describe("NaN is rejected the same way everywhere", () => {
         // doInt is the reachable source: it is documented to hand back NaN for a
         // non-numeric argument, and typeof NaN === "number", so any guard written
@@ -856,7 +1044,15 @@ describe("MathUtility", () => {
             ["doAbs", a => MathUtility.doAbs(a)],
             ["doNegate", a => MathUtility.doNegate(a)],
             ["doCalculateDistance", a => MathUtility.doCalculateDistance(a, 0, 3, 4)],
-            ["doRandom", a => MathUtility.doRandom(a, 3)]
+            ["doRandom", a => MathUtility.doRandom(a, 3)],
+            ["doSin", a => MathUtility.doSin(a)],
+            ["doCos", a => MathUtility.doCos(a)],
+            ["doTan", a => MathUtility.doTan(a)],
+            ["doArcSin", a => MathUtility.doArcSin(a)],
+            ["doArcCos", a => MathUtility.doArcCos(a)],
+            ["doArcTan", a => MathUtility.doArcTan(a)],
+            ["doLn", a => MathUtility.doLn(a)],
+            ["doLog", a => MathUtility.doLog(a)]
         ])("%s throws NanError for a NaN first argument", (_name, call) => {
             expect(() => call(nan)).toThrow("NanError");
         });
