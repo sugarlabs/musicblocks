@@ -1770,6 +1770,41 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].value).not.toBe(value);
         });
 
+        it("restores the Rhythm Maker edits, moving the drum ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                rhythmruler2: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const rulerHistory = [
+                [[[0, 2]], 1],
+                "not an entry",
+                [[3], "not a block"],
+                [[null], 1],
+                [[[]], 1],
+                [[[0, 2], [null]], 1]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["rhythmruler2", { collapsed: false, rulerHistory }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].rulerHistory).toEqual([[[[0, 2]], 3]]);
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is

@@ -808,7 +808,6 @@ class ProjectManager {
                     case "action":
                     case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -817,6 +816,18 @@ class ProjectManager {
                         args = {
                             collapsed: myBlock.collapsed
                         };
+                        break;
+                    case "rhythmruler2":
+                        args = {
+                            collapsed: myBlock.collapsed
+                        };
+                        // The edits made in the widget, keyed by drum block. Drop the drums
+                        // that are no longer in the project.
+                        if (Array.isArray(myBlock.rulerHistory)) {
+                            args.rulerHistory = myBlock.rulerHistory
+                                .filter(entry => blockIndexById.has(entry[1]))
+                                .map(entry => [entry[0], blockIndexById.get(entry[1])]);
+                        }
                         break;
                     case "storein2":
                     case "nameddo":

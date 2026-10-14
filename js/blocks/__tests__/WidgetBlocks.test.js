@@ -1089,6 +1089,15 @@ describe("setupWidgetBlocks", () => {
             expect(logo[logoKey]).toBeDefined();
         });
 
+        it("tells the Rhythm Maker which block opened it, so its edits are saved there", () => {
+            logo.rhythmRuler = { Rulers: [[[1], []]], Drums: [3] };
+
+            getBlock("rhythmruler2").flow(["childBlk"], logo, 0, "rrBlk");
+
+            expect(logo.rhythmRuler.rulerBlock).toBe("rrBlk");
+            expect(logo.rhythmRuler.Rulers).toEqual([]);
+        });
+
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
