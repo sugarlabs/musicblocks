@@ -71,6 +71,7 @@ const blockIsMacro = (activity, blkname) => {
         "cursoruphelp",
         "decrescendohelp",
         "deltapitchhelp",
+        "deltapitch2help",
         "dishelp",
         "dohelp",
         "dothelp",
@@ -536,6 +537,15 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [4, "everybeatdo", x, y, [null, 5, null]],
         [5, ["text", { value: "action" }], 0, 0, [4]],
         [6, "deltapitch", 0, 0, [3]]
+    ];
+    const DELTAPITCH2HELP = [
+        [0, ["action", { collapsed: false }], x, y + 100, [null, 1, 2, null]],
+        [1, ["text", { value: "action" }], 0, 0, [0]],
+        [2, "hidden", 0, 0, [0, 3]],
+        [3, "forward", 533, 361, [2, 6, null]],
+        [4, "everybeatdo", x, y, [null, 5, null]],
+        [5, ["text", { value: "action" }], 0, 0, [4]],
+        [6, "deltapitch2", 0, 0, [3]]
     ];
     const DISHELP = [
         [0, "dis", x, y, [null, 11, 1, 10]],
@@ -1694,6 +1704,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         decrescendohelp: DECRESCENDOHELP,
         deletehelp: DELETEHELP,
         deltapitchhelp: DELTAPITCHHELP,
+        deltapitch2help: DELTAPITCH2HELP,
         dishelp: DISHELP,
         dohelp: DOHELP,
         dothelp: DOTHELP,
