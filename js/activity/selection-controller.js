@@ -325,23 +325,23 @@ class SelectionController {
             const blocksArray = activity.blocks.selectedBlocks;
             let pasteDx = 0,
                 pasteDy = 0;
-            const map = new Map();
-            for (let i = 0; i < blocksArray.length; i++) {
-                const idx = blocksArray[i].blockIndex;
-                map.set(
-                    idx,
-                    blocksArray[i].connections.filter(blk => blk !== null)
-                );
-
-                if (
-                    blocksArray[i].connections.some(blkno => {
-                        const a = map.get(blkno);
-                        return a && a.some(b => b === idx);
-                    }) ||
-                    blocksArray[i].trash
-                )
-                    continue;
-
+            const selectedIndices = new Set(
+                blocksArray.filter(block => !block.trash).map(block => block.blockIndex)
+            );
+            // A selected ancestor already copies this block as part of its drag group.
+            const roots = blocksArray.filter(block => {
+                if (block.trash) return false;
+                const visited = new Set([block.blockIndex]);
+                let parent = block.connections[0];
+                while (parent !== null && parent !== undefined && !visited.has(parent)) {
+                    if (selectedIndices.has(parent)) return false;
+                    visited.add(parent);
+                    parent = activity.blocks.blockList[parent]?.connections[0];
+                }
+                return true;
+            });
+            for (const block of roots) {
+                const idx = block.blockIndex;
                 activity.blocks.activeBlock = idx;
                 activity.blocks.pasteDx = pasteDx;
                 activity.blocks.pasteDy = pasteDy;
