@@ -302,7 +302,7 @@ describe("helper.js", () => {
     describe("responsive Planet search", () => {
         let originalRequestAnimationFrame;
         let originalAnimate;
-
+        let animationFinishHandler;
         beforeEach(() => {
             jest.resetModules();
 
@@ -350,7 +350,15 @@ describe("helper.js", () => {
             window.requestAnimationFrame = callback => callback();
 
             originalAnimate = Element.prototype.animate;
-            Element.prototype.animate = jest.fn();
+            animationFinishHandler = null;
+
+            Element.prototype.animate = jest.fn(() => ({
+                addEventListener: jest.fn((eventName, handler) => {
+                    if (eventName === "finish") {
+                        animationFinishHandler = handler;
+                    }
+                })
+            }));
 
             const navbar = document.getElementById("main-nav");
             navbar.getBoundingClientRect = jest.fn(() => ({
@@ -435,6 +443,20 @@ describe("helper.js", () => {
             expect(search.style.transform).toBe("none");
             expect(tabs.style.transform).toBe("translateX(-40px)");
             expect(Element.prototype.animate).toHaveBeenCalled();
+        });
+
+        it("should recalculate spacing when docking animation finishes", () => {
+            const input = document.getElementById("local-search");
+            const tabs = document.getElementById("localglobal");
+
+            input.value = "music";
+            tabs.style.translate = "";
+
+            expect(animationFinishHandler).toEqual(expect.any(Function));
+
+            animationFinishHandler();
+
+            expect(tabs.style.translate).not.toBe("");
         });
 
         it("should move Local/Global tabs when docked search expands", () => {
