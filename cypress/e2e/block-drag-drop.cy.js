@@ -77,39 +77,67 @@ describe("Block palette drag-and-drop", () => {
 
         cy.get("@dropPlan").then(plan => {
             cy.get('#PaletteBody tbody tr[aria-label="pitch"] img').then($img => {
-                const rect = $img[0].getBoundingClientRect();
-                const startX = rect.x + rect.width / 2;
-                const startY = rect.y + rect.height / 2;
+                cy.window().then(win => {
+                    const canvasRect = win.document
+                        .querySelector("#canvas")
+                        .getBoundingClientRect();
+                    const stageScale = win.ActivityContext.getActivity().getStageScale();
 
-                // js/palette.js's drag handler centers the floating icon on
-                // the cursor (moveAt) and then converts its final page
-                // position back into container coordinates by subtracting
-                // half the icon's own size, so the on-screen point we must
-                // release the mouse at is the target container position plus
-                // that same half-icon offset.
-                const endX = plan.targetContainerX + rect.width / 2;
-                const endY = plan.targetContainerY + rect.height / 2;
+                    const rect = $img[0].getBoundingClientRect();
+                    const startX = rect.left + rect.width / 2;
+                    const startY = rect.top + rect.height / 2;
 
-                cy.get('#PaletteBody tbody tr[aria-label="pitch"] img')
-                    .trigger("mousedown", { which: 1, pageX: startX, pageY: startY, force: true })
-                    .then($draggedImg => {
-                        // The real handler listens for mousemove on document
-                        // (to follow the cursor) but binds mouseup directly to
-                        // the dragged <img> element, matching where a real
-                        // cursor release would land once the icon has been
-                        // repositioned under it.
-                        cy.document().trigger("mousemove", {
-                            pageX: (startX + endX) / 2,
-                            pageY: (startY + endY) / 2
-                        });
-                        cy.document().trigger("mousemove", { pageX: endX, pageY: endY });
-                        cy.wrap($draggedImg).trigger("mouseup", {
+                    // js/palette.js's drag handler centers the floating icon on
+                    // the cursor (moveAt) and then converts its final page
+                    // position back into container coordinates by subtracting
+                    // half the icon's own size, so the on-screen point we must
+                    // release the mouse at is the target container position plus
+                    // that same half-icon offset.
+                    const clientX =
+                        canvasRect.left +
+                        (plan.targetContainerX +
+                            win.ActivityContext.getActivity().blocksContainer.x) *
+                            stageScale +
+                        rect.width / 2;
+
+                    const clientY =
+                        canvasRect.top +
+                        (plan.targetContainerY +
+                            win.ActivityContext.getActivity().blocksContainer.y) *
+                            stageScale +
+                        rect.height / 2;
+
+                    const endX = clientX + win.scrollX;
+                    const endY = clientY + win.scrollY;
+
+                    cy.wrap($img)
+                        .trigger("mousedown", {
                             which: 1,
-                            pageX: endX,
-                            pageY: endY,
+                            pageX: startX,
+                            pageY: startY,
                             force: true
+                        })
+                        .then($draggedImg => {
+                            // The real handler listens for mousemove on document
+                            // (to follow the cursor) but binds mouseup directly to
+                            // the dragged <img> element, matching where a real
+                            // cursor release would land once the icon has been
+                            // repositioned under it.
+                            cy.document().trigger("mousemove", {
+                                pageX: (startX + endX) / 2,
+                                pageY: (startY + endY) / 2
+                            });
+                            cy.document().trigger("mousemove", { pageX: endX, pageY: endY });
+                            cy.document().trigger("mouseup", {
+                                which: 1,
+                                clientX: clientX,
+                                clientY: clientY,
+                                pageX: endX,
+                                pageY: endY,
+                                force: true
+                            });
                         });
-                    });
+                });
             });
         });
 
