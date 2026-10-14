@@ -58,6 +58,8 @@ table.white > tbody > tr > td {
   max-width: 80px;
   height: 100%;
   vertical-align: bottom;
+  background-color: #fff;
+  color: #000;
   border: 1px solid #000;
 }
 table.black > tbody > tr > td {

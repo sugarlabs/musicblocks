@@ -318,6 +318,46 @@ describe("themes.css colour tokens", () => {
         expect(bg).not.toBeNull();
         expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
     });
+
+    it.each(["dark", "highcontrast"])(
+        "keeps music keyboard containers readable in the %s theme",
+        theme => {
+            const rule = rules.find(
+                r => r.selector.includes("#mkbKeyboardDiv") && themeOf(r.selector) === theme
+            );
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it("keeps piano keys readable with high contrast and preserves transparent spacers", () => {
+        const whiteRule = rules.find(r => r.selector.includes("table.white > tbody > tr > td"));
+        expect(whiteRule).toBeDefined();
+        const whiteBg = resolveColor(declaration(whiteRule.body, "background-color"), {});
+        const whiteFg = resolveColor(declaration(whiteRule.body, "color"), {});
+        expect(contrastRatio(whiteFg, whiteBg)).toBeGreaterThanOrEqual(4.5);
+
+        const blackRule = rules.find(r =>
+            r.selector.includes("table.black > tbody > tr > td:not(.spacer)")
+        );
+        expect(blackRule).toBeDefined();
+        const blackBg = resolveColor(declaration(blackRule.body, "background-color"), {});
+        const blackFg = resolveColor(declaration(blackRule.body, "color"), {});
+        expect(contrastRatio(blackFg, blackBg)).toBeGreaterThanOrEqual(4.5);
+
+        const spacerRule = rules.find(r =>
+            r.selector.includes("table.black > tbody > tr > td.spacer")
+        );
+        expect(spacerRule).toBeDefined();
+        expect(declaration(spacerRule.body, "background-color")).toBe("transparent");
+        expect(declaration(spacerRule.body, "border")).toBe("none");
+    });
 });
 
 describe("play-only-mode.css colour tokens", () => {
@@ -356,4 +396,53 @@ describe("play-only-mode.css colour tokens", () => {
             expect(rule.body).toContain("var(--color-border-primary)");
         }
     );
+
+    it("keeps piano keys readable and preserves transparent spacers in play-only mode", () => {
+        const whiteRule = playOnlyRules.find(r =>
+            r.selector.includes("#keyboardHolder2 table.white > tbody > tr > td")
+        );
+        expect(whiteRule).toBeDefined();
+        const whiteBg = resolveColor(declaration(whiteRule.body, "background-color"), {});
+        const whiteFg = resolveColor(declaration(whiteRule.body, "color"), {});
+        expect(contrastRatio(whiteFg, whiteBg)).toBeGreaterThanOrEqual(4.5);
+
+        const blackRule = playOnlyRules.find(r =>
+            r.selector.includes("#keyboardHolder2 table.black > tbody > tr > td:not(.spacer)")
+        );
+        expect(blackRule).toBeDefined();
+        const blackBg = resolveColor(declaration(blackRule.body, "background-color"), {});
+        const blackFg = resolveColor(declaration(blackRule.body, "color"), {});
+        expect(contrastRatio(blackFg, blackBg)).toBeGreaterThanOrEqual(4.5);
+
+        const spacerRule = playOnlyRules.find(r =>
+            r.selector.includes("#keyboardHolder2 table.black > tbody > tr > td.spacer")
+        );
+        expect(spacerRule).toBeDefined();
+        expect(declaration(spacerRule.body, "background-color")).toBe("transparent");
+        expect(declaration(spacerRule.body, "border")).toBe("none");
+    });
+
+    it("anchors floating windows below the toolbar in play-only mode", () => {
+        const rule = playOnlyRules.find(
+            r => r.selector.includes(".play-only #floatingWindows") && !r.selector.includes(">")
+        );
+        expect(rule).toBeDefined();
+        expect(rule.body).toContain("top: 64px");
+        expect(rule.body).toContain("height: calc(100vh - 64px)");
+    });
+
+    it("pins floating window frame to left 0 and ensures close button is visible in play-only mode", () => {
+        const frameRule = playOnlyRules.find(
+            r =>
+                r.selector.includes(".play-only #floatingWindows > .windowFrame") &&
+                !r.selector.includes(".wf")
+        );
+        expect(frameRule).toBeDefined();
+        expect(frameRule.body).toContain("left: 0");
+        expect(frameRule.body).toContain("width: 100%");
+
+        const closeRule = playOnlyRules.find(r => r.selector.includes(".wftButton.close"));
+        expect(closeRule).toBeDefined();
+        expect(closeRule.body).toContain("display: flex");
+    });
 });
