@@ -448,6 +448,52 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain("<duration>24</duration>");
     });
 
+    it("keeps the grid bounded when staging carries huge tuplet factors", () => {
+        // Linus-and-Lucy stages these: durations from floating-point arithmetic factor into
+        // large primes, and the LCM of the three alone is about 1.6e11 divisions per whole
+        // note. Taking it whole wrote <duration> values far past what readers accept.
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 8, 0, null, null],
+                        [["D4"], 1, 0, [5153, 1], 4096],
+                        [["E4"], 1, 0, [5159, 1], 4096],
+                        [["F4"], 1, 0, [6213, 1], 8192]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+        const divisions = Number(output.match(/<divisions>(\d+)<\/divisions>/)[1]);
+        const durations = [...output.matchAll(/<duration>([^<]*)<\/duration>/g)].map(m => m[1]);
+
+        expect(divisions * 4).toBeLessThanOrEqual(2 ** 20);
+        expect(durations.length).toBeGreaterThan(0);
+        durations.forEach(d => expect(d).toMatch(/^[1-9]\d*$/));
+    });
+
+    it("writes a fractional tuplet factor as a plain note with a rounded duration", () => {
+        // Bartok-fib-color stages [13.333333333333334, 0.5]: not a tuplet MusicXML can write,
+        // and _gcd on it never settled. It becomes a plain note on the grid.
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 1, 0, [13.333333333333334, 0.5], 8]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).not.toContain("<time-modification>");
+        expect(output).not.toMatch(/NaN|Infinity/);
+        output
+            .match(/<duration>([^<]*)<\/duration>/g)
+            .forEach(d => expect(d).toMatch(/<duration>[1-9]\d*<\/duration>/));
+    });
+
     it("should emit time-modification with the reduced actual/normal notes ratio for a tuplet note", () => {
         const logo = {
             notation: {

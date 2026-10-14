@@ -20,7 +20,15 @@ const MXML_TUPLETVALUE = 3;
 const MXML_ROUNDDOWN = 4;
 const MXML_DRUM = 7;
 
-const _gcd = (a, b) => (b === 0 ? a : _gcd(b, a % b));
+// Iterative, and only defined for finite numbers: Infinity % b is NaN, which never reaches
+// the b === 0 base case, so the recursive form ran until the stack overflowed.
+const _gcd = (a, b) => {
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return 1;
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) [a, b] = [b, a % b];
+    return a;
+};
 const _lcm = (a, b) => (a * b) / _gcd(a, b);
 
 // Tuplet durations can still land off an integer in extreme cases (e.g. a tuplet fine
@@ -35,6 +43,13 @@ const DIVISIONS_EPSILON = 1e-6;
 // integer <duration> for them instead of the nearest-integer approximation this
 // constant alone could represent.
 const DIVISIONS_PER_WHOLE_NOTE = 32;
+
+// Largest grid _resolveDivisionsPerWholeNote will build. A staged duration that came out of
+// floating-point arithmetic can carry a huge or fractional "tuplet" factor (Linus-and-Lucy
+// stages 5153, 5159 and 6213; Bartok-fib-color 13.333...), and taking the LCM of those gave
+// <duration> values up to 1e197 and, once, Infinity. Notes that would push the grid past this
+// are written with a rounded duration instead.
+const MAX_DIVISIONS_PER_WHOLE_NOTE = 2 ** 20;
 
 // The <type> name MusicXML gives each note-value denominator.
 const MXML_NOTE_TYPES = new Map([
@@ -110,6 +125,11 @@ const _escapeWords = text =>
  */
 const _tupletNotesRatio = (tupletRatio, roundDown) => {
     const noteValue = tupletRatio[0] * tupletRatio[1];
+    // Only a whole-number factoring is a tuplet MusicXML can write; anything else is
+    // floating-point residue from the duration and is written as a plain, rounded note.
+    if (!Number.isInteger(noteValue) || !Number.isInteger(roundDown) || roundDown <= 0) {
+        return null;
+    }
     const divisor = _gcd(noteValue, roundDown);
     return { actualNotes: noteValue / divisor, normalNotes: roundDown / divisor };
 };
@@ -130,11 +150,11 @@ const _resolveDivisionsPerWholeNote = notes => {
         if (!Array.isArray(entry)) continue;
 
         if (Array.isArray(entry[MXML_TUPLETVALUE])) {
-            const { actualNotes } = _tupletNotesRatio(
-                entry[MXML_TUPLETVALUE],
-                entry[MXML_ROUNDDOWN]
-            );
-            scaleFactor = _lcm(scaleFactor, actualNotes);
+            const ratio = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
+            if (ratio !== null) {
+                const next = _lcm(scaleFactor, ratio.actualNotes);
+                if (perWholeNote * next <= MAX_DIVISIONS_PER_WHOLE_NOTE) scaleFactor = next;
+            }
             continue;
         }
 
@@ -144,7 +164,8 @@ const _resolveDivisionsPerWholeNote = notes => {
         const noteValue = Number(entry[1]);
         const dots = Number(entry[2]);
         if (Number.isInteger(noteValue) && noteValue > 0 && Number.isInteger(dots) && dots >= 0) {
-            perWholeNote = _lcm(perWholeNote, noteValue * 2 ** dots);
+            const next = _lcm(perWholeNote, noteValue * 2 ** dots);
+            if (next * scaleFactor <= MAX_DIVISIONS_PER_WHOLE_NOTE) perWholeNote = next;
         }
     }
     return perWholeNote * scaleFactor;
@@ -674,11 +695,17 @@ class MusicXMLExporter {
                         const tupletRatio = obj[MXML_TUPLETVALUE];
                         let preciseDur, dur, timeModification;
 
-                        if (Array.isArray(tupletRatio)) {
-                            const { actualNotes, normalNotes } = _tupletNotesRatio(
-                                tupletRatio,
-                                obj[MXML_ROUNDDOWN]
-                            );
+                        const ratio = Array.isArray(tupletRatio)
+                            ? _tupletNotesRatio(tupletRatio, obj[MXML_ROUNDDOWN])
+                            : null;
+                        if (ratio === null && Array.isArray(tupletRatio)) {
+                            // Not a writable tuplet (see _tupletNotesRatio): give the note its
+                            // true length on the grid, rounded, without a <time-modification>.
+                            preciseDur = divisionsPerWholeNote / (tupletRatio[0] * tupletRatio[1]);
+                            dur = Math.max(1, Math.round(preciseDur));
+                            timeModification = null;
+                        } else if (ratio !== null) {
+                            const { actualNotes, normalNotes } = ratio;
                             // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
                             // to be an exact multiple of every tuplet's actualNotes count in this
                             // voice, so this is already a whole number, not an approximation.
@@ -692,7 +719,10 @@ class MusicXMLExporter {
                         } else {
                             preciseDur =
                                 (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
-                            dur = preciseDur;
+                            // Whole unless the grid hit MAX_DIVISIONS_PER_WHOLE_NOTE.
+                            dur = Number.isInteger(preciseDur)
+                                ? preciseDur
+                                : Math.max(1, Math.round(preciseDur));
                             timeModification = null;
                         }
 
