@@ -49,6 +49,36 @@ const MXML_NOTE_TYPES = new Map([
     [256, "256th"]
 ]);
 
+// The <mode> value MusicXML defines for each mode this exporter can name. Restricted to
+// the ones the element actually carries, the same set js/activity/mxml-parser.js reads back;
+// a mode outside it (pentatonic, blues, whole tone) is written without a <mode> at all.
+const _MXML_MODE_NAMES = new Map([
+    ["major", "major"],
+    ["ionian", "major"],
+    ["lydian", "lydian"],
+    ["mixolydian", "mixolydian"],
+    ["dorian", "dorian"],
+    ["minor", "minor"],
+    ["m", "minor"],
+    ["aeolian", "minor"],
+    ["natural minor", "minor"],
+    ["phrygian", "phrygian"],
+    ["locrian", "locrian"]
+]);
+
+const _keyMode = mode =>
+    _MXML_MODE_NAMES.get(
+        String(mode ?? "")
+            .toLowerCase()
+            .trim()
+    ) ?? null;
+
+// The <mode> element for a mode MusicXML can name, or nothing for one it cannot.
+const _modeElement = mode => {
+    const name = _keyMode(mode);
+    return name === null ? "" : ` <mode>${name}</mode>`;
+};
+
 /**
  * Converts a LilyPond duration, the form notation.js stages pickups and tempo beats in
  * (convertFactor() in js/utils/musicutils.js), to a length in whole notes.
@@ -318,10 +348,13 @@ class MusicXMLExporter {
      * Writes a key signature on its own, for a change that arrives when the
      * measure attributes are not being written anyway.
      * @param {number} fifths - sharps, or flats as a negative.
+     * @param {string} mode - the mode the key is in, written when MusicXML can name it.
      * @returns {void}
      */
-    addKeyAttributes(fifths) {
-        this.add(`<attributes> <key> <fifths>${fifths}</fifths> </key> </attributes>`);
+    addKeyAttributes(fifths, mode) {
+        this.add(
+            `<attributes> <key> <fifths>${fifths}</fifths>${_modeElement(mode)} </key> </attributes>`
+        );
     }
 
     addMeasureAttributes(
@@ -331,12 +364,13 @@ class MusicXMLExporter {
         beatType,
         implicit = false,
         isPercussion = false,
-        fifths = 0
+        fifths = 0,
+        mode = null
     ) {
         this.add(
             isPercussion
                 ? `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
-                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
+                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths>${_modeElement(mode)} </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
     }
 
@@ -495,6 +529,9 @@ class MusicXMLExporter {
                 let previousNote = -1;
                 // Sharps, or flats as a negative, for the key this voice is in.
                 let fifths = 0;
+                // A minor and C major share a signature, so the mode is the only thing that
+                // tells them apart, and has to be tracked and compared in its own right.
+                let keyMode = "major";
                 // A key change still waiting to be written. The meter is tracked
                 // separately, because a measure can begin without a new meter.
                 let keyChanged = false;
@@ -526,8 +563,10 @@ class MusicXMLExporter {
 
                     if (obj === "key") {
                         const staged = _keyFifths(notes[i + 1], notes[i + 2]);
-                        if (staged !== null && staged !== fifths) {
+                        const stagedMode = notes[i + 2];
+                        if (staged !== null && (staged !== fifths || stagedMode !== keyMode)) {
                             fifths = staged;
+                            keyMode = stagedMode;
                             keyChanged = true;
                         }
                         i += 2;
@@ -739,7 +778,8 @@ class MusicXMLExporter {
                                         beatType,
                                         isPickup,
                                         part.isPercussion,
-                                        fifths
+                                        fifths,
+                                        keyMode
                                     );
                                     firstMeasure = false;
                                     beatsChanged = false;
@@ -761,7 +801,7 @@ class MusicXMLExporter {
                             // already open, still has to carry a key change. The
                             // percussion clef is written without a key at all.
                             if (keyChanged) {
-                                if (!part.isPercussion) this.addKeyAttributes(fifths);
+                                if (!part.isPercussion) this.addKeyAttributes(fifths, keyMode);
                                 keyChanged = false;
                             }
 
