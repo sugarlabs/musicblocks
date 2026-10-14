@@ -117,6 +117,10 @@ describe("RhythmRulerHistory", () => {
             const rows = [{ cells: [{}, {}] }, { cells: [{}, {}] }];
             const widget = {
                 Drums: [11, 11],
+                Rulers: [
+                    [[4, 4], []],
+                    [[4, 4], []]
+                ],
                 _rulers: rows,
                 _dissectHistory: [
                     [[[0, 2]], 11],
