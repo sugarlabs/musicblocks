@@ -821,6 +821,15 @@ describe("widgetWindows", () => {
             expect(win1._frame.style.zIndex).toBe("0");
             expect(win2._frame.style.zIndex).toBe("10000");
         });
+
+        test("notifies the window via onfocused", () => {
+            const win = createTestWindow();
+            win.onfocused = jest.fn();
+
+            win.takeFocus();
+
+            expect(win.onfocused).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("isMaximized", () => {
@@ -1128,6 +1137,18 @@ describe("widgetWindows", () => {
             expect(win2._frame.style.zIndex).toBe("10000");
             expect(win1._frame.style.opacity).toBe("0.7");
             expect(win1._frame.style.zIndex).toBe("0");
+        });
+
+        test("notifies the clicked window via onfocused", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onfocused = jest.fn();
+            win2.onfocused = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onfocused).toHaveBeenCalledTimes(1);
+            expect(win2.onfocused).not.toHaveBeenCalled();
         });
 
         test("clears focus and dims all windows when clicking outside all windows", () => {
