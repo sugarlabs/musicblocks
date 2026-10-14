@@ -240,7 +240,11 @@ class OfflineCommitManager {
                 `[OfflineCommitManager] Failed to create pending repo for project ${projectId}:`,
                 result?.error
             );
-            return;
+            return {
+                success: false,
+                synced: 0,
+                error: result?.error || "creation_failed"
+            };
         }
 
         // result.repository should equal pendingCreation.repoName (same name we sent).
@@ -289,7 +293,11 @@ class OfflineCommitManager {
         );
 
         // Push ALL drafts (draft 1, 2, 3, …) to the real repo as proper commits
-        await this.syncPending(projectId, actualRepoName, realKey);
+        const syncResult = await this.syncPending(projectId, actualRepoName, realKey);
+        return {
+            success: true,
+            synced: syncResult?.synced || 0
+        };
     }
 
     // ── Connectivity hook ─────────────────────────────────────────────────
@@ -322,8 +330,10 @@ class OfflineCommitManager {
                 if (this._hasPendingRepo(id)) {
                     const pending = projects[id].pendingRepoCreation;
                     try {
-                        await this._createPendingRepo(id, pending);
-                        syncedCount++;
+                        const repoResult = await this._createPendingRepo(id, pending);
+                        if (repoResult && repoResult.success) {
+                            syncedCount += repoResult.synced || 0;
+                        }
                     } catch (err) {
                         console.error(
                             `[OfflineCommitManager] Pending repo creation failed for ${id}:`,
