@@ -623,26 +623,35 @@ describe("setupVolumeActions", () => {
             expect(connectSpyPiano).not.toHaveBeenCalled();
         });
 
-        it("should return early without processing if panning value is NaN or Infinity", () => {
-            targetTurtle.singer.panner = new Tone.Panner(0);
+        it("should fallback to center (0) when panning value is NaN or non-numeric", () => {
+            targetTurtle.singer.panner = new Tone.Panner(0.5);
 
             Singer.VolumeActions.setPanning(NaN, 0);
             expect(targetTurtle.singer.panner.pan.value).toBe(0);
 
-            Singer.VolumeActions.setPanning(Infinity, 0);
+            Singer.VolumeActions.setPanning(undefined, 0);
             expect(targetTurtle.singer.panner.pan.value).toBe(0);
 
-            Singer.VolumeActions.setPanning(-Infinity, 0);
+            Singer.VolumeActions.setPanning("invalid", 0);
             expect(targetTurtle.singer.panner.pan.value).toBe(0);
         });
 
-        it("should not create a panner if panning value is NaN or Infinity", () => {
+        it("should create centered panner when value is NaN and no panner exists", () => {
             targetTurtle.singer.panner = null;
             Tone.Panner.mockClear();
 
             Singer.VolumeActions.setPanning(NaN, 0);
-            expect(Tone.Panner).not.toHaveBeenCalled();
-            expect(targetTurtle.singer.panner).toBeNull();
+            expect(Tone.Panner).toHaveBeenCalledWith(0);
+        });
+
+        it("should clamp infinite panning values to [-1, 1]", () => {
+            targetTurtle.singer.panner = new Tone.Panner(0);
+
+            Singer.VolumeActions.setPanning(Infinity, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(1);
+
+            Singer.VolumeActions.setPanning(-Infinity, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(-1);
         });
     });
 
