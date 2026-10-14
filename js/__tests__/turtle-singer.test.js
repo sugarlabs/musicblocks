@@ -1039,6 +1039,23 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.butNotThese).toEqual({});
     });
 
+    test("should isolate and restore enclosing clamp suppressions", () => {
+        const original = { 5: [0], 7: [1] };
+        turtleMock.butNotThese = original;
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        logoMock.runFromBlockNow = jest.fn(() => {
+            expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [0, 1] });
+            turtleMock.butNotThese[5].push(1);
+            turtleMock.butNotThese[9] = [0];
+            expect(original).toEqual({ 5: [0], 7: [1] });
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(turtleMock.butNotThese).toBe(original);
+        expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [1] });
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -1439,6 +1456,23 @@ describe("noteCounter regression behavior", () => {
 
         expect(skipped).toEqual({ 7: [0, 1] });
         expect(turtleMock.butNotThese).toEqual({});
+    });
+
+    test("should isolate and restore enclosing clamp suppressions", () => {
+        const original = { 5: [0], 7: [1] };
+        turtleMock.butNotThese = original;
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [0, 1] });
+            turtleMock.butNotThese[5].push(1);
+            turtleMock.butNotThese[9] = [0];
+            expect(original).toEqual({ 5: [0], 7: [1] });
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(turtleMock.butNotThese).toBe(original);
+        expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [1] });
     });
 
     test("should restore an untouched heap as an array, not an object", () => {
