@@ -731,6 +731,25 @@ describe("PhraseMaker Widget", () => {
         // Marked columns in the preserved row (original row index 0) should contain [0, 1] (column indices), NOT row index 1
         expect(phraseMaker._markedColsInRow[0]).toEqual([0, 1]);
     });
+    test("_sort orders arc before setxy using the secondary graphics list", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+        phraseMaker.stylePhraseMaker = jest.fn();
+        phraseMaker.rowLabels = ["arc", "C", "setxy"];
+        phraseMaker.rowArgs = [90, 4, 0];
+        phraseMaker._rows = [{ cells: [] }, { cells: [] }, { cells: [] }];
+        phraseMaker._noteStored = ["arc", "C4", "setxy"];
+        phraseMaker.columnBlocksMap = [[0], [1], [2]];
+
+        phraseMaker.activity = {
+            turtles: { ithTurtle: () => ({ singer: { keySignature: 0 } }) },
+            logo: { tupletRhythms: [] }
+        };
+
+        phraseMaker._sort();
+
+        expect(phraseMaker.rowLabels).toEqual(["C", "arc", "setxy"]);
+    });
     test("makeClickable safely handles sorted rows when cells are undefined", () => {
         phraseMaker.sorted = true;
         phraseMaker._rowMapper = [0];
