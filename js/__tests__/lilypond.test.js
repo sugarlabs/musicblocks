@@ -401,6 +401,21 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("->");
     });
 
+    test("should write a rest for a staged note with no pitches inside a tuplet", () => {
+        const tupletNote = pitches => [pitches, 1, 0, [3, 2], 4, -1, false];
+        logo.notation.notationStaging[turtle] = [
+            tupletNote(["G4"]),
+            tupletNote([]),
+            tupletNote(["B4"])
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+
+        // Without the rest nothing is written for the note and its duration runs on from
+        // the g, giving "g' 44", which Lilypond rejects as not a duration.
+        expect(logo.notationNotes[turtle]).toContain("{ g' 4r 4b' 4}");
+        expect(logo.notationNotes[turtle]).not.toContain("44");
+    });
+
     test("should process a pickup command correctly", () => {
         logo.notation.notationStaging[turtle] = ["pickup", 4, [["G4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);

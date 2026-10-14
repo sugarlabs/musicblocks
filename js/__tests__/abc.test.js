@@ -650,6 +650,24 @@ describe("processABCNotes - notation markers", () => {
         expect(parseNotes(body)).toHaveLength(2);
     });
 
+    it("writes a rest for a staged note with no pitches inside a tuplet", () => {
+        const tupletNote = pitches => [pitches, 1, 0, [3, 2], 4, -1, false];
+        const body = exportBody([
+            note("C4"),
+            tupletNote(["G4"]),
+            tupletNote([]),
+            tupletNote(["B4"]),
+            note("C5")
+        ]);
+        const notes = parseNotes(body);
+
+        // Without the rest the note is left out and its duration runs on from the G,
+        // which abcjs reads as a single note eleven times as long.
+        expect(notes).toHaveLength(5);
+        expect(notes[2].rest).toBeDefined();
+        expect(notes.map(n => n.duration)).toEqual([0.25, 0.25, 0.25, 0.25, 0.25]);
+    });
+
     describe("tempo", () => {
         it.each([
             ["4", "1/4"],
