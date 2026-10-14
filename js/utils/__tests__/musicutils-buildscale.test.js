@@ -108,10 +108,40 @@ describe("musicutils-buildscale", () => {
             SHARP
         ]);
 
-        // Double accidental on natural scale note (C major: C -> C##)
+        // Double accidental on natural scale note (C major: C -> C##, C -> Cbb)
         expect(
             buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLESHARP)
         ).toEqual(["1", DOUBLESHARP, "8", DOUBLESHARP]);
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLEFLAT)
+        ).toEqual(["1", DOUBLEFLAT, "8", DOUBLEFLAT]);
+
+        // Explicit natural symbol on natural scale note
+        expect(buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + NATURAL)).toEqual(
+            ["1", NATURAL, "8", NATURAL]
+        );
+
+        // Boundary offsets (> 2 or < -2) return null accidental
+        expect(buildscale.scaleDegreeToPitchMapping("F♭ major", null, false, "B" + SHARP)).toEqual([
+            "4"
+        ]);
+        expect(
+            buildscale.scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLEFLAT)
+        ).toEqual(["7"]);
+
+        // Unrecognized accidental notation returns null accidental
+        expect(buildscale.scaleDegreeToPitchMapping("C major", null, false, "C?")).toEqual([
+            "1",
+            "8"
+        ]);
+
+        // Scales with < 7 notes and > 7 notes in reverse mapping
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C major pentatonic", null, false, "D" + SHARP)
+        ).toEqual(["2", SHARP]);
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C chromatic", null, false, "C" + SHARP)
+        ).toEqual(["1", SHARP]);
     });
 
     it("still resolves a minor key signature's scale and solfege", () => {

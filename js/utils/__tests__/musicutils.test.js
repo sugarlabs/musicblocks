@@ -3456,6 +3456,14 @@ describe("scaleDegreeToPitchMapping", () => {
         expect(scaleDegreeToPitchMapping("G major", null, false, "F")).toEqual(["7", "♭"]);
         expect(scaleDegreeToPitchMapping("F major", null, false, "B♭")).toEqual(["4", "♮"]);
         expect(scaleDegreeToPitchMapping("G major", null, false, "F♯")).toEqual(["7", "♮"]);
+        expect(scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLEFLAT)).toEqual([
+            "1",
+            DOUBLEFLAT,
+            "8",
+            DOUBLEFLAT
+        ]);
+        expect(scaleDegreeToPitchMapping("F♭ major", null, false, "B♯")).toEqual(["4"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLEFLAT)).toEqual(["7"]);
     });
 });
 

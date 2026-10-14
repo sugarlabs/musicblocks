@@ -595,10 +595,10 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
         if (diff === -1) {
             return FLAT;
         }
-        if (diff >= 2) {
+        if (diff === 2) {
             return DOUBLESHARP;
         }
-        if (diff <= -2) {
+        if (diff === -2) {
             return DOUBLEFLAT;
         }
         return null;
