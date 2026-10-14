@@ -3652,7 +3652,8 @@ describe("getPitchInfo", () => {
 
     it("returns correct alphabet class", () => {
         expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
-        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
+        // D♯ is not in C major and neither is E♭, so it keeps its own letter.
+        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("D");
     });
 
     it("returns correct solfege syllable (fixed do)", () => {
@@ -3728,7 +3729,8 @@ describe("getPitchInfo", () => {
     });
 
     it("handles solfege class with accidental", () => {
-        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("re");
+        // C♯ keeps its spelling (D♭ is not in C major either), so its class is do.
+        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("do");
     });
 
     it("returns pitch number", () => {
@@ -3736,11 +3738,22 @@ describe("getPitchInfo", () => {
         expect(typeof pNum).toBe("number");
     });
 
-    it("handles equivalent sharps mapping", () => {
-        // "Db" translates to "D♭". In C major, "D♭" is not in the scale.
-        // It should look it up in EQUIVALENTSHARPS and convert to "C♯".
-        const pitch = getPitchInfo(activity, "alphabet", "Db4", tur);
-        expect(pitch).toBe("C♯");
+    it("keeps an off-scale spelling whose enharmonic is off the scale too", () => {
+        // "Db" translates to "D♭". In C major neither D♭ nor C♯ is in the scale, so the
+        // note keeps the spelling it was given rather than being swapped for C♯.
+        expect(getPitchInfo(activity, "alphabet", "Db4", tur)).toBe("D♭");
+    });
+
+    it("respells an off-scale note only when its enharmonic is in the scale", () => {
+        tur.singer.keySignature = "F major";
+        // A♯ is B♭ in F major.
+        expect(getPitchInfo(activity, "alphabet", "A#4", tur)).toBe("B♭");
+        expect(getPitchInfo(activity, "scale degree", "A#4", tur)).toBe("4♮");
+        // E♭ and F♯ have no enharmonic in F major; they used to come back as D♯ and G♭.
+        expect(getPitchInfo(activity, "alphabet", "E♭4", tur)).toBe("E♭");
+        expect(getPitchInfo(activity, "scale degree", "E♭4", tur)).toBe("7♭");
+        expect(getPitchInfo(activity, "alphabet", "F♯4", tur)).toBe("F♯");
+        expect(getPitchInfo(activity, "scale degree", "F♯4", tur)).toBe("1♯");
     });
 
     it("handles invalid type", () => {
