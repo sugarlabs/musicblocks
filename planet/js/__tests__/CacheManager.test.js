@@ -265,6 +265,43 @@ describe("IndexedDB CacheManager integration", () => {
             expect(spy).toHaveBeenCalledTimes(1);
         });
 
+        test("closes the database if initialization cleanup fails", async () => {
+            const database = await freshManager._openDatabase();
+            const closeSpy = jest.spyOn(database, "close");
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            const openDatabaseSpy = jest
+                .spyOn(freshManager, "_openDatabase")
+                .mockResolvedValue(database);
+            const clearExpiredSpy = jest
+                .spyOn(freshManager, "clearExpired")
+                .mockRejectedValue(new Error("cleanup failed"));
+
+            try {
+                const results = await Promise.all([freshManager.init(), freshManager.init()]);
+
+                expect(results).toEqual([false, false]);
+                expect(openDatabaseSpy).toHaveBeenCalledTimes(1);
+                expect(clearExpiredSpy).toHaveBeenCalledTimes(1);
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+                expect(freshManager.db).toBeNull();
+                expect(freshManager.isInitialized).toBe(false);
+            } finally {
+                consoleErrorSpy.mockRestore();
+            }
+        });
+
+        test("concurrent init calls share a successful initialization", async () => {
+            const openDatabaseSpy = jest.spyOn(freshManager, "_openDatabase");
+
+            const results = await Promise.all([freshManager.init(), freshManager.init()]);
+
+            expect(results).toEqual([true, true]);
+            expect(openDatabaseSpy).toHaveBeenCalledTimes(1);
+            expect(freshManager.db).not.toBeNull();
+            expect(freshManager.isInitialized).toBe(true);
+        });
+
         test("returns false when window.indexedDB is missing", async () => {
             const saved = global.indexedDB;
             delete global.indexedDB;
