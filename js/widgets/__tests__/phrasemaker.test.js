@@ -731,6 +731,25 @@ describe("PhraseMaker Widget", () => {
         // Marked columns in the preserved row (original row index 0) should contain [0, 1] (column indices), NOT row index 1
         expect(phraseMaker._markedColsInRow[0]).toEqual([0, 1]);
     });
+    test("_sort orders arc before setxy using the secondary graphics list", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+        phraseMaker.stylePhraseMaker = jest.fn();
+        phraseMaker.rowLabels = ["arc", "C", "setxy"];
+        phraseMaker.rowArgs = [90, 4, 0];
+        phraseMaker._rows = [{ cells: [] }, { cells: [] }, { cells: [] }];
+        phraseMaker._noteStored = ["arc", "C4", "setxy"];
+        phraseMaker.columnBlocksMap = [[0], [1], [2]];
+
+        phraseMaker.activity = {
+            turtles: { ithTurtle: () => ({ singer: { keySignature: 0 } }) },
+            logo: { tupletRhythms: [] }
+        };
+
+        phraseMaker._sort();
+
+        expect(phraseMaker.rowLabels).toEqual(["C", "arc", "setxy"]);
+    });
     test("makeClickable safely handles sorted rows when cells are undefined", () => {
         phraseMaker.sorted = true;
         phraseMaker._rowMapper = [0];
@@ -2311,6 +2330,27 @@ describe("PhraseMaker Widget", () => {
             phraseMaker._tupletValueRow = mockTable.insertRow();
             phraseMaker._noteValueRow = mockTable.insertRow();
             phraseMaker._rows = [firstRow];
+        });
+
+        test("addTuplet paints arc and setxy cells with the graphics background", () => {
+            global.PhraseMakerUtils.MATRIXGRAPHICS2 = ["arc", "setxy"];
+            const arcRow = mockTable.insertRow();
+            arcRow.insertCell();
+            const setxyRow = mockTable.insertRow();
+            setxyRow.insertCell();
+            phraseMaker.rowLabels = ["arc", "setxy"];
+            phraseMaker._rows = [arcRow, setxyRow];
+
+            phraseMaker.addTuplet([[1, 4], [8]]);
+
+            const arcCell = arcRow.cells[arcRow.cells.length - 1];
+            const setxyCell = setxyRow.cells[setxyRow.cells.length - 1];
+            expect(arcCell.getAttribute("cellColor")).toBe(
+                phraseMaker.platformColor.graphicsBackground
+            );
+            expect(setxyCell.getAttribute("cellColor")).toBe(
+                phraseMaker.platformColor.graphicsBackground
+            );
         });
 
         test("addTuplet initializes tuplet labels and inserts filler cells on first invocation", () => {
