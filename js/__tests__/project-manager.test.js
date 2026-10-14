@@ -140,6 +140,7 @@ const makeActivity = (overrides = {}) => ({
     textMsg: jest.fn(),
     refreshCanvas: jest.fn(),
     parseABC: jest.fn(),
+    parseMXML: jest.fn(),
     toolbar: {
         closeAuxToolbar: jest.fn()
     },
@@ -2962,6 +2963,36 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(pm._midiImportBlocks).toHaveBeenCalled();
     });
 
+    it("change handler imports MusicXML when a .musicxml file is selected", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: "<score-partwise />" } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "score.musicxml" }];
+        handlers.change();
+        await readers[3].promise;
+
+        expect(activity.parseMXML).toHaveBeenCalledWith("<score-partwise />");
+        expect(activity.loading).toBe(false);
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
     it("change handler handles midi reader error", () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -3331,6 +3362,40 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.parseABC).toHaveBeenCalledWith({ header: {} });
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler imports MusicXML and cleans up after parsing", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: "<score-partwise />" } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "score.xml" }] }
+        });
+        await readers[3].promise;
+
+        expect(activity.parseMXML).toHaveBeenCalledWith("<score-partwise />");
+        expect(activity.loading).toBe(false);
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
