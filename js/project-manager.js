@@ -1223,6 +1223,7 @@ class ProjectManager {
                 const reader = new FileReader();
                 const midiReader = new FileReader();
                 const abcReader = new FileReader();
+                const mxmlReader = new FileReader();
 
                 reader.onload = () => {
                     that.loading = true;
@@ -1326,15 +1327,91 @@ class ProjectManager {
                     }
                 };
 
+                mxmlReader.onload = async event => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+
+                    // loadNewBlocks() (js/blocks.js) processes blocks in
+                    // chunks across setTimeout(0) boundaries and reports
+                    // completion asynchronously via the "finishedLoading"/
+                    // "loadFailed" pubsub events (tagged with the token it
+                    // returns), rather than returning only once every block
+                    // is in place. parseMXML's own promise resolving is not
+                    // enough to know the import is actually finished.
+                    // Listeners are registered before parseMXML runs so a
+                    // load that happens to finish synchronously (small
+                    // scores) is still observed.
+                    let loadToken = null;
+                    let settled = false;
+                    const belongsToThisLoad = payload =>
+                        loadToken === null || !payload || payload.token === loadToken;
+                    const stopWatching = () => {
+                        pubsub.off("finishedLoading", onFinished);
+                        pubsub.off("loadFailed", onFailed);
+                    };
+                    const onFinished = payload => {
+                        if (settled || !belongsToThisLoad(payload)) return;
+                        settled = true;
+                        stopWatching();
+                        finishLoading();
+                    };
+                    const onFailed = payload => {
+                        if (settled || !belongsToThisLoad(payload)) return;
+                        settled = true;
+                        stopWatching();
+                        const error =
+                            (payload && payload.error) || new Error("loadNewBlocks failed");
+                        ErrorHandler.capture(error, { operation: "mxmlImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    };
+
+                    pubsub.on("finishedLoading", onFinished);
+                    pubsub.on("loadFailed", onFailed);
+
+                    try {
+                        const mxmlData =
+                            (event && event.target && event.target.result) || mxmlReader.result;
+
+                        loadToken = await that.parseMXML(mxmlData);
+
+                        // A null token means parseMXML never reached
+                        // loadNewBlocks() (malformed XML, no part found) --
+                        // it already reported that via its own errorMsg
+                        // call, so no pubsub event is coming for it.
+                        if (loadToken === null && !settled) {
+                            settled = true;
+                            stopWatching();
+                            finishLoading();
+                        }
+                    } catch (e) {
+                        if (!settled) {
+                            settled = true;
+                            stopWatching();
+                            ErrorHandler.capture(e, { operation: "mxmlImport" });
+                            that.errorMsg(
+                                _("Cannot load project from the file. Please check the file type.")
+                            );
+                            finishLoading();
+                        }
+                    }
+                };
+
                 const file = that.fileChooser.files[0];
                 if (file) {
                     const extension = file.name.split(".").pop().toLowerCase();
                     const isMidi = extension === "mid" || extension === "midi";
                     const isABC = extension === "abc";
+                    const isMXML = extension === "xml" || extension === "musicxml";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
                     } else if (isABC) {
                         abcReader.readAsText(file);
+                    } else if (isMXML) {
+                        mxmlReader.readAsText(file);
                     } else {
                         reader.readAsText(file);
                     }
@@ -1352,6 +1429,7 @@ class ProjectManager {
             const midiReader = new FileReader();
 
             const abcReader = new FileReader();
+            const mxmlReader = new FileReader();
             reader.onload = () => {
                 that.loading = true;
                 document.body.style.cursor = "wait";
@@ -1432,6 +1510,67 @@ class ProjectManager {
                 }
             };
 
+            mxmlReader.onload = async event => {
+                that.loading = true;
+                document.body.style.cursor = "wait";
+
+                // See the matching comment on the file-chooser's mxmlReader
+                // handler above: loadNewBlocks() finishes asynchronously, so
+                // completion is tracked via the "finishedLoading"/
+                // "loadFailed" pubsub events rather than parseMXML's own
+                // promise resolving.
+                let loadToken = null;
+                let settled = false;
+                const belongsToThisLoad = payload =>
+                    loadToken === null || !payload || payload.token === loadToken;
+                const stopWatching = () => {
+                    pubsub.off("finishedLoading", onFinished);
+                    pubsub.off("loadFailed", onFailed);
+                };
+                const onFinished = payload => {
+                    if (settled || !belongsToThisLoad(payload)) return;
+                    settled = true;
+                    stopWatching();
+                    finishLoading();
+                };
+                const onFailed = payload => {
+                    if (settled || !belongsToThisLoad(payload)) return;
+                    settled = true;
+                    stopWatching();
+                    const error = (payload && payload.error) || new Error("loadNewBlocks failed");
+                    ErrorHandler.capture(error, { operation: "mxmlImport" });
+                    that.errorMsg(
+                        _("Cannot load project from the file. Please check the file type.")
+                    );
+                    finishLoading();
+                };
+
+                pubsub.on("finishedLoading", onFinished);
+                pubsub.on("loadFailed", onFailed);
+
+                try {
+                    const mxmlData = event.target.result;
+
+                    loadToken = await that.parseMXML(mxmlData);
+
+                    if (loadToken === null && !settled) {
+                        settled = true;
+                        stopWatching();
+                        finishLoading();
+                    }
+                } catch (e) {
+                    if (!settled) {
+                        settled = true;
+                        stopWatching();
+                        ErrorHandler.capture(e, { operation: "mxmlImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    }
+                }
+            };
+
             if (files[0] !== undefined) {
                 const extension = files[0].name.split(".").pop().toLowerCase();
 
@@ -1444,6 +1583,12 @@ class ProjectManager {
                 const isABC = extension === "abc";
                 if (isABC) {
                     abcReader.readAsText(files[0]);
+                    return;
+                }
+
+                const isMXML = extension === "xml" || extension === "musicxml";
+                if (isMXML) {
+                    mxmlReader.readAsText(files[0]);
                     return;
                 }
                 reader.readAsText(files[0]);
