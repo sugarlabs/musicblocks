@@ -1253,3 +1253,116 @@ describe("SearchController._hideHelpfulSearchWidget", () => {
         expect(removeChild).toHaveBeenCalledWith(sc.helpfulSearchDiv);
     });
 });
+
+describe("SearchController touch result placement", () => {
+    let activity, placeBlock;
+
+    let row, listeners, originalAutocomplete, originalJQuery;
+    const $ = jest.requireActual("jquery");
+
+    beforeEach(() => {
+        // Earlier suites assign DOM mocks directly. Use real DOM methods for gestures.
+        delete document.getElementById;
+        delete document.createElement;
+        delete document.addEventListener;
+        delete document.removeEventListener;
+        delete document.body.appendChild;
+        delete document.body.removeChild;
+        document.body.innerHTML = '<input id="search"><ul id="touch-search-results"></ul>';
+        originalAutocomplete = $.fn.autocomplete;
+        originalJQuery = window.jQuery;
+        const instance = {};
+        $.fn.autocomplete = jest.fn(function (arg) {
+            return arg === "instance" ? instance : this;
+        });
+        window.jQuery = $;
+        listeners = jest.spyOn(document, "addEventListener");
+
+        const block = makeProtoBlock("forward", "forward");
+        activity = makeActivity({ forward: block });
+        activity.searchWidget = document.getElementById("search");
+        placeBlock = activity.palettes.dict["test-palette"].makeBlockFromSearch;
+        setupSearchController(activity);
+        activity.searchController.doSearch();
+        const item = { label: "forward", value: "forward", specialDict: block };
+        row = instance._renderItem($("#touch-search-results"), item)[0];
+    });
+
+    afterEach(() => {
+        for (const [type, listener, options] of listeners.mock.calls) {
+            document.removeEventListener(type, listener, options);
+        }
+        listeners.mockRestore();
+        $.fn.autocomplete = originalAutocomplete;
+        window.jQuery = originalJQuery;
+        document.body.innerHTML = "";
+    });
+
+    function touch(type, x, y, scrollX = 0, scrollY = 0) {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperty(event, "touches", {
+            value:
+                type === "touchend"
+                    ? []
+                    : [{ clientX: x, clientY: y, pageX: x + scrollX, pageY: y + scrollY }]
+        });
+        return event;
+    }
+
+    test("places a block after a touch tap without movement", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchend", 150, 180));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 150, 180);
+    });
+
+    test("places a dragged block at the last touch position", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchmove", 300, 350));
+        document.dispatchEvent(touch("touchend", 300, 350));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 300, 350);
+    });
+
+    test("still places a block after a mouse click", () => {
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 150, clientY: 180 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 150, 180);
+    });
+
+    test("uses page coordinates for a stationary tap on a scrolled page", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180, 40, 90));
+        document.dispatchEvent(touch("touchend", 150, 180, 40, 90));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 190, 270);
+    });
+
+    test("does not repeat a completed touch placement on the next mouse gesture", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchend", 150, 180));
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 250, clientY: 280 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        expect(placeBlock).toHaveBeenCalledTimes(2);
+        expect(activity.blocks.moveBlock).toHaveBeenLastCalledWith(42, 250, 280);
+    });
+
+    test("does not repeat a completed mouse placement on a later touch release", () => {
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 150, clientY: 180 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        document.dispatchEvent(touch("touchend", 250, 280));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+    });
+});

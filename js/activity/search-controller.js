@@ -388,8 +388,8 @@ class SearchController {
                             e.preventDefault();
                             let x, y;
                             if (e.type === "touchstart" || e.type === "touchmove") {
-                                x = e.touches[0].clientX;
-                                y = e.touches[0].clientY;
+                                x = e.touches[0].pageX;
+                                y = e.touches[0].pageY;
                             } else {
                                 x = e.pageX;
                                 y = e.pageY;
@@ -405,6 +405,8 @@ class SearchController {
                             document.body.style.cursor = "default";
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
+                            document.removeEventListener("mouseup", up);
+                            document.removeEventListener("touchend", up);
 
                             const x = parseInt(img.style.left, 10);
                             const y = parseInt(img.style.top, 10);
