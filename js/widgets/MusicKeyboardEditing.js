@@ -61,6 +61,16 @@ const MusicKeyboardEditing = {
     install(deps) {
         const { FAKEBLOCKNUMBER, beginnerMode, resolveSynthNoteName, fillChromaticGaps } = deps;
 
+        // Scoped element lookup. the ids repeat across keyboard windows.
+        if (typeof this._mkbEl !== "function") {
+            this._mkbEl = id => {
+                if (this._widgetBody && typeof this._widgetBody.querySelector === "function") {
+                    return this._widgetBody.querySelector(`[id="${id}"]`);
+                }
+                return docById(id);
+            };
+        }
+
         // Semitones for the pitch rows Add Note can create: C1 to B8.
         const LOWESTSTEP = 1 * 12;
         const HIGHESTSTEP = 8 * 12 + 11;
@@ -228,8 +238,8 @@ const MusicKeyboardEditing = {
             docById("wheelDivptm").style.height = "250px";
             docById("wheelDivptm").style.width = "250px";
 
-            const x = docById(cellId).getBoundingClientRect().x;
-            const y = docById(cellId).getBoundingClientRect().y;
+            const x = this._mkbEl(cellId).getBoundingClientRect().x;
+            const y = this._mkbEl(cellId).getBoundingClientRect().y;
 
             docById("wheelDivptm").style.left =
                 Math.min(
@@ -328,7 +338,7 @@ const MusicKeyboardEditing = {
          */
         this._addNotes = function (cellId, start, divideNoteBy) {
             start = parseInt(start, 10);
-            const cell = docById(cellId);
+            const cell = this._mkbEl(cellId);
             const dur = cell.getAttribute("dur");
 
             this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
@@ -480,8 +490,11 @@ const MusicKeyboardEditing = {
             }
             this._configureExitWheel(this._exitWheel);
 
-            const x = docById("addnotes").getBoundingClientRect().x;
-            const y = docById("addnotes").getBoundingClientRect().y;
+            // The toolbar button lives outside the widget body, so _mkbEl can't see
+            // it; keep the direct reference and fall back to the document lookup.
+            const addNoteButton = this._addNoteButton || docById("addnotes");
+            const x = addNoteButton.getBoundingClientRect().x;
+            const y = addNoteButton.getBoundingClientRect().y;
 
             docById("wheelDivptm").style.position = "absolute";
             docById("wheelDivptm").style.height = "300px";
@@ -1005,8 +1018,8 @@ const MusicKeyboardEditing = {
                 }
             }
 
-            const x = docById("labelcol" + index).getBoundingClientRect().x;
-            const y = docById("labelcol" + index).getBoundingClientRect().y;
+            const x = this._mkbEl("labelcol" + index).getBoundingClientRect().x;
+            const y = this._mkbEl("labelcol" + index).getBoundingClientRect().y;
 
             docById("wheelDivptm").style.position = "absolute";
             docById("wheelDivptm").style.height = "300px";
@@ -1089,7 +1102,7 @@ const MusicKeyboardEditing = {
                 );
                 this.activity.blocks.blockList[argBlock].updateCache();
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
+                const cell = this._mkbEl("labelcol" + (displayLayout.length - index - 1));
                 displayLayout[index].noteOctave = parseInt(blockValue, 10);
                 if (this.layout[index]) {
                     this.layout[index].noteOctave = parseInt(blockValue, 10);
@@ -1154,7 +1167,7 @@ const MusicKeyboardEditing = {
                     );
                 }
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
+                const cell = this._mkbEl("labelcol" + (displayLayout.length - index - 1));
                 displayLayout[index].noteName = label;
                 displayLayout[index].noteOctave = octave;
                 if (this.layout[index]) {

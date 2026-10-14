@@ -130,8 +130,8 @@ function MusicKeyboard(activity) {
      */
     this._stopOrCloseClicked = false;
 
-    this._savedDocumentOnKeyDown = undefined;
-    this._savedDocumentOnKeyUp = undefined;
+    this._boundKeyDown = null;
+    this._boundKeyUp = null;
     if (typeof ManagedTimer !== "undefined") {
         this._timerManager = new ManagedTimer();
     } else if (typeof require !== "undefined") {
@@ -155,30 +155,49 @@ function MusicKeyboard(activity) {
      */
     this.playingNow = false;
 
-    this._cacheDocumentKeyHandlers = function () {
-        if (
-            this._savedDocumentOnKeyDown !== undefined ||
-            this._savedDocumentOnKeyUp !== undefined
-        ) {
-            return;
+    // document.onkeydown/up ownership across the open keyboards.
+    this._registerDocumentKeyHandlers = function (keyDown, keyUp) {
+        const stack = MusicKeyboard._keyHandlerStack;
+        if (stack.indexOf(this) === -1) {
+            // Capture the base handler only on the first registration.
+            if (stack.length === 0) {
+                MusicKeyboard._baseKeyDown = document.onkeydown;
+                MusicKeyboard._baseKeyUp = document.onkeyup;
+            }
+            stack.push(this);
         }
-
-        this._savedDocumentOnKeyDown = document.onkeydown;
-        this._savedDocumentOnKeyUp = document.onkeyup;
+        this._boundKeyDown = keyDown;
+        this._boundKeyUp = keyUp;
+        // Only the newest open keyboard drives the document handlers.
+        if (stack[stack.length - 1] === this) {
+            document.onkeydown = keyDown;
+            document.onkeyup = keyUp;
+        }
     };
 
-    this._restoreDocumentKeyHandlers = function () {
-        if (
-            this._savedDocumentOnKeyDown === undefined &&
-            this._savedDocumentOnKeyUp === undefined
-        ) {
+    this._releaseDocumentKeyHandlers = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        const existing = stack.indexOf(this);
+        if (existing === -1) {
             return;
         }
+        stack.splice(existing, 1);
+        const owner = stack[stack.length - 1];
+        document.onkeydown = owner ? owner._boundKeyDown : MusicKeyboard._baseKeyDown;
+        document.onkeyup = owner ? owner._boundKeyUp : MusicKeyboard._baseKeyUp;
+    };
 
-        document.onkeydown = this._savedDocumentOnKeyDown;
-        document.onkeyup = this._savedDocumentOnKeyUp;
-        this._savedDocumentOnKeyDown = undefined;
-        this._savedDocumentOnKeyUp = undefined;
+    // Clicking this window hands it the document key handlers.
+    this._focusKeyboardInput = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        const existing = stack.indexOf(this);
+        if (existing === -1) {
+            return; // not open
+        }
+        stack.splice(existing, 1);
+        stack.push(this);
+        document.onkeydown = this._boundKeyDown;
+        document.onkeyup = this._boundKeyUp;
     };
 
     this._setWidgetInterval = function (callback, interval) {
@@ -365,7 +384,7 @@ function MusicKeyboard(activity) {
         this.tick = false;
         this.firstNote = false;
         this.metronomeON = false;
-        const countdownContainer = docById("countdownContainer");
+        const countdownContainer = this._mkbEl("countdownContainer");
         if (countdownContainer) {
             countdownContainer.remove();
         }
@@ -547,7 +566,7 @@ function MusicKeyboard(activity) {
         const __startNote = event => {
             const id = __getNoteId(event);
 
-            const ele = docById(id);
+            const ele = this._mkbEl(id);
             if (!(id in startTime)) {
                 startTime[id] = new Date().getTime();
             }
@@ -639,7 +658,7 @@ function MusicKeyboard(activity) {
          */
         const __endNote = event => {
             const id = __getNoteId(event);
-            const ele = docById(id);
+            const ele = this._mkbEl(id);
             const newDate = new Date();
             const noteEndTime = newDate.getTime();
             duration = (noteEndTime - startTime[id]) / 1000.0;
@@ -722,9 +741,7 @@ function MusicKeyboard(activity) {
             __endNote(event);
         };
 
-        this._cacheDocumentKeyHandlers();
-        document.onkeydown = __keyboarddown;
-        document.onkeyup = __keyboardup;
+        this._registerDocumentKeyHandlers(__keyboarddown, __keyboardup);
     };
 
     /**
@@ -892,6 +909,10 @@ function MusicKeyboard(activity) {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        // Scope _mkbEl to this window's body.
+        this._widgetBody = widgetWindow.getWidgetBody();
+        // Focus routes physical-key input to this keyboard.
+        widgetWindow.onfocused = () => this._focusKeyboardInput();
         this.displayLayout = this._keysLayout();
         /**
          * Beats per minute (BPM) for the MusicKeyboard.
@@ -914,19 +935,20 @@ function MusicKeyboard(activity) {
          */
         widgetWindow.onclose = () => {
             let myNode;
-            this._restoreDocumentKeyHandlers();
+            this._releaseDocumentKeyHandlers();
 
-            if (document.getElementById("keyboardHolder2")) {
-                document.getElementById("keyboardHolder2").style.display = "none";
+            const keyboardHolder = this._mkbEl("keyboardHolder2");
+            if (keyboardHolder && keyboardHolder.style) {
+                keyboardHolder.style.display = "none";
             }
 
-            myNode = document.getElementById("myrow");
-            if (myNode !== null) {
+            myNode = this._mkbEl("myrow");
+            if (myNode && typeof myNode.replaceChildren === "function") {
                 myNode.replaceChildren();
             }
 
-            myNode = document.getElementById("myrow2");
-            if (myNode !== null) {
+            myNode = this._mkbEl("myrow2");
+            if (myNode && typeof myNode.replaceChildren === "function") {
                 myNode.replaceChildren();
             }
 
@@ -1041,6 +1063,8 @@ function MusicKeyboard(activity) {
          */
         const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"));
         addNoteButton.setAttribute("id", "addnotes");
+        // Toolbar button lives outside _widgetBody, so keep the reference.
+        this._addNoteButton = addNoteButton;
         addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
         };
@@ -1068,7 +1092,7 @@ function MusicKeyboard(activity) {
                 this.metronomeON = true;
                 this.tickButton.style.background = platformColor.orange;
 
-                const winBody = document.getElementsByClassName("wfbWidget")[0];
+                const winBody = this.widgetWindow.getWidgetBody();
                 const countdownContainer = document.createElement("div");
                 countdownContainer.id = "countdownContainer";
 
@@ -1203,7 +1227,7 @@ function MusicKeyboard(activity) {
             let ele, zx, res, cell;
             for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
                 if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
-                    ele = docById(selectedNotes[0].objId[i]);
+                    ele = this._mkbEl(selectedNotes[0].objId[i]);
                     if (ele !== null) {
                         ele.style.backgroundColor = "lightgrey";
                     }
@@ -1219,7 +1243,7 @@ function MusicKeyboard(activity) {
             }
 
             if (!this.keyboardShown) {
-                cell = docById("cells-0");
+                cell = this._mkbEl("cells-0");
                 cell.style.backgroundColor = platformColor.selectorBackground;
             }
 
@@ -1267,14 +1291,14 @@ function MusicKeyboard(activity) {
                 }
 
                 if (!this.keyboardShown) {
-                    cell = docById("cells-" + counter);
+                    cell = this._mkbEl("cells-" + counter);
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
 
                 if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
                     for (let i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
                         eleid = selectedNotes[counter - 1].objId[i];
-                        ele = docById(eleid);
+                        ele = this._mkbEl(eleid);
                         if (eleid.includes("blackRow")) {
                             ele.style.backgroundColor = "black";
                         } else {
@@ -1292,7 +1316,7 @@ function MusicKeyboard(activity) {
                         });
                         */
 
-                        ele = docById(selectedNotes[counter].objId[i]);
+                        ele = this._mkbEl(selectedNotes[counter].objId[i]);
                         if (ele !== null) {
                             ele.style.backgroundColor = "lightgrey";
                         }
@@ -2069,9 +2093,9 @@ function MusicKeyboard(activity) {
             const key =
                 this.noteToKeyMap[pitch1 + "" + octave] || this.noteToKeyMap[pitch2 + "" + octave];
             if (event.data[0] === 144 && event.data[2] !== 0) {
-                __startNote(event, docById(key));
+                __startNote(event, this._mkbEl(key));
             } else {
-                __endNote(event, docById(key));
+                __endNote(event, this._mkbEl(key));
             }
         };
 
@@ -2174,7 +2198,7 @@ function MusicKeyboard(activity) {
             for (let i = 0; i < this.displayLayout.length; i++) {
                 const item = this.displayLayout[i];
                 if (item.noteName !== "hertz") {
-                    const elem = docById("cell-" + i) || docById("blackRow" + i);
+                    const elem = this._mkbEl("cell-" + i) || this._mkbEl("blackRow" + i);
                     if (elem) {
                         const newSynthName = resolveSynthNoteName(item.noteName, item.noteOctave);
                         if (this.noteMapper && elem.id) {
@@ -2203,6 +2227,11 @@ function MusicKeyboard(activity) {
         }
     };
 }
+
+// Open keyboards, oldest first; the last one owns document.onkeydown/up.
+MusicKeyboard._keyHandlerStack = [];
+MusicKeyboard._baseKeyDown = undefined;
+MusicKeyboard._baseKeyUp = undefined;
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = MusicKeyboard;
