@@ -45,6 +45,21 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.getSharpFlatPreference("G major")).toBe("sharp");
     });
 
+    it("calculates pitch numbers accurately for enharmonic notes across octave boundaries in 12-EDO", () => {
+        expect(pitchscale.pitchToNumber("B♯", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 5, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♭", 5, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("B", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("E♯", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("F", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("F♭", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("E", 4, "C major", "equal")
+        );
+    });
+
     it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
         expect(pitchscale.getNoteFromSolfege("sol", "C major", true, 12, 4, 0)).toEqual([
             "G",

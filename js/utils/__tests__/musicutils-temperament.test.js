@@ -91,6 +91,39 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("getEdoNoteNamePosition", () => {
+        it("resolves enharmonic note spellings in 12-EDO via EQUIVALENTNATURALS", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B♯", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♭", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("F♭", 12)).toBe(4);
+        });
+
+        it("resolves ASCII enharmonic spellings in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("E#", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B#", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("Cb", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("Fb", 12)).toBe(4);
+        });
+
+        it("resolves double-accidental natural equivalents in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("D𝄪", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("D♯♯", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("C𝄫", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("C♭♭", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("F𝄫", 12)).toBe(3);
+        });
+
+        it("preserves non-12 EDO distinct pitch positions", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 19)).toBe(7);
+            expect(temperament.getEdoNoteNamePosition("B♯", 19)).toBe(18);
+            expect(temperament.getEdoNoteNamePosition("F", 19)).toBe(8);
+            expect(temperament.getEdoNoteNamePosition("C", 19)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♯", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("D♭", 12)).toBe(1);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [
