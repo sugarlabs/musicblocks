@@ -2775,7 +2775,7 @@ class PhraseMaker {
                     this._noteStored[i]
                 ]);
             } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
-                gi = PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
+                gi = PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) + 200;
                 sortableList.push([
                     -gi,
                     this.rowLabels[i],
@@ -3256,7 +3256,10 @@ class PhraseMaker {
             // Add the notes to the matrix a la addNote.
             for (let j = 0; j < this.rowLabels.length; j++) {
                 // Depending on the row, we choose a different background color.
-                if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1) {
+                if (
+                    PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1 ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[j]) !== -1
+                ) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[j]);
