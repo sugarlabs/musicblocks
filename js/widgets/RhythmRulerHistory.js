@@ -51,8 +51,19 @@ class RhythmRulerHistory {
                 continue;
             }
 
+            // A drum repeated in the clamp has one entry per row, saved in row order, so each row
+            // replays only its own entry.
+            const occurrence = this.Drums.slice(0, drum).filter(
+                other => other === this.Drums[drum]
+            ).length;
+            let match = -1;
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 if (this._dissectHistory[i][1] !== this.Drums[drum]) {
+                    continue;
+                }
+
+                match++;
+                if (match !== occurrence) {
                     continue;
                 }
 
