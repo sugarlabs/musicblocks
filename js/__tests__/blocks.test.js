@@ -3624,6 +3624,7 @@ describe("Blocks Foundation", () => {
     });
 
     describe("Batched block highlighting", () => {
+        const ArtworkBlock = require("../block");
         let blocks;
         let frames;
         let realRequestAnimationFrame;
@@ -3655,12 +3656,32 @@ describe("Blocks Foundation", () => {
          */
         function makeHighlightableBlock() {
             const rendered = [];
-            return {
+            const block = {
                 trash: false,
+                inCollapsed: false,
+                collapsed: false,
+                container: { visible: true },
+                bitmap: { visible: true },
+                disconnectedBitmap: null,
+                highlightBitmap: { visible: false },
+                disconnectedHighlightBitmap: null,
+                highlightCollapseBlockBitmap: null,
+                collapseBlockBitmap: null,
+                collapseText: null,
+                isDisconnected: () => false,
+                isCollapsible: () => false,
+                updateCache: jest.fn(),
                 rendered,
-                highlight: jest.fn(() => rendered.push(true)),
-                unhighlight: jest.fn(() => rendered.push(false))
+                highlight: jest.fn(() => {
+                    ArtworkBlock.prototype.highlight.call(block);
+                    rendered.push(true);
+                }),
+                unhighlight: jest.fn(() => {
+                    ArtworkBlock.prototype.unhighlight.call(block);
+                    rendered.push(false);
+                })
             };
+            return block;
         }
 
         beforeEach(() => {
@@ -3801,6 +3822,26 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
         });
 
+        it("bounds a burst across many blocks and finishes with every highlight cleared", () => {
+            blocks.blockList = Array.from({ length: 40 }, makeHighlightableBlock);
+            blocks.highlight(0, false);
+            tick();
+
+            for (let i = 1; i < blocks.blockList.length; i++) {
+                blocks.highlight(i, false);
+                blocks.unhighlight(i);
+                expect(blocks._highlightQueue.length).toBeLessThanOrEqual(24);
+            }
+
+            drain();
+
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+            expect(blocks.blockList[39].rendered).toEqual([true, false]);
+            expect(blocks.blockList.every(block => !block.highlightBitmap.visible)).toBe(true);
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(blocks._highlightQueue).toHaveLength(0);
+        });
+
         it("does not queue a redundant off/on pair when re-highlighting the same block", () => {
             blocks.highlight(0, true);
             drain();
@@ -3830,16 +3871,132 @@ describe("Blocks Foundation", () => {
             drain();
 
             expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks._renderedHighlight).toBeNull();
         });
 
-        it("queues nothing while the blocks are hidden", () => {
+        const undrawable = [
+            ["removed", list => delete list[1]],
+            ["null", list => (list[1] = null)],
+            ["trashed", list => (list[1].trash = true)],
+            ["in a collapsed stack", list => (list[1].inCollapsed = true)],
+            ["hidden", list => (list[1].container.visible = false)],
+            ["without a container", list => (list[1].container = null)],
+            ["without artwork", list => (list[1].bitmap = null)],
+            ["with hidden artwork", list => (list[1].bitmap.visible = false)],
+            [
+                "with both normal and disconnected artwork hidden",
+                list => {
+                    list[1].bitmap.visible = false;
+                    list[1].disconnectedBitmap = { visible: false };
+                }
+            ]
+        ];
+
+        it.each(undrawable)(
+            "keeps the current highlight when the next block is %s",
+            (_reason, makeUndrawable) => {
+                blocks.highlight(0, false);
+                tick();
+                const skipped = blocks.blockList[1];
+                blocks.highlight(1, false);
+                makeUndrawable(blocks.blockList);
+
+                tick();
+
+                expect(skipped.highlight).not.toHaveBeenCalled();
+                expect(blocks.blockList[0].highlightBitmap.visible).toBe(true);
+                expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+                expect(blocks._renderedHighlight).toBe(0);
+                expect(frames).toHaveLength(0);
+            }
+        );
+
+        it.each(undrawable)(
+            "renders the next visible block in the same frame when a queued block is %s",
+            (_reason, makeUndrawable) => {
+                blocks.highlight(0, false);
+                tick();
+                const skipped = blocks.blockList[1];
+                blocks.highlight(1, false);
+                blocks.unhighlight(1);
+                blocks.highlight(2, false);
+                makeUndrawable(blocks.blockList);
+
+                tick();
+
+                expect(skipped.highlight).not.toHaveBeenCalled();
+                expect(blocks.blockList[0].highlightBitmap.visible).toBe(false);
+                expect(blocks.blockList[2].highlightBitmap.visible).toBe(true);
+                expect(blocks._renderedHighlight).toBe(2);
+                expect(frames).toHaveLength(0);
+            }
+        );
+
+        it("highlights a block whose disconnected artwork is visible", () => {
+            const block = blocks.blockList[0];
+            block.bitmap.visible = false;
+            block.disconnectedBitmap = { visible: true };
+            block.disconnectedHighlightBitmap = { visible: false };
+            block.isDisconnected = () => true;
+            blocks.highlight(0, false);
+
+            tick();
+
+            expect(block.disconnectedHighlightBitmap.visible).toBe(true);
+            expect(blocks._renderedHighlight).toBe(0);
+        });
+
+        it("unhighlightAll clears highlights drawn directly outside the queue", () => {
+            for (const block of blocks.blockList) {
+                block.highlight();
+            }
+            blocks.blockList.push(null, { trash: true, unhighlight: jest.fn() });
+
+            blocks.unhighlightAll();
+
+            for (const block of blocks.blockList.slice(0, 3)) {
+                expect(block.highlightBitmap.visible).toBe(false);
+                expect(block.unhighlight).toHaveBeenCalledTimes(1);
+            }
+            expect(blocks.blockList[4].unhighlight).not.toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBeNull();
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(frames).toHaveLength(0);
+        });
+
+        it("unhighlightAll cancels pending transitions so a later frame cannot relight blocks", () => {
+            blocks.highlight(0, false);
+            tick();
+            blocks.highlight(1, true);
+            blocks.highlight(2, true);
+
+            blocks.unhighlightAll();
+            drain();
+
+            expect(blocks._highlightQueue).toHaveLength(0);
+            expect(blocks.highlightedBlock).toBeNull();
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(blocks.blockList[0].highlightBitmap.visible).toBe(false);
+            expect(blocks.blockList[1].highlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[2].highlight).not.toHaveBeenCalled();
+
+            blocks.highlight(2, true);
+            tick();
+            expect(blocks.blockList[2].highlightBitmap.visible).toBe(true);
+        });
+
+        it("queues nothing and leaves artwork alone while the blocks are hidden", () => {
+            blocks.blockList[0].highlight();
             blocks.visible = false;
 
             blocks.highlight(0, false);
             blocks.unhighlight(0);
+            blocks.unhighlightAll();
 
             expect(frames.length).toBe(0);
             expect(blocks._highlightQueue.length).toBe(0);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[0].highlightBitmap.visible).toBe(true);
         });
     });
 });

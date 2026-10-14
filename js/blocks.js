@@ -2615,9 +2615,20 @@ class Blocks {
          * @returns {void}
          */
         this.unhighlightAll = () => {
-            for (const [blk, block] of this.blockList.entries()) {
+            if (!this.visible) {
+                return;
+            }
+
+            // Drag and snap feedback can highlight artwork outside this queue.
+            // Cancel pending playback transitions before clearing every block.
+            this._highlightQueue.length = 0;
+            this._renderedHighlight = null;
+            this.highlightedBlock = null;
+            for (const block of this.blockList) {
                 if (!block || block.trash) continue;
-                this.unhighlight(blk);
+                if (typeof block.unhighlight === "function") {
+                    block.unhighlight();
+                }
             }
         };
 
@@ -2875,12 +2886,12 @@ class Blocks {
 
             const draw = (blk, state) => {
                 const block = this.blockList[blk];
-                if (block === undefined || block.trash) {
+                if (!block || block.trash) {
                     return;
                 }
                 if (state) {
                     block.highlight();
-                } else {
+                } else if (typeof block.unhighlight === "function") {
                     block.unhighlight();
                 }
             };
@@ -2898,8 +2909,22 @@ class Blocks {
                     continue;
                 }
 
-                // One block lit per frame; the rest wait for the next one.
                 queue.shift();
+                const block = this.blockList[next.blk];
+                // Match Block.highlight()'s artwork guards before clearing the
+                // predecessor. An undrawable entry must not consume this frame.
+                if (
+                    !block ||
+                    block.trash ||
+                    block.inCollapsed ||
+                    !block.container?.visible ||
+                    !block.bitmap ||
+                    (!block.bitmap.visible && !block.disconnectedBitmap?.visible)
+                ) {
+                    continue;
+                }
+
+                // One drawable block lit per frame; the rest wait for the next one.
                 if (this._renderedHighlight !== null && this._renderedHighlight !== next.blk) {
                     draw(this._renderedHighlight, false);
                 }
