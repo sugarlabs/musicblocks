@@ -627,6 +627,23 @@ describe("afterSaveMIDI", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    it("should defer MIDI generation without a fixed export delay", () => {
+        const data = mockActivity.logo._midiData;
+        document.body.style.cursor = "wait";
+
+        instance.afterSaveMIDI();
+
+        expect(mockActivity.save.download).not.toHaveBeenCalled();
+        expect(mockActivity.logo._midiData).toBe(data);
+        expect(document.body.style.cursor).toBe("wait");
+
+        jest.advanceTimersByTime(0);
+
+        expect(mockActivity.save.download).toHaveBeenCalledWith("midi", "mockURL", null);
+        expect(mockActivity.logo._midiData).toEqual({});
+        expect(document.body.style.cursor).toBe("default");
+    });
+
     it("should handle empty MIDI data gracefully", () => {
         mockActivity.logo._midiData = {};
         instance.afterSaveMIDI();
