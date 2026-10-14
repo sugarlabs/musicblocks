@@ -314,6 +314,7 @@ class PitchStaircaseLayout {
             this._stopRow();
         }
         pscTable.replaceChildren();
+        pscTable.classList.add("mb-text-center");
         pscTable.style.textAlign = "center";
         pscTable.style.borderCollapse = "separate";
         pscTable.style.borderSpacing = "0 8px"; // Vertical gap between stair rows

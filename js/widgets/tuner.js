@@ -523,7 +523,7 @@ function Tuner() {
                 noteDisplayContainer.style.top = "62%";
                 noteDisplayContainer.style.left = "50%";
                 noteDisplayContainer.style.transform = "translate(-50%, -50%)";
-                noteDisplayContainer.style.textAlign = "center";
+                noteDisplayContainer.classList.add("mb-text-center");
                 noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
                 noteDisplayContainer.style.zIndex = "1000";
 

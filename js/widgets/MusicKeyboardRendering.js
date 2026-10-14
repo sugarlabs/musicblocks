@@ -470,7 +470,7 @@ const MusicKeyboardRendering = {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.lineHeight = 60 + "%";
-                cell.style.textAlign = "center";
+                cell.classList.add("mb-text-center");
                 cell.textContent = `${dur[0].toString()}/${dur[1].toString()}`;
                 cell.setAttribute("id", "cells-" + j);
                 cell.setAttribute("start", selectedNotes[j].startTime);
@@ -496,7 +496,7 @@ const MusicKeyboardRendering = {
             mkbKeyboardDiv.style.display = "flex";
             mkbKeyboardDiv.style.visibility = "visible";
             mkbKeyboardDiv.style.border = "0px";
-            mkbKeyboardDiv.style.width = "100%";
+            mkbKeyboardDiv.classList.add("mb-w-full");
             mkbKeyboardDiv.style.top = "0px";
             mkbKeyboardDiv.style.overflow = "auto";
             mkbKeyboardDiv.style.userSelect = "none";
@@ -590,7 +590,7 @@ const MusicKeyboardRendering = {
                     parenttbl2.appendChild(newel2);
                 } else if (this.displayLayout[p].noteName === "drum") {
                     newel = document.createElement("td");
-                    newel.style.textAlign = "center";
+                    newel.classList.add("mb-text-center");
                     newel.setAttribute("id", "whiteRow" + myrowId.toString());
                     newel.setAttribute(
                         "alt",
@@ -619,7 +619,7 @@ const MusicKeyboardRendering = {
                     parenttbl.appendChild(newel);
                 } else if (this.displayLayout[p].noteName === "hertz") {
                     newel = document.createElement("td");
-                    newel.style.textAlign = "center";
+                    newel.classList.add("mb-text-center");
                     newel.setAttribute("id", "hertzRow" + myrow3Id.toString());
                     newel.setAttribute(
                         "alt",
@@ -654,7 +654,7 @@ const MusicKeyboardRendering = {
                 ) {
                     newel2 = document.createElement("td");
                     newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                    newel2.style.textAlign = "center";
+                    newel2.classList.add("mb-text-center");
                     if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
                         appendSpacerKey(parenttbl2, newel2);
                         p--;
@@ -719,7 +719,7 @@ const MusicKeyboardRendering = {
                 ) {
                     newel2 = document.createElement("td");
                     newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                    newel2.style.textAlign = "center";
+                    newel2.classList.add("mb-text-center");
                     if (BLACKKEY_SPACER_INDICES.includes(myrow2Id)) {
                         appendSpacerKey(parenttbl2, newel2);
                         p--;
@@ -774,7 +774,7 @@ const MusicKeyboardRendering = {
                 } else {
                     newel = document.createElement("td");
                     newel.setAttribute("id", "whiteRow" + myrowId.toString());
-                    newel.style.textAlign = "center";
+                    newel.classList.add("mb-text-center");
                     newel.setAttribute(
                         "alt",
                         this.displayLayout[p].noteName +
@@ -822,7 +822,7 @@ const MusicKeyboardRendering = {
             }
             newel = document.createElement("td");
             parenttbl.appendChild(newel);
-            newel.style.textAlign = "center";
+            newel.classList.add("mb-text-center");
             newel.setAttribute("id", "rest");
             newel.setAttribute("alt", "R__");
             setKeyboardCellLabel(newel, "", "", _("rest"));
