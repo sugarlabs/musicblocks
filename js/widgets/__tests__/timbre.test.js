@@ -3139,3 +3139,20 @@ describe("TimbreWidget with a real DOM", () => {
         expect(instrumentsFilters[0].custom[0].filterFrequency).toBe(392);
     });
 });
+
+describe("TimbreWidget loaded as a browser script", () => {
+    it("should not touch Node globals when require exists but module does not", () => {
+        const vm = require("vm");
+        const source = require("fs").readFileSync(require.resolve("../timbre.js"), "utf8");
+        const window = {};
+        const context = vm.createContext({
+            window,
+            require: jest.fn(),
+            _: msg => msg,
+            console
+        });
+
+        expect(() => vm.runInContext(source, context)).not.toThrow();
+        expect(context.require).not.toHaveBeenCalled();
+    });
+});

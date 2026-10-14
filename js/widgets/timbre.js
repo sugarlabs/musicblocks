@@ -506,7 +506,7 @@ class TimbreWidget {
     }
 }
 
-if (typeof require !== "undefined") {
+if (typeof module !== "undefined" && module.exports && typeof require !== "undefined") {
     if (typeof TimbreState === "undefined") {
         global.TimbreState = require("./TimbreState.js");
     }
