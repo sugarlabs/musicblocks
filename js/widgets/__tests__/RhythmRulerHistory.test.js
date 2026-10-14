@@ -110,4 +110,29 @@ describe("RhythmRulerHistory", () => {
             expect(widget._dissectHistory[0][0][0]).toEqual([0, 2]);
         });
     });
+
+    describe("_restoreDissectHistory", () => {
+        test("replays each row of a repeated drum with only its own edits", () => {
+            // A drum inside a repeat block gives two rows for the same drum block (11).
+            const rows = [{ cells: [{}, {}] }, { cells: [{}, {}] }];
+            const widget = {
+                Drums: [11, 11],
+                Rulers: [
+                    [[4, 4], []],
+                    [[4, 4], []]
+                ],
+                _rulers: rows,
+                _dissectHistory: [
+                    [[[0, 2]], 11],
+                    [[], 11]
+                ],
+                __dissectByNumber: jest.fn()
+            };
+
+            RhythmRulerHistory.prototype._restoreDissectHistory.call(widget);
+
+            expect(widget.__dissectByNumber).toHaveBeenCalledTimes(1);
+            expect(widget.__dissectByNumber).toHaveBeenCalledWith(rows[0].cells[0], 2, false);
+        });
+    });
 });
