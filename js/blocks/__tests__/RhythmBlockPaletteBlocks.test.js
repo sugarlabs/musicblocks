@@ -95,7 +95,8 @@ function createDummyTurtle() {
             inNoteBlock: [],
             notePitches: {},
             noteOctaves: {},
-            noteCents: {}
+            noteCents: {},
+            noteValue: {}
         },
         doWait: jest.fn()
     };
@@ -274,7 +275,7 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             rhythmBlock.flow([2, 0.25], logo, turtleIndex, "blkRhythm");
 
             expect(logo.addingNotesToTuplet).toBe(true);
-            expect(logo.tupletRhythms).toEqual([["notes", 0, 0.25, 0.25]]);
+            expect(logo.tupletRhythms).toEqual([["notes", 0, 4, 4]]);
         });
     });
 
@@ -457,20 +458,8 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             expect(logo.tupletRhythms[1]).toEqual([["notes", 0, 1 / 16, 1 / 16]]);
             expect(logo.addingNotesToTuplet[1]).toBe(true);
 
-            expect(Singer.processNote).toHaveBeenCalledWith(
-                activity,
-                1 / 8,
-                false,
-                "blkRhythm0",
-                0
-            );
-            expect(Singer.processNote).toHaveBeenCalledWith(
-                activity,
-                1 / 16,
-                false,
-                "blkRhythm1",
-                1
-            );
+            expect(Singer.processNote).toHaveBeenCalledWith(activity, 8, false, "blkRhythm0", 0);
+            expect(Singer.processNote).toHaveBeenCalledWith(activity, 16, false, "blkRhythm1", 1);
 
             // 5. Turtle 0's clamp ends and its dispatch listener runs
             const listener0 = logo.setTurtleListener.mock.calls.find(call => call[0] === 0)[2];
@@ -521,20 +510,8 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             tuplet4Block.flow([4, 4, 99], logo, 1, "blkTuplet4_1");
             rhythm2Block.flow([2, 16], logo, 1, "blkRhythm1");
 
-            expect(Singer.processNote).toHaveBeenCalledWith(
-                activity,
-                1 / 8,
-                false,
-                "blkRhythm0",
-                0
-            );
-            expect(Singer.processNote).toHaveBeenCalledWith(
-                activity,
-                1 / 16,
-                false,
-                "blkRhythm1",
-                1
-            );
+            expect(Singer.processNote).toHaveBeenCalledWith(activity, 8, false, "blkRhythm0", 0);
+            expect(Singer.processNote).toHaveBeenCalledWith(activity, 16, false, "blkRhythm1", 1);
 
             // Reverse interleaving: Turtle 1 finishes FIRST
             const listener1 = logo.setTurtleListener.mock.calls.find(call => call[0] === 1)[2];
