@@ -671,6 +671,62 @@ describe("TemperamentUI module", () => {
 
             spyMainWheel.mockRestore();
         });
+
+        const useTwelveEdo = () => {
+            mockTW.ratios = [];
+            mockTW.frequencies = [];
+            for (let i = 0; i <= 12; i++) {
+                mockTW.ratios.push(Math.pow(2, i / 12));
+                mockTW.frequencies.push((261.63 * Math.pow(2, i / 12)).toFixed(2));
+            }
+            mockTW.pitchNumber = 12;
+        };
+
+        const runEqualEdit = (from, to, divisions) => {
+            TemperamentUI.equalEdit(mockTW);
+            document.getElementById("octaveIn").value = from;
+            document.getElementById("octaveOut").value = to;
+            document.getElementById("divisions").value = divisions;
+            mockTW.performEqualEdit({ target: { textContent: "done" } });
+        };
+
+        test("performEqualEdit gives the same ratios when the pitch range is reversed", () => {
+            useTwelveEdo();
+            runEqualEdit("0", "4", "2");
+            const forward = mockTW.ratios.slice();
+            const forwardPitchNumber = mockTW.pitchNumber;
+
+            useTwelveEdo();
+            runEqualEdit("4", "0", "2");
+
+            expect(mockTW.activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTW.pitchNumber).toBe(forwardPitchNumber);
+            expect(mockTW.ratios).toEqual(forward);
+            for (let i = 1; i < mockTW.ratios.length; i++) {
+                expect(mockTW.ratios[i]).toBeGreaterThan(mockTW.ratios[i - 1]);
+            }
+        });
+
+        test.each([
+            ["0", "20"],
+            ["-1", "4"],
+            ["a", "4"],
+            ["0", "2.5"],
+            ["", "4"],
+            ["0", "  "]
+        ])("performEqualEdit rejects the pitch range %s to %s", (from, to) => {
+            useTwelveEdo();
+            const ratios = mockTW.ratios.slice();
+            runEqualEdit(from, to, "2");
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter pitch numbers between 0 and 12.",
+                3000
+            );
+            expect(mockTW.ratios).toEqual(ratios);
+            expect(mockTW.pitchNumber).toBe(12);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
+        });
     });
 
     describe("ratioEdit calculations and callbacks", () => {
@@ -777,6 +833,78 @@ describe("TemperamentUI module", () => {
 
             expect(mockTW.activity.errorMsg).not.toHaveBeenCalled();
             expect(mockTW.ratios).toEqual([1, 1.5, 2]);
+        });
+
+        const runRatioEdit = (input, output, recursion) => {
+            TemperamentUI.ratioEdit(mockTW);
+            document.getElementById("ratioIn").value = input;
+            document.getElementById("ratioOut").value = output;
+            document.getElementById("recursion").value = recursion;
+            document.getElementById("divAppend").onclick({ target: { textContent: "done" } });
+        };
+
+        test("ratioEdit folds a ratio below 1 up into the octave", () => {
+            mockTW.ratios = [1, 1.5, 2];
+            mockTW.frequencies = [440, 660, 880];
+            mockTW.powerBase = 2;
+            runRatioEdit("2", "3", "1");
+
+            expect(mockTW.activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTW.ratios[0]).toBe(1);
+            expect(mockTW.ratios.length).toBe(4);
+            expect(mockTW.ratios[1]).toBeCloseTo(4 / 3, 10);
+        });
+
+        test("ratioEdit folds by the octave space, not by 2", () => {
+            mockTW.ratios = [1, 3];
+            mockTW.frequencies = [100, 300];
+            mockTW.powerBase = 3;
+            runRatioEdit("5", "2", "2");
+
+            expect(mockTW.ratios.length).toBe(4);
+            expect(mockTW.ratios[1]).toBeCloseTo(6.25 / 3, 10);
+            expect(mockTW.ratios[2]).toBeCloseTo(2.5, 10);
+            expect(mockTW.ratios[3]).toBe(3);
+        });
+
+        test("ratioEdit keeps a ratio above the last listed pitch", () => {
+            mockTW.ratios = [1, 1.5];
+            mockTW.frequencies = [440, 660];
+            mockTW.powerBase = 2;
+            runRatioEdit("7", "4", "1");
+
+            expect(mockTW.ratios).toEqual([1, 1.5, 1.75]);
+        });
+
+        test.each(["0", "57", "1.5", "abc", "", "1000000000"])(
+            "ratioEdit rejects the recursion %p",
+            recursion => {
+                mockTW.ratios = [1, 1.5, 2];
+                mockTW.frequencies = [440, 660, 880];
+                mockTW.powerBase = 2;
+                runRatioEdit("2", "3", recursion);
+
+                expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                    "Please enter a recursion between 1 and 56.",
+                    3000
+                );
+                expect(mockTW.ratios).toEqual([1, 1.5, 2]);
+                expect(mockTW._visualizerView).not.toHaveBeenCalled();
+            }
+        );
+
+        test("ratioEdit rejects a ratio that overflows instead of looping forever", () => {
+            mockTW.ratios = [1, 1e300];
+            mockTW.frequencies = [1, 1e300];
+            mockTW.powerBase = 1e300;
+            runRatioEdit("1e299", "1", "2");
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid ratio (e.g. 3:2) within the octave space.",
+                3000
+            );
+            expect(mockTW.ratios).toEqual([1, 1e300]);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
         });
 
         test("ratioEdit handles overDivisionCap", () => {
@@ -976,6 +1104,34 @@ describe("TemperamentUI module", () => {
             expect(mockTW.powerBase).toBe(2);
             expect(mockTW.octaveChanged).toBeUndefined();
             expect(mockTW._visualizerView).toHaveBeenCalled();
+        });
+
+        test.each([
+            ["3", "0"],
+            ["x", "1"],
+            ["1", "2"],
+            ["1", "1"],
+            ["-4", "-2"],
+            ["-3", "-1"],
+            ["4", "-2"],
+            ["-4", "2"]
+        ])("octaveSpaceEdit rejects the octave ratio %s:%s", (start, end) => {
+            const ratios = mockTW.ratios.slice();
+            const frequencies = mockTW.frequencies.slice();
+            TemperamentUI.octaveSpaceEdit(mockTW);
+            document.getElementById("startNote").value = start;
+            document.getElementById("endNote").value = end;
+
+            document.getElementById("divAppend").onclick();
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter an octave ratio greater than 1 (e.g. 2:1).",
+                3000
+            );
+            expect(mockTW.powerBase).toBe(2);
+            expect(mockTW.ratios).toEqual(ratios);
+            expect(mockTW.frequencies).toEqual(frequencies);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
         });
 
         test("octaveSpaceEdit divAppend mouseover sets pointer cursor", () => {
