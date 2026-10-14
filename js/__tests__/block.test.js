@@ -608,6 +608,40 @@ describe("Block Foundation", () => {
             });
         });
 
+        describe("collapsed labels with an empty slot", () => {
+            beforeEach(() => {
+                block.collapseText = { text: "" };
+                global.NSYMBOLS = global.NSYMBOLS || {};
+                global.RSYMBOLS = global.RSYMBOLS || {};
+                global.DEGREES = global.DEGREES || "unison 2nd 3rd 4th 5th 6th 7th octave";
+            });
+
+            it("should not throw for a note whose divide has an empty slot", () => {
+                block.name = "newnote";
+                block.connections = [null, 1, null];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, null, 3] },
+                    null,
+                    { name: "number", value: 4, connections: [1] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(() => null);
+
+                expect(() => block._newNoteLabel()).not.toThrow();
+            });
+
+            it("should not throw for an interval whose number slot is empty", () => {
+                block.name = "interval";
+                block.blockIndex = 0;
+                block.connections = [null, null, null];
+                mockBlocks.blockList = [block];
+                mockBlocks.findNestedIntervalBlock = jest.fn(() => null);
+                mockBlocks.findNoteBlock = jest.fn(() => null);
+
+                expect(() => block._intervalLabel()).not.toThrow();
+            });
+        });
+
         describe("regenerateArtwork()", () => {
             it("should remove old bitmaps and call generateArtwork", () => {
                 block.bitmap = new global.createjs.Bitmap();
