@@ -291,7 +291,12 @@ describe("Rhythm Ruler widget", () => {
         cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td').first().click({ force: true });
         cy.get('[aria-label="rhythm maker"] #rulerCellTable0 tr td').should("have.length", 2);
 
-        // Reloading saves the project to localStorage (beforeunload) and loads it again.
+        // On a restart the project comes back from Planet's storage, which the 15 second autosave
+        // keeps current. The save started on unload is asynchronous and can be cut short, so save
+        // as the autosave does and wait for it before reloading.
+        cy.window().then(win =>
+            win.ActivityContext.getActivity().saveLocally({ rejectOnProjectSaveError: true })
+        );
         cy.reload();
         cy.waitForAppReady();
         waitForRhythmRulerBlock();
