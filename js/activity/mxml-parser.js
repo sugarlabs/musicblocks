@@ -62,6 +62,19 @@ const _contentsEqual = (a, b) => {
     return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
 };
 
+// A note's <time-modification> as [actual-notes, normal-notes], the ratio a
+// tuplet is played at, or 1:1 for a note that is not in one. Anything missing or
+// not a positive number is read as 1:1, so a malformed tuplet keeps its written
+// length rather than becoming zero or NaN.
+const _timeModification = noteEl => {
+    const el = noteEl.querySelector(":scope > time-modification");
+    if (el === null) return [1, 1];
+    const actual = Number(_text(el, "actual-notes"));
+    const normal = Number(_text(el, "normal-notes"));
+    if (!(actual > 0) || !(normal > 0)) return [1, 1];
+    return [actual, normal];
+};
+
 /**
  * A note's length as a Music Blocks [numerator, denominator] fraction.
  *
@@ -84,7 +97,10 @@ function _noteDuration(noteEl, divisions) {
     if (typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
-        return [2 ** (dots + 1) - 1, denominator * 2 ** dots];
+        // <type> is the note as written, so a tuplet note has to be shortened by
+        // its ratio. <duration> below needs no such adjustment, having it already.
+        const [actual, normal] = _timeModification(noteEl);
+        return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
     }
 
     const durationText = _text(noteEl, "duration");
