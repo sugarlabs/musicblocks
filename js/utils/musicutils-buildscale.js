@@ -1132,6 +1132,12 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
             );
             if (noteIdx === -1 && t.noteLabels.length === 12) {
                 noteIdx = t.noteLabels.findIndex(label => _notePitchClass(label) === pitchClass);
+                // A spelling that crosses C lands in the next or previous octave of the table:
+                // B♯4 is C5 and C♭4 is B3.
+                const letter = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[pitch[0]];
+                if (noteIdx !== -1 && letter !== undefined) {
+                    octave += Math.floor((letter + ((pitchClass - letter + 18) % 12) - 6) / 12);
+                }
             }
         }
         if (noteIdx !== -1) {
