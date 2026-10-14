@@ -2678,7 +2678,7 @@ Editor*" (`<>`) button in the auxilliary menu.
 
 For the block stacks (and mouse art generated after running),
 
-![Example Project](../js/js-export/samples/mode-up-down.png)
+![Example Project](../../js/js-export/samples/mode-up-down.png)
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725884337271676&run=True)
 
@@ -2721,7 +2721,7 @@ new Mouse(async mouse => {
 MusicBlocks.run();
 ```
 
-Here's the complete [API](../js/js-export/samples/sample.js) of
+Here's the complete [API](../../js/js-export/samples/sample.js) of
 methods, getters, setters.
 
 ## <a name="APPENDIX">6. Appendix</a>
