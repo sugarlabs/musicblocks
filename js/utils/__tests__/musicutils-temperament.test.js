@@ -91,6 +91,39 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("enharmonic spellings in 12-EDO", () => {
+        it("resolves E♯, B♯, C♭ and F♭ to the position of their enharmonic equivalent", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B♯", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♭", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("F♭", 12)).toBe(4);
+        });
+
+        it("reads ASCII accidentals the same way", () => {
+            expect(temperament.getEdoNoteNamePosition("E#", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("Cb", 12)).toBe(11);
+        });
+
+        it("keeps resolving sharps and flats that already worked", () => {
+            expect(temperament.getEdoNoteNamePosition("C♯", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("D♭", 12)).toBe(1);
+        });
+
+        it("keeps E♯ and B♯ as distinct pitches outside 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 19)).toBe(7);
+            expect(temperament.getEdoNoteNamePosition("B♯", 19)).toBe(18);
+        });
+
+        it("puts B♯ and C♭ in the octave of the pitch they sound as", () => {
+            const number = (note, octave) =>
+                musicutils.pitchToNumber(note, octave, "C major", "equal");
+            expect(number("B♯", 4)).toBe(number("C", 5));
+            expect(number("C♭", 5)).toBe(number("B", 4));
+            expect(number("E♯", 4)).toBe(number("F", 4));
+            expect(number("F♭", 4)).toBe(number("E", 4));
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [

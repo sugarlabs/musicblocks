@@ -42,6 +42,7 @@ if (typeof module !== "undefined" && module.exports) {
         DOUBLEFLAT,
         EQUIVALENTSHARPS,
         EQUIVALENTFLATS,
+        EQUIVALENTNATURALS,
         PITCHES2,
         PITCHES,
         DEFAULTTEMPERAMENT
@@ -207,6 +208,11 @@ function getEdoNoteNamePosition(name, edo) {
     }
     if (edo === 12 && normalizedName in EQUIVALENTFLATS) {
         idx = names.indexOf(EQUIVALENTFLATS[normalizedName]);
+        if (idx !== -1) return idx;
+    }
+
+    if (edo === 12 && normalizedName in EQUIVALENTNATURALS) {
+        idx = names.indexOf(EQUIVALENTNATURALS[normalizedName]);
         if (idx !== -1) return idx;
     }
 
