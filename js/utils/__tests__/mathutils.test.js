@@ -836,17 +836,22 @@ describe("MathUtility", () => {
     });
 
     describe("doSin", () => {
-        test("calculates sine for 0, 30, 90, 180, 270 degrees", () => {
-            expect(MathUtility.doSin(0)).toBeCloseTo(0);
-            expect(MathUtility.doSin(30)).toBeCloseTo(0.5);
-            expect(MathUtility.doSin(90)).toBeCloseTo(1);
-            expect(MathUtility.doSin(180)).toBeCloseTo(0);
-            expect(MathUtility.doSin(270)).toBeCloseTo(-1);
+        test("calculates sine for 0, 30, 90, 180, 270, 360, 720 degrees with exact values", () => {
+            expect(MathUtility.doSin(0)).toBe(0);
+            expect(MathUtility.doSin(30)).toBe(0.5);
+            expect(MathUtility.doSin(90)).toBe(1);
+            expect(MathUtility.doSin(180)).toBe(0);
+            expect(MathUtility.doSin(270)).toBe(-1);
+            expect(MathUtility.doSin(360)).toBe(0);
+            expect(MathUtility.doSin(720)).toBe(0);
         });
 
-        test("handles negative angles", () => {
-            expect(MathUtility.doSin(-90)).toBeCloseTo(-1);
-            expect(MathUtility.doSin(-30)).toBeCloseTo(-0.5);
+        test("handles negative angles with normalized zero", () => {
+            expect(MathUtility.doSin(-90)).toBe(-1);
+            expect(MathUtility.doSin(-30)).toBe(-0.5);
+            expect(MathUtility.doSin(-180)).toBe(0);
+            expect(Object.is(MathUtility.doSin(-180), 0)).toBe(true);
+            expect(MathUtility.doSin(-360)).toBe(0);
         });
 
         test("throws NanError for non-numeric input", () => {
@@ -857,16 +862,20 @@ describe("MathUtility", () => {
     });
 
     describe("doCos", () => {
-        test("calculates cosine for 0, 60, 90, 180 degrees", () => {
-            expect(MathUtility.doCos(0)).toBeCloseTo(1);
-            expect(MathUtility.doCos(60)).toBeCloseTo(0.5);
-            expect(MathUtility.doCos(90)).toBeCloseTo(0);
-            expect(MathUtility.doCos(180)).toBeCloseTo(-1);
+        test("calculates cosine for 0, 60, 90, 180, 360 degrees with exact values", () => {
+            expect(MathUtility.doCos(0)).toBe(1);
+            expect(MathUtility.doCos(60)).toBe(0.5);
+            expect(MathUtility.doCos(90)).toBe(0);
+            expect(MathUtility.doCos(180)).toBe(-1);
+            expect(MathUtility.doCos(360)).toBe(1);
         });
 
-        test("handles negative angles", () => {
-            expect(MathUtility.doCos(-180)).toBeCloseTo(-1);
-            expect(MathUtility.doCos(-60)).toBeCloseTo(0.5);
+        test("handles negative angles with normalized zero", () => {
+            expect(MathUtility.doCos(-180)).toBe(-1);
+            expect(MathUtility.doCos(-90)).toBe(0);
+            expect(Object.is(MathUtility.doCos(-90), 0)).toBe(true);
+            expect(MathUtility.doCos(-60)).toBe(0.5);
+            expect(MathUtility.doCos(-360)).toBe(1);
         });
 
         test("throws NanError for non-numeric input", () => {
@@ -876,10 +885,14 @@ describe("MathUtility", () => {
     });
 
     describe("doTan", () => {
-        test("calculates tangent for 0, 45 degrees", () => {
-            expect(MathUtility.doTan(0)).toBeCloseTo(0);
-            expect(MathUtility.doTan(45)).toBeCloseTo(1);
-            expect(MathUtility.doTan(-45)).toBeCloseTo(-1);
+        test("calculates tangent for 0, 45, 180, 360 degrees with exact values", () => {
+            expect(MathUtility.doTan(0)).toBe(0);
+            expect(MathUtility.doTan(45)).toBe(1);
+            expect(MathUtility.doTan(-45)).toBe(-1);
+            expect(MathUtility.doTan(180)).toBe(0);
+            expect(MathUtility.doTan(360)).toBe(0);
+            expect(MathUtility.doTan(-180)).toBe(0);
+            expect(Object.is(MathUtility.doTan(-180), 0)).toBe(true);
         });
 
         test("throws NanError for angles equivalent to 90 degrees modulo 180", () => {
@@ -896,11 +909,12 @@ describe("MathUtility", () => {
     });
 
     describe("doArcSin", () => {
-        test("calculates arcsine in degrees", () => {
-            expect(MathUtility.doArcSin(0)).toBeCloseTo(0);
-            expect(MathUtility.doArcSin(0.5)).toBeCloseTo(30);
-            expect(MathUtility.doArcSin(1)).toBeCloseTo(90);
-            expect(MathUtility.doArcSin(-1)).toBeCloseTo(-90);
+        test("calculates arcsine in degrees with exact values for common inputs", () => {
+            expect(MathUtility.doArcSin(0)).toBe(0);
+            expect(MathUtility.doArcSin(0.5)).toBe(30);
+            expect(MathUtility.doArcSin(-0.5)).toBe(-30);
+            expect(MathUtility.doArcSin(1)).toBe(90);
+            expect(MathUtility.doArcSin(-1)).toBe(-90);
         });
 
         test("throws NanError for values outside [-1, 1]", () => {
@@ -915,11 +929,12 @@ describe("MathUtility", () => {
     });
 
     describe("doArcCos", () => {
-        test("calculates arccosine in degrees", () => {
-            expect(MathUtility.doArcCos(1)).toBeCloseTo(0);
-            expect(MathUtility.doArcCos(0.5)).toBeCloseTo(60);
-            expect(MathUtility.doArcCos(0)).toBeCloseTo(90);
-            expect(MathUtility.doArcCos(-1)).toBeCloseTo(180);
+        test("calculates arccosine in degrees with exact values for common inputs", () => {
+            expect(MathUtility.doArcCos(1)).toBe(0);
+            expect(MathUtility.doArcCos(0.5)).toBe(60);
+            expect(MathUtility.doArcCos(0)).toBe(90);
+            expect(MathUtility.doArcCos(-0.5)).toBe(120);
+            expect(MathUtility.doArcCos(-1)).toBe(180);
         });
 
         test("throws NanError for values outside [-1, 1]", () => {
@@ -934,15 +949,27 @@ describe("MathUtility", () => {
     });
 
     describe("doArcTan", () => {
-        test("calculates arctangent in degrees", () => {
-            expect(MathUtility.doArcTan(0)).toBeCloseTo(0);
-            expect(MathUtility.doArcTan(1)).toBeCloseTo(45);
-            expect(MathUtility.doArcTan(-1)).toBeCloseTo(-45);
+        test("calculates arctangent in degrees with exact values for common inputs", () => {
+            expect(MathUtility.doArcTan(0)).toBe(0);
+            expect(MathUtility.doArcTan(1)).toBe(45);
+            expect(MathUtility.doArcTan(-1)).toBe(-45);
         });
 
         test("throws NanError for non-numeric input", () => {
             expect(() => MathUtility.doArcTan("abc")).toThrow("NanError");
             expect(() => MathUtility.doArcTan(null)).toThrow("NanError");
+        });
+    });
+
+    describe("_round10", () => {
+        test("preserves non-finite values", () => {
+            expect(MathUtility._round10(Infinity)).toBe(Infinity);
+            expect(MathUtility._round10(-Infinity)).toBe(-Infinity);
+            expect(Number.isNaN(MathUtility._round10(NaN))).toBe(true);
+        });
+
+        test("normalizes negative zero to positive zero", () => {
+            expect(Object.is(MathUtility._round10(-0), 0)).toBe(true);
         });
     });
 

@@ -64,6 +64,18 @@ class MathUtility {
         return typeof a === "number" && !Number.isNaN(a);
     }
 
+    /**
+     * Rounds a number to at most 10 decimal places to eliminate floating-point
+     * conversion artifacts from degree/radian transformations (matching Scratch-VM).
+     *
+     * @static
+     * @param {number} val
+     * @returns {number}
+     */
+    static _round10(val) {
+        return Number.isFinite(val) ? parseFloat(val.toFixed(10)) + 0 : val;
+    }
+
     static doRandom(a, b, c) {
         /**
          * Returns a random number between n1 and n2 (both inclusive).
@@ -417,7 +429,7 @@ class MathUtility {
         if (!MathUtility._isNumber(a)) {
             throw new Error("NanError");
         }
-        return Math.sin((Number(a) * Math.PI) / 180);
+        return MathUtility._round10(Math.sin(((Number(a) % 360) * Math.PI) / 180));
     }
 
     /**
@@ -432,7 +444,7 @@ class MathUtility {
         if (!MathUtility._isNumber(a)) {
             throw new Error("NanError");
         }
-        return Math.cos((Number(a) * Math.PI) / 180);
+        return MathUtility._round10(Math.cos(((Number(a) % 360) * Math.PI) / 180));
     }
 
     /**
@@ -447,7 +459,7 @@ class MathUtility {
         if (!MathUtility._isNumber(a) || (Number(a) - 90) % 180 === 0) {
             throw new Error("NanError");
         }
-        return Math.tan((Number(a) * Math.PI) / 180);
+        return MathUtility._round10(Math.tan(((Number(a) % 180) * Math.PI) / 180));
     }
 
     /**
@@ -462,7 +474,7 @@ class MathUtility {
         if (!MathUtility._isNumber(a) || a < -1 || a > 1) {
             throw new Error("NanError");
         }
-        return (Math.asin(Number(a)) * 180) / Math.PI;
+        return MathUtility._round10((Math.asin(Number(a)) * 180) / Math.PI);
     }
 
     /**
@@ -477,7 +489,7 @@ class MathUtility {
         if (!MathUtility._isNumber(a) || a < -1 || a > 1) {
             throw new Error("NanError");
         }
-        return (Math.acos(Number(a)) * 180) / Math.PI;
+        return MathUtility._round10((Math.acos(Number(a)) * 180) / Math.PI);
     }
 
     /**
@@ -492,7 +504,7 @@ class MathUtility {
         if (!MathUtility._isNumber(a)) {
             throw new Error("NanError");
         }
-        return (Math.atan(Number(a)) * 180) / Math.PI;
+        return MathUtility._round10((Math.atan(Number(a)) * 180) / Math.PI);
     }
 
     /**
