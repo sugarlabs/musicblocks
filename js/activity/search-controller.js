@@ -387,7 +387,7 @@ class SearchController {
                         const onMouseMove = e => {
                             e.preventDefault();
                             let x, y;
-                            if (e.type === "touchmove") {
+                            if (e.type === "touchstart" || e.type === "touchmove") {
                                 x = e.touches[0].clientX;
                                 y = e.touches[0].clientY;
                             } else {
