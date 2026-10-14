@@ -2886,7 +2886,6 @@ class PhraseMaker {
     _export() {
         const exportWindow = window.open("");
         if (!exportWindow) {
-            console.debug("Could not create export window");
             this.activity.errorMsg(
                 this._(
                     "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
@@ -4690,8 +4689,6 @@ class PhraseMaker {
                             null
                         );
                     }
-                } else {
-                    console.debug("Cannot parse note object: " + obj);
                 }
             }
         } else if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
