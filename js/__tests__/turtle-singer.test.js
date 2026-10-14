@@ -1151,7 +1151,7 @@ describe("processPitch — note block execution path", () => {
     });
 });
 
-describe("processPitch outside 12 EDO", () => {
+describe("processPitch intervals, chords and register by temperament", () => {
     let turtleMock;
     let activityMock;
     const saved = {};
@@ -1237,6 +1237,20 @@ describe("processPitch outside 12 EDO", () => {
         turtleMock.singer.register = -1;
         Singer.processPitch(activityMock, "C", 4, 0, 0, "pitchBlk");
         expect(played("pitchBlk")).toEqual(["C3"]);
+    });
+
+    test("an interval of a third above C4 adds E4 in 12 EDO", () => {
+        activityMock.logo.synth.inTemperament = "equal";
+        turtleMock.singer.intervals = [2];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4"]);
+    });
+
+    test("a semitone interval of 4 above C4 adds E4 in 12 EDO", () => {
+        activityMock.logo.synth.inTemperament = "equal";
+        turtleMock.singer.semitoneIntervals = [[4, 0]];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4"]);
     });
 });
 
