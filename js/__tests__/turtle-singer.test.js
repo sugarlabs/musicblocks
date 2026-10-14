@@ -1151,6 +1151,95 @@ describe("processPitch — note block execution path", () => {
     });
 });
 
+describe("processPitch outside 12 EDO", () => {
+    let turtleMock;
+    let activityMock;
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getCurrentEDO", "getTemperament"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.inNoteBlock = [0];
+        for (const key of ["notePitches", "noteOctaves", "noteCents", "noteHertz"]) {
+            turtleMock.singer[key] = { 0: [] };
+        }
+        turtleMock.singer.noteBeatValues = { 0: [] };
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth.inTemperament = "equal19";
+        activityMock.logo.clearNoteParams = jest.fn((tur, blk) => {
+            for (const key of [
+                "notePitches",
+                "noteOctaves",
+                "noteCents",
+                "noteHertz",
+                "noteBeatValues"
+            ]) {
+                tur.singer[key][blk] = [];
+            }
+        });
+        jest.spyOn(Singer, "processNote").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+        jest.restoreAllMocks();
+    });
+
+    const played = blk =>
+        turtleMock.singer.notePitches[blk].map(
+            (pitch, i) => pitch + turtleMock.singer.noteOctaves[blk][i]
+        );
+
+    test("an interval of a third above C4 adds E4 in 19 EDO", () => {
+        turtleMock.singer.intervals = [2];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4"]);
+    });
+
+    test("a root position triad on C4 adds E4 and G4 in 19 EDO", () => {
+        turtleMock.singer.chordIntervals = [
+            [2, 0],
+            [4, 0]
+        ];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4", "G4"]);
+    });
+
+    test("an arpeggio step of a third plays E4 for C4 in 19 EDO", () => {
+        turtleMock.singer.arpeggio = [[2, 0]];
+        turtleMock.singer.arpeggioIndex = 0;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["E4"]);
+    });
+
+    test("register 1 plays C4 as C5 in 19 EDO", () => {
+        turtleMock.singer.register = 1;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C5"]);
+    });
+
+    test("a pitch block on its own with an interval of a third adds E4 in 19 EDO", () => {
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.intervals = [2];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "pitchBlk");
+        expect(played("pitchBlk")).toEqual(["C4", "E4"]);
+    });
+
+    test("a pitch block on its own with register -1 plays C3 in 19 EDO", () => {
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.register = -1;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "pitchBlk");
+        expect(played("pitchBlk")).toEqual(["C3"]);
+    });
+});
+
 describe("processPitch widget-row definition adds one row per visit", () => {
     // The Duplicate block re-queues each block in its clamp `factor` times
     // (see DuplicateBlock.flow), so a pitch block is already visited once per
