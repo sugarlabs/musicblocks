@@ -295,15 +295,7 @@ function setupVolumeActions(activity) {
                 if (firstConnection === null && lastConnection === null) {
                     activity.logo._timerManager.setGuardedTimeout(
                         () => {
-                            activity.logo.synth.trigger(
-                                0,
-                                "G4",
-                                1 / 4,
-                                synthname,
-                                null,
-                                null,
-                                false
-                            );
+                            activity.logo.synth.trigger(0, "G4", 1 / 4, synth, null, null, false);
                         },
                         250,
                         () => activity.logo.stopTurtle
