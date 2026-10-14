@@ -296,42 +296,7 @@ class HelpWidget {
 
                     const bodyFragment = document.createDocumentFragment();
                     if (message.length > 1) {
-                        let path = message[1];
-                        // We need to add a case here whenever we add
-                        // help artwort support for a new language.
-                        // e.g., documentation-es
-                        let language = localStorage.languagePreference;
-                        if (language === undefined) {
-                            language = navigator.language;
-                        }
-
-                        switch (language) {
-                            case "ja":
-                                if (localStorage.kanaPreference === "kana") {
-                                    path = path + "-kana";
-                                } else {
-                                    path = path + "-ja";
-                                }
-                                break;
-                            case "es":
-                                path = path + "-es";
-                                break;
-                            case "pt":
-                                path = path + "-pt";
-                                break;
-                            default:
-                                break;
-                        }
-
-                        // body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
-                        const imageSrc = `Docs/${path}/${name}_block.svg`;
-                        const figure = document.createElement("figure");
-                        figure.classList.add("blockImage-wrapper");
-                        const img = document.createElement("img");
-                        img.classList.add("blockImage");
-                        img.src = imageSrc;
-                        figure.append(img);
-                        bodyFragment.append(figure);
+                        bodyFragment.append(this._makeBlockImageFigure(message[1], name));
                     }
 
                     const messageParagraph = document.createElement("p");
@@ -741,6 +706,66 @@ class HelpWidget {
     }
 
     /**
+     * Folder of block help artwork for the current language, e.g.
+     * "documentation-es". Languages without their own artwork use the
+     * folder from the help string.
+     * @private
+     * @param {string} path - folder from the help string, e.g. "documentation"
+     * @returns {string}
+     */
+    _localizedHelpPath(path) {
+        // We need to add a case here whenever we add help artwork
+        // support for a new language.
+        let language = localStorage.languagePreference;
+        if (language === undefined) {
+            language = navigator.language;
+        }
+
+        switch (language) {
+            case "ja":
+                return localStorage.kanaPreference === "kana" ? path + "-kana" : path + "-ja";
+            case "es":
+                return path + "-es";
+            case "pt":
+                return path + "-pt";
+            default:
+                return path;
+        }
+    }
+
+    /**
+     * Figure with the help artwork of a block. Not every language has
+     * artwork for every block, so a missing localized image falls back to
+     * the one in the help string's folder, and the figure is removed if
+     * that is missing too, instead of showing a broken image.
+     * @private
+     * @param {string} path - folder from the help string, e.g. "documentation"
+     * @param {string} name - block name
+     * @returns {HTMLElement}
+     */
+    _makeBlockImageFigure(path, name) {
+        const figure = document.createElement("figure");
+        figure.classList.add("blockImage-wrapper");
+        const img = document.createElement("img");
+        img.classList.add("blockImage");
+
+        const defaultSrc = `Docs/${path}/${name}_block.svg`;
+        const localizedSrc = `Docs/${this._localizedHelpPath(path)}/${name}_block.svg`;
+        img.onerror = () => {
+            if (img.getAttribute("src") !== defaultSrc) {
+                img.src = defaultSrc;
+            } else {
+                img.onerror = null;
+                figure.remove();
+            }
+        };
+        img.src = localizedSrc;
+
+        figure.append(img);
+        return figure;
+    }
+
+    /**
      * @private
      * @param {string} title
      * @returns {boolean}
@@ -1024,41 +1049,7 @@ class HelpWidget {
             if (message) {
                 const bodyFragment = document.createDocumentFragment();
                 if (message.length > 1) {
-                    let path = message[1];
-                    // We need to add a case here whenever we add
-                    // help artwort support for a new language.
-                    // e.g., documentation-es
-                    let language = localStorage.languagePreference;
-                    if (language === undefined) {
-                        language = navigator.language;
-                    }
-
-                    switch (language) {
-                        case "ja":
-                            if (localStorage.kanaPreference === "kana") {
-                                path = path + "-kana";
-                            } else {
-                                path = path + "-ja";
-                            }
-                            break;
-                        case "es":
-                            path = path + "-es";
-                            break;
-                        case "pt":
-                            path = path + "-pt";
-                            break;
-                        default:
-                            break;
-                    }
-
-                    const imageSrc = `Docs/documentation/${name}_block.svg`;
-                    const figure = document.createElement("figure");
-                    figure.classList.add("blockImage-wrapper");
-                    const img = document.createElement("img");
-                    img.classList.add("blockImage");
-                    img.src = imageSrc;
-                    figure.append(img);
-                    bodyFragment.append(figure);
+                    bodyFragment.append(this._makeBlockImageFigure(message[1], name));
                 }
 
                 const messageParagraph = document.createElement("p");
