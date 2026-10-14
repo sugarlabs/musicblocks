@@ -117,6 +117,7 @@ const createBaseSandbox = () => ({
     hideDOMLabel: jest.fn(),
     setupActivityRecorder: jest.fn(),
     setupActivityAbcParser: jest.fn(),
+    setupActivityMxmlParser: jest.fn(),
     performance: global.performance || { now: () => Date.now() }
 });
 
