@@ -133,7 +133,10 @@ describe("RhythmRulerEditing", () => {
                 __toggleRestState: jest.fn(),
                 _calculateZebraStripes: jest.fn(),
                 _refreshCircularView: jest.fn(),
-                saveDissectHistory: jest.fn()
+                // Records the ruler history as it is when saved.
+                saveDissectHistory: jest.fn(function () {
+                    this.savedHistory = JSON.parse(JSON.stringify(this.Rulers[0][1]));
+                })
             };
         };
 
@@ -163,7 +166,7 @@ describe("RhythmRulerEditing", () => {
             expect(widget._calculateZebraStripes).toHaveBeenCalledWith(0);
             expect(widget._refreshCircularView).toHaveBeenCalled();
             // So the project saves the ruler without the undone edit.
-            expect(widget.saveDissectHistory).toHaveBeenCalled();
+            expect(widget.savedHistory).toEqual([]);
         });
 
         test("merges tapped cells back into one", () => {
