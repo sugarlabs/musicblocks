@@ -1025,17 +1025,15 @@ describe("Tests for Singer.PitchActions setup", () => {
             turtle.singer.previousNotePlayed = ["C4", 4];
             turtle.singer.lastNotePlayed = ["E4", 4];
             const val = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            // Ground truth obtained by running the real implementation (not derived by hand):
-            // C4 → E4 is a 4-semitone gap (deltapitch=4) covered in 3 upward scalar steps.
-            expect(val).toBe(3);
+            // C4 → E4 is a 4-semitone gap (deltapitch=4) covered in 2 upward scalar steps (C -> D -> E).
+            expect(val).toBe(2);
         });
         test("deltascalarpitch returns a negative count when last < previous", () => {
             turtle.singer.previousNotePlayed = ["D4", 4];
             turtle.singer.lastNotePlayed = ["C4", 4];
             const count = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            // Ground truth obtained by running the real implementation: D4 → C4 is a
-            // 2-semitone gap covered in 2 downward scalar steps.
-            expect(count).toBe(-2);
+            // D4 → C4 is a 2-semitone gap covered in 1 downward scalar step (D -> C).
+            expect(count).toBe(-1);
         });
         test("deltapitch/deltascalarpitch return 0 at the exact zero-delta boundary (same note)", () => {
             turtle.singer.previousNotePlayed = ["C4", 4];
@@ -1052,8 +1050,8 @@ describe("Tests for Singer.PitchActions setup", () => {
                 musicUtils.getStepSizeUp("C major", "C", 0, "totally-not-a-real-temperament")
             ).toBe(2);
             const result = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            // C4 -> E4 in 3 upward scalar steps.
-            expect(result).toBe(3);
+            // C4 -> E4 in 2 upward scalar steps.
+            expect(result).toBe(2);
         }, 10000);
 
         test("deltascalarpitch follows the mode in the downward direction for a custom EDO temperament", () => {
@@ -1062,7 +1060,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
             const result = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
             // E -> D -> C.
-            expect(result).toBe(-3);
+            expect(result).toBe(-2);
         }, 10000);
     });
 
