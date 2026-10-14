@@ -1118,7 +1118,28 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
     const t = getTemperament(temperament);
     if (t && !t.isEDO && t.noteLabels && t.ratios) {
-        const noteIdx = t.noteLabels.indexOf(pitch);
+        let noteIdx = t.noteLabels.indexOf(pitch);
+        if (noteIdx === -1) {
+            // The labels are not spelled like the notes that reach here: Just Intonation and
+            // Pythagorean write sharps as "C#" and have no flats, while notes arrive as "C♯"
+            // and "D♭". Match the same spelling in either notation first (the meantones label
+            // C♯ and D♭ as different pitches), then, in a 12-note table, the one label that
+            // sounds the same, which is how the synth resolves a D♭ there. Without this the
+            // note fell through to the 12-EDO formula below.
+            const pitchClass = _notePitchClass(pitch);
+            noteIdx = t.noteLabels.findIndex(
+                label => label[0] === pitch[0] && _notePitchClass(label) === pitchClass
+            );
+            if (noteIdx === -1 && t.noteLabels.length === 12) {
+                noteIdx = t.noteLabels.findIndex(label => _notePitchClass(label) === pitchClass);
+                // A spelling that crosses C lands in the next or previous octave of the table:
+                // B♯4 is C5 and C♭4 is B3.
+                const letter = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[pitch[0]];
+                if (noteIdx !== -1 && letter !== undefined) {
+                    octave += Math.floor((letter + ((pitchClass - letter + 18) % 12) - 6) / 12);
+                }
+            }
+        }
         if (noteIdx !== -1) {
             const aIdx = t.noteLabels.indexOf("A");
             const baseRefFreq = A0 / t.ratios[aIdx];

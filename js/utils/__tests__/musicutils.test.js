@@ -529,6 +529,45 @@ describe("Temperament Functions", () => {
         });
     });
 
+    describe("pitchToFrequency with accidentals in non-EDO tables", () => {
+        // Just Intonation and Pythagorean label sharps "C#" and have no flats, while notes
+        // arrive as "C♯" and "D♭"; those used to fall through to the 12-EDO formula.
+        const freq = (note, octave, key) => pitchToFrequency(note, octave, 0, "C major", key);
+
+        it.each(["just intonation", "Pythagorean"])(
+            "%s gives an accidental its table ratio whatever its spelling",
+            key => {
+                const t = getTemperament(key);
+                const c4 = freq("C", 4, key);
+                expect(freq("C" + SHARP, 4, key) / c4).toBeCloseTo(t.ratios[1], 12);
+                expect(freq("C#", 4, key) / c4).toBeCloseTo(t.ratios[1], 12);
+                expect(freq("D" + FLAT, 4, key)).toBe(freq("C#", 4, key));
+                expect(freq("Db", 4, key)).toBe(freq("C#", 4, key));
+                expect(freq("G" + FLAT, 4, key)).toBe(freq("F#", 4, key));
+                // not the 12-EDO value
+                expect(freq("C" + SHARP, 4, key)).not.toBeCloseTo(
+                    pitchToFrequency("C" + SHARP, 4, 0, "C major", "equal"),
+                    6
+                );
+            }
+        );
+
+        it.each(["just intonation", "Pythagorean"])(
+            "%s moves the octave when an enharmonic spelling crosses C",
+            key => {
+                expect(freq("B" + SHARP, 4, key)).toBe(freq("C", 5, key));
+                expect(freq("C" + FLAT, 4, key)).toBe(freq("B", 3, key));
+            }
+        );
+
+        it("1/4 comma meantone still tells C♯ and D♭ apart", () => {
+            const key = "1/4 comma meantone";
+            expect(freq("C" + SHARP, 4, key)).not.toBe(freq("D" + FLAT, 4, key));
+            expect(freq("C#", 4, key)).toBe(freq("C" + SHARP, 4, key));
+            expect(freq("Db", 4, key)).toBe(freq("D" + FLAT, 4, key));
+        });
+    });
+
     describe("getTemperamentKeys", () => {
         it("should return an array with the correct length", () => {
             const keys = getTemperamentKeys();
