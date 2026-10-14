@@ -272,9 +272,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     // The same tempo counted in the note the beat divides into, because
                     // Lilypond has nowhere to put the rest of a tied beat.
                     const tempoBeat = lilypondBeat(logo.notation.notationStaging[turtle][i + 2]);
-                    // Lilypond only accepts a whole number of beats per minute, and an
-                    // unsigned one, so a tempo that does not round to one is left out the
-                    // way abc.js and mxml.js leave it out.
+                    // What Lilypond needs as a whole unsigned number is the count after
+                    // the "=", not the beats per minute, so the beat is counted first and
+                    // the tempo left out only if that count is not one, the way abc.js and
+                    // mxml.js leave out a tempo they cannot write.
                     const beatsPerMinute =
                         tempoBeat === null
                             ? NaN
