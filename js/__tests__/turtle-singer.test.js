@@ -3065,7 +3065,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(0);
         });
 
@@ -3079,22 +3079,22 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
 
             // Visit 1: [0, 0] -> 0 semitones
             const res1 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res1).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res1).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(1);
 
             // Visit 2: [2, 0] -> 4 semitones (E)
             const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res2).toEqual({ arpeggioTrans: 4, anote: "C" });
+            expect(res2).toEqual({ arpeggioSteps: 4, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(2);
 
             // Visit 3: [4, 0] -> 7 semitones (G), wraps index to 0
             const res3 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res3).toEqual({ arpeggioTrans: 7, anote: "C" });
+            expect(res3).toEqual({ arpeggioSteps: 7, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(0);
 
             // Visit 4: wraps back to [0, 0] -> 0 semitones
             const res4 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res4).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res4).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(1);
         });
 
@@ -3107,11 +3107,11 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
 
             // Scalar step 2 (4 semitones) + 1 semitone = 5 semitones (F)
             const res1 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res1).toEqual({ arpeggioTrans: 5, anote: "C" });
+            expect(res1).toEqual({ arpeggioSteps: 4, arpeggioSemitones: 1, anote: "C" });
 
             // Scalar step 2 (4 semitones) - 1 semitone = 3 semitones (Eb)
             const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res2).toEqual({ arpeggioTrans: 3, anote: "C" });
+            expect(res2).toEqual({ arpeggioSteps: 4, arpeggioSemitones: -1, anote: "C" });
         });
 
         test("decodes negative scalar steps", () => {
@@ -3120,7 +3120,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
 
             // 3 scale steps down from C in C major is G3 (-5 semitones)
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res.arpeggioTrans).toBe(-5);
+            expect(res.arpeggioSteps).toBe(-5);
         });
 
         test("handles key signature context correctly (e.g. C minor)", () => {
@@ -3129,7 +3129,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res.arpeggioTrans).toBe(3);
+            expect(res.arpeggioSteps).toBe(3);
         });
 
         test("handles array keySignature representation gracefully", () => {
@@ -3138,7 +3138,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res.arpeggioTrans).toBe(4);
+            expect(res.arpeggioSteps).toBe(4);
         });
 
         test("handles rest sentinel [NaN, 0] by returning anote = 'rest'", () => {
@@ -3146,7 +3146,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res).toEqual({ arpeggioTrans: 0, anote: "rest" });
+            expect(res).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "rest" });
             expect(turtleMock.singer.arpeggioIndex).toBe(0);
         });
 
@@ -3158,8 +3158,77 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 99;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(1);
+        });
+
+        test("counts scalar steps in steps of the temperament outside 12 EDO", () => {
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.arpeggio = [
+                [2, 0],
+                [4, 0]
+            ];
+            turtleMock.singer.arpeggioIndex = 0;
+
+            // In 19 EDO a major third is 6 steps and a fifth is 11.
+            const res1 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 19);
+            expect(res1).toEqual({ arpeggioSteps: 6, arpeggioSemitones: 0, anote: "C" });
+            const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 19);
+            expect(res2).toEqual({ arpeggioSteps: 11, arpeggioSemitones: 0, anote: "C" });
+        });
+    });
+
+    describe("Singer.edoTransposition", () => {
+        const play = (note, octave, [transposition, inSteps], temperament) =>
+            musicUtils
+                .getNote(
+                    note,
+                    octave,
+                    transposition,
+                    "C major",
+                    false,
+                    null,
+                    null,
+                    temperament,
+                    inSteps
+                )
+                .slice(0, 2);
+
+        test("is the plain sum in 12 EDO", () => {
+            expect(Singer.edoTransposition(4, 3, 12)).toEqual([7, false]);
+            expect(Singer.edoTransposition(0.5, 2, 12)).toEqual([2.5, false]);
+        });
+
+        test("keeps steps as they are and rounds semitones to steps outside 12 EDO", () => {
+            expect(Singer.edoTransposition(0, 6, 19)).toEqual([6, true]);
+            expect(Singer.edoTransposition(4, 0, 19)).toEqual([6, true]);
+            expect(Singer.edoTransposition(1, 19, 19)).toEqual([21, true]);
+        });
+
+        test.each([
+            ["equal19", 19, 2, ["E", 4]],
+            ["equal19", 19, 4, ["G", 4]],
+            ["equal19", 19, -2, ["A", 3]],
+            ["equal31", 31, 2, ["E", 4]],
+            ["equal31", 31, 4, ["G", 4]],
+            ["equal17", 17, 2, ["E", 4]]
+        ])(
+            "%s (%i EDO): scalar interval %i from C4 lands on %j",
+            (temperament, edo, interval, expected) => {
+                const steps = musicUtils.getInterval(interval, "C major", "C", edo);
+                expect(play("C", 4, Singer.edoTransposition(0, steps, edo), temperament)).toEqual(
+                    expected
+                );
+            }
+        );
+
+        test("a register of one octave moves C4 to C5 and C3 in 19 EDO", () => {
+            expect(play("C", 4, Singer.edoTransposition(0, 19, 19), "equal19")).toEqual(["C", 5]);
+            expect(play("C", 4, Singer.edoTransposition(0, -19, 19), "equal19")).toEqual(["C", 3]);
+        });
+
+        test("a semitone interval still converts to steps in 19 EDO", () => {
+            expect(play("C", 4, Singer.edoTransposition(4, 0, 19), "equal19")).toEqual(["E", 4]);
         });
     });
 
