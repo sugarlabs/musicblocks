@@ -1339,32 +1339,45 @@ function setupWidgetBlocks(activity) {
          * @returns {any[]} - Returns an array of arguments.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            const interruption = _ensureWidget(
-                logo,
-                "musicKeyboard",
-                _getWidgetDependencies(
-                    typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    [
-                        "widgets/MusicKeyboardEditing",
-                        "widgets/MusicKeyboardRendering",
-                        "widgets/musickeyboard"
-                    ]
-                ),
-                () => new MusicKeyboard(activity),
-                turtle,
-                blk,
-                receivedArg
-            );
-            if (interruption) return interruption;
+            // One MusicKeyboard per block.
+            const keyboards = (logo.musicKeyboards = logo.musicKeyboards || {});
+
+            if (keyboards[blk] === undefined) {
+                keyboards[blk] = "loading"; // Guard against multiple simultaneous loads
+                _lazyRequire(
+                    _getWidgetDependencies(
+                        typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
+                        [
+                            "widgets/MusicKeyboardEditing",
+                            "widgets/MusicKeyboardRendering",
+                            "widgets/musickeyboard"
+                        ]
+                    ),
+                    () => {
+                        keyboards[blk] = new MusicKeyboard(activity);
+                        if (typeof logo.runFromBlockNow === "function") {
+                            logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                        }
+                    }
+                );
+                return [null, 0, true];
+            } else if (keyboards[blk] === "loading") {
+                return [null, 0, true];
+            }
+
+            // Active instance, so this clamp's pitch/drum/meter rows land here.
+            const keyboard = keyboards[blk];
+            logo.musicKeyboard = keyboard;
 
             logo.inMusicKeyboard = true;
-            logo.musicKeyboard.blockNo = blk;
-            logo.musicKeyboard.instruments = [];
-            logo.musicKeyboard.noteNames = [];
-            logo.musicKeyboard.octaves = [];
-            logo.musicKeyboard._rowBlocks = [];
+            keyboard.blockNo = blk;
+            keyboard.instruments = [];
+            keyboard.noteNames = [];
+            keyboard.octaves = [];
+            keyboard._rowBlocks = [];
 
-            const listenerName = "_musickeyboard_" + turtle;
+            // Include blk so keyboards on one turtle don't overwrite one listener.
+            const listenerName = "_musickeyboard_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // The keyboard plays and saves at this turtle's tempo (the turtle itself, not its
@@ -1372,8 +1385,8 @@ function setupWidgetBlocks(activity) {
             // another turtle's Music Keyboard block running in between can't swap it.
             const keyboardTurtle = activity.turtles.ithTurtle(turtle);
             const __listener = () => {
-                logo.musicKeyboard.turtle = keyboardTurtle;
-                logo.musicKeyboard.init(logo);
+                keyboard.turtle = keyboardTurtle;
+                keyboard.init(logo);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

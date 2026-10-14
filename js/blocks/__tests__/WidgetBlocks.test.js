@@ -727,10 +727,12 @@ describe("setupWidgetBlocks", () => {
         it("gives the Music Keyboard the turtle that ran the block (#9337)", () => {
             const keyboard = getBlock("musickeyboard");
             let turtleAtInit = null;
-            logo.musicKeyboard = {
-                init: jest.fn(() => {
-                    turtleAtInit = logo.musicKeyboard.turtle;
-                })
+            logo.musicKeyboards = {
+                kbdBlk: {
+                    init: jest.fn(() => {
+                        turtleAtInit = logo.musicKeyboards.kbdBlk.turtle;
+                    })
+                }
             };
 
             keyboard.flow(["childBlk"], logo, 2, "kbdBlk");
@@ -743,8 +745,13 @@ describe("setupWidgetBlocks", () => {
         it("opens each turtle's Music Keyboard with that turtle, whatever ran in between", () => {
             const keyboard = getBlock("musickeyboard");
             const turtlesAtInit = [];
-            logo.musicKeyboard = {
-                init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboard.turtle))
+            logo.musicKeyboards = {
+                kbdBlk1: {
+                    init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboards.kbdBlk1.turtle))
+                },
+                kbdBlk2: {
+                    init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboards.kbdBlk2.turtle))
+                }
             };
 
             // Two turtles run Music Keyboard blocks before either listener fires.
@@ -761,10 +768,43 @@ describe("setupWidgetBlocks", () => {
 
         it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
             const keyboard = getBlock("musickeyboard");
-            logo.musicKeyboard = null;
+            logo.musicKeyboards = {};
             const res = keyboard.flow(["childBlk"], logo, 0, "kbdBlk", "received");
             expect(res).toEqual([null, 0, true]);
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "kbdBlk", true, "received");
+        });
+
+        it("gives each Music Keyboard block its own keyboard instance", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboards = {};
+
+            // First pass lazy-loads; the re-run (mocked here) sets the instance active.
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+
+            expect(logo.musicKeyboards.kbdBlk1).toBeDefined();
+            expect(logo.musicKeyboards.kbdBlk2).toBeDefined();
+            // The second block must not reuse (or overwrite) the first block's keyboard.
+            expect(logo.musicKeyboards.kbdBlk1).not.toBe(logo.musicKeyboards.kbdBlk2);
+            expect(logo.musicKeyboards.kbdBlk1.blockNo).toBe("kbdBlk1");
+            expect(logo.musicKeyboards.kbdBlk2.blockNo).toBe("kbdBlk2");
+        });
+
+        it("points logo.musicKeyboard at the block that ran, so clamps land on it", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboards = {};
+
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+
+            // The second block ran last, so its pitch/drum/meter rows must land
+            // on the second keyboard, not the first.
+            expect(logo.musicKeyboard).toBe(logo.musicKeyboards.kbdBlk2);
+            expect(logo.inMusicKeyboard).toBe(true);
         });
 
         it("returns interruption and triggers runFromBlockNow for MatrixBlock (PhraseMaker)", () => {
@@ -1031,7 +1071,6 @@ describe("setupWidgetBlocks", () => {
                 ["arpeggio", "Arpeggio"],
                 ["pitchDrumMatrix", "PitchDrumMatrix"],
                 ["pitchSlider", "PitchSlider"],
-                ["musicKeyboard", "MusicKeyboard"],
                 ["pitchStaircase", "PitchStaircase"],
                 ["rhythmRuler", "RhythmRuler"],
                 ["phraseMaker", "PhraseMaker"],
@@ -1054,6 +1093,13 @@ describe("setupWidgetBlocks", () => {
                 if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(`_ensureWidget("${widgetKey}") is missing a dependency fallback`);
                 }
+            }
+            // Music Keyboard lazy-loads per block, not via _ensureWidget.
+            const musicKeyboardCallSite = new RegExp(
+                `_getWidgetDependencies\\(\\s*typeof MusicKeyboard !== "undefined" \\? MusicKeyboard : null,`
+            );
+            if (!musicKeyboardCallSite.test(widgetBlocksSource)) {
+                notWired.push(`musicKeyboard is missing a dependency fallback`);
             }
             for (const [widgetKey, className] of lazyLoadWidgetSites) {
                 const callSite = new RegExp(
