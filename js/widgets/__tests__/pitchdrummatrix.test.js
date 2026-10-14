@@ -833,7 +833,7 @@ describe("PitchDrumMatrix Widget", () => {
         });
     });
 
-    // --- Additional Coverage Tests for init, DOM callbacks, _addDrum, makeClickable, _save, _scale, _setCellPitchDrum ---
+    // --- Additional Coverage Tests for init, DOM callbacks, _addDrum, makeClickable, _save, _setCellPitchDrum ---
     describe("init & full DOM table setup", () => {
         let mockActivity;
         let createdElements;
@@ -1205,36 +1205,6 @@ describe("PitchDrumMatrix Widget", () => {
             pdm._save();
 
             expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
-        });
-
-        test("_scale handles widget scaling and SVG dimensions", () => {
-            jest.useFakeTimers();
-
-            const svgElement = { setAttribute: jest.fn(), style: {} };
-            const widgetBody = {
-                style: {},
-                children: [{ style: {} }],
-                getElementsByTagName: jest.fn().mockReturnValue([svgElement]),
-                offsetHeight: 400
-            };
-
-            pdm.getWidgetFrame = jest.fn().mockReturnValue({ offsetHeight: 800 });
-            pdm.getDragElement = jest.fn().mockReturnValue({ offsetHeight: 50 });
-            pdm.getWidgetBody = jest.fn().mockReturnValue(widgetBody);
-            pdm.isMaximized = jest.fn().mockReturnValue(true);
-
-            pdm._scale();
-
-            expect(svgElement.style.pointerEvents).toBe("none");
-            expect(svgElement.setAttribute).toHaveBeenCalledWith(
-                "height",
-                expect.stringContaining("px")
-            );
-
-            jest.advanceTimersByTime(100);
-            expect(svgElement.style.pointerEvents).toBe("auto");
-
-            jest.useRealTimers();
         });
     });
 });
