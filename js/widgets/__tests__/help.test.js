@@ -1452,6 +1452,22 @@ describe("block help artwork", () => {
         expect(hw._localizedHelpPath("documentation")).toBe(folder);
     });
 
+    test.each([
+        ["pt-BR", "documentation-pt"],
+        ["es-ES", "documentation-es"],
+        ["ja-JP", "documentation-ja"],
+        ["es", "documentation-es"],
+        ["en-US", "documentation"],
+        ["", "documentation"]
+    ])("with no saved language, browser locale %s uses the %s folder", (locale, folder) => {
+        delete window.localStorage.languagePreference;
+        const languageSpy = jest.spyOn(window.navigator, "language", "get").mockReturnValue(locale);
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+
+        languageSpy.mockRestore();
+    });
+
     test("loads the localized image first", () => {
         window.localStorage.languagePreference = "pt";
 

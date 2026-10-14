@@ -718,7 +718,8 @@ class HelpWidget {
         // support for a new language.
         let language = localStorage.languagePreference;
         if (language === undefined) {
-            language = navigator.language;
+            // The browser gives a regional locale such as "pt-BR" or "ja-JP".
+            language = (navigator.language || "").split("-")[0];
         }
 
         switch (language) {
