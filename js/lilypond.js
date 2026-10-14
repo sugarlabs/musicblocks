@@ -146,6 +146,14 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
             notes = logo.notation.notationStaging[turtle][i + j][NOTATIONNOTE];
             if (typeof notes === "object") {
+                // A staged note with no pitches is silence for its duration, the same as
+                // one staged as ["R"], which is what the note outside a tuplet does with
+                // it. Without this nothing is written for the note and its duration runs
+                // on from the note before it, giving "g' 44", which is not a duration.
+                if (notes.length === 0) {
+                    notes = ["R"];
+                }
+
                 if (notes.length > 1) {
                     logo.notationNotes[turtle] += "<";
                 }

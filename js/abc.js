@@ -500,20 +500,26 @@ class AbcExporter {
             const tupletNotes = this.staging[i + j];
 
             if (typeof tupletNotes[NOTATIONNOTE] === "object") {
+                // A staged note with no pitches is silence for its duration, the same as
+                // one staged as ["R"]. Without this the note is left out and its duration
+                // runs on from the note before it, as in "G44".
+                const pitches =
+                    tupletNotes[NOTATIONNOTE].length > 0 ? tupletNotes[NOTATIONNOTE] : ["R"];
+
                 this.parts.push(this.__decorations());
                 if (tupletNotes[NOTATIONSTACCATO]) {
                     this.parts.push(".");
                 }
 
-                if (tupletNotes[NOTATIONNOTE].length > 1) {
+                if (pitches.length > 1) {
                     this.parts.push("[");
                 }
 
-                for (let ii = 0; ii < tupletNotes[NOTATIONNOTE].length; ii++) {
-                    this.parts.push(this.__toABCnote(tupletNotes[NOTATIONNOTE][ii]));
+                for (let ii = 0; ii < pitches.length; ii++) {
+                    this.parts.push(this.__toABCnote(pitches[ii]));
                 }
 
-                if (tupletNotes[NOTATIONNOTE].length > 1) {
+                if (pitches.length > 1) {
                     this.parts.push("]");
                 }
 
