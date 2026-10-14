@@ -156,7 +156,24 @@ describe("StringHelper", () => {
                 document.body.innerHTML = '<input id="global-search" />';
                 helper.init();
                 const elem = document.getElementById("global-search");
-                expect(elem.getAttribute("placeholder")).toBe("Search for a project");
+                expect(elem.getAttribute("placeholder")).toBe("Search for projects...");
+            });
+
+            it("should set accessible labels for project search inputs", () => {
+                document.body.innerHTML = `
+                    <input id="local-search" />
+                    <input id="global-search" />
+                `;
+
+                helper.init();
+
+                expect(document.getElementById("local-search").getAttribute("aria-label")).toBe(
+                    "Search for projects"
+                );
+
+                expect(document.getElementById("global-search").getAttribute("aria-label")).toBe(
+                    "Search for projects"
+                );
             });
 
             it("should handle a mix of present and missing elements", () => {

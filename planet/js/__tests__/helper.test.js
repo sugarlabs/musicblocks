@@ -299,4 +299,261 @@ describe("helper.js", () => {
             expect(urlInput.value).toBe("https://example.com&a=True&b=True&c=True");
         });
     });
+    describe("responsive Planet search", () => {
+        let originalRequestAnimationFrame;
+        let originalAnimate;
+        let animationFinishHandler;
+        beforeEach(() => {
+            jest.resetModules();
+
+            document.body.innerHTML = `
+                <div id="publisher"></div>
+                <div id="deleter"></div>
+                <div id="projectviewer"></div>
+
+                <nav id="main-nav">
+                    <a id="planet-new-project"></a>
+
+                    <ul id="localglobal">
+                        <li><a id="local-tab"></a></li>
+                        <li><a id="global-tab"></a></li>
+                    </ul>
+                </nav>
+
+                <div id="searchcontainer"></div>
+
+                <div id="view-more-chips">Show more tags ▼</div>
+                <div id="morechips" class="flexchips"></div>
+                <div id="local" style="display:block;">
+                    <div class="projects-title-row">
+                        <h3 id="localtitle">My Projects</h3>
+                        <div class="project-search-preview">
+                            <input id="local-search" value="" />
+                            <i class="project-search-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="global" style="display:none;">
+                    <div class="projects-title-row">
+                        <h3 id="globaltitle">Explore Projects</h3>
+                        <div class="project-search-preview">
+                            <input id="global-search" value="" />
+                            <i class="project-search-icon"></i>
+                            <span id="search-close"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            originalRequestAnimationFrame = window.requestAnimationFrame;
+            window.requestAnimationFrame = callback => callback();
+
+            originalAnimate = Element.prototype.animate;
+            animationFinishHandler = null;
+
+            Element.prototype.animate = jest.fn(() => ({
+                addEventListener: jest.fn((eventName, handler) => {
+                    if (eventName === "finish") {
+                        animationFinishHandler = handler;
+                    }
+                })
+            }));
+
+            const navbar = document.getElementById("main-nav");
+            navbar.getBoundingClientRect = jest.fn(() => ({
+                top: 0,
+                bottom: 64,
+                height: 64,
+                left: 0,
+                right: 1000,
+                width: 1000
+            }));
+
+            const newProjectBtn = document.getElementById("planet-new-project");
+            newProjectBtn.getBoundingClientRect = jest.fn(() => ({
+                left: 900,
+                right: 940,
+                top: 12,
+                bottom: 52,
+                width: 40,
+                height: 40
+            }));
+
+            const globalTab = document.getElementById("global-tab");
+            globalTab.getBoundingClientRect = jest.fn(() => ({
+                right: 650,
+                left: 580,
+                top: 0,
+                bottom: 40,
+                width: 70,
+                height: 40
+            }));
+
+            const titleRow = document.querySelector("#local .projects-title-row");
+            titleRow.getBoundingClientRect = jest.fn(() => ({
+                top: 20,
+                bottom: 110,
+                left: 0,
+                right: 1000,
+                width: 1000,
+                height: 90
+            }));
+
+            const search = document.querySelector("#local .project-search-preview");
+
+            search.getBoundingClientRect = jest.fn(() => {
+                if (search.classList.contains("project-search-floating")) {
+                    return {
+                        left: 700,
+                        right: 740,
+                        top: 12,
+                        bottom: 52,
+                        width: 40,
+                        height: 40
+                    };
+                }
+
+                return {
+                    left: 800,
+                    right: 840,
+                    top: 90,
+                    bottom: 130,
+                    width: 40,
+                    height: 40
+                };
+            });
+
+            jest.isolateModules(() => {
+                require("../helper");
+            });
+        });
+
+        afterEach(() => {
+            window.requestAnimationFrame = originalRequestAnimationFrame;
+            Element.prototype.animate = originalAnimate;
+        });
+
+        it("should dock the local search into the navbar", () => {
+            const search = document.querySelector("#local .project-search-preview");
+            const tabs = document.getElementById("localglobal");
+
+            expect(search.classList.contains("project-search-floating")).toBe(true);
+            expect(search.style.left).toBe("auto");
+            expect(search.style.transform).toBe("none");
+            expect(tabs.style.transform).toBe("translateX(-40px)");
+            expect(Element.prototype.animate).toHaveBeenCalled();
+        });
+
+        it("should recalculate spacing when docking animation finishes", () => {
+            const input = document.getElementById("local-search");
+            const tabs = document.getElementById("localglobal");
+
+            input.value = "music";
+            tabs.style.translate = "";
+
+            expect(animationFinishHandler).toEqual(expect.any(Function));
+
+            animationFinishHandler();
+
+            expect(tabs.style.translate).not.toBe("");
+        });
+
+        it("should move Local/Global tabs when docked search expands", () => {
+            const search = document.querySelector("#local .project-search-preview");
+            const input = document.getElementById("local-search");
+            const tabs = document.getElementById("localglobal");
+
+            input.value = "music";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(search.classList.contains("project-search-floating")).toBe(true);
+            expect(tabs.style.translate).not.toBe("");
+        });
+
+        it("should recalculate docked search position on resize", () => {
+            const search = document.querySelector("#local .project-search-preview");
+            const newProjectBtn = document.getElementById("planet-new-project");
+
+            newProjectBtn.getBoundingClientRect = jest.fn(() => ({
+                left: 800,
+                right: 840,
+                top: 12,
+                bottom: 52,
+                width: 40,
+                height: 40
+            }));
+
+            window.dispatchEvent(new Event("resize"));
+
+            expect(search.style.right).not.toBe("");
+        });
+        it("should move the title left when expanded search would overlap it", () => {
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const title = document.getElementById("localtitle");
+            const input = document.getElementById("local-search");
+
+            // Move the title row below the navbar so the search is not docked.
+            titleRow.getBoundingClientRect = jest.fn(() => ({
+                top: 100,
+                bottom: 190,
+                left: 0,
+                right: 1000,
+                width: 1000,
+                height: 90
+            }));
+
+            title.getBoundingClientRect = jest.fn(() => ({
+                left: 400,
+                right: 650,
+                top: 100,
+                bottom: 140,
+                width: 250,
+                height: 40
+            }));
+
+            window.dispatchEvent(new Event("scroll"));
+
+            input.value = "music";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(title.style.translate).toBe("-60px 0");
+        });
+
+        it("should restore the title position when search collapses", () => {
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const title = document.getElementById("localtitle");
+            const input = document.getElementById("local-search");
+
+            titleRow.getBoundingClientRect = jest.fn(() => ({
+                top: 100,
+                bottom: 190,
+                left: 0,
+                right: 1000,
+                width: 1000,
+                height: 90
+            }));
+
+            title.getBoundingClientRect = jest.fn(() => ({
+                left: 400,
+                right: 650,
+                top: 100,
+                bottom: 140,
+                width: 250,
+                height: 40
+            }));
+
+            window.dispatchEvent(new Event("scroll"));
+
+            input.value = "music";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(title.style.translate).toBe("-60px 0");
+
+            input.value = "";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(title.style.translate).toBe("");
+        });
+    });
 });

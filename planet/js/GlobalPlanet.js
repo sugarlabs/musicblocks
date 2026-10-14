@@ -51,6 +51,7 @@ class GlobalPlanet {
         this.searchString = "";
         this.oldSearchString = "";
         this.remixPrefix = _("Remix of");
+        this.searchDebounce = null;
 
         /** @type {IntersectionObserver|null} */
         this._scrollObserver = null;
@@ -696,6 +697,9 @@ class GlobalPlanet {
     }
 
     destroy() {
+        clearTimeout(this.searchDebounce);
+        this.searchDebounce = null;
+
         this.listenerRefs.forEach(({ el, type, bound }) => {
             el.removeEventListener(type, bound);
         });
@@ -788,21 +792,35 @@ class GlobalPlanet {
                 }
             });
 
+            register("global-search", "input", function (evt) {
+                clearTimeout(this.searchDebounce);
+
+                this.searchString = evt.target.value.trim();
+
+                this.searchDebounce = setTimeout(() => {
+                    this.search();
+                }, 300);
+            });
+
             register("global-search", "keydown", function (evt) {
                 if (evt.key === "Enter") {
-                    this.searchString = document.getElementById("global-search").value;
+                    clearTimeout(this.searchDebounce);
+                    this.searchString = document.getElementById("global-search").value.trim();
                     this.search();
                 }
             });
 
             register("global-search-2", "keydown", function (evt) {
                 if (evt.key === "Enter") {
-                    this.searchString = document.getElementById("global-search-2").value;
+                    clearTimeout(this.searchDebounce);
+                    this.searchString = document.getElementById("global-search-2").value.trim();
                     this.search();
                 }
             });
 
             register("search-close", "click", function (evt) {
+                clearTimeout(this.searchDebounce);
+
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
@@ -810,19 +828,12 @@ class GlobalPlanet {
             });
 
             register("search-close-2", "click", function (evt) {
+                clearTimeout(this.searchDebounce);
+
                 document.getElementById("global-search-2").value = "";
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";
                 this.search();
-            });
-
-            register("global-tab", "click", function (evt) {
-                document.getElementById("searchcontainer-one").style.display = "block";
-            });
-
-            register("local-tab", "click", function (evt) {
-                document.getElementById("searchcontainer-one").style.display = "none";
-                // document.getElementById("two_header").style.display = "none";
             });
 
             this.ProjectViewer = new ProjectViewer(Planet);
