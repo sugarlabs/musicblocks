@@ -372,6 +372,33 @@ describe("selectBlocksInDragArea", () => {
         expect(result).toEqual([block]);
     });
 
+    test.each([-100, 100])(
+        "keeps selecting at the displayed position after disabling horizontal scrolling (offset %i)",
+        offset => {
+            const activity = makeActivity();
+            setupSelectionController(activity);
+            activity.blocksContainer = { x: offset, y: 20 };
+            const block = makeBlock({ x: 300, y: 100, width: 40, height: 40 });
+            activity.blocks.blockList = [block];
+            activity.selectionController.dragArea = {
+                x: 310 + offset,
+                y: 130,
+                width: 20,
+                height: 20
+            };
+
+            activity.scrollBlockContainer = true;
+            expect(activity.selectBlocksInDragArea()).toEqual([block]);
+
+            activity.scrollBlockContainer = false;
+            expect(activity.selectBlocksInDragArea()).toEqual([block]);
+
+            // The block's old location is now empty, regardless of the scroll setting.
+            activity.selectionController.dragArea.x = 310;
+            expect(activity.selectBlocksInDragArea()).toEqual([]);
+        }
+    );
+
     test("returns an empty array when no blocks overlap", () => {
         const activity = makeActivity();
         setupSelectionController(activity);
