@@ -1425,3 +1425,114 @@ describe("HelpWidget", () => {
         });
     });
 });
+
+describe("block help artwork", () => {
+    let hw;
+
+    beforeEach(() => {
+        hw = Object.create(HelpWidget.prototype);
+    });
+
+    afterEach(() => {
+        window.localStorage.languagePreference = "en";
+        delete window.localStorage.kanaPreference;
+    });
+
+    test.each([
+        ["en", undefined, "documentation"],
+        ["he", undefined, "documentation"],
+        ["es", undefined, "documentation-es"],
+        ["pt", undefined, "documentation-pt"],
+        ["ja", undefined, "documentation-ja"],
+        ["ja", "kana", "documentation-kana"]
+    ])("language %s (kana: %s) uses the %s folder", (language, kana, folder) => {
+        window.localStorage.languagePreference = language;
+        if (kana !== undefined) window.localStorage.kanaPreference = kana;
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+    });
+
+    test.each([
+        ["pt-BR", "documentation-pt"],
+        ["es-ES", "documentation-es"],
+        ["ja-JP", "documentation-ja"],
+        ["es", "documentation-es"],
+        ["en-US", "documentation"],
+        ["", "documentation"]
+    ])("with no saved language, browser locale %s uses the %s folder", (locale, folder) => {
+        delete window.localStorage.languagePreference;
+        const languageSpy = jest.spyOn(window.navigator, "language", "get").mockReturnValue(locale);
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+
+        languageSpy.mockRestore();
+    });
+
+    test("loads the localized image first", () => {
+        window.localStorage.languagePreference = "pt";
+
+        const figure = hw._makeBlockImageFigure("documentation", "settimbre");
+        const img = figure.querySelector("img.blockImage");
+
+        expect(figure.classList.contains("blockImage-wrapper")).toBe(true);
+        expect(img.getAttribute("src")).toBe("Docs/documentation-pt/settimbre_block.svg");
+    });
+
+    test("falls back to the default image when the localized one is missing", () => {
+        window.localStorage.languagePreference = "pt";
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "settimbre");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+        img.onerror();
+
+        expect(img.getAttribute("src")).toBe("Docs/documentation/settimbre_block.svg");
+        expect(parent.contains(figure)).toBe(true);
+    });
+
+    test("removes the figure when no image exists in any folder", () => {
+        window.localStorage.languagePreference = "pt";
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "noimage");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+        img.onerror();
+        img.onerror();
+
+        expect(parent.contains(figure)).toBe(false);
+        expect(img.onerror).toBeNull();
+    });
+
+    test("removes the figure at once when the default image is missing", () => {
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "noimage");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+
+        expect(img.getAttribute("src")).toBe("Docs/documentation/noimage_block.svg");
+        img.onerror();
+
+        expect(parent.contains(figure)).toBe(false);
+    });
+
+    test("block help from the help pages uses the localized image too", () => {
+        window.localStorage.languagePreference = "es";
+        const block = {
+            name: "pitch",
+            staticLabels: ["pitch"],
+            helpString: ["Pitch help", "documentation"],
+            beginnerModeBlock: true,
+            palette: { name: "pitch", palettes: { showPalette: jest.fn() } }
+        };
+        const activity = createMockActivity({ protoBlockDict: { pitch: block } });
+
+        HelpWidget.showBlockHelp(activity, "pitch");
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation-es/pitch_block.svg");
+    });
+});
