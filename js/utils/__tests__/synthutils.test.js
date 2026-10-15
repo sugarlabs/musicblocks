@@ -4061,4 +4061,102 @@ describe("DRUMNAMES Lilypond symbols", () => {
         expect(symbolFor("snare drum")).toBe("sn");
         expect(symbolFor("hi hat")).toBe("hh");
     });
+
+    it("registers all 11 Sonic Pi drum samples with correct metadata and symbols", () => {
+        const expectedDrums = [
+            {
+                name: "heavy kick",
+                symbol: "bd",
+                category: "drum",
+                global: "HEAVY_KICK_SAMPLE",
+                file: "heavy_kick"
+            },
+            {
+                name: "snare hard",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_HARD_SAMPLE",
+                file: "snare_hard"
+            },
+            {
+                name: "snare soft",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_SOFT_SAMPLE",
+                file: "snare_soft"
+            },
+            {
+                name: "snare roll",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_ROLL_SAMPLE",
+                file: "snare_roll"
+            },
+            {
+                name: "tom mid",
+                symbol: "tomml",
+                category: "drum",
+                global: "TOM_MID_SAMPLE",
+                file: "tom_mid"
+            },
+            {
+                name: "tom hi",
+                symbol: "tomh",
+                category: "drum",
+                global: "TOM_HI_SAMPLE",
+                file: "tom_hi"
+            },
+            {
+                name: "tom lo",
+                symbol: "tomfl",
+                category: "drum",
+                global: "TOM_LO_SAMPLE",
+                file: "tom_lo"
+            },
+            {
+                name: "cymbal closed",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_CLOSED_SAMPLE",
+                file: "cymbal_closed"
+            },
+            {
+                name: "cymbal open",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_OPEN_SAMPLE",
+                file: "cymbal_open"
+            },
+            {
+                name: "cymbal pedal",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_PEDAL_SAMPLE",
+                file: "cymbal_pedal"
+            },
+            {
+                name: "sonic cowbell",
+                symbol: "cb",
+                category: "bell",
+                global: "SONIC_COWBELL_SAMPLE",
+                file: "sonic_cowbell"
+            }
+        ];
+
+        const { SAMPLE_INFO, DEFAULTSYNTHVOLUME } = synthutilsModule;
+
+        expectedDrums.forEach(({ name, symbol, category, global: globalVar, file }) => {
+            const entry = DRUMNAMES.find(d => d[1] === name);
+            expect(entry).toBeDefined();
+            expect(entry[3]).toBe(symbol);
+            expect(entry[4]).toBe(category);
+
+            expect(SAMPLE_INFO.drum[name]).toEqual({
+                path: `samples/${file}`,
+                global: globalVar
+            });
+
+            expect(DEFAULTSYNTHVOLUME[name]).toBeGreaterThan(0);
+        });
+    });
 });
