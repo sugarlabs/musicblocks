@@ -595,6 +595,31 @@ describe("GlobalPlanet", () => {
             );
         });
 
+        it("forceAddToCache should open only after details are cached", () => {
+            const cb = jest.fn();
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: true, data: { ProjectName: "Test" } });
+
+            expect(gp.cache["repo-1"].ProjectName).toBe("Test");
+            expect(cb).toHaveBeenCalledTimes(1);
+            expect(gp.loadCount).toBe(0);
+        });
+
+        it("forceAddToCache should show an error without opening when details fail", () => {
+            const cb = jest.fn();
+            const error = jest.spyOn(gp, "throwOfflineError").mockImplementation(() => {});
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: false });
+
+            expect(cb).not.toHaveBeenCalled();
+            expect(error).toHaveBeenCalledTimes(1);
+            expect(gp.loadCount).toBe(0);
+        });
+
         it("downloadDataToCache should pass expectedUpdatedAt from cache to downloadProject", () => {
             gp.cache["repo-1"] = {
                 ProjectLastUpdated: "2026-10-01T12:00:00Z"
