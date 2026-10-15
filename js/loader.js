@@ -203,7 +203,7 @@ requirejs.config({
             exports: "PieMenuUtils"
         },
         "utils/musicutils-modewheel": {
-            deps: ["utils/utils", "utils/musicutils-constants"],
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-temperament"],
             exports: "MusicUtilsModeWheel"
         },
         "utils/musicutils-modecore": {
