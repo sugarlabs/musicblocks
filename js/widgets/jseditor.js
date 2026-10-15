@@ -360,7 +360,7 @@ class JSEditor {
         this._editor.style.flexDirection = "column";
 
         const menubar = document.createElement("div");
-        menubar.style.width = "100%";
+        menubar.classList.add("mb-w-full");
         menubar.style.height = "3rem";
         menubar.style.display = "flex";
         menubar.style.flexDirection = "row";
@@ -500,7 +500,7 @@ class JSEditor {
 
         const editorContainer = document.createElement("div");
         editorContainer.id = "editor_container";
-        editorContainer.style.width = "100%";
+        editorContainer.classList.add("mb-w-full");
         editorContainer.style.flex = "2 1 auto";
         editorContainer.style.position = "relative";
         editorContainer.style.background = "#1e88e5";
@@ -545,14 +545,14 @@ class JSEditor {
         debugButtons.style.lineHeight = "20px";
         debugButtons.style.background = "rgba(255, 255, 255, 0.05)";
         debugButtons.style.color = "rgba(255, 255, 255, 0.5)";
-        debugButtons.style.textAlign = "center";
+        debugButtons.classList.add("mb-text-center");
         debugButtons.style.pointerEvents = "none";
         editorContainer.appendChild(debugButtons);
 
         const codebox = document.createElement("div");
         codebox.classList.add("editor");
         codebox.classList.add("language-javascript");
-        codebox.style.width = "100%";
+        codebox.classList.add("mb-w-full");
         codebox.style.height = "100%";
         codebox.style.position = "absolute";
         codebox.style.top = "0";
@@ -571,7 +571,7 @@ class JSEditor {
 
         const divider = document.createElement("div");
         divider.id = "editor_divider";
-        divider.style.width = "100%";
+        divider.classList.add("mb-w-full");
         divider.style.height = "5px";
         divider.style.cursor = "row-resize";
         divider.style.background = "gray";
@@ -580,7 +580,7 @@ class JSEditor {
 
         const consolelabel = document.createElement("div");
         consolelabel.id = "console_label";
-        consolelabel.style.width = "100%";
+        consolelabel.classList.add("mb-w-full");
         consolelabel.style.flex = "0 0 auto";
         consolelabel.style.boxSizing = "border-box";
         consolelabel.style.borderTop = "1px solid gray";
@@ -612,7 +612,7 @@ class JSEditor {
 
         const editorconsole = document.createElement("div");
         editorconsole.id = "editorConsole";
-        editorconsole.style.width = "100%";
+        editorconsole.classList.add("mb-w-full");
         editorconsole.style.flex = "1 1 auto";
         editorconsole.style.overflow = "auto";
         editorconsole.style.boxSizing = "border-box";

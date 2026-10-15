@@ -188,6 +188,10 @@ describe("Arpeggio Widget", () => {
 
             // 12 pitches + 1 extra for time steps = 14 rows total (0-12 + 1)
             expect(arpeggioTable.rows.length).toBe(14);
+            expect(arpeggioTable.rows[0].cells[0].classList.contains("mb-bg-label")).toBe(true);
+            expect(arpeggioTable.rows[0].cells[0].classList.contains("headcol")).toBe(true);
+            expect(arpeggioTable.rows[13].cells[0].classList.contains("mb-bg-label")).toBe(true);
+            expect(arpeggioTable.rows[13].cells[0].classList.contains("headcol")).toBe(true);
 
             // Check the mode extraction
             expect(arpeggio._modeNumbers).toEqual(["0", "2", "4", "5", "7", "9", "11"]);

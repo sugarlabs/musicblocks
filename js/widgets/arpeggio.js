@@ -311,13 +311,13 @@ class Arpeggio {
 
             // A cell for the row label
             labelCell = arpeggioTableRow.insertCell();
-            labelCell.style.backgroundColor = "var(--color-label-bg)";
+            labelCell.classList.add("mb-bg-label");
             labelCell.style.fontSize = this._cellScale * 50 + "%";
             labelCell.style.height = Arpeggio.CELLSIZE + "px";
             labelCell.style.width = Arpeggio.CELLSIZE + "px";
             labelCell.style.minWidth = 0;
             labelCell.style.maxWidth = 0;
-            labelCell.className = "headcol";
+            labelCell.classList.add("headcol");
             labelCell.textContent = this._rowLabels[j];
 
             arpeggioCell = arpeggioTableRow.insertCell();
@@ -340,13 +340,13 @@ class Arpeggio {
         // An extra row for the time values
         arpeggioTableRow = arpeggioTable.insertRow();
         labelCell = arpeggioTableRow.insertCell();
-        labelCell.style.backgroundColor = "var(--color-label-bg)";
+        labelCell.classList.add("mb-bg-label");
         labelCell.style.fontSize = this._cellScale * 50 + "%";
         labelCell.style.height = Arpeggio.CELLSIZE + "px";
         labelCell.style.width = Arpeggio.CELLSIZE + "px";
         labelCell.style.minWidth = Arpeggio.CELLSIZE + "px";
         labelCell.style.maxWidth = labelCell.style.minWidth;
-        labelCell.className = "headcol";
+        labelCell.classList.add("headcol");
         labelCell.textContent = "";
 
         const outerDiv = docById("arpeggioOuterDiv");
@@ -533,9 +533,8 @@ class Arpeggio {
         cell.style.fontSize = Math.floor(this._cellScale * 50) + "%";
         cell.style.lineHeight = 100 + "%";
         cell.setAttribute("id", arpeggioIdx);
-        cell.className = "headcol";
+        cell.classList.add("headcol", "mb-bg-selector");
         cell.textContent = arpeggioName;
-        cell.style.backgroundColor = "var(--color-selector-bg)";
     }
 
     /**

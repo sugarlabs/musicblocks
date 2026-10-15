@@ -781,7 +781,7 @@ class Palettes {
         cover.style.position = "absolute";
         cover.style.zIndex = "10";
         cover.style.top = "0";
-        cover.style.width = "100%";
+        cover.classList.add("mb-w-full");
         cover.style.height = "1px";
         cover.style.background = platformColor.paletteLabelBackground;
 
@@ -1597,7 +1597,7 @@ class Palette {
         tbody.id = "PaletteBody_items";
         tbody.className = "PalScrol";
         tbody.style.display = "block";
-        tbody.style.width = "100%";
+        tbody.classList.add("mb-w-full");
         tbody.style.height = "auto";
         tbody.style.maxHeight = `${palBodyHeight}px`;
         tbody.style.overflow = "auto";
