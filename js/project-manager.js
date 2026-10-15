@@ -1190,12 +1190,9 @@ class ProjectManager {
             that.sendAllToTrash(false, true);
             if (clearCanvas) {
                 that._allClear(false, true);
-                if (
-                    that.gitDropdownUI &&
-                    typeof that.gitDropdownUI.clearForNewProject === "function"
-                ) {
-                    that.gitDropdownUI.clearForNewProject();
-                }
+            }
+            if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+                that.gitDropdownUI.clearForNewProject();
             }
 
             try {

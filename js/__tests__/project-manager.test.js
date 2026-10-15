@@ -2451,7 +2451,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(planet.initialiseNewProject).toHaveBeenCalledWith("student-song", false);
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
         expect(activity._allClear).not.toHaveBeenCalled();
-        expect(activity.gitDropdownUI.clearForNewProject).not.toHaveBeenCalled();
+        expect(activity.gitDropdownUI.clearForNewProject).toHaveBeenCalledTimes(1);
         expect(order).toEqual(["save-old", "clear-without-save", "create-project", "load-import"]);
         expect(activity.saveLocally).not.toHaveBeenCalled();
         expect(activity.loading).toBe(true);
