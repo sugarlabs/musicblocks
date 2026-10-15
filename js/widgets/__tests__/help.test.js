@@ -1425,3 +1425,51 @@ describe("HelpWidget", () => {
         });
     });
 });
+
+describe("Hebrew block help artwork", () => {
+    afterEach(() => {
+        localStorage.languagePreference = "en";
+    });
+
+    test("help for a block on the canvas uses documentation-he", () => {
+        localStorage.languagePreference = "he";
+        const activity = createMockActivity({
+            blockList: [
+                {
+                    name: "repeat",
+                    protoblock: {
+                        staticLabels: ["repeat"],
+                        helpString: ["Repeat help", "documentation"]
+                    }
+                }
+            ]
+        });
+        activity.blocks.activeBlock = 0;
+
+        new HelpWidget(activity, true);
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation-he/repeat_block.svg");
+    });
+});
+
+describe("committed block help artwork", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const docsDir = path.join(__dirname, "..", "..", "..", "Docs");
+    const folders = fs.readdirSync(docsDir).filter(dir => /^documentation(-|$)/.test(dir));
+
+    test.each(folders)("every block image in %s is a complete, non-empty SVG", folder => {
+        const broken = fs
+            .readdirSync(path.join(docsDir, folder))
+            .filter(file => file.endsWith("_block.svg"))
+            .filter(file => {
+                const svg = fs.readFileSync(path.join(docsDir, folder, file), "utf8");
+                // A cut-off file never closes the <svg>, and an empty one
+                // is saved as a 0x0 <svg> with nothing in it.
+                return !svg.trimEnd().endsWith("</svg>") || /<svg[^>]*\swidth="0"/.test(svg);
+            });
+        expect(broken).toEqual([]);
+    });
+});
