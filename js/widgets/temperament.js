@@ -1813,10 +1813,6 @@ function TemperamentWidget() {
         const entry = { pitchNumber: pitchNumber, octaveRatio: period };
         for (let i = 0; i < pitchNumber; i++) {
             const pitch = frequencyToPitch(ratios[i] * resolvedHz);
-            if (!Number.isFinite(Number(pitch[1]))) {
-                this.activity.errorMsg(_("Cannot import: invalid note octave."), 3000);
-                return false;
-            }
             entry["" + i] = [ratios[i], pitch[0], pitch[1]];
         }
 

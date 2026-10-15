@@ -20,7 +20,7 @@
 
    getSavedCustomModes, getModeNamesForGroup, getModeLabel,
    getModeNameFromLabel, getModeSliceColors,
-   getModeGroupTitleFont, getModeSliceFont,
+   getModeGroupTitleFont, getModeSliceArc, getModeSliceFont,
    getTemperamentSliceAngles, sliceAnglesFromRatios,
    enforceMinSliceAngles, applySliceAngles,
    MusicUtilsModeWheel
@@ -106,9 +106,15 @@ var getModeSliceColors = (modes, colors) =>
 /** Group-ring title font, scaled to wheel radius. */
 var getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 
+/**
+ * Arc-length of `degrees` of a slice's label track, in px. The label track sits
+ * at 0.575 of the wheel radius (midpoint of the 0.4-0.75 name ring).
+ */
+var getModeSliceArc = (wheelRadius, degrees) => (2 * Math.PI * 0.575 * wheelRadius * degrees) / 360;
+
 /** Name-ring label font sized to fit its slice arc. */
 var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
-    const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
+    const arcPx = getModeSliceArc(wheelRadius, 360 / sliceCount);
     const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
     const minSize = Math.round(0.06 * wheelRadius);
     const maxSize = Math.round(0.12 * wheelRadius);
@@ -140,8 +146,6 @@ var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
 var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
     const entry = getTemperament(temperamentKey);
     if (
-        !Number.isInteger(pitchCount) ||
-        pitchCount < 2 ||
         !entry ||
         !Array.isArray(entry.ratios) ||
         entry.ratios.length !== pitchCount ||
@@ -149,11 +153,8 @@ var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
     ) {
         return null;
     }
-    const octaveRatio = Number(entry.octaveRatio);
-    if (!Number.isFinite(octaveRatio) || octaveRatio <= 1) {
-        return null;
-    }
-    return sliceAnglesFromRatios(entry.ratios.map(getTemperamentRatio), octaveRatio);
+    // sliceAnglesFromRatios rejects a bad octaveRatio and any pitch count < 2.
+    return sliceAnglesFromRatios(entry.ratios.map(getTemperamentRatio), Number(entry.octaveRatio));
 };
 
 /** Raises slices below minDegrees to that floor, absorbing the excess from wider slices. Null for bad input. */
@@ -182,11 +183,7 @@ var enforceMinSliceAngles = (sliceAngles, minDegrees) => {
  * before createWheel(), which bakes sliceAngle into the SVG paths.
  */
 var applySliceAngles = (wheel, sliceAngles) => {
-    if (
-        !Array.isArray(sliceAngles) ||
-        !Array.isArray(wheel.navItems) ||
-        sliceAngles.length < wheel.navItems.length
-    ) {
+    if (!Array.isArray(sliceAngles) || !Array.isArray(wheel.navItems)) {
         return;
     }
     wheel.navItemsContinuous = true;
@@ -202,6 +199,7 @@ var MusicUtilsModeWheel = {
     getModeNameFromLabel,
     getModeSliceColors,
     getModeGroupTitleFont,
+    getModeSliceArc,
     getModeSliceFont,
     getTemperamentSliceAngles,
     sliceAnglesFromRatios,

@@ -17,7 +17,7 @@
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
-    getTemperamentSliceAngles, applySliceAngles, enforceMinSliceAngles,
+    getTemperamentSliceAngles, applySliceAngles, enforceMinSliceAngles, getModeSliceArc,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
     closeSharePopup
@@ -409,7 +409,7 @@ class ModeWidget {
                 return;
             }
             const newEDO = getCurrentEDO(key);
-            if (isNaN(newEDO) || newEDO < ModeWidget.MIN_EDO || newEDO > ModeWidget.MAX_EDO) {
+            if (!this._isValidEDO(newEDO)) {
                 return;
             }
 
@@ -664,10 +664,17 @@ class ModeWidget {
         this._rebuildModeIndex();
     }
 
+    _isValidEDO(edo) {
+        return !isNaN(edo) && edo >= ModeWidget.MIN_EDO && edo <= ModeWidget.MAX_EDO;
+    }
+
     _ensureDropdownOption(select, value, label) {
         // The dropdown may lack an option for an unusual value (e.g. 21
-        // from 1/4 comma meantone); add it so .value sticks.
-        if (!select.querySelector(`option[value="${value}"]`)) {
+        // from 1/4 comma meantone); add it so .value sticks. Compare option
+        // values instead of building a selector: `value` is a temperament key
+        // from the saved project, and temperament blocks are user-renamable,
+        // so it can contain characters that break a selector.
+        if (![...select.options].some(option => option.value === value)) {
             const opt = document.createElement("option");
             opt.value = value;
             opt.textContent = label;
@@ -688,7 +695,7 @@ class ModeWidget {
             return false;
         }
         const savedEDO = getCurrentEDO(savedKey);
-        if (isNaN(savedEDO) || savedEDO < ModeWidget.MIN_EDO || savedEDO > ModeWidget.MAX_EDO) {
+        if (!this._isValidEDO(savedEDO)) {
             return false;
         }
         const savedName = TEMPERAMENT[savedKey]?.name || savedKey;
@@ -1791,8 +1798,6 @@ class ModeWidget {
         if (!Array.isArray(wheel.navItems)) {
             return;
         }
-        // Same 0.575 arc factor as getModeSliceFont: midpoint of the 0.4-0.75 ring.
-        const midRadiusPercent = 0.575;
         const fontSize = this._titleFontSize(wheel.navItems.length);
         for (const item of wheel.navItems) {
             const title = typeof item.title === "string" ? item.title.trim() : "";
@@ -1804,9 +1809,7 @@ class ModeWidget {
             ) {
                 continue;
             }
-            const available =
-                (2 * Math.PI * (ModeWidget.WHEELSIZE / 2) * midRadiusPercent * item.sliceAngle) /
-                360;
+            const available = getModeSliceArc(wheel.wheelRadius, item.sliceAngle);
             // Roughly 0.6em per character is the usual sans-serif advance width.
             item._narrow = available < fontSize * 0.6 * title.length;
             if (item._narrow) {

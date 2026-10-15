@@ -144,6 +144,16 @@ describe("musicutils-modewheel", () => {
         }
     });
 
+    describe("getModeSliceArc", () => {
+        it("is the circumference at the label radius, scaled by the slice angle", () => {
+            const fullTurn = modewheel.getModeSliceArc(200, 360);
+            expect(fullTurn).toBeCloseTo(2 * Math.PI * 0.575 * 200, 6);
+            // Half the degrees is half the arc: this is what lets the mode
+            // widget measure proportional slices and equal slices alike.
+            expect(modewheel.getModeSliceArc(200, 30)).toBeCloseTo(fullTurn / 12, 6);
+        });
+    });
+
     describe("enforceMinSliceAngles", () => {
         it("raises slices below the floor and takes the excess from wider slices", () => {
             expect(modewheel.enforceMinSliceAngles([8.9, 351.1], 12)).toEqual([12, 348]);

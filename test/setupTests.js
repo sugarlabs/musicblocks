@@ -78,6 +78,7 @@ const {
     applySliceAngles,
     getTemperamentSliceAngles,
     enforceMinSliceAngles,
+    getModeSliceArc,
     stripMicrotonalPrefix
 } = require("../js/utils/musicutils.js");
 
@@ -113,6 +114,7 @@ global.sliceAnglesFromRatios = sliceAnglesFromRatios;
 global.applySliceAngles = applySliceAngles;
 global.getTemperamentSliceAngles = getTemperamentSliceAngles;
 global.enforceMinSliceAngles = enforceMinSliceAngles;
+global.getModeSliceArc = getModeSliceArc;
 global.stripMicrotonalPrefix = stripMicrotonalPrefix;
 
 // Provide ErrorHandler global for tests
