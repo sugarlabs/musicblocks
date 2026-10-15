@@ -330,6 +330,11 @@ class HelpWidget {
                         const img = document.createElement("img");
                         img.classList.add("blockImage");
                         img.src = imageSrc;
+                        img.alt = this._blockImageAlt(
+                            this.activity.blocks.blockList[this.activity.blocks.activeBlock]
+                                .protoblock,
+                            name
+                        );
                         figure.append(img);
                         bodyFragment.append(figure);
                     }
@@ -741,6 +746,19 @@ class HelpWidget {
     }
 
     /**
+     * Alt text for a block's help image: the block label, as shown in the
+     * help window title, or the block name for blocks without a label.
+     * @private
+     * @param {Object} protoblock
+     * @param {string} name - block name
+     * @returns {string}
+     */
+    _blockImageAlt(protoblock, name) {
+        const label = protoblock && protoblock.staticLabels && protoblock.staticLabels[0];
+        return label ? _(label) : name;
+    }
+
+    /**
      * @private
      * @param {string} title
      * @returns {boolean}
@@ -1057,6 +1075,7 @@ class HelpWidget {
                     const img = document.createElement("img");
                     img.classList.add("blockImage");
                     img.src = imageSrc;
+                    img.alt = this._blockImageAlt(block, name);
                     figure.append(img);
                     bodyFragment.append(figure);
                 }
