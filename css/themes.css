@@ -563,11 +563,11 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse) 080 !important;
+    background-color: #000080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse) 0ff !important;
+    background-color: #0000ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -654,12 +654,12 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .highcontrast #chooseKeyDiv {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #movable {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .dropdown-content li > a {
