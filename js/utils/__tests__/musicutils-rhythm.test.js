@@ -33,8 +33,13 @@ describe("musicutils-rhythm", () => {
     });
 
     it("converts durations to note values and rhythm-block factors", () => {
-        expect(rhythm.durationToNoteValue(0.25)).toEqual([1, 0, [0.5, 0.5], 1]);
-        expect(rhythm.durationToNoteValue(0.75)).toEqual([1, 0, [1.5, 0.5], 1]);
+        expect(rhythm.durationToNoteValue(0.25)).toEqual([1, 0, null, 1]);
+        expect(rhythm.durationToNoteValue(0.75)).toEqual([1, 0, null, 1]);
+        expect(rhythm.durationToNoteValue(2.006018054162)).toEqual([2, 0, null, 2]);
+        expect(rhythm.durationToNoteValue(1.9999999995)).toEqual([2, 0, null]);
+        expect(rhythm.durationToNoteValue(2.9999999995)).toEqual([1, 0, [3, 1], 2]);
+        expect(rhythm.durationToNoteValue(3)).toEqual([1, 0, [3, 1], 2]);
+        expect(rhythm.durationToNoteValue(6)).toEqual([1, 0, [3, 2], 4]);
         expect(rhythm.convertFactor(0.25)).toBe("4");
         expect(rhythm.convertFactor(0.125)).toBe("8");
         expect(rhythm.convertFactor(4)).toBeNull();
