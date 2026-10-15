@@ -531,6 +531,12 @@ describe("Theme Switching & Inline Styles Purity", () => {
 
         // Verify .highcontrast .blue rules have valid color syntax and do not contain fragmented tokens
         expect(themesCss).not.toMatch(/var\(--color-text-inverse\)\s*0[0-9a-f]+/i);
+        expect(themesCss).toMatch(
+            /\.highcontrast\s+\.blue\s*\{[^}]*background-color\s*:\s*#000080\s*!important/i
+        );
+        expect(themesCss).toMatch(
+            /\.highcontrast\s+\.blue\.darken-1\s*\{[^}]*background-color\s*:\s*#0000ff\s*!important/i
+        );
 
         // Verify .highcontrast pitch selector rules use readable var(--color-text-primary)
         const pitchSelectorElements = ["#chooseKeyDiv", "#movable"];
