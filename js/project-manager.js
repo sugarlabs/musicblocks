@@ -686,7 +686,6 @@ class ProjectManager {
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
         that._doHardStopButton();
-        that._allClear(true, true);
     }
 
     doLoad() {

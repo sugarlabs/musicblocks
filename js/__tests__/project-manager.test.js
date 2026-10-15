@@ -1287,6 +1287,7 @@ describe("doLoad / doMergeLoad", () => {
         const pm = new ProjectManager(activity);
         pm.doMergeLoad();
         expect(activity.merging).toBe(true);
+        expect(activity._allClear).not.toHaveBeenCalled();
     });
 
     it("doLoad calls toolbar.closeAuxToolbar", () => {
@@ -1303,11 +1304,11 @@ describe("doLoad / doMergeLoad", () => {
         expect(activity._doHardStopButton).toHaveBeenCalled();
     });
 
-    it("doLoad calls _allClear", () => {
+    it("doLoad preserves the canvas while opening the file chooser", () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
         pm.doLoad();
-        expect(activity._allClear).toHaveBeenCalledWith(true, true);
+        expect(activity._allClear).not.toHaveBeenCalled();
     });
 });
 
