@@ -1258,6 +1258,12 @@ class ModeWidget {
 
     _clear() {
         this._saveState();
+        if (this._playing) {
+            this.logo.synth.stop();
+        }
+        this._cancelAnimations();
+        this._setPlayButtonIcon("play-button.svg", _("Play all"));
+        this._selectedNotes[0] = true;
         for (let i = 1; i < this._activeEDO; i++) {
             this._selectedNotes[i] = false;
         }
