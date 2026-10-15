@@ -238,7 +238,7 @@ describe("GlobalPlanet", () => {
         it("should call addProjects on success", () => {
             const spy = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
             gp.afterRefreshProjects({ success: true, data: [] });
-            expect(spy).toHaveBeenCalledWith([]);
+            expect(spy).toHaveBeenCalledWith([], gp._requestId);
             spy.mockRestore();
         });
 
@@ -247,6 +247,44 @@ describe("GlobalPlanet", () => {
             gp.afterRefreshProjects({ success: false });
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
+        });
+
+        it("should ignore an older tag response that arrives last", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.searchAllProjects();
+            const firstResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[0][4];
+            gp.searchTags(["1"]);
+            const secondResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][4];
+
+            secondResponse({ success: true, data: [["music", 2]] });
+            firstResponse({ success: true, data: [["all", 1]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["music", 2]], gp._requestId);
+        });
+
+        it("should ignore project details from an older tag response", () => {
+            const render = jest.spyOn(gp, "render").mockImplementation(() => {});
+            gp.searchAllProjects();
+            mockPlanet.ServerInterface.downloadProjectList.mock.calls[0][4]({
+                success: true,
+                data: [["old", 1]]
+            });
+            const oldDetails = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            gp.searchTags(["1"]);
+            mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][4]({
+                success: true,
+                data: [["new", 2]]
+            });
+            const newDetails = mockPlanet.ServerInterface.getProjectDetails.mock.calls[1][1];
+            oldDetails({ success: true, data: { ProjectName: "Old" } });
+            newDetails({ success: true, data: { ProjectName: "New" } });
+
+            expect(gp.cache.old).toBeUndefined();
+            expect(gp.cache.new.ProjectName).toBe("New");
+            expect(render).toHaveBeenCalledTimes(1);
+            expect(render).toHaveBeenCalledWith([["new", 2]]);
         });
     });
 
