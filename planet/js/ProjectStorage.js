@@ -488,10 +488,11 @@ class ProjectStorage {
         }
         const isPortedAlready = await this.get(this.VersionKey);
         if (isPortedAlready !== this.Version) {
-            // port
-
             console.debug("Porting ProjectStorage to V2...");
-            await this.set(this.LocalStorageKey, oldProjectData);
+            const currentProjectData = await this.get(this.LocalStorageKey);
+            if (currentProjectData === null && oldProjectData !== null) {
+                await this.set(this.LocalStorageKey, oldProjectData);
+            }
             await this.set(this.VersionKey, this.Version);
         }
     }
