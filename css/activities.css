@@ -2536,6 +2536,14 @@ input.timbreName {
     background-color: var(--color-label-bg);
 }
 
+.mb-bg-selector {
+    background-color: var(--color-selector-bg);
+}
+
+.mb-bg-selector-selected {
+    background-color: var(--color-selector-selected);
+}
+
 /* ==========================================================================
    PhraseMaker Widget Token-Backed Component Styles
    ========================================================================== */

@@ -314,7 +314,7 @@ function TemperamentWidget() {
      */
     this._visualizerView = function () {
         temperamentTableDiv.textContent = "";
-        temperamentTableDiv.style.backgroundColor = "var(--color-bg-primary, #1a1a2e)";
+        temperamentTableDiv.classList.add("mb-bg-primary");
         temperamentTableDiv.style.color = "var(--color-text-primary, #e0e0e0)";
         temperamentTableDiv.style.fontFamily = "sans-serif";
         temperamentTableDiv.style.padding = "8px";
@@ -806,8 +806,7 @@ function TemperamentWidget() {
             th.textContent = h;
             th.style.border = "1px solid var(--color-border-secondary, #333)";
             th.style.padding = "6px 8px";
-            th.classList.add("mb-text-center");
-            th.style.backgroundColor = "var(--color-bg-tertiary, #2a2a3e)";
+            th.classList.add("mb-text-center", "mb-bg-tertiary");
             th.style.color = "var(--color-text-secondary, #ccc)";
             th.style.fontWeight = "bold";
             thead.appendChild(th);

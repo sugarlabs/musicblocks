@@ -533,9 +533,8 @@ class Arpeggio {
         cell.style.fontSize = Math.floor(this._cellScale * 50) + "%";
         cell.style.lineHeight = 100 + "%";
         cell.setAttribute("id", arpeggioIdx);
-        cell.className = "headcol";
+        cell.classList.add("headcol", "mb-bg-selector");
         cell.textContent = arpeggioName;
-        cell.style.backgroundColor = "var(--color-selector-bg)";
     }
 
     /**
