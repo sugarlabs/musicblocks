@@ -1196,7 +1196,7 @@ function setupIntervalsBlocks(activity) {
                 ),
                 "documentation",
                 null,
-                "moveablehelp"
+                "movablehelp"
             ]);
             this.size = 0;
             this.formBlock({

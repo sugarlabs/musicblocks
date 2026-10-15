@@ -319,6 +319,9 @@ class HelpWidget {
                             case "pt":
                                 path = path + "-pt";
                                 break;
+                            case "he":
+                                path = path + "-he";
+                                break;
                             default:
                                 break;
                         }
@@ -1046,6 +1049,9 @@ class HelpWidget {
                             break;
                         case "pt":
                             path = path + "-pt";
+                            break;
+                        case "he":
+                            path = path + "-he";
                             break;
                         default:
                             break;
