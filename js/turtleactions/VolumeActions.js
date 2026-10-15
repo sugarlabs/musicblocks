@@ -54,8 +54,16 @@ function setupVolumeActions(activity) {
         }
 
         for (const drum in DRUMNAMES) {
-            if (DRUMNAMES[drum][0].replace("-", " ") === synthname) return DRUMNAMES[drum][1];
-            if (DRUMNAMES[drum][1].replace("-", " ") === synthname) return synthname;
+            const displayName = DRUMNAMES[drum][0];
+            const technicalName = DRUMNAMES[drum][1];
+
+            if (displayName === synthname || displayName.replace("-", " ") === synthname) {
+                return technicalName;
+            }
+
+            if (technicalName === synthname || technicalName.replace("-", " ") === synthname) {
+                return synthname;
+            }
         }
 
         return null;
