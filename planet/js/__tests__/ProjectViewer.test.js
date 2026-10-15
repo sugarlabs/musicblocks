@@ -227,6 +227,35 @@ describe("ProjectViewer", () => {
                     expect.any(Function)
                 );
             });
+
+            it("should mark the submitted project after the viewer switches projects", () => {
+                projectViewer.id = "proj-1";
+                document.getElementById("reportdescription").value = "Valid report";
+                projectViewer.submitReporter();
+                const callback = mockPlanet.ServerInterface.reportProject.mock.calls[0][2];
+
+                projectViewer.id = "proj-2";
+                callback({ success: true });
+
+                expect(mockPlanet.ProjectStorage.report).toHaveBeenCalledWith("proj-1", true);
+                expect(mockPlanet.ProjectStorage.report).not.toHaveBeenCalledWith("proj-2", true);
+                expect(
+                    document.getElementById("projectviewer-reportsubmit-content").style.display
+                ).not.toBe("block");
+            });
+
+            it("should not show an old report error in a new project viewer", () => {
+                projectViewer.id = "proj-1";
+                document.getElementById("reportdescription").value = "Valid report";
+                projectViewer.submitReporter();
+                const callback = mockPlanet.ServerInterface.reportProject.mock.calls[0][2];
+
+                projectViewer.id = "proj-2";
+                callback({ success: false });
+
+                expect(document.getElementById("submittext").textContent).toBe("");
+                expect(mockPlanet.ProjectStorage.report).not.toHaveBeenCalled();
+            });
         });
 
         describe("afterReport", () => {
