@@ -453,6 +453,9 @@ var rationalSum = (a, b) => {
  * Finds the nearest beat for a given fraction.
  */
 var nearestBeat = (d, b) => {
+    if (typeof b !== "number" || b <= 0 || !Number.isFinite(b) || !Number.isFinite(d)) {
+        return [0, typeof b === "number" && Number.isFinite(b) && b > 0 ? b : 0];
+    }
     let sum = 1 / (2 * b);
     let count = 0;
     const dd = d / 100;

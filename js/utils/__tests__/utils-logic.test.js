@@ -206,6 +206,14 @@ describe("Utility Logic Functions", () => {
         it("returns zero beat when very small", () => {
             expect(nearestBeat(1, 8)).toEqual([0, 8]);
         });
+
+        it("safely handles non-positive or non-finite inputs without hanging", () => {
+            expect(nearestBeat(50, -1)).toEqual([0, 0]);
+            expect(nearestBeat(50, 0)).toEqual([0, 0]);
+            expect(nearestBeat(Infinity, 8)).toEqual([0, 8]);
+            expect(nearestBeat(50, Infinity)).toEqual([0, 0]);
+            expect(nearestBeat(50, NaN)).toEqual([0, 0]);
+        });
     });
 
     describe("oneHundredToFraction()", () => {
