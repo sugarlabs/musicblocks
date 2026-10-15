@@ -171,6 +171,20 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("taiko"), "japanese drum", "images/tom.svg", "hh", "drum"],
     //.TRANS: musical instrument
+    [_("heavy kick"), "heavy kick", "images/kick.svg", "bd", "drum"],
+    //.TRANS: musical instrument
+    [_("snare hard"), "snare hard", "images/snaredrum.svg", "sn", "drum"],
+    //.TRANS: musical instrument
+    [_("snare soft"), "snare soft", "images/snaredrum.svg", "sn", "drum"],
+    //.TRANS: musical instrument
+    [_("snare roll"), "snare roll", "images/snaredrum.svg", "sn", "drum"],
+    //.TRANS: musical instrument
+    [_("tom mid"), "tom mid", "images/tom.svg", "tomml", "drum"],
+    //.TRANS: musical instrument
+    [_("tom hi"), "tom hi", "images/tom.svg", "tomh", "drum"],
+    //.TRANS: musical instrument
+    [_("tom lo"), "tom lo", "images/floortom.svg", "tomfl", "drum"],
+    //.TRANS: musical instrument
     [_("hi hat"), "hi hat", "images/hihat.svg", "hh", "bell"],
     //.TRANS: a small metal bell
     [_("ride bell"), "ride bell", "images/ridebell.svg", "rb", "bell"],
@@ -186,6 +200,14 @@ const DRUMNAMES = [
     [_("chime"), "chime", "images/chime.svg", "cymca", "bell"],
     //.TRANS: a musical instrument
     [_("gong"), "gong", "images/gong.svg", "cymca", "bell"],
+    //.TRANS: musical instrument
+    [_("cymbal closed"), "cymbal closed", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("cymbal open"), "cymbal open", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("cymbal pedal"), "cymbal pedal", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("sonic cowbell"), "sonic cowbell", "images/cowbell.svg", "cb", "bell"],
     //.TRANS: sound effect
     [_("clang"), "clang", "images/clang.svg", "cymca", "effect"],
     //.TRANS: sound effect
@@ -285,7 +307,18 @@ const SAMPLE_INFO = {
         "cup drum": { path: "samples/cup", global: "CUP_SAMPLE" },
         "floor tom": { path: "samples/floortom", global: "FLOORTOM_SAMPLE" },
         "bass drum": { path: "samples/bassdrum", global: "BASSDRUM_SAMPLE" },
-        "snare drum": { path: "samples/snare", global: "SNARE_SAMPLE" }
+        "snare drum": { path: "samples/snare", global: "SNARE_SAMPLE" },
+        "heavy kick": { path: "samples/heavy_kick", global: "HEAVY_KICK_SAMPLE" },
+        "snare hard": { path: "samples/snare_hard", global: "SNARE_HARD_SAMPLE" },
+        "snare soft": { path: "samples/snare_soft", global: "SNARE_SOFT_SAMPLE" },
+        "snare roll": { path: "samples/snare_roll", global: "SNARE_ROLL_SAMPLE" },
+        "cymbal closed": { path: "samples/cymbal_closed", global: "CYMBAL_CLOSED_SAMPLE" },
+        "cymbal open": { path: "samples/cymbal_open", global: "CYMBAL_OPEN_SAMPLE" },
+        "cymbal pedal": { path: "samples/cymbal_pedal", global: "CYMBAL_PEDAL_SAMPLE" },
+        "tom mid": { path: "samples/tom_mid", global: "TOM_MID_SAMPLE" },
+        "tom hi": { path: "samples/tom_hi", global: "TOM_HI_SAMPLE" },
+        "tom lo": { path: "samples/tom_lo", global: "TOM_LO_SAMPLE" },
+        "sonic cowbell": { path: "samples/sonic_cowbell", global: "SONIC_COWBELL_SAMPLE" }
     }
 };
 
@@ -334,7 +367,18 @@ const DEFAULTSYNTHVOLUME = {
     "japanese drum": 90,
     "sitar": 100,
     "harmonium": 100,
-    "mandolin": 100
+    "mandolin": 100,
+    "heavy kick": 100,
+    "snare hard": 100,
+    "snare soft": 100,
+    "snare roll": 100,
+    "cymbal closed": 100,
+    "cymbal open": 90,
+    "cymbal pedal": 90,
+    "tom mid": 100,
+    "tom hi": 100,
+    "tom lo": 100,
+    "sonic cowbell": 100
 };
 
 /**
@@ -2979,6 +3023,7 @@ if (typeof module !== "undefined" && module.exports) {
         instrumentsFilters,
         instruments,
         instrumentsSource,
-        DEFAULTSYNTHVOLUME
+        DEFAULTSYNTHVOLUME,
+        SAMPLE_INFO
     };
 }
