@@ -21,21 +21,31 @@ name: Docker
 on:
     push:
         branches: [master]
+        # `COPY . .` puts everything in the image except what .dockerignore
+        # drops, so trigger on everything except those paths (and keep this
+        # workflow itself in).
         paths:
-            - "dockerfile"
-            - ".dockerignore"
-            - "package.json"
-            - "package-lock.json"
-            - "index.js"
+            - "**"
+            - "!docs/**"
+            - "!**.md"
+            - "!**/*.test.js"
+            - "!**/*.spec.js"
+            - "!coverage/**"
+            - "!.github/**"
             - ".github/workflows/docker.yml"
     pull_request:
         branches: [master]
+        # `COPY . .` puts everything in the image except what .dockerignore
+        # drops, so trigger on everything except those paths (and keep this
+        # workflow itself in).
         paths:
-            - "dockerfile"
-            - ".dockerignore"
-            - "package.json"
-            - "package-lock.json"
-            - "index.js"
+            - "**"
+            - "!docs/**"
+            - "!**.md"
+            - "!**/*.test.js"
+            - "!**/*.spec.js"
+            - "!coverage/**"
+            - "!.github/**"
             - ".github/workflows/docker.yml"
 
 # One in-flight run per PR / ref; newer pushes cancel older runs.
