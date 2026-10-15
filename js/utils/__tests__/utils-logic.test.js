@@ -211,8 +211,9 @@ describe("Utility Logic Functions", () => {
             expect(nearestBeat(50, -1)).toEqual([0, 0]);
             expect(nearestBeat(50, 0)).toEqual([0, 0]);
             expect(nearestBeat(Infinity, 8)).toEqual([0, 8]);
+            expect(nearestBeat(50, Infinity)).toEqual([0, 0]);
             expect(nearestBeat(50, NaN)).toEqual([0, 0]);
-        }, 1000);
+        });
     });
 
     describe("oneHundredToFraction()", () => {
