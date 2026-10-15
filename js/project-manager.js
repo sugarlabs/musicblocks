@@ -1266,7 +1266,7 @@ class ProjectManager {
                                         obj,
                                         that.fileChooser.files[0],
                                         "loadProjectFromFile",
-                                        true
+                                        false
                                     );
                                 } else {
                                     that.merging = false;
