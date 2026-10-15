@@ -525,4 +525,21 @@ describe("Theme Switching & Inline Styles Purity", () => {
         expect(compliantContrast).toBeGreaterThanOrEqual(7);
         expect(failingContrast).toBeLessThan(4.5);
     });
+
+    it("ensures themes.css has valid highcontrast properties and avoids black-on-black text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast .blue rules have valid color syntax and do not contain fragmented tokens
+        expect(themesCss).not.toMatch(/var\(--color-text-inverse\)\s*0[0-9a-f]+/i);
+
+        // Verify .highcontrast pitch selector rules use readable var(--color-text-primary)
+        const pitchSelectorElements = ["#chooseKeyDiv", "#movable"];
+        pitchSelectorElements.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-primary\\)`,
+                "i"
+            );
+            expect(themesCss).toMatch(regex);
+        });
+    });
 });
