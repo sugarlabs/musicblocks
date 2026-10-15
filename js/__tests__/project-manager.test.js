@@ -1318,6 +1318,7 @@ describe("doLoad / doMergeLoad", () => {
         const pm = new ProjectManager(activity);
         pm.doMergeLoad();
         expect(activity.merging).toBe(true);
+        expect(activity._allClear).not.toHaveBeenCalled();
     });
 
     it("doLoad calls toolbar.closeAuxToolbar", () => {
@@ -1334,11 +1335,11 @@ describe("doLoad / doMergeLoad", () => {
         expect(activity._doHardStopButton).toHaveBeenCalled();
     });
 
-    it("doLoad calls _allClear", () => {
+    it("doLoad preserves the canvas while opening the file chooser", () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
         pm.doLoad();
-        expect(activity._allClear).toHaveBeenCalledWith(true, true);
+        expect(activity._allClear).not.toHaveBeenCalled();
     });
 });
 
@@ -2480,7 +2481,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
         expect(planet.initialiseNewProject).toHaveBeenCalledWith("student-song", false);
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
-        expect(activity._allClear).toHaveBeenCalledWith(false, true);
+        expect(activity._allClear).not.toHaveBeenCalled();
         expect(activity.gitDropdownUI.clearForNewProject).toHaveBeenCalledTimes(1);
         expect(order).toEqual(["save-old", "clear-without-save", "create-project", "load-import"]);
         expect(activity.saveLocally).not.toHaveBeenCalled();
