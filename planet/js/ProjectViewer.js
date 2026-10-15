@@ -192,14 +192,19 @@ class ProjectViewer {
             return;
         } else {
             document.getElementById("projectviewer-report-progress").style.visibility = "visible";
-            this.Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
+            const reportedId = this.id;
+            this.Planet.ServerInterface.reportProject(reportedId, text, data =>
+                this.afterReport(data, reportedId)
+            );
         }
     }
 
-    afterReport(data) {
+    afterReport(data, reportedId = this.id) {
+        if (data.success) this.Planet.ProjectStorage.report(reportedId, true);
+        if (this.id !== reportedId) return;
+
         if (data.success) {
             document.getElementById("submittext").textContent = this.ReportSuccess;
-            this.Planet.ProjectStorage.report(this.id, true);
             document.getElementById("projectviewer-report-project").style.display = "none";
             document.getElementById("projectviewer-report-project-disabled").style.display =
                 "block";
