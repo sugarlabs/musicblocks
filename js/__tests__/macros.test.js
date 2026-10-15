@@ -82,6 +82,13 @@ describe("getMacroExpansion", () => {
         const result = getMacroExpansion(mockActivity, "namedbox", 0, 0);
         expect(result).toBeNull();
     });
+    // js/blocks/IntervalsBlocks.js named "moveablehelp" in the movable Do help string,
+    // which is not a macro, so the help loader had nothing to load.
+    test("the movable Do help macro is named movablehelp", () => {
+        expect(Array.isArray(getMacroExpansion(mockActivity, "movablehelp", 0, 0))).toBe(true);
+        expect(getMacroExpansion(mockActivity, "moveablehelp", 0, 0)).toBeNull();
+    });
+
     test("builtin macro should use provided x and y coordinates", () => {
         const expansion = getMacroExpansion(mockActivity, "archelp", 100, 200);
 

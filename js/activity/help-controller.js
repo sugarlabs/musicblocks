@@ -390,8 +390,21 @@ class HelpController {
             that.sendAllToTrash(false, true);
             setTimeout(() => {
                 const message = that.blocks.protoBlockDict[name].helpString;
-                if (message.length < 4) {
-                    // If there is nothing specified, just load the block.
+                // A help string can name a macro to load as an example. A name that is not
+                // a macro expands to null, which loadNewBlocks cannot read; js/palette.js
+                // checks the same call for that. Fall back to the block itself, which is
+                // what a help string with no fourth entry loads.
+                let blocksToLoad = null;
+                if (message.length >= 4) {
+                    blocksToLoad =
+                        typeof message[3] === "string"
+                            ? getMacroExpansion(that, message[3], 0, 0)
+                            : message[3];
+                }
+
+                if (blocksToLoad) {
+                    that.blocks.loadNewBlocks(blocksToLoad);
+                } else {
                     const obj = that.palettes.getProtoNameAndPalette(name);
                     const protoblk = obj[0];
                     const paletteName = obj[1];
@@ -408,14 +421,6 @@ class HelpController {
                             }
                         );
                     }
-                } else if (typeof message[3] === "string") {
-                    // If it is a string, load the macro associated with this block.
-                    const blocksToLoad = getMacroExpansion(that, message[3], 0, 0);
-                    that.blocks.loadNewBlocks(blocksToLoad);
-                } else {
-                    // Load the block.
-                    const blocksToLoad = message[3];
-                    that.blocks.loadNewBlocks(blocksToLoad);
                 }
 
                 setTimeout(() => {

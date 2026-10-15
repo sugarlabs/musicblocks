@@ -469,6 +469,26 @@ describe("HelpController.saveHelpBlocks", () => {
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
 
+    test("loads the block when the help message names something that is not a macro", () => {
+        // getMacroExpansion returns null for a name with no macro behind it, and
+        // loadNewBlocks reads .length on what it is given, so passing the null through
+        // threw a TypeError and took the rest of the artwork run with it.
+        const activity = makeActivity();
+        activity.blocks.protoBlockDict = {
+            note: { helpString: ["a", "b", "c", "notAMacro"] }
+        };
+        global.getMacroExpansion.mockReturnValueOnce(null);
+        const controller = new HelpController(activity);
+
+        expect(() => {
+            controller.saveHelpBlocks();
+            jest.advanceTimersByTime(1000 + 500);
+        }).not.toThrow();
+
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalledWith(null);
+        expect(activity.palettes.dict.paletteName.makeBlockFromSearch).toHaveBeenCalled();
+    });
+
     test("showKeyboardShortcuts opens keyboard shortcuts widget window containing shortcut entries", () => {
         const activity = makeActivity();
         const controller = new HelpController(activity);

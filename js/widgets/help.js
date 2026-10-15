@@ -384,41 +384,40 @@ class HelpWidget {
 
                     if (loadButton) {
                         loadButton.onclick = () => {
-                            if (message.length < 4) {
-                                // If there is nothing specified, just load the block.
-                                // console.debug("CLICK: " + name);
+                            // A help string can name a macro to load as an example. A
+                            // name that is not a macro expands to null, which loadNewBlocks
+                            // cannot read; js/palette.js checks the same call for that. Fall
+                            // back to the block itself, which is what a help string with no
+                            // fourth entry loads.
+                            let blocksToLoad = null;
+                            if (message.length >= 4) {
+                                blocksToLoad =
+                                    typeof message[3] === "string"
+                                        ? getMacroExpansion(this.activity, message[3], 100, 100)
+                                        : message[3];
+                            }
 
-                                const protoblk = object[0];
-                                const paletteName = object[1];
-                                const protoName = object[2];
+                            if (blocksToLoad) {
+                                this.activity.blocks.loadNewBlocks(blocksToLoad);
+                                return;
+                            }
 
-                                const protoResult = Object.prototype.hasOwnProperty.call(
-                                    this.activity.blocks.protoBlockDict,
-                                    protoName
-                                );
-                                if (protoResult) {
-                                    this.activity.blocks.palettes.dict[
-                                        paletteName
-                                    ].makeBlockFromSearch(protoblk, protoName, newBlock => {
+                            const protoblk = object[0];
+                            const paletteName = object[1];
+                            const protoName = object[2];
+
+                            const protoResult = Object.prototype.hasOwnProperty.call(
+                                this.activity.blocks.protoBlockDict,
+                                protoName
+                            );
+                            if (protoResult) {
+                                this.activity.blocks.palettes.dict[paletteName].makeBlockFromSearch(
+                                    protoblk,
+                                    protoName,
+                                    newBlock => {
                                         this.activity.blocks.moveBlock(newBlock, 100, 100);
-                                    });
-                                }
-                            } else if (typeof message[3] === "string") {
-                                // If it is a string, load the macro
-                                // assocuated with this block
-                                const blocksToLoad = getMacroExpansion(
-                                    this.activity,
-                                    message[3],
-                                    100,
-                                    100
+                                    }
                                 );
-                                // console.debug("CLICK: " + blocksToLoad);
-                                this.activity.blocks.loadNewBlocks(blocksToLoad);
-                            } else {
-                                // Load the blocks.
-                                const blocksToLoad = message[3];
-                                // console.debug("CLICK: " + blocksToLoad);
-                                this.activity.blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
                     }
@@ -1107,44 +1106,41 @@ class HelpWidget {
 
                 if (loadButton !== null) {
                     loadButton.onclick = () => {
-                        if (message.length < 4) {
-                            // If there is nothing specified, just
-                            // load the block.
-                            // console.debug("CLICK: " + name);
-                            const obj = this.activity.blocks.palettes.getProtoNameAndPalette(name);
-                            const protoblk = obj[0];
-                            const paletteName = obj[1];
-                            const protoName = obj[2];
+                        // A help string can name a macro to load as an example. A
+                        // name that is not a macro expands to null, which loadNewBlocks
+                        // cannot read; js/palette.js checks the same call for that. Fall
+                        // back to the block itself, which is what a help string with no
+                        // fourth entry loads.
+                        let blocksToLoad = null;
+                        if (message.length >= 4) {
+                            blocksToLoad =
+                                typeof message[3] === "string"
+                                    ? getMacroExpansion(this.activity, message[3], 100, 100)
+                                    : message[3];
+                        }
 
-                            const protoResult = Object.prototype.hasOwnProperty.call(
-                                this.activity.blocks.protoBlockDict,
-                                protoName
-                            );
-                            if (protoResult) {
-                                this.activity.blocks.palettes.dict[paletteName].makeBlockFromSearch(
-                                    protoblk,
-                                    protoName,
-                                    newBlock => {
-                                        this.activity.blocks.moveBlock(newBlock, 100, 100);
-                                    }
-                                );
-                            }
-                        } else if (typeof message[3] === "string") {
-                            // If it is a string, load the macro
-                            // assocuated with this block
-                            const blocksToLoad = getMacroExpansion(
-                                this.activity,
-                                message[3],
-                                100,
-                                100
-                            );
-                            // console.debug("CLICK: " + blocksToLoad);
+                        if (blocksToLoad) {
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
-                        } else {
-                            // Load the blocks.
-                            const blocksToLoad = message[3];
-                            // console.debug("CLICK: " + blocksToLoad);
-                            this.activity.blocks.loadNewBlocks(blocksToLoad);
+                            return;
+                        }
+
+                        const obj = this.activity.blocks.palettes.getProtoNameAndPalette(name);
+                        const protoblk = obj[0];
+                        const paletteName = obj[1];
+                        const protoName = obj[2];
+
+                        const protoResult = Object.prototype.hasOwnProperty.call(
+                            this.activity.blocks.protoBlockDict,
+                            protoName
+                        );
+                        if (protoResult) {
+                            this.activity.blocks.palettes.dict[paletteName].makeBlockFromSearch(
+                                protoblk,
+                                protoName,
+                                newBlock => {
+                                    this.activity.blocks.moveBlock(newBlock, 100, 100);
+                                }
+                            );
                         }
                     };
                 }
