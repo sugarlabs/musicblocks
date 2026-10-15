@@ -263,6 +263,51 @@ describe("GlobalPlanet", () => {
             expect(addProjects).toHaveBeenCalledWith([["music", 2]], gp._requestId);
         });
 
+        it("should ignore a search response after the view refreshes", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.searchString = "drum";
+            gp.search();
+            const oldResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[0][4];
+
+            gp.refreshProjects();
+            const currentResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[1][4];
+            oldResponse({ success: true, data: [["old", 1]] });
+            currentResponse({ success: true, data: [["current", 2]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["current", 2]], gp._requestId);
+        });
+
+        it("should ignore an old Load More response after changing tags", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.searchAllProjects();
+            gp.loadMoreProjects();
+            const oldResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][4];
+
+            gp.searchTags(["1"]);
+            const currentResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[2][4];
+            oldResponse({ success: true, data: [["old", 1]] });
+            currentResponse({ success: true, data: [["current", 2]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["current", 2]], gp._requestId);
+        });
+
+        it("should ignore an old search Load More response after refreshing", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.oldSearchString = "drum";
+            gp.loadMoreProjects();
+            const oldResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[0][4];
+
+            gp.refreshProjects();
+            const currentResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[1][4];
+            oldResponse({ success: true, data: [["old", 1]] });
+            currentResponse({ success: true, data: [["current", 2]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["current", 2]], gp._requestId);
+        });
+
         it("should ignore project details from an older tag response", () => {
             const render = jest.spyOn(gp, "render").mockImplementation(() => {});
             gp.searchAllProjects();
