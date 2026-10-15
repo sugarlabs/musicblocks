@@ -313,7 +313,7 @@ class GlobalPlanet {
         this.Planet.ServerInterface.getProjectDetails(
             id,
             function (d) {
-                this.addProjectToCache(id, d, callback);
+                this.afterForceAddToCache(id, d, callback);
             }.bind(this),
             true
         );
