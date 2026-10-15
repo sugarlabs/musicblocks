@@ -607,6 +607,21 @@ describe("ModeWidget", () => {
             global.getCurrentEDO = savedGetCurrentEDO;
             global.TEMPERAMENT = savedTemperament;
         });
+
+        test("ignores a dropdown value that is not a registered temperament", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 19;
+
+            // getCurrentEDO answers 12 for an unregistered key, so the isNaN guard
+            // below cannot catch one. Registering it also arms _userSetTuning.
+            fireEdoChange(modeWidget._edoSelect, "notATemperament");
+
+            expect(modeWidget._activeTemperamentKey).toBe("equal");
+            expect(modeWidget.logo.synth.inTemperament).toBe("equal");
+            expect(modeWidget._activeEDO).toBe(19);
+            expect(modeWidget._userSetTuning).toBe(false);
+        });
     });
 
     test("should fall back to generated names when numberToPitch returns a NaN octave", () => {
@@ -744,6 +759,63 @@ describe("ModeWidget", () => {
             expect(w2._activeEDO).toBe(12);
         } finally {
             teardown();
+        }
+    });
+
+    test("adds a temperament key to the tuning dropdown, and only when it retunes", () => {
+        MUSICALMODES["m41"] = Array(41).fill(1);
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([
+                { name: "m41", pattern: Array(41).fill(1), edo: 41, temperamentKey: "equal41" }
+            ])
+        );
+        modeWidget._rebuildModeIndex();
+        // Simulates a reload: _ensureTempKey registers equal41 in memory only,
+        // so the saved key is dangling and _loadMode falls through to its
+        // native-EDO branch.
+        delete TEMPERAMENT.equal41;
+
+        // A <select> stub recording what the widget appends.
+        const makeSelect = () => ({
+            appended: [],
+            value: "",
+            querySelector: () => null,
+            appendChild(o) {
+                this.appended.push(o);
+            }
+        });
+
+        try {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            const equal = makeSelect();
+            modeWidget._loadMode("m41", Array(41).fill(1), equal);
+            // EDO 41 proves the native-EDO branch ran. The value must be a
+            // temperament key: a bare EDO number resolves to 12 via
+            // getCurrentEDO's fallback, retunes the synth to an unregistered
+            // key, and arms _userSetTuning.
+            expect(modeWidget._activeEDO).toBe(41);
+            expect(equal.appended.map(o => o.value)).toEqual(["equal41"]);
+            expect(equal.value).toBe("equal41");
+
+            // A non-equal temperament keeps inTemperament, so pinning equal41
+            // would misreport it and retune on click.
+            modeWidget._activeTemperamentKey = "just intonation";
+            modeWidget.logo.synth.inTemperament = "just intonation";
+            modeWidget._activeEDO = 12;
+            // The first _loadMode re-registered equal41 in memory; drop it so
+            // this case sees the same dangling key the first one did.
+            delete TEMPERAMENT.equal41;
+            const nonEqual = makeSelect();
+            modeWidget._loadMode("m41", Array(41).fill(1), nonEqual);
+            expect(modeWidget._activeEDO).toBe(41);
+            expect(nonEqual.appended).toEqual([]);
+            expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        } finally {
+            delete MUSICALMODES["m41"];
+            localStorage.removeItem("customModes");
+            delete TEMPERAMENT.equal41;
         }
     });
 

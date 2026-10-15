@@ -405,6 +405,9 @@ class ModeWidget {
             if (!key || key === this._activeTemperamentKey) {
                 return;
             }
+            if (!TEMPERAMENT[key]) {
+                return;
+            }
             const newEDO = getCurrentEDO(key);
             if (isNaN(newEDO) || newEDO < ModeWidget.MIN_EDO || newEDO > ModeWidget.MAX_EDO) {
                 return;
@@ -951,8 +954,14 @@ class ModeWidget {
             // round-trips restore it losslessly.
             const oldEDO = this._activeEDO;
             this._cacheState(oldEDO);
-            if (edoSelect) {
-                this._ensureDropdownOption(edoSelect, nativeEDO, nativeEDO + "-EDO");
+            // Pin only when _rebuildWheel will retune; under a non-equal temperament it
+            // leaves inTemperament alone, so the option would misreport it.
+            if (edoSelect && isEquallyTempered(this._activeTemperamentKey)) {
+                this._ensureDropdownOption(
+                    edoSelect,
+                    this._temperamentKeyForEDO(nativeEDO),
+                    nativeEDO + "-EDO"
+                );
             }
             this._rebuildWheel(nativeEDO);
             this.textMsg(
