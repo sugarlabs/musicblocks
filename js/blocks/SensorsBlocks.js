@@ -148,7 +148,7 @@ function setupSensorsBlocks(activity) {
                 _("The Input-value block stores the input."),
                 "documentation",
                 null,
-                "input"
+                "inputvaluehelp"
             ]);
         }
 
