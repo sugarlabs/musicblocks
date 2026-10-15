@@ -669,6 +669,56 @@ describe("processABCNotes - notation markers", () => {
         expect(notes.map(n => n.duration)).toEqual([0.25, 0.25, 0.25, 0.25, 0.25]);
     });
 
+    it("should not emit a fractional tuplet header for non-integer tuplet factors (Issue #9512)", () => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["G4"], 4, 0, null, 0, -1, false, null],
+                        [[], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null]
+                    ]
+                }
+            }
+        };
+        processABCNotes(logo, 0);
+        const out = logo.notationNotes[0];
+        expect(out).toBe("G4 z8 ");
+        expect(out).not.toMatch(/\(\d+\.\d+:/);
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${out}\n`);
+        const warnings = (tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""));
+        expect(warnings).toEqual([]);
+    });
+
+    it("should fall back to roundDown when duration is non-integer", () => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 2.5, 0, null, 2, -1, false, null]]
+                }
+            }
+        };
+        processABCNotes(logo, 0);
+        expect(logo.notationNotes[0]).toBe("C8 ");
+    });
+
+    it("should fall back to rounded duration when duration and roundDown are not integer note values", () => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["D4"], 2.4, 0, null, null, -1, false, null],
+                        [["E4"], 0, 0, null, null, -1, false, null]
+                    ]
+                }
+            }
+        };
+        processABCNotes(logo, 0);
+        expect(logo.notationNotes[0]).toBe("D8 E16 ");
+    });
+
     describe("tempo", () => {
         it.each([
             ["4", "1/4"],
@@ -1361,5 +1411,109 @@ describe("processABCNotes - bar lines", () => {
         ];
 
         expect(measureLengths(exportBody(staged))).toEqual([2, 0.25]);
+    });
+});
+
+describe("Browser shared-global execution (Issue #9533)", () => {
+    const vm = require("vm");
+    const fs = require("fs");
+    const path = require("path");
+
+    const rhythmPath = path.resolve(__dirname, "../utils/musicutils-rhythm.js");
+    const abcPath = path.resolve(__dirname, "../abc.js");
+    const lilypondPath = path.resolve(__dirname, "../lilypond.js");
+
+    const createSharedBrowserContext = () => {
+        const sandbox = {
+            console,
+            Math,
+            Number,
+            Array,
+            String,
+            Object,
+            Set,
+            RegExp,
+            NOTATIONNOTE: 0,
+            NOTATIONDURATION: 1,
+            NOTATIONDOTCOUNT: 2,
+            NOTATIONTUPLETVALUE: 3,
+            NOTATIONROUNDDOWN: 4,
+            NOTATIONINSIDECHORD: 5,
+            NOTATIONSTACCATO: 6,
+            frequencyToPitch: () => ["C", "4"],
+            toFraction: n => [n, 1],
+            _: s => s,
+            last: arr => arr[arr.length - 1]
+        };
+        sandbox.window = sandbox;
+        return vm.createContext(sandbox);
+    };
+
+    const stagedRow = [["C4"], 2.5, 0, [2.5, 0.5], 2, -1, false, null];
+
+    const createActivity = () => ({
+        logo: {
+            notationNotes: { 0: "" },
+            notation: {
+                notationStaging: { 0: [stagedRow] },
+                notationDrumStaging: { 0: [] }
+            },
+            notationOutput: "",
+            guitarOutputHead: "",
+            guitarOutputEnd: "",
+            MIDIOutput: "",
+            synth: { inTemperament: "equal" }
+        },
+        turtles: {
+            ithTurtle: () => ({ singer: { keySignature: "C major" } }),
+            turtleList: { 0: { name: "Turtle 0" } },
+            getTurtle: () => ({ name: "Turtle 0" })
+        },
+        prepareExport: () => "{}"
+    });
+
+    it("evaluates abc.js and lilypond.js in the same global scope without SyntaxError and exports sequentially (ABC then Lilypond)", () => {
+        const context = createSharedBrowserContext();
+        const rhythmCode = fs.readFileSync(rhythmPath, "utf8");
+        const abcCode = fs.readFileSync(abcPath, "utf8");
+        const lilypondCode = fs.readFileSync(lilypondPath, "utf8");
+
+        expect(() => {
+            vm.runInContext(rhythmCode, context, { filename: "musicutils-rhythm.js" });
+            vm.runInContext(abcCode, context, { filename: "abc.js" });
+            vm.runInContext(lilypondCode, context, { filename: "lilypond.js" });
+        }).not.toThrow();
+
+        context.activity = createActivity();
+        const abcOutput = vm.runInContext("saveAbcOutput(activity)", context);
+        expect(abcOutput).toContain("C8 ");
+        expect(abcOutput).not.toMatch(/\(\d+\.\d+:/);
+
+        const lilyOutput = vm.runInContext("saveLilypondOutput(activity)", context);
+        expect(lilyOutput).not.toMatch(/\\tuplet/);
+        expect(lilyOutput).toContain("c'2 ");
+    });
+
+    it("evaluates lilypond.js and abc.js in reverse order and exports sequentially (Lilypond then ABC)", () => {
+        const context = createSharedBrowserContext();
+        const rhythmCode = fs.readFileSync(rhythmPath, "utf8");
+        const abcCode = fs.readFileSync(abcPath, "utf8");
+        const lilypondCode = fs.readFileSync(lilypondPath, "utf8");
+
+        expect(() => {
+            vm.runInContext(rhythmCode, context, { filename: "musicutils-rhythm.js" });
+            vm.runInContext(lilypondCode, context, { filename: "lilypond.js" });
+            vm.runInContext(abcCode, context, { filename: "abc.js" });
+        }).not.toThrow();
+
+        context.activity = createActivity();
+        const lilyOutput = vm.runInContext("saveLilypondOutput(activity)", context);
+        expect(lilyOutput).not.toMatch(/\\tuplet/);
+        expect(lilyOutput).toContain("c'2 ");
+
+        context.activity = createActivity();
+        const abcOutput = vm.runInContext("saveAbcOutput(activity)", context);
+        expect(abcOutput).toContain("C8 ");
+        expect(abcOutput).not.toMatch(/\(\d+\.\d+:/);
     });
 });
