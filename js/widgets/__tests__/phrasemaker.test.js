@@ -1867,6 +1867,74 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.init(mockActivity);
         expect(global.announceToScreenReader).not.toHaveBeenCalled();
     });
+
+    test("init starts from the cells saved with the project, until this session has its own", () => {
+        const savedCells = [[2, [23, 0], 0]];
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: 0 }
+                }))
+            },
+            logo: {
+                tupletRhythms: [["notes", 0, 4]],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {},
+                blockList: { 7: { name: "matrix", matrixCells: savedCells } }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+        const open = () => {
+            phraseMaker._rows = [];
+            phraseMaker._headcols = [];
+            phraseMaker._labelcols = [];
+            phraseMaker.init(mockActivity);
+        };
+
+        phraseMaker.blockNo = 7;
+        phraseMaker.rowLabels = ["C"];
+        phraseMaker.rowArgs = [4];
+        global.PhraseMakerUtils = { MATRIXGRAPHICS: [], MATRIXGRAPHICS2: [], MATRIXSYNTHS: [] };
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = { calculateNoteWidth: jest.fn(() => 80), resetMatrix: jest.fn() };
+
+        phraseMaker._blockMap = {};
+        open();
+        expect(phraseMaker._blockMap[7]).toEqual([[2, [23, 0], 0]]);
+        // A copy, so changing the matrix doesn't change the loaded project data.
+        expect(phraseMaker._blockMap[7][0]).not.toBe(savedCells[0]);
+
+        phraseMaker._blockMap = { 7: [[5, [23, 1], 0]] };
+        open();
+        expect(phraseMaker._blockMap[7]).toEqual([[5, [23, 1], 0]]);
+    });
     test("_createColumnPieSubmenu executes", () => {
         phraseMaker.platformColor = {
             pitchWheelcolors: [],

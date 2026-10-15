@@ -1805,6 +1805,45 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[2].rulerHistory).toEqual([[[[0, 2]], 3]]);
         });
 
+        it("restores the Phrase Maker cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                matrix: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const matrixCells = [
+                [1, [2, 0], 0],
+                // A row on the second pass of a repeat.
+                [1000001, [2, 1], 1],
+                "not a cell",
+                [-1, [2, 0], 0],
+                [1, null, 0],
+                [1, [2, "0"], 0]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["matrix", { collapsed: false, matrixCells }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].matrixCells).toEqual([
+                [3, [4, 0], 0],
+                [1000003, [4, 1], 1]
+            ]);
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is
