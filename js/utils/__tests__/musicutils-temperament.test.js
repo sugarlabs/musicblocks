@@ -91,6 +91,59 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("getEdoNoteNamePosition", () => {
+        it("resolves enharmonic note spellings in 12-EDO via EQUIVALENTNATURALS", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B♯", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♭", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("F♭", 12)).toBe(4);
+        });
+
+        it("resolves ASCII single and double accidental spellings in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("E#", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B#", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("Cb", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("Fb", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("D##", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("Cbb", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("Fbb", 12)).toBe(3);
+        });
+
+        it("resolves double-accidental natural and chained equivalents in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("D𝄪", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("D♯♯", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("A𝄪", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("C𝄫", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("C♭♭", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("F𝄫", 12)).toBe(3);
+            expect(temperament.getEdoNoteNamePosition("F♭♭", 12)).toBe(3);
+            expect(temperament.getEdoNoteNamePosition("B𝄪", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("E𝄪", 12)).toBe(6);
+        });
+
+        it("keeps resolving standard sharps and flats in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("C♯", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("D♭", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("F♯", 12)).toBe(6);
+            expect(temperament.getEdoNoteNamePosition("G♭", 12)).toBe(6);
+            expect(temperament.getEdoNoteNamePosition("A", 12)).toBe(9);
+        });
+
+        it("preserves non-12 EDO distinct pitch positions", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 19)).toBe(7);
+            expect(temperament.getEdoNoteNamePosition("F", 19)).toBe(8);
+            expect(temperament.getEdoNoteNamePosition("B♯", 19)).toBe(18);
+            expect(temperament.getEdoNoteNamePosition("C", 19)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♯", 19)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("D♭", 19)).toBe(2);
+        });
+
+        it("returns -1 for invalid or unresolvable pitch names", () => {
+            expect(temperament.getEdoNoteNamePosition("H", 12)).toBe(-1);
+            expect(temperament.getEdoNoteNamePosition("invalid", 12)).toBe(-1);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [
