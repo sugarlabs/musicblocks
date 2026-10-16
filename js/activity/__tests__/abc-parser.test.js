@@ -225,6 +225,53 @@ describe("Test 2: Multiple voices", () => {
     });
 });
 
+describe("ABC voices sharing one staff", () => {
+    const staff = voices => ({
+        meter: { value: [{ num: 4, den: 4 }] },
+        key: { root: "C", mode: "major", accidentals: [] },
+        voices
+    });
+
+    test("imports simultaneous voices as separate Start stacks", async () => {
+        const abcjs = require("abcjs");
+        const tune = abcjs.parseOnly(
+            "X:1\nT:Two voices\nM:4/4\nL:1/4\n%%score (1 2)\nV:1\nV:2\nK:C\n[V:1] C4|\n[V:2] E4|"
+        )[0];
+        expect(tune.lines[0].staff[0].voices).toHaveLength(2);
+
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+
+        const calls = blocksOfType(blocks, "nameddo");
+        expect(calls.map(block => block[1][1].value)).toEqual(["V: 1 Line 1", "V: 2 Line 1"]);
+        expect(calls.every(block => block[4][1] === null)).toBe(true);
+    });
+
+    test("keeps each voice's segments together across staff lines", async () => {
+        const tune = {
+            metaText: { title: "Two voices", instruction: "guitar" },
+            lines: [
+                { staff: [staff([[makeNote("C", 0)], [makeNote("E", 2)]])] },
+                { staff: [staff([[makeNote("D", 1)], [makeNote("F", 3)]])] }
+            ]
+        };
+
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const firstCalls = blocksOfType(blocks, "nameddo").filter(block => {
+            const previous = byId.get(block[4][0]);
+            return previous && previous[1] === "settimbre";
+        });
+        expect(firstCalls.map(block => block[1][1].value)).toEqual(["V: 1 Line 1", "V: 2 Line 1"]);
+        expect(firstCalls.map(block => byId.get(block[4][1])[1][1].value)).toEqual([
+            "V: 1 Line 2",
+            "V: 2 Line 2"
+        ]);
+    });
+});
+
 // ---------------------------------------------------------------------------
 // Test 3 — Repeat bars
 // ---------------------------------------------------------------------------
