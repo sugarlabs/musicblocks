@@ -970,10 +970,7 @@ class Painter {
         this.turtle.orientation = Painter._normalizeHeading(this.turtle.orientation + degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
-        // We cannot update the cache during the 'tween'
-        if (!this.turtle.blinking()) {
-            this.turtle.updateCache();
-        }
+        this._scheduleCanvasUpdate();
     }
 
     /**
@@ -1033,10 +1030,7 @@ class Painter {
         this.turtle.orientation = Painter._normalizeHeading(degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
-        // We cannot update the cache during the 'tween'
-        if (!this.turtle.blinking()) {
-            this.turtle.updateCache();
-        }
+        this._scheduleCanvasUpdate();
     }
 
     /**
