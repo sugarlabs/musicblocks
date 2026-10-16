@@ -127,7 +127,12 @@ const _tupletNotesRatio = (tupletRatio, roundDown) => {
     const noteValue = tupletRatio[0] * tupletRatio[1];
     // Only a whole-number factoring is a tuplet MusicXML can write; anything else is
     // floating-point residue from the duration and is written as a plain, rounded note.
-    if (!Number.isInteger(noteValue) || !Number.isInteger(roundDown) || roundDown <= 0) {
+    if (
+        !Number.isInteger(noteValue) ||
+        noteValue <= 0 ||
+        !Number.isInteger(roundDown) ||
+        roundDown <= 0
+    ) {
         return null;
     }
     const divisor = _gcd(noteValue, roundDown);
@@ -701,8 +706,19 @@ class MusicXMLExporter {
                         if (ratio === null && Array.isArray(tupletRatio)) {
                             // Not a writable tuplet (see _tupletNotesRatio): give the note its
                             // true length on the grid, rounded, without a <time-modification>.
-                            preciseDur = divisionsPerWholeNote / (tupletRatio[0] * tupletRatio[1]);
-                            dur = Math.max(1, Math.round(preciseDur));
+                            // A factor that isn't a positive finite number (NaN, 0) falls back to
+                            // the staged power-of-two note value, so no NaN reaches <duration>.
+                            const staged = tupletRatio[0] * tupletRatio[1];
+                            const roundDown = obj[MXML_ROUNDDOWN];
+                            const noteValue =
+                                Number.isFinite(staged) && staged > 0
+                                    ? staged
+                                    : Number.isFinite(roundDown) && roundDown > 0
+                                      ? roundDown
+                                      : 4;
+                            dur = Math.max(1, Math.round(divisionsPerWholeNote / noteValue));
+                            // Measures are filled by what is written, so count the rounded length.
+                            preciseDur = dur;
                             timeModification = null;
                         } else if (ratio !== null) {
                             const { actualNotes, normalNotes } = ratio;
@@ -713,16 +729,21 @@ class MusicXMLExporter {
                                 (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) *
                                 (normalNotes / actualNotes);
                             // Rounding only guards extreme cases (e.g. a tuplet fine enough that
-                            // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
+                            // divisionsPerWholeNote can't represent it exactly, or one left out of
+                            // the grid by MAX_DIVISIONS_PER_WHOLE_NOTE); it's a no-op otherwise.
+                            // When it does round, measures are filled by the written length.
                             dur = Math.max(1, Math.round(preciseDur));
+                            preciseDur = dur;
                             timeModification = { actualNotes, normalNotes };
                         } else {
                             preciseDur =
                                 (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
-                            // Whole unless the grid hit MAX_DIVISIONS_PER_WHOLE_NOTE.
-                            dur = Number.isInteger(preciseDur)
-                                ? preciseDur
-                                : Math.max(1, Math.round(preciseDur));
+                            // Whole unless the grid hit MAX_DIVISIONS_PER_WHOLE_NOTE; then the
+                            // rounded length is what is written, and what the measure counts.
+                            if (!Number.isInteger(preciseDur)) {
+                                preciseDur = Math.max(1, Math.round(preciseDur));
+                            }
+                            dur = preciseDur;
                             timeModification = null;
                         }
 
