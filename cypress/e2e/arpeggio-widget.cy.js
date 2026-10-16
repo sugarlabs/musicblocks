@@ -35,21 +35,8 @@
  */
 
 // ---------------------------------------------------------------------------
-// Uncaught Exception Handler
+// Constants
 // ---------------------------------------------------------------------------
-
-Cypress.on("uncaught:exception", err => {
-    const ignored = [
-        "ResizeObserver loop limit exceeded",
-        "Cannot read properties of undefined",
-        "Cannot read properties of null",
-        "Cannot set properties of null",
-        "Cannot set properties of undefined",
-        "_ is not defined",
-        "Permissions check failed"
-    ];
-    return !ignored.some(msg => err.message.includes(msg));
-});
 
 const ARPEGGIO_DIALOG = '[role="dialog"][aria-label="arpeggio"]';
 
