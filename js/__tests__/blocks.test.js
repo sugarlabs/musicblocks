@@ -5144,4 +5144,120 @@ describe("sendStackToTrash – turtle container guard", () => {
         expect(mockTurtleList[0].inTrash).toBe(true);
         expect(mockTurtleList[1].inTrash).toBe(true);
     });
+
+    describe("_adjustExpandableTwoArgBlock", () => {
+        let blocksInstance;
+        let setxyBlock;
+        let child0;
+        let child1;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+            blocksInstance.adjustDocks = jest.fn();
+
+            setxyBlock = {
+                name: "setxy",
+                trash: false,
+                connections: [null, null, null, null],
+                clampCount: [1, 1],
+                size: 2,
+                updateSlots: jest.fn((clamp, plusMinus) => {
+                    setxyBlock.clampCount[clamp] += plusMinus;
+                    setxyBlock.size += plusMinus;
+                }),
+                isInlineCollapsible: () => false
+            };
+
+            child0 = {
+                name: "multiply",
+                trash: false,
+                connections: [0, null, null],
+                clampCount: [1, 1],
+                size: 2,
+                isInlineCollapsible: () => false
+            };
+
+            child1 = {
+                name: "random",
+                trash: false,
+                connections: [0, null, null],
+                clampCount: [1, 1],
+                size: 3,
+                isInlineCollapsible: () => false
+            };
+
+            blocksInstance.blockList = [setxyBlock, child0, child1];
+        });
+
+        it("does nothing when input array is empty", () => {
+            blocksInstance._adjustExpandableTwoArgBlock([]);
+            expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
+            expect(blocksInstance.adjustDocks).not.toHaveBeenCalled();
+        });
+
+        it("expands slot 0 when first argument child has size > 1", () => {
+            setxyBlock.connections[1] = 1;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 1);
+            expect(setxyBlock.clampCount[0]).toBe(2);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands slot 1 when second argument child has size > 1", () => {
+            setxyBlock.connections[2] = 2;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(setxyBlock.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands both slots when both argument children have size > 1", () => {
+            setxyBlock.connections[1] = 1;
+            setxyBlock.connections[2] = 2;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 1);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(setxyBlock.clampCount[0]).toBe(2);
+            expect(setxyBlock.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("contracts slots back to 1 when argument children are disconnected", () => {
+            setxyBlock.clampCount = [3, 2];
+            setxyBlock.connections[1] = null;
+            setxyBlock.connections[2] = null;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, -2);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, -1);
+            expect(setxyBlock.clampCount[0]).toBe(1);
+            expect(setxyBlock.clampCount[1]).toBe(1);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("processes deeper nested blocks first so parent reads updated child size", () => {
+            child0.updateSlots = jest.fn((clamp, plusMinus) => {
+                child0.clampCount[clamp] += plusMinus;
+                child0.size += plusMinus;
+            });
+            child0.connections = [0, 2, null];
+            setxyBlock.connections = [null, 1, null, null];
+
+            blocksInstance.insideExpandableBlock = jest.fn(blk => {
+                if (blk === 2) return 1;
+                if (blk === 1) return 0;
+                return null;
+            });
+
+            blocksInstance._adjustExpandableTwoArgBlock([0, 1]);
+
+            expect(child0.updateSlots).toHaveBeenCalledWith(0, 2);
+            expect(child0.size).toBe(4);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+        });
+    });
 });

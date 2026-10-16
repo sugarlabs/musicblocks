@@ -967,25 +967,52 @@ class Blocks {
          * @returns {void}
          */
         this._adjustExpandableTwoArgBlock = argBlocksToCheck => {
-            if (argBlocksToCheck.length === 0) {
+            if (!argBlocksToCheck || argBlocksToCheck.length === 0) {
                 return;
             }
 
-            const blk = argBlocksToCheck.pop();
-            const myBlock = this.blockList[blk];
+            // Sort so deepest nested blocks are processed first when popped from the end
+            argBlocksToCheck.sort((a, b) => this._getNestingDepth(a) - this._getNestingDepth(b));
 
-            /** Determine the size of the first argument. */
-            const c = myBlock.connections[1];
-            let firstArgumentSize = 1; /** Minimum size */
-            if (c !== null) {
-                firstArgumentSize = Math.max(this._getBlockSize(c), 1);
-            }
+            while (argBlocksToCheck.length > 0) {
+                const blk = argBlocksToCheck.pop();
+                const myBlock = this.blockList[blk];
+                if (!myBlock || myBlock.trash) {
+                    continue;
+                }
 
-            /** Expand/contract block by plusMinus. */
-            const plusMinus = firstArgumentSize - myBlock.clampCount[0];
-            if (plusMinus !== 0) {
-                if (!(firstArgumentSize === 0)) {
-                    myBlock.updateSlots(0, plusMinus);
+                /** Determine the size of the first argument. */
+                const c1 = myBlock.connections[1];
+                let firstArgumentSize = 1; /** Minimum size */
+                if (c1 !== null && c1 !== undefined) {
+                    firstArgumentSize = Math.max(this._getBlockSize(c1), 1);
+                }
+
+                /** Determine the size of the second argument. */
+                const c2 = myBlock.connections[2];
+                let secondArgumentSize = 1; /** Minimum size */
+                if (c2 !== null && c2 !== undefined) {
+                    secondArgumentSize = Math.max(this._getBlockSize(c2), 1);
+                }
+
+                let updated = false;
+
+                /** Expand/contract slot 0 by plusMinus1. */
+                const plusMinus1 = firstArgumentSize - myBlock.clampCount[0];
+                if (plusMinus1 !== 0) {
+                    myBlock.updateSlots(0, plusMinus1);
+                    updated = true;
+                }
+
+                /** Expand/contract slot 1 by plusMinus2. */
+                const plusMinus2 = secondArgumentSize - myBlock.clampCount[1];
+                if (plusMinus2 !== 0) {
+                    myBlock.updateSlots(1, plusMinus2);
+                    updated = true;
+                }
+
+                if (updated) {
+                    this.adjustDocks(blk, true);
                 }
             }
         };
@@ -2493,6 +2520,9 @@ class Blocks {
                     this._expandablesList.push(i);
                 }
             }
+            this._expandablesList.sort(
+                (a, b) => this._getNestingDepth(a) - this._getNestingDepth(b)
+            );
         };
 
         /**

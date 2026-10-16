@@ -474,20 +474,41 @@ class BlockDragController {
 
         /** If it is an arg block, where is it coming from? */
         if (myBlock.isArgBlock() && c !== null) {
-            /**
-             * We care about twoarg (2arg) blocks with
-             * connections to the first arg;
-             */
-            if (blocks.blockList[c].isTwoArgBlock() || blocks.blockList[c].isArgClamp()) {
-                if (cBlock.connections[1] === thisBlock) {
-                    blocks._checkTwoArgBlocks.push(c);
+            let currentBlk = thisBlock;
+            let currentParent = c;
+            while (currentParent !== null) {
+                const parentBlock = blocks.blockList[currentParent];
+                if (!parentBlock) break;
+
+                const isTwoArg =
+                    (typeof parentBlock.isTwoArgBlock === "function" &&
+                        parentBlock.isTwoArgBlock()) ||
+                    (typeof parentBlock.isArgClamp === "function" && parentBlock.isArgClamp()) ||
+                    (typeof parentBlock.isArgBlock === "function" &&
+                        parentBlock.isArgBlock() &&
+                        typeof parentBlock.isExpandableBlock === "function" &&
+                        parentBlock.isExpandableBlock());
+
+                if (isTwoArg) {
+                    if (
+                        parentBlock.connections[1] === currentBlk ||
+                        parentBlock.connections[2] === currentBlk
+                    ) {
+                        if (!blocks._checkTwoArgBlocks.includes(currentParent)) {
+                            blocks._checkTwoArgBlocks.push(currentParent);
+                        }
+                    }
                 }
-            } else if (
-                (blocks.blockList[c].isArgBlock() && blocks.blockList[c].isExpandableBlock()) ||
-                blocks.blockList[c].isArgClamp()
-            ) {
-                if (cBlock.connections[1] === thisBlock) {
-                    blocks._checkTwoArgBlocks.push(c);
+
+                if (
+                    typeof parentBlock.isArgumentLikeBlock === "function" &&
+                    parentBlock.isArgumentLikeBlock() &&
+                    parentBlock.connections[0] !== null
+                ) {
+                    currentBlk = currentParent;
+                    currentParent = parentBlock.connections[0];
+                } else {
+                    break;
                 }
             }
         }
@@ -1068,24 +1089,43 @@ class BlockDragController {
 
         /** If it is an arg block, where is it coming from? */
         if (myBlock.isArgumentLikeBlock() && newBlock !== null) {
-            const parentBlock = blocks.blockList[newBlock];
+            let currentBlk = thisBlock;
+            let currentParent = newBlock;
+            while (currentParent !== null) {
+                const parentBlock = blocks.blockList[currentParent];
+                if (!parentBlock) break;
 
-            // Find which connection index this block is attached to
-            const connectionIndex = parentBlock.connections.indexOf(thisBlock);
+                // Find which connection index this block is attached to
+                const connectionIndex = parentBlock.connections.indexOf(currentBlk);
 
-            // Guard against invalid index (can happen during drag/undo/intermediate states)
-            if (connectionIndex !== -1) {
-                // Ask the parent block what type of layout update it needs for this connection
-                const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
+                // Guard against invalid index (can happen during drag/undo/intermediate states)
+                if (
+                    connectionIndex !== -1 &&
+                    typeof parentBlock.getLayoutUpdateType === "function"
+                ) {
+                    // Ask the parent block what type of layout update it needs for this connection
+                    const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
 
-                if (updateType === "ARG") {
-                    if (!blocks._checkTwoArgBlocks.includes(newBlock)) {
-                        blocks._checkTwoArgBlocks.push(newBlock);
+                    if (updateType === "ARG") {
+                        if (!blocks._checkTwoArgBlocks.includes(currentParent)) {
+                            blocks._checkTwoArgBlocks.push(currentParent);
+                        }
+                    } else if (updateType === "FLOW") {
+                        if (!checkArgBlocks.includes(currentParent)) {
+                            checkArgBlocks.push(currentParent);
+                        }
                     }
-                } else if (updateType === "FLOW") {
-                    if (!checkArgBlocks.includes(newBlock)) {
-                        checkArgBlocks.push(newBlock);
-                    }
+                }
+
+                if (
+                    typeof parentBlock.isArgumentLikeBlock === "function" &&
+                    parentBlock.isArgumentLikeBlock() &&
+                    parentBlock.connections[0] !== null
+                ) {
+                    currentBlk = currentParent;
+                    currentParent = parentBlock.connections[0];
+                } else {
+                    break;
                 }
             }
         }
