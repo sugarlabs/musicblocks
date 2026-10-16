@@ -223,8 +223,6 @@ describe("setupMeterActions", () => {
             [100, [], 100],
             [500, [], 500],
             [10, ["1/4 beats per minute must be greater than 30"], 30],
-            [0, ["1/4 beats per minute must be greater than 30"], 30],
-            [-60, ["1/4 beats per minute must be greater than 30"], 30],
             [5000, ["maximum 1/4 beats per minute is 1000"], 1000],
             [30, [], 30],
             [1000, [], 1000]
@@ -240,12 +238,18 @@ describe("setupMeterActions", () => {
             if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
         });
 
-        test("setMasterBPM(NaN) shows an error and does not mutate masterBPM", () => {
+        test.each([
+            ["NaN", NaN],
+            ["zero", 0],
+            ["negative", -60],
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity]
+        ])("setMasterBPM(%s) shows an error and does not mutate masterBPM", (label, badBpm) => {
             activity.errorMsg.mockClear();
             const masterBpmBefore = Singer.masterBPM;
             const factorBefore = Singer.defaultBPMFactor;
 
-            Singer.MeterActions.setMasterBPM(NaN, 0.25, 1);
+            Singer.MeterActions.setMasterBPM(badBpm, 0.25, 1);
 
             expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
             expect(Singer.masterBPM).toBe(masterBpmBefore);
