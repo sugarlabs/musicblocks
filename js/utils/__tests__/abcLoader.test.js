@@ -124,6 +124,44 @@ describe("ensureABCJS", () => {
         addEventListenerSpy.mockRestore();
     });
 
+    it("rejects every caller when an existing script fails to load", async () => {
+        const existingScript = document.createElement("script");
+        existingScript.src = "lib/abc.min.js";
+        document.head.appendChild(existingScript);
+
+        const first = ensureABCJS();
+        const second = ensureABCJS();
+        const error = new Event("error");
+        existingScript.dispatchEvent(error);
+
+        await expect(first).rejects.toBe(error);
+        await expect(second).rejects.toBe(error);
+        expect(document.querySelector('script[src="lib/abc.min.js"]')).toBeNull();
+
+        const retry = ensureABCJS();
+        const replacement = document.querySelector('script[src="lib/abc.min.js"]');
+        expect(replacement).not.toBe(existingScript);
+        replacement.dispatchEvent(new Event("load"));
+        await expect(retry).resolves.toBeUndefined();
+    });
+
+    it("rejects and removes a script created by the loader when it fails", async () => {
+        const promise = ensureABCJS();
+        const createdScript = document.querySelector('script[src="lib/abc.min.js"]');
+        const error = new Event("error");
+
+        createdScript.dispatchEvent(error);
+
+        await expect(promise).rejects.toBe(error);
+        expect(document.querySelector('script[src="lib/abc.min.js"]')).toBeNull();
+
+        const retry = ensureABCJS();
+        const replacement = document.querySelector('script[src="lib/abc.min.js"]');
+        expect(replacement).not.toBe(createdScript);
+        replacement.dispatchEvent(new Event("load"));
+        await expect(retry).resolves.toBeUndefined();
+    });
+
     describe("when RequireJS is present", () => {
         afterEach(() => {
             delete window.requirejs;

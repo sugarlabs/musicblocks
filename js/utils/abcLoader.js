@@ -54,6 +54,10 @@ function loadABCJSViaScriptTag() {
                 resolve();
             } else {
                 existing.addEventListener("load", resolve);
+                existing.addEventListener("error", error => {
+                    existing.remove();
+                    reject(error);
+                });
             }
             return;
         }
@@ -66,7 +70,10 @@ function loadABCJSViaScriptTag() {
             resolve();
         };
 
-        script.onerror = reject;
+        script.onerror = error => {
+            script.remove();
+            reject(error);
+        };
 
         document.head.appendChild(script);
     });
