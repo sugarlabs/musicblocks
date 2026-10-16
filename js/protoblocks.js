@@ -373,21 +373,20 @@ class ProtoBlock {
 
     /**
      * Generates an expandable block with two arguments.
-     * @param {number} expandY - The expansion along the Y-axis.
+     * @param {number} expandY - The expansion along the Y-axis for the first argument.
+     * @param {number} expandY2 - The expansion along the Y-axis for the second argument.
      * @returns {array} - An array containing SVG representation, docks, width, and height of the block.
      */
-    twoArgBlockGenerator(expandY) {
+    twoArgBlockGenerator(expandY, expandY2) {
         const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setInnies([true, true]);
         svg.setSlot(true);
 
-        if (expandY) {
-            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
-        } else {
-            svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        }
+        const ey1 = expandY ? ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+        const ey2 = expandY2 ? ((expandY2 - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+        svg.setExpand(30 + this.extraWidth, ey1, 0, ey2);
 
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
@@ -535,7 +534,8 @@ class ProtoBlock {
 
     /**
      * Generates a block with two arguments for mathematical operations.
-     * @param {number} expandY - Expansion factor for the Y dimension (optional).
+     * @param {number} expandY - Expansion factor for the first argument (optional).
+     * @param {number} expandY2 - Expansion factor for the second argument (optional).
      * @returns {array} - An array containing block SVG, docks, width, and height.
      */
     twoArgMathBlockGenerator(expandY) {
@@ -1771,22 +1771,19 @@ class BaseBlock extends ProtoBlock {
                 svg.setClampSlots(i, 1);
             svg.setClampCount(this._style.flows.labels.length);
 
-            for (let i = 0; i < arguments.length; i++) {
-                if (this._style.flows.type === undefined) {
-                    svg.setExpand(
-                        30 + this.extraWidth,
-                        ((arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT) / 2,
-                        0,
-                        0
-                    );
-                } else if (this._style.flows.type === "value") {
-                    svg.setExpand(
-                        60 + this.extraWidth,
-                        ((arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT) / 2,
-                        0,
-                        0
-                    );
-                } else {
+            if (this._style.flows.type === undefined || this._style.flows.type === "value") {
+                const ey1 = arguments[0]
+                    ? ((arguments[0] - 1) * STANDARDBLOCKHEIGHT) / 2
+                    : this.image
+                      ? 23
+                      : 0;
+                const ey2 =
+                    this.style === "twoarg" && arguments[1]
+                        ? ((arguments[1] - 1) * STANDARDBLOCKHEIGHT) / 2
+                        : 0;
+                svg.setExpand(pad + this.extraWidth, ey1, 0, ey2);
+            } else {
+                for (let i = 0; i < arguments.length; i++) {
                     svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
                 }
             }

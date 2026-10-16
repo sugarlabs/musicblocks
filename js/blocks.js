@@ -939,25 +939,60 @@ class Blocks {
          * @returns {void}
          */
         this._adjustExpandableTwoArgBlock = argBlocksToCheck => {
-            if (argBlocksToCheck.length === 0) {
+            if (!argBlocksToCheck || argBlocksToCheck.length === 0) {
                 return;
             }
 
-            const blk = argBlocksToCheck.pop();
-            const myBlock = this.blockList[blk];
+            // Filter out missing or trashed blocks before sorting
+            const validBlocks = argBlocksToCheck.filter(
+                blk => this.blockList[blk] && !this.blockList[blk].trash
+            );
 
-            /** Determine the size of the first argument. */
-            const c = myBlock.connections[1];
-            let firstArgumentSize = 1; /** Minimum size */
-            if (c !== null) {
-                firstArgumentSize = Math.max(this._getBlockSize(c), 1);
-            }
+            // Sort so deepest nested blocks are processed first when popped from the end
+            validBlocks.sort((a, b) => this._getNestingDepth(a) - this._getNestingDepth(b));
 
-            /** Expand/contract block by plusMinus. */
-            const plusMinus = firstArgumentSize - myBlock.clampCount[0];
-            if (plusMinus !== 0) {
-                if (!(firstArgumentSize === 0)) {
-                    myBlock.updateSlots(0, plusMinus);
+            while (validBlocks.length > 0) {
+                const blk = validBlocks.pop();
+                const myBlock = this.blockList[blk];
+
+                /** Determine the size of the first argument. */
+                const c1 = myBlock.connections[1];
+                let firstArgumentSize = 1; /** Minimum size */
+                if (c1 !== null && c1 !== undefined) {
+                    firstArgumentSize = Math.max(this._getBlockSize(c1), 1);
+                }
+
+                let updated = false;
+
+                /** Expand/contract slot 0 by plusMinus1. */
+                const plusMinus1 = firstArgumentSize - myBlock.clampCount[0];
+                if (plusMinus1 !== 0) {
+                    myBlock.updateSlots(0, plusMinus1);
+                    updated = true;
+                }
+
+                /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy). */
+                const isTwoArgFlow =
+                    typeof myBlock.isTwoArgBlock === "function"
+                        ? myBlock.isTwoArgBlock()
+                        : myBlock.name === "setxy";
+                if (isTwoArgFlow) {
+                    /** Determine the size of the second argument. */
+                    const c2 = myBlock.connections[2];
+                    let secondArgumentSize = 1; /** Minimum size */
+                    if (c2 !== null && c2 !== undefined) {
+                        secondArgumentSize = Math.max(this._getBlockSize(c2), 1);
+                    }
+
+                    const plusMinus2 = secondArgumentSize - myBlock.clampCount[1];
+                    if (plusMinus2 !== 0) {
+                        myBlock.updateSlots(1, plusMinus2);
+                        updated = true;
+                    }
+                }
+
+                if (updated) {
+                    this.adjustDocks(blk, true);
                 }
             }
         };
@@ -2465,6 +2500,9 @@ class Blocks {
                     this._expandablesList.push(i);
                 }
             }
+            this._expandablesList.sort(
+                (a, b) => this._getNestingDepth(a) - this._getNestingDepth(b)
+            );
         };
 
         /**
@@ -4150,7 +4188,7 @@ class Blocks {
          * @returns expandable block
          */
         this.insideExpandableBlock = blk => {
-            if (this.blockList[blk] === null) {
+            if (this.blockList[blk] === null || this.blockList[blk] === undefined) {
                 /** race condition? */
 
                 console.debug("null block in blockList? " + blk);
@@ -4163,7 +4201,8 @@ class Blocks {
                     /** If it is the last connection, keep searching. */
                     if (
                         this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
+                        this.blockList[cblk].isLeftClampBlock() ||
+                        this.blockList[cblk].isArgBlock()
                     ) {
                         return cblk;
                     } else if (blk === last(this.blockList[cblk].connections)) {

@@ -1000,6 +1000,7 @@ class Block {
                 case "greater":
                 case "less":
                     obj = this.protoblock.generator(this.clampCount[0]);
+                    this.size += plusMinus;
                     break;
                 case "makeblock":
                 case "calcArg":
@@ -1018,7 +1019,7 @@ class Block {
                     if (this.isArgBlock()) {
                         obj = this.protoblock.generator(this.clampCount[0]);
                     } else if (this.isTwoArgBlock()) {
-                        obj = this.protoblock.generator(this.clampCount[0]);
+                        obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
                     } else {
                         obj = this.protoblock.generator();
                     }
@@ -2323,8 +2324,8 @@ class Block {
         }
 
         // Two-argument blocks and expandable argument blocks need ARG layout updates
-        // when a child connects to their first argument slot (connection index 1)
-        if (connectionIndex === 1) {
+        // when a child connects to their first or second argument slot (connection index 1 or 2)
+        if (connectionIndex === 1 || connectionIndex === 2) {
             if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
                 return "ARG";
             }
