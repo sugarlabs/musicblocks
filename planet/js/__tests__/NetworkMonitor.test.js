@@ -246,6 +246,28 @@ describe("NetworkMonitor", () => {
 
             monitor.destroy();
         });
+
+        test("does not let an older probe overwrite a newer offline result", async () => {
+            const monitor = new NetworkMonitor(jest.fn(), jest.fn());
+            await Promise.resolve();
+            const requests = [];
+            mockFetch.mockImplementation(
+                () => new Promise((resolve, reject) => requests.push({ resolve, reject }))
+            );
+
+            const older = monitor.forceProbe();
+            const newer = monitor.forceProbe();
+            requests[1].reject(new Error("offline"));
+            expect(await newer).toBe(false);
+            expect(monitor.isOnline).toBe(false);
+            expect(monitor._onOffline).toHaveBeenCalledTimes(1);
+
+            requests[0].resolve({ ok: true });
+            expect(await older).toBe(true);
+            expect(monitor.isOnline).toBe(false);
+            expect(monitor._onOnline).not.toHaveBeenCalled();
+            monitor.destroy();
+        });
     });
 
     describe("destroy", () => {
