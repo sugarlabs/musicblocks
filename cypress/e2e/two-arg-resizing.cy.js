@@ -44,19 +44,17 @@ describe("Two-arg block vertical resizing (Issue #9563)", () => {
                 [9, "pendown", 0, 0, [2, null]]
             ];
 
-            activity.sendAllToTrash(false, true);
-
             return new Promise(resolve => {
-                setTimeout(() => {
-                    activity.blocks.loadNewBlocks(testProject);
+                const loadAfterTrash = () => {
+                    activity.stage.removeEventListener("trashsignal", loadAfterTrash);
                     win.pubsub.once("finishedLoading", () => {
                         activity.refreshCanvas();
-                        setTimeout(() => {
-                            activity.stage.update();
-                            resolve();
-                        }, 500);
+                        resolve();
                     });
-                }, 300);
+                    activity.blocks.loadNewBlocks(testProject);
+                };
+                activity.stage.addEventListener("trashsignal", loadAfterTrash);
+                activity.sendAllToTrash(false, true);
             });
         });
 

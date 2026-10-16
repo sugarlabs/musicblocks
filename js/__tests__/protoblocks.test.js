@@ -27,6 +27,7 @@ global.createjs = {
 };
 
 let lastMockSvgInstance;
+let mockSvgDocks = [[0, 0]];
 global.SVG = jest.fn(() => {
     lastMockSvgInstance = {
         setScale: jest.fn(),
@@ -36,8 +37,21 @@ global.SVG = jest.fn(() => {
         setOutie: jest.fn(),
         setFontSize: jest.fn(),
         setExpand: jest.fn(),
+        setCap: jest.fn(),
+        setTail: jest.fn(),
+        setClampSlots: jest.fn(),
+        setClampCount: jest.fn(),
+        setBoolean: jest.fn(),
+        setLabelOffset: jest.fn(),
+        twoArgBlock: jest.fn(() => "<svg></svg>"),
+        basicClamp: jest.fn(() => "<svg></svg>"),
+        argClamp: jest.fn(() => "<svg></svg>"),
+        doubleClamp: jest.fn(() => "<svg></svg>"),
+        booleanBlock: jest.fn(() => "<svg></svg>"),
+        booleanCompare: jest.fn(() => "<svg></svg>"),
+        booleanNot: jest.fn(() => "<svg></svg>"),
         basicBlock: jest.fn(() => "<svg></svg>"),
-        docks: [[0, 0]],
+        docks: [...mockSvgDocks],
         getWidth: jest.fn(() => 100),
         getHeight: jest.fn(() => 50)
     };
@@ -50,6 +64,7 @@ global.STANDARDBLOCKHEIGHT = 20;
 describe("ProtoBlock", () => {
     let block;
     beforeEach(() => {
+        mockSvgDocks = [[0, 0]];
         block = new ProtoBlock("TestBlock");
     });
 
@@ -969,12 +984,14 @@ describe("BaseBlock.formBlock", () => {
     describe("two-argument block generators with dual slot expansion", () => {
         it("twoArgBlockGenerator passes expandY and expandY2 to svg.setExpand", () => {
             const block = new ProtoBlock("setxy");
+            block.fontsize = 14;
             block.twoArgBlock();
 
             block.generator(2, 3);
             expect(lastMockSvgInstance.setInnies).toHaveBeenCalledWith([true, true]);
             expect(lastMockSvgInstance.setTab).toHaveBeenCalledWith(true);
             expect(lastMockSvgInstance.setSlot).toHaveBeenCalledWith(true);
+            expect(lastMockSvgInstance.setFontSize).toHaveBeenCalledWith(14);
             // expandY = 2 -> ey1 = (2 - 1) * 20 / 2 = 10
             // expandY2 = 3 -> ey2 = (3 - 1) * 20 / 2 = 20
             expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 10, 0, 20);
@@ -982,14 +999,39 @@ describe("BaseBlock.formBlock", () => {
 
         it("twoArgMathBlockGenerator passes expandY and expandY2 to svg.setExpand", () => {
             const block = new ProtoBlock("plus");
+            block.fontsize = 12;
             block.twoArgMathBlock();
 
             block.generator(3, 4);
             expect(lastMockSvgInstance.setInnies).toHaveBeenCalledWith([true, true]);
             expect(lastMockSvgInstance.setOutie).toHaveBeenCalledWith(true);
+            expect(lastMockSvgInstance.setFontSize).toHaveBeenCalledWith(12);
             // expandY = 3 -> ey1 = (3 - 1) * 20 / 2 = 20
             // expandY2 = 4 -> ey2 = (4 - 1) * 20 / 2 = 30
             expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 20, 0, 30);
+        });
+
+        it("BaseBlock formBlock generator passes expandY and expandY2 to svg.setExpand for two-arg block", () => {
+            const block = form({ name: "setxy", args: 2, flows: { top: true, bottom: true } });
+            block.generator(2, 3);
+            expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 10, 0, 20);
+            expect(lastMockSvgInstance.basicBlock).toHaveBeenCalled();
+        });
+
+        it("BaseBlock formBlock generator configures clamp slots when flow has clamp labels", () => {
+            const block = form({
+                name: "repeat",
+                flows: { top: true, bottom: true, type: "flow", labels: ["do"] }
+            });
+            mockSvgDocks = [
+                [0, 0],
+                [0, 20],
+                [0, 40]
+            ];
+            block.generator(3);
+            expect(lastMockSvgInstance.setClampSlots).toHaveBeenCalledWith(0, 3);
+            expect(lastMockSvgInstance.basicClamp).toHaveBeenCalled();
+            mockSvgDocks = [[0, 0]];
         });
     });
 });
