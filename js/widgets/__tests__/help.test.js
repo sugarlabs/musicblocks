@@ -630,6 +630,96 @@ describe("HelpWidget", () => {
             }
         });
 
+        test("_showPage makes regular semi-transparent SVG icons full strength in light mode without white filter", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:#292929;fill-opacity:0.4;stroke:#292929;stroke-opacity:0.4;opacity:0.4"/><rect style="fill:#ffffff;opacity:0"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Light Mode Icon", "Icon description", src]);
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const normalizedSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(false);
+                expect(normalizedSvg).toContain("fill-opacity:1");
+                expect(normalizedSvg).toContain("stroke-opacity:1");
+                expect(normalizedSvg).toContain("opacity:1");
+                expect(normalizedSvg).toContain("opacity:0");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage makes regular semi-transparent SVG icons full strength and applies white filter in dark mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:#292929;fill-opacity:0.4;stroke:#292929;stroke-opacity:0.4;opacity:0.4"/><rect style="fill:#ffffff;opacity:0"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Dark Mode Icon", "Icon description", src]);
+            document.body.classList.add("dark");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const normalizedSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(true);
+                expect(normalizedSvg).toContain("fill-opacity:1");
+                expect(normalizedSvg).toContain("stroke-opacity:1");
+                expect(normalizedSvg).toContain("opacity:1");
+                expect(normalizedSvg).toContain("opacity:0");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage preserves regular black-and-white SVG icon details in dark mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:#292929;opacity:0.4"/><path style="fill:#ffffff"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Dark Black White Icon", "Icon description", src]);
+            document.body.classList.add("dark");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const normalizedSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(false);
+                expect(normalizedSvg).toContain("opacity:1");
+                expect(normalizedSvg).toContain("fill:#ffffff");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
         test("_showPage preserves regular black-and-white SVG icon details in high contrast mode", () => {
             const svg =
                 '<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:#292929;opacity:0.4"/><path style="fill:#ffffff"/></svg>';

@@ -54,6 +54,7 @@ body.highcontrast {
     outline: 3px solid #ffff00;
 }
 
+.dark #helpBodyDiv .help-tour-white-icon,
 .highcontrast #helpBodyDiv .help-tour-white-icon {
     filter: brightness(0) invert(1);
 }
