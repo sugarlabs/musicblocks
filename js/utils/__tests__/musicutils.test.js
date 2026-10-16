@@ -4426,13 +4426,25 @@ describe("getNoteFromInterval edge intervals", () => {
         ["C4", "augmented 8", ["C" + SHARP, 5]],
         ["C4", "up-major 3", ["E" + SHARP, 4]],
         ["C4", "down-minor 3", ["E" + DOUBLEFLAT, 4]],
-        ["C4", "mid 3", ["E" + FLAT, 4]]
+        ["C4", "mid 3", ["E" + FLAT, 4]],
+        ["C4", "chromatic semitone", ["C" + SHARP, 4]],
+        ["C4", "whole tone", ["D", 4]],
+        ["C4", "diminished octave", ["C" + FLAT, 5]],
+        ["C4", "octave", ["C", 5]]
     ];
 
     cases.forEach(([pitch, interval, expected]) => {
         it(`finds ${interval} from ${pitch}`, () => {
             expect(getNoteFromInterval(pitch, interval)).toEqual(expected);
         });
+    });
+
+    it.each(Object.keys(INTERVALVALUES))("spells %s from any root", interval => {
+        for (const root of ["C4", "E" + FLAT + "4", "F" + SHARP + "4", "B4"]) {
+            const [note, octave] = getNoteFromInterval(root, interval);
+            expect(typeof note).toBe("string");
+            expect(Number.isInteger(octave)).toBe(true);
+        }
     });
 });
 
