@@ -728,6 +728,39 @@ describe("afterSaveMIDI", () => {
             velocity: 0.9
         });
     });
+
+    it("writes every drum in a Note at the same MIDI time", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4", "E4"],
+                    drum: ["kick drum", "snare drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const kickTrack = tracks.find(track => track.name === "Track 1 - kick drum");
+        const snareTrack = tracks.find(track => track.name === "Track 1 - snare drum");
+        expect(kickTrack.addNote).toHaveBeenCalledWith({
+            midi: 36,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+        expect(snareTrack.addNote).toHaveBeenCalledWith({
+            midi: 38,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+    });
 });
 
 describe("save artwork methods", () => {

@@ -1272,8 +1272,7 @@ class Logo {
      * Records a note event into the per-turtle MIDI buffer for later export.
      *
      * @param {string[]} note - Array of pitch names.
-     * @param {string[]|null} drum - Drum patch names; only the first element is
-     *     used. Pass a falsy value for non-drum notes.
+     * @param {string[]|null} drum - Drum patch names. Pass a falsy value for non-drum notes.
      * @param {number} duration - Note duration in beats.
      * @param {number} turtle - Index of the active turtle.
      * @param {number} bpm - Tempo in beats per minute at the time of the note.
@@ -1284,8 +1283,8 @@ class Logo {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
-        if (drum) drum = drum[0];
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum });
+        const drums = drum && drum.length > 0 ? [...drum] : null;
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum: drums });
     }
 
     // ========================================================================
