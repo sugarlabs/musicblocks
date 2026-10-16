@@ -1278,14 +1278,16 @@ class Logo {
      * @param {number} turtle - Index of the active turtle.
      * @param {number} bpm - Tempo in beats per minute at the time of the note.
      * @param {string} instrument - Instrument name for the note.
+     * @param {number[]} [meter] - The meter at the time of the note, as
+     *     [beats per measure, note value per beat].
      * @returns {void}
      */
-    notationMIDI(note, drum, duration, turtle, bpm, instrument) {
+    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
         if (drum) drum = drum[0];
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum });
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum, meter });
     }
 
     // ========================================================================
