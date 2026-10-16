@@ -2091,6 +2091,7 @@ class Activity {
                 }
             }
 
+            this.blocks.trimTrashHistory();
             this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
