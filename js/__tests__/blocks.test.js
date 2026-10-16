@@ -409,6 +409,74 @@ describe("Viewport Culling", () => {
 // be a number.
 // ---------------------------------------------------------------------------
 
+describe("Boundary visibility", () => {
+    let mockActivity;
+    let blocks;
+
+    beforeEach(() => {
+        mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {
+                hide: jest.fn(),
+                show: jest.fn()
+            },
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("shows the boundary when a top-level block is off-screen", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                offScreen: jest.fn().mockReturnValue(true)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.boundary.show).toHaveBeenCalledTimes(1);
+        expect(mockActivity.boundary.hide).not.toHaveBeenCalled();
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
+    });
+
+    it("hides the boundary when all top-level blocks are on-screen", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                offScreen: jest.fn().mockReturnValue(false)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.boundary.hide).toHaveBeenCalledTimes(1);
+        expect(mockActivity.boundary.show).not.toHaveBeenCalled();
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+    });
+});
+
 describe("renameDos", () => {
     let blocks;
 
