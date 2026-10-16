@@ -3335,12 +3335,26 @@ describe("Logo notationMIDI", () => {
     test("collects MIDI records and normalizes drum array", () => {
         logo._midiData = {};
 
-        logo.notationMIDI("C4", ["kick"], 0.5, 0, 90, "piano");
-        logo.notationMIDI("D4", null, 0.25, 0, 120, "flute");
+        logo.notationMIDI("C4", ["kick"], 0.5, 0, 90, "piano", [3, 4]);
+        logo.notationMIDI("D4", null, 0.25, 0, 120, "flute", [6, 8]);
 
         expect(logo._midiData[0]).toEqual([
-            { note: "C4", duration: 0.5, bpm: 90, instrument: "piano", drum: "kick" },
-            { note: "D4", duration: 0.25, bpm: 120, instrument: "flute", drum: null }
+            {
+                note: "C4",
+                duration: 0.5,
+                bpm: 90,
+                instrument: "piano",
+                drum: "kick",
+                meter: [3, 4]
+            },
+            {
+                note: "D4",
+                duration: 0.25,
+                bpm: 120,
+                instrument: "flute",
+                drum: null,
+                meter: [6, 8]
+            }
         ]);
     });
 });
