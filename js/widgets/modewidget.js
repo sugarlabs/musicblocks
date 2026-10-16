@@ -68,7 +68,7 @@ class ModeWidget {
 
         this._modeBlock = this.logo.modeBlock;
         this._locked = false;
-        this._pitch = this.turtles.ithTurtle(0).singer.keySignature[0];
+        this._pitch = this.turtles.ithTurtle(0).singer.keySignature.split(" ")[0];
         this._noteValue = 0.333;
         this._undoStack = [];
         this._playing = false;
