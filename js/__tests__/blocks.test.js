@@ -1339,6 +1339,27 @@ describe("Blocks Foundation", () => {
             expect(blocks._expandablesList).toEqual([1]);
         });
 
+        it("should include two-arg blocks and sort by nesting depth in _findTwoArgs", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._getNestingDepth = jest.fn(i => (i === 1 ? 5 : 2));
+            blocks.blockList = [
+                null,
+                {
+                    trash: false,
+                    isArgBlock: jest.fn().mockReturnValue(false),
+                    isTwoArgBlock: jest.fn().mockReturnValue(true)
+                },
+                {
+                    trash: false,
+                    isArgBlock: jest.fn().mockReturnValue(false),
+                    isTwoArgBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+
+            blocks._findTwoArgs();
+            expect(blocks._expandablesList).toEqual([2, 1]);
+        });
+
         describe("after disposeBlock evicts a trashed stack", () => {
             let blocks;
 
@@ -5189,10 +5210,17 @@ describe("sendStackToTrash – turtle container guard", () => {
             blocksInstance.blockList = [setxyBlock, child0, child1];
         });
 
-        it("does nothing when input array is empty", () => {
+        it("does nothing when input array is empty or falsy", () => {
             blocksInstance._adjustExpandableTwoArgBlock([]);
+            blocksInstance._adjustExpandableTwoArgBlock(null);
             expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
             expect(blocksInstance.adjustDocks).not.toHaveBeenCalled();
+        });
+
+        it("skips trashed or missing blocks in argBlocksToCheck", () => {
+            blocksInstance.blockList[5] = { trash: true };
+            blocksInstance._adjustExpandableTwoArgBlock([5, 99]);
+            expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
         });
 
         it("expands slot 0 when first argument child has size > 1", () => {
