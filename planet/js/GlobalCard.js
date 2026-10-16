@@ -12,7 +12,7 @@
 /*
    global
 
-   _, hideOnClickOutside, updateCheckboxes, ClipboardJS
+   _, hideOnClickOutside, toggleExpandable, updateCheckboxes, ClipboardJS
 */
 /*
    exported
@@ -95,9 +95,9 @@ class GlobalCard {
                                     </div> 
 
                                     <div class="card-action"> 
-                                        <a onclick="toggleExpandable('global-advanced-{ID}','shareurl-advanced');">${_(
+                                        <button type="button" id="global-advanced-toggle-{ID}" style="background:none;border:none;color:inherit;cursor:pointer;padding:0;font:inherit">${_(
                                             "Advanced Options"
-                                        )}</a> 
+                                        )}</button> 
                                     </div> 
                                 </div> 
                             </div> 
@@ -235,6 +235,14 @@ class GlobalCard {
         frag.getElementById(`global-checkboxcollapse-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
+
+        // set advanced options toggle listener
+        const advancedToggle = frag.getElementById(`global-advanced-toggle-${this.id}`);
+        if (advancedToggle) {
+            advancedToggle.addEventListener("click", () => {
+                toggleExpandable(`global-advanced-${this.id}`, "shareurl-advanced");
+            });
+        }
 
         // set like icon
         const likeIconId = `global-like-icon-${this.id}`;
