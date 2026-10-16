@@ -560,6 +560,7 @@ describe("Activity Toolbar Integration", () => {
                 captureStackPreview: jest.fn(() => "preview"),
                 trashPreviews: {},
                 trashStacks: [],
+                trimTrashHistory: jest.fn(),
                 moveBlockRelative: jest.fn(),
                 blockArt: {},
                 blockCollapseArt: {}
@@ -576,6 +577,10 @@ describe("Activity Toolbar Integration", () => {
             expect(hideMenu).toHaveBeenCalledWith(true);
             expect(activity.blocks._beginDeferCheckBounds).toHaveBeenCalled();
             expect(activity.blocks._endDeferCheckBounds).toHaveBeenCalled();
+            expect(activity.blocks.trimTrashHistory).toHaveBeenCalledTimes(1);
+            expect(activity.blocks.trimTrashHistory.mock.invocationCallOrder[0]).toBeGreaterThan(
+                mockBlock.hide.mock.invocationCallOrder[0]
+            );
             expect(mockBlock.trash).toBe(true);
             expect(mockBlock.hide).toHaveBeenCalled();
             expect(mockBlock.container.uncache).toHaveBeenCalled();
@@ -602,6 +607,7 @@ describe("Activity Toolbar Integration", () => {
                 captureStackPreview: jest.fn(() => "preview"),
                 trashPreviews: {},
                 trashStacks: ["0"],
+                trimTrashHistory: jest.fn(),
                 moveBlockRelative: jest.fn(),
                 blockArt: {},
                 blockCollapseArt: {}
@@ -642,6 +648,7 @@ describe("Activity Toolbar Integration", () => {
                 deleteActionBlock: jest.fn(),
                 trashPreviews: {},
                 trashStacks: [],
+                trimTrashHistory: jest.fn(),
                 moveBlockRelative: jest.fn(),
                 blockArt: {},
                 blockCollapseArt: {}
