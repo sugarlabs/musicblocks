@@ -491,7 +491,7 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number") {
+    if (typeof arg === "number" && !Number.isNaN(arg)) {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
 
