@@ -525,32 +525,73 @@ describe("GraphicsBlocks", () => {
 
     // ── Matrix / PhraseMaker Integration ──────────────
     describe("Matrix / PhraseMaker Integration", () => {
-        test("ForwardBlock records row block and args when logo.inMatrix is true", () => {
-            logo.inMatrix = true;
-            activity.blocks.blockList = { 1: { name: "forward" } };
-            const block = new activity.blocks.forward();
-            block.flow([50], logo, turtle, 1);
-            expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(1);
-            expect(logo.phraseMaker.rowLabels).toContain("forward");
-            expect(logo.phraseMaker.rowArgs).toContain(50);
-        });
-        test("SetXYBlock records row block and args when logo.inMatrix is true", () => {
-            logo.inMatrix = true;
-            activity.blocks.blockList = { 2: { name: "setxy" } };
-            const block = new activity.blocks.setxy();
-            block.flow([10, 20], logo, turtle, 2);
-            expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(2);
-            expect(logo.phraseMaker.rowLabels).toContain("setxy");
-            expect(logo.phraseMaker.rowArgs).toContainEqual([10, 20]);
-        });
-        test("ArcBlock records row block and args when logo.inMatrix is true", () => {
-            logo.inMatrix = true;
-            activity.blocks.blockList = { 3: { name: "arc" } };
-            const block = new activity.blocks.arc();
-            block.flow([90, 100], logo, turtle, 3);
-            expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(3);
-            expect(logo.phraseMaker.rowLabels).toContain("arc");
-            expect(logo.phraseMaker.rowArgs).toContainEqual([90, 100]);
+        describe.each([
+            ["scrollxy", [10, 20], [10, 20], "doScrollXY"],
+            ["arc", [90, 100], [90, 100], "doArc"],
+            ["setheading", [45], 45, "doSetHeading"],
+            ["setxy", [30, 40], [30, 40], "doSetXY"],
+            ["right", [90], 90, "doRight"],
+            ["left", [60], 60, "doRight"],
+            ["back", [25], 25, "doForward"],
+            ["forward", [50], 50, "doForward"]
+        ])("%s", (name, args, rowArg, painterMethod) => {
+            let block;
+
+            beforeEach(() => {
+                logo.inMatrix = true;
+                activity.blocks.blockList[1] = { name };
+                block = new activity.blocks[name]();
+            });
+
+            test("records a row with the original argument shape without painting", () => {
+                const flowArgs = [...args];
+                block.flow(flowArgs, logo, turtle, 1);
+                flowArgs[0] = 999;
+
+                expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledTimes(1);
+                expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(1);
+                expect(logo.pitchBlocks).toEqual([1]);
+                expect(logo.phraseMaker.rowLabels).toEqual([name]);
+                expect(logo.phraseMaker.rowArgs).toEqual([rowArg]);
+                expect(turtleObj.painter[painterMethod]).not.toHaveBeenCalled();
+            });
+
+            test("records repeated rows while tracking each block only once", () => {
+                logo.pitchBlocks = [99];
+                block.flow(args, logo, turtle, 1);
+                block.flow(args, logo, turtle, 1);
+
+                expect(logo.phraseMaker.addRowBlock.mock.calls).toEqual([[1], [1]]);
+                expect(logo.pitchBlocks).toEqual([99, 1]);
+                expect(logo.phraseMaker.rowLabels).toEqual([name, name]);
+                expect(logo.phraseMaker.rowArgs).toEqual([rowArg, rowArg]);
+            });
+
+            test("records the matrix row instead of queuing embedded graphics", () => {
+                turtleObj.singer.inNoteBlock = [0];
+                block.flow(args, logo, turtle, 1);
+
+                expect(logo.phraseMaker.rowLabels).toEqual([name]);
+                expect(logo.phraseMaker.rowArgs).toEqual([rowArg]);
+                expect(turtleObj.singer.embeddedGraphics[0]).toEqual([]);
+                expect(turtleObj.painter[painterMethod]).not.toHaveBeenCalled();
+            });
+
+            test.each(args.map((_, index) => [index]))(
+                "rejects a string at argument %i before recording or painting",
+                index => {
+                    const invalidArgs = [...args];
+                    invalidArgs[index] = "invalid";
+                    block.flow(invalidArgs, logo, turtle, 1);
+
+                    expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+                    expect(logo.phraseMaker.addRowBlock).not.toHaveBeenCalled();
+                    expect(logo.pitchBlocks).toEqual([]);
+                    expect(logo.phraseMaker.rowLabels).toEqual([]);
+                    expect(logo.phraseMaker.rowArgs).toEqual([]);
+                    expect(turtleObj.painter[painterMethod]).not.toHaveBeenCalled();
+                }
+            );
         });
     });
 
