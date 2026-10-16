@@ -943,15 +943,17 @@ class Blocks {
                 return;
             }
 
-            // Sort so deepest nested blocks are processed first when popped from the end
-            argBlocksToCheck.sort((a, b) => this._getNestingDepth(a) - this._getNestingDepth(b));
+            // Filter out missing or trashed blocks before sorting
+            const validBlocks = argBlocksToCheck.filter(
+                blk => this.blockList[blk] && !this.blockList[blk].trash
+            );
 
-            while (argBlocksToCheck.length > 0) {
-                const blk = argBlocksToCheck.pop();
+            // Sort so deepest nested blocks are processed first when popped from the end
+            validBlocks.sort((a, b) => this._getNestingDepth(a) - this._getNestingDepth(b));
+
+            while (validBlocks.length > 0) {
+                const blk = validBlocks.pop();
                 const myBlock = this.blockList[blk];
-                if (!myBlock || myBlock.trash) {
-                    continue;
-                }
 
                 /** Determine the size of the first argument. */
                 const c1 = myBlock.connections[1];
