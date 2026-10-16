@@ -26,17 +26,23 @@ global.createjs = {
     Text: jest.fn((text, font, color) => ({ text, font, color }))
 };
 
-global.SVG = jest.fn(() => ({
-    setScale: jest.fn(),
-    setTab: jest.fn(),
-    setSlot: jest.fn(),
-    setFontSize: jest.fn(),
-    setExpand: jest.fn(),
-    basicBlock: jest.fn(() => "<svg></svg>"),
-    docks: [[0, 0]],
-    getWidth: jest.fn(() => 100),
-    getHeight: jest.fn(() => 50)
-}));
+let lastMockSvgInstance;
+global.SVG = jest.fn(() => {
+    lastMockSvgInstance = {
+        setScale: jest.fn(),
+        setTab: jest.fn(),
+        setSlot: jest.fn(),
+        setInnies: jest.fn(),
+        setOutie: jest.fn(),
+        setFontSize: jest.fn(),
+        setExpand: jest.fn(),
+        basicBlock: jest.fn(() => "<svg></svg>"),
+        docks: [[0, 0]],
+        getWidth: jest.fn(() => 100),
+        getHeight: jest.fn(() => 50)
+    };
+    return lastMockSvgInstance;
+});
 
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;
@@ -957,6 +963,33 @@ describe("BaseBlock.formBlock", () => {
             expect(block.args).toBe(0);
             expect(block.dockTypes).toEqual([]);
             expect(block.defaults).toEqual([]);
+        });
+    });
+
+    describe("two-argument block generators with dual slot expansion", () => {
+        it("twoArgBlockGenerator passes expandY and expandY2 to svg.setExpand", () => {
+            const block = new ProtoBlock("setxy");
+            block.twoArgBlock();
+
+            block.generator(2, 3);
+            expect(lastMockSvgInstance.setInnies).toHaveBeenCalledWith([true, true]);
+            expect(lastMockSvgInstance.setTab).toHaveBeenCalledWith(true);
+            expect(lastMockSvgInstance.setSlot).toHaveBeenCalledWith(true);
+            // expandY = 2 -> ey1 = (2 - 1) * 20 / 2 = 10
+            // expandY2 = 3 -> ey2 = (3 - 1) * 20 / 2 = 20
+            expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 10, 0, 20);
+        });
+
+        it("twoArgMathBlockGenerator passes expandY and expandY2 to svg.setExpand", () => {
+            const block = new ProtoBlock("plus");
+            block.twoArgMathBlock();
+
+            block.generator(3, 4);
+            expect(lastMockSvgInstance.setInnies).toHaveBeenCalledWith([true, true]);
+            expect(lastMockSvgInstance.setOutie).toHaveBeenCalledWith(true);
+            // expandY = 3 -> ey1 = (3 - 1) * 20 / 2 = 20
+            // expandY2 = 4 -> ey2 = (4 - 1) * 20 / 2 = 30
+            expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 20, 0, 30);
         });
     });
 });
