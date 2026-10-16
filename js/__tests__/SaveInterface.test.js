@@ -793,6 +793,111 @@ describe("afterSaveMIDI", () => {
             velocity: 0.9
         });
     });
+
+    it("writes every drum in a Note at the same MIDI time", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4", "E4"],
+                    drum: ["kick drum", "snare drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const kickTrack = tracks.find(track => track.name === "Track 1 - kick drum");
+        const snareTrack = tracks.find(track => track.name === "Track 1 - snare drum");
+        expect(kickTrack.addNote).toHaveBeenCalledWith({
+            midi: 36,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+        expect(snareTrack.addNote).toHaveBeenCalledWith({
+            midi: 38,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+    });
+
+    it("keeps a drum and an instrument of the same name on separate tracks", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4"],
+                    drum: null,
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "snare drum"
+                },
+                {
+                    note: ["C4"],
+                    drum: ["snare drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "snare drum"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const named = tracks.filter(track => track.name === "Track 1 - snare drum");
+        expect(named).toHaveLength(2);
+
+        const drumTrack = named.find(track => track.channel === 9);
+        const instrumentTrack = named.find(track => track.channel !== 9);
+        expect(drumTrack.addNote).toHaveBeenCalledWith({
+            midi: 38,
+            time: 0.6666666666666666,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "C4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("keeps an instrument with a drum-prefixed name off the drum track", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                { note: ["C4"], drum: null, duration: 4, bpm: 90, instrument: "drum:snare drum" },
+                {
+                    note: ["R"],
+                    drum: ["snare drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "default"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - drum:snare drum");
+        const drumTrack = tracks.find(track => track.name === "Track 1 - snare drum");
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith(
+            expect.objectContaining({ name: "C4", time: 0 })
+        );
+        expect(drumTrack.channel).toBe(9);
+        expect(drumTrack.addNote).toHaveBeenCalledWith(
+            expect.objectContaining({ midi: 38, time: 0.6666666666666666 })
+        );
+    });
 });
 
 describe("afterSaveMIDI tempo and time signatures", () => {
