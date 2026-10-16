@@ -95,9 +95,9 @@ class GlobalCard {
                                     </div> 
 
                                     <div class="card-action"> 
-                                        <a id="global-advanced-toggle-{ID}" role="button" tabindex="0">${_(
+                                        <button type="button" id="global-advanced-toggle-{ID}" style="background:none;border:none;color:inherit;cursor:pointer;padding:0;font:inherit">${_(
                                             "Advanced Options"
-                                        )}</a> 
+                                        )}</button> 
                                     </div> 
                                 </div> 
                             </div> 

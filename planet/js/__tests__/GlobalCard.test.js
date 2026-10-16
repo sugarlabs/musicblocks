@@ -224,12 +224,14 @@ describe("GlobalCard", () => {
             expect(global.ClipboardJS).toHaveBeenCalled();
         });
 
-        it("should render advanced options toggle without inline onclick and attach click listener", () => {
+        it("should render advanced options toggle as a button without inline onclick and attach click listener", () => {
             card.init("test-id-1");
             card.render();
 
             const toggleBtn = document.getElementById("global-advanced-toggle-test-id-1");
             expect(toggleBtn).not.toBeNull();
+            expect(toggleBtn.tagName).toBe("BUTTON");
+            expect(toggleBtn.getAttribute("type")).toBe("button");
             expect(toggleBtn.getAttribute("onclick")).toBeNull();
 
             toggleBtn.click();
