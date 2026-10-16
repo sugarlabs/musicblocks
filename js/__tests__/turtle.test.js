@@ -882,6 +882,15 @@ describe("Turtle.TurtleView", () => {
     });
 
     describe("resizeDecoration", () => {
+        it("returns early without error when decoration bitmap is null", () => {
+            const view = makeView();
+
+            expect(view._decorationBitmap).toBeNull();
+            expect(() => {
+                view.resizeDecoration(2, 200);
+            }).not.toThrow();
+        });
+
         it("places and scales the decoration from the block width and scale", () => {
             const view = makeView();
             view._decorationBitmap = new createjs.Bitmap("shell.png");
