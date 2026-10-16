@@ -3332,14 +3332,20 @@ describe("Logo notationMIDI", () => {
 
     afterEach(() => jest.restoreAllMocks());
 
-    test("collects MIDI records and normalizes drum array", () => {
+    test("collects MIDI records without losing simultaneous drums", () => {
         logo._midiData = {};
 
-        logo.notationMIDI("C4", ["kick"], 0.5, 0, 90, "piano");
+        logo.notationMIDI(["C4", "E4"], ["kick", "snare drum"], 0.5, 0, 90, "piano");
         logo.notationMIDI("D4", null, 0.25, 0, 120, "flute");
 
         expect(logo._midiData[0]).toEqual([
-            { note: "C4", duration: 0.5, bpm: 90, instrument: "piano", drum: "kick" },
+            {
+                note: ["C4", "E4"],
+                duration: 0.5,
+                bpm: 90,
+                instrument: "piano",
+                drum: ["kick", "snare drum"]
+            },
             { note: "D4", duration: 0.25, bpm: 120, instrument: "flute", drum: null }
         ]);
     });
