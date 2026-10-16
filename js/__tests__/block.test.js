@@ -1311,6 +1311,55 @@ describe("Block Foundation", () => {
     });
 
     describe("hide", () => {
+        it.each([
+            ["ordinary", false, false],
+            ["expanded", true, false],
+            ["collapsed", true, true]
+        ])(
+            "should defer cache updates until showing a %s block",
+            async (_, collapsible, collapsed) => {
+                mockProtoBlock.capabilities.collapsible = collapsible;
+                const b = new Block(mockProtoBlock, mockBlocks);
+                b.container = {
+                    visible: true,
+                    bitmapCache: {},
+                    updateCache: jest.fn(),
+                    uncache: jest.fn()
+                };
+                b.bounds = { x: 0, y: 0, width: 100, height: 100 };
+                b.collapsed = collapsed;
+                b.collapseText = { visible: true };
+                b.expandButtonBitmap = { visible: true };
+                b.collapseButtonBitmap = { visible: true };
+                b._removeAccessibleElement = jest.fn();
+                b._setupAccessibleElement = jest.fn();
+
+                b.hide();
+
+                expect(b.container.visible).toBe(false);
+                expect(b.container.updateCache).not.toHaveBeenCalled();
+                expect(b.container.uncache).not.toHaveBeenCalled();
+                expect(b._removeAccessibleElement).toHaveBeenCalledTimes(1);
+                if (collapsible) {
+                    expect(b.collapseText.visible).toBe(false);
+                    expect(b.expandButtonBitmap.visible).toBe(false);
+                    expect(b.collapseButtonBitmap.visible).toBe(false);
+                }
+
+                b.show();
+                await Promise.resolve();
+
+                expect(b.container.visible).toBe(true);
+                expect(b.container.updateCache).toHaveBeenCalledTimes(1);
+                expect(b._setupAccessibleElement).toHaveBeenCalledTimes(1);
+                if (collapsible) {
+                    expect(b.collapseText.visible).toBe(collapsed);
+                    expect(b.expandButtonBitmap.visible).toBe(collapsed);
+                    expect(b.collapseButtonBitmap.visible).toBe(!collapsed);
+                }
+            }
+        );
+
         it("should not throw when container is null", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = null;

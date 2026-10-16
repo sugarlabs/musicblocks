@@ -1994,7 +1994,6 @@ class Block {
             }
         }
 
-        this.updateCache();
         this.activity.refreshCanvas();
         this._removeAccessibleElement();
     }
