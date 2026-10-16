@@ -500,8 +500,13 @@ class SaveInterface {
             const midi = new Midi();
             midi.header.ticksPerBeat = 480;
 
+            // The first track with a drum or pitch written to the file, not just rests.
             const firstTrack = Object.values(data).find(notes =>
-                notes.some(noteData => noteSeconds(noteData) !== null)
+                notes.some(
+                    noteData =>
+                        noteSeconds(noteData) !== null &&
+                        (noteData.drum || noteData.note.some(pitch => !pitch.includes("R")))
+                )
             );
             if (firstTrack) {
                 writeTempoAndMeter(midi.header, firstTrack);

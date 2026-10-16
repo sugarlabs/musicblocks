@@ -877,6 +877,35 @@ describe("afterSaveMIDI tempo and time signatures", () => {
         expect(seconds[1]).toBeCloseTo(1 / 3, 5);
     });
 
+    it("takes the tempo from the first track with notes, not one with only rests", () => {
+        const midi = exportMidi({
+            0: [note("R", 4, 120, [3, 4]), note("R", 4, 120, [3, 4])],
+            1: [note("G4", 4, 90, [4, 4]), note("A4", 4, 90, [4, 4])],
+            2: [{ ...note("C2", 4, 60, [2, 4]), drum: "kick drum" }]
+        });
+
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 90]]);
+        expect(midi.header.timeSignatures.map(t => [t.ticks, t.timeSignature])).toEqual([
+            [0, [4, 4]]
+        ]);
+        expect(noteTicks(midi, "Track 2 - guitar")).toEqual([
+            [0, 480],
+            [480, 480]
+        ]);
+    });
+
+    it("takes the tempo from a track with only drums", () => {
+        const midi = exportMidi({
+            0: [{ ...note("C2", 4, 60, [2, 4]), drum: "kick drum" }],
+            1: [note("G4", 4, 90, [4, 4])]
+        });
+
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 60]]);
+        expect(midi.header.timeSignatures.map(t => [t.ticks, t.timeSignature])).toEqual([
+            [0, [2, 4]]
+        ]);
+    });
+
     it("writes neither tempo nor time signature when no note is written", () => {
         const midi = exportMidi({
             0: [
