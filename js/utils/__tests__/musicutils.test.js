@@ -3420,6 +3420,9 @@ describe("calcOctave", () => {
             calcOctave(4, "current", ["C"], "C")
         );
         expect(calcOctave(4, "", ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, NaN, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, null, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, undefined, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
     });
 
     it("should return correct octave based on currentNote and lastNotePlayed", () => {
