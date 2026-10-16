@@ -962,13 +962,6 @@ class Blocks {
                     firstArgumentSize = Math.max(this._getBlockSize(c1), 1);
                 }
 
-                /** Determine the size of the second argument. */
-                const c2 = myBlock.connections[2];
-                let secondArgumentSize = 1; /** Minimum size */
-                if (c2 !== null && c2 !== undefined) {
-                    secondArgumentSize = Math.max(this._getBlockSize(c2), 1);
-                }
-
                 let updated = false;
 
                 /** Expand/contract slot 0 by plusMinus1. */
@@ -978,11 +971,24 @@ class Blocks {
                     updated = true;
                 }
 
-                /** Expand/contract slot 1 by plusMinus2. */
-                const plusMinus2 = secondArgumentSize - myBlock.clampCount[1];
-                if (plusMinus2 !== 0) {
-                    myBlock.updateSlots(1, plusMinus2);
-                    updated = true;
+                /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy). */
+                const isTwoArgFlow =
+                    typeof myBlock.isTwoArgBlock === "function"
+                        ? myBlock.isTwoArgBlock()
+                        : myBlock.name === "setxy";
+                if (isTwoArgFlow) {
+                    /** Determine the size of the second argument. */
+                    const c2 = myBlock.connections[2];
+                    let secondArgumentSize = 1; /** Minimum size */
+                    if (c2 !== null && c2 !== undefined) {
+                        secondArgumentSize = Math.max(this._getBlockSize(c2), 1);
+                    }
+
+                    const plusMinus2 = secondArgumentSize - myBlock.clampCount[1];
+                    if (plusMinus2 !== 0) {
+                        myBlock.updateSlots(1, plusMinus2);
+                        updated = true;
+                    }
                 }
 
                 if (updated) {
@@ -4182,7 +4188,7 @@ class Blocks {
          * @returns expandable block
          */
         this.insideExpandableBlock = blk => {
-            if (this.blockList[blk] === null) {
+            if (this.blockList[blk] === null || this.blockList[blk] === undefined) {
                 /** race condition? */
 
                 console.debug("null block in blockList? " + blk);
@@ -4195,7 +4201,8 @@ class Blocks {
                     /** If it is the last connection, keep searching. */
                     if (
                         this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
+                        this.blockList[cblk].isLeftClampBlock() ||
+                        this.blockList[cblk].isArgBlock()
                     ) {
                         return cblk;
                     } else if (blk === last(this.blockList[cblk].connections)) {

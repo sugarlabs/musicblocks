@@ -4549,7 +4549,8 @@ describe("sendStackToTrash – turtle container guard", () => {
                     setxyBlock.clampCount[clamp] += plusMinus;
                     setxyBlock.size += plusMinus;
                 }),
-                isInlineCollapsible: () => false
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => true
             };
 
             child0 = {
@@ -4558,7 +4559,10 @@ describe("sendStackToTrash – turtle container guard", () => {
                 connections: [0, null, null],
                 clampCount: [1, 1],
                 size: 2,
-                isInlineCollapsible: () => false
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isExpandableBlock: () => true
             };
 
             child1 = {
@@ -4567,7 +4571,10 @@ describe("sendStackToTrash – turtle container guard", () => {
                 connections: [0, null, null],
                 clampCount: [1, 1],
                 size: 3,
-                isInlineCollapsible: () => false
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isExpandableBlock: () => false
             };
 
             blocksInstance.blockList = [setxyBlock, child0, child1];
@@ -4630,6 +4637,16 @@ describe("sendStackToTrash – turtle container guard", () => {
             expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
         });
 
+        it("does not expand slot 1 on expandable arg blocks when second argument has size > 1", () => {
+            child0.connections[2] = 2;
+            child0.updateSlots = jest.fn();
+
+            blocksInstance._adjustExpandableTwoArgBlock([1]);
+
+            expect(child0.updateSlots).not.toHaveBeenCalled();
+            expect(child0.clampCount[1]).toBe(1);
+        });
+
         it("processes deeper nested blocks first so parent reads updated child size", () => {
             child0.updateSlots = jest.fn((clamp, plusMinus) => {
                 child0.clampCount[clamp] += plusMinus;
@@ -4649,6 +4666,120 @@ describe("sendStackToTrash – turtle container guard", () => {
             expect(child0.updateSlots).toHaveBeenCalledWith(0, 2);
             expect(child0.size).toBe(4);
             expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+        });
+    });
+
+    describe("insideExpandableBlock", () => {
+        let blocksInstance;
+        let setxyBlock;
+        let multiplyBlock;
+        let plusBlock;
+        let randomBlock;
+        let pendownBlock;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+
+            setxyBlock = {
+                name: "setxy",
+                connections: [null, 1, null, 4],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => true,
+                isArgBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            multiplyBlock = {
+                name: "multiply",
+                connections: [0, null, 2],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            plusBlock = {
+                name: "plus",
+                connections: [1, null, 3],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            randomBlock = {
+                name: "random",
+                connections: [2, null, null],
+                isExpandableBlock: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            pendownBlock = {
+                name: "pendown",
+                connections: [0, null],
+                isExpandableBlock: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            blocksInstance.blockList = [
+                setxyBlock,
+                multiplyBlock,
+                plusBlock,
+                randomBlock,
+                pendownBlock
+            ];
+        });
+
+        it("returns null if blk is null or not in blockList", () => {
+            expect(blocksInstance.insideExpandableBlock(null)).toBeNull();
+            expect(blocksInstance.insideExpandableBlock(99)).toBeNull();
+        });
+
+        it("returns null for a root block without a parent connection", () => {
+            expect(blocksInstance.insideExpandableBlock(0)).toBeNull();
+        });
+
+        it("returns the parent expandable block for a child connected to first argument slot", () => {
+            expect(blocksInstance.insideExpandableBlock(1)).toBe(0);
+        });
+
+        it("returns the parent arg block when a child expression is in the second argument slot", () => {
+            expect(blocksInstance.insideExpandableBlock(2)).toBe(1);
+        });
+
+        it("correctly traverses nested expressions in second argument slots", () => {
+            expect(blocksInstance.insideExpandableBlock(3)).toBe(2);
+            expect(blocksInstance.insideExpandableBlock(2)).toBe(1);
+            expect(blocksInstance.insideExpandableBlock(1)).toBe(0);
+        });
+
+        it("calculates accurate nesting depths for nested expressions in the second argument slot", () => {
+            const depth3 = blocksInstance._getNestingDepth(3);
+            const depth2 = blocksInstance._getNestingDepth(2);
+            const depth1 = blocksInstance._getNestingDepth(1);
+            const depth0 = blocksInstance._getNestingDepth(0);
+
+            expect(depth3).toBe(4);
+            expect(depth2).toBe(3);
+            expect(depth1).toBe(2);
+            expect(depth0).toBe(1);
+
+            expect(depth3).toBeGreaterThan(depth2);
+            expect(depth2).toBeGreaterThan(depth1);
+            expect(depth1).toBeGreaterThan(depth0);
+        });
+
+        it("treats the last connection of a flow block as downstream flow rather than inside the block", () => {
+            expect(blocksInstance.insideExpandableBlock(4)).toBeNull();
         });
     });
 });

@@ -999,7 +999,7 @@ class Block {
                 case "equal":
                 case "greater":
                 case "less":
-                    obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
+                    obj = this.protoblock.generator(this.clampCount[0]);
                     this.size += plusMinus;
                     break;
                 case "makeblock":
@@ -1017,7 +1017,7 @@ class Block {
                     break;
                 default:
                     if (this.isArgBlock()) {
-                        obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
+                        obj = this.protoblock.generator(this.clampCount[0]);
                     } else if (this.isTwoArgBlock()) {
                         obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
                     } else {
