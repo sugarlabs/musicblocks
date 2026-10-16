@@ -160,7 +160,7 @@ function setupMeterActions(activity) {
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
-            if (Number.isNaN(bpm)) {
+            if (!Number.isFinite(bpm) || bpm <= 0) {
                 activity.errorMsg(_("BPM must be a positive number."), blk);
                 return;
             }
