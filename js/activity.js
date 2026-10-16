@@ -1732,7 +1732,9 @@ class Activity {
 
             // Reposition coordinate grids.
             const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            const newY = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+            const gridCenterY =
+                this.canvas.height / (2 * this.turtleBlocksScale) + this.toolbarHeight;
+            const newY = gridCenterY - 450;
             this.cartesianBitmap.x = newX;
             this.cartesianBitmap.y = newY;
             this.polarBitmap.x = newX;
@@ -1766,19 +1768,19 @@ class Activity {
             }
             // Position the sharps and flats
             this.grandSharpBitmap[0].y = newY;
-            this.grandSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
-            this.grandSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
-            this.grandSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
-            this.grandSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
-            this.grandSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
-            this.grandSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+            this.grandSharpBitmap[1].y = gridCenterY - 412.5;
+            this.grandSharpBitmap[2].y = gridCenterY - 462.5;
+            this.grandSharpBitmap[3].y = gridCenterY - 425;
+            this.grandSharpBitmap[4].y = gridCenterY - 387.5;
+            this.grandSharpBitmap[5].y = gridCenterY - 437.5;
+            this.grandSharpBitmap[6].y = gridCenterY - 400;
             this.grandFlatBitmap[0].y = newY;
-            this.grandFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
-            this.grandFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
-            this.grandFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
-            this.grandFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
-            this.grandFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
-            this.grandFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+            this.grandFlatBitmap[1].y = gridCenterY - 487.5;
+            this.grandFlatBitmap[2].y = gridCenterY - 437.5;
+            this.grandFlatBitmap[3].y = gridCenterY - 475;
+            this.grandFlatBitmap[4].y = gridCenterY - 425;
+            this.grandFlatBitmap[5].y = gridCenterY - 462.5;
+            this.grandFlatBitmap[6].y = gridCenterY - 412.5;
 
             for (let i = 0; i < 7; i++) {
                 this.trebleSharpBitmap[i].y = this.grandSharpBitmap[i].y;
