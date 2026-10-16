@@ -111,8 +111,11 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.onerror = () => {
-        console.debug("Failed to load SVG bitmap from SVG data");
+    img.onerror = function (err) {
+        console.debug("Failed to load or decode bitmap image", err);
+        if (typeof callback === "function") {
+            callback(null, err || new Error("Image decode failed"));
+        }
     };
 
     img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
