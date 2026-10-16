@@ -215,6 +215,17 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "\\tuplet Infinity/1 { g' 0} ");
     });
 
+    test("should not emit a fractional tuplet header for non-integer tuplet factors (Issue #9512)", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 0, null, 0, -1, false, null],
+            [[], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toMatch(/\\tuplet/);
+        expect(logo.notationNotes[turtle]).toContain("g'4");
+        expect(logo.notationNotes[turtle]).toContain("r2");
+    });
+
     test("should process staccato on a note inside a tuplet", () => {
         logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);

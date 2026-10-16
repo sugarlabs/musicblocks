@@ -178,8 +178,15 @@ const getABCHeader = function () {
     return ABCHEADER;
 };
 
+const isAbcWholeTuplet = tuplet =>
+    Array.isArray(tuplet) &&
+    Number.isInteger(tuplet[0]) &&
+    tuplet[0] > 0 &&
+    Number.isInteger(tuplet[1]) &&
+    tuplet[1] > 0;
+
 const isSameTuplet = (a, b) =>
-    Array.isArray(a) && Array.isArray(b) && a[0] === b[0] && a[1] === b[1];
+    isAbcWholeTuplet(a) && isAbcWholeTuplet(b) && a[0] === b[0] && a[1] === b[1];
 
 const getTupletTime = count => 2 ** Math.floor(Math.log2(Math.max(2, count)));
 
@@ -558,7 +565,7 @@ class AbcExporter {
 
         let incompleteTuplet = 0;
 
-        if (obj[NOTATIONTUPLETVALUE] !== null) {
+        if (isAbcWholeTuplet(obj[NOTATIONTUPLETVALUE])) {
             let j = 1;
             let k = 1;
             while (k < obj[NOTATIONTUPLETVALUE][0]) {
@@ -588,7 +595,7 @@ class AbcExporter {
             }
         }
 
-        if (obj[NOTATIONTUPLETVALUE] !== null) {
+        if (isAbcWholeTuplet(obj[NOTATIONTUPLETVALUE])) {
             const inTuplet = obj[NOTATIONTUPLETVALUE][0];
             const count = incompleteTuplet === 0 ? inTuplet : incompleteTuplet;
 
@@ -603,6 +610,26 @@ class AbcExporter {
 
             i += Math.max(1, this.processTupletNotes(i, count)) - 1;
         } else {
+            const isRejectedTuplet =
+                obj[NOTATIONTUPLETVALUE] !== null &&
+                obj[NOTATIONTUPLETVALUE] !== undefined &&
+                !isAbcWholeTuplet(obj[NOTATIONTUPLETVALUE]);
+            let duration;
+            if (
+                isRejectedTuplet &&
+                Number.isInteger(obj[NOTATIONROUNDDOWN]) &&
+                obj[NOTATIONROUNDDOWN] > 0
+            ) {
+                duration = obj[NOTATIONROUNDDOWN];
+            } else if (Number.isInteger(obj[NOTATIONDURATION]) && obj[NOTATIONDURATION] > 0) {
+                duration = obj[NOTATIONDURATION];
+            } else if (Number.isInteger(obj[NOTATIONROUNDDOWN]) && obj[NOTATIONROUNDDOWN] > 0) {
+                duration = obj[NOTATIONROUNDDOWN];
+            } else {
+                duration = Math.max(1, Math.round(obj[NOTATIONDURATION]) || 1);
+            }
+            const dotCount = isRejectedTuplet ? 0 : obj[NOTATIONDOTCOUNT];
+
             if (obj[NOTATIONINSIDECHORD] <= 0) {
                 this.__beginNote();
                 this.parts.push(this.__decorations());
@@ -622,7 +649,7 @@ class AbcExporter {
                     this.parts.push("]");
                 }
 
-                this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
+                this.parts.push(convertDuration(duration, dotCount));
             }
 
             if (obj[NOTATIONINSIDECHORD] > 0) {
@@ -645,7 +672,7 @@ class AbcExporter {
                     this.staging[i + 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]
                 ) {
                     this.parts.push("]");
-                    this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
+                    this.parts.push(convertDuration(duration, dotCount));
                 }
             }
         }
