@@ -101,6 +101,10 @@ function makeBitmap() {
     return { y: 0 };
 }
 
+function makeAccidentals() {
+    return Array.from({ length: 7 }, makeBitmap);
+}
+
 function makeActivity() {
     return {
         addEventListener: jest.fn(),
@@ -161,6 +165,18 @@ function makeActivity() {
         altoBitmap: makeBitmap(),
         tenorBitmap: makeBitmap(),
         bassBitmap: makeBitmap(),
+        grandSharpBitmap: makeAccidentals(),
+        grandFlatBitmap: makeAccidentals(),
+        trebleSharpBitmap: makeAccidentals(),
+        trebleFlatBitmap: makeAccidentals(),
+        sopranoSharpBitmap: makeAccidentals(),
+        sopranoFlatBitmap: makeAccidentals(),
+        altoSharpBitmap: makeAccidentals(),
+        altoFlatBitmap: makeAccidentals(),
+        tenorSharpBitmap: makeAccidentals(),
+        tenorFlatBitmap: makeAccidentals(),
+        bassSharpBitmap: makeAccidentals(),
+        bassFlatBitmap: makeAccidentals(),
         refreshCanvas: jest.fn(),
         menuButtonsVisible: false,
         onscreenButtons: [],
@@ -700,6 +716,39 @@ describe("ContextMenuController", () => {
             activity.palettes.deltaY.mockClear();
             controller._showHideAuxMenu(true);
             expect(activity.toolbarHeight).toBe(0);
+        });
+
+        test("keeps key signature accidentals aligned with staff grids", () => {
+            const staffs = ["grand", "treble", "soprano", "alto", "tenor", "bass"];
+            for (const staff of staffs) {
+                activity[`${staff}Bitmap`].y = 100;
+                for (const kind of ["Sharp", "Flat"]) {
+                    activity[`${staff}${kind}Bitmap`].forEach((bitmap, i) => {
+                        bitmap.y = 10 + i;
+                    });
+                }
+            }
+
+            mockElement.offsetHeight = 60;
+            controller._showHideAuxMenu(false);
+            for (const staff of staffs) {
+                expect(activity[`${staff}Bitmap`].y).toBe(160);
+                for (const kind of ["Sharp", "Flat"]) {
+                    activity[`${staff}${kind}Bitmap`].forEach((bitmap, i) => {
+                        expect(bitmap.y).toBe(70 + i);
+                    });
+                }
+            }
+
+            controller._showHideAuxMenu(true);
+            for (const staff of staffs) {
+                expect(activity[`${staff}Bitmap`].y).toBe(100);
+                for (const kind of ["Sharp", "Flat"]) {
+                    activity[`${staff}${kind}Bitmap`].forEach((bitmap, i) => {
+                        expect(bitmap.y).toBe(10 + i);
+                    });
+                }
+            }
         });
 
         test("hideAuxMenu hides the menu only when it is open", () => {
