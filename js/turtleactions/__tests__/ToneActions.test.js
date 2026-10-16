@@ -758,6 +758,31 @@ describe("setupToneActions", () => {
             expect(activity.logo.stopTurtle).toBe(true);
         });
 
+        it("should show error for NaN harmonic value", () => {
+            Singer.ToneActions.doHarmonic(NaN, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Partial must be greater than or equal to 0."
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.partials).toHaveLength(0);
+        });
+
+        it.each([1223, 1e9, Infinity])("should reject out-of-range harmonic %p", value => {
+            Singer.ToneActions.doHarmonic(value, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Partial must be less than or equal to 1222.",
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.partials).toHaveLength(0);
+        });
+
+        it("should accept the largest harmonic value", () => {
+            Singer.ToneActions.doHarmonic(1222, 0, 1);
+            expect(targetTurtle.singer.partials[0]).toHaveLength(1223);
+            expect(last(targetTurtle.singer.partials[0])).toBe(1);
+        });
+
         it("should handle zero harmonic value", () => {
             Singer.ToneActions.doHarmonic(0, 0, 1);
             expect(targetTurtle.singer.partials).toHaveLength(1);
