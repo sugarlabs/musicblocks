@@ -2178,11 +2178,17 @@ class Block {
 
             this.updateCache();
 
-            // Ensure cache creation is retried/completed if it was skipped due to being trashed earlier.
+            // If the block was trashed before first-load setup finished, complete it now.
             if (
                 this.container &&
-                !this.container.bitmapCache &&
+                !this.loadComplete &&
                 typeof this.generateArtwork === "function"
+            ) {
+                this.generateArtwork(true);
+            } else if (
+                this.container &&
+                !this.container.bitmapCache &&
+                typeof this._createCache === "function"
             ) {
                 this._createCache(block => {
                     if (block.activity && typeof block.activity.refreshCanvas === "function") {

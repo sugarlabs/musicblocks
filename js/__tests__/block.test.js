@@ -1600,6 +1600,7 @@ describe("Block Foundation", () => {
         it("should set container.visible to true when container exists", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = { visible: false };
+            b.loadComplete = true;
             b.trash = false;
             b.inCollapsed = false;
             b.bitmap = { visible: false };
@@ -1615,11 +1616,25 @@ describe("Block Foundation", () => {
             expect(b.container.visible).toBe(true);
         });
 
-        it("should restore cache via _createCache in show() when bitmapCache is missing", () => {
+        it("should complete first-load setup via generateArtwork(true) in show() when loadComplete is false", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = { visible: false };
             b.trash = false;
             b.inCollapsed = false;
+            b.loadComplete = false;
+            const generateSpy = jest.spyOn(b, "generateArtwork").mockImplementation(() => {});
+
+            b.show();
+            expect(b.container.visible).toBe(true);
+            expect(generateSpy).toHaveBeenCalledWith(true);
+        });
+
+        it("should restore cache via _createCache in show() when loadComplete is true but bitmapCache is missing", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.trash = false;
+            b.inCollapsed = false;
+            b.loadComplete = true;
             b.bitmap = { visible: false };
             b.highlightBitmap = null;
             b.disconnectedBitmap = null;
