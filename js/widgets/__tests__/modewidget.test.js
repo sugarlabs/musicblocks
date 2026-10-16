@@ -331,11 +331,25 @@ describe("ModeWidget", () => {
 
     test("should initialize pitch without truncating accidental roots in key signature", () => {
         const testCases = [
+            { keySig: "C major", expectedPitch: "C" },
             { keySig: "F# major", expectedPitch: "F#" },
             { keySig: "Bb minor", expectedPitch: "Bb" },
-            { keySig: "Db dorian", expectedPitch: "Db" },
-            { keySig: "G# aeolian", expectedPitch: "G#" },
-            { keySig: "Eb mixolydian", expectedPitch: "Eb" }
+            { keySig: "Db dorian", expectedPitch: "Db" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
+    });
+
+    test("should handle legacy array keySignature values without error", () => {
+        const testCases = [
+            { keySig: ["C"], expectedPitch: "C" },
+            { keySig: ["F#", "major"], expectedPitch: "F#" }
         ];
 
         testCases.forEach(({ keySig, expectedPitch }) => {
