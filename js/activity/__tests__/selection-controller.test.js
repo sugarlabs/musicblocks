@@ -553,18 +553,58 @@ describe("copyMultipleBlocks", () => {
     test("skips blocks that are connected to another block already being copied, or trashed", () => {
         const activity = makeActivity();
         setupSelectionController(activity);
-        const parent = { blockIndex: 1, connections: [2], trash: false };
-        const child = { blockIndex: 2, connections: [1], trash: false };
+        const parent = { blockIndex: 1, connections: [null, 2], trash: false };
+        const child = { blockIndex: 2, connections: [1, null], trash: false };
         const trashed = { blockIndex: 3, connections: [], trash: true };
         activity.blocks.selectionModeOn = true;
         activity.blocks.selectedBlocks = [parent, child, trashed];
+        activity.blocks.blockList = [null, parent, child, trashed];
 
         activity.copyMultipleBlocks();
 
-        // parent is copied (its own stack includes the child); child is skipped
-        // because it is itself in a connection reachable via map; trashed is
-        // skipped outright.
+        // The parent copies its child, so only the parent is a copy root.
+        // Trashed blocks are excluded.
         expect(activity.blocks.prepareStackForCopy).toHaveBeenCalledTimes(1);
+    });
+
+    test.each([
+        ["parent first", [1, 2, 0, 3], [1]],
+        ["child first", [0, 3, 1, 2], [1]],
+        ["argument first", [2, 1, 0, 3], [1]],
+        ["child only", [0, 3], [0]],
+        ["selected ancestor across an unselected block", [3, 1], [1]]
+    ])("copies complete groups once with %s", (_label, selection, expectedRoots) => {
+        const activity = makeActivity();
+        setupSelectionController(activity);
+        // The lower block was created before its parent. Include real argument connections.
+        activity.blocks.blockList = [
+            { blockIndex: 0, name: "forward", connections: [1, 3, null], trash: false },
+            { blockIndex: 1, name: "right", connections: [null, 2, 0], trash: false },
+            { blockIndex: 2, name: "number", connections: [1], trash: false },
+            { blockIndex: 3, name: "number", connections: [0], trash: false }
+        ];
+        activity.blocks.selectionModeOn = true;
+        activity.blocks.selectedBlocks = selection.map(index => activity.blocks.blockList[index]);
+        const { BlockDragController } = require("../block-drag-controller.js");
+        const dragController = new BlockDragController(activity.blocks);
+        const copiedRoots = [];
+        const copiedGroups = [];
+        activity.blocks.prepareStackForCopy.mockImplementation(() => {
+            copiedRoots.push(activity.blocks.activeBlock);
+            dragController.findDragGroup(activity.blocks.activeBlock);
+        });
+        activity.blocks.pasteStack.mockImplementation(() => {
+            copiedGroups.push([...activity.blocks.dragGroup]);
+        });
+        const connectionsBefore = activity.blocks.blockList.map(block => [...block.connections]);
+
+        activity.copyMultipleBlocks();
+
+        expect(copiedRoots).toEqual(expectedRoots);
+        expect(copiedGroups).toEqual(expectedRoots[0] === 1 ? [[1, 2, 0, 3]] : [[0, 3]]);
+        expect(activity.blocks.blockList.map(block => block.connections)).toEqual(
+            connectionsBefore
+        );
     });
 
     test("does nothing when there are no selected blocks", () => {
