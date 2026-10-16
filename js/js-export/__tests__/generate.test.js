@@ -359,9 +359,25 @@ describe("JSGenerate Class", () => {
         );
     });
 
+    // Tests that stub the BooleanBlock global put the previous binding back here, so later
+    // tests don't see the stand-in.
+    let restoreBooleanBlock = null;
+    afterEach(() => {
+        if (restoreBooleanBlock) {
+            restoreBooleanBlock();
+            restoreBooleanBlock = null;
+        }
+    });
+
     test("should generate stack trees with various block types and arguments", () => {
         globalActivity.blocks.stackList = [1, 20];
         // In the browser BooleanBlock is a global binding from protoblocks.js, not a window property.
+        const hadBooleanBlock = Object.prototype.hasOwnProperty.call(global, "BooleanBlock");
+        const previousBooleanBlock = global.BooleanBlock;
+        restoreBooleanBlock = () => {
+            if (hadBooleanBlock) global.BooleanBlock = previousBooleanBlock;
+            else delete global.BooleanBlock;
+        };
         global.BooleanBlock = class BooleanBlock {};
         const booleanProtoblock = new global.BooleanBlock();
         booleanProtoblock.style = "value";
