@@ -727,6 +727,38 @@ class SampleLoader {
 }
 
 /**
+ * Calculates the calibrated volume in decibels for a given instrument and volume level.
+ * As per #1697, adjusts the volume for instruments defined in DEFAULTSYNTHVOLUME.
+ * @param {string} instrumentName - The name of the instrument.
+ * @param {number} volume - The volume level (0 to 100).
+ * @param {Function} [resolveFn] - Optional resolver function for instrument names.
+ * @returns {number} The volume level in decibels.
+ */
+function calculateInstrumentVolumeDb(instrumentName, volume, resolveFn) {
+    if (typeof resolveFn === "function") {
+        instrumentName = resolveFn(instrumentName);
+    }
+    // guard invalid UI/programmatic input (audio boundary safety)
+    volume = clampNumber(volume, 0, 100);
+
+    let nv;
+    if (instrumentName in DEFAULTSYNTHVOLUME) {
+        const sv = DEFAULTSYNTHVOLUME[instrumentName];
+        if (volume > 50) {
+            const d = 100 - sv;
+            nv = ((volume - 50) / 50) * d + sv;
+        } else {
+            nv = (volume / 50) * sv;
+        }
+    } else {
+        nv = volume;
+    }
+
+    const gain = Math.max(0.0001, nv / 100);
+    return Tone.gainToDb(gain);
+}
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -2608,6 +2640,23 @@ function Synth() {
         this.transport.stop();
     };
 
+    /**
+     * Calculates the calibrated volume in decibels for a given instrument and volume level.
+     * As per #1697, adjusts the volume for instruments defined in DEFAULTSYNTHVOLUME.
+     * @function
+     * @memberof Synth
+     * @param {string} instrumentName - The name of the instrument.
+     * @param {number} volume - The volume level (0 to 100).
+     * @returns {number} The volume level in decibels.
+     */
+    this.calculateInstrumentVolumeDb = (
+        instrumentName,
+        volume,
+        resolveFn = this.resolveInstrumentName
+    ) => calculateInstrumentVolumeDb(instrumentName, volume, resolveFn);
+
+    this.getCalibratedVolumeDb = this.calculateInstrumentVolumeDb;
+
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
         // guard invalid UI/programmatic input (audio boundary safety)
         volume = clampNumber(volume, 0, 100);
@@ -2617,21 +2666,7 @@ function Synth() {
         )
             return;
 
-        let nv;
-        if (instrumentName in DEFAULTSYNTHVOLUME) {
-            const sv = DEFAULTSYNTHVOLUME[instrumentName];
-            if (volume > 50) {
-                const d = 100 - sv;
-                nv = ((volume - 50) / 50) * d + sv;
-            } else {
-                nv = (volume / 50) * sv;
-            }
-        } else {
-            nv = volume;
-        }
-
-        const gain = Math.max(0.0001, nv / 100);
-        const db = Tone.gainToDb(gain);
+        const db = this.calculateInstrumentVolumeDb(instrumentName, volume);
 
         let synth = instruments[turtle]["electronic synth"];
         if (instrumentName in instruments[turtle]) {
@@ -2680,25 +2715,7 @@ function Synth() {
     this.setVolume = (turtle, instrumentName, volume) => {
         // Resolve instrumentName to internal key
         instrumentName = this.resolveInstrumentName(instrumentName);
-        // guard invalid UI/programmatic input (audio boundary safety)
-        volume = clampNumber(volume, 0, 100);
-        // We pass in volume as a number from 0 to 100.
-        // As per #1697, we adjust the volume of some instruments.
-        let nv;
-        if (instrumentName in DEFAULTSYNTHVOLUME) {
-            const sv = DEFAULTSYNTHVOLUME[instrumentName];
-            if (volume > 50) {
-                const d = 100 - sv;
-                nv = ((volume - 50) / 50) * d + sv;
-            } else {
-                nv = (volume / 50) * sv;
-            }
-        } else {
-            nv = volume;
-        }
-
-        const gain = Math.max(0.0001, nv / 100);
-        const db = Tone.gainToDb(gain);
+        const db = this.calculateInstrumentVolumeDb(instrumentName, volume);
         if (instrumentName in instruments[turtle]) {
             const synth = instruments[turtle][instrumentName];
             // Do not schedule a ramp if volume didn't actually change to avoid "flutter" buzz
@@ -3026,6 +3043,9 @@ function Synth() {
     return this;
 }
 
+Synth.calculateInstrumentVolumeDb = calculateInstrumentVolumeDb;
+Synth.getCalibratedVolumeDb = calculateInstrumentVolumeDb;
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         Synth,
@@ -3039,6 +3059,7 @@ if (typeof module !== "undefined" && module.exports) {
         instruments,
         instrumentsSource,
         DEFAULTSYNTHVOLUME,
-        SAMPLE_INFO
+        SAMPLE_INFO,
+        calculateInstrumentVolumeDb
     };
 }
