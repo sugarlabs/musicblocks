@@ -7276,6 +7276,26 @@ class Blocks {
         };
 
         /**
+         * Dispose trashed stacks beyond the shared restore-history limit.
+         * @public
+         * @returns {void}
+         */
+        this.trimTrashHistory = () => {
+            const MAX_TRASH_UNDO = 100;
+            while (this.trashStacks.length > MAX_TRASH_UNDO) {
+                const removed = this.trashStacks.shift();
+                if (removed !== undefined) {
+                    delete this.trashPreviews[removed];
+                    this.findDragGroup(removed);
+                    const evictedGroup = Array.from(this.dragGroup);
+                    for (const blk of evictedGroup) {
+                        this.disposeBlock(blk);
+                    }
+                }
+            }
+        };
+
+        /**
          * Send a stack of blocks to the trash.
          * @param - myBlock
          * @public
@@ -7401,22 +7421,7 @@ class Blocks {
                 this.redoActionHistory = [];
             }
 
-            // Cap the undo history to prevent unbounded memory growth.
-            // Keep the 100 most recent trashed stacks.
-            const MAX_TRASH_UNDO = 100;
-            if (this.trashStacks.length > MAX_TRASH_UNDO) {
-                const removed = this.trashStacks.shift();
-                if (removed !== undefined) {
-                    if (this.trashPreviews[removed]) {
-                        delete this.trashPreviews[removed];
-                    }
-                    this.findDragGroup(removed);
-                    const evictedGroup = Array.from(this.dragGroup);
-                    for (let i = 0; i < evictedGroup.length; i++) {
-                        this.disposeBlock(evictedGroup[i]);
-                    }
-                }
-            }
+            this.trimTrashHistory();
 
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
