@@ -34,20 +34,31 @@ describe("Two-arg block vertical resizing (Issue #9563)", () => {
             const testProject = [
                 [0, "start", 500, 150, [null, 1, null]],
                 [1, "clean", 0, 0, [0, 2]],
-                [2, "setxy", 0, 0, [1, 3, 6, 9]],
+                [2, "setxy", 0, 0, [1, 3, 7, 11]],
+                // x slot: multiply (3) with number 50 in slot 1 and random in slot 2
                 [3, "multiply", 0, 0, [2, 4, 5]],
-                [4, "random", 0, 0, [3, null, null]],
-                [5, ["number", { value: 10 }], 0, 0, [3]],
-                [6, "multiply", 0, 0, [2, 7, 8]],
-                [7, "random", 0, 0, [6, null, null]],
-                [8, ["number", { value: 10 }], 0, 0, [6]],
-                [9, "pendown", 0, 0, [2, null]]
+                [4, ["number", { value: 50 }], 0, 0, [3]],
+                [5, "random", 0, 0, [3, null, 6]],
+                [6, ["number", { value: 4 }], 0, 0, [5]],
+                // y slot: multiply (7) with number 50 in slot 1 and random in slot 2
+                [7, "multiply", 0, 0, [2, 8, 9]],
+                [8, ["number", { value: 50 }], 0, 0, [7]],
+                [9, "random", 0, 0, [7, null, 10]],
+                [10, ["number", { value: 4 }], 0, 0, [9]],
+                // pendown under setxy (11)
+                [11, "pendown", 0, 0, [2, null]]
             ];
 
             return new Promise(resolve => {
                 const loadAfterTrash = () => {
                     activity.stage.removeEventListener("trashsignal", loadAfterTrash);
                     win.pubsub.once("finishedLoading", () => {
+                        const start = activity.blocks.blockList.find(
+                            b => b && !b.trash && b.name === "start"
+                        );
+                        if (start) {
+                            activity.blocks.adjustDocks(start.blockIndex, true);
+                        }
                         activity.refreshCanvas();
                         resolve();
                     });
@@ -74,14 +85,19 @@ describe("Two-arg block vertical resizing (Issue #9563)", () => {
             expect(pendownBlock, "pendown block exists").to.exist;
             expect(multiplyBlocks).to.have.length(2);
 
-            // Both slot clamp counts should reflect the compound children
-            expect(setxyBlock.clampCount[0], "slot 0 clamp count").to.be.greaterThan(1);
-            expect(setxyBlock.clampCount[1], "slot 1 clamp count").to.be.greaterThan(1);
+            // setxy should expand both slots to accommodate the compound multiply blocks
+            expect(setxyBlock.clampCount[0], "slot 0 clamp count").to.equal(2);
+            expect(setxyBlock.clampCount[1], "slot 1 clamp count").to.equal(2);
+            expect(setxyBlock.size, "setxy total size").to.equal(4);
 
-            // pendown y should be below setxy y + expanded height
+            // pendown should dock cleanly below setxy without overlapping the second multiply
             expect(pendownBlock.container.y, "pendown is below setxy").to.be.greaterThan(
-                setxyBlock.container.y + 80
+                setxyBlock.container.y + 100
             );
+            expect(
+                pendownBlock.container.y,
+                "pendown is below second multiply block"
+            ).to.be.greaterThan(multiplyBlocks[1].container.y);
         });
 
         cy.screenshot("two_arg_resize_issue_9563_verified", { capture: "viewport" });

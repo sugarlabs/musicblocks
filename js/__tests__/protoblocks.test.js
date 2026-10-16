@@ -997,18 +997,17 @@ describe("BaseBlock.formBlock", () => {
             expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 10, 0, 20);
         });
 
-        it("twoArgMathBlockGenerator passes expandY and expandY2 to svg.setExpand", () => {
+        it("twoArgMathBlockGenerator passes expandY to svg.setExpand with ey2=0", () => {
             const block = new ProtoBlock("plus");
             block.fontsize = 12;
             block.twoArgMathBlock();
 
-            block.generator(3, 4);
+            block.generator(3);
             expect(lastMockSvgInstance.setInnies).toHaveBeenCalledWith([true, true]);
             expect(lastMockSvgInstance.setOutie).toHaveBeenCalledWith(true);
             expect(lastMockSvgInstance.setFontSize).toHaveBeenCalledWith(12);
-            // expandY = 3 -> ey1 = (3 - 1) * 20 / 2 = 20
-            // expandY2 = 4 -> ey2 = (4 - 1) * 20 / 2 = 30
-            expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 20, 0, 30);
+            // expandY = 3 -> ey1 = (3 - 1) * 20 / 2 = 20, ey2 = 0
+            expect(lastMockSvgInstance.setExpand).toHaveBeenCalledWith(30, 20, 0, 0);
         });
 
         it("BaseBlock formBlock generator passes expandY and expandY2 to svg.setExpand for two-arg block", () => {

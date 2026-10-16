@@ -538,7 +538,7 @@ class ProtoBlock {
      * @param {number} expandY2 - Expansion factor for the second argument (optional).
      * @returns {array} - An array containing block SVG, docks, width, and height.
      */
-    twoArgMathBlockGenerator(expandY, expandY2) {
+    twoArgMathBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -546,9 +546,11 @@ class ProtoBlock {
         svg.setOutie(true);
         svg.setTab(false);
 
-        const ey1 = expandY ? ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
-        const ey2 = expandY2 ? ((expandY2 - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
-        svg.setExpand(30 + this.extraWidth, ey1, 0, ey2);
+        if (expandY) {
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+        } else {
+            svg.setExpand(30 + this.extraWidth, 0, 0, 0);
+        }
 
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
@@ -1775,7 +1777,10 @@ class BaseBlock extends ProtoBlock {
                     : this.image
                       ? 23
                       : 0;
-                const ey2 = arguments[1] ? ((arguments[1] - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+                const ey2 =
+                    this.style === "twoarg" && arguments[1]
+                        ? ((arguments[1] - 1) * STANDARDBLOCKHEIGHT) / 2
+                        : 0;
                 svg.setExpand(pad + this.extraWidth, ey1, 0, ey2);
             } else {
                 for (let i = 0; i < arguments.length; i++) {
