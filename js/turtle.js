@@ -863,6 +863,10 @@ Turtle.TurtleView = class {
      * @param width - resize decoration by width
      */
     resizeDecoration(scale, width) {
+        if (this._decorationBitmap === null) {
+            return;
+        }
+
         this._decorationBitmap.x = width - (30 * scale) / 2;
         this._decorationBitmap.y = (20 * scale) / 2; // Use 20 to match doTurtleShell
         this._decorationBitmap.scaleX =
