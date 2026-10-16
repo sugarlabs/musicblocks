@@ -167,6 +167,34 @@ describe("Block Foundation", () => {
         };
     });
 
+    describe("_createCache and updateCache lifecycle guards", () => {
+        it("should return early in _createCache without calling retryWithBackoff if container is null", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+
+            await block._createCache(jest.fn());
+
+            expect(global.retryWithBackoff).not.toHaveBeenCalled();
+        });
+
+        it("should return early in _createCache without calling retryWithBackoff if block is trashed", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = new global.createjs.Container();
+            block.trash = true;
+
+            await block._createCache(jest.fn());
+
+            expect(global.retryWithBackoff).not.toHaveBeenCalled();
+        });
+
+        it("should return early in updateCache if container is missing or trashed", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+
+            await expect(block.updateCache()).resolves.toBe(undefined);
+        });
+    });
+
     describe("Constructor", () => {
         it("should initialize with core properties from protoblock", () => {
             const block = new Block(mockProtoBlock, mockBlocks);

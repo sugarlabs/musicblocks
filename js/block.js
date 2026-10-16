@@ -387,7 +387,7 @@ class Block {
         return retryWithBackoff({
             check: () => {
                 if (!that.container || that.trash) {
-                    return null;
+                    return Promise.resolve();
                 }
                 that.bounds = that.container.getBounds();
                 return that.bounds;
@@ -2177,6 +2177,19 @@ class Block {
             }
 
             this.updateCache();
+
+            // Ensure cache creation is retried/completed if it was skipped due to being trashed earlier.
+            if (
+                this.container &&
+                !this.container.bitmapCache &&
+                typeof this.generateArtwork === "function"
+            ) {
+                this._createCache(block => {
+                    if (block.activity && typeof block.activity.refreshCanvas === "function") {
+                        block.activity.refreshCanvas();
+                    }
+                }, []);
+            }
             this.activity.refreshCanvas();
             this._setupAccessibleElement();
         }
