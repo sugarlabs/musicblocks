@@ -2536,4 +2536,60 @@ describe("Block Foundation", () => {
             expect(childBlock._setupAccessibleElement).toHaveBeenCalled();
         });
     });
+
+    describe("getLayoutUpdateType()", () => {
+        let block;
+        let mockPb;
+
+        beforeEach(() => {
+            mockPb = {
+                style: "twoarg",
+                expandable: true,
+                dockTypes: ["out", "numberin", "numberin", "in"]
+            };
+            block = new Block(mockPb, mockBlocks);
+            block.connections = [null, null, null, null];
+            block.docks = [
+                [0, 0, "out"],
+                [10, 10, "numberin"],
+                [10, 30, "numberin"],
+                [0, 40, "in"]
+            ];
+        });
+
+        it("returns null for negative connectionIndex", () => {
+            expect(block.getLayoutUpdateType(-1)).toBeNull();
+        });
+
+        it("returns 'ARG' for connectionIndex 1 and 2 on twoArgBlock", () => {
+            expect(block.isTwoArgBlock()).toBe(true);
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+            expect(block.getLayoutUpdateType(2)).toBe("ARG");
+        });
+
+        it("returns 'ARG' for connectionIndex 1 and 2 on expandable arg blocks", () => {
+            mockPb.style = "arg";
+            mockPb.expandable = true;
+            expect(block.isArgBlock()).toBe(true);
+            expect(block.isExpandableBlock()).toBe(true);
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+            expect(block.getLayoutUpdateType(2)).toBe("ARG");
+        });
+
+        it("returns 'FLOW' for flow connections (connectionIndex === n - 2)", () => {
+            mockPb.style = "flow";
+            mockPb.expandable = false;
+            block.connections = [null, null];
+            block.docks = [
+                [0, 0, "out"],
+                [0, 20, "in"]
+            ];
+            expect(block.getLayoutUpdateType(0)).toBe("FLOW");
+        });
+
+        it("returns null for other connection indices", () => {
+            expect(block.getLayoutUpdateType(0)).toBeNull();
+            expect(block.getLayoutUpdateType(3)).toBeNull();
+        });
+    });
 });
