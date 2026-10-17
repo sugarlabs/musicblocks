@@ -658,8 +658,11 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
             const duration = _noteDuration(child, divisions);
             const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
+            // A cue note shows another part's line during this one's rest
+            // and MusicXML says it isn't played, but it still fills the time.
             const isRest =
                 child.querySelector(":scope > rest") !== null ||
+                child.querySelector(":scope > cue") !== null ||
                 (pitchEl === null && unpitchedEl === null);
 
             let content;
