@@ -1339,7 +1339,8 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [21, "vspace", 0, 0, [17, 22]],
         [22, "pitch", 0, 0, [21, 23, 24, null]],
         [23, ["solfege", { value: "do" }], 0, 0, [22]],
-        [24, ["number", { value: 5 }], 0, 0, [22]]
+        [24, ["number", { value: 5 }], 0, 0, [22]],
+        [25, "hidden", 0, 0, [17, null]]
     ];
     const SETTIMBREHELP = [
         [0, "settimbre", x, y, [null, 1, 3, 2]],
