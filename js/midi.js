@@ -126,6 +126,7 @@ class MidiTranscriber {
         this.trackCount = 0;
         this.actionBlockPerTrack = [];
         this.instruments = [];
+        this.trackNames = [];
 
         this.tempos = this.midi.header.tempos || [];
         // The project plays at the tempo in force when the file starts, which is 120 bpm until
@@ -203,54 +204,87 @@ class MidiTranscriber {
             : [note.time, note.time + note.duration];
     }
 
-    buildSchedule(track) {
-        const events = [];
-        track.notes.forEach((note, index) => {
+    buildSchedules(track) {
+        // Only notes with the same onset AND release form a chord. Slicing at every
+        // other note's boundary would turn a held pitch into several new attacks.
+        const chords = new Map();
+        for (const note of track.notes) {
             const [noteStart, noteEnd] = this.noteSeconds(note);
             const start = Math.round(noteStart * 100) / 100;
             const end = Math.round(noteEnd * 100) / 100;
-
-            if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
-            events.push({ time: start, index, note }, { time: end, index });
-        });
-
-        events.sort((a, b) => a.time - b.time);
-        const sched = [];
-        // Key by note instance, not pitch: overlapping repetitions have independent endings.
-        const activeNotes = new Map();
-        let start = 0;
-        for (let i = 0; i < events.length;) {
-            const end = events[i].time;
-            if (end > start) {
-                sched.push({
-                    start,
-                    end,
-                    notes: activeNotes.size ? [...activeNotes.values()] : [{ name: "R" }]
-                });
+            if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+                continue;
             }
-            // Apply every change at this boundary before emitting the next interval. This
-            // avoids zero-length chords and keeps notes ending here out of the next chord.
-            while (i < events.length && events[i].time === end) {
-                const event = events[i++];
-                if (event.note) activeNotes.set(event.index, event.note);
-                else activeNotes.delete(event.index);
-            }
-            start = end;
+            const key = `${start}:${end}`;
+            if (!chords.has(key)) chords.set(key, { start, end, notes: [] });
+            chords.get(key).notes.push(note);
         }
-        return sched;
+
+        const schedules = [];
+        const ordered = [...chords.values()].sort((a, b) => a.start - b.start || b.end - a.end);
+        for (const chord of ordered) {
+            // Reuse a voice only once its previous note has ended. Every voice starts
+            // at time zero, with explicit rests for delayed entries and later gaps.
+            let schedule = schedules.find(voice => voice[voice.length - 1].end <= chord.start);
+            if (!schedule) {
+                schedule = [];
+                schedules.push(schedule);
+            }
+            const previousEnd = schedule.length ? schedule[schedule.length - 1].end : 0;
+            if (chord.start > previousEnd) {
+                schedule.push({ start: previousEnd, end: chord.start, notes: [{ name: "R" }] });
+            }
+            schedule.push(chord);
+        }
+        return schedules;
     }
 
-    getPitch(x, notes, prev, isPercussionTrack, isFirstNote) {
+    noteValueForInterval(seconds, bpm, preserveDuration) {
+        if (!preserveDuration) return getClosestStandardNoteValue(this.wholeNotesAt(seconds, bpm));
+        // Independent voices must keep a common clock. Quantising each voice's rests
+        // separately would shift its later attacks relative to the sustained voice.
+        // Schedule boundaries use centiseconds and tempo segments use integer BPM.
+        const numerator = Math.round(seconds * 100) * bpm;
+        const denominator = 24000;
+        let a = numerator;
+        let b = denominator;
+        while (b !== 0) [a, b] = [b, a % b];
+        return [numerator / a, denominator / a];
+    }
+
+    atNoteLimit() {
+        if (this.stopProcessing) return true;
+        if (this.totalnoteblockCount < this.maxNoteBlocks || this.maxNoteBlocks === undefined) {
+            return false;
+        }
+        this.stopProcessing = true;
+        if (typeof activity !== "undefined" && activity.textMsg) {
+            activity.textMsg(
+                `MIDI file is too large. Generating only ${this.maxNoteBlocks} noteblocks`
+            );
+        }
+        return true;
+    }
+
+    getPitch(x, notes, prev, isPercussionTrack) {
         const ar = [];
         if (notes[0].name === "R") {
             ar.push([x, "rest2", 0, 0, [prev, null]]);
         } else if (isPercussionTrack) {
-            const drumname = this.drumMidi[notes[0].midi]?.[0] || "kick drum";
-            ar.push(
-                [x, "playdrum", 0, 0, [isFirstNote ? prev : x - 1, x + 1, null]],
-                [x + 1, ["drumname", { value: drumname }], 0, 0, [x]]
-            );
-            x += 2;
+            for (let i = 0; i < notes.length; i++) {
+                const drumname = this.drumMidi[notes[i].midi]?.[0] || "kick drum";
+                ar.push(
+                    [
+                        x,
+                        "playdrum",
+                        0,
+                        0,
+                        [i === 0 ? prev : x - 2, x + 1, i === notes.length - 1 ? null : x + 2]
+                    ],
+                    [x + 1, ["drumname", { value: drumname }], 0, 0, [x]]
+                );
+                x += 2;
+            }
         } else {
             for (let na = 0; na < notes.length; na++) {
                 const [pitchName, octave] = splitNoteName(notes[na].name);
@@ -267,12 +301,11 @@ class MidiTranscriber {
         return ar;
     }
 
-    processTrack(track, trackIndex) {
+    processTrack(track, sched, trackName, preserveDuration) {
         let k = 0;
-        if (this.stopProcessing) return; // Exit if flag is set
-        if (!track.notes.length) return;
-        const sched = this.buildSchedule(track);
-        if (!sched.length) return;
+        if (!sched.length || this.atNoteLimit()) return;
+        this.noteblockCount = 0;
+        this.trackNames[this.trackCount] = trackName;
         const r = this.jsONON.length;
         const isPercussionTrack =
             track.instrument.percussion && (track.channel === 9 || track.channel === 10);
@@ -362,15 +395,7 @@ class MidiTranscriber {
             const isLastNoteInBlock =
                 noteSum >= 16 || (this.noteblockCount > 0 && this.noteblockCount % 24 === 0);
 
-            if (this.totalnoteblockCount >= this.maxNoteBlocks) {
-                if (typeof activity !== "undefined" && activity.textMsg) {
-                    activity.textMsg(
-                        `MIDI file is too large. Generating only ${this.maxNoteBlocks} noteblocks`
-                    );
-                }
-                this.stopProcessing = true;
-                break;
-            }
+            if (this.atNoteLimit()) break;
 
             const isLastNoteInSched = i === sched.length - 1;
             const last = isLastNoteInBlock || isLastNoteInSched;
@@ -383,7 +408,7 @@ class MidiTranscriber {
 
             // Splice a setbpm3 chunk in before this note if the tempo changed since the last
             // one, so notation reads at the tempo actually in force (playback timing already
-            // follows the file's own tempo map via noteSeconds()/buildSchedule(), unaffected
+            // follows the file's own tempo map via noteSeconds()/buildSchedules(), unaffected
             // by this). jsONON is append-only, so later indices just shift to make room; no
             // renumbering of already-pushed blocks is needed.
             const segIndex = this.tempoSegmentIndexAt(start);
@@ -431,10 +456,12 @@ class MidiTranscriber {
             if (tempoVspaceEntry) tempoVspaceEntry[4][1] = val;
 
             const bpm = this.tempoSegments[segIndex].bpm;
-            const obj = getNoteValue(this.wholeNotesAt(end - written, bpm));
-            written += (obj[0] / obj[1]) * (240 / bpm);
+            const obj = preserveDuration
+                ? this.noteValueForInterval(duration, bpm, true)
+                : getNoteValue(this.wholeNotesAt(end - written, bpm));
+            if (!preserveDuration) written += (obj[0] / obj[1]) * (240 / bpm);
 
-            const pitches = this.getPitch(val + 5, notes, val, isPercussionTrack, first);
+            const pitches = this.getPitch(val + 5, notes, val, isPercussionTrack);
             currentActionBlock.push(
                 [
                     val,
@@ -449,6 +476,7 @@ class MidiTranscriber {
                 [val + 4, "vspace", 0, 0, [val, val + 5]]
             );
             this.noteblockCount++;
+            this.totalnoteblockCount++;
             pitches[0][4][0] = val + 4;
             currentActionBlock = currentActionBlock.concat(pitches);
 
@@ -460,7 +488,6 @@ class MidiTranscriber {
             }
 
             if (isLastNoteInBlock) {
-                this.totalnoteblockCount += this.noteblockCount;
                 this.noteblockCount = 0;
                 noteSum = 0;
             }
@@ -656,7 +683,7 @@ class MidiTranscriber {
             m += 6;
             this.jsONON.push(
                 [len + m, "setturtlename2", 0, 0, [startIndex, len + m + 1, startIndex + 1]],
-                [len + m + 1, ["text", { value: `track${i}` }], 0, 0, [len + m]]
+                [len + m + 1, ["text", { value: this.trackNames[i] }], 0, 0, [len + m]]
             );
             m += 2;
         }
@@ -664,7 +691,12 @@ class MidiTranscriber {
 
     async transcribe() {
         this.midi.tracks.forEach((track, trackIndex) => {
-            this.processTrack(track, trackIndex);
+            const schedules = this.buildSchedules(track);
+            schedules.forEach((schedule, voiceIndex) => {
+                const name =
+                    `track${trackIndex}` + (schedules.length > 1 ? ` voice ${voiceIndex + 1}` : "");
+                this.processTrack(track, schedule, name, schedules.length > 1);
+            });
         });
 
         this.finalizeTracks();
