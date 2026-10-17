@@ -249,6 +249,15 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                 }
 
+                if (tur.singer.noteValue === undefined) {
+                    tur.singer.noteValue = {};
+                }
+                const isRhythm2 = activity.blocks.blockList[blk].name === "rhythm2";
+                const storedNoteValue = isRhythm2
+                    ? noteBeatValue / tur.singer.beatFactor
+                    : 1 / (noteBeatValue * tur.singer.beatFactor);
+                tur.singer.noteValue[last(tur.singer.inNoteBlock)] = storedNoteValue;
+
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 

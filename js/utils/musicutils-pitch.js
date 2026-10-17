@@ -434,6 +434,11 @@ var parseNoteString = note => {
     if (match) {
         return [match[1], Number(match[2])];
     }
+    // Match custom/microtonal notes with cents and an octave (e.g. "^^G♭(+0¢)4", "C(+14¢)4", "D(+25)4")
+    const centsMatch = note.match(/^(.*\([+-]?\d+¢?\))(-?\d+)$/);
+    if (centsMatch) {
+        return [centsMatch[1], Number(centsMatch[2])];
+    }
 
     // If completely unparseable, return the whole string as the note with NaN octave.
     // This is safer than silently chopping off the last character.
