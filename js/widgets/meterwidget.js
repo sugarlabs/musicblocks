@@ -195,6 +195,7 @@ class MeterWidget {
          */
         widgetWindow.onclose = () => {
             this._playing = false;
+            this._hidePlaybackIndicator();
             if (this._playBeatTimeout) {
                 this._clearWidgetTimeout(this._playBeatTimeout);
                 this._playBeatTimeout = null;
@@ -240,6 +241,7 @@ class MeterWidget {
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
+                    this._hidePlaybackIndicator();
                     if (this._playBeatTimeout) {
                         this._clearWidgetTimeout(this._playBeatTimeout);
                         this._playBeatTimeout = null;
@@ -342,6 +344,7 @@ class MeterWidget {
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
+            this._hidePlaybackIndicator();
             if (this._playBeatTimeout) {
                 this._clearWidgetTimeout(this._playBeatTimeout);
                 this._playBeatTimeout = null;
@@ -475,24 +478,34 @@ class MeterWidget {
     }
 
     /**
+     * Hides all play-wheel beat indicator slices.
+     *
+     * @private
+     * @returns {void}
+     */
+    _hidePlaybackIndicator() {
+        if (this._playWheel && this._playWheel.navItems) {
+            for (let i = 0; i < this._strongBeats.length; i++) {
+                if (
+                    this._playWheel.navItems[i] &&
+                    this._playWheel.navItems[i].navItem &&
+                    typeof this._playWheel.navItems[i].navItem.hide === "function"
+                ) {
+                    this._playWheel.navItems[i].navItem.hide();
+                }
+            }
+        }
+    }
+
+    /**
      * @private
      * @param {number} i
      * @param {number} ms
      * @returns {void}
      */
     __playOneBeat(i, ms) {
-        if (!this._playing) {
-            return;
-        }
-
-        if (this.__getPauseStatus()) {
-            if (this._playWheel && this._playWheel.navItems) {
-                for (let i = 0; i < this._strongBeats.length; i++) {
-                    if (this._playWheel.navItems[i] && this._playWheel.navItems[i].navItem) {
-                        this._playWheel.navItems[i].navItem.hide();
-                    }
-                }
-            }
+        if (!this._playing || this.__getPauseStatus()) {
+            this._hidePlaybackIndicator();
             return;
         }
 
@@ -538,9 +551,7 @@ class MeterWidget {
         const tur = this._turtle;
         const bpmFactor =
             TONEBPM / (tur && tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        for (let i = 0; i < this._strongBeats.length; i++) {
-            this._playWheel.navItems[i].navItem.hide();
-        }
+        this._hidePlaybackIndicator();
 
         const noteBeatValue = bpmFactor * 1000 * this._beatValue;
         this.__playOneBeat(0, noteBeatValue);
