@@ -1468,4 +1468,41 @@ describe("processABCNotes - measure bar lines", () => {
         const bars = elements.filter(e => e.el_type === "bar");
         expect(bars.map(b => b.type)).toEqual(["bar_left_repeat", "bar_right_repeat"]);
     });
+
+    it("aligns subsequent full measures when preceded by a quarter-note pickup", () => {
+        const staged = [
+            "pickup",
+            "4",
+            note("C4", 4),
+            ...Array.from({ length: 8 }, () => note("D4", 8))
+        ];
+        const body = exportBody(staged);
+
+        expect(body.replace(/\n/g, "")).toBe("C4 | D2 D2 D2 D2 D2 D2 D2 D2 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("tracks measure timing independently per active voice", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            "voice two",
+            note("E4"),
+            note("F4"),
+            note("G4"),
+            note("A4"),
+            "one voice",
+            note("E4"),
+            note("F4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toContain("[V:2]E4 F4 G4 A4 |");
+        expect(body).toContain("[V:1]E4 F4 |");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
 });

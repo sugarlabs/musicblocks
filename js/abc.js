@@ -237,6 +237,8 @@ class AbcExporter {
         this.pendingAnnotations = [];
         this.prefixStart = null;
         this.queueSlur = 0;
+        this.activeVoice = 0;
+        this.voiceStates = {};
         this.measureDuration = 16;
         this.measureTime = 0;
         this.pickupDuration = null;
@@ -265,7 +267,23 @@ class AbcExporter {
         return "[V:" + this.voiceId + (n === 0 ? "" : "v" + n) + "]";
     }
 
-    __voiceChanged() {
+    __voiceChanged(n = 0) {
+        if (this.voiceStates) {
+            this.voiceStates[this.activeVoice] = {
+                measureTime: this.measureTime,
+                pickupDuration: this.pickupDuration,
+                firstMeasure: this.firstMeasure
+            };
+            this.activeVoice = n;
+            const state = this.voiceStates[this.activeVoice] || {
+                measureTime: 0,
+                pickupDuration: null,
+                firstMeasure: true
+            };
+            this.measureTime = state.measureTime;
+            this.pickupDuration = state.pickupDuration;
+            this.firstMeasure = state.firstMeasure;
+        }
         this.pitchesInDoubt = new Set(Object.keys(this.accidentalsInForce));
     }
 
@@ -536,23 +554,23 @@ class AbcExporter {
                 break;
             case "voice one":
                 this.__pushField(this.__voiceField(1));
-                this.__voiceChanged();
+                this.__voiceChanged(1);
                 break;
             case "voice two":
                 this.__pushField(this.__voiceField(2));
-                this.__voiceChanged();
+                this.__voiceChanged(2);
                 break;
             case "voice three":
                 this.__pushField(this.__voiceField(3));
-                this.__voiceChanged();
+                this.__voiceChanged(3);
                 break;
             case "voice four":
                 this.__pushField(this.__voiceField(4));
-                this.__voiceChanged();
+                this.__voiceChanged(4);
                 break;
             case "one voice":
                 this.__pushField(this.__voiceField(0));
-                this.__voiceChanged();
+                this.__voiceChanged(0);
                 break;
             default:
                 break;
@@ -753,12 +771,13 @@ class AbcExporter {
             const target =
                 this.pickupDuration !== null ? this.pickupDuration : this.measureDuration;
             if (this.measureTime >= target - EPSILON) {
+                this.measureTime -= target;
                 this.pickupDuration = null;
                 this.__pushBarLine();
                 while (this.measureTime >= this.measureDuration - EPSILON) {
                     this.measureTime -= this.measureDuration;
                 }
-                if (this.measureTime < EPSILON) {
+                if (Math.abs(this.measureTime) < EPSILON) {
                     this.measureTime = 0;
                 }
             }
