@@ -338,9 +338,17 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
 function _initialTimeSignature(partEl) {
     const timeEl = partEl.querySelector("measure attributes time");
     if (!timeEl) return { beats: 4, beatType: 4 };
+    // <beats> can be additive: the MusicXML spec writes a 3+2/8 bar as one
+    // <beats>3+2</beats>/<beat-type>8</beat-type> pair, and it holds the sum.
+    // Number("3+2") is NaN, and the meter block was handed that as its beat
+    // count.
+    const beats = (_text(timeEl, "beats") ?? "4")
+        .split("+")
+        .reduce((total, part) => total + Number(part), 0);
+    const beatType = Number(_text(timeEl, "beat-type") ?? "4");
     return {
-        beats: Number(_text(timeEl, "beats") ?? "4"),
-        beatType: Number(_text(timeEl, "beat-type") ?? "4")
+        beats: Number.isFinite(beats) && beats > 0 ? beats : 4,
+        beatType: Number.isFinite(beatType) && beatType > 0 ? beatType : 4
     };
 }
 
