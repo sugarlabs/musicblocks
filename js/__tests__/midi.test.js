@@ -22,7 +22,7 @@ const { getClosestStandardNoteValue, transcribeMidi } = require("../midi");
 const mockMidi = {
     header: {
         ppq: 480,
-        tempos: [{ bpm: 120 }],
+        tempos: [{ bpm: 120, ticks: 0 }],
         timeSignatures: [{ timeSignature: [4, 4], ticks: 0 }]
     },
     tracks: [
@@ -926,6 +926,47 @@ describe("transcribeMidi", () => {
             const seconds = (wholeNotes * 4 * 60) / tempoOf(blocks).quarterNotesPerMinute;
 
             expect(seconds).toBeCloseTo(lastNote.time + lastNote.duration, 2);
+        });
+
+        describe("long and tied lengths", () => {
+            it("keeps a rest of several bars at its full length", async () => {
+                const blocks = await importBlocks(midiFile({ lengths: [-8, 1, 1] }));
+
+                expect(noteValues(blocks)).toEqual(["2/1", "1/4", "1/4"]);
+            });
+
+            it("keeps a note held over several bars at its full length", async () => {
+                const blocks = await importBlocks(midiFile({ lengths: [9, 1] }));
+
+                expect(noteValues(blocks)).toEqual(["9/4", "1/4"]);
+            });
+
+            it("writes tied lengths exactly", async () => {
+                const blocks = await importBlocks(
+                    midiFile({ lengths: [2.5, 0.5, 1, 5, 3, 3.5, 0.5, 1.75] })
+                );
+
+                expect(noteValues(blocks)).toEqual([
+                    "5/8",
+                    "1/8",
+                    "1/4",
+                    "5/4",
+                    "3/4",
+                    "7/8",
+                    "1/8",
+                    "7/16"
+                ]);
+            });
+
+            it("does not let rounding add up along a track", async () => {
+                const lengths = Array(12).fill(1.1);
+                const blocks = await importBlocks(midiFile({ lengths }));
+
+                const total = noteValues(blocks)
+                    .map(value => value.split("/").map(Number))
+                    .reduce((sum, [numerator, denominator]) => sum + numerator / denominator, 0);
+                expect(Math.abs(total - (12 * 1.1) / 4)).toBeLessThan(1 / 32);
+            });
         });
 
         describe("dotted notes and triplets", () => {
