@@ -167,6 +167,294 @@ describe("Block Foundation", () => {
         };
     });
 
+    describe("_createCache and updateCache lifecycle guards", () => {
+        let consoleDebugSpy;
+
+        beforeEach(() => {
+            consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            consoleDebugSpy.mockRestore();
+        });
+
+        describe("_blockMakeBitmap", () => {
+            let originalImage;
+            let mockImageInstance;
+            let originalBase64Encode;
+
+            beforeEach(() => {
+                originalBase64Encode = window.base64Encode;
+                window.base64Encode = jest.fn(str => str);
+                originalImage = global.Image;
+                global.Image = jest.fn(() => {
+                    mockImageInstance = {
+                        onload: null,
+                        onerror: null,
+                        set src(val) {
+                            this._src = val;
+                        }
+                    };
+                    return mockImageInstance;
+                });
+            });
+
+            afterEach(() => {
+                global.Image = originalImage;
+                window.base64Encode = originalBase64Encode;
+            });
+
+            it("should create a bitmap on successful image load and invoke callback", () => {
+                const mockCallback = jest.fn();
+                const args = { id: 1 };
+                Block._blockMakeBitmap("<svg></svg>", mockCallback, args);
+
+                expect(typeof mockImageInstance.onload).toBe("function");
+                mockImageInstance.onload();
+
+                expect(mockCallback).toHaveBeenCalledWith(
+                    expect.objectContaining({ visible: true }),
+                    args
+                );
+            });
+
+            it("should log debug message on image load error", () => {
+                const mockCallback = jest.fn();
+                Block._blockMakeBitmap("<svg></svg>", mockCallback, {});
+
+                expect(typeof mockImageInstance.onerror).toBe("function");
+                mockImageInstance.onerror(new Error("Image decode failed"));
+
+                expect(consoleDebugSpy).toHaveBeenCalledWith(
+                    "Failed to load SVG bitmap from SVG data"
+                );
+                expect(mockCallback).not.toHaveBeenCalled();
+            });
+        });
+
+        describe("_createCache lifecycle and retry options", () => {
+            it("should return early without calling retryWithBackoff if container is null", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = null;
+
+                await block._createCache(jest.fn());
+                expect(global.retryWithBackoff).not.toHaveBeenCalled();
+            });
+
+            it("should return early without calling retryWithBackoff if block is trashed", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = new global.createjs.Container();
+                block.trash = true;
+
+                await block._createCache(jest.fn());
+                expect(global.retryWithBackoff).not.toHaveBeenCalled();
+            });
+
+            it("should handle check callback guards when container becomes null or block is trashed", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = new global.createjs.Container();
+
+                let capturedOptions;
+                global.retryWithBackoff.mockImplementationOnce(async options => {
+                    capturedOptions = options;
+                    return options.check();
+                });
+
+                await block._createCache(jest.fn());
+
+                // Test container becomes null in check
+                block.container = null;
+                await expect(capturedOptions.check()).resolves.toBeUndefined();
+
+                // Test block becomes trashed in check
+                block.container = new global.createjs.Container();
+                block.trash = true;
+                await expect(capturedOptions.check()).resolves.toBeUndefined();
+
+                // Test valid check returns bounds
+                block.trash = false;
+                const bounds = { x: 0, y: 0, width: 50, height: 50 };
+                block.container.getBounds = jest.fn().mockReturnValue(bounds);
+                expect(capturedOptions.check()).toBe(bounds);
+                expect(block.bounds).toBe(bounds);
+            });
+
+            it("should handle onSuccess callback guards and successful caching", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = new global.createjs.Container();
+                const callback = jest.fn();
+                const args = ["arg1"];
+
+                let capturedOptions;
+                global.retryWithBackoff.mockImplementationOnce(async options => {
+                    capturedOptions = options;
+                    return options.check();
+                });
+
+                await block._createCache(callback, args);
+
+                // When container is null in onSuccess
+                block.container = null;
+                capturedOptions.onSuccess({ x: 0, y: 0, width: 10, height: 10 });
+                expect(callback).not.toHaveBeenCalled();
+
+                // When block is trashed in onSuccess
+                block.container = new global.createjs.Container();
+                block.trash = true;
+                capturedOptions.onSuccess({ x: 0, y: 0, width: 10, height: 10 });
+                expect(block.container.cache).not.toHaveBeenCalled();
+                expect(callback).not.toHaveBeenCalled();
+
+                // Normal execution in onSuccess
+                block.trash = false;
+                capturedOptions.onSuccess({ x: 1, y: 2, width: 30, height: 40 });
+                expect(block.container.cache).toHaveBeenCalledWith(1, 2, 30, 40);
+                expect(callback).toHaveBeenCalledWith(block, args);
+            });
+
+            it("should handle onRetry callback guards and artwork regeneration", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = new global.createjs.Container();
+                block.regenerateArtwork = jest.fn();
+
+                let capturedOptions;
+                global.retryWithBackoff.mockImplementationOnce(async options => {
+                    capturedOptions = options;
+                    return options.check();
+                });
+
+                await block._createCache(jest.fn());
+
+                // When container is null in onRetry
+                block.container = null;
+                capturedOptions.onRetry();
+                expect(block.regenerateArtwork).not.toHaveBeenCalled();
+
+                // When block is trashed in onRetry
+                block.container = new global.createjs.Container();
+                block.trash = true;
+                capturedOptions.onRetry();
+                expect(block.regenerateArtwork).not.toHaveBeenCalled();
+
+                // Normal execution in onRetry
+                block.trash = false;
+                capturedOptions.onRetry();
+                expect(block.regenerateArtwork).toHaveBeenCalledWith(true, []);
+            });
+
+            it("should catch and log errors in _createCache", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = new global.createjs.Container();
+
+                global.retryWithBackoff.mockRejectedValueOnce(new Error("Cache failed"));
+                await block._createCache(jest.fn());
+                expect(consoleDebugSpy).toHaveBeenCalledWith("Cache failed");
+
+                global.retryWithBackoff.mockRejectedValueOnce("String error");
+                await block._createCache(jest.fn());
+                expect(consoleDebugSpy).toHaveBeenCalledWith("String error");
+            });
+        });
+
+        describe("updateCache lifecycle and retry options", () => {
+            it("should return early if container is missing, has no bitmapCache, or block is trashed", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = null;
+                await expect(block.updateCache()).resolves.toBeUndefined();
+
+                block.container = { bitmapCache: null };
+                await expect(block.updateCache()).resolves.toBeUndefined();
+
+                block.container = { bitmapCache: {} };
+                block.trash = true;
+                await expect(block.updateCache()).resolves.toBeUndefined();
+
+                expect(global.retryWithBackoff).not.toHaveBeenCalled();
+            });
+
+            it("should validate all conditions in updateCache check callback", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = { bitmapCache: {} };
+                block.bounds = { x: 0, y: 0, width: 10, height: 10 };
+
+                let capturedOptions;
+                global.retryWithBackoff.mockImplementationOnce(async options => {
+                    capturedOptions = options;
+                    return options.check();
+                });
+
+                await block.updateCache();
+
+                // All valid
+                expect(capturedOptions.check()).toBe(true);
+
+                // Bounds null
+                block.bounds = null;
+                expect(capturedOptions.check()).toBe(false);
+                block.bounds = { x: 0, y: 0, width: 10, height: 10 };
+
+                // Container null
+                block.container = null;
+                expect(capturedOptions.check()).toBe(false);
+                block.container = { bitmapCache: {} };
+
+                // bitmapCache falsy
+                block.container.bitmapCache = null;
+                expect(capturedOptions.check()).toBe(false);
+                block.container.bitmapCache = {};
+
+                // Trash true
+                block.trash = true;
+                expect(capturedOptions.check()).toBe(false);
+            });
+
+            it("should handle updateCache onSuccess and activity refresh", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.bounds = { x: 0, y: 0, width: 10, height: 10 };
+                block.container = { bitmapCache: {}, updateCache: jest.fn() };
+
+                let capturedOptions;
+                global.retryWithBackoff.mockImplementationOnce(async options => {
+                    capturedOptions = options;
+                    return options.check();
+                });
+
+                await block.updateCache();
+
+                // Normal execution
+                capturedOptions.onSuccess();
+                expect(block.container.updateCache).toHaveBeenCalled();
+                expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
+
+                // Without activity or refreshCanvas
+                block.activity = null;
+                expect(() => capturedOptions.onSuccess()).not.toThrow();
+
+                // When container is null or trash is true during onSuccess
+                block.container = null;
+                expect(() => capturedOptions.onSuccess()).not.toThrow();
+
+                block.container = { bitmapCache: {}, updateCache: jest.fn() };
+                block.trash = true;
+                capturedOptions.onSuccess();
+                expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+
+            it("should catch and log errors in updateCache", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = { bitmapCache: {} };
+
+                global.retryWithBackoff.mockRejectedValueOnce(new Error("Update cache failed"));
+                await block.updateCache();
+                expect(consoleDebugSpy).toHaveBeenCalledWith("Update cache failed");
+
+                global.retryWithBackoff.mockRejectedValueOnce("Update cache string error");
+                await block.updateCache();
+                expect(consoleDebugSpy).toHaveBeenCalledWith("Update cache string error");
+            });
+        });
+    });
+
     describe("Constructor", () => {
         it("should initialize with core properties from protoblock", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
@@ -1360,6 +1648,32 @@ describe("Block Foundation", () => {
             b.show();
             expect(b.container.visible).toBe(true);
         });
+
+        it("should restore cache via _createCache in show() when bitmapCache is missing", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.trash = false;
+            b.inCollapsed = false;
+            b.bitmap = { visible: false };
+            b.highlightBitmap = null;
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+
+            const createCacheSpy = jest.spyOn(b, "_createCache").mockImplementation((cb, args) => {
+                cb(b, args);
+            });
+
+            b.show();
+            expect(b.container.visible).toBe(true);
+            expect(createCacheSpy).toHaveBeenCalledWith(expect.any(Function), []);
+            expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
+
+            // When activity or refreshCanvas is absent in callback
+            b.activity = null;
+            expect(() => {
+                createCacheSpy.mock.calls[0][0](b, []);
+            }).not.toThrow();
+        });
     });
 
     describe("Cache Management (_createCache & updateCache)", () => {
@@ -1422,6 +1736,36 @@ describe("Block Foundation", () => {
 
             expect(block.container.updateCache).toHaveBeenCalled();
             expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("_createCache should resolve immediately without retry if container is null or block is trashed", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+
+            const res1 = await block._createCache(jest.fn(), []);
+            expect(res1).toBeUndefined();
+
+            block.container = { getBounds: jest.fn(), cache: jest.fn() };
+            block.trash = true;
+
+            const res2 = await block._createCache(jest.fn(), []);
+            expect(res2).toBeUndefined();
+            expect(block.container.cache).not.toHaveBeenCalled();
+        });
+
+        it("updateCache should resolve immediately without retry if container is null or block is trashed", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+
+            const res1 = await block.updateCache();
+            expect(res1).toBeUndefined();
+
+            block.container = { bitmapCache: {}, updateCache: jest.fn() };
+            block.trash = true;
+
+            const res2 = await block.updateCache();
+            expect(res2).toBeUndefined();
+            expect(block.container.updateCache).not.toHaveBeenCalled();
         });
     });
 
