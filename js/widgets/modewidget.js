@@ -1522,8 +1522,27 @@ class ModeWidget {
         );
     }
 
+    /**
+     * Find the equal division of the octave an imported .scl mode sits on.
+     * A mode on n-EDO also fits every multiple of n, so the search can't
+     * just take the finest grid that fits: that read a 12-EDO major scale
+     * back as 48-EDO and switched the project's temperament with it. The
+     * wheel's current EDO wins when the file fits it; otherwise the
+     * coarsest grid that holds every pitch.
+     * @param {Array<{cents: number}>} pitches - The .scl pitches above 1/1
+     * @returns {{edo: number, pattern: number[]}|null}
+     */
     _findEdoSteps(pitches) {
-        for (let edo = TuningFormats.EDO_MAX; edo >= TuningFormats.EDO_MIN; edo--) {
+        const candidates = [];
+        for (let edo = TuningFormats.EDO_MIN; edo <= TuningFormats.EDO_MAX; edo++) {
+            candidates.push(edo);
+        }
+        if (candidates.includes(this._activeEDO)) {
+            candidates.splice(candidates.indexOf(this._activeEDO), 1);
+            candidates.unshift(this._activeEDO);
+        }
+
+        for (const edo of candidates) {
             const step = 1200 / edo;
             const steps = [];
             let prevStepCount = 0;
