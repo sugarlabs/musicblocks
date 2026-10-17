@@ -936,9 +936,27 @@ describe("transcribeMidi", () => {
             });
 
             it("keeps a note held over several bars at its full length", async () => {
-                const blocks = await importBlocks(midiFile({ lengths: [9, 1] }));
+                const blocks = await importBlocks(midiFile({ lengths: [9, 11.5, 1] }));
 
-                expect(noteValues(blocks)).toEqual(["9/4", "1/4"]);
+                expect(noteValues(blocks)).toEqual(["9/4", "23/8", "1/4"]);
+            });
+
+            it("keeps a note that runs across a tempo change at its own length", async () => {
+                // One second at 120 bpm then one at 240 bpm, all played at 120 bpm
+                const blocks = await importBlocks(
+                    midiFile({
+                        tempos: [
+                            [0, 120],
+                            [2 * PPQ, 240]
+                        ],
+                        lengths: [6, 1]
+                    })
+                );
+
+                expect(noteValues(blocks)).toEqual(["1/1", "1/4"]);
+                expect(midTrackTempoChanges(blocks).map(t => t.quarterNotesPerMinute)).toEqual([
+                    240
+                ]);
             });
 
             it("writes tied lengths exactly", async () => {

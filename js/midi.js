@@ -73,14 +73,14 @@ const getClosestStandardNoteValue = duration => {
 const gcd = (a, b) => (b ? gcd(b, a % b) : a);
 
 // A length no single value fits within a thirty-second note, such as a tied note or a rest of
-// several bars, is written as the largest plain value that fits plus the closest remainder.
+// several bars, is written as the largest plain value that fits plus the value of the rest.
 const getNoteValue = length => {
     const error = ([n, d]) => Math.abs(n / d - length);
     const closest = getClosestStandardNoteValue(length);
     if (length <= 1 / 128 || error(closest) <= 1 / 32) return closest;
 
     const plain = length >= 1 ? [Math.floor(length), 1] : [1, 2 ** Math.ceil(-Math.log2(length))];
-    const [n, d] = getClosestStandardNoteValue(length - plain[0] / plain[1]);
+    const [n, d] = getNoteValue(length - plain[0] / plain[1]);
     const numerator = plain[0] * d + n * plain[1];
     const denominator = plain[1] * d;
     const divisor = gcd(numerator, denominator);
@@ -185,21 +185,6 @@ class MidiTranscriber {
     // own tempo map, not from this.
     wholeNotesAt(seconds, bpm = this.currentMidiTempoBpm) {
         return (seconds * bpm) / 240;
-    }
-
-    // Whole notes from the start of the file, each tempo segment counted at its own tempo.
-    wholeNotePositionAt(seconds) {
-        let position = 0;
-        for (let i = 0; i < this.tempoSegments.length; i++) {
-            const { start, bpm } = this.tempoSegments[i];
-            if (start >= seconds) break;
-            const next = this.tempoSegments[i + 1];
-            position += this.wholeNotesAt(
-                Math.min(seconds, next ? next.start : seconds) - start,
-                bpm
-            );
-        }
-        return position;
     }
 
     // @tonejs/midi times notes before a delayed first tempo event at 120 bpm, but times the
@@ -319,7 +304,8 @@ class MidiTranscriber {
         // at 0: finalizeTracks() always writes one setbpm3 for the file's starting tempo,
         // shared by every track, before any of this runs.
         let appliedTempoIndex = 0;
-        // Each note runs up to where the file's note ends, so rounding never adds up.
+        // Seconds the written notes play for. Each note runs up to where the file's note ends,
+        // at the tempo it plays at, so rounding never adds up.
         let written = 0;
 
         const addNewActionBlock = (isLastBlock = false) => {
@@ -444,8 +430,9 @@ class MidiTranscriber {
             if (k !== 0) val = val + 2;
             if (tempoVspaceEntry) tempoVspaceEntry[4][1] = val;
 
-            const obj = getNoteValue(this.wholeNotePositionAt(end) - written);
-            written += obj[0] / obj[1];
+            const bpm = this.tempoSegments[segIndex].bpm;
+            const obj = getNoteValue(this.wholeNotesAt(end - written, bpm));
+            written += (obj[0] / obj[1]) * (240 / bpm);
 
             const pitches = this.getPitch(val + 5, notes, val, isPercussionTrack, first);
             currentActionBlock.push(
