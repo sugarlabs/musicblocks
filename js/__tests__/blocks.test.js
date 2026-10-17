@@ -2045,6 +2045,11 @@ describe("Blocks Foundation", () => {
         const makeBatch = n =>
             Array.from({ length: n }, (_, i) => [i, "forward", 0, 0, [null, null, null]]);
 
+        // Subscribe before starting a load so even synchronous events are captured.
+        // Jest's test timeout bounds the wait if the expected event never arrives.
+        const nextLoadEvent = eventName =>
+            new Promise(resolve => global.pubsub.once(eventName, resolve));
+
         // Stands in for the real path: block.js calls cleanupAfterLoad()
         // once a block's own artwork generation finishes, asynchronously,
         // after _processOneBlock has already recorded the block for the
@@ -2481,20 +2486,26 @@ describe("Blocks Foundation", () => {
             const callback = jest.fn();
 
             try {
-                blocks.loadNewBlocks(makeBatch(25));
+                const loadFailed = nextLoadEvent("loadFailed");
+                const failedToken = blocks.loadNewBlocks(makeBatch(25));
                 blocks.runAfterLoad(callback);
-                await new Promise(r => setTimeout(r, 50));
+                expect(callback).not.toHaveBeenCalled();
+                expect((await loadFailed).token).toBe(failedToken);
             } finally {
                 window.removeEventListener("error", onWindowError);
             }
 
             expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
             expect(callback).not.toHaveBeenCalled();
 
             blocks._processOneBlock = stubProcessOneBlock();
-            blocks.loadNewBlocks(makeBatch(2));
-            await new Promise(r => setTimeout(r, 50));
+            const recovered = nextLoadEvent("finishedLoading");
+            const recoveryToken = blocks.loadNewBlocks(makeBatch(2));
+            expect((await recovered).token).toBe(recoveryToken);
 
+            expect(blocks.isLoading()).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(false);
             expect(callback).not.toHaveBeenCalled();
         });
 
@@ -2513,16 +2524,21 @@ describe("Blocks Foundation", () => {
             const callback = jest.fn();
 
             try {
-                blocks.loadNewBlocks(makeBatch(25));
-                blocks.loadNewBlocks(makeBatch(2));
+                const loadFailed = nextLoadEvent("loadFailed");
+                const queuedLoadFinished = nextLoadEvent("finishedLoading");
+                const failedToken = blocks.loadNewBlocks(makeBatch(25));
+                const queuedToken = blocks.loadNewBlocks(makeBatch(2));
                 blocks.runAfterLoad(callback);
-                await new Promise(r => setTimeout(r, 50));
+                expect(callback).not.toHaveBeenCalled();
+                expect((await loadFailed).token).toBe(failedToken);
+                expect((await queuedLoadFinished).token).toBe(queuedToken);
             } finally {
                 window.removeEventListener("error", onWindowError);
             }
 
             expect(blocks._lastLoadFailed).toBe(false);
             expect(blocks.isLoading()).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
             expect(callback).not.toHaveBeenCalled();
         });
 
@@ -2530,12 +2546,15 @@ describe("Blocks Foundation", () => {
             const callback = jest.fn();
             const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
 
-            blocks.loadNewBlocks(makeBatch(25));
+            const firstLoadFinished = nextLoadEvent("finishedLoading");
+            const firstToken = blocks.loadNewBlocks(makeBatch(25));
             blocks.loadNewBlocks(circularBatch);
             blocks.runAfterLoad(callback);
-            await new Promise(r => setTimeout(r, 50));
+            expect(callback).not.toHaveBeenCalled();
+            expect((await firstLoadFinished).token).toBe(firstToken);
 
             expect(blocks.isLoading()).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
             expect(mockActivity.errorMsg).toHaveBeenCalled();
             expect(callback).not.toHaveBeenCalled();
         });
