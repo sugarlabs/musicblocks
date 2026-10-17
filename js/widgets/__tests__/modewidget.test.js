@@ -304,7 +304,10 @@ describe("ModeWidget", () => {
                 resetSynth: jest.fn(),
                 synth: {
                     trigger: jest.fn(),
-                    stop: jest.fn()
+                    stop: jest.fn(),
+                    temperamentChanged: jest.fn(),
+                    startingPitch: "C4",
+                    inTemperament: "equal"
                 }
             },
             turtles: {
@@ -1321,6 +1324,58 @@ describe("ModeWidget", () => {
 
             expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
             expect(widget._playing).toBe(false);
+        });
+    });
+
+    describe("synthesizer temperament synchronization", () => {
+        test("_syncSynthTemperament updates inTemperament and notifies synth.temperamentChanged", () => {
+            modeWidget._syncSynthTemperament("equal19");
+
+            expect(mockActivity.logo.synth.inTemperament).toBe("equal19");
+            expect(mockActivity.logo.synth.temperamentChanged).toHaveBeenCalledWith(
+                "equal19",
+                "C4"
+            );
+        });
+
+        test("_syncSynthTemperament safely handles missing logo, synth, or temperamentChanged", () => {
+            modeWidget.logo = null;
+            expect(() => modeWidget._syncSynthTemperament("equal")).not.toThrow();
+
+            modeWidget.logo = {};
+            expect(() => modeWidget._syncSynthTemperament("equal")).not.toThrow();
+
+            modeWidget.logo = { synth: {} };
+            expect(() => modeWidget._syncSynthTemperament("equal")).not.toThrow();
+            expect(modeWidget.logo.synth.inTemperament).toBe("equal");
+        });
+
+        test("_rebuildWheel synchronizes synth temperament for equally tempered tunings", () => {
+            jest.spyOn(modeWidget, "_piemenuMode").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_rebuildModeIndex").mockImplementation(() => {});
+
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget._rebuildWheel(19);
+
+            expect(mockActivity.logo.synth.inTemperament).toBe("equal19");
+            expect(mockActivity.logo.synth.temperamentChanged).toHaveBeenCalledWith(
+                "equal19",
+                "C4"
+            );
+        });
+
+        test("_applyImportedMode synchronizes synth temperament with imported mode EDO", () => {
+            jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+            modeWidget._applyImportedMode(31, [3, 4, 2, 3, 4, 3, 3], "imported-31");
+
+            expect(mockActivity.logo.synth.inTemperament).toBe("equal31");
+            expect(mockActivity.logo.synth.temperamentChanged).toHaveBeenCalledWith(
+                "equal31",
+                "C4"
+            );
         });
     });
 });
