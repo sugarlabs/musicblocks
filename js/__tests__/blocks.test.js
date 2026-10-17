@@ -2033,6 +2033,181 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    // ---------------------------------------------------------------------------
+    // Regression: invalid block connections in imported project data
+    // ---------------------------------------------------------------------------
+    // Each test below pins a specific corrupt-input shape against the real
+    // _processOneBlock path (no mock) to prove that the loader either aborts
+    // cleanly via abortLoad() or does NOT throw an unhandled exception.
+    //
+    // The four cases correspond to real failure modes that can occur when
+    // loading hand-edited or externally generated project JSON:
+    //
+    //   Case 1 – out-of-range parent pointer on an unknown block:
+    //     dock[0] of a block not in protoBlockDict references index 99, which
+    //     does not exist. _processOneBlock reaches the NOP-substitution path
+    //     and calls blockObjs[99][4].indexOf(b), which is a TypeError on
+    //     undefined. Expected: abortLoad fires (errorMsg called, no throw).
+    //
+    //   Case 2 – out-of-range last-connection pointer on an unknown block:
+    //     dock[0] is null (top-level block), but the last dock references
+    //     index 99. Same NOP path, same crash site one branch later.
+    //     Expected: abortLoad fires (errorMsg called, no throw).
+    //
+    //   Case 3 – non-array connections field:
+    //     blkData[4] is the string "bad" instead of an array. The metadata-
+    //     strip guard pops entries only when the *last* element is non-array;
+    //     a single non-array element at index 0 survives and reaches
+    //     _processOneBlock where blkData[4].length is "bad".length (3),
+    //     producing unexpected behavior. Expected: no throw, _loadInProgress
+    //     false.
+    //
+    //   Case 4 – connections array containing a negative index:
+    //     A value of -1 is syntactically valid JSON but semantically illegal.
+    //     blockObjs[-1] is undefined; the NOP path must not crash when it
+    //     tries to inspect that parent block. Expected: no throw,
+    //     _loadInProgress false.
+    // ---------------------------------------------------------------------------
+    describe("invalid block connections – regression (import load)", () => {
+        const { PubSub } = require("../pubsub");
+        let loadContainer;
+
+        /** Minimal activity stub that satisfies every code path _loadNewBlocksNow visits. */
+        function makeActivity() {
+            return {
+                storage: {},
+                trashcan: {},
+                turtles: { getTurtleCount: jest.fn(() => 0), addTurtle: jest.fn() },
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn(),
+                        preloadProjectSamples: jest.fn()
+                    },
+                    customTemperamentDefined: false
+                },
+                blocksContainer: { x: 0, y: 0, addChild: jest.fn(), children: [] },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+        }
+
+        /** Minimal Blocks instance wired up for the synchronous load path. */
+        function makeBlocks(activity, protoNames) {
+            const b = new Blocks(activity);
+            b.blockList = [];
+            b.protoBlockDict = {};
+            for (const name of protoNames || []) {
+                b.protoBlockDict[name] = {
+                    hasCapability: () => false,
+                    dockTypes: [],
+                    style: "flow"
+                };
+            }
+            b.setActionProtoVisibility = jest.fn();
+            b.customTemperamentDefined = true;
+            // Stub cleanup helpers that would require full DOM/audio.
+            b._findDrumURLs = jest.fn();
+            b.updateBlockPositions = jest.fn();
+            b._rebuildSpatialGrid = jest.fn();
+            b._cleanupStacks = jest.fn();
+            b.newNameddoBlock = jest.fn(() => false);
+            b.newStorein2Block = jest.fn();
+            b.newNamedboxBlock = jest.fn();
+            b.actionMetadata = jest.fn(() => ({ hasReturn: false, hasArgs: false }));
+            return b;
+        }
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        // Case 1 ----------------------------------------------------------------
+        it("does not throw when an unknown block's dock[0] points to a missing block index", () => {
+            // Block 0 is an unrecognised name, so _processOneBlock falls into the
+            // NOP-substitution branch. dock[0] = 99 is not in blockObjs.
+            // Without a guard, the code reaches blockObjs[99][4].indexOf(0) and
+            // throws "Cannot read properties of undefined".
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [
+                // [id, name, x, y, connections]
+                [0, "unknownBlockType", 100, 100, [99, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            // The load must finish (success or abortLoad); _loadInProgress must
+            // not remain stuck at true.
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
+        // Case 2 ----------------------------------------------------------------
+        it("does not throw when an unknown block's last dock points to a missing block index", () => {
+            // dock[0] is null so the NOP path tries the last-dock branch instead.
+            // last([null, 99]) === 99, and blockObjs[99] is undefined, so
+            // blockObjs[99][4].indexOf(b) throws without a guard.
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [[0, "unknownBlockType", 100, 100, [null, 99]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
+        // Case 3 ----------------------------------------------------------------
+        it("does not leave _loadInProgress stuck when the connections field is not an array", () => {
+            // Corrupt project data: blkData[4] is a string. The metadata-strip
+            // guard only removes the *last* element when it is non-array; a
+            // single non-array element at index 0 survives and reaches
+            // _processOneBlock. The load must not stall with _loadInProgress
+            // permanently true.
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [[0, "forward", 100, 100, "bad"]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
+        // Case 4 ----------------------------------------------------------------
+        it("does not throw when a connections entry is a negative index", () => {
+            // -1 is valid JSON but an illegal block reference. blockObjs[-1] is
+            // undefined; the NOP substitution path must not crash when it reads
+            // that entry to determine the block's role (flow vs. arg).
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [[0, "unknownBlockType", 100, 100, [-1, null]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+        });
+    });
+
     describe("loadNewBlocks re-entrancy (#8392)", () => {
         const { PubSub } = require("../pubsub");
         let mockActivity;

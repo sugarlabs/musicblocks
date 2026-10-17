@@ -5813,6 +5813,40 @@ class Blocks {
                     }
                 }
 
+                /**
+                 * General out-of-range connection guard: every non-null
+                 * connection must reference a valid index inside blockObjs.
+                 * Connections outside [0, blockObjs.length) produce undefined
+                 * when looked up in _processOneBlock and cause an unhandled
+                 * TypeError in the NOP-substitution branch (and potentially
+                 * elsewhere). Abort early here so no partial workspace is left
+                 * behind, consistent with the existing dangling-next-block
+                 * checks for clamp blocks above.
+                 */
+                for (let b = 0; b < blockObjs.length; b++) {
+                    const blkData = blockObjs[b];
+                    if (!Array.isArray(blkData[4])) {
+                        continue;
+                    }
+                    for (let c = 0; c < blkData[4].length; c++) {
+                        const connId = blkData[4][c];
+                        if (connId === null || connId === undefined) {
+                            continue;
+                        }
+                        if (!Number.isInteger(connId) || connId < 0 || connId >= blockObjs.length) {
+                            abortLoad(
+                                "Out-of-range connection " +
+                                    connId +
+                                    " in block " +
+                                    b +
+                                    ": punting loading of new blocks!",
+                                blkData
+                            );
+                            return;
+                        }
+                    }
+                }
+
                 /** Append to the current set of blocks. */
                 this._adjustTheseStacks = [];
                 this._adjustTheseDocks = [];
@@ -6697,7 +6731,7 @@ class Blocks {
                             let flowBlock = true;
                             /** Is the first connection attached to a flow block? */
                             const c = blkData[4][0];
-                            if (c !== null) {
+                            if (c !== null && blockObjs[c] !== undefined) {
                                 const cc = blockObjs[c][4].indexOf(b);
                                 if (typeof blockObjs[c][1] === "string") {
                                     if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
@@ -6722,7 +6756,7 @@ class Blocks {
                             } else {
                                 /** Or the last connection attached to a flow block? */
                                 const c = last(blkData[4]);
-                                if (c !== null) {
+                                if (c !== null && blockObjs[c] !== undefined) {
                                     const cc = blockObjs[c][4].indexOf(b);
                                     if (typeof blockObjs[c][1] === "string") {
                                         if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
