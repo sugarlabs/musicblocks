@@ -199,6 +199,22 @@ const convertDuration = function (duration, dotCount = 0) {
     return `${num}/${den}`;
 };
 
+const getNoteLengthInSixteenths = (duration, dotCount = 0) => {
+    if (isNaN(Number(duration)) || Number(duration) <= 0) return 0;
+    const dots = Number(dotCount) || 0;
+    return (16 / Number(duration)) * (2 - 2 ** -dots);
+};
+
+const lilypondDurationToWholeNotes = duration => {
+    let wholeNotes = 0;
+    for (const token of String(duration).trim().split(/\s+/)) {
+        const match = /^(\d+)(\.*)$/.exec(token);
+        if (match === null || Number(match[1]) === 0) return NaN;
+        wholeNotes += (1 / Number(match[1])) * (2 - 1 / Math.pow(2, match[2].length));
+    }
+    return wholeNotes;
+};
+
 class AbcExporter {
     constructor(logo, turtle, keySignature, voiceId = "") {
         this.logo = logo;
@@ -221,6 +237,10 @@ class AbcExporter {
         this.pendingAnnotations = [];
         this.prefixStart = null;
         this.queueSlur = 0;
+        this.measureDuration = 16;
+        this.measureTime = 0;
+        this.pickupDuration = null;
+        this.firstMeasure = true;
 
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
@@ -354,6 +374,19 @@ class AbcExporter {
         }
     }
 
+    __pushBarLine() {
+        const at = this.prefixStart === null ? this.parts.length : this.prefixStart;
+        const written = this.parts.slice(0, at).join("");
+        const trimmed = written.trimEnd();
+        if (trimmed.endsWith("|") || trimmed.endsWith("|:") || trimmed.endsWith(":|")) {
+            return;
+        }
+        this.parts.splice(at, 0, "| ");
+        if (this.prefixStart !== null) {
+            this.prefixStart += 1;
+        }
+    }
+
     __decorations() {
         return (
             (this.articulationDepth > 0 ? "!accent!" : "") +
@@ -398,11 +431,25 @@ class AbcExporter {
                 break;
             case "begin repeat":
                 if (i === this.repeatStart) {
-                    this.parts.push("|: ");
+                    if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                        this.parts[this.parts.length - 1] = "|: ";
+                    } else {
+                        this.parts.push("|: ");
+                    }
                 }
                 break;
             case "end slur":
-                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                    if (this.parts.length > 1 && this.parts[this.parts.length - 2].endsWith(" ")) {
+                        const last = this.parts[this.parts.length - 2];
+                        this.parts[this.parts.length - 2] = last.slice(0, -1) + ") ";
+                    } else {
+                        this.parts.splice(this.parts.length - 1, 0, ")");
+                    }
+                } else if (
+                    this.parts.length > 0 &&
+                    this.parts[this.parts.length - 1].endsWith(" ")
+                ) {
                     const last = this.parts[this.parts.length - 1];
                     this.parts[this.parts.length - 1] = last.slice(0, -1) + ") ";
                 } else {
@@ -410,7 +457,17 @@ class AbcExporter {
                 }
                 break;
             case "tie":
-                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                    if (this.parts.length > 1 && this.parts[this.parts.length - 2].endsWith(" ")) {
+                        const last = this.parts[this.parts.length - 2];
+                        this.parts[this.parts.length - 2] = last.slice(0, -1) + "- ";
+                    } else {
+                        this.parts.splice(this.parts.length - 1, 0, "-");
+                    }
+                } else if (
+                    this.parts.length > 0 &&
+                    this.parts[this.parts.length - 1].endsWith(" ")
+                ) {
                     const last = this.parts[this.parts.length - 1];
                     this.parts[this.parts.length - 1] = last.slice(0, -1) + "- ";
                 } else {
@@ -421,6 +478,9 @@ class AbcExporter {
                 if (Number(this.staging[i + 1]) > 0 && Number(this.staging[i + 2]) > 0) {
                     this.__pushField(`M:${this.staging[i + 1]}/${this.staging[i + 2]}\n`, true);
                     this.counter = 0;
+                    this.measureDuration =
+                        (Number(this.staging[i + 1]) / Number(this.staging[i + 2])) * 16;
+                    this.measureTime = 0;
                 }
                 i += 2;
                 break;
@@ -433,9 +493,17 @@ class AbcExporter {
                 i += 2;
                 break;
             }
-            case "pickup":
+            case "pickup": {
+                const pickupWhole = lilypondDurationToWholeNotes(this.staging[i + 1]);
+                if (this.firstMeasure && pickupWhole > 0) {
+                    const pickup16ths = pickupWhole * 16;
+                    if (pickup16ths < this.measureDuration) {
+                        this.pickupDuration = pickup16ths;
+                    }
+                }
                 i += 1;
                 break;
+            }
             case "key": {
                 const changed = abcKeySignature(`${this.staging[i + 1]} ${this.staging[i + 2]}`);
                 if (changed.field !== this.keyField) {
@@ -495,6 +563,9 @@ class AbcExporter {
     processTupletNotes(i, count) {
         let j = 0;
         let k = 0;
+        let tupletDuration = 0;
+        const inTuplet = this.staging[i][NOTATIONTUPLETVALUE][0];
+        const tupletFactor = getTupletTime(inTuplet) / inTuplet;
 
         while (k < count) {
             const tupletNotes = this.staging[i + j];
@@ -529,15 +600,23 @@ class AbcExporter {
                         tupletNotes[NOTATIONDOTCOUNT] || 0
                     )
                 );
+
+                tupletDuration +=
+                    getNoteLengthInSixteenths(
+                        tupletNotes[NOTATIONROUNDDOWN],
+                        tupletNotes[NOTATIONDOTCOUNT] || 0
+                    ) * tupletFactor;
             }
             j++;
             k++;
         }
 
-        return j;
+        return { j, tupletDuration };
     }
 
     processNoteArray(obj, i) {
+        this.firstMeasure = false;
+        let noteDuration = 0;
         const inChordContinuation =
             obj[NOTATIONINSIDECHORD] > 0 &&
             i > 0 &&
@@ -601,9 +680,16 @@ class AbcExporter {
                     (count === inTuplet ? "" : ":" + count)
             );
 
-            i += Math.max(1, this.processTupletNotes(i, count)) - 1;
+            const { j, tupletDuration } = this.processTupletNotes(i, count);
+            noteDuration = tupletDuration;
+            i += Math.max(1, j) - 1;
         } else {
             if (obj[NOTATIONINSIDECHORD] <= 0) {
+                noteDuration = getNoteLengthInSixteenths(
+                    obj[NOTATIONDURATION],
+                    obj[NOTATIONDOTCOUNT] || 0
+                );
+
                 this.__beginNote();
                 this.parts.push(this.__decorations());
                 if (obj[NOTATIONSTACCATO]) {
@@ -626,6 +712,18 @@ class AbcExporter {
             }
 
             if (obj[NOTATIONINSIDECHORD] > 0) {
+                const isChordEnd =
+                    i === this.staging.length - 1 ||
+                    !Array.isArray(this.staging[i + 1]) ||
+                    this.staging[i + 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD];
+
+                if (isChordEnd) {
+                    noteDuration = getNoteLengthInSixteenths(
+                        obj[NOTATIONDURATION],
+                        obj[NOTATIONDOTCOUNT] || 0
+                    );
+                }
+
                 if (
                     i === 0 ||
                     this.staging[i - 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]
@@ -640,10 +738,7 @@ class AbcExporter {
 
                 this.parts.push(this.__toABCnote(notes[0]));
 
-                if (
-                    i === this.staging.length - 1 ||
-                    this.staging[i + 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]
-                ) {
+                if (isChordEnd) {
                     this.parts.push("]");
                     this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
                 }
@@ -651,6 +746,24 @@ class AbcExporter {
         }
 
         this.parts.push(" ");
+
+        if (noteDuration > 0) {
+            this.measureTime += noteDuration;
+            const EPSILON = 1e-4;
+            const target =
+                this.pickupDuration !== null ? this.pickupDuration : this.measureDuration;
+            if (this.measureTime >= target - EPSILON) {
+                this.pickupDuration = null;
+                this.__pushBarLine();
+                while (this.measureTime >= this.measureDuration - EPSILON) {
+                    this.measureTime -= this.measureDuration;
+                }
+                if (this.measureTime < EPSILON) {
+                    this.measureTime = 0;
+                }
+            }
+        }
+
         return i;
     }
 
@@ -664,7 +777,11 @@ class AbcExporter {
             }
         }
         if (this.repeatStart !== -1) {
-            this.parts.push(":|");
+            if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                this.parts[this.parts.length - 1] = ":|";
+            } else {
+                this.parts.push(":|");
+            }
         }
         this.logo.notationNotes[this.turtle] = this.parts.join("");
     }

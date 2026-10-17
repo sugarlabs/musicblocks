@@ -68,7 +68,7 @@ describe("processABCNotes - Basic Note Processing", () => {
 
     it("should process notes and update notationNotes correctly", () => {
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("^G4 F4 ^G8 ");
+        expect(logo.notationNotes["0"]).toBe("^G4 F4 ^G8 | ");
     });
 
     it("should handle octaves 5 and above correctly (lowercase and proper octave markers)", () => {
@@ -147,7 +147,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 __G4 ");
+        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 | __G4 ");
     });
 
     it("should support ASCII accidentals without changing lowercase B notes", () => {
@@ -325,7 +325,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 | ");
     });
 
     it("should preserve each note in a tuplet", () => {
@@ -336,7 +336,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2G8F8A8 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2G8F8A8 | ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
@@ -492,7 +492,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 | ");
     });
 });
 
@@ -1248,5 +1248,224 @@ describe("saveAbcOutput - forever repeats", () => {
 
     it("writes no repeat bars without a forever", () => {
         expect(notesOf([note("C4"), note("G4")])).toBe("C4 G4 ");
+    });
+});
+
+describe("processABCNotes - measure bar lines", () => {
+    const abcjs = require("abcjs");
+
+    const note = (pitch, noteValue = 4, dotCount = 0) => [
+        [pitch],
+        noteValue,
+        dotCount,
+        null,
+        null,
+        -1,
+        false
+    ];
+
+    const exportBody = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        return logo.notationNotes["0"];
+    };
+
+    const parseElements = body => {
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        const warnings = (tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""));
+        expect(warnings).toEqual([]);
+        return tune.lines
+            .flatMap(line => (line.staff || []).flatMap(staff => staff.voices.flat()))
+            .filter(element => element.el_type === "note" || element.el_type === "bar");
+    };
+
+    it("writes bar lines dividing eight quarter notes in 4/4 into two measures", () => {
+        const staged = [
+            "meter",
+            4,
+            4,
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            note("G4"),
+            note("A4"),
+            note("B4"),
+            note("C5")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toContain("C4 D4 E4 F4 | G4 A4 B4 c4 |");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        const notes = elements.filter(e => e.el_type === "note");
+        expect(bars).toHaveLength(2);
+        expect(notes).toHaveLength(8);
+    });
+
+    it("writes bar lines every 3 quarter notes in 3/4 time", () => {
+        const staged = [
+            "meter",
+            3,
+            4,
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            note("G4"),
+            note("A4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toContain("C4 D4 E4 | F4 G4 A4 |");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        const notes = elements.filter(e => e.el_type === "note");
+        expect(bars).toHaveLength(2);
+        expect(notes).toHaveLength(6);
+    });
+
+    it("writes bar lines every 6 eighth notes in 6/8 time", () => {
+        const staged = ["meter", 6, 8, ...Array.from({ length: 12 }, (_, i) => note("C4", 8))];
+        const body = exportBody(staged);
+
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        const notes = elements.filter(e => e.el_type === "note");
+        expect(bars).toHaveLength(2);
+        expect(notes).toHaveLength(12);
+    });
+
+    it("handles mid-piece meter changes by closing the previous measure before the new meter", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "meter",
+            3,
+            4,
+            note("G4"),
+            note("A4"),
+            note("B4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toContain("C4 D4 E4 F4 |");
+        expect(body).toContain("M:3/4");
+        expect(body).toContain("G4 A4 B4 |");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("counts chords as single-step durations and places bar lines correctly", () => {
+        const staged = [
+            [["C4"], 4, 0, null, null, 1, false],
+            [["E4"], 4, 0, null, null, 1, false],
+            [["G4"], 4, 0, null, null, 1, false],
+            [["D4"], 4, 0, null, null, 2, false],
+            [["F4"], 4, 0, null, null, 2, false],
+            [["E4"], 4, 0, null, null, 3, false],
+            [["G4"], 4, 0, null, null, 3, false],
+            [["F4"], 4, 0, null, null, 4, false],
+            [["A4"], 4, 0, null, null, 4, false]
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("[C E G]4 [D F]4 [E G]4 [F A]4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(1);
+    });
+
+    it("counts tuplet durations correctly toward measure boundaries", () => {
+        const tupletNote = pitch => [[pitch], 1, 0, [3, 1], 4, -1, false];
+        const staged = [tupletNote("C4"), tupletNote("D4"), tupletNote("E4"), note("G4", 2)];
+        const body = exportBody(staged);
+
+        expect(body).toBe("(3:2C4D4E4 G8 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(1);
+    });
+
+    it("bars an initial pickup measure and subsequent full measures", () => {
+        const staged = [
+            "pickup",
+            "8",
+            note("C4", 8),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            note("G4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("C2 | D4 E4 F4 G4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("attaches a tie to the preceding note before the bar line", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "tie",
+            note("F4"),
+            note("G4"),
+            note("A4"),
+            note("B4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("C4 D4 E4 F4- | F4 G4 A4 B4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("attaches a slur ending to the preceding note before the bar line", () => {
+        const staged = [
+            "begin slur",
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "end slur",
+            note("G4"),
+            note("A4"),
+            note("B4"),
+            note("C5")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("(C4 D4 E4 F4) | G4 A4 B4 c4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("avoids redundant double bar lines when a repeat starts at a measure boundary", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "begin repeat",
+            note("G4"),
+            note("A4"),
+            note("B4"),
+            note("C5")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("C4 D4 E4 F4 |: G4 A4 B4 c4 :|");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars.map(b => b.type)).toEqual(["bar_left_repeat", "bar_right_repeat"]);
     });
 });
