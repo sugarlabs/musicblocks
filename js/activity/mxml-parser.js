@@ -94,7 +94,17 @@ const _timeModification = noteEl => {
  */
 function _noteDuration(noteEl, divisions) {
     const typeName = _text(noteEl, "type");
-    if (typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
+    const durationText = _text(noteEl, "duration");
+    // A whole-measure rest lasts the measure whatever <type> it is drawn
+    // with: PhotoScore writes a 3/4 bar's rest as <type>whole</type> over a
+    // three-beat <duration> (musescore.org/en/node/51611, the same bug in
+    // MuseScore's importer), and reading the type made every bar after it a
+    // beat late. Its <duration> is the length that counts.
+    const isMeasureRest =
+        noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes" &&
+        durationText !== null &&
+        divisions > 0;
+    if (!isMeasureRest && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
         // <type> is the note as written, so a tuplet note has to be shortened by
@@ -103,7 +113,6 @@ function _noteDuration(noteEl, divisions) {
         return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
     }
 
-    const durationText = _text(noteEl, "duration");
     if (durationText !== null && divisions > 0) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
         return [Number(durationText), divisions * 4];
