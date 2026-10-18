@@ -697,18 +697,7 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(Number(3.14159).toFixed(2));
         });
 
-        const realDoPlus = (a, b) => {
-            if (typeof a === "string" || typeof b === "string") {
-                if (a === null || a === undefined || b === null || b === undefined) {
-                    throw new Error("NanError");
-                }
-                return (
-                    (typeof a === "string" ? a : a.toString()) +
-                    (typeof b === "string" ? b : b.toString())
-                );
-            }
-            return Number(a) + Number(b);
-        };
+        const MathUtility = require("../../utils/mathutils");
 
         it("should show the no-input error instead of crashing when an operand is null", () => {
             activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
@@ -718,7 +707,7 @@ describe("setupNumberBlocks", () => {
             });
             const defaultDoPlus = global.MathUtility.doPlus;
             try {
-                global.MathUtility.doPlus = realDoPlus;
+                global.MathUtility.doPlus = MathUtility.doPlus;
                 const plusBlock = createdBlocks["plus"];
                 const result = plusBlock.arg(logo, 0, 200, null);
                 expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
@@ -736,11 +725,65 @@ describe("setupNumberBlocks", () => {
             });
             const defaultDoPlus = global.MathUtility.doPlus;
             try {
-                global.MathUtility.doPlus = realDoPlus;
+                global.MathUtility.doPlus = MathUtility.doPlus;
                 const plusBlock = createdBlocks["plus"];
                 const result = plusBlock.arg(logo, 0, 200, null);
                 expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
                 expect(result).toEqual("5");
+            } finally {
+                global.MathUtility.doPlus = defaultDoPlus;
+            }
+        });
+
+        it("should show the no-input error when an operand is null and the other is a number", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return null;
+                if (c === "c2") return 5;
+            });
+            const defaultDoPlus = global.MathUtility.doPlus;
+            try {
+                global.MathUtility.doPlus = MathUtility.doPlus;
+                const plusBlock = createdBlocks["plus"];
+                const result = plusBlock.arg(logo, 0, 200, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
+                expect(result).toEqual(5);
+            } finally {
+                global.MathUtility.doPlus = defaultDoPlus;
+            }
+        });
+
+        it("should show the no-input error when an operand is undefined and the other is a number", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return undefined;
+                if (c === "c2") return 5;
+            });
+            const defaultDoPlus = global.MathUtility.doPlus;
+            try {
+                global.MathUtility.doPlus = MathUtility.doPlus;
+                const plusBlock = createdBlocks["plus"];
+                const result = plusBlock.arg(logo, 0, 200, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
+                expect(result).toEqual(5);
+            } finally {
+                global.MathUtility.doPlus = defaultDoPlus;
+            }
+        });
+
+        it("should show the no-input error when an operand is NaN and the other is a number", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return NaN;
+                if (c === "c2") return 5;
+            });
+            const defaultDoPlus = global.MathUtility.doPlus;
+            try {
+                global.MathUtility.doPlus = MathUtility.doPlus;
+                const plusBlock = createdBlocks["plus"];
+                const result = plusBlock.arg(logo, 0, 200, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
+                expect(result).toEqual(5);
             } finally {
                 global.MathUtility.doPlus = defaultDoPlus;
             }
