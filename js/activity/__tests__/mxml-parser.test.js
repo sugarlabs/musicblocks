@@ -177,9 +177,14 @@ describe("Test 2: Rests", () => {
         ]);
     });
 
-    it("keeps <type> for a whole-measure rest that has no <duration>", async () => {
+    it.each([
+        ["no <duration>", ""],
+        ["an empty <duration>", "<duration></duration>"],
+        ["a non-numeric <duration>", "<duration>abc</duration>"],
+        ["a zero <duration>", "<duration>0</duration>"]
+    ])("keeps <type> for a whole-measure rest with %s", async (_label, durationXml) => {
         const { blocks } = await parseAndCapture(
-            scorePartwise('<note><rest measure="yes"/><type>whole</type></note>')
+            scorePartwise(`<note><rest measure="yes"/>${durationXml}<type>whole</type></note>`)
         );
 
         expect(noteValues(blocks)).toEqual([[1, 1]]);

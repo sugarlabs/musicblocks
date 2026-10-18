@@ -100,9 +100,13 @@ function _noteDuration(noteEl, divisions) {
     // three-beat <duration> (musescore.org/en/node/51611, the same bug in
     // MuseScore's importer), and reading the type made every bar after it a
     // beat late. Its <duration> is the length that counts.
+    // An empty or non-numeric <duration> says nothing, so it doesn't outrank
+    // <type> (Number("") is 0, not "missing").
+    const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
     const isMeasureRest =
         noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes" &&
-        durationText !== null &&
+        Number.isFinite(measureRestLength) &&
+        measureRestLength > 0 &&
         divisions > 0;
     if (!isMeasureRest && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
