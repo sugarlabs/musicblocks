@@ -563,9 +563,12 @@ function setupIntervalsActions(activity) {
                 activity.logo.synth.changeInTemperament = true;
             }
 
-            // Update the default custom mode to match the new EDO's step count.
+            // Reset the custom mode only when its steps don't add up to the new
+            // EDO. A defined mode like [2, 2, 3, 2, 3] has fewer steps than the
+            // EDO, so comparing the length would throw it away.
             const edo = getCurrentEDO(temperament);
-            if (MUSICALMODES["custom"].length !== edo) {
+            const custom = MUSICALMODES["custom"];
+            if (!Array.isArray(custom) || custom.reduce((a, b) => a + b, 0) !== edo) {
                 MUSICALMODES["custom"] = new Array(edo).fill(1);
             }
         }

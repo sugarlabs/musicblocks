@@ -866,6 +866,9 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom" mode,
  * the current MUSICALMODES.custom pattern is used when its steps sum to the
  * EDO; otherwise a full EDO-length step-1 (chromatic) pattern is returned.
+ * Unlike other modes, custom is not rescaled with scalePatternToEDO: define
+ * mode always stores steps that sum to the current EDO, and set temperament
+ * resets it when the EDO changes.
  *
  * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
  * EDO step model does not apply, so the returned array is a list of per-step
