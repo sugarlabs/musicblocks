@@ -1227,6 +1227,52 @@ describe("Blocks Foundation", () => {
             const copiedSolfege = blocks._copyBlocksToObj(false);
             expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
         });
+
+        it("copies a stand-in as the block it was loaded from", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.blockList = [
+                {
+                    name: "nopOneArgBlock",
+                    privateData: "eat",
+                    unknownBlock: "eat",
+                    connections: [null, 1, null],
+                    isValueBlock: jest.fn().mockReturnValue(false)
+                },
+                {
+                    name: "nopValueBlock",
+                    privateData: "apple",
+                    unknownBlock: ["apple", { value: 2 }],
+                    connections: [0],
+                    isValueBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+            blocks.selectedStack = 0;
+
+            expect(blocks._copyBlocksToObj(false)).toEqual([
+                [0, "eat", 75, 75, [null, 1, null]],
+                [1, ["apple", { value: 2 }], 0, 0, [0]]
+            ]);
+        });
+    });
+
+    describe("Unknown Blocks", () => {
+        it("keeps the entry an unknown block was loaded from on its stand-in", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks._makeNewBlockWithConnections = jest.fn((name, offset, conns, post, arg) => {
+                blocks.blockList.push({ name, connections: [] });
+                post(arg);
+            });
+            const entry = ["pluginblock", { value: 3 }];
+
+            blocks._processOneBlock(0, [[0, entry, 0, 0, [null, null]]], 0, 0);
+
+            expect(blocks._makeNewBlockWithConnections.mock.calls[0][0]).toBe("nopZeroArgBlock");
+            expect(blocks.blockList[0].privateData).toBe("pluginblock");
+            expect(blocks.blockList[0].unknownBlock).toBe(entry);
+        });
     });
 
     describe("Parameter Block Cache Updates", () => {

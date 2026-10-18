@@ -2019,23 +2019,63 @@ describe("prepareExport additional block types", () => {
         expect(result[0][1][1].customName).toBe("myScale");
     });
 
-    it("exports nopValueBlock with privateData as exportName", () => {
+    const makeStandIn = (name, unknownBlock, isValueBlock, connections = [null]) => ({
+        name,
+        trash: false,
+        value: null,
+        collapsed: false,
+        privateData: Array.isArray(unknownBlock) ? unknownBlock[0] : unknownBlock,
+        unknownBlock,
+        container: { x: 0, y: 0 },
+        connections,
+        isValueBlock: () => isValueBlock
+    });
+
+    it("exports nopValueBlock with the name it was loaded with", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [makeStandIn("nopValueBlock", "pi", true)];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toBe("pi");
+    });
+
+    it("exports the math stand-ins with the name they were loaded with", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            makeStandIn("nopOneArgMathBlock", "floor", false, [null, null]),
+            makeStandIn("nopTwoArgMathBlock", "atan2", false, [null, null, null])
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result.map(entry => entry[1])).toEqual(["floor", "atan2"]);
+    });
+
+    it("exports a stand-in with the arguments it was loaded with", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            makeStandIn("nopValueBlock", ["pluginvalue", { value: 7 }], true)
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["pluginvalue", { value: 7 }]);
+    });
+
+    it("never exports a null block name for a stand-in", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
             {
-                name: "nopValueBlock",
+                name: "nopOneArgBlock",
                 trash: false,
                 value: null,
                 collapsed: false,
-                privateData: "myCustomBlock",
                 container: { x: 0, y: 0 },
-                connections: [null],
+                connections: [null, null, null],
                 isValueBlock: () => false
             }
         ];
         const pm = new ProjectManager(activity);
         const result = JSON.parse(pm.prepareExport());
-        expect(result[0][1]).toBe("myCustomBlock");
+        expect(result[0][1]).toBe("nopOneArgBlock");
     });
 
     it("exports matrixData block with notes and count", () => {
