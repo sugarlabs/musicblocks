@@ -314,11 +314,16 @@ class MathUtility {
      * @param {number} a
      * @param {number} b
      * @returns {number} - Result of a raised to the power of b.
-     * @throws {string} NAN error if the arguments are not valid.
+     * @throws {string} NAN error if the arguments are not valid, or if the
+     * result is not a number (e.g. a negative base with a fractional exponent).
      */
     static doPower(a, b) {
         if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
-            return Math.pow(a, b);
+            const result = Math.pow(a, b);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
