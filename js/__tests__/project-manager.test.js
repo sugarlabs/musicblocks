@@ -1078,6 +1078,71 @@ describe("prepareExport", () => {
         ]);
     });
 
+    describe("Phrase Maker cells", () => {
+        const block = (name, extra = {}) => ({
+            name,
+            trash: false,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections: [null],
+            isValueBlock: () => false,
+            ...extra
+        });
+
+        // Block 0 is in the trash, so the matrix (1), pitch (2) and rhythm (3) become 0, 1 and 2.
+        const exportMatrix = (matrixCells, liveCells) => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("pitch", { trash: true }),
+                block("matrix", { matrixCells }),
+                block("pitch"),
+                block("rhythm2")
+            ];
+            if (liveCells !== undefined) {
+                activity.logo.phraseMaker = { _blockMap: { 1: liveCells } };
+            }
+            const pm = new ProjectManager(activity);
+            return JSON.parse(pm.prepareExport())[0][1];
+        };
+
+        it("exports the selected cells with the block ids renumbered like connections", () => {
+            const cells = [
+                [2, [3, 0], 0],
+                // The same pitch block on the second pass of a repeat.
+                [1000002, [3, 1], 1],
+                // A row in the trash, and an empty entry.
+                [0, [3, 2], 0],
+                [-1, [3, 0], 0]
+            ];
+
+            expect(exportMatrix(undefined, cells)).toEqual([
+                "matrix",
+                {
+                    collapsed: false,
+                    matrixCells: [
+                        [1, [2, 0], 0],
+                        [1000001, [2, 1], 1]
+                    ]
+                }
+            ]);
+        });
+
+        it("exports the cells loaded with the project when the matrix wasn't opened", () => {
+            expect(exportMatrix([[2, [3, 0], 0]])[1].matrixCells).toEqual([[1, [2, 0], 0]]);
+        });
+
+        it("prefers the cells selected in this session over the loaded ones", () => {
+            expect(exportMatrix([[2, [3, 0], 0]], [[2, [3, 3], 0]])[1].matrixCells).toEqual([
+                [1, [2, 3], 0]
+            ]);
+        });
+
+        it("exports only the collapsed state when there are no cells", () => {
+            expect(exportMatrix()).toEqual(["matrix", { collapsed: false }]);
+        });
+    });
+
     describe("customsample", () => {
         const exportSample = connections => {
             const activity = makeActivity();
