@@ -1021,6 +1021,9 @@ describe("Oscilloscope", () => {
         test("captures waveform when freezing", () => {
             const osc = createOscilloscope();
             osc.reconnectSynthsToAnalyser = jest.fn();
+            osc._stopAnimation = jest.fn();
+            osc._renderFrame = jest.fn();
+
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
@@ -1029,16 +1032,19 @@ describe("Oscilloscope", () => {
                 turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0
             };
+
             const analyserValues = new Float32Array([0.25, -0.5, 0.75, -1]);
             const mockAnalyser = {
                 getValue: jest.fn(() => analyserValues)
             };
             osc.pitchAnalysers[0] = mockAnalyser;
 
-            osc._captureFrozenFrames();
+            osc.toggleFreeze();
 
+            expect(osc.isFrozen).toBe(true);
             expect(mockAnalyser.getValue).toHaveBeenCalled();
             expect(osc._frozenFrames["0:waveform"]).toEqual(analyserValues);
+            expect(osc._stopAnimation).toHaveBeenCalled();
         });
 
         test("draws using cached waveform when frozen", () => {
