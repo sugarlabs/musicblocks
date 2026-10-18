@@ -625,8 +625,7 @@ class GitDropdownUI {
         // OS network interface changes — no fetch needed, no waiting.
         // If the device has no network right now, skip straight to offline draft.
         if (this._isOffline()) {
-            await this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
-            return;
+            return this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
         }
 
         // ── Step 2: attempt the commit, abort instantly if network drops ──────
@@ -658,7 +657,7 @@ class GitDropdownUI {
                 const err = await res.json().catch(() => ({}));
                 if (res.status === 401 || res.status === 403) {
                     this._showToast("You don't have permission to save this project.", "error");
-                    return;
+                    return false;
                 }
                 throw new Error(err.message || `HTTP ${res.status}`);
             }
@@ -668,6 +667,7 @@ class GitDropdownUI {
             localStorage.removeItem("mbGitCurrentDraftId");
             this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
+            return true;
         } catch (e) {
             window.removeEventListener("offline", abortOnOffline);
 
@@ -683,7 +683,7 @@ class GitDropdownUI {
                     "[GitDropdownUI] Network lost during commit — saving offline draft.",
                     e
                 );
-                await this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
+                return this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
             } else {
                 // Server-side error (4xx/5xx that wasn't caught above, or unexpected)
                 console.error("[GitDropdownUI] commit server error:", e);
@@ -691,6 +691,7 @@ class GitDropdownUI {
                     "Could not save this moment — the server returned an error.",
                     "error"
                 );
+                return false;
             }
         }
     }
@@ -711,7 +712,7 @@ class GitDropdownUI {
         const planetIframe = document.getElementById("planet-iframe");
         if (!planetIframe || !planetIframe.contentWindow) {
             this._showToast("Could not save offline — planet frame unavailable.", "error");
-            return;
+            return false;
         }
 
         planetIframe.contentWindow.postMessage(
@@ -734,6 +735,7 @@ class GitDropdownUI {
             if (result.success) {
                 this.onSaveLocally();
                 this._showToast("Saved offline ✔ — will sync when you reconnect.", "success");
+                return true;
             } else if (result.error === "OFFLINE_DRAFT_CAP_REACHED") {
                 this._showToast(
                     "You've reached 5 offline saves. Connect to the internet to sync first.",
@@ -754,6 +756,7 @@ class GitDropdownUI {
             console.error("[GitDropdownUI] offline commit bridge timeout:", e);
             this._showToast("Offline save timed out — please try again.", "error");
         }
+        return false;
     }
 
     async _showHistoryPanel() {
@@ -1418,7 +1421,12 @@ class GitDropdownUI {
                         cancelText: "Cancel"
                     });
                     if (msg === null) return;
-                    await this._doCommit(repoName, this._getHashedKey(), msg.trim() || defaultMsg);
+                    const saved = await this._doCommit(
+                        repoName,
+                        this._getHashedKey(),
+                        msg.trim() || defaultMsg
+                    );
+                    if (!saved) return;
                 }
                 await this._restoreCommit(commitTarget, commitMessage);
             },
@@ -1474,7 +1482,12 @@ class GitDropdownUI {
                     cancelText: "Cancel"
                 });
                 if (userMsg === null) return;
-                await this._doCommit(repoName, this._getHashedKey(), userMsg.trim() || defaultMsg);
+                const saved = await this._doCommit(
+                    repoName,
+                    this._getHashedKey(),
+                    userMsg.trim() || defaultMsg
+                );
+                if (!saved) return;
             }
             await this._restoreCommit(commitTarget, commitMessage);
         });
