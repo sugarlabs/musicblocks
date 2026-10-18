@@ -126,6 +126,38 @@ describe("setupMeterActions", () => {
         expect(targetTurtle.singer.defaultStrongBeats).toBe(false);
     });
 
+    describe("strong beats chosen with on strong beat", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.onStrongBeatDo(2, "testAction", false, null, 0, 1);
+            Singer.MeterActions.onWeakBeatDo("testAction", false, null, 0, 1);
+        });
+
+        it("replace the default strong beats", () => {
+            expect(targetTurtle.singer.beatList).toEqual([2, "offbeat"]);
+        });
+
+        it("survive later meter changes", () => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            expect(targetTurtle.singer.beatList).toEqual([2, "offbeat"]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(false);
+        });
+
+        it("survive a change to a meter with different defaults", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            expect(targetTurtle.singer.beatList).toEqual([2, "offbeat"]);
+        });
+    });
+
+    it("keeps a strong beat past the end of the measure from bringing the defaults back", () => {
+        Singer.MeterActions.setMeter(4, 1 / 4, 0);
+        Singer.MeterActions.onStrongBeatDo(9, "testAction", false, null, 0, 1);
+        Singer.MeterActions.setMeter(4, 1 / 4, 0);
+        expect(targetTurtle.singer.factorList).toEqual([9]);
+        expect(targetTurtle.singer.beatList).toEqual([]);
+    });
+
     it("should not clear manually-set beats when defaultStrongBeats is false", () => {
         targetTurtle.singer.beatList = [2, 5];
         targetTurtle.singer.defaultStrongBeats = false;

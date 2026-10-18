@@ -88,21 +88,28 @@ function setupMeterActions(activity) {
             // Clear previous default strong beats before setting new ones
             _clearDefaultStrongBeats(tur.singer);
 
-            // setup default strong / weak beats until any strong beat block is used
-            if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 4) {
-                tur.singer.beatList.push(1);
-                tur.singer.beatList.push(3);
-                tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 2) {
-                tur.singer.beatList.push(1);
-                tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 3) {
-                tur.singer.beatList.push(1);
-                tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat === 8 && tur.singer.beatsPerMeasure === 6) {
-                tur.singer.beatList.push(1);
-                tur.singer.beatList.push(4);
-                tur.singer.defaultStrongBeats = true;
+            // Default strong beats only stand in until an on strong beat block picks
+            // some. A meter change after that block must keep the user's beats, not
+            // add the defaults back over them.
+            const userStrongBeats =
+                tur.singer.beatList.some(beat => typeof beat === "number") ||
+                tur.singer.factorList.length > 0;
+            if (!userStrongBeats) {
+                if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 4) {
+                    tur.singer.beatList.push(1);
+                    tur.singer.beatList.push(3);
+                    tur.singer.defaultStrongBeats = true;
+                } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 2) {
+                    tur.singer.beatList.push(1);
+                    tur.singer.defaultStrongBeats = true;
+                } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 3) {
+                    tur.singer.beatList.push(1);
+                    tur.singer.defaultStrongBeats = true;
+                } else if (tur.singer.noteValuePerBeat === 8 && tur.singer.beatsPerMeasure === 6) {
+                    tur.singer.beatList.push(1);
+                    tur.singer.beatList.push(4);
+                    tur.singer.defaultStrongBeats = true;
+                }
             }
 
             activity.logo.notation.notationMeter(
