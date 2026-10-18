@@ -27,6 +27,13 @@
 const ModeWidget = require("../modewidget.js");
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
+global.Tone = require("../../utils/__tests__/tonemock.js");
+global.clampNumber = require("../../utils/utils-logic").clampNumber;
+const { Synth } = require("../../utils/synthutils.js");
+const {
+    TEMPERAMENT: REAL_TEMPERAMENT,
+    getTemperament: realGetTemperament
+} = require("../../utils/musicutils-temperament.js");
 
 // --- 1. Global Mocks ---
 global._ = msg => msg;
@@ -72,9 +79,11 @@ global.MUSICALMODES = {
     minor: [2, 1, 2, 2, 1, 2, 2]
 };
 global.TEMPERAMENT = {
-    "equal": { isEDO: true, pitchNumber: 12 },
-    "just intonation": { isEDO: false, pitchNumber: 12 }
+    ...REAL_TEMPERAMENT,
+    "equal": { ...REAL_TEMPERAMENT.equal, isEDO: true, pitchNumber: 12 },
+    "just intonation": { ...REAL_TEMPERAMENT["just intonation"], isEDO: false, pitchNumber: 12 }
 };
+global.getTemperament = realGetTemperament;
 global.getCurrentEDO = jest.fn().mockReturnValue(12);
 global.getModePattern = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
 global.DEFAULTMODE = "major";
@@ -100,7 +109,12 @@ const {
     getNonEDOModeSteps,
     getNonEDOFrequency,
     isEquallyTempered,
-    pitchToFrequency
+    pitchToFrequency,
+    numberToPitch: realNumberToPitch,
+    getNoteFromInterval: realGetNoteFromInterval,
+    parseNoteString: realParseNoteString,
+    pitchToNumber: realPitchToNumber,
+    getOctaveRatio: realGetOctaveRatio
 } = require("../../utils/musicutils.js");
 const { configureWheel, updateWheelItems } = require("../../utils/piemenu.js");
 global.getSavedCustomModes = getSavedCustomModes;
@@ -123,7 +137,11 @@ global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
 global.generateNoteNames =
     global.generateNoteNames ||
     jest.fn().mockReturnValue(["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]);
-global.numberToPitch = global.numberToPitch || jest.fn().mockReturnValue(["C", 4]);
+global.numberToPitch = realNumberToPitch;
+global.getNoteFromInterval = realGetNoteFromInterval;
+global.parseNoteString = realParseNoteString;
+global.pitchToNumber = realPitchToNumber;
+global.getOctaveRatio = realGetOctaveRatio;
 global.NOTESTABLE = global.NOTESTABLE || [
     "C",
     "C#",
@@ -1376,6 +1394,56 @@ describe("ModeWidget", () => {
                 "equal31",
                 "C4"
             );
+        });
+
+        test("switching from equal temperament to just intonation updates real synth frequency table", () => {
+            const realSynth = new Synth();
+            modeWidget.logo = { synth: realSynth };
+
+            // In Equal Temperament, E4 is calculated via 12-EDO (~329.63 Hz)
+            expect(realSynth.inTemperament).toBe("equal");
+            const equalFreq = realSynth.getFrequency("E4", false);
+            expect(equalFreq).toBeCloseTo(329.63, 1);
+
+            // Switching to Just Intonation via ModeWidget updates synth.inTemperament
+            // and calls temperamentChanged(), rebuilding synth.noteFrequencies
+            modeWidget._syncSynthTemperament("just intonation");
+
+            expect(realSynth.inTemperament).toBe("just intonation");
+            // In 5-limit Just Intonation with root C4, major third E4 has ratio 5/4.
+            // With A4 = 440 Hz, C4 = 264 Hz, giving E4 = 264 * 1.25 = 330.00 Hz.
+            const jiFreq = realSynth.getFrequency("E4", false);
+            expect(jiFreq).toBeCloseTo(330.0, 1);
+            expect(jiFreq).not.toBeCloseTo(equalFreq, 1);
+        });
+
+        test("_wireEdoSelect updates real synth frequency table when switching to just intonation", () => {
+            const realSynth = new Synth();
+            modeWidget.logo = { synth: realSynth };
+            modeWidget._activeTemperamentKey = "equal";
+
+            jest.spyOn(modeWidget, "_closeModePiemenu").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+
+            // Equal temperament frequency for E4
+            const equalFreq = realSynth.getFrequency("E4", false);
+            expect(equalFreq).toBeCloseTo(329.63, 1);
+
+            // User selects "just intonation" in dropdown wired by _wireEdoSelect
+            const mockSelect = {
+                value: "just intonation",
+                addEventListener: jest.fn()
+            };
+            modeWidget._wireEdoSelect(mockSelect);
+            const changeHandler = mockSelect.addEventListener.mock.calls.find(
+                call => call[0] === "change"
+            )[1];
+            changeHandler();
+
+            expect(realSynth.inTemperament).toBe("just intonation");
+            const jiFreq = realSynth.getFrequency("E4", false);
+            expect(jiFreq).toBeCloseTo(330.0, 1);
+            expect(jiFreq).not.toBeCloseTo(equalFreq, 1);
         });
     });
 });
