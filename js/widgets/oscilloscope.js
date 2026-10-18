@@ -120,7 +120,7 @@ class Oscilloscope {
             _("Toggle waveform/spectrum mode (M)")
         );
 
-        this.modeButton.onclick = () => this.toggleMode;
+        this.modeButton.onclick = () => this.toggleMode();
         this._updateModeButton();
 
         // Active turtles
@@ -135,6 +135,7 @@ class Oscilloscope {
     }
 
     toggleMode() {
+        console.log("[Oscilloscope] toggleMode called", this.mode);
         this.mode = this.mode === "waveform" ? "spectrum" : "waveform";
         this._updateModeButton();
 
