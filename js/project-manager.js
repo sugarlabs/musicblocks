@@ -686,7 +686,6 @@ class ProjectManager {
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
         that._doHardStopButton();
-        that._allClear(true, true);
     }
 
     doLoad() {
@@ -1202,12 +1201,9 @@ class ProjectManager {
             that.sendAllToTrash(false, true);
             if (clearCanvas) {
                 that._allClear(false, true);
-                if (
-                    that.gitDropdownUI &&
-                    typeof that.gitDropdownUI.clearForNewProject === "function"
-                ) {
-                    that.gitDropdownUI.clearForNewProject();
-                }
+            }
+            if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+                that.gitDropdownUI.clearForNewProject();
             }
 
             try {
@@ -1277,7 +1273,7 @@ class ProjectManager {
                                         obj,
                                         that.fileChooser.files[0],
                                         "loadProjectFromFile",
-                                        true
+                                        false
                                     );
                                 } else {
                                     that.merging = false;
