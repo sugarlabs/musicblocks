@@ -87,7 +87,7 @@ describe("GlobalPlanet", () => {
                 downloadProject: jest.fn()
             },
             ProjectStorage: {
-                decodeTB: jest.fn(data => data),
+                decodeProjectData: jest.fn(data => data),
                 initialiseNewProject: jest.fn(),
                 getCurrentProjectName: jest.fn().mockReturnValue("My Project")
             },

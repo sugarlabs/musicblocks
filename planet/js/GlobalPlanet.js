@@ -356,7 +356,7 @@ class GlobalPlanet {
         if (error === undefined) error = null;
 
         if (data.success) {
-            const projectData = Planet.ProjectStorage.decodeTB(data.data);
+            const projectData = Planet.ProjectStorage.decodeProjectData(data.data);
             if (id in this.cache) {
                 if (this.cache[id] === cacheEntry) {
                     this.cache[id].ProjectData = projectData;
@@ -619,9 +619,9 @@ class GlobalPlanet {
             // If the fork returned project data directly, decode then open it.
             // Otherwise fall back to fetching it via getData().
             if (forkedData) {
-                // forkedData is a base64+URI-encoded string (same as getProjectData
-                // returns).  decodeTB() must be applied before loadProjectFromData.
-                const decoded = Planet.ProjectStorage.decodeTB(forkedData);
+                // forkedData may be base64+URI-encoded or a raw project string;
+                // decodeProjectData() handles both before loadProjectFromData.
+                const decoded = Planet.ProjectStorage.decodeProjectData(forkedData);
                 // Pass null for publishedData — fork is NOT published yet.
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName,
