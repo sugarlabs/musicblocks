@@ -219,6 +219,10 @@ One detail to note for the identifiers path is that during matching, we use AND 
 }
 ```
 For this example, all values with property path 'declarations[0].init.type' count as a match.
+
+Besides `value`, an identifier can check a property in two other ways:
+- `"same_as": "<other path>"` matches when the property holds the same value as another path in the same statement. The `repeat` entries use it to require one loop variable, e.g. `{ "property": "test.left.name", "same_as": "init.declarations[0].id.name" }`.
+- `"integer": true` matches when the property is a whole number, e.g. `{ "property": "test.right.value", "integer": true }`.
   - For arguments and children property paths, there is a property called "arguments" in the object. Get the full path to the arguments list, and the first n elements should be the n arguments, so list them in the argument_properties for your block. 
     - If there are arguments, you also have to add an "arguments" section above "ast", with the types of the arguments. Based on the block, this can be one of the following supported types:
         - text (string arguments)

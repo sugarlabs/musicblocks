@@ -62,16 +62,10 @@ const MAX_ARC_ANGLE = 45000;
  * Class pertaining to visual actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Painter for each Turtle component. It is responsible
- * for the visual actions and artworks of the Turtle. It is mostly view specific and communicates
- * with methods of Turtle and Turtles objects. An action may require updating the state of the
- * Turtle or the Turtles object.
- *
- * @todo move visual artwork related states from logo.js to here eventually.
- * As of now, some state variables are present in logo.js. To ensure modularity and independence of
- * components, Logo should contain members only related to execution of blocks while the logic of
- * execution of blocks should be present in respective files in blocks/ directory, which should
- * eventually use members of this file and turtle-singer.js to proceed.
+ * @classdesc This is the prototype of the Painter for each Turtle component. It owns the
+ * per-turtle drawing state and actions. It is mostly view specific and communicates with methods
+ * of Turtle and Turtles objects. An action may require updating the state of the Turtle or the
+ * Turtles object.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -90,21 +84,17 @@ class Painter {
         this.turtles = turtle.turtles;
         this.activity = turtle.activity;
 
-        // Things used for what the turtle draws
         this._svgOutput = "";
-        this._svgPath = false; // are we currently drawing a path?
+        this._svgPath = false;
+
+        // Reset control points and close open SVG path if any
+        this.reset();
 
         this._color = DEFAULTCOLOR;
         this._value = DEFAULTVALUE;
         this._chroma = DEFAULTCHROMA;
         this._stroke = DEFAULTSTROKE;
         this._font = DEFAULTFONT;
-
-        // Control points for bezier curves
-        this.cp1x = 0;
-        this.cp1y = 100;
-        this.cp2x = 100;
-        this.cp2y = 100;
 
         // Kept as a Munsell hex string: _processColor() converts it on every
         // stroke, and converting an already-converted rgba string yields black.
@@ -121,6 +111,23 @@ class Painter {
         this._cachedCanvasHeight = 0;
         this._pendingCanvasUpdate = false;
         this._rafId = null;
+    }
+
+    /**
+     * Resets transient bezier control-point state for consecutive runs.
+     * Closes any open SVG path while preserving accumulated SVG output
+     * and persistent pen styling attributes (color, value, chroma, stroke, font).
+     *
+     * @returns {void}
+     */
+    reset() {
+        if (typeof this.closeSVG === "function") {
+            this.closeSVG();
+        }
+        this.cp1x = 0;
+        this.cp1y = 100;
+        this.cp2x = 100;
+        this.cp2y = 100;
     }
 
     // ========= Setters, Getters =============================================
@@ -937,6 +944,18 @@ class Painter {
     }
 
     /**
+     * Maps any finite angle into [0, 360). A loop adding 360 per turn hangs on a
+     * large negative angle, and never ends once 360 is below the number's precision.
+     *
+     * @private
+     * @param {Number} degrees - finite angle in degrees
+     * @returns {Number} the same heading in [0, 360)
+     */
+    static _normalizeHeading(degrees) {
+        return ((degrees % 360) + 360) % 360;
+    }
+
+    /**
      * Turn right and display corresponding turtle graphic by rotating bitmap.
      *
      * @param degrees - degrees for right turn
@@ -948,12 +967,7 @@ class Painter {
             return;
         }
 
-        this.turtle.orientation += degrees;
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
+        this.turtle.orientation = Painter._normalizeHeading(this.turtle.orientation + degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
         // We cannot update the cache during the 'tween'
@@ -1016,12 +1030,7 @@ class Painter {
             return;
         }
 
-        this.turtle.orientation = degrees;
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
+        this.turtle.orientation = Painter._normalizeHeading(degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
         // We cannot update the cache during the 'tween'
@@ -1534,6 +1543,10 @@ class Painter {
      * @param color - hex code specifying color
      */
     doSetColor(color) {
+        if (!Number.isFinite(Number(color))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.color = Number(color);
         const results = getcolor(this.color);
@@ -1551,6 +1564,10 @@ class Painter {
      * @param chroma - chroma hex code
      */
     doSetChroma(chroma) {
+        if (!Number.isFinite(Number(chroma))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.chroma = Number(chroma);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1563,6 +1580,10 @@ class Painter {
      * @param shade - shade hex code
      */
     doSetValue(shade) {
+        if (!Number.isFinite(Number(shade))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.value = Number(shade);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1575,6 +1596,10 @@ class Painter {
      * @param hue - hue hex code
      */
     doSetHue(hue) {
+        if (!Number.isFinite(Number(hue))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.color = Number(hue);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1591,11 +1616,38 @@ class Painter {
     }
 
     /**
+     * Sets the pen's translucency as the Set Translucency block takes it:
+     * 0 is opaque and 100 is invisible.
+     *
+     * @param translucency - translucency from 0 to 100
+     */
+    doSetTranslucency(translucency) {
+        translucency = Number(translucency);
+        if (!Number.isFinite(translucency)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        this.doSetPenAlpha(1.0 - (translucency % 101) / 100);
+    }
+
+    /**
      * Sets pen size/thickness.
      *
      * @param size - pen size which is assigned to pen stroke
      */
     doSetPensize(size) {
+        size = Number(size);
+        if (!Number.isFinite(size)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        // A canvas ignores a lineWidth of 0 or less and keeps the old width, so
+        // storing it would leave the Pen size block and SVG export out of step.
+        if (size <= 0) {
+            this.turtles.activity.errorMsg(_("Pen size must be greater than 0."));
+            return;
+        }
+
         this.closeSVG();
         this.stroke = size;
         if (this.turtle.ctx.lineWidth !== this.stroke) {

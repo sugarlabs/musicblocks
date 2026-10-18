@@ -22,6 +22,7 @@
    ensureABCJS,
    extractProjectDataFromHTML,
    unescapeHTML,
+   isSafeUrl,
    getTemperament,
    getOctaveRatio,
    debugLog,
@@ -44,10 +45,41 @@ const _STANDARD_DURATIONS = [
     { value: "1/128", duration: 0.0078125 }
 ];
 
+// Query parameters the app answers to, lowercased so matching stays
+// case-insensitive. start() acts on id, file, run, show, collapse and inurl.
+// The rest belong to other modules -- release config (music, turtle), the
+// debug log, the performance tracker, the loader, the sampler backend and the
+// save-to-URL block -- and are listed here only so that their links do not
+// trip the unknown-parameter warning.
+const _KNOWN_URL_PARAMS = new Set([
+    "backend",
+    "backend_url",
+    "collapse",
+    "debug",
+    "file",
+    "id",
+    "inurl",
+    "kokoro",
+    "layoutprofiling",
+    "mbperf",
+    "music",
+    "outurl",
+    "performance",
+    "repo",
+    "run",
+    "show",
+    "turtle"
+]);
+
+// How long startup will wait on the document named by "inurl" before giving
+// up on it and loading the project without an initial argument.
+const _ENV_ARG_TIMEOUT = 10000;
+
 class ProjectManager {
     constructor(activity) {
         this.activity = activity;
         this._loadAnimationIntervalId = null;
+        this._saveAfterLoad = () => this.saveLocally();
     }
 
     // -----------------------------------------------------------------------
@@ -176,8 +208,8 @@ class ProjectManager {
                         "font-size: 16px; font-family: sans-serif; font-weight: bold;"
                     );
                 }
-                that.keyboardEnableFlag = 1;
             }
+            that.keyboardEnableFlag = 1;
 
             pubsub.off("finishedLoading", __afterLoad);
         };
@@ -185,35 +217,138 @@ class ProjectManager {
         that.keyboardEnableFlag = 0;
 
         that.sessionData = null;
-        const currentProject = that.storage.currentProject;
-        const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
+        let sessionSource = null;
+        let currentProject = "My Project";
+        try {
+            currentProject = (that.storage && that.storage.currentProject) || "My Project";
+        } catch (e) {
+            currentProject = "My Project";
+        }
+        const sessionKey = "SESSION" + currentProject;
+        const sessionTimestampKey = "SESSION_TIMESTAMP" + currentProject;
+
+        let idbPayload = null;
+        if (that.sessionStorageManager) {
+            try {
+                idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
+            } catch (e) {
+                console.error("Failed to load session from IndexedDB:", e);
+            }
+        }
+
+        let localData = null;
+        let localTimestamp = 0;
+        try {
+            if (that.storage) {
+                localData = that.storage[sessionKey] || null;
+                let localTimestampStr = that.storage[sessionTimestampKey];
+                let parsedLocalTimestamp = localTimestampStr ? parseInt(localTimestampStr, 10) : 0;
+                localTimestamp = Number.isFinite(parsedLocalTimestamp) ? parsedLocalTimestamp : 0;
+            }
+        } catch (storageReadErr) {
+            console.warn(
+                "[ProjectManager] Failed to read session from local storage:",
+                storageReadErr
+            );
+            localData = null;
+            localTimestamp = 0;
+        }
 
         if (that.planet) {
             that.sessionData = await that.planet.openCurrentProject();
-            if (!that.sessionData) {
-                if (currentProject !== undefined) {
-                    that.sessionData = that.storage[sessionKey];
+            if (that.sessionData) {
+                sessionSource = "planet";
+            } else {
+                if (idbPayload && idbPayload.data) {
+                    if (!localData || idbPayload.timestamp >= localTimestamp) {
+                        that.sessionData = idbPayload.data;
+                        sessionSource = "idb";
+                    } else {
+                        that.sessionData = localData;
+                        sessionSource = "local";
+                    }
+                } else if (localData) {
+                    that.sessionData = localData;
+                    sessionSource = "local";
                 }
             }
+            // Fix #1+#4: Restore Git state keys if repo data exists in Planet storage
+            try {
+                const repoData =
+                    that.planet.getCurrentGitRepoData && that.planet.getCurrentGitRepoData();
+                if (repoData && repoData.repoName) {
+                    that.storage.mbGitRepoName = repoData.repoName;
+                    that.storage.mbGitHashedKey = repoData.hashedKey || "";
+                    that.storage.mbGitCurrentProjectId = repoData.projectId || "";
+                    if (repoData.displayName) {
+                        that.storage.mbGitDisplayName = repoData.displayName;
+                    }
+                }
+            } catch (gitRestoreErr) {
+                console.warn(
+                    "[ProjectManager] Could not restore git session state:",
+                    gitRestoreErr
+                );
+            }
         } else {
-            if (sessionKey !== null) {
-                that.sessionData = that.storage[sessionKey];
+            if (idbPayload && idbPayload.data) {
+                if (!localData || idbPayload.timestamp >= localTimestamp) {
+                    that.sessionData = idbPayload.data;
+                    sessionSource = "idb";
+                } else {
+                    that.sessionData = localData;
+                    sessionSource = "local";
+                }
+            } else if (localData) {
+                that.sessionData = localData;
+                sessionSource = "local";
             }
         }
 
         pubsub.on("finishedLoading", __afterLoad);
 
-        if (that.sessionData) {
-            that.doLoadAnimation();
-            try {
-                if (that.sessionData === "undefined" || that.sessionData === "[]") {
-                    that.justLoadStart();
-                } else {
-                    window.loadedSession = that.sessionData;
-                    that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+        // Returns the loadToken loadNewBlocks() assigns this request (see
+        // js/blocks.js), or null when no load was actually started (the
+        // empty/undefined-session shortcuts below already route through
+        // justLoadStart() instead).
+        const tryParseAndLoad = data => {
+            if (data === "undefined" || data === "[]") {
+                that.justLoadStart();
+                return null;
+            }
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed) && parsed.length === 0) {
+                // Any whitespace/formatting variant of "[]" (e.g. " [ ]")
+                // still parses to an empty array here, past the literal
+                // string check above. loadNewBlocks([]) completes
+                // synchronously inside blocks.js's own zero-block fast
+                // path, emitting "finishedLoading" before this call even
+                // returns — before a caller could register a watcher for
+                // it. Treating a parsed-empty array the same as the
+                // literal "[]" case keeps that synchronous emit from
+                // leaving watchForDeferredLoadFailure()'s listeners
+                // stranded (review comment on issue #8855's fix).
+                that.justLoadStart();
+                return null;
+            }
+            window.loadedSession = data;
+            return that.blocks.loadNewBlocks(parsed);
+        };
+
+        const deleteFromSource = async source => {
+            if (source === "idb") {
+                if (
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.deleteSession === "function" &&
+                    sessionKey
+                ) {
+                    try {
+                        await that.sessionStorageManager.deleteSession(sessionKey);
+                    } catch (idbErr) {
+                        ErrorHandler.recoverable(idbErr, { operation: "removeBadIdbSessionKey" });
+                    }
                 }
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+            } else if (source === "local") {
                 if (sessionKey !== null) {
                     try {
                         if (typeof that.storage.removeItem === "function") {
@@ -227,7 +362,112 @@ class ProjectManager {
                         });
                     }
                 }
-                that.justLoadStart();
+            }
+        };
+
+        // A block-processing failure past the first ~20 blocks throws from
+        // inside loadNewBlocks()'s deferred setTimeout chunking
+        // (js/blocks.js), which no synchronous try/catch around
+        // tryParseAndLoad() below can ever observe: that throw has no
+        // caller left to reach (see issue #8855). loadNewBlocks() reports
+        // that case through this "loadFailed" pubsub event instead (the
+        // same channel "finishedLoading" already uses for success), so it
+        // can still reach the same delete-and-fallback recovery a
+        // synchronous failure gets below.
+        //
+        // Both events carry the loadToken loadNewBlocks() returned for the
+        // request they belong to (js/blocks.js), which is assigned the
+        // moment that request is made — whether it then runs immediately or
+        // sits queued behind another, unrelated load already in progress.
+        // Filtering on it (rather than just the event name) keeps this from
+        // reacting to that other load's own completion or failure, which a
+        // reviewer flagged: reading a "currently active load" counter after
+        // the fact isn't safe here, since this request may still be queued
+        // at that point.
+        const watchForDeferredLoadFailure = (source, expectedToken) => {
+            const belongsToThisLoad = payload =>
+                !payload || payload.token === undefined ? true : payload.token === expectedToken;
+            const stopWatching = () => {
+                pubsub.off("finishedLoading", onSucceeded);
+                pubsub.off("loadFailed", onFailed);
+            };
+            const onFailed = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                recoverFromLoadFailure(
+                    source,
+                    (payload && payload.error) || new Error("loadNewBlocks failed")
+                );
+            };
+            const onSucceeded = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+            };
+            pubsub.on("finishedLoading", onSucceeded);
+            pubsub.on("loadFailed", onFailed);
+        };
+
+        // Runs the delete-and-fallback recovery for a failed session load,
+        // whether that failure was caught synchronously below or reported
+        // asynchronously via "loadFailed" above. Attempts at most one
+        // fallback (the same bound the original synchronous-only version of
+        // this logic had) so two independently bad storage tiers can't
+        // bounce off each other indefinitely.
+        let fallbackAttempted = false;
+        const recoverFromLoadFailure = async (failedSource, error) => {
+            ErrorHandler.recoverable(error, { operation: "loadSessionData" });
+            await deleteFromSource(failedSource);
+
+            // The failed load may have only partially populated blockList
+            // before it threw. Clear those leftover blocks before loading
+            // anything else, or the next attempt's blocks render on top of
+            // them instead of replacing them (reported against this fix).
+            if (typeof that.sendAllToTrash === "function") {
+                that.sendAllToTrash(false, false);
+            }
+
+            let fallbackData = null;
+            let fallbackSource = null;
+            if (!fallbackAttempted) {
+                if (failedSource === "idb" && localData) {
+                    fallbackData = localData;
+                    fallbackSource = "local";
+                } else if (failedSource === "local" && idbPayload && idbPayload.data) {
+                    fallbackData = idbPayload.data;
+                    fallbackSource = "idb";
+                }
+            }
+
+            if (fallbackData) {
+                fallbackAttempted = true;
+                try {
+                    that.sessionData = fallbackData;
+                    const loadToken = tryParseAndLoad(fallbackData);
+                    if (loadToken !== null) {
+                        watchForDeferredLoadFailure(fallbackSource, loadToken);
+                    }
+                    return;
+                } catch (fallbackErr) {
+                    ErrorHandler.recoverable(fallbackErr, {
+                        operation: "loadFallbackSessionData"
+                    });
+                    await deleteFromSource(fallbackSource);
+                }
+            }
+
+            that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            that.justLoadStart();
+        };
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            try {
+                const loadToken = tryParseAndLoad(that.sessionData);
+                if (loadToken !== null) {
+                    watchForDeferredLoadFailure(sessionSource, loadToken);
+                }
+            } catch (e) {
+                await recoverFromLoadFailure(sessionSource, e);
             }
         } else {
             that.justLoadStart();
@@ -360,15 +600,56 @@ class ProjectManager {
             that._doHardStopButton();
         }
 
+        // Clear the Git tracking for the new project — mirrors the
+        // same cleanup done in activity.js _afterDelete (which is only
+        // reached via a different code path).
+        const gitKeys = [
+            "mbGitRepoName",
+            "mbGitHashedKey",
+            "mbGitDisplayName",
+            "mbGitLastSavedHash",
+            "mbGitCurrentSha",
+            "mbGitCurrentDraftId",
+            "mbGitCurrentProjectId"
+        ];
+        for (const key of gitKeys) {
+            if (typeof that.storage.removeItem === "function") {
+                that.storage.removeItem(key);
+            } else {
+                delete that.storage[key];
+            }
+        }
+        if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+            that.gitDropdownUI.clearForNewProject();
+        } else if (that.gitDropdownUI && typeof that.gitDropdownUI._syncMenuState === "function") {
+            that.gitDropdownUI._syncMenuState();
+        }
+
         if (
             that.planet !== undefined &&
             that.planet.planet !== null &&
             that.planet.getCurrentProjectName() !== _("My Project")
         ) {
+            // Save the current project before switching away from it.
             that.planet.saveLocally();
+            // Create the new project slot and clear the canvas synchronously.
             that.planet.initialiseNewProject();
-            pm._loadStart(that);
-            that.planet.saveLocally();
+            // _loadStart is async: it fires loadNewBlocks and then emits
+            // "finishedLoading". We save the NEW project only after that
+            // event fires so we capture the fresh start blocks, not stale data.
+            const loadPromise = pm._loadStart(that);
+            if (loadPromise && typeof loadPromise.then === "function") {
+                loadPromise
+                    .then(() => {
+                        that.planet.saveLocally();
+                    })
+                    .catch(() => {
+                        // Best-effort — ignore if _loadStart rejects unexpectedly.
+                        that.planet.saveLocally();
+                    });
+            } else {
+                that.planet.saveLocally();
+            }
         } else {
             that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
 
@@ -463,6 +744,12 @@ class ProjectManager {
                         args = {
                             value: myBlock.value
                         };
+                        if (
+                            myBlock.manualAccidental !== undefined &&
+                            myBlock.manualAccidental !== null
+                        ) {
+                            args.manualAccidental = myBlock.manualAccidental;
+                        }
                 }
             } else {
                 switch (myBlock.name) {
@@ -521,7 +808,6 @@ class ProjectManager {
                     case "action":
                     case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -530,6 +816,18 @@ class ProjectManager {
                         args = {
                             collapsed: myBlock.collapsed
                         };
+                        break;
+                    case "rhythmruler2":
+                        args = {
+                            collapsed: myBlock.collapsed
+                        };
+                        // The edits made in the widget, keyed by drum block. Drop the drums
+                        // that are no longer in the project.
+                        if (Array.isArray(myBlock.rulerHistory)) {
+                            args.rulerHistory = myBlock.rulerHistory
+                                .filter(entry => blockIndexById.has(entry[1]))
+                                .map(entry => [entry[0], blockIndexById.get(entry[1])]);
+                        }
                         break;
                     case "storein2":
                     case "nameddo":
@@ -559,6 +857,16 @@ class ProjectManager {
                         args = {
                             value: myBlock.value
                         };
+                        break;
+                    case "customsample":
+                        if (Array.isArray(myBlock.value)) {
+                            // The connected audiofile block already saves the sample data.
+                            const value = myBlock.value.slice();
+                            if (myBlock.connections[1] !== null) {
+                                value[1] = "";
+                            }
+                            args = { value: value };
+                        }
                         break;
                     default:
                         break;
@@ -599,9 +907,17 @@ class ProjectManager {
         return JSON.stringify(data);
     }
 
-    saveLocally() {
+    saveLocally(options = {}) {
         const activity = this.activity;
+
+        // Don't replace the saved session with a partly loaded project.
+        if (activity.blocks.isLoading()) {
+            activity.blocks.runAfterLoad(this._saveAfterLoad);
+            return;
+        }
+
         const data = this.prepareExport();
+        const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
 
         if (activity.storage.currentProject === undefined) {
             try {
@@ -609,6 +925,7 @@ class ProjectManager {
                 activity.storage.allProjects = JSON.stringify(["My Project"]);
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
+                if (rejectOnProjectSaveError) throw e;
             }
         }
 
@@ -616,8 +933,13 @@ class ProjectManager {
         try {
             p = activity.storage.currentProject;
             activity.storage["SESSION" + p] = data;
+            activity.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
         } catch (e) {
+            // If it hits QuotaExceededError, it fails gracefully because saveSessionAsync
+            // (IndexedDB) handles large payloads.
+            console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
+            if (rejectOnProjectSaveError) throw e;
         }
 
         const img = new Image();
@@ -762,6 +1084,146 @@ class ProjectManager {
             that.stopLoadAnimation();
         };
 
+        const getProjectName = file => {
+            const extensionIndex = file.name.lastIndexOf(".");
+            return extensionIndex === -1 ? file.name : file.name.slice(0, extensionIndex);
+        };
+
+        const initialiseLocalImportedProject = async file => {
+            const baseName = getProjectName(file) || _("My Project");
+            let projectName = baseName;
+            let suffix = 2;
+            const projectExists = async name => {
+                if (
+                    name === that.storage.currentProject ||
+                    that.storage["SESSION" + name] !== undefined
+                ) {
+                    return true;
+                }
+                return Boolean(
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.loadSession === "function" &&
+                    (await that.sessionStorageManager.loadSession("SESSION" + name))
+                );
+            };
+            while (await projectExists(projectName)) {
+                projectName = `${baseName} ${suffix}`;
+                suffix += 1;
+            }
+            that.storage.currentProject = projectName;
+        };
+
+        const saveLocalSession = async () => {
+            if (that.sessionStorageManager && typeof that.saveSessionAsync === "function") {
+                await that.saveSessionAsync();
+            } else if (typeof that.saveLocally === "function") {
+                await that.saveLocally({ rejectOnProjectSaveError: true });
+            }
+        };
+
+        const saveImportedProject = async () => {
+            try {
+                if (!that.planet) {
+                    await saveLocalSession();
+                    return;
+                }
+                await (typeof that.saveLocally === "function"
+                    ? that.saveLocally({ rejectOnProjectSaveError: true })
+                    : that.planet && typeof that.planet.saveLocally === "function"
+                      ? that.planet.saveLocally({ rejectOnProjectSaveError: true })
+                      : null);
+            } catch (error) {
+                ErrorHandler.recoverable(error, { operation: "saveImportedProject" });
+            }
+        };
+
+        const loadImportedBlocks = (obj, errorOperation) => {
+            let loadToken = null;
+            const belongsToThisLoad = payload =>
+                loadToken === null || !payload || payload.token === loadToken;
+            const stopWatching = () => {
+                pubsub.off("finishedLoading", onFinished);
+                pubsub.off("loadFailed", onFailed);
+            };
+            const onFinished = async payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                await saveImportedProject();
+                finishLoading();
+            };
+            const onFailed = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                const error = (payload && payload.error) || new Error("loadNewBlocks failed");
+                ErrorHandler.capture(error, { operation: errorOperation });
+                that.errorMsg(_("Cannot load project from the file. Please check the file type."));
+                finishLoading();
+            };
+
+            pubsub.on("finishedLoading", onFinished);
+            pubsub.on("loadFailed", onFailed);
+            try {
+                loadToken = that.blocks.loadNewBlocks(obj);
+            } catch (error) {
+                stopWatching();
+                throw error;
+            }
+        };
+
+        const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+            if (that.planet) {
+                try {
+                    await that.planet.saveLocally({ rejectOnProjectSaveError: true });
+                } catch (error) {
+                    ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
+                    finishLoading();
+                    return;
+                }
+                that.planet.closePlanet();
+            } else {
+                try {
+                    await saveLocalSession();
+                    await initialiseLocalImportedProject(file);
+                } catch (error) {
+                    ErrorHandler.capture(error, { operation: "saveProjectBeforeImport" });
+                    finishLoading();
+                    return;
+                }
+            }
+
+            const trashComplete = new Promise(resolve => {
+                const onTrash = () => {
+                    that.stage.removeAllEventListeners("trashsignal");
+                    resolve();
+                };
+                that.stage.removeAllEventListeners("trashsignal");
+                that.stage.addEventListener("trashsignal", onTrash, false);
+            });
+            that.sendAllToTrash(false, true);
+            if (clearCanvas) {
+                that._allClear(false, true);
+                if (
+                    that.gitDropdownUI &&
+                    typeof that.gitDropdownUI.clearForNewProject === "function"
+                ) {
+                    that.gitDropdownUI.clearForNewProject();
+                }
+            }
+
+            try {
+                const initialization = that.planet
+                    ? that.planet.initialiseNewProject(getProjectName(file), false)
+                    : null;
+                await Promise.all([trashComplete, initialization]);
+                loadImportedBlocks(obj, errorOperation);
+            } catch (error) {
+                that.stage.removeAllEventListeners("trashsignal");
+                ErrorHandler.capture(error, { operation: errorOperation });
+                that.errorMsg(_("Cannot load project from the file. Please check the file type."));
+                finishLoading();
+            }
+        };
+
         that.fileChooser.addEventListener("click", event => {
             event.currentTarget.value = "";
         });
@@ -771,13 +1233,14 @@ class ProjectManager {
             () => {
                 const reader = new FileReader();
                 const midiReader = new FileReader();
+                const abcReader = new FileReader();
 
                 reader.onload = () => {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     that.doLoadAnimation();
 
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         const rawData = reader.result;
                         if (rawData === null || rawData === "") {
                             that.errorMsg(
@@ -810,50 +1273,18 @@ class ProjectManager {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 if (!that.merging) {
-                                    const __listener = () => {
-                                        try {
-                                            that.blocks.loadNewBlocks(obj);
-                                            if (that.planet) {
-                                                that.planet.saveLocally();
-                                            }
-                                        } catch (e) {
-                                            that.errorMsg(
-                                                _(
-                                                    "Cannot load project from the file. Please check the file type."
-                                                )
-                                            );
-                                            ErrorHandler.capture(e, {
-                                                operation: "loadProjectFromFile"
-                                            });
-                                            finishLoading();
-                                            return;
-                                        } finally {
-                                            that.stage.removeAllEventListeners("trashsignal");
-                                        }
-                                        if (that.planet) {
-                                            that.planet.saveLocally();
-                                        }
-                                    };
-
-                                    that.stage.addEventListener("trashsignal", __listener, false);
-                                    that.sendAllToTrash(false, false);
-                                    that._allClear(false, true);
-                                    if (that.planet) {
-                                        that.planet.closePlanet();
-                                        that.planet.initialiseNewProject(
-                                            that.fileChooser.files[0].name.substr(
-                                                0,
-                                                that.fileChooser.files[0].name.lastIndexOf(".")
-                                            )
-                                        );
-                                    }
+                                    await replaceProjectFromFile(
+                                        obj,
+                                        that.fileChooser.files[0],
+                                        "loadProjectFromFile",
+                                        true
+                                    );
                                 } else {
                                     that.merging = false;
                                     that.blocks.loadNewBlocks(obj);
+                                    that.loading = false;
+                                    that.refreshCanvas();
                                 }
-
-                                that.loading = false;
-                                that.refreshCanvas();
                             } catch (e) {
                                 that.errorMsg(
                                     _(
@@ -883,12 +1314,38 @@ class ProjectManager {
                     }
                 };
 
+                abcReader.onload = async event => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+                    try {
+                        const abcData =
+                            (event && event.target && event.target.result) || abcReader.result;
+
+                        await ensureABCJS();
+                        const tunebook = new ABCJS.parseOnly(abcData);
+
+                        debugLog(tunebook);
+                        await Promise.all(tunebook.map(tune => that.parseABC(tune)));
+                        finishLoading();
+                    } catch (e) {
+                        ErrorHandler.capture(e, { operation: "abcImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    }
+                };
+
                 const file = that.fileChooser.files[0];
                 if (file) {
                     const extension = file.name.split(".").pop().toLowerCase();
                     const isMidi = extension === "mid" || extension === "midi";
+                    const isABC = extension === "abc";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
+                    } else if (isABC) {
+                        abcReader.readAsText(file);
                     } else {
                         reader.readAsText(file);
                     }
@@ -910,7 +1367,7 @@ class ProjectManager {
                 that.loading = true;
                 document.body.style.cursor = "wait";
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     const rawData = reader.result;
                     if (rawData === null || rawData === "") {
                         that.errorMsg(
@@ -938,39 +1395,7 @@ class ProjectManager {
                                 that.palettes.dict[name].hideMenu(true);
                             }
 
-                            that.stage.removeAllEventListeners("trashsignal");
-
-                            const __afterLoad = () => {
-                                pubsub.off("finishedLoading", __afterLoad);
-                            };
-
-                            const __listener = () => {
-                                try {
-                                    that.blocks.loadNewBlocks(obj);
-                                    pubsub.on("finishedLoading", __afterLoad);
-                                } catch (e) {
-                                    ErrorHandler.capture(e, { operation: "loadFromFile" });
-                                    that.errorMsg(
-                                        _(
-                                            "Cannot load project from the file. Please check the file type."
-                                        )
-                                    );
-                                    finishLoading();
-                                } finally {
-                                    that.stage.removeAllEventListeners("trashsignal");
-                                }
-                            };
-
-                            that.stage.addEventListener("trashsignal", __listener, false);
-                            that.sendAllToTrash(false, false);
-                            if (that.planet !== undefined) {
-                                that.planet.initialiseNewProject(
-                                    files[0].name.substr(0, files[0].name.lastIndexOf("."))
-                                );
-                            }
-
-                            that.loading = false;
-                            that.refreshCanvas();
+                            await replaceProjectFromFile(obj, files[0], "loadFromFile", false);
                         } catch (e) {
                             ErrorHandler.capture(e, { operation: "loadFromFile" });
                             that.errorMsg(
@@ -1052,112 +1477,121 @@ class ProjectManager {
     // Startup: URL params + initial load
     // -----------------------------------------------------------------------
 
+    /**
+     * Reads the initial block argument named by the "inurl" query parameter.
+     *
+     * @private
+     * @param {string} url - URL of a JSON document carrying an "arg" property.
+     * @returns {Promise<number|null>} The argument, or null if it could not be read.
+     */
+    async _readEnvArg(url) {
+        if (!isSafeUrl(url)) {
+            this.activity.errorMsg(_("Invalid parameters"));
+            return null;
+        }
+
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        let timeoutId = null;
+
+        try {
+            const request = {};
+            if (controller) {
+                request.signal = controller.signal;
+                // Aborting tears the body stream down too, so a server that
+                // stalls part way through the JSON cannot hold up the load
+                // any more than one that never answers at all.
+                timeoutId = setTimeout(() => controller.abort(), _ENV_ARG_TIMEOUT);
+            }
+
+            const response = await fetch(url, request);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const arg = parseInt((await response.json()).arg, 10);
+            return isNaN(arg) ? null : arg;
+        } catch (e) {
+            ErrorHandler.recoverable(e, { operation: "readEnvArg" });
+            this.activity.errorMsg(_("Something went wrong reading JSON-encoded project data."));
+            return null;
+        } finally {
+            if (timeoutId !== null) {
+                clearTimeout(timeoutId);
+            }
+        }
+    }
+
     start() {
         const that = this.activity;
         const pm = this;
 
         this._setupFileHandlers();
 
-        const URL = window.location.href;
-        const flags = {
-            run: false,
-            show: false,
-            collapse: false
-        };
+        // Fold the query string into a lowercase-keyed map in one pass. First
+        // value wins for a repeated key, and anything the app does not answer
+        // to is reported once rather than per parameter.
+        const params = new Map();
+        let unknownParam = false;
 
-        let urlParts;
-        const env = [];
-
-        if (URL.indexOf("?") > 0) {
-            let args, url;
-            urlParts = URL.split("?");
-            if (urlParts[1].indexOf("&") > 0) {
-                const newUrlParts = urlParts[1].split("&");
-                for (let i = 0; i < newUrlParts.length; i++) {
-                    if (newUrlParts[i].indexOf("=") > 0) {
-                        args = newUrlParts[i].split("=");
-                        switch (args[0].toLowerCase()) {
-                            case "file":
-                                break;
-                            case "id":
-                                that.projectID = args[1];
-                                break;
-                            case "run":
-                                if (args[1].toLowerCase() === "true") flags.run = true;
-                                break;
-                            case "show":
-                                if (args[1].toLowerCase() === "true") flags.show = true;
-                                break;
-                            case "collapse":
-                                if (args[1].toLowerCase() === "true") flags.collapse = true;
-                                break;
-                            case "inurl":
-                                url = args[1];
-                                // eslint-disable-next-line no-case-declarations
-                                const getJSON = u => {
-                                    return new Promise((resolve, reject) => {
-                                        const xhr = new XMLHttpRequest();
-                                        xhr.open("get", u, true);
-                                        xhr.responseType = "json";
-                                        xhr.onload = () => {
-                                            const status = xhr.status;
-                                            if (status === 200) {
-                                                resolve(xhr.response);
-                                            } else {
-                                                reject(status);
-                                            }
-                                        };
-                                        xhr.send();
-                                    });
-                                };
-
-                                getJSON(url).then(
-                                    data => {
-                                        const n = data.arg;
-                                        env.push(parseInt(n, 10));
-                                    },
-                                    () => {
-                                        alert(
-                                            _(
-                                                "Something went wrong reading JSON-encoded project data."
-                                            )
-                                        );
-                                    }
-                                );
-                                break;
-                            case "outurl":
-                                url = args[1];
-                                break;
-                            default:
-                                that.errorMsg(_("Invalid parameters"));
-                                break;
-                        }
-                    }
-                }
-            } else {
-                if (urlParts[1].indexOf("=") > 0) {
-                    args = urlParts[1].split("=");
-                    if (args[0].toLowerCase() === "id") {
-                        that.projectID = args[1];
-                    }
-                }
+        for (const [name, value] of new URLSearchParams(window.location.search)) {
+            const key = name.toLowerCase();
+            if (!_KNOWN_URL_PARAMS.has(key)) {
+                unknownParam = true;
+            } else if (!params.has(key)) {
+                params.set(key, value);
             }
         }
 
-        if (that.projectID !== null) {
-            setTimeout(() => {
-                that.loadStartWrapper(
-                    (act, pID, f, e) => pm._loadProject(pID, f, e),
-                    that.projectID,
-                    flags,
-                    env
-                );
-            }, 200);
-        } else {
-            setTimeout(() => {
-                that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
-            }, 200);
+        if (unknownParam) {
+            that.errorMsg(_("Invalid parameters"));
         }
+
+        if (params.has("id")) {
+            that.projectID = params.get("id");
+        } else if (params.has("repo")) {
+            that.projectID = params.get("repo");
+        }
+
+        const isTrue = name => (params.get(name) || "").toLowerCase() === "true";
+        const flags = {
+            run: isTrue("run"),
+            show: isTrue("show"),
+            collapse: isTrue("collapse")
+        };
+        const env = [];
+
+        const __scheduleLoad = () => {
+            if (that.projectID !== null) {
+                setTimeout(() => {
+                    that.loadStartWrapper(
+                        (act, pID, f, e) => pm._loadProject(pID, f, e),
+                        that.projectID,
+                        flags,
+                        env
+                    );
+                }, 200);
+            } else {
+                setTimeout(() => {
+                    that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
+                }, 200);
+            }
+        };
+
+        // "inurl" names the document holding the argument handed to the first
+        // block, so the load waits on it. Requesting it and scheduling the
+        // load side by side left env empty every time.
+        if (!params.has("inurl")) {
+            __scheduleLoad();
+            return;
+        }
+
+        this._readEnvArg(params.get("inurl"))
+            .then(arg => {
+                if (arg !== null) {
+                    env.push(arg);
+                }
+            })
+            .finally(__scheduleLoad);
     }
 }
 

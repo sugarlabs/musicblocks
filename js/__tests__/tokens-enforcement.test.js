@@ -117,6 +117,18 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
+    it("keeps the floating widget roll-up button white in dark mode", () => {
+        expect(darkmodeCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+        );
+    });
+
+    it("keeps the floating widget close button white in dark mode", () => {
+        expect(darkmodeCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);
@@ -459,5 +471,58 @@ describe("Theme Switching & Inline Styles Purity", () => {
                 expect(decl).not.toMatch(/!important/i);
             }
         }
+    });
+
+    it("ensures #search keeps a visible focus indicator from the global focus-visible rule", () => {
+        const activitiesCss = fs.readFileSync(path.join(CSS_DIR, "activities.css"), "utf8");
+
+        const searchFocusMatch = activitiesCss.match(/(?:^|\})\s*#search:focus\s*\{([^}]*)\}/);
+        expect(searchFocusMatch).not.toBeNull();
+        expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*none/i);
+        expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*0\b/i);
+        expect(activitiesCss).not.toMatch(
+            /#search:focus-visible\s*\{[^}]*outline\s*:\s*(?:none|0\b)/i
+        );
+
+        // The search input has no rule of its own; the global one draws its outline (#9152).
+        const focusVisibleMatch = activitiesCss.match(/(?:^|\})\s*\*:focus-visible\s*\{([^}]*)\}/);
+        expect(focusVisibleMatch).not.toBeNull();
+        expect(focusVisibleMatch[1]).toMatch(
+            /outline\s*:\s*2px\s+solid\s+var\(--color-brand-primary\)/i
+        );
+        expect(focusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
+    });
+
+    it("ensures highcontrast bright accent surfaces (cyan) do not use white text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast elements with cyan/bright background (var(--color-brand-secondary))
+        // do not set color to var(--color-text-primary) (which is white, failing WCAG contrast)
+        const brightBgRules = [
+            "#submitLilypond",
+            "\\.dropdown-content li:hover > a",
+            "\\.ui-autocomplete .ui-menu-item a:hover"
+        ];
+        brightBgRules.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+[^}]*${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-primary\\)`,
+                "i"
+            );
+            expect(themesCss).not.toMatch(regex);
+        });
+
+        // Contrast compliance check: var(--color-brand-secondary) with var(--color-text-inverse)
+        // must exceed WCAG AAA (>= 7:1), while var(--color-brand-secondary) with var(--color-text-primary) fails (< 4.5:1)
+        const hcTokens = THEMES.highcontrast;
+        const compliantContrast = contrastRatio(
+            hcTokens["--color-text-inverse"],
+            hcTokens["--color-brand-secondary"]
+        );
+        const failingContrast = contrastRatio(
+            hcTokens["--color-text-primary"],
+            hcTokens["--color-brand-secondary"]
+        );
+        expect(compliantContrast).toBeGreaterThanOrEqual(7);
+        expect(failingContrast).toBeLessThan(4.5);
     });
 });

@@ -12,7 +12,7 @@
 /* global
 
    Singer, _, last, platformColor, docById, wheelnav, slicePath,
-   PREVIEWVOLUME, TONEBPM, clampNumber
+   PREVIEWVOLUME, TONEBPM, clampNumber, ManagedTimer
 */
 
 /*
@@ -22,6 +22,9 @@
      
      - js/utils/utils.js
          _, last, docById
+
+     - js/utils/ManagedTimer.js
+         ManagedTimer
      
      - js/turtle-singer.js
          Singer
@@ -84,14 +87,24 @@ class MeterWidget {
      *
      * @param {object} activity - The activity object.
      * @param {number} widgetBlock - The widget block number.
+     * @param {number} [turtle] - The turtle that ran the Meter widget block.
      */
-    constructor(activity, widgetBlock) {
+    constructor(activity, widgetBlock, turtle) {
         /**
          * The activity object.
          *
          * @type {object}
          */
         this.activity = activity;
+
+        /**
+         * The turtle that ran the Meter widget block, whose tempo the beats are played at. The
+         * turtle itself rather than its index, which shifts when a turtle is removed.
+         *
+         * @type {object|null}
+         * @private
+         */
+        this._turtle = turtle !== undefined ? this.activity.turtles.ithTurtle(turtle) : null;
 
         /**
          * The meter block.
@@ -116,6 +129,20 @@ class MeterWidget {
          * @private
          */
         this._playing = false;
+
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+        this._playBeatTimeout = null;
 
         /**
          * Flag indicating if the widget is locked for clicks.
@@ -168,6 +195,13 @@ class MeterWidget {
          */
         widgetWindow.onclose = () => {
             this._playing = false;
+            if (this._playBeatTimeout) {
+                this._clearWidgetTimeout(this._playBeatTimeout);
+                this._playBeatTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
             if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
                 this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
             }
@@ -198,14 +232,21 @@ class MeterWidget {
                     playBtn.textContent = "\u00A0\u00A0";
                     const img = document.createElement("img");
                     img.src = "header-icons/play-button.svg";
-                    img.title = _("Play all");
-                    img.alt = _("Play all");
+                    img.title = _("Play");
+                    img.alt = _("Play");
                     img.setAttribute("height", MeterWidget.ICONSIZE);
                     img.setAttribute("width", MeterWidget.ICONSIZE);
                     img.setAttribute("vertical-align", "middle");
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
+                    if (this._playBeatTimeout) {
+                        this._clearWidgetTimeout(this._playBeatTimeout);
+                        this._playBeatTimeout = null;
+                    }
+                    if (this._timerManager !== null) {
+                        this._timerManager.clearAll();
+                    }
                 } else {
                     playBtn.textContent = "\u00A0\u00A0";
                     const img = document.createElement("img");
@@ -276,9 +317,10 @@ class MeterWidget {
         input1.style.cssFloat = "left";
         input1.value = v1;
         input1.type = "number";
-        input1.id = "beatValue";
+        input1.id = "beatCount";
         input1.setAttribute("min", "1");
         input1.setAttribute("max", "16");
+        input1.setAttribute("aria-label", _("Number of beats"));
         divInput.appendChild(input1);
 
         const divInput2 = document.createElement("div");
@@ -290,6 +332,7 @@ class MeterWidget {
         input2.id = "beatValue";
         input2.setAttribute("min", "1");
         input2.setAttribute("max", "35");
+        input2.setAttribute("aria-label", _("Beat note value"));
         divInput2.appendChild(input2);
 
         widgetWindow._toolbar.appendChild(divInput);
@@ -299,11 +342,26 @@ class MeterWidget {
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
+            if (this._playBeatTimeout) {
+                this._clearWidgetTimeout(this._playBeatTimeout);
+                this._playBeatTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
             const el = divInput.children[0];
             const el2 = divInput2.children[0];
 
-            divInput.children[0].value = clampNumber(el.value, el.min, el.max);
-            divInput2.children[0].value = clampNumber(el2.value, el2.min, el2.max);
+            divInput.children[0].value = clampNumber(
+                Math.round(Number(el.value)),
+                Number(el.min),
+                Number(el.max)
+            );
+            divInput2.children[0].value = clampNumber(
+                Math.round(Number(el2.value)),
+                Number(el2.min),
+                Number(el2.max)
+            );
 
             const bnBlk = c1 !== null ? this.activity.blocks.blockList[c1] : null;
             const bvBlk = c3 !== null ? this.activity.blocks.blockList[c3] : null;
@@ -333,6 +391,24 @@ class MeterWidget {
         activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -443,7 +519,7 @@ class MeterWidget {
             this.__playDrum("kick drum");
         }
 
-        setTimeout(() => {
+        this._playBeatTimeout = this._setWidgetTimeout(() => {
             if (this._playing) {
                 this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
             }
@@ -457,9 +533,11 @@ class MeterWidget {
      * @returns {void}
      */
     _playBeat() {
-        const tur = this.activity.turtles.ithTurtle(0);
+        // The tempo of the turtle that ran the block, not turtle 0: after a project is loaded,
+        // turtle 0 is a trashed turtle of the old project.
+        const tur = this._turtle;
         const bpmFactor =
-            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
+            TONEBPM / (tur && tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
         for (let i = 0; i < this._strongBeats.length; i++) {
             this._playWheel.navItems[i].navItem.hide();
         }

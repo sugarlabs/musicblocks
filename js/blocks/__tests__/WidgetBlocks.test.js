@@ -100,7 +100,16 @@ global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
-global.Tempo.dependencies = ["widgets/tempo"];
+global.Tempo.dependencies = [
+    "widgets/TempoWindow",
+    "widgets/TempoRows",
+    "widgets/TempoKeyboard",
+    "widgets/TempoTap",
+    "widgets/TempoControls",
+    "widgets/TempoMetronome",
+    "widgets/TempoSave",
+    "widgets/tempo"
+];
 global.TimbreWidget = jest.fn(() => ({
     instrumentName: "testInstrument",
     blockNo: null,
@@ -133,9 +142,26 @@ global.TimbreWidget = jest.fn(() => ({
     },
     init: jest.fn()
 }));
-global.TimbreWidget.dependencies = ["widgets/timbre"];
+global.TimbreWidget.dependencies = [
+    "widgets/TimbreState",
+    "widgets/TimbrePanels",
+    "widgets/TimbreAudio",
+    "widgets/TimbreBlocks",
+    "widgets/timbre"
+];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+global.SampleWidget.dependencies = [
+    "widgets/tuner",
+    "widgets/SamplerBlocks",
+    "widgets/SamplerPlayback",
+    "widgets/SamplerPitch",
+    "widgets/SamplerFiles",
+    "widgets/SamplerUI",
+    "widgets/SamplerPieMenu",
+    "widgets/SamplerCanvas",
+    "widgets/SamplerTuner",
+    "widgets/sampler"
+];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
@@ -143,10 +169,14 @@ global.TemperamentWidget = jest.fn(() => ({
     scale: null,
     init: jest.fn()
 }));
-global.TemperamentWidget.dependencies = ["widgets/temperament"];
+global.TemperamentWidget.dependencies = ["widgets/TemperamentUI", "widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
-global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+global.MusicKeyboard.dependencies = [
+    "widgets/MusicKeyboardEditing",
+    "widgets/MusicKeyboardRendering",
+    "widgets/musickeyboard"
+];
 global.PhraseMaker = jest.fn();
 global.PhraseMaker.dependencies = [
     "widgets/PhraseMakerUtils",
@@ -158,17 +188,51 @@ global.PhraseMaker.dependencies = [
 global.Arpeggio = jest.fn();
 global.Arpeggio.dependencies = ["widgets/arpeggio"];
 global.PitchDrumMatrix = jest.fn();
-global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
+global.PitchDrumMatrix.dependencies = [
+    "widgets/PitchDrumMatrixWindow",
+    "widgets/PitchDrumMatrixGrid",
+    "widgets/PitchDrumMatrixBlocks",
+    "widgets/PitchDrumMatrixCells",
+    "widgets/PitchDrumMatrixPlayback",
+    "widgets/PitchDrumMatrixSave",
+    "widgets/pitchdrummatrix"
+];
 global.PitchSlider = jest.fn();
 global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
-global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
+global.PitchStaircase.dependencies = [
+    "widgets/PitchStaircaseTimers",
+    "widgets/PitchStaircaseLayout",
+    "widgets/PitchStaircaseSteps",
+    "widgets/PitchStaircasePlayback",
+    "widgets/PitchStaircaseSave",
+    "widgets/PitchStaircaseWindow",
+    "widgets/pitchstaircase"
+];
 global.RhythmRuler = jest.fn();
-global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
+global.RhythmRuler.dependencies = [
+    "widgets/RhythmRulerLayout",
+    "widgets/RhythmRulerHistory",
+    "widgets/RhythmRulerEditing",
+    "widgets/RhythmRulerPlayback",
+    "widgets/RhythmRulerSave",
+    "widgets/RhythmRulerCircular",
+    "widgets/rhythmruler"
+];
 global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
-global.LegoWidget.dependencies = ["widgets/legobricks"];
+global.LegoWidget.dependencies = [
+    "widgets/LegoBricksRows",
+    "widgets/LegoBricksLayout",
+    "widgets/LegoBricksExport",
+    "widgets/LegoBricksMedia",
+    "widgets/LegoBricksEyeDropper",
+    "widgets/LegoBricksColor",
+    "widgets/LegoBricksPlayback",
+    "widgets/LegoBricksVisualization",
+    "widgets/legobricks"
+];
 global.AIWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIWidget.dependencies = ["widgets/aiwidget"];
 
@@ -288,6 +352,34 @@ describe("setupWidgetBlocks", () => {
             expect(getBlock("timbre")).toBeDefined();
             expect(getBlock("tempo")).toBeDefined();
             expect(getBlock("meterwidget")).toBeDefined();
+            expect(activity.blockTypes).toEqual([
+                "aidebugger",
+                "envelope",
+                "filter",
+                "reflection",
+                "aimusic",
+                "legobricks",
+                "timbre",
+                "temperament",
+                "modewidget",
+                "meterwidget",
+                "tempo",
+                "sampler",
+                "oscilloscope",
+                "pitchdrummatrix",
+                "arpeggiomatrix",
+                "pitchstaircase",
+                "pitchslider",
+                "chromatic",
+                "musickeyboard2",
+                "musickeyboard",
+                "rhythmruler3",
+                "rhythmruler2",
+                "matrixgmajor",
+                "matrixcmajor",
+                "matrix",
+                "status"
+            ]);
         });
     });
 
@@ -408,6 +500,106 @@ describe("setupWidgetBlocks", () => {
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("tempoBlk", 0, "_tempo_0");
             expect(logo.setTurtleListener).toHaveBeenCalled();
         });
+
+        it("starts each run with no recorded turtles", () => {
+            const tempo = getBlock("tempo");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            logo.tempo.BPMTurtles = [3, 4];
+
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+
+            expect(logo.tempo.BPMTurtles).toEqual([]);
+            expect(logo.tempo.BPMBlocks).toEqual([]);
+            expect(logo.tempo.BPMs).toEqual([]);
+        });
+
+        it("stops recording BPM blocks once the widget opens", () => {
+            const tempo = getBlock("tempo");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            tempo.flow(["childBlk"], logo, 0, "tempoBlk");
+            expect(logo.inTempo).toBe(true);
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.tempo.init).toHaveBeenCalledWith(activity);
+            // A BPM block after the Tempo block must not add a row to the widget.
+            expect(logo.inTempo).toBe(false);
+        });
+    });
+
+    describe("PitchDrumMatrixBlock", () => {
+        const runBlock = pitchDrumMatrix => {
+            logo.pitchDrumMatrix = pitchDrumMatrix;
+            getBlock("pitchdrummatrix").flow(["childBlk"], logo, 0, "pdmBlk");
+            return logo.setTurtleListener.mock.calls[0][2];
+        };
+        const widget = (rowLabels, drums) => ({
+            rowLabels,
+            rowArgs: [],
+            drums,
+            rowBlocks: [],
+            clearBlocks: jest.fn(),
+            addRowBlock(blk) {
+                this.rowBlocks.push(blk);
+            },
+            hasPitchRows() {
+                return this.rowBlocks.length > 0;
+            },
+            init: jest.fn(),
+            makeClickable: jest.fn()
+        });
+
+        it("records the pitches and drums inside the block", () => {
+            runBlock(widget([], []));
+
+            expect(logo.inPitchDrumMatrix).toBe(true);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("pdmBlk", 0, "_pitchdrummatrix_0");
+        });
+
+        it("stops recording once the block has run, so later notes play", () => {
+            const pdm = widget([], []);
+            const listener = runBlock(pdm);
+            pdm.rowLabels.push("sol");
+            pdm.addRowBlock("solBlk");
+            pdm.drums.push("kick drum");
+
+            listener();
+
+            expect(logo.inPitchDrumMatrix).toBe(false);
+            expect(pdm.init).toHaveBeenCalledWith(activity);
+            expect(pdm.makeClickable).toHaveBeenCalled();
+        });
+
+        it("stops recording when the block has no pitch or no drum too", () => {
+            const pdm = widget([], []);
+            const listener = runBlock(pdm);
+
+            listener();
+
+            expect(logo.inPitchDrumMatrix).toBe(false);
+            expect(pdm.init).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "You must have at least one pitch block and one drum block in the matrix.",
+                "pdmBlk"
+            );
+        });
+
+        it("says there is no pitch block when the block only has rests", () => {
+            const pdm = widget([], []);
+            const listener = runBlock(pdm);
+            // A rest is a label, but not a row.
+            pdm.rowLabels.push("rest");
+            pdm.drums.push("kick drum");
+
+            listener();
+
+            expect(pdm.init).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "You must have at least one pitch block and one drum block in the matrix.",
+                "pdmBlk"
+            );
+        });
     });
 
     describe("MeterWidgetBlock", () => {
@@ -475,6 +667,18 @@ describe("setupWidgetBlocks", () => {
             expect(global.SampleWidget).toHaveBeenCalledTimes(1);
             expect(logo.sample).toBeDefined();
         });
+
+        it("stops collecting the timbre once the sampler opens", () => {
+            const sampler = getBlock("sampler");
+            sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(logo.sample.init).toHaveBeenCalled();
+            expect(logo.inSample).toBe(false);
+        });
     });
 
     describe("AIDebuggerBlock", () => {
@@ -520,6 +724,41 @@ describe("setupWidgetBlocks", () => {
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
         });
 
+        it("gives the Music Keyboard the turtle that ran the block (#9337)", () => {
+            const keyboard = getBlock("musickeyboard");
+            let turtleAtInit = null;
+            logo.musicKeyboard = {
+                init: jest.fn(() => {
+                    turtleAtInit = logo.musicKeyboard.turtle;
+                })
+            };
+
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk");
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(turtleAtInit).toBe(activity.turtles.ithTurtle(2));
+            expect(turtleAtInit).not.toBe(activity.turtles.ithTurtle(0));
+        });
+
+        it("opens each turtle's Music Keyboard with that turtle, whatever ran in between", () => {
+            const keyboard = getBlock("musickeyboard");
+            const turtlesAtInit = [];
+            logo.musicKeyboard = {
+                init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboard.turtle))
+            };
+
+            // Two turtles run Music Keyboard blocks before either listener fires.
+            keyboard.flow(["childBlk"], logo, 1, "kbdBlk1");
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk2");
+            logo.setTurtleListener.mock.calls[0][2]();
+            logo.setTurtleListener.mock.calls[1][2]();
+
+            // toBe: the mock turtles look alike, so only identity tells them apart.
+            expect(turtlesAtInit).toHaveLength(2);
+            expect(turtlesAtInit[0]).toBe(activity.turtles.ithTurtle(1));
+            expect(turtlesAtInit[1]).toBe(activity.turtles.ithTurtle(2));
+        });
+
         it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
             const keyboard = getBlock("musickeyboard");
             logo.musicKeyboard = null;
@@ -549,6 +788,73 @@ describe("setupWidgetBlocks", () => {
             expect(res).toEqual([null, 0, true]);
             // Should not trigger another runFromBlockNow or lazy load callback
             expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("TemperamentBlock", () => {
+        let temperament;
+
+        beforeEach(() => {
+            temperament = getBlock("temperament");
+            logo.temperament = { inTemperament: null, scale: null, init: jest.fn() };
+            logo.synth.temperamentChanged = jest.fn();
+        });
+
+        it("does not throw when the pitch arg has been removed", () => {
+            // connections[2] is where the pitch block docks; a user can drag it
+            // out of the clamp, leaving the slot empty.
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", null, "hiddenBlk"]
+            };
+            expect(() =>
+                temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received")
+            ).not.toThrow();
+            expect(logo.temperament.scale).toBeNull();
+        });
+
+        it("does not throw when a block under the pitch arg has been removed", () => {
+            // Pitch is still docked, but one of the blocks it reads from (here the
+            // set-key notename) has been dragged out, leaving that slot empty.
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", "pitchBlk", "hiddenBlk"]
+            };
+            activity.blocks.blockList["pitchBlk"] = {
+                name: "pitch",
+                connections: ["tempBlk", "noteBlk", "octaveBlk", "setKeyBlk"]
+            };
+            activity.blocks.blockList["noteBlk"] = { value: "C" };
+            activity.blocks.blockList["octaveBlk"] = { value: 4 };
+            activity.blocks.blockList["setKeyBlk"] = {
+                connections: ["pitchBlk", null, "modeBlk"]
+            };
+            activity.blocks.blockList["modeBlk"] = { value: "major" };
+
+            expect(() =>
+                temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received")
+            ).not.toThrow();
+            expect(logo.temperament.scale).toBeNull();
+        });
+
+        it("sets the scale and starting pitch when the full pitch chain is docked", () => {
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", "pitchBlk", "hiddenBlk"]
+            };
+            activity.blocks.blockList["pitchBlk"] = {
+                name: "pitch",
+                connections: ["tempBlk", "noteBlk", "octaveBlk", "setKeyBlk"]
+            };
+            activity.blocks.blockList["noteBlk"] = { value: "D" };
+            activity.blocks.blockList["octaveBlk"] = { value: 4 };
+            activity.blocks.blockList["setKeyBlk"] = {
+                connections: ["pitchBlk", "keyNameBlk", "modeBlk"]
+            };
+            activity.blocks.blockList["keyNameBlk"] = { value: "C" };
+            activity.blocks.blockList["modeBlk"] = { value: "major" };
+
+            temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received");
+
+            expect(logo.temperament.scale).toEqual(["C", "major"]);
+            expect(logo.synth.startingPitch).toBe("D4");
         });
     });
 
@@ -783,6 +1089,15 @@ describe("setupWidgetBlocks", () => {
             expect(logo[logoKey]).toBeDefined();
         });
 
+        it("tells the Rhythm Maker which block opened it, so its edits are saved there", () => {
+            logo.rhythmRuler = { Rulers: [[[1], []]], Drums: [3] };
+
+            getBlock("rhythmruler2").flow(["childBlk"], logo, 0, "rrBlk");
+
+            expect(logo.rhythmRuler.rulerBlock).toBe("rrBlk");
+            expect(logo.rhythmRuler.Rulers).toEqual([]);
+        });
+
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
@@ -809,6 +1124,22 @@ describe("setupWidgetBlocks", () => {
 
             expect(Widget).toHaveBeenCalledTimes(1);
             expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("gives the Meter widget the turtle that ran the block", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, 4, 5] },
+                4: { value: 1 },
+                5: { value: 4 }
+            };
+
+            getBlock("meterwidget").flow(["childBlk"], logo, 3, "meterBlk");
+            logo._meterBlock = 1;
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(global.MeterWidget).toHaveBeenCalledWith(activity, "meterBlk", 3);
         });
 
         it("does not open when the meter block input is disconnected", () => {
@@ -876,6 +1207,15 @@ describe("setupWidgetBlocks", () => {
 
             expect(global.AIWidget).toHaveBeenCalledTimes(1);
             expect(logo.aiMusic).toBeDefined();
+        });
+
+        it("aimusic does not put the sampler into capture mode", () => {
+            const aiMusic = getBlock("aimusic");
+            aiMusic.flow(["childBlk"], logo, 0, "aiMusicBlk");
+
+            expect(logo.inSample).toBe(false);
+            expect(logo.sample).toBeNull();
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("aiMusicBlk", 0, "_aimusic_0");
         });
     });
 });

@@ -94,6 +94,7 @@ describe("ExtrasBlocks", () => {
 
     beforeEach(() => {
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {},
                 showBlocks: jest.fn(),
@@ -138,7 +139,6 @@ describe("ExtrasBlocks", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -320,6 +320,7 @@ describe("ExtrasBlocks - additional branch coverage", () => {
 
     beforeEach(() => {
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {
                     blk1: { connections: [null, null], value: "hello", name: "text" },
@@ -371,7 +372,6 @@ describe("ExtrasBlocks - additional branch coverage", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -478,6 +478,7 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
     beforeEach(() => {
         instances = {};
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {
                     blk1: { connections: [null, null], value: "hello", name: "text" },
@@ -513,7 +514,13 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
                 getTurtleCount: jest.fn(() => 1),
                 getTurtle: jest.fn(() => ({ inTrash: false, name: "turtle1" }))
             },
-            save: { afterSaveAbc: jest.fn(), afterSaveLilypond: jest.fn(), saveSVG: jest.fn() },
+            save: {
+                afterSaveAbc: jest.fn(),
+                afterSaveLilypond: jest.fn(),
+                saveLilypondFromBlock: jest.fn(),
+                afterSaveMxml: jest.fn(),
+                saveSVG: jest.fn()
+            },
             errorMsg: jest.fn(),
             textMsg: jest.fn(),
             hideGrids: jest.fn()
@@ -525,7 +532,6 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -636,8 +642,50 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         logo.svgBackground = true;
         logo.svgOutput = "output";
         instances["SaveSVGBlock"].flow(["test.svg"], logo, turtle, blk);
-        expect(activity.save.saveSVG).toHaveBeenCalledWith("test.svg");
+        expect(logo.svgOutput).toMatch(/^<rect x="0" y="0" height="300" width="400" /);
+        expect(activity.save.saveSVG).toHaveBeenCalledWith(activity, "test.svg");
     });
+
+    test("real RecordNotationBlock flow() turns on notation recording for its mouse", () => {
+        const tur = { singer: { recordingNotation: false } };
+        activity.turtles.ithTurtle.mockReturnValueOnce(tur);
+        instances["RecordNotationBlock"].flow([], logo, turtle, blk);
+        expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(turtle);
+        expect(tur.singer.recordingNotation).toBe(true);
+    });
+
+    test("real save blocks are shown in the palette", () => {
+        ["SaveABCBlock", "SaveLilypondBlock", "SaveSVGBlock", "SaveMxmlBlock"].forEach(name => {
+            expect(instances[name].hidden).toBeFalsy();
+            expect(instances[name].deprecated).toBeFalsy();
+        });
+    });
+
+    test("real SaveLilypondBlock flow() saves through saveLilypondFromBlock", () => {
+        instances["SaveLilypondBlock"].flow(["song.ly"], logo, turtle, blk);
+        expect(activity.save.saveLilypondFromBlock).toHaveBeenCalledWith("song.ly");
+        expect(activity.save.afterSaveLilypond).not.toHaveBeenCalled();
+    });
+
+    test("real SaveMxmlBlock flow() saves MusicXML under its file name", () => {
+        instances["SaveMxmlBlock"].flow(["song.xml"], logo, turtle, blk);
+        expect(activity.save.afterSaveMxml).toHaveBeenCalledWith("song.xml");
+    });
+
+    test.each(["runningLilypond", "runningAbc", "runningMxml", "runningMIDI"])(
+        "real save blocks do nothing while %s",
+        flag => {
+            logo[flag] = true;
+            instances["SaveABCBlock"].flow(["song.abc"], logo, turtle, blk);
+            instances["SaveLilypondBlock"].flow(["song.ly"], logo, turtle, blk);
+            instances["SaveMxmlBlock"].flow(["song.xml"], logo, turtle, blk);
+            instances["SaveSVGBlock"].flow(["song.svg"], logo, turtle, blk);
+            expect(activity.save.afterSaveAbc).not.toHaveBeenCalled();
+            expect(activity.save.saveLilypondFromBlock).not.toHaveBeenCalled();
+            expect(activity.save.afterSaveMxml).not.toHaveBeenCalled();
+            expect(activity.save.saveSVG).not.toHaveBeenCalled();
+        }
+    );
 
     test("real ShowBlocksBlock flow() calls showBlocks", () => {
         instances["ShowBlocksBlock"].flow([], logo, turtle, blk);
@@ -698,5 +746,129 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
     test("real CommentBlock flow() calls textMsg", () => {
         instances["CommentBlock"].flow(["a comment"], logo, turtle, blk);
         expect(activity.textMsg).toHaveBeenCalledWith("a comment");
+    });
+});
+
+describe("proto block registration names", () => {
+    // setup() is `activity.blocks.protoBlockDict[this.name] = this`, a plain
+    // assignment, so two classes registering the same name means the later
+    // setup() silently replaces the earlier proto. The loader then cannot
+    // find the name it substitutes for an unknown block, and drops it.
+    // NOPTwoArgMathBlock shipped with NOPOneArgMathBlock's name and hit both
+    // halves of that at once.
+    it("every class in ExtrasBlocks registers a distinct name", () => {
+        const fs = require("fs");
+        const path = require("path");
+        const src = fs.readFileSync(path.join(__dirname, "..", "ExtrasBlocks.js"), "utf8");
+
+        const pairs = [
+            ...src.matchAll(/class\s+(\w+)\s+extends\s+\w+\s*\{[\s\S]*?super\(\s*"([^"]+)"/g)
+        ].map(m => ({ className: m[1], protoName: m[2] }));
+        expect(pairs.length).toBeGreaterThan(20);
+
+        const byProtoName = {};
+        for (const { className, protoName } of pairs) {
+            (byProtoName[protoName] ||= []).push(className);
+        }
+        const collisions = Object.entries(byProtoName)
+            .filter(([, classes]) => classes.length > 1)
+            .map(([protoName, classes]) => `${protoName} <- ${classes.join(", ")}`);
+
+        expect(collisions).toEqual([]);
+    });
+
+    it("NOPTwoArgMathBlock registers under its own name", () => {
+        const fs = require("fs");
+        const path = require("path");
+        const src = fs.readFileSync(path.join(__dirname, "..", "ExtrasBlocks.js"), "utf8");
+        const body = /class\s+NOPTwoArgMathBlock\s+extends\s+\w+\s*\{[\s\S]*?\n {4}\}/.exec(src)[0];
+
+        expect(body).toContain('super("nopTwoArgMathBlock"');
+        // The name blocks.js substitutes for an unknown two-argument math
+        // block, so the two have to agree.
+        expect(body).toMatch(/args:\s*2/);
+    });
+});
+
+describe("runtime proto registration", () => {
+    // The tests above read ExtrasBlocks.js as text, which proves the source
+    // says the right thing but not that setup() ends up registering it.
+    // This drives the real setupExtrasBlocks() against a base class that
+    // records what super() and formBlock() were given and registers the way
+    // ProtoBlock.setup does (protoBlockDict[this.name] = this), so a
+    // regression in registration fails here even if the source still reads
+    // correctly.
+    const register = dict =>
+        class {
+            constructor(name) {
+                this.name = name;
+                this.capabilities = Object.create(null);
+            }
+            setPalette() {}
+            setHelpString() {}
+            beginnerBlock() {}
+            makeMacro() {}
+            updateDockValue() {}
+            setCapability(n, v = true) {
+                this.capabilities[n] = !!v;
+                return this;
+            }
+            getCapability(n) {
+                return this.capabilities[n];
+            }
+            formBlock(def) {
+                this.formBlockDef = def;
+            }
+            setup() {
+                dict[this.name] = this;
+            }
+        };
+
+    let saved;
+    let protoBlockDict;
+
+    beforeAll(() => {
+        saved = {
+            LeftBlock: global.LeftBlock,
+            FlowBlock: global.FlowBlock,
+            ValueBlock: global.ValueBlock,
+            StackClampBlock: global.StackClampBlock
+        };
+        protoBlockDict = {};
+        const Base = register(protoBlockDict);
+        global.LeftBlock = Base;
+        global.FlowBlock = class extends Base {};
+        global.ValueBlock = class extends Base {};
+        global.StackClampBlock = class extends Base {};
+
+        setupExtrasBlocks({
+            blocks: { blockList: {}, protoBlockDict },
+            turtles: { ithTurtle: () => ({ singer: {}, doWait() {} }), getTurtleCount: () => 1 },
+            save: {},
+            errorMsg: () => {},
+            textMsg: () => {}
+        });
+    });
+
+    afterAll(() => {
+        Object.assign(global, saved);
+    });
+
+    it("registers nopOneArgMathBlock and nopTwoArgMathBlock separately", () => {
+        expect(protoBlockDict.nopOneArgMathBlock).toBeDefined();
+        expect(protoBlockDict.nopTwoArgMathBlock).toBeDefined();
+        // The bug was one overwriting the other, so identity matters.
+        expect(protoBlockDict.nopOneArgMathBlock).not.toBe(protoBlockDict.nopTwoArgMathBlock);
+    });
+
+    it("gives each NOP math placeholder its own argument count", () => {
+        expect(protoBlockDict.nopOneArgMathBlock.formBlockDef.args).toBe(1);
+        expect(protoBlockDict.nopTwoArgMathBlock.formBlockDef.args).toBe(2);
+    });
+
+    it("registers every class under a distinct name", () => {
+        const names = Object.keys(protoBlockDict);
+        expect(new Set(names).size).toBe(names.length);
+        expect(names.length).toBeGreaterThan(20);
     });
 });

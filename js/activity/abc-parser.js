@@ -55,12 +55,18 @@ const _ABC_MODE_MAP = {
 };
 
 /**
- * Strips ABC inline accidental prefixes (^, ^^, _, __, =) from a
- * note name so only the bare letter (plus optional octave comma)
- * remains.  For example "^^G" becomes "G", "_E" becomes "E".
+ * abcjs bar types for |:, :| and ::.
+ */
+const _ABC_REPEAT_BARS = ["bar_left_repeat", "bar_right_repeat", "bar_dbl_repeat"];
+
+/**
+ * Strips ABC inline accidental prefixes (^, ^^, _, __, =) and octave
+ * marks (any number of "," or "'") from a note name so only the bare
+ * letter remains.  For example "^^G" becomes "G", "_E," becomes "E"
+ * and "c''" becomes "c".  The octave itself comes from pitch.pitch.
  */
 function _stripAbcAccidentalPrefix(name) {
-    return name.replace(/^[\^_=]+/, "");
+    return name.replace(/^[\^_=]+/, "").replace(/[,']+$/, "");
 }
 
 // Converts an abcjs pitch object to a Music Blocks note name.
@@ -72,7 +78,7 @@ function _stripAbcAccidentalPrefix(name) {
 //   2. A key-signature accidental that applies to the note letter.
 // If neither applies the bare note letter is returned.
 function _adjustPitch(note, keySignature, inlineAccidental) {
-    const bare = _stripAbcAccidentalPrefix(note).replace(",", "");
+    const bare = _stripAbcAccidentalPrefix(note);
 
     // Inline accidental takes priority (ABC rule: it overrides the
     // key signature for the rest of the bar).
@@ -82,7 +88,7 @@ function _adjustPitch(note, keySignature, inlineAccidental) {
 
     // Fall back to the key signature.
     const ksa = keySignature.accidentals.find(acc => {
-        const noteToCompare = acc.note.toUpperCase().replace(",", "");
+        const noteToCompare = _stripAbcAccidentalPrefix(acc.note);
         return noteToCompare.toLowerCase() === bare.toLowerCase();
     });
 
@@ -109,7 +115,8 @@ function _createPitchBlocks(
     keySignature,
     actionBlock,
     triplet,
-    meterDen
+    meterDen,
+    inlineAccidental
 ) {
     const duration = toFraction(pitchDuration);
     const hiddenBlockId = blockId + (pitches ? 8 : 6);
@@ -135,7 +142,7 @@ function _createPitchBlocks(
         const adjustedNote = _adjustPitch(
             pitches.name,
             keySignature,
-            pitches.accidental
+            inlineAccidental
         ).toUpperCase();
         noteBlocks.push(
             [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
@@ -157,19 +164,21 @@ function _createPitchBlocks(
     return noteBlocks.length;
 }
 
-// Function to search index for particular type of block
-// mainly used to find nammeddo block in repeat block.
-function _searchIndexForMusicBlock(array, x) {
-    // Iterate over each sub-array in the main array
-    for (let i = 0; i < array.length; i++) {
-        // Check if the 0th element of the sub-array matches x
-        if (array[i][0] === x) {
-            // Return the index if a match is found
-            return i;
-        }
-    }
-    // Return -1 if no match is found
-    return -1;
+/**
+ * Links blocks into one stack hanging from a connection slot of parent:
+ * each block's first connection is its previous block and its last
+ * connection is the next one.
+ *
+ * @param {Array} chain - Block literals in play order (mutated in place).
+ * @param {Array} parent - The block the stack hangs from (mutated in place).
+ * @param {number} slot - The parent connection that holds the stack.
+ */
+function _chainBlocks(chain, parent, slot) {
+    parent[4][slot] = chain[0][0];
+    chain.forEach((block, i) => {
+        block[4][0] = i === 0 ? parent[0] : chain[i - 1][0];
+        block[4][block[4].length - 1] = i === chain.length - 1 ? null : chain[i + 1][0];
+    });
 }
 
 /**
@@ -237,109 +246,52 @@ function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
 }
 
 /**
- * Handles a bar element — updates repeatArray for left/right repeat bar types.
+ * Records the segment range of a repeat. Lines are split at repeat bars, so
+ * the bar sits between the last segment built and the next one.
  *
- * @param {object} element - The bar element from the voice.
- * @param {Array} repeatArray - The staff's repeat array (mutated in place).
- * @param {number} baseBlocksCount - The current count of base blocks.
+ * A :| with no |: repeats from the end of the previous repeat or from the
+ * start of the tune, and :: ends one repeat and starts the next.
+ *
+ * @param {string} type - A bar type from _ABC_REPEAT_BARS.
+ * @param {object} staffRecord - The localized staff record (mutated in place).
  */
-function _handleBarElement(element, repeatArray, baseBlocksCount) {
-    if (element.type === "bar_left_repeat") {
-        repeatArray.push({
-            start: baseBlocksCount,
-            end: -1
-        });
-    } else if (element.type === "bar_right_repeat") {
-        for (const repeatbar of repeatArray) {
-            if (repeatbar.end === -1) {
-                repeatbar.end = baseBlocksCount;
-            }
+function _handleRepeatBar(type, staffRecord) {
+    const next = staffRecord.baseBlocks.length;
+    if (type !== "bar_left_repeat") {
+        const start = staffRecord.repeatStart ?? staffRecord.repeatFrom;
+        if (start < next) {
+            staffRecord.repeatArray.push({ start, end: next - 1 });
         }
+        staffRecord.repeatFrom = next;
     }
+    staffRecord.repeatStart = type === "bar_right_repeat" ? null : next;
 }
 
 /**
- * Processes one voice: iterates all elements, builds pitch blocks for notes
- * and updates repeat markers for bars, then appends the nameddo/action/hidden
- * tail. Returns early without pushing if no note blocks were produced.
+ * Turns the notes collected so far into an action block called by a nameddo
+ * block. The nameddo blocks are linked into the start stack later, in
+ * _finalizeStaffBlocks. Does nothing when no notes were collected.
  *
- * tripletFinder is initialized fresh for each voice so that triplet state
- * never bleeds from one voice into the next.
- *
- * @param {Array} voice - The voice element array.
+ * @param {Array} actionBlock - Note blocks of the segment (mutated in place).
  * @param {number} blockId - Current block ID counter.
- * @param {object} staff - The staff object.
  * @param {string} staffIdx - The staff index key.
  * @param {object} staffRecord - The localized staff record (mutated in place).
  * @returns {number} newBlockId
  */
-function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
-    // Reset triplet state at every voice boundary so that an unclosed
-    // triplet in one voice cannot affect timing in subsequent voices.
-    let tripletFinder = null;
-    const actionBlock = [];
-
-    voice.forEach(element => {
-        if (element.el_type === "note") {
-            //check if triplet exists
-            if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
-                tripletFinder = element.startTriplet;
-            }
-
-            blockId += _createPitchBlocks(
-                element.pitches?.[0],
-                blockId,
-                element.duration,
-                staff.key,
-                actionBlock,
-                tripletFinder,
-                staffRecord.meterDen
-            );
-
-            // Check and set tripletFinder to null if element?.endTriplet exists.
-            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
-                tripletFinder = null;
-            }
-        } else if (element.el_type === "bar") {
-            _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
-        }
-    });
-
-    // Skip voices that produced no note blocks (e.g. bar-only voices).
+function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
     if (actionBlock.length === 0) {
         return blockId;
     }
 
-    // actionBlock.length > 0 is guaranteed by the guard above.
     // Update the newnote connection with hidden
     actionBlock[0][4][0] = blockId + 3;
     actionBlock[actionBlock.length - 1][4][1] = null;
-
-    // Update the namedo block if not first nameddo block appear
-    if (staffRecord.baseBlocks.length !== 0) {
-        staffRecord.baseBlocks[staffRecord.baseBlocks.length - 1][0][
-            staffRecord.baseBlocks[staffRecord.baseBlocks.length - 1][0].length - 4
-        ][4][1] = blockId;
-    }
 
     const lineLabel = `V: ${parseInt(staffIdx, 10) + 1} Line ${staffRecord.baseBlocks.length + 1}`;
 
     // Add the nameddo action text and hidden block for each line
     actionBlock.push(
-        [
-            blockId,
-            ["nameddo", { value: lineLabel }],
-            0,
-            0,
-            [
-                staffRecord.baseBlocks.length === 0
-                    ? null
-                    : staffRecord.baseBlocks[staffRecord.baseBlocks.length - 1][0][
-                          staffRecord.baseBlocks[staffRecord.baseBlocks.length - 1][0].length - 4
-                      ][0],
-                null
-            ]
-        ],
+        [blockId, ["nameddo", { value: lineLabel }], 0, 0, [null, null]],
         [
             blockId + 1,
             ["action", { collapsed: false }],
@@ -352,193 +304,89 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
     ); // blockid of topaction block
 
     staffRecord.nameddoIds.push(blockId);
-    blockId += 4;
-
     staffRecord.baseBlocks.push([actionBlock]);
 
-    return blockId;
+    return blockId + 4;
 }
 
 /**
- * Handles a repeat that starts at the very beginning of the staff (repeatId.start === 0).
- * Pushes the repeat and its count block, then rewires settimbre and nameddo connections.
+ * Processes one voice: iterates all elements, builds pitch blocks for notes
+ * and updates repeat markers for bars. The notes become one action block per
+ * stretch between repeat bars, so a repeat can start or end mid-line.
+ * Voices that produced no note blocks add nothing.
  *
- * @param {object} repeatId - The repeat entry { start, end }.
- * @param {number} blockId - Current block ID counter.
- * @param {string} staffIndex - The staff index key.
- * @param {object} staffBlocksMap - The shared staff blocks map (mutated in place).
- * @returns {number} newBlockId
- */
-/**
- * Handles a repeat that starts at the very beginning of the staff (repeatId.start === 0).
- * Pushes the repeat and its count block, then rewires settimbre and nameddo connections.
+ * tripletFinder is initialized fresh for each voice so that triplet state
+ * never bleeds from one voice into the next.
  *
- * @param {object} repeatId - The repeat entry { start, end }.
+ * @param {Array} voice - The voice element array.
  * @param {number} blockId - Current block ID counter.
+ * @param {object} staff - The staff object.
+ * @param {string} staffIdx - The staff index key.
  * @param {object} staffRecord - The localized staff record (mutated in place).
+ * @param {number} voiceIdx - The voice's index within the staff.
  * @returns {number} newBlockId
  */
-function _processRepeatFromStart(repeatId, blockId, staffRecord) {
-    staffRecord.repeatBlock.push([
-        blockId,
-        "repeat",
-        0,
-        0,
-        [
-            staffRecord.startBlock[staffRecord.startBlock.length - 3][0] /*settimbre*/,
-            blockId + 1,
-            staffRecord.nameddoIds[0],
-            staffRecord.nameddoIds[repeatId.end + 1] === undefined
-                ? null
-                : staffRecord.nameddoIds[repeatId.end + 1]
-        ]
-    ]);
-    staffRecord.repeatBlock.push([blockId + 1, ["number", { value: 2 }], 100, 100, [blockId]]);
-
-    // Update the settimbre block
-    staffRecord.startBlock[staffRecord.startBlock.length - 3][4][2] = blockId;
-
-    const firstNameddo = _searchIndexForMusicBlock(
-        staffRecord.baseBlocks[0][0],
-        staffRecord.nameddoIds[0]
-    );
-    const endNameddo = _searchIndexForMusicBlock(
-        staffRecord.baseBlocks[repeatId.end][0],
-        staffRecord.nameddoIds[repeatId.end]
-    );
-
-    // Check if the block after the repeat end exists before accessing it
-    if (staffRecord.baseBlocks[repeatId.end + 1] && staffRecord.baseBlocks[repeatId.end + 1][0]) {
-        const secondNameddo = _searchIndexForMusicBlock(
-            staffRecord.baseBlocks[repeatId.end + 1][0],
-            staffRecord.nameddoIds[repeatId.end + 1]
-        );
-
-        if (secondNameddo !== -1) {
-            staffRecord.baseBlocks[repeatId.end + 1][0][secondNameddo][4][0] = blockId;
-        }
+function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
+    // Reset triplet state at every voice boundary so that an unclosed
+    // triplet in one voice cannot affect timing in subsequent voices.
+    let tripletFinder = null;
+    // An inline accidental holds for the same pitch until the next bar line,
+    // but abcjs only sets it on the note that carries the mark. A bar can run
+    // across staff lines, so the state lives on the staff record per voice.
+    const barAccidentals = staffRecord.barAccidentals;
+    if (!barAccidentals[voiceIdx]) {
+        barAccidentals[voiceIdx] = {};
     }
+    let actionBlock = [];
 
-    staffRecord.baseBlocks[0][0][firstNameddo][4][0] = blockId;
-    staffRecord.baseBlocks[repeatId.end][0][endNameddo][4][1] = null;
+    voice.forEach(element => {
+        if (element.el_type === "note") {
+            //check if triplet exists
+            if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
+                tripletFinder = element.startTriplet;
+            }
 
-    return blockId + 2;
+            const pitch = element.pitches?.[0];
+            let accidental = pitch?.accidental;
+            if (pitch) {
+                if (accidental) {
+                    barAccidentals[voiceIdx][pitch.pitch] = accidental;
+                } else {
+                    accidental = barAccidentals[voiceIdx][pitch.pitch];
+                }
+            }
+
+            blockId += _createPitchBlocks(
+                pitch,
+                blockId,
+                element.duration,
+                staff.key,
+                actionBlock,
+                tripletFinder,
+                staffRecord.meterDen,
+                accidental
+            );
+
+            // Check and set tripletFinder to null if element?.endTriplet exists.
+            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
+                tripletFinder = null;
+            }
+        } else if (element.el_type === "bar") {
+            barAccidentals[voiceIdx] = {};
+            if (_ABC_REPEAT_BARS.includes(element.type)) {
+                blockId = _closeSegment(actionBlock, blockId, staffIdx, staffRecord);
+                actionBlock = [];
+                _handleRepeatBar(element.type, staffRecord);
+            }
+        }
+    });
+
+    return _closeSegment(actionBlock, blockId, staffIdx, staffRecord);
 }
 
 /**
- * Handles a mid-piece repeat (repeatId.start > 0).
- * Pushes the repeat and its count block, then rewires predecessor and successor
- * nameddo connections.
- *
- * @param {object} repeatId - The repeat entry { start, end }.
- * @param {number} blockId - Current block ID counter.
- * @param {object} staffRecord - The localized staff record (mutated in place).
- * @returns {number} newBlockId
- */
-function _processRepeatMid(repeatId, blockId, staffRecord) {
-    const currentNameddo = _searchIndexForMusicBlock(
-        staffRecord.baseBlocks[repeatId.start][0],
-        staffRecord.nameddoIds[repeatId.start]
-    );
-    const prevnameddo = _searchIndexForMusicBlock(
-        staffRecord.baseBlocks[repeatId.start - 1][0],
-        staffRecord.baseBlocks[repeatId.start][0][currentNameddo][4][0]
-    );
-    const afterNameddo = _searchIndexForMusicBlock(
-        staffRecord.baseBlocks[repeatId.end][0],
-        staffRecord.baseBlocks[repeatId.start][0][currentNameddo][4][1]
-    );
-
-    let prevRepeatNameddo = -1;
-    if (prevnameddo === -1) {
-        prevRepeatNameddo = _searchIndexForMusicBlock(
-            staffRecord.repeatBlock,
-            staffRecord.baseBlocks[repeatId.start][0][currentNameddo][4][0]
-        );
-    }
-
-    const currentBlockId = staffRecord.baseBlocks[repeatId.start][0][currentNameddo][0];
-
-    // Needs null checking optimize
-    const nextBlockId = staffRecord.nameddoIds[repeatId.end + 1];
-
-    staffRecord.repeatBlock.push([
-        blockId,
-        "repeat",
-        0,
-        0,
-        [
-            staffRecord.baseBlocks[repeatId.start][0][currentNameddo][4][0],
-            blockId + 1,
-            currentBlockId,
-            nextBlockId === null || nextBlockId === undefined ? null : nextBlockId
-        ]
-    ]);
-    staffRecord.repeatBlock.push([blockId + 1, ["number", { value: 2 }], 100, 100, [blockId]]);
-
-    if (prevnameddo !== -1) {
-        staffRecord.baseBlocks[repeatId.start - 1][0][prevnameddo][4][1] = blockId;
-    } else {
-        staffRecord.repeatBlock[prevRepeatNameddo][4][3] = blockId;
-    }
-
-    if (afterNameddo !== -1) {
-        staffRecord.baseBlocks[repeatId.end][0][afterNameddo][4][1] = null;
-    }
-
-    staffRecord.baseBlocks[repeatId.start][0][currentNameddo][4][0] = blockId;
-
-    if (
-        nextBlockId !== null &&
-        nextBlockId !== undefined &&
-        staffRecord.baseBlocks[repeatId.end + 1] &&
-        staffRecord.baseBlocks[repeatId.end + 1][0]
-    ) {
-        const nextnameddo = _searchIndexForMusicBlock(
-            staffRecord.baseBlocks[repeatId.end + 1][0],
-            nextBlockId
-        );
-        if (nextnameddo !== -1) {
-            staffRecord.baseBlocks[repeatId.end + 1][0][nextnameddo][4][0] = blockId;
-        }
-    }
-
-    return blockId + 2;
-}
-
-/**
- * Iterates all repeat entries for a staff, applies bounds checks, and dispatches
- * to _processRepeatFromStart or _processRepeatMid as appropriate.
- *
- * @param {object} staffRecord - The localized staff record (mutated in place).
- * @param {number} blockId - Current block ID counter.
- * @returns {number} newBlockId
- */
-function _processRepeats(staffRecord, blockId) {
-    const repeatblockids = staffRecord.repeatArray;
-    for (const repeatId of repeatblockids) {
-        // Skip repeat entries with out-of-bounds block indices
-        if (
-            repeatId.start < 0 ||
-            repeatId.end < 0 ||
-            repeatId.start >= staffRecord.baseBlocks.length ||
-            repeatId.end >= staffRecord.baseBlocks.length
-        ) {
-            continue;
-        }
-
-        if (repeatId.start === 0) {
-            blockId = _processRepeatFromStart(repeatId, blockId, staffRecord);
-        } else {
-            blockId = _processRepeatMid(repeatId, blockId, staffRecord);
-        }
-    }
-    return blockId;
-}
-
-/**
- * Links settimbre to the first nameddo block, processes all repeats, then
- * flattens and pushes the complete staff block data into finalBlock.
+ * Links the nameddo blocks under settimbre, wrapping each repeat range in a
+ * repeat block, then flattens and pushes the complete staff block data into finalBlock.
  *
  * @param {object} staffRecord - The localized staff record (mutated in place).
  * @param {number} blockId - Current block ID counter.
@@ -564,15 +412,25 @@ function _finalizeStaffBlocks(staffRecord, blockId, finalBlock) {
         return blockId;
     }
 
-    // Link settimbre -> first nameddo block (forward direction)
-    staffRecord.startBlock[staffRecord.startBlock.length - 3][4][2] =
-        staffRecord.baseBlocks[0][0][staffRecord.baseBlocks[0][0].length - 4][0];
-
-    // Update the first namedo block with settimbre (back-link)
-    staffRecord.baseBlocks[0][0][staffRecord.baseBlocks[0][0].length - 4][4][0] =
-        staffRecord.startBlock[staffRecord.startBlock.length - 3][0];
-
-    blockId = _processRepeats(staffRecord, blockId);
+    // Play the segments in order under settimbre, with each repeat range
+    // wrapped in a repeat block that plays it twice.
+    const segments = staffRecord.baseBlocks.map(
+        ([actionBlock]) => actionBlock[actionBlock.length - 4]
+    );
+    const stack = [];
+    let next = 0;
+    for (const { start, end } of staffRecord.repeatArray) {
+        stack.push(...segments.slice(next, start));
+        const repeat = [blockId, "repeat", 0, 0, [null, blockId + 1, null, null]];
+        const count = [blockId + 1, ["number", { value: 2 }], 0, 0, [blockId]];
+        staffRecord.repeatBlock.push(repeat, count);
+        _chainBlocks(segments.slice(start, end + 1), repeat, 2);
+        stack.push(repeat);
+        next = end + 1;
+        blockId += 2;
+    }
+    stack.push(...segments.slice(next));
+    _chainBlocks(stack, staffRecord.startBlock[staffRecord.startBlock.length - 3], 2);
 
     const lineBlock = staffRecord.baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
     // Flatten the multidimensional array
@@ -624,18 +482,22 @@ const setupActivityAbcParser = activityInstance => {
                         startBlock,
                         repeatBlock: [],
                         repeatArray: [],
-                        nameddoIds: []
+                        repeatStart: null,
+                        repeatFrom: 0,
+                        nameddoIds: [],
+                        barAccidentals: []
                     };
                     blockId = newBlockId;
                 }
 
-                staff.voices.forEach(voice => {
+                staff.voices.forEach((voice, voiceIdx) => {
                     blockId = _processVoice(
                         voice,
                         blockId,
                         staff,
                         staffIdx,
-                        staffBlocksMap[staffIdx]
+                        staffBlocksMap[staffIdx],
+                        voiceIdx
                     );
                 });
             });

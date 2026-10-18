@@ -113,10 +113,6 @@ class PluginDialog {
      * Shows a modal asking for a built-in plugin name or triggers file upload if blank.
      */
     openPlugin() {
-        if (typeof this.options.closeAuxToolbar === "function") {
-            this.options.closeAuxToolbar(this.options.showHideAuxMenu);
-        }
-
         if (document.getElementById("open-plugin-modal")) return;
         const modal = document.createElement("div");
         modal.classList.add("modalBox");
@@ -162,6 +158,7 @@ class PluginDialog {
         leftGroup.appendChild(uploadBtn);
 
         const rightGroup = document.createElement("div");
+        rightGroup.classList.add("plugin-modal-right-actions");
 
         const loadBtn = document.createElement("button");
         loadBtn.textContent = _("Load");
@@ -195,10 +192,6 @@ class PluginDialog {
     }
 
     deletePlugin() {
-        if (typeof this.options.closeAuxToolbar === "function") {
-            this.options.closeAuxToolbar(this.options.showHideAuxMenu);
-        }
-
         if (document.getElementById("delete-plugin-confirm")) return;
 
         const loadedPlugins =

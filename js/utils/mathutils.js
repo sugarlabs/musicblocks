@@ -75,7 +75,15 @@ class MathUtility {
         const GetRandom = (n1, n2) => {
             // n1 should be <= n2
             [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
-            return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
+            // Pick from the whole numbers inside the range, so decimal bounds
+            // can't give a result below n1 or above n2.
+            const low = Math.ceil(Number(n1));
+            const high = Math.floor(Number(n2));
+            if (low > high) {
+                // No whole number between them (e.g. 2.2 and 2.8).
+                return Number(n1);
+            }
+            return low + Math.floor(Math.random() * (high - low + 1));
         };
 
         /**
@@ -122,7 +130,7 @@ class MathUtility {
             // non-number is already rejected in js/block.js, but the project
             // loader (js/blocks.js, case "number") assigns Number(value) with
             // no isNaN check, so a saved project can carry one here.
-            if (Number.isNaN(c)) {
+            if (c !== undefined && !Number.isFinite(c)) {
                 throw new Error("NanError");
             }
             return GetRandomSolfege(a, b, c);
@@ -354,15 +362,47 @@ class MathUtility {
     }
 
     /**
-     * Returns integer value.
+     * Returns integer value, rounding half away from zero (symmetric rounding).
+     *
+     * `Math.floor(n + 0.5)` is the classic "round half up" formula, which
+     * is asymmetric: `doInt(-2.5)` would give `-2` instead of `-3`.
+     * Using `Math.sign(n) * Math.round(Math.abs(n))` keeps both sides of
+     * zero consistent — positives and negatives mirror each other.
      *
      * @static
      * @param {*} a
-     * @returns {number} - Integer value of a.
+     * @returns {number} - Integer value of a, rounded half away from zero.
      */
     static doInt(a) {
         const n = Number(a);
-        return Number.isNaN(n) ? NaN : Math.floor(n + 0.5);
+        if (Number.isNaN(n)) return NaN;
+        return Math.sign(n) * Math.round(Math.abs(n));
+    }
+
+    /**
+     * Matches the value returned by the XOR block.
+     *
+     * @static
+     * @param {*} a
+     * @param {*} b
+     * @returns {*}
+     */
+    static doXor(a, b) {
+        return a ? !b : b;
+    }
+
+    /**
+     * Returns how many times a Repeat block runs its body for count a (see
+     * RepeatBlock.flow): the count rounded down, or 0 when it is below 1 or
+     * not a number. Exported JavaScript uses it as the for-loop bound, since
+     * `i < a` alone runs Math.ceil(a) times.
+     *
+     * @static
+     * @param {*} a
+     * @returns {number} - Number of repetitions.
+     */
+    static doRepeatCount(a) {
+        return typeof a === "number" && a >= 1 ? Math.floor(a) : 0;
     }
 }
 // Ensure mathutils.js exports the MathUtility class

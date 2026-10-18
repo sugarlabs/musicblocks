@@ -288,15 +288,16 @@ describe("rubrics.js test suite", () => {
 
         it("counts tuplet groupings, tracks the pitch range and reads articulation markers", () => {
             const freq = { C4: 300, D4: 100, F4: 400, G4: 500 };
+            // Staging items are [notes, note value, dots, tuplet, roundDown, ...].
             const activity = {
                 logo: {
                     notation: {
                         notationStaging: {
                             0: [
-                                [["C4"], 2],
-                                [["D4", "F4"], 3],
-                                [["G4"], 5],
-                                [["R"], 4],
+                                [["C4"], 2, 0, null, undefined],
+                                [["D4", "F4"], 1, 0, [3, 4], 8],
+                                [["G4"], 1, 0, [5, 4], 16],
+                                [["R"], 4, 0, null, undefined],
                                 "begin articulation",
                                 "end articulation"
                             ]
@@ -326,7 +327,8 @@ describe("rubrics.js test suite", () => {
 
             const stats = getStatsFromNotation(activity);
 
-            expect(stats.duples).toBe(1);
+            // The half note C4 is not a tuplet.
+            expect(stats.duples).toBe(0);
             expect(stats.triplets).toBe(1);
             expect(stats.quintuplets).toBe(1);
             // C4, D4, F4, G4 and the rest "R" each count as a note.
@@ -346,6 +348,72 @@ describe("rubrics.js test suite", () => {
             expect(stats.articulation.begin.length + stats.articulation.end.length).toBe(2);
             expect(stats.rests).toBe(1);
             expect(stats.ornaments).toBe(1);
+        });
+
+        it("counts tuplets from the notation that real note values produce", () => {
+            const { durationToNoteValue } = require("../utils/musicutils-rhythm");
+            // A half note, three triplet eighths (1/12) and two quintuplet
+            // sixteenths (1/20), staged the way doUpdateNotation stages them.
+            const notes = [
+                ["C4", 2],
+                ["D4", 4],
+                ["E4", 12],
+                ["F4", 12],
+                ["G4", 12],
+                ["A4", 20],
+                ["B4", 20]
+            ];
+            const staging = notes.map(([note, duration]) => {
+                const obj = durationToNoteValue(duration);
+                return [[note], obj[0], obj[1], obj[2], obj[3], false, false, null];
+            });
+            const activity = {
+                logo: {
+                    notation: { notationStaging: { 0: staging } },
+                    synth: { inTemperament: "equal", _getFrequency: jest.fn(() => 440) }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.duples).toBe(0);
+            expect(stats.triplets).toBe(3);
+            expect(stats.quintuplets).toBe(2);
+        });
+
+        it("pushes multiple 'end articulation' markers into .end, not .begin (regression)", () => {
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [
+                                [["C4"], 4],
+                                "begin articulation",
+                                [["D4"], 4],
+                                "end articulation",
+                                [["E4"], 4],
+                                "end articulation"
+                            ]
+                        }
+                    },
+                    synth: {
+                        inTemperament: false,
+                        _getFrequency: jest.fn(() => 440)
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.articulation.begin).toHaveLength(1);
+            expect(stats.articulation.end).toHaveLength(2);
+            // The "end articulation" markers must NOT appear in .begin.
+            expect(stats.articulation.begin).not.toContain("3");
+            expect(stats.articulation.begin).not.toContain("5");
+            expect(stats.articulation.end).toContain("3");
+            expect(stats.articulation.end).toContain("5");
         });
 
         it("resolves note names through the custom temperament table when one is active", () => {
@@ -376,6 +444,104 @@ describe("rubrics.js test suite", () => {
             // "C" matched row[3], so the stored name becomes row[1] + octave.
             expect(stats.pitchNames.has("Cff")).toBe(true);
             expect(stats.pitches).toContain(261.6);
+        });
+
+        it("resolves custom note names when getTemperament returns a dictionary object", () => {
+            isCustomTemperament.mockReturnValueOnce(true);
+            getTemperament.mockReturnValueOnce({
+                pitchNumber: 12,
+                0: ["idx", "Cff", "ratio", "C"]
+            });
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4]]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "custom_dict",
+                        getCustomFrequency: jest.fn(() => 261.6),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(activity.logo.synth.getCustomFrequency).toHaveBeenCalled();
+            expect(stats.pitchNames.has("Cff")).toBe(true);
+            expect(stats.pitches).toContain(261.6);
+        });
+
+        it("handles undefined return from getTemperament gracefully", () => {
+            isCustomTemperament.mockReturnValueOnce(true);
+            getTemperament.mockReturnValueOnce(undefined);
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4]]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "unknown_custom",
+                        getCustomFrequency: jest.fn(() => 261.6),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.pitchNames.has("C")).toBe(true);
+            expect(stats.pitches).toContain(261.6);
+        });
+
+        it("resolves custom note names with 3-element entries and calculates lowest/highest notes", () => {
+            isCustomTemperament.mockReturnValue(true);
+            getTemperament.mockReturnValue({
+                pitchNumber: 12,
+                0: [1, "vvC", 4],
+                1: [1.88, "^B", 4]
+            });
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [
+                                [["vvC4"], 4],
+                                [["^B4"], 4]
+                            ]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "custom",
+                        getCustomFrequency: jest.fn(note => (note === "vvC4" ? 261.63 : 493.88)),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            try {
+                const stats = getStatsFromNotation(activity);
+
+                expect(stats.pitchNames.has("vvC")).toBe(true);
+                expect(stats.pitchNames.has("^B")).toBe(true);
+                expect(stats.pitches).toContain(261.63);
+                expect(stats.pitches).toContain(493.88);
+                expect(stats.lowestNote).toEqual(["vvC4", 0, 261.63]);
+                expect(stats.highestNote).toEqual(["^B4", 1, 493.88]);
+            } finally {
+                isCustomTemperament.mockReturnValue(false);
+                getTemperament.mockReturnValue([]);
+            }
         });
     });
 });

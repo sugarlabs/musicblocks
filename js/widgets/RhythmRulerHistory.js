@@ -1,0 +1,217 @@
+/**
+ * MusicBlocks
+ *
+ * @copyright 2016-21 Walter Bender
+ * @copyright 2016 Hemant Kasat
+ * @copyright 2026 Music Blocks contributors
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
+
+/*
+   global
+
+   deepClone, last
+*/
+/*
+    Globals location
+    - js/utils/utils.js
+        deepClone, last
+*/
+
+/* exported RhythmRulerHistory */
+
+/**
+ * @file RhythmRulerHistory.js
+ * @description Rhythm Maker dissect history: restoring each ruler's divisions when the widget
+ * reopens, and saving them after an edit.
+ *
+ * The methods are moved as they were from the RhythmRuler class, which copies them onto
+ * RhythmRuler.prototype (see RhythmRuler.installModules), so `this` is still the widget.
+ */
+class RhythmRulerHistory {
+    /**
+     * Replays the saved dissect history onto the freshly built ruler cells
+     * (rests, dissects, divisions and ties), so a widget rebuilt by init()
+     * restores the edits made in a previous session.
+     * @private
+     * @returns {void}
+     */
+    _restoreDissectHistory() {
+        // Edits saved with the project, for drums not edited yet in this session. They have no
+        // undo entries yet, so they get them as they are replayed, or undo and clear would stop.
+        const fromProject = new Set();
+        const savedHistory = this.activity?.blocks?.blockList?.[this.rulerBlock]?.rulerHistory;
+        if (Array.isArray(savedHistory)) {
+            const drums = new Set(this._dissectHistory.map(entry => entry[1]));
+            for (const entry of savedHistory) {
+                if (!drums.has(entry[1])) {
+                    const copy = deepClone(entry);
+                    this._dissectHistory.push(copy);
+                    fromProject.add(copy);
+                }
+            }
+        }
+
+        let cell;
+        for (let drum = 0; drum < this.Drums.length; drum++) {
+            if (drum === null) {
+                continue;
+            }
+
+            // A drum repeated in the clamp has one entry per row, saved in row order, so each row
+            // replays only its own entry.
+            const occurrence = this.Drums.slice(0, drum).filter(
+                other => other === this.Drums[drum]
+            ).length;
+            let match = -1;
+            for (let i = 0; i < this._dissectHistory.length; i++) {
+                if (this._dissectHistory[i][1] !== this.Drums[drum]) {
+                    continue;
+                }
+
+                match++;
+                if (match !== occurrence) {
+                    continue;
+                }
+
+                const rhythmRulerTableRow = this._rulers[drum];
+                for (let j = 0; j < this._dissectHistory[i][0].length; j++) {
+                    if (this._dissectHistory[i][0][j] === undefined) {
+                        continue;
+                    }
+
+                    this._rulerSelected = drum;
+                    const historyLength = this.Rulers[drum][1].length;
+                    let undoType;
+
+                    if (typeof this._dissectHistory[i][0][j] === "number") {
+                        cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j]];
+                        if (cell !== undefined) {
+                            this.__toggleRestState(cell, false);
+                            undoType = "rest";
+                        }
+                    } else if (typeof this._dissectHistory[i][0][j][0] === "number") {
+                        if (typeof this._dissectHistory[i][0][j][1] === "number") {
+                            // dissect is [cell, num]
+                            cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
+                            if (cell !== undefined) {
+                                this.__dissectByNumber(
+                                    cell,
+                                    this._dissectHistory[i][0][j][1],
+                                    false
+                                );
+                                undoType = "dissect";
+                            } else {
+                                // console.warn(
+                                //     "Could not find cell to divide. Did the order of the rhythm blocks change?"
+                                // );
+                            }
+                        } else {
+                            // divide is [cell, [values]]
+                            cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
+                            if (cell !== undefined) {
+                                this.__divideFromList(
+                                    cell,
+                                    this._dissectHistory[i][0][j][1],
+                                    false
+                                );
+                                undoType = "tap";
+                            }
+                        }
+                    } else {
+                        // tie is [[cell, value], [cell, value]...]
+                        const history = this._dissectHistory[i][0][j];
+                        this._mouseDownCell = rhythmRulerTableRow.cells[history[0][0]];
+                        this._mouseUpCell = rhythmRulerTableRow.cells[last(history)[0]];
+                        if (this._mouseUpCell !== undefined) {
+                            this.__tie(false);
+                            undoType = "tie";
+                        }
+
+                        this._mouseDownCell = null;
+                        this._mouseUpCell = null;
+                    }
+
+                    if (
+                        fromProject.has(this._dissectHistory[i]) &&
+                        this.Rulers[drum][1].length > historyLength
+                    ) {
+                        this._undoList.push([undoType, drum]);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the save lock status.
+     * @private
+     * @returns {boolean} The current status of the save lock.
+     */
+    _get_save_lock() {
+        return this._save_lock;
+    }
+
+    /**
+     * Saves the dissect history.
+     * @public
+     * @returns {void}
+     */
+    saveDissectHistory() {
+        // Save the new dissect history.
+
+        const dissectHistory = [];
+        const drums = [];
+        let drum;
+        let history;
+        for (let i = 0; i < this.Rulers.length; i++) {
+            if (this.Drums[i] === null) {
+                continue;
+            }
+
+            history = [];
+            for (let j = 0; j < this.Rulers[i][1].length; j++) {
+                history.push(this.Rulers[i][1][j]);
+            }
+
+            this._dissectNumber.classList.add("hasKeyboard");
+            dissectHistory.push([history, this.Drums[i]]);
+            drums.push(this.Drums[i]);
+        }
+
+        // Look for any old entries that we may have missed.
+        // Use Set for O(1) lookup instead of Array.includes() O(n)
+        const drumsSet = new Set(drums);
+        for (let i = 0; i < this._dissectHistory.length; i++) {
+            drum = this._dissectHistory[i][1];
+            if (!drumsSet.has(drum)) {
+                history = deepClone(this._dissectHistory[i][0]);
+                dissectHistory.push([history, drum]);
+            }
+        }
+
+        this._dissectHistory = deepClone(dissectHistory);
+
+        // Keep this ruler's own entries (the first drums.length) on its block, so they are saved
+        // with the project. Drums this run didn't reach keep their saved edits.
+        const block = this.activity?.blocks?.blockList?.[this.rulerBlock];
+        if (block) {
+            const notReached = (block.rulerHistory || []).filter(entry => !drumsSet.has(entry[1]));
+            block.rulerHistory = deepClone(
+                dissectHistory.slice(0, drums.length).concat(notReached)
+            );
+        }
+    }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = RhythmRulerHistory;
+}

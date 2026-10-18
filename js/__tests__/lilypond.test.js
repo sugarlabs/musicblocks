@@ -30,12 +30,14 @@ const toFraction = jest.fn(num => {
     return [num, 1];
 });
 
-const NOTATIONDURATION = 1;
-const NOTATIONNOTE = 0;
-const NOTATIONROUNDDOWN = 2;
-const NOTATIONSTACCATO = 6;
-const NOTATIONTUPLETVALUE = 3;
-const NOTATIONDOTCOUNT = 4;
+const {
+    NOTATIONNOTE,
+    NOTATIONDURATION,
+    NOTATIONDOTCOUNT,
+    NOTATIONTUPLETVALUE,
+    NOTATIONROUNDDOWN,
+    NOTATIONSTACCATO
+} = require("../logoconstants");
 
 global.frequencyToPitch = frequencyToPitch;
 global.getScaleAndHalfSteps = getScaleAndHalfSteps;
@@ -117,10 +119,65 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a tempo change correctly", () => {
-        logo.notation.notationStaging[turtle] = ["tempo", 120, "Allegro"];
+        logo.notation.notationStaging[turtle] = ["tempo", 120, "4"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\tempo Allegro = 120");
+        expect(logo.notationNotes[turtle]).toContain("\\tempo 4 = 120");
     });
+
+    test.each([
+        ["4", "\\tempo 4 = 90\n"],
+        ["4.", "\\tempo 4. = 90\n"],
+        ["8..", "\\tempo 8.. = 90\n"],
+        // Five sixteenths, which Lilypond cannot write as one note: 90 of them a minute is
+        // 450 sixteenths a minute.
+        ["4 16", "\\tempo 16 = 450\n"],
+        // Fifteen sixteenths.
+        ["2 4 8 16", "\\tempo 16 = 1350\n"]
+    ])("should count a tempo of 90 beats per %s in a note Lilypond reads", (beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["tempo", 90, beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([["Allegro"], ["0"], ["4 0"], [""], ["3"], ["4 3"]])(
+        "should skip a tempo whose beat is not a note value Lilypond reads (%s)",
+        beat => {
+            logo.notation.notationStaging[turtle] = ["tempo", 120, beat];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
+
+    // \tempo takes an unsigned whole number of beats per minute.
+    test.each([[0], [-90], [0.4], ["fast"], [Infinity]])(
+        "should skip a tempo of %s beats per minute",
+        bpm => {
+            logo.notation.notationStaging[turtle] = ["tempo", bpm, "4"];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
+
+    // It is the count after the "=" that has to be a whole number, not the beats per
+    // minute: 0.4 beats of five sixteenths a minute is exactly 2 sixteenths a minute.
+    test.each([
+        [0.4, "4 16", "\\tempo 16 = 2\n"],
+        [0.1, "4 16", "\\tempo 16 = 1\n"],
+        [0.2, "2 4 8 16", "\\tempo 16 = 3\n"]
+    ])("should write %s beats per %s a minute as a whole count", (bpm, beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["tempo", bpm, beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([[-90], [NaN], [Infinity], [0.01]])(
+        "should skip a tempo of %s beats per minute on a tied beat too",
+        bpm => {
+            logo.notation.notationStaging[turtle] = ["tempo", bpm, "4 16"];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
 
     test("should process a slur correctly", () => {
         logo.notation.notationStaging[turtle] = [
@@ -178,6 +235,132 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
     });
 
+    // One note of a triplet of eighth notes, as notation.js stages it.
+    const tripletNote = pitch => [[pitch], 1, 8, [3, 4], 8, -1, false];
+
+    test("should write a natural as the plain note name followed by !", () => {
+        logo.notation.notationStaging[turtle] = [[["C♮4"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("c'!4 ");
+    });
+
+    test("should write double sharps and double flats", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C𝄪4"], 4, 0, null, 0, -1, false],
+            [["E𝄫4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("cisis'4 eeses'4 ");
+    });
+
+    test("should round the tempo to a whole number of beats per minute", () => {
+        logo.notation.notationStaging[turtle] = ["tempo", 90.5, "4"];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tempo 4 = 91\n");
+    });
+
+    test("should quote markup text so Lilypond does not parse it", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4"], 4, 0, null, 0, -1, false],
+            "markdown",
+            '50% "loud" {x} a\\b'
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain('_\\markup { "50% \\"loud\\" {x} a\\\\b" } ');
+    });
+
+    test("should keep a slur that spans a tuplet inside the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin slur",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end slur",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
+    });
+
+    test("should wrap a forever loop in repeat bars that run to the end of the voice", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4"], 4, 0, null, 0, -1, false],
+            "begin repeat",
+            [["G4"], 4, 0, null, 0, -1, false],
+            [["E4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toBe(
+            "\\meter\n" + "c'4 " + '\\bar ".|:" ' + "g'4 e'4 " + '\\bar ":|." '
+        );
+    });
+
+    test("should only repeat the innermost of nested forever loops", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin repeat",
+            [["G4"], 4, 0, null, 0, -1, false],
+            "begin repeat",
+            [["E4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toBe(
+            "\\meter\n" + "g'4 " + '\\bar ".|:" ' + "e'4 " + '\\bar ":|." '
+        );
+    });
+
+    test("should close a repeat that ends on a tuplet after the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin repeat",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4")
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toMatch(
+            /^\\meter\n\\bar "\.\|:" \\tuplet .*\} \\bar ":\|\." $/
+        );
+    });
+
+    test("should not add repeat bars when no notes follow the forever loop", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 0, null, 0, -1, false],
+            "begin repeat"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\bar");
+    });
+
+    test("should not add repeat bars without a forever loop", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\bar");
+    });
+
+    test("should keep a crescendo that spans a tuplet inside the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin crescendo",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end crescendo",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8\\< d' 8e' 8\\! } f'4 ");
+    });
+
+    test("should accent tuplet notes inside an articulation", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin articulation",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end articulation"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8->d' 8->e' 8->} ");
+    });
+
     test("should place staccato after the chord on notes inside a tuplet", () => {
         logo.notation.notationStaging[turtle] = [[["C4", "E4"], 4, 8, [3, 2], 8, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);
@@ -188,14 +371,14 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = ["markup", "Test Markup"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain(
-            "^\\markup { \\abs-fontsize #6 { Test Markup } } "
+            '^\\markup { \\abs-fontsize #6 { "Test Markup" } } '
         );
     });
 
     test("should process a markdown command correctly", () => {
         logo.notation.notationStaging[turtle] = ["markdown", "Test Markdown"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("_\\markup { Test Markdown } ");
+        expect(logo.notationNotes[turtle]).toContain('_\\markup { "Test Markdown" } ');
     });
 
     test("should process a break command correctly", () => {
@@ -218,11 +401,49 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("->");
     });
 
+    test("should write a rest for a staged note with no pitches inside a tuplet", () => {
+        const tupletNote = pitches => [pitches, 1, 0, [3, 2], 4, -1, false];
+        logo.notation.notationStaging[turtle] = [
+            tupletNote(["G4"]),
+            tupletNote([]),
+            tupletNote(["B4"])
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+
+        // Without the rest nothing is written for the note and its duration runs on from
+        // the g, giving "g' 44", which Lilypond rejects as not a duration.
+        expect(logo.notationNotes[turtle]).toContain("{ g' 4r 4b' 4}");
+        expect(logo.notationNotes[turtle]).not.toContain("44");
+    });
+
     test("should process a pickup command correctly", () => {
         logo.notation.notationStaging[turtle] = ["pickup", 4, [["G4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\partial 4\n");
     });
+
+    test.each([
+        ["8", "\\partial 8\n"],
+        ["4.", "\\partial 4.\n"],
+        // Five sixteenths. \\partial takes one duration, with a multiplier for the rest.
+        ["4 16", "\\partial 16*5\n"],
+        ["2 4 8 16", "\\partial 16*15\n"],
+        // Two eighths add up to a quarter, which needs no multiplier.
+        ["8 8", "\\partial 4\n"]
+    ])("should write a pickup of %s as a duration Lilypond reads", (beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["pickup", beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([["half a bar"], ["0"], ["3"], [""]])(
+        "should skip a pickup that is not a note value Lilypond reads (%s)",
+        beat => {
+            logo.notation.notationStaging[turtle] = ["pickup", beat];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\partial");
+        }
+    );
 
     test("should process voice commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
@@ -251,7 +472,7 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process note object with dot notation", () => {
-        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 2, -1, false]];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 2, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("4..");
     });
@@ -308,9 +529,9 @@ describe("processLilypondNotes", () => {
     });
     test("should handle tuplet with notes of varying durations", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 8, 4, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 8, 4, [3, 2], 0, -1, false]
+            [["G4"], 8, 0, [3, 2], 4, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 8, 0, [3, 2], 4, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -318,8 +539,8 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with varying tuplet factors", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 4], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 4], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -327,9 +548,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tie command within tuplet", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
             "tie",
-            [["A4"], 4, 2, [3, 2], 0, -1, false]
+            [["A4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("~");
@@ -338,9 +559,9 @@ describe("processLilypondNotes", () => {
 
     test("should break tuplet when reaching POW2 duration (0.5)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false],
             [["C4"], 4, 0, null, 0, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -348,26 +569,26 @@ describe("processLilypondNotes", () => {
     });
     test("should handle null tuplet value interrupting tuplet", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
             [["A4"], 4, 0, null, 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
     test("should break tuplet when tuplet factor changes", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [5, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [5, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
     test("should handle tuplet with mixed NOTATIONROUNDDOWN values (greater)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 8, 4, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 8, 0, [3, 2], 4, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -375,9 +596,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with mixed NOTATIONROUNDDOWN values (less)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 4, [3, 2], 0, -1, false],
-            [["A4"], 8, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 4, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 4, -1, false],
+            [["A4"], 8, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 4, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -385,9 +606,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with equal NOTATIONROUNDDOWN values", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -462,6 +683,30 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain("\\drummode {");
     });
 
+    test("should preserve drum rests in drummode when drum staging contains rests", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [
+                [["sn"], 4, 0, null, 0, -1, false],
+                [["R"], 4, 0, null, 0, -1, false],
+                [["sn"], 4, 0, null, 0, -1, false],
+                [["sn"], 4, 0, null, 0, -1, false]
+            ]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("\\drummode {");
+        expect(result).toContain("sn4 r4 sn4 sn4");
+    });
+
+    test("should keep drum voices out of the guitar tablature", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [[["sn"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("\\drumoneVoice\n");
+        expect(result).toContain('\\context TabVoice = "Turtlezero"');
+        expect(result).not.toContain('\\context TabVoice = "drumone"');
+    });
+
     test("should handle empty drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
             0: []
@@ -472,8 +717,8 @@ describe("saveLilypondOutput", () => {
 
     test("should handle multiple turtles correctly", () => {
         const result = saveLilypondOutput(activity);
-        expect(result).toContain("Turtle0 = {");
-        expect(result).toContain("Turtle1 = {");
+        expect(result).toContain("Turtlezero = {");
+        expect(result).toContain("Turtleone = {");
     });
 
     test("should handle unique short instrument names correctly", () => {
@@ -533,9 +778,9 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        expect(result).toContain('\\context TabVoice = "Turtle0" \\Turtle0');
+        expect(result).toContain('\\context TabVoice = "Turtlezero" \\Turtlezero');
         expect(result).toContain('shortInstrumentName = "Tu"');
-        expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
+        expect(result).toContain("TurtleoneVoice = \\new Staff \\with {");
     });
 
     test("guitar tablature groups each instrument by its own clef, not turtle 0's", () => {
@@ -552,10 +797,10 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        const scoreVoice0 = result.indexOf("\\Turtle0Voice\n");
-        const scoreVoice1 = result.indexOf("\\Turtle1Voice\n");
-        const tab0 = result.indexOf('\\context TabVoice = "Turtle0"');
-        const tab1 = result.indexOf('\\context TabVoice = "Turtle1"');
+        const scoreVoice0 = result.indexOf("\\TurtlezeroVoice\n");
+        const scoreVoice1 = result.indexOf("\\TurtleoneVoice\n");
+        const tab0 = result.indexOf('\\context TabVoice = "Turtlezero"');
+        const tab1 = result.indexOf('\\context TabVoice = "Turtleone"');
 
         expect(scoreVoice0).toBeGreaterThan(-1);
         expect(scoreVoice1).toBeGreaterThan(-1);
@@ -563,7 +808,7 @@ describe("saveLilypondOutput", () => {
         expect(tab1).toBeGreaterThan(-1);
 
         // the score section above already groups treble on top, bass_8 on
-        // the bottom, so Turtle1 (treble) lists before Turtle0 (bass_8)
+        // the bottom, so Turtleone (treble) lists before Turtlezero (bass_8)
         expect(scoreVoice1).toBeLessThan(scoreVoice0);
         // the guitar tablature section must match that same ordering,
         // grouping each instrument by its own clef instead of turtle 0's
@@ -757,5 +1002,126 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('shortInstrumentName = "ft"');
         expect(result).toContain('shortInstrumentName = "ab"');
         expect(result).toContain('shortInstrumentName = "aab"');
+    });
+
+    test("should spell out digits and drop punctuation in voice identifiers", () => {
+        activity.turtles.turtleList = {
+            0: { name: "Voice 1" },
+            1: { name: "Bob's-flute" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("Voiceone = {");
+        expect(result).toContain("Bobsflute = {");
+        expect(result).toContain('instrumentName = "Voice 1"');
+        expect(result).toContain('instrumentName = "Bob\'s-flute"');
+        expect(result).toContain("\\VoiceoneVoice\n");
+        expect(result).toContain("\\BobsfluteVoice\n");
+    });
+
+    test("should give turtles with the same name their own voices", () => {
+        activity.turtles.turtleList = {
+            0: { name: "Piano" },
+            1: { name: "Piano" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("Piano = {");
+        expect(result).toContain("Pianoone = {");
+        expect(result).toContain("\\PianoVoice\n");
+        expect(result).toContain("\\PianooneVoice\n");
+    });
+
+    test("should list an unnamed turtle under the same voice it was written to", () => {
+        activity.turtles.turtleList = {
+            0: { name: "start" },
+            1: { name: "" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("brownrat = {");
+        expect(result).toContain("\\brownratVoice\n");
+        expect(result.match(/\\mouseVoice\n/g)).toHaveLength(1);
+    });
+
+    test("should end the last voice with a bar even when every turtle has a drum slot", () => {
+        activity.logo.notation.notationDrumStaging = { 0: [], 1: [] };
+        const result = saveLilypondOutput(activity);
+        expect(result.match(/\\bar "\|\."/g)).toHaveLength(1);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
+    });
+
+    test("should not add a final bar after a last voice that ends on a repeat", () => {
+        activity.logo.notation.notationStaging[1] = [
+            "begin repeat",
+            [["E4"], 4, 0, null, 0, -1, false]
+        ];
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar ":\|\." \n\}/);
+        expect(result).not.toContain('\\bar "|."');
+    });
+
+    test("should keep the final bar when no notes follow the last voice's forever", () => {
+        activity.logo.notation.notationStaging[1] = [
+            [["E4"], 4, 0, null, 0, -1, false],
+            "begin repeat"
+        ];
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
+        expect(result).not.toContain(":|.");
+    });
+
+    test("should repeat the drum staff along with the voice", () => {
+        activity.logo.notation.notationStaging[0] = [
+            "begin repeat",
+            [["G4"], 4, 0, null, 0, -1, false]
+        ];
+        activity.logo.notation.notationDrumStaging = {
+            0: ["begin repeat", [["sn"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/\\drummode \{\n[^}]*\\bar "\.\|:" sn4 \\bar ":\|\." \n\}/);
+    });
+});
+
+describe("saveLilypondOutput - drum staff numbering", () => {
+    const note = pitch => [[pitch], 4, 0, null, 0, -1, false];
+
+    const build = melodicStaves => {
+        const notationStaging = {};
+        const notationDrumStaging = {};
+        const turtleList = {};
+        for (let t = 0; t < melodicStaves; t++) {
+            notationStaging[t] = [note("G4")];
+            notationDrumStaging[t] = [];
+            turtleList[t] = { name: "Turtle " + t };
+        }
+        // One drum part, on the last turtle.
+        notationDrumStaging[melodicStaves - 1] = [note("sn")];
+
+        return {
+            logo: {
+                notation: { notationStaging, notationDrumStaging },
+                notationNotes: {},
+                notationOutput: "",
+                guitarOutputHead: "",
+                guitarOutputEnd: "",
+                MIDIOutput: "",
+                synth: { inTemperament: "equal" }
+            },
+            turtles: { turtleList, getTurtle: t => turtleList[t] },
+            prepareExport: jest.fn(() => "{}")
+        };
+    };
+
+    it.each([1, 2, 3])("names the only drum staff drum one above %i melodic staves", n => {
+        const result = saveLilypondOutput(build(n));
+
+        expect(result).toContain("drumone = {");
+        expect(result).not.toContain("drumtwo");
+        expect(result).not.toContain("drumthree");
+    });
+
+    it.each([1, 2, 3])("keeps the short name in step above %i melodic staves", n => {
+        const result = saveLilypondOutput(build(n));
+
+        expect(result).toContain('shortInstrumentName = "d1"');
     });
 });

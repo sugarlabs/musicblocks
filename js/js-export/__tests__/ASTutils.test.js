@@ -18,7 +18,11 @@
  */
 
 const ASTUtils = require("../ASTutils");
+const MathUtility = require("../../utils/mathutils");
+const astring = require("../../../lib/astring.min");
+const { deepClone } = require("../../utils/utils-logic");
 
+global.deepClone = deepClone;
 global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
     isSetter: jest.fn(),
@@ -42,6 +46,15 @@ describe("ASTUtils", () => {
         it("should return the barebone AST", () => {
             const result = ASTUtils.BAREBONE_AST;
             expect(result).toEqual(ASTUtils._bareboneAST);
+        });
+
+        it("should return a new deep clone instance on each call", () => {
+            const ast1 = ASTUtils.BAREBONE_AST;
+            const ast2 = ASTUtils.BAREBONE_AST;
+            expect(ast1).not.toBe(ast2);
+            expect(ast1).not.toBe(ASTUtils._bareboneAST);
+            ast1.body.push({ type: "EmptyStatement" });
+            expect(ast2.body).not.toContainEqual({ type: "EmptyStatement" });
         });
     });
 
@@ -179,6 +192,21 @@ describe("ASTUtils", () => {
                                 type: "Literal",
                                 value: 0
                             }
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "limit" + iteratorNum
+                            },
+                            init: {
+                                type: "CallExpression",
+                                callee: {
+                                    type: "Identifier",
+                                    name: "MathUtility.doRepeatCount"
+                                },
+                                arguments: ASTUtils._getArgsAST(args)
+                            }
                         }
                     ]
                 },
@@ -188,7 +216,10 @@ describe("ASTUtils", () => {
                         type: "Identifier",
                         name: "i" + iteratorNum
                     },
-                    right: ASTUtils._getArgsAST(args)[0],
+                    right: {
+                        type: "Identifier",
+                        name: "limit" + iteratorNum
+                    },
                     operator: "<"
                 },
                 update: {
@@ -205,6 +236,45 @@ describe("ASTUtils", () => {
                     body: ASTUtils._getBlockAST(flow, iteratorNum + 1)
                 }
             });
+        });
+
+        it("should keep a non-negative integer literal count as a plain loop bound", () => {
+            const result = ASTUtils._getForLoopAST([4], [], 0);
+            expect(result.init.declarations).toHaveLength(1);
+            expect(result.test.right).toEqual({ type: "Literal", value: 4 });
+        });
+
+        // Repeat works out its count once before running the body, so a body
+        // that changes the value the count came from mustn't change it.
+        it("should work out a non-literal count once, before the loop runs", () => {
+            const code = astring.generate(ASTUtils._getForLoopAST(["box_n"], [], 0));
+            let runs = 0;
+            new Function(
+                "MathUtility",
+                "tick",
+                `let n = 3; ${code.replace("{}", "{ n++; tick(); }")}`
+            )(MathUtility, () => runs++);
+            expect(runs).toBe(3);
+        });
+
+        // `i < n` runs Math.ceil(n) times, but Repeat runs Math.floor(n)
+        // times and skips counts below 1 (#8910).
+        it.each([
+            [4, 4],
+            [3.5, 3],
+            [2.2, 2],
+            [0.5, 0],
+            [0, 0],
+            [-2, 0],
+            [["divide", [7, 2]], 3]
+        ])("should export Repeat %j as a loop that runs %i times", (count, expected) => {
+            const code = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+            let runs = 0;
+            new Function("MathUtility", "tick", code.replace("{}", "{ tick(); }"))(
+                MathUtility,
+                () => runs++
+            );
+            expect(runs).toBe(expected);
         });
     });
 
@@ -231,14 +301,40 @@ describe("ASTUtils", () => {
             const flow = ["flow"];
             const iteratorNum = 0;
             const result = ASTUtils._getDoWhileLoopAST(args, flow, iteratorNum);
+            // `until` repeats while the condition is false, so the exported
+            // do-while must test the negated condition.
             expect(result).toEqual({
                 type: "DoWhileStatement",
                 body: {
                     type: "BlockStatement",
                     body: ASTUtils._getBlockAST(flow, iteratorNum)
                 },
-                test: ASTUtils._getArgsAST(args)[0]
+                test: {
+                    type: "UnaryExpression",
+                    operator: "!",
+                    prefix: true,
+                    argument: ASTUtils._getArgsAST(args)[0]
+                }
             });
+        });
+
+        it("should collapse an already-negated condition instead of double-negating", () => {
+            // An `until (not done)` block yields a negated condition; the export
+            // must drop the outer negation rather than emit `!!done`.
+            const negated = {
+                type: "UnaryExpression",
+                operator: "!",
+                prefix: true,
+                argument: { type: "Identifier", name: "done" }
+            };
+            const original = ASTUtils._getArgsAST;
+            ASTUtils._getArgsAST = () => [negated];
+            try {
+                const result = ASTUtils._getDoWhileLoopAST(["ignored"], ["flow"], 0);
+                expect(result.test).toEqual({ type: "Identifier", name: "done" });
+            } finally {
+                ASTUtils._getArgsAST = original;
+            }
         });
     });
 
@@ -472,6 +568,28 @@ describe("ASTUtils", () => {
             });
         });
 
+        it("should preserve strict equality semantics in exported code", () => {
+            const result = ASTUtils._getArgExpAST("equal", [1, "1"]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 1 },
+                right: { type: "Literal", value: "1" },
+                operator: "==="
+            });
+        });
+
+        it("should preserve XOR results when compared with Equal", () => {
+            const compare = (left, right, expected) => {
+                const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
+                return new Function("MathUtility", `return ${astring.generate(ast)}`)(MathUtility);
+            };
+
+            expect(compare("bool_true", "bool_false", "bool_true")).toBe(true);
+            expect(compare(1, 2, "bool_false")).toBe(true);
+            expect(compare(0, 2, 2)).toBe(true);
+        });
+
         it("should return the AST for a unary expression", () => {
             const methodName = "not";
             const args = ["arg1"];
@@ -655,6 +773,18 @@ describe("ASTUtils", () => {
             ]);
         });
 
+        it("should return the AST for an if block with iteratorNum", () => {
+            const flows = [["if", ["testArg"], [["action1", ["arg1"]]]]];
+            const iteratorNum = 2;
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+
+            const result = ASTUtils._getBlockAST(flows, iteratorNum);
+            expect(result).toEqual([
+                ASTUtils._getIfAST(["testArg"], [["action1", ["arg1"]]], undefined, iteratorNum)
+            ]);
+        });
+
         it("should return the AST for an if-else block", () => {
             const flows = [["ifthenelse", ["testArg"], ["ifFlow"], ["elseFlow"]]];
             const iteratorNum = 0;
@@ -687,15 +817,21 @@ describe("ASTUtils", () => {
             ]);
         });
 
-        it("should return the AST for a break block", () => {
+        it("should return a Stop block marker for a break block", () => {
             const flows = [["break"]];
             const result = ASTUtils._getBlockAST(flows);
             expect(result).toEqual([
                 {
                     type: "BreakStatement",
-                    label: null
+                    label: null,
+                    stopBlock: true
                 }
             ]);
+        });
+
+        it("should leave a loop without a Stop block as it is", () => {
+            const loop = { type: "WhileStatement", body: { type: "BlockStatement", body: [] } };
+            expect(ASTUtils._getStoppableLoopAST(loop)).toBe(loop);
         });
 
         it("should return the AST for a switch block", () => {
@@ -719,6 +855,25 @@ describe("ASTUtils", () => {
                 {
                     type: "SwitchCase",
                     test: ASTUtils._getArgsAST(["testArg"])[0],
+                    consequent: [
+                        ...ASTUtils._getBlockAST(["flow"], iteratorNum),
+                        {
+                            type: "BreakStatement",
+                            label: null
+                        }
+                    ]
+                }
+            ]);
+        });
+
+        it("should stop after a default case instead of falling through", () => {
+            const flows = [["defaultcase", null, ["flow"]]];
+            const iteratorNum = 0;
+            const result = ASTUtils._getBlockAST(flows, iteratorNum);
+            expect(result).toEqual([
+                {
+                    type: "SwitchCase",
+                    test: null,
                     consequent: [
                         ...ASTUtils._getBlockAST(["flow"], iteratorNum),
                         {
@@ -799,6 +954,13 @@ describe("ASTUtils", () => {
                 ASTUtils._getMethodCallAST("testMethod", ["testArg"], { action: true })
             ]);
         });
+
+        it("serializes a do block named by text as an awaited action call", () => {
+            // The tree JSGenerate builds for a do block whose name is a text block.
+            const flows = [["nameddo_chorus", null, null]];
+            const code = astring.generate({ type: "Program", body: ASTUtils._getBlockAST(flows) });
+            expect(code).toContain("await chorus(mouse);");
+        });
     });
 
     describe("getMethodAST", () => {
@@ -870,6 +1032,87 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("action names", () => {
+        const acorn = require("../../../lib/acorn.min");
+
+        // Exports an action with this name plus a call to it, and parses the result back.
+        const exportAction = name => {
+            const program = {
+                type: "Program",
+                sourceType: "script",
+                body: [
+                    ASTUtils.getMethodAST(name, []),
+                    ASTUtils._getBlockAST([["nameddo_" + name, null, null]])[0]
+                ]
+            };
+            const code = astring.generate(program);
+            const parsed = acorn.parse(`(async () => { ${code} })`, { ecmaVersion: 2020 });
+            const body = parsed.body[0].expression.body.body;
+            return {
+                code,
+                defined: body[0].declarations[0].id.name,
+                called: body[1].expression.argument.callee.name
+            };
+        };
+
+        it("keeps names that are already identifiers", () => {
+            for (const name of ["action", "chorus2", "verse_1", "ドレミ"]) {
+                expect(exportAction(name).defined).toBe(name);
+            }
+        });
+
+        it.each([
+            ["La Marseilles1", "La_Marseilles1"],
+            ["1st verse", "_1st_verse"],
+            ["chorus-2", "chorus_2"],
+            ["do", "_do"],
+            ["delete", "_delete"],
+            ["mouse", "_mouse"],
+            ["Math", "_Math"],
+            ["", "_"]
+        ])("exports %p as %p, defined and called the same way", (name, identifier) => {
+            const { defined, called } = exportAction(name);
+            expect(defined).toBe(identifier);
+            expect(called).toBe(identifier);
+        });
+
+        it("keeps join controls, which are valid after the first character", () => {
+            expect(exportAction("a\u200Cb").defined).toBe("a\u200Cb");
+            expect(exportAction("\u200Cb").defined).toBe("_\u200Cb");
+        });
+
+        describe("when two names convert to the same identifier", () => {
+            afterEach(() => ASTUtils.setActionNames([]));
+
+            it("keeps the name that is already an identifier and suffixes the other", () => {
+                ASTUtils.setActionNames(["chorus-2", "chorus_2", "chorus 2"]);
+                expect(exportAction("chorus_2").defined).toBe("chorus_2");
+                expect(exportAction("chorus-2").defined).toBe("chorus_2_2");
+                const { defined, called } = exportAction("chorus 2");
+                expect(defined).toBe("chorus_2_3");
+                expect(called).toBe("chorus_2_3");
+            });
+
+            it("does not convert a name onto a box variable", () => {
+                ASTUtils.setActionNames(["chorus-2"], ["chorus_2", "not a name"]);
+                expect(exportAction("chorus-2").defined).toBe("chorus_2_2");
+            });
+        });
+
+        describe("getBoxNames", () => {
+            it("finds storein and storein2 boxes at any depth", () => {
+                const trees = [
+                    [
+                        ["storein", ["pitch", 5]],
+                        ["repeat", [2], [["storein2_count", [1]]]]
+                    ],
+                    [["print", ["storein"]]]
+                ];
+                expect(ASTUtils.getBoxNames(trees)).toEqual(["pitch", "count"]);
+            });
+        });
+    });
+
     describe("getMouseAST", () => {
         it("should return the AST for a mouse", () => {
             const tree = ["flow"];
@@ -918,6 +1161,46 @@ describe("ASTUtils", () => {
                     ]
                 }
             });
+        });
+
+        it("should return a new deep clone instance independent of _mouseAST", () => {
+            const mouseAst1 = ASTUtils.getMouseAST([]);
+            const mouseAst2 = ASTUtils.getMouseAST([]);
+            expect(mouseAst1).not.toBe(mouseAst2);
+            expect(mouseAst1).not.toBe(ASTUtils._mouseAST);
+        });
+
+        it("should export a repeat containing an if with a nested repeat", async () => {
+            const tree = [
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["if", [["less", [1, 2]]], [["repeat", [3], [["print", ["hello"]]]]]],
+                        ["if", [["less", [2, 1]]], [["print", ["never"]]]]
+                    ]
+                ]
+            ];
+
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+            JSInterface.isGetter.mockReturnValue(false);
+            JSInterface.methodReturns.mockReturnValue(false);
+            JSInterface.getMethodName.mockImplementation(methodName => methodName);
+            JSInterface.rearrangeMethodArgs.mockImplementation((methodName, args) => args);
+
+            const code = astring.generate(ASTUtils.getMouseAST(tree));
+            expect(code).toContain("let i0 = 0");
+            expect(code).toContain("let i1 = 0");
+
+            const printed = [];
+            let flow;
+            new Function("Mouse", code)(function Mouse(mouseFlow) {
+                flow = mouseFlow;
+            });
+            await flow({ print: value => printed.push(value) });
+            expect(printed).toEqual(["hello", "hello", "hello", "hello", "hello", "hello"]);
         });
     });
 });

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg11666"
+   version="1.1"
+   viewBox="0 0 84.547948 25.796878"
+   height="25.796875mm"
+   width="84.547951mm">
+  <defs
+     id="defs11660" />
+  <metadata
+     id="metadata11663">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(452.51541,-13.247814)"
+     id="layer1">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-893.04665,-188.89385)"
+       id="g10490">
+      <g
+         transform="translate(1665,764)"
+         id="g1850">
+        <g
+           transform="scale(1.5)"
+           id="g1848">
+          <path
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 75.03418 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -42 z"
+             style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path1830" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text1834">
+            <tspan
+               x="91"
+               y="21"
+               id="tspan1832">set temperament</tspan>
+          </text>
+          <text
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text1838">
+            <tspan
+               x="91"
+               y="12"
+               id="tspan1836">temperament</tspan>
+          </text>
+          <text
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text1842">
+            <tspan
+               x="91"
+               y="33"
+               id="tspan1840">reference pitch</tspan>
+          </text>
+          <text
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text1846">
+            <tspan
+               x="91"
+               y="54"
+               id="tspan1844">octave</tspan>
+          </text>
+        </g>
+      </g>
+      <g
+         transform="translate(1806.0513,764)"
+         id="g1860">
+        <g
+           transform="scale(1.5)"
+           id="g1858">
+          <path
+             d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path1852" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text1856">
+            <tspan
+               x="13"
+               y="14"
+               id="tspan1854">equal</tspan>
+          </text>
+        </g>
+      </g>
+      <g
+         transform="translate(1806.0513,795.5)"
+         id="g1870">
+        <g
+           transform="scale(1.5)"
+           id="g1868">
+          <path
+             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path1862" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text1866">
+            <tspan
+               x="13"
+               y="14"
+               id="tspan1864">C</tspan>
+          </text>
+        </g>
+      </g>
+      <g
+         transform="translate(1806.0513,827)"
+         id="g1880">
+        <g
+           transform="scale(1.5)"
+           id="g1878">
+          <path
+             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path1872" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text1876">
+            <tspan
+               x="13"
+               y="14"
+               id="tspan1874">4</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

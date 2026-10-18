@@ -43,14 +43,13 @@ describe("ToolbarUI tooltip dismissal", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        calls = { tooltip: [], css: [] };
+        calls = { tooltip: [], trigger: [] };
         clickHandler = null;
 
         const jq = jest.fn(selector => ({
             tooltip: jest.fn(opts => calls.tooltip.push({ selector, opts })),
             dropdown: jest.fn(),
-            css: jest.fn((prop, value) => calls.css.push({ selector, prop, value })),
-            trigger: jest.fn(),
+            trigger: jest.fn(event => calls.trigger.push({ selector, event })),
             on: jest.fn((event, handler) => {
                 if (selector === ".tooltipped" && event === "click") {
                     clickHandler = handler;
@@ -108,19 +107,11 @@ describe("ToolbarUI tooltip dismissal", () => {
         expect(calls.tooltip.every(c => typeof c.opts !== "string")).toBe(true);
     });
 
-    it("hides the tooltip node belonging to the clicked element", () => {
-        clickHandler.call({ getAttribute: () => "tooltip-42" });
+    it("triggers the tooltip mouseleave handler on the clicked element", () => {
+        const element = {};
 
-        expect(calls.css).toContainEqual({
-            selector: "#tooltip-42",
-            prop: "visibility",
-            value: "hidden"
-        });
-    });
+        clickHandler.call(element);
 
-    it("does nothing for an element that has no tooltip yet", () => {
-        clickHandler.call({ getAttribute: () => null });
-
-        expect(calls.css).toHaveLength(0);
+        expect(calls.trigger).toContainEqual({ selector: element, event: "mouseleave.tooltip" });
     });
 });

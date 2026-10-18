@@ -74,7 +74,13 @@ function setupToneActions(activity) {
             if (!accounted && typeof instrument === "object") {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
-                    CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
+                    // data, pitch, octave and the cent adjustment from the sampler
+                    CUSTOMSAMPLES[synth] = [
+                        instrument[1],
+                        instrument[2],
+                        instrument[3],
+                        instrument[4] || 0
+                    ];
                 } else {
                     synth = DEFAULTVOICE;
                 }
@@ -178,20 +184,6 @@ function setupToneActions(activity) {
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
-
-            if (activity.logo.inTimbre) {
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName]["vibratoActive"] =
-                    true;
-                activity.logo.timbre.vibratoEffect.push(blk);
-                activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoIntensity"
-                ] = tur.singer.vibratoIntensity;
-                activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoFrequency"
-                ] = rate;
-            }
         }
 
         /**
@@ -204,6 +196,26 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static doChorus(chorusRate, delayTime, chorusDepth, turtle, blk) {
+            const isInvalidInput = val =>
+                val === undefined ||
+                val === null ||
+                (typeof val === "string" && val.trim() === "") ||
+                !isFinite(val);
+
+            if (
+                isInvalidInput(chorusRate) ||
+                isInvalidInput(delayTime) ||
+                isInvalidInput(chorusDepth)
+            ) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            chorusRate = safeNumber(chorusRate);
+            delayTime = safeNumber(delayTime);
+            chorusDepth = safeNumber(chorusDepth);
+
             chorusDepth /= 100;
 
             if (chorusDepth < 0 || chorusDepth > 1) {
@@ -245,6 +257,22 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static doPhaser(rate, octaves, baseFrequency, turtle, blk) {
+            const isInvalidInput = val =>
+                val === undefined ||
+                val === null ||
+                (typeof val === "string" && val.trim() === "") ||
+                !isFinite(val);
+
+            if (isInvalidInput(rate) || isInvalidInput(octaves) || isInvalidInput(baseFrequency)) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            rate = safeNumber(rate);
+            octaves = safeNumber(octaves);
+            baseFrequency = safeNumber(baseFrequency);
+
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.rate.push(rate);
@@ -277,6 +305,21 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static doTremolo(frequency, depth, turtle, blk) {
+            const isInvalidInput = val =>
+                val === undefined ||
+                val === null ||
+                (typeof val === "string" && val.trim() === "") ||
+                !isFinite(val);
+
+            if (isInvalidInput(frequency) || isInvalidInput(depth)) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            frequency = safeNumber(frequency);
+            depth = safeNumber(depth);
+
             depth /= 100;
 
             if (depth < 0 || depth > 1) {
@@ -315,6 +358,20 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block index in blocks.blockList
          */
         static doDistortion(distortion, turtle, blk) {
+            const isInvalidInput = val =>
+                val === undefined ||
+                val === null ||
+                (typeof val === "string" && val.trim() === "") ||
+                !isFinite(val);
+
+            if (isInvalidInput(distortion)) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            distortion = safeNumber(distortion);
+
             distortion /= 100;
 
             if (distortion < 0 || distortion > 1) {

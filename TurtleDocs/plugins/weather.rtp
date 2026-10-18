@@ -1,0 +1,149 @@
+//* comment *//
+
+// Copyright (c) 2015 Walter Bender, Sam Parkinson
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+// Plugins are a dictionary of json-encoded components: a flow-block
+// dictionary, an arg-block dictionary, a block dictionary, and a
+// palette dictionary. The flow-block dictionary is a set of commands
+// that are evaluated when a flow block is run; the arg-block
+// dictionary is a set of commands that are evaluated when an arg
+// block is run; the block dictionary defines the new blocks in the
+// plugin; and the palette dictionary defines icons (svg) associated
+// with the palettes populated by the blocks found in the plugin.
+
+// The Mashape plugin provides blocks that use the mashape.com APIs.
+// Included here are blocks to translate strings and to poll
+// international weather forecasts.
+
+//* globals *//
+
+var weatherMashapeKey = '3Rfxc7fwp2mshJxgtDxKSueYna8Ap1qZfAcjsn2hjpuWPuBCrI';
+
+//* arg:weatherincity *//
+var block = logo.blocks.blockList[blk];
+var apiURL = 'https://george-vustrey-weather.p.mashape.com/api.php?location=';
+var conns = block.connections;
+var city = logo.parseArg(logo, turtle, conns[1]);
+var daysAhead = parseInt(logo.parseArg(logo, turtle, conns[2]));
+if (daysAhead < -1 || daysAhead > 5) {
+   logo.errorMsg('Days ahead must be in the range of -1 to 5.', blk);
+   daysAhead = 0;
+}
+if (block.cacheCity === city && block.cache !== undefined) {
+   var response = block.cache;
+} else {
+   var request = new XMLHttpRequest();
+   request.open('GET', apiURL + city, false);
+   request.setRequestHeader('X-Mashape-Authorization', weatherMashapeKey);
+   request.send(null);
+   var response = request.responseText;
+   block.cacheCity = city;
+   block.cache = response;
+}
+var forecast = JSON.parse(response);
+block.value = forecast[daysAhead + 1]['condition'];
+
+//* arg:weatherincityhigh *//
+var block = logo.blocks.blockList[blk];
+var apiURL = 'https://george-vustrey-weather.p.mashape.com/api.php?location=';
+var conns = block.connections;
+var city = logo.parseArg(logo, turtle, conns[1]);
+var daysAhead = parseInt(logo.parseArg(logo, turtle, conns[2]));
+if (daysAhead < -1 || daysAhead > 5) {
+   logo.errorMsg(_('Days ahead must be in the range of -1 to 5.'), blk);
+   daysAhead = 0;
+}
+if (block.cacheCity === city && block.cache !== undefined) {
+   var response = block.cache;
+} else {
+   var request = new XMLHttpRequest();
+   request.open('GET', apiURL + city, false);
+   request.setRequestHeader('X-Mashape-Authorization', weatherMashapeKey);
+   request.send(null);
+   var response = request.responseText;
+   block.cacheCity = city;
+   block.cache = response;
+}
+var forecast = JSON.parse(response);
+block.value = parseInt(forecast[daysAhead + 1]['high_celsius']);
+
+//* arg:weatherincitylow *//
+var block = logo.blocks.blockList[blk];
+var apiURL = 'https://george-vustrey-weather.p.mashape.com/api.php?location=';
+var conns = block.connections;
+var city = logo.parseArg(logo, turtle, conns[1]);
+var daysAhead = parseInt(logo.parseArg(logo, turtle, conns[2]));
+if (daysAhead < -1 || daysAhead > 5) {
+   logo.errorMsg(_('Days ahead must be in the range of -1 to 5.'), blk);
+   daysAhead = 0;
+}
+if (block.cacheCity === city && block.cache !== undefined) {
+   var response = block.cache;
+} else {
+   var request = new XMLHttpRequest();
+   request.open('GET', apiURL + city, false);
+   request.setRequestHeader('X-Mashape-Authorization', weatherMashapeKey);
+   request.send(null);
+   var response = request.responseText;
+   block.cacheCity = city;
+   block.cache = response;
+}
+var forecast = JSON.parse(response);
+block.value = parseInt(forecast[daysAhead + 1]['low_celsius']);
+
+//* block:weatherincity *//
+var weatherBlock = new ProtoBlock('weatherincity');
+weatherBlock.palette = palettes.dict['external'];
+blocks.protoBlockDict['weatherincity'] = weatherBlock;
+weatherBlock.staticLabels.push(_('forecast'));
+weatherBlock.staticLabels.push(_('city'));
+weatherBlock.staticLabels.push(_('day'));
+weatherBlock.adjustWidthToLabel();
+weatherBlock.twoArgMathBlock();
+weatherBlock.dockTypes[0] = 'textout';
+weatherBlock.dockTypes[1] = 'anyin';
+weatherBlock.defaults.push('Canberra');
+weatherBlock.defaults.push(1);
+
+//* block:weatherincityhigh *//
+var weatherHighBlock = new ProtoBlock('weatherincityhigh');
+weatherHighBlock.palette = palettes.dict['external'];
+blocks.protoBlockDict['weatherincityhigh'] = weatherHighBlock;
+weatherHighBlock.staticLabels.push(_('high'));
+weatherHighBlock.staticLabels.push(_('city'));
+weatherHighBlock.staticLabels.push(_('day'));
+weatherHighBlock.adjustWidthToLabel();
+weatherHighBlock.twoArgMathBlock();
+weatherHighBlock.dockTypes[1] = 'anyin';
+weatherHighBlock.defaults.push('Canberra');
+weatherHighBlock.defaults.push(1);
+
+//* block:weatherincitylow *//
+var weatherLowBlock = new ProtoBlock('weatherincitylow');
+weatherLowBlock.palette = palettes.dict['external'];
+blocks.protoBlockDict['weatherincitylow'] = weatherLowBlock;
+weatherLowBlock.staticLabels.push(_('low'));
+weatherLowBlock.staticLabels.push(_('city'));
+weatherLowBlock.staticLabels.push(_('day'));
+weatherLowBlock.adjustWidthToLabel();
+weatherLowBlock.twoArgMathBlock();
+weatherLowBlock.dockTypes[1] = 'anyin';
+weatherLowBlock.defaults.push('Canberra');
+weatherLowBlock.defaults.push(1);
+
+//* palette-icon:external *//
+<svg height="55" viewBox="0 0 55 55" width="55" xmlns="http://www.w3.org/2000/svg"><g fill="#59f" stroke="#3771c8" stroke-width="1.5" transform="matrix(.46522973 0 0 .46522973 4.261775 4.215252)"><path d="m86.2 50v0 0c0-9.7-3.8-18.8-10.7-25.7-6.8-6.8-15.9-10.5-25.5-10.5h-.1c-9.7 0-18.8 3.8-25.7 10.7-.4.4-.8.8-1.1 1.2v0c-6.1 6.7-9.4 15.3-9.4 24.4 0 9.2 3.5 17.7 9.2 24.1v0c .1.2.3.4.6.6 6.6 7.1 16 11.5 26.5 11.5v0 0 0 0 0 0c5.5 0 10.9-1.2 15.8-3.6 1-.5 1.4-1.7.9-2.7-.5-1-1.7-1.4-2.7-.9-3.3 1.6-6.8 2.6-10.4 3l2.9-4.8c4.7-7.8 7.3-16.5 7.6-25.2h18l-.3 3.3c-.2 1.1-.4 2.1-.7 3.2-.3 1.1.3 2.2 1.4 2.5 1.1.3 2.2-.3 2.5-1.4.3-1.2.6-2.4.8-3.6.3-2.1.4-4.1.4-6.1zm-39.3 25.1c-1.3-2.1-2.3-4.2-3.3-6.5 4.3-.6 8.6-.6 12.7 0-.9 2.2-2 4.4-3.3 6.5l-3 5.2zm-3.4 2.1l2.9 4.8c-7-.8-13.4-3.9-18.3-8.5 3.6-1.9 7.6-3.2 11.5-4.1 1.1 2.7 2.4 5.3 3.9 7.8zm-18.3-6.7c-4.2-5.1-6.9-11.5-7.4-18.5h18.1c.2 4.6 1 9.2 2.4 13.6-4.6 1.1-9 2.7-13.1 4.9zm-.1-41c4.2 2.2 8.6 3.9 13.1 4.9-1.4 4.5-2.2 9.1-2.4 13.7h-18c .4-6.9 3-13.4 7.3-18.6zm24.9-9.8l3.1 5.2c1.3 2.1 2.3 4.2 3.3 6.4-4.2.5-8.5.5-12.7 0 .9-2.2 2-4.4 3.3-6.4zm6.5 3.1l-2.9-4.8c6.9.8 13.3 3.7 18.4 8.5-3.7 1.9-7.6 3.3-11.6 4.1-1.1-2.7-2.4-5.3-3.9-7.8zm-13 0c-1.5 2.5-2.8 5.1-3.9 7.8-4-.9-7.9-2.2-11.6-4.1 5.1-4.8 11.5-7.7 18.4-8.5zm-1.3 12.3c2.6.4 5.2.6 7.8.6 2.6 0 5.2-.2 7.7-.6 1.4 4.2 2.1 8.5 2.3 12.9h-20.1c.2-4.3 1-8.7 2.3-12.9zm19.5-.7c4.5-1 8.9-2.7 13.1-4.9 4.4 5.3 6.9 11.7 7.3 18.5h-18c-.2-4.6-1-9.2-2.4-13.6zm-3.9 30.4c-5-.8-10.3-.8-15.5 0-1.4-4.2-2.1-8.5-2.3-12.8h20.1c-.2 4.3-1 8.7-2.3 12.8z"/><g transform="translate(-.125 .125)"><path d="m67.8 66.2h10.2l-1.6-1.6c-.4-.4-.6-.9-.6-1.4 0-.5.2-1 .6-1.4.8-.8 2-.8 2.8 0l5 5v0 0 0 0 0 0c .3.4.5.8.6 1.3v.4c0 .4-.2.7-.5 1l-.2.2c-.4.3-.8.5-1.2.5v0h-.1-15c-1.1 0-2-.9-2-2 0-1.1.9-2 2-2z"/><path d="m84.7 74.239601c0 1.1-.9 2-2 2h-10.1l1.6 1.6c.4.4.6.9.6 1.4 0 .5-.2 1-.6 1.4-.4.4-.9.6-1.4.6-.5 0-1-.2-1.4-.6l-5-5v0 0 0 0 0 0c-.3-.4-.5-.8-.6-1.3v-.4c0-.4.2-.7.5-1l .2-.2c.4-.3.8-.5 1.2-.5v0h .1 15c1 0 1.9.9 1.9 2z"/></g></g></svg>
+
+//* palette-fill:external *// #59f
+//* palette-stroke:external *// #3771c8
+//* palette-highlight:external *// #9DC4FF
+//* palette-stroke-highlight:external *// #000000

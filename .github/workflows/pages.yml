@@ -1,0 +1,85 @@
+name: Pages
+
+# Publishes master to GitHub Pages (sugarlabs.github.io/musicblocks) with a
+# development version string, so the always-current Pages build can be told
+# apart from the tagged release on musicblocks.sugarlabs.org (see #8641).
+#
+# The version is stamped on the copy that gets published, not on master:
+# js/turtledefs.js keeps the plain release-please version, which is what
+# version-consistency.test.js checks and what release-please bumps. Only the
+# uploaded artifact reads e.g. "3.8.0-dev+1a2b3c4".
+#
+# Requires the repository's Pages source to be set to "GitHub Actions"
+# (Settings → Pages). Until then the legacy branch build keeps serving master
+# and this workflow's deploy step fails without affecting anything else.
+
+on:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+# Least privilege by default; the deploy job opts into what it needs.
+permissions:
+    contents: read
+
+# One deployment at a time. Queue rather than cancel, so the last push to
+# master is always the one that ends up published.
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        name: Stamp the development version and package the site
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        # Forks have no Pages environment to deploy to, and a manual run from
+        # another branch must not publish that branch.
+        if: github.repository == 'sugarlabs/musicblocks' && github.ref == 'refs/heads/master'
+        steps:
+            # The legacy build also serves the user manual submodule.
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  submodules: true
+                  persist-credentials: false
+
+            # Rewrites `const VERSION = "X.Y.Z";` to `"X.Y.Z-dev+<short sha>"`
+            # and fails if the line was not found, so a change to the line's
+            # format cannot silently publish an unstamped build.
+            - name: Stamp the development version
+              run: |
+                  short="${GITHUB_SHA::7}"
+                  sed -i -E "s/^(const VERSION = \")([^\"]+)(\";)/\1\2-dev+${short}\3/" js/turtledefs.js
+                  grep -E "^const VERSION = \"[^\"]+-dev\+${short}\";" js/turtledefs.js
+
+            - name: Configure Pages
+              uses: actions/configure-pages@v5
+
+            # The same Jekyll build the legacy branch build runs, so README-only
+            # folders (Docs/FAQ, TurtleDocs, ...) are still rendered as pages.
+            # It copies .js files as they are, so the stamp above survives.
+            - name: Build with Jekyll
+              uses: actions/jekyll-build-pages@v1
+              with:
+                  source: ./
+                  destination: ./_site
+
+            - name: Upload the site
+              uses: actions/upload-pages-artifact@v3
+
+    deploy:
+        name: Deploy to GitHub Pages
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            pages: write # publish the artifact
+            id-token: write # verify the deployment's origin
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy
+              id: deployment
+              uses: actions/deploy-pages@v4

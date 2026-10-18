@@ -39,10 +39,11 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
-   setupActivityAbcParser, setupActivityIdleWatcher,
+   requestClear,
+   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   DEFAULTDELAY, define, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
@@ -62,7 +63,7 @@ try {
    MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
  */
 
 /*
@@ -102,9 +103,13 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/dom-helpers",
+    "utils/browser-utils",
     "utils/http-utils",
     "utils/utils",
     "utils/camera-utils",
+    "utils/plugin-utils",
+    "utils/macro-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -147,6 +152,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "activity/clear-confirmation",
     "activity/workspace-layout-controller",
     "activity/trash-controller",
     "activity/help-controller",
@@ -155,9 +161,23 @@ let MYDEFINES = [
     "search-ui",
     "activity/keyboard-controller",
     "widgets/plugin-dialog",
+    "utils/musicutils-constants",
+    "utils/musicutils-i18n",
+    "utils/musicutils-temperament",
+    "utils/musicutils-pitch",
+    "utils/musicutils-lookups",
+    "utils/musicutils-rhythm",
+    "utils/musicutils-solfege",
+    "utils/piemenu",
+    "utils/musicutils-modewheel",
+    "utils/musicutils-modecore",
+    "utils/musicutils-pitchscale",
+    "utils/musicutils-buildscale",
+    "utils/musicutils-pitchinfo",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/tuningformats",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -460,6 +480,9 @@ class Activity {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
 
+        this.sessionStorageManager =
+            typeof SessionStorageManager !== "undefined" ? new SessionStorageManager() : null;
+
         setupActivityIdleWatcher(this);
         setupProjectManager(this);
         setupKeyboardController(this);
@@ -612,6 +635,8 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
+                        let frameErrored = false;
+                        this.stageDirty = false;
                         try {
                             // Recompute culling when container moved.
                             if (
@@ -631,11 +656,27 @@ class Activity {
                             // with no frame queued, and _startRenderLoop() refuses to
                             // restart on that flag, so the canvas stopped repainting for
                             // the rest of the session. Report the frame and keep going.
+                            frameErrored = true;
+                            this.stageDirty = true;
                             console.error("Music Blocks: render frame failed", err);
-                        } finally {
-                            this.stageDirty = false;
-                            // Continue the loop if there's work or ongoing interaction
+                        }
+
+                        // On error: always keep the loop alive (prevents canvas freeze).
+                        // On success: continue only if there is still outstanding work.
+                        // Clearing stageDirty before stage.update() catches the edge case
+                        // where stage.update() itself synchronously re-dirtied the stage.
+                        if (
+                            frameErrored ||
+                            this.stageDirty ||
+                            hasActiveTweens ||
+                            hasActiveGifs ||
+                            isInteracting
+                        ) {
                             this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        } else {
+                            // Nothing to render — let the loop go idle
+                            this._renderLoopRunning = false;
+                            this._renderLoopRafId = null;
                         }
                     } else {
                         // Nothing to render — let the loop go idle
@@ -714,9 +755,6 @@ class Activity {
         // setupWorkspaceLayoutController() installs the delegation stubs below:
         // findBlocks, setHomeContainers, repositionBlocks, _handleRepositionBlocksOnResize.
 
-        //if any window resize event occurs:
-        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
         // Sets up HelpController (js/activity/help-controller.js), which owns the help
         // window, about page, keyboard shortcuts dialog, statistics window,
         // JavaScript editor launch, and the Alt-H save-help-block workflow.
@@ -743,57 +781,6 @@ class Activity {
         /*
          * Clears "canvas"
          */
-        const renderClearConfirmation = clearCanvasAction => {
-            if (document.getElementById("clear-confirm")) return;
-            // Create a custom modal for confirmation
-            const modal = document.createElement("div");
-            modal.classList.add("modalBox");
-            modal.id = "clear-confirm";
-            const title = document.createElement("h2");
-            title.textContent = _("Clear workspace");
-            title.classList.add("modal-title");
-
-            modal.appendChild(title);
-            const message = document.createElement("p");
-            message.textContent = _("Are you sure you want to clear the workspace?");
-            message.classList.add("modal-message");
-            modal.appendChild(message);
-
-            const buttonContainer = document.createElement("div");
-            buttonContainer.classList.add("clear-button-container");
-
-            const confirmBtn = document.createElement("button");
-            confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = _("Confirm");
-            confirmBtn.style.border = "none";
-            confirmBtn.style.borderRadius = "4px";
-            confirmBtn.style.padding = "8px 16px";
-            confirmBtn.style.fontWeight = "bold";
-            confirmBtn.style.cursor = "pointer";
-            confirmBtn.style.marginRight = "16px";
-            this.addEventListener(confirmBtn, "click", () => {
-                document.body.removeChild(modal);
-                clearCanvasAction();
-            });
-
-            const cancelBtn = document.createElement("button");
-            cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = _("Cancel");
-            cancelBtn.style.border = "none";
-            cancelBtn.style.borderRadius = "4px";
-            cancelBtn.style.padding = "8px 16px";
-            cancelBtn.style.fontWeight = "bold";
-            cancelBtn.style.cursor = "pointer";
-            this.addEventListener(cancelBtn, "click", () => {
-                document.body.removeChild(modal);
-            });
-
-            buttonContainer.appendChild(confirmBtn);
-            buttonContainer.appendChild(cancelBtn);
-            modal.appendChild(buttonContainer);
-            document.body.appendChild(modal);
-        };
-
         this._allClear = (noErase, skipConfirmation = false) => {
             const clearCanvasAction = () => {
                 this.blocks.activeBlock = null;
@@ -851,11 +838,7 @@ class Activity {
                 }
             };
 
-            if (skipConfirmation) {
-                clearCanvasAction();
-            } else {
-                renderClearConfirmation(clearCanvasAction);
-            }
+            requestClear(this, skipConfirmation, clearCanvasAction);
         };
         /**
          * Sets up play button functionality; runs Music Blocks.
@@ -887,16 +870,13 @@ class Activity {
             this.toolbarController.runFast(env, currentDelay);
 
             // Keep DOM queries, colors, and block visibilities in activity.js
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-
-                    this.logo.tempo.resume();
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+
+                this.logo.tempo.resume();
             }
 
             if (!this.turtles.running()) {
@@ -989,13 +969,10 @@ class Activity {
 
             this.toolbar.resetStop();
 
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
             }
         };
@@ -1880,8 +1857,6 @@ class Activity {
         const canvas = document.getElementById("myCanvas");
         const overCanvas = document.getElementById("canvas");
         const canvasHolder = document.getElementById("canvasHolder");
-        const defaultWidth = 1600;
-        const defaultHeight = 900;
 
         function handleResize() {
             // Skip resize when the tab is hidden to prevent 0×0 canvas
@@ -1889,34 +1864,30 @@ class Activity {
                 return;
             }
 
-            const isMaximized =
-                window.innerWidth === window.screen.width &&
-                window.innerHeight === window.screen.height;
-            if (isMaximized) {
-                container.style.width = defaultWidth + "px";
-                container.style.height = defaultHeight + "px";
-                canvas.width = defaultWidth;
-                canvas.height = defaultHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = defaultWidth;
-                canvasHolder.height = defaultHeight;
-            } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-
-                // Guard against zero or invalid dimensions
-                if (windowWidth <= 0 || windowHeight <= 0) {
-                    return;
-                }
-
-                container.style.width = windowWidth + "px";
-                container.style.height = windowHeight + "px";
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = canvas.width;
-                canvasHolder.height = canvas.height;
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+            const isAndroidWebkit =
+                (typeof platform !== "undefined" && platform.androidWebkit) ||
+                (typeof window !== "undefined" && window.platform && window.platform.androidWebkit);
+            if (isAndroidWebkit) {
+                windowWidth = window.outerWidth;
+                windowHeight = window.outerHeight;
             }
+
+            // Guard against zero or invalid dimensions
+            if (windowWidth <= 0 || windowHeight <= 0) {
+                return;
+            }
+
+            container.style.width = windowWidth + "px";
+            container.style.height = windowHeight + "px";
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+            overCanvas.width = canvas.width;
+            overCanvas.height = canvas.height;
+            canvasHolder.width = canvas.width;
+            canvasHolder.height = canvas.height;
+
             const hideContents = document.getElementById("hideContents");
             if (hideContents) {
                 hideContents.click();
@@ -1925,14 +1896,35 @@ class Activity {
         }
 
         let resizeTimeout;
+        let resizeAnimationFrame;
+
         this._handleWindowResize = () => {
+            if (!resizeAnimationFrame) {
+                const scheduleRaf =
+                    typeof requestAnimationFrame === "function"
+                        ? requestAnimationFrame
+                        : typeof window !== "undefined" &&
+                            typeof window.requestAnimationFrame === "function"
+                          ? window.requestAnimationFrame
+                          : null;
+
+                if (scheduleRaf) {
+                    resizeAnimationFrame = scheduleRaf(() => {
+                        if (typeof this._handleRepositionBlocksOnResize === "function") {
+                            this._handleRepositionBlocksOnResize();
+                        }
+                        resizeAnimationFrame = null;
+                    });
+                }
+            }
+
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
+                this._onResize(false);
                 this.setupPaletteMenu();
             }, 200);
         };
-        this.addEventListener(window, "resize", this._handleWindowResize);
         this._handleOrientationChangeResize = handleResize;
         this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
 
@@ -2014,7 +2006,7 @@ class Activity {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
-            for (const name in this.blocks.palettes.dict) {
+            for (const name of Object.keys(this.blocks.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2030,9 +2022,10 @@ class Activity {
             // which scans all blocks, so N moves × N blocks = O(N²).
             this.blocks._beginDeferCheckBounds();
 
-            for (const blk in this.blocks.blockList) {
+            for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
-                if (!myBlock) continue;
+                // Blocks already in the trash were recorded when they were trashed.
+                if (!myBlock || myBlock.trash) continue;
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -2050,11 +2043,13 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
 
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                    if (turtle !== null) {
                         const primaryTurtle = this.turtles.getTurtle(turtle);
 
                         primaryTurtle.inTrash = true;
-                        primaryTurtle.container.visible = false;
+                        if (primaryTurtle.container) {
+                            primaryTurtle.container.visible = false;
+                        }
 
                         const comp = primaryTurtle.companionTurtle;
 
@@ -2063,15 +2058,15 @@ class Activity {
 
                             if (companionTurtle) {
                                 companionTurtle.inTrash = true;
-                                companionTurtle.container.visible = false;
+                                if (companionTurtle.container) {
+                                    companionTurtle.container.visible = false;
+                                }
                             }
                         }
                     }
                 } else if (myBlock.name === "action") {
-                    if (!myBlock.trash) {
-                        this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
-                        actionBlockCounter += 1;
-                    }
+                    this.blocks.deleteActionBlock(myBlock);
+                    actionBlockCounter += 1;
                 }
 
                 this.blocks.blockList[blk].trash = true;
@@ -2185,7 +2180,7 @@ class Activity {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
             // Announce program stop to screen readers
-            this.textMsg && this.textMsg(_("Program stopped."));
+            announceToScreenReader(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -2205,7 +2200,7 @@ class Activity {
 
             // TODO: plugin support
             // Announce program start to screen readers
-            this.textMsg && this.textMsg(_("Program running."));
+            announceToScreenReader(_("Program running."));
         };
 
         /*
@@ -2216,7 +2211,7 @@ class Activity {
                 // Skip trashed blocks — they are hidden and their backing
                 // canvases are freed in sendStackToTrash(). Re-caching them
                 // here would waste ~0.5–2 MB per trashed block.
-                if (block.trash) return;
+                if (!block || block.trash) return;
 
                 if (block.container) {
                     block.container.uncache();
@@ -2528,7 +2523,7 @@ class Activity {
                 return;
             }
 
-            for (const name in this.palettes.dict) {
+            for (const name of Object.keys(this.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2561,6 +2556,70 @@ class Activity {
                 "activity.domReady.start",
                 "activity.domReady.end"
             );
+        };
+
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            if (typeof this.saveLocally === "function" && this.saveLocally !== this.__saveLocally) {
+                this.saveLocally();
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = "My Project";
+                try {
+                    p = (this.storage && this.storage.currentProject) || "My Project";
+                } catch (e) {
+                    p = "My Project";
+                }
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed or was invalid.
+                let timestampStr = null;
+                try {
+                    timestampStr = this.storage ? this.storage["SESSION_TIMESTAMP" + p] : null;
+                } catch (e) {
+                    timestampStr = null;
+                }
+                let parsedTimestamp = timestampStr ? parseInt(timestampStr, 10) : NaN;
+                let isValidTimestamp = Number.isFinite(parsedTimestamp) && parsedTimestamp > 0;
+                let timestamp = isValidTimestamp ? parsedTimestamp : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!isValidTimestamp) {
+                        try {
+                            if (this.storage) {
+                                this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                            }
+                        } catch (storageErr) {
+                            console.warn(
+                                "Failed to write session timestamp to localStorage:",
+                                storageErr
+                            );
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                    throw e;
+                }
+            }
         };
 
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);
@@ -2622,6 +2681,7 @@ class Activity {
             const that = this;
 
             this.setupWindowBlurHandler(doHardStopButton);
+            this.setupResizeListeners();
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage, false, true);
@@ -2654,23 +2714,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                // Save synchronously to SESSION* keys so manual reload/F5
-                // still has recoverable data even if async saves are cut short.
-                if (typeof this.__saveLocally === "function") {
-                    this.__saveLocally();
-                }
-                if (
-                    typeof this.saveLocally === "function" &&
-                    this.saveLocally !== this.__saveLocally
-                ) {
-                    this.saveLocally();
-                }
-                this._stopRenderLoop();
-                if (typeof this._stopAutoSave === "function") {
-                    this._stopAutoSave();
-                }
-            });
+            this.addEventListener(window, "beforeunload", this._handleBeforeUnload);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -2763,7 +2807,15 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
+            // Initialise the Git dropdown ("My Project") after the planet
+            // is ready so activity.prepareExport() is available.
+            if (typeof GitDropdownUI !== "undefined") {
+                this.gitDropdownUI = new GitDropdownUI();
+                this.gitDropdownUI.init(this);
+                this.toolbar.renderGitDropdownIcon(this.gitDropdownUI);
+            }
             this.toolbar.renderMenuIcon(this.showHideAuxMenu);
+
             this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
@@ -2795,6 +2847,17 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
+
+            // Keep the Git dirty-check hash up to date after every local save.
+            if (this.gitDropdownUI) {
+                const _origSaveLocally = this.saveLocally;
+                this.saveLocally = (...args) => {
+                    const result = _origSaveLocally.apply(this, args);
+                    this.gitDropdownUI.onSaveLocally();
+                    return result;
+                };
+                window.saveLocally = this.saveLocally;
+            }
 
             // Auto-save live workspace every 5 minutes to guard against
             // data loss from browser crashes (see issue #2994).
@@ -2997,6 +3060,13 @@ class Activity {
         const end = window.__mbPerf.marks[endMark];
         if (typeof start !== "number" || typeof end !== "number") return;
         window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
+    }
+
+    /**
+     * Registers window resize listeners after dependency cleanup.
+     */
+    setupResizeListeners() {
+        this.addEventListener(window, "resize", this._handleWindowResize);
     }
 
     /**

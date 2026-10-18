@@ -46,7 +46,8 @@ global.fileExt = jest.fn(file => {
     if (parts.length === 1 || (parts[0] === "" && parts.length === 2)) {
         return "";
     }
-    return parts.pop();
+    // Matches the real fileExt (js/utils/utils-logic.js): extensions compare lowercase.
+    return parts.pop().toLowerCase();
 });
 global.window = {
     isElectron: false,
@@ -82,8 +83,9 @@ global.normalizeNoteAccidentals = note => {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 };
-const { LILYPONDHEADER } = require("../lilypond");
+const { LILYPONDHEADER, escapeLilypondString } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
+global.escapeLilypondString = escapeLilypondString;
 
 describe("SaveInterface", () => {
     let mockActivity;
@@ -625,6 +627,23 @@ describe("afterSaveMIDI", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    it("should defer MIDI generation without a fixed export delay", () => {
+        const data = mockActivity.logo._midiData;
+        document.body.style.cursor = "wait";
+
+        instance.afterSaveMIDI();
+
+        expect(mockActivity.save.download).not.toHaveBeenCalled();
+        expect(mockActivity.logo._midiData).toBe(data);
+        expect(document.body.style.cursor).toBe("wait");
+
+        jest.advanceTimersByTime(0);
+
+        expect(mockActivity.save.download).toHaveBeenCalledWith("midi", "mockURL", null);
+        expect(mockActivity.logo._midiData).toEqual({});
+        expect(document.body.style.cursor).toBe("default");
+    });
+
     it("should handle empty MIDI data gracefully", () => {
         mockActivity.logo._midiData = {};
         instance.afterSaveMIDI();
@@ -650,6 +669,80 @@ describe("afterSaveMIDI", () => {
             time: 0.6666666666666666,
             duration: 0.6666666666666666,
             velocity: 0.8
+        });
+    });
+
+    it("should skip notes with zero or invalid duration and not corrupt globalTime with Infinity", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4"],
+                    duration: 0,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: ["D4"],
+                    duration: -2,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: ["E4"],
+                    duration: NaN,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: ["F4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+
+        // The zero, negative, and NaN duration notes should be skipped.
+        // F4 should be the only note added, starting at time 0 (not Infinity).
+        expect(instrumentTrack.addNote).toHaveBeenCalledTimes(1);
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "F4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("should handle drum notes with invalid bpm safely by falling back to 90 bpm", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["snare drum"],
+                    drum: ["snare drum"],
+                    duration: 4,
+                    bpm: 0,
+                    instrument: "drums"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const drumTrack = tracks.find(track => track.name === "Track 1 - snare drum");
+
+        expect(drumTrack.addNote).toHaveBeenCalledWith({
+            midi: 38,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
         });
     });
 });
@@ -696,6 +789,25 @@ describe("save artwork methods", () => {
             "svg",
             "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
             null
+        );
+    });
+
+    it("should save the SVG under a given file name", () => {
+        global.doSVG = jest.fn(() => "<svg>Mock SVG</svg>");
+        const activity = {
+            save: {
+                download: mockDownload
+            },
+            canvas: { width: 500, height: 500 },
+            logo: "mockLogo",
+            turtles: "mockTurtles"
+        };
+
+        instance.saveSVG(activity, "drawing.svg");
+        expect(mockDownload).toHaveBeenCalledWith(
+            "svg",
+            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
+            "drawing.svg"
         );
     });
 
@@ -859,7 +971,7 @@ describe("saveWAV & saveABC methods", () => {
         expect(activity.logo.runningAbc).toBe(true);
     });
 
-    it("should encode and download ABC notation output", () => {
+    it("should encode and download ABC notation output and clear notation output/buffer", () => {
         const mockSaveAbcOutput = jest.fn(() => "mock_abc_data");
 
         global.saveAbcOutput = mockSaveAbcOutput;
@@ -867,6 +979,12 @@ describe("saveWAV & saveABC methods", () => {
         const activity = {
             save: {
                 download: mockDownload
+            },
+            logo: {
+                notationOutput: "previous_abc_output",
+                recordingBuffer: {
+                    hasData: true
+                }
             }
         };
 
@@ -874,6 +992,21 @@ describe("saveWAV & saveABC methods", () => {
 
         expect(mockSaveAbcOutput).toHaveBeenCalledWith(activity);
         expect(mockDownload).toHaveBeenCalledWith("abc", "data:text;utf8,mock_abc_data", null);
+        expect(activity.logo.notationOutput).toBe("");
+        expect(activity.logo.recordingBuffer.hasData).toBe(false);
+    });
+
+    it("should save ABC notation under the file name it is given", () => {
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+        const activity = { save: { download: mockDownload } };
+
+        instance.afterSaveAbc.call({ activity }, "mysong.abc");
+
+        expect(mockDownload).toHaveBeenLastCalledWith(
+            "abc",
+            "data:text;utf8,mock_abc_data",
+            "mysong.abc"
+        );
     });
 });
 
@@ -1071,6 +1204,20 @@ describe("saveLilypond Methods", () => {
         });
     });
 
+    it("should give a block-saved Lilypond file the default header and closing sections", () => {
+        instance.afterSaveLilypond = jest.fn();
+        instance.saveLilypondFromBlock("song.ly");
+
+        const logo = instance.activity.logo;
+        expect(logo.notationOutput).toBe(LILYPONDHEADER);
+        // The MIDI section closes the \score block.
+        expect(logo.MIDIOutput).toContain("% MIDI SECTION");
+        expect(logo.MIDIOutput.trimEnd().endsWith("}")).toBe(true);
+        expect(logo.guitarOutputHead).toContain("% GUITAR TAB SECTION");
+        expect(logo.guitarOutputEnd).toContain(">>");
+        expect(instance.afterSaveLilypond).toHaveBeenCalledWith("song.ly");
+    });
+
     it("should open the Lilypond modal and populate fields", () => {
         instance.saveLilypond(activity);
 
@@ -1119,6 +1266,16 @@ describe("saveLilypond Methods", () => {
         expect(global.docById).toHaveBeenCalledWith("fileName");
     });
 
+    it("should escape quotes and backslashes in the Lilypond title and author", () => {
+        document.getElementById("title").value = 'My "Best" Song';
+        document.getElementById("author").value = "A\\B";
+
+        saveInterface.saveLYFile();
+
+        expect(mockActivity.logo.notationOutput).toContain('title = "My \\"Best\\" Song"');
+        expect(mockActivity.logo.notationOutput).toContain('composer = "A\\\\B"');
+    });
+
     it("should save a Lilypond file with PDF conversion", () => {
         saveInterface.saveLYFile(true);
         expect(saveInterface.notationConvert).toBe("pdf");
@@ -1152,14 +1309,24 @@ describe("saveLilypond Methods", () => {
         expect(mockActivity.logo.MIDIOutput).toContain(expectedMIDIOutput);
     });
 
-    it("should call saveLilypondOutput and afterSaveLilypondLY", () => {
-        instance.afterSaveLilypond("ignored.ly");
+    it("should call saveLilypondOutput and afterSaveLilypondLY and clear notation output/buffer", () => {
+        instance.activity.logo.notationOutput = "previous_lilypond_output";
+        instance.activity.logo.recordingBuffer.hasData = true;
+        // Called with no file name, as when an export finishes, it uses the dialog's.
+        instance.afterSaveLilypond();
         expect(mockSaveLilypondOutput).toHaveBeenCalledWith(instance.activity);
         expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith(
             "Lilypond Data",
             "TestProject.ly"
         );
         expect(instance.notationConvert).toBe("");
+        expect(instance.activity.logo.notationOutput).toBe("");
+        expect(instance.activity.logo.recordingBuffer.hasData).toBe(false);
+    });
+
+    it("should save Lilypond under the file name it is given", () => {
+        instance.afterSaveLilypond("mysong.ly");
+        expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith("Lilypond Data", "mysong.ly");
     });
 
     it('should set cursor to "wait" and call ly2pdf with correct arguments', () => {
@@ -1240,6 +1407,26 @@ describe("saveLilypond Methods", () => {
         expect(writeText).toHaveBeenCalledWith(lydata);
         expect(document.execCommand).toHaveBeenCalledWith("copy");
         expect(mockActivity.textMsg).not.toHaveBeenCalled();
+    });
+
+    it("should download the .ly file under the given file name, or the dialog's", () => {
+        delete navigator.clipboard;
+        document.execCommand.mockReturnValue(true);
+        saveInterface.download = jest.fn();
+
+        saveInterface.afterSaveLilypondLY(lydata, "mysong.ly");
+        expect(saveInterface.download).toHaveBeenLastCalledWith(
+            "ly",
+            expect.any(String),
+            "mysong.ly"
+        );
+
+        saveInterface.afterSaveLilypondLY(lydata);
+        expect(saveInterface.download).toHaveBeenLastCalledWith(
+            "ly",
+            expect.any(String),
+            "TestProject.ly"
+        );
     });
 
     it("should use legacy copy when Clipboard API is unavailable", () => {

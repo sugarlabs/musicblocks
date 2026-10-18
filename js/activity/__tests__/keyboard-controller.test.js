@@ -69,7 +69,7 @@ beforeEach(() => {
 // Activity mock
 // ---------------------------------------------------------------------------
 
-const makeActivity = () => ({
+const makeActivity = (overrides = {}) => ({
     keyboardEnableFlag: true,
     currentKeyCode: 0,
     currentKey: "",
@@ -125,7 +125,8 @@ const makeActivity = () => ({
     _doFastButton: jest.fn(),
     _doHardStopButton: jest.fn(),
     _saveHelpBlocks: jest.fn(),
-    workspaceLayoutController: { _findBlocks: jest.fn() }
+    workspaceLayoutController: { _findBlocks: jest.fn() },
+    ...overrides
 });
 
 const makeEvent = (overrides = {}) => ({
@@ -133,6 +134,7 @@ const makeEvent = (overrides = {}) => ({
     key: "",
     altKey: false,
     ctrlKey: false,
+    metaKey: false,
     shiftKey: false,
     preventDefault: jest.fn(),
     stopPropagation: jest.fn(),
@@ -140,6 +142,7 @@ const makeEvent = (overrides = {}) => ({
 });
 
 const KEYCODE = {
+    RETURN: 13,
     UP: 38,
     DOWN: 40,
     LEFT: 37,
@@ -347,6 +350,161 @@ describe("KeyboardController", () => {
         });
     });
 
+    describe("return / enter key handling", () => {
+        it("starts playback and prevents default when not running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
+            expect(activity._doFastButton).toHaveBeenCalled();
+        });
+
+        it("stops playback and prevents default when running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(true);
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("does not start playback when an open widget window is present", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            global.window.widgetWindows = {
+                isOpen: jest.fn(() => false),
+                openWindows: { tempo: true }
+            };
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("submits paste text and hides paste box on Enter when visible", () => {
+            const activity = makeActivity();
+            activity.paste.style.visibility = "visible";
+            activity.paste.value = "stack payload";
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity.pasted).toHaveBeenCalled();
+            expect(activity.paste.style.visibility).toBe("hidden");
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("hides paste box without pasting or starting playback on Enter when paste box is empty", () => {
+            const activity = makeActivity();
+            activity.paste.style.visibility = "visible";
+            activity.paste.value = "";
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity.pasted).not.toHaveBeenCalled();
+            expect(activity.paste.style.visibility).toBe("hidden");
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+        });
+
+        it("toggles playback with Alt+Enter when idle or running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const eventIdle = makeEvent({ keyCode: KEYCODE.RETURN, altKey: true });
+
+            controller.__keyPressed(eventIdle);
+
+            expect(eventIdle.preventDefault).toHaveBeenCalled();
+            expect(activity._doFastButton).toHaveBeenCalled();
+
+            activity.turtles.running.mockReturnValue(true);
+            const eventRunning = makeEvent({ keyCode: KEYCODE.RETURN, altKey: true });
+
+            controller.__keyPressed(eventRunning);
+
+            expect(eventRunning.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+        });
+
+        it("toggles playback with Shift+Enter when idle or running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const eventIdle = makeEvent({ keyCode: KEYCODE.RETURN, shiftKey: true });
+
+            controller.__keyPressed(eventIdle);
+
+            expect(eventIdle.preventDefault).toHaveBeenCalled();
+            expect(activity._doFastButton).toHaveBeenCalled();
+
+            activity.turtles.running.mockReturnValue(true);
+            const eventRunning = makeEvent({ keyCode: KEYCODE.RETURN, shiftKey: true });
+
+            controller.__keyPressed(eventRunning);
+
+            expect(eventRunning.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+        });
+
+        it("toggles playback with Ctrl+Enter when idle or running", () => {
+            const activity = makeActivity();
+            activity.turtles.running.mockReturnValue(false);
+            const controller = createController(activity);
+            const eventIdle = makeEvent({ keyCode: KEYCODE.RETURN, ctrlKey: true });
+
+            controller.__keyPressed(eventIdle);
+
+            expect(eventIdle.preventDefault).toHaveBeenCalled();
+            expect(activity._doFastButton).toHaveBeenCalled();
+
+            activity.turtles.running.mockReturnValue(true);
+            const eventRunning = makeEvent({ keyCode: KEYCODE.RETURN, ctrlKey: true });
+
+            controller.__keyPressed(eventRunning);
+
+            expect(eventRunning.preventDefault).toHaveBeenCalled();
+            expect(activity._doHardStopButton).toHaveBeenCalled();
+        });
+
+        it("suppresses Enter when isInputON is true", () => {
+            const activity = makeActivity();
+            activity.isInputON = true;
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+            expect(activity._doHardStopButton).not.toHaveBeenCalled();
+        });
+
+        it("suppresses Enter when searchWidget is visible", () => {
+            const activity = makeActivity();
+            activity.searchWidget.style.visibility = "visible";
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: KEYCODE.RETURN });
+
+            controller.__keyPressed(event);
+
+            expect(activity._doFastButton).not.toHaveBeenCalled();
+            expect(activity._doHardStopButton).not.toHaveBeenCalled();
+        });
+    });
+
     describe("Tab handoff", () => {
         it("leaves Tab handling to FocusCycleManager when it is active", () => {
             const activity = makeActivity();
@@ -394,6 +552,20 @@ describe("KeyboardController", () => {
             expect(activity.pasteBox.show).toHaveBeenCalled();
             expect(activity.paste.style.visibility).toBe("visible");
         });
+    });
+    it("Cmd+V opens the paste box at the current scale", () => {
+        const activity = makeActivity();
+        const controller = createController(activity);
+
+        controller.__keyPressed(makeEvent({ keyCode: KEYCODE.V, metaKey: true }));
+
+        expect(activity.pasteBox.createBox).toHaveBeenCalledWith(
+            activity.turtleBlocksScale,
+            200,
+            200
+        );
+        expect(activity.pasteBox.show).toHaveBeenCalled();
+        expect(activity.paste.style.visibility).toBe("visible");
     });
 
     describe("tempo widget integration", () => {
@@ -509,6 +681,37 @@ describe("KeyboardController", () => {
             expect(activity.blocks.undoAction).toHaveBeenCalled();
         });
 
+        it("Cmd+Z triggers undoAction on macOS", () => {
+            const activity = makeActivity();
+            activity.blocks.undoAction = jest.fn();
+            activity.blocks.redoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: 90, metaKey: true });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).not.toHaveBeenCalled();
+        });
+        it("Cmd+Shift+Z triggers redoAction on macOS", () => {
+            const activity = makeActivity();
+            activity.blocks.redoAction = jest.fn();
+            activity.blocks.undoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({
+                keyCode: 90,
+                metaKey: true,
+                shiftKey: true
+            });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+        });
+
         it("Ctrl+Y triggers redoAction", () => {
             const activity = makeActivity();
             activity.blocks.redoAction = jest.fn();
@@ -520,6 +723,48 @@ describe("KeyboardController", () => {
             expect(event.preventDefault).toHaveBeenCalled();
             expect(activity.blocks.redoAction).toHaveBeenCalled();
         });
+    });
+    it("Cmd+Y triggers redoAction on macOS", () => {
+        const activity = makeActivity();
+        activity.blocks.redoAction = jest.fn();
+        const controller = createController(activity);
+        const event = makeEvent({ keyCode: 89, metaKey: true });
+
+        controller.__keyPressed(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(activity.blocks.redoAction).toHaveBeenCalled();
+    });
+    it("does not trigger undo on Cmd+Z when paste input is active", () => {
+        const activity = makeActivity();
+        activity.blocks.undoAction = jest.fn();
+        activity.paste.style.visibility = "visible";
+
+        const controller = createController(activity);
+        const event = makeEvent({
+            keyCode: 90,
+            metaKey: true
+        });
+
+        controller.__keyPressed(event);
+
+        expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+    });
+
+    it("does not trigger redo on Cmd+Y when paste input is active", () => {
+        const activity = makeActivity();
+        activity.blocks.redoAction = jest.fn();
+        activity.paste.style.visibility = "visible";
+
+        const controller = createController(activity);
+        const event = makeEvent({
+            keyCode: 89,
+            metaKey: true
+        });
+
+        controller.__keyPressed(event);
+
+        expect(activity.blocks.redoAction).not.toHaveBeenCalled();
     });
 
     describe("ignores shortcuts while a text input is active", () => {

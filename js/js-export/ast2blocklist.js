@@ -30,6 +30,459 @@
  */
 class AST2BlockList {
     /**
+     * Returns whether a string names an interval (e.g. "major 3"), which the
+     * intervalname block turns into a number of semitones.
+     *
+     * @param {String} name - candidate interval name
+     * @returns {Boolean} whether name is an interval name
+     */
+    static _isIntervalName(name) {
+        const intervals =
+            (typeof window !== "undefined" && window.INTERVALVALUES) ||
+            (typeof INTERVALVALUES !== "undefined" && INTERVALVALUES) ||
+            require("../utils/musicutils-constants").INTERVALVALUES;
+        return Object.prototype.hasOwnProperty.call(intervals, name);
+    }
+
+    /**
+     * Returns whether a pitch name is solfege (sol, ti♭, ...) rather than a note name (G, B♭, ...),
+     * using the same test as the rest of Music Blocks. Microtonal prefixes (e.g. "^C", "vvD♭")
+     * are stripped first, so a note name keeps its block.
+     *
+     * @param {String} note - pitch name
+     * @returns {Boolean} whether note is solfege
+     */
+    static _isSolfege(note) {
+        const solfege =
+            (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
+            require("../utils/musicutils-solfege");
+        const pitch =
+            (typeof window !== "undefined" && window.MusicUtilsPitch) ||
+            require("../utils/musicutils-pitch");
+        const constants =
+            (typeof window !== "undefined" && window.MusicUtilsConstants) ||
+            require("../utils/musicutils-constants");
+        const stripped = pitch.stripMicrotonalPrefix(note);
+        // noteIsSolfege only knows the spellings in SOLFEGECONVERSIONTABLE, so check every note
+        // spelling first (E♯, F♭, C𝄪, ...), in the ASCII form ALLNOTENAMES uses.
+        const ascii = stripped
+            .replace(constants.DOUBLESHARP, "x")
+            .replace(constants.DOUBLEFLAT, "bb")
+            .replace(constants.SHARP, "#")
+            .replace(constants.FLAT, "b");
+        if (constants.ALLNOTENAMES.includes(ascii)) {
+            return false;
+        }
+        return solfege.noteIsSolfege(stripped);
+    }
+
+    /**
+     * Returns a deep copy of an AST. Regular expression literal values are
+     * shared, since nothing here changes them.
+     *
+     * @param {*} node - Acorn-generated AST (or part of one)
+     * @returns {*} copy of node
+     */
+    static _copyAST(node) {
+        if (Array.isArray(node)) return node.map(AST2BlockList._copyAST);
+        if (node === null || typeof node !== "object" || node instanceof RegExp) return node;
+        const copy = {};
+        for (const [key, value] of Object.entries(node)) {
+            copy[key] = AST2BlockList._copyAST(value);
+        }
+        return copy;
+    }
+
+    /**
+     * An action that reports its Stop block takes a third parameter that is true when it is
+     * called from a loop, and ends early at a Stop that has blocks after it otherwise:
+     * `if (inLoop) { f = true; } else { return mouse.ENDFLOW; }`. Puts back the plain
+     * `f = true` and drops the parameter, leaving the code the importer already reads.
+     * Anything else that reads the parameter is left alone.
+     *
+     * @static
+     * @param {Object} fn - function node, changed in place
+     * @returns {void}
+     */
+    static _dropInLoopParam(fn) {
+        const param = fn.params && fn.params[2];
+        if (
+            !param ||
+            param.type !== "AssignmentPattern" ||
+            param.left.type !== "Identifier" ||
+            !/^stop\d+$/.test(param.left.name) ||
+            param.right.value !== false ||
+            !fn.body ||
+            fn.body.type !== "BlockStatement"
+        ) {
+            return;
+        }
+        const name = param.left.name;
+        const generated = statement =>
+            statement.type === "IfStatement" &&
+            statement.test.type === "Identifier" &&
+            statement.test.name === name &&
+            statement.consequent.type === "BlockStatement" &&
+            statement.consequent.body.length === 1 &&
+            statement.alternate &&
+            statement.alternate.type === "BlockStatement" &&
+            statement.alternate.body.length === 1 &&
+            statement.alternate.body[0].type === "ReturnStatement" &&
+            statement.alternate.body[0].argument &&
+            statement.alternate.body[0].argument.type === "MemberExpression" &&
+            statement.alternate.body[0].argument.object.name === "mouse" &&
+            statement.alternate.body[0].argument.property.name === "ENDFLOW";
+        let uses = 0;
+        const count = node => {
+            if (Array.isArray(node)) {
+                node.forEach(count);
+            } else if (node !== null && typeof node === "object") {
+                if (node.type === "Identifier" && node.name === name) uses++;
+                Object.values(node).forEach(count);
+            }
+        };
+        count(fn.body);
+        const found = fn.body.body.filter(generated);
+        if (found.length !== uses) return;
+        fn.body.body = fn.body.body.map(statement =>
+            generated(statement) ? statement.consequent.body[0] : statement
+        );
+        fn.params.splice(2, 1);
+    }
+
+    /**
+     * Rewrites, in place, the code JSGenerate writes for Stop blocks back to
+     * plain `break` statements, which the config maps to the Stop block:
+     * - `{ let f = false; loop { ...; f = true; ...; if (f) break; } }` becomes
+     *   the loop, with `break` for each `f = true`;
+     * - an action that reports its Stop block (`let f = false; ...; f = true; ...;
+     *   return f ? mouse.STOPFLOW : mouse.ENDFLOW`) becomes the action with `break` and
+     *   `return mouse.ENDFLOW`, and `if ((await action(mouse)) === "STOPFLOW") <Stop>`
+     *   becomes the plain action call;
+     * - `return mouse.ENDFLOW` / `return mouse.ENDMOUSE` that is not the last
+     *   statement of a function (a Stop with no loop around it) becomes `break`;
+     * - `let f = false; <clamp>; if (f) <leave>` drops the flag and the check,
+     *   with `break` for each `f = true` inside the clamp;
+     * - a labeled block (`stop0: { ... }`) becomes the plain block, and its
+     *   labeled `break` stays a Stop block;
+     * - the `break` that ends every switch case is dropped, since cases don't
+     *   fall through and it isn't a Stop block.
+     *
+     * @param {Object} node - Acorn-generated AST (or part of one)
+     * @param {Boolean} [isFunctionBody=false] - whether node is a function body
+     * @returns {void}
+     */
+    static _normalizeStops(node, isFunctionBody = false) {
+        if (node === null || typeof node !== "object") return;
+
+        // Only the names ASTUtils generates for Stop blocks (and `let`, which
+        // exported boxes don't use), so hand-written flags and labels are
+        // left alone.
+        const isStopLabel = label => /^stop\d+$/.test(label.name);
+        const isStopFlag = declaration =>
+            declaration.kind === "let" &&
+            /^(?:_*stopLoop|stop\d+)$/.test(declaration.declarations[0].id.name);
+
+        const isFunction = ["ArrowFunctionExpression", "FunctionExpression"].includes(node.type);
+        if (isFunction) AST2BlockList._dropInLoopParam(node);
+        // The Stop flags this function declares, for the call-site check below: setting
+        // any other variable in that branch is the user's own code.
+        const declared = new Set();
+        if (isFunction) {
+            const find = child => {
+                if (Array.isArray(child)) {
+                    child.forEach(find);
+                } else if (child !== null && typeof child === "object") {
+                    if (
+                        child.type === "VariableDeclaration" &&
+                        child.declarations.length === 1 &&
+                        child.declarations[0].id.type === "Identifier" &&
+                        child.declarations[0].init !== null &&
+                        child.declarations[0].init.value === false &&
+                        isStopFlag(child)
+                    ) {
+                        declared.add(child.declarations[0].id.name);
+                    }
+                    Object.values(child).forEach(find);
+                }
+            };
+            find(node.body);
+        }
+        if (isFunction) AST2BlockList._declaredStopFlags.push(declared);
+        for (const [key, value] of Object.entries(node)) {
+            if (Array.isArray(value)) {
+                value.forEach(child => AST2BlockList._normalizeStops(child));
+            } else {
+                AST2BlockList._normalizeStops(value, isFunction && key === "body");
+            }
+        }
+        const visibleFlags = new Set(AST2BlockList._declaredStopFlags.flatMap(set => [...set]));
+        if (isFunction) AST2BlockList._declaredStopFlags.pop();
+
+        let list = null;
+        if (node.type === "Program" || node.type === "BlockStatement") {
+            list = node.body;
+        } else if (node.type === "SwitchCase") {
+            list = node.consequent;
+            const lastStatement = list[list.length - 1];
+            if (lastStatement && lastStatement.type === "BreakStatement" && !lastStatement.label) {
+                list.pop();
+            }
+        }
+        if (node.type === "IfStatement") {
+            for (const key of ["consequent", "alternate"]) {
+                const branch = node[key];
+                if (branch && branch.type === "LabeledStatement") {
+                    // Any other label here would reach the if mapping, which
+                    // expects a block, so report it like other unsupported code.
+                    if (!isStopLabel(branch.label) || branch.body.type !== "BlockStatement") {
+                        throw {
+                            prefix: "Unsupported statement: ",
+                            start: branch.start,
+                            end: branch.end
+                        };
+                    }
+                    node[key] = branch.body;
+                }
+            }
+        }
+        if (list === null) return;
+
+        const toBreak = statement => ({
+            type: "BreakStatement",
+            label: null,
+            start: statement.start,
+            end: statement.end
+        });
+
+        // Labeled blocks that only exist so a Stop can leave them.
+        for (let i = list.length - 1; i >= 0; i--) {
+            const statement = list[i];
+            if (
+                statement.type === "LabeledStatement" &&
+                isStopLabel(statement.label) &&
+                statement.body.type === "BlockStatement"
+            ) {
+                if (node.type === "SwitchCase") {
+                    list.splice(i, 1, ...statement.body.body);
+                } else {
+                    list[i] = statement.body;
+                }
+            }
+        }
+
+        // Only the statements the exporter writes for a Stop: a break, the end of the
+        // action, or the flag assignment. Anything else in the branch is the user's code.
+        const isGeneratedStop = consequent => {
+            const only =
+                consequent.type === "BlockStatement"
+                    ? consequent.body.length === 1
+                        ? consequent.body[0]
+                        : null
+                    : consequent;
+            if (only === null) return false;
+            if (only.type === "BreakStatement") return true;
+            if (only.type === "ReturnStatement") {
+                return (
+                    only.argument !== null &&
+                    only.argument.type === "MemberExpression" &&
+                    only.argument.object.name === "mouse" &&
+                    ["ENDFLOW", "ENDMOUSE"].includes(only.argument.property.name)
+                );
+            }
+            return (
+                only.type === "ExpressionStatement" &&
+                only.expression.type === "AssignmentExpression" &&
+                only.expression.operator === "=" &&
+                only.expression.left.type === "Identifier" &&
+                visibleFlags.has(only.expression.left.name) &&
+                only.expression.right.value === true
+            );
+        };
+
+        // True when the flag appears only where the exporter puts it: its declaration, the
+        // `flag = true` Stop assignments and the final return. A hand-written read of the
+        // flag would lose its value if the importer dropped the declaration.
+        const onlyGeneratedFlagUses = (body, flag) => {
+            let total = 0;
+            let generated = 0;
+            const visit = child => {
+                if (Array.isArray(child)) {
+                    child.forEach(visit);
+                } else if (child !== null && typeof child === "object") {
+                    if (child.type === "Identifier" && child.name === flag) total++;
+                    if (
+                        child.type === "AssignmentExpression" &&
+                        child.operator === "=" &&
+                        child.left.type === "Identifier" &&
+                        child.left.name === flag &&
+                        child.right.value === true
+                    ) {
+                        generated++; // the assigned flag itself
+                    }
+                    Object.values(child).forEach(visit);
+                }
+            };
+            visit(body);
+            // declaration + final return test + every `flag = true`
+            return total === 2 + generated;
+        };
+
+        // `f = true` statements for flag f, anywhere inside node, become break.
+        const replaceFlagSets = (inside, flag) => {
+            const setsFlag = child =>
+                child.type === "ExpressionStatement" &&
+                child.expression.type === "AssignmentExpression" &&
+                child.expression.operator === "=" &&
+                child.expression.left.type === "Identifier" &&
+                child.expression.left.name === flag &&
+                child.expression.right.value === true;
+            const visit = child => {
+                if (Array.isArray(child)) {
+                    child.forEach((item, j) => {
+                        if (item && typeof item === "object" && setsFlag(item)) {
+                            child[j] = toBreak(item);
+                        } else {
+                            visit(item);
+                        }
+                    });
+                } else if (child !== null && typeof child === "object") {
+                    Object.values(child).forEach(visit);
+                }
+            };
+            visit(inside);
+        };
+        const falseFlag = statement =>
+            statement.type === "VariableDeclaration" &&
+            statement.declarations.length === 1 &&
+            statement.declarations[0].id.type === "Identifier" &&
+            statement.declarations[0].init !== null &&
+            statement.declarations[0].init.value === false &&
+            isStopFlag(statement)
+                ? statement.declarations[0].id.name
+                : null;
+
+        // let f = false; ...; f = true; ...; return f ? mouse.STOPFLOW : mouse.ENDFLOW
+        // is an action with a Stop block: back to `break` and a plain return.
+        if (isFunctionBody && list.length > 1) {
+            const last = list[list.length - 1];
+            const flag = falseFlag(list[0]);
+            const value = last.type === "ReturnStatement" ? last.argument : null;
+            if (
+                flag !== null &&
+                value !== null &&
+                value.type === "ConditionalExpression" &&
+                value.test.type === "Identifier" &&
+                value.test.name === flag &&
+                value.consequent.type === "MemberExpression" &&
+                value.consequent.object.name === "mouse" &&
+                value.consequent.property.name === "STOPFLOW" &&
+                onlyGeneratedFlagUses(list, flag)
+            ) {
+                last.argument = value.alternate;
+                list.shift();
+                replaceFlagSets(list, flag);
+            }
+        }
+
+        // if ((await action(mouse)) === "STOPFLOW") <Stop>; is a plain action call, the
+        // Stop being the one inside the action.
+        list.forEach((statement, i) => {
+            if (
+                statement.type === "IfStatement" &&
+                !statement.alternate &&
+                statement.test.type === "BinaryExpression" &&
+                statement.test.operator === "===" &&
+                statement.test.left.type === "AwaitExpression" &&
+                statement.test.right.value === "STOPFLOW" &&
+                isGeneratedStop(statement.consequent)
+            ) {
+                const callArgs = statement.test.left.argument.arguments;
+                if (
+                    callArgs &&
+                    callArgs.length === 3 &&
+                    callArgs[2].type === "Literal" &&
+                    callArgs[2].value === true
+                ) {
+                    // The "called from a loop" flag; an action without arguments has [null].
+                    const empty =
+                        callArgs[1].type === "ArrayExpression" &&
+                        callArgs[1].elements.length === 1 &&
+                        callArgs[1].elements[0] !== null &&
+                        callArgs[1].elements[0].type === "Literal" &&
+                        callArgs[1].elements[0].value === null;
+                    callArgs.splice(empty ? 1 : 2, empty ? 2 : 1);
+                }
+                list[i] = {
+                    type: "ExpressionStatement",
+                    expression: statement.test.left,
+                    start: statement.start,
+                    end: statement.end
+                };
+            }
+        });
+
+        // let f = false; <clamp>; if (f) return mouse.END... / break label;
+        for (let i = list.length - 3; i >= 0; i--) {
+            const flag = falseFlag(list[i]);
+            const check = list[i + 2];
+            if (
+                flag !== null &&
+                check.type === "IfStatement" &&
+                check.test.type === "Identifier" &&
+                check.test.name === flag &&
+                !check.alternate &&
+                ["ReturnStatement", "BreakStatement"].includes(check.consequent.type)
+            ) {
+                replaceFlagSets(list[i + 1], flag);
+                list.splice(i + 2, 1);
+                list.splice(i, 1);
+            }
+        }
+
+        list.forEach((statement, i) => {
+            const returnsEnd =
+                statement.type === "ReturnStatement" &&
+                statement.argument &&
+                statement.argument.type === "MemberExpression" &&
+                statement.argument.object.name === "mouse" &&
+                ["ENDFLOW", "ENDMOUSE"].includes(statement.argument.property.name);
+            if (returnsEnd && !(isFunctionBody && i === list.length - 1)) {
+                list[i] = toBreak(statement);
+                return;
+            }
+
+            // { let f = false; loop { ...; if (f) break; } }
+            if (statement.type !== "BlockStatement" || statement.body.length !== 2) return;
+            const [declaration, loop] = statement.body;
+            const flag = falseFlag(declaration);
+            if (
+                flag === null ||
+                !["ForStatement", "WhileStatement", "DoWhileStatement"].includes(loop.type) ||
+                loop.body.type !== "BlockStatement"
+            ) {
+                return;
+            }
+            const check = loop.body.body[loop.body.body.length - 1];
+            if (
+                !check ||
+                check.type !== "IfStatement" ||
+                check.test.type !== "Identifier" ||
+                check.test.name !== flag ||
+                check.consequent.type !== "BreakStatement" ||
+                check.consequent.label ||
+                check.alternate
+            ) {
+                return;
+            }
+
+            loop.body.body.pop();
+            replaceFlagSets(loop.body, flag);
+            list[i] = loop;
+        });
+    }
+
+    /**
      * Converts a JavaScript AST into an array of block specifications for Music Blocks.
      *
      * @param {Object} AST - Acorn-generated AST object representing the JavaScript code
@@ -37,6 +490,10 @@ class AST2BlockList {
      * @returns {Array} List of block specifications ready to be loaded via loadNewBlocks
      */
     static toBlockList(AST, config) {
+        // Normalize a copy, so the caller's AST is untouched and converting it
+        // again gives the same blocks.
+        AST = AST2BlockList._copyAST(AST);
+        AST2BlockList._normalizeStops(AST);
         let trees = _astToTree(AST, config);
         return _treeToBlockList(trees, config);
 
@@ -90,13 +547,21 @@ class AST2BlockList {
                 const steps = path.split(".");
                 let current = obj;
                 for (let step of steps) {
+                    // A missing node (e.g. the null init of `for (;;)`) means the
+                    // path doesn't exist, so the entry just doesn't match.
+                    if (current === null || current === undefined) {
+                        return undefined;
+                    }
                     // Regex matching to handle array case such as arguments[0]
                     const matchStep = step.match(/(\w+)\[(\d+)\]/);
                     if (matchStep) {
                         // Following the example above, the output of matchStep will have
                         // 'arguments' at index 1 and the index (0) will be at index 2
                         current = current[matchStep[1]];
-                        current = current[matchStep[2]];
+                        current =
+                            current === null || current === undefined
+                                ? undefined
+                                : current[matchStep[2]];
                     } else {
                         current = current[step];
                     }
@@ -126,6 +591,21 @@ class AST2BlockList {
                         for (const identifier of identifiers) {
                             if ("value" in identifier) {
                                 if (value === identifier.value) {
+                                    groupMatched = true;
+                                    break;
+                                }
+                            } else if ("same_as" in identifier) {
+                                // Two parts of the statement must be the same
+                                // node, e.g. the loop variable in init, test and update.
+                                if (
+                                    value !== undefined &&
+                                    value === _getPropertyValue(bodyAST, identifier.same_as)
+                                ) {
+                                    groupMatched = true;
+                                    break;
+                                }
+                            } else if ("integer" in identifier) {
+                                if (Number.isInteger(value) === identifier.integer) {
                                     groupMatched = true;
                                     break;
                                 }
@@ -226,6 +706,22 @@ class AST2BlockList {
                         for (const argPath of pair.ast.argument_properties) {
                             argArray.push(_getPropertyValue(bodyAST, argPath));
                         }
+                    }
+                    // The `until` block repeats while its condition is FALSE, so a
+                    // JavaScript `do { ... } while (test)` maps to `until (!test)`.
+                    // Negate the condition, collapsing an existing `!x` back to `x`
+                    // so a blocks -> JS -> blocks round-trip is stable.
+                    if (pair.name === "until" && argArray.length > 0) {
+                        const test = argArray[0];
+                        argArray[0] =
+                            test && test.type === "UnaryExpression" && test.operator === "!"
+                                ? test.argument
+                                : {
+                                      type: "UnaryExpression",
+                                      operator: "!",
+                                      prefix: true,
+                                      argument: test
+                                  };
                     }
                     let args = _createArgNode(argArray);
                     if (args.length > 0) {
@@ -591,11 +1087,14 @@ class AST2BlockList {
                     if (!argConfig) {
                         throw new Error(`Missing argument configuration for: ${block_name}`);
                     }
-                    if (argConfig.type === "note_or_solfege") {
-                        // Handle pitch notes (solfege or note names)
-                        const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
+                    if (argConfig.type === "note_or_solfege" && typeof arg === "string") {
+                        // Handle pitch notes (solfege or note names). A pitch read from a box
+                        // or computed is handled below like any other value.
                         vspaces += _addNthArgToBlockList(
-                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { value: arg }],
+                            [
+                                AST2BlockList._isSolfege(arg) ? "solfege" : "notename",
+                                { value: arg }
+                            ],
                             i + 1,
                             blockList,
                             parentBlockNumber
@@ -609,15 +1108,20 @@ class AST2BlockList {
                             parentBlockNumber
                         );
                     } else if (
+                        argConfig.type === "note_or_solfege" ||
                         argConfig.type === "NumberExpression" ||
-                        argConfig.type === "BooleanExpression"
+                        argConfig.type === "BooleanExpression" ||
+                        argConfig.type === "IntervalExpression"
                     ) {
-                        // Handle number/boolean expressions
+                        // Handle number/boolean expressions. In an interval expression, a string
+                        // naming an interval (as the exporter writes an intervalname block) becomes
+                        // an intervalname block again.
                         vspaces += _addNthValueArgToBlockList(
                             arg,
                             i + 1,
                             blockList,
-                            parentBlockNumber
+                            parentBlockNumber,
+                            argConfig.type === "IntervalExpression"
                         );
                     } else {
                         vspaces += _addNthArgToBlockList(
@@ -672,20 +1176,21 @@ class AST2BlockList {
              * @param {Array} blockList - the blockList to which the new argument blocks will be added
              * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
              */
-            function _addValueArgsToBlockList(args, blockList, parentBlockNumber) {
+            function _addValueArgsToBlockList(args, blockList, parentBlockNumber, intervals) {
                 let vspaces = 0;
                 for (let i = 0; i < args.length; i++) {
                     vspaces += _addNthValueArgToBlockList(
                         args[i],
                         i + 1,
                         blockList,
-                        parentBlockNumber
+                        parentBlockNumber,
+                        intervals
                     );
                 }
                 return vspaces;
             }
 
-            function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber) {
+            function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber, intervals) {
                 let vspaces = 0;
                 let block = [];
                 let blockNumber = blockList.length;
@@ -693,12 +1198,14 @@ class AST2BlockList {
                 blockList.push(block);
                 let type = typeof arg;
                 if (type === "string") {
-                    type = "text";
+                    type =
+                        intervals && AST2BlockList._isIntervalName(arg) ? "intervalname" : "text";
                 }
                 if (
                     type === "number" ||
                     type === "boolean" ||
                     type === "text" ||
+                    type === "intervalname" ||
                     (type === "object" && arg.identifier !== undefined)
                 ) {
                     // variables can be in number or boolean expressions
@@ -719,7 +1226,12 @@ class AST2BlockList {
                     let connections = new Array(1 + arg.arguments.length).fill(null);
                     connections[0] = parentBlockNumber;
                     block.push(connections);
-                    vspaces = _addValueArgsToBlockList(arg.arguments, blockList, blockNumber);
+                    vspaces = _addValueArgsToBlockList(
+                        arg.arguments,
+                        blockList,
+                        blockNumber,
+                        intervals
+                    );
                     if (arg.arguments.length === 0) {
                         vspaces += 1;
                     }
@@ -733,6 +1245,9 @@ class AST2BlockList {
         }
     }
 }
+
+// The Stop flags declared by the functions being converted, innermost last.
+AST2BlockList._declaredStopFlags = [];
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { AST2BlockList };

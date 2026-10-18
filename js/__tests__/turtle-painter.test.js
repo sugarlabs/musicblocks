@@ -128,6 +128,38 @@ describe("Painter Class", () => {
             expect(painter._penDown).toBe(true);
         });
 
+        test("keeps Painter state isolated between turtles", () => {
+            const secondPainter = new Painter(createMockTurtle());
+
+            painter.color = 75;
+            painter.penState = false;
+
+            expect(secondPainter.color).toBe(0);
+            expect(secondPainter.penState).toBe(true);
+        });
+
+        test("reset() resets control points and closes open SVG path without wiping accumulated SVG output or pen styling", () => {
+            painter.cp1x = 10;
+            painter.cp1y = 20;
+            painter.cp2x = 30;
+            painter.cp2y = 40;
+            painter._svgPath = "M 0 0 ";
+            painter._svgOutput = '<path d="M 0 0 ';
+            painter.color = 75;
+            painter.stroke = 12;
+
+            painter.reset();
+
+            expect(painter.cp1x).toBe(0);
+            expect(painter.cp1y).toBe(100);
+            expect(painter.cp2x).toBe(100);
+            expect(painter.cp2y).toBe(100);
+            expect(painter._svgPath).toBe(false);
+            expect(painter._svgOutput).toContain('<path d="M 0 0 ');
+            expect(painter.color).toBe(75);
+            expect(painter.stroke).toBe(12);
+        });
+
         test("should initialize value to DEFAULTVALUE (50)", () => {
             expect(painter._value).toBe(50);
         });
@@ -276,10 +308,27 @@ describe("Pen operations", () => {
         expect(mockTurtle.ctx.lineWidth).toBe(10);
     });
 
-    test("doSetPensize should handle zero", () => {
-        painter.doSetPensize(0);
-        expect(painter.stroke).toBe(0);
-        expect(mockTurtle.ctx.lineWidth).toBe(0);
+    test.each([0, -5])("doSetPensize rejects %s and keeps the current size", size => {
+        painter.doSetPensize(20);
+        painter.doSetPensize(size);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+            "Pen size must be greater than 0."
+        );
+        expect(painter.stroke).toBe(20);
+        expect(mockTurtle.ctx.lineWidth).toBe(20);
+    });
+
+    test.each([NaN, Infinity, "abc"])("doSetPensize rejects the non-number %s", size => {
+        painter.doSetPensize(20);
+        painter.doSetPensize(size);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.stroke).toBe(20);
+    });
+
+    test("doSetPensize accepts a fractional size", () => {
+        painter.doSetPensize(0.5);
+        expect(painter.stroke).toBe(0.5);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
     });
 
     test("doSetPensize should handle large values", () => {
@@ -319,6 +368,27 @@ describe("Pen operations", () => {
         expect(getMunsellColor).toHaveBeenCalledWith(120, painter.value, painter.chroma);
     });
 
+    test.each([
+        ["doSetColor", "color"],
+        ["doSetHue", "color"],
+        ["doSetValue", "value"],
+        ["doSetChroma", "chroma"]
+    ])("%s should reject a non-finite value and keep the pen colour", (method, field) => {
+        for (const bad of [-Infinity, Infinity, NaN]) {
+            const before = painter[field];
+            getcolor.mockClear();
+            getMunsellColor.mockClear();
+            mockTurtle.turtles.activity.errorMsg.mockClear();
+
+            painter[method](bad);
+
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter[field]).toBe(before);
+            expect(getcolor).not.toHaveBeenCalled();
+            expect(getMunsellColor).not.toHaveBeenCalled();
+        }
+    });
+
     test("doSetPenAlpha should update canvas alpha", () => {
         painter.doSetPenAlpha(0.5);
         expect(painter.canvasAlpha).toBe(0.5);
@@ -333,6 +403,27 @@ describe("Pen operations", () => {
         painter.doSetPenAlpha(1);
         expect(painter.canvasAlpha).toBe(1);
     });
+
+    test.each([
+        [0, 1],
+        [25, 0.75],
+        [50, 0.5],
+        [100, 0],
+        [225, 1 - 23 / 100]
+    ])("doSetTranslucency(%s) sets the pen alpha to %s", (translucency, alpha) => {
+        painter.doSetTranslucency(translucency);
+        expect(painter.canvasAlpha).toBeCloseTo(alpha);
+    });
+
+    test.each([NaN, Infinity, "abc"])(
+        "doSetTranslucency rejects the non-number %s and keeps the alpha",
+        translucency => {
+            painter.doSetTranslucency(50);
+            painter.doSetTranslucency(translucency);
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter.canvasAlpha).toBe(0.5);
+        }
+    );
 
     test("doPenUp should set penDown to false", () => {
         painter.doPenUp();
@@ -673,6 +764,37 @@ describe("Heading and orientation", () => {
         mockTurtle.blinking.mockReturnValue(true);
         painter.doSetHeading(90);
         expect(mockTurtle.updateCache).not.toHaveBeenCalled();
+    });
+
+    test.each([-1e20, 1e20, -1e300, -Number.MAX_VALUE])(
+        "doSetHeading(%s) returns a heading in [0, 360) without looping",
+        degrees => {
+            painter.doSetHeading(degrees);
+            expect(mockTurtle.orientation).toBeGreaterThanOrEqual(0);
+            expect(mockTurtle.orientation).toBeLessThan(360);
+        }
+    );
+
+    test.each([-1e20, 1e20, -1e300])(
+        "doRight(%s) returns a heading in [0, 360) without looping",
+        degrees => {
+            mockTurtle.orientation = 90;
+            painter.doRight(degrees);
+            expect(mockTurtle.orientation).toBeGreaterThanOrEqual(0);
+            expect(mockTurtle.orientation).toBeLessThan(360);
+        }
+    );
+
+    test.each([
+        [-90, 270],
+        [-360, 0],
+        [-450, 270],
+        [-1e9, 80],
+        [720, 0],
+        [-0.5, 359.5]
+    ])("doSetHeading(%s) normalizes to %s", (degrees, expected) => {
+        painter.doSetHeading(degrees);
+        expect(mockTurtle.orientation).toBeCloseTo(expected);
     });
 
     test("doSetHeading should handle NaN or Infinity gracefully", () => {

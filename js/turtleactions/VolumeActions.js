@@ -18,7 +18,7 @@
 
 /*
    global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE, clampNumber
+   Tone, DEFAULTVOLUME, DEFAULTVOICE, clampNumber, instruments
 */
 
 /*
@@ -27,10 +27,8 @@
         _, last
     js/turtle-singer.js
         Singer
-    js/js-export/interface.js
-        instruments
     js/utils/synthutils.js
-        VOICENAMES, DRUMNAMES
+        VOICENAMES, DRUMNAMES, instruments
     js/logo.js
         DEFAULTVOLUME
     js/js-export/export.js
@@ -57,12 +55,14 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static doCrescendo(type, value, turtle, blk) {
+            if (!Number.isFinite(value)) return;
             value = clampNumber(value, 0, 100);
             const tur = activity.turtles.ithTurtle(turtle);
+            const synthList = Object.keys(tur.singer.synthVolume);
 
             tur.singer.crescendoDelta.push(type === "crescendo" ? value : -value);
 
-            for (const synth in tur.singer.synthVolume) {
+            for (const synth of synthList) {
                 const vol = last(tur.singer.synthVolume[synth]);
                 tur.singer.synthVolume[synth].push(vol);
                 if (tur.singer.crescendoInitialVolume[synth] === undefined) {
@@ -91,12 +91,20 @@ function setupVolumeActions(activity) {
                 }
 
                 tur.singer.crescendoDelta.pop();
-                for (const synth in tur.singer.synthVolume) {
-                    const len = tur.singer.synthVolume[synth].length;
-                    tur.singer.synthVolume[synth][len - 1] = last(
-                        tur.singer.crescendoInitialVolume[synth]
+                for (const synth of synthList) {
+                    tur.singer.synthVolume[synth].pop();
+                    if (
+                        tur.singer.crescendoInitialVolume[synth] &&
+                        tur.singer.crescendoInitialVolume[synth].length > 0
+                    ) {
+                        tur.singer.crescendoInitialVolume[synth].pop();
+                    }
+                    Singer.setSynthVolume(
+                        activity.logo,
+                        turtle,
+                        synth,
+                        last(tur.singer.synthVolume[synth])
                     );
-                    tur.singer.crescendoInitialVolume[synth].pop();
                 }
                 tur.singer.inCrescendo.pop();
             };
@@ -113,6 +121,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setRelativeVolume(volume, turtle, blk) {
+            if (!Number.isFinite(volume)) return;
             const tur = activity.turtles.ithTurtle(turtle);
             const synthList = Object.keys(tur.singer.synthVolume);
 
@@ -175,6 +184,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setMasterVolume(volume, turtle, blk) {
+            if (!Number.isFinite(volume)) return;
             volume = clampNumber(volume, 0, 100);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
@@ -207,10 +217,6 @@ function setupVolumeActions(activity) {
             } else {
                 tur.singer.panner.pan.value = value;
             }
-
-            for (const synth in instruments[turtle]) {
-                instruments[turtle][synth].connect(tur.singer.panner);
-            }
         }
 
         /**
@@ -223,6 +229,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setSynthVolume(synthname, volume, turtle, blk) {
+            if (!Number.isFinite(volume)) return;
             let synth = null;
             let firstConnection = null;
             let lastConnection = null;
@@ -269,14 +276,16 @@ function setupVolumeActions(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (!tur.singer.instrumentNames.includes(synth)) {
-                tur.singer.instrumentNames.push(synth);
+            // Load the synth if this turtle doesn't have it yet, but leave
+            // instrumentNames alone: notes play with its last entry, so pushing
+            // here would switch the current instrument to the volume target.
+            if (!(instruments[turtle] && synth in instruments[turtle])) {
                 activity.logo.synth.loadSynth(turtle, synth);
+            }
 
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
+            if (tur.singer.synthVolume[synth] === undefined) {
+                tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
             }
 
             volume = clampNumber(volume, 0, 100);
@@ -286,15 +295,7 @@ function setupVolumeActions(activity) {
                 if (firstConnection === null && lastConnection === null) {
                     activity.logo._timerManager.setGuardedTimeout(
                         () => {
-                            activity.logo.synth.trigger(
-                                0,
-                                "G4",
-                                1 / 4,
-                                synthname,
-                                null,
-                                null,
-                                false
-                            );
+                            activity.logo.synth.trigger(0, "G4", 1 / 4, synth, null, null, false);
                         },
                         250,
                         () => activity.logo.stopTurtle
@@ -322,11 +323,11 @@ function setupVolumeActions(activity) {
         static getSynthVolume(targetSynth, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            for (const synth in tur.singer.synthVolume) {
-                if (synth === targetSynth) {
-                    return last(tur.singer.synthVolume[synth]);
-                }
+            if (Object.prototype.hasOwnProperty.call(tur.singer.synthVolume, targetSynth)) {
+                return last(tur.singer.synthVolume[targetSynth]);
             }
+
+            return 50;
         }
     };
 }

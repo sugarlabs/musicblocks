@@ -262,6 +262,32 @@ describe("TrashController.restoreTrashById", () => {
         expect(primaryTurtle.inTrash).toBe(false);
     });
 
+    test("restores a trashed start block whose primary turtle has a null container", () => {
+        const activity = makeActivity();
+        const block = makeBlock({ name: "start" });
+        block.value = "turtle1";
+        activity.blocks.blockList.blk1 = block;
+        activity.blocks.trashStacks = ["blk1"];
+
+        const companionTurtle = { inTrash: true, container: null };
+        const primaryTurtle = {
+            inTrash: true,
+            container: null,
+            companionTurtle: "turtle2"
+        };
+        activity.turtles.getTurtle.mockImplementation(id => {
+            if (id === "turtle1") return primaryTurtle;
+            if (id === "turtle2") return companionTurtle;
+            return undefined;
+        });
+
+        const controller = new TrashController(activity);
+
+        expect(() => controller.restoreTrashById("blk1")).not.toThrow();
+        expect(primaryTurtle.inTrash).toBe(false);
+        expect(companionTurtle.inTrash).toBe(false);
+    });
+
     test("re-registers a trashed action block under a unique name", () => {
         const activity = makeActivity();
         const actionArg = {
@@ -324,6 +350,30 @@ describe("TrashController.renderTrashView", () => {
         expect(trashView.querySelectorAll(".trash-item").length).toBe(2);
         expect(document.getElementById("restoreLastIcon")).not.toBeNull();
         expect(document.getElementById("restoreAllIcon")).not.toBeNull();
+        expect(document.getElementById("restoreLastIcon").dataset.tooltip).toBe(
+            "Restore last item"
+        );
+        expect(document.getElementById("restoreAllIcon").dataset.tooltip).toBe("Restore all items");
+    });
+
+    test("initializes restore controls with the standard toolbar tooltip", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList.blk1 = makeBlock();
+        activity.blocks.trashStacks = ["blk1"];
+        const tooltip = jest.fn();
+        const originalJQuery = window.jQuery;
+        window.jQuery = jest.fn(() => ({ tooltip }));
+        const controller = new TrashController(activity);
+
+        controller.renderTrashView();
+
+        expect(window.jQuery).toHaveBeenCalledWith("#trashView .tooltipped");
+        expect(tooltip).toHaveBeenCalledWith({ html: true, delay: 100 });
+        if (originalJQuery) {
+            window.jQuery = originalJQuery;
+        } else {
+            delete window.jQuery;
+        }
     });
 
     test("replaces an existing trashView rather than appending a duplicate", () => {
@@ -336,6 +386,26 @@ describe("TrashController.renderTrashView", () => {
         controller.renderTrashView();
 
         expect(document.querySelectorAll("#trashView").length).toBe(1);
+    });
+
+    test("removes restore-control tooltips before replacing the trash view", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList.blk1 = makeBlock();
+        activity.blocks.trashStacks = ["blk1"];
+        const tooltip = jest.fn();
+        const originalJQuery = window.jQuery;
+        window.jQuery = jest.fn(() => ({ tooltip }));
+        const controller = new TrashController(activity);
+
+        controller.renderTrashView();
+        controller.renderTrashView();
+
+        expect(tooltip).toHaveBeenCalledWith("remove");
+        if (originalJQuery) {
+            window.jQuery = originalJQuery;
+        } else {
+            delete window.jQuery;
+        }
     });
 
     test("clicking a trash item restores that block", () => {

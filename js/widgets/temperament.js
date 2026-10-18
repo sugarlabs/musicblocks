@@ -17,20 +17,23 @@
  */
 
 /*
-   global
+    global
 
-   _, addTemperamentToDictionary, buildScale,
-   deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-   getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
- */
+    TemperamentUI, _, addTemperamentToDictionary, buildScale,
+    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
+    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentsList,
+    getTemperamentRatio, isCustomTemperament, isUnsafeObjectKey, last,
+    normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
+    PREVIEWVOLUME, rationalToFraction, setOctaveRatio, SHARP, Singer,
+    TuningFormats, updateTemperaments, frequencyToPitch, clampNumber,
+    ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
+    closeSharePopup
+*/
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
 
 /** AMD module dependencies for lazy loading. */
-TemperamentWidget.dependencies = ["widgets/temperament"];
+TemperamentWidget.dependencies = ["widgets/TemperamentUI", "widgets/temperament"];
 
 /**
  * Represents a widget for managing temperament settings.
@@ -89,6 +92,21 @@ const overDivisionCap = (activity, count) => {
     return true;
 };
 
+/**
+ * Builds the slug used in export file names: lowercased name with every run
+ * of non-alphanumerics replaced by "-", leading/trailing "-" stripped;
+ * an empty slug falls back to "custom".
+ * @param {string} name - The temperament name.
+ * @returns {string} The slug.
+ */
+const temperamentSlug = name => {
+    const slug = String(name)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    return slug === "" ? "custom" : slug;
+};
+
 function TemperamentWidget() {
     // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
@@ -109,8 +127,9 @@ function TemperamentWidget() {
      * Reference to the temperament table div. Created in init() since it
      * is not needed (and should not be attached to the DOM) until the
      * widget is actually opened.
-     * @type {HTMLElement}
+     * @type {HTMLElement|null}
      */
+    this.temperamentTableDiv = null;
     let temperamentTableDiv;
 
     const _stripCents = n => n.replace(/\(.*?\)/g, "");
@@ -126,6 +145,87 @@ function TemperamentWidget() {
      */
     this.inTemperament = null;
     this._playTimeout = null;
+
+    /**
+     * Timer manager for managing all widget timeouts safely.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+        this._playTimeout = null;
+
+        return count;
+    };
 
     /**
      * Last triggered event.
@@ -196,138 +296,16 @@ function TemperamentWidget() {
         return frequencies;
     };
 
-    /** Sets a wheelnav nav item's fill/hover/path/selected color attributes to one color. */
-    const setNavItemColor = (navObj, index, color) => {
-        navObj.navItems[index].fillAttr = color;
-        navObj.navItems[index].sliceHoverAttr.fill = color;
-        navObj.navItems[index].slicePathAttr.fill = color;
-        navObj.navItems[index].sliceSelectedAttr.fill = color;
-    };
-
-    /** Builds the "preview"/"done" button pair shown while editing a temperament. */
-    const addPreviewDoneButtonPair = (divAppend, container, marginLeft, preview) => {
-        divAppend.id = "divAppend";
-        divAppend.textContent = "";
-        const previewDiv = document.createElement("div");
-        previewDiv.id = "preview";
-        previewDiv.style.cssFloat = "left";
-        previewDiv.textContent = preview ? _("back") : _("preview");
-        const doneDiv = document.createElement("div");
-        doneDiv.id = "done_";
-        doneDiv.style.cssFloat = "right";
-        doneDiv.textContent = _("done");
-        divAppend.appendChild(previewDiv);
-        divAppend.appendChild(doneDiv);
-        divAppend.style.textAlign = "center";
-        divAppend.style.marginLeft = marginLeft;
-        divAppend.style.height = "32px";
-        divAppend.style.marginTop = "40px";
-        divAppend.style.overflow = "auto";
-        container.append(divAppend);
-
-        const divAppend1 = docById("preview");
-        divAppend1.style.height = "30px";
-        divAppend1.style.marginLeft = "3px";
-        divAppend1.style.backgroundColor = platformColor.selectorBackground;
-        divAppend1.style.width = "215px";
-
-        const divAppend2 = docById("done_");
-        divAppend2.style.height = "30px";
-        divAppend2.style.marginRight = "3px";
-        divAppend2.style.backgroundColor = platformColor.selectorBackground;
-        divAppend2.style.width = "205px";
-    };
-
-    /**
-     * Creates the main wheel for the circle of notes.
-     * @param {number[]} [ratios] - The ratios for the wheel.
-     * @param {number} [pitchNumber] - The pitch number.
-     * @returns {void}
-     */
-    this.createMainWheel = function (ratios, pitchNumber) {
-        if (ratios === undefined) {
-            ratios = this.ratios;
-        }
-        if (pitchNumber === undefined) {
-            pitchNumber = this.pitchNumber;
-        }
-        const radius = 150;
-        const height = 2 * radius + 60;
-
-        const labels = [];
-        for (let j = 0; j < pitchNumber; j++) {
-            labels.push(j.toString());
-        }
-
-        this.notesCircle = new wheelnav("wheelDiv2", null, 350, 350);
-        this.notesCircle.wheelRadius = 230;
-        this.notesCircle.navItemsEnabled = false;
-        this.notesCircle.navAngle = 270;
-        this.notesCircle.navItemsContinuous = true;
-        this.notesCircle.navItemsCentered = false;
-        this.notesCircle.slicePathFunction = slicePath().MenuSliceWithoutLine;
-        this.notesCircle.slicePathCustom = slicePath().MenuSliceCustomization();
-        this.notesCircle.sliceSelectedPathCustom = this.notesCircle.slicePathCustom;
-        this.notesCircle.sliceInitPathCustom = this.notesCircle.slicePathCustom;
-        this.notesCircle.initWheel(labels);
-        const angle = [];
-        const baseAngle = [];
-        const sliceAngle = [];
-        const angleDiff = [];
-        for (let i = 0; i < this.notesCircle.navItemCount; i++) {
-            this.notesCircle.navItems[i].fillAttr = platformColor.selectorBackground || "#c8C8C8";
-            this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-            this.notesCircle.navItems[i].titleSelectedAttr.font =
-                "20 20px Impact, Charcoal, sans-serif";
-            angle[i] = ratioToWheelAngle(ratios[i], this.powerBase);
-            if (i !== 0) {
-                if (i === pitchNumber - 1) {
-                    angleDiff[i - 1] = angle[0] + 360 - angle[i];
-                } else {
-                    angleDiff[i - 1] = angle[i] - angle[i - 1];
-                }
-            }
-            if (i === 0) {
-                sliceAngle[i] = 360 / pitchNumber;
-                baseAngle[i] = this.notesCircle.navAngle - sliceAngle[0] / 2;
-            } else {
-                baseAngle[i] = baseAngle[i - 1] + sliceAngle[i - 1];
-                sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
-            }
-            this.notesCircle.navItems[i].sliceAngle = sliceAngle[i];
-        }
-
-        let menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
-        for (let i = 0; i < angleDiff.length; i++) {
-            if (angleDiff[i] < 11) {
-                menuRadius = (2 * Math.PI * radius) / pitchNumber / 6;
-            }
-        }
-        if (menuRadius > 29) {
-            menuRadius = (2 * Math.PI * radius) / 33;
-        }
-        this.notesCircle.slicePathCustom.menuRadius = menuRadius;
-        this.notesCircle.createWheel();
-
-        docById("wheelDiv2").style.position = "absolute";
-        docById("wheelDiv2").style.height = height + "px";
-        docById("wheelDiv2").style.width = BUTTONDIVWIDTH + "px";
-        docById("wheelDiv2").style.zIndex = 5;
-    };
+    this.MAX_DIVISIONS = MAX_DIVISIONS;
+    this.overDivisionCap = overDivisionCap;
+    this.ratioToCents = ratioToCents;
+    this.trustedKey = trustedKey;
+    this.computeFrequencies = computeFrequencies;
 
     this._freqToCents = (freq, baseFreq) => ratioToCents(freq / baseFreq, 2);
 
     /** Converts a cents offset back to absolute frequency. */
     this._centsToFreq = (cents, baseFreq) => baseFreq * Math.pow(2, cents / 1200);
-
-    /** Hides and removes a wheelnav wheel if its container div is present in the DOM. */
-    const removeWheelIfPresent = (divId, wheel) => {
-        const el = docById(divId);
-        if (el !== null) {
-            el.style.display = "none";
-            if (wheel && wheel.removeWheel) wheel.removeWheel();
-        }
-    };
 
     /**
      * Draws the visualizer view: 12-EDO reference ring with colored spokes
@@ -495,47 +473,48 @@ function TemperamentWidget() {
         that._playAllRunning = false;
         const _playAll = function () {
             if (that._playAllRunning) {
-                clearTimeout(that._playAllTimer);
+                that._clearWidgetTimeout(that._playAllTimer);
+                that._playAllTimer = null;
                 that._playAllRunning = false;
                 flashDot = -1;
                 _drawCircle();
+                _updateRemoveButton();
                 return;
             }
+            if (that._vizMenu) _removeMenu();
+            dragIndex = -1;
+            lockedDrag = false;
+            highlightDot = -1;
+            _highlightTableRow(-1);
             that._playAllRunning = true;
+            _updateRemoveButton();
+            // Play up the scale, the octave exactly once, then back down.
+            // frequencies[] may or may not carry an octave entry at
+            // pitchNumber, so only iterate the pitches within the octave
+            // and synthesize the octave explicitly. The octave sits at the
+            // same position on the circle as the tonic, so highlight dot 0.
+            const n = Math.min(that.pitchNumber, that.frequencies.length);
+            const sequence = [];
+            for (let k = 0; k < n; k++) sequence.push([k]);
+            sequence.push([0, Number(that.frequencies[0]) * that.powerBase]);
+            for (let k = n - 1; k >= 0; k--) sequence.push([k]);
             let i = 0;
-            let forward = true;
-            let octaveWrap = false;
             const step = function () {
                 if (!that._playAllRunning) {
                     flashDot = -1;
                     _drawCircle();
                     return;
                 }
-                // Guard: only play valid indices
-                if (octaveWrap) {
-                    _playNote(0, that.frequencies[0] * that.powerBase);
-                    octaveWrap = false;
-                    forward = false;
-                    i = that.frequencies.length;
-                } else if (i >= 0 && i < that.frequencies.length) {
-                    _playNote(i);
-                }
-                // Advance
-                if (forward) {
-                    i++;
-                    if (i >= that.frequencies.length) {
-                        octaveWrap = true;
-                    }
-                } else {
-                    i--;
-                    if (i < 0) {
-                        that._playAllRunning = false;
-                        setTimeout(function () {
-                            flashDot = -1;
-                            _drawCircle();
-                        }, 200);
-                        return;
-                    }
+                _playNote(sequence[i][0], sequence[i][1]);
+                i++;
+                if (i >= sequence.length) {
+                    that._playAllRunning = false;
+                    _updateRemoveButton();
+                    that._setWidgetTimeout(function () {
+                        flashDot = -1;
+                        _drawCircle();
+                    }, 200);
+                    return;
                 }
                 // Pace the run by the project tempo factor (matches the
                 // Singer.defaultBPMFactor pattern used for note durations).
@@ -543,7 +522,7 @@ function TemperamentWidget() {
                     typeof Singer !== "undefined" && Singer.defaultBPMFactor
                         ? 300 * Singer.defaultBPMFactor
                         : 300;
-                that._playAllTimer = setTimeout(step, gap);
+                that._playAllTimer = that._setWidgetTimeout(step, gap);
             };
             step();
         };
@@ -551,6 +530,7 @@ function TemperamentWidget() {
         that._playAll = _playAll;
 
         const _addPitch = function (dir) {
+            if (that._playAllRunning) return;
             const base = that.cents.slice(0, that.pitchNumber);
             const nGaps = base.length;
             const s = highlightDot >= 0 && highlightDot < that.cents.length ? highlightDot : -1;
@@ -586,11 +566,22 @@ function TemperamentWidget() {
         const _updateRemoveButton = () => {
             if (!that._vizToolbar) return;
             const btn = that._vizToolbar.removePitchBtn;
-            if (!btn || !btn.style) return;
-            const locked = highlightDot >= 0 && _isLocked(highlightDot);
-            btn.style.opacity = locked ? "0.4" : "1";
-            btn.style.pointerEvents = locked ? "none" : "auto";
-            btn.style.cursor = locked ? "not-allowed" : "pointer";
+            if (btn && btn.style) {
+                const locked =
+                    that._playAllRunning || (highlightDot >= 0 && _isLocked(highlightDot));
+                btn.style.opacity = locked ? "0.4" : "1";
+                btn.style.pointerEvents = locked ? "none" : "auto";
+                btn.style.cursor = locked ? "not-allowed" : "pointer";
+            }
+            const addAfter = that._vizToolbar.addPitchAfterBtn;
+            const addBefore = that._vizToolbar.addPitchBeforeBtn;
+            for (const addBtn of [addAfter, addBefore]) {
+                if (addBtn && addBtn.style) {
+                    addBtn.style.opacity = that._playAllRunning ? "0.4" : "1";
+                    addBtn.style.pointerEvents = that._playAllRunning ? "none" : "auto";
+                    addBtn.style.cursor = that._playAllRunning ? "not-allowed" : "pointer";
+                }
+            }
         };
 
         // ── Canvas ──
@@ -670,6 +661,7 @@ function TemperamentWidget() {
         };
 
         canvas.onkeydown = function (e) {
+            if (that._playAllRunning) return;
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
                 focusedDot = (focusedDot + 1) % that.pitchNumber;
@@ -750,7 +742,7 @@ function TemperamentWidget() {
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                if (i === highlightDot || i === flashDot) {
+                if (i === flashDot || (!that._playAllRunning && i === highlightDot)) {
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#ffeb3b";
@@ -849,7 +841,7 @@ function TemperamentWidget() {
             td.style.cursor = _isLocked(i) ? "default" : "text";
             td.ondblclick = ev => {
                 ev.stopPropagation();
-                if (_isLocked(i)) return;
+                if (_isLocked(i) || that._playAllRunning) return;
                 const prev = getPrev(i);
                 const next = getNext(i);
                 const cur = getCur(i);
@@ -872,6 +864,10 @@ function TemperamentWidget() {
                 input.focus();
                 input.select();
                 const commit = () => {
+                    if (that._playAllRunning) {
+                        _updateTableRow(i);
+                        return;
+                    }
                     let v = parseFloat(input.value);
                     if (isNaN(v)) {
                         _updateTableRow(i);
@@ -955,6 +951,7 @@ function TemperamentWidget() {
                             : bgColor;
                 };
                 tr.onclick = function () {
+                    if (that._playAllRunning) return;
                     highlightDot = i;
                     _drawCircle();
                     _highlightTableRow(i);
@@ -1122,7 +1119,7 @@ function TemperamentWidget() {
         };
 
         const _removePitch = function (index) {
-            if (that.pitchNumber <= 1) return;
+            if (that._playAllRunning || that.pitchNumber <= 1) return;
             if (index < 0 || index >= that.pitchNumber) return;
             if (_isLocked(index)) return;
             that.cents.splice(index, 1);
@@ -1150,7 +1147,7 @@ function TemperamentWidget() {
             );
             flashDot = index;
             _drawCircle();
-            setTimeout(function () {
+            that._setWidgetTimeout(function () {
                 flashDot = -1;
                 _drawCircle();
             }, 200);
@@ -1189,7 +1186,7 @@ function TemperamentWidget() {
                 : that.scale;
             that.scaleNotes = buildScale(that.scale);
             that.scaleNotes = that.scaleNotes[0];
-            that.powerBase = 2;
+            that.powerBase = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
 
             const startingPitch = that._logo.synth.startingPitch;
             that.notes = [];
@@ -1277,13 +1274,16 @@ function TemperamentWidget() {
             that._visualizerView();
         };
 
+        // Expose on the widget instance so import can apply a registered temperament
+        that._loadTemperament = _loadTemperament;
+
         let dragIndex = -1;
         let dragMoved = false;
         let lockedDrag = false;
         let longPressTimer = null;
         const _clearLongPress = () => {
             if (longPressTimer) {
-                clearTimeout(longPressTimer);
+                that._clearWidgetTimeout(longPressTimer);
                 longPressTimer = null;
             }
         };
@@ -1307,6 +1307,7 @@ function TemperamentWidget() {
         };
 
         const _showMenu = function (e, index) {
+            if (that._playAllRunning) return;
             e.preventDefault();
             _removeMenu();
             const menu = document.createElement("div");
@@ -1379,7 +1380,7 @@ function TemperamentWidget() {
             document.body.appendChild(menu);
             that._vizMenu = menu;
             that._vizMenuClose = _closeMenu;
-            setTimeout(function () {
+            that._setWidgetTimeout(function () {
                 if (that._vizMenu) document.addEventListener("mousedown", _closeMenu);
             }, 0);
         };
@@ -1413,7 +1414,7 @@ function TemperamentWidget() {
         };
 
         canvas.onmousedown = function (e) {
-            if (e.button !== 0) return;
+            if (that._playAllRunning || e.button !== 0) return;
             const [x, y] = _canvasCoords(e, canvas);
             const hit = _findNearest(x, y, dotR + 8);
             if (hit !== null) {
@@ -1436,6 +1437,10 @@ function TemperamentWidget() {
         };
 
         canvas.onmousemove = function (e) {
+            if (that._playAllRunning) {
+                canvas.style.cursor = "default";
+                return;
+            }
             const [x, y] = _canvasCoords(e, canvas);
             if (dragIndex >= 0 && !lockedDrag) {
                 dragMoved = true;
@@ -1453,6 +1458,7 @@ function TemperamentWidget() {
         canvas.onmouseup = _endDrag;
 
         canvas.ontouchstart = function (e) {
+            if (that._playAllRunning) return;
             const [x, y] = _canvasCoords(e.touches[0], canvas);
             const hit = _findNearest(x, y, dotR + 16);
             if (hit !== null) {
@@ -1470,7 +1476,7 @@ function TemperamentWidget() {
                 _clearLongPress();
                 const tx = e.touches[0].clientX;
                 const ty = e.touches[0].clientY;
-                longPressTimer = setTimeout(() => {
+                longPressTimer = that._setWidgetTimeout(() => {
                     if (!dragMoved && dragIndex === hit) {
                         _showMenu({ clientX: tx, clientY: ty, preventDefault: () => {} }, hit);
                         dragIndex = -1;
@@ -1536,906 +1542,11 @@ function TemperamentWidget() {
     /**
      * Create new temperament — form to define a new temperament from scratch
      * (equal / ratios / arbitrary / octave space).
+     * Delegates to TemperamentUI.edit (PR #8815).
      * @returns {void}
      */
     this.edit = function () {
-        if (this._playAllRunning) {
-            clearTimeout(this._playAllTimer);
-            this._playAllRunning = false;
-        }
-        this._lastPlaybackIndex = 0;
-        this.editMode = null;
-        this._logo.synth.setMasterVolume(0);
-        this._logo.synth.stop();
-        const that = this;
-        if (that._vizToolbar) {
-            that._vizToolbar.playAllBtn2.onclick = null;
-            that._vizToolbar.addPitchAfterBtn.onclick = null;
-            that._vizToolbar.addPitchBeforeBtn.onclick = null;
-            that._vizToolbar.removePitchBtn.onclick = null;
-        }
-        removeWheelIfPresent("wheelDiv2", this.notesCircle);
-        temperamentTableDiv.textContent = "";
-        const editOctaveTable = document.createElement("table");
-        editOctaveTable.id = "editOctave";
-        editOctaveTable.setAttribute("width", BUTTONDIVWIDTH);
-        const editOctaveTbody = document.createElement("tbody");
-        const editOctaveTr = document.createElement("tr");
-        editOctaveTr.id = "menu";
-        editOctaveTbody.appendChild(editOctaveTr);
-        editOctaveTable.appendChild(editOctaveTbody);
-        temperamentTableDiv.appendChild(editOctaveTable);
-
-        const editMenus = [_("equal"), _("ratios"), _("arbitrary"), _("octave space")];
-
-        const menuItems = [];
-        for (let i = 0; i < editMenus.length; i++) {
-            const td = document.createElement("td");
-            td.className = "editMenus";
-            td.textContent = editMenus[i];
-            td.style.background = platformColor.selectorBackground;
-            td.style.height = 30 + "px";
-            td.style.textAlign = "center";
-            td.style.fontWeight = "bold";
-            menuItems.push(td);
-            editOctaveTr.appendChild(td);
-        }
-
-        const userEditTr = document.createElement("tr");
-        const userEditTd = document.createElement("td");
-        userEditTd.setAttribute("colspan", "4");
-        userEditTd.id = "userEdit";
-        userEditTr.appendChild(userEditTd);
-        editOctaveTbody.appendChild(userEditTr);
-
-        menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
-        that.equalEdit();
-
-        menuItems[0].onclick = function () {
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
-            that.equalEdit();
-        };
-
-        menuItems[1].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground || "#c8C8C8";
-            that.ratioEdit();
-        };
-
-        menuItems[2].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground || "#c8C8C8";
-            that.arbitraryEdit();
-        };
-
-        menuItems[3].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground || "#c8C8C8";
-            that.octaveSpaceEdit();
-        };
-    };
-
-    /** Recolors a preview wheelnav wheel's slices back to the default background. */
-    const paintPreviewWheelColors = (navObj, pitchNumber) => {
-        for (let i = 0; i < pitchNumber; i++) {
-            setNavItemColor(navObj, i, platformColor.selectorBackground || "#e0e0e0");
-        }
-        navObj.refreshWheel();
-    };
-
-    /**
-     * Enters the equal temperament edit mode.
-     * @returns {void}
-     */
-    this.equalEdit = function () {
-        this.editMode = "equal";
-        docById("userEdit").textContent = "";
-        const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
-        equalEdit.appendChild(document.createElement("br"));
-        equalEdit.appendChild(
-            document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
-        );
-        const octaveIn = document.createElement("input");
-        octaveIn.type = "text";
-        octaveIn.id = "octaveIn";
-        octaveIn.value = "0";
-        equalEdit.appendChild(octaveIn);
-        equalEdit.appendChild(
-            document.createTextNode(" \u00A0\u00A0 " + _("to") + "\u00A0\u00A0 ")
-        );
-        const octaveOut = document.createElement("input");
-        octaveOut.type = "text";
-        octaveOut.id = "octaveOut";
-        octaveOut.value = "0";
-        equalEdit.appendChild(octaveOut);
-        equalEdit.appendChild(document.createElement("br"));
-        equalEdit.appendChild(document.createElement("br"));
-        equalEdit.appendChild(
-            document.createTextNode(_("number of divisions") + " \u00A0\u00A0\u00A0\u00A0 ")
-        );
-        const divisions = document.createElement("input");
-        divisions.type = "number";
-        divisions.id = "divisions";
-        divisions.min = "1";
-        divisions.max = String(MAX_DIVISIONS);
-        divisions.step = "1";
-        divisions.title = _("Maximum 57 divisions");
-        divisions.value = this.pitchNumber;
-        equalEdit.appendChild(divisions);
-        equalEdit.style.paddingLeft = "80px";
-        const that = this;
-
-        const divAppend = document.createElement("div");
-
-        function addDivision(preview) {
-            addPreviewDoneButtonPair(divAppend, equalEdit, "-80px", preview);
-        }
-
-        addDivision(false);
-
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
-
-        let pitchNumber = this.pitchNumber;
-        let pitchNumber1 = Number(docById("octaveIn").value);
-        let pitchNumber2 = Number(docById("octaveOut").value);
-        let numDivs = Number(docById("divisions").value);
-        const ratio = [];
-        const compareRatios = [];
-        this.tempRatios = [];
-
-        divAppend.addEventListener("click", function (event) {
-            that.performEqualEdit(event);
-        });
-
-        this.performEqualEdit = function (event) {
-            pitchNumber1 = Number(docById("octaveIn").value);
-            pitchNumber2 = Number(docById("octaveOut").value);
-            numDivs = Number(docById("divisions").value);
-            if (!Number.isFinite(numDivs) || !Number.isInteger(numDivs) || numDivs < 1) {
-                this.activity.errorMsg(_("Please enter a valid number of divisions."), 3000);
-                return;
-            }
-            if (overDivisionCap(this.activity, numDivs)) return;
-            this.tempRatios = this.ratios.slice();
-            if (pitchNumber1 === pitchNumber2) {
-                for (let i = 0; i < numDivs; i++) {
-                    // 2^(n/edo) — equal temperament: ratio = 2^(pitch / divisions)
-                    ratio[i] = Math.pow(this.powerBase, i / numDivs);
-                }
-
-                // Fresh equal division replaces the scale; merging with the
-                // previous ratios produced hybrids (e.g. 12-EDO + 25-div
-                // request = 25 non-EDO notes).
-                this.tempRatios = ratio.slice(0, numDivs);
-                this.tempRatios.sort(function (a, b) {
-                    return a - b;
-                });
-
-                pitchNumber = this.tempRatios.length;
-                this.typeOfEdit = "equal";
-                this.divisions = numDivs;
-            } else {
-                pitchNumber = numDivs + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
-                const angle1 =
-                    270 +
-                    360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase));
-                const angle2 =
-                    270 +
-                    360 * (Math.log10(this.tempRatios[pitchNumber2]) / Math.log10(this.powerBase));
-                const divisionAngle = Math.abs(angle2 - angle1) / numDivs;
-                this.tempRatios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
-                for (let i = 0; i < numDivs - 1; i++) {
-                    const power = (Math.min(angle1, angle2) + divisionAngle * (i + 1) - 270) / 360;
-                    ratio[i] = Math.pow(this.powerBase, power);
-                    this.tempRatios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
-                    compareRatios[i] = this.tempRatios[i];
-                    compareRatios[i] = compareRatios[i].toFixed(2);
-                }
-                this.typeOfEdit = "nonequal";
-            }
-
-            if (event.target.textContent === _("done")) {
-                // Go to main "Circle of Notes"
-                this.ratios = this.tempRatios.slice();
-                const frequency = this.frequencies[0];
-                this.frequencies = computeFrequencies(this.ratios, frequency, pitchNumber);
-
-                this.pitchNumber = pitchNumber;
-                for (let k = 0; k < pitchNumber; k++) {
-                    this.cents[k] = ratioToCents(this.ratios[k], this.powerBase);
-                    const f = Number(this.frequencies[0]) * this.ratios[k];
-                    const o = frequencyToPitch(f, trustedKey(this.inTemperament));
-                    this.notes[k] = [o[0], o[1]];
-                    this.intervals[k] = "";
-                    this.ratiosNotesPair[k] = [this.ratios[k], this.notes[k]];
-                }
-                this.checkTemperament(compareRatios);
-                this._visualizerView();
-            } else if (event.target.textContent === _("preview")) {
-                //Preview Notes
-                docById("userEdit").textContent = "";
-                const wheelDiv2 = document.createElement("div");
-                wheelDiv2.id = "wheelDiv2";
-                wheelDiv2.className = "wheelNav";
-                docById("userEdit").appendChild(wheelDiv2);
-                this.createMainWheel(this.tempRatios, pitchNumber);
-                paintPreviewWheelColors(this.notesCircle, pitchNumber);
-                docById("userEdit").style.paddingLeft = "0px";
-                addDivision(true);
-                divAppend.style.marginTop = docById("wheelDiv2").style.height;
-                docById("preview").style.marginLeft = "80px";
-
-                //make temperary
-                const ratios = this.tempRatios.slice();
-                const frequency = this.frequencies[0];
-                this.eqTempHzs = computeFrequencies(ratios, frequency, pitchNumber);
-                this.eqTempPitchNumber = pitchNumber;
-                this.checkTemperament(compareRatios);
-
-                docById("done_").onclick = function () {
-                    //Go to main Circle of Notes
-                    that.ratios = that.tempRatios.slice();
-                    const frequency = that.frequencies[0];
-                    that.frequencies = computeFrequencies(that.ratios, frequency, pitchNumber);
-
-                    that.pitchNumber = pitchNumber;
-                    for (let k = 0; k < pitchNumber; k++) {
-                        that.cents[k] = ratioToCents(that.ratios[k], that.powerBase);
-                        const f = Number(that.frequencies[0]) * that.ratios[k];
-                        const o = frequencyToPitch(f, trustedKey(that.inTemperament));
-                        that.notes[k] = [o[0], o[1]];
-                        that.intervals[k] = "";
-                        that.ratiosNotesPair[k] = [that.ratios[k], that.notes[k]];
-                    }
-                    that.eqTempPitchNumber = null;
-                    that.eqTempHzs = [];
-                    that.checkTemperament(compareRatios);
-                    that._visualizerView();
-                };
-
-                docById("preview").onclick = function () {
-                    that.equalEdit();
-                    that.eqTempPitchNumber = null;
-                    that.eqTempHzs = [];
-                };
-            }
-        };
-    };
-
-    /**
-     * Enters the ratio edit mode for adjusting temperament settings based on ratios.
-     * @returns {void}
-     */
-    this.ratioEdit = function () {
-        this.editMode = "ratio";
-        docById("userEdit").textContent = "";
-        const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
-        ratioEdit.appendChild(document.createElement("br"));
-        ratioEdit.appendChild(document.createTextNode(_("ratio") + " \u00A0\u00A0\u00A0\u00A0 "));
-        const ratioIn = document.createElement("input");
-        ratioIn.type = "text";
-        ratioIn.id = "ratioIn";
-        ratioIn.value = "1";
-        ratioEdit.appendChild(ratioIn);
-        ratioEdit.appendChild(document.createTextNode(" \u00A0\u00A0 : \u00A0\u00A0 "));
-        const ratioOut = document.createElement("input");
-        ratioOut.type = "text";
-        ratioOut.id = "ratioOut";
-        ratioOut.value = "1";
-        ratioEdit.appendChild(ratioOut);
-        ratioEdit.appendChild(document.createElement("br"));
-        ratioEdit.appendChild(document.createElement("br"));
-        ratioEdit.appendChild(
-            document.createTextNode(_("recursion") + " \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 ")
-        );
-        const recursion = document.createElement("input");
-        recursion.type = "number";
-        recursion.min = "1";
-        recursion.max = "56";
-        recursion.id = "recursion";
-        recursion.value = "1";
-        ratioEdit.appendChild(recursion);
-        ratioEdit.style.paddingLeft = "100px";
-        const that = this;
-
-        const divAppend = document.createElement("div");
-
-        function addButtons(preview) {
-            addPreviewDoneButtonPair(divAppend, ratioEdit, "-100px", preview);
-        }
-
-        addButtons(false);
-
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
-
-        divAppend.onclick = function (event) {
-            const input1 = docById("ratioIn").value;
-            const input2 = docById("ratioOut").value;
-            const recursion = docById("recursion").value;
-            const len = that.frequencies.length;
-            const ratio1 = input1 / input2;
-            if (
-                !isFinite(input1) ||
-                !isFinite(input2) ||
-                input1 <= 0 ||
-                input2 <= 0 ||
-                !isFinite(ratio1) ||
-                ratio1 <= 0 ||
-                ratio1 >= that.powerBase ||
-                input2 > input1 * that.powerBase
-            ) {
-                that.activity.errorMsg(
-                    _("Please enter a valid ratio (e.g. 3:2) within the octave space."),
-                    3000
-                );
-                return;
-            }
-            const ratio = [];
-            const frequency = [];
-            const ratioDifference = [];
-            const index = [];
-            const compareRatios = [];
-            that.tempRatios = that.ratios.slice();
-
-            const calculateRatios = function (i) {
-                if (frequency[i] < that.frequencies[len - 1]) {
-                    for (let j = 0; j < that.tempRatios.length; j++) {
-                        ratioDifference[j] = ratio[i] - that.tempRatios[j];
-                        if (ratioDifference[j] < 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 0, ratio[i]);
-                            break;
-                        }
-                        if (ratioDifference[j] === 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 1, ratio[i]);
-                            break;
-                        }
-                    }
-                } else {
-                    ratio[i] = ratio[i] / 2;
-                    frequency[i] = that.frequencies[0] * ratio[i];
-                    calculateRatios(i);
-                }
-            };
-
-            for (let i = 0; i < recursion; i++) {
-                ratio[i] = Math.pow(ratio1, i + 1);
-                frequency[i] = that.frequencies[0] * ratio[i];
-                calculateRatios(i);
-            }
-            that.tempRatios.sort(function (a, b) {
-                return a - b;
-            });
-            if (overDivisionCap(that.activity, that.tempRatios.length)) return;
-            const pitchNumber = that.tempRatios.length;
-            if (event.target.textContent === _("done")) {
-                that.ratios = that.tempRatios.slice();
-                that.typeOfEdit = "nonequal";
-                that.pitchNumber = that.ratios.length;
-                const frequency1 = that.frequencies[0];
-                that.frequencies = computeFrequencies(that.ratios, frequency1, that.pitchNumber);
-
-                for (let i = 0; i < that.ratios.length; i++) {
-                    compareRatios[i] = that.ratios[i];
-                    compareRatios[i] = compareRatios[i].toFixed(2);
-                }
-
-                that.checkTemperament(compareRatios);
-                that._visualizerView();
-            } else if (event.target.textContent === _("preview")) {
-                //Preview Notes
-                docById("userEdit").textContent = "";
-                const wheelDiv2 = document.createElement("div");
-                wheelDiv2.id = "wheelDiv2";
-                wheelDiv2.className = "wheelNav";
-                docById("userEdit").appendChild(wheelDiv2);
-                that.createMainWheel(that.tempRatios, pitchNumber);
-                paintPreviewWheelColors(that.notesCircle, pitchNumber);
-                docById("userEdit").style.paddingLeft = "0px";
-                addButtons(true);
-                divAppend.style.marginTop = docById("wheelDiv2").style.height;
-                docById("preview").style.marginLeft = "100px";
-
-                //make temperary
-                const ratios = that.tempRatios.slice();
-                that.typeOfEdit = "nonequal";
-                that.NEqTempPitchNumber = ratios.length;
-                const frequency1 = that.frequencies[0];
-                that.NEqTempHzs = computeFrequencies(ratios, frequency1, that.NEqTempPitchNumber);
-
-                for (let i = 0; i < ratios.length; i++) {
-                    compareRatios[i] = ratios[i];
-                    compareRatios[i] = compareRatios[i].toFixed(2);
-                }
-                that.checkTemperament(compareRatios);
-
-                docById("done_").onclick = function () {
-                    //Go to main Circle of Notes
-                    that.ratios = that.tempRatios.slice();
-                    that.pitchNumber = that.ratios.length;
-                    const frequency1 = that.frequencies[0];
-                    that.frequencies = computeFrequencies(
-                        that.ratios,
-                        frequency1,
-                        that.pitchNumber
-                    );
-
-                    for (let i = 0; i < that.ratios.length; i++) {
-                        compareRatios[i] = that.ratios[i];
-                        compareRatios[i] = compareRatios[i].toFixed(2);
-                    }
-
-                    that.checkTemperament(compareRatios);
-                    that._visualizerView();
-                    that.NEqTempPitchNumber = null;
-                    that.NEqTempHzs = [];
-                };
-
-                docById("preview").onclick = function () {
-                    that.ratioEdit();
-                    that.NEqTempPitchNumber = null;
-                    that.NEqTempHzs = [];
-                };
-            }
-        };
-    };
-
-    /**
-     * Enters the arbitrary edit mode for adjusting temperament settings arbitrarily.
-     * @returns {void}
-     */
-    this.arbitraryEdit = function () {
-        this.editMode = "arbitrary";
-        docById("userEdit").textContent = "";
-        const arbitraryEdit = docById("userEdit");
-        arbitraryEdit.appendChild(document.createElement("br"));
-        const wheelDiv3 = document.createElement("div");
-        wheelDiv3.id = "wheelDiv3";
-        wheelDiv3.className = "wheelNav";
-        arbitraryEdit.appendChild(wheelDiv3);
-        arbitraryEdit.style.paddingLeft = "0px";
-
-        const that = this;
-
-        const radius = 128;
-        const height = 2 * radius;
-        let angle1 = [];
-        this.tempRatios1 = this.ratios.slice();
-
-        this._createInnerWheel = function (ratios, pitchNumber) {
-            if (this.wheel1 !== undefined) {
-                docById("wheelDiv4").display = "none";
-                this.wheel1.removeWheel();
-            }
-            if (ratios === undefined) {
-                ratios = this.ratios;
-            }
-            if (pitchNumber === undefined) {
-                pitchNumber = this.pitchNumber;
-            }
-            const labels = [];
-            for (let j = 0; j < pitchNumber; j++) {
-                labels.push(j.toString());
-            }
-            docById("wheelDiv4").style.display = "";
-            docById("wheelDiv4").style.background = "none";
-            docById("wheelDiv4").style.position = "relative";
-            docById("wheelDiv4").style.zIndex = 5;
-            this.wheel1 = new wheelnav("wheelDiv4");
-            this.wheel1.wheelRadius = 200;
-            this.wheel1.navItemsEnabled = false;
-            this.wheel1.navAngle = 270;
-            this.wheel1.navItemsContinuous = true;
-            this.wheel1.navItemsCentered = false;
-            this.wheel1.slicePathFunction = slicePath().MenuSliceWithoutLine;
-            this.wheel1.slicePathCustom = slicePath().MenuSliceCustomization();
-            this.wheel1.sliceSelectedPathCustom = this.wheel1.slicePathCustom;
-            this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
-            this.wheel1.initWheel(labels);
-
-            const baseAngle = [];
-            const sliceAngle = [];
-            const angle = [];
-            const angleDiff = [];
-            for (let i = 0; i < this.wheel1.navItemCount; i++) {
-                this.wheel1.navItems[i].fillAttr = platformColor.selectorBackground || "#e0e0e0";
-                this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-                this.wheel1.navItems[i].titleSelectedAttr.font =
-                    "20 20px Impact, Charcoal, sans-serif";
-                angle[i] = ratioToWheelAngle(ratios[i], this.powerBase);
-                if (i !== 0) {
-                    if (i === this.pitchNumber - 1) {
-                        angleDiff[i - 1] = angle[0] + 360 - angle[i];
-                    } else {
-                        angleDiff[i - 1] = angle[i] - angle[i - 1];
-                    }
-                }
-                if (i === 0) {
-                    sliceAngle[i] = 360 / pitchNumber;
-                    baseAngle[i] = this.wheel1.navAngle - sliceAngle[0] / 2;
-                } else {
-                    baseAngle[i] = baseAngle[i - 1] + sliceAngle[i - 1];
-                    sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
-                }
-                this.wheel1.navItems[i].sliceAngle = sliceAngle[i];
-            }
-            let menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
-            for (let i = 0; i < angleDiff.length; i++) {
-                if (angleDiff[i] < 11) {
-                    menuRadius = (2 * Math.PI * radius) / this.pitchNumber / 6;
-                }
-            }
-            if (menuRadius > 29) {
-                menuRadius = (2 * Math.PI * radius) / 33;
-            }
-            this.wheel1.slicePathCustom.menuRadius = menuRadius;
-
-            if (docById("frequencySlider") !== null) {
-                docById("frequencySlider").oninput = function () {
-                    that._refreshInnerWheel();
-                };
-            }
-            this.wheel1.createWheel();
-        };
-        const wheelDiv4 = document.createElement("div");
-        wheelDiv4.id = "wheelDiv4";
-        wheelDiv4.className = "wheelNav";
-        arbitraryEdit.appendChild(wheelDiv4);
-        this._createInnerWheel();
-
-        const canvas1 = document.createElement("canvas");
-        canvas1.id = "circ1";
-        canvas1.setAttribute("width", BUTTONDIVWIDTH);
-        canvas1.setAttribute("height", height);
-        arbitraryEdit.appendChild(canvas1);
-
-        const canvas = docById("circ1");
-        canvas.style.position = "absolute";
-        canvas.style.zIndex = 1;
-        canvas.style.marginTop = "-305px";
-        const ctx = canvas.getContext("2d");
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-        ctx.fillStyle = "rgba(204, 0, 102, 0)";
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = platformColor.strokeColor || "#003300";
-        ctx.stroke();
-
-        this._createOuterWheel = function (ratios, pitchNumber) {
-            if (this.wheel !== undefined) {
-                docById("wheelDiv3").display = "none";
-                this.wheel.removeWheel();
-            }
-            if (pitchNumber === undefined) {
-                pitchNumber = this.pitchNumber;
-            }
-            if (ratios === undefined) {
-                ratios = this.ratios;
-            }
-            docById("wheelDiv3").style.display = "";
-            docById("wheelDiv3").style.background = "none";
-            this.wheel = new wheelnav("wheelDiv3", null, 600, 600);
-            this.wheel.wheelRadius = 300;
-            this.wheel.slicePathFunction = slicePath().DonutSlice;
-            this.wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this.wheel.slicePathCustom.minRadiusPercent = 0.9;
-            this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
-            this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
-            this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
-            this.wheel.colors = [
-                platformColor.selectorBackground || "#c0c0c0",
-                platformColor.selectorBackground || "#e0e0e0"
-            ];
-            this.wheel.titleRotateAngle = 90;
-            this.wheel.navItemsEnabled = false;
-
-            const minutes = [];
-            const angle = [];
-            const angleDiff1 = [];
-            const baseAngle1 = [];
-            const sliceAngle1 = [];
-            angle1 = [];
-            for (let i = 0; i <= pitchNumber; i++) {
-                if (i !== pitchNumber) {
-                    minutes.push("|");
-                }
-                //Change angles of outer circle
-                angle[i] = ratioToWheelAngle(ratios[i], this.powerBase);
-                if (i !== 0) {
-                    if (i === pitchNumber - 1) {
-                        angleDiff1[i - 1] = angle[0] + 360 - angle[i];
-                    } else {
-                        angleDiff1[i - 1] = angle[i] - angle[i - 1];
-                    }
-                    angle1[i - 1] = angle[i - 1] + angleDiff1[i - 1] / 2;
-                }
-            }
-            this.wheel.navAngle = 270 + angleDiff1[0] / 2;
-            this.wheel.initWheel(minutes);
-            for (let i = 0; i < pitchNumber; i++) {
-                if (i === 0) {
-                    sliceAngle1[i] = 360 / pitchNumber;
-                    baseAngle1[i] = this.wheel.navAngle - sliceAngle1[0] / 2;
-                } else {
-                    baseAngle1[i] = baseAngle1[i - 1] + sliceAngle1[i - 1];
-                    sliceAngle1[i] = 2 * (angle1[i] - baseAngle1[i]);
-                }
-                this.wheel.navItems[i].sliceAngle = sliceAngle1[i];
-            }
-            this.wheel.createWheel();
-            docById("wheelDiv3").style.position = "absolute";
-            docById("wheelDiv3").style.zIndex = 10;
-            docById("wheelDiv3").style.marginTop = 15 + "px";
-            docById("wheelDiv3").style.marginLeft = 37 + "px";
-            docById("wheelDiv3").addEventListener("mouseover", function (e) {
-                that.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
-            });
-        };
-
-        this._createOuterWheel();
-
-        const divAppend = document.createElement("div");
-        divAppend.id = "divAppend";
-        divAppend.textContent = _("done");
-        divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
-        divAppend.style.marginTop = "40px";
-        divAppend.style.overflow = "auto";
-        arbitraryEdit.append(divAppend);
-
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
-
-        divAppend.onclick = function () {
-            that.ratios = that.tempRatios1.slice();
-            that.typeOfEdit = "nonequal";
-            that.pitchNumber = that.ratios.length;
-            const compareRatios = [];
-            const frequency1 = that.frequencies[0];
-            that.frequencies = computeFrequencies(that.ratios, frequency1, that.ratios.length);
-
-            for (let i = 0; i < that.ratios.length; i++) {
-                compareRatios[i] = that.ratios[i];
-                compareRatios[i] = compareRatios[i].toFixed(2);
-            }
-
-            that.checkTemperament(compareRatios);
-            that._visualizerView();
-        };
-    };
-
-    /**
-     * Handles the event when the user interacts with the sliders in the arbitrary edit mode.
-     * @param {Event} event - The event object triggered by the slider interaction.
-     * @param {number} angle - The angle of the wheel.
-     * @param {number[]} ratios - The ratios representing the temperament.
-     * @param {number} pitchNumber - The number of pitches in the temperament.
-     * @returns {void}
-     */
-    this.arbitraryEditSlider = function (event, angle, ratios, pitchNumber) {
-        const frequency = this.frequencies[0];
-        const frequencies = computeFrequencies(ratios, frequency, pitchNumber);
-        for (let i = 0; i < pitchNumber; i++) {
-            if (event.target.parentNode.id === "wheelnav-wheelDiv3-title-" + i) {
-                const that = this;
-                if (docById("noteInfo1") !== null) {
-                    docById("noteInfo1").remove();
-                }
-                const noteInfo1 = document.createElement("div");
-                noteInfo1.className = "popup";
-                noteInfo1.id = "noteInfo1";
-                noteInfo1.style.width = "180px";
-                noteInfo1.style.height = "135px";
-                const myPopup = document.createElement("span");
-                myPopup.className = "popuptext";
-                myPopup.id = "myPopup";
-                noteInfo1.appendChild(myPopup);
-                docById("wheelDiv3").appendChild(noteInfo1);
-
-                const closeImg = document.createElement("img");
-                closeImg.src = "header-icons/close-button.svg";
-                closeImg.id = "close";
-                closeImg.title = _("Close");
-                closeImg.alt = _("Close");
-                closeImg.setAttribute("height", "20px");
-                closeImg.setAttribute("width", "20px");
-                closeImg.setAttribute("align", "right");
-                noteInfo1.appendChild(closeImg);
-
-                noteInfo1.appendChild(document.createElement("br"));
-                const centerNode = document.createElement("center");
-                const slider = document.createElement("input");
-                slider.type = "range";
-                slider.className = "sliders";
-                slider.id = "frequencySlider";
-                slider.style.width = "170px";
-                slider.style.background = "white";
-                slider.style.border = "0";
-                slider.setAttribute("min", frequencies[i]);
-                slider.setAttribute("max", frequencies[i + 1]);
-                slider.setAttribute("value", "30");
-                centerNode.appendChild(slider);
-                noteInfo1.appendChild(centerNode);
-
-                noteInfo1.appendChild(document.createTextNode(`\u00A0\u00A0${_("frequency")} : `));
-                const freqSpan = document.createElement("span");
-                freqSpan.className = "rangeslidervalue";
-                freqSpan.id = "frequencydiv";
-                freqSpan.textContent = frequencies[i];
-                noteInfo1.appendChild(freqSpan);
-
-                noteInfo1.appendChild(document.createElement("br"));
-                noteInfo1.appendChild(document.createElement("br"));
-                const doneDiv = document.createElement("div");
-                doneDiv.id = "done";
-                doneDiv.style.background = "rgb(196, 196, 196)";
-                const doneCenter = document.createElement("center");
-                doneCenter.textContent = _("done");
-                doneDiv.appendChild(doneCenter);
-                noteInfo1.appendChild(doneDiv);
-
-                docById("noteInfo1").style.top = "100px";
-                docById("noteInfo1").style.left = "90px";
-
-                docById("frequencySlider").oninput = function () {
-                    that._refreshInnerWheel();
-                };
-                docById("done").onclick = function () {
-                    that.tempRatios1 = that.tempRatios.slice();
-                    const pitchNumber = that.tempRatios1.length;
-                    that._createOuterWheel(that.tempRatios1, pitchNumber);
-                };
-                docById("close").onclick = function () {
-                    that.tempRatios = that.tempRatios1.slice();
-                    const pitchNumber = that.tempRatios.length;
-                    that._createInnerWheel(that.tempRatios, pitchNumber);
-                    docById("noteInfo1").remove();
-                };
-            }
-        }
-    };
-
-    /**
-     * Refreshes the inner wheel based on the frequency slider input.
-     * @returns {void}
-     */
-    this._refreshInnerWheel = function () {
-        docById("frequencydiv").textContent = docById("frequencySlider").value;
-        const frequency = docById("frequencySlider").value;
-        const ratio = frequency / this.frequencies[0];
-        const ratioDifference = [];
-        this.tempRatios = this.tempRatios1.slice();
-
-        const EPS = 1e-6;
-        for (let j = 0; j < this.tempRatios.length; j++) {
-            const diff = ratio - this.tempRatios[j];
-            if (diff < -EPS) {
-                if (overDivisionCap(this.activity, this.tempRatios.length)) return;
-                this.tempRatios.splice(j, 0, ratio);
-                break;
-            } else if (Math.abs(diff) < EPS) {
-                this.tempRatios.splice(j, 1, ratio);
-                break;
-            }
-        }
-        const pitchNumber = this.tempRatios.length;
-        this._logo.resetSynth(0);
-        this._logo.synth.trigger(
-            0,
-            frequency,
-            Singer.defaultBPMFactor * 0.01,
-            "electronic synth",
-            null,
-            null
-        );
-        this._createInnerWheel(this.tempRatios, pitchNumber);
-    };
-
-    /**
-     * Initiates the octave space edit mode.
-     * Allows the user to modify the octave space of the temperament.
-     * @returns {void}
-     */
-    this.octaveSpaceEdit = function () {
-        this.editMode = "octave";
-        docById("userEdit").textContent = "";
-        const len = this.ratios.length;
-        const octaveRatio = this.ratios[len - 1];
-        const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
-        octaveSpaceEdit.appendChild(document.createElement("br"));
-        octaveSpaceEdit.appendChild(document.createElement("br"));
-        octaveSpaceEdit.appendChild(
-            document.createTextNode(_("octave space") + " \u00A0\u00A0\u00A0\u00A0 ")
-        );
-        const startNote = document.createElement("input");
-        startNote.type = "text";
-        startNote.id = "startNote";
-        startNote.value = octaveRatio;
-        startNote.style.width = "50px";
-        octaveSpaceEdit.appendChild(startNote);
-        octaveSpaceEdit.appendChild(document.createTextNode(" \u00A0\u00A0 : \u00A0\u00A0 "));
-        const endNote = document.createElement("input");
-        endNote.type = "text";
-        endNote.id = "endNote";
-        endNote.value = "1";
-        endNote.style.width = "50px";
-        octaveSpaceEdit.appendChild(endNote);
-        octaveSpaceEdit.appendChild(document.createElement("br"));
-        octaveSpaceEdit.appendChild(document.createElement("br"));
-        octaveSpaceEdit.style.paddingLeft = "70px";
-        const that = this;
-
-        const divAppend = document.createElement("div");
-        divAppend.id = "divAppend";
-        divAppend.textContent = _("done");
-        divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
-        divAppend.style.marginLeft = "-70px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
-        divAppend.style.marginTop = "40px";
-        divAppend.style.overflow = "auto";
-        octaveSpaceEdit.append(divAppend);
-
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
-
-        divAppend.onclick = function () {
-            const startRatio = docById("startNote").value;
-            const endRatio = docById("endNote").value;
-            const ratio = startRatio / endRatio;
-            if (ratio !== 2) {
-                that.activity.textMsg(
-                    _("The octave ratio has changed. This changes temperament significantly."),
-                    3000
-                );
-            }
-            const powers = [];
-            const compareRatios = [];
-            const frequency = that.frequencies[0];
-            that.frequencies = [];
-
-            for (let i = 0; i < len; i++) {
-                powers[i] =
-                    that.pitchNumber * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
-                that.ratios[i] = Math.pow(ratio, powers[i] / that.pitchNumber);
-                compareRatios[i] = that.ratios[i].toFixed(2);
-                that.frequencies[i] = that.ratios[i] * frequency;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
-            }
-            that.powerBase = ratio;
-            that.typeOfEdit = "nonequal";
-            that.checkTemperament(compareRatios);
-            if (ratio !== 2) {
-                that.octaveChanged = true;
-            }
-            that._visualizerView();
-        };
+        TemperamentUI.edit(this);
     };
 
     /**
@@ -2489,6 +1600,251 @@ function TemperamentWidget() {
             // not the powerBase^(i/divisions) formula.
             this.typeOfEdit = "nonequal";
         }
+    };
+
+    /**
+     * Collects the current widget state into the export data format. Reads
+     * live state, so unsaved edits are reflected in the export.
+     * @returns {object|null} The export data, or null (after an error
+     * message) when the widget has no complete set of ratios to export.
+     */
+    this._temperamentExportData = function () {
+        const ratios = [];
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            let raw = this.ratios[i];
+            if (i === this.pitchNumber && !isFinite(Number(raw))) {
+                raw = this.powerBase;
+            }
+            const ratio = Number(raw);
+            if (!isFinite(ratio)) {
+                this.activity.errorMsg(_("No temperament to export."), 3000);
+                return null;
+            }
+            ratios.push(ratio);
+        }
+
+        const interval = [];
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            if (typeof this.intervals[i] === "string") {
+                interval.push(this.intervals[i]);
+            } else if (Array.isArray(this.notes[i])) {
+                interval.push(this.notes[i][0]);
+            } else if (typeof this.notes[i] === "string") {
+                interval.push(parseNoteString(_stripCents(this.notes[i]))[0]);
+            } else {
+                interval.push("");
+            }
+        }
+
+        return {
+            name: this.inTemperament,
+            pitchNumber: this.pitchNumber,
+            referencePitch: this._logo.synth.startingPitch,
+            interval: interval,
+            ratios: ratios
+        };
+    };
+
+    /**
+     * Exports the current temperament as a pretty-printed JSON file.
+     * @returns {void}
+     */
+    this._exportJson = function () {
+        const data = this._temperamentExportData();
+        if (data === null) {
+            return;
+        }
+
+        downloadTextFile(
+            JSON.stringify(data, null, 2),
+            "temperament-" + temperamentSlug(data.name) + ".json"
+        );
+    };
+
+    /**
+     * Exports the current temperament as a Scala (.scl) file: a header, the
+     * temperament name, the pitch count, and one absolute cents line per
+     * ratio above unison (1200 cents per octave, independent of the
+     * exported period).
+     * @returns {void}
+     */
+    this._exportScl = function () {
+        const data = this._temperamentExportData();
+        if (data === null) {
+            return;
+        }
+
+        const lines = ["! temperament.scl", "!", data.name, String(data.pitchNumber)];
+        for (let i = 1; i <= data.pitchNumber; i++) {
+            lines.push(ratioToCents(data.ratios[i], 2).toFixed(2));
+        }
+
+        downloadTextFile(
+            lines.join("\n") + "\n",
+            "temperament-" + temperamentSlug(data.name) + ".scl"
+        );
+    };
+
+    /**
+     * Imports a .json or .scl temperament file: parses and validates it,
+     * then registers the temperament in the dictionary and applies it.
+     * @returns {void}
+     */
+    this._importFile = function () {
+        readTextFile("myModeSclFile", (err, data) => {
+            if (err) {
+                this.activity.errorMsg(err.message);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            const ext = (data.file.name || "").toLowerCase();
+            let name;
+            let pitchNumber;
+            let ratios;
+            let referenceFrequency;
+
+            if (ext.endsWith(".json")) {
+                let def;
+                try {
+                    def = TuningFormats.parseTemperamentJson(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading JSON file: ") + e.message);
+                    return;
+                }
+                pitchNumber = def.pitchNumber;
+                ratios = def.ratios;
+                name = def.name || data.file.name.replace(/\.json$/i, "") || "custom";
+                if (typeof def.referencePitch === "string" && def.referencePitch !== "") {
+                    try {
+                        // Fixed equal-temperament reference: importing the
+                        // same JSON must yield the same frequency no
+                        // matter which temperament is selected.
+                        const parsed = parseNoteString(def.referencePitch);
+                        const resolved = pitchToFrequency(
+                            parsed[0],
+                            Number(parsed[1]),
+                            0,
+                            "c major",
+                            "equal"
+                        );
+                        if (Number.isFinite(resolved) && resolved > 0) {
+                            referenceFrequency = Number(resolved);
+                        }
+                    } catch (e) {
+                        // Fall through to the widget's current reference frequency.
+                    }
+                }
+            } else if (ext.endsWith(".scl")) {
+                let result;
+                try {
+                    result = TuningFormats.parseSclFile(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading .scl file: ") + e.message);
+                    return;
+                }
+                pitchNumber = result.pitchCount;
+                ratios = [1].concat(result.pitches.map(p => p.ratio));
+                for (let i = 1; i < ratios.length; i++) {
+                    if (!(ratios[i] > ratios[i - 1])) {
+                        this.activity.errorMsg(
+                            _("Invalid .scl file: pitches must be strictly ascending above 1/1.")
+                        );
+                        return;
+                    }
+                }
+                name = result.description || data.file.name.replace(/\.scl$/i, "") || "custom";
+            } else {
+                this.activity.errorMsg(_("Unsupported file type. Use .json or .scl."));
+                return;
+            }
+
+            if (overDivisionCap(this.activity, pitchNumber)) {
+                return;
+            }
+
+            this._registerImportedTemperament(name, pitchNumber, ratios, referenceFrequency);
+        });
+    };
+
+    /**
+     * Registers an imported temperament in the TEMPERAMENT dictionary and
+     * applies it to the widget.
+     * @param {string} name - The temperament name.
+     * @param {number} pitchNumber - The number of pitches per period.
+     * @param {number} ratios - Length pitchNumber + 1, with ratios[0] the
+     * unison and ratios[pitchNumber] the period.
+     * @param {number} [startHz] - Reference frequency for pitch labels;
+     * falls back to the widget's current first frequency.
+     * @returns {boolean} True when the temperament was registered.
+     */
+    this._registerImportedTemperament = function (name, pitchNumber, ratios, startHz) {
+        if (isUnsafeObjectKey(name)) {
+            this.activity.errorMsg(_("Invalid temperament name."), 3000);
+            return false;
+        }
+
+        // Re-importing under an existing custom name refreshes that entry
+        // in place (mirroring the mode widget); only built-in collisions
+        // are renamed, looping until the suffixed name is unused.
+        while (getTemperament(name) !== undefined && !isCustomTemperament(name)) {
+            name = name + " (imported)";
+        }
+
+        const resolvedHz =
+            Number.isFinite(Number(startHz)) && Number(startHz) > 0
+                ? Number(startHz)
+                : Number(this.frequencies[0]);
+        if (!isFinite(resolvedHz) || resolvedHz <= 0) {
+            this.activity.errorMsg(_("Cannot import: no reference frequency."), 3000);
+            return false;
+        }
+
+        const period = ratios[pitchNumber];
+        if (!Number.isFinite(period) || period <= 1 || period > 1e6) {
+            this.activity.errorMsg(_("Invalid temperament: octave ratio out of range."), 3000);
+            return false;
+        }
+
+        const entry = { pitchNumber: pitchNumber, octaveRatio: period };
+        for (let i = 0; i < pitchNumber; i++) {
+            const pitch = frequencyToPitch(ratios[i] * resolvedHz);
+            entry["" + i] = [ratios[i], pitch[0], pitch[1]];
+        }
+
+        addTemperamentToDictionary(name, entry);
+        updateTemperaments();
+        Singer.clearPitchToFrequencyCache();
+        setOctaveRatio(ratios[pitchNumber]);
+
+        this._logo.customTemperamentDefined = true;
+        this.activity.blocks.protoBlockDict["custompitch"].hidden = false;
+        this.activity.blocks.palettes.updatePalettes("pitch");
+
+        this._loadTemperament(name);
+
+        this.activity.textMsg(_("Temperament imported: ") + name, 3000);
+        return true;
+    };
+
+    /**
+     * Builds the export/import popup anchored to a toolbar button. Clicking
+     * the button again, choosing an item, or clicking outside closes it.
+     * @param {HTMLElement} anchor - The Share button the popup is anchored to.
+     * @returns {void}
+     */
+    this._createSharePopup = function (anchor) {
+        createSharePopup(
+            "temperamentSharePopup",
+            [
+                [_("Export .scl"), () => this._exportScl()],
+                [_("Export JSON"), () => this._exportJson()],
+                [_("Import"), () => this._importFile()]
+            ],
+            anchor
+        );
     };
 
     /**
@@ -2744,7 +2100,10 @@ function TemperamentWidget() {
 
         if (isCustomTemperament(this.inTemperament)) {
             deleteTemperamentFromList(this.inTemperament);
-            const newTemperament = { pitchNumber: this.pitchNumber };
+            const newTemperament = {
+                pitchNumber: this.pitchNumber,
+                octaveRatio: this.powerBase
+            };
             for (let i = 0; i < this.pitchNumber; i++) {
                 const number = "" + i;
                 const cleanName = _stripCents(this.notes[i]);
@@ -2753,6 +2112,11 @@ function TemperamentWidget() {
             }
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
+            // The redefined temperament keeps its old name, so any frequency
+            // already cached under that name (see Singer.getCachedPitchToFrequency)
+            // would otherwise keep playing at the pre-edit tuning until the
+            // project is stopped and restarted.
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (isCustomTemperament(this.inTemperament)) {
@@ -2852,6 +2216,7 @@ function TemperamentWidget() {
         this._cellScale = w / 1200;
 
         temperamentTableDiv = document.createElement("div");
+        this.temperamentTableDiv = temperamentTableDiv;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "temperament");
         this.widgetWindow = widgetWindow;
@@ -2866,11 +2231,11 @@ function TemperamentWidget() {
         const that = this;
 
         widgetWindow.onclose = function () {
-            if (that._playAllTimer) {
-                clearTimeout(that._playAllTimer);
-                that._playAllTimer = null;
-            }
+            that._clearWidgetTimers();
+            that._playing = false;
+            that._playAllTimer = null;
             that._playAllRunning = false;
+            closeSharePopup("temperamentSharePopup");
             if (that._vizMenu && that._vizMenu.parentNode) {
                 that._vizMenu.parentNode.removeChild(that._vizMenu);
                 that._vizMenu = null;
@@ -2879,16 +2244,12 @@ function TemperamentWidget() {
                 document.removeEventListener("mousedown", that._vizMenuClose);
                 that._vizMenuClose = null;
             }
-            if (that._playTimeout) {
-                clearTimeout(that._playTimeout);
-                that._playTimeout = null;
-            }
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));
 
-            removeWheelIfPresent("wheelDiv2", that.notesCircle);
-            removeWheelIfPresent("wheelDiv3", that.wheel);
-            removeWheelIfPresent("wheelDiv4", that.wheel1);
+            TemperamentUI._removeWheelIfPresent("wheelDiv2", that.notesCircle);
+            TemperamentUI._removeWheelIfPresent("wheelDiv3", that.wheel);
+            TemperamentUI._removeWheelIfPresent("wheelDiv4", that.wheel1);
 
             this.destroy();
         };
@@ -2905,6 +2266,11 @@ function TemperamentWidget() {
         );
         widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = function () {
             that._save();
+        };
+
+        const shareBtn = widgetWindow.addButton("share.svg", ICONSIZE, _("Share"));
+        shareBtn.onclick = () => {
+            that._createSharePopup(shareBtn);
         };
 
         const addPitchAfterBtn = widgetWindow.addButton(
@@ -2943,7 +2309,7 @@ function TemperamentWidget() {
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
+        this.powerBase = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
         const startingPitch = this._logo.synth.startingPitch;
         const str = [];
         const note = [];

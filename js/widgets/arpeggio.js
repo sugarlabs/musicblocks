@@ -16,7 +16,8 @@
    global
 
    _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE
+   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE,
+   ManagedTimer
 */
 /*
    Global locations
@@ -24,6 +25,8 @@
        getNote, setCustomChord
    js/utils/utils.js
         _, docById
+   js/utils/ManagedTimer.js
+        ManagedTimer
 */
 /* exported Arpeggio */
 
@@ -47,9 +50,39 @@ class Arpeggio {
         this._blockMap = []; // pairs storage
         this.defaultCols = Arpeggio.DEFAULTCOLS;
         this._playTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
         this._arpeggioCellTables = []; // cached arpeggioCellTable elements
         this._arpeggioTable = null; // cached arpeggioTable element
         this._keyHandler = null;
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -145,8 +178,11 @@ class Arpeggio {
                 this._keyHandler = null;
             }
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
             }
             this._playing = false;
             this._activity.logo.synth.stop();
@@ -353,9 +389,12 @@ class Arpeggio {
                 widgetWindow.getWidgetBody().style.left = "0px";
                 widgetWindow.getWidgetBody().style.height = "400px";
                 widgetWindow.getWidgetBody().style.width = "400px";
-                // const innerDiv = docById("arpeggioInnerDiv");
-                innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
-                innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+                docById("arpeggioOuterDiv").style.height =
+                    widgetWindow.getWidgetBody().style.height;
+                docById("arpeggioOuterDiv").style.width = widgetWindow.getWidgetBody().style.width;
+                docById("arpeggioInnerDiv").style.height =
+                    widgetWindow.getWidgetBody().style.height;
+                docById("arpeggioInnerDiv").style.width = widgetWindow.getWidgetBody().style.width;
             }
         };
 
@@ -650,7 +689,7 @@ class Arpeggio {
                 );
             }
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._activity.logo.synth.stop();
@@ -667,7 +706,7 @@ class Arpeggio {
         for (let n = 0; n < notesToPlay.length; n++) {
             const noteValue = notesToPlay[n][1];
             const letter = notesToPlay[n][0].slice(0, -1);
-            const octave = Number(notesToPlay[n][0].substr(notesToPlay[n][0].length - 1));
+            const octave = Number(notesToPlay[n][0].slice(notesToPlay[n][0].length - 1));
             for (let i = 0; i < pairs.length; i++) {
                 if (pairs[i][0] === -1) {
                     this._playList.push(["", noteValue]);
@@ -741,7 +780,7 @@ class Arpeggio {
                     null
                 );
             }
-            this._playTimeout = setTimeout(() => {
+            this._playTimeout = this._setWidgetTimeout(() => {
                 this.__playNote(i + 1);
             }, 2600 * this._playList[i][1]);
         } else {
@@ -916,7 +955,7 @@ class Arpeggio {
         if (this._playing) {
             this._playing = false;
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._activity.logo.synth.stop();

@@ -93,6 +93,7 @@ beforeEach(() => {
             window.widgetWindows._boundHandleGlobalMouseDown,
             true
         );
+        window.removeEventListener("resize", window.widgetWindows._boundHandleResize);
     }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
@@ -554,6 +555,75 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("viewport resize", () => {
+        test("keeps open windows within the viewport without moving windows that still fit", () => {
+            const offscreen = createTestWindow("Offscreen");
+            offscreen.setPosition(338, 141);
+            offscreen._frame.getBoundingClientRect = () => ({
+                left: 338,
+                top: 141,
+                width: 616,
+                height: 500
+            });
+
+            const fitting = createTestWindow("Fitting");
+            fitting.setPosition(100, 150);
+            fitting._frame.getBoundingClientRect = () => ({
+                left: 100,
+                top: 150,
+                width: 300,
+                height: 300
+            });
+
+            const originalWidth = window.innerWidth;
+            const originalHeight = window.innerHeight;
+            window.innerWidth = 900;
+            window.innerHeight = 700;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(offscreen._frame.style.left).toBe("284px");
+                expect(offscreen._frame.style.top).toBe("141px");
+                expect(fitting._frame.style.left).toBe("100px");
+                expect(fitting._frame.style.top).toBe("150px");
+            } finally {
+                window.innerWidth = originalWidth;
+                window.innerHeight = originalHeight;
+            }
+        });
+
+        test("repositions hidden windows when they are shown after a resize", () => {
+            const single = createTestWindow("Single");
+            const all = createTestWindow("All");
+            for (const win of [single, all]) {
+                win.setPosition(338, 141);
+                win._frame.getBoundingClientRect = () => ({
+                    left: parseFloat(win._frame.style.left),
+                    top: 141,
+                    width: 616,
+                    height: 500
+                });
+            }
+            window.widgetWindows.hideAllWindows();
+
+            const originalWidth = window.innerWidth;
+            window.innerWidth = 900;
+            try {
+                window.dispatchEvent(new Event("resize"));
+                expect(single._frame.style.left).toBe("338px");
+                expect(all._frame.style.left).toBe("338px");
+
+                single.show();
+                expect(single._frame.style.left).toBe("284px");
+                expect(all._frame.style.left).toBe("338px");
+
+                window.widgetWindows.showWindows();
+                expect(all._frame.style.left).toBe("284px");
+            } finally {
+                window.innerWidth = originalWidth;
+            }
+        });
+    });
+
     describe("_maximize and _restore", () => {
         test("_maximize sets _maximized to true", () => {
             const win = createTestWindow();
@@ -645,6 +715,52 @@ describe("widgetWindows", () => {
             win._restore();
 
             expect(win._savedPos).toBeNull();
+        });
+    });
+
+    describe("ARIA dialog and state semantics", () => {
+        test("frame is a focusable dialog labelled by its title element", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("tabindex")).toBe("-1");
+            expect(win._frame.getAttribute("aria-labelledby")).toBe(win._key + "WidgetID");
+        });
+
+        test("title bar and widget toolbar expose distinct toolbar roles", () => {
+            const win = createTestWindow();
+
+            expect(win._drag.getAttribute("role")).toBe("toolbar");
+            expect(win._toolbar.getAttribute("role")).toBe("toolbar");
+            expect(win._drag.getAttribute("aria-label")).not.toBe(
+                win._toolbar.getAttribute("aria-label")
+            );
+        });
+
+        test("maximize/restore keep the button aria-label in sync", () => {
+            const win = createTestWindow();
+
+            win._maximize();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Maximize window");
+        });
+
+        test("rollup/unroll toggle aria-expanded and rename the roll button", () => {
+            const win = createTestWindow();
+
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+
+            win._rollup();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("false");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Expand window");
+            expect(win._rollButton.title).toBe("Expand");
+
+            win.unroll();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+            expect(win._rollButton.title).toBe("Minimize");
         });
     });
 
@@ -838,6 +954,68 @@ describe("widgetWindows", () => {
             expect(win._rolled).toBe(false);
             expect(win._body.style.display).toBe("flex");
         });
+
+        test("destroy removes window elements and deletes key from openWindows", () => {
+            const win = createTestWindow("testDestroyKey");
+            const key = win._key;
+            expect(key in window.widgetWindows.openWindows).toBe(true);
+
+            win.destroy();
+
+            expect(key in window.widgetWindows.openWindows).toBe(false);
+            expect(window.widgetWindows.openWindows[key]).toBeUndefined();
+        });
+
+        test("sendToCenter uses the fallback height when nav is absent", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("132px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                if (nav && parent) parent.appendChild(nav);
+            }
+        });
+
+        test("sendToCenter preserves a zero nav height", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const zeroNav = document.createElement("nav");
+            Object.defineProperty(zeroNav, "offsetHeight", { value: 0 });
+            document.body.appendChild(zeroNav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("100px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                zeroNav.remove();
+                if (nav && parent) parent.appendChild(nav);
+            }
+        });
     });
 
     describe("widgetWindows global functions", () => {
@@ -889,8 +1067,8 @@ describe("widgetWindows", () => {
             expect(isOpen(902)).toBeTruthy();
         });
 
-        test("isOpen returns empty string for non-existent windows", () => {
-            expect(isOpen("nonexistent")).toBe("");
+        test("isOpen returns false for non-existent windows", () => {
+            expect(isOpen("nonexistent")).toBe(false);
         });
 
         test("windowFor uses saveAs as key when blockNo is missing", () => {
@@ -977,6 +1155,83 @@ describe("widgetWindows", () => {
                 expect(win1._frame.style.zIndex).toBe("10000");
             } finally {
                 toolbars.remove();
+            }
+        });
+
+        test("preserves focus when clicking a widget pie menu", () => {
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "wheelDivptm";
+            const slice = document.createElement("span");
+            pieMenu.appendChild(slice);
+            document.body.appendChild(pieMenu);
+
+            try {
+                const win1 = createTestWindow("Window 1");
+                const win2 = createTestWindow("Window 2");
+
+                win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+                expect(window.widgetWindows.focused).toBe(win1);
+
+                slice.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+                expect(window.widgetWindows.focused).toBe(win1);
+                expect(win1._frame.style.opacity).toBe("1");
+                expect(win1._frame.style.zIndex).toBe("10000");
+                expect(win2._frame.style.opacity).toBe("0.7");
+            } finally {
+                pieMenu.remove();
+            }
+        });
+
+        test("Escape leaves the focused window open while its pie menu is showing", () => {
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "wheelDivptm";
+            document.body.appendChild(pieMenu);
+
+            try {
+                const win = createTestWindow("Window 1");
+                const closeSpy = jest.spyOn(win, "onclose");
+
+                const escape = () =>
+                    document.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                    );
+
+                pieMenu.style.display = "";
+                escape();
+                expect(closeSpy).not.toHaveBeenCalled();
+
+                pieMenu.style.display = "none";
+                escape();
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                pieMenu.remove();
+            }
+        });
+
+        test("Escape leaves the focused window open while the Mode widget pie menu is showing", () => {
+            const wheelDiv = document.createElement("div");
+            wheelDiv.id = "wheelDiv";
+            document.body.appendChild(wheelDiv);
+
+            try {
+                const win = createTestWindow("Window 1");
+                const closeSpy = jest.spyOn(win, "onclose");
+
+                const escape = () =>
+                    document.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                    );
+
+                wheelDiv.style.display = "";
+                escape();
+                expect(closeSpy).not.toHaveBeenCalled();
+
+                wheelDiv.style.display = "none";
+                escape();
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                wheelDiv.remove();
             }
         });
 
@@ -1098,10 +1353,15 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Win 2");
             window.widgetWindows.focused = win1;
 
+            win1._overlay(true);
+
             window.widgetWindows.hideAllWindows();
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1._frame.style.zIndex).toBe("10");
+            expect(win1._overlayframe.style.zIndex).toBe("-1");
+            expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
             expect(window.widgetWindows.focused).toBeNull();
         });
 
@@ -1199,10 +1459,14 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow = jest.fn();
         });
 
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
         it("closes matching widget by name", () => {
             const mockElement = { textContent: "TestWidget", id: "" };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
@@ -1224,9 +1488,95 @@ describe("widgetWindows", () => {
                 "pitch drum": { close: jest.fn() }
             };
 
-            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+            window.widgetWindows.closeBlkWidgets("pitch drum");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
+        });
+
+        it("closes pitch slider using mapped key 'slider'", () => {
+            window.widgetWindows.openWindows = {
+                slider: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch slider");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+        });
+
+        it("closes music keyboard, pitch staircase, and status using mapped keys", () => {
+            window.widgetWindows.openWindows = {
+                "music keyboard": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("music keyboard");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("music keyboard");
+
+            window.widgetWindows.closeBlkWidgets("pitch staircase");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+            window.widgetWindows.closeBlkWidgets("status");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+        });
+
+        it("closes sampler using mapped key 'sampler'", () => {
+            window.widgetWindows.openWindows = {
+                sampler: { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("sampler");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes LEGO Bricks widget using mapped key 'LEGO Bricks'", () => {
+            window.widgetWindows.openWindows = {
+                "LEGO Bricks": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("LEGO Bricks");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("LEGO Bricks");
+        });
+
+        it("closes widgets when receiving localized block titles", () => {
+            const originalI18n = global._;
+            const translations = {
+                "pitch slider": "control deslizante de tono",
+                "music keyboard": "teclado musical",
+                "pitch staircase": "escalera de tono",
+                "status": "estado",
+                "sampler": "muestreador"
+            };
+            global._ = jest.fn(str => translations[str] || str);
+
+            window.widgetWindows.openWindows = {
+                "slider": { close: jest.fn() },
+                "pitch staircase": { close: jest.fn() },
+                "status": { close: jest.fn() },
+                "sampler": { close: jest.fn() }
+            };
+            windowFor({ blockNo: 7 }, "music keyboard");
+
+            try {
+                window.widgetWindows.closeBlkWidgets("control deslizante de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("slider");
+
+                window.widgetWindows.closeBlkWidgets("teclado musical");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("7");
+
+                window.widgetWindows.closeBlkWidgets("escalera de tono");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch staircase");
+
+                window.widgetWindows.closeBlkWidgets("estado");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("status");
+
+                window.widgetWindows.closeBlkWidgets("muestreador");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+            } finally {
+                global._ = originalI18n;
+            }
         });
 
         it("closes widget by matching element ID when display title changes", () => {
@@ -1235,7 +1585,7 @@ describe("widgetWindows", () => {
                 id: "custom modeWidgetID"
             };
 
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([mockElement]);
 
             window.widgetWindows.closeBlkWidgets("custom mode");
 
@@ -1243,13 +1593,45 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([
                 { textContent: "OtherWidget", id: "" }
             ]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
             expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("isReinitWidgetTitle()", () => {
+        it("recognizes titles used by open-widget stack reinitialization", () => {
+            expect(window.widgetWindows.isReinitWidgetTitle("tempo")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("LEGO Bricks")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("arpeggio")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("not a widget")).toBe(false);
+        });
+
+        it("keeps REINIT_WIDGET_TITLES as the single lookup source", () => {
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("custom mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("sampler")).toBe(false);
+        });
+
+        it("recognizes a localized title that differs from the English registry entry", () => {
+            // Temporarily replace _ with a translator that maps "pitch drum"
+            // to its German equivalent, simulating a non-English locale.
+            const originalTranslate = global._;
+
+            try {
+                global._ = str => (str === "pitch drum" ? "Tonhöhen-Schlagzeug" : str);
+
+                // The localized form should be recognized…
+                expect(window.widgetWindows.isReinitWidgetTitle("Tonhöhen-Schlagzeug")).toBe(true);
+                // …while the raw English string is no longer a match under this locale.
+                expect(window.widgetWindows.isReinitWidgetTitle("pitch drum")).toBe(false);
+            } finally {
+                global._ = originalTranslate;
+            }
         });
     });
 

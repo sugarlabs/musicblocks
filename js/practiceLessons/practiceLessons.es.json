@@ -1,0 +1,747 @@
+{
+    "theme": {
+        "title": "Las Islas de la Melodía Perdida",
+        "subtitle": "La búsqueda del tesoro escondido",
+        "intro": "\n      <section class=\"story-card\">\n      <h4>Comienza la historia</h4>\n\n      <div class=\"character-row\" aria-label=\"Meet Lyra and Choon\">\n      <span class=\"character-token lyra-token\">\n        <span class=\"character-name\">\n            Lyra\n        </span>\n\n        <span class=\"character-role\">Exploradora</span>\n      </span>\n\n      <span class=\"character-token beat-token\">\n        <span class=\"character-name\">\n            Choon\n        </span>\n        <span class=\"character-role\">Robot musical</span>\n      </span>\n    </div>\n\n      <p>¡Toda aventura necesita un equipo! <b>Lyra</b> es una exploradora valiente, y <b>Choon</b> es su alegre robot musical que puede oír melodías escondidas por todas partes.</p>\n\n      <p>La mágica <b>Gran Melodía</b> que unía todas las islas ha desaparecido. Sus pedazos están esparcidos por el mar. Resuelve acertijos musicales, descubre melodías escondidas y ayuda a tus nuevos amigos a recuperar la canción antes de que las islas queden en silencio para siempre.</p>\n    </section>\n    "
+    },
+    "bigBadges": {
+        "echo_island": {
+            "label": "Guardián de la Isla del Eco",
+            "shortLabel": "Guardián",
+            "message": "Insignia Grande desbloqueada: Guardián de la Isla del Eco. ¡La isla vuelve a oír música!"
+        },
+        "harmony_geometry_reef": {
+            "label": "Navegante del Arrecife Geométrico",
+            "shortLabel": "Navegante",
+            "message": "Insignia Grande desbloqueada: Navegante del Arrecife Geométrico. ¡Lyra ya sabe leer el mapa de formas y ritmos del arrecife!"
+        },
+        "broadcast_bay": {
+            "label": "Guardián de Señales de la Bahía de Emisión",
+            "shortLabel": "Señal",
+            "message": "Insignia Grande desbloqueada: Guardián de Señales de la Bahía de Emisión. ¡Ahora cada ratón de la bahía responde a su propia llamada!"
+        },
+        "starlight_summit": {
+            "label": "Guardián de la Gran Melodía",
+            "shortLabel": "Gran Melodía",
+            "message": "Insignia Grande desbloqueada: Guardián de la Gran Melodía. La canción que unía todas las islas vuelve a estar completa."
+        },
+        "pulse_lighthouse": {
+            "label": "Guardián del Faro del Pulso",
+            "shortLabel": "Guardián",
+            "message": "Insignia grande desbloqueada: Guardián del Faro del Pulso. El faro gira en su tiempo justo y todas las islas pueden encontrar el camino a casa."
+        },
+        "singing_stones": {
+            "label": "Guardián de las Piedras Cantoras",
+            "shortLabel": "Piedras",
+            "message": "Insignia grande desbloqueada: Guardián de las Piedras Cantoras. Toda la orilla responde a tu mano y el último trozo de la Gran Melodía vuelve a casa."
+        }
+    },
+    "problems": {
+        "1": {
+            "title": "El Puente de la Isla del Eco",
+            "description": "\n      <section class=\"story-card\">\n        <p>Lyra y Choon llegan a la Isla del Eco. El puente ya no está, pero el mar sigue tarareando. Choon señala un viejo mapa-canción tallado en piedra.</p>\n        <div class=\"bridge-map\" aria-label=\"Bridge song pattern A A B A\">\n          <div class=\"bridge-gate\"></div>\n          <div class=\"bridge-letters\">\n            <span>A</span>\n            <span>A</span>\n            <span>B</span>\n            <span>A</span>\n          </div>\n          <div class=\"bridge-waves\"></div>\n        </div>\n        <p>\"Estas marcas son sonidos\", susurra Choon. \"Si los escuchamos primero, podremos despertar el puente.\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Canción del puente</h4>\n        <p>Prueba a tocar los trozos sueltos <b>A</b> y <b>B</b>. Cuando sus sonidos te resulten familiares, colócalos debajo de <b>iniciar</b> para que coincidan con el mapa-canción de arriba.</p>\n        <p>Pulsa <b>Tocar</b>. Si el puente empieza a brillar, pulsa <b>Comprobar mi trabajo</b>.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Caminos secretos</h4>\n        <p>Cuando el puente se levante, prueba un cambio pequeño. Puede que la isla te responda.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"changeOctave\">Cambiar la octava</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Usar transponer</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">Hacerlo más largo</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">Renombrar los trozos</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Isla del Eco",
+                "island": "Isla del Eco",
+                "learned": ["Patrones", "Bloques de repetición"]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 1",
+                "Página n.º 1 del diario del capitán",
+                "Pista del tesoro: el primer camino empieza donde los ecos responden dos veces."
+            ],
+            "badges": {
+                "bridge_builder": {
+                    "label": "Constructor de Puentes",
+                    "shortLabel": "Puente",
+                    "message": "La tabla de piedra empieza a brillar. La música resuena por toda la isla y un puente reluciente se levanta poco a poco desde el océano."
+                },
+                "name_keeper": {
+                    "label": "Guardián de Nombres",
+                    "shortLabel": "Nombres",
+                    "message": "Descubrimiento oculto: Guardián de Nombres. Lyra rotula el mapa musical con su propio estilo de exploradora."
+                },
+                "sky_builder": {
+                    "label": "Constructor del Cielo",
+                    "shortLabel": "Cielo",
+                    "message": "Descubrimiento oculto: Constructor del Cielo. El puente se estira más alto, hacia las nubes."
+                },
+                "melody_shifter": {
+                    "label": "Transformador de Melodías",
+                    "shortLabel": "Cambio",
+                    "message": "Descubrimiento oculto: Transformador de Melodías. El puente brilla con un color nuevo."
+                },
+                "secret_treasure_coin": {
+                    "label": "Moneda del Tesoro Secreto",
+                    "shortLabel": "Moneda",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Descubriste un camino que el capitán Cadence nunca anotó."
+                }
+            },
+            "secretHelpCards": {
+                "changeOctave": {
+                    "title": "Cambiar la octava"
+                },
+                "useTranspose": {
+                    "title": "Usar transponer"
+                },
+                "makeLonger": {
+                    "title": "Hacerlo más largo",
+                    "heading": "Haz que el sonido dure más",
+                    "description": "Puedes alargar un tono o un camino añadiendo otro trozo de acción después de la canción, repitiendo un trozo que te guste o poniendo más notas dentro de una acción antes de volver a tocarla.<br>Musicalmente, esto le da a la melodía más tiempo para viajar sin cambiar la idea principal."
+                },
+                "renameChunks": {
+                    "title": "Renombrar los trozos"
+                }
+            }
+        },
+        "2": {
+            "title": "El Eco del Bosque de Sakura",
+            "description": "\n      <section class=\"story-card\">\n        <p>Al cruzar el puente nuevo, Lyra y Choon encuentran un bosque de Sakura en silencio. De una rama cae una página de diario: \"Canta la vieja melodía de las flores y los pétalos mostrarán la siguiente pista.\"</p>\n        <div class=\"sakura-grove\" aria-label=\"Silent Sakura grove\">\n          <div class=\"sakura-sky-note\"></div>\n          <div class=\"sakura-tree sakura-tree-left\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"sakura-tree sakura-tree-right\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page\">#2</div>\n          <div class=\"petal petal-one\"></div>\n          <div class=\"petal petal-two\"></div>\n          <div class=\"petal petal-three\"></div>\n        </div>\n        <p>Choon oye cuatro trozos dormidos de <b>Sakura Sakura</b>. Tócalos una vez y luego guíalos por el sendero de pétalos.</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Canción de los pétalos</h4>\n        <div class=\"petal-song-map\" aria-label=\"Sakura melody path\">\n          <span>Sakura</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>Sakura</span>\n          <span>miniyukan</span>\n        </div>\n        <p>Coloca los trozos debajo de <b>iniciar</b> siguiendo el sendero de arriba. Deja que el sendero florezca <b>4 veces</b>, pulsa <b>Tocar</b> y observa el bosque.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Pétalos escondidos</h4>\n        <p>Cuando los árboles respondan, prueba algo nuevo. Algunos pétalos esconden insignias secretas.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"renameChunks\">Renombrar los trozos</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">Levantar los pétalos</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Usar transponer</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">Hacer un camino más largo</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Bosque de Sakura",
+                "island": "Isla del Eco",
+                "learned": ["Melodías más largas", "Trozos de melodía"]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 2",
+                "Página n.º 2 del diario del capitán",
+                "Pista del tesoro: sigue los pétalos cuando el viejo bosque cante cuatro veces."
+            ],
+            "badges": {
+                "sakura_echo": {
+                    "label": "Eco de Sakura",
+                    "shortLabel": "Sakura",
+                    "message": "Los árboles de Sakura empiezan a cantar. Los pétalos giran en el aire y descubren la siguiente página del diario del capitán Cadence."
+                },
+                "grove_name_keeper": {
+                    "label": "Guardián de Nombres del Bosque",
+                    "shortLabel": "Nombres",
+                    "message": "Descubrimiento oculto: Guardián de Nombres del Bosque. Lyra pone sus propios nombres en el mapa de Sakura."
+                },
+                "petal_lifter": {
+                    "label": "Elevador de Pétalos",
+                    "shortLabel": "Pétalos",
+                    "message": "Descubrimiento oculto: Elevador de Pétalos. Las flores flotan más alto mientras la melodía sube."
+                },
+                "grove_shifter": {
+                    "label": "Transformador del Bosque",
+                    "shortLabel": "Cambio",
+                    "message": "Descubrimiento oculto: Transformador del Bosque. El bosque de Sakura brilla con un color nuevo."
+                },
+                "petal_trail_coin": {
+                    "label": "Moneda del Sendero de Pétalos",
+                    "shortLabel": "Moneda",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Tu camino de Sakura más largo descubre pétalos que el capitán Cadence nunca siguió."
+                }
+            },
+            "secretHelpCards": {
+                "renameChunks": {
+                    "title": "Renombrar los trozos"
+                },
+                "changeOctave": {
+                    "title": "Levantar los pétalos"
+                },
+                "useTranspose": {
+                    "title": "Usar transponer"
+                },
+                "makeLonger": {
+                    "title": "Hacer un camino más largo",
+                    "heading": "Alarga el sendero de pétalos",
+                    "description": "Puedes alargar el camino añadiendo otro trozo de acción, repitiendo un trozo de Sakura que te guste o poniendo más notas dentro de una acción antes de volver a usarla.<br>Musicalmente, un camino más largo le da a la melodía más tiempo para florecer sin perder la sensación del patrón."
+                }
+            }
+        },
+        "3": {
+            "title": "El Ritmo de la Cueva del Pulso",
+            "description": "\n      <section class=\"story-card\">\n        <p>Después del bosque de Sakura, Lyra y Choon oyen unos golpecitos suaves dentro de una cueva azul. El mapa del tesoro está callado, pero las paredes de la cueva parpadean como un latido.</p>\n        <div class=\"rhythm-cave\" aria-label=\"Pulse Cave beat map\">\n          <div class=\"cave-mouth\"></div>\n          <div class=\"pulse-lights\">\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"rhythm-river\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page rhythm-journal-page\">#3</div>\n        </div>\n        <p>\"Esta pista no empieza con una melodía\", dice Choon. \"Es un pulso. Tenemos que construir el ritmo antes de que despierte la siguiente canción.\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>El pulso de la cueva</h4>\n        <p>Abre <b>hacer un ritmo</b>. Crea un pulso constante, prueba algunos cambios de ritmo largos y cortos, y pulsa <b>Guardar ritmos</b>.</p>\n        <p>Busca la acción de ritmo exportada en la paleta <b>Acción</b>, colócala debajo de <b>iniciar</b>, pulsa <b>Tocar</b> y escucha el latido de la cueva.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Ritmos secretos</h4>\n        <p>Cuando la cueva empiece a parpadear, prueba un experimento rítmico. Estos descubrimientos tratan del pulso, la duración y el color del tambor.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openMaker\">Abrir hacer un ritmo</button>\n          <button type=\"button\" data-secret-help=\"saveRhythm\">Guardar ritmos</button>\n          <button type=\"button\" data-secret-help=\"changeLength\">Cambiar la duración de las notas</button>\n          <button type=\"button\" data-secret-help=\"swapDrum\">Probar otro tambor</button>\n          <button type=\"button\" data-secret-help=\"drumMachine\">Guardar la caja de ritmos</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Cueva del Pulso",
+                "island": "Isla del Eco",
+                "completeTitle": "Cueva del Pulso completada",
+                "learned": ["Pulso", "Hacer un ritmo", "Acciones de ritmo exportadas"]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 3",
+                "Página n.º 3 del diario del capitán",
+                "Pista del tesoro: el siguiente camino se abre cuando un pulso constante lleva un ritmo que cambia."
+            ],
+            "badges": {
+                "pulse_cave_keeper": {
+                    "label": "Guardián de la Cueva del Pulso",
+                    "shortLabel": "Pulso",
+                    "message": "Las luces de la cueva parpadean a tiempo. Lyra y Choon guardan el camino del ritmo en el diario del capitán Cadence."
+                },
+                "beat_shaper": {
+                    "label": "Escultor del Pulso",
+                    "shortLabel": "Pulso",
+                    "message": "Descubrimiento oculto: Escultor del Pulso. El pulso de la cueva se estira y se encoge según tus notas se hacen largas y cortas."
+                },
+                "drum_taster": {
+                    "label": "Catador de Tambores",
+                    "shortLabel": "Tambor",
+                    "message": "Descubrimiento oculto: Catador de Tambores. Un color de tambor nuevo resuena en la pared de la cueva."
+                },
+                "drum_machine_builder": {
+                    "label": "Constructor de Cajas de Ritmos",
+                    "shortLabel": "Caja",
+                    "message": "Descubrimiento oculto: Constructor de Cajas de Ritmos. La cueva responde con un patrón de percusión completo."
+                }
+            },
+            "secretHelpCards": {
+                "openMaker": {
+                    "title": "Abrir hacer un ritmo"
+                },
+                "saveRhythm": {
+                    "title": "Guardar ritmos",
+                    "heading": "Convierte tu pulso en un trozo",
+                    "description": "Usa hacer un ritmo para dar forma al pulso y luego pulsa Guardar ritmos. Music Blocks crea una acción nueva llamada rhythm. Coloca esa acción debajo de iniciar para que tu programa pueda tocarla.<br>Musicalmente, exportar convierte tu idea de ritmo en un patrón que puedes reutilizar."
+                },
+                "changeLength": {
+                    "title": "Cambiar la duración de las notas",
+                    "heading": "Estira o acorta el pulso",
+                    "description": "Abre hacer un ritmo y cambia un valor de ritmo para que el pulso deje de tener siempre la misma duración. Prueba a cambiar el ritmo de 1/1 a 1/2, 1/4 u otro valor, y escucha otra vez.<br>Esto desbloquea el descubrimiento Escultor del Pulso, porque las notas largas y cortas cambian el patrón mientras el pulso sigue avanzando."
+                },
+                "swapDrum": {
+                    "title": "Probar otro tambor"
+                },
+                "drumMachine": {
+                    "title": "Guardar la caja de ritmos",
+                    "heading": "Haz que la cueva responda con tambores",
+                    "description": "Después de probar un ritmo, pulsa Guardar la caja de ritmos en hacer un ritmo. Esto crea una acción que toca sonidos de tambor directamente. Úsala cuando quieras que el pulso suene como un patrón de percusión y no solo como una guía de ritmo."
+                }
+            },
+            "incomplete": {
+                "title": "La Cueva del Pulso sigue callada",
+                "message": "Choon oye el pulso en hacer un ritmo, pero iniciar todavía no está tocando el ritmo exportado. Pulsa Guardar ritmos, busca la acción de ritmo, colócala debajo de iniciar y vuelve a pulsar Comprobar mi trabajo."
+            }
+        },
+        "4": {
+            "title": "Pecho, chasquido, palmada: construye el ritmo",
+            "description": "\n      <section class=\"story-card\">\n        <p>La Cueva del Pulso se abre a una cala de piedra luminosa. Tres grabados brillan en la arena: <b>pecho</b>, <b>chasquido</b> y <b>palmada</b>. Choon golpea el patrón en su caparazón de metal y las rocas le responden.</p>\n        <div class=\"body-beat-cove\" aria-label=\"Chest snap clap rhythm map\">\n          <div class=\"cove-sun\"></div>\n          <div class=\"body-beat-row\">\n            <span>Chest</span>\n            <span>Snap</span>\n            <span>Clap</span>\n          </div>\n          <div class=\"body-beat-grid\">\n            <span></span><span></span><span></span><span></span>\n            <span></span><span></span><span></span><span></span>\n          </div>\n          <div class=\"journal-page body-beat-journal-page\">#4</div>\n        </div>\n        <p>\"Este ritmo tiene dos mitades\", dice Lyra. \"Si dibujamos los sonidos del cuerpo a lo largo del tiempo, la cala nos mostrará la siguiente marca del tesoro.\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Mapa del ritmo corporal</h4>\n        <p>Este es el ritmo que golpea la cala. Dilo primero en voz alta con Choon, un sonido del cuerpo por cada casilla.</p>\n        <div class=\"rhythm-chart\" aria-label=\"El ritmo que hay que copiar, ocho casillas en cada mitad\">\n          <h5>Primera mitad</h5>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Pecho</span><span class=\"beat-clap\">Palmada</span><span class=\"beat-snap\">Chasquido</span><span class=\"beat-clap\">Palmada</span></div>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Pecho</span><span class=\"beat-clap\">Palmada</span><span class=\"beat-snap\">Chasquido</span><span class=\"beat-clap\">Palmada</span></div>\n          <h5>Segunda mitad</h5>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Pecho</span><span class=\"beat-clap\">Palmada</span><span class=\"beat-snap\">Chasquido</span><span class=\"beat-clap\">Palmada</span></div>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Pecho</span><span class=\"beat-clap\">Palmada</span><span class=\"beat-snap\">Chasquido</span><span class=\"beat-clap beat-quick\"><i>Palmada</i><i>Palmada</i></span></div>\n        </div>\n        <p>Las dos mitades son iguales hasta la última casilla. Allí la palmada se convierte en <b>dos palmadas rápidas</b> en el mismo tiempo, así el ritmo entra directo en la siguiente vuelta. Los músicos llaman a esa pareja dos semicorcheas.</p>\n        <p>Abre <b>matriz de tono y tiempo</b> y da a cada sonido del cuerpo su propia fila de tambor. Toca las casillas para que los tambores suenen en ese orden y guarda la <b>primera mitad</b> como un bloque de <b>acción</b>. Construye la <b>segunda mitad</b> igual.</p>\n        <p>Coloca los dos bloques debajo de <b>iniciar</b>, envuélvelos en un bloque <b>repetir</b> y pulsa <b>Reproducir</b>. La cala te responderá con palmadas.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Ritmos corporales secretos</h4>\n        <p>Cuando la cala empiece a responder con palmadas, prueba una variación. Estos descubrimientos tratan de la forma, los bucles, la elección de sonidos y las mezclas.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">Abrir matriz de tono y tiempo</button>\n          <button type=\"button\" data-secret-help=\"exportHalves\">Exportar las dos mitades</button>\n          <button type=\"button\" data-secret-help=\"loopGroove\">Repetir el groove</button>\n          <button type=\"button\" data-secret-help=\"swapBodySounds\">Cambiar los sonidos del cuerpo</button>\n          <button type=\"button\" data-secret-help=\"remixGroove\">Crear tu propio groove</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Cala del Ritmo Corporal",
+                "island": "Isla del Eco",
+                "completeTitle": "Cala del Ritmo Corporal completada",
+                "learned": ["Matriz de tono y tiempo", "Forma en dos partes", "Percusión corporal"]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 4",
+                "Página n.º 4 del diario del capitán",
+                "Pista del tesoro: la puerta del tesoro escucha dos respuestas corporales dentro de un mismo bucle."
+            ],
+            "badges": {
+                "body_beat_builder": {
+                    "label": "Constructor de Ritmo Corporal",
+                    "shortLabel": "Cuerpo",
+                    "message": "La cala responde con palmadas en dos partes. Lyra anota el ritmo corporal en el diario del capitán Cadence."
+                },
+                "two_part_mapper": {
+                    "label": "Cartógrafo de Dos Partes",
+                    "shortLabel": "Partes",
+                    "message": "Descubrimiento oculto: Cartógrafo de Dos Partes. Tu primera mitad y tu segunda mitad se responden con claridad."
+                },
+                "loop_leader": {
+                    "label": "Líder del Bucle",
+                    "shortLabel": "Bucle",
+                    "message": "Descubrimiento oculto: Líder del Bucle. El ritmo corporal da vueltas hasta que todos sienten el groove."
+                },
+                "body_sound_designer": {
+                    "label": "Diseñador de Sonidos Corporales",
+                    "shortLabel": "Sonido",
+                    "message": "Descubrimiento oculto: Diseñador de Sonidos Corporales. El mismo ritmo habla con un color de sonido nuevo."
+                },
+                "cove_remixer": {
+                    "label": "Mezclador de la Cala",
+                    "shortLabel": "Mezcla",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Tu idea corporal extra hace que la cala baile de una forma nueva."
+                }
+            },
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "Abrir matriz de tono y tiempo"
+                },
+                "exportHalves": {
+                    "title": "Exportar las dos mitades",
+                    "heading": "Haz dos trozos de ritmo",
+                    "description": "Usa la matriz de tono y tiempo para construir la primera mitad y guárdala como una acción. Construye la segunda mitad con su final de semicorcheas más cortas y guárdala también. Coloca los dos trozos de acción debajo de iniciar.<br>Musicalmente, dos trozos forman una pregunta y una respuesta: la primera mitad plantea el patrón y la segunda cambia el final."
+                },
+                "loopGroove": {
+                    "title": "Repetir el groove",
+                    "heading": "Haz que el ritmo corporal se repita",
+                    "description": "Pon un bloque repetir debajo de iniciar y coloca dentro los dos trozos de acción de la matriz de tono y tiempo. Prueba a repetir el groove entero 2 o 4 veces.<br>Esto desbloquea el descubrimiento Líder del Bucle, porque un ritmo se siente mejor cuando vuelve a pasar."
+                },
+                "swapBodySounds": {
+                    "title": "Cambiar los sonidos del cuerpo",
+                    "heading": "Cambia los sonidos corporales de la cala",
+                    "description": "Haz clic en el nombre de un tambor dentro de tu acción de la matriz de tono y tiempo y elige otro sonido en el menú circular. Por ejemplo, cambia un tambor por una campana, una palmada u otra percusión.<br>Musicalmente, el tiempo sigue igual, pero cambia el color del ritmo."
+                },
+                "remixGroove": {
+                    "title": "Crear tu propio groove",
+                    "heading": "Añade una idea corporal más",
+                    "description": "Cuando tu ritmo de dos partes funcione, añade otra acción exportada de la matriz de tono y tiempo o llama otra vez a una de tus acciones debajo de iniciar.<br>Esto desbloquea el descubrimiento Mezclador de la Cala, porque estás ampliando la forma más allá del ritmo pedido."
+                }
+            },
+            "incomplete": {
+                "title": "La Cala del Ritmo Corporal está esperando",
+                "message": "Choon oye algunos golpes, pero la cala necesita dos trozos de acción de la matriz de tono y tiempo debajo de iniciar, repetidos con un bloque repetir. Exporta las dos mitades, pon las dos acciones dentro del bucle y vuelve a comprobar."
+            }
+        },
+        "5": {
+            "title": "El Arrecife de los Tambores con Forma",
+            "description": "\n      <section class=\"story-card\">\n        <p>Cuando la Cala del Ritmo Corporal responde con palmadas, el mapa del capitán Cadence se pliega en tres siluetas brillantes. Choon oye cada forma como un ritmo: un círculo entero dividido en pulsos iguales.</p>\n        <div class=\"geometry-reef\" aria-label=\"Triangle square and pentagon reef map\">\n          <div class=\"geometry-orbit\"></div>\n          <div class=\"geometry-shape geometry-triangle\"></div>\n          <div class=\"geometry-shape geometry-square\"></div>\n          <div class=\"geometry-shape geometry-pentagon\"></div>\n          <div class=\"journal-page geometry-journal-page\">#5</div>\n        </div>\n        <p>\"Una vuelta completa son <b>360 grados</b>\", dice Choon. \"Divide la vuelta en lados y el ratón dibujará el ritmo de una forma.\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Ritmo de formas</h4>\n        <p>Los bloques sueltos <b>repetir</b>, <b>adelante</b> y <b>derecha</b> van debajo del bloque <b>iniciar</b> que ya está en el lienzo. Construye primero el cuadrado, después saca dos bloques <b>iniciar</b> más de la paleta y construye las otras dos formas al lado.</p>\n        <div class=\"beat-map\" aria-label=\"Blocks and numbers for each shape\">\n          <span>Triángulo - repetir 3, adelante 100, derecha 120</span>\n          <span>Cuadrado - repetir 4, adelante 100, derecha 90</span>\n          <span>Pentágono - repetir 5, adelante 100, derecha 72</span>\n        </div>\n        <p>Cada giro es un círculo entero repartido entre los lados: 360 entre 3 es 120, entre 4 es 90, entre 5 es 72. Girar a la <b>izquierda</b> dibuja la misma forma al revés, y también cuenta.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Ritmos de formas escondidos</h4>\n        <p>Cuando aparezcan las tres formas, prueba un truco de geometría más profundo. Cada uno esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"divideCircle\">Repartir el círculo</button>\n          <button type=\"button\" data-secret-help=\"useBox\">Guardar los lados en una caja</button>\n          <button type=\"button\" data-secret-help=\"colorShape\">Colorear cada forma</button>\n          <button type=\"button\" data-secret-help=\"extraPolygon\">Dibujar una sexta forma</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Arrecife de los Tambores con Forma",
+                "island": "Arrecife de la Geometría Armónica",
+                "completeTitle": "Arrecife de los Tambores con Forma completado",
+                "learned": ["Giros de 360 grados", "Polígonos", "Geometría y ritmo"]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 5",
+                "Página n.º 5 del diario del capitán",
+                "Pista del tesoro: el Corazón de la Armonía escucha círculos divididos en pulsos con forma iguales."
+            ],
+            "badges": {
+                "shape_reef_builder": {
+                    "label": "Constructor del Arrecife de Formas",
+                    "shortLabel": "Formas",
+                    "message": "El arrecife se ilumina con los ritmos del triángulo, el cuadrado y el pentágono. Lyra guarda la pista de las formas en el diario del capitán Cadence."
+                },
+                "circle_divider": {
+                    "label": "Divisor de Círculos",
+                    "shortLabel": "Dividir",
+                    "message": "Descubrimiento oculto: Divisor de Círculos. Dividiste 360 grados igual que se divide una redonda en pulsos."
+                },
+                "box_geometer": {
+                    "label": "Geómetra de la Caja",
+                    "shortLabel": "Caja",
+                    "message": "Descubrimiento oculto: Geómetra de la Caja. Un solo número guardado guía ahora la repetición y el giro de la forma."
+                },
+                "reef_colorist": {
+                    "label": "Colorista del Arrecife",
+                    "shortLabel": "Color",
+                    "message": "Descubrimiento oculto: Colorista del Arrecife. El arrecife geométrico brilla con un color nuevo."
+                },
+                "polygon_explorer": {
+                    "label": "Explorador de Polígonos",
+                    "shortLabel": "Polígono",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Dibujaste una forma que el capitán Cadence no había marcado en el arrecife."
+                }
+            },
+            "secretHelpCards": {
+                "divideCircle": {
+                    "title": "Repartir el círculo",
+                    "heading": "Deja que los bloques hagan la división",
+                    "description": "En vez de escribir el ángulo en el bloque derecha, mete dentro un bloque dividir con 360 arriba y el número de lados abajo. Los bloques calculan el ángulo por ti.<br>Sirve para cualquier forma, así que el único número que cambias es el de abajo.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Repartir un círculo entero entre lados iguales es el mismo gesto que repartir un pulso entero entre notas iguales."
+                },
+                "useBox": {
+                    "title": "Guardar los lados en una caja",
+                    "heading": "Un número, usado dos veces",
+                    "description": "Pon un bloque guardar en encima del repetir, llama a la caja como quieras y mete dentro el número de lados. Después pon un bloque caja en la cuenta del repetir, y otro debajo del 360 en un bloque dividir.<br>Ahora un solo número decide la forma entera, y solo lo editas en un sitio.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Una caja es como un músico que escribe una parte una vez y la usa en varios sitios: un cambio y se actualizan todas las copias."
+                },
+                "colorShape": {
+                    "title": "Colorear cada forma"
+                },
+                "extraPolygon": {
+                    "title": "Dibujar una sexta forma",
+                    "heading": "Prueba una división nueva del círculo",
+                    "description": "Copia un programa iniciar y cambia a la vez el número de repetir y el giro. Seis lados giran 60, ocho giran 45, y para siete puedes redondear 360 entre 7 a 51: con acercarse basta.<br>Vale cualquier número de lados, y cuantos más añadas más se acerca la forma a un círculo.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Dividir un entero en partes iguales cada vez más pequeñas es exactamente lo que pasa con las figuras musicales desde la redonda hacia abajo."
+                }
+            },
+            "incomplete": {
+                "title": "El Arrecife de Formas todavía se ve borroso",
+                "message": "Choon ve una parte del arrecife, pero hacen falta las tres formas: repetir 3 con derecha 120, repetir 4 con derecha 90 y repetir 5 con derecha 72, cada una con un adelante dentro del repetir. Constrúyelas debajo de bloques iniciar y pulsa Revisar mi trabajo."
+            }
+        },
+        "6": {
+            "title": "La Laguna Giratoria de la Polirritmia",
+            "description": "\n      <section class=\"story-card\">\n        <p>Más allá del Arrecife de los Tambores con Forma, Lyra encuentra una laguna donde dos ondas bailan a la vez. Una onda marca de <b>2</b> en 2. La otra marca de <b>3</b> en 3. Choon susurra: \"Eso es una <b>polirritmia</b>: dos ritmos que se mueven juntos, se encuentran y se separan.\"</p>\n        <div class=\"polyrhythm-lagoon\" aria-label=\"Two rhythm ripples and a spinning avatar\">\n          <div class=\"lagoon-ring lagoon-ring-two\"><span>2</span></div>\n          <div class=\"lagoon-ring lagoon-ring-three\"><span>3</span></div>\n          <div class=\"avatar-orb\"></div>\n          <div class=\"journal-page lagoon-journal-page\">#6</div>\n        </div>\n        <p>La página del capitán Cadence dice: \"Cuando los pulsos se mueven distinto, deja que un avatar muestre el movimiento para que tus ojos también puedan oír el ritmo.\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Misión de la laguna</h4>\n        <p>Las dos reglas de ritmo del lienzo ya marcan en <b>2</b> y en <b>3</b>, así que déjalas como están. Todo lo demás está suelto y hay que encajarlo.</p>\n        <ol>\n          <li>Encaja el bloque <b>avatar</b> debajo del bloque <b>iniciar</b>, para que haya un ratón que mirar en la pantalla.</li>\n          <li>Encaja <b>en cada nota hacer</b> justo debajo, en la misma pila de iniciar. Los dos bloques tienen que estar en esa pila o no se ejecutará nada.</li>\n          <li>Saca un bloque <b>acción</b> de la paleta de acciones, deja su nombre en <b>action</b> y pon dentro algo que mueva al ratón. Los bloques sueltos <b>derecha</b> y <b>dividir</b> que hay al lado están justo para eso.</li>\n        </ol>\n        <p>Pulsa Tocar y escucha el momento en que la onda de 2 pulsos y la de 3 pulsos vuelven a encontrarse.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Trucos de ondas escondidos</h4>\n        <p>La laguna guarda marcas extra para quienes hacen visible el ritmo de formas nuevas.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"turnMotion\">Girar en cada nota</button>\n          <button type=\"button\" data-secret-help=\"noteMotion\">Que mande la duración</button>\n          <button type=\"button\" data-secret-help=\"pitchVoice\">Dar voz a una onda</button>\n          <button type=\"button\" data-secret-help=\"extraRipple\">Añadir una tercera onda</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Laguna Giratoria de la Polirritmia",
+                "island": "Arrecife de la Geometría Armónica",
+                "completeTitle": "Laguna de la Polirritmia completada",
+                "learned": ["Polirritmias", "Dosillos y tresillos", "Animación al ritmo del sonido"]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 6",
+                "Página n.º 6 del diario del capitán",
+                "Pista del tesoro: el Corazón de la Armonía aparece cuando pulsos distintos se mueven juntos sin perder su propio camino."
+            ],
+            "badges": {
+                "lagoon_conductor": {
+                    "label": "Director de la Laguna",
+                    "shortLabel": "Laguna",
+                    "message": "Las ondas de dosillo y tresillo empiezan a girar juntas. Lyra añade el ritmo en movimiento de la laguna al diario del capitán Cadence."
+                },
+                "extra_ripple_maker": {
+                    "label": "Creador de Ondas Extra",
+                    "shortLabel": "Onda",
+                    "message": "Descubrimiento oculto: Creador de Ondas Extra. Añadiste una onda de ritmo más allá del patrón de 2 y 3 de la laguna."
+                },
+                "avatar_spark": {
+                    "label": "Chispa del Avatar",
+                    "shortLabel": "Avatar",
+                    "message": "Descubrimiento oculto: Chispa del Avatar. Ahora la laguna tiene quien la interprete."
+                },
+                "note_motion_mapper": {
+                    "label": "Cartógrafo del Movimiento",
+                    "shortLabel": "Movimiento",
+                    "message": "Descubrimiento oculto: Cartógrafo del Movimiento. Tu animación escucha la duración de las notas, tal como sugería el capitán Cadence."
+                },
+                "singing_ripple": {
+                    "label": "Onda Cantarina",
+                    "shortLabel": "Voz",
+                    "message": "Descubrimiento oculto: Onda Cantarina. Añadiste una voz con tono al ritmo en movimiento."
+                },
+                "spin_choreographer": {
+                    "label": "Coreógrafo del Giro",
+                    "shortLabel": "Giro",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Tu avatar gira con el ritmo y muestra el desfase de la laguna."
+                }
+            },
+            "secretHelpCards": {
+                "turnMotion": {
+                    "title": "Girar en cada nota",
+                    "heading": "Haz que el giro encaje con el ritmo",
+                    "description": "Pon un bloque de giro dentro de tu acción y dale el ángulo que quieras. 360 entre 4 lleva al ratón por todo el círculo en cuatro notas, mientras que un ángulo pequeño dibuja una espiral lenta.<br>Prueba varios y mira qué le hace cada uno al recorrido.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Cuando el giro se cierra en el mismo momento en que el ritmo se repite, la longitud del patrón se ve en lugar de contarse."
+                },
+                "noteMotion": {
+                    "title": "Que mande la duración",
+                    "heading": "Notas cortas, movimientos cortos",
+                    "description": "Mete un bloque de duración de nota en la casilla del número de tu bloque de giro, para que una nota corta gire poco y una larga gire mucho. Duración de nota, notas transcurridas y contador de notas sirven todos.<br>El ratón deja de girar de forma regular y empieza a trazar el ritmo de verdad.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "La duración es la parte del ritmo más fácil de oír y más difícil de ver, así que merece la pena dibujarla una vez."
+                },
+                "pitchVoice": {
+                    "title": "Dar voz a una onda",
+                    "heading": "Cambia un tambor por una nota",
+                    "description": "Abre una de las reglas de ritmo y pon un bloque de nota donde está su bloque de tambor. Un bloque de tono, un nombre de nota o un grado de la escala le dan voz igual de bien.<br>Deja la otra onda con tambor para seguir oyendo cómo las dos rítmicas se separan.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Una polirritmia se sigue mucho mejor cuando las dos partes tienen voces distintas, por eso los círculos de tambores mezclan agudos y graves."
+                },
+                "extraRipple": {
+                    "title": "Añadir una tercera onda",
+                    "heading": "Un ritmo más encima",
+                    "description": "Copia una regla de ritmo y cambia su número a cualquier cosa que no sea 2 ni 3. Cuatro, cinco, siete: cada uno se encuentra con los otros dos en un momento distinto.<br>Cuenta los pulsos hasta que los tres vuelvan a coincidir y mira cuánto lo aleja tu elección.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Que los ritmos vuelvan a coincidir solo tras un buen rato es lo que hace que un groove suene a la vez estable y sorprendente."
+                }
+            },
+            "incomplete": {
+                "title": "La laguna sigue en calma",
+                "message": "Choon oye las ondas de 2 y de 3 pulsos, pero todavía no se mueve nada. El bloque avatar y el bloque en cada nota hacer tienen que estar encajados debajo del bloque iniciar, no sueltos en el lienzo. Conéctalos y pulsa Revisar mi trabajo."
+            }
+        },
+        "7": {
+            "title": "El Anillo de Señales del Director",
+            "description": "\n      <section class=\"story-card\">\n        <p>La laguna giratoria lleva a Lyra y a Choon hasta la <b>Bahía de Emisión</b>. Doce ratoncitos tamborileros están sentados en un círculo ancho sujetando sus tambores, y ninguno hace el menor sonido. \"No pueden sentir el pulso\", dice Choon. \"Cada ratón espera oír su propio nombre.\"</p>\n        <div class=\"signal-ring\" aria-label=\"Twelve drum mice in a circle around the conductor mouse\">\n          <div class=\"signal-ring-track\"></div>\n          <span class=\"ring-drum ring-drum-active\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <div class=\"ring-conductor\"></div>\n          <div class=\"journal-page ring-journal-page\">#7</div>\n        </div>\n        <p>En el centro está <b>Mr. Mouse</b>, el director. La página del capitán Cadence dice: \"Una voz que llama, muchas que escuchan. Lanza un nombre al aire y solo responderá el ratón dueño de ese nombre.\"</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Dos trucos para el anillo</h4>\n        <p><b>Sumar palabras.</b> El bloque <b>más (+)</b> suma números, pero también puede pegar palabras. \"event\" + \"5\" se convierte en <span class=\"tablet-code\">event5</span>. Así una sola emisión puede llamar a un ratón distinto en cada vuelta.</p>\n        <p><b>Contar en círculo.</b> El bloque <b>módulo</b> cuenta y luego vuelve a empezar. Módulo 12 solo da 0, 1, 2 ... 11, y después regresa a 0. Funciona como contar los pulsos de un compás, salvo que el anillo empieza en 0 en vez de en 1.</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Misión del anillo</h4>\n        <p>Los dos trozos de acción que hay en el lienzo ya pertenecen a los ratones tamborileros, y los bloques sueltos que están al lado son tus ingredientes. Tu tarea es despertar al director.</p>\n        <ol>\n          <li>Engancha el bucle <b>por siempre</b> debajo del bloque iniciar de Mr. Mouse y mete dentro el bloque <b>arco</b>, para que el director siga dando vueltas al anillo.</li>\n          <li>Añade una <b>emisión</b> cuyo nombre se construya con el bloque <b>más (+)</b>, de manera que llame a event0, event1, event2 y así sucesivamente.</li>\n          <li>Usa el bloque <b>módulo</b> para que la cuenta vuelva a 0 después del 11 y el director nunca se quede sin ratones a los que llamar.</li>\n          <li>Conserva el trozo <b>mouse setup</b>, que usa <b>cuando</b> y <b>fijar xy</b> para que cada ratón tamborilero salte a su sitio en el anillo al oír su nombre.</li>\n        </ol>\n        <p>Pulsa Tocar y luego haz clic en un ratón tamborilero para cambiar el sonido con el que responde.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Para pensar</h4>\n        <ul>\n          <li>¿Qué significa emitir fuera de los ordenadores? ¿Quién escucha?</li>\n          <li>¿En qué se parece Mr. Mouse a un director que cuenta 1, 2, 3 alrededor de un círculo de percusionistas?</li>\n          <li>¿Por qué módulo 12 nunca puede llegar a 12?</li>\n          <li>¿Qué pasaría si dos ratones escucharan el mismo nombre?</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Señales escondidas</h4>\n        <p>Cuando el anillo gire, prueba un truco nuevo. Cada uno esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"makeMice\">Añadir más ratones</button>\n          <button type=\"button\" data-secret-help=\"ringDrum\">Dar su tambor a un ratón</button>\n          <button type=\"button\" data-secret-help=\"toggleTrick\">Alternar entre dos tambores</button>\n          <button type=\"button\" data-secret-help=\"readBox\">Leer lo que guarda la caja</button>\n          <button type=\"button\" data-secret-help=\"mouseDance\">Hacer bailar a los ratones</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Anillo de Señales del Director",
+                "island": "Bahía de Emisión",
+                "completeTitle": "Anillo de Señales completado",
+                "learned": [
+                    "Emitir y escuchar",
+                    "Nombres de evento con más (+)",
+                    "Contar con módulo"
+                ]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 7",
+                "Página n.º 7 del diario del capitán",
+                "Pista del tesoro: la última puerta se abre donde una voz llama y muchas responden, cada una a su turno."
+            ],
+            "badges": {
+                "ring_conductor": {
+                    "label": "Director del Anillo",
+                    "shortLabel": "Anillo",
+                    "message": "Mr. Mouse llama un nombre, un ratón tamborilero responde y el anillo empieza a girar. Lyra copia el círculo de señales en el diario del capitán Cadence."
+                },
+                "toggle_trickster": {
+                    "label": "Malabarista del Interruptor",
+                    "shortLabel": "Cambio",
+                    "message": "Descubrimiento oculto: Malabarista del Interruptor. Una sola resta hace que un tambor salte entre dos sonidos."
+                },
+                "ring_drummer": {
+                    "label": "Tamborilero del Anillo",
+                    "shortLabel": "Tambor",
+                    "message": "Descubrimiento oculto: Tamborilero del Anillo. La Bahía de Emisión oye por fin el pulso que estaba esperando."
+                },
+                "mouse_ringmaker": {
+                    "label": "Creador del Anillo de Ratones",
+                    "shortLabel": "Ratones",
+                    "message": "Descubrimiento oculto: Creador del Anillo de Ratones. Tu anillo ya tiene ratones suficientes para pasar el pulso de uno a otro."
+                },
+                "box_reader": {
+                    "label": "Lector de Cajas",
+                    "shortLabel": "Caja",
+                    "message": "Descubrimiento oculto: Lector de Cajas. El director puede mirar dentro de una caja y saber qué tambor pedir."
+                },
+                "ring_dancer": {
+                    "label": "Bailarín del Anillo",
+                    "shortLabel": "Baile",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Los ratones tamborileros ya no solo tocan: bailan cuando los llaman por su nombre."
+                }
+            },
+            "secretHelpCards": {
+                "makeMice": {
+                    "title": "Añadir más ratones",
+                    "heading": "Cada tambor del anillo es su propio ratón",
+                    "description": "Añade un bloque iniciar, usa un bloque fijar nombre para darle un número y luego llama al trozo mouse setup para que escuche ese nombre. Repite con tantos ratones como quieras.<br>Con dos o tres ratones ya se oye viajar el pulso, y con doce se cierra el círculo entero.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Un círculo de tambores son muchos músicos con una parte cada uno, no un músico haciendo malabares con todas."
+                },
+                "ringDrum": {
+                    "title": "Dar su tambor a un ratón",
+                    "heading": "Pon el sonido dentro del ratón",
+                    "description": "Abre el trozo mouse setup y pon un bloque de tambor junto al bloque escuchar, para que el ratón suene cuando llamen su nombre. Vale cualquier tambor o ruido.<br>Dale a cada ratón uno distinto y el anillo se convierte en una batería entera.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Los tambores distintos alrededor del círculo son lo que convierte una fila de golpes en un ritmo que se puede seguir."
+                },
+                "toggleTrick": {
+                    "title": "Alternar entre dos tambores",
+                    "heading": "Un número que se da la vuelta solo",
+                    "description": "Dentro de la acción de cambio, guarda una cuenta que solo pueda dar 0 o 1: 1 menos la caja, o la caja más 1 contada mod 2. De cualquiera de las dos formas el número se invierte con cada clic.<br>Ese único número elige cuál de los dos tambores responde.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Alternar dos sonidos con un solo músico es como un baterista mantiene el contratiempo sin un segundo par de manos."
+                },
+                "readBox": {
+                    "title": "Leer lo que guarda la caja",
+                    "heading": "Mira dentro antes de tocar",
+                    "description": "Pon un bloque caja en cualquier hueco donde vaya un número y Music Blocks leerá lo que se guardó ahí en vez de un valor fijo. El tambor, el giro, el siguiente ratón al que llamar: cualquiera puede salir de una caja.<br>Cambia la caja una vez y cambian con ella todos los sitios que la leen.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "El director lleva la cuenta en la cabeza y el grupo entero la lee; una caja es esa cuenta compartida puesta por escrito."
+                },
+                "mouseDance": {
+                    "title": "Hacer bailar a los ratones",
+                    "heading": "Moverse con el pulso, no solo tocarlo",
+                    "description": "Añade un bloque de giro dentro del trozo mouse setup para que cada ratón se mueva un poco cuando llamen su nombre. Sirve cualquier ángulo, y 30 grados es un buen primer intento.<br>El anillo deja de parecer quieto y empieza a parecer que lleva el tiempo.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Los músicos se mueven con el pulso antes de tocarlo, y así es como un grupo se mantiene junto sin contar en voz alta."
+                }
+            },
+            "incomplete": {
+                "title": "El anillo sigue en silencio",
+                "message": "Choon ve a los ratones, pero nadie los está llamando. El director necesita un arco dentro de un bucle, una emisión cuyo nombre se construya con el bloque más (+) y un bloque módulo para que la cuenta vuelva a 0. Conserva el trozo mouse setup con sus bloques cuando y fijar xy."
+            }
+        },
+        "8": {
+            "title": "La Canción del Cielo Estrellado",
+            "description": "\n      <section class=\"story-card\">\n        <p>La última llamada del anillo de señales abre la puerta que está en lo más alto del mundo. Al otro lado, Lyra y Choon suben hasta la <b>Cumbre de las Estrellas</b>, donde se cantó por primera vez la Gran Melodía. El cielo está oscuro. \"Las estrellas se callaron cuando se perdió la canción\", dice Choon. \"Vuelve a cantarlas y brillarán.\"</p>\n        <div class=\"star-sky\" aria-label=\"Pitch over time graph of the first Twinkle Twinkle phrase\">\n          <div class=\"star-graph\">\n            <div class=\"star-graph-labels\">\n              <span>La</span><span>Sol</span><span>Fa</span>\n              <span>Mi</span><span>Re</span><span>Do</span>\n            </div>\n            <div class=\"star-graph-plot\">\n            <span class=\"star-note star-beat-1 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-2 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-3 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-4 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-5 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-6 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-7 star-pitch-sol\"></span>\n            </div>\n          </div>\n          <div class=\"journal-page star-journal-page\">#8</div>\n        </div>\n        <p>Cada estrella está a su propia altura. Una estrella baja en el cielo es una nota grave, y una estrella alta es una nota aguda. Leer de izquierda a derecha es avanzar en el tiempo. Eso es el <b>tono a lo largo del tiempo</b>, y las estrellas de arriba deletrean la primera frase de la canción de las estrellas.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>La canción de las estrellas</h4>\n        <p>Cántala una vez antes de construirla, para que tus oídos sepan adónde va. Twinkle Twinkle tiene tres frases:</p>\n        <ul>\n          <li><b>A1:</b> Do Do Sol Sol La La Sol</li>\n          <li><b>A2:</b> Fa Fa Mi Mi Re Re Do</li>\n          <li><b>B:</b> Sol Sol Fa Fa Mi Mi Re</li>\n        </ul>\n        <p>Todos los tonos usan la octava <b>4</b>, y el ritmo de la matriz de tono y tiempo ya encaja: seis notas cortas y una larga, exactamente siete estrellas por frase.</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Misión de la cumbre</h4>\n        <p>La matriz de tono y tiempo ya está preparada con Do, Re, Mi, Fa, Sol y La. Solo tienes que colocar las estrellas.</p>\n        <ol>\n          <li>Haz clic en el bloque <b>matriz de tono y tiempo</b> para abrir la cuadrícula y luego haz clic en las casillas para construir la frase <b>A1</b>.</li>\n          <li>Pulsa <b>Guardar</b> para convertir esa frase en un bloque de acción, y después construye y guarda <b>A2</b> y <b>B</b> de la misma manera.</li>\n          <li>Busca tus tres acciones guardadas en la paleta <b>Acción</b> y apílalas debajo de <b>iniciar</b> en el orden de la canción: <b>A1 A2 B B A1 A2</b>.</li>\n          <li>Pulsa Tocar. Si suena como la canción de las estrellas, el cielo se enciende.</li>\n        </ol>\n        <p>El truco de Choon para recordar el orden: es un bocadillo. Las dos frases <b>A</b> son el pan de fuera y <b>B</b> es el relleno del medio.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Para pensar</h4>\n        <ul>\n          <li>¿Qué parte de la canción sube y qué parte vuelve a bajar?</li>\n          <li>¿Por qué la frase B se toca dos veces en el medio?</li>\n          <li>Si una estrella subiera una fila, ¿sonaría más aguda o más grave en ese punto?</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Luz de estrellas escondida</h4>\n        <p>Cuando el cielo se encienda, prueba una idea nueva. Cada una esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"renameChunks\">Nombrar tus tres frases</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">Subir una estrella</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Mover la canción entera</button>\n          <button type=\"button\" data-secret-help=\"starDance\">Dibujar mientras canta</button>\n          <button type=\"button\" data-secret-help=\"harmonize\">Añadir una segunda voz</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Canción del Cielo Estrellado",
+                "island": "Cumbre de las Estrellas",
+                "completeTitle": "Cielo Estrellado completado",
+                "learned": [
+                    "Tono a lo largo del tiempo",
+                    "Melodías con la matriz de tono y tiempo",
+                    "Forma A1 A2 B B A1 A2"
+                ]
+            },
+            "rewards": [
+                "Fragmento de melodía n.º 8",
+                "Página n.º 8 del diario del capitán",
+                "Tesoro encontrado: la Gran Melodía vuelve a estar completa y todas las islas que despertaste la cantan de vuelta."
+            ],
+            "badges": {
+                "star_song_keeper": {
+                    "label": "Guardián de la Canción Estelar",
+                    "shortLabel": "Estrella",
+                    "message": "Estrella a estrella la cumbre se ilumina y la Gran Melodía regresa. Lyra escribe la última página del diario del capitán Cadence."
+                },
+                "sandwich_namer": {
+                    "label": "Bautizador de Bocadillos",
+                    "shortLabel": "Nombres",
+                    "message": "Descubrimiento oculto: Bautizador de Bocadillos. Tus frases tienen los nombres que tú elegiste, así que la forma se lee como una receta."
+                },
+                "high_star": {
+                    "label": "Estrella Alta",
+                    "shortLabel": "Más alta",
+                    "message": "Descubrimiento oculto: Estrella Alta. Ahora una nota brilla desde otra octava."
+                },
+                "star_variation": {
+                    "label": "Variación Estelar",
+                    "shortLabel": "Cambio",
+                    "message": "Descubrimiento oculto: Variación Estelar. Moviste la canción entera a otro lugar, igual que hizo Mozart con esta misma melodía."
+                },
+                "star_dancer": {
+                    "label": "Bailarín de Estrellas",
+                    "shortLabel": "Baile",
+                    "message": "Descubrimiento oculto: Bailarín de Estrellas. El ratón gira con la melodía y dibuja el cielo mientras canta."
+                },
+                "second_voice": {
+                    "label": "Segunda Voz",
+                    "shortLabel": "Voz",
+                    "message": "Has encontrado una Moneda del Tesoro Secreto. Un segundo bloque iniciar se une y la canción de las estrellas tiene armonía."
+                }
+            },
+            "secretHelpCards": {
+                "renameChunks": {
+                    "title": "Nombrar tus tres frases",
+                    "heading": "Llámalas por lo que son",
+                    "description": "El Creador de Frases llama a tus frases guardadas action, action1 y action2. Haz clic en un nombre y escribe encima lo que quieras.<br>A1, A2 y B dejan clara la forma de la canción, pero Twinkle y Destello funcionan igual de bien.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Los músicos etiquetan las secciones con letras justo por esto: las letras enseñan la forma de un vistazo."
+                },
+                "changeOctave": {
+                    "title": "Subir una estrella",
+                    "heading": "El número que va junto a la nota",
+                    "description": "Cada bloque de tono lleva un nombre de nota y un número de octava, y esta canción usa el 4 de principio a fin. Cambia uno por cualquier otro número: el 5 sube esa nota y el 3 la baja.<br>Pruébalo en la última nota de una frase y escucha dónde acaba la frase.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "La misma nota en otra octava es la misma estrella vista desde más lejos: más aguda, pero la misma nota."
+                },
+                "useTranspose": {
+                    "title": "Mover la canción entera"
+                },
+                "starDance": {
+                    "title": "Dibujar mientras canta",
+                    "heading": "Deja que la melodía guíe al ratón",
+                    "description": "Pon un bloque de giro dentro de una de tus acciones de frase para que el ratón se mueva en cada nota, y añade debajo un bloque adelante. Cualquier ángulo dibuja algo.<br>Cada frase deja su propia figura en la pantalla mientras se canta.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Ver las frases dibujadas una al lado de otra deja claro que A1 y A2 son la misma figura empezando desde notas distintas."
+                },
+                "harmonize": {
+                    "title": "Añadir una segunda voz",
+                    "heading": "Dos ratones cantando a la vez",
+                    "description": "Añade un segundo bloque iniciar y coloca debajo las mismas acciones de frase, para que los dos ratones canten juntos en cuanto pulses Tocar.<br>Pon un bloque de transposición encima de la segunda pila y las voces se separan en armonía, a la distancia que tú elijas.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Dos voces cantando la misma melodía a una distancia fija es la clase de armonía más antigua que existe."
+                }
+            },
+            "incomplete": {
+                "title": "Las estrellas siguen apagadas",
+                "message": "Choon oye una parte de la canción de las estrellas. La matriz de tono y tiempo necesita las tres frases guardadas como bloques de acción (Do Do Sol Sol La La Sol, luego Fa Fa Mi Mi Re Re Do, luego Sol Sol Fa Fa Mi Mi Re) y esas acciones apiladas debajo de iniciar como A1 A2 B B A1 A2."
+            }
+        },
+        "9": {
+            "title": "El Faro del Pulso",
+            "description": "\n      <section class=\"story-card\">\n        <p>Más allá de la cumbre el mar se oscurece. Allí se alza un faro con su gran lámpara quieta, porque hace mucho que no está quien contaba sus vueltas. &quot;Todas las islas ponían su reloj con esa luz&quot;, dice Choon. &quot;Dale un latido y despertará.&quot;</p>\n        <div class=\"metronome-scene\" aria-label=\"Faro silencioso con metrónomo\">\n          <div class=\"metronome-beam\"></div>\n          <div class=\"metronome-body\">\n            <span class=\"metronome-arm\"></span>\n            <span class=\"metronome-weight\"></span>\n          </div>\n          <div class=\"metronome-tick metronome-tick-left\"></div>\n          <div class=\"metronome-tick metronome-tick-right\"></div>\n        </div>\n        <p>Lyra se lleva la mano al pecho y siente su propio pulso: uno, dos, uno, dos. &quot;Eso es lo que necesita la lámpara&quot;, dice. &quot;Un pulso que nunca se pierda.&quot;</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Tic y tac</h4>\n        <div class=\"beat-map\" aria-label=\"Faro silencioso con metrónomo\">\n          <span>Tiempo 1 - tambor grave</span>\n          <span>Tiempo 2 - tambor brillante</span>\n        </div>\n        <p>Un bloque <b>Por siempre</b> ya está girando en tu lienzo con un tambor dentro. Añade un segundo <b>tambor con valor de nota</b> y dale un <b>sonido de tambor distinto</b>, para que la lámpara haga tic y tac en vez de repetirse. Pulsa <b>Reproducir</b> y comprueba el faro.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Engranajes ocultos</h4>\n        <p>Cuando la lámpara ya gire, prueba un engranaje nuevo. Cada uno esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"swingPendulum\">Balancear el péndulo</button>\n          <button type=\"button\" data-secret-help=\"changeTempo\">Cambiar el tempo</button>\n          <button type=\"button\" data-secret-help=\"setMeter\">Definir el compás</button>\n          <button type=\"button\" data-secret-help=\"colorBeat\">Colorear cada tiempo</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Faro del Pulso",
+                "island": "Faro del Pulso",
+                "completeTitle": "El faro vuelve a latir",
+                "learned": ["Pulso", "Tiempo", "Compás"]
+            },
+            "rewards": [
+                "Fragmento de Melodía #9",
+                "Página del Diario del Capitán #9",
+                "Pista del tesoro: la luz marca el tiempo para todas las islas a la vez."
+            ],
+            "badges": {
+                "beacon_keeper": {
+                    "label": "Guardián del Faro",
+                    "shortLabel": "Faro",
+                    "message": "Tic, tac. La gran lámpara gira con tu pulso y un haz de luz recorre el agua."
+                },
+                "pendulum_swinger": {
+                    "label": "Balanceador del Péndulo",
+                    "shortLabel": "Vaivén",
+                    "message": "Descubrimiento oculto: Balanceador del Péndulo. Choon se inclina a izquierda y derecha con el pulso, igual que un metrónomo de verdad."
+                },
+                "tempo_master": {
+                    "label": "Maestro del Tempo",
+                    "shortLabel": "Tempo",
+                    "message": "Descubrimiento oculto: Maestro del Tempo. El faro puede correr como un corazón agitado o descansar como uno dormido."
+                },
+                "meter_marker": {
+                    "label": "Marcador de Compás",
+                    "shortLabel": "Compás",
+                    "message": "Descubrimiento oculto: Marcador de Compás. Lyra escribe cuántos tiempos y de qué clase, y la lámpara empieza a contar compases."
+                },
+                "beat_painter": {
+                    "label": "Pintor del Pulso",
+                    "shortLabel": "Color",
+                    "message": "Descubrimiento oculto: Pintor del Pulso. El haz cambia de color en cada tiempo, así puedes ver el pulso además de oírlo."
+                }
+            },
+            "secretHelpCards": {
+                "swingPendulum": {
+                    "title": "Balancear el péndulo"
+                },
+                "changeTempo": {
+                    "title": "Cambiar el tempo"
+                },
+                "setMeter": {
+                    "title": "Definir el compás"
+                },
+                "colorBeat": {
+                    "title": "Colorear cada tiempo",
+                    "heading": "Pinta la luz con la cuenta de tiempos",
+                    "description": "Cuando un bloque Compás está contando, el bloque Cuenta de Tiempos dice en qué tiempo estás. Pon Cuenta de Tiempos dentro de Fijar color y la lámpara cambiará de color en cada tiempo.<br>Multiplícalo primero si los colores se parecen demasiado, porque la escala de color va de 0 a 100.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Oír el pulso y verlo al mismo tiempo hace mucho más fácil sentir la diferencia entre el pulso y el ritmo."
+                }
+            },
+            "incomplete": {
+                "title": "La lámpara sigue dormida",
+                "message": "Choon oye un solo tambor girando una y otra vez, pero un metrónomo necesita dos sonidos distintos para hacer tic y tac. Añade otro tambor con valor de nota dentro del bloque Por siempre y dale otro tambor; después pulsa Comprobar mi trabajo."
+            }
+        },
+        "10": {
+            "title": "Las Piedras Cantoras",
+            "description": "\n      <section class=\"story-card\">\n        <p>En la última orilla hay una fila de piedras altas clavadas en la arena. Lyra toca una y no pasa nada. &quot;No están rotas&quot;, dice Choon. &quot;Están esperando. Una piedra así solo canta cuando alguien la toca, y alguien tiene que decirle qué cantar.&quot;</p>\n        <div class=\"piano-scene\" aria-label=\"Fila de piedras cantoras en silencio\">\n          <span class=\"piano-key piano-key-1\"></span>\n          <span class=\"piano-key piano-key-2\"></span>\n          <span class=\"piano-key piano-key-3\"></span>\n          <span class=\"piano-key piano-key-4\"></span>\n          <span class=\"piano-hand\"></span>\n        </div>\n        <p>En un piano de verdad la tecla empuja un martillo, el martillo golpea una cuerda y la cuerda canta. Aquí el <b>clic</b> es el martillo, y la nota que elijas es la cuerda.</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Dos piedras, dos voces</h4>\n        <div class=\"beat-map\" aria-label=\"Fila de piedras cantoras en silencio\">\n          <span>Tecla 1 - sol (ya construida para ti)</span>\n          <span>Tecla 2 - una nota tuya</span>\n        </div>\n        <p>Una piedra ya funciona. Su ratón escucha con <b>al hacer clic hacer</b>, y la <b>acción</b> correspondiente toca sol. Copia los bloques <b>Iniciar</b> y <b>acción</b> para construir una <b>segunda tecla</b> con su propia nota, pulsa <b>Reproducir</b> y luego haz clic en tus piedras.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Voces ocultas</h4>\n        <p>Cuando dos piedras te respondan, prueba una idea nueva. Cada una esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"nameKeys\">Nombra tus teclas</button>\n          <button type=\"button\" data-secret-help=\"spreadKeys\">Separa las teclas</button>\n          <button type=\"button\" data-secret-help=\"addDrum\">Añade un tambor</button>\n          <button type=\"button\" data-secret-help=\"addAvatar\">Añade un avatar</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Piedras Cantoras",
+                "island": "Piedras Cantoras",
+                "completeTitle": "Las piedras responden a tu mano",
+                "learned": ["Eventos de clic", "Acciones", "Interactividad"]
+            },
+            "rewards": [
+                "Fragmento de Melodía #10",
+                "Página del Diario del Capitán #10",
+                "Pista del tesoro: una piedra solo responde a la mano que la toca."
+            ],
+            "badges": {
+                "stone_singer": {
+                    "label": "Cantante de Piedra",
+                    "shortLabel": "Piedras",
+                    "message": "Tocas la primera piedra y canta, y la segunda responde con otra voz. La orilla vuelve a tener un piano."
+                },
+                "key_namer": {
+                    "label": "Bautizador de Teclas",
+                    "shortLabel": "Nombres",
+                    "message": "Descubrimiento oculto: Bautizador de Teclas. Ahora cada piedra sabe su propio nombre, así que Lyra puede llamar a cualquiera."
+                },
+                "key_spacer": {
+                    "label": "Separador de Teclas",
+                    "shortLabel": "Espacio",
+                    "message": "Descubrimiento oculto: Separador de Teclas. Las piedras se reparten por la arena, así tu mano nunca toca dos a la vez."
+                },
+                "drum_key": {
+                    "label": "Tecla de Tambor",
+                    "shortLabel": "Tambor",
+                    "message": "Descubrimiento oculto: Tecla de Tambor. Una piedra responde con un tambor debajo de su nota y la arena tiembla un poco."
+                },
+                "avatar_key": {
+                    "label": "Rostro de la Piedra",
+                    "shortLabel": "Rostro",
+                    "message": "Descubrimiento oculto: Rostro de la Piedra. Cada tecla lleva su propia cara y la orilla te devuelve la mirada."
+                }
+            },
+            "secretHelpCards": {
+                "nameKeys": {
+                    "title": "Nombra tus teclas"
+                },
+                "spreadKeys": {
+                    "title": "Separa las teclas"
+                },
+                "addDrum": {
+                    "title": "Añade un tambor"
+                },
+                "addAvatar": {
+                    "title": "Añade un avatar"
+                }
+            },
+            "incomplete": {
+                "title": "Las piedras siguen calladas",
+                "message": "Choon oye una piedra responder a tu mano, pero un piano necesita más de una tecla. Copia los bloques Iniciar y acción para construir una segunda tecla con su propia nota, después pulsa Comprobar mi trabajo."
+            }
+        }
+    }
+}

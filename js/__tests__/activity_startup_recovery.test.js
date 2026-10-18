@@ -93,6 +93,7 @@ describe("Activity startup recovery", () => {
             },
             justLoadStart: jest.fn(),
             doLoadAnimation: jest.fn(),
+            errorMsg: jest.fn(),
             update: false
         };
 
@@ -109,6 +110,7 @@ describe("Activity startup recovery", () => {
         expect(removeItem).toHaveBeenCalledWith("SESSIONCorrupt Project");
         expect(activity.justLoadStart).toHaveBeenCalledTimes(1);
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
         expect(activity.update).toBe(true);
 
         pubsub.emit("finishedLoading");

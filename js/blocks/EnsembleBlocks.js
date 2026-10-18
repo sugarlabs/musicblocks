@@ -29,7 +29,7 @@ function getTargetTurtle(turtles, targetTurtle) {
     // We'll compare the names as strings so convert to "string" if "number".
     targetTurtle = targetTurtle.toString();
 
-    for (const i in turtles.turtleList) {
+    for (const i of Object.keys(turtles.turtleList)) {
         const turtle = turtles.ithTurtle(i);
         if (!turtle.inTrash) {
             // Convert to string incase of type "number".
@@ -128,8 +128,13 @@ function setupEnsembleBlocks(activity) {
             }
 
             const targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            if (targetTurtle === null) return -1;
+
             const i = getTargetTurtle(activity.turtles, targetTurtle);
-            if (i < 0) return -1;
+            if (i === null) {
+                activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                return -1;
+            }
 
             const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk2 === null) {
@@ -141,7 +146,21 @@ function setupEnsembleBlocks(activity) {
                         logo.turtleHeaps[i] = [];
                     }
 
-                    if (a < 1) {
+                    a = Math.floor(a);
+                    const heapLen = logo.turtleHeaps[i].length;
+
+                    if (a < 0) {
+                        if (heapLen === 0) {
+                            activity.errorMsg(_("empty heap"));
+                            return 0;
+                        }
+                        if (-a <= heapLen) {
+                            a = heapLen + a + 1;
+                        } else {
+                            a = 1;
+                            activity.errorMsg(_("Index must be > 0."));
+                        }
+                    } else if (a < 1) {
                         a = 1;
                         activity.errorMsg(_("Index must be > 0."));
                     }
@@ -438,6 +457,11 @@ function setupEnsembleBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
+            if (args[0] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -495,6 +519,11 @@ function setupEnsembleBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+            if (args[0] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle !== null) {
                 logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
@@ -953,6 +982,8 @@ function setupEnsembleBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            // parseArg has already reported the empty slot.
+            if (targetTurtle === null) return false;
             return getTargetTurtle(activity.turtles, targetTurtle) !== null;
         }
     }
@@ -993,6 +1024,8 @@ function setupEnsembleBlocks(activity) {
         flow(args, logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const turtleName = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            // parseArg has already reported the empty slot.
+            if (turtleName === null) return;
 
             if (getTargetTurtle(activity.turtles, turtleName) === null) {
                 const blockNumber = activity.blocks.blockList.length;
@@ -1079,7 +1112,8 @@ function setupEnsembleBlocks(activity) {
 
             let fillColor;
             let strokeColor;
-            if (typeof args[0] === "number") {
+            // A non-finite number gets the default colour, like a non-number.
+            if (Number.isFinite(args[0])) {
                 fillColor = getMunsellColor(args[0], 50, 100);
                 strokeColor = getMunsellColor(args[0], 70, 80);
             } else {

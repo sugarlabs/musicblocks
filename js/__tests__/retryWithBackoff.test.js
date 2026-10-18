@@ -164,6 +164,52 @@ describe("retryWithBackoff", () => {
             expect(delayFn).toHaveBeenNthCalledWith(2, 100);
             expect(delayFn).toHaveBeenNthCalledWith(3, 200);
         });
+
+        it("should cap delays at default maxDelay (1000ms)", async () => {
+            let callCount = 0;
+            const delayFn = jest.fn(() => Promise.resolve());
+
+            await retryWithBackoff({
+                check: () => {
+                    callCount++;
+                    return callCount >= 8 ? true : null;
+                },
+                onSuccess: jest.fn(),
+                delayFn,
+                maxRetries: 10,
+                initialDelay: 50
+            });
+
+            // 7 retries: 50, 100, 200, 400, 800, 1000, 1000
+            expect(delayFn).toHaveBeenCalledTimes(7);
+            expect(delayFn).toHaveBeenNthCalledWith(5, 800);
+            expect(delayFn).toHaveBeenNthCalledWith(6, 1000);
+            expect(delayFn).toHaveBeenNthCalledWith(7, 1000);
+        });
+
+        it("should cap delays at custom maxDelay when provided", async () => {
+            let callCount = 0;
+            const delayFn = jest.fn(() => Promise.resolve());
+
+            await retryWithBackoff({
+                check: () => {
+                    callCount++;
+                    return callCount >= 5 ? true : null;
+                },
+                onSuccess: jest.fn(),
+                delayFn,
+                maxRetries: 10,
+                initialDelay: 50,
+                maxDelay: 250
+            });
+
+            // 4 retries: 50, 100, 200, 250
+            expect(delayFn).toHaveBeenCalledTimes(4);
+            expect(delayFn).toHaveBeenNthCalledWith(1, 50);
+            expect(delayFn).toHaveBeenNthCalledWith(2, 100);
+            expect(delayFn).toHaveBeenNthCalledWith(3, 200);
+            expect(delayFn).toHaveBeenNthCalledWith(4, 250);
+        });
     });
 
     describe("max retries exceeded", () => {

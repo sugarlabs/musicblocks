@@ -90,6 +90,18 @@ describe("initBasicProtoBlocks", () => {
         );
         expect(mockActivity.blocks.protoBlockDict.blockWithoutPalette.palette).toBeUndefined();
     });
+
+    it("should safely handle empty protoBlockDict without throwing", () => {
+        const emptyActivity = {
+            blocks: {
+                palettes: {},
+                protoBlockDict: {}
+            },
+            palettes: {}
+        };
+        expect(() => initBasicProtoBlocks(emptyActivity)).not.toThrow();
+        expect(emptyActivity.blocks.palettes).toBe(emptyActivity.palettes);
+    });
 });
 
 describe("BACKWARDCOMPATIBILITYDICT", () => {
@@ -98,13 +110,60 @@ describe("BACKWARDCOMPATIBILITYDICT", () => {
         expect(Object.keys(BACKWARDCOMPATIBILITYDICT).length).toBeGreaterThan(0);
     });
 
-    it("should correctly map old block names to new block names", () => {
-        expect(BACKWARDCOMPATIBILITYDICT.fullscreen).toBe("vspace");
-        expect(BACKWARDCOMPATIBILITYDICT.seth).toBe("setheading");
+    it("correctly maps arithmetic and comparison block names", () => {
+        expect(BACKWARDCOMPATIBILITYDICT.plus2).toBe("plus");
+        expect(BACKWARDCOMPATIBILITYDICT.minus2).toBe("minus");
+        expect(BACKWARDCOMPATIBILITYDICT.product2).toBe("multiply");
+        expect(BACKWARDCOMPATIBILITYDICT.division2).toBe("divide");
+        expect(BACKWARDCOMPATIBILITYDICT.remainder2).toBe("mod");
+        expect(BACKWARDCOMPATIBILITYDICT.greater2).toBe("greater");
+        expect(BACKWARDCOMPATIBILITYDICT.less2).toBe("less");
+        expect(BACKWARDCOMPATIBILITYDICT.equal2).toBe("equal");
         expect(BACKWARDCOMPATIBILITYDICT.random2).toBe("random");
+    });
+
+    it("correctly maps turtle and coordinate block names", () => {
+        expect(BACKWARDCOMPATIBILITYDICT.xcor).toBe("x");
+        expect(BACKWARDCOMPATIBILITYDICT.ycor).toBe("y");
+        expect(BACKWARDCOMPATIBILITYDICT.setxy2).toBe("setxy");
+        expect(BACKWARDCOMPATIBILITYDICT.seth).toBe("setheading");
+        expect(BACKWARDCOMPATIBILITYDICT.shell).toBe("turtleshell");
+    });
+
+    it("correctly maps color and graphics block names", () => {
+        expect(BACKWARDCOMPATIBILITYDICT.setvalue).toBe("setshade");
+        expect(BACKWARDCOMPATIBILITYDICT.setchroma).toBe("setgrey");
+        expect(BACKWARDCOMPATIBILITYDICT.setgray).toBe("setgrey");
+        expect(BACKWARDCOMPATIBILITYDICT.gray).toBe("grey");
+        expect(BACKWARDCOMPATIBILITYDICT.chroma).toBe("grey");
+        expect(BACKWARDCOMPATIBILITYDICT.value).toBe("shade");
+        expect(BACKWARDCOMPATIBILITYDICT.hue).toBe("color");
+        expect(BACKWARDCOMPATIBILITYDICT.startfill).toBe("beginfill");
+        expect(BACKWARDCOMPATIBILITYDICT.stopfill).toBe("endfill");
+        expect(BACKWARDCOMPATIBILITYDICT.fullscreen).toBe("vspace");
+        expect(BACKWARDCOMPATIBILITYDICT.fillscreen2).toBe("fillscreen");
+    });
+
+    it("correctly maps flow control and stack aliases", () => {
+        expect(BACKWARDCOMPATIBILITYDICT.sandwichclampcollapsed).toBe("clamp");
+        expect(BACKWARDCOMPATIBILITYDICT.ifelse).toBe("ifthenelse");
+        expect(BACKWARDCOMPATIBILITYDICT.stack).toBe("do");
+        expect(BACKWARDCOMPATIBILITYDICT.hat).toBe("action");
+        expect(BACKWARDCOMPATIBILITYDICT.stopstack).toBe("break");
+        expect(BACKWARDCOMPATIBILITYDICT.clean).toBe("clear");
+        expect(BACKWARDCOMPATIBILITYDICT.string).toBe("text");
     });
 
     it("maps the old turtlelapsednotes name so old Turtle Blocks projects still load (#8701)", () => {
         expect(BACKWARDCOMPATIBILITYDICT.turtlelapsednotes).toBe("turtleelapsednotes");
+    });
+
+    it("ensures every entry maps to a valid, non-empty string target", () => {
+        for (const [oldName, newName] of Object.entries(BACKWARDCOMPATIBILITYDICT)) {
+            expect(typeof oldName).toBe("string");
+            expect(oldName.trim().length).toBeGreaterThan(0);
+            expect(typeof newName).toBe("string");
+            expect(newName.trim().length).toBeGreaterThan(0);
+        }
     });
 });

@@ -89,3 +89,40 @@ describe("getMacroExpansion", () => {
         expect(expansion[0][3]).toBe(200);
     });
 });
+
+describe("builtin macro connections", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const source = fs.readFileSync(path.join(__dirname, "..", "macros.js"), "utf8");
+    const builtins = source.slice(source.indexOf("const BUILTINMACROS = {"));
+    const macroNames = [...builtins.matchAll(/^\s+(\w+): [A-Z0-9]+,?$/gm)].map(m => m[1]);
+    const mockActivity = { blocks: { protoBlockDict: {} } };
+
+    test("finds the builtin macros in macros.js", () => {
+        expect(macroNames.length).toBeGreaterThan(60);
+        expect(macroNames).toContain("scalartranshelp");
+    });
+
+    // loadNewBlocks rejects the whole macro when a connection points at a
+    // block that isn't in it, so a help example with one never loads.
+    test.each(macroNames)("%s only connects to blocks that connect back", name => {
+        const expansion = getMacroExpansion(mockActivity, name, 0, 0);
+        const byId = new Map(expansion.map(blk => [blk[0], blk]));
+
+        for (const [id, , , , connections] of expansion) {
+            for (const other of connections) {
+                if (other === null) continue;
+                expect(byId.has(other)).toBe(true);
+                expect(byId.get(other)[4]).toContain(id);
+            }
+        }
+    });
+
+    test("scalartranshelp ends its second note with a hidden block", () => {
+        const expansion = getMacroExpansion(mockActivity, "scalartranshelp", 0, 0);
+        const note = expansion[17];
+
+        expect(note[1][0]).toBe("newnote");
+        expect(expansion[note[4][3]]).toEqual([25, "hidden", 0, 0, [17, null]]);
+    });
+});

@@ -11,7 +11,13 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
-/* global _, escapeHTML, isSafeUrl, DOMPurify */
+/* global _, escapeHTML, isSafeUrl, DOMPurify, ManagedTimer */
+
+/*
+   Globals location
+    - js/utils/ManagedTimer.js
+        ManagedTimer
+*/
 
 if (typeof module !== "undefined" && module.exports) {
     // Under Jest the shared helper resolves through CommonJS. In the browser it
@@ -37,6 +43,42 @@ class ReflectionMatrix {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static REQUEST_TIMEOUT = 30000;
+    /**
+     * Backend origins the widget may talk to, keyed by host name.
+     *
+     * The hosted site is served over HTTPS, so it has to use its own API origin;
+     * a plain-HTTP backend is blocked there as mixed content. The local servers
+     * are listed for development.
+     *
+     * @type {Object}
+     */
+    static BACKENDS = {
+        "localhost": "http://localhost:8000",
+        "127.0.0.1": "http://127.0.0.1:8000",
+        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org"
+    };
+
+    /**
+     * Resolves the backend origin to send requests to.
+     *
+     * @param {string} [host] - Host name to resolve; defaults to the page host.
+     * @returns {string|null} Backend origin without a trailing slash, or null
+     *     when the host is not one this widget knows a backend for.
+     */
+    static backendURL(host) {
+        const name = host === undefined ? window.location.hostname : host;
+
+        if (Object.prototype.hasOwnProperty.call(ReflectionMatrix.BACKENDS, name)) {
+            return ReflectionMatrix.BACKENDS[name];
+        }
+
+        if (name.endsWith(".musicblocks.sugarlabs.org")) {
+            return "https://api.musicblocks.sugarlabs.org";
+        }
+
+        return null;
+    }
+
     constructor() {
         /**
          * Chat history array to store the conversation
@@ -92,6 +134,28 @@ class ReflectionMatrix {
         this.summarizedUpTo = 0;
 
         this.startChatTypingTimeout = null;
+        this.dotsInterval = null;
+
+        /**
+         * Centralized timer management instance for tracking/cancelling timers.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
+
+        /**
+         * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeIntervals = new Set();
 
         /**
          * User messages waiting to be sent to the backend
@@ -123,6 +187,129 @@ class ReflectionMatrix {
     }
 
     /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    _setWidgetInterval(callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    }
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    _clearWidgetInterval(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        if (this.startChatTypingTimeout !== null) {
+            this._clearWidgetTimeout(this.startChatTypingTimeout);
+            this.startChatTypingTimeout = null;
+        }
+
+        if (this.dotsInterval !== null && this.dotsInterval !== undefined) {
+            this._clearWidgetInterval(this.dotsInterval);
+            this.dotsInterval = null;
+        }
+
+        return count;
+    }
+
+    /**
      * Initializes the reflection widget.
      */
 
@@ -132,7 +319,7 @@ class ReflectionMatrix {
         this._lifecycle.mount();
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
+        this.PORT = ReflectionMatrix.backendURL();
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -146,6 +333,7 @@ class ReflectionMatrix {
             this._lifecycle.unmount();
             this.activity.isInputON = false;
             this.hideTypingIndicator();
+            this._clearWidgetTimers();
             this._lifecycle.abortPendingRequests();
             this.pendingMessages = [];
             this.isProcessingPendingMessage = false;
@@ -278,7 +466,7 @@ class ReflectionMatrix {
         // Start animation
         let dotCount = 0;
         const maxDots = 3;
-        this.dotsInterval = setInterval(() => {
+        this.dotsInterval = this._setWidgetInterval(() => {
             dotCount = (dotCount + 1) % (maxDots + 1);
             this.dotsContainer.textContent = ".".repeat(dotCount);
         }, 500);
@@ -289,13 +477,17 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
-        if (this.startChatTypingTimeout) {
-            clearTimeout(this.startChatTypingTimeout);
+        if (this.startChatTypingTimeout !== null) {
+            this._clearWidgetTimeout(this.startChatTypingTimeout);
             this.startChatTypingTimeout = null;
         }
 
+        if (this.dotsInterval !== null) {
+            this._clearWidgetInterval(this.dotsInterval);
+            this.dotsInterval = null;
+        }
+
         if (this.typingDiv) {
-            clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
         }
@@ -333,10 +525,11 @@ class ReflectionMatrix {
         messageContainer.classList.add("message-container", "user");
 
         const senderName = document.createElement("div");
+        senderName.classList.add("sender-name");
         senderName.style.fontSize = "12px";
         senderName.style.fontWeight = "bold";
         senderName.style.marginBottom = "4px";
-        senderName.style.color = "#555";
+        senderName.style.color = "var(--color-text-secondary)";
         senderName.style.overflowWrap = "break-word";
         senderName.style.alignSelf = "flex-start";
         senderName.innerText = "You";
@@ -374,10 +567,11 @@ class ReflectionMatrix {
         messageContainer.className = "message-container";
 
         const senderName = document.createElement("div");
+        senderName.classList.add("sender-name");
         senderName.style.fontSize = "12px";
         senderName.style.fontWeight = "bold";
         senderName.style.marginBottom = "4px";
-        senderName.style.color = "#383838ff";
+        senderName.style.color = "var(--color-text-secondary)";
         senderName.style.alignSelf = "flex-start";
         senderName.innerText = this.mentorsMap[role];
 
@@ -481,7 +675,7 @@ class ReflectionMatrix {
         // Reset summarization state for a fresh session
         this.conversationSummary = "";
         this.summarizedUpTo = 0;
-        this.startChatTypingTimeout = setTimeout(() => {
+        this.startChatTypingTimeout = this._setWidgetTimeout(() => {
             this.startChatTypingTimeout = null;
             if (this.isOpen) {
                 this.showTypingIndicator("Reading code");
@@ -565,9 +759,20 @@ class ReflectionMatrix {
      * Sends JSON to the backend through the shared lifecycle tracker.
      * @param {string} path - Backend path suffix.
      * @param {Object} payload - Request payload.
-     * @returns {Promise<Object|null>}
+     * @returns {Promise<Object|null>} Backend response, or null when no backend
+     *     is configured for this host.
      */
     _postJSON(path, payload) {
+        if (!this.PORT) {
+            this.activity.errorMsg(
+                _(
+                    "Reflection is not available on this host. The backend URL could not be determined."
+                ),
+                3000
+            );
+            return Promise.resolve(null);
+        }
+
         return this._lifecycle.postJSON(
             `${this.PORT}${path}`,
             payload,
@@ -738,10 +943,11 @@ class ReflectionMatrix {
             messageContainer.className = "message-container";
 
             const senderName = document.createElement("div");
+            senderName.classList.add("sender-name");
             senderName.style.fontSize = "12px";
             senderName.style.fontWeight = "bold";
             senderName.style.marginBottom = "4px";
-            senderName.style.color = "#555";
+            senderName.style.color = "var(--color-text-secondary)";
             senderName.style.overflowWrap = "break-word";
             senderName.style.alignSelf = "flex-start";
 

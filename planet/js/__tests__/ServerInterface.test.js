@@ -48,6 +48,7 @@ describe("ServerInterface", () => {
             init: jest.fn().mockResolvedValue(true),
             getMetadata: jest.fn().mockResolvedValue(null),
             cacheMetadata: jest.fn().mockResolvedValue(true),
+            deleteMetadata: jest.fn().mockResolvedValue(true),
             getProject: jest.fn().mockResolvedValue(null),
             cacheProject: jest.fn().mockResolvedValue(true),
             clearAll: jest.fn().mockResolvedValue(true),
@@ -112,41 +113,146 @@ describe("ServerInterface", () => {
 
         it("should fetch and cache when metadata is missing", async () => {
             mockCacheManager.getMetadata.mockResolvedValue(null);
-            const serverResponse = { success: true, data: { name: "New Project" } };
+            const serverResponse = {
+                repoName: "123",
+                projectName: "New Project",
+                description: "desc"
+            };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
             const callback = jest.fn();
 
-            server.getProjectDetails("123", callback);
+            await server.getProjectDetails("123", callback);
 
-            await new Promise(process.nextTick);
-            const ajaxInstance = jQuery.ajax.mock.results[0].value;
-            ajaxInstance._done(serverResponse);
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: server._normaliseProjectRow(serverResponse)
+            });
+            expect(mockCacheManager.cacheMetadata).toHaveBeenCalledWith(
+                "123",
+                server._normaliseProjectRow(serverResponse)
+            );
+        });
 
-            await new Promise(process.nextTick);
+        it("should bypass cache when skipCache is true", async () => {
+            const cachedData = { name: "Old Cached Project" };
+            mockCacheManager.getMetadata.mockResolvedValue(cachedData);
+            const serverResponse = {
+                repoName: "123",
+                projectName: "Fresh Project",
+                description: "fresh desc"
+            };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
+            const callback = jest.fn();
 
-            expect(callback).toHaveBeenCalledWith(serverResponse);
-            expect(mockCacheManager.cacheMetadata).toHaveBeenCalledWith("123", serverResponse.data);
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).not.toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: server._normaliseProjectRow(serverResponse)
+            });
+        });
+
+        it("should fall back to cached metadata when skipCache is true and network returns null or error", async () => {
+            const cachedData = { name: "Fallback Cached Project" };
+            mockCacheManager.getMetadata.mockResolvedValue(cachedData);
+            jest.spyOn(server, "_get").mockResolvedValue(null);
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: cachedData
+            });
+        });
+
+        it("should fall back to cached metadata when skipCache is true and network throws an error", async () => {
+            const cachedData = { name: "Fallback Cached Project" };
+            mockCacheManager.getMetadata.mockResolvedValue(cachedData);
+            jest.spyOn(server, "_get").mockRejectedValue(new Error("Network offline"));
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                data: cachedData
+            });
+        });
+
+        it("should return ConnectionFailureData when skipCache is true, network fails, and cache is empty", async () => {
+            mockCacheManager.getMetadata.mockResolvedValue(null);
+            jest.spyOn(server, "_get").mockResolvedValue(null);
+            const callback = jest.fn();
+
+            await server.getProjectDetails("123", callback, true);
+
+            expect(mockCacheManager.getMetadata).toHaveBeenCalledWith("123");
+            expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
         });
     });
 
-    describe("request handling", () => {
-        it("should append the API Key to every request", () => {
-            const callback = jest.fn();
-            server.getTagManifest(callback);
-
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData["api-key"]).toBe(window.MB_PLANET_API_KEY);
-            expect(sentData.action).toBe("getTagManifest");
+    it("returns PROJECT_NOT_FOUND and invalidates cached metadata when project details respond with 404", async () => {
+        jest.spyOn(server, "_get").mockResolvedValue({
+            __httpError: true,
+            status: 404
         });
 
-        it("should use throttled requests for read operations", () => {
-            server.getTagManifest(jest.fn());
+        const callback = jest.fn();
+
+        await server.getProjectDetails("missing-project", callback);
+
+        expect(server.cacheManager.deleteMetadata).toHaveBeenCalledWith("missing-project");
+        expect(callback).toHaveBeenCalledWith({
+            success: false,
+            error: "PROJECT_NOT_FOUND"
+        });
+    });
+
+    it("returns ConnectionFailureData for non-404 HTTP errors", async () => {
+        jest.spyOn(server, "_get").mockResolvedValue({
+            __httpError: true,
+            status: 500
+        });
+
+        const callback = jest.fn();
+
+        await server.getProjectDetails("broken-project", callback);
+
+        expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
+    });
+
+    describe("request handling", () => {
+        it("should call _get for getTagManifest", async () => {
+            const manifest = { music: { TagName: "Music" } };
+            jest.spyOn(server, "_get").mockResolvedValue({ success: true, data: manifest });
+            const callback = jest.fn();
+            await server.getTagManifest(callback);
+            expect(server._get).toHaveBeenCalledWith("/tagManifest");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: manifest });
+        });
+
+        it("should use throttled requests for convertFile", () => {
+            server.convertFile("abc", "mid", "DATA", jest.fn());
             expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
         });
 
-        it("should send likes without throttling", () => {
-            server.likeProject("123", true, jest.fn());
+        it("should send likes without throttling", async () => {
+            jest.spyOn(server, "_post").mockResolvedValue({ success: true, likes: 1 });
+            const callback = jest.fn();
+            await server.likeProject("123", true, callback);
             expect(mockRequestManager.throttledRequest).not.toHaveBeenCalled();
-            expect(jQuery.ajax).toHaveBeenCalled();
+            expect(server._post).toHaveBeenCalledWith(
+                "/like",
+                expect.objectContaining({
+                    repoName: "123",
+                    like: true
+                })
+            );
+            expect(callback).toHaveBeenCalledWith({ success: true, likes: 1 });
         });
     });
 
@@ -222,45 +328,93 @@ describe("ServerInterface", () => {
         it("should fetch from network and cache project when not cached", async () => {
             mockCacheManager.getProject.mockResolvedValueOnce(null);
             const callback = jest.fn();
-            const serverResponse = { success: true, data: { blocks: [1] } };
+            const serverResponse = { content: '[[0,"start",100,100,[null]]]' };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
 
-            server.downloadProject("p1", callback);
-            await new Promise(process.nextTick);
+            await server.downloadProject("p1", callback);
 
-            const ajaxInstance = jQuery.ajax.mock.results[0].value;
-            ajaxInstance._done(serverResponse);
+            expect(server._get).toHaveBeenCalledWith("/getProjectData?repoName=p1");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: serverResponse.content });
+            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith(
+                "p1",
+                serverResponse.content
+            );
+        });
 
-            await new Promise(process.nextTick);
+        it("should validate against expectedUpdatedAt when downloading", async () => {
+            const cachedProject = { blocks: [] };
+            mockCacheManager.getProject.mockResolvedValueOnce(cachedProject);
+            const callback = jest.fn();
 
-            expect(callback).toHaveBeenCalledWith(serverResponse);
-            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith("p1", serverResponse.data);
+            await server.downloadProject("p1", callback, "2026-10-01T12:00:00Z");
+
+            expect(mockCacheManager.getProject).toHaveBeenCalledWith("p1", "2026-10-01T12:00:00Z");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: cachedProject });
+        });
+
+        it("should fetch fresh and cache with updatedAt when cache misses for version", async () => {
+            mockCacheManager.getProject.mockResolvedValueOnce(null);
+            const callback = jest.fn();
+            const serverResponse = { content: '[[0,"start",100,100,[null]]]' };
+            jest.spyOn(server, "_get").mockResolvedValue(serverResponse);
+
+            await server.downloadProject("p1", callback, "2026-10-01T12:00:00Z");
+
+            expect(mockCacheManager.getProject).toHaveBeenCalledWith("p1", "2026-10-01T12:00:00Z");
+            expect(server._get).toHaveBeenCalledWith("/getProjectData?repoName=p1");
+            expect(callback).toHaveBeenCalledWith({ success: true, data: serverResponse.content });
+            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith(
+                "p1",
+                serverResponse.content,
+                "2026-10-01T12:00:00Z"
+            );
         });
     });
 
     describe("endpoint methods", () => {
-        it("should call addProject using a direct request", () => {
+        it("should call addProject using POST /create", async () => {
             const callback = jest.fn();
-            server.addProject("{}", callback);
+            const projectData = { ProjectName: "Test", ProjectData: "{}" };
+            jest.spyOn(server, "_post").mockResolvedValue({
+                success: true,
+                repository: "test-org/test",
+                key: "key-123"
+            });
+            await server.addProject(JSON.stringify(projectData), callback);
 
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData.action).toBe("addProject");
-            expect(sentData.ProjectJSON).toBe("{}");
-            expect(sentData["api-key"]).toBe(server.APIKey);
+            expect(server._post).toHaveBeenCalledWith(
+                "/create",
+                expect.objectContaining({
+                    projectName: "Test"
+                })
+            );
+            expect(callback).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    success: true,
+                    repository: "test-org/test"
+                })
+            );
         });
 
-        it("should call reportProject using a direct request", () => {
+        it("should call reportProject using POST /report", async () => {
             const callback = jest.fn();
-            server.reportProject("p1", "spam", callback);
+            jest.spyOn(server, "_post").mockResolvedValue({ success: true });
+            await server.reportProject("p1", "spam", callback);
 
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData.action).toBe("reportProject");
-            expect(sentData.ProjectID).toBe("p1");
-            expect(sentData.Description).toBe("spam");
+            expect(server._post).toHaveBeenCalledWith("/report", {
+                repoName: "p1",
+                description: "spam"
+            });
+            expect(callback).toHaveBeenCalledWith({ success: true });
         });
 
-        it("should use throttledRequest for searchProjects", () => {
-            server.searchProjects("q", "recent", 0, 10, jest.fn());
-            expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
+        it("should search projects using GET /search", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.searchProjects("q", "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(expect.stringContaining("/search?q=q"));
+            expect(callback).toHaveBeenCalled();
         });
 
         it("should use throttledRequest for convertFile", () => {
@@ -268,10 +422,162 @@ describe("ServerInterface", () => {
             expect(mockRequestManager.throttledRequest).toHaveBeenCalled();
         });
 
-        it("should send correct action for downloadProjectList", () => {
-            server.downloadProjectList(["tag"], "recent", 0, 10, jest.fn());
-            const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData.action).toBe("downloadProjectList");
+        it("should fetch project list using GET /allRepos with single tag", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList(["tag"], "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt&topic=tag")
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should fetch project list with multiple tags when passed as an array", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList(["music", "math", "art"], "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    "/allRepos?page=1&limit=10&sort=createdAt&topic=music,math,art"
+                )
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should fetch project list with multiple tags when passed as a JSON string", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList(
+                JSON.stringify(["music", "math"]),
+                "recent",
+                0,
+                10,
+                callback
+            );
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt&topic=music,math")
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should fetch project list when tags is a comma-separated string", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList("music,math", "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt&topic=music,math")
+            );
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should omit topic param when tags is ALL_PROJECTS", async () => {
+            jest.spyOn(server, "_get").mockResolvedValue({ data: [] });
+            const callback = jest.fn();
+            await server.downloadProjectList("ALL_PROJECTS", "recent", 0, 10, callback);
+
+            expect(server._get).toHaveBeenCalledWith(
+                expect.stringContaining("/allRepos?page=1&limit=10&sort=createdAt")
+            );
+            expect(server._get).not.toHaveBeenCalledWith(expect.stringContaining("&topic="));
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it("should pre-populate GlobalPlanet.cache and overwrite when updatedAt changes", () => {
+            const mockGlobalPlanet = {
+                cache: {
+                    "existing-repo": {
+                        repoName: "existing-repo",
+                        ProjectName: "Old Title",
+                        ProjectLastUpdated: "2026-10-01T10:00:00Z"
+                    },
+                    "unchanged-repo": {
+                        repoName: "unchanged-repo",
+                        ProjectName: "Unchanged Title",
+                        ProjectLastUpdated: "2026-10-01T10:00:00Z",
+                        ProjectData: { preserved: true }
+                    }
+                }
+            };
+            server.Planet = { GlobalPlanet: mockGlobalPlanet };
+
+            const apiResponse = {
+                data: [
+                    {
+                        repoName: "existing-repo",
+                        projectName: "Updated Title",
+                        updatedAt: "2026-10-01T12:00:00Z"
+                    },
+                    {
+                        repoName: "unchanged-repo",
+                        projectName: "Unchanged Title",
+                        updatedAt: "2026-10-01T10:00:00Z"
+                    },
+                    {
+                        repoName: "new-repo",
+                        projectName: "New Title",
+                        updatedAt: "2026-10-01T12:00:00Z"
+                    }
+                ]
+            };
+
+            const result = server._normaliseProjectList(apiResponse);
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual([
+                ["existing-repo", "2026-10-01T12:00:00Z"],
+                ["unchanged-repo", "2026-10-01T10:00:00Z"],
+                ["new-repo", "2026-10-01T12:00:00Z"]
+            ]);
+            expect(mockGlobalPlanet.cache["existing-repo"].ProjectName).toBe("Updated Title");
+            expect(mockGlobalPlanet.cache["existing-repo"].ProjectLastUpdated).toBe(
+                "2026-10-01T12:00:00Z"
+            );
+            expect(mockGlobalPlanet.cache["existing-repo"].ProjectData).toBeNull();
+            expect(mockGlobalPlanet.cache["unchanged-repo"].ProjectData).toEqual({
+                preserved: true
+            });
+            expect(mockGlobalPlanet.cache["new-repo"].ProjectName).toBe("New Title");
+        });
+    });
+
+    describe("owned project list", () => {
+        afterEach(() => {
+            localStorage.removeItem("mb_git_key_cached-repo");
+            localStorage.removeItem("mb_git_key_new-repo");
+        });
+
+        it("reports the cached updatedAt for an owned project, so addProjects skips it", () => {
+            localStorage.setItem("mb_git_key_cached-repo", "k1");
+            localStorage.setItem("mb_git_key_new-repo", "k2");
+            server.Planet = {
+                GlobalPlanet: {
+                    cache: { "cached-repo": { ProjectLastUpdated: "2026-10-01T10:00:00Z" } }
+                }
+            };
+
+            const list = server._getOwnedProjectList();
+
+            expect(list).toEqual(
+                expect.arrayContaining([
+                    ["cached-repo", "2026-10-01T10:00:00Z"],
+                    ["new-repo", null]
+                ])
+            );
+        });
+
+        it("returns the same list on every call", () => {
+            localStorage.setItem("mb_git_key_new-repo", "k2");
+
+            const first = server._getOwnedProjectList();
+            jest.useFakeTimers().setSystemTime(Date.now() + 60000);
+            const second = server._getOwnedProjectList();
+            jest.useRealTimers();
+
+            expect(second).toEqual(first);
         });
     });
 
@@ -313,6 +619,163 @@ describe("ServerInterface", () => {
             const devServer = new ServerInterface(mockPlanet);
             await devServer.init();
             expect(devServer.disablePlanetCache).toBe(true);
+        });
+    });
+
+    describe("paging windows", () => {
+        // A backend with 60 projects that pages by page number and limit, like
+        // /allRepos and /search do.
+        const rows = Array.from({ length: 60 }, (_, i) => ({
+            repoName: `p${i}`,
+            updatedAt: `t${i}`
+        }));
+        const fakeBackend = () =>
+            jest.spyOn(server, "_get").mockImplementation(async path => {
+                const params = new URLSearchParams(path.split("?")[1]);
+                const page = Number(params.get("page"));
+                const limit = Number(params.get("limit"));
+                return { data: rows.slice((page - 1) * limit, page * limit) };
+            });
+        const names = callback => callback.mock.calls[0][0].data.map(row => row[0]);
+        const range = (from, to) => Array.from({ length: to - from }, (_, i) => `p${from + i}`);
+
+        it("paginates USER_PROJECTS across Load More windows", async () => {
+            const ownedProjects = Array.from({ length: 26 }, (_, i) => [`p${i}`, `t${i}`]);
+            const ownedProjectsSpy = jest
+                .spyOn(server, "_getOwnedProjectList")
+                .mockReturnValue(ownedProjects);
+
+            try {
+                const windows = [
+                    [0, 25],
+                    [24, 49]
+                ];
+                const batches = [];
+
+                for (const [start, end] of windows) {
+                    const callback = jest.fn();
+                    await server.downloadProjectList(
+                        "USER_PROJECTS",
+                        "RECENT",
+                        start,
+                        end,
+                        callback
+                    );
+                    batches.push(names(callback));
+                }
+
+                expect(batches[0]).toEqual(range(0, 25));
+                expect(batches[1]).toEqual(range(24, 26));
+            } finally {
+                ownedProjectsSpy.mockRestore();
+            }
+        });
+
+        // GlobalPlanet asks for index..index+25 and advances index by 24.
+        it("returns the next rows on each Load More, not the first page again", async () => {
+            fakeBackend();
+            const windows = [
+                [0, 25],
+                [24, 49],
+                [48, 73]
+            ];
+            const batches = [];
+            for (const [start, end] of windows) {
+                const callback = jest.fn();
+                await server.downloadProjectList("ALL_PROJECTS", "RECENT", start, end, callback);
+                batches.push(names(callback));
+            }
+
+            expect(batches[0]).toEqual(range(0, 25));
+            expect(batches[1]).toEqual(range(24, 49));
+            expect(batches[2]).toEqual(range(48, 60));
+        });
+
+        it("makes a single request when the window starts on a page boundary", async () => {
+            const get = fakeBackend();
+            const callback = jest.fn();
+            await server.downloadProjectList("ALL_PROJECTS", "RECENT", 0, 25, callback);
+
+            expect(get).toHaveBeenCalledTimes(1);
+            expect(get).toHaveBeenCalledWith(expect.stringContaining("page=1&limit=25"));
+        });
+
+        it("stops after a short page instead of asking past the end", async () => {
+            const get = fakeBackend();
+            const callback = jest.fn();
+            await server.downloadProjectList("ALL_PROJECTS", "RECENT", 48, 73, callback);
+
+            // page 2 is full (25-49), page 3 is short (50-59), so no page 4
+            expect(get).toHaveBeenCalledTimes(2);
+            expect(names(callback)).toEqual(range(48, 60));
+        });
+
+        it("reports a connection failure when a page fails", async () => {
+            jest.spyOn(server, "_get")
+                .mockResolvedValueOnce({ data: rows.slice(0, 25) })
+                .mockResolvedValueOnce(null);
+            const callback = jest.fn();
+            await server.downloadProjectList("ALL_PROJECTS", "RECENT", 24, 49, callback);
+
+            expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
+        });
+
+        it("pages search results the same way", async () => {
+            fakeBackend();
+            const callback = jest.fn();
+            await server.searchProjects("p", "RECENT", 24, 49, callback);
+
+            expect(names(callback)).toEqual(range(24, 49));
+        });
+    });
+
+    it("should preserve HTTP status when requested", async () => {
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: false,
+            status: 404
+        });
+
+        const result = await server._get("/project/missing-project", true);
+
+        expect(result).toEqual({
+            __httpError: true,
+            status: 404
+        });
+    });
+
+    describe("_get timeout", () => {
+        afterEach(() => {
+            jest.useRealTimers();
+            delete global.fetch;
+        });
+
+        it("gives up on a request that never answers", async () => {
+            jest.useFakeTimers();
+            // A server that accepts the connection and then goes quiet.
+            global.fetch = jest.fn(
+                (url, { signal }) =>
+                    new Promise((resolve, reject) => {
+                        signal.addEventListener("abort", () =>
+                            reject(new DOMException("aborted", "AbortError"))
+                        );
+                    })
+            );
+
+            const pending = server._get("/allRepos?page=1&limit=25");
+            jest.advanceTimersByTime(server.RequestTimeout);
+
+            await expect(pending).resolves.toBeNull();
+        });
+
+        it("clears the timer once the request answers", async () => {
+            jest.useFakeTimers();
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ data: [] })
+            });
+
+            await expect(server._get("/allRepos?page=1&limit=25")).resolves.toEqual({ data: [] });
+            expect(jest.getTimerCount()).toBe(0);
         });
     });
 });

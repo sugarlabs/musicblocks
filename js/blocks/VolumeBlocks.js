@@ -14,7 +14,7 @@
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, FlowClampBlock,
    LeftBlock, Singer, DEFAULTVOLUME, NANERRORMSG, last, VOICENAMES,
-   DRUMNAMES, DEFAULTVOICE, DEFAULTDRUM
+   DRUMNAMES, DEFAULTVOICE, DEFAULTDRUM, instruments
  */
 
 /* exported setupVolumeBlocks */
@@ -444,16 +444,17 @@ function setupVolumeBlocks(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (!tur.singer.instrumentNames.includes(synth)) {
-                tur.singer.instrumentNames.push(synth);
+            // Load the synth without touching instrumentNames, which holds the
+            // instrument notes play with (see Singer.VolumeActions.setSynthVolume).
+            if (!(instruments[turtle] && synth in instruments[turtle])) {
                 if (logo?.synth?.loadSynth) {
                     logo.synth.loadSynth(turtle, synth);
                 }
+            }
 
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
+            if (tur.singer.synthVolume[synth] === undefined) {
+                tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
             }
 
             tur.singer.synthVolume[synth].push(arg1);

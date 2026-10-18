@@ -361,10 +361,19 @@ describe("setupEnsembleBlocks", () => {
             expect(result).toBe(-1);
         });
 
-        it("should return error if target turtle not found", () => {
-            logo.parseArg.mockReturnValue("NonExistent");
+        it("should report an error if target turtle is not found", () => {
+            logo.parseArg.mockReturnValueOnce("NonExistent").mockReturnValueOnce(1);
             const result = turtleHeapBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // null < 0 is false, reaches end of function
+            expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle NonExistent", blk);
+            expect(result).toBe(-1);
+            expect(logo.turtleHeaps).not.toHaveProperty("null");
+        });
+
+        it("should return an error value if the turtle name evaluates to null", () => {
+            logo.parseArg.mockReturnValueOnce(null);
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(result).toBe(-1);
+            expect(logo.turtleHeaps).not.toHaveProperty("null");
         });
 
         it("should return error if index connection is null", () => {
@@ -548,6 +557,12 @@ describe("setupEnsembleBlocks", () => {
             setXYTurtleBlock = createdBlocks["setxyturtle"];
         });
 
+        it("should return error if args[0] is null", () => {
+            setXYTurtleBlock.flow([null, 10, 20], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(turtles.getTurtle(0).painter.doSetXY).not.toHaveBeenCalled();
+        });
+
         it("should return error if turtle not found", () => {
             setXYTurtleBlock.flow(["NonExistent", 10, 20], logo, 0, 10);
             expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle NonExistent", 10);
@@ -571,6 +586,12 @@ describe("setupEnsembleBlocks", () => {
 
         beforeEach(() => {
             setTurtleBlock = createdBlocks["setturtle"];
+        });
+
+        it("should return error if args[0] is null", () => {
+            setTurtleBlock.flow([null, 100], logo, 0, 10, null, [], false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.runFromBlock).not.toHaveBeenCalled();
         });
 
         it("should run from block for valid turtle", () => {
@@ -814,6 +835,22 @@ describe("setupEnsembleBlocks", () => {
             const result = foundTurtleBlock.arg(logo, 0, blk, null);
             expect(result).toBe(false);
         });
+
+        it("should return false if the name slot is empty", () => {
+            // Empty the slot and mirror logo.parseArg, which reports the
+            // missing argument and returns null for an empty connection.
+            activity.blocks.blockList[blk].connections = [null, null];
+            logo.parseArg.mockImplementation((l, t, cblk, parentBlk) => {
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, parentBlk);
+                    return null;
+                }
+                return "Yertle";
+            });
+            const result = foundTurtleBlock.arg(logo, 0, blk, null);
+            expect(result).toBe(false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
     });
 
     describe("NewTurtleBlock", () => {
@@ -839,6 +876,22 @@ describe("setupEnsembleBlocks", () => {
             logo.parseArg.mockReturnValue("Yertle");
             newTurtleBlock.flow(["Yertle"], logo, 0, blk, null);
             expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("Yertle");
+        });
+
+        it("should not create a turtle if the name slot is empty", () => {
+            // Empty the slot and mirror logo.parseArg, which reports the
+            // missing argument and returns null for an empty connection.
+            activity.blocks.blockList[blk].connections = [null, null];
+            logo.parseArg.mockImplementation((l, t, cblk, parentBlk) => {
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, parentBlk);
+                    return null;
+                }
+                return "NewTurtle";
+            });
+            newTurtleBlock.flow([null], logo, 0, blk, null);
+            expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
         });
     });
 
@@ -869,6 +922,20 @@ describe("setupEnsembleBlocks", () => {
             expect(getMunsellColor).toHaveBeenCalledWith(0, 50, 100);
             expect(tur.doTurtleShell).toHaveBeenCalled();
         });
+
+        it.each([[-Infinity], [Infinity], [NaN]])(
+            "should set the default color for a non-finite number (%p)",
+            hue => {
+                const tur = turtles.ithTurtle(0);
+                tur.doTurtleShell = jest.fn();
+                getMunsellColor.mockClear();
+                setTurtleColorBlock.flow([hue], logo, 0, 10);
+                expect(getMunsellColor).toHaveBeenCalledWith(0, 50, 100);
+                expect(getMunsellColor).toHaveBeenCalledWith(0, 70, 80);
+                expect(getMunsellColor).not.toHaveBeenCalledWith(hue, 50, 100);
+                expect(tur.doTurtleShell).toHaveBeenCalled();
+            }
+        );
     });
 
     describe("TurtleNameBlock", () => {
@@ -1158,6 +1225,76 @@ describe("setupEnsembleBlocks", () => {
             tur.singer.lastNotePlayed = ["F#-2", 0.25];
             turtlePitchBlock.arg(logo, 0, blk, null);
             expect(pitchToNumber).toHaveBeenCalledWith("F#", -2, "C");
+        });
+    });
+
+    describe("TurtleHeapBlock", () => {
+        it("should floor fractional index", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return 2.5;
+            });
+            logo.turtleHeaps[0] = [10, 20, 30];
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(result).toBe(20);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should support negative indices down to -heap_length", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.turtleHeaps[0] = [10, 20, 30];
+
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -1;
+            });
+            expect(turtleHeapBlock.arg(logo, 0, blk, null)).toBe(30);
+
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -2;
+            });
+            expect(turtleHeapBlock.arg(logo, 0, blk, null)).toBe(20);
+
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -3;
+            });
+            expect(turtleHeapBlock.arg(logo, 0, blk, null)).toBe(10);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should report empty heap and return 0 on empty heap with negative index", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.turtleHeaps[0] = [];
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -1;
+            });
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith("empty heap");
+            expect(result).toBe(0);
+        });
+
+        it("should adjust negative index < -heap_length and call errorMsg", () => {
+            const turtleHeapBlock = createdBlocks["turtleheap"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100, 101] };
+            logo.turtleHeaps[0] = [10, 20, 30];
+            logo.parseArg.mockImplementation((lg, turtle, cblk) => {
+                if (cblk === 100) return "Yertle";
+                if (cblk === 101) return -4;
+            });
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Index must be > 0.");
+            expect(result).toBe(10);
         });
     });
 });

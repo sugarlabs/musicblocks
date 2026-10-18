@@ -273,6 +273,117 @@ describe("SearchUI stubs", () => {
     });
 });
 
+describe("SearchUI empty search results", () => {
+    test("wrapEmptySearchResults returns matches unchanged", () => {
+        const ui = new SearchUI(makeActivity());
+        const results = [{ label: "drum", value: "drum" }];
+        expect(ui.wrapEmptySearchResults("drum", results, "Drum")).toBe(results);
+    });
+
+    test("wrapEmptySearchResults names the query in the empty-state label", () => {
+        const ui = new SearchUI(makeActivity());
+        const wrapped = ui.wrapEmptySearchResults("xyz", [], "XYZ");
+        expect(wrapped).toHaveLength(1);
+        expect(wrapped[0].isEmptyState).toBe(true);
+        expect(wrapped[0].label).toBe("No results found for XYZ");
+        expect(ui.isEmptySearchResult(wrapped[0])).toBe(true);
+    });
+
+    test("wrapEmptySearchResults leaves a blank query empty", () => {
+        const ui = new SearchUI(makeActivity());
+        expect(ui.wrapEmptySearchResults("", [], "")).toEqual([]);
+        expect(ui.wrapEmptySearchResults("", null, "")).toEqual([]);
+    });
+
+    test("wrapEmptySearchResults uses the match term when displayTerm is omitted", () => {
+        const ui = new SearchUI(makeActivity());
+        expect(ui.wrapEmptySearchResults("xyz", [])[0].label).toBe("No results found for xyz");
+        expect(ui.wrapEmptySearchResults("xyz", [], null)[0].label).toBe(
+            "No results found for xyz"
+        );
+    });
+
+    test("renderEmptySearchItem draws a disabled row without artwork", () => {
+        const li = {
+            0: { className: "", setAttribute: jest.fn() },
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        const anchor = {
+            0: { setAttribute: jest.fn() },
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        const $j = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>") return anchor;
+            return {};
+        });
+        const ul = { css: jest.fn(() => ul) };
+        const ui = new SearchUI(makeActivity());
+
+        const rendered = ui.renderEmptySearchItem($j, ul, {
+            label: "No results found for xyz",
+            isEmptyState: true
+        });
+
+        expect(li.addClass).toHaveBeenCalledWith("ui-state-disabled search-no-results");
+        expect(li[0].setAttribute).toHaveBeenCalledWith("aria-disabled", "true");
+        expect(anchor.text).toHaveBeenCalledWith("No results found for xyz");
+        expect(anchor[0].setAttribute).toHaveBeenCalledWith("role", "status");
+        expect(anchor[0].setAttribute).toHaveBeenCalledWith("aria-live", "polite");
+        expect(rendered).toBe(li);
+    });
+
+    test("decorateEmptySearchItem keeps existing classes and skips missing nodes", () => {
+        const li = {
+            0: { className: "ui-menu-item", setAttribute: jest.fn() },
+            append: jest.fn()
+        };
+        const $j = jest.fn(() => ({
+            text: jest.fn(function () {
+                return this;
+            })
+        }));
+        const ui = new SearchUI(makeActivity());
+
+        ui.decorateEmptySearchItem(li, { label: "No results found for xyz" }, $j);
+
+        expect(li[0].className).toBe("ui-menu-item ui-state-disabled search-no-results");
+        expect(li[0].setAttribute).toHaveBeenCalledWith("aria-disabled", "true");
+    });
+
+    test("renderEmptySearchItem still appends when ul.css is missing", () => {
+        const li = {
+            0: { className: "", setAttribute: jest.fn() },
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        const anchor = {
+            0: { setAttribute: jest.fn() },
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        const $j = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>") return anchor;
+            return {};
+        });
+        const ui = new SearchUI(makeActivity());
+
+        expect(ui.renderEmptySearchItem($j, {}, { label: "No results found for xyz" })).toBe(li);
+        expect(li.appendTo).toHaveBeenCalledWith({});
+    });
+});
+
 // ---------------------------------------------------------------------------
 // setupMainAutocomplete
 // ---------------------------------------------------------------------------
@@ -345,6 +456,53 @@ describe("SearchUI.setupMainAutocomplete", () => {
         expect(response).toHaveBeenCalledWith([{ label: "drum" }]);
     });
 
+    test("source callback keeps the menu open with an empty-state item when nothing matches", () => {
+        const sourceFn = jest.fn(() => []);
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(sourceFn, jest.fn(), jest.fn());
+
+        const response = jest.fn();
+        $elem._capturedOpts.source({ term: "zzzznonexistent" }, response);
+
+        expect(sourceFn).toHaveBeenCalledWith("zzzznonexistent");
+        expect(response).toHaveBeenCalledWith([
+            expect.objectContaining({
+                isEmptyState: true,
+                label: "No results found for zzzznonexistent"
+            })
+        ]);
+    });
+
+    test("source callback does not inject an empty-state item for a blank query", () => {
+        const sourceFn = jest.fn(() => []);
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(sourceFn, jest.fn(), jest.fn());
+
+        const response = jest.fn();
+        $elem._capturedOpts.source({ term: "   " }, response);
+
+        expect(response).toHaveBeenCalledWith([]);
+    });
+
+    test("select callback ignores the empty-state item", () => {
+        const selectCb = jest.fn();
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(() => [], selectCb, jest.fn());
+
+        const event = { preventDefault: jest.fn(), keyCode: 13 };
+        const result = $elem._capturedOpts.select(event, {
+            item: { isEmptyState: true, label: "No results found for zzz" }
+        });
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(result).toBe(false);
+        expect(selectCb).not.toHaveBeenCalled();
+        expect(activity.searchWidget.value).toBeNull();
+    });
+
     test("select callback updates searchWidget fields and calls selectCb", () => {
         const selectCb = jest.fn();
         const activity = makeActivity();
@@ -352,14 +510,14 @@ describe("SearchUI.setupMainAutocomplete", () => {
         ui.setupMainAutocomplete(() => [], selectCb, jest.fn());
 
         const item = { label: "drum", value: "drum-id", specialDict: { name: "drum" } };
-        const event = { preventDefault: jest.fn(), keyCode: 0 };
+        const event = { preventDefault: jest.fn(), key: "" };
         $elem._capturedOpts.select(event, { item });
 
         expect(event.preventDefault).toHaveBeenCalled();
         expect(activity.searchWidget.value).toBe("drum");
         expect(activity.searchWidget.idInput_custom).toBe("drum-id");
         expect(activity.searchWidget.protoblk).toBe(item.specialDict);
-        expect(selectCb).toHaveBeenCalledWith(item, 0);
+        expect(selectCb).toHaveBeenCalledWith(item, "");
     });
 
     test("focus callback calls event.preventDefault", () => {
@@ -912,6 +1070,18 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
         expect(response).toHaveBeenCalledWith([{ label: "drum" }]);
     });
 
+    test("source callback injects an empty-state item when helpful search matches nothing", () => {
+        const sourceFn = jest.fn(() => []);
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(sourceFn, jest.fn());
+
+        const response = jest.fn();
+        $elem._capturedOpts.source({ term: "xyz" }, response);
+
+        expect(response.mock.calls[0][0][0].isEmptyState).toBe(true);
+        expect(response.mock.calls[0][0][0].label).toBe("No results found for xyz");
+    });
+
     test("select callback updates helpfulSearchWidget fields and calls selectCb", () => {
         const selectCb = jest.fn();
         const activity = makeActivity();
@@ -927,6 +1097,22 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
         expect(activity.helpfulSearchWidget.idInput_custom).toBe("drum-id");
         expect(activity.helpfulSearchWidget.protoblk).toBe(item.specialDict);
         expect(selectCb).toHaveBeenCalledWith(item);
+    });
+
+    test("select callback ignores the empty-state row", () => {
+        const selectCb = jest.fn();
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupHelpfulAutocomplete(() => [], selectCb);
+
+        const event = { preventDefault: jest.fn() };
+        const result = $elem._capturedOpts.select(event, {
+            item: { isEmptyState: true, label: "No results found for zzz" }
+        });
+
+        expect(result).toBe(false);
+        expect(selectCb).not.toHaveBeenCalled();
+        expect(activity.helpfulSearchWidget.value).toBe(null);
     });
 
     test("focus callback calls event.preventDefault", () => {
@@ -969,6 +1155,42 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
         const item = { label: "drum", artwork: "" };
         instance._renderItem(ul, item);
         expect(li.append).toHaveBeenCalled();
+    });
+
+    test("renders the empty-state row from the helpful-search instance", () => {
+        const instance = { _renderItem: null };
+        const li = {
+            0: { className: "", setAttribute: jest.fn() },
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        const anchor = {
+            0: { setAttribute: jest.fn() },
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        $elem.autocomplete = jest.fn(function (arg) {
+            if (typeof arg === "object") this._capturedOpts = arg;
+            if (arg === "instance") return instance;
+        });
+        global.window.jQuery = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>") return anchor;
+            return $elem;
+        });
+
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+
+        const ul = { css: jest.fn(() => ul) };
+        instance._renderItem(ul, { isEmptyState: true, label: "No results found for xyz" });
+
+        expect(li.addClass).toHaveBeenCalledWith("ui-state-disabled search-no-results");
+        expect(anchor.text).toHaveBeenCalledWith("No results found for xyz");
     });
 });
 
@@ -1088,6 +1310,8 @@ describe("SearchUI._renderMainItem", () => {
 
     beforeEach(() => {
         liEl = {
+            style: {},
+            querySelector: jest.fn(() => null),
             addEventListener: jest.fn()
         };
         liProxy = {
@@ -1119,6 +1343,21 @@ describe("SearchUI._renderMainItem", () => {
 
     afterEach(() => {
         jest.restoreAllMocks();
+    });
+
+    test("renders the empty-state row without drag handlers", () => {
+        liProxy.addClass = jest.fn();
+        liEl.setAttribute = jest.fn();
+        const ui = new SearchUI(makeActivity());
+        ui._renderMainItem(
+            $j,
+            ul,
+            { isEmptyState: true, label: "No results found for xyz" },
+            jest.fn()
+        );
+
+        expect(liProxy.addClass).toHaveBeenCalledWith("ui-state-disabled search-no-results");
+        expect(liEl.addEventListener).not.toHaveBeenCalled();
     });
 
     test("creates an img element and appends it to the li", () => {
@@ -1301,10 +1540,173 @@ describe("SearchUI._renderMainItem", () => {
         moveCall[1]({
             preventDefault: jest.fn(),
             type: "touchmove",
-            touches: [{ clientX: 55, clientY: 66 }]
+            touches: [{ clientX: 15, clientY: 26, pageX: 55, pageY: 66 }]
         });
         // 55 - 10 = 45
         expect(mockImg.style.left).toBe("45px");
         expect(mockImg.style.top).toBe("56px");
+    });
+});
+
+// ---------------------------------------------------------------------------
+// appendSuggestionLabel
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.appendSuggestionLabel", () => {
+    beforeEach(() => {
+        // Earlier suites assign mocks to document.createElement; drop the
+        // own property so the real jsdom implementation is used again.
+        delete document.createElement;
+    });
+
+    const makeRow = () => {
+        const row = document.createElement("li");
+        row.appendChild(document.createElement("img"));
+        return { 0: row, append: node => row.appendChild(node) };
+    };
+
+    test("shows the block name with its argument names in dimmed text", () => {
+        const li = makeRow();
+        const ui = new SearchUI(makeActivity());
+        ui.appendSuggestionLabel(li, {
+            label: "neighbor (+/–)",
+            argLabels: "scalar interval, note value"
+        });
+
+        const link = li[0].querySelector("a");
+        const args = link.querySelector(".search-item-args");
+        expect(link.firstChild.textContent).toBe("neighbor (+/–)");
+        expect(args.textContent).toBe("scalar interval, note value");
+        expect(args.style.opacity).toBe("0.7");
+    });
+
+    test("leaves out the argument span when there are no argument names", () => {
+        const li = makeRow();
+        const ui = new SearchUI(makeActivity());
+        ui.appendSuggestionLabel(li, { label: "drum", argLabels: "" });
+
+        const link = li[0].querySelector("a");
+        expect(link.textContent).toBe("drum");
+        expect(link.querySelector(".search-item-args")).toBeNull();
+    });
+
+    test("lays the row out so text wraps beside the icon", () => {
+        const li = makeRow();
+        const ui = new SearchUI(makeActivity());
+        ui.appendSuggestionLabel(li, { label: "drum" });
+
+        expect(li[0].style.display).toBe("flex");
+        expect(li[0].querySelector("img").style.flexShrink).toBe("0");
+        expect(li[0].querySelector("a").style.minWidth).toBe("0");
+    });
+});
+
+describe("SearchUI touch result placement", () => {
+    let dropCb, block;
+
+    let row, listeners, originalAutocomplete, originalJQuery;
+    const $ = jest.requireActual("jquery");
+
+    beforeEach(() => {
+        // Earlier suites assign DOM mocks directly. Use real DOM methods for gestures.
+        delete document.getElementById;
+        delete document.createElement;
+        delete document.addEventListener;
+        delete document.removeEventListener;
+        delete document.body.appendChild;
+        delete document.body.removeChild;
+        document.body.innerHTML = '<input id="search"><ul id="touch-search-results"></ul>';
+        originalAutocomplete = $.fn.autocomplete;
+        originalJQuery = window.jQuery;
+        const instance = {};
+        $.fn.autocomplete = jest.fn(function (arg) {
+            return arg === "instance" ? instance : this;
+        });
+        window.jQuery = $;
+        listeners = jest.spyOn(document, "addEventListener");
+
+        block = { name: "forward" };
+        dropCb = jest.fn();
+        const ui = new SearchUI(makeActivity());
+        const item = { label: "forward", value: "forward", specialDict: block };
+        row = ui._renderMainItem($, $("#touch-search-results"), item, dropCb)[0];
+    });
+
+    afterEach(() => {
+        for (const [type, listener, options] of listeners.mock.calls) {
+            document.removeEventListener(type, listener, options);
+        }
+        listeners.mockRestore();
+        $.fn.autocomplete = originalAutocomplete;
+        window.jQuery = originalJQuery;
+        document.body.innerHTML = "";
+    });
+
+    function touch(type, x, y, scrollX = 0, scrollY = 0) {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperty(event, "touches", {
+            value:
+                type === "touchend"
+                    ? []
+                    : [{ clientX: x, clientY: y, pageX: x + scrollX, pageY: y + scrollY }]
+        });
+        return event;
+    }
+
+    test("places a block after a touch tap without movement", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchend", 150, 180));
+
+        expect(dropCb).toHaveBeenCalledTimes(1);
+        expect(dropCb).toHaveBeenCalledWith(block, 150, 180);
+    });
+
+    test("places a dragged block at the last touch position", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchmove", 300, 350));
+        document.dispatchEvent(touch("touchend", 300, 350));
+
+        expect(dropCb).toHaveBeenCalledTimes(1);
+        expect(dropCb).toHaveBeenCalledWith(block, 300, 350);
+    });
+
+    test("still places a block after a mouse click", () => {
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 150, clientY: 180 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        expect(dropCb).toHaveBeenCalledTimes(1);
+        expect(dropCb).toHaveBeenCalledWith(block, 150, 180);
+    });
+
+    test("uses page coordinates for a stationary tap on a scrolled page", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180, 40, 90));
+        document.dispatchEvent(touch("touchend", 150, 180, 40, 90));
+
+        expect(dropCb).toHaveBeenCalledTimes(1);
+        expect(dropCb).toHaveBeenCalledWith(block, 190, 270);
+    });
+
+    test("does not repeat a completed touch placement on the next mouse gesture", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchend", 150, 180));
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 250, clientY: 280 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        expect(dropCb).toHaveBeenCalledTimes(2);
+        expect(dropCb).toHaveBeenLastCalledWith(block, 250, 280);
+    });
+
+    test("does not repeat a completed mouse placement on a later touch release", () => {
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 150, clientY: 180 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        document.dispatchEvent(touch("touchend", 250, 280));
+
+        expect(dropCb).toHaveBeenCalledTimes(1);
     });
 });

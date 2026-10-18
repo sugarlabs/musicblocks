@@ -117,7 +117,14 @@ function AIWidget() {
     this.pitchAnalysers = {};
 
     /**
-     * Disconnects and disposes the pitch analysers.
+     * Maps each synth name to the pitch analyser index and synth object it is
+     * currently connected to.
+     * @type {object}
+     */
+    this._connectedSynths = {};
+
+    /**
+     * Disposes the pitch analysers.
      * @private
      * @returns {void}
      */
@@ -125,13 +132,11 @@ function AIWidget() {
         for (const id in this.pitchAnalysers) {
             const analyser = this.pitchAnalysers[id];
             if (analyser) {
-                for (const synth in instruments[0]) {
-                    instruments[0][synth].disconnect(analyser);
-                }
                 analyser.dispose();
             }
         }
         this.pitchAnalysers = {};
+        this._connectedSynths = {};
     };
 
     /**
@@ -808,15 +813,24 @@ function AIWidget() {
             };
 
         widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
-            function () {
-                const key = prompt(
-                    _("Enter your Groq API Key: %s").replace(
-                        /%s/g,
-                        that.activity.storage.groq_api_key || ""
-                    )
-                );
+            async function () {
+                const currentKey = getGroqApiKey(that.activity);
+                let key;
+
+                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                    key = await window.MBDialog.prompt({
+                        title: _("Set API Key"),
+                        message: _("Enter your Groq API Key:"),
+                        defaultValue: currentKey,
+                        okText: _("Save"),
+                        cancelText: _("Cancel")
+                    });
+                } else {
+                    key = prompt(_("Enter your Groq API Key: %s").replace(/%s/g, currentKey));
+                }
+
                 if (key !== null) {
-                    that.activity.storage.groq_api_key = key.trim();
+                    setGroqApiKey(key.trim());
                 }
             };
 
@@ -965,21 +979,41 @@ function AIWidget() {
 
         // Connect instruments. Ref tone connects with the first pitchAnalyser.
         for (const synth in instruments[0]) {
+            const synthObject = instruments[0][synth];
+
             let analyser = 1;
             if (synth === REFERENCESAMPLE) {
                 analyser = 0;
             }
 
-            if (this.pitchAnalysers[analyser]) {
-                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
-                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+            const connection = this._connectedSynths[synth];
+            if (
+                this.pitchAnalysers[analyser] &&
+                (!connection ||
+                    connection.analyser !== analyser ||
+                    connection.synth !== synthObject)
+            ) {
+                synthObject.connect(this.pitchAnalysers[analyser]);
+                this._connectedSynths[synth] = {
+                    analyser,
+                    synth: synthObject
+                };
             }
 
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                if (this.pitchAnalysers[analyser]) {
-                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
-                    instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                const customConnection = this._connectedSynths[synth];
+                if (
+                    this.pitchAnalysers[analyser] &&
+                    (!customConnection ||
+                        customConnection.analyser !== analyser ||
+                        customConnection.synth !== synthObject)
+                ) {
+                    synthObject.connect(this.pitchAnalysers[analyser]);
+                    this._connectedSynths[synth] = {
+                        analyser,
+                        synth: synthObject
+                    };
                 }
             }
         }
@@ -1108,11 +1142,17 @@ function AIWidget() {
                 return;
             }
 
-            const apiKey = that.activity.storage.groq_api_key;
+            const apiKey = getGroqApiKey(that.activity);
             if (!apiKey) {
-                alert(
-                    _("Please set your Groq API Key using the settings button (wrench icon) first.")
+                const notice = _(
+                    "Please set your Groq API Key using the settings button (wrench icon) first."
                 );
+
+                if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                    window.MBDialog.alert(notice, _("Set API Key"));
+                } else {
+                    alert(notice);
+                }
                 return;
             }
 
@@ -1246,6 +1286,63 @@ function AIWidget() {
     };
 }
 
+/**
+ * Item name the Groq API key is stored under.
+ */
+const GROQ_API_KEY_ITEM = "groq_api_key";
+
+/**
+ * Returns the Groq API key for the current session.
+ * The key is a credential, so it is kept in sessionStorage, which the browser
+ * clears when the tab closes, rather than in the persistent store. A key saved
+ * by an earlier build is copied to sessionStorage and then removed from the old
+ * location; it is only removed once the copy is in place, so a storage failure
+ * cannot lose it.
+ *
+ * @param {Object} activity - the Activity, for the key saved by earlier builds
+ * @returns {String} - the API key, or an empty string when none is set
+ */
+function getGroqApiKey(activity) {
+    let stored = "";
+    try {
+        stored = sessionStorage.getItem(GROQ_API_KEY_ITEM) || "";
+    } catch (e) {
+        console.warn("Could not read the Groq API key from session storage:", e);
+    }
+
+    const legacy = activity.storage ? activity.storage[GROQ_API_KEY_ITEM] : null;
+    if (!legacy) {
+        return stored;
+    }
+
+    // The copy is already there, or it was just stored for this session.
+    if (stored || setGroqApiKey(legacy)) {
+        try {
+            delete activity.storage[GROQ_API_KEY_ITEM];
+        } catch (e) {
+            console.warn("Could not remove the stored Groq API key:", e);
+        }
+    }
+
+    return stored || legacy;
+}
+
+/**
+ * Saves the Groq API key for the current session.
+ *
+ * @param {String} key - the API key
+ * @returns {Boolean} - whether the key was stored for this session
+ */
+function setGroqApiKey(key) {
+    try {
+        sessionStorage.setItem(GROQ_API_KEY_ITEM, key);
+        return true;
+    } catch (e) {
+        console.warn("Could not save the Groq API key for this session:", e);
+        return false;
+    }
+}
+
 function adjustPitch(note, keySignature) {
     const accidental = keySignature.accidentals.find(acc => {
         const noteToCompare = acc.note.toUpperCase().replace(",", "");
@@ -1355,6 +1452,8 @@ if (typeof module !== "undefined" && module.exports) {
         adjustPitch,
         abcToStandardValue,
         createPitchBlocks,
-        searchIndexForMusicBlock
+        searchIndexForMusicBlock,
+        getGroqApiKey,
+        setGroqApiKey
     };
 }

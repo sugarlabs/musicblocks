@@ -179,6 +179,51 @@ describe("ToolbarUI - Visual Helpers", () => {
         expect(mockPlayBtn.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
     });
 
+    test.each([true, false])(
+        "init keeps translated tooltips paired with their controls (music blocks: %s)",
+        isMusicBlocks => {
+            const elements = new Map();
+            global.document.getElementById = jest.fn(id => {
+                if (!elements.has(id)) elements.set(id, createMockElement(id));
+                return elements.get(id);
+            });
+            global._THIS_IS_MUSIC_BLOCKS_ = isMusicBlocks;
+            global._ = jest.fn(text => `translated: ${text}`);
+            const activity = { beginnerMode: false };
+
+            toolbar.init(activity);
+
+            const labels = {
+                runSlowlyIcon: "Run slowly",
+                runStepByStepIcon: "Run step by step",
+                displayStatsIcon: "Display statistics",
+                loadPluginIcon: "Load plugin",
+                delPluginIcon: "Delete plugin",
+                languageSelectIcon: "Select language",
+                saveButtonAdvanced: "Save project as HTML"
+            };
+            for (const [id, label] of Object.entries(labels)) {
+                expect(elements.get(id).setAttribute).toHaveBeenCalledWith(
+                    "data-tooltip",
+                    `translated: ${label}`
+                );
+                expect(elements.get(id).setAttribute).toHaveBeenCalledWith(
+                    "aria-label",
+                    `translated: ${label}`
+                );
+            }
+            expect(elements.get("practiceLessonsItem").textContent).toBe(
+                "translated: Practice levels"
+            );
+
+            const onStep = jest.fn();
+            toolbar.renderRunStepIcon(onStep);
+            elements.get("runStepByStepIcon").onclick();
+            expect(onStep).toHaveBeenCalledTimes(1);
+            expect(onStep).toHaveBeenCalledWith(activity);
+        }
+    );
+
     test("renderWrapIcon sets aria-label alongside data-tooltip, and updates both on toggle", () => {
         const mockWrapIcon = createMockElement("wrapTurtle");
         global.document.getElementById = jest.fn(id => {
@@ -255,6 +300,42 @@ describe("FocusCycleManager - dispose", () => {
         expect(events).toContain("keydown");
         expect(events).toContain("mousedown");
         expect(events).toContain("focusin");
+    });
+});
+
+describe("ToolbarUI - renderGitDropdownIcon", () => {
+    test("wires click, mouseenter, and focus to call gitDropdownUI._syncMenuState", () => {
+        const toolbar = new ToolbarUI();
+        const mockBtn = createMockElement("gitProjectBtn");
+        global.document.getElementById = jest.fn(id => {
+            if (id === "gitProjectBtn") return mockBtn;
+            return createMockElement(id);
+        });
+
+        const mockGitDropdownUI = {
+            _syncMenuState: jest.fn()
+        };
+
+        toolbar.renderGitDropdownIcon(mockGitDropdownUI);
+
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
+
+        const clickHandler = mockBtn.addEventListener.mock.calls.find(c => c[0] === "click")[1];
+        const hoverHandler = mockBtn.addEventListener.mock.calls.find(
+            c => c[0] === "mouseenter"
+        )[1];
+        const focusHandler = mockBtn.addEventListener.mock.calls.find(c => c[0] === "focus")[1];
+
+        clickHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(1);
+
+        hoverHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(2);
+
+        focusHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(3);
     });
 });
 

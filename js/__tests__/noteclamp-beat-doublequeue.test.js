@@ -89,6 +89,8 @@ global.getIntervalDirection = jest.fn(() => 1);
 global.getIntervalNumber = jest.fn(() => 5);
 global.mixedNumber = jest.fn(n => n.toString());
 global.rationalToFraction = jest.fn(n => [1, Math.round(1 / n)]);
+const { getMeasurePosition, getMeterAnchor } = require("../utils/musicutils-rhythm");
+Object.assign(global, { getMeasurePosition, getMeterAnchor });
 global.doStopVideoCam = jest.fn();
 global.CAMERAVALUE = "camera:";
 global.VIDEOVALUE = "video:";

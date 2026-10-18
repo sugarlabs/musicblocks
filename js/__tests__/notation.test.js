@@ -130,20 +130,27 @@ describe("Notation Class", () => {
             const insideChord = false;
             const drum = ["kick"];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+            expect(notation._notationStaging[turtle][0][7]).toBe("kick");
             expect(notation._notationDrumStaging[turtle]).toContainEqual(
                 expect.arrayContaining([["drums"], expect.any(Number), expect.any(Number)])
             );
         });
 
-        it("should update notation with noise correctly", () => {
-            const note = "C4";
-            const duration = 4;
-            const turtle = "turtle1";
-            const insideChord = false;
-            const drum = ["noise1"];
-            notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
-            expect(notation._notationDrumStaging[turtle].length).toBe(0);
-        });
+        it.each(["noise1", "noise2", "noise3"])(
+            "should stage a rest on the drum line when note uses %s",
+            noiseName => {
+                const note = "C4";
+                const duration = 4;
+                const turtle = "turtle1";
+                const insideChord = false;
+                const drum = [noiseName];
+                notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+                const lastStaged = notation._notationStaging[turtle].slice(-1)[0];
+                const lastDrumStaged = notation._notationDrumStaging[turtle].slice(-1)[0];
+                expect(lastStaged[7]).toBeNull();
+                expect(lastDrumStaged[0]).toEqual(["R"]);
+            }
+        );
 
         it("should handle object notes with markup", () => {
             const note = { 0: "C4", 1: "D4" };
@@ -267,9 +274,13 @@ describe("Notation Class", () => {
         it("should add harmonics notation", () => {
             const turtle = "turtle1";
             notation.__notationHarmonic(turtle);
-            // In the source code, this pushes to this._notationStaging (without the turtle index)
-            // So let's test just the side effect
             expect(notation._pickupPoint[turtle]).toBeNull();
+            expect(notation._notationStaging[turtle]).toContain("harmonic");
+
+            const turtle2 = "turtle2";
+            notation.__notationHarmonic(turtle2);
+            expect(notation._pickupPoint[turtle2]).toBeNull();
+            expect(notation._notationStaging[turtle2]).toContain("harmonic");
         });
 
         it("should begin harmonics", () => {
@@ -338,6 +349,13 @@ describe("Notation Class", () => {
             const turtle = "turtle1";
             notation.notationEndSlur(turtle);
             expect(notation._notationStaging[turtle]).toEqual(["end slur"]);
+        });
+
+        it("should begin a repeat on both the note and drum staging", () => {
+            const turtle = "turtle1";
+            notation.notationBeginRepeat(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin repeat"]);
+            expect(notation._notationDrumStaging[turtle]).toEqual(["begin repeat"]);
         });
 
         it("should insert tie", () => {

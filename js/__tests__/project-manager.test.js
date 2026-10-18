@@ -43,6 +43,7 @@ beforeAll(() => {
     global.ensureABCJS = jest.fn().mockResolvedValue(undefined);
     global.extractProjectDataFromHTML = jest.fn();
     global.unescapeHTML = jest.fn(x => x);
+    global.isSafeUrl = jest.fn(url => /^https?:\/\//i.test(url));
     global.doSVG = jest.fn(() => "<svg></svg>");
     global.base64Encode = jest.fn(x => x);
     global.debugLog = jest.fn();
@@ -99,6 +100,8 @@ const makeActivity = (overrides = {}) => ({
     blocks: {
         blockList: [],
         loadNewBlocks: jest.fn(),
+        isLoading: jest.fn(() => false),
+        runAfterLoad: jest.fn(),
         palettes: { dict: {} },
         customTemperamentDefined: false
     },
@@ -437,6 +440,35 @@ describe("_loadStart", () => {
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
+    it("calls justLoadStart for whitespace-formatted empty JSON, not loadNewBlocks([])", async () => {
+        // " [ ]" parses to an empty array but doesn't match the literal
+        // "[]" string check above it. loadNewBlocks([]) completes
+        // synchronously inside blocks.js's own zero-block fast path,
+        // emitting "finishedLoading" before this call even returns — so if
+        // it were reached here, watchForDeferredLoadFailure() would
+        // register its listeners too late to ever see that completion,
+        // leaving them stranded (review comment on issue #8855's fix).
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: " [ ]",
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = " [ ]";
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.justLoadStart).toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+
+        // No watcher should have been left registered: a later, unrelated
+        // "loadFailed" must not trigger this session's recovery.
+        global.pubsub.emit("loadFailed", { error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+    });
+
     it("recovers from malformed JSON and removes the bad session key", async () => {
         const removeItem = jest.fn();
         const activity = makeActivity({
@@ -455,6 +487,11 @@ describe("_loadStart", () => {
             { operation: "loadSessionData" }
         );
         expect(removeItem).toHaveBeenCalledWith("SESSIONBad");
+        // Any blocks a partially-successful load left behind must be
+        // cleared before justLoadStart()/the fallback attempt runs, or the
+        // new stack renders on top of the leftovers instead of replacing
+        // them (reported against this fix).
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
@@ -510,6 +547,16 @@ describe("_loadStart", () => {
         expect(activity.keyboardEnableFlag).toBe(1); // re-enabled once load is done
     });
 
+    it("re-enables keyboard input after finishedLoading fires even when turtles are running", async () => {
+        const activity = makeActivity();
+        activity.turtles.running = jest.fn(() => true);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+        expect(activity.keyboardEnableFlag).toBe(0);
+        global.pubsub.emit("finishedLoading");
+        expect(activity.keyboardEnableFlag).toBe(1);
+    });
+
     it("post-load callback fires only once — self-unsubscribes after first event", async () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
@@ -518,6 +565,141 @@ describe("_loadStart", () => {
         const firstUpdateCount = activity.stage.update.mock.calls.length;
         global.pubsub.emit("finishedLoading"); // should be a no-op — listener removed
         expect(activity.stage.update).toHaveBeenCalledTimes(firstUpdateCount);
+    });
+
+    // A failure past loadNewBlocks()'s first ~20 blocks throws from inside a
+    // deferred setTimeout, so it can never reach the synchronous try/catch
+    // around tryParseAndLoad() below — it can only be reported through the
+    // "loadFailed" pubsub event instead (see issue #8855).
+    it("recovers via a 'loadFailed' event reporting a deferred chunk failure", async () => {
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const removeItem = jest.fn();
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem
+            }
+        });
+        activity.sessionData = sessionData;
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "start" }]);
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+
+        const deferredError = new Error("deferred chunk failure");
+        global.pubsub.emit("loadFailed", { error: deferredError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(deferredError, {
+            operation: "loadSessionData"
+        });
+        expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("ignores a 'loadFailed' event tagged with a different load's token", async () => {
+        // loadNewBlocks() tags "loadFailed"/"finishedLoading" with the token
+        // it returned for the request they belong to; a listener registered
+        // for one load must not react to some other, unrelated load's event
+        // just because the names match (review comment on issue #8855's
+        // fix). The token comes from loadNewBlocks()'s own return value —
+        // not some "currently active load" counter read afterward — since
+        // this request could still be sitting queued behind an unrelated
+        // one at that point.
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        activity.blocks.loadNewBlocks = jest.fn(() => 7);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "start" }]);
+
+        global.pubsub.emit("loadFailed", { token: 999, error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+
+        const deferredError = new Error("deferred chunk failure");
+        global.pubsub.emit("loadFailed", { token: 7, error: deferredError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(deferredError, {
+            operation: "loadSessionData"
+        });
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("watches its own request's token, not whatever load is active, when queued behind another (issue #8855)", async () => {
+        // Reproduces the race a reviewer flagged: loadNewBlocks() queues
+        // this request behind an unrelated one already in progress, so
+        // nothing is "currently active" for this request yet when
+        // _loadStart() registers its watcher. The token returned by
+        // loadNewBlocks() itself — not a counter read afterward — is what
+        // lets the watcher still find its own request's eventual outcome.
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        // This request (token 42) is queued behind an unrelated load that's
+        // still running (so an "active load" counter would point at that
+        // other load, not this one, if read right after this call).
+        activity.blocks.loadNewBlocks = jest.fn(() => 42);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        // The unrelated, already-running load fails first.
+        global.pubsub.emit("loadFailed", { token: 1, error: new Error("unrelated load") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+
+        // This request is dequeued and fails on its own later.
+        const ownError = new Error("this request's own failure");
+        global.pubsub.emit("loadFailed", { token: 42, error: ownError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(ownError, {
+            operation: "loadSessionData"
+        });
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("ignores a 'loadFailed' event that arrives after the load already succeeded", async () => {
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        global.pubsub.emit("finishedLoading");
+        // A stray "loadFailed" for some unrelated, later load must not run
+        // this session's recovery — the listener should already be gone.
+        global.pubsub.emit("loadFailed", { error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
     });
 });
 
@@ -764,6 +946,25 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["number", { value: 42 }]);
     });
 
+    it("exports a value block with manualAccidental if set (Issue #9003)", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            {
+                name: "notename",
+                trash: false,
+                value: "F",
+                manualAccidental: "♮",
+                collapsed: false,
+                container: { x: 0, y: 0 },
+                connections: [null],
+                isValueBlock: () => true
+            }
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
+    });
+
     it("exports namedbox with privateData", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
@@ -846,6 +1047,69 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["rhythmruler2", { collapsed: true }]);
     });
 
+    it("exports the Rhythm Maker edits with drum ids renumbered like connections", () => {
+        const activity = makeActivity();
+        const block = (name, extra = {}) => ({
+            name,
+            trash: false,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections: [null],
+            isValueBlock: () => false,
+            ...extra
+        });
+        activity.blocks.blockList = [
+            block("setdrum", { trash: true }),
+            block("rhythmruler2", {
+                rulerHistory: [
+                    [[[0, 2]], 2],
+                    [[3], 0]
+                ]
+            }),
+            block("setdrum")
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        // The trashed drum (block 0) is dropped and block 2 becomes block 1.
+        expect(result[0][1]).toEqual([
+            "rhythmruler2",
+            { collapsed: false, rulerHistory: [[[[0, 2]], 1]] }
+        ]);
+    });
+
+    describe("customsample", () => {
+        const exportSample = connections => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                {
+                    name: "customsample",
+                    trash: false,
+                    value: ["tuned", "data:audio/wav;base64,AAAA", "la", 4, 50],
+                    container: { x: 0, y: 0 },
+                    connections,
+                    isValueBlock: () => false
+                }
+            ];
+            return JSON.parse(new ProjectManager(activity).prepareExport())[0][1];
+        };
+
+        it("saves the cent adjustment and leaves the sample data to its audiofile block", () => {
+            // Dock 1 points at itself only so the export keeps a non-null connection.
+            expect(exportSample([null, 0, null, null])).toEqual([
+                "customsample",
+                { value: ["tuned", "", "la", 4, 50] }
+            ]);
+        });
+
+        it("keeps the sample data when no audiofile block is attached", () => {
+            expect(exportSample([null, null, null, null])).toEqual([
+                "customsample",
+                { value: ["tuned", "data:audio/wav;base64,AAAA", "la", 4, 50] }
+            ]);
+        });
+    });
+
     it("remaps connections to dense indices", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
@@ -924,6 +1188,30 @@ describe("saveLocally", () => {
         expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
             operation: "saveLocally_saveSession"
         });
+    });
+
+    it("keeps the saved session until a project load has finished", () => {
+        const storage = { "currentProject": "My Project", "SESSIONMy Project": "[saved]" };
+        const activity = makeActivity({ storage, canvas: { width: 100 } });
+        activity.blocks.isLoading.mockReturnValue(true);
+        const pm = new ProjectManager(activity);
+        pm.prepareExport = jest.fn(() => "[partial]");
+
+        pm.saveLocally();
+        pm.saveLocally();
+
+        expect(pm.prepareExport).not.toHaveBeenCalled();
+        expect(storage["SESSIONMy Project"]).toBe("[saved]");
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(2);
+        expect(activity.blocks.runAfterLoad.mock.calls[1][0]).toBe(
+            activity.blocks.runAfterLoad.mock.calls[0][0]
+        );
+
+        activity.blocks.isLoading.mockReturnValue(false);
+        pm.prepareExport.mockReturnValue("[full]");
+        activity.blocks.runAfterLoad.mock.calls[0][0]();
+
+        expect(storage["SESSIONMy Project"]).toBe("[full]");
     });
 });
 
@@ -1107,6 +1395,7 @@ describe("start() URL parameter parsing", () => {
     afterEach(() => {
         jest.useRealTimers();
         document.getElementById.mockRestore?.();
+        delete global.fetch;
     });
 
     const setURL = path => {
@@ -1153,6 +1442,21 @@ describe("start() URL parameter parsing", () => {
 
         expect(activity.projectID).toBe("project-42");
         expect(activity.loadStartWrapper).toHaveBeenCalled();
+    });
+
+    it("parses ?repo= URL param and schedules _loadProject without warning", () => {
+        setURL("/?repo=project-1588145070717097&run=True");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+
+        pm.start();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.projectID).toBe("project-1588145070717097");
+        expect(activity.loadStartWrapper).toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
     });
 
     it("parses run=true flag from multi-param URL", () => {
@@ -1217,6 +1521,147 @@ describe("start() URL parameter parsing", () => {
             expect.any(Object),
             expect.any(Array)
         );
+    });
+
+    it("leaves parameters owned by other modules alone", () => {
+        setURL("/?id=proj&music=true&debug=true&layoutProfiling=true&mbPerf=1");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.projectID).toBe("proj");
+    });
+
+    it("warns once however many parameters are unknown", () => {
+        setURL("/?id=proj&badparam=foo&worse=bar");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+    });
+
+    it("percent-decodes the project id", () => {
+        setURL("/?id=My%20Project");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.projectID).toBe("My Project");
+    });
+
+    it("matches parameter names case-insensitively", () => {
+        setURL("/?ID=proj");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+
+        pm.start();
+
+        expect(activity.projectID).toBe("proj");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    it("forwards the run flag to _loadProject", () => {
+        setURL("/?id=proj&run=true");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+
+        pm.start();
+        jest.advanceTimersByTime(200);
+
+        expect(pm._loadProject).toHaveBeenCalledWith(
+            "proj",
+            expect.objectContaining({ run: true, show: false, collapse: false }),
+            []
+        );
+    });
+
+    it("waits for inurl and forwards its argument in env", async () => {
+        jest.useRealTimers();
+        setURL("/?id=proj&inurl=https%3A%2F%2Fexample.org%2Fenv.json");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ arg: "7" })
+        });
+
+        pm.start();
+        expect(pm._loadProject).not.toHaveBeenCalled();
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            "https://example.org/env.json",
+            expect.any(Object)
+        );
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), [7]);
+    });
+
+    it("gives up on an inurl that never answers and still loads the project", async () => {
+        setURL("/?id=proj&inurl=https%3A%2F%2Fexample.org%2Fenv.json");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn(
+            (url, request) =>
+                new Promise((resolve, reject) => {
+                    request.signal.addEventListener("abort", () =>
+                        reject(new DOMException("Aborted", "AbortError"))
+                    );
+                })
+        );
+
+        pm.start();
+        await jest.advanceTimersByTimeAsync(10000);
+
+        expect(global.fetch.mock.calls[0][1].signal.aborted).toBe(true);
+
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), []);
+    });
+
+    it("refuses an unsafe inurl and still loads the project", async () => {
+        jest.useRealTimers();
+        setURL("/?id=proj&inurl=javascript%3Aalert(1)");
+        const activity = makeStartActivity();
+        activity.loadStartWrapper = jest.fn().mockImplementation(async (fn, ...args) => {
+            if (typeof fn === "function") await fn(activity, ...args);
+        });
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadProject = jest.fn();
+        global.fetch = jest.fn();
+
+        pm.start();
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledWith("Invalid parameters");
+        expect(pm._loadProject).toHaveBeenCalledWith("proj", expect.any(Object), []);
     });
 });
 
@@ -1669,6 +2114,27 @@ describe("saveLocally additional paths", () => {
         );
     });
 
+    it("can report a local session write failure to a replacing import", () => {
+        const saveError = new Error("quota exceeded");
+        const storage = { currentProject: "Current Project" };
+        Object.defineProperty(storage, "SESSIONCurrent Project", {
+            set: () => {
+                throw saveError;
+            }
+        });
+        const activity = makeActivity({ storage });
+        activity.blocks.blockList = makeBlockList();
+        const pm = new ProjectManager(activity);
+        const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(() => pm.saveLocally({ rejectOnProjectSaveError: true })).toThrow(saveError);
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(saveError, {
+            operation: "saveLocally_saveSession"
+        });
+
+        consoleSpy.mockRestore();
+    });
+
     it("saves thumbnail to storage when Image loads", () => {
         const origImage = global.Image;
         class FakeImage {
@@ -1941,6 +2407,331 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
+    it("change handler preserves the old project and saves the import after loading", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const order = [];
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => {
+                order.push("load-import");
+                return 7;
+            })
+        };
+        const planet = {
+            saveLocally: jest.fn(() => {
+                order.push("save-old");
+                return Promise.resolve();
+            }),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn((name, clearWorkspace) => {
+                order.push("create-project");
+                return Promise.resolve({ name, clearWorkspace });
+            })
+        };
+        let finishImportedSave;
+        const importedSave = new Promise(resolve => {
+            finishImportedSave = resolve;
+        });
+        const activity = makeActivity({
+            stage,
+            blocks,
+            planet,
+            gitDropdownUI: { clearForNewProject: jest.fn() },
+            saveLocally: jest.fn(() => {
+                order.push("save-import");
+                return importedSave;
+            })
+        });
+        activity.sendAllToTrash = jest.fn((_addStartBlock, doNotSave) => {
+            order.push(doNotSave ? "clear-without-save" : "clear-and-save");
+            stage.dispatchEvent("trashsignal");
+        });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(planet.initialiseNewProject).toHaveBeenCalledWith("student-song", false);
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(activity._allClear).toHaveBeenCalledWith(false, true);
+        expect(activity.gitDropdownUI.clearForNewProject).toHaveBeenCalledTimes(1);
+        expect(order).toEqual(["save-old", "clear-without-save", "create-project", "load-import"]);
+        expect(activity.saveLocally).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(true);
+
+        global.pubsub.emit("finishedLoading", { token: 7 });
+
+        expect(order).toEqual([
+            "save-old",
+            "clear-without-save",
+            "create-project",
+            "load-import",
+            "save-import"
+        ]);
+        expect(activity.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(activity.loading).toBe(true);
+
+        finishImportedSave();
+        await importedSave;
+        await Promise.resolve();
+
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler finishes loading when saving the imported project rejects", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => 7)
+        };
+        const saveError = new Error("import save failed");
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({
+            stage,
+            blocks,
+            planet,
+            saveLocally: jest.fn().mockRejectedValue(saveError)
+        });
+        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+        global.pubsub.emit("finishedLoading", { token: 7 });
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(activity.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(saveError, {
+            operation: "saveImportedProject"
+        });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler preserves the previous local session without Planet", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+        const storage = {
+            "currentProject": "Original Project",
+            "SESSIONOriginal Project": "older saved data",
+            "SESSIONstudent-song 2": "existing local project"
+        };
+        const sessionStorageManager = {
+            loadSession: jest.fn(key =>
+                Promise.resolve(
+                    key === "SESSIONstudent-song" ? { data: "existing large project" } : null
+                )
+            )
+        };
+        let projectData = "latest original data";
+        const saveLocally = jest.fn(() => {
+            storage["SESSION" + storage.currentProject] = projectData;
+        });
+        const saveSessionAsync = jest.fn(() => {
+            storage["SESSION" + storage.currentProject] = projectData;
+            return Promise.resolve();
+        });
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => {
+                projectData = "new imported data";
+                return 7;
+            })
+        };
+        const activity = makeActivity({
+            stage,
+            storage,
+            blocks,
+            saveLocally,
+            saveSessionAsync,
+            sessionStorageManager
+        });
+        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(storage["SESSIONOriginal Project"]).toBe("latest original data");
+        expect(storage.currentProject).toBe("student-song 3");
+        expect(storage["SESSIONstudent-song 2"]).toBe("existing local project");
+        expect(sessionStorageManager.loadSession).toHaveBeenCalledWith("SESSIONstudent-song");
+
+        global.pubsub.emit("finishedLoading", { token: 7 });
+        await jest.advanceTimersByTimeAsync(0);
+
+        expect(storage["SESSIONOriginal Project"]).toBe("latest original data");
+        expect(storage["SESSIONstudent-song 3"]).toBe("new imported data");
+        expect(saveSessionAsync).toHaveBeenCalledTimes(2);
+        expect(saveLocally).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler aborts local replacement when the IndexedDB save fails", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const saveError = new Error("IndexedDB save failed");
+        const saveLocally = jest.fn();
+        const activity = makeActivity({
+            saveLocally,
+            saveSessionAsync: jest.fn().mockRejectedValue(saveError),
+            sessionStorageManager: { loadSession: jest.fn() }
+        });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.saveSessionAsync).toHaveBeenCalledTimes(1);
+        expect(saveLocally).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(saveError, {
+            operation: "saveProjectBeforeImport"
+        });
+        expect(activity.storage.currentProject).toBe("Test Project");
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler aborts replacement when preserving the current project fails", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const saveError = new Error("save failed");
+        const planet = {
+            saveLocally: jest.fn().mockRejectedValue(saveError),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(saveError, {
+            operation: "saveProjectBeforeImport"
+        });
+        expect(planet.closePlanet).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity._allClear).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
     it("change handler cleans up when loading merged blocks throws", () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -2046,6 +2837,102 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(() => handlers.change()).not.toThrow();
     });
 
+    it("change handler parses ABC files through ABCJS and activity.parseABC", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC \\ D";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.ensureABCJS.mockResolvedValueOnce(undefined);
+        const mockTune = {
+            metaText: { title: "Test Tune" },
+            lines: [
+                {
+                    staff: [
+                        {
+                            voices: [
+                                [
+                                    {
+                                        el_type: "note",
+                                        pitches: [{ name: "C", pitch: 0 }]
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+        global.ABCJS.parseOnly.mockReturnValueOnce([mockTune]);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.abc" }];
+        handlers.change();
+        await readers[2].promise;
+
+        expect(global.ensureABCJS).toHaveBeenCalledTimes(1);
+        expect(global.ABCJS.parseOnly).toHaveBeenCalledWith("X:1\nK:C\nC \\ D");
+        expect(activity.parseABC).toHaveBeenCalledWith(mockTune);
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler reports rejected ABCJS loading and restores state", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        const abcError = new Error("ABCJS unavailable");
+        global.ensureABCJS.mockRejectedValueOnce(abcError);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.abc" }];
+        handlers.change();
+        await readers[2].promise;
+
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(abcError, {
+            operation: "abcImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(activity.parseABC).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
     it("drop handler cleans up when file is empty", () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -2119,7 +3006,72 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
-    it("drop handler catches a deferred block-load failure and restores state", () => {
+    it("drop handler clears without saving an empty project and saves after loading", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => {
+                global.pubsub.emit("finishedLoading", { token: 9 });
+                return 9;
+            })
+        };
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({
+            stage,
+            blocks,
+            planet,
+            saveLocally: jest.fn()
+        });
+        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "dropped-project.tb" }] }
+        });
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+        expect(planet.initialiseNewProject).toHaveBeenCalledWith("dropped-project", false);
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(activity.saveLocally).toHaveBeenCalledTimes(1);
+        expect(activity.saveLocally.mock.invocationCallOrder[0]).toBeGreaterThan(
+            blocks.loadNewBlocks.mock.invocationCallOrder[0]
+        );
+    });
+
+    it("drop handler catches a deferred block-load failure and restores state", async () => {
         origFileReader = global.FileReader;
         class MockFR {
             constructor() {
@@ -2162,7 +3114,7 @@ describe("_setupFileHandlers inner callbacks", () => {
             preventDefault: jest.fn(),
             dataTransfer: { files: [{ name: "broken.tb" }] }
         });
-        jest.advanceTimersByTime(200);
+        await jest.advanceTimersByTimeAsync(200);
 
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
         expect(global.ErrorHandler.capture).toHaveBeenCalledWith(loadError, {

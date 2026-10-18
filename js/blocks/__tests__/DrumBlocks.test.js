@@ -633,6 +633,25 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
     });
 
+    test("real PlayDrumBlock flow() plays the default drum when the slot is empty", () => {
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow([null], logo, 0, "blk1");
+        expect(global.Singer.DrumActions.GetDrumname).toHaveBeenCalledWith(global.DEFAULTDRUM);
+        expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith(
+            global.DEFAULTDRUM,
+            0,
+            "blk1"
+        );
+    });
+
     test("real PlayDrumBlock flow() calls playDrum in note context", () => {
         activity.turtles.ithTurtle = jest.fn(() => ({
             singer: {

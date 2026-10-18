@@ -99,10 +99,8 @@ class Turtles {
      */
     add(startBlock, infoDict) {
         if (startBlock !== null) {
-            // console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.getTurtleCount()) {
                 startBlock.value = this.getTurtleCount();
-                // console.debug("turtle #" + startBlock.value);
             }
         }
 
@@ -162,7 +160,6 @@ class Turtles {
             };
 
             turtlesStage.dispatchEvent("CursorDown" + turtle.id);
-            // console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
             turtle.container.on("pressmove", event => {
@@ -179,24 +176,23 @@ class Turtles {
         });
 
         turtle.container.on("pressup", () => {
-            // console.debug("--> [CursorUp " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorUp" + turtle.id);
         });
 
         turtle.container.on("click", () => {
             // If turtles listen for clicks then they can be used as buttons
-            // console.debug("--> [click " + turtle.name + "]");
             turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
         turtle.container.on("mouseover", () => {
-            // console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
-            if (turtle.running) {
+            if (turtle.running || turtle._isHovered) {
                 return;
             }
 
+            turtle._isHovered = true;
+            turtle._baseScale = turtle.container.scaleX;
             turtle.container.scaleX *= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
             turtle.container.scale = turtle.container.scaleX;
@@ -204,16 +200,18 @@ class Turtles {
         });
 
         turtle.container.on("mouseout", () => {
-            // console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
-            if (turtle.running) {
+            if (!turtle._isHovered) {
                 return;
             }
 
-            turtle.container.scaleX /= 1.2;
-            turtle.container.scaleY = turtle.container.scaleX;
-            turtle.container.scale = turtle.container.scaleX;
+            turtle._isHovered = false;
+            const targetScale =
+                turtle._baseScale !== undefined ? turtle._baseScale : turtle.container.scaleX / 1.2;
+            turtle.container.scaleX = targetScale;
+            turtle.container.scaleY = targetScale;
+            turtle.container.scale = targetScale;
             this.activity.refreshCanvas();
         });
 
@@ -894,11 +892,6 @@ Turtles.TurtlesView = class {
             canvas.style.backgroundColor = this._backgroundColor;
         }
 
-        // Also update body background if available
-        if (typeof document !== "undefined") {
-            document.body.style.backgroundColor = this._backgroundColor;
-        }
-
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
@@ -911,8 +904,7 @@ Turtles.TurtlesView = class {
             makeKeyboardAccessible(container, object.label || object.name || "Canvas button");
             if (typeof container.addEventListener === "function") {
                 container.addEventListener("keydown", event => {
-                    const isEscape =
-                        event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                    const isEscape = event.key === "Escape" || event.key === "Esc";
                     if (!isEscape) return;
 
                     event.preventDefault();
@@ -1261,6 +1253,7 @@ Turtles.TurtlesView = class {
             // Calculate new SVG container dimensions
             // const dx = newCanvasWidth - 20;
             // const dy = newCanvasHeight - 55 - LEADING;
+            this.activity.refreshCanvas();
         };
 
         const __makeBoundary2 = () => {
