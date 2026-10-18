@@ -342,9 +342,11 @@ function _initialTimeSignature(partEl) {
     // <beats>3+2</beats>/<beat-type>8</beat-type> pair, and it holds the sum.
     // Number("3+2") is NaN, and the meter block was handed that as its beat
     // count.
+    // An empty part ("3+", "3++2", or an empty <beats>) is malformed, not
+    // zero, so it falls back to 4 with the rest.
     const beats = (_text(timeEl, "beats") ?? "4")
         .split("+")
-        .reduce((total, part) => total + Number(part), 0);
+        .reduce((total, part) => total + (part.trim() === "" ? NaN : Number(part)), 0);
     const beatType = Number(_text(timeEl, "beat-type") ?? "4");
     return {
         beats: Number.isFinite(beats) && beats > 0 ? beats : 4,
