@@ -493,11 +493,10 @@ class Arpeggio {
         const arpeggioTable = this._arpeggioTable;
         let table;
         let row;
-        let cell;
         for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
             table = this._arpeggioCellTables[i];
             row = table.rows[0];
-            cell = row.insertCell();
+            const cell = row.insertCell();
             cell.style.height = Arpeggio.CELLSIZE + "px";
             cell.width = Arpeggio.CELLSIZE;
             cell.style.width = cell.width;
@@ -516,14 +515,14 @@ class Arpeggio {
             };
             cell.onmouseout = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = "var(--color-selector-bg)";
+                    cell.style.backgroundColor = this._getBackgroundColor(i);
                 }
             };
         }
 
         const arpeggioNoteTable = docById("arpeggioNoteTable");
         row = arpeggioNoteTable.rows[0];
-        cell = row.insertCell();
+        const cell = row.insertCell();
         cell.height = Arpeggio.CELLSIZE + 1 + "px";
         cell.width = Arpeggio.CELLSIZE;
         cell.style.width = cell.width + "px";
