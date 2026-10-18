@@ -913,49 +913,85 @@ describe("Oscilloscope", () => {
     });
 
     describe("reconnectSynthsToAnalyser", () => {
-        test("creates a new Tone.Analyser when none exists", () => {
+        test("creates waveform and spectrum Tone.Analysers when none exist", () => {
             const osc = createOscilloscope();
             global.instruments = { 0: {} };
 
             osc.reconnectSynthsToAnalyser(0);
 
             expect(osc.pitchAnalysers[0]).toBeDefined();
+            expect(osc.spectrumAnalysers[0]).toBeDefined();
+            expect(Tone.Analyser).toHaveBeenCalledTimes(2);
             expect(Tone.Analyser).toHaveBeenCalledWith({
                 type: "waveform",
                 size: Oscilloscope.analyserSize
             });
+            expect(Tone.Analyser).toHaveBeenCalledWith({
+                type: "fft",
+                size: 2048,
+                smoothing: 0.8
+            });
         });
 
-        test("reuses existing analyser when already created", () => {
+        test("reuses existing analysers when already created", () => {
             const osc = createOscilloscope();
-            const existing = { getValue: jest.fn(), connect: jest.fn() };
-            osc.pitchAnalysers[0] = existing;
+            const existingWaveform = { getValue: jest.fn(), connect: jest.fn() };
+            const existingSpectrum = { getValue: jest.fn(), connect: jest.fn() };
+            osc.pitchAnalysers[0] = existingWaveform;
+            osc.spectrumAnalysers[0] = existingSpectrum;
             global.instruments = { 0: {} };
             Tone.Analyser.mockClear();
 
             osc.reconnectSynthsToAnalyser(0);
 
             expect(Tone.Analyser).not.toHaveBeenCalled();
-            expect(osc.pitchAnalysers[0]).toBe(existing);
+            expect(osc.pitchAnalysers[0]).toBe(existingWaveform);
+            expect(osc.spectrumAnalysers[0]).toBe(existingSpectrum);
         });
-
-        test("connects each synth instrument to the analyser", () => {
+        test("creates only the spectrum analyser when a waveform analyser already exists", () => {
             const osc = createOscilloscope();
-            const mockConnect = jest.fn();
-            const mockAnalyser = { getValue: jest.fn(), connect: jest.fn() };
-            Tone.Analyser.mockImplementationOnce(() => mockAnalyser);
-            global.instruments = {
-                0: {
-                    synth1: { connect: mockConnect },
-                    synth2: { connect: mockConnect }
-                }
-            };
+            const existingWaveform = { getValue: jest.fn(), connect: jest.fn() };
+            osc.pitchAnalysers[0] = existingWaveform;
+            osc._connectedSynths[0] = new Set();
+            global.instruments = { 0: {} };
+            Tone.Analyser.mockClear();
 
             osc.reconnectSynthsToAnalyser(0);
 
-            expect(mockConnect).toHaveBeenCalledTimes(2);
-            expect(mockConnect).toHaveBeenCalledWith(mockAnalyser);
+            expect(Tone.Analyser).toHaveBeenCalledTimes(1);
+            expect(Tone.Analyser).toHaveBeenCalledWith({
+                type: "fft",
+                size: 2048,
+                smoothing: 0.8
+            });
+            expect(osc.pitchAnalysers[0]).toBe(existingWaveform);
+            expect(osc.spectrumAnalysers[0]).toBeDefined();
         });
+    });
+
+    test("connects each synth instrument to both analysers exactly once", () => {
+        const osc = createOscilloscope();
+        const waveformAnalyser = { getValue: jest.fn(), connect: jest.fn() };
+        const spectrumAnalyser = { getValue: jest.fn(), connect: jest.fn() };
+        // Waveform analyser is constructed first, then the spectrum analyser.
+        Tone.Analyser.mockImplementationOnce(() => waveformAnalyser).mockImplementationOnce(
+            () => spectrumAnalyser
+        );
+        const synth1 = { connect: jest.fn() };
+        const synth2 = { connect: jest.fn() };
+        global.instruments = {
+            0: { synth1, synth2 }
+        };
+
+        osc.reconnectSynthsToAnalyser(0);
+        // A second call must not reconnect synths that are already connected.
+        osc.reconnectSynthsToAnalyser(0);
+
+        for (const synth of [synth1, synth2]) {
+            expect(synth.connect).toHaveBeenCalledTimes(2);
+            expect(synth.connect).toHaveBeenCalledWith(waveformAnalyser);
+            expect(synth.connect).toHaveBeenCalledWith(spectrumAnalyser);
+        }
     });
 
     describe("_renderFrame", () => {
