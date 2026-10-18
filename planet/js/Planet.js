@@ -68,6 +68,10 @@ class Planet {
         this.ProjectStorage.saveLocally(data, image);
     }
 
+    saveThumbnail(image, projectId) {
+        return this.ProjectStorage.saveThumbnail(image, projectId);
+    }
+
     setAnalyzeProject(func) {
         this.analyzeProject = func;
     }
@@ -442,9 +446,18 @@ class Planet {
     }
 
     async closeButton() {
-        if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
+        const currentProjectID = this.ProjectStorage.getCurrentProjectID();
+        const projectMissing =
+            currentProjectID === undefined ||
+            currentProjectID === null ||
+            (Boolean(this.ProjectStorage.data?.Projects) &&
+                this.ProjectStorage.data.Projects[currentProjectID] === undefined);
+
+        if (projectMissing) {
+            this.loadNewProject();
+        } else if (currentProjectID !== this.oldCurrentProjectID) {
             const data = await this.ProjectStorage.getCurrentProjectData();
-            !data ? this.loadNewProject() : this.loadProjectFromData(data);
+            this.loadProjectFromData(data);
         } else this.planetClose();
     }
 

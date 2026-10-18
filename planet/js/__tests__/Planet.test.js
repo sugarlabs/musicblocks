@@ -23,6 +23,7 @@
  */
 
 const { Planet } = require("../Planet.js");
+global._ = jest.fn(str => str);
 
 describe("Planet", () => {
     it("should be defined", () => {
@@ -112,6 +113,24 @@ describe("Planet", () => {
             planet.ProjectStorage = mockStorage;
             planet.saveLocally("data", "image");
             expect(mockStorage.saveLocally).toHaveBeenCalledWith("data", "image");
+        });
+    });
+
+    describe("saveThumbnail", () => {
+        it("should call ProjectStorage.saveThumbnail", () => {
+            const planet = new Planet(true, {});
+            const mockStorage = { saveThumbnail: jest.fn() };
+            planet.ProjectStorage = mockStorage;
+            planet.saveThumbnail("image", "proj1");
+            expect(mockStorage.saveThumbnail).toHaveBeenCalledWith("image", "proj1");
+        });
+
+        it("should pass undefined projectId safely", () => {
+            const planet = new Planet(true, {});
+            const mockStorage = { saveThumbnail: jest.fn() };
+            planet.ProjectStorage = mockStorage;
+            planet.saveThumbnail("image", undefined);
+            expect(mockStorage.saveThumbnail).toHaveBeenCalledWith("image", undefined);
         });
     });
 
@@ -272,6 +291,7 @@ describe("Planet", () => {
         let planet;
 
         beforeEach(() => {
+            global._ = jest.fn(str => str);
             planet = new Planet(true, {});
             planet.planetClose = jest.fn();
             planet.loadNewProject = jest.fn();
@@ -293,9 +313,57 @@ describe("Planet", () => {
             expect(planet.loadProjectFromData).not.toHaveBeenCalled();
         });
 
-        it("should call loadNewProject if project ID changed and no data exists", async () => {
+        it("should call loadProjectFromData if project ID changed and project exists even if ProjectData is null", async () => {
             planet.oldCurrentProjectID = "old-id";
             planet.ProjectStorage.getCurrentProjectID.mockReturnValue("new-id");
+            planet.ProjectStorage.data = {
+                Projects: {
+                    "new-id": { ProjectName: "New", ProjectData: null }
+                }
+            };
+            planet.ProjectStorage.getCurrentProjectData.mockResolvedValue(null);
+
+            await planet.closeButton();
+
+            expect(planet.loadProjectFromData).toHaveBeenCalledWith(null);
+            expect(planet.loadNewProject).not.toHaveBeenCalled();
+            expect(planet.planetClose).not.toHaveBeenCalled();
+        });
+
+        it("should call loadProjectFromData if project ID changed and data exists", async () => {
+            planet.oldCurrentProjectID = "old-id";
+            planet.ProjectStorage.getCurrentProjectID.mockReturnValue("new-id");
+            planet.ProjectStorage.data = {
+                Projects: {
+                    "new-id": { ProjectName: "New", ProjectData: "project-data" }
+                }
+            };
+            planet.ProjectStorage.getCurrentProjectData.mockResolvedValue("project-data");
+
+            await planet.closeButton();
+
+            expect(planet.loadProjectFromData).toHaveBeenCalledWith("project-data");
+            expect(planet.planetClose).not.toHaveBeenCalled();
+        });
+
+        it("should load new project when active project was deleted and no replacement exists", async () => {
+            planet.oldCurrentProjectID = "deleted-id";
+            planet.ProjectStorage.getCurrentProjectID.mockReturnValue(undefined);
+            planet.ProjectStorage.getCurrentProjectData.mockResolvedValue(null);
+
+            await planet.closeButton();
+
+            expect(planet.loadNewProject).toHaveBeenCalled();
+            expect(planet.planetClose).not.toHaveBeenCalled();
+            expect(planet.loadProjectFromData).not.toHaveBeenCalled();
+        });
+
+        it("should load new project when projectMissing is true even if ID has not changed", async () => {
+            planet.oldCurrentProjectID = "deleted-id";
+            planet.ProjectStorage.getCurrentProjectID.mockReturnValue("deleted-id");
+            planet.ProjectStorage.data = {
+                Projects: {}
+            };
             planet.ProjectStorage.getCurrentProjectData.mockResolvedValue(null);
 
             await planet.closeButton();
@@ -304,15 +372,59 @@ describe("Planet", () => {
             expect(planet.planetClose).not.toHaveBeenCalled();
         });
 
-        it("should call loadProjectFromData if project ID changed and data exists", async () => {
-            planet.oldCurrentProjectID = "old-id";
-            planet.ProjectStorage.getCurrentProjectID.mockReturnValue("new-id");
-            planet.ProjectStorage.getCurrentProjectData.mockResolvedValue("project-data");
+        it("retains replacement project as current project and enters valid state when active project is deleted and replacement ProjectData is null", async () => {
+            const ProjectStorage = require("../ProjectStorage.js");
+            const storage = new ProjectStorage(planet);
+            const store = {};
+            storage.LocalStorage = {
+                getItem: jest.fn(async k => store[k] ?? null),
+                setItem: jest.fn(async (k, v) => {
+                    store[k] = v;
+                })
+            };
+            storage.fireDataLoaded();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Project 1",
+                        ProjectData: JSON.stringify([{ name: "start" }]),
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Project 2",
+                        ProjectData: null,
+                        DateLastModified: 500
+                    }
+                }
+            };
+            planet.ProjectStorage = storage;
+            planet.oldCurrentProjectID = "proj1";
 
+            // 1. Two local projects exist
+            expect(storage.getCurrentProjectID()).toBe("proj1");
+            expect(Object.keys(storage.data.Projects)).toEqual(["proj1", "proj2"]);
+
+            // 2. The active project is deleted
+            await storage.deleteProject("proj1");
+
+            // 3. The replacement project's record exists, but ProjectData is null
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+            expect(storage.data.Projects["proj2"]).toBeDefined();
+            expect(storage.data.Projects["proj2"].ProjectData).toBeNull();
+
+            // 4. Planet closes
             await planet.closeButton();
 
-            expect(planet.loadProjectFromData).toHaveBeenCalledWith("project-data");
-            expect(planet.planetClose).not.toHaveBeenCalled();
+            // 5. Assert:
+            // - Existing replacement project is retained as current project
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+            // - No unintended extra project is created
+            expect(Object.keys(storage.data.Projects)).toEqual(["proj2"]);
+            // - loadNewProject is NOT called (which would have created an extra project)
+            expect(planet.loadNewProject).not.toHaveBeenCalled();
+            // - loadProjectFromData is called with null (to load starter workspace)
+            expect(planet.loadProjectFromData).toHaveBeenCalledWith(null);
         });
     });
 
