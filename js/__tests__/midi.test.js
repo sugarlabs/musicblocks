@@ -707,22 +707,24 @@ describe("transcribeMidi", () => {
         // Writes a real MIDI file with @tonejs/midi and reads it back, so every note carries
         // the time in seconds the library derives from the file's tempo map.
         // lengths are in quarter notes; a negative length is a rest.
-        const midiFile = ({ tempos = [], timeSignature = null, lengths }) => {
+        const midiFile = ({ tempos = [], timeSignature = null, lengths, tracks = [lengths] }) => {
             const midi = new Midi();
             midi.header.tempos = tempos.map(([ticks, bpm]) => ({ ticks, bpm }));
             if (timeSignature) {
                 midi.header.timeSignatures = [{ ticks: 0, timeSignature }];
             }
             midi.header.update();
-            const track = midi.addTrack();
-            track.instrument.number = 0;
-            let ticks = 0;
-            lengths.forEach((quarters, index) => {
-                const durationTicks = Math.abs(quarters) * PPQ;
-                if (quarters > 0) {
-                    track.addNote({ midi: 60 + index, ticks, durationTicks });
-                }
-                ticks += durationTicks;
+            tracks.forEach(trackLengths => {
+                const track = midi.addTrack();
+                track.instrument.number = 0;
+                let ticks = 0;
+                trackLengths.forEach((quarters, index) => {
+                    const durationTicks = Math.abs(quarters) * PPQ;
+                    if (quarters > 0) {
+                        track.addNote({ midi: 60 + index, ticks, durationTicks });
+                    }
+                    ticks += durationTicks;
+                });
             });
             return new Midi(midi.toArray());
         };
@@ -929,10 +931,39 @@ describe("transcribeMidi", () => {
         });
 
         describe("long and tied lengths", () => {
+            // Where each track's notes and rests start in whole notes, then where it ends
+            const trackPositions = blocks => {
+                const byIndex = new Map(blocks.map(block => [block[0], block]));
+                const tracks = [];
+                let positions;
+                blocks.forEach(block => {
+                    if (blockName(block) === "action") {
+                        const track = parseInt(numberOf(byIndex, block[4][1]).slice(5));
+                        positions = tracks[track] = tracks[track] || [0];
+                    } else if (blockName(block) === "newnote") {
+                        const divide = byIndex.get(block[4][1]);
+                        const value =
+                            numberOf(byIndex, divide[4][1]) / numberOf(byIndex, divide[4][2]);
+                        positions.push(positions[positions.length - 1] + value);
+                    }
+                });
+                return tracks;
+            };
+
             it("keeps a rest of several bars at its full length", async () => {
                 const blocks = await importBlocks(midiFile({ lengths: [-8, 1, 1] }));
 
                 expect(noteValues(blocks)).toEqual(["2/1", "1/4", "1/4"]);
+            });
+
+            it("keeps a track that comes in after a long rest in time with the others", async () => {
+                const blocks = await importBlocks(
+                    midiFile({ tracks: [Array(12).fill(1), [-8, 1, 1, 1, 1]] })
+                );
+
+                const [melody, bass] = trackPositions(blocks);
+                expect(bass[1]).toBe(melody[8]);
+                expect(bass[bass.length - 1]).toBe(melody[melody.length - 1]);
             });
 
             it("keeps a note held over several bars at its full length", async () => {
