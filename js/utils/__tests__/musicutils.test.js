@@ -2361,6 +2361,49 @@ describe("getModePattern", () => {
         expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
     });
 
+    describe("custom mode", () => {
+        let savedCustom;
+
+        beforeEach(() => {
+            savedCustom = MUSICALMODES.custom;
+        });
+
+        afterEach(() => {
+            MUSICALMODES.custom = savedCustom;
+        });
+
+        it("keeps the default chromatic pattern in 12-EDO", () => {
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("uses the current pattern after MUSICALMODES.custom is replaced", () => {
+            // The define mode block (default name "custom") replaces the array.
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            expect(getModePattern("custom", 12)).toEqual([2, 2, 3, 2, 3]);
+            expect(buildScale("C custom")).toEqual([
+                ["C", "D", "E", "G", "A", "C"],
+                [2, 2, 3, 2, 3]
+            ]);
+        });
+
+        it("uses a replaced pattern in another EDO when its steps fit that EDO", () => {
+            MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2]; // sums to 19
+            expect(getModePattern("custom", 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+        });
+
+        it("falls back to one step per pitch when the pattern doesn't fit the EDO", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
+            expect(getModePattern("custom", 19)).toEqual(new Array(19).fill(1));
+        });
+
+        it("returns a copy, not the stored array", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            const out = getModePattern("custom", 12);
+            out.push(99);
+            expect(MUSICALMODES.custom).toEqual([2, 2, 3, 2, 3]);
+        });
+    });
+
     it("rescales a native 19-EDO custom mode requested at EDO 12", () => {
         MUSICALMODES._nineteenNative = [4, 3, 2, 3, 4, 3]; // sums to 19
         try {

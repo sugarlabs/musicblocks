@@ -863,9 +863,9 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * Get the step pattern for a mode in the given EDO (or temperament).
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
- * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
- * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
- * returns a full EDO-length step-1 pattern.
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom" mode,
+ * the current MUSICALMODES.custom pattern is used when its steps sum to the
+ * EDO; otherwise a full EDO-length step-1 (chromatic) pattern is returned.
  *
  * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
  * EDO step model does not apply, so the returned array is a list of per-step
@@ -883,8 +883,12 @@ var getModePattern = (mode, edo = 12) => {
         return overrides[mode].slice();
     }
     if (mode.toLowerCase() === "custom") {
-        if (edo === 12) {
-            return customMode.slice();
+        // Read MUSICALMODES.custom on each call rather than customMode: the
+        // define mode block, set temperament and saved custom modes all
+        // replace that array, so the copy taken at load time goes stale.
+        const custom = MUSICALMODES.custom;
+        if (Array.isArray(custom) && custom.reduce((a, b) => a + b, 0) === edo) {
+            return custom.slice();
         }
         return new Array(edo).fill(1);
     }
