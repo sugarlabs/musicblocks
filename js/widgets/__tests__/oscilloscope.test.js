@@ -219,10 +219,10 @@ describe("Oscilloscope", () => {
             expect(osc.widgetWindow).toBe(mockWidgetWindow);
         });
 
-        test("adds three buttons (zoom in, zoom out, freeze)", () => {
+        test("adds four buttons (zoom in, zoom out, freeze, mode)", () => {
             createOscilloscope();
 
-            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(3);
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(4);
         });
 
         test("calls sendToCenter", () => {
@@ -998,7 +998,7 @@ describe("Oscilloscope", () => {
             expect(osc.reconnectSynthsToAnalyser).toHaveBeenCalledWith(0);
             expect(ctx.fillRect).toHaveBeenCalled();
             expect(ctx.stroke).toHaveBeenCalled();
-            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
+            expect(osc._frozenFrames["0:waveform"]).toBeInstanceOf(Float32Array);
         });
 
         test("skips when frozen and no cached waveform exists", () => {
@@ -1018,9 +1018,9 @@ describe("Oscilloscope", () => {
             expect(ctx.fillRect).not.toHaveBeenCalled();
         });
 
-        test("captures waveform from analyser when frozen and no cached waveform exists", () => {
+        test("captures waveform when freezing", () => {
             const osc = createOscilloscope();
-            osc.isFrozen = true;
+            osc.reconnectSynthsToAnalyser = jest.fn();
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
@@ -1035,12 +1035,10 @@ describe("Oscilloscope", () => {
             };
             osc.pitchAnalysers[0] = mockAnalyser;
 
-            osc._renderFrame();
+            osc._captureFrozenFrames();
 
             expect(mockAnalyser.getValue).toHaveBeenCalled();
-            expect(osc._frozenWaveforms[0]).toEqual(analyserValues);
-            expect(ctx.fillRect).toHaveBeenCalled();
-            expect(ctx.stroke).toHaveBeenCalled();
+            expect(osc._frozenFrames["0:waveform"]).toEqual(analyserValues);
         });
 
         test("draws using cached waveform when frozen", () => {
@@ -1054,7 +1052,7 @@ describe("Oscilloscope", () => {
                 turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0
             };
-            osc._frozenWaveforms[0] = new Float32Array(128);
+            osc._frozenFrames["0:waveform"] = new Float32Array(128);
 
             osc._renderFrame();
 
