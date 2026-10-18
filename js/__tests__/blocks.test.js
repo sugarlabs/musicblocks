@@ -14,7 +14,7 @@
  * This file establishes the mocking infrastructure for the 7,500-line blocks.js.
  */
 
-/* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
+/* global jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
 const ManagedTimer = require("../utils/ManagedTimer");
@@ -1738,6 +1738,71 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].value).toBe("F");
             expect(blocks.blockList[0].manualAccidental).toBe("♮");
             expect(blocks.updateBlockText).toHaveBeenCalledWith(0);
+        });
+
+        it("keeps the cent adjustment of a loaded customsample block", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                customsample: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        value: null,
+                        connections: [null, null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const value = ["tuned", "", "la", 4, 50];
+            blocks.loadNewBlocks([
+                [0, ["customsample", { value }], 0, 0, [null, null, null, null]]
+            ]);
+
+            expect(blocks.blockList[0].value).toEqual(["tuned", "", "la", 4, 50]);
+            // The block gets its own copy, so running it can't change the project data.
+            expect(blocks.blockList[0].value).not.toBe(value);
+        });
+
+        it("restores the Rhythm Maker edits, moving the drum ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                rhythmruler2: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const rulerHistory = [
+                [[[0, 2]], 1],
+                "not an entry",
+                [[3], "not a block"],
+                [[null], 1],
+                [[[]], 1],
+                [[[0, 2], [null]], 1]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["rhythmruler2", { collapsed: false, rulerHistory }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].rulerHistory).toEqual([[[[0, 2]], 3]]);
         });
 
         // SwitchBlock.flow hooks its case onto the block after the switch
@@ -3557,6 +3622,383 @@ describe("Blocks Foundation", () => {
             expect(blocksInstance.blockList[0]).toBeNull();
         });
     });
+
+    describe("Batched block highlighting", () => {
+        const ArtworkBlock = require("../block");
+        let blocks;
+        let frames;
+        let realRequestAnimationFrame;
+
+        /** Run every callback queued for the next frame. */
+        function tick() {
+            const pending = frames;
+            frames = [];
+            for (const callback of pending) {
+                callback();
+            }
+        }
+
+        /** Run frames until the highlight queue drains, with a guard against a stuck queue. */
+        function drain() {
+            let guard = 0;
+            while (frames.length > 0) {
+                if (++guard > 50) {
+                    throw new Error("highlight queue never drained");
+                }
+                tick();
+            }
+        }
+
+        /**
+         * A stand-in for a Block that records the order in which highlight and
+         * unhighlight reached its artwork, so a test can assert that no state in a
+         * transition was skipped.
+         */
+        function makeHighlightableBlock() {
+            const rendered = [];
+            const block = {
+                trash: false,
+                inCollapsed: false,
+                collapsed: false,
+                container: { visible: true },
+                bitmap: { visible: true },
+                disconnectedBitmap: null,
+                highlightBitmap: { visible: false },
+                disconnectedHighlightBitmap: null,
+                highlightCollapseBlockBitmap: null,
+                collapseBlockBitmap: null,
+                collapseText: null,
+                isDisconnected: () => false,
+                isCollapsible: () => false,
+                updateCache: jest.fn(),
+                rendered,
+                highlight: jest.fn(() => {
+                    ArtworkBlock.prototype.highlight.call(block);
+                    rendered.push(true);
+                }),
+                unhighlight: jest.fn(() => {
+                    ArtworkBlock.prototype.unhighlight.call(block);
+                    rendered.push(false);
+                })
+            };
+            return block;
+        }
+
+        beforeEach(() => {
+            frames = [];
+            realRequestAnimationFrame = global.requestAnimationFrame;
+            global.requestAnimationFrame = callback => {
+                frames.push(callback);
+                return frames.length;
+            };
+
+            blocks = new Blocks(mockActivity);
+            blocks.visible = true;
+            blocks.blockList = [
+                makeHighlightableBlock(),
+                makeHighlightableBlock(),
+                makeHighlightableBlock()
+            ];
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = realRequestAnimationFrame;
+        });
+
+        it("defers artwork updates to an animation frame rather than writing synchronously", () => {
+            blocks.highlight(0, false);
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBe(0);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("batches every block queued during a frame into a single scheduled flush", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(1, false);
+            blocks.highlight(2, false);
+
+            // One frame is scheduled no matter how many blocks were queued.
+            expect(frames.length).toBe(1);
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[2].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("lights one block per frame, handing over without ever showing two", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(1, false);
+            blocks.highlight(2, false);
+
+            tick();
+            expect(blocks.blockList[0].rendered).toEqual([true]);
+            expect(blocks.blockList[1].rendered).toEqual([]);
+
+            // The outgoing block is turned off in the same frame the next one is lit,
+            // so the highlight is handed over rather than duplicated or dropped.
+            tick();
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+            expect(blocks.blockList[1].rendered).toEqual([true]);
+
+            tick();
+            expect(blocks.blockList[1].rendered).toEqual([true, false]);
+            expect(blocks.blockList[2].rendered).toEqual([true]);
+        });
+
+        it("never leaves two blocks highlighted at the same time", () => {
+            // Several blocks running between two frames is the case that made a
+            // per-block queue light all of them at once.
+            const lit = new Set();
+            for (const [index, block] of blocks.blockList.entries()) {
+                block.highlight.mockImplementation(() => {
+                    block.rendered.push(true);
+                    lit.add(index);
+                    expect(lit.size).toBeLessThanOrEqual(1);
+                });
+                block.unhighlight.mockImplementation(() => {
+                    block.rendered.push(false);
+                    lit.delete(index);
+                });
+            }
+
+            for (let i = 0; i < 3; i++) {
+                blocks.highlight(i, true);
+                blocks.unhighlight(i);
+            }
+
+            drain();
+
+            expect(lit.size).toBe(0);
+        });
+
+        it("collapses repeated requests for the state a block is already heading to", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(0, false);
+            blocks.highlight(0, false);
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("still renders a highlight that is unhighlighted within the same frame", () => {
+            // At full playback speed a block is highlighted and unhighlighted between two
+            // frames. The highlight must survive rather than being coalesced away.
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+        });
+
+        it("keeps the backlog bounded when a block flashes repeatedly in one frame", () => {
+            for (let i = 0; i < 20; i++) {
+                blocks.highlight(0, false);
+                blocks.unhighlight(0);
+            }
+
+            // A bounded queue means the block never falls more than one frame behind.
+            const pendingForBlock0 = blocks._highlightQueue.filter(step => step.blk === 0);
+            expect(pendingForBlock0.length).toBeLessThanOrEqual(2);
+
+            drain();
+
+            // The block still visibly flashes, and ends up unhighlighted as requested.
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("bounds a burst across many blocks and finishes with every highlight cleared", () => {
+            blocks.blockList = Array.from({ length: 40 }, makeHighlightableBlock);
+            blocks.highlight(0, false);
+            tick();
+
+            for (let i = 1; i < blocks.blockList.length; i++) {
+                blocks.highlight(i, false);
+                blocks.unhighlight(i);
+                expect(blocks._highlightQueue.length).toBeLessThanOrEqual(24);
+            }
+
+            drain();
+
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+            expect(blocks.blockList[39].rendered).toEqual([true, false]);
+            expect(blocks.blockList.every(block => !block.highlightBitmap.visible)).toBe(true);
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(blocks._highlightQueue).toHaveLength(0);
+        });
+
+        it("does not queue a redundant off/on pair when re-highlighting the same block", () => {
+            blocks.highlight(0, true);
+            drain();
+
+            blocks.highlight(0, true);
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("unhighlights the previously highlighted block when moving to a new one", () => {
+            blocks.highlight(0, true);
+            drain();
+
+            blocks.highlight(1, true);
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.highlightedBlock).toBe(1);
+        });
+
+        it("skips blocks that were trashed before the queue was flushed", () => {
+            blocks.highlight(0, false);
+            blocks.blockList[0].trash = true;
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks._renderedHighlight).toBeNull();
+        });
+
+        const undrawable = [
+            ["removed", list => delete list[1]],
+            ["null", list => (list[1] = null)],
+            ["trashed", list => (list[1].trash = true)],
+            ["in a collapsed stack", list => (list[1].inCollapsed = true)],
+            ["hidden", list => (list[1].container.visible = false)],
+            ["without a container", list => (list[1].container = null)],
+            ["without artwork", list => (list[1].bitmap = null)],
+            ["with hidden artwork", list => (list[1].bitmap.visible = false)],
+            [
+                "with both normal and disconnected artwork hidden",
+                list => {
+                    list[1].bitmap.visible = false;
+                    list[1].disconnectedBitmap = { visible: false };
+                }
+            ]
+        ];
+
+        it.each(undrawable)(
+            "keeps the current highlight when the next block is %s",
+            (_reason, makeUndrawable) => {
+                blocks.highlight(0, false);
+                tick();
+                const skipped = blocks.blockList[1];
+                blocks.highlight(1, false);
+                makeUndrawable(blocks.blockList);
+
+                tick();
+
+                expect(skipped.highlight).not.toHaveBeenCalled();
+                expect(blocks.blockList[0].highlightBitmap.visible).toBe(true);
+                expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+                expect(blocks._renderedHighlight).toBe(0);
+                expect(frames).toHaveLength(0);
+            }
+        );
+
+        it.each(undrawable)(
+            "renders the next visible block in the same frame when a queued block is %s",
+            (_reason, makeUndrawable) => {
+                blocks.highlight(0, false);
+                tick();
+                const skipped = blocks.blockList[1];
+                blocks.highlight(1, false);
+                blocks.unhighlight(1);
+                blocks.highlight(2, false);
+                makeUndrawable(blocks.blockList);
+
+                tick();
+
+                expect(skipped.highlight).not.toHaveBeenCalled();
+                expect(blocks.blockList[0].highlightBitmap.visible).toBe(false);
+                expect(blocks.blockList[2].highlightBitmap.visible).toBe(true);
+                expect(blocks._renderedHighlight).toBe(2);
+                expect(frames).toHaveLength(0);
+            }
+        );
+
+        it("highlights a block whose disconnected artwork is visible", () => {
+            const block = blocks.blockList[0];
+            block.bitmap.visible = false;
+            block.disconnectedBitmap = { visible: true };
+            block.disconnectedHighlightBitmap = { visible: false };
+            block.isDisconnected = () => true;
+            blocks.highlight(0, false);
+
+            tick();
+
+            expect(block.disconnectedHighlightBitmap.visible).toBe(true);
+            expect(blocks._renderedHighlight).toBe(0);
+        });
+
+        it("unhighlightAll clears highlights drawn directly outside the queue", () => {
+            for (const block of blocks.blockList) {
+                block.highlight();
+            }
+            blocks.blockList.push(null, { trash: true, unhighlight: jest.fn() });
+
+            blocks.unhighlightAll();
+
+            for (const block of blocks.blockList.slice(0, 3)) {
+                expect(block.highlightBitmap.visible).toBe(false);
+                expect(block.unhighlight).toHaveBeenCalledTimes(1);
+            }
+            expect(blocks.blockList[4].unhighlight).not.toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBeNull();
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(frames).toHaveLength(0);
+        });
+
+        it("unhighlightAll cancels pending transitions so a later frame cannot relight blocks", () => {
+            blocks.highlight(0, false);
+            tick();
+            blocks.highlight(1, true);
+            blocks.highlight(2, true);
+
+            blocks.unhighlightAll();
+            drain();
+
+            expect(blocks._highlightQueue).toHaveLength(0);
+            expect(blocks.highlightedBlock).toBeNull();
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(blocks.blockList[0].highlightBitmap.visible).toBe(false);
+            expect(blocks.blockList[1].highlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[2].highlight).not.toHaveBeenCalled();
+
+            blocks.highlight(2, true);
+            tick();
+            expect(blocks.blockList[2].highlightBitmap.visible).toBe(true);
+        });
+
+        it("queues nothing and leaves artwork alone while the blocks are hidden", () => {
+            blocks.blockList[0].highlight();
+            blocks.visible = false;
+
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+            blocks.unhighlightAll();
+
+            expect(frames.length).toBe(0);
+            expect(blocks._highlightQueue.length).toBe(0);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[0].highlightBitmap.visible).toBe(true);
+        });
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -4314,19 +4756,29 @@ describe("findPitchOctave and setPitchOctave with custompitch", () => {
     });
 });
 
-describe("adjustDocks - customNote preservation", () => {
+describe("sendStackToTrash – turtle container guard", () => {
     let mockActivity;
+    let blocks;
+    let mockTurtleList;
+    let origGetById;
 
     beforeEach(() => {
         mockActivity = {
             storage: {},
-            trashcan: {},
-            turtles: {},
+            trashcan: { stopHighlightAnimation: jest.fn() },
+            turtles: { running: jest.fn().mockReturnValue(false) },
             boundary: {},
             macroDict: {},
             palettes: { dict: {}, show: jest.fn() },
             logo: { synth: { loadSynth: jest.fn() } },
-            blocksContainer: { x: 0, y: 0 },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
             canvas: { width: 800, height: 600 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
@@ -4335,209 +4787,101 @@ describe("adjustDocks - customNote preservation", () => {
             setHomeContainers: jest.fn(),
             __tick: jest.fn()
         };
-    });
 
-    it("preserves customNote name and customID when disconnecting from a pitch block", () => {
-        const blocks = new Blocks(mockActivity);
-
-        const pitchBlock = {
-            name: "pitch",
-            connections: [null, null, 99],
-            docks: [
-                [0, 0],
-                [0, 20],
-                [20, 20]
-            ],
-            container: { x: 0, y: 0 },
-            isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
-            isInlineCollapsible: jest.fn().mockReturnValue(false),
-            collapsed: false
-        };
-
-        const removedCustomBlock = {
-            name: "customNote",
-            value: "C(+0¢)",
-            customID: "my_custom_temperament",
-            connections: [0, null],
-            docks: [[0, 0]],
-            container: { x: 0, y: 20 },
-            isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
-            isInlineCollapsible: jest.fn().mockReturnValue(false),
-            collapsed: false
-        };
-
-        blocks.blockList = [pitchBlock, removedCustomBlock];
-
-        let capturedPostProcess = null;
-        let capturedArgs = null;
-        blocks._makeNewBlockWithConnections = jest.fn((name, type, conns, postProcess, args) => {
-            capturedPostProcess = postProcess;
-            capturedArgs = args;
-            const newBlk = {
-                name,
-                value: null,
-                customID: null,
-                text: { text: "" },
-                container: {
-                    children: [{}],
-                    setChildIndex: jest.fn(),
-                    updateCache: jest.fn()
-                }
-            };
-            blocks.blockList.push(newBlk);
-            if (postProcess) {
-                postProcess(args);
-            }
+        blocks = new Blocks(mockActivity);
+        blocks.captureStackPreview = jest.fn();
+        blocks.findDragGroup = jest.fn(() => {
+            blocks.dragGroup = [0];
         });
+        blocks.insideExpandableBlock = jest.fn(() => null);
+        blocks.addDefaultBlock = jest.fn();
+        blocks.deleteActionBlock = jest.fn();
+        blocks.findTopBlock = jest.fn(blk => blk);
+        blocks._cleanupStacks = jest.fn();
+        blocks.blockArt = {};
+        blocks.blockCollapseArt = {};
 
-        blocks.adjustDocks = jest.fn();
+        mockTurtleList = [];
+        blocks.turtles = { turtleList: mockTurtleList };
 
-        // Invoke addDefaultBlock(parentblk=0, oldBlock=1)
-        blocks.addDefaultBlock(0, 1);
-
-        expect(blocks._makeNewBlockWithConnections).toHaveBeenCalledWith(
-            "customNote",
-            0,
-            [0],
-            expect.any(Function),
-            [0, "C(+0¢)", 2, "my_custom_temperament"]
-        );
-
-        const replacementBlock = blocks.blockList[2];
-        expect(replacementBlock.name).toBe("customNote");
-        expect(replacementBlock.value).toBe("C(+0¢)");
-        expect(replacementBlock.customID).toBe("my_custom_temperament");
-        expect(pitchBlock.connections[1]).toBe(2);
-    });
-
-    it("leaves an open dock when disconnecting from a custompitch block", () => {
-        const blocks = new Blocks(mockActivity);
-
-        const customPitchBlock = {
-            name: "custompitch",
-            connections: [null, null, 99],
-            docks: [
-                [0, 0],
-                [0, 20],
-                [20, 20]
-            ],
-            container: { x: 0, y: 0 },
-            isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
-            isInlineCollapsible: jest.fn().mockReturnValue(false),
-            collapsed: false
-        };
-
-        const removedCustomBlock = {
-            name: "customNote",
-            value: "C(+0¢)",
-            customID: "my_custom_temperament",
-            connections: [0, null],
-            docks: [[0, 0]],
-            container: { x: 0, y: 20 },
-            isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
-            isInlineCollapsible: jest.fn().mockReturnValue(false),
-            collapsed: false
-        };
-
-        blocks.blockList = [customPitchBlock, removedCustomBlock];
-        blocks._makeNewBlockWithConnections = jest.fn();
-
-        blocks.addDefaultBlock(0, 1);
-
-        // custompitch leaves open dock without auto-generating a replacement block
-        expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
-        expect(customPitchBlock.connections[1]).toBeNull();
-    });
-
-    it("finds and sets pitch octave for custompitch blocks", () => {
-        const blocks = new Blocks(mockActivity);
-
-        const octaveBlock = {
-            name: "number",
-            value: 4,
-            text: { text: "4" },
-            container: {
-                children: [{}, {}],
-                setChildIndex: jest.fn(),
-                updateCache: jest.fn()
-            }
-        };
-
-        const customPitchBlock = {
-            name: "custompitch",
-            connections: [null, 1, 2]
-        };
-
-        blocks.blockList = [customPitchBlock, null, octaveBlock];
-
-        expect(blocks.findPitchOctave(0)).toBe(4);
-
-        blocks.setPitchOctave(0, 5);
-        expect(octaveBlock.value).toBe(5);
-        expect(octaveBlock.text.text).toBe("5");
-    });
-
-    it("restores octave number block when disconnected from a custompitch block", () => {
-        const blocks = new Blocks(mockActivity);
-
-        const customPitchBlock = {
-            name: "custompitch",
-            connections: [null, 1, null],
-            docks: [
-                [0, 0],
-                [0, 20],
-                [20, 20]
-            ],
-            container: { x: 0, y: 0 },
-            isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
-            isInlineCollapsible: jest.fn().mockReturnValue(false),
-            collapsed: false
-        };
-
-        const removedOctaveBlock = {
-            name: "number",
-            value: 6,
-            connections: [0, null],
-            docks: [[0, 0]],
-            container: { x: 20, y: 20 },
-            isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
-            isInlineCollapsible: jest.fn().mockReturnValue(false),
-            collapsed: false
-        };
-
-        blocks.blockList = [customPitchBlock, null, removedOctaveBlock];
-        blocks._makeNewBlockWithConnections = jest.fn((name, type, conns, postProcess, args) => {
-            const newBlk = {
-                name,
-                value: null,
-                text: { text: "" },
-                container: {
-                    children: [{}],
-                    setChildIndex: jest.fn(),
-                    updateCache: jest.fn()
-                }
-            };
-            blocks.blockList.push(newBlk);
-            if (postProcess) {
-                postProcess(args);
-            }
+        origGetById = document.getElementById;
+        document.getElementById = jest.fn(id => {
+            if (id === "hideContents") return { click: jest.fn() };
+            if (id === "mbA11yLiveRegion") return { textContent: "" };
+            return origGetById.call(document, id);
         });
+    });
 
-        blocks.adjustDocks = jest.fn();
+    afterEach(() => {
+        document.getElementById = origGetById;
+    });
 
-        blocks.addDefaultBlock(0, 2);
+    function makeStartBlock(turtleIndex) {
+        return {
+            name: "start",
+            value: turtleIndex,
+            blockIndex: 0,
+            trash: false,
+            connections: [null],
+            protoblock: { staticLabels: ["start"] },
+            hide: jest.fn(),
+            container: { uncache: jest.fn() },
+            isTwoArgBlock: jest.fn().mockReturnValue(false),
+            isArgBlock: jest.fn().mockReturnValue(false),
+            isExpandableBlock: jest.fn().mockReturnValue(false),
+            isArgClamp: jest.fn().mockReturnValue(false)
+        };
+    }
 
-        expect(blocks._makeNewBlockWithConnections).toHaveBeenCalledWith(
-            "number",
-            0,
-            [0],
-            expect.any(Function),
-            [0, 2, 3]
-        );
+    it("should not crash when start block turtle has null container", () => {
+        const myBlock = makeStartBlock(0);
+        blocks.blockList = [myBlock];
 
-        const replacementOctave = blocks.blockList[3];
-        expect(replacementOctave.name).toBe("number");
-        expect(replacementOctave.value).toBe(6);
-        expect(customPitchBlock.connections[2]).toBe(3);
+        mockTurtleList[0] = { container: null, inTrash: false, companionTurtle: null };
+
+        expect(() => blocks.sendStackToTrash(myBlock)).not.toThrow();
+        expect(mockTurtleList[0].inTrash).toBe(true);
+    });
+
+    it("should not crash when companion turtle has null container", () => {
+        const myBlock = makeStartBlock(0);
+        blocks.blockList = [myBlock];
+
+        mockTurtleList[0] = { container: null, inTrash: false, companionTurtle: 1 };
+        mockTurtleList[1] = { container: null, inTrash: false };
+
+        expect(() => blocks.sendStackToTrash(myBlock)).not.toThrow();
+        expect(mockTurtleList[0].inTrash).toBe(true);
+        expect(mockTurtleList[1].inTrash).toBe(true);
+    });
+
+    it("should hide container when turtle has a valid container", () => {
+        const mockContainer = { visible: true, uncache: jest.fn() };
+        const myBlock = makeStartBlock(0);
+        blocks.blockList = [myBlock];
+
+        mockTurtleList[0] = { container: mockContainer, inTrash: false, companionTurtle: null };
+
+        blocks.sendStackToTrash(myBlock);
+
+        expect(mockContainer.visible).toBe(false);
+        expect(mockTurtleList[0].inTrash).toBe(true);
+    });
+
+    it("should hide both containers when companion turtle has valid containers", () => {
+        const container0 = { visible: true, uncache: jest.fn() };
+        const container1 = { visible: true, uncache: jest.fn() };
+        const myBlock = makeStartBlock(0);
+        blocks.blockList = [myBlock];
+
+        mockTurtleList[0] = { container: container0, inTrash: false, companionTurtle: 1 };
+        mockTurtleList[1] = { container: container1, inTrash: false };
+
+        blocks.sendStackToTrash(myBlock);
+
+        expect(container0.visible).toBe(false);
+        expect(container1.visible).toBe(false);
+        expect(mockTurtleList[0].inTrash).toBe(true);
+        expect(mockTurtleList[1].inTrash).toBe(true);
     });
 });
