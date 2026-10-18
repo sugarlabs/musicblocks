@@ -1252,22 +1252,52 @@ describe("newProject / _afterDelete", () => {
         jest.useRealTimers();
     });
 
-    it("uses planet new-project path when available", () => {
+    it("waits for the current Planet project to save before creating a new one", async () => {
+        let finishSave;
         const planet = {
             planet: {},
             getCurrentProjectName: jest.fn(() => "Real Project"),
-            saveLocally: jest.fn(),
+            saveLocally: jest.fn(
+                () =>
+                    new Promise(resolve => {
+                        finishSave = resolve;
+                    })
+            ),
             initialiseNewProject: jest.fn()
         };
         const activity = makeActivity({ planet });
         const pm = new ProjectManager(activity);
         pm._loadStart = jest.fn();
 
-        pm._afterDelete();
+        const newProject = pm._afterDelete();
 
-        expect(planet.saveLocally).toHaveBeenCalled();
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        finishSave();
+        await newProject;
         expect(planet.initialiseNewProject).toHaveBeenCalled();
         expect(pm._loadStart).toHaveBeenCalled();
+    });
+
+    it("keeps the current project when its save fails", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockRejectedValue(new Error("Storage full")),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        await pm._afterDelete();
+
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(pm._loadStart).not.toHaveBeenCalled();
+        expect(activity.storage.removeItem).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
+            operation: "saveProjectBeforeNewProject"
+        });
     });
 
     it("does not use planet path when project name is 'My Project'", () => {
