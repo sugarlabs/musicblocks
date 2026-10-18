@@ -28,6 +28,7 @@ const fs = require("fs");
 const path = require("path");
 const Block = require("../block");
 const ManagedTimer = require("../utils/ManagedTimer");
+const { retryWithBackoff: actualRetryWithBackoff } = require("../utils/retryWithBackoff");
 const musicutils = require("../utils/musicutils");
 
 Object.assign(global, {
@@ -182,10 +183,27 @@ describe("Block Foundation", () => {
             let originalImage;
             let mockImageInstance;
             let originalBase64Encode;
+            let originalCreateElement;
+            let mockCanvas;
 
             beforeEach(() => {
                 originalBase64Encode = window.base64Encode;
                 window.base64Encode = jest.fn(str => str);
+                originalCreateElement = document.createElement;
+                document.createElement = jest.fn(() => {
+                    mockCanvas = {
+                        width: 0,
+                        height: 0,
+                        getContext: jest.fn().mockReturnValue({
+                            fillRect: jest.fn(),
+                            strokeRect: jest.fn(),
+                            fillStyle: "",
+                            strokeStyle: "",
+                            lineWidth: 0
+                        })
+                    };
+                    return mockCanvas;
+                });
                 originalImage = global.Image;
                 global.Image = jest.fn(() => {
                     mockImageInstance = {
@@ -202,6 +220,11 @@ describe("Block Foundation", () => {
             afterEach(() => {
                 global.Image = originalImage;
                 window.base64Encode = originalBase64Encode;
+                if (originalCreateElement === undefined) {
+                    delete document.createElement;
+                } else {
+                    document.createElement = originalCreateElement;
+                }
             });
 
             it("should create a bitmap on successful image load and invoke callback", () => {
@@ -218,17 +241,30 @@ describe("Block Foundation", () => {
                 );
             });
 
-            it("should log debug message on image load error", () => {
+            it("should use a dimension-matched placeholder when SVG image decoding fails", () => {
                 const mockCallback = jest.fn();
-                Block._blockMakeBitmap("<svg></svg>", mockCallback, {});
+                const args = { width: 40, height: 20 };
+                Block._blockMakeBitmap(
+                    '<svg width="40" height="20" viewBox="0 0 40 20"></svg>',
+                    mockCallback,
+                    args
+                );
 
                 expect(typeof mockImageInstance.onerror).toBe("function");
                 mockImageInstance.onerror(new Error("Image decode failed"));
 
                 expect(consoleDebugSpy).toHaveBeenCalledWith(
-                    "Failed to load SVG bitmap from SVG data"
+                    "Failed to load SVG bitmap from SVG data; using placeholder",
+                    expect.any(Error)
                 );
-                expect(mockCallback).not.toHaveBeenCalled();
+                expect(mockCallback).toHaveBeenCalledTimes(1);
+
+                const [bitmap, callbackArgs] = mockCallback.mock.calls[0];
+                expect(bitmap).toEqual(expect.objectContaining({ visible: true }));
+                expect(bitmap.image.width).toBe(40);
+                expect(bitmap.image.height).toBe(20);
+                expect(callbackArgs).toBe(args);
+                expect(bitmap).not.toBeNull();
             });
         });
 
@@ -250,6 +286,60 @@ describe("Block Foundation", () => {
                 expect(global.retryWithBackoff).not.toHaveBeenCalled();
             });
 
+            it("should cancel a real first-load retry and resume initialization after trash restore", async () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                const container = new global.createjs.Container();
+                block.container = container;
+                container.visible = false;
+                container.bitmapCache = null;
+                container.getBounds = jest.fn(() => {
+                    block.trash = true;
+                    return null;
+                });
+
+                const callback = jest.fn();
+                const originalRetryWithBackoff = global.retryWithBackoff;
+                global.retryWithBackoff = actualRetryWithBackoff;
+
+                try {
+                    await block._createCache(callback, true);
+
+                    expect(container.getBounds).toHaveBeenCalledTimes(1);
+                    expect(block._firstLoadPending).toBe(true);
+                    expect(callback).not.toHaveBeenCalled();
+
+                    block.trash = false;
+                    container.getBounds.mockReturnValue({
+                        x: 0,
+                        y: 0,
+                        width: 50,
+                        height: 50
+                    });
+
+                    const loadHandlersSpy = jest
+                        .spyOn(block, "_loadEventHandlers")
+                        .mockImplementation(() => {});
+                    const addImageSpy = jest.spyOn(block, "_addImage").mockImplementation(() => {});
+                    const finishImageLoadSpy = jest
+                        .spyOn(block, "_finishImageLoad")
+                        .mockImplementation(() => {
+                            block.loadComplete = true;
+                        });
+
+                    block.show();
+                    await new Promise(resolve => setTimeout(resolve, 0));
+
+                    expect(container.cache).toHaveBeenCalledWith(0, 0, 50, 50);
+                    expect(loadHandlersSpy).toHaveBeenCalledTimes(1);
+                    expect(addImageSpy).toHaveBeenCalledTimes(1);
+                    expect(finishImageLoadSpy).toHaveBeenCalledTimes(1);
+                    expect(block.loadComplete).toBe(true);
+                    expect(block._firstLoadPending).toBe(false);
+                } finally {
+                    global.retryWithBackoff = originalRetryWithBackoff;
+                }
+            });
+
             it("should handle check callback guards when container becomes null or block is trashed", async () => {
                 const block = new Block(mockProtoBlock, mockBlocks);
                 block.container = new global.createjs.Container();
@@ -264,12 +354,12 @@ describe("Block Foundation", () => {
 
                 // Test container becomes null in check
                 block.container = null;
-                await expect(capturedOptions.check()).resolves.toBeUndefined();
+                expect(capturedOptions.check()).toBeNull();
 
                 // Test block becomes trashed in check
                 block.container = new global.createjs.Container();
                 block.trash = true;
-                await expect(capturedOptions.check()).resolves.toBeUndefined();
+                expect(capturedOptions.check()).toBeNull();
 
                 // Test valid check returns bounds
                 block.trash = false;
@@ -1649,8 +1739,9 @@ describe("Block Foundation", () => {
             expect(b.container.visible).toBe(true);
         });
 
-        it("should restore cache via _createCache in show() when bitmapCache is missing", () => {
+        it("should restore cache via _createCache in show() when a loaded block has no bitmapCache", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
+            b.loadComplete = true;
             b.container = { visible: false };
             b.trash = false;
             b.inCollapsed = false;
@@ -1673,6 +1764,22 @@ describe("Block Foundation", () => {
             expect(() => {
                 createCacheSpy.mock.calls[0][0](b, []);
             }).not.toThrow();
+        });
+
+        it("should not start a duplicate cache creation while first load is in flight", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = new global.createjs.Container();
+            b.container.bitmapCache = null;
+            b.trash = false;
+            b.inCollapsed = false;
+            b.loadComplete = false;
+            b._firstLoadPending = false;
+
+            const createCacheSpy = jest.spyOn(b, "_createCache").mockResolvedValue();
+
+            b.show();
+
+            expect(createCacheSpy).not.toHaveBeenCalled();
         });
     });
 

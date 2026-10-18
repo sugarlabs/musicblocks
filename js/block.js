@@ -111,8 +111,55 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.onerror = () => {
-        console.debug("Failed to load SVG bitmap from SVG data");
+    img.onerror = error => {
+        console.debug("Failed to load SVG bitmap from SVG data; using placeholder", error);
+
+        // Keep the bitmap-processing chain moving when malformed SVG cannot decode.
+        // Preserve the SVG dimensions where possible so cache bounds remain useful.
+        const svg = String(data);
+        const getDimension = name => {
+            const match = svg.match(new RegExp(`\\b${name}\\s*=\\s*["']([\\d.]+)`, "i"));
+            if (match && Number(match[1]) > 0) {
+                return Math.ceil(Number(match[1]));
+            }
+            return null;
+        };
+
+        let viewBoxWidth = null;
+        let viewBoxHeight = null;
+        const viewBoxMatch = svg.match(/\bviewBox\s*=\s*["']([^"']+)["']/i);
+        if (viewBoxMatch) {
+            const values = viewBoxMatch[1]
+                .trim()
+                .split(/[\s,]+/)
+                .map(Number);
+            viewBoxWidth = values[2];
+            viewBoxHeight = values[3];
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = getDimension("width") || viewBoxWidth || 1;
+        canvas.height = getDimension("height") || viewBoxHeight || 1;
+
+        try {
+            const context = canvas.getContext("2d");
+            if (context) {
+                context.fillStyle = "#eeeeee";
+                context.strokeStyle = "#666666";
+                context.lineWidth = Math.min(2, canvas.width, canvas.height);
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.strokeRect(
+                    context.lineWidth / 2,
+                    context.lineWidth / 2,
+                    Math.max(0, canvas.width - context.lineWidth),
+                    Math.max(0, canvas.height - context.lineWidth)
+                );
+            }
+        } catch (drawError) {
+            // A blank canvas is still a valid fallback bitmap if drawing is unavailable.
+        }
+
+        callback(new createjs.Bitmap(canvas), args);
     };
 
     img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
@@ -168,6 +215,7 @@ class Block {
         this.trash = false; // Is this block in the trash?
         this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
+        this._firstLoadPending = false; // Was first-load initialization interrupted by trashing?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this._boundExitKeyPressed = this._exitKeyPressed.bind(this);
@@ -376,8 +424,14 @@ class Block {
      */
     _createCache(callback, args) {
         const that = this;
+        const deferFirstLoad = () => {
+            if (args === true && that.trash) {
+                that._firstLoadPending = true;
+            }
+        };
 
         if (!that.container || that.trash) {
+            deferFirstLoad();
             return Promise.resolve();
         }
 
@@ -387,13 +441,16 @@ class Block {
         return retryWithBackoff({
             check: () => {
                 if (!that.container || that.trash) {
-                    return Promise.resolve();
+                    return null;
                 }
                 that.bounds = that.container.getBounds();
                 return that.bounds;
             },
+            shouldCancel: () => !that.container || that.trash,
+            onCancel: deferFirstLoad,
             onSuccess: bounds => {
                 if (!that.container || that.trash) {
+                    deferFirstLoad();
                     return;
                 }
                 that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -437,6 +494,7 @@ class Block {
                 that.container !== null &&
                 Boolean(that.container.bitmapCache) &&
                 !that.trash,
+            shouldCancel: () => !that.container || !that.container.bitmapCache || that.trash,
             onSuccess: () => {
                 if (that.container && that.container.bitmapCache && !that.trash) {
                     that.container.updateCache();
@@ -1261,12 +1319,7 @@ class Block {
                 const thisBlock = that.blockIndex;
 
                 if (firstTime) {
-                    that._loadEventHandlers();
-                    if (that.image !== null) {
-                        that._addImage();
-                    }
-
-                    that._finishImageLoad();
+                    that._completeFirstLoad();
                 } else {
                     if (that.isCollapsible()) {
                         that._ensureDecorationOnTop();
@@ -1487,6 +1540,23 @@ class Block {
         that.blocks.blockArt[that.blockIndex] = artwork;
 
         _blockMakeBitmap(artwork, __processBitmap, this);
+    }
+
+    /**
+     * Complete first-load initialization after the cache is ready.
+     * This is also used when a first load was interrupted because the block
+     * entered the trash before its cache could be created.
+     * @private
+     * @returns {void}
+     */
+    _completeFirstLoad() {
+        this._loadEventHandlers();
+        if (this.image !== null) {
+            this._addImage();
+        }
+
+        this._finishImageLoad();
+        this._firstLoadPending = false;
     }
 
     /**
@@ -2178,12 +2248,22 @@ class Block {
 
             this.updateCache();
 
-            // Ensure cache creation is retried/completed if it was skipped due to being trashed earlier.
-            if (
+            // Resume first-load initialization only when it was interrupted by trashing.
+            // A missing cache alone is insufficient: initial cache creation is async.
+            if (this._firstLoadPending) {
+                this._createCache(block => {
+                    if (block.activity && typeof block.activity.refreshCanvas === "function") {
+                        block.activity.refreshCanvas();
+                    }
+                    block._completeFirstLoad();
+                }, true);
+            } else if (
+                this.loadComplete &&
                 this.container &&
                 !this.container.bitmapCache &&
                 typeof this.generateArtwork === "function"
             ) {
+                // Fully loaded blocks may need their cache recreated after being restored.
                 this._createCache(block => {
                     if (block.activity && typeof block.activity.refreshCanvas === "function") {
                         block.activity.refreshCanvas();

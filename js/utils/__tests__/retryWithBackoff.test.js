@@ -281,6 +281,67 @@ describe("retryWithBackoff Utility", () => {
         });
     });
 
+    describe("Cancellation", () => {
+        test("stops without success or another retry when cancellation is detected after check", async () => {
+            let cancelled = false;
+            const check = jest.fn(() => {
+                cancelled = true;
+                return null;
+            });
+            const shouldCancel = jest.fn(() => cancelled);
+            const onCancel = jest.fn();
+            const onRetry = jest.fn();
+            const onSuccess = jest.fn();
+            const delayFn = jest.fn().mockResolvedValue();
+
+            await expect(
+                retryWithBackoff({
+                    check,
+                    shouldCancel,
+                    onCancel,
+                    onRetry,
+                    onSuccess,
+                    delayFn,
+                    maxRetries: 3
+                })
+            ).resolves.toBeUndefined();
+
+            expect(check).toHaveBeenCalledTimes(1);
+            expect(onCancel).toHaveBeenCalledTimes(1);
+            expect(onRetry).not.toHaveBeenCalled();
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(delayFn).not.toHaveBeenCalled();
+        });
+
+        test("stops before another check when cancellation occurs during backoff", async () => {
+            let cancelled = false;
+            const check = jest.fn().mockReturnValue(null);
+            const shouldCancel = jest.fn(() => cancelled);
+            const onCancel = jest.fn();
+            const onRetry = jest.fn();
+            const delayFn = jest.fn().mockImplementation(async () => {
+                cancelled = true;
+            });
+
+            await expect(
+                retryWithBackoff({
+                    check,
+                    shouldCancel,
+                    onCancel,
+                    onRetry,
+                    onSuccess: jest.fn(),
+                    delayFn,
+                    maxRetries: 3
+                })
+            ).resolves.toBeUndefined();
+
+            expect(check).toHaveBeenCalledTimes(1);
+            expect(onCancel).toHaveBeenCalledTimes(1);
+            expect(onRetry).toHaveBeenCalledTimes(1);
+            expect(delayFn).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("Max Retries Exhaustion and Rejection", () => {
         test("rejects with Error when maxRetries is reached without success", async () => {
             const check = jest.fn().mockReturnValue(false);
