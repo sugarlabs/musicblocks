@@ -266,7 +266,9 @@ class Oscilloscope {
         } else {
             this.isFrozen = false;
             this._frozenFrames = {};
-            this._startAnimation();
+            if (this.divisions.length > 0) {
+                this._startAnimation();
+            }
         }
 
         this._updateFreezeButton();
@@ -507,12 +509,20 @@ class Oscilloscope {
 
         for (let x = 0; x < width; x++) {
             const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, x / width);
-
-            const index = Math.floor((frequency / nyquist) * dataArray.length);
-
-            if (index < 0 || index >= dataArray.length) continue;
-
-            const db = dataArray[index];
+            const nextFrequency =
+                minFrequency * Math.pow(maxFrequency / minFrequency, (x + 1) / width);
+            const startIndex = Math.floor((frequency / nyquist) * dataArray.length);
+            const endIndex = Math.min(
+                dataArray.length,
+                Math.max(startIndex + 1, Math.ceil((nextFrequency / nyquist) * dataArray.length))
+            );
+            if (startIndex < 0 || startIndex >= dataArray.length || endIndex <= startIndex) {
+                continue;
+            }
+            let db = -Infinity;
+            for (let index = startIndex; index < endIndex; index++) {
+                db = Math.max(db, dataArray[index]);
+            }
 
             const normalized = Math.max(0, Math.min(1, (db - dbFloor) / (dbCeiling - dbFloor)));
 
