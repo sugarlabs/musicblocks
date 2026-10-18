@@ -1901,14 +1901,24 @@ class Blocks {
             if (this._deferCheckBounds) return;
             const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
 
+            const wasVisible =
+                this.boundary &&
+                this.boundary._container &&
+                Boolean(this.boundary._container.visible);
+
             let onScreen = true;
             for (const block of this.blockList) {
                 if (!block || block.trash) continue;
                 if (block.connections[0] === null) {
-                    if (block.offScreen(this.boundary)) {
+                    if (
+                        this.boundary &&
+                        typeof this.boundary.offScreen === "function" &&
+                        block.offScreen(this.boundary)
+                    ) {
                         this.activity.setHomeContainers(true);
-                        /** Just highlight the button. */
-                        /** this.boundary.show(); */
+                        if (typeof this.boundary.show === "function") {
+                            this.boundary.show();
+                        }
                         onScreen = false;
                         break;
                     }
@@ -1917,7 +1927,22 @@ class Blocks {
 
             if (onScreen) {
                 this.activity.setHomeContainers(false);
-                this.boundary.hide();
+                if (this.boundary && typeof this.boundary.hide === "function") {
+                    this.boundary.hide();
+                }
+            }
+
+            const isVisible =
+                this.boundary &&
+                this.boundary._container &&
+                Boolean(this.boundary._container.visible);
+
+            if (wasVisible !== isVisible) {
+                if (this.activity && typeof this.activity.refreshCanvas === "function") {
+                    this.activity.refreshCanvas();
+                } else if (this.deps && typeof this.deps.refreshCanvas === "function") {
+                    this.deps.refreshCanvas();
+                }
             }
 
             if (start > 0) {
