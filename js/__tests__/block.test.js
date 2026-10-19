@@ -2932,4 +2932,36 @@ describe("Block Foundation", () => {
             expect(block.getLayoutUpdateType(3)).toBeNull();
         });
     });
+
+    describe("_newArtwork() clamp counts propagation", () => {
+        let block;
+        let mockPb;
+
+        beforeEach(() => {
+            mockPb = {
+                style: "arg",
+                expandable: true,
+                generator: jest.fn(() => ["<svg></svg>", [[0, 0]], 100, 40, 40])
+            };
+            block = new Block(mockPb, mockBlocks);
+            block.clampCount = [2, 3];
+            block.isInlineCollapsible = () => false;
+            block.isCollapsible = () => false;
+        });
+
+        it("passes both clamp counts to generator for argument blocks", () => {
+            block.name = "multiply";
+            block._newArtwork(1);
+            expect(mockPb.generator).toHaveBeenCalledWith(2, 3);
+        });
+
+        it("passes both clamp counts to generator for comparison blocks", () => {
+            for (const compName of ["equal", "greater", "less"]) {
+                block.name = compName;
+                mockPb.generator.mockClear();
+                block._newArtwork(1);
+                expect(mockPb.generator).toHaveBeenCalledWith(2, 3);
+            }
+        });
+    });
 });

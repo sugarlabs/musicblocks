@@ -999,12 +999,17 @@ class Blocks {
                     updated = true;
                 }
 
-                /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy). */
+                /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy) and two-arg arg blocks (e.g., multiply). */
                 const isTwoArgFlow =
                     typeof myBlock.isTwoArgBlock === "function"
                         ? myBlock.isTwoArgBlock()
                         : myBlock.name === "setxy";
-                if (isTwoArgFlow) {
+                const isTwoArgArg =
+                    typeof myBlock.isArgBlock === "function" &&
+                    myBlock.isArgBlock() &&
+                    myBlock.protoblock &&
+                    myBlock.protoblock.args === 2;
+                if (isTwoArgFlow || isTwoArgArg) {
                     /** Determine the size of the second argument. */
                     const c2 = myBlock.connections[2];
                     let secondArgumentSize = 1; /** Minimum size */
