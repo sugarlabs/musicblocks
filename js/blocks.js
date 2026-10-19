@@ -24,7 +24,7 @@
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
-    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
+    splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
     CAMERAVALUE, VIDEOVALUE, setupBlockDragController,
@@ -59,8 +59,7 @@
         addTemperamentToDictionary,
         getDrumSynthName, getNoiseName, getNoiseSynthName,
         getTemperamentsList, getVoiceSynthName, i18nSolfege,
-        setOctaveRatio, splitScaleDegree, splitSolfege,
-        updateTemperaments
+        splitScaleDegree, splitSolfege, updateTemperaments
 */
 // Constants moved to js/block-constants.js
 
@@ -6391,19 +6390,15 @@ class Blocks {
                                 customName = value.customName;
                             }
                             if (value.customTemperamentNotes !== undefined) {
+                                const notes = value.customTemperamentNotes;
+                                notes.octaveRatio ??= value.octaveSpace;
                                 deleteTemperamentFromList(customName);
-                                addTemperamentToDictionary(
-                                    customName,
-                                    value.customTemperamentNotes
-                                );
+                                addTemperamentToDictionary(customName, notes);
                                 updateTemperaments();
                             }
                             /** Is this correct? */
                             if (value.startingPitch !== undefined) {
                                 that.activity.logo.synth.startingPitch = value.startingPitch;
-                            }
-                            if (value.octaveSpace !== undefined) {
-                                setOctaveRatio(value.octaveSpace);
                             }
                             that.activity.logo.customTemperamentDefined = true;
                             that.protoBlockDict["custompitch"].hidden = false;
