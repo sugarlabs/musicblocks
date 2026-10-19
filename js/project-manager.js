@@ -24,7 +24,7 @@
    unescapeHTML,
    isSafeUrl,
    getTemperament,
-   getOctaveRatio,
+   getEffectiveOctaveRatio,
    debugLog,
    platformColor,
    transcribeMidi,
@@ -806,7 +806,7 @@ class ProjectManager {
                                 customName: customName,
                                 customTemperamentNotes: getTemperament(customName),
                                 startingPitch: activity.logo?.synth?.startingPitch || 392,
-                                octaveSpace: getOctaveRatio()
+                                octaveSpace: getEffectiveOctaveRatio(customName)
                             };
                         }
                         break;

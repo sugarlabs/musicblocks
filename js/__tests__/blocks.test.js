@@ -1890,6 +1890,61 @@ describe("Blocks Foundation", () => {
             ]);
         });
 
+        describe("custom temperament octave space", () => {
+            const loadTemperament = value => {
+                const blocks = new Blocks(mockActivity);
+                mockActivity.palettes.updatePalettes = jest.fn();
+                blocks.protoBlockDict = {
+                    temperament1: { hasCapability: () => false, dockTypes: [] },
+                    custompitch: { hidden: true }
+                };
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._updateSpatialGrid = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn(
+                    (name, offset, conns, postProcess, args) => {
+                        blocks.blockList[args[0]] = {
+                            name,
+                            connections: [null, null, null, null],
+                            container: { x: 0, y: 0 }
+                        };
+                        postProcess(args);
+                    }
+                );
+                blocks.loadNewBlocks([
+                    [0, ["temperament1", value], 0, 0, [null, null, null, null]]
+                ]);
+            };
+
+            it("gives the temperament the octave space saved beside its notes", () => {
+                loadTemperament({
+                    customName: "tritave",
+                    customTemperamentNotes: { pitchNumber: 1, 0: [1, "C", 4] },
+                    octaveSpace: 3
+                });
+
+                expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("tritave", {
+                    pitchNumber: 1,
+                    0: [1, "C", 4],
+                    octaveRatio: 3
+                });
+                expect(global.setOctaveRatio).not.toHaveBeenCalled();
+            });
+
+            it("keeps the octave ratio the notes already carry", () => {
+                loadTemperament({
+                    customName: "tritave",
+                    customTemperamentNotes: { pitchNumber: 1, octaveRatio: 3, 0: [1, "C", 4] },
+                    octaveSpace: 2
+                });
+
+                expect(global.addTemperamentToDictionary).toHaveBeenCalledWith(
+                    "tritave",
+                    expect.objectContaining({ octaveRatio: 3 })
+                );
+                expect(global.setOctaveRatio).not.toHaveBeenCalled();
+            });
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is
@@ -2850,7 +2905,7 @@ describe("Blocks Foundation", () => {
             global.base64Encode = jest.fn(x => x);
             global.debugLog = jest.fn();
             global.getTemperament = jest.fn(() => [440]);
-            global.getOctaveRatio = jest.fn(() => 2);
+            global.getEffectiveOctaveRatio = jest.fn(() => 2);
             global.transcribeMidi = jest.fn();
             global.amdRequire = jest.fn((deps, cb) => cb && cb());
             global.DATAOBJS = makeBatch(1);

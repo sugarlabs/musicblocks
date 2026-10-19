@@ -48,7 +48,7 @@ beforeAll(() => {
     global.base64Encode = jest.fn(x => x);
     global.debugLog = jest.fn();
     global.getTemperament = jest.fn(() => [440]);
-    global.getOctaveRatio = jest.fn(() => 2);
+    global.getEffectiveOctaveRatio = jest.fn(() => 2);
     global.transcribeMidi = jest.fn();
     // AMD-style require stub so _midiImportBlocks confirm button doesn't crash
     global.amdRequire = jest.fn((deps, cb) => cb && cb());
@@ -2146,6 +2146,53 @@ describe("prepareExport additional block types", () => {
         const pm = new ProjectManager(activity);
         const result = JSON.parse(pm.prepareExport());
         expect(result[0][1][1].customName).toBe("myScale");
+    });
+
+    it("exports each custom temperament with its own octave space", () => {
+        const temperaments = require("../utils/musicutils-temperament");
+        const tritave = { pitchNumber: 1, octaveRatio: 3, 0: [1, "C", 4] };
+        const octave = { pitchNumber: 1, octaveRatio: 2, 0: [1, "C", 4] };
+        temperaments.TEMPERAMENT.tritave = tritave;
+        temperaments.TEMPERAMENT.octave = octave;
+        global.getTemperament = temperaments.getTemperament;
+        global.getEffectiveOctaveRatio = temperaments.getEffectiveOctaveRatio;
+        try {
+            const activity = makeActivity();
+            activity.blocks.customTemperamentDefined = true;
+            const block = (name, connections, value = null) => ({
+                name,
+                trash: false,
+                value,
+                collapsed: false,
+                container: { x: 0, y: 0 },
+                connections,
+                isValueBlock: () => name === "text"
+            });
+            activity.blocks.blockList = [
+                block("temperament1", [null, 1]),
+                block("text", [0], "tritave"),
+                block("temperament1", [null, 3]),
+                block("text", [2], "octave")
+            ];
+
+            const result = JSON.parse(new ProjectManager(activity).prepareExport());
+
+            expect(result[0][1][1]).toMatchObject({
+                customName: "tritave",
+                customTemperamentNotes: tritave,
+                octaveSpace: 3
+            });
+            expect(result[2][1][1]).toMatchObject({
+                customName: "octave",
+                customTemperamentNotes: octave,
+                octaveSpace: 2
+            });
+        } finally {
+            delete temperaments.TEMPERAMENT.tritave;
+            delete temperaments.TEMPERAMENT.octave;
+            global.getTemperament = jest.fn(() => [440]);
+            global.getEffectiveOctaveRatio = jest.fn(() => 2);
+        }
     });
 
     const makeStandIn = (name, unknownBlock, isValueBlock, connections = [null]) => ({
