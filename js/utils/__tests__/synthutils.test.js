@@ -1655,6 +1655,47 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    describe("octave ratio of each temperament", () => {
+        let startingPitch;
+
+        beforeEach(() => {
+            startingPitch = Synth.startingPitch;
+            Synth.startingPitch = "C4";
+            global.TEMPERAMENT.tritave = {
+                pitchNumber: 2,
+                octaveRatio: 3,
+                0: [1, "C", 4],
+                1: [Math.sqrt(3), "F", 4]
+            };
+        });
+
+        afterEach(() => {
+            delete global.TEMPERAMENT.tritave;
+            setOctaveRatio(2);
+            Synth.startingPitch = startingPitch;
+        });
+
+        it("plays a custom temperament at its own octave ratio", () => {
+            const c4 = getCustomFrequency("C4", "tritave");
+
+            expect(getCustomFrequency("C5", "tritave") / c4).toBeCloseTo(3, 10);
+            expect(getCustomFrequency("C3", "tritave") / c4).toBeCloseTo(1 / 3, 10);
+        });
+
+        it("keeps just intonation at 2:1 when another temperament has a 3:1 octave", () => {
+            setOctaveRatio(3);
+            const inTemperament = Synth.inTemperament;
+            Synth.inTemperament = "just intonation";
+            try {
+                const freqs = _getFrequency(["C4", "C5", "G3", "E5"], true);
+
+                [264, 528, 198, 660].forEach((hz, i) => expect(freqs[i]).toBeCloseTo(hz, 6));
+            } finally {
+                Synth.inTemperament = inTemperament;
+            }
+        });
+    });
+
     describe("loadSamples", () => {
         beforeEach(() => {
             // Reset mocks before each test
