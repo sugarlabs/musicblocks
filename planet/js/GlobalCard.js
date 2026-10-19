@@ -66,8 +66,9 @@ class GlobalCard {
                             )}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${`${
                                 Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"
-                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> 
-                            <div id="global-share-{ID}"> 
+                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
+
+                            <div class="global-share-container" id="global-share-{ID}">
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Share project"
                                 )}" id="global-project-share-{ID}"><i class="material-icons">share</i></a> 
@@ -111,6 +112,26 @@ class GlobalCard {
     showToast(message, isError = false) {
         if (this.Planet?.SaveInterface?.showToast) {
             this.Planet.SaveInterface.showToast(message, isError);
+        }
+    }
+
+    _positionShareCard(shareBox, trigger) {
+        const gap = 8;
+
+        shareBox.classList.remove("share-card-above", "share-card-below");
+
+        const triggerRect = trigger.getBoundingClientRect();
+        const shareRect = shareBox.getBoundingClientRect();
+
+        const spaceBelow = window.innerHeight - triggerRect.bottom - gap;
+        const spaceAbove = triggerRect.top - gap;
+
+        if (spaceBelow < shareRect.height && spaceAbove > spaceBelow) {
+            shareBox.classList.add("share-card-above");
+            shareBox.style.maxHeight = `${spaceAbove}px`;
+        } else {
+            shareBox.classList.add("share-card-below");
+            shareBox.style.maxHeight = `${spaceBelow}px`;
         }
     }
 
@@ -228,14 +249,33 @@ class GlobalCard {
 
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
+            const card = evt.currentTarget.closest(".card");
 
             if (s.style.display === "none") {
                 s.style.display = "initial";
+
+                if (card) {
+                    card.classList.add("share-popup-open");
+                }
+
+                this._positionShareCard(s, evt.currentTarget);
+
                 hideOnClickOutside(
                     [document.getElementById(`global-share-${this.id}`)],
-                    `global-sharebox-${this.id}`
+                    `global-sharebox-${this.id}`,
+                    () => {
+                        if (card) {
+                            card.classList.remove("share-popup-open");
+                        }
+                    }
                 );
-            } else s.style.display = "none";
+            } else {
+                s.style.display = "none";
+
+                if (card) {
+                    card.classList.remove("share-popup-open");
+                }
+            }
         });
 
         // set share checkbox listener
@@ -257,6 +297,13 @@ class GlobalCard {
         if (advancedToggle) {
             advancedToggle.addEventListener("click", () => {
                 toggleExpandable(`global-advanced-${this.id}`, "shareurl-advanced");
+
+                const shareBox = document.getElementById(`global-sharebox-${this.id}`);
+                const shareTrigger = document.getElementById(`global-project-share-${this.id}`);
+
+                if (shareBox && shareTrigger) {
+                    this._positionShareCard(shareBox, shareTrigger);
+                }
             });
         }
 
