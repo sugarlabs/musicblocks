@@ -1080,6 +1080,35 @@ describe("Oscilloscope", () => {
             expect(osc.isFrozen).toBe(true);
             expect(mockAnalyser.getValue).toHaveBeenCalled();
             expect(osc._frozenFrames["0:waveform"]).toEqual(analyserValues);
+            expect(osc._frozenFrames["0:waveform"]).toBeUndefined();
+            expect(osc._stopAnimation).toHaveBeenCalled();
+        });
+
+        test("captures spectrum when freezing", () => {
+            const osc = createOscilloscope();
+            osc.mode = "spectrum";
+            osc.reconnectSynthsToAnalyser = jest.fn();
+            osc._stopAnimation = jest.fn();
+            osc._renderFrame = jest.fn();
+            osc._canvasState[0] = {
+                canvasCtx: makeCtx(),
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+
+            const analyserValues = new Float32Array([-80, -60, -40]);
+            const mockAnalyser = {
+                getValue: jest.fn(() => analyserValues)
+            };
+            osc.spectrumAnalysers[0] = mockAnalyser;
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(true);
+            expect(mockAnalyser.getValue).toHaveBeenCalled();
+            expect(osc._frozenFrames["0:spectrum"]).toEqual(analyserValues);
             expect(osc._stopAnimation).toHaveBeenCalled();
         });
 

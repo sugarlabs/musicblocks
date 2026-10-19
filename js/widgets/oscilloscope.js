@@ -135,7 +135,6 @@ class Oscilloscope {
     }
 
     toggleMode() {
-        console.log("[Oscilloscope] toggleMode called", this.mode);
         this.mode = this.mode === "waveform" ? "spectrum" : "waveform";
         this._updateModeButton();
 
@@ -325,7 +324,6 @@ class Oscilloscope {
         this.drawVisualIDs = {};
         this._canvasState = {};
         this.pitchAnalysers = {};
-        this._frozenWaveforms = {};
         this._connectedSynths = {};
         this.spectrumAnalysers = {};
         this._frozenFrames = {};
