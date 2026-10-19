@@ -602,17 +602,17 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             gitDropdown._prefetchCommits = jest.fn();
         });
 
-        test("keeps applied git state readable after a failed persist", () => {
+        test("a failed persist does not replace a value storage can still return", () => {
             expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
 
-            expect(gitDropdown._getRepoName()).toBe("my-repo");
-            expect(gitDropdown._getHashedKey()).toBe("key-1");
-            expect(mockItemCreate.style.display).toBe("none");
-            expect(mockItemCommit.style.display).toBe("list-item");
-            expect(mockItemHistory.style.display).toBe("list-item");
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(gitDropdown._getHashedKey()).toBe("");
+            expect(mockItemCreate.style.display).toBe("list-item");
+            expect(mockItemCommit.style.display).toBe("none");
+            expect(mockItemHistory.style.display).toBe("none");
         });
 
-        test("replaces a previously stored repo when the new persist fails", () => {
+        test("a failed persist leaves the repo storage already holds", () => {
             Storage.prototype.setItem.mockRestore();
             localStorage.setItem("mbGitRepoName", "old-repo");
             expect(gitDropdown._getRepoName()).toBe("old-repo");
@@ -622,8 +622,18 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
             expect(() => gitDropdown._applyGitState("new-repo", "key-2", "New Repo")).not.toThrow();
 
-            expect(gitDropdown._getRepoName()).toBe("new-repo");
+            expect(gitDropdown._getRepoName()).toBe("old-repo");
             expect(mockItemCommit.style.display).toBe("list-item");
+        });
+
+        test("a repo written straight to localStorage is the next read", () => {
+            Storage.prototype.setItem.mockRestore();
+            gitDropdown._applyGitState("repo-a", "key-a", "Project A");
+            expect(gitDropdown._getRepoName()).toBe("repo-a");
+
+            localStorage.setItem("mbGitRepoName", "repo-b");
+
+            expect(gitDropdown._getRepoName()).toBe("repo-b");
         });
     });
 });

@@ -15,8 +15,10 @@
 /**
  * The git menu keeps a handful of small keys describing the current project.
  * localStorage throws when the profile blocks storage or has no room left,
- * so read and write through here. Values stay in memory when persistence
- * fails, so the menu keeps working for the rest of the session.
+ * so read and write through here. A read uses localStorage, and the memory
+ * copy only when that read throws. A write updates memory only when
+ * localStorage itself throws, so a value stored by another caller is what
+ * the next successful read returns.
  */
 const gitStorage = {
     _memory: Object.create(null),
@@ -26,26 +28,23 @@ const gitStorage = {
     },
 
     getItem(key) {
-        if (Object.prototype.hasOwnProperty.call(this._memory, key)) {
-            return this._memory[key];
-        }
         try {
-            const value = localStorage.getItem(key);
-            if (value !== null) {
-                this._memory[key] = value;
-            }
-            return value;
+            return localStorage.getItem(key);
         } catch (e) {
             console.warn(`Could not read the stored git state (${key}):`, e);
+            if (Object.prototype.hasOwnProperty.call(this._memory, key)) {
+                return this._memory[key];
+            }
             return null;
         }
     },
 
     setItem(key, value) {
-        this._memory[key] = String(value);
         try {
             localStorage.setItem(key, value);
+            delete this._memory[key];
         } catch (e) {
+            this._memory[key] = String(value);
             console.warn(`Could not store the git state (${key}):`, e);
         }
     },
@@ -55,8 +54,8 @@ const gitStorage = {
             localStorage.removeItem(key);
             delete this._memory[key];
         } catch (e) {
-            console.warn(`Could not clear the stored git state (${key}):`, e);
             this._memory[key] = null;
+            console.warn(`Could not clear the stored git state (${key}):`, e);
         }
     }
 };
