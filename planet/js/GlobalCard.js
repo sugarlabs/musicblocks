@@ -28,6 +28,7 @@ class GlobalCard {
         this.likeTimeout = null;
         this.likePending = false;
         this.clipboard = null;
+        this._shareRepositionHandler = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
@@ -248,7 +249,16 @@ class GlobalCard {
 
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
-            const card = evt.currentTarget.closest(".card");
+            const trigger = evt.currentTarget;
+            const card = trigger.closest(".card");
+
+            const stopRepositioning = () => {
+                if (!this._shareRepositionHandler) return;
+
+                window.removeEventListener("resize", this._shareRepositionHandler);
+                window.removeEventListener("scroll", this._shareRepositionHandler, true);
+                this._shareRepositionHandler = null;
+            };
 
             if (s.style.display === "none") {
                 s.style.display = "initial";
@@ -257,7 +267,18 @@ class GlobalCard {
                     card.classList.add("share-popup-open");
                 }
 
-                this._positionShareCard(s, evt.currentTarget);
+                this._positionShareCard(s, trigger);
+
+                stopRepositioning();
+
+                this._shareRepositionHandler = () => {
+                    if (s.style.display !== "none") {
+                        this._positionShareCard(s, trigger);
+                    }
+                };
+
+                window.addEventListener("resize", this._shareRepositionHandler);
+                window.addEventListener("scroll", this._shareRepositionHandler, true);
 
                 hideOnClickOutside(
                     [document.getElementById(`global-share-${this.id}`)],
@@ -266,6 +287,8 @@ class GlobalCard {
                         if (card) {
                             card.classList.remove("share-popup-open");
                         }
+
+                        stopRepositioning();
                     }
                 );
             } else {
@@ -274,6 +297,8 @@ class GlobalCard {
                 if (card) {
                     card.classList.remove("share-popup-open");
                 }
+
+                stopRepositioning();
             }
         });
 
@@ -387,6 +412,12 @@ class GlobalCard {
         if (this._thumbObserver) {
             this._thumbObserver.disconnect();
             this._thumbObserver = null;
+        }
+
+        if (this._shareRepositionHandler) {
+            window.removeEventListener("resize", this._shareRepositionHandler);
+            window.removeEventListener("scroll", this._shareRepositionHandler, true);
+            this._shareRepositionHandler = null;
         }
 
         if (this.likeTimeout) {
