@@ -240,6 +240,74 @@ describe("GlobalCard", () => {
                 "shareurl-advanced"
             );
         });
+
+        it("keeps the owning card above neighboring cards while the share popup is open", () => {
+            card.init("test-id-1");
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+            const projectCard = shareButton.closest(".card");
+
+            shareButton.click();
+
+            expect(projectCard.classList.contains("share-popup-open")).toBe(true);
+
+            shareButton.click();
+
+            expect(projectCard.classList.contains("share-popup-open")).toBe(false);
+        });
+    });
+
+    describe("_positionShareCard", () => {
+        it("positions the share card above when there is not enough space below", () => {
+            const shareBox = document.createElement("div");
+            const trigger = document.createElement("button");
+
+            Object.defineProperty(window, "innerHeight", {
+                configurable: true,
+                value: 800
+            });
+
+            trigger.getBoundingClientRect = jest.fn(() => ({
+                top: 700,
+                bottom: 740
+            }));
+
+            shareBox.getBoundingClientRect = jest.fn(() => ({
+                height: 200
+            }));
+
+            card._positionShareCard(shareBox, trigger);
+
+            expect(shareBox.classList.contains("share-card-above")).toBe(true);
+            expect(shareBox.classList.contains("share-card-below")).toBe(false);
+            expect(shareBox.style.maxHeight).toBe("692px");
+        });
+
+        it("positions the share card below when enough space is available", () => {
+            const shareBox = document.createElement("div");
+            const trigger = document.createElement("button");
+
+            Object.defineProperty(window, "innerHeight", {
+                configurable: true,
+                value: 800
+            });
+
+            trigger.getBoundingClientRect = jest.fn(() => ({
+                top: 200,
+                bottom: 240
+            }));
+
+            shareBox.getBoundingClientRect = jest.fn(() => ({
+                height: 200
+            }));
+
+            card._positionShareCard(shareBox, trigger);
+
+            expect(shareBox.classList.contains("share-card-below")).toBe(true);
+            expect(shareBox.classList.contains("share-card-above")).toBe(false);
+            expect(shareBox.style.maxHeight).toBe("552px");
+        });
     });
 
     describe("cleanup", () => {

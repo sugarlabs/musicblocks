@@ -91,14 +91,29 @@
 	color: #343434;
 }
 
+.global-share-container {
+	position: relative;
+}
+
 .share-card {
 	position: absolute;
 	z-index: 200;
-	left: 50%;
-	-webkit-transform: translateX(-50%);
-	-ms-transform: translateX(-50%);
-	transform: translateX(-50%);
-	min-width: 350px;
+	right: 0;
+	left: auto;
+	width: 350px;
+	max-width: calc(100vw - 24px);
+	max-height: calc(100vh - 24px);
+	overflow-y: auto;
+}
+
+.share-card-below {
+	top: calc(100% + 8px);
+	bottom: auto;
+}
+
+.share-card-above {
+	top: auto;
+	bottom: calc(100% + 8px);
 }
 
 .shareurltext {
@@ -554,6 +569,11 @@ a {
     transform: translateY(-5px) scale(1.02);
     box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
     z-index: 5;
+}
+
+#globalcontents .card.share-popup-open {
+	position: relative;
+	z-index: 10;
 }
 
 @media (prefers-reduced-motion: reduce) {
