@@ -751,11 +751,13 @@ describe("MathUtility", () => {
             expect(MathUtility.doRepeatCount(-3)).toBe(0);
         });
 
-        test("returns 0 for values that are not numbers", () => {
+        test("returns 0 for non-finite counts or values that are not numbers", () => {
             expect(MathUtility.doRepeatCount("4")).toBe(0);
             expect(MathUtility.doRepeatCount(null)).toBe(0);
             expect(MathUtility.doRepeatCount(undefined)).toBe(0);
             expect(MathUtility.doRepeatCount(NaN)).toBe(0);
+            expect(MathUtility.doRepeatCount(Infinity)).toBe(0);
+            expect(MathUtility.doRepeatCount(-Infinity)).toBe(0);
         });
     });
 
