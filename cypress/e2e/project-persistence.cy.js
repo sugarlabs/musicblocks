@@ -90,4 +90,63 @@ describe("Project persistence", () => {
             ).to.deep.equal(blockStateBeforeReload);
         });
     });
+
+    // A note's last dock leads to its hidden block, whose last dock leads to the next note.
+    const clampedNotes = win => {
+        const { blockList } = win.ActivityContext.getActivity().blocks;
+        const notes = [];
+        let blk = blockList.find(block => !block.trash && block.name === "duplicatenotes")
+            ?.connections[2];
+        while (blk !== null && blk !== undefined) {
+            const block = blockList[blk];
+            if (block.name === "newnote") notes.push(blk);
+            blk = block.connections[block.connections.length - 1];
+        }
+        return notes;
+    };
+
+    const waitForClampLoaded = () => {
+        let stableObservations = 0;
+        cy.window({ timeout: 60000 }).should(win => {
+            const { blocks } = win.ActivityContext.getActivity();
+            stableObservations =
+                blocks._loadCounter === 0 && clampedNotes(win).length > 0
+                    ? stableObservations + 1
+                    : 0;
+            expect(
+                stableObservations,
+                "the duplicate notes project should stay fully loaded"
+            ).to.be.at.least(3);
+        });
+    };
+
+    it("keeps a duplicate notes clamp whole when the page reloads while it plays", () => {
+        cy.get("#load").click();
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/duplicate-notes-minimal.tb", {
+            force: true
+        });
+        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+        waitForClampLoaded();
+        cy.window().then(win => {
+            expect(clampedNotes(win)).to.have.length(3);
+        });
+
+        // The clamp unhooks its notes into logo.connectionStore while it plays.
+        cy.get("#play").click();
+        cy.window({ timeout: 10000 }).should(win => {
+            const { connectionStore } = win.ActivityContext.getActivity().logo;
+            expect(
+                Object.values(connectionStore).some(store => Object.keys(store).length > 0),
+                "the duplicate notes clamp should be playing"
+            ).to.be.true;
+        });
+
+        cy.reload();
+        cy.waitForAppReady();
+        waitForClampLoaded();
+
+        cy.window().should(win => {
+            expect(clampedNotes(win), "the clamp should keep its notes").to.have.length(3);
+        });
+    });
 });
