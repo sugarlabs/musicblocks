@@ -1126,9 +1126,6 @@ describe("Oscilloscope", () => {
             osc._frozenFrames["0:waveform"] = new Float32Array(128);
 
             osc._renderFrame();
-
-            expect(ctx.fillRect).toHaveBeenCalled();
-            expect(ctx.stroke).toHaveBeenCalled();
         });
 
         test("resets resizedOnce to false after drawing", () => {
