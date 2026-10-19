@@ -292,9 +292,12 @@ class KeyboardController {
                     }
             }
         } else if (
-            (event.ctrlKey || event.metaKey) &&
-            !disableKeys &&
-            (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V)
+            (event.ctrlKey &&
+                (!disableKeys ||
+                    (event.keyCode !== 90 && event.keyCode !== 89 && event.keyCode !== V))) ||
+            (event.metaKey &&
+                !disableKeys &&
+                (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V))
         ) {
             switch (event.keyCode) {
                 case 90: // 'Z'
@@ -477,11 +480,11 @@ class KeyboardController {
                         break;
                 }
             }
-
-            // Always store current key so as not to mask it from
-            // the keyboard block.
-            activity.currentKeyCode = event.keyCode;
         }
+
+        // Always store current key so as not to mask it from
+        // the keyboard block.
+        activity.currentKeyCode = event.keyCode;
     }
 
     /**

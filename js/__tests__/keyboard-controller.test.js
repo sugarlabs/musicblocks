@@ -50,8 +50,12 @@ describe("KeyboardController - modifier precedence and runtime guard", () => {
             paste: { style: { visibility: "hidden" } },
             turtles: { running: jest.fn(() => false) },
             blocks: {
-                undoAction: jest.fn()
+                undoAction: jest.fn(),
+                extract: jest.fn()
             },
+            toolbar: { highlightStop: jest.fn() },
+            _doFastButton: jest.fn(),
+            _doHardStopButton: jest.fn(),
             palettes: { activePalette: null, dict: {} }
         };
 
@@ -85,5 +89,24 @@ describe("KeyboardController - modifier precedence and runtime guard", () => {
         const ctrlC = pressKey(67, { ctrlKey: true });
         expect(ctrlC.defaultPrevented).toBe(false);
         expect(activity.currentKeyCode).toBe(67);
+    });
+
+    it("does not trigger block extraction on Ctrl+Delete", () => {
+        const event = pressKey(46, { ctrlKey: true });
+        expect(activity.blocks.extract).not.toHaveBeenCalled();
+        expect(event.defaultPrevented).toBe(false);
+    });
+
+    it("does not trigger playback start on Ctrl+Space when idle", () => {
+        const event = pressKey(32, { ctrlKey: true });
+        expect(activity._doFastButton).not.toHaveBeenCalled();
+        expect(event.defaultPrevented).toBe(false);
+    });
+
+    it("does not trigger playback stop on Ctrl+Space when running", () => {
+        activity.turtles.running.mockReturnValue(true);
+        const event = pressKey(32, { ctrlKey: true });
+        expect(activity._doHardStopButton).not.toHaveBeenCalled();
+        expect(event.defaultPrevented).toBe(false);
     });
 });
