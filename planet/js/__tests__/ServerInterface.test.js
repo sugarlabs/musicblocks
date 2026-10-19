@@ -778,4 +778,42 @@ describe("ServerInterface", () => {
             expect(jest.getTimerCount()).toBe(0);
         });
     });
+
+    describe("_post timeout", () => {
+        afterEach(() => {
+            jest.useRealTimers();
+            delete global.fetch;
+        });
+
+        it("gives up on a request that never answers", async () => {
+            jest.useFakeTimers();
+            // A server that accepts the connection and then goes quiet.
+            global.fetch = jest.fn(
+                (url, { signal }) =>
+                    new Promise((resolve, reject) => {
+                        signal.addEventListener("abort", () =>
+                            reject(new DOMException("aborted", "AbortError"))
+                        );
+                    })
+            );
+
+            const pending = server._post("/like", { repoName: "x", like: true });
+            jest.advanceTimersByTime(server.RequestTimeout);
+
+            await expect(pending).resolves.toBeNull();
+        });
+
+        it("clears the timer once the request answers", async () => {
+            jest.useFakeTimers();
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ likes: 1 })
+            });
+
+            await expect(server._post("/like", { repoName: "x", like: true })).resolves.toEqual({
+                likes: 1
+            });
+            expect(jest.getTimerCount()).toBe(0);
+        });
+    });
 });

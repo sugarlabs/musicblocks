@@ -469,12 +469,18 @@ class GlobalCard {
         const Planet = this.Planet;
         const id = this.id;
         const projectData = this.ProjectData;
+        // Coordinate by project so a replacement card cannot send a second,
+        // conflicting request while the first is still in flight.
+        if (!Planet.pendingLikes) Planet.pendingLikes = new Set();
+        if (Planet.pendingLikes.has(id)) return;
         const like = !Planet.ProjectStorage.isLiked(id);
         this.likePending = true;
+        Planet.pendingLikes.add(id);
         const likesEl = document.getElementById(`global-project-likes-${id}`);
         if (likesEl) this.setLike(like);
         Planet.ServerInterface.likeProject(id, like, data => {
             this.likePending = false;
+            Planet.pendingLikes.delete(id);
             if (data.success && Number.isFinite(data.likes)) {
                 projectData.ProjectLikes = data.likes;
                 const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
