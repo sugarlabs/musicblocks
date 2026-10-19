@@ -163,6 +163,13 @@ function MusicKeyboard(activity) {
             if (stack.length === 0) {
                 MusicKeyboard._baseKeyDown = document.onkeydown;
                 MusicKeyboard._baseKeyUp = document.onkeyup;
+            } else {
+                // Opening a new keyboard takes input from the previous owner;
+                // finish any note it is still holding.
+                const previous = stack[stack.length - 1];
+                if (typeof previous._releaseActiveNotes === "function") {
+                    previous._releaseActiveNotes();
+                }
             }
             stack.push(this);
         }
@@ -193,6 +200,10 @@ function MusicKeyboard(activity) {
         const existing = stack.indexOf(this);
         if (existing === -1) {
             return; // not open
+        }
+        const previous = stack[stack.length - 1];
+        if (previous !== this && typeof previous._releaseActiveNotes === "function") {
+            previous._releaseActiveNotes();
         }
         stack.splice(existing, 1);
         stack.push(this);
@@ -735,10 +746,21 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __keyboardup = function (event) {
-            if (isTextEntryActive() && !current.has(event.keyCode)) return;
+            // Only release keys this keyboard started, so a keyup that arrives
+            // after focus moved cannot record a note with no matching keydown.
+            if (!current.has(event.keyCode)) return;
 
             current.delete(event.keyCode);
             __endNote(event);
+        };
+
+        // Ends any physical keys this keyboard is still holding. Called when it
+        // hands the document key handlers to another keyboard.
+        this._releaseActiveNotes = () => {
+            for (const keyCode of Array.from(current)) {
+                current.delete(keyCode);
+                __endNote({ keyCode });
+            }
         };
 
         this._registerDocumentKeyHandlers(__keyboarddown, __keyboardup);
@@ -1169,6 +1191,11 @@ function MusicKeyboard(activity) {
         this.keyboardDiv.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
         this.keyTable.addEventListener("wheel", this._stopPropagationHandler);
         this.keyTable.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
+
+        // Focus this window explicitly so physical-key input follows the keyboard being played.
+        this.keyboardDiv.addEventListener("pointerdown", () => {
+            this.widgetWindow.takeFocus();
+        });
 
         /**
          * Appends keyboard and table divs to the widget window body.

@@ -141,6 +141,76 @@ describe("MusicKeyboard document key handler ownership", () => {
         orphan._focusKeyboardInput();
         expect(document.onkeydown).toBeNull();
     });
+
+    test("pressing a piano key focuses that keyboard so input follows it", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+        // The newer keyboard owns the document handlers until another is focused.
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+
+        const body = document.createElement("div");
+        first.widgetWindow = {
+            takeFocus: () => first._focusKeyboardInput(),
+            getWidgetBody: () => body
+        };
+        first._createKeyboard = jest.fn();
+        first._createTable = jest.fn();
+        first._createKeyboardContainers();
+
+        first.keyboardDiv.dispatchEvent(new Event("pointerdown"));
+
+        expect(document.onkeydown).toBe(first._boundKeyDown);
+        expect(MusicKeyboard._keyHandlerStack[MusicKeyboard._keyHandlerStack.length - 1]).toBe(
+            first
+        );
+    });
+
+    test("a key held while focus moves is finished by the keyboard that started it", () => {
+        const originalPlatformColor = global.platformColor;
+        global.platformColor = { orange: "orange" };
+        try {
+            const makeKeyboard = () => {
+                const synth = { trigger: jest.fn(), stopSound: jest.fn() };
+                const keyboard = new MusicKeyboard({ logo: { synth } });
+                keyboard.bpm = 90;
+                keyboard.meterArgs = [4, 0.25];
+                keyboard.instrumentMapper = { whiteRow0: "electronic synth" };
+                keyboard.blockNumberMapper = { whiteRow0: 1 };
+                keyboard._createTable = jest.fn();
+                keyboard._updateWidgetWindowSize = jest.fn();
+                keyboard._mkbEl = () => ({ style: {}, getAttribute: () => "do__4" });
+                keyboard.addKeyboardShortcuts();
+                return keyboard;
+            };
+
+            const first = makeKeyboard();
+            const second = makeKeyboard();
+            first._focusKeyboardInput();
+            expect(document.onkeydown).toBe(first._boundKeyDown);
+
+            document.onkeydown({
+                key: "a",
+                keyCode: 65,
+                shiftKey: false,
+                preventDefault: jest.fn()
+            });
+
+            // Focus moves to the other keyboard while the key is still held.
+            second._focusKeyboardInput();
+
+            // The held note is ended by its own keyboard with a real duration.
+            expect(first._notesPlayed).toHaveLength(1);
+            expect(Number.isFinite(first._notesPlayed[0].duration)).toBe(true);
+
+            // The later release must not record a bogus note on the second keyboard.
+            document.onkeyup({ key: "a", keyCode: 65 });
+            expect(second._notesPlayed).toHaveLength(0);
+        } finally {
+            global.platformColor = originalPlatformColor;
+        }
+    });
 });
 
 describe("MusicKeyboard add-row submenu", () => {
