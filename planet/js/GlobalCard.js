@@ -117,14 +117,30 @@ class GlobalCard {
 
     _positionShareCard(shareBox, trigger) {
         const gap = 8;
+        const viewportPadding = 12;
 
         shareBox.classList.remove("share-card-above", "share-card-below");
 
+        // Reset previous constraints before measuring the popup again.
+        shareBox.style.maxHeight = "";
+        shareBox.style.left = "";
+        shareBox.style.right = "";
+
         const triggerRect = trigger.getBoundingClientRect();
         const shareRect = shareBox.getBoundingClientRect();
+        const container = shareBox.offsetParent || shareBox.parentElement;
+        const containerRect = container ? container.getBoundingClientRect() : { left: 0 };
 
-        const spaceBelow = window.innerHeight - triggerRect.bottom - gap;
-        const spaceAbove = triggerRect.top - gap;
+        // Keep the popup horizontally inside the viewport.
+        const minLeft = viewportPadding;
+        const maxLeft = window.innerWidth - viewportPadding - shareRect.width;
+        const left = Math.min(Math.max(minLeft, shareRect.left), maxLeft);
+
+        shareBox.style.left = `${left - containerRect.left}px`;
+        shareBox.style.right = "auto";
+
+        const spaceBelow = Math.max(0, window.innerHeight - triggerRect.bottom - gap);
+        const spaceAbove = Math.max(0, triggerRect.top - gap);
 
         if (spaceBelow < shareRect.height && spaceAbove > spaceBelow) {
             shareBox.classList.add("share-card-above");
