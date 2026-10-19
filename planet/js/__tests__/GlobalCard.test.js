@@ -280,6 +280,78 @@ describe("GlobalCard", () => {
 
             expect(projectCard.classList.contains("share-popup-open")).toBe(false);
         });
+
+        it("repositions an open share popup when the viewport changes", () => {
+            card.init("test-id-1");
+
+            const positionSpy = jest.spyOn(card, "_positionShareCard");
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            window.dispatchEvent(new Event("resize"));
+
+            expect(positionSpy).toHaveBeenCalledTimes(2);
+
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(positionSpy).toHaveBeenCalledTimes(3);
+
+            shareButton.click();
+        });
+
+        it("stops repositioning after the share popup is closed", () => {
+            card.init("test-id-1");
+
+            const positionSpy = jest.spyOn(card, "_positionShareCard");
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            shareButton.click();
+
+            window.dispatchEvent(new Event("resize"));
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+            expect(card._shareRepositionHandler).toBeNull();
+        });
+
+        it("stops repositioning when the share popup is dismissed outside", () => {
+            card.init("test-id-1");
+
+            const positionSpy = jest.spyOn(card, "_positionShareCard");
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            const onHide = global.hideOnClickOutside.mock.calls[0][2];
+
+            expect(typeof onHide).toBe("function");
+
+            onHide();
+
+            window.dispatchEvent(new Event("resize"));
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+            expect(card._shareRepositionHandler).toBeNull();
+        });
     });
 
     describe("_positionShareCard", () => {
