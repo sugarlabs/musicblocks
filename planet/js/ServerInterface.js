@@ -729,7 +729,8 @@ class ServerInterface {
                 return;
             }
 
-            const projectId = this.Planet?.ProjectStorage?.getCurrentProjectID();
+            const projectId =
+                projectObj.ProjectID || this.Planet?.ProjectStorage?.getCurrentProjectID();
             if (!projectId) {
                 callback({ success: false, error: "NO_CURRENT_PROJECT_ID" });
                 return;
@@ -799,8 +800,41 @@ class ServerInterface {
      * @param {string[]} [tags]
      * @param {string}   [thumbnail] base64 PNG data URL — the canvas state at publish
      *                               time, used as the canonical thumbnail on GitHub
+     * @param {string}   [projectId] local project ID for an offline publication
      */
-    async publishProject(repoName, key, callback, projectName, description, tags, thumbnail) {
+    async publishProject(
+        repoName,
+        key,
+        callback,
+        projectName,
+        description,
+        tags,
+        thumbnail,
+        projectId
+    ) {
+        if (this.offlineManager && !this.offlineManager.isOnline) {
+            const id = projectId || this.Planet?.ProjectStorage?.getCurrentProjectID();
+            if (!id) {
+                callback({ success: false, error: "NO_CURRENT_PROJECT_ID" });
+                return;
+            }
+
+            try {
+                await this.Planet.ProjectStorage.setPendingPublication(id, {
+                    repoName,
+                    projectName,
+                    description,
+                    tags,
+                    thumbnail
+                });
+                callback({ success: true, offline: true });
+            } catch (err) {
+                console.error("[ServerInterface] Could not queue publication:", err);
+                callback({ success: false, error: "OFFLINE_SAVE_FAILED" });
+            }
+            return;
+        }
+
         try {
             const body = { repoName, key };
             if (projectName && typeof projectName === "string" && projectName.trim()) {

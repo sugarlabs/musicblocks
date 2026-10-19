@@ -209,6 +209,16 @@ class ProjectStorage {
         await this.save();
     }
 
+    async setPendingPublication(id, details) {
+        this.data.Projects[id].pendingPublication = details;
+        await this.save();
+    }
+
+    async clearPendingPublication(id) {
+        this.data.Projects[id].pendingPublication = null;
+        await this.save();
+    }
+
     /**
      * Returns how many drafts for a project currently have status 'pending'.
      * Used by OfflineCommitManager to enforce the 5-draft cap.
