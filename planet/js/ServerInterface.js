@@ -242,6 +242,8 @@ class ServerInterface {
      * @returns {Promise<any|null>}
      */
     async _post(path, body, method = "POST") {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), this.RequestTimeout);
         try {
             const res = await fetch(this.BaseURL + path, {
                 method,
@@ -249,7 +251,8 @@ class ServerInterface {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                signal: controller.signal
             });
             if (!res.ok) {
                 const text = await res.text().catch(() => "");
@@ -264,6 +267,8 @@ class ServerInterface {
         } catch (err) {
             console.error(`[ServerInterface] ${method} ${path} failed:`, err);
             return null;
+        } finally {
+            clearTimeout(timer);
         }
     }
 
