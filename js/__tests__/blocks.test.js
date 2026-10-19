@@ -5196,6 +5196,7 @@ describe("sendStackToTrash – turtle container guard", () => {
                 connections: [0, null, null],
                 clampCount: [1, 1],
                 size: 2,
+                protoblock: { args: 2 },
                 isInlineCollapsible: () => false,
                 isTwoArgBlock: () => false,
                 isArgBlock: () => true,
@@ -5274,14 +5275,18 @@ describe("sendStackToTrash – turtle container guard", () => {
             expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
         });
 
-        it("does not expand slot 1 on expandable arg blocks when second argument has size > 1", () => {
+        it("expands slot 1 on expandable two-arg arg blocks when second argument has size > 1", () => {
             child0.connections[2] = 2;
-            child0.updateSlots = jest.fn();
+            child0.updateSlots = jest.fn((clamp, plusMinus) => {
+                child0.clampCount[clamp] += plusMinus;
+                child0.size += plusMinus;
+            });
 
             blocksInstance._adjustExpandableTwoArgBlock([1]);
 
-            expect(child0.updateSlots).not.toHaveBeenCalled();
-            expect(child0.clampCount[1]).toBe(1);
+            expect(child0.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(child0.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(1, true);
         });
 
         it("processes deeper nested blocks first so parent reads updated child size", () => {

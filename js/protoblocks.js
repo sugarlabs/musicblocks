@@ -538,7 +538,7 @@ class ProtoBlock {
      * @param {number} expandY2 - Expansion factor for the second argument (optional).
      * @returns {array} - An array containing block SVG, docks, width, and height.
      */
-    twoArgMathBlockGenerator(expandY) {
+    twoArgMathBlockGenerator(expandY, expandY2) {
         const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -546,11 +546,9 @@ class ProtoBlock {
         svg.setOutie(true);
         svg.setTab(false);
 
-        if (expandY) {
-            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
-        } else {
-            svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        }
+        const ey1 = expandY ? ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+        const ey2 = expandY2 ? ((expandY2 - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+        svg.setExpand(30 + this.extraWidth, ey1, 0, ey2);
 
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
@@ -1484,15 +1482,13 @@ class ProtoBlock {
      * @param {number} expandY - Expansion factor for Y dimension (optional).
      * @returns {Array} - An array containing generated SVG, docks, width, and height.
      */
-    booleanTwoArgBlockGenerator(expandY) {
+    booleanTwoArgBlockGenerator(expandY, expandY2) {
         const svg = new SVG();
         svg.setScale(this.scale);
 
-        if (expandY) {
-            svg.setExpand(10 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
-        } else {
-            svg.setExpand(10 + this.extraWidth, 0, 0, 0);
-        }
+        const ey1 = expandY ? ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+        const ey2 = expandY2 ? ((expandY2 - 1) * STANDARDBLOCKHEIGHT) / 2 : 0;
+        svg.setExpand(10 + this.extraWidth, ey1, 0, ey2);
 
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);

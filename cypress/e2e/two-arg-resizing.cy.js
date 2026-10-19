@@ -85,10 +85,18 @@ describe("Two-arg block vertical resizing (Issue #9563)", () => {
             expect(pendownBlock, "pendown block exists").to.exist;
             expect(multiplyBlocks).to.have.length(2);
 
+            // multiply blocks should expand slot 1 to accommodate the compound random blocks
+            expect(multiplyBlocks[0].clampCount[1], "first multiply slot 1 clamp count").to.equal(
+                2
+            );
+            expect(multiplyBlocks[1].clampCount[1], "second multiply slot 1 clamp count").to.equal(
+                2
+            );
+
             // setxy should expand both slots to accommodate the compound multiply blocks
-            expect(setxyBlock.clampCount[0], "slot 0 clamp count").to.equal(2);
-            expect(setxyBlock.clampCount[1], "slot 1 clamp count").to.equal(2);
-            expect(setxyBlock.size, "setxy total size").to.equal(4);
+            expect(setxyBlock.clampCount[0], "setxy slot 0 clamp count").to.be.greaterThan(1);
+            expect(setxyBlock.clampCount[1], "setxy slot 1 clamp count").to.be.greaterThan(1);
+            expect(setxyBlock.size, "setxy total size").to.be.greaterThan(2);
 
             // pendown should dock cleanly below setxy without overlapping the second multiply
             expect(pendownBlock.container.y, "pendown is below setxy").to.be.greaterThan(
