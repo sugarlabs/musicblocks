@@ -94,7 +94,7 @@ function toggleExpandable(id, c) {
 
 const outsideClickListeners = new WeakMap();
 
-function hideOnClickOutside(eles, other) {
+function hideOnClickOutside(eles, other, onHide) {
     const validEles = (Array.isArray(eles) ? eles : [eles]).filter(Boolean);
     if (validEles.length === 0) return;
 
@@ -122,6 +122,10 @@ function hideOnClickOutside(eles, other) {
             const otherEl = document.getElementById(other);
             if (otherEl) {
                 otherEl.style.display = "none";
+            }
+
+            if (typeof onHide === "function") {
+                onHide();
             }
 
             removeClickListener();

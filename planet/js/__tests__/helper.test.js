@@ -249,6 +249,26 @@ describe("helper.js", () => {
 
             spyRemove.mockRestore();
         });
+
+        it("calls the onHide callback when clicking outside", () => {
+            document.body.innerHTML = `
+                <div id="anchor"></div>
+                <div id="target" style="display: block;"></div>
+                <div id="outside"></div>
+            `;
+
+            const anchor = document.getElementById("anchor");
+            const target = document.getElementById("target");
+            const outside = document.getElementById("outside");
+            const onHide = jest.fn();
+
+            hideOnClickOutside([anchor], "target", onHide);
+
+            outside.click();
+
+            expect(target.style.display).toBe("none");
+            expect(onHide).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("updateCheckboxes", () => {
