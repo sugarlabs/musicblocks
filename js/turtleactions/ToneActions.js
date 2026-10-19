@@ -55,6 +55,9 @@ function setupToneActions(activity) {
         static setTimbre(instrument, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // Restored when this block ends, so an inner Set Instrument does not
+            // switch off the outer one's timbre effects.
+            const wasInSetTimbre = tur.inSetTimbre;
             tur.inSetTimbre = true;
 
             let accounted = false;
@@ -111,7 +114,10 @@ function setupToneActions(activity) {
                 }
             }
 
-            const listenerName = "_settimbre_" + turtle;
+            // One listener per block: nested Set Instrument blocks would otherwise
+            // share a name, and the inner block's cleanup (with its own `pushed`)
+            // would replace the outer one's.
+            const listenerName = "_settimbre_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -120,7 +126,7 @@ function setupToneActions(activity) {
             }
 
             const __listener = () => {
-                tur.inSetTimbre = false;
+                tur.inSetTimbre = wasInSetTimbre;
                 if (pushed) {
                     tur.singer.instrumentNames.pop();
                 }
