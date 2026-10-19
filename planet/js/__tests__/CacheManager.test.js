@@ -149,6 +149,13 @@ describe("CacheManager", () => {
         });
     });
 
+    describe("deleteMetadata before init", () => {
+        it("should return false if not initialized", async () => {
+            const result = await cacheManager.deleteMetadata("test-id");
+            expect(result).toBe(false);
+        });
+    });
+
     describe("cacheProject before init", () => {
         it("should return false if not initialized", async () => {
             const result = await cacheManager.cacheProject("test-id", { data: "test" });
@@ -265,6 +272,43 @@ describe("IndexedDB CacheManager integration", () => {
             expect(spy).toHaveBeenCalledTimes(1);
         });
 
+        test("closes the database if initialization cleanup fails", async () => {
+            const database = await freshManager._openDatabase();
+            const closeSpy = jest.spyOn(database, "close");
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            const openDatabaseSpy = jest
+                .spyOn(freshManager, "_openDatabase")
+                .mockResolvedValue(database);
+            const clearExpiredSpy = jest
+                .spyOn(freshManager, "clearExpired")
+                .mockRejectedValue(new Error("cleanup failed"));
+
+            try {
+                const results = await Promise.all([freshManager.init(), freshManager.init()]);
+
+                expect(results).toEqual([false, false]);
+                expect(openDatabaseSpy).toHaveBeenCalledTimes(1);
+                expect(clearExpiredSpy).toHaveBeenCalledTimes(1);
+                expect(closeSpy).toHaveBeenCalledTimes(1);
+                expect(freshManager.db).toBeNull();
+                expect(freshManager.isInitialized).toBe(false);
+            } finally {
+                consoleErrorSpy.mockRestore();
+            }
+        });
+
+        test("concurrent init calls share a successful initialization", async () => {
+            const openDatabaseSpy = jest.spyOn(freshManager, "_openDatabase");
+
+            const results = await Promise.all([freshManager.init(), freshManager.init()]);
+
+            expect(results).toEqual([true, true]);
+            expect(openDatabaseSpy).toHaveBeenCalledTimes(1);
+            expect(freshManager.db).not.toBeNull();
+            expect(freshManager.isInitialized).toBe(true);
+        });
+
         test("returns false when window.indexedDB is missing", async () => {
             const saved = global.indexedDB;
             delete global.indexedDB;
@@ -296,6 +340,83 @@ describe("IndexedDB CacheManager integration", () => {
             const metadata = { name: "Project A", author: "ABC" };
             await cacheManager.cacheMetadata("proj-1", metadata);
             expect(await cacheManager.getMetadata("proj-1")).toEqual(metadata);
+        });
+
+        it("should delete cached metadata", async () => {
+            const metadata = { name: "Test Project" };
+
+            await cacheManager.cacheMetadata("proj-delete", metadata);
+
+            expect(await cacheManager.getMetadata("proj-delete")).toEqual(metadata);
+
+            const deleted = await cacheManager.deleteMetadata("proj-delete");
+
+            expect(deleted).toBe(true);
+            expect(await cacheManager.getMetadata("proj-delete")).toBeNull();
+        });
+
+        it("should not return invalidated metadata when deletion fails", async () => {
+            const metadata = { name: "Stale Project" };
+
+            await cacheManager.cacheMetadata("proj-stale", metadata);
+            expect(await cacheManager.getMetadata("proj-stale")).toEqual(metadata);
+
+            const originalTransaction = cacheManager.db.transaction;
+            cacheManager.db.transaction = jest.fn(() => {
+                throw new Error("Delete failed");
+            });
+
+            const deleted = await cacheManager.deleteMetadata("proj-stale");
+
+            expect(deleted).toBe(false);
+            expect(cacheManager.invalidatedMetadataIds.has("proj-stale")).toBe(true);
+
+            cacheManager.db.transaction = originalTransaction;
+
+            expect(await cacheManager.getMetadata("proj-stale")).toBeNull();
+        });
+
+        it("should clear metadata invalidation after successfully caching fresh metadata", async () => {
+            cacheManager.invalidatedMetadataIds.add("proj-fresh");
+
+            await cacheManager.cacheMetadata("proj-fresh", {
+                name: "Fresh Project"
+            });
+
+            expect(cacheManager.invalidatedMetadataIds.has("proj-fresh")).toBe(false);
+            expect(await cacheManager.getMetadata("proj-fresh")).toEqual({
+                name: "Fresh Project"
+            });
+        });
+
+        it("should not return metadata invalidated while a read is in flight", async () => {
+            const metadata = { name: "Stale Project" };
+
+            await cacheManager.cacheMetadata("proj-race", metadata);
+
+            const originalGetFromStore = cacheManager._getFromStore;
+
+            let resolveRead;
+            cacheManager._getFromStore = jest.fn(
+                () =>
+                    new Promise(resolve => {
+                        resolveRead = resolve;
+                    })
+            );
+
+            const readPromise = cacheManager.getMetadata("proj-race");
+
+            cacheManager.invalidatedMetadataIds.add("proj-race");
+
+            resolveRead({
+                id: "proj-race",
+                metadata,
+                expiry: Date.now() + 10000
+            });
+
+            expect(await readPromise).toBeNull();
+
+            cacheManager._getFromStore = originalGetFromStore;
         });
 
         test("returns null for unknown id", async () => {

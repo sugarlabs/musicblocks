@@ -6081,6 +6081,38 @@ class Blocks {
                             [thisBlock, blkInfo[1]]
                         );
                         break;
+                    case "matrix":
+                        /** Restore the selected cells, moving the block ids like connections. */
+                        postProcess = args => {
+                            const matrixCells = args[1]?.matrixCells;
+                            if (Array.isArray(matrixCells)) {
+                                that.blockList[args[0]].matrixCells = matrixCells
+                                    .filter(
+                                        cell =>
+                                            Array.isArray(cell) &&
+                                            Number.isInteger(cell[0]) &&
+                                            cell[0] >= 0 &&
+                                            Array.isArray(cell[1]) &&
+                                            Number.isInteger(cell[1][0]) &&
+                                            cell[1][0] >= 0 &&
+                                            Number.isInteger(cell[1][1]) &&
+                                            Number.isInteger(cell[2])
+                                    )
+                                    .map(cell => [
+                                        cell[0] + blockOffset,
+                                        [cell[1][0] + blockOffset, cell[1][1]],
+                                        cell[2]
+                                    ]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
                     case "storein2":
                         /** Named boxes and dos need private data. */
                         postProcess = args => {

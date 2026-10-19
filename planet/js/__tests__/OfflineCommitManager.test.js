@@ -336,6 +336,13 @@ describe("OfflineCommitManager", () => {
                         data: { melody: [1, 2, 3] },
                         timestamp: 100,
                         status: "pending"
+                    },
+                    {
+                        id: "d_off_2",
+                        message: "Added harmony",
+                        data: { melody: [1, 2, 3], harmony: [4, 5, 6] },
+                        timestamp: 200,
+                        status: "pending"
                     }
                 ],
                 pendingRepoCreation: {
@@ -360,19 +367,23 @@ describe("OfflineCommitManager", () => {
             });
 
             server.editProject.mockImplementation((repo, key, data, msg, cb) => {
-                cb({ success: true, sha: "sha-created-draft-1" });
+                cb({ success: true, sha: `sha-${msg}` });
             });
 
             server.getCommitHistory.mockImplementation((repo, cb) => {
                 cb({
                     success: true,
-                    data: [{ sha: "sha-created-draft-1", message: "Recorded melody" }]
+                    data: [
+                        { sha: "sha-Added harmony", message: "Added harmony" },
+                        { sha: "sha-Recorded melody", message: "Recorded melody" }
+                    ]
                 });
             });
 
             await manager._onOnline();
 
             expect(server.addProject).toHaveBeenCalledTimes(1);
+            expect(server.editProject).toHaveBeenCalledTimes(2);
             expect(storage.addGitRepoData).toHaveBeenCalledWith(
                 "p_off",
                 "Offline-Song-abcdef12",
@@ -393,7 +404,44 @@ describe("OfflineCommitManager", () => {
             );
 
             expect(window.parent.postMessage).toHaveBeenCalledWith(
-                { type: "MB_SYNC_COMPLETE", synced: expect.any(Number) },
+                { type: "MB_SYNC_COMPLETE", synced: 2 },
+                "*"
+            );
+        });
+
+        test("does not report sync complete when pending repo creation fails", async () => {
+            storage.data.Projects.p_off = {
+                ProjectName: "Offline Song",
+                ProjectData: { melody: [1, 2, 3] },
+                commitDrafts: [
+                    {
+                        id: "d_off_1",
+                        message: "Recorded melody",
+                        data: { melody: [1, 2, 3] },
+                        timestamp: 100,
+                        status: "pending"
+                    }
+                ],
+                pendingRepoCreation: {
+                    status: "pending",
+                    projectName: "Offline Song",
+                    repoName: "Offline-Song-abcdef12"
+                },
+                GitRepoData: {
+                    repoName: "Offline-Song-abcdef12",
+                    hashedKey: ""
+                }
+            };
+            server.addProject.mockImplementation((payloadStr, cb) => {
+                cb({ success: false, error: "CREATE_FAILED" });
+            });
+
+            await manager._onOnline();
+
+            expect(storage.data.Projects.p_off.pendingRepoCreation.status).toBe("pending");
+            expect(server.editProject).not.toHaveBeenCalled();
+            expect(window.parent.postMessage).not.toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_SYNC_COMPLETE" }),
                 "*"
             );
         });

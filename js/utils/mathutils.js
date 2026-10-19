@@ -199,23 +199,22 @@ class MathUtility {
      * @param {*} a
      * @param {*} b
      * @returns {number|string} - Sum of a and b. If either a or b is a string, it concatenates them.
-     * @throws {string} NanError if the non-string operand is null or undefined.
+     * @throws {string} NanError if an operand is null, undefined, or NaN.
      */
     static doPlus(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            // The operand on the non-string side still needs a toString(), which
-            // null/undefined don't have. Reject them here so this reports the
-            // same NanError every other operation reports for invalid input,
-            // instead of letting the bare call below throw its own TypeError.
-            if (a === null || a === undefined || b === null || b === undefined) {
-                throw new Error("NanError");
-            }
+        if (a === null || a === undefined || b === null || b === undefined) {
+            throw new Error("NanError");
+        }
 
+        if (typeof a === "string" || typeof b === "string") {
             const aString = typeof a === "string" ? a : a.toString();
             const bString = typeof b === "string" ? b : b.toString();
 
             return aString + bString;
         } else {
+            if (Number.isNaN(a) || Number.isNaN(b)) {
+                throw new Error("NanError");
+            }
             return Number(a) + Number(b);
         }
     }

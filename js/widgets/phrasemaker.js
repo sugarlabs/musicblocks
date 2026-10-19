@@ -1182,7 +1182,11 @@ class PhraseMaker {
         ptmTableRow.insertCell().append(tempTable);
 
         if (this._blockMap[this.blockNo] === undefined) {
-            this._blockMap[this.blockNo] = [];
+            // The cells saved with the project, until the matrix is opened in this session.
+            const savedCells = this.activity.blocks.blockList?.[this.blockNo]?.matrixCells;
+            this._blockMap[this.blockNo] = Array.isArray(savedCells)
+                ? savedCells.map(cell => [cell[0], [cell[1][0], cell[1][1]], cell[2]])
+                : [];
         }
         this._lookForNoteBlocksOrRepeat();
 

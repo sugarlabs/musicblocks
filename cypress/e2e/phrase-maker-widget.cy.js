@@ -22,6 +22,8 @@
  *  8. Confirming the note-value row (#bottomRow) is rendered at the bottom
  *     of the grid.
  *  9. Closing the widget and confirming the frame is fully removed from the DOM.
+ * 10. Selecting cells, reloading the page, and confirming the same cells are
+ *     still selected.
  *
  * NOTE ON SELECTORS
  * PhraseMaker.show() calls:
@@ -41,15 +43,10 @@
 // ---------------------------------------------------------------------------
 
 /**
- * Loads a fixture project file and waits until the `matrix` block is fully
- * in the block list with a stable _loadCounter of 0 (same stability pattern
- * as meter-widget.cy.js and rhythm-ruler-widget.cy.js).
- * @param {string} fixtureName - Filename inside cypress/fixtures/.
+ * Waits until the `matrix` block is fully in the block list with a stable
+ * _loadCounter of 0.
  */
-const loadFixtureProject = fixtureName => {
-    cy.get("#load").click();
-    cy.get("#myOpenFile").selectFile(`cypress/fixtures/${fixtureName}`, { force: true });
-
+const waitForMatrixBlock = () => {
     let stableObservations = 0;
     cy.window({ timeout: 30000 }).should(win => {
         const { blocks } = win.ActivityContext.getActivity();
@@ -62,6 +59,19 @@ const loadFixtureProject = fixtureName => {
             "fixture matrix block should remain fully loaded"
         ).to.be.at.least(5);
     });
+};
+
+/**
+ * Loads a fixture project file and waits until the `matrix` block is fully
+ * in the block list with a stable _loadCounter of 0 (same stability pattern
+ * as meter-widget.cy.js and rhythm-ruler-widget.cy.js).
+ * @param {string} fixtureName - Filename inside cypress/fixtures/.
+ */
+const loadFixtureProject = fixtureName => {
+    cy.get("#load").click();
+    cy.get("#myOpenFile").selectFile(`cypress/fixtures/${fixtureName}`, { force: true });
+
+    waitForMatrixBlock();
     cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
     cy.get("#errorText").should("not.be.visible");
 };
@@ -241,6 +251,49 @@ describe("Phrase Maker widget", () => {
             // also be absent from the document.
             cy.get("#bottomRow").should("not.exist");
             cy.get("#addnotes").should("not.exist");
+        });
+    });
+
+    // 8. Saving — the selected cells survive a page reload
+
+    it("keeps the selected cells after the page is reloaded", () => {
+        const selected = [
+            [0, 0],
+            [2, 3]
+        ];
+        const cellAt = ([i, j]) => `${PM} [data-i="${i}"][data-j="${j}"]`;
+        const expectBlack = cell =>
+            cy.get(cellAt(cell), { timeout: 30000 }).should($cell => {
+                expect($cell[0].style.backgroundColor).to.equal("black");
+            });
+
+        openPhraseMaker();
+        cy.get(`${PM} [data-i="0"]`, { timeout: 15000 }).should("have.length.at.least", 1);
+        for (const cell of selected) {
+            cy.get(cellAt(cell))
+                .first()
+                .trigger("mousedown", { force: true })
+                .trigger("mouseup", { force: true });
+            expectBlack(cell);
+        }
+
+        // On a restart the project comes back from Planet's storage, which the 15 second autosave
+        // keeps current. The save started on unload is asynchronous and can be cut short, so save
+        // as the autosave does and wait for it before reloading.
+        cy.window().then(win =>
+            win.ActivityContext.getActivity().saveLocally({ rejectOnProjectSaveError: true })
+        );
+        cy.reload();
+        cy.waitForAppReady();
+        waitForMatrixBlock();
+
+        cy.get("#play").click();
+        for (const cell of selected) {
+            expectBlack(cell);
+        }
+        cy.get(`${PM} td[data-i]`).should($cells => {
+            const black = $cells.filter((index, cell) => cell.style.backgroundColor === "black");
+            expect(black.length, "only the selected cells are black").to.equal(selected.length);
         });
     });
 });
