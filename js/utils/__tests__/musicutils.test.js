@@ -261,6 +261,7 @@ describe("musicutils", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
         expect(octaveR).toBe(4);
+        setOctaveRatio(2);
     });
 });
 
