@@ -117,6 +117,12 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
+    it("does not hardcode dark-mode widget title bar button backgrounds", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.(?:rollup|close)\s*\{[^}]*background(?:-color)?\s*:\s*#[0-9a-f]{3,8}\b/i
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);
