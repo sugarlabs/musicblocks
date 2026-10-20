@@ -240,6 +240,9 @@ class MeterWidget {
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
+                    for (let i = 0; i < this._strongBeats.length; i++) {
+                        this._playWheel.navItems[i].navItem.hide();
+                    }
                     if (this._playBeatTimeout) {
                         this._clearWidgetTimeout(this._playBeatTimeout);
                         this._playBeatTimeout = null;
