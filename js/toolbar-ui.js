@@ -1191,6 +1191,9 @@ class ToolbarUI {
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
             }
+            if (window.widgetWindows && typeof window.widgetWindows._handleResize === "function") {
+                window.widgetWindows._handleResize();
+            }
         };
     }
 
