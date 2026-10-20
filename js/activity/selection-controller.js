@@ -215,9 +215,8 @@ class SelectionController {
             if (!block) return;
 
             this.blockRect = {
-                x: activity.scrollBlockContainer
-                    ? block.container.x + activity.blocksContainer.x
-                    : block.container.x,
+                // Disabling horizontal scrolling keeps the workspace's existing offset.
+                x: block.container.x + activity.blocksContainer.x,
                 y: block.container.y + activity.blocksContainer.y,
                 height: block.height,
                 width: block.width
