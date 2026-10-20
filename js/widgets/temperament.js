@@ -646,33 +646,26 @@ function TemperamentWidget() {
         canvas.setAttribute("role", "img");
         canvas.setAttribute("aria-label", _("Temperament visualizer circle"));
 
-        let focusedDot = -1;
-
         const _triggerFocused = function () {
-            that._logo.resetSynth(0);
-            that._logo.synth.trigger(
-                0,
-                Number(that.frequencies[focusedDot]),
-                1 / 4,
-                "electronic synth",
-                null,
-                null
-            );
+            _highlightTableRow(highlightDot);
+            _updateRemoveButton();
+            _playNote(highlightDot);
         };
 
         canvas.onkeydown = function (e) {
             if (that._playAllRunning) return;
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
-                focusedDot = (focusedDot + 1) % that.pitchNumber;
+                highlightDot = (highlightDot + 1) % that.pitchNumber;
                 _triggerFocused();
             } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
                 e.preventDefault();
-                focusedDot = (focusedDot - 1 + that.pitchNumber) % that.pitchNumber;
+                highlightDot =
+                    (Math.max(0, highlightDot) - 1 + that.pitchNumber) % that.pitchNumber;
                 _triggerFocused();
             } else if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                if (focusedDot >= 0) _triggerFocused();
+                if (highlightDot >= 0) _triggerFocused();
             }
         };
 
