@@ -17,6 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const { deepClone } = require("../utils-logic");
+global.deepClone = deepClone;
+
 describe("platformstyle", () => {
     const buildDom = () => {
         const meta = document.createElement("meta");
@@ -288,6 +291,9 @@ describe("platformstyle", () => {
     });
 
     it("clonePlatformTheme creates independent deep clones using deepClone", () => {
+        // global.deepClone is set at module level (like themebox.test.js) so the
+        // fast path is exercised — not the JSON fallback.
+        expect(typeof global.deepClone).toBe("function");
         const { clonePlatformTheme, platformThemes } = require("../platformstyle");
         const originalTheme = platformThemes.light;
         const clonedTheme = clonePlatformTheme(originalTheme);
