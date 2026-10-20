@@ -488,6 +488,30 @@ class ProjectManager {
         this.activity.update = true;
     }
 
+    /**
+     * Synchronizes the browser document title with the active project's current name.
+     * Uses Planet storage when available, falling back to local session storage.
+     * @private
+     * @returns {void}
+     */
+    _syncBrowserTitle() {
+        const that = this.activity;
+        let projectName = "";
+        try {
+            if (that.planet && typeof that.planet.getCurrentProjectName === "function") {
+                projectName = that.planet.getCurrentProjectName();
+            }
+        } catch (e) {
+            ErrorHandler.recoverable(e, { operation: "getProjectNameForTitle" });
+        }
+        if (!projectName && that.storage && that.storage.currentProject) {
+            projectName = that.storage.currentProject;
+        }
+        if (typeof document !== "undefined" && projectName) {
+            document.title = projectName;
+        }
+    }
+
     _loadProject(projectID, flags) {
         const that = this.activity;
 
@@ -1171,6 +1195,7 @@ class ProjectManager {
                 if (!belongsToThisLoad(payload)) return;
                 stopWatching();
                 await saveImportedProject();
+                pm._syncBrowserTitle();
                 finishLoading();
             };
             const onFailed = payload => {

@@ -43,4 +43,44 @@ describe("Project loading", () => {
             expect(loadedPiHeap, "pi.tb's heap.json loadFile block should be present").to.be.true;
         });
     });
+
+    it("updates the browser tab title to the newly imported project's name (#9716)", () => {
+        // Step 1: Import the first project fixture (tempo-widget-minimal.tb)
+        cy.get("#load").click();
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/tempo-widget-minimal.tb", {
+            force: true
+        });
+
+        cy.get("#load-container").should("be.visible");
+        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+        cy.get("#errorText").should("not.be.visible");
+        cy.get("#canvas").should("be.visible");
+
+        // Verify the first project's blocks loaded and title reflects its name
+        cy.window().should(win => {
+            const activity = win.ActivityContext.getActivity();
+            const hasTempo = activity.blocks.blockList.some(block => block.name === "tempo");
+            expect(hasTempo, "tempo-widget-minimal blocks should be present").to.be.true;
+        });
+        cy.title().should("eq", "tempo-widget-minimal");
+
+        // Step 2: Import the second project fixture (meter-widget-minimal.tb)
+        cy.get("#load").click();
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/meter-widget-minimal.tb", {
+            force: true
+        });
+
+        cy.get("#load-container").should("be.visible");
+        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+        cy.get("#errorText").should("not.be.visible");
+        cy.get("#canvas").should("be.visible");
+
+        // Verify the second project's blocks loaded and title reflects the new project's name
+        cy.window().should(win => {
+            const activity = win.ActivityContext.getActivity();
+            const hasMeter = activity.blocks.blockList.some(block => block.name === "meterwidget");
+            expect(hasMeter, "meter-widget-minimal blocks should be present").to.be.true;
+        });
+        cy.title().should("eq", "meter-widget-minimal");
+    });
 });

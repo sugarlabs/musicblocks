@@ -2512,6 +2512,7 @@ describe("_setupFileHandlers inner callbacks", () => {
                 return Promise.resolve();
             }),
             closePlanet: jest.fn(),
+            getCurrentProjectName: jest.fn(() => "student-song"),
             initialiseNewProject: jest.fn((name, clearWorkspace) => {
                 order.push("create-project");
                 return Promise.resolve({ name, clearWorkspace });
@@ -2569,6 +2570,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         await Promise.resolve();
 
         expect(activity.loading).toBe(false);
+        expect(document.title).toBe("student-song");
     });
 
     it("change handler finishes loading when saving the imported project rejects", async () => {
@@ -3290,5 +3292,75 @@ describe("_finishLoading", () => {
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.update).toBe(true);
+    });
+});
+
+describe("_syncBrowserTitle", () => {
+    it("sets document.title from planet.getCurrentProjectName when available", () => {
+        const activity = makeActivity({
+            planet: { getCurrentProjectName: jest.fn(() => "My Imported Song") }
+        });
+        const pm = new ProjectManager(activity);
+
+        pm._syncBrowserTitle();
+
+        expect(document.title).toBe("My Imported Song");
+    });
+
+    it("falls back to storage.currentProject when planet is absent", () => {
+        const activity = makeActivity({
+            planet: undefined,
+            storage: { currentProject: "Local Saved Song" }
+        });
+        const pm = new ProjectManager(activity);
+
+        pm._syncBrowserTitle();
+
+        expect(document.title).toBe("Local Saved Song");
+    });
+
+    it("falls back to storage.currentProject when planet.getCurrentProjectName returns empty", () => {
+        const activity = makeActivity({
+            planet: { getCurrentProjectName: jest.fn(() => "") },
+            storage: { currentProject: "Fallback Project" }
+        });
+        const pm = new ProjectManager(activity);
+
+        pm._syncBrowserTitle();
+
+        expect(document.title).toBe("Fallback Project");
+    });
+
+    it("recovers gracefully if planet.getCurrentProjectName throws", () => {
+        const err = new Error("Storage broken");
+        const activity = makeActivity({
+            planet: {
+                getCurrentProjectName: jest.fn(() => {
+                    throw err;
+                })
+            },
+            storage: { currentProject: "Recovered Project" }
+        });
+        const pm = new ProjectManager(activity);
+
+        pm._syncBrowserTitle();
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(err, {
+            operation: "getProjectNameForTitle"
+        });
+        expect(document.title).toBe("Recovered Project");
+    });
+
+    it("does not overwrite document.title when no project name is available", () => {
+        document.title = "Existing Title";
+        const activity = makeActivity({
+            planet: { getCurrentProjectName: jest.fn(() => "") },
+            storage: { currentProject: "" }
+        });
+        const pm = new ProjectManager(activity);
+
+        pm._syncBrowserTitle();
+
+        expect(document.title).toBe("Existing Title");
     });
 });
