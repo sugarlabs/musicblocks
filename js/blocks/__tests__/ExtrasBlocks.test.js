@@ -94,6 +94,7 @@ describe("ExtrasBlocks", () => {
 
     beforeEach(() => {
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {},
                 showBlocks: jest.fn(),
@@ -138,7 +139,6 @@ describe("ExtrasBlocks", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -320,6 +320,7 @@ describe("ExtrasBlocks - additional branch coverage", () => {
 
     beforeEach(() => {
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {
                     blk1: { connections: [null, null], value: "hello", name: "text" },
@@ -371,7 +372,6 @@ describe("ExtrasBlocks - additional branch coverage", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -478,6 +478,7 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
     beforeEach(() => {
         instances = {};
         activity = {
+            canvas: { height: 300, width: 400 },
             blocks: {
                 blockList: {
                     blk1: { connections: [null, null], value: "hello", name: "text" },
@@ -513,7 +514,13 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
                 getTurtleCount: jest.fn(() => 1),
                 getTurtle: jest.fn(() => ({ inTrash: false, name: "turtle1" }))
             },
-            save: { afterSaveAbc: jest.fn(), afterSaveLilypond: jest.fn(), saveSVG: jest.fn() },
+            save: {
+                afterSaveAbc: jest.fn(),
+                afterSaveLilypond: jest.fn(),
+                saveLilypondFromBlock: jest.fn(),
+                afterSaveMxml: jest.fn(),
+                saveSVG: jest.fn()
+            },
             errorMsg: jest.fn(),
             textMsg: jest.fn(),
             hideGrids: jest.fn()
@@ -525,7 +532,6 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
             inMatrix: false,
             inStatusMatrix: false,
             svgOutput: "",
-            canvas: { height: 500, width: 500 },
             svgBackground: true,
             oscilloscopeTurtles: [],
             turtleDelay: 100,
@@ -636,8 +642,50 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         logo.svgBackground = true;
         logo.svgOutput = "output";
         instances["SaveSVGBlock"].flow(["test.svg"], logo, turtle, blk);
-        expect(activity.save.saveSVG).toHaveBeenCalledWith("test.svg");
+        expect(logo.svgOutput).toMatch(/^<rect x="0" y="0" height="300" width="400" /);
+        expect(activity.save.saveSVG).toHaveBeenCalledWith(activity, "test.svg");
     });
+
+    test("real RecordNotationBlock flow() turns on notation recording for its mouse", () => {
+        const tur = { singer: { recordingNotation: false } };
+        activity.turtles.ithTurtle.mockReturnValueOnce(tur);
+        instances["RecordNotationBlock"].flow([], logo, turtle, blk);
+        expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(turtle);
+        expect(tur.singer.recordingNotation).toBe(true);
+    });
+
+    test("real save blocks are shown in the palette", () => {
+        ["SaveABCBlock", "SaveLilypondBlock", "SaveSVGBlock", "SaveMxmlBlock"].forEach(name => {
+            expect(instances[name].hidden).toBeFalsy();
+            expect(instances[name].deprecated).toBeFalsy();
+        });
+    });
+
+    test("real SaveLilypondBlock flow() saves through saveLilypondFromBlock", () => {
+        instances["SaveLilypondBlock"].flow(["song.ly"], logo, turtle, blk);
+        expect(activity.save.saveLilypondFromBlock).toHaveBeenCalledWith("song.ly");
+        expect(activity.save.afterSaveLilypond).not.toHaveBeenCalled();
+    });
+
+    test("real SaveMxmlBlock flow() saves MusicXML under its file name", () => {
+        instances["SaveMxmlBlock"].flow(["song.xml"], logo, turtle, blk);
+        expect(activity.save.afterSaveMxml).toHaveBeenCalledWith("song.xml");
+    });
+
+    test.each(["runningLilypond", "runningAbc", "runningMxml", "runningMIDI"])(
+        "real save blocks do nothing while %s",
+        flag => {
+            logo[flag] = true;
+            instances["SaveABCBlock"].flow(["song.abc"], logo, turtle, blk);
+            instances["SaveLilypondBlock"].flow(["song.ly"], logo, turtle, blk);
+            instances["SaveMxmlBlock"].flow(["song.xml"], logo, turtle, blk);
+            instances["SaveSVGBlock"].flow(["song.svg"], logo, turtle, blk);
+            expect(activity.save.afterSaveAbc).not.toHaveBeenCalled();
+            expect(activity.save.saveLilypondFromBlock).not.toHaveBeenCalled();
+            expect(activity.save.afterSaveMxml).not.toHaveBeenCalled();
+            expect(activity.save.saveSVG).not.toHaveBeenCalled();
+        }
+    );
 
     test("real ShowBlocksBlock flow() calls showBlocks", () => {
         instances["ShowBlocksBlock"].flow([], logo, turtle, blk);

@@ -20,7 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.PitchStaircaseTimers = require("../PitchStaircaseTimers.js");
+global.PitchStaircaseLayout = require("../PitchStaircaseLayout.js");
+global.PitchStaircaseSteps = require("../PitchStaircaseSteps.js");
+global.PitchStaircasePlayback = require("../PitchStaircasePlayback.js");
+global.PitchStaircaseSave = require("../PitchStaircaseSave.js");
+global.PitchStaircaseWindow = require("../PitchStaircaseWindow.js");
 const PitchStaircase = require("../pitchstaircase.js");
+global.PitchStaircase = PitchStaircase;
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 global.ManagedTimer = ManagedTimer;
@@ -38,7 +45,6 @@ global.DEFAULTVOICE = "electronic synth";
 global.frequencyToPitch = jest.fn(f => ["A", "", 4]);
 global.base64Encode = jest.fn(s => s);
 global.PREVIEWVOLUME = 0.5;
-global.normalizeNoteAccidentals = jest.fn(n => n);
 global.Singer = { masterVolume: [50] };
 global.last = arr => arr[arr.length - 1];
 global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
@@ -379,7 +385,7 @@ describe("PitchStaircase Widget", () => {
     describe("_playAll", () => {
         const makeStepCell = () => ({ classList: { add: jest.fn(), remove: jest.fn() } });
 
-        test("triggers every stair note and clears the active class after the timeout", () => {
+        test("triggers the stairs once as a chord and clears the active class after the timeout", () => {
             jest.useFakeTimers();
 
             psc.Stairs = [
@@ -392,8 +398,8 @@ describe("PitchStaircase Widget", () => {
 
             psc._playAll();
 
-            expect(global.normalizeNoteAccidentals).toHaveBeenCalledTimes(2);
-            expect(psc.activity.logo.synth.trigger).toHaveBeenCalledTimes(2);
+            expect(psc.activity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            expect(psc.activity.logo.synth.trigger.mock.calls[0][1]).toEqual([220.0, 246.94]);
             cells.forEach(cell => expect(cell.classList.add).toHaveBeenCalledWith("active"));
 
             jest.advanceTimersByTime(1000);
@@ -1171,5 +1177,63 @@ describe("PitchStaircase Widget", () => {
             ];
             expect(() => psc._makeStairs()).not.toThrow();
         });
+    });
+});
+
+describe("PitchStaircase modules", () => {
+    const MODULES = [
+        "PitchStaircaseTimers",
+        "PitchStaircaseLayout",
+        "PitchStaircaseSteps",
+        "PitchStaircasePlayback",
+        "PitchStaircaseSave",
+        "PitchStaircaseWindow"
+    ];
+
+    test("lists every module, and itself last, as its lazy-loading dependencies", () => {
+        expect(PitchStaircase.dependencies).toEqual([
+            ...MODULES.map(name => "widgets/" + name),
+            "widgets/pitchstaircase"
+        ]);
+    });
+
+    test("the Pitch Staircase block falls back to the same dependencies", () => {
+        const source = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "..", "blocks", "WidgetBlocks.js"),
+            "utf8"
+        );
+        const site = source.slice(source.indexOf('typeof PitchStaircase !== "undefined"'));
+        const fallback = site.slice(site.indexOf("["), site.indexOf("]") + 1);
+
+        expect(JSON.parse(fallback)).toEqual(PitchStaircase.dependencies);
+    });
+
+    test("installModules waits until every module is loaded", () => {
+        jest.isolateModules(() => {
+            const saved = global.PitchStaircaseSave;
+            delete global.PitchStaircaseSave;
+            try {
+                const Fresh = require("../pitchstaircase.js");
+                expect(Fresh.installModules()).toBe(false);
+                expect(Fresh.prototype._save).toBeUndefined();
+
+                global.PitchStaircaseSave = saved;
+                expect(Fresh.installModules()).toBe(true);
+                expect(Fresh.prototype._save).toBe(saved.prototype._save);
+            } finally {
+                global.PitchStaircaseSave = saved;
+            }
+        });
+    });
+
+    test("a widget has every module method", () => {
+        const psc = new PitchStaircase();
+        for (const name of MODULES) {
+            for (const method of Object.getOwnPropertyNames(global[name].prototype)) {
+                if (method !== "constructor") {
+                    expect(typeof psc[method]).toBe("function");
+                }
+            }
+        }
     });
 });

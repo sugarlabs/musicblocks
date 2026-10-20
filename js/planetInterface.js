@@ -154,6 +154,7 @@ class PlanetInterface {
             this.closePlanet();
             if (!merge) {
                 this.activity.sendAllToTrash(false, true);
+                this._resetTrashHistory();
             }
 
             if (data === undefined) {
@@ -210,16 +211,28 @@ class PlanetInterface {
 
         /**
          * Initializes a new project with the provided name or a default name.
-         * Clears the canvas, resets project data, and refreshes the canvas.
+         * Resets project state and optionally clears and refreshes the workspace.
          * @param {string} [name] - The name of the new project.
+         * @param {boolean} [clearWorkspace=true] - Whether to clear the current workspace.
          */
-        this.initialiseNewProject = name => {
+        this.initialiseNewProject = (name, clearWorkspace = true) => {
             const projectStorage = this._getProjectStorage();
             if (!projectStorage) return;
 
-            projectStorage.initialiseNewProject(name);
-            this.activity.sendAllToTrash();
-            this.activity.refreshCanvas();
+            const initialization = projectStorage.initialiseNewProject(name);
+            if (clearWorkspace) {
+                this.activity.sendAllToTrash();
+                this.activity.refreshCanvas();
+            }
+            this._resetTrashHistory();
+            return initialization;
+        };
+
+        /**
+         * Forgets the trash and undo history of the project being replaced, so
+         * it cannot be restored into the next one or grow across project switches.
+         */
+        this._resetTrashHistory = () => {
             this.activity.blocks.trashStacks = [];
             this.activity.blocks.actionHistory = [];
             this.activity.blocks.redoActionHistory = [];
@@ -228,13 +241,25 @@ class PlanetInterface {
         /**
          * Function to save the current project locally.
          * Prepares project data for export, generates SVG data, and saves the project data locally.
-         * Returns false if the project data could not be saved.
+         * @param {Object} [options] - Save behavior options.
+         * @param {boolean} [options.rejectOnProjectSaveError=false] - Reject when project data cannot be saved.
+         * @returns {Promise|boolean} False if project data could not be saved.
          */
-        this.saveLocally = () => {
+        this.saveLocally = (options = {}) => {
+            const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
             if (!this.planet || !this.planet.ProjectStorage) {
-                console.error(
+                const error = new Error(
                     "[PlanetInterface] saveLocally called before Planet storage is ready."
                 );
+                console.error(error.message);
+                return rejectOnProjectSaveError ? Promise.reject(error) : Promise.resolve(null);
+            }
+
+            // The project being loaded is already the current one, so saving
+            // now would overwrite its stored copy with the blocks loaded so
+            // far. Its stored copy is still complete, so save once it is done.
+            if (this.activity.blocks.isLoading()) {
+                this.activity.blocks.runAfterLoad(this.saveLocally);
                 return Promise.resolve(null);
             }
 
@@ -248,12 +273,12 @@ class PlanetInterface {
                 240,
                 320 / this.activity.canvas.width
             );
-            const handleSaveError = e => {
-                if (
-                    e?.name === "QuotaExceededError" ||
-                    e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
-                    e?.message === "Not enough space to save locally"
-                ) {
+            const isQuotaError = e =>
+                e?.name === "QuotaExceededError" ||
+                e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
+                e?.message === "Not enough space to save locally";
+            const reportSaveError = e => {
+                if (isQuotaError(e)) {
                     this.activity.textMsg(
                         _(
                             "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
@@ -265,32 +290,40 @@ class PlanetInterface {
                 }
                 return false;
             };
+            const handleProjectSaveError = e => {
+                const result = reportSaveError(e);
+                if (rejectOnProjectSaveError) throw e;
+                return result;
+            };
             try {
+                const projectStorage = this.planet.ProjectStorage;
+                const projectId =
+                    typeof projectStorage.getCurrentProjectID === "function"
+                        ? projectStorage.getCurrentProjectID()
+                        : undefined;
+                const saveProject = image =>
+                    projectId === undefined
+                        ? projectStorage.saveLocally(data, image)
+                        : projectStorage.saveLocally(data, image, projectId);
                 if (svgData === null || svgData === undefined || svgData === "") {
-                    return Promise.resolve(
-                        this.planet.ProjectStorage.saveLocally(data, null)
-                    ).catch(handleSaveError);
+                    return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
                 } else {
                     const fallbackImage =
-                        typeof this.planet.ProjectStorage.getCurrentProjectImage === "function"
-                            ? this.planet.ProjectStorage.getCurrentProjectImage()
+                        typeof projectStorage.getCurrentProjectImage === "function"
+                            ? projectStorage.getCurrentProjectImage()
                             : null;
-                    const savePromise = Promise.resolve(
-                        this.planet.ProjectStorage.saveLocally(data, fallbackImage)
-                    ).catch(handleSaveError);
+                    const savePromise = Promise.resolve(saveProject(fallbackImage)).catch(
+                        handleProjectSaveError
+                    );
                     const img = new Image();
-                    const t = this;
                     img.onload = () => {
                         try {
                             const bitmap = new createjs.Bitmap(img);
                             const bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             Promise.resolve(
-                                t.planet.ProjectStorage.saveLocally(
-                                    data,
-                                    bitmap.bitmapCache.getCacheDataURL()
-                                )
-                            ).catch(handleSaveError);
+                                saveProject(bitmap.bitmapCache.getCacheDataURL())
+                            ).catch(reportSaveError);
                         } catch (error) {
                             console.error(error);
                         }
@@ -299,16 +332,10 @@ class PlanetInterface {
                     return savePromise;
                 }
             } catch (e) {
-                if (
-                    e.code === DOMException.QUOTA_EXCEEDED_ERR ||
-                    e.message === "Not enough space to save locally"
-                ) {
-                    this.activity.textMsg(
-                        _(
-                            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
-                        )
-                    );
-                    return false;
+                if (isQuotaError(e)) {
+                    const result = reportSaveError(e);
+                    if (rejectOnProjectSaveError) throw e;
+                    return result;
                 } else {
                     console.error(e);
                     throw e;
@@ -468,8 +495,8 @@ class PlanetInterface {
             try {
                 const palettes = this.activity.blocks.palettes;
                 const nameMap = {};
-                for (const palette in palettes.dict) {
-                    for (const blk in palettes.dict[palette].protoList) {
+                for (const palette of Object.keys(palettes.dict)) {
+                    for (const blk of Object.keys(palettes.dict[palette].protoList)) {
                         const proto = palettes.dict[palette].protoList[blk];
                         if (proto.name && proto.staticLabels && proto.staticLabels[0]) {
                             nameMap[proto.name] = proto.staticLabels[0];

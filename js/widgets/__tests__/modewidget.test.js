@@ -1043,6 +1043,32 @@ describe("ModeWidget", () => {
         });
     });
 
+    describe("_updateModeDisplay", () => {
+        test("updates the mode table label without touching the window title", () => {
+            modeWidget._modeLabelCell = { textContent: "" };
+
+            modeWidget._updateModeDisplay("C major");
+
+            expect(modeWidget._modeLabelCell.textContent).toBe("C major");
+            // The window title is set once, to "custom mode", by windowFor() in the
+            // constructor and must stay that way: block-drag-controller.js and
+            // block.js both gate reinitialization on the open title still reading
+            // "custom mode" (widgetWindows.isReinitWidgetTitle()). Overwriting it
+            // with the current mode name here used to silently disable that once
+            // any mode had been displayed.
+            expect(modeWidget.widgetWindow.updateTitle).not.toHaveBeenCalled();
+        });
+
+        test("clearing the mode name still leaves the window title untouched", () => {
+            modeWidget._modeLabelCell = { textContent: "C major" };
+
+            modeWidget._updateModeDisplay("");
+
+            expect(modeWidget._modeLabelCell.textContent).toBe("");
+            expect(modeWidget.widgetWindow.updateTitle).not.toHaveBeenCalled();
+        });
+    });
+
     describe("mode pie menu safety", () => {
         test("closes when the control-bar button is clicked while open", () => {
             modeWidget._piemenuModes();
@@ -1135,6 +1161,71 @@ describe("ModeWidget", () => {
             // Test: svg element is null
             modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
             expect(() => modeWidget._scale()).not.toThrow();
+        });
+    });
+
+    describe("Clear during animation", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            modeWidget._setModeName = jest.fn();
+            modeWidget._selectedNotes = Array.from({ length: 12 }, (_, i) =>
+                [0, 2, 4, 5, 7, 9, 11].includes(i)
+            );
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+        });
+
+        test.each(["_rotateRight", "_rotateLeft"])(
+            "Clear stays cleared after %s callbacks would have run",
+            rotate => {
+                modeWidget[rotate]();
+                jest.advanceTimersByTime(250);
+                modeWidget._clear();
+                jest.runAllTimers();
+
+                expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+                expect(modeWidget._locked).toBe(false);
+                for (let i = 1; i < 12; i++) {
+                    expect(modeWidget._noteWheel.navItems[i].navItem.hide).toHaveBeenCalled();
+                }
+                modeWidget._rotateRight();
+                jest.runAllTimers();
+                expect(modeWidget._locked).toBe(false);
+            }
+        );
+
+        test("Clear cancels rotation with the fallback timer implementation", () => {
+            modeWidget._timerManager = null;
+            modeWidget._rotateRight();
+            modeWidget._clear();
+            jest.runAllTimers();
+            expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+            expect(modeWidget._activeTimeouts.size).toBe(0);
+        });
+
+        test("Clear stops playback and restores its button", () => {
+            modeWidget._playing = true;
+            modeWidget._playAll();
+            const triggerCount = mockActivity.logo.synth.trigger.mock.calls.length;
+            const setIcon = jest.spyOn(modeWidget, "_setPlayButtonIcon");
+            modeWidget._clear();
+            jest.runAllTimers();
+
+            expect(modeWidget._playing).toBe(false);
+            expect(modeWidget._locked).toBe(false);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(triggerCount);
+            expect(setIcon).toHaveBeenCalledWith("play-button.svg", "Play all");
+        });
+
+        test("idle Clear preserves the root and can be undone", () => {
+            const original = [...modeWidget._selectedNotes];
+            modeWidget._clear();
+            expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+            modeWidget._undo();
+            expect(modeWidget._selectedNotes).toEqual(original);
         });
     });
 

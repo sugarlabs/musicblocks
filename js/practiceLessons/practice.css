@@ -25,8 +25,7 @@
     position: fixed;
     top: 64px; /* below top toolbar */
     right: 0;
-    width: 360px;
-    max-width: calc(100vw - 16px);
+    width: max-content;
     height: min(760px, calc(100% - 80px));
     z-index: 9000;
     display: flex;
@@ -40,6 +39,9 @@
 }
 
 .practice-panel-frame {
+    width: 360px;
+    box-sizing: border-box;
+    max-width: calc(100vw - 24px);
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -65,11 +67,11 @@
     padding: 0;
     border: none;
     cursor: pointer;
-    color: white;
+    color: var(--color-widget-titlebar-text);
     font-size: 14px;
     font-weight: bold;
     line-height: 1;
-    background: var(--color-brand-primary);
+    background: var(--color-widget-titlebar-bg);
     border-radius: 30px 0 0 30px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     z-index: 1;
@@ -107,8 +109,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 14px 16px;
-    background: var(--color-brand-primary);
-    color: white;
+    background: var(--color-widget-titlebar-bg);
+    color: var(--color-widget-titlebar-text);
     font-size: 18px;
     font-weight: 600;
     user-select: none;
@@ -132,9 +134,9 @@
 
 #close-practice,
 #close-explorer-journal {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-bg-primary);
     border: none;
-    color: white;
+    color: var(--color-text-primary);
     font-size: 18px;
     width: 32px;
     height: 32px;
@@ -145,7 +147,7 @@
 
 #close-practice:hover,
 #close-explorer-journal:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-bg-secondary);
 }
 
 /* === CONTENT AREA === */
@@ -159,7 +161,7 @@
 }
 
 .journal-header {
-    background: var(--color-brand-primary);
+    background: var(--color-widget-titlebar-bg);
 }
 
 .quest-title {
@@ -168,13 +170,13 @@
 
 .quest-title h3 {
     margin: 0;
-    color: #1b4965;
+    color: var(--color-text-primary);
     font-size: 20px;
 }
 
 .quest-title p {
     margin: 4px 0 0;
-    color: #5c677d;
+    color: var(--color-text-secondary);
     font-size: 13px;
 }
 
@@ -184,8 +186,8 @@
 .badge-card {
     margin: 10px 0;
     padding: 12px;
-    background: white;
-    border: 1px solid #d8e2dc;
+    background: var(--color-panel-bg);
+    border: 1px solid var(--color-border-primary);
     border-radius: 8px;
 }
 
@@ -194,7 +196,7 @@
 .reward-card h4,
 .badge-card h4 {
     margin: 0 0 8px;
-    color: #264653;
+    color: var(--color-text-primary);
 }
 
 .character-row {
@@ -1916,7 +1918,7 @@
 .reward-card li {
     font-size: 14px;
     line-height: 1.45;
-    color: #444;
+    color: var(--color-text-primary);
 }
 
 .practice-description ul,

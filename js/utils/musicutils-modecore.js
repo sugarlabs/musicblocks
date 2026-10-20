@@ -373,7 +373,7 @@ var modeMapper = (key, mode) => {
             mode = "major";
             switch (key) {
                 case "c":
-                    key = "a" + SHARP;
+                    key = "b" + FLAT;
                     break;
                 case "d":
                     key = "c";
@@ -435,10 +435,10 @@ var modeMapper = (key, mode) => {
             mode = "major";
             switch (key) {
                 case "c":
-                    key = "g" + SHARP;
+                    key = "a" + FLAT;
                     break;
                 case "d":
-                    key = "a" + SHARP;
+                    key = "b" + FLAT;
                     break;
                 case "e":
                     key = "c";
@@ -542,7 +542,6 @@ var modeMapper = (key, mode) => {
                     break;
                 case "g" + FLAT:
                     key = "d" + FLAT;
-                    mode = "minor";
                     break;
                 case "a" + FLAT:
                     key = "c";
@@ -567,7 +566,7 @@ var modeMapper = (key, mode) => {
                     key = "a";
                     break;
                 case "f":
-                    key = "a" + SHARP;
+                    key = "b" + FLAT;
                     break;
                 case "g":
                     key = "c";
@@ -620,7 +619,7 @@ var modeMapper = (key, mode) => {
             mode = "major";
             switch (key) {
                 case "c":
-                    key = "b";
+                    key = "d" + FLAT;
                     break;
                 case "d":
                     key = "c";
@@ -633,10 +632,10 @@ var modeMapper = (key, mode) => {
                     key = "g" + FLAT;
                     break;
                 case "g":
-                    key = "g" + SHARP;
+                    key = "a" + FLAT;
                     break;
                 case "a":
-                    key = "a" + SHARP;
+                    key = "b" + FLAT;
                     break;
                 case "b":
                     key = "c";

@@ -793,7 +793,7 @@ describe("AIDebuggerWidget", () => {
             const added = debuggerWidget.chatLog.children[0];
             expect(added).toBeDefined();
             expect(added.style.alignSelf).toBe("flex-end");
-            expect(added.style.backgroundColor).toBe("rgb(33, 150, 243)");
+            expect(added.className).toContain("aidebugger-message-user");
         });
 
         test("adds bot message with correct styling", () => {

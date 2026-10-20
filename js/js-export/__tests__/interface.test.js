@@ -81,6 +81,33 @@ describe("JSInterface", () => {
         it("should return false for a method that does not have a return value", () => {
             expect(JSInterface.methodReturns("newnote")).toBe(false);
         });
+
+        it("should return true for value blocks that call a mouse method", () => {
+            for (const block of [
+                "elapsednotes2",
+                "number2pitch",
+                "number2octave",
+                "synthvolumefactor"
+            ]) {
+                expect(JSInterface.methodReturns(block)).toBe(true);
+            }
+        });
+
+        it("should export those blocks as awaited mouse calls, not bare function calls", () => {
+            global.JSInterface = JSInterface;
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            const expected = {
+                elapsednotes2: "await mouse.getNotesPlayed(4)",
+                number2pitch: "await mouse.numToPitch(4)",
+                number2octave: "await mouse.numToOctave(4)",
+                synthvolumefactor: "await mouse.getSynthVolume(4)"
+            };
+            for (const [block, code] of Object.entries(expected)) {
+                const [ast] = ASTUtils._getArgsAST([[block, [4]]]);
+                expect(astring.generate(ast)).toBe(code);
+            }
+        });
     });
 
     describe("getSetterName", () => {

@@ -113,6 +113,49 @@ describe("ReflectionMatrix", () => {
             expect(reflection._lifecycle.pendingRequests.size).toBe(0);
         });
     });
+    describe("backendURL()", () => {
+        test("uses the local server on localhost", () => {
+            expect(ReflectionMatrix.backendURL("localhost")).toBe("http://localhost:8000");
+            expect(ReflectionMatrix.backendURL("127.0.0.1")).toBe("http://127.0.0.1:8000");
+        });
+
+        test("uses the HTTPS API on the hosted site", () => {
+            expect(ReflectionMatrix.backendURL("musicblocks.sugarlabs.org")).toBe(
+                "https://api.musicblocks.sugarlabs.org"
+            );
+        });
+
+        test("uses the HTTPS API on a subdomain of the hosted site", () => {
+            expect(ReflectionMatrix.backendURL("staging.musicblocks.sugarlabs.org")).toBe(
+                "https://api.musicblocks.sugarlabs.org"
+            );
+        });
+
+        test("returns null on a host without a known backend", () => {
+            expect(ReflectionMatrix.backendURL("example.com")).toBeNull();
+            expect(ReflectionMatrix.backendURL("musicblocks.sugarlabs.org.example.com")).toBeNull();
+        });
+
+        test("does not read an inherited object property as a backend", () => {
+            expect(ReflectionMatrix.backendURL("constructor")).toBeNull();
+            expect(ReflectionMatrix.backendURL("toString")).toBeNull();
+        });
+
+        test("falls back to the host the page is served from", () => {
+            expect(ReflectionMatrix.backendURL()).toBe("http://localhost:8000");
+        });
+
+        test("sends nothing and reports when no backend is configured", async () => {
+            const reflection = new ReflectionMatrix();
+            reflection.PORT = null;
+            reflection.activity = mockActivity;
+
+            await expect(reflection.generateAlgorithm("code")).resolves.toBeNull();
+
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            expect(global.fetch).not.toHaveBeenCalled();
+        });
+    });
 
     describe("init()", () => {
         test("Sets up widget window and basic properties", () => {
@@ -128,7 +171,7 @@ describe("ReflectionMatrix", () => {
             expect(reflection.isOpen).toBe(true);
             expect(reflection.isMaximized).toBe(false);
             expect(mockActivity.isInputON).toBe(true);
-            expect(reflection.PORT).toBe("http://3.105.177.138:8000");
+            expect(reflection.PORT).toBe("http://localhost:8000");
 
             expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
                 reflection,
@@ -314,6 +357,7 @@ describe("ReflectionMatrix", () => {
             reflection.summaryButton = document.createElement("button");
             reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
+            reflection.PORT = ReflectionMatrix.backendURL();
 
             jest.spyOn(reflection, "showTypingIndicator").mockImplementation(() => {});
             jest.spyOn(reflection, "hideTypingIndicator").mockImplementation(() => {});
@@ -649,6 +693,7 @@ describe("ReflectionMatrix", () => {
             reflection.input = document.createElement("input");
             reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
+            reflection.PORT = ReflectionMatrix.backendURL();
         });
 
         test("sendMessage ignores input after the widget is closed", () => {

@@ -479,9 +479,92 @@ describe("Temperament Functions", () => {
         it("1/4 comma meantone labels each ratio with a distinct note", () => {
             const t = getTemperament("1/4 comma meantone");
             expect(new Set(t.noteLabels).size).toBe(t.noteLabels.length);
-            // the perfect fifth must be the 3/2 the table already stores
+            // the fifth is tempered to 5^(1/4), about 696.578 cents, not a pure 3/2
             const g = t.noteLabels.indexOf("G");
-            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(701.955, 2);
+            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(696.578, 2);
+        });
+
+        it("1/4 comma meantone stacks tempered fifths into pure major thirds", () => {
+            const key = "1/4 comma meantone";
+            const t = getTemperament(key);
+            const fifth = Math.pow(5, 1 / 4);
+            // each label sits at its place on the chain of fifths from C
+            const chain = {
+                "C": 0,
+                "G": 1,
+                "D": 2,
+                "A": 3,
+                "E": 4,
+                "B": 5,
+                "F♯": 6,
+                "C♯": 7,
+                "G♯": 8,
+                "D♯": 9,
+                "A♯": 10,
+                "E♯": 11,
+                "B♯": 12,
+                "F": -1,
+                "B♭": -2,
+                "E♭": -3,
+                "A♭": -4,
+                "D♭": -5,
+                "G♭": -6,
+                "C♭": -7,
+                "F♭": -8
+            };
+            t.noteLabels.forEach((label, i) => {
+                const expected =
+                    Math.pow(fifth, chain[label]) /
+                    Math.pow(2, Math.floor(chain[label] * Math.log2(fifth)));
+                expect({ label, ratio: t.ratios[i] }).toEqual({
+                    label,
+                    ratio: expect.closeTo(expected, 6)
+                });
+            });
+            const c4 = pitchToFrequency("C", 4, 0, "C major", key);
+            expect(pitchToFrequency("E", 4, 0, "C major", key) / c4).toBeCloseTo(5 / 4, 6);
+            expect(pitchToFrequency("G", 4, 0, "C major", key) / c4).toBeCloseTo(fifth, 6);
+            // A4 stays at 440, so C4 is a meantone major sixth, 5^(3/4) / 2, below it
+            expect(c4).toBeCloseTo(440 / (Math.pow(5, 3 / 4) / 2), 3);
+        });
+    });
+
+    describe("pitchToFrequency with accidentals in non-EDO tables", () => {
+        // Just Intonation and Pythagorean label sharps "C#" and have no flats, while notes
+        // arrive as "C♯" and "D♭"; those used to fall through to the 12-EDO formula.
+        const freq = (note, octave, key) => pitchToFrequency(note, octave, 0, "C major", key);
+
+        it.each(["just intonation", "Pythagorean"])(
+            "%s gives an accidental its table ratio whatever its spelling",
+            key => {
+                const t = getTemperament(key);
+                const c4 = freq("C", 4, key);
+                expect(freq("C" + SHARP, 4, key) / c4).toBeCloseTo(t.ratios[1], 12);
+                expect(freq("C#", 4, key) / c4).toBeCloseTo(t.ratios[1], 12);
+                expect(freq("D" + FLAT, 4, key)).toBe(freq("C#", 4, key));
+                expect(freq("Db", 4, key)).toBe(freq("C#", 4, key));
+                expect(freq("G" + FLAT, 4, key)).toBe(freq("F#", 4, key));
+                // not the 12-EDO value
+                expect(freq("C" + SHARP, 4, key)).not.toBeCloseTo(
+                    pitchToFrequency("C" + SHARP, 4, 0, "C major", "equal"),
+                    6
+                );
+            }
+        );
+
+        it.each(["just intonation", "Pythagorean"])(
+            "%s moves the octave when an enharmonic spelling crosses C",
+            key => {
+                expect(freq("B" + SHARP, 4, key)).toBe(freq("C", 5, key));
+                expect(freq("C" + FLAT, 4, key)).toBe(freq("B", 3, key));
+            }
+        );
+
+        it("1/4 comma meantone still tells C♯ and D♭ apart", () => {
+            const key = "1/4 comma meantone";
+            expect(freq("C" + SHARP, 4, key)).not.toBe(freq("D" + FLAT, 4, key));
+            expect(freq("C#", 4, key)).toBe(freq("C" + SHARP, 4, key));
+            expect(freq("Db", 4, key)).toBe(freq("D" + FLAT, 4, key));
         });
     });
 
@@ -1453,20 +1536,30 @@ describe("modeMapper", () => {
         ["D", "natural minor", ["d", "minor"]],
         ["E", "major", ["e", "major"]],
         ["F♯", "minor", ["f♯", "minor"]],
-        ["C", "phrygian", ["g♯", "major"]],
+        ["C", "phrygian", ["a♭", "major"]],
         ["A♯", "mixolydian", ["c", "minor"]],
-        ["C", "DORIAN", ["a♯", "major"]]
+        ["C", "DORIAN", ["b♭", "major"]]
     ])("should correctly map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
+    });
+
+    // Modes whose key signature has flats map to a flat-named key, so the
+    // sharp/flat preference lookup finds them.
+    it.each([
+        ["C", "dorian", ["b♭", "major"]],
+        ["D", "phrygian", ["b♭", "major"]],
+        ["F", "mixolydian", ["b♭", "major"]],
+        ["A", "locrian", ["b♭", "major"]],
+        ["C", "phrygian", ["a♭", "major"]],
+        ["G", "locrian", ["a♭", "major"]],
+        ["C", "locrian", ["d♭", "major"]],
+        ["G♭", "lydian", ["d♭", "major"]]
+    ])("should map %s %s to the flat key %j", (key, mode, expected) => {
         expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
 
 describe("getSharpFlatPreference", () => {
-    beforeEach(() => {
-        global.SHARPPREFERENCE = ["g major", "d major", "a major", "e major", "b major"];
-        global.FLATPREFERENCE = ["f major", "bb major", "eb major", "ab major", "db major"];
-    });
-
     it('should return "sharp" for keys that traditionally use sharps', () => {
         expect(getSharpFlatPreference("G")).toBe("sharp");
         expect(getSharpFlatPreference("D")).toBe("sharp");
@@ -1474,6 +1567,30 @@ describe("getSharpFlatPreference", () => {
     it('should return "natural" for C major and keys not in sharp/flat preferences', () => {
         expect(getSharpFlatPreference("C")).toBe("natural");
         expect(getSharpFlatPreference("Am")).toBe("natural");
+    });
+
+    it.each([
+        ["F♯ major", "sharp"],
+        ["C♯ major", "sharp"],
+        ["F♯ minor", "sharp"],
+        ["C♯ minor", "sharp"],
+        ["G♯ minor", "sharp"],
+        ["D♯ minor", "sharp"],
+        ["B♭ major", "flat"],
+        ["E♭ major", "flat"],
+        ["A♭ major", "flat"],
+        ["D♭ major", "flat"],
+        ["G♭ major", "flat"],
+        ["C♭ major", "flat"],
+        ["B♭ minor", "flat"],
+        ["E♭ minor", "flat"]
+    ])("should treat %s as a %s key", (keySignature, expected) => {
+        expect(getSharpFlatPreference(keySignature)).toBe(expected);
+    });
+
+    it("should accept # and b in place of ♯ and ♭", () => {
+        expect(getSharpFlatPreference("F# major")).toBe("sharp");
+        expect(getSharpFlatPreference("Bb major")).toBe("flat");
     });
 });
 
@@ -1963,6 +2080,24 @@ describe("getNote", () => {
         const result = getNote("C", 4, 0.07, "C major");
         expect(result[2]).toBeCloseTo(7, 0);
     });
+
+    it("should spell transposed notes with flats in flat keys", () => {
+        expect(getNote("A", 4, 1, "B♭ major")).toEqual(["B♭", 4, 0]);
+        expect(getNote("D", 4, 1, "E♭ major")).toEqual(["E♭", 4, 0]);
+        expect(getNote("G", 4, 1, "A♭ major")).toEqual(["A♭", 4, 0]);
+        expect(getNote("C", 4, 1, "B♭ minor")).toEqual(["D♭", 4, 0]);
+    });
+
+    it("should spell pitch numbers with sharps in sharp keys", () => {
+        expect(getNote(6, 4, 0, "F♯ major")).toEqual(["F♯", 4, 0]);
+        expect(getNote(1, 4, 0, "C♯ major")).toEqual(["C♯", 4, 0]);
+        expect(getNote(8, 4, 0, "C♯ minor")).toEqual(["G♯", 4, 0]);
+    });
+
+    it("should not change spellings in keys without a sharp or flat preference", () => {
+        expect(getNote("A", 4, 1, "C major")).toEqual(["A♯", 4, 0]);
+        expect(getNote(10, 4, 0, "C major")).toEqual(["B♭", 4, 0]);
+    });
 });
 
 describe("getPitchInfo with frequency input", () => {
@@ -2130,6 +2265,49 @@ describe("buildScale", () => {
         expect(buildScale("E natural minor")[0]).toContain("F♯");
         expect(buildScale("E natural minor")[0]).not.toContain("G♭");
     });
+
+    it.each([
+        ["A harmonic minor", "A B C D E F G♯ A"],
+        ["D harmonic minor", "D E F G A B♭ C♯ D"],
+        ["E harmonic minor", "E F♯ G A B C D♯ E"],
+        ["G harmonic minor", "G A B♭ C D E♭ F♯ G"],
+        ["B harmonic minor", "B C♯ D E F♯ G A♯ B"],
+        ["A melodic minor", "A B C D E F♯ G♯ A"],
+        ["E melodic minor", "E F♯ G A B C♯ D♯ E"],
+        ["G melodic minor", "G A B♭ C D E F♯ G"]
+    ])("should spell %s with one letter per degree", (keySignature, expected) => {
+        expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it("should not repeat a letter in any seven-note scale it can spell", () => {
+        const roots = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+        const modes = ["harmonic minor", "melodic minor", "harmonic major", "hungarian"];
+        for (const root of roots) {
+            for (const mode of modes) {
+                const letters = buildScale(`${root} ${mode}`)[0]
+                    .slice(0, 7)
+                    .map(note => note[0]);
+                expect(new Set(letters).size).toBe(7);
+            }
+        }
+    });
+
+    it("should spell a scale on a sharp or flat tonic from that tonic", () => {
+        expect(buildScale("G♯ lydian")[0].join(" ")).toBe("G♯ A♯ B♯ C𝄪 D♯ E♯ F𝄪 G♯");
+        expect(buildScale("B♭ harmonic minor")[0].join(" ")).toBe("B♭ C D♭ E♭ F G♭ A B♭");
+    });
+
+    it("should keep the old spelling when a degree needs more than a double accidental", () => {
+        // Its sixth note, G♯, would need a triple sharp to be spelled as an F, so the scale is
+        // left as it was.
+        expect(buildScale("A♯ enigmatic")[0].join(" ")).toBe("A♯ B D E F♯ G♯ G𝄪 A♯");
+    });
+
+    it("should leave scales that already use each letter once unchanged", () => {
+        expect(buildScale("C major")[0].join(" ")).toBe("C D E F G A B C");
+        expect(buildScale("E natural minor")[0].join(" ")).toBe("E F♯ G A B C D E");
+        expect(buildScale("C harmonic minor")[0].join(" ")).toBe("C D E♭ F G A♭ B C");
+    });
 });
 
 describe("scalePatternToEDO", () => {
@@ -2258,13 +2436,45 @@ describe("getStepSize", () => {
     });
 
     it('should return the correct step size for "F#" in "F# major" going up', () => {
+        // Same as "F♯ major" / "F♯": F♯ up to G♯.
         const result = _getStepSize("F# major", "F#", "up", 0, "equal");
-        expect(result).toBe(0);
+        expect(result).toBe(2);
     });
 
     it('should return the correct step size for "G#" in "G# major" going down', () => {
+        // Same as "G♯ major" / "G♯": G♯ down to F𝄪.
         const result = _getStepSize("G# major", "G#", "down", 0, "equal");
-        expect(result).toBe(0);
+        expect(result).toBe(-1);
+    });
+
+    it("should step to the next scale note however the scale spells it", () => {
+        // G is not in A harmonic minor; the next note up is G♯, one semitone away.
+        expect(_getStepSize("A harmonic minor", "G", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("A harmonic minor", "A♭", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("A harmonic minor", "A", "down", 0, "equal")).toBe(-1);
+        // C is not in D major; the next note up is C♯.
+        expect(_getStepSize("D major", "C", "up", 0, "equal")).toBe(1);
+        // ASCII accidentals are read as ♯ and ♭.
+        expect(_getStepSize("A harmonic minor", "G#", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("D major", "C#", "up", 0, "equal")).toBe(1);
+        expect(_getStepSize("B♭ major", "Bb", "up", 0, "equal")).toBe(2);
+        // Double accidentals outside the scale step from the note they sound as: F𝄪 is G,
+        // and the next note up in A harmonic minor is G♯.
+        for (const name of ["F𝄪", "Fx", "F##"]) {
+            expect(_getStepSize("A harmonic minor", name, "up", 0, "equal")).toBe(1);
+        }
+        // A𝄫 is G; the next note down in A harmonic minor is F.
+        for (const name of ["A𝄫", "Abb"]) {
+            expect(_getStepSize("A harmonic minor", name, "down", 0, "equal")).toBe(-2);
+        }
+    });
+
+    it("should keep the named enharmonic rules in other temperaments", () => {
+        // In 19-EDO E♯ is still matched to the scale's F by name.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-2);
+        // ...and an F is matched to F♯ major's E♯.
+        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(2);
     });
 
     it('should return 0 for "C" going down in a key without a lower note', () => {
@@ -2303,6 +2513,12 @@ describe("nthDegreeToPitch", () => {
         expect(result).toEqual(["D", 0]);
     });
 
+    it("should name the raised degrees of harmonic minor by their own letter", () => {
+        expect(nthDegreeToPitch("A harmonic minor", 7)).toEqual(["G♯", 0]);
+        expect(nthDegreeToPitch("E harmonic minor", 2)).toEqual(["F♯", 0]);
+        expect(nthDegreeToPitch("E harmonic minor", 7)).toEqual(["D♯", 0]);
+    });
+
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
         const result = nthDegreeToPitch("C major", 8);
         expect(result).toEqual(["C", 1]);
@@ -2330,6 +2546,51 @@ describe("nthDegreeToPitch", () => {
 });
 
 describe("getInterval", () => {
+    it("should find a pitch by its sound when the scale spells it differently", () => {
+        // A harmonic minor spells its seventh G♯; A♭ is the same note.
+        expect(getInterval(1, "A harmonic minor", "A♭")).toBe(1);
+        expect(getInterval(1, "A harmonic minor", "G♯")).toBe(1);
+        // G is not in the scale: step up from the G♯ above it.
+        expect(getInterval(1, "A harmonic minor", "G")).toBe(1);
+        // C is not in D major: step up from the C♯ above it.
+        expect(getInterval(1, "D major", "C")).toBe(1);
+    });
+
+    it("should step from the nearest scale note for a sharp or flat outside the scale", () => {
+        // C♯ is not in C major: step up from D, the next note above.
+        expect(getInterval(1, "C major", "C♯")).toBe(2);
+        // D♭ is not in C major: step down from C, the next note below.
+        expect(getInterval(-1, "C major", "D♭")).toBe(-1);
+        // ASCII accidentals are read as ♯ and ♭, inside or outside the scale.
+        expect(getInterval(1, "G major", "F#")).toBe(1);
+        expect(getInterval(1, "C major", "C#")).toBe(2);
+        expect(getInterval(1, "A harmonic minor", "G#")).toBe(1);
+        // Double accidentals, inside or outside the scale.
+        for (const name of ["F𝄪", "Fx", "F##", "A𝄫", "Abb"]) {
+            expect(getInterval(1, "A harmonic minor", name)).toBe(1);
+        }
+        expect(getInterval(1, "G♯ major", "Fx")).toBe(1);
+    });
+
+    it("should keep matching notes by name in other temperaments", () => {
+        expect(getInterval(1, "C major", "C♯", 19)).toBe(3);
+        expect(getInterval(1, "C major", "D♭", 19)).toBe(3);
+        expect(getInterval(1, "C major", "E♯", 19)).toBe(3);
+        expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
+        // C♭ major's scale has 12-EDO steps even in 19-EDO, but B is still matched by name.
+        expect(getInterval(2, "C♭ major", "B", 19)).toBe(3);
+    });
+
+    it("should use the current temperament's EDO when none is given", () => {
+        const savedActivity = global.globalActivity;
+        global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
+        try {
+            expect(getInterval(2, "C♭ major", "B")).toBe(3);
+        } finally {
+            global.globalActivity = savedActivity;
+        }
+    });
+
     it("should return the correct interval for a pitch in the scale", () => {
         const result = getInterval(2, "C major", "E");
         expect(result).toBe(3); // Example: `E` is the 3rd degree in C major.
@@ -2435,7 +2696,9 @@ describe("calcNoteValueToDisplay", () => {
 
     it("should return a reduced fraction when note value is not in NSYMBOLS", () => {
         const result = calcNoteValueToDisplay(3, 4); // Result will not be in NSYMBOLS
-        expect(result).toBe("4<br>&mdash;<br>3<br>𝅝.");
+        // 4/3 is not a dotted note, so it gets no note symbol: a dotted whole
+        // note would be 3/2.
+        expect(result).toBe("4<br>&mdash;<br>3<br><br>");
     });
 
     it("should handle note values with fractional components and display them correctly", () => {
@@ -2445,7 +2708,8 @@ describe("calcNoteValueToDisplay", () => {
 
     it("should handle cases where note value cannot be found in NSYMBOLS and returns a reduced fraction", () => {
         const result = calcNoteValueToDisplay(5, 6); // Not in NSYMBOLS
-        expect(result).toBe("6<br>&mdash;<br>5<br>𝅝.");
+        // 6/5 is not a dotted note either.
+        expect(result).toBe("6<br>&mdash;<br>5<br><br>");
     });
 
     it("should return a note value with a symbol for valid inputs that map to an NSYMBOL", () => {
@@ -3389,6 +3653,30 @@ describe("scaleDegreeToPitchMapping", () => {
         const result = scaleDegreeToPitchMapping("C major", null, false, "C#");
         expect(result).toEqual(["1", "8"]);
     });
+
+    it("maps altered pitches to correct accidentals in flat and sharp keys", () => {
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B")).toEqual(["4", "♯"]);
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B" + DOUBLEFLAT)).toEqual([
+            "4",
+            "♭"
+        ]);
+        expect(scaleDegreeToPitchMapping("C minor", null, false, "B")).toEqual(["7", "♯"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLESHARP)).toEqual([
+            "7",
+            "♯"
+        ]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F")).toEqual(["7", "♭"]);
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B♭")).toEqual(["4", "♮"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F♯")).toEqual(["7", "♮"]);
+        expect(scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLEFLAT)).toEqual([
+            "1",
+            DOUBLEFLAT,
+            "8",
+            DOUBLEFLAT
+        ]);
+        expect(scaleDegreeToPitchMapping("F♭ major", null, false, "B♯")).toEqual(["4"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLEFLAT)).toEqual(["7"]);
+    });
 });
 
 describe("getPitchInfo", () => {
@@ -3420,6 +3708,8 @@ describe("getPitchInfo", () => {
 
     it("returns correct pitch for 'alphabet'", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
+        // lowercase octave-free 'c' should default to octave 4, capitalize, and return "C" (#9430)
+        expect(getPitchInfo(activity, "alphabet", "c", tur)).toBe("C");
     });
 
     it("should correctly parse string inputs", () => {
@@ -3471,7 +3761,8 @@ describe("getPitchInfo", () => {
 
     it("returns correct alphabet class", () => {
         expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
-        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
+        // D♯ is not in C major and neither is E♭, so it keeps its own letter.
+        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("D");
     });
 
     it("returns correct solfege syllable (fixed do)", () => {
@@ -3547,7 +3838,8 @@ describe("getPitchInfo", () => {
     });
 
     it("handles solfege class with accidental", () => {
-        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("re");
+        // C♯ keeps its spelling (D♭ is not in C major either), so its class is do.
+        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("do");
     });
 
     it("returns pitch number", () => {
@@ -3555,11 +3847,22 @@ describe("getPitchInfo", () => {
         expect(typeof pNum).toBe("number");
     });
 
-    it("handles equivalent sharps mapping", () => {
-        // "Db" translates to "D♭". In C major, "D♭" is not in the scale.
-        // It should look it up in EQUIVALENTSHARPS and convert to "C♯".
-        const pitch = getPitchInfo(activity, "alphabet", "Db4", tur);
-        expect(pitch).toBe("C♯");
+    it("keeps an off-scale spelling whose enharmonic is off the scale too", () => {
+        // "Db" translates to "D♭". In C major neither D♭ nor C♯ is in the scale, so the
+        // note keeps the spelling it was given rather than being swapped for C♯.
+        expect(getPitchInfo(activity, "alphabet", "Db4", tur)).toBe("D♭");
+    });
+
+    it("respells an off-scale note only when its enharmonic is in the scale", () => {
+        tur.singer.keySignature = "F major";
+        // A♯ is B♭ in F major.
+        expect(getPitchInfo(activity, "alphabet", "A#4", tur)).toBe("B♭");
+        expect(getPitchInfo(activity, "scale degree", "A#4", tur)).toBe("4♮");
+        // E♭ and F♯ have no enharmonic in F major; they used to come back as D♯ and G♭.
+        expect(getPitchInfo(activity, "alphabet", "E♭4", tur)).toBe("E♭");
+        expect(getPitchInfo(activity, "scale degree", "E♭4", tur)).toBe("7♭");
+        expect(getPitchInfo(activity, "alphabet", "F♯4", tur)).toBe("F♯");
+        expect(getPitchInfo(activity, "scale degree", "F♯4", tur)).toBe("1♯");
     });
 
     it("handles invalid type", () => {
@@ -3749,10 +4052,10 @@ describe("ACCIDENTALNAMES", () => {
 describe("modeMapper branch coverage", () => {
     const cases = [
         ["C", "ionian", ["c", "major"]],
-        ["C", "dorian", ["a" + SHARP, "major"]],
+        ["C", "dorian", ["b" + FLAT, "major"]],
         ["F", "dorian", ["c", "minor"]],
         ["D" + FLAT, "dorian", ["e" + FLAT, "minor"]],
-        ["C", "phrygian", ["g" + SHARP, "major"]],
+        ["C", "phrygian", ["a" + FLAT, "major"]],
         ["G", "phrygian", ["c", "minor"]],
         ["D" + FLAT, "phrygian", ["g" + FLAT, "minor"]],
         ["C", "lydian", ["g", "major"]],
@@ -3761,7 +4064,7 @@ describe("modeMapper branch coverage", () => {
         ["C", "mixolydian", ["f", "major"]],
         ["A" + SHARP, "mixolydian", ["c", "minor"]],
         ["B" + FLAT, "mixolydian", ["c", "minor"]],
-        ["C", "locrian", ["b", "major"]],
+        ["C", "locrian", ["d" + FLAT, "major"]],
         ["D", "locrian", ["c", "minor"]],
         ["E" + FLAT, "locrian", ["d" + FLAT, "minor"]],
         ["A", "aeolian", ["a", "minor"]],
@@ -4217,8 +4520,8 @@ describe("_getStepSize with temperament", () => {
     });
 
     it("should return correct step size for sharps and flats", () => {
-        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(0);
-        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(0);
+        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(2);
+        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(-1);
     });
 
     it("follows the mode for custom temperaments without ratios", () => {
@@ -4313,9 +4616,28 @@ describe("actual drum lookup helpers", () => {
             expect(_parse_pitch_string("Ebbb2")).toEqual(["E" + FLAT + FLAT + FLAT, 2]);
         });
 
-        it("should fallback when regex fails to match (e.g., missing octave)", () => {
+        it("should fallback when regex fails to match", () => {
             expect(_parse_pitch_string("x")).toEqual(["x", 4]);
             expect(_parse_pitch_string("X#")).toEqual(["X" + SHARP, 4]);
+        });
+
+        it("should parse and normalize pitches when octave is omitted (#9430)", () => {
+            expect(_parse_pitch_string("C")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("c")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("C#")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("Bb")).toEqual(["B" + FLAT, 4]);
+            expect(_parse_pitch_string("Cx")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("F" + DOUBLESHARP)).toEqual(["F" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("Bbb")).toEqual(["B" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("C" + DOUBLEFLAT)).toEqual(["C" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("C#b")).toEqual(["C", 4]);
+        });
+
+        it("should handle pitch strings with leading and trailing whitespace", () => {
+            expect(_parse_pitch_string("  C4  ")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+            expect(_parse_pitch_string("  x  ")).toEqual(["x", 4]);
         });
     });
 });

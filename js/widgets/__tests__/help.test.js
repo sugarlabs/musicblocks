@@ -68,7 +68,11 @@ function createMockWidgetWindow() {
         isMaximized: jest.fn(() => false),
         destroy: jest.fn(),
         updateTitle: jest.fn(),
-        takeFocus: jest.fn(),
+        takeFocus: jest.fn(function () {
+            if (window.widgetWindows) {
+                window.widgetWindows.focused = this;
+            }
+        }),
         _widgetBody: widgetBody
     };
 }
@@ -1087,6 +1091,448 @@ describe("HelpWidget", () => {
 
             const rightArrow = document.getElementById("right-arrow");
             expect(rightArrow.classList.contains("disabled")).toBe(true);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("true");
         });
+    });
+
+    describe("keyboard navigation and focus guards", () => {
+        function createBlockMock(overrides = {}) {
+            return {
+                name: "forward",
+                staticLabels: ["Forward"],
+                helpString: ["Move forward"],
+                beginnerModeBlock: true,
+                palette: {
+                    name: "turtle",
+                    palettes: { showPalette: jest.fn() }
+                },
+                ...overrides
+            };
+        }
+
+        test("arrow keys navigate when widget window is focused", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const leftArrow = document.getElementById("left-arrow");
+            const rightClickSpy = jest.spyOn(rightArrow, "click");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const rightEvent = new KeyboardEvent("keydown", {
+                key: "ArrowRight",
+                cancelable: true
+            });
+            document.dispatchEvent(rightEvent);
+            expect(rightClickSpy).toHaveBeenCalled();
+            expect(rightEvent.defaultPrevented).toBe(true);
+
+            const leftEvent = new KeyboardEvent("keydown", {
+                key: "ArrowLeft",
+                cancelable: true
+            });
+            document.dispatchEvent(leftEvent);
+            expect(leftClickSpy).toHaveBeenCalled();
+            expect(leftEvent.defaultPrevented).toBe(true);
+        });
+
+        test("arrow keys are ignored when another widget window has focus", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            const otherWindow = createMockWidgetWindow();
+            window.widgetWindows.focused = otherWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        test("arrow keys are ignored when no widget window has focus", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = null;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const leftArrow = document.getElementById("left-arrow");
+            const rightClickSpy = jest.spyOn(rightArrow, "click");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const rightEvent = new KeyboardEvent("keydown", {
+                key: "ArrowRight",
+                cancelable: true
+            });
+            document.dispatchEvent(rightEvent);
+
+            const leftEvent = new KeyboardEvent("keydown", {
+                key: "ArrowLeft",
+                cancelable: true
+            });
+            document.dispatchEvent(leftEvent);
+
+            expect(rightClickSpy).not.toHaveBeenCalled();
+            expect(leftClickSpy).not.toHaveBeenCalled();
+            expect(rightEvent.defaultPrevented).toBe(false);
+            expect(leftEvent.defaultPrevented).toBe(false);
+        });
+
+        test("arrow keys are ignored when focus is inside text input or textarea", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            input.focus();
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+
+            input.remove();
+
+            const textarea = document.createElement("textarea");
+            document.body.appendChild(textarea);
+            textarea.focus();
+
+            const leftArrow = document.getElementById("left-arrow");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const leftEvent = new KeyboardEvent("keydown", { key: "ArrowLeft" });
+            document.dispatchEvent(leftEvent);
+
+            expect(leftClickSpy).not.toHaveBeenCalled();
+
+            textarea.remove();
+        });
+
+        test("arrow keys are ignored when focus is inside a contentEditable element", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const editableDiv = document.createElement("div");
+            editableDiv.setAttribute("contenteditable", "true");
+            editableDiv.tabIndex = 0;
+            document.body.appendChild(editableDiv);
+            editableDiv.focus();
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+
+            editableDiv.remove();
+        });
+
+        test("arrow keys are ignored when a workspace block is active", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block },
+                activeBlock: "active_block_1"
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        test("arrow keys are ignored in standalone block help mode", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw._standaloneBlockHelp = true;
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            window.widgetWindows.focused = hw.widgetWindow;
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+            expect(hw._keydownHandler).toBeNull();
+        });
+
+        test("keydown listener is removed when widget window closes", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            expect(hw._keydownHandler).not.toBeNull();
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            hw.widgetWindow.onclose();
+
+            expect(hw._keydownHandler).toBeNull();
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.dispatchEvent(event);
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        test("Enter and Space keys activate arrow buttons", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            const rightArrow = document.getElementById("right-arrow");
+            const leftArrow = document.getElementById("left-arrow");
+
+            const rightClickSpy = jest.spyOn(rightArrow, "click");
+            const leftClickSpy = jest.spyOn(leftArrow, "click");
+
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                cancelable: true,
+                bubbles: true
+            });
+            rightArrow.dispatchEvent(enterEvent);
+            expect(rightClickSpy).toHaveBeenCalledTimes(1);
+            expect(enterEvent.defaultPrevented).toBe(true);
+
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                cancelable: true,
+                bubbles: true
+            });
+            leftArrow.dispatchEvent(spaceEvent);
+            expect(leftClickSpy).toHaveBeenCalledTimes(1);
+            expect(spaceEvent.defaultPrevented).toBe(true);
+
+            const otherKeyEvent = new KeyboardEvent("keydown", {
+                key: "Tab",
+                cancelable: true,
+                bubbles: true
+            });
+            rightArrow.dispatchEvent(otherKeyEvent);
+            expect(rightClickSpy).toHaveBeenCalledTimes(1);
+            expect(otherKeyEvent.defaultPrevented).toBe(false);
+        });
+
+        test("aria-disabled reflects page boundaries during tour display", () => {
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            const leftArrow = document.getElementById("left-arrow");
+            const rightArrow = document.getElementById("right-arrow");
+
+            // Page 0 (initial)
+            hw._showPage(0);
+            expect(leftArrow.getAttribute("aria-disabled")).toBe("true");
+            expect(leftArrow.classList.contains("disabled")).toBe(true);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(rightArrow.classList.contains("disabled")).toBe(false);
+
+            // Middle page
+            hw._showPage(1);
+            expect(leftArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(leftArrow.classList.contains("disabled")).toBe(false);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(rightArrow.classList.contains("disabled")).toBe(false);
+
+            // Last page
+            hw._showPage(HELPCONTENT.length - 1);
+            expect(leftArrow.getAttribute("aria-disabled")).toBe("false");
+            expect(leftArrow.classList.contains("disabled")).toBe(false);
+            expect(rightArrow.getAttribute("aria-disabled")).toBe("true");
+            expect(rightArrow.classList.contains("disabled")).toBe(true);
+        });
+    });
+});
+
+describe("block help artwork", () => {
+    let hw;
+
+    beforeEach(() => {
+        hw = Object.create(HelpWidget.prototype);
+    });
+
+    afterEach(() => {
+        window.localStorage.languagePreference = "en";
+        delete window.localStorage.kanaPreference;
+    });
+
+    test.each([
+        ["en", undefined, "documentation"],
+        ["he", undefined, "documentation"],
+        ["es", undefined, "documentation-es"],
+        ["pt", undefined, "documentation-pt"],
+        ["ja", undefined, "documentation-ja"],
+        ["ja", "kana", "documentation-kana"]
+    ])("language %s (kana: %s) uses the %s folder", (language, kana, folder) => {
+        window.localStorage.languagePreference = language;
+        if (kana !== undefined) window.localStorage.kanaPreference = kana;
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+    });
+
+    test.each([
+        ["pt-BR", "documentation-pt"],
+        ["es-ES", "documentation-es"],
+        ["ja-JP", "documentation-ja"],
+        ["es", "documentation-es"],
+        ["en-US", "documentation"],
+        ["", "documentation"]
+    ])("with no saved language, browser locale %s uses the %s folder", (locale, folder) => {
+        delete window.localStorage.languagePreference;
+        const languageSpy = jest.spyOn(window.navigator, "language", "get").mockReturnValue(locale);
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+
+        languageSpy.mockRestore();
+    });
+
+    test("loads the localized image first", () => {
+        window.localStorage.languagePreference = "pt";
+
+        const figure = hw._makeBlockImageFigure("documentation", "settimbre");
+        const img = figure.querySelector("img.blockImage");
+
+        expect(figure.classList.contains("blockImage-wrapper")).toBe(true);
+        expect(img.getAttribute("src")).toBe("Docs/documentation-pt/settimbre_block.svg");
+    });
+
+    test("falls back to the default image when the localized one is missing", () => {
+        window.localStorage.languagePreference = "pt";
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "settimbre");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+        img.onerror();
+
+        expect(img.getAttribute("src")).toBe("Docs/documentation/settimbre_block.svg");
+        expect(parent.contains(figure)).toBe(true);
+    });
+
+    test("removes the figure when no image exists in any folder", () => {
+        window.localStorage.languagePreference = "pt";
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "noimage");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+        img.onerror();
+        img.onerror();
+
+        expect(parent.contains(figure)).toBe(false);
+        expect(img.onerror).toBeNull();
+    });
+
+    test("removes the figure at once when the default image is missing", () => {
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "noimage");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+
+        expect(img.getAttribute("src")).toBe("Docs/documentation/noimage_block.svg");
+        img.onerror();
+
+        expect(parent.contains(figure)).toBe(false);
+    });
+
+    test("block help from the help pages uses the localized image too", () => {
+        window.localStorage.languagePreference = "es";
+        const block = {
+            name: "pitch",
+            staticLabels: ["pitch"],
+            helpString: ["Pitch help", "documentation"],
+            beginnerModeBlock: true,
+            palette: { name: "pitch", palettes: { showPalette: jest.fn() } }
+        };
+        const activity = createMockActivity({ protoBlockDict: { pitch: block } });
+
+        HelpWidget.showBlockHelp(activity, "pitch");
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation-es/pitch_block.svg");
     });
 });

@@ -15,6 +15,7 @@ const path = require("path");
 const CSS_DIR = path.join(__dirname, "..", "..", "css");
 const tokensCss = fs.readFileSync(path.join(CSS_DIR, "tokens.css"), "utf8");
 const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+const playOnlyCss = fs.readFileSync(path.join(CSS_DIR, "play-only-mode.css"), "utf8");
 
 /**
  * Collects the custom properties declared in one selector block.
@@ -203,6 +204,32 @@ describe("themes.css colour tokens", () => {
         expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     });
 
+    it("keeps widget title bar buttons and icons visible and accessible in dark mode", () => {
+        const buttonRule = rules.find(
+            r =>
+                r.selector.includes(".wftButton") &&
+                !r.selector.includes("::") &&
+                !r.selector.includes(":") &&
+                themeOf(r.selector) === "dark"
+        );
+        expect(buttonRule).toBeDefined();
+
+        const iconRule = rules.find(
+            r => r.selector.includes(".wftButton.close::before") && themeOf(r.selector) === "dark"
+        );
+        expect(iconRule).toBeDefined();
+
+        const tokens = THEMES.dark;
+        const buttonBg = resolveColor(declaration(buttonRule.body, "background-color"), tokens);
+        const iconColor = resolveColor(declaration(iconRule.body, "background-color"), tokens);
+
+        expect(buttonBg).not.toBeNull();
+        expect(iconColor).not.toBeNull();
+
+        // WCAG 2.1 AA requirement for UI icons/controls (3:1) and text (4.5:1).
+        expect(contrastRatio(iconColor, buttonBg)).toBeGreaterThanOrEqual(4.5);
+    });
+
     it("ensures themes.css does not declare or reference deleted legacy properties", () => {
         const legacyNames = ["--bg", "--fg", "--border", "--panel-bg", "--overlay-bg", "--accent"];
         legacyNames.forEach(depName => {
@@ -211,5 +238,211 @@ describe("themes.css colour tokens", () => {
             expect(declRegex.test(themesCss)).toBe(false);
             expect(varRegex.test(themesCss)).toBe(false);
         });
+    });
+
+    it.each(["dark", "highcontrast"])(
+        "keeps reflection chat messages readable in the %s theme",
+        theme => {
+            const botRule = rules.find(r => r.selector.trim() === `.${theme} .message-container`);
+            const userRule = rules.find(
+                r => r.selector.trim() === `.${theme} .message-container.user`
+            );
+            expect(botRule).toBeDefined();
+            expect(userRule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const botFg = resolveColor(declaration(botRule.body, "color"), tokens);
+            const botBg = resolveColor(declaration(botRule.body, "background-color"), tokens);
+            expect(botFg).not.toBeNull();
+            expect(botBg).not.toBeNull();
+            expect(contrastRatio(botFg, botBg)).toBeGreaterThanOrEqual(4.5);
+
+            const userFg = resolveColor(declaration(userRule.body, "color"), tokens);
+            const userBg = resolveColor(declaration(userRule.body, "background-color"), tokens);
+            expect(userFg).not.toBeNull();
+            expect(userBg).not.toBeNull();
+            expect(contrastRatio(userFg, userBg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])(
+        "keeps reflection mentor select readable in the %s theme",
+        theme => {
+            const rule = rules.find(r => r.selector.trim() === `.${theme} .select-mentor`);
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])(
+        "keeps debugger chat messages readable in the %s theme",
+        theme => {
+            const botRule = rules.find(
+                r => r.selector.trim() === `.${theme} .aidebugger-message-bot`
+            );
+            const userRule = rules.find(
+                r => r.selector.trim() === `.${theme} .aidebugger-message-user`
+            );
+            expect(botRule).toBeDefined();
+            expect(userRule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const botFg = resolveColor(declaration(botRule.body, "color"), tokens);
+            const botBg = resolveColor(declaration(botRule.body, "background-color"), tokens);
+            expect(botFg).not.toBeNull();
+            expect(botBg).not.toBeNull();
+            expect(contrastRatio(botFg, botBg)).toBeGreaterThanOrEqual(4.5);
+
+            const userFg = resolveColor(declaration(userRule.body, "color"), tokens);
+            const userBg = resolveColor(declaration(userRule.body, "background-color"), tokens);
+            expect(userFg).not.toBeNull();
+            expect(userBg).not.toBeNull();
+            expect(contrastRatio(userFg, userBg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it.each(["dark", "highcontrast"])("keeps debugger input readable in the %s theme", theme => {
+        const rule = rules.find(r => r.selector.trim() === `.${theme} .aidebugger-input`);
+        expect(rule).toBeDefined();
+
+        const tokens = THEMES[theme];
+        const fg = resolveColor(declaration(rule.body, "color"), tokens);
+        const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+        expect(fg).not.toBeNull();
+        expect(bg).not.toBeNull();
+        expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it.each(["dark", "highcontrast"])(
+        "keeps music keyboard containers readable in the %s theme",
+        theme => {
+            const rule = rules.find(
+                r => r.selector.includes("#mkbKeyboardDiv") && themeOf(r.selector) === theme
+            );
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+        }
+    );
+
+    it("keeps piano keys readable with high contrast and preserves transparent spacers", () => {
+        const whiteRule = rules.find(r => r.selector.includes("table.white > tbody > tr > td"));
+        expect(whiteRule).toBeDefined();
+        const whiteBg = resolveColor(declaration(whiteRule.body, "background-color"), {});
+        const whiteFg = resolveColor(declaration(whiteRule.body, "color"), {});
+        expect(contrastRatio(whiteFg, whiteBg)).toBeGreaterThanOrEqual(4.5);
+
+        const blackRule = rules.find(r =>
+            r.selector.includes("table.black > tbody > tr > td:not(.spacer)")
+        );
+        expect(blackRule).toBeDefined();
+        const blackBg = resolveColor(declaration(blackRule.body, "background-color"), {});
+        const blackFg = resolveColor(declaration(blackRule.body, "color"), {});
+        expect(contrastRatio(blackFg, blackBg)).toBeGreaterThanOrEqual(4.5);
+
+        const spacerRule = rules.find(r =>
+            r.selector.includes("table.black > tbody > tr > td.spacer")
+        );
+        expect(spacerRule).toBeDefined();
+        expect(declaration(spacerRule.body, "background-color")).toBe("transparent");
+        expect(declaration(spacerRule.body, "border")).toBe("none");
+    });
+});
+
+describe("play-only-mode.css colour tokens", () => {
+    const playOnlyRules = parseRules(playOnlyCss);
+
+    it.each(["light", "dark", "highcontrast"])(
+        "keeps floating action buttons readable in the %s theme",
+        theme => {
+            const rule = playOnlyRules.find(
+                r => r.selector.includes("#buttoncontainerBOTTOM") && r.selector.includes("div")
+            );
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+            expect(rule.body).toContain("var(--color-border-primary)");
+        }
+    );
+
+    it.each(["light", "dark", "highcontrast"])(
+        "keeps keyboard holder readable in the %s theme",
+        theme => {
+            const rule = playOnlyRules.find(r => r.selector.includes("#keyboardHolder2"));
+            expect(rule).toBeDefined();
+
+            const tokens = THEMES[theme];
+            const fg = resolveColor(declaration(rule.body, "color"), tokens);
+            const bg = resolveColor(declaration(rule.body, "background-color"), tokens);
+            expect(fg).not.toBeNull();
+            expect(bg).not.toBeNull();
+            expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+            expect(rule.body).toContain("var(--color-border-primary)");
+        }
+    );
+
+    it("keeps piano keys readable and preserves transparent spacers in play-only mode", () => {
+        const whiteRule = playOnlyRules.find(r =>
+            r.selector.includes("#keyboardHolder2 table.white > tbody > tr > td")
+        );
+        expect(whiteRule).toBeDefined();
+        const whiteBg = resolveColor(declaration(whiteRule.body, "background-color"), {});
+        const whiteFg = resolveColor(declaration(whiteRule.body, "color"), {});
+        expect(contrastRatio(whiteFg, whiteBg)).toBeGreaterThanOrEqual(4.5);
+
+        const blackRule = playOnlyRules.find(r =>
+            r.selector.includes("#keyboardHolder2 table.black > tbody > tr > td:not(.spacer)")
+        );
+        expect(blackRule).toBeDefined();
+        const blackBg = resolveColor(declaration(blackRule.body, "background-color"), {});
+        const blackFg = resolveColor(declaration(blackRule.body, "color"), {});
+        expect(contrastRatio(blackFg, blackBg)).toBeGreaterThanOrEqual(4.5);
+
+        const spacerRule = playOnlyRules.find(r =>
+            r.selector.includes("#keyboardHolder2 table.black > tbody > tr > td.spacer")
+        );
+        expect(spacerRule).toBeDefined();
+        expect(declaration(spacerRule.body, "background-color")).toBe("transparent");
+        expect(declaration(spacerRule.body, "border")).toBe("none");
+    });
+
+    it("anchors floating windows below the toolbar in play-only mode", () => {
+        const rule = playOnlyRules.find(
+            r => r.selector.includes(".play-only #floatingWindows") && !r.selector.includes(">")
+        );
+        expect(rule).toBeDefined();
+        expect(rule.body).toContain("top: 64px");
+        expect(rule.body).toContain("height: calc(100vh - 64px)");
+    });
+
+    it("pins floating window frame to left 0 and ensures close button is visible in play-only mode", () => {
+        const frameRule = playOnlyRules.find(
+            r =>
+                r.selector.includes(".play-only #floatingWindows > .windowFrame") &&
+                !r.selector.includes(".wf")
+        );
+        expect(frameRule).toBeDefined();
+        expect(frameRule.body).toContain("left: 0");
+        expect(frameRule.body).toContain("width: 100%");
+
+        const closeRule = playOnlyRules.find(r => r.selector.includes(".wftButton.close"));
+        expect(closeRule).toBeDefined();
+        expect(closeRule.body).toContain("display: flex");
     });
 });

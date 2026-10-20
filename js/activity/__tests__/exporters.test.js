@@ -316,6 +316,55 @@ describe("printBlockSVG", () => {
         global._ = originalTranslate;
     });
 
+    test("value-driven label uses the shortened label shown on the canvas", () => {
+        const specialSVG =
+            '<svg xmlns="http://www.w3.org/2000/svg">' + "<text><tspan></tspan></text>" + "</svg>";
+
+        const block = makeBlock({
+            name: "text",
+            x: 0,
+            y: 0,
+            width: 60,
+            height: 30,
+            value: "Debugger Initiated",
+            hasValueDrivenLabel: jest.fn(() => true)
+        });
+        block.text = { text: "Debugger Ini..." };
+
+        const activity = makeActivity([block], {
+            blockArt: { 0: specialSVG }
+        });
+
+        const decoded = decodeURIComponent(printBlockSVG(activity));
+
+        expect(decoded).toContain("<tspan>Debugger Ini...</tspan>");
+        expect(decoded).not.toContain("Debugger Initiated");
+    });
+
+    test("value-driven label falls back to the value when the canvas label is empty", () => {
+        const specialSVG =
+            '<svg xmlns="http://www.w3.org/2000/svg">' + "<text><tspan></tspan></text>" + "</svg>";
+
+        const block = makeBlock({
+            name: "number",
+            x: 0,
+            y: 0,
+            width: 60,
+            height: 30,
+            value: 42,
+            hasValueDrivenLabel: jest.fn(() => true)
+        });
+        block.text = { text: "" };
+
+        const activity = makeActivity([block], {
+            blockArt: { 0: specialSVG }
+        });
+
+        const decoded = decodeURIComponent(printBlockSVG(activity));
+
+        expect(decoded).toContain("<tspan>42</tspan>");
+    });
+
     test("handles value-driven-label blocks with last tspan fallback (no empty tspan)", () => {
         const specialSVG =
             '<svg xmlns="http://www.w3.org/2000/svg">' +

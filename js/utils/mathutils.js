@@ -75,7 +75,15 @@ class MathUtility {
         const GetRandom = (n1, n2) => {
             // n1 should be <= n2
             [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
-            return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
+            // Pick from the whole numbers inside the range, so decimal bounds
+            // can't give a result below n1 or above n2.
+            const low = Math.ceil(Number(n1));
+            const high = Math.floor(Number(n2));
+            if (low > high) {
+                // No whole number between them (e.g. 2.2 and 2.8).
+                return Number(n1);
+            }
+            return low + Math.floor(Math.random() * (high - low + 1));
         };
 
         /**
@@ -122,7 +130,7 @@ class MathUtility {
             // non-number is already rejected in js/block.js, but the project
             // loader (js/blocks.js, case "number") assigns Number(value) with
             // no isNaN check, so a saved project can carry one here.
-            if (Number.isNaN(c)) {
+            if (c !== undefined && !Number.isFinite(c)) {
                 throw new Error("NanError");
             }
             return GetRandomSolfege(a, b, c);
@@ -191,23 +199,22 @@ class MathUtility {
      * @param {*} a
      * @param {*} b
      * @returns {number|string} - Sum of a and b. If either a or b is a string, it concatenates them.
-     * @throws {string} NanError if the non-string operand is null or undefined.
+     * @throws {string} NanError if an operand is null, undefined, or NaN.
      */
     static doPlus(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            // The operand on the non-string side still needs a toString(), which
-            // null/undefined don't have. Reject them here so this reports the
-            // same NanError every other operation reports for invalid input,
-            // instead of letting the bare call below throw its own TypeError.
-            if (a === null || a === undefined || b === null || b === undefined) {
-                throw new Error("NanError");
-            }
+        if (a === null || a === undefined || b === null || b === undefined) {
+            throw new Error("NanError");
+        }
 
+        if (typeof a === "string" || typeof b === "string") {
             const aString = typeof a === "string" ? a : a.toString();
             const bString = typeof b === "string" ? b : b.toString();
 
             return aString + bString;
         } else {
+            if (Number.isNaN(a) || Number.isNaN(b)) {
+                throw new Error("NanError");
+            }
             return Number(a) + Number(b);
         }
     }

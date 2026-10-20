@@ -718,6 +718,52 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("ARIA dialog and state semantics", () => {
+        test("frame is a focusable dialog labelled by its title element", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("tabindex")).toBe("-1");
+            expect(win._frame.getAttribute("aria-labelledby")).toBe(win._key + "WidgetID");
+        });
+
+        test("title bar and widget toolbar expose distinct toolbar roles", () => {
+            const win = createTestWindow();
+
+            expect(win._drag.getAttribute("role")).toBe("toolbar");
+            expect(win._toolbar.getAttribute("role")).toBe("toolbar");
+            expect(win._drag.getAttribute("aria-label")).not.toBe(
+                win._toolbar.getAttribute("aria-label")
+            );
+        });
+
+        test("maximize/restore keep the button aria-label in sync", () => {
+            const win = createTestWindow();
+
+            win._maximize();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Maximize window");
+        });
+
+        test("rollup/unroll toggle aria-expanded and rename the roll button", () => {
+            const win = createTestWindow();
+
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+
+            win._rollup();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("false");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Expand window");
+            expect(win._rollButton.title).toBe("Expand");
+
+            win.unroll();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+            expect(win._rollButton.getAttribute("aria-label")).toBe("Roll up window");
+            expect(win._rollButton.title).toBe("Minimize");
+        });
+    });
+
     describe("updateTitle", () => {
         test("updates the title element textContent", () => {
             const win = createTestWindow("Old Title");
@@ -907,6 +953,68 @@ describe("widgetWindows", () => {
 
             expect(win._rolled).toBe(false);
             expect(win._body.style.display).toBe("flex");
+        });
+
+        test("destroy removes window elements and deletes key from openWindows", () => {
+            const win = createTestWindow("testDestroyKey");
+            const key = win._key;
+            expect(key in window.widgetWindows.openWindows).toBe(true);
+
+            win.destroy();
+
+            expect(key in window.widgetWindows.openWindows).toBe(false);
+            expect(window.widgetWindows.openWindows[key]).toBeUndefined();
+        });
+
+        test("sendToCenter uses the fallback height when nav is absent", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("132px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                if (nav && parent) parent.appendChild(nav);
+            }
+        });
+
+        test("sendToCenter preserves a zero nav height", () => {
+            const win = createTestWindow("testCenterKey");
+            const nav = document.querySelector("nav");
+            const parent = nav?.parentElement;
+            if (nav && parent) parent.removeChild(nav);
+
+            const zeroNav = document.createElement("nav");
+            Object.defineProperty(zeroNav, "offsetHeight", { value: 0 });
+            document.body.appendChild(zeroNav);
+
+            const canvasRect = jest
+                .spyOn(document.getElementById("myCanvas"), "getBoundingClientRect")
+                .mockReturnValue({ width: 200, height: 300 });
+            const frameRect = jest
+                .spyOn(win._frame, "getBoundingClientRect")
+                .mockReturnValue({ width: 100, height: 100 });
+
+            try {
+                win.sendToCenter();
+                expect(win._frame.style.top).toBe("100px");
+            } finally {
+                frameRect.mockRestore();
+                canvasRect.mockRestore();
+                zeroNav.remove();
+                if (nav && parent) parent.appendChild(nav);
+            }
         });
     });
 
@@ -1245,10 +1353,15 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Win 2");
             window.widgetWindows.focused = win1;
 
+            win1._overlay(true);
+
             window.widgetWindows.hideAllWindows();
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1._frame.style.zIndex).toBe("10");
+            expect(win1._overlayframe.style.zIndex).toBe("-1");
+            expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
             expect(window.widgetWindows.focused).toBeNull();
         });
 
@@ -1415,6 +1528,16 @@ describe("widgetWindows", () => {
             window.widgetWindows.closeBlkWidgets("sampler");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+        });
+
+        it("closes LEGO Bricks widget using mapped key 'LEGO Bricks'", () => {
+            window.widgetWindows.openWindows = {
+                "LEGO Bricks": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("LEGO Bricks");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("LEGO Bricks");
         });
 
         it("closes widgets when receiving localized block titles", () => {

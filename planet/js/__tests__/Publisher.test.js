@@ -189,6 +189,24 @@ describe("Publisher", () => {
         it("should return null for non-existent tag name", () => {
             expect(publisher.findTagWithName("NonExistent")).toBeNull();
         });
+
+        it("should return null when the tag manifest has not loaded", () => {
+            mockPlanet.TagsManifest = null;
+            expect(publisher.findTagWithName("Music")).toBeNull();
+        });
+    });
+
+    describe("addTags", () => {
+        it("should build ChipTags from user-addable tags", () => {
+            publisher.addTags();
+            expect(publisher.ChipTags).toEqual({ Music: null, Art: null });
+        });
+
+        it("should not throw when the tag manifest has not loaded", () => {
+            mockPlanet.TagsManifest = null;
+            expect(() => publisher.addTags()).not.toThrow();
+            expect(publisher.ChipTags).toEqual({});
+        });
     });
 
     describe("setTagInput", () => {

@@ -650,6 +650,24 @@ describe("processABCNotes - notation markers", () => {
         expect(parseNotes(body)).toHaveLength(2);
     });
 
+    it("writes a rest for a staged note with no pitches inside a tuplet", () => {
+        const tupletNote = pitches => [pitches, 1, 0, [3, 2], 4, -1, false];
+        const body = exportBody([
+            note("C4"),
+            tupletNote(["G4"]),
+            tupletNote([]),
+            tupletNote(["B4"]),
+            note("C5")
+        ]);
+        const notes = parseNotes(body);
+
+        // Without the rest the note is left out and its duration runs on from the G,
+        // which abcjs reads as a single note eleven times as long.
+        expect(notes).toHaveLength(5);
+        expect(notes[2].rest).toBeDefined();
+        expect(notes.map(n => n.duration)).toEqual([0.25, 0.25, 0.25, 0.25, 0.25]);
+    });
+
     describe("tempo", () => {
         it.each([
             ["4", "1/4"],
@@ -1195,5 +1213,40 @@ describe("saveAbcOutput - one voice per turtle", () => {
         const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
 
         expect(result).not.toMatch(/\S +V:/);
+    });
+});
+
+describe("saveAbcOutput - forever repeats", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const notesOf = staged => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: staged } }
+        };
+        processABCNotes(logo, "0");
+        return logo.notationNotes[0];
+    };
+
+    it("wraps the notes after a forever in repeat bars", () => {
+        expect(notesOf(["begin repeat", note("G4"), note("E4")])).toBe("|: G4 E4 :|");
+    });
+
+    it("starts the repeat where the forever starts", () => {
+        expect(notesOf([note("C4"), "begin repeat", note("G4")])).toBe("C4 |: G4 :|");
+    });
+
+    it("repeats only the innermost of nested forevers", () => {
+        expect(notesOf(["begin repeat", note("C4"), "begin repeat", note("G4")])).toBe(
+            "C4 |: G4 :|"
+        );
+    });
+
+    it("writes no repeat bars when no notes follow the forever", () => {
+        expect(notesOf([note("C4"), "begin repeat"])).toBe("C4 ");
+    });
+
+    it("writes no repeat bars without a forever", () => {
+        expect(notesOf([note("C4"), note("G4")])).toBe("C4 G4 ");
     });
 });

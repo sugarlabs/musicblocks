@@ -27,7 +27,7 @@
    noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
    keySignatureToMode, getSavedCustomModes,
-   clampNumber
+   clampNumber, saveMeterState, restoreMeterState
  */
 
 /*
@@ -39,6 +39,8 @@
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
         getCurrentEDO, isEquallyTempered
+    js/utils/musicutils-rhythm.js
+        saveMeterState, restoreMeterState
     js/utils/utils.js
         rationalSum, _
     js/utils/synthutils.js
@@ -129,6 +131,12 @@ class Singer {
         }
         this._unhighlightTimers = {};
 
+        // Each run sets its own panning.
+        if (this.panner) {
+            this.panner.dispose();
+            this.panner = null;
+        }
+
         // Parameters used by envelope block
         /** @deprecated */ this.attack = [];
         /** @deprecated */ this.decay = [];
@@ -146,6 +154,7 @@ class Singer {
         this.defaultNoteValue = 4;
         this.register = 0;
         this.beatFactor = 1;
+        this.beatFactorValues = [];
         this.dotCount = 0;
         this.oscList = {};
         this.noteBeat = {};
@@ -254,6 +263,8 @@ class Singer {
         this.pickup = 0;
         this.beatsPerMeasure = 4;
         this.noteValuePerBeat = 4;
+        // Where the latest meter change started counting measures (see getMeterAnchor)
+        this.meterAnchor = null;
         this.currentBeat = 0;
         this.currentMeasure = 0;
 
@@ -263,6 +274,8 @@ class Singer {
         this.firstPitch = [];
         this.lastPitch = [];
         this.suppressOutput = Boolean(suppressOutput);
+        // Set by the record notation block, so notes are staged while playing too
+        this.recordingNotation = false;
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
         this.runningFromEvent = false;
@@ -588,18 +601,20 @@ class Singer {
         const savePrevTurtleTime = tur.singer.previousTurtleTime;
         const saveTurtleTime = tur.singer.turtleTime;
 
+        const previousButNotThese = tur.butNotThese;
+        tur.butNotThese = deepClone(tur.butNotThese);
+
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
+        // Logo skips these signals by index once the counting run ends.
         for (const b in tur.endOfClampSignals) {
-            tur.butNotThese[b] = [];
-            for (const i of tur.endOfClampSignals[b]) {
-                tur.butNotThese[b].push(i);
-            }
+            tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
         }
 
         const actionArgs = [];
         const saveNoteCount = tur.singer.notesPlayed;
+        const saveMeter = saveMeterState(tur.singer);
         const saveTallyNotes = tur.singer.tallyNotes;
         tur.running = true;
 
@@ -622,6 +637,7 @@ class Singer {
             activity.errorMsg(noteCountErr);
         }
         tur.singer.notesPlayed = saveNoteCount;
+        restoreMeterState(tur.singer, saveMeter);
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
@@ -647,7 +663,7 @@ class Singer {
         tur.singer.justCounting.pop();
         tur.singer.suppressOutput = saveSuppressStatus;
 
-        tur.butNotThese = {};
+        tur.butNotThese = previousButNotThese;
 
         return returnValue[0] / returnValue[1];
     }
@@ -688,14 +704,18 @@ class Singer {
             prevTurtleTime: tur.singer.previousTurtleTime,
             turtleTime: tur.singer.turtleTime,
             noteCount: tur.singer.notesPlayed,
+            meter: saveMeterState(tur.singer),
             tallyNotes: tur.singer.tallyNotes
         };
+
+        const previousButNotThese = tur.butNotThese;
+        tur.butNotThese = deepClone(tur.butNotThese);
 
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
         Object.keys(tur.endOfClampSignals).forEach(b => {
-            tur.butNotThese[b] = Object.keys(tur.endOfClampSignals[b]);
+            tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
         });
 
         tur.running = true;
@@ -720,6 +740,7 @@ class Singer {
             whichNoteToCount: saveState.whichNoteToCount,
             suppressOutput: saveState.suppressOutput
         });
+        restoreMeterState(tur.singer, saveState.meter);
 
         Object.assign(tur.painter, {
             color: saveState.color,
@@ -738,7 +759,7 @@ class Singer {
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
         tur.singer.justCounting.pop();
-        tur.butNotThese = {};
+        tur.butNotThese = previousButNotThese;
 
         return returnValue;
     }
@@ -854,6 +875,69 @@ class Singer {
     // ========= Action =======================================================
 
     /**
+     * Resolves the arpeggio interval for the current execution visit.
+     * Advances tur.singer.arpeggioIndex and wraps around at the end of the chord.
+     *
+     * @param {Object} activity - The activity instance
+     * @param {Object} tur - The turtle instance
+     * @param {String} note - Note value or solfege
+     * @param {Number} octave - Scale octave
+     * @param {String|null} direction - Interval direction or null
+     * @param {Number} edo - The current EDO steps per octave
+     * @returns {{ arpeggioTrans: Number, anote: String }}
+     */
+    static resolveArpeggio(activity, tur, note, octave, direction, edo) {
+        const alen = tur.singer.arpeggio.length;
+        if (alen === 0) {
+            return { arpeggioTrans: 0, anote: note };
+        }
+
+        const keySig = Array.isArray(tur.singer.keySignature)
+            ? tur.singer.keySignature.join(" ")
+            : tur.singer.keySignature;
+
+        let basePitch = note;
+        if (tur.singer.movable && typeof noteIsSolfege === "function" && noteIsSolfege(note)) {
+            const baseNoteObj = getNote(
+                note,
+                octave,
+                0,
+                keySig,
+                tur.singer.movable,
+                direction,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            basePitch = baseNoteObj[0];
+        }
+
+        if (
+            typeof tur.singer.arpeggioIndex !== "number" ||
+            tur.singer.arpeggioIndex >= alen ||
+            tur.singer.arpeggioIndex < 0
+        ) {
+            tur.singer.arpeggioIndex = 0;
+        }
+
+        const entry = tur.singer.arpeggio[tur.singer.arpeggioIndex];
+        let anote = note;
+        let arpeggioTrans = 0;
+
+        if (isNaN(entry[0])) {
+            anote = "rest";
+        } else {
+            arpeggioTrans = getInterval(entry[0], keySig, basePitch, edo) + entry[1];
+        }
+
+        tur.singer.arpeggioIndex += 1;
+        if (tur.singer.arpeggioIndex === alen) {
+            tur.singer.arpeggioIndex = 0;
+        }
+
+        return { arpeggioTrans, anote };
+    }
+
+    /**
      * @static
      * @param {String} note - note value or solfege
      * @param {Number} octave - scale octave
@@ -965,45 +1049,58 @@ class Singer {
                 }
             }
 
-            const duplicateFactor =
-                tur.singer.duplicateFactor.length > 0 ? tur.singer.duplicateFactor : 1;
+            // Apply transpositions
+            const transposition = 2 * delta + tur.singer.transposition;
+            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+                activity,
+                tur,
+                note,
+                octave,
+                null,
+                edo
+            );
+            const atrans = transposition + cents / 100 + arpeggioTrans;
+            const keySig = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature.join(" ")
+                : tur.singer.keySignature;
 
-            for (let i = 0; i < duplicateFactor; i++) {
-                // Apply transpositions
-                const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
-                let atrans = transposition + cents;
-                if (alen > 0 && i < alen) {
-                    atrans += tur.singer.arpeggio[i];
-                }
-
-                const nnote = getNote(
-                    note,
-                    octave,
-                    atrans, // transposition,
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
-                );
-                nnote[0] = noteIsSolfege(note)
+            const nnote = getNote(
+                anote,
+                octave,
+                atrans, // transposition,
+                keySig,
+                tur.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            // Step Pitch steps from the row before, as in the Phrase Maker. Only a pitch row
+            // counts, not a rest or a drum column.
+            if (
+                !["rest", "r"].includes(note.toLowerCase()) &&
+                !["rest", "r"].includes(anote.toLowerCase()) &&
+                tur.singer.drumStyle.length === 0
+            ) {
+                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                tur.singer.lastNotePlayed = [nnote[0] + nnote[1], 4];
+            }
+            nnote[0] =
+                anote !== "rest" && noteIsSolfege(note)
                     ? getSolfege(
                           nnote[0],
-                          tur.singer.keySignature,
+                          keySig,
                           false, // getNote already applied movable Do; widgets use fixed Do
                           activity.logo.synth.inTemperament,
                           edo
                       )
                     : nnote[0];
 
-                if (tur.singer.drumStyle.length > 0) {
-                    activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
-                    activity.logo.pitchDrumMatrix.addColBlock(blk);
-                } else {
-                    activity.logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
-                    activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
-                }
+            if (tur.singer.drumStyle.length > 0) {
+                activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                activity.logo.pitchDrumMatrix.addColBlock(blk);
+            } else {
+                activity.logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
+                activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
             }
         } else if (activity.logo.inMatrix) {
             if (note.toLowerCase() !== "rest") {
@@ -1013,66 +1110,72 @@ class Singer {
                 }
             }
 
-            const duplicateFactor =
-                tur.singer.duplicateFactor.length > 0 ? tur.singer.duplicateFactor : 1;
+            // Apply transpositions
+            const transposition = 2 * delta + tur.singer.transposition;
+            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+                activity,
+                tur,
+                note,
+                octave,
+                null,
+                edo
+            );
+            const atrans = transposition + cents / 100 + arpeggioTrans;
+            const keySig = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature.join(" ")
+                : tur.singer.keySignature;
 
-            for (let i = 0; i < duplicateFactor; i++) {
-                // Apply transpositions
-                const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
-                let atrans = transposition + cents;
-                if (alen > 0 && i < alen) {
-                    atrans += tur.singer.arpeggio[i];
-                }
-                const noteObj = getNote(
-                    note,
-                    octave,
-                    atrans, // transposition,
-                    tur.singer.keySignature,
+            const noteObj = getNote(
+                anote,
+                octave,
+                atrans, // transposition,
+                keySig,
+                tur.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+            tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+
+            const isCMajor = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature[0] === "C" &&
+                  typeof tur.singer.keySignature[1] === "string" &&
+                  tur.singer.keySignature[1].toLowerCase() === "major"
+                : typeof tur.singer.keySignature === "string" &&
+                  tur.singer.keySignature.toLowerCase().startsWith("c major");
+
+            if (anote !== "rest" && isCMajor && noteIsSolfege(note)) {
+                noteObj[0] = getSolfege(
+                    noteObj[0],
+                    keySig,
                     tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    edo
                 );
-                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
-                tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+            }
 
+            // If we are in a setdrum clamp, override the pitch.
+            if (tur.singer.drumStyle.length > 0) {
+                activity.logo.phraseMaker.rowLabels.push(last(tur.singer.drumStyle));
+                activity.logo.phraseMaker.rowArgs.push(-1);
+            } else {
+                // Don't bother with the name conversions.
+                activity.logo.phraseMaker.rowLabels.push(noteObj[0]);
+                /*
+                // Was the pitch arg a note name or solfege name?
                 if (
-                    tur.singer.keySignature[0] === "C" &&
-                    tur.singer.keySignature[1].toLowerCase() === "major" &&
-                    noteIsSolfege(note)
+                    SOLFEGENAMES1.indexOf(note) !== -1 &&
+                    noteObj[0] in SOLFEGECONVERSIONTABLE
                 ) {
-                    noteObj[0] = getSolfege(
-                        noteObj[0],
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        activity.logo.synth.inTemperament,
-                        edo
+                    activity.logo.phraseMaker.rowLabels.push(
+                        SOLFEGECONVERSIONTABLE[noteObj[0]]
                     );
-                }
-
-                // If we are in a setdrum clamp, override the pitch.
-                if (tur.singer.drumStyle.length > 0) {
-                    activity.logo.phraseMaker.rowLabels.push(last(tur.singer.drumStyle));
-                    activity.logo.phraseMaker.rowArgs.push(-1);
                 } else {
-                    // Don't bother with the name conversions.
                     activity.logo.phraseMaker.rowLabels.push(noteObj[0]);
-                    /*
-                    // Was the pitch arg a note name or solfege name?
-                    if (
-                        SOLFEGENAMES1.indexOf(note) !== -1 &&
-                        noteObj[0] in SOLFEGECONVERSIONTABLE
-                    ) {
-                        activity.logo.phraseMaker.rowLabels.push(
-                            SOLFEGECONVERSIONTABLE[noteObj[0]]
-                        );
-                    } else {
-                        activity.logo.phraseMaker.rowLabels.push(noteObj[0]);
-                    }
-                    */
-                    activity.logo.phraseMaker.rowArgs.push(noteObj[1]);
                 }
+                */
+                activity.logo.phraseMaker.rowArgs.push(noteObj[1]);
             }
         } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
             if (note.toLowerCase() !== "rest") {
@@ -1082,53 +1185,59 @@ class Singer {
                 }
             }
 
-            const duplicateFactor =
-                tur.singer.duplicateFactor.length > 0 ? tur.singer.duplicateFactor : 1;
+            // Apply transpositions
+            const transposition = 2 * delta + tur.singer.transposition;
+            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+                activity,
+                tur,
+                note,
+                octave,
+                null,
+                edo
+            );
+            const atrans = transposition + cents / 100 + arpeggioTrans;
+            const keySig = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature.join(" ")
+                : tur.singer.keySignature;
 
-            for (let i = 0; i < duplicateFactor; i++) {
-                // Apply transpositions
-                const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
-                let atrans = transposition + cents;
-                if (alen > 0 && i < alen) {
-                    atrans += tur.singer.arpeggio[i];
-                }
-                const noteObj = getNote(
-                    note,
-                    octave,
-                    atrans, // transposition,
-                    tur.singer.keySignature,
+            const noteObj = getNote(
+                anote,
+                octave,
+                atrans, // transposition,
+                keySig,
+                tur.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+            tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+
+            const isCMajor = Array.isArray(tur.singer.keySignature)
+                ? tur.singer.keySignature[0] === "C" &&
+                  typeof tur.singer.keySignature[1] === "string" &&
+                  tur.singer.keySignature[1].toLowerCase() === "major"
+                : typeof tur.singer.keySignature === "string" &&
+                  tur.singer.keySignature.toLowerCase().startsWith("c major");
+
+            if (anote !== "rest" && isCMajor && noteIsSolfege(note)) {
+                noteObj[0] = getSolfege(
+                    noteObj[0],
+                    keySig,
                     tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    edo
                 );
-                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
-                tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+            }
 
-                if (
-                    tur.singer.keySignature[0] === "C" &&
-                    tur.singer.keySignature[1].toLowerCase() === "major" &&
-                    noteIsSolfege(note)
-                ) {
-                    noteObj[0] = getSolfege(
-                        noteObj[0],
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        activity.logo.synth.inTemperament,
-                        edo
-                    );
-                }
-
-                // If we are in a setdrum clamp, override the pitch.
-                if (tur.singer.drumStyle.length > 0) {
-                    activity.logo.legoWidget.rowLabels.push(last(tur.singer.drumStyle));
-                    activity.logo.legoWidget.rowArgs.push(-1);
-                } else {
-                    // Don't bother with the name conversions.
-                    activity.logo.legoWidget.rowLabels.push(noteObj[0]);
-                    activity.logo.legoWidget.rowArgs.push(noteObj[1]);
-                }
+            // If we are in a setdrum clamp, override the pitch.
+            if (tur.singer.drumStyle.length > 0) {
+                activity.logo.legoWidget.rowLabels.push(last(tur.singer.drumStyle));
+                activity.logo.legoWidget.rowArgs.push(-1);
+            } else {
+                // Don't bother with the name conversions.
+                activity.logo.legoWidget.rowLabels.push(noteObj[0]);
+                activity.logo.legoWidget.rowArgs.push(noteObj[1]);
             }
         } else if (tur.singer.inNoteBlock.length > 0) {
             const addPitch = (note, octave, cents, direction) => {
@@ -1349,39 +1458,12 @@ class Singer {
                 activity.logo.synth.inTemperament
             );
 
-            for (let i = 0; i < activity.logo.pitchStaircase.Stairs.length; i++) {
-                if (activity.logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                    activity.logo.pitchStaircase.Stairs.splice(i, 0, [
-                        noteObj1[0],
-                        noteObj1[1],
-                        parseFloat(frequency),
-                        1,
-                        1
-                    ]);
-                    return;
-                }
-
-                if (activity.logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                    activity.logo.pitchStaircase.Stairs.splice(i, 1, [
-                        noteObj1[0],
-                        noteObj1[1],
-                        parseFloat(frequency),
-                        1,
-                        1
-                    ]);
-                    return;
-                }
-            }
-
-            activity.logo.pitchStaircase.Stairs.push([
+            activity.logo.pitchStaircase.addStair(
                 noteObj1[0],
                 noteObj1[1],
                 parseFloat(frequency),
-                1,
-                1
-            ]);
-
-            activity.logo.pitchStaircase.stairPitchBlocks.push(blk);
+                blk
+            );
         } else if (activity.logo.inMusicKeyboard) {
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
@@ -2386,21 +2468,31 @@ class Singer {
                                 d = tur.singer.tieCarryOver;
                             }
 
-                            if (
+                            const exporting =
                                 activity.logo.runningLilypond ||
                                 activity.logo.runningMxml ||
                                 activity.logo.runningAbc ||
-                                activity.logo.runningMIDI
-                            ) {
-                                activity.logo.notationMIDI(
-                                    chordNotes,
-                                    chordDrums,
-                                    d,
-                                    turtle,
-                                    bpmValue || 90,
-                                    last(tur.singer.instrumentNames)
-                                );
-                                activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
+                                activity.logo.runningMIDI;
+                            if (typeof d === "number" && d > 0 && isFinite(d)) {
+                                if (exporting) {
+                                    activity.logo.notationMIDI(
+                                        chordNotes,
+                                        chordDrums,
+                                        d,
+                                        turtle,
+                                        bpmValue || 90,
+                                        last(tur.singer.instrumentNames)
+                                    );
+                                }
+                                if (exporting || tur.singer.recordingNotation) {
+                                    activity.logo.updateNotation(
+                                        chordNotes,
+                                        d,
+                                        turtle,
+                                        -1,
+                                        chordDrums
+                                    );
+                                }
                             }
                         }
                     }
@@ -2472,18 +2564,31 @@ class Singer {
                                     blk in activity.blocks.blockList
                                 ) {
                                     // Start from the note block's parent
-                                    let par = activity.blocks.blockList[blk].connections[0];
-                                    par = activity.blocks.blockList[par];
+                                    let parentId = activity.blocks.blockList[blk].connections
+                                        ? activity.blocks.blockList[blk].connections[0]
+                                        : null;
+                                    const visited = new Set();
                                     // Keep looking for all parents up in order
-                                    while (par.name !== "setdrum") {
-                                        // If settimbre encountered before setdrum, the said case is true
-                                        if (par.name === "settimbre") {
+                                    while (
+                                        parentId !== null &&
+                                        parentId !== undefined &&
+                                        !visited.has(parentId)
+                                    ) {
+                                        visited.add(parentId);
+                                        const parentBlock = activity.blocks.blockList[parentId];
+                                        if (!parentBlock) {
+                                            break;
+                                        }
+                                        if (parentBlock.name === "settimbre") {
                                             hasSetTimbreInSetDrum = true;
                                             break;
                                         }
-                                        par = par.connections[0];
-                                        if (par === null) break;
-                                        par = activity.blocks.blockList[par];
+                                        if (parentBlock.name === "setdrum") {
+                                            break;
+                                        }
+                                        parentId = parentBlock.connections
+                                            ? parentBlock.connections[0]
+                                            : null;
                                     }
                                 }
 
@@ -2506,7 +2611,8 @@ class Singer {
                                             paramsEffects,
                                             null,
                                             false,
-                                            future
+                                            future,
+                                            tur.singer.panner
                                         );
                                     }
                                 } else if (
@@ -2523,7 +2629,8 @@ class Singer {
                                             null,
                                             null,
                                             false,
-                                            future
+                                            future,
+                                            tur.singer.panner
                                         );
                                     }
                                 } else {
@@ -2542,7 +2649,8 @@ class Singer {
                                                     null,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
@@ -2558,7 +2666,8 @@ class Singer {
                                                             paramsEffects,
                                                             filters,
                                                             true,
-                                                            future
+                                                            future,
+                                                            tur.singer.panner
                                                         );
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
@@ -2572,7 +2681,8 @@ class Singer {
                                                             paramsEffects,
                                                             filters,
                                                             false,
-                                                            future
+                                                            future,
+                                                            tur.singer.panner
                                                         );
                                                         tur.singer.glideOverride = 0;
                                                     }
@@ -2585,7 +2695,8 @@ class Singer {
                                                         paramsEffects,
                                                         filters,
                                                         false,
-                                                        future
+                                                        future,
+                                                        tur.singer.panner
                                                     );
                                                 }
                                             }
@@ -2602,7 +2713,8 @@ class Singer {
                                                     paramsEffects,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         } else {
@@ -2615,7 +2727,8 @@ class Singer {
                                                     paramsEffects,
                                                     null,
                                                     false,
-                                                    future
+                                                    future,
+                                                    tur.singer.panner
                                                 );
                                             }
                                         }
@@ -2675,7 +2788,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                tur.singer.panner
                                             );
                                         }
                                     } else {
@@ -2688,7 +2802,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                tur.singer.panner
                                             );
                                         }
                                     }

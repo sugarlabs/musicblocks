@@ -479,17 +479,18 @@ describe("AST2BlockList Class", () => {
                     ]
                 ]
             ];
-            const code =
-                astring.generate(ASTUtils.getMethodAST("action", action)) +
-                "\n" +
-                exportStart(start);
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const actionCode = astring.generate(ASTUtils.getMethodAST("action", action));
+            const code = actionCode + "\n" + exportStart(start);
 
             expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
-            expect(code).not.toMatch(/\bbreak;/);
+            // The bare break, a syntax error outside a loop, isn't in the action.
+            expect(actionCode).not.toMatch(/\bbreak;/);
 
             const printed = [];
             const mouse = {
                 ENDFLOW: "ENDFLOW",
+                STOPFLOW: Promise.resolve("STOPFLOW"),
                 ENDMOUSE: "ENDMOUSE",
                 print: async value => printed.push(value),
                 playNote: async (value, flow) => flow(),
@@ -500,10 +501,134 @@ describe("AST2BlockList Class", () => {
                 run = flow(mouse);
             });
             await run;
-            // The Stop ends the action. Ending the Repeat it was called from, as Music
-            // Blocks does, isn't exported yet (#9004), so the Repeat keeps going.
-            expect(printed.slice(0, 3)).toEqual(["DO", "RE", "MI"]);
+            // As in Music Blocks, the Stop ends the Repeat the action was called from, after
+            // the rest of this round: the Repeat doesn't start a second round.
+            expect(printed).toEqual(["DO", "RE", "MI"]);
         });
+
+        test("an action with a Stop runs to its end, then ends the loop that called it", async () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const start = [
+                [
+                    "repeat",
+                    [3],
+                    [
+                        ["nameddo_action", null],
+                        ["print", ["after"]]
+                    ]
+                ]
+            ];
+            const code =
+                astring.generate(ASTUtils.getMethodAST("action", action)) +
+                "\n" +
+                exportStart(start);
+
+            const printed = [];
+            const mouse = {
+                ENDFLOW: Promise.resolve(),
+                STOPFLOW: Promise.resolve("STOPFLOW"),
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value)
+            };
+            let run;
+            await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                run = flow(mouse);
+            });
+            await run;
+            expect(printed).toEqual(["k", "j", "after"]);
+        });
+
+        // What Music Blocks prints for an action with a Stop, run in a real browser:
+        // Logo.doBreak removes the loop when there is one, and otherwise drops the next
+        // pending blocks, which are the action's own when the Stop is not its last block.
+        describe("an action with a Stop, as Music Blocks runs it", () => {
+            const run = async (action, start) => {
+                ASTUtils.setStoppingActions(["action"], [action]);
+                const code =
+                    astring.generate(ASTUtils.getMethodAST("action", action)) +
+                    "\n" +
+                    exportStart(start);
+                expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+                const printed = [];
+                const mouse = {
+                    ENDFLOW: Promise.resolve(),
+                    STOPFLOW: Promise.resolve("STOPFLOW"),
+                    ENDMOUSE: "ENDMOUSE",
+                    print: async value => printed.push(value)
+                };
+                let finish;
+                await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                    finish = flow(mouse);
+                });
+                await finish;
+                return printed;
+            };
+            const middle = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            const last = [["print", ["k"]], ["break"]];
+            const call = ["nameddo_action", null];
+            const z = ["print", ["z"]];
+
+            test("Stop in the middle, no loop: the action ends, the caller carries on", async () => {
+                expect(await run(middle, [call, z])).toEqual(["k", "z"]);
+            });
+
+            test("Stop in the middle, call inside an if: the action ends, the caller carries on", async () => {
+                const start = [["if", ["bool_true"], [call]], z];
+                expect(await run(middle, start)).toEqual(["k", "z"]);
+            });
+
+            test("Stop last, no loop: the rest of the caller is skipped", async () => {
+                expect(await run(last, [call, z])).toEqual(["k"]);
+            });
+
+            test("Stop in the middle, called from a loop: the rest runs and the loop ends", async () => {
+                expect(await run(middle, [["repeat", [3], [call, z]]])).toEqual(["k", "j", "z"]);
+            });
+
+            test("Stop last, called from a loop: the loop ends after the round", async () => {
+                expect(await run(last, [["repeat", [3], [call, z]]])).toEqual(["k", "z"]);
+            });
+        });
+
+        test.each([
+            ["called from a loop", [["repeat", [3], [["nameddo_action", null]]]]],
+            [
+                "called with no loop",
+                [
+                    ["nameddo_action", null],
+                    ["print", ["z"]]
+                ]
+            ],
+            ["called inside an if", [["if", ["bool_true"], [["nameddo_action", null]]]]]
+        ])(
+            "an action with a Stop imports back as the same action call and Stop, %s",
+            (_, start) => {
+                const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+                ASTUtils.setStoppingActions(["action"], [action]);
+                const withStop =
+                    astring.generate(ASTUtils.getMethodAST("action", action)) +
+                    "\n" +
+                    exportStart(start);
+                ASTUtils.setStoppingActions([], []);
+                const plain =
+                    astring.generate(
+                        ASTUtils.getMethodAST("action", [
+                            ["print", ["k"]],
+                            ["print", ["j"]]
+                        ])
+                    ) +
+                    "\n" +
+                    exportStart(start);
+                const toBlocks = code =>
+                    AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+
+                expect(() => toBlocks(withStop)).not.toThrow();
+                // Same blocks as the code without the check at the call, plus the Stop block.
+                const stopBlocks = toBlocks(withStop).length;
+                expect(stopBlocks).toBe(toBlocks(plain).length + 1);
+            }
+        );
 
         // The importer only undoes the flags and labels the exporter writes;
         // the same shapes in hand-written code must not turn into Stop blocks.
@@ -552,6 +677,84 @@ describe("AST2BlockList Class", () => {
             expect(error).toBeDefined();
             expect(error.prefix).toBe("Unsupported statement: ");
             expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
+        });
+
+        // The same patterns in hand-written code are not the exporter's Stop, so the
+        // importer must not rewrite them and silently lose what the code does.
+        test("leaves a hand-written read of the Stop flag alone", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const generated = astring.generate(ASTUtils.getMethodAST("action", action));
+            const flag = generated.match(/let (\w+) = false/)[1];
+            const edited = generated.replace(
+                /(\n\s*)(return [^\n]*STOPFLOW)/,
+                `$1await mouse.print(${flag});$1$2`
+            );
+            expect(edited).not.toBe(generated);
+
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(edited, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a hand-written branch on STOPFLOW alone", () => {
+            const code = `
+            new Mouse(async mouse => {
+                if ((await action(mouse)) === "STOPFLOW") {
+                    await mouse.print("x");
+                }
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a branch on STOPFLOW that sets another variable alone", () => {
+            const code = `
+            new Mouse(async mouse => {
+                if ((await action(mouse)) === "STOPFLOW") {
+                    stop0 = true;
+                }
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
+        });
+
+        test("leaves a return of another object's STOPFLOW alone", () => {
+            const action = [["print", ["k"]], ["break"], ["print", ["j"]]];
+            ASTUtils.setStoppingActions(["action"], [action]);
+            const generated = astring.generate(ASTUtils.getMethodAST("action", action));
+            const edited = generated.replace("mouse.STOPFLOW", "other.STOPFLOW");
+            expect(edited).not.toBe(generated);
+
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(edited, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toMatch(/^Unsupported/);
         });
 
         test("leaves the AST alone, so converting it twice gives the same blocks", () => {
@@ -1678,43 +1881,81 @@ describe("AST2BlockList Class", () => {
             [59, "pitch", 0, 0, [58, 60, 61, null]],
             [60, ["solfege", { value: "sol" }], 0, 0, [59]],
             [61, ["number", { value: 4 }], 0, 0, [59]],
-            [62, "until", 0, 0, [53, 63, 64, 72]],
-            [63, ["boolean", { value: true }], 0, 0, [62]],
-            [64, "newnote", 0, 0, [62, 65, 68, null]],
-            [65, "divide", 0, 0, [64, 66, 67]],
-            [66, ["number", { value: 1 }], 0, 0, [65]],
-            [67, ["number", { value: 4 }], 0, 0, [65]],
-            [68, "vspace", 0, 0, [64, 69]],
-            [69, "pitch", 0, 0, [68, 70, 71, null]],
-            [70, ["solfege", { value: "sol" }], 0, 0, [69]],
-            [71, ["number", { value: 4 }], 0, 0, [69]],
-            [72, "switch", 0, 0, [62, 73, 74, null]],
-            [73, ["number", { value: 1 }], 0, 0, [72]],
-            [74, "case", 0, 0, [72, 75, 76, 86]],
-            [75, ["number", { value: 1 }], 0, 0, [74]],
-            [76, "newnote", 0, 0, [74, 77, 80, 84]],
-            [77, "divide", 0, 0, [76, 78, 79]],
-            [78, ["number", { value: 1 }], 0, 0, [77]],
-            [79, ["number", { value: 4 }], 0, 0, [77]],
-            [80, "vspace", 0, 0, [76, 81]],
-            [81, "pitch", 0, 0, [80, 82, 83, null]],
-            [82, ["solfege", { value: "sol" }], 0, 0, [81]],
-            [83, ["number", { value: 4 }], 0, 0, [81]],
-            [84, "break", 0, 0, [76, 85]],
-            [85, "break", 0, 0, [84, null]],
-            [86, "defaultcase", 0, 0, [74, 87, null]],
-            [87, "newnote", 0, 0, [86, 88, 91, null]],
-            [88, "divide", 0, 0, [87, 89, 90]],
-            [89, ["number", { value: 1 }], 0, 0, [88]],
-            [90, ["number", { value: 4 }], 0, 0, [88]],
-            [91, "vspace", 0, 0, [87, 92]],
-            [92, "pitch", 0, 0, [91, 93, 94, null]],
-            [93, ["solfege", { value: "5" }], 0, 0, [92]],
-            [94, ["number", { value: 4 }], 0, 0, [92]]
+            [62, "until", 0, 0, [53, 63, 65, 73]],
+            [63, "not", 0, 0, [62, 64]],
+            [64, ["boolean", { value: true }], 0, 0, [63]],
+            [65, "newnote", 0, 0, [62, 66, 69, null]],
+            [66, "divide", 0, 0, [65, 67, 68]],
+            [67, ["number", { value: 1 }], 0, 0, [66]],
+            [68, ["number", { value: 4 }], 0, 0, [66]],
+            [69, "vspace", 0, 0, [65, 70]],
+            [70, "pitch", 0, 0, [69, 71, 72, null]],
+            [71, ["solfege", { value: "sol" }], 0, 0, [70]],
+            [72, ["number", { value: 4 }], 0, 0, [70]],
+            [73, "switch", 0, 0, [62, 74, 75, null]],
+            [74, ["number", { value: 1 }], 0, 0, [73]],
+            [75, "case", 0, 0, [73, 76, 77, 87]],
+            [76, ["number", { value: 1 }], 0, 0, [75]],
+            [77, "newnote", 0, 0, [75, 78, 81, 85]],
+            [78, "divide", 0, 0, [77, 79, 80]],
+            [79, ["number", { value: 1 }], 0, 0, [78]],
+            [80, ["number", { value: 4 }], 0, 0, [78]],
+            [81, "vspace", 0, 0, [77, 82]],
+            [82, "pitch", 0, 0, [81, 83, 84, null]],
+            [83, ["solfege", { value: "sol" }], 0, 0, [82]],
+            [84, ["number", { value: 4 }], 0, 0, [82]],
+            [85, "break", 0, 0, [77, 86]],
+            [86, "break", 0, 0, [85, null]],
+            [87, "defaultcase", 0, 0, [75, 88, null]],
+            [88, "newnote", 0, 0, [87, 89, 92, null]],
+            [89, "divide", 0, 0, [88, 90, 91]],
+            [90, ["number", { value: 1 }], 0, 0, [89]],
+            [91, ["number", { value: 4 }], 0, 0, [89]],
+            [92, "vspace", 0, 0, [88, 93]],
+            [93, "pitch", 0, 0, [92, 94, 95, null]],
+            [94, ["solfege", { value: "5" }], 0, 0, [93]],
+            [95, ["number", { value: 4 }], 0, 0, [93]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         let blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual(expectedBlockList);
+    });
+
+    // The `until` block repeats while its condition is false, so a JS
+    // `do { ... } while (test)` imports as `until (!test)`. A test that is
+    // already negated collapses so a blocks -> JS -> blocks round-trip is stable.
+    test("should import do-while as until with a collapsed negated condition", () => {
+        const code = `
+        new Mouse(async mouse => {
+            do {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+            } while (!(2 < 1));
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "until", 0, 0, [0, 2, 5, null]],
+            [2, "less", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 2 }], 0, 0, [2]],
+            [4, ["number", { value: 1 }], 0, 0, [2]],
+            [5, "newnote", 0, 0, [1, 6, 9, null]],
+            [6, "divide", 0, 0, [5, 7, 8]],
+            [7, ["number", { value: 1 }], 0, 0, [6]],
+            [8, ["number", { value: 4 }], 0, 0, [6]],
+            [9, "vspace", 0, 0, [5, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["solfege", { value: "sol" }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -1789,6 +2030,71 @@ describe("AST2BlockList Class", () => {
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
+    });
+
+    test("should keep microtonal note names as note names", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch("^C", 4);
+            await mouse.playPitch("vvD♭", 4);
+            await mouse.playPitch("^sol", 4);
+            await mouse.playPitch("E♯", 4);
+            await mouse.playPitch("C𝄪", 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["notename", { value: "^C" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 6, 7]],
+            [5, ["notename", { value: "vvD♭" }], 0, 0, [4]],
+            [6, ["number", { value: 4 }], 0, 0, [4]],
+            [7, "pitch", 0, 0, [4, 8, 9, 10]],
+            [8, ["solfege", { value: "^sol" }], 0, 0, [7]],
+            [9, ["number", { value: 4 }], 0, 0, [7]],
+            [10, "pitch", 0, 0, [7, 11, 12, 13]],
+            [11, ["notename", { value: "E♯" }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]],
+            [13, "pitch", 0, 0, [10, 14, 15, null]],
+            [14, ["notename", { value: "C𝄪" }], 0, 0, [13]],
+            [15, ["number", { value: 4 }], 0, 0, [13]]
+        ]);
+    });
+
+    test("should convert a pitch that isn't a note name literal", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch(pitch, 4);
+            await mouse.playPitch(box1 + 1, 4);
+            await mouse.playPitch(5, 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["namedbox", { value: "pitch" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 8, 9]],
+            [5, "plus", 0, 0, [4, 6, 7]],
+            [6, ["namedbox", { value: "box1" }], 0, 0, [5]],
+            [7, ["number", { value: 1 }], 0, 0, [5]],
+            [8, ["number", { value: 4 }], 0, 0, [4]],
+            [9, "vspace", 0, 0, [4, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ]);
     });
 
     test("should convert the current meter getter", () => {
@@ -2303,5 +2609,60 @@ describe("AST2BlockList Class", () => {
         const argBlock = blockList.find(b => b[0] === 2);
         expect(argBlock).toBeDefined();
         expect(argBlock[1]).toEqual(["number", { value: 1 }]);
+    });
+
+    test("should import playNoise and the value blocks that call a mouse method", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNoise("noise1");
+            var box1 = await mouse.getNotesPlayed(4);
+            var box2 = await mouse.numToPitch(5);
+            var box3 = await mouse.numToOctave(5);
+            var box4 = await mouse.getSynthVolume("piano");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "playnoise", 0, 0, [0, 2, 3]],
+            [2, ["noisename", { value: "noise1" }], 0, 0, [1]],
+            [3, ["storein2", { value: "box1" }], 0, 0, [1, 4, 6]],
+            [4, "elapsednotes2", 0, 0, [3, 5]],
+            [5, ["number", { value: 4 }], 0, 0, [4]],
+            [6, ["storein2", { value: "box2" }], 0, 0, [3, 7, 9]],
+            [7, "number2pitch", 0, 0, [6, 8]],
+            [8, ["number", { value: 5 }], 0, 0, [7]],
+            [9, ["storein2", { value: "box3" }], 0, 0, [6, 10, 12]],
+            [10, "number2octave", 0, 0, [9, 11]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["storein2", { value: "box4" }], 0, 0, [9, 13, null]],
+            [13, "synthvolumefactor", 0, 0, [12, 14]],
+            [14, ["text", { value: "piano" }], 0, 0, [13]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+    });
+
+    test("should still import the bare numToPitch and getSynthVolume calls older exports wrote", () => {
+        const code = `
+        new Mouse(async mouse => {
+            var box1 = numToPitch(5);
+            var box2 = getSynthVolume("piano");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList.map(block => block[1])).toEqual([
+            "start",
+            ["storein2", { value: "box1" }],
+            "number2pitch",
+            ["number", { value: 5 }],
+            ["storein2", { value: "box2" }],
+            "synthvolumefactor",
+            ["text", { value: "piano" }]
+        ]);
     });
 });

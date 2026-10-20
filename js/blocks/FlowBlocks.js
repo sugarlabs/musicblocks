@@ -1032,6 +1032,61 @@ function setupFlowBlocks(activity) {
         }
     }
 
+    // Blocks that run an action stack.
+    const ACTIONCALLS = [
+        "do",
+        "nameddo",
+        "doArg",
+        "nameddoArg",
+        "calc",
+        "namedcalc",
+        "calcArg",
+        "namedcalcArg"
+    ];
+
+    // Loops a Stop block breaks out of; it exits only the nearest one.
+    const LOOPS = ["forever", "repeat", "while", "until"];
+
+    /**
+     * Checks whether a Stop block can be reached from a stack, including
+     * through any action it calls. A forever that can stop is not infinite.
+     * A Stop inside a nested loop only exits that loop, but Stop mouse ends the
+     * whole turtle, so only Stop mouse counts inside nested loop bodies.
+     * @param {number} blk - The first block of the stack.
+     * @param {object} logo - The logo object.
+     * @returns {boolean} - True if a Stop or Stop mouse block is reachable.
+     */
+    const canReachStop = (blk, logo) => {
+        const blockList = activity.blocks.blockList;
+        const actions = logo.actions || {};
+        const stack = [[blk, false]];
+        const seen = new Set();
+        while (stack.length > 0) {
+            const [b, nested] = stack.pop();
+            const key = `${b}:${nested}`;
+            if (b === null || b === undefined || seen.has(key) || !blockList[b]) continue;
+            seen.add(key);
+            const block = blockList[b];
+            if (block.name === "stopTurtle" || (block.name === "break" && !nested)) return true;
+            if (ACTIONCALLS.includes(block.name)) {
+                const arg = blockList[block.connections[1]];
+                const name = block.name.startsWith("named")
+                    ? block.privateData
+                    : arg && arg.name === "text"
+                      ? arg.value
+                      : undefined;
+                // A computed action name could be any action.
+                const targets = name === undefined ? Object.values(actions) : [actions[name]];
+                stack.push(...targets.map(t => [t, nested]));
+            }
+            const next = block.connections.slice(1).map(c => [c, nested]);
+            // The body is the second-to-last connection; args still run first.
+            if (LOOPS.includes(block.name)) next[next.length - 2][1] = true;
+            stack.push(...next);
+        }
+        return false;
+    };
+
     /**
      * Represents a block for repeating a flow forever.
      * @extends {FlowClampBlock}
@@ -1076,7 +1131,22 @@ function setupFlowBlocks(activity) {
         flow(args, logo, turtle) {
             if (args.length !== 1) return;
 
-            return [args[0], activity.turtles.ithTurtle(turtle).singer.suppressOutput ? 20 : -1];
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            // Notate one pass as a repeat rather than unrolling the loop. Nothing
+            // queued after a forever ever runs, so drop it and end the voice here.
+            // A forever that can reach a Stop is unrolled as before.
+            if (
+                (logo.runningLilypond || logo.runningAbc || logo.runningMxml) &&
+                tur.singer.justCounting.length === 0 &&
+                !canReachStop(args[0], logo)
+            ) {
+                logo.notation.notationBeginRepeat(turtle);
+                tur.queue = [];
+                return [args[0], 1];
+            }
+
+            return [args[0], tur.singer.suppressOutput ? 20 : -1];
         }
     }
 

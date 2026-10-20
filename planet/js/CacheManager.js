@@ -40,6 +40,7 @@ class CacheManager {
         this.dbName = options.dbName || "MusicBlocksPlanetCache";
         this.dbVersion = 1;
         this.db = null;
+        this.initializationPromise = null;
 
         // Cache expiry times
         this.metadataExpiry = options.metadataExpiry || 24 * 60 * 60 * 1000; // 24 hours
@@ -53,6 +54,7 @@ class CacheManager {
             THUMBNAILS: "projectThumbnails"
         };
 
+        this.invalidatedMetadataIds = new Set();
         this.isInitialized = false;
     }
 
@@ -62,17 +64,36 @@ class CacheManager {
      */
     async init() {
         if (this.isInitialized) return true;
+        if (this.initializationPromise) return this.initializationPromise;
 
+        const initializationPromise = this._initialize();
+        this.initializationPromise = initializationPromise;
+        try {
+            return await initializationPromise;
+        } finally {
+            if (this.initializationPromise === initializationPromise) {
+                this.initializationPromise = null;
+            }
+        }
+    }
+
+    /**
+     * Opens the database and completes startup cleanup
+     * @private
+     * @returns {Promise<boolean>}
+     */
+    async _initialize() {
         try {
             this.db = await this._openDatabase();
-            this.isInitialized = true;
 
             // Clean up expired entries on init
             await this.clearExpired();
 
+            this.isInitialized = true;
             cacheDebugLog("[CacheManager] Initialized successfully");
             return true;
         } catch (error) {
+            this.close();
             console.error("[CacheManager] Initialization failed:", error);
             return false;
         }
@@ -139,9 +160,12 @@ class CacheManager {
      */
     async getMetadata(id) {
         if (!this.isInitialized) return null;
+        if (this.invalidatedMetadataIds.has(id)) return null;
 
         try {
             const data = await this._getFromStore(this.STORES.METADATA, id);
+
+            if (this.invalidatedMetadataIds.has(id)) return null;
 
             if (data && !this._isExpired(data.expiry)) {
                 // Update last accessed time
@@ -176,6 +200,9 @@ class CacheManager {
 
             await this._putToStore(this.STORES.METADATA, entry);
             await this._enforceMaxSize(this.STORES.METADATA);
+
+            this.invalidatedMetadataIds.delete(id);
+
             return true;
         } catch (error) {
             cacheDebugLog("[CacheManager] Error caching metadata:", error);
@@ -184,17 +211,51 @@ class CacheManager {
     }
 
     /**
+     * Deletes cached project metadata
+     * @param {string} id - Project ID
+     * @returns {Promise<boolean>}
+     */
+    async deleteMetadata(id) {
+        this.invalidatedMetadataIds.add(id);
+
+        if (!this.isInitialized) return false;
+
+        try {
+            await new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.STORES.METADATA], "readwrite");
+                const store = transaction.objectStore(this.STORES.METADATA);
+
+                store.delete(id);
+
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+
+            return true;
+        } catch (error) {
+            cacheDebugLog("[CacheManager] Error deleting metadata:", error);
+            return false;
+        }
+    }
+
+    /**
      * Gets full project data from cache
      * @param {string} id - Project ID
+     * @param {string} [expectedUpdatedAt] - Optional expected updatedAt version to validate against
      * @returns {Promise<Object|null>} - Cached project data or null
      */
-    async getProject(id) {
+    async getProject(id, expectedUpdatedAt) {
         if (!this.isInitialized) return null;
 
         try {
             const data = await this._getFromStore(this.STORES.PROJECTS, id);
 
             if (data && !this._isExpired(data.expiry)) {
+                if (expectedUpdatedAt !== undefined && expectedUpdatedAt !== null) {
+                    if (!data.updatedAt || data.updatedAt !== expectedUpdatedAt) {
+                        return null;
+                    }
+                }
                 await this._updateLastAccessed(this.STORES.PROJECTS, id);
                 return data.projectData;
             }
@@ -210,15 +271,17 @@ class CacheManager {
      * Caches full project data
      * @param {string} id - Project ID
      * @param {Object} projectData - Full project data
+     * @param {string} [updatedAt] - Optional updatedAt timestamp/version
      * @returns {Promise<boolean>}
      */
-    async cacheProject(id, projectData) {
+    async cacheProject(id, projectData, updatedAt) {
         if (!this.isInitialized) return false;
 
         try {
             const entry = {
                 id,
                 projectData,
+                updatedAt: updatedAt || null,
                 expiry: Date.now() + this.projectExpiry,
                 lastAccessed: Date.now(),
                 cachedAt: Date.now()
@@ -283,7 +346,7 @@ class CacheManager {
      * @returns {Promise<number>} - Number of entries cleared
      */
     async clearExpired() {
-        if (!this.isInitialized) return 0;
+        if (!this.db) return 0;
 
         let cleared = 0;
         const now = Date.now();

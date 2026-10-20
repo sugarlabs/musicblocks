@@ -22,6 +22,7 @@
 
 global._ = jest.fn(str => str);
 global.hideOnClickOutside = jest.fn();
+global.toggleExpandable = jest.fn();
 global.updateCheckboxes = jest.fn();
 global.ClipboardJS = jest.fn().mockImplementation(() => ({
     on: jest.fn(),
@@ -116,7 +117,7 @@ describe("GlobalCard", () => {
     describe("showToast", () => {
         it("should call SaveInterface.showToast with the message", () => {
             card.showToast("Test message");
-            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith("Test message");
+            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith("Test message", false);
         });
 
         it("should not throw when SaveInterface is not available", () => {
@@ -124,12 +125,9 @@ describe("GlobalCard", () => {
             expect(() => card.showToast("msg")).not.toThrow();
         });
 
-        it("should handle error toast styling", () => {
-            jest.useFakeTimers();
-            document.body.innerHTML = '<div class="toast">msg</div>';
+        it("should forward error flag to SaveInterface.showToast", () => {
             card.showToast("Error!", true);
-            jest.advanceTimersByTime(20);
-            jest.useRealTimers();
+            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalledWith("Error!", true);
         });
     });
 
@@ -224,6 +222,23 @@ describe("GlobalCard", () => {
             card.init("test-id-1");
             card.render();
             expect(global.ClipboardJS).toHaveBeenCalled();
+        });
+
+        it("should render advanced options toggle as a button without inline onclick and attach click listener", () => {
+            card.init("test-id-1");
+            card.render();
+
+            const toggleBtn = document.getElementById("global-advanced-toggle-test-id-1");
+            expect(toggleBtn).not.toBeNull();
+            expect(toggleBtn.tagName).toBe("BUTTON");
+            expect(toggleBtn.getAttribute("type")).toBe("button");
+            expect(toggleBtn.getAttribute("onclick")).toBeNull();
+
+            toggleBtn.click();
+            expect(global.toggleExpandable).toHaveBeenCalledWith(
+                "global-advanced-test-id-1",
+                "shareurl-advanced"
+            );
         });
     });
 

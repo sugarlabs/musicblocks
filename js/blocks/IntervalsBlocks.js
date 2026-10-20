@@ -14,7 +14,7 @@
 
    deepClone, last, _, ErrorHandler, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
-   Queue, INTERVALVALUES
+   Queue, INTERVALVALUES, saveMeterState, restoreMeterState
  */
 
 /*
@@ -27,6 +27,8 @@
     NOINPUTERRORMSG
    - js/turtle-singer.js
     Singer
+   - js/utils/musicutils-rhythm.js
+    saveMeterState, restoreMeterState
  */
 
 /* exported setupIntervalsBlocks */
@@ -449,15 +451,12 @@ function setupIntervalsBlocks(activity) {
 
             // Save the state of endOfClampSignals
             for (const b in tur.endOfClampSignals) {
-                tur.butNotThese[b] = [];
-
-                for (const i in tur.endOfClampSignals[b]) {
-                    tur.butNotThese[b].push(i);
-                }
+                tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
             }
 
             const actionArgs = [];
             const saveNoteCount = tur.singer.notesPlayed;
+            const saveMeter = saveMeterState(tur.singer);
 
             let distance = 0;
             tur.running = true;
@@ -475,6 +474,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             tur.singer.notesPlayed = saveNoteCount;
+            restoreMeterState(tur.singer, saveMeter);
 
             // Restore previous state
             logo.boxes = saveBoxes;
@@ -569,14 +569,12 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.push(true);
 
             for (const b in tur.endOfClampSignals) {
-                tur.butNotThese[b] = [];
-                for (const i in tur.endOfClampSignals[b]) {
-                    tur.butNotThese[b].push(i);
-                }
+                tur.butNotThese[b] = tur.endOfClampSignals[b].map((_, i) => i);
             }
 
             const actionArgs = [];
             const saveNoteCount = tur.singer.notesPlayed;
+            const saveMeter = saveMeterState(tur.singer);
             tur.running = true;
             let distance = 0;
             logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
@@ -596,6 +594,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             tur.singer.notesPlayed = saveNoteCount;
+            restoreMeterState(tur.singer, saveMeter);
 
             // Restore previous state
             logo.boxes = saveBoxes;

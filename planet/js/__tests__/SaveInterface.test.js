@@ -189,4 +189,33 @@ describe("SaveInterface", () => {
             expect(spyDownload.mock.calls[0][1]).toMatch(/^data:text\/plain/);
         });
     });
+
+    describe("showToast", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it("should render a toast element with text and remove after timeout", () => {
+            saveInterface.showToast("Test notification");
+            const toast = document.querySelector(".planet-toast");
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toBe("Test notification");
+            expect(toast.style.background).toBe("rgb(50, 50, 50)");
+
+            jest.advanceTimersByTime(3000);
+            expect(toast.parentNode).toBeNull();
+        });
+
+        it("should render an error toast with red background", () => {
+            saveInterface.showToast("Error occurred", true);
+            const toast = document.querySelector(".planet-toast");
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toBe("Error occurred");
+            expect(toast.style.background).toBe("rgb(211, 47, 47)");
+        });
+    });
 });

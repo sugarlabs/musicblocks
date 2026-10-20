@@ -799,7 +799,7 @@ describe("BlockDragController", () => {
         it("reinitializes an open widget window when a block is dragged out of its stack", async () => {
             const wftTitle = document.createElement("div");
             wftTitle.className = "wftTitle";
-            wftTitle.innerHTML = "tempo";
+            wftTitle.textContent = "tempo";
             document.body.appendChild(wftTitle);
 
             try {
@@ -840,7 +840,7 @@ describe("BlockDragController", () => {
             async title => {
                 const wftTitle = document.createElement("div");
                 wftTitle.className = "wftTitle";
-                wftTitle.innerHTML = title;
+                wftTitle.textContent = title;
                 document.body.appendChild(wftTitle);
 
                 try {
@@ -876,6 +876,45 @@ describe("BlockDragController", () => {
                 }
             }
         );
+
+        it("reinitializes an open widget when title element contains whitespace or formatting", async () => {
+            const wftTitle = document.createElement("div");
+            wftTitle.className = "wftTitle";
+            wftTitle.textContent = "  tempo \n ";
+            document.body.appendChild(wftTitle);
+
+            try {
+                const parent = makeFlowBlock({
+                    x: -500,
+                    y: -500,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, 1],
+                    name: "parent"
+                });
+                const moving = makeFlowBlock({
+                    x: 5000,
+                    y: 5000,
+                    docks: [[0, 0, "in"]],
+                    connections: [0],
+                    name: "moving"
+                });
+                moving.protoblock = { staticLabels: ["tempo"] };
+
+                const blocks = makeBlocks([parent, moving]);
+
+                await blocks.blockMoved(1);
+
+                expect(parent.connections[1]).toBeNull();
+                expect(moving.connections[0]).toBeNull();
+                expect(blocks.raiseStackToTop).toHaveBeenCalledWith(1);
+                expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+            } finally {
+                wftTitle.remove();
+            }
+        });
 
         it("removes the note block's default/silence placeholder when a new block is inserted", async () => {
             const target = makeFlowBlock({
@@ -1455,7 +1494,7 @@ describe("BlockDragController", () => {
         it("reinitializes an open widget window on a brand-new (not just override) connection", async () => {
             const wftTitle = document.createElement("div");
             wftTitle.className = "wftTitle";
-            wftTitle.innerHTML = "tempo";
+            wftTitle.textContent = "tempo";
             document.body.appendChild(wftTitle);
 
             try {
@@ -1494,7 +1533,7 @@ describe("BlockDragController", () => {
             async title => {
                 const wftTitle = document.createElement("div");
                 wftTitle.className = "wftTitle";
-                wftTitle.innerHTML = title;
+                wftTitle.textContent = title;
                 document.body.appendChild(wftTitle);
 
                 try {
@@ -1528,6 +1567,43 @@ describe("BlockDragController", () => {
                 }
             }
         );
+
+        it("reinitializes an open widget on a brand-new connection when title element contains whitespace or formatting", async () => {
+            const wftTitle = document.createElement("div");
+            wftTitle.className = "wftTitle";
+            wftTitle.textContent = "\n  tempo\t  ";
+            document.body.appendChild(wftTitle);
+
+            try {
+                const target = makeFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                });
+                const moving = makeFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                });
+                moving.protoblock = { staticLabels: ["tempo"] };
+
+                const blocks = makeBlocks([target, moving]);
+
+                await blocks.blockMoved(1);
+
+                expect(moving.connections[0]).toBe(0);
+                expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+            } finally {
+                wftTitle.remove();
+            }
+        });
 
         it("queues a parent's ARG/FLOW layout re-check based on getLayoutUpdateType after connecting an argument-like block", async () => {
             const target = makeFlowBlock({

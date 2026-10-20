@@ -755,9 +755,6 @@ class Activity {
         // setupWorkspaceLayoutController() installs the delegation stubs below:
         // findBlocks, setHomeContainers, repositionBlocks, _handleRepositionBlocksOnResize.
 
-        //if any window resize event occurs:
-        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
         // Sets up HelpController (js/activity/help-controller.js), which owns the help
         // window, about page, keyboard shortcuts dialog, statistics window,
         // JavaScript editor launch, and the Alt-H save-help-block workflow.
@@ -1860,8 +1857,6 @@ class Activity {
         const canvas = document.getElementById("myCanvas");
         const overCanvas = document.getElementById("canvas");
         const canvasHolder = document.getElementById("canvasHolder");
-        const defaultWidth = 1600;
-        const defaultHeight = 900;
 
         function handleResize() {
             // Skip resize when the tab is hidden to prevent 0×0 canvas
@@ -1869,34 +1864,30 @@ class Activity {
                 return;
             }
 
-            const isMaximized =
-                window.innerWidth === window.screen.width &&
-                window.innerHeight === window.screen.height;
-            if (isMaximized) {
-                container.style.width = defaultWidth + "px";
-                container.style.height = defaultHeight + "px";
-                canvas.width = defaultWidth;
-                canvas.height = defaultHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = defaultWidth;
-                canvasHolder.height = defaultHeight;
-            } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-
-                // Guard against zero or invalid dimensions
-                if (windowWidth <= 0 || windowHeight <= 0) {
-                    return;
-                }
-
-                container.style.width = windowWidth + "px";
-                container.style.height = windowHeight + "px";
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = canvas.width;
-                canvasHolder.height = canvas.height;
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+            const isAndroidWebkit =
+                (typeof platform !== "undefined" && platform.androidWebkit) ||
+                (typeof window !== "undefined" && window.platform && window.platform.androidWebkit);
+            if (isAndroidWebkit) {
+                windowWidth = window.outerWidth;
+                windowHeight = window.outerHeight;
             }
+
+            // Guard against zero or invalid dimensions
+            if (windowWidth <= 0 || windowHeight <= 0) {
+                return;
+            }
+
+            container.style.width = windowWidth + "px";
+            container.style.height = windowHeight + "px";
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+            overCanvas.width = canvas.width;
+            overCanvas.height = canvas.height;
+            canvasHolder.width = canvas.width;
+            canvasHolder.height = canvas.height;
+
             const hideContents = document.getElementById("hideContents");
             if (hideContents) {
                 hideContents.click();
@@ -1905,14 +1896,35 @@ class Activity {
         }
 
         let resizeTimeout;
+        let resizeAnimationFrame;
+
         this._handleWindowResize = () => {
+            if (!resizeAnimationFrame) {
+                const scheduleRaf =
+                    typeof requestAnimationFrame === "function"
+                        ? requestAnimationFrame
+                        : typeof window !== "undefined" &&
+                            typeof window.requestAnimationFrame === "function"
+                          ? window.requestAnimationFrame
+                          : null;
+
+                if (scheduleRaf) {
+                    resizeAnimationFrame = scheduleRaf(() => {
+                        if (typeof this._handleRepositionBlocksOnResize === "function") {
+                            this._handleRepositionBlocksOnResize();
+                        }
+                        resizeAnimationFrame = null;
+                    });
+                }
+            }
+
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
+                this._onResize(false);
                 this.setupPaletteMenu();
             }, 200);
         };
-        this.addEventListener(window, "resize", this._handleWindowResize);
         this._handleOrientationChangeResize = handleResize;
         this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
 
@@ -1994,7 +2006,7 @@ class Activity {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
-            for (const name in this.blocks.palettes.dict) {
+            for (const name of Object.keys(this.blocks.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2010,9 +2022,10 @@ class Activity {
             // which scans all blocks, so N moves × N blocks = O(N²).
             this.blocks._beginDeferCheckBounds();
 
-            for (const blk in this.blocks.blockList) {
+            for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
-                if (!myBlock) continue;
+                // Blocks already in the trash were recorded when they were trashed.
+                if (!myBlock || myBlock.trash) continue;
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -2030,11 +2043,13 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
 
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                    if (turtle !== null) {
                         const primaryTurtle = this.turtles.getTurtle(turtle);
 
                         primaryTurtle.inTrash = true;
-                        primaryTurtle.container.visible = false;
+                        if (primaryTurtle.container) {
+                            primaryTurtle.container.visible = false;
+                        }
 
                         const comp = primaryTurtle.companionTurtle;
 
@@ -2043,15 +2058,15 @@ class Activity {
 
                             if (companionTurtle) {
                                 companionTurtle.inTrash = true;
-                                companionTurtle.container.visible = false;
+                                if (companionTurtle.container) {
+                                    companionTurtle.container.visible = false;
+                                }
                             }
                         }
                     }
                 } else if (myBlock.name === "action") {
-                    if (!myBlock.trash) {
-                        this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
-                        actionBlockCounter += 1;
-                    }
+                    this.blocks.deleteActionBlock(myBlock);
+                    actionBlockCounter += 1;
                 }
 
                 this.blocks.blockList[blk].trash = true;
@@ -2196,7 +2211,7 @@ class Activity {
                 // Skip trashed blocks — they are hidden and their backing
                 // canvases are freed in sendStackToTrash(). Re-caching them
                 // here would waste ~0.5–2 MB per trashed block.
-                if (block.trash) return;
+                if (!block || block.trash) return;
 
                 if (block.container) {
                     block.container.uncache();
@@ -2508,7 +2523,7 @@ class Activity {
                 return;
             }
 
-            for (const name in this.palettes.dict) {
+            for (const name of Object.keys(this.palettes.dict)) {
                 this.palettes.dict[name].hideMenu(true);
             }
 
@@ -2666,6 +2681,7 @@ class Activity {
             const that = this;
 
             this.setupWindowBlurHandler(doHardStopButton);
+            this.setupResizeListeners();
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage, false, true);
@@ -3044,6 +3060,13 @@ class Activity {
         const end = window.__mbPerf.marks[endMark];
         if (typeof start !== "number" || typeof end !== "number") return;
         window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
+    }
+
+    /**
+     * Registers window resize listeners after dependency cleanup.
+     */
+    setupResizeListeners() {
+        this.addEventListener(window, "resize", this._handleWindowResize);
     }
 
     /**

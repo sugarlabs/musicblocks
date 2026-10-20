@@ -194,17 +194,7 @@ class HelpWidget {
             leftArrow.setAttribute("title", _("Previous"));
             leftArrow.setAttribute("aria-label", _("Previous"));
 
-            if (this._keydownHandler) {
-                document.removeEventListener("keydown", this._keydownHandler);
-            }
-            this._keydownHandler = event => {
-                if (event.key === "ArrowLeft") {
-                    leftArrow.click();
-                } else if (event.key === "ArrowRight") {
-                    rightArrow.click();
-                }
-            };
-            document.addEventListener("keydown", this._keydownHandler);
+            this._setupKeyHandler(leftArrow, rightArrow);
 
             let cell = docById("left-arrow");
             if (page === 0) {
@@ -306,42 +296,7 @@ class HelpWidget {
 
                     const bodyFragment = document.createDocumentFragment();
                     if (message.length > 1) {
-                        let path = message[1];
-                        // We need to add a case here whenever we add
-                        // help artwort support for a new language.
-                        // e.g., documentation-es
-                        let language = localStorage.languagePreference;
-                        if (language === undefined) {
-                            language = navigator.language;
-                        }
-
-                        switch (language) {
-                            case "ja":
-                                if (localStorage.kanaPreference === "kana") {
-                                    path = path + "-kana";
-                                } else {
-                                    path = path + "-ja";
-                                }
-                                break;
-                            case "es":
-                                path = path + "-es";
-                                break;
-                            case "pt":
-                                path = path + "-pt";
-                                break;
-                            default:
-                                break;
-                        }
-
-                        // body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
-                        const imageSrc = `Docs/${path}/${name}_block.svg`;
-                        const figure = document.createElement("figure");
-                        figure.classList.add("blockImage-wrapper");
-                        const img = document.createElement("img");
-                        img.classList.add("blockImage");
-                        img.src = imageSrc;
-                        figure.append(img);
-                        bodyFragment.append(figure);
+                        bodyFragment.append(this._makeBlockImageFigure(message[1], name));
                     }
 
                     const messageParagraph = document.createElement("p");
@@ -445,6 +400,79 @@ class HelpWidget {
     }
 
     /**
+     * Set up keyboard event handling for tour page navigation
+     * @private
+     * @param {HTMLElement} leftArrow
+     * @param {HTMLElement} rightArrow
+     * @returns {void}
+     */
+    _setupKeyHandler(leftArrow, rightArrow) {
+        if (this._keydownHandler) {
+            document.removeEventListener("keydown", this._keydownHandler);
+            this._keydownHandler = null;
+        }
+
+        if (this._standaloneBlockHelp) {
+            return;
+        }
+
+        const handleButtonKey = event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                event.currentTarget.click();
+            }
+        };
+
+        if (leftArrow) {
+            leftArrow.onkeydown = handleButtonKey;
+        }
+        if (rightArrow) {
+            rightArrow.onkeydown = handleButtonKey;
+        }
+
+        this._keydownHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== this.widgetWindow
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.tagName === "SELECT" ||
+                    activeElement.isContentEditable ||
+                    activeElement.getAttribute("contenteditable") === "true")
+            ) {
+                return;
+            }
+
+            if (
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.activeBlock !== null &&
+                this.activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            if (event.key === "ArrowLeft" && leftArrow) {
+                event.preventDefault();
+                leftArrow.click();
+            } else if (event.key === "ArrowRight" && rightArrow) {
+                event.preventDefault();
+                rightArrow.click();
+            }
+        };
+
+        document.addEventListener("keydown", this._keydownHandler);
+    }
+
+    /**
      * @private
      * @param {number} page
      * @returns {void}
@@ -463,7 +491,12 @@ class HelpWidget {
         const imageSrc = typeof image === "function" ? image() : image;
 
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
+        rightArrow.setAttribute(
+            "aria-disabled",
+            page === HELPCONTENT.length - 1 ? "true" : "false"
+        );
         leftArrow.classList.toggle("disabled", page === 0);
+        leftArrow.setAttribute("aria-disabled", page === 0 ? "true" : "false");
 
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
@@ -670,6 +703,67 @@ class HelpWidget {
         this.appendedBlockList = [blockName];
         this.index = 0;
         this._blockHelp(block);
+    }
+
+    /**
+     * Folder of block help artwork for the current language, e.g.
+     * "documentation-es". Languages without their own artwork use the
+     * folder from the help string.
+     * @private
+     * @param {string} path - folder from the help string, e.g. "documentation"
+     * @returns {string}
+     */
+    _localizedHelpPath(path) {
+        // We need to add a case here whenever we add help artwork
+        // support for a new language.
+        let language = localStorage.languagePreference;
+        if (language === undefined) {
+            // The browser gives a regional locale such as "pt-BR" or "ja-JP".
+            language = (navigator.language || "").split("-")[0];
+        }
+
+        switch (language) {
+            case "ja":
+                return localStorage.kanaPreference === "kana" ? path + "-kana" : path + "-ja";
+            case "es":
+                return path + "-es";
+            case "pt":
+                return path + "-pt";
+            default:
+                return path;
+        }
+    }
+
+    /**
+     * Figure with the help artwork of a block. Not every language has
+     * artwork for every block, so a missing localized image falls back to
+     * the one in the help string's folder, and the figure is removed if
+     * that is missing too, instead of showing a broken image.
+     * @private
+     * @param {string} path - folder from the help string, e.g. "documentation"
+     * @param {string} name - block name
+     * @returns {HTMLElement}
+     */
+    _makeBlockImageFigure(path, name) {
+        const figure = document.createElement("figure");
+        figure.classList.add("blockImage-wrapper");
+        const img = document.createElement("img");
+        img.classList.add("blockImage");
+
+        const defaultSrc = `Docs/${path}/${name}_block.svg`;
+        const localizedSrc = `Docs/${this._localizedHelpPath(path)}/${name}_block.svg`;
+        img.onerror = () => {
+            if (img.getAttribute("src") !== defaultSrc) {
+                img.src = defaultSrc;
+            } else {
+                img.onerror = null;
+                figure.remove();
+            }
+        };
+        img.src = localizedSrc;
+
+        figure.append(img);
+        return figure;
     }
 
     /**
@@ -880,17 +974,7 @@ class HelpWidget {
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
 
-        if (this._keydownHandler) {
-            document.removeEventListener("keydown", this._keydownHandler);
-        }
-        this._keydownHandler = event => {
-            if (event.key === "ArrowLeft") {
-                leftArrow.click();
-            } else if (event.key === "ArrowRight") {
-                rightArrow.click();
-            }
-        };
-        document.addEventListener("keydown", this._keydownHandler);
+        this._setupKeyHandler(leftArrow, rightArrow);
 
         if (this._standaloneBlockHelp) {
             rightArrow.style.display = "none";
@@ -899,6 +983,9 @@ class HelpWidget {
             leftArrow.classList.remove("hover");
         } else if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
+            rightArrow.setAttribute("aria-disabled", "true");
+        } else {
+            rightArrow.setAttribute("aria-disabled", "false");
         }
         cell.onclick = () => {
             if (this._standaloneBlockHelp) return;
@@ -963,41 +1050,7 @@ class HelpWidget {
             if (message) {
                 const bodyFragment = document.createDocumentFragment();
                 if (message.length > 1) {
-                    let path = message[1];
-                    // We need to add a case here whenever we add
-                    // help artwort support for a new language.
-                    // e.g., documentation-es
-                    let language = localStorage.languagePreference;
-                    if (language === undefined) {
-                        language = navigator.language;
-                    }
-
-                    switch (language) {
-                        case "ja":
-                            if (localStorage.kanaPreference === "kana") {
-                                path = path + "-kana";
-                            } else {
-                                path = path + "-ja";
-                            }
-                            break;
-                        case "es":
-                            path = path + "-es";
-                            break;
-                        case "pt":
-                            path = path + "-pt";
-                            break;
-                        default:
-                            break;
-                    }
-
-                    const imageSrc = `Docs/documentation/${name}_block.svg`;
-                    const figure = document.createElement("figure");
-                    figure.classList.add("blockImage-wrapper");
-                    const img = document.createElement("img");
-                    img.classList.add("blockImage");
-                    img.src = imageSrc;
-                    figure.append(img);
-                    bodyFragment.append(figure);
+                    bodyFragment.append(this._makeBlockImageFigure(message[1], name));
                 }
 
                 const messageParagraph = document.createElement("p");

@@ -42,6 +42,7 @@ describe("setupVolumeActions", () => {
 
         global.instruments = {
             0: {
+                default: { connect: jest.fn() },
                 synth1: { connect: jest.fn() },
                 piano: { connect: jest.fn() }
             }
@@ -417,6 +418,19 @@ describe("setupVolumeActions", () => {
             }
         });
 
+        it("should return early without processing if volume is NaN or Infinity", () => {
+            targetTurtle.singer.synthVolume = { default: [50] };
+
+            Singer.VolumeActions.setRelativeVolume(NaN, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+
+            Singer.VolumeActions.setRelativeVolume(Infinity, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+
+            Singer.VolumeActions.setRelativeVolume(-Infinity, 0, 1);
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(50);
+        });
+
         it("should call notationBeginArticulation when justCounting is empty", () => {
             Singer.VolumeActions.setRelativeVolume(20, 0, 1);
 
@@ -600,14 +614,45 @@ describe("setupVolumeActions", () => {
             expect(inst2.pan.value).toBe(-1);
         });
 
-        it("should connect all instruments to the panner", () => {
+        it("should not connect instruments beside their current route", () => {
             const connectSpy = jest.spyOn(instruments[0].synth1, "connect");
             const connectSpyPiano = jest.spyOn(instruments[0].piano, "connect");
 
-            Singer.VolumeActions.setPanning(50, 0);
+            Singer.VolumeActions.setPanning(-100, 0);
 
-            expect(connectSpy).toHaveBeenCalledWith(targetTurtle.singer.panner);
-            expect(connectSpyPiano).toHaveBeenCalledWith(targetTurtle.singer.panner);
+            expect(connectSpy).not.toHaveBeenCalled();
+            expect(connectSpyPiano).not.toHaveBeenCalled();
+        });
+
+        it("should fallback to center (0) when panning value is NaN or non-numeric", () => {
+            targetTurtle.singer.panner = new Tone.Panner(0.5);
+
+            Singer.VolumeActions.setPanning(NaN, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(0);
+
+            Singer.VolumeActions.setPanning(undefined, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(0);
+
+            Singer.VolumeActions.setPanning("invalid", 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(0);
+        });
+
+        it("should create centered panner when value is NaN and no panner exists", () => {
+            targetTurtle.singer.panner = null;
+            Tone.Panner.mockClear();
+
+            Singer.VolumeActions.setPanning(NaN, 0);
+            expect(Tone.Panner).toHaveBeenCalledWith(0);
+        });
+
+        it("should clamp infinite panning values to [-1, 1]", () => {
+            targetTurtle.singer.panner = new Tone.Panner(0);
+
+            Singer.VolumeActions.setPanning(Infinity, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(1);
+
+            Singer.VolumeActions.setPanning(-Infinity, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(-1);
         });
     });
 
@@ -733,13 +778,36 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
         });
 
-        it("should load synth when not in instrumentNames", () => {
+        it("loads a synth the turtle doesn't have yet", () => {
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+
+            expect(loadSynthSpy).toHaveBeenCalledWith(0, "violin");
+        });
+
+        it("does not reload a synth the turtle already has", () => {
             targetTurtle.singer.instrumentNames = ["default"];
 
             Singer.VolumeActions.setSynthVolume("piano", 70, 0, "testBlock");
 
-            expect(targetTurtle.singer.instrumentNames).toContain("piano");
-            expect(loadSynthSpy).toHaveBeenCalledWith(0, "piano");
+            expect(loadSynthSpy).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.synthVolume.piano).toContain(70);
+        });
+
+        it("does not make the volume target the current instrument", () => {
+            targetTurtle.singer.instrumentNames = ["default"];
+
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+            Singer.VolumeActions.setSynthVolume("Kick", 50, 0, "testBlock");
+
+            expect(targetTurtle.singer.instrumentNames).toEqual(["default"]);
+        });
+
+        it("leaves the instrument set by an enclosing set instrument on top", () => {
+            targetTurtle.singer.instrumentNames = ["default", "piano"];
+
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+
+            expect(last(targetTurtle.singer.instrumentNames)).toBe("piano");
         });
 
         it("should initialize synthVolume and crescendoInitialVolume when undefined", () => {
@@ -765,7 +833,7 @@ describe("setupVolumeActions", () => {
             ).not.toThrow();
 
             expect(targetTurtle.singer.synthVolume.violin).toEqual([DEFAULTVOLUME, 70]);
-            expect(loadSynthSpy).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["default", "violin"]);
         });
 
         it("does not reset an already-tracked synth volume when the instrument is newly added", () => {
@@ -807,6 +875,14 @@ describe("setupVolumeActions", () => {
                 null,
                 false
             );
+        });
+
+        it("should trigger tone with resolved synth when firstConnection and lastConnection are null", () => {
+            Singer.VolumeActions.setSynthVolume("Piano", 70, 0, null);
+
+            jest.advanceTimersByTime(250);
+
+            expect(triggerSpy).toHaveBeenCalledWith(0, "G4", 1 / 4, "piano", null, null, false);
         });
 
         it("should not trigger tone when connections exist", () => {

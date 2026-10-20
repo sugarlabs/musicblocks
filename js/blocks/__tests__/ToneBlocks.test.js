@@ -140,6 +140,8 @@ const createMockActivity = () => {
                             chorusRate: [],
                             delayTime: [],
                             chorusDepth: [],
+                            vibratoIntensity: [],
+                            vibratoRate: [],
                             instrumentNames: [],
                             voices: []
                         }
@@ -172,6 +174,8 @@ const createMockLogo = (opts = {}) => {
             phaserParams: [],
             chorusEffect: [],
             chorusParams: [],
+            vibratoEffect: [],
+            vibratoParams: [],
             instrumentName: "testInstrument",
             synthVals: undefined
         },
@@ -372,7 +376,7 @@ describe("setupToneBlocks", () => {
             expect(logo.timbre.distortionParams).toContain(0.5 * 100);
             expect(
                 global.instrumentsEffects[turtle][logo.timbre.instrumentName].distortionAmount
-            ).toEqual(40);
+            ).toEqual(0.5);
             expect(ret).toEqual([1, 1]);
         });
     });
@@ -399,7 +403,7 @@ describe("setupToneBlocks", () => {
             ).toEqual(10);
             expect(
                 global.instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloDepth
-            ).toEqual(50);
+            ).toEqual(0.7);
             expect(ret).toEqual([99, 1]);
         });
     });
@@ -458,6 +462,9 @@ describe("setupToneBlocks", () => {
             expect(logo.timbre.chorusParams).toContain(1.5);
             expect(logo.timbre.chorusParams).toContain(3.5);
             expect(logo.timbre.chorusParams).toContain(0.7 * 100);
+            expect(
+                global.instrumentsEffects[turtle][logo.timbre.instrumentName].chorusDepth
+            ).toEqual(0.7);
             expect(ret).toEqual([77, 1]);
         });
     });
@@ -468,6 +475,36 @@ describe("setupToneBlocks", () => {
             const args = [5, 1 / 16, 33];
             const ret = vibrato.flow(args, logo, 0, "vibratoBlk");
             expect(Singer.ToneActions.doVibrato).toHaveBeenCalledWith(5, 1 / 16, 0, "vibratoBlk");
+            expect(ret).toEqual([33, 1]);
+        });
+
+        it("should call doVibrato and update vibrato effect if in timbre", () => {
+            const vibrato = getBlock("vibrato");
+            const args = [5, 1 / 16, 33];
+            const turtle = 0;
+            const tur = activity.turtles.ithTurtle(turtle);
+            tur.singer.vibratoIntensity = [0.05];
+            tur.singer.vibratoRate = [16];
+            logo.inTimbre = true;
+            const ret = vibrato.flow(args, logo, turtle, "vibratoBlk");
+            expect(Singer.ToneActions.doVibrato).toHaveBeenCalledWith(
+                5,
+                1 / 16,
+                turtle,
+                "vibratoBlk"
+            );
+            expect(
+                global.instrumentsEffects[turtle][logo.timbre.instrumentName].vibratoActive
+            ).toBe(true);
+            expect(logo.timbre.vibratoEffect).toContain("vibratoBlk");
+            expect(logo.timbre.vibratoParams).toContain(0.05 * 100);
+            expect(logo.timbre.vibratoParams).toContain(16);
+            expect(
+                global.instrumentsEffects[turtle][logo.timbre.instrumentName].vibratoIntensity
+            ).toEqual(0.05);
+            expect(
+                global.instrumentsEffects[turtle][logo.timbre.instrumentName].vibratoRate
+            ).toEqual(16);
             expect(ret).toEqual([33, 1]);
         });
     });

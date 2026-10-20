@@ -438,6 +438,48 @@ describe("Meter Widget", () => {
         }
     });
 
+    test("Reset keeps the entered beat count and beat note value instead of collapsing them to 1", () => {
+        mockActivity.logo._meterBlock = 1;
+        mockActivity.blocks.blockList = {
+            1: { connections: [null, 2, 3], value: 4 },
+            2: { connections: [null, null, 4], value: 4 },
+            3: { connections: [1, 5, 6], value: 1 / 4 },
+            4: {
+                value: 4,
+                text: { text: "" },
+                container: { children: [], setChildIndex: jest.fn() }
+            },
+            5: {
+                value: 1,
+                text: { text: "" },
+                container: { children: [], setChildIndex: jest.fn() }
+            },
+            6: {
+                value: 4,
+                text: { text: "" },
+                container: { children: [], setChildIndex: jest.fn() }
+            }
+        };
+
+        new MeterWidget(mockActivity, 1);
+
+        const toolbar = window.widgetWindows.windowFor()._toolbar;
+        const [beatInput, noteInput] = toolbar.appendChild.mock.calls
+            .slice(-2)
+            .map(call => call[0].children[0]);
+
+        const resetButton = mockAddButton.mock.results
+            .filter(res => res.value && res.value.tip === "Reset")
+            .pop().value;
+
+        beatInput.value = "7";
+        noteInput.value = "8";
+        resetButton.onclick();
+
+        expect(beatInput.value).toBe("7");
+        expect(noteInput.value).toBe("8");
+    });
+
     test("handles window onclose callback", () => {
         const widget = new MeterWidget(mockActivity, 1);
         if (widget.widgetWindow && widget.widgetWindow.onclose) {
@@ -502,6 +544,127 @@ describe("Meter Widget", () => {
         jest.useRealTimers();
     });
 
+    describe("Drum Playback and Beat Distinction", () => {
+        test("plays snare drum for strong beat and kick drum for weak beat", () => {
+            meterWidget._playing = true;
+            meterWidget._strongBeats = [true, false];
+
+            meterWidget.__playOneBeat(0, 500);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "snare drum",
+                null,
+                null
+            );
+
+            mockActivity.logo.synth.trigger.mockClear();
+
+            meterWidget.__playOneBeat(1, 500);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "kick drum",
+                null,
+                null
+            );
+
+            const widgetWindow = window.widgetWindows.windowFor();
+            widgetWindow.onclose();
+            expect(meterWidget._playing).toBe(false);
+            expect(meterWidget._playBeatTimeout).toBeNull();
+        });
+    });
+
+    describe("Block Export with _save()", () => {
+        test("generates onbeatdo block stack and calls loadNewBlocks", () => {
+            meterWidget._strongBeats = [true, false, true, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith(expect.any(Array));
+            const generatedStack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(generatedStack.length).toBe(6);
+            expect(generatedStack).toEqual([
+                [0, "onbeatdo", 100, 100, [null, 1, 2, 3]],
+                [1, ["number", { value: 1 }], 0, 0, [0]],
+                [2, ["text", { value: "action" }], 0, 0, [0]],
+                [3, "onbeatdo", 0, 0, [0, 4, 5, null]],
+                [4, ["number", { value: 3 }], 0, 0, [3]],
+                [5, ["text", { value: "action" }], 0, 0, [3]]
+            ]);
+        });
+
+        test("exports single onbeatdo block stack when only one beat is strong", () => {
+            meterWidget._strongBeats = [true, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith([
+                [0, "onbeatdo", 100, 100, [null, 1, 2, null]],
+                [1, ["number", { value: 1 }], 0, 0, [0]],
+                [2, ["text", { value: "action" }], 0, 0, [0]]
+            ]);
+        });
+
+        test("exports empty stack when no beats are strong", () => {
+            meterWidget._strongBeats = [false, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith([]);
+        });
+    });
+
+    describe("Scaling and Timeout Helpers", () => {
+        test("scales SVG element when window is maximized", () => {
+            const mockSvg = {
+                style: {},
+                setAttribute: jest.fn()
+            };
+            const mockFrame = { offsetHeight: 600 };
+            const mockDrag = { offsetHeight: 100 };
+
+            meterWidget.getWidgetFrame = jest.fn().mockReturnValue(mockFrame);
+            meterWidget.getDragElement = jest.fn().mockReturnValue(mockDrag);
+            meterWidget.getWidgetBody = jest.fn().mockReturnValue({
+                getElementsByTagName: jest.fn().mockReturnValue([mockSvg])
+            });
+            meterWidget.isMaximized = jest.fn().mockReturnValue(true);
+
+            meterWidget._scale();
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", "500px");
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", "500px");
+        });
+
+        test("clears and sets widget timeout correctly", () => {
+            jest.useFakeTimers();
+            try {
+                const callback1 = jest.fn();
+                const timerId1 = meterWidget._setWidgetTimeout(callback1, 100);
+
+                expect(timerId1).toBeDefined();
+                expect(callback1).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(99);
+                expect(callback1).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(1);
+                expect(callback1).toHaveBeenCalledTimes(1);
+
+                const callback2 = jest.fn();
+                const timerId2 = meterWidget._setWidgetTimeout(callback2, 100);
+
+                expect(meterWidget._clearWidgetTimeout(timerId2)).toBe(true);
+                jest.advanceTimersByTime(100);
+                expect(callback2).not.toHaveBeenCalled();
+
+                expect(meterWidget._clearWidgetTimeout(null)).toBe(false);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+    });
+
     test("creates inputs with distinct IDs and accessible labels", () => {
         const widgetWindow = window.widgetWindows.windowFor();
         const toolbarCalls = widgetWindow._toolbar.appendChild.mock.calls;
@@ -516,5 +679,73 @@ describe("Meter Widget", () => {
         expect(beatValueInput).toBeDefined();
         expect(beatCountInput.getAttribute("aria-label")).toBe("Number of beats");
         expect(beatValueInput.getAttribute("aria-label")).toBe("Beat note value");
+    });
+
+    describe("the tempo the beats are played at (#9321)", () => {
+        let turtles;
+
+        // Turtle 0 is a trashed turtle of a project loaded before; turtle 1 ran the block
+        // after setting 120 BPM. Like Turtles.getTurtle, which throws for a missing turtle.
+        beforeEach(() => {
+            turtles = [{ singer: { bpm: [] } }, { singer: { bpm: [120] } }];
+            // A meter of 1/4 beats (the shared mock gives a placeholder string).
+            mockBlockList[3].value = 1 / 4;
+            mockActivity.turtles.ithTurtle = jest.fn(i => {
+                if (!turtles[i]) throw new Error(`Turtle ${i} not found`);
+                return turtles[i];
+            });
+        });
+
+        const beatInterval = widget => {
+            const playOneBeat = jest.spyOn(widget, "__playOneBeat").mockImplementation(() => {});
+            widget._playBeat();
+            return playOneBeat.mock.calls[0][1];
+        };
+
+        test("plays at the tempo of the turtle that ran the block, not turtle 0", () => {
+            const widget = new MeterWidget(mockActivity, 1, 1);
+
+            // TONEBPM / 120 BPM * 1000 ms * 1/4
+            expect(beatInterval(widget)).toBe((global.TONEBPM / 120) * 1000 * 0.25);
+        });
+
+        test("keeps that turtle when an earlier turtle is removed", () => {
+            const widget = new MeterWidget(mockActivity, 1, 1);
+            // Turtles.removeTurtle splices the list, so turtle 1 is now at index 0.
+            turtles.splice(0, 1);
+
+            expect(beatInterval(widget)).toBe((global.TONEBPM / 120) * 1000 * 0.25);
+        });
+
+        test("uses the latest tempo the turtle set", () => {
+            turtles[1].singer.bpm = [120, 90];
+            const widget = new MeterWidget(mockActivity, 1, 1);
+
+            expect(beatInterval(widget)).toBe((global.TONEBPM / 90) * 1000 * 0.25);
+        });
+
+        test("uses the master tempo when the turtle hasn't set one", () => {
+            const widget = new MeterWidget(mockActivity, 1, 0);
+
+            expect(beatInterval(widget)).toBe(
+                (global.TONEBPM / global.Singer.masterBPM) * 1000 * 0.25
+            );
+        });
+
+        test("uses the master tempo when it isn't told which turtle ran it", () => {
+            const widget = new MeterWidget(mockActivity, 1);
+
+            expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            expect(beatInterval(widget)).toBe(
+                (global.TONEBPM / global.Singer.masterBPM) * 1000 * 0.25
+            );
+        });
+
+        test("scales the interval with the meter's beat value", () => {
+            const widget = new MeterWidget(mockActivity, 1, 1);
+            widget._beatValue = 1 / 8;
+
+            expect(beatInterval(widget)).toBe((global.TONEBPM / 120) * 1000 * 0.125);
+        });
     });
 });

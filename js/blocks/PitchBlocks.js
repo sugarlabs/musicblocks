@@ -249,6 +249,14 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
             super("deltapitch2", _("scalar change in pitch"));
+            this.setHelpString([
+                _(
+                    "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played."
+                ),
+                "documentation",
+                null,
+                "deltapitch2help"
+            ]);
         }
     }
 
@@ -1674,6 +1682,24 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+            } else if (logo.inPitchDrumMatrix) {
+                // The widget's rows are notes, so use the nearest note and octave. The pitch
+                // path would add the cents as semitones.
+                const note = obj;
+                if (tur.singer.drumStyle.length > 0) {
+                    logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    logo.pitchDrumMatrix.addColBlock(blk);
+                } else {
+                    logo.pitchDrumMatrix.addRowBlock(blk);
+                    if (!logo.pitchBlocks.includes(blk)) {
+                        logo.pitchBlocks.push(blk);
+                    }
+
+                    logo.pitchDrumMatrix.rowLabels.push(note[0]);
+                    logo.pitchDrumMatrix.rowArgs.push(note[1]);
+                    tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                    tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                }
             } else if (logo.inLegoWidget) {
                 logo.legoWidget.addRowBlock(blk);
                 if (!logo.pitchBlocks.includes(blk)) {
@@ -1694,36 +1720,8 @@ function setupPitchBlocks(activity) {
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inPitchStaircase) {
-                const frequency = arg;
                 const note = obj;
-                let flag = 0;
-
-                for (let i = 0; i < logo.pitchStaircase.Stairs.length; i++) {
-                    if (logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        logo.pitchStaircase.Stairs.splice(i, 0, [
-                            note[0],
-                            note[1],
-                            parseFloat(frequency)
-                        ]);
-                        flag = 1;
-                        return;
-                    }
-                    if (logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        logo.pitchStaircase.Stairs.splice(i, 1, [
-                            note[0],
-                            note[1],
-                            parseFloat(frequency)
-                        ]);
-                        flag = 1;
-                        return;
-                    }
-                }
-
-                if (flag === 0) {
-                    logo.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
-                }
-
-                logo.pitchStaircase.stairPitchBlocks.push(blk);
+                logo.pitchStaircase.addStair(note[0], note[1], parseFloat(arg), blk);
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequencies.push(args[0]);
             } else {

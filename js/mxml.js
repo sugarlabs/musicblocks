@@ -36,6 +36,49 @@ const DIVISIONS_EPSILON = 1e-6;
 // constant alone could represent.
 const DIVISIONS_PER_WHOLE_NOTE = 32;
 
+// The <type> name MusicXML gives each note-value denominator.
+const MXML_NOTE_TYPES = new Map([
+    [1, "whole"],
+    [2, "half"],
+    [4, "quarter"],
+    [8, "eighth"],
+    [16, "16th"],
+    [32, "32nd"],
+    [64, "64th"],
+    [128, "128th"],
+    [256, "256th"]
+]);
+
+// The <mode> value MusicXML defines for each mode this exporter can name. Restricted to
+// the ones the element actually carries, the same set js/activity/mxml-parser.js reads back;
+// a mode outside it (pentatonic, blues, whole tone) is written without a <mode> at all.
+const _MXML_MODE_NAMES = new Map([
+    ["major", "major"],
+    ["ionian", "major"],
+    ["lydian", "lydian"],
+    ["mixolydian", "mixolydian"],
+    ["dorian", "dorian"],
+    ["minor", "minor"],
+    ["m", "minor"],
+    ["aeolian", "minor"],
+    ["natural minor", "minor"],
+    ["phrygian", "phrygian"],
+    ["locrian", "locrian"]
+]);
+
+const _keyMode = mode =>
+    _MXML_MODE_NAMES.get(
+        String(mode ?? "")
+            .toLowerCase()
+            .trim()
+    ) ?? null;
+
+// The <mode> element for a mode MusicXML can name, or nothing for one it cannot.
+const _modeElement = mode => {
+    const name = _keyMode(mode);
+    return name === null ? "" : ` <mode>${name}</mode>`;
+};
+
 /**
  * Converts a LilyPond duration, the form notation.js stages pickups and tempo beats in
  * (convertFactor() in js/utils/musicutils.js), to a length in whole notes.
@@ -112,12 +155,29 @@ const _tupletNotesRatio = (tupletRatio, roundDown) => {
  */
 const _resolveDivisionsPerWholeNote = notes => {
     let scaleFactor = 1;
+    let perWholeNote = DIVISIONS_PER_WHOLE_NOTE;
     for (const entry of notes) {
-        if (!Array.isArray(entry) || !Array.isArray(entry[MXML_TUPLETVALUE])) continue;
-        const { actualNotes } = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
-        scaleFactor = _lcm(scaleFactor, actualNotes);
+        if (!Array.isArray(entry)) continue;
+
+        if (Array.isArray(entry[MXML_TUPLETVALUE])) {
+            const { actualNotes } = _tupletNotesRatio(
+                entry[MXML_TUPLETVALUE],
+                entry[MXML_ROUNDDOWN]
+            );
+            scaleFactor = _lcm(scaleFactor, actualNotes);
+            continue;
+        }
+
+        // A note of 1/v carrying d dots is (D / v) * (2 - 2^-d) divisions, so the
+        // grid has to be a multiple of v * 2^d for that to land on a whole number.
+        // At the base of 32 a sixty-fourth note comes out as 0.5.
+        const noteValue = Number(entry[1]);
+        const dots = Number(entry[2]);
+        if (Number.isInteger(noteValue) && noteValue > 0 && Number.isInteger(dots) && dots >= 0) {
+            perWholeNote = _lcm(perWholeNote, noteValue * 2 ** dots);
+        }
     }
-    return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
+    return perWholeNote * scaleFactor;
 };
 
 const _musicXmlPitch = note => {
@@ -134,6 +194,97 @@ const _musicXmlPitch = note => {
     }
 
     return { step: match[1], alter, octave: match[3] ?? "4" };
+};
+
+// Sharps in the signature of each major key, going round the circle of fifths.
+const _MAJOR_FIFTHS = new Map([
+    ["C", 0],
+    ["G", 1],
+    ["D", 2],
+    ["A", 3],
+    ["E", 4],
+    ["B", 5],
+    ["F#", 6],
+    ["C#", 7],
+    ["F", -1],
+    ["Bb", -2],
+    ["Eb", -3],
+    ["Ab", -4],
+    ["Db", -5],
+    ["Gb", -6],
+    ["Cb", -7],
+    // No one writes a major key on these, but the modes below them are ordinary:
+    // G# minor carries five sharps, A# minor seven, Fb lydian seven flats. The
+    // range check at the end throws out the majors again.
+    ["G#", 8],
+    ["D#", 9],
+    ["A#", 10],
+    ["Fb", -8]
+]);
+
+// How far each mode sits from the major key on the same tonic.
+// Modes with no standard key signature (e.g. whole tone, chromatic) are
+// omitted so _keyFifths returns null and the caller leaves the score where it was.
+const _MODE_FIFTHS = new Map([
+    // Diatonic modes
+    ["major", 0],
+    ["ionian", 0],
+    ["lydian", 1],
+    ["mixolydian", -1],
+    ["dorian", -2],
+    ["minor", -3],
+    ["m", -3],
+    ["aeolian", -3],
+    ["natural minor", -3],
+    ["phrygian", -4],
+    ["locrian", -5],
+
+    // Minor variants that share the natural-minor key signature
+    ["harmonic minor", -3],
+    ["melodic minor", -3],
+    ["jazz minor", -3],
+
+    // Pentatonics: nearest diatonic relative
+    ["major pentatonic", 0],
+    ["minor pentatonic", -3],
+    ["minyo", -3], // Japanese minyo — alias of minor pentatonic
+    ["chinese", 0], // Major pentatonic variant
+    ["egyptian", 0],
+    ["hirajoshi", -3],
+    ["in", -3], // Japanese in scale
+
+    // Blues
+    ["major blues", 0],
+    ["minor blues", -3]
+]);
+
+/**
+ * The number for a MusicXML <fifths> element: how many sharps, or how many flats
+ * as a negative, the key signature carries.
+ * @param {string} key - the tonic, e.g. "G" or "B♭".
+ * @param {string} mode - e.g. "major", "dorian".
+ * @returns {number|null} null when the mode has no signature of its own, so the
+ *   caller can leave the score where it was.
+ */
+const _keyFifths = (key, mode) => {
+    const tonic = String(key ?? "")
+        .trim()
+        .replace(/♯/g, "#")
+        .replace(/♭/g, "b");
+    const step = tonic.charAt(0).toUpperCase() + tonic.slice(1).toLowerCase();
+
+    const major = _MAJOR_FIFTHS.get(step);
+    const offset = _MODE_FIFTHS.get(
+        String(mode ?? "")
+            .trim()
+            .toLowerCase()
+    );
+    if (major === undefined || offset === undefined) return null;
+
+    const fifths = major + offset;
+    // Beyond seven the signature needs double accidentals, which MusicXML does
+    // not write in a <key> element.
+    return fifths < -7 || fifths > 7 ? null : fifths;
 };
 
 class MusicXMLExporter {
@@ -160,6 +311,15 @@ class MusicXMLExporter {
         this.add("</direction>");
     }
 
+    addRepeatBarline(location, style, direction) {
+        this.add(`<barline location="${location}">`);
+        this.indent++;
+        this.add(`<bar-style>${style}</bar-style>`);
+        this.add(`<repeat direction="${direction}"/>`);
+        this.indent--;
+        this.add("</barline>");
+    }
+
     addWords(text, placement) {
         this.add(`<direction placement="${placement}">`);
         this.indent++;
@@ -184,11 +344,33 @@ class MusicXMLExporter {
         this.add("</direction>");
     }
 
-    addMeasureAttributes(measure, div, beats, beatType, implicit = false, isPercussion = false) {
+    /**
+     * Writes a key signature on its own, for a change that arrives when the
+     * measure attributes are not being written anyway.
+     * @param {number} fifths - sharps, or flats as a negative.
+     * @param {string} mode - the mode the key is in, written when MusicXML can name it.
+     * @returns {void}
+     */
+    addKeyAttributes(fifths, mode) {
+        this.add(
+            `<attributes> <key> <fifths>${fifths}</fifths>${_modeElement(mode)} </key> </attributes>`
+        );
+    }
+
+    addMeasureAttributes(
+        measure,
+        div,
+        beats,
+        beatType,
+        implicit = false,
+        isPercussion = false,
+        fifths = 0,
+        mode = null
+    ) {
         this.add(
             isPercussion
                 ? `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
-                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>0</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
+                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths>${_modeElement(mode)} </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
     }
 
@@ -345,6 +527,14 @@ class MusicXMLExporter {
                     harmonicsDepth = 0;
                 // Index of the last staged note, or -1 before the first.
                 let previousNote = -1;
+                // Sharps, or flats as a negative, for the key this voice is in.
+                let fifths = 0;
+                // A minor and C major share a signature, so the mode is the only thing that
+                // tells them apart, and has to be tracked and compared in its own right.
+                let keyMode = "major";
+                // A key change still waiting to be written. The meter is tracked
+                // separately, because a measure can begin without a new meter.
+                let keyChanged = false;
                 // <direction> and <sound> belong inside a <measure>, at the note they precede.
                 // Markers are staged before it's known whether that note still fits the current
                 // measure, so they're held here and written just ahead of the next note.
@@ -353,6 +543,13 @@ class MusicXMLExporter {
                     pendingDirections.forEach(write => write());
                     pendingDirections = [];
                 };
+                // With nested forevers, only the innermost one ever repeats.
+                const repeatStart = notes.lastIndexOf("begin repeat");
+                // A forward repeat waiting for the next measure to open.
+                let repeatPending = false;
+                // A repeat that starts mid-measure splits it. The second half is implicit and
+                // only holds what was left of the measure, so later barlines stay on the beat.
+                let splitMeasure = false;
                 this.indent++;
                 let divisionsLeft = divisions;
 
@@ -365,6 +562,13 @@ class MusicXMLExporter {
                         continue;
 
                     if (obj === "key") {
+                        const staged = _keyFifths(notes[i + 1], notes[i + 2]);
+                        const stagedMode = notes[i + 2];
+                        if (staged !== null && (staged !== fifths || stagedMode !== keyMode)) {
+                            fifths = staged;
+                            keyMode = stagedMode;
+                            keyChanged = true;
+                        }
                         i += 2;
                         continue;
                     }
@@ -456,6 +660,11 @@ class MusicXMLExporter {
                         continue;
                     }
 
+                    if (obj === "begin repeat") {
+                        if (i === repeatStart) repeatPending = true;
+                        continue;
+                    }
+
                     // Anything else that isn't a staged note is a marker with no MusicXML
                     // counterpart here. Iterating it as a pitch list would turn its characters
                     // into notes, so it's skipped.
@@ -526,11 +735,16 @@ class MusicXMLExporter {
                             timeModification = null;
                         }
 
-                        if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
+                        // A forward repeat can only start a measure.
+                        if (
+                            (repeatPending || divisionsLeft < preciseDur - DIVISIONS_EPSILON) &&
+                            !isChordNote
+                        ) {
                             if (openedMeasureTag) {
                                 this.add("</measure>");
                                 currMeasure++;
-                                divisionsLeft = divisions;
+                                splitMeasure = divisionsLeft >= preciseDur - DIVISIONS_EPSILON;
+                                if (!splitMeasure) divisionsLeft = divisions;
                                 openedMeasureTag = false;
                             }
                         }
@@ -563,15 +777,34 @@ class MusicXMLExporter {
                                         beats,
                                         beatType,
                                         isPickup,
-                                        part.isPercussion
+                                        part.isPercussion,
+                                        fifths,
+                                        keyMode
                                     );
                                     firstMeasure = false;
                                     beatsChanged = false;
+                                    keyChanged = false;
                                 } else {
-                                    this.add(`<measure number="${currMeasure}">`);
+                                    this.add(
+                                        `<measure number="${currMeasure}"${splitMeasure ? ' implicit="yes"' : ""}>`
+                                    );
                                 }
                                 openedMeasureTag = true;
+                                splitMeasure = false;
+                                if (repeatPending) {
+                                    this.addRepeatBarline("left", "heavy-light", "forward");
+                                    repeatPending = false;
+                                }
                             }
+
+                            // A measure that opened without new attributes, or one
+                            // already open, still has to carry a key change. The
+                            // percussion clef is written without a key at all.
+                            if (keyChanged) {
+                                if (!part.isPercussion) this.addKeyAttributes(fifths, keyMode);
+                                keyChanged = false;
+                            }
+
                             divisionsLeft -= preciseDur;
                         }
 
@@ -630,6 +863,18 @@ class MusicXMLExporter {
                         if (part.isPercussion && obj[MXML_DRUM]) {
                             this.add(`<instrument id="${part.instruments.get(p)}"/>`);
                         }
+                        // A tuplet note's duration is scaled by its ratio, so the written
+                        // note only survives in <type>; Lilypond's importer stops without
+                        // one. That note is the power of two it was rounded down to.
+                        const noteType = MXML_NOTE_TYPES.get(
+                            timeModification ? obj[MXML_ROUNDDOWN] : obj[1]
+                        );
+                        if (noteType !== undefined) {
+                            this.add(`<type>${noteType}</type>`);
+                            if (!timeModification) {
+                                for (let d = 0; d < obj[2]; d++) this.add("<dot/>");
+                            }
+                        }
                         if (timeModification) {
                             this.add("<time-modification>");
                             this.indent++;
@@ -687,11 +932,16 @@ class MusicXMLExporter {
                     this.indent++;
                     // Markers staged after the last note still belong to the final measure.
                     flushPendingDirections();
-                    this.add("<barline>");
-                    this.indent++;
-                    this.add("<bar-style>light-heavy</bar-style>");
-                    this.indent--;
-                    this.add("</barline>");
+                    // A forever with no notes after it never opened a repeat.
+                    if (repeatStart !== -1 && !repeatPending) {
+                        this.addRepeatBarline("right", "light-heavy", "backward");
+                    } else {
+                        this.add("<barline>");
+                        this.indent++;
+                        this.add("<bar-style>light-heavy</bar-style>");
+                        this.indent--;
+                        this.add("</barline>");
+                    }
                     this.indent--;
                     this.add("</measure>");
                 }

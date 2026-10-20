@@ -14,7 +14,7 @@
 
    _, ValueBlock, LeftBlock, NOINPUTERRORMSG, MathUtility,
    NANERRORMSG, toFixed2, NOSQRTERRORMSG, ZERODIVIDEERRORMSG,
-   calcOctave
+   calcOctave, clampNumber
  */
 
 /* exported setupNumberBlocks */
@@ -955,7 +955,86 @@ function setupNumberBlocks(activity) {
         }
     }
 
+    class ClampBlock extends LeftBlock {
+        constructor() {
+            super("clampNumber");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _(
+                    "The Clamp block restricts a number so it stays within a minimum and maximum range."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("clamp"),
+                args: 3,
+                argLabels: [_("value"), _("min"), _("max")],
+                argTypes: ["anyin", "anyin", "anyin"],
+                defaults: [50, 0, 100]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (typeof activity.blocks.blockList[blk].value === "string") {
+                return activity.blocks.blockList[blk].value;
+            } else {
+                return toFixed2(activity.blocks.blockList[blk].value);
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, "clampNumber")) return 0;
+
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+            const cblk3 = activity.blocks.blockList[blk].connections[3];
+
+            if (!validateConnections([cblk1, cblk2, cblk3], blk)) return 0;
+
+            const toNumber = value => {
+                if (typeof value === "string") {
+                    const str = value.trim();
+                    if (str === "") {
+                        logo.stopTurtle = true;
+                        activity.errorMsg(NANERRORMSG, blk);
+                        return null;
+                    }
+                    const num = Number(str);
+                    if (isNaN(num)) {
+                        logo.stopTurtle = true;
+                        activity.errorMsg(NANERRORMSG, blk);
+                        return null;
+                    }
+                    return num;
+                }
+                return value;
+            };
+
+            let val = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            val = toNumber(val);
+            if (val === null) return 0;
+
+            let min = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            min = toNumber(min);
+            if (min === null) return 0;
+
+            let max = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
+            max = toNumber(max);
+            if (max === null) return 0;
+
+            try {
+                return clampNumber(val, min, max);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
     new DistanceBlock().setup(activity);
+    new ClampBlock().setup(activity);
     new IntBlock().setup(activity);
     new ModBlock().setup(activity);
     new PowerBlock().setup(activity);

@@ -879,7 +879,12 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            // An empty slot arrives as null, which slips past the range check.
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -956,7 +961,11 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1034,7 +1043,7 @@ function setupProgramBlocks(activity) {
                 // Look for a block with logo name
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
                     if (
-                        activity.blocks.blockList[i].protoblock.staticLabels.length > 0 &&
+                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
                         activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;
@@ -1047,7 +1056,11 @@ function setupProgramBlocks(activity) {
                 args[0] = -1;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1117,7 +1130,11 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[0]) ||
+                args[0] < 0 ||
+                args[0] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1127,7 +1144,11 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
+            if (
+                !Number.isInteger(args[2]) ||
+                args[2] < 0 ||
+                args[2] > activity.blocks.blockList.length - 1
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }

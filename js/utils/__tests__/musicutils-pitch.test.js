@@ -66,6 +66,52 @@ describe("musicutils-pitch", () => {
         expect(pitch.stripMicrotonalPrefix("x^C4")).toBe("x^C4");
     });
 
+    describe("normalizeNoteAccidentals", () => {
+        it("normalizes single Unicode flat and sharp symbols to ASCII", () => {
+            expect(pitch.normalizeNoteAccidentals("♭")).toBe("b");
+            expect(pitch.normalizeNoteAccidentals("♯")).toBe("#");
+            expect(pitch.normalizeNoteAccidentals("C♭")).toBe("Cb");
+            expect(pitch.normalizeNoteAccidentals("F♯")).toBe("F#");
+            expect(pitch.normalizeNoteAccidentals("C♭4")).toBe("Cb4");
+            expect(pitch.normalizeNoteAccidentals("F♯5")).toBe("F#5");
+        });
+
+        it("normalizes double-flat and double-sharp Unicode symbols to ASCII", () => {
+            expect(pitch.normalizeNoteAccidentals("𝄫")).toBe("bb");
+            expect(pitch.normalizeNoteAccidentals("𝄪")).toBe("x");
+            expect(pitch.normalizeNoteAccidentals("B𝄫")).toBe("Bbb");
+            expect(pitch.normalizeNoteAccidentals("G𝄪")).toBe("Gx");
+            expect(pitch.normalizeNoteAccidentals("B𝄫3")).toBe("Bbb3");
+            expect(pitch.normalizeNoteAccidentals("G𝄪2")).toBe("Gx2");
+        });
+
+        it("leaves natural notes and non-accidental strings unchanged", () => {
+            expect(pitch.normalizeNoteAccidentals("C")).toBe("C");
+            expect(pitch.normalizeNoteAccidentals("D4")).toBe("D4");
+            expect(pitch.normalizeNoteAccidentals("A0")).toBe("A0");
+            expect(pitch.normalizeNoteAccidentals("")).toBe("");
+            expect(pitch.normalizeNoteAccidentals("Do")).toBe("Do");
+            expect(pitch.normalizeNoteAccidentals("rest")).toBe("rest");
+        });
+
+        it("strips leading microtonal prefixes before normalizing accidentals", () => {
+            expect(pitch.normalizeNoteAccidentals("^C")).toBe("C");
+            expect(pitch.normalizeNoteAccidentals("^^C")).toBe("C");
+            expect(pitch.normalizeNoteAccidentals("vvD♭")).toBe("Db");
+            expect(pitch.normalizeNoteAccidentals("vF♯4")).toBe("F#4");
+            expect(pitch.normalizeNoteAccidentals("^^^C♭")).toBe("^Cb");
+        });
+
+        it("normalizes multiple and mixed Unicode accidentals in note sequences", () => {
+            expect(pitch.normalizeNoteAccidentals("C♭♭")).toBe("Cbb");
+            expect(pitch.normalizeNoteAccidentals("C♯♯")).toBe("C##");
+            expect(pitch.normalizeNoteAccidentals("C♭♯")).toBe("Cb#");
+            expect(pitch.normalizeNoteAccidentals("C𝄫𝄪")).toBe("Cbbx");
+            expect(pitch.normalizeNoteAccidentals("C♭ D♯ E𝄫 F𝄪")).toBe("Cb D# Ebb Fx");
+            expect(pitch.normalizeNoteAccidentals("Sol♭")).toBe("Solb");
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of Object.keys(pitch)) {
             if (name === "MusicUtilsPitch") continue;
@@ -89,6 +135,83 @@ describe("musicutils-pitch", () => {
         for (const name of Object.keys(pitch)) {
             expect(remaining).not.toMatch(new RegExp(`^(const|let|var|function) ${name}\\b`, "m"));
         }
+    });
+
+    it("calculates interval octaves for numbers, keywords, and string-typed numbers", () => {
+        // Numeric values
+        expect(pitch.calcOctaveInterval(1)).toBe(1);
+        expect(pitch.calcOctaveInterval(-1)).toBe(-1);
+        expect(pitch.calcOctaveInterval(0)).toBe(0);
+        expect(pitch.calcOctaveInterval(2)).toBe(2);
+        expect(pitch.calcOctaveInterval(-2)).toBe(-2);
+
+        // Keywords
+        expect(pitch.calcOctaveInterval("next")).toBe(1);
+        expect(pitch.calcOctaveInterval("previous")).toBe(-1);
+        expect(pitch.calcOctaveInterval("current")).toBe(0);
+
+        // String-typed numbers
+        expect(pitch.calcOctaveInterval("1")).toBe(1);
+        expect(pitch.calcOctaveInterval("-1")).toBe(-1);
+        expect(pitch.calcOctaveInterval("0")).toBe(0);
+        expect(pitch.calcOctaveInterval("2")).toBe(2);
+        expect(pitch.calcOctaveInterval("-2")).toBe(-2);
+        expect(pitch.calcOctaveInterval(" 1 ")).toBe(1);
+        expect(pitch.calcOctaveInterval(" -2 ")).toBe(-2);
+
+        // Out of range or invalid inputs default to 0
+        expect(pitch.calcOctaveInterval("5")).toBe(0);
+        expect(pitch.calcOctaveInterval(3)).toBe(0);
+        expect(pitch.calcOctaveInterval(-3)).toBe(0);
+        expect(pitch.calcOctaveInterval("invalid")).toBe(0);
+        expect(pitch.calcOctaveInterval("")).toBe(0);
+        expect(pitch.calcOctaveInterval(null)).toBe(0);
+        expect(pitch.calcOctaveInterval(undefined)).toBe(0);
+    });
+
+    describe("_parse_pitch_string (#9430)", () => {
+        const { SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
+        const fn = pitch._parse_pitch_string;
+
+        it("normalizes double accidentals without an octave", () => {
+            expect(fn("Cx")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(fn("Bbb")).toEqual(["B" + DOUBLEFLAT, 4]);
+            expect(fn("C#b")).toEqual(["C", 4]);
+        });
+
+        it("capitalizes and defaults octave to 4 for bare letter", () => {
+            expect(fn("c")).toEqual(["C", 4]);
+            expect(fn("C#")).toEqual(["C" + SHARP, 4]);
+        });
+
+        it("trims leading and trailing whitespace before parsing", () => {
+            expect(fn("  C4  ")).toEqual(["C", 4]);
+            expect(fn("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(fn("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+            expect(fn("   ")).toEqual(["", 4]);
+        });
+
+        it("keeps existing behaviour with octave present", () => {
+            expect(fn("C4")).toEqual(["C", 4]);
+            expect(fn("Bb-1")).toEqual(["B" + FLAT, -1]);
+        });
+
+        it("handles non-string inputs safely", () => {
+            expect(fn(440)).toEqual([440, 4]);
+            expect(fn(null)).toEqual(["", 4]);
+            expect(fn(undefined)).toEqual(["", 4]);
+            expect(fn(-1)).toEqual(["", 4]);
+            expect(fn(0)).toEqual(["", 4]);
+        });
+    });
+
+    describe("getNumber", () => {
+        it("handles double-sharp accidentals including 'x', '##', '*', and unicode '𝄪'", () => {
+            expect(pitch.getNumber("Cx", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C##", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C*", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C𝄪", 4, "equal")).toBe(39);
+        });
     });
 
     describe("loaded as classic scripts, the way the browser does", () => {

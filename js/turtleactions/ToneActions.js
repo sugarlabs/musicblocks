@@ -74,7 +74,13 @@ function setupToneActions(activity) {
             if (!accounted && typeof instrument === "object") {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
-                    CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
+                    // data, pitch, octave and the cent adjustment from the sampler
+                    CUSTOMSAMPLES[synth] = [
+                        instrument[1],
+                        instrument[2],
+                        instrument[3],
+                        instrument[4] || 0
+                    ];
                 } else {
                     synth = DEFAULTVOICE;
                 }
@@ -178,20 +184,6 @@ function setupToneActions(activity) {
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
-
-            if (activity.logo.inTimbre) {
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName]["vibratoActive"] =
-                    true;
-                activity.logo.timbre.vibratoEffect.push(blk);
-                activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoIntensity"
-                ] = tur.singer.vibratoIntensity;
-                activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoFrequency"
-                ] = rate;
-            }
         }
 
         /**

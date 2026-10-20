@@ -515,7 +515,7 @@ class BlockDragController {
                 if (lockInit) {
                     break;
                 }
-                const title = widgetTitle[x].innerHTML;
+                const title = widgetTitle[x].textContent.trim();
                 if (!widgetWindows.isReinitWidgetTitle(title)) {
                     continue;
                 }
@@ -987,7 +987,7 @@ class BlockDragController {
                         continue;
                     }
 
-                    if (blocks.blockList[b].trash) {
+                    if (!blocks.blockList[b] || blocks.blockList[b].trash) {
                         continue;
                     }
 
@@ -1052,7 +1052,7 @@ class BlockDragController {
                     if (lockInit) {
                         break;
                     }
-                    const title = widgetTitle[i].innerHTML;
+                    const title = widgetTitle[i].textContent.trim();
                     if (!widgetWindows.isReinitWidgetTitle(title)) {
                         continue;
                     }

@@ -5,6 +5,12 @@ on:
     - cron: '30 19 * * *' # Schedule for 7:30 PM every day
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # remove the stale label
+  actions: write # cache progress between runs
+
 jobs:
   stale:
     runs-on: ubuntu-latest

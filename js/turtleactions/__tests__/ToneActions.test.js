@@ -228,9 +228,15 @@ describe("setupToneActions", () => {
             expect(global.CUSTOMSAMPLES["customsample_custom1"]).toEqual([
                 "sample1",
                 "sample2",
-                "sample3"
+                "sample3",
+                0
             ]);
             expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
+        });
+
+        it("should keep the cent adjustment of a custom sample", () => {
+            Singer.ToneActions.setTimbre(["tuned", "data", "la", 4, 50], 0, 1);
+            expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
         });
 
         it("should handle empty custom sample name", () => {
@@ -305,9 +311,6 @@ describe("setupToneActions", () => {
 
             expect(targetTurtle.singer.vibratoIntensity).toContain(intensity / 100);
             expect(targetTurtle.singer.vibratoRate).toContain(1 / rate);
-            expect(activity.logo.timbre.vibratoEffect).toContain(blk);
-            expect(activity.logo.timbre.vibratoParams).toContain(intensity);
-            expect(global.instrumentsEffects[0]["default-voice"].vibratoActive).toBe(true);
             expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0");
 
             if (listenerCallbacks["_vibrato_0"]) {
@@ -419,24 +422,16 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
-        it("should use last vibrato intensity in timbre mode", () => {
-            activity.logo.inTimbre = true;
-
+        it("should apply vibrato effect correctly on singer stacks", () => {
             Singer.ToneActions.doVibrato(50, 10, 0, 1);
-
-            expect(global.instrumentsEffects[0]["default-voice"].vibratoActive).toBe(true);
-            expect(activity.logo.timbre.vibratoParams).toContain(50);
-            expect(activity.logo.timbre.vibratoParams).toContain(0.1);
-            expect(global.instrumentsEffects[0]["default-voice"].vibratoFrequency).toBe(10);
-            expect(global.instrumentsEffects[0]["default-voice"].vibratoIntensity).toBe(
-                targetTurtle.singer.vibratoIntensity
-            );
-        });
-
-        it("should skip timbre‑mode params when not in timbre", () => {
-            activity.logo.inTimbre = false;
-            Singer.ToneActions.doVibrato(50, 5, 0, 1);
-            expect(activity.logo.timbre.vibratoEffect).toHaveLength(0);
+            expect(targetTurtle.singer.vibratoIntensity).toContain(0.5);
+            expect(targetTurtle.singer.vibratoRate).toContain(0.1);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0");
+            if (listenerCallbacks["_vibrato_0"]) {
+                listenerCallbacks["_vibrato_0"]();
+                expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
+                expect(targetTurtle.singer.vibratoRate.length).toBe(0);
+            }
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createInstrumenter } = require("istanbul-lib-instrument");
 
 describe("Activity Event Listener Management", () => {
     let Activity;
@@ -8,12 +9,36 @@ describe("Activity Event Listener Management", () => {
     let target;
     let listener;
     let setupBlocksContainerEventsBody;
+    let setupDependenciesBody;
+    let sandbox;
 
     beforeAll(() => {
         // Load activity.js manually to bypass RequireJS/Global complexity
         const activityPath = path.resolve(__dirname, "../activity.js");
         let code = fs.readFileSync(activityPath, "utf8");
         const fullSource = code;
+        const extractAssignedFunctionBody = marker => {
+            const start = fullSource.indexOf(marker);
+
+            if (start === -1) {
+                throw new Error(`Could not find ${marker} in activity.js`);
+            }
+
+            let end = start + marker.length;
+            let braceDepth = 1;
+
+            while (braceDepth > 0) {
+                if (fullSource[end] === "{") braceDepth++;
+                else if (fullSource[end] === "}") braceDepth--;
+                end++;
+            }
+
+            return fullSource.slice(start + marker.length, end - 1);
+        };
+
+        setupDependenciesBody = new Function(
+            extractAssignedFunctionBody("this.setupDependencies = () => {")
+        );
 
         // Strip the instantiation and require calls at the end to prevent side effects
         // We look for 'const activity = new Activity();'
@@ -46,21 +71,93 @@ describe("Activity Event Listener Management", () => {
         );
         setupBlocksContainerEventsBody = new Function(setupBody);
 
-        // Short-circuit the constructor to avoid dependencies
-        code = code.replace(
-            /constructor\s*\(\)\s*\{/,
-            "constructor() { this._listeners = []; return;"
+        // Keep the real, instrumented init() assignment while skipping the heavy
+        // constructor setup around it.
+        const constructorMarker = "constructor() {";
+        const initMarker = "this.init = async () => {";
+
+        const constructorStart = code.indexOf(constructorMarker);
+        const initStart = code.indexOf(initMarker);
+
+        if (constructorStart === -1 || initStart === -1) {
+            throw new Error("Could not locate Activity constructor or init()");
+        }
+
+        const constructorBodyStart = constructorStart + constructorMarker.length;
+
+        // Find the end of the init() function assignment.
+        let initEnd = initStart + initMarker.length;
+        let initBraceDepth = 1;
+
+        while (initBraceDepth > 0) {
+            if (code[initEnd] === "{") initBraceDepth++;
+            else if (code[initEnd] === "}") initBraceDepth--;
+            initEnd++;
+        }
+
+        // Include the semicolon after:
+        // this.init = async () => { ... };
+        if (code[initEnd] === ";") {
+            initEnd++;
+        }
+
+        // Find the closing brace of the constructor.
+        let constructorEnd = constructorBodyStart;
+        let constructorBraceDepth = 1;
+
+        while (constructorBraceDepth > 0) {
+            if (code[constructorEnd] === "{") constructorBraceDepth++;
+            else if (code[constructorEnd] === "}") constructorBraceDepth--;
+            constructorEnd++;
+        }
+
+        const constructorClosingBrace = constructorEnd - 1;
+
+        // Replace skipped sections with whitespace while preserving newlines.
+        // This keeps Istanbul's source line numbers aligned with activity.js.
+        const preserveLines = source => source.replace(/[^\n]/g, " ");
+
+        const beforeInitSource = code.slice(constructorBodyStart, initStart);
+
+        const resizeSectionStart = beforeInitSource.indexOf(
+            'const container = document.getElementById("canvasContainer");'
         );
+        const resizeSectionEndMarker = "this._handleOrientationChangeResize = handleResize;";
+        const resizeSectionEnd =
+            beforeInitSource.indexOf(resizeSectionEndMarker, resizeSectionStart) +
+            resizeSectionEndMarker.length;
+
+        if (resizeSectionStart === -1 || resizeSectionEnd < resizeSectionEndMarker.length) {
+            throw new Error("Could not locate window resize handler in activity.js");
+        }
+
+        const beforeInit =
+            preserveLines(beforeInitSource.slice(0, resizeSectionStart)) +
+            beforeInitSource.slice(resizeSectionStart, resizeSectionEnd) +
+            preserveLines(beforeInitSource.slice(resizeSectionEnd));
+        const afterInit = preserveLines(code.slice(initEnd, constructorClosingBrace));
+
+        code =
+            code.slice(0, constructorBodyStart) +
+            " this._listeners = [];" +
+            beforeInit +
+            code.slice(initStart, initEnd) +
+            " return;" +
+            afterInit +
+            code.slice(constructorClosingBrace);
 
         // Mock global environment required by activity.js
-        const sandbox = {
+        sandbox = {
             window: global.window,
             document: global.document,
             console: global.console,
-            _: key => key, // Mock translation function
+            _: key => key,
             define: () => {},
             require: () => {},
-            setTimeout: setTimeout,
+            setTimeout: (...args) => setTimeout(...args),
+            clearTimeout: (...args) => clearTimeout(...args),
+            requestAnimationFrame: callback => setTimeout(callback, 16),
+            cancelAnimationFrame: id => clearTimeout(id),
             createjs: {},
 
             // Mock classes instantiated in constructor
@@ -97,6 +194,11 @@ describe("Activity Event Listener Management", () => {
         // Expose Activity class to sandbox
         code += "\n this.Activity = Activity;";
 
+        const instrumenter = createInstrumenter();
+        code = instrumenter.instrumentSync(code, activityPath);
+
+        sandbox.__coverage__ = global.__coverage__ || (global.__coverage__ = {});
+
         vm.createContext(sandbox);
         try {
             vm.runInContext(code, sandbox);
@@ -124,7 +226,7 @@ describe("Activity Event Listener Management", () => {
         Activity.prototype._createDrag = () => {};
 
         activity = new Activity();
-
+        activity.setupDependencies = setupDependenciesBody.bind(activity);
         // Restore if needed, but for these tests we don't need them
 
         // Mock a DOM element as target
@@ -207,6 +309,87 @@ describe("Activity Event Listener Management", () => {
         expect(activity._listeners).toHaveLength(0);
     });
 
+    test("should restore resize listeners after dependency cleanup during initialization", async () => {
+        activity._handleRepositionBlocksOnResize = jest.fn();
+        activity._handleWindowResize = jest.fn();
+
+        const getResizeListeners = () =>
+            activity._listeners.filter(l => l.target === window && l.type === "resize");
+
+        // Simulate listeners that existed before setupDependencies cleanup.
+        activity.setupResizeListeners();
+        expect(getResizeListeners()).toHaveLength(1);
+
+        // Exercise the real setupDependencies lifecycle up to listener cleanup.
+        activity._stopRenderLoop = jest.fn();
+
+        const originalCleanup = activity.cleanupEventListeners.bind(activity);
+        const stopAfterCleanup = new Error("stop after cleanup");
+
+        activity.cleanupEventListeners = jest.fn(() => {
+            originalCleanup();
+            throw stopAfterCleanup;
+        });
+
+        expect(() => activity.setupDependencies()).toThrow(stopAfterCleanup);
+        expect(getResizeListeners()).toHaveLength(0);
+
+        activity.cleanupEventListeners = originalCleanup;
+
+        // Exercise the real init lifecycle through resize registration.
+        document.body.innerHTML = '<div id="loader"></div><canvas id="myCanvas"></canvas>';
+
+        activity._initialized = false;
+        activity._perfMark = jest.fn();
+        activity.setupWindowBlurHandler = jest.fn();
+
+        sandbox.doHardStopButton = jest.fn();
+
+        const originalSetupResizeListeners = activity.setupResizeListeners.bind(activity);
+
+        const stopAfterResizeSetup = new Error("stop after resize setup");
+
+        activity.setupResizeListeners = jest.fn(() => {
+            originalSetupResizeListeners();
+            throw stopAfterResizeSetup;
+        });
+
+        await expect(activity.init()).rejects.toThrow(stopAfterResizeSetup);
+
+        expect(getResizeListeners()).toHaveLength(1);
+
+        expect(getResizeListeners().map(l => l.listener)).toEqual([activity._handleWindowResize]);
+
+        delete sandbox.doHardStopButton;
+    });
+
+    test("should update the stage canvas during a window resize", () => {
+        jest.useFakeTimers();
+
+        Object.defineProperty(document, "hidden", {
+            configurable: true,
+            value: true
+        });
+
+        activity._onResize = jest.fn();
+        activity.setupPaletteMenu = jest.fn();
+        activity._handleRepositionBlocksOnResize = jest.fn();
+
+        activity._handleWindowResize();
+
+        jest.advanceTimersByTime(200);
+
+        expect(activity._handleRepositionBlocksOnResize).toHaveBeenCalledTimes(1);
+        expect(activity._onResize).toHaveBeenCalledWith(false);
+        expect(activity.setupPaletteMenu).toHaveBeenCalledTimes(1);
+
+        Object.defineProperty(document, "hidden", {
+            configurable: true,
+            value: false
+        });
+
+        jest.useRealTimers();
+    });
     test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {
         activity._setupBlocksContainerEvents();
         activity._setupBlocksContainerEvents();

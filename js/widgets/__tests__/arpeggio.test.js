@@ -215,22 +215,34 @@ describe("Arpeggio Widget", () => {
             );
         });
 
-        test("should handle window maximize logic", () => {
+        test("should handle window maximize and restore logic", () => {
             arpeggio.init(activityMock);
+            const outerDiv = document.getElementById("arpeggioOuterDiv");
+            const innerDiv = document.getElementById("arpeggioInnerDiv");
+
             // Simulate maximize
             mockWidgetWindow._maximized = true;
             mockWidgetWindow.onmaximize();
 
             expect(mockWidgetBody.style.position).toBe("absolute");
-            expect(document.getElementById("arpeggioOuterDiv").style.height).toBe(
-                "calc(100vh - 80px)"
-            );
+            expect(mockWidgetBody.style.height).toBe("calc(100vh - 80px)");
+            expect(mockWidgetBody.style.width).toBe("200vh");
+            expect(outerDiv.style.height).toBe("calc(100vh - 80px)");
+            expect(outerDiv.style.width).toBe("calc(200vh - 64px)");
+            expect(innerDiv.style.height).toBe("calc(100vh - 80px)");
+            expect(innerDiv.style.width).toBe("calc(200vh - 64px)");
 
             // Simulate restore
             mockWidgetWindow._maximized = false;
             mockWidgetWindow.onmaximize();
 
             expect(mockWidgetBody.style.position).toBe("relative");
+            expect(mockWidgetBody.style.height).toBe("400px");
+            expect(mockWidgetBody.style.width).toBe("400px");
+            expect(outerDiv.style.height).toBe("400px");
+            expect(outerDiv.style.width).toBe("400px");
+            expect(innerDiv.style.height).toBe("400px");
+            expect(innerDiv.style.width).toBe("400px");
         });
     });
 
@@ -239,6 +251,34 @@ describe("Arpeggio Widget", () => {
         beforeEach(() => {
             arpeggio.notesToPlay = [["C4", 1]];
             arpeggio.init(activityMock);
+        });
+
+        test.each([
+            [0, "var(--color-selector-selected)"],
+            [2, "var(--color-selector-bg)"]
+        ])("highlights only the hovered cell in row %i", (row, background) => {
+            const cell = document.getElementById(`${row},0`);
+            const columnLabel = document.getElementById("arpeggioNoteTable").rows[0].cells[0];
+
+            cell.dispatchEvent(new MouseEvent("mouseover"));
+
+            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
+            expect(columnLabel.style.backgroundColor).toBe("var(--color-selector-bg)");
+
+            cell.dispatchEvent(new MouseEvent("mouseout"));
+
+            expect(cell.style.backgroundColor).toBe(background);
+        });
+
+        test("keeps selected cells black when hovered", () => {
+            const cell = document.getElementById("2,0");
+            cell.click();
+
+            cell.dispatchEvent(new MouseEvent("mouseover"));
+            expect(cell.style.backgroundColor).toBe("black");
+
+            cell.dispatchEvent(new MouseEvent("mouseout"));
+            expect(cell.style.backgroundColor).toBe("black");
         });
 
         test("should highlight cell and add node on click", () => {

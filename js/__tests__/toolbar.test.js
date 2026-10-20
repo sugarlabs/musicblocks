@@ -104,14 +104,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(108);
+        expect(global._).toHaveBeenCalledWith("Run step by step");
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(93);
+        expect(global._).toHaveBeenCalledWith("Run step by step");
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -801,6 +801,7 @@ describe("Toolbar Class", () => {
                 }
             },
             "toggleAuxBtn": {
+                onclick: null,
                 className: "tooltipped aux-toggle",
                 classList: {
                     add: jest.fn(),
@@ -820,8 +821,11 @@ describe("Toolbar Class", () => {
         const mockOnClick = jest.fn();
         toolbar.activity = {};
         toolbar.renderMenuIcon(mockOnClick);
-        expect(elements.menu.onclick).toBeInstanceOf(Function);
-        const clickHandler = elements.menu.onclick;
+
+        expect(elements.toggleAuxBtn.onclick).toBeInstanceOf(Function);
+        expect(elements.menu.onclick).toBeNull();
+
+        const clickHandler = elements.toggleAuxBtn.onclick;
 
         elements["aux-toolbar"].style.display = "none";
         clickHandler();

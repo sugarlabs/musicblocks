@@ -88,6 +88,66 @@ window.ast2blocklist_config = {
             name_map: { getValue: "getDict2" }
         },
         {
+            comment: "Notes played block",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "AwaitExpression" },
+                    { property: "argument.type", value: "CallExpression" },
+                    { property: "argument.callee.type", value: "MemberExpression" },
+                    { property: "argument.callee.property.name", value: "getNotesPlayed" },
+                    { property: "argument.arguments", size: 1 }
+                ],
+                name_property: "argument.callee.property.name",
+                argument_properties: ["argument.arguments[0]"]
+            },
+            name_map: { getNotesPlayed: "elapsednotes2" }
+        },
+        {
+            comment: "Number to pitch block",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "AwaitExpression" },
+                    { property: "argument.type", value: "CallExpression" },
+                    { property: "argument.callee.type", value: "MemberExpression" },
+                    { property: "argument.callee.property.name", value: "numToPitch" },
+                    { property: "argument.arguments", size: 1 }
+                ],
+                name_property: "argument.callee.property.name",
+                argument_properties: ["argument.arguments[0]"]
+            },
+            name_map: { numToPitch: "number2pitch" }
+        },
+        {
+            comment: "Number to octave block",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "AwaitExpression" },
+                    { property: "argument.type", value: "CallExpression" },
+                    { property: "argument.callee.type", value: "MemberExpression" },
+                    { property: "argument.callee.property.name", value: "numToOctave" },
+                    { property: "argument.arguments", size: 1 }
+                ],
+                name_property: "argument.callee.property.name",
+                argument_properties: ["argument.arguments[0]"]
+            },
+            name_map: { numToOctave: "number2octave" }
+        },
+        {
+            comment: "Synth volume block",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "AwaitExpression" },
+                    { property: "argument.type", value: "CallExpression" },
+                    { property: "argument.callee.type", value: "MemberExpression" },
+                    { property: "argument.callee.property.name", value: "getSynthVolume" },
+                    { property: "argument.arguments", size: 1 }
+                ],
+                name_property: "argument.callee.property.name",
+                argument_properties: ["argument.arguments[0]"]
+            },
+            name_map: { getSynthVolume: "synthvolumefactor" }
+        },
+        {
             comment: "Skip, this is for children",
             ast: { identifiers: [{ property: "type", value: "ArrowFunctionExpression" }] }
         },
@@ -236,7 +296,8 @@ window.ast2blocklist_config = {
                     { property: "declarations[0].init.type", value: "Literal" },
                     { property: "declarations[0].init.type", value: "BinaryExpression" },
                     { property: "declarations[0].init.type", value: "UnaryExpression" },
-                    { property: "declarations[0].init.type", value: "CallExpression" }
+                    { property: "declarations[0].init.type", value: "CallExpression" },
+                    { property: "declarations[0].init.type", value: "AwaitExpression" }
                 ],
                 name_property: "declarations[0].id.name",
                 argument_properties: ["declarations[0].init"]
@@ -1414,6 +1475,22 @@ window.ast2blocklist_config = {
                     { property: "expression.argument.type", value: "CallExpression" },
                     { property: "expression.argument.callee.type", value: "MemberExpression" },
                     { property: "expression.argument.callee.property.name", value: "playDrum" }
+                ],
+                argument_properties: ["expression.argument.arguments[0]"]
+            },
+            blocklist_connections: ["parent_or_previous_sibling", "argument", "next_sibling"]
+        },
+        {
+            name: "playnoise",
+            comment: "Play noise block",
+            arguments: [{ type: "noisename" }],
+            ast: {
+                identifiers: [
+                    { property: "type", value: "ExpressionStatement" },
+                    { property: "expression.type", value: "AwaitExpression" },
+                    { property: "expression.argument.type", value: "CallExpression" },
+                    { property: "expression.argument.callee.type", value: "MemberExpression" },
+                    { property: "expression.argument.callee.property.name", value: "playNoise" }
                 ],
                 argument_properties: ["expression.argument.arguments[0]"]
             },

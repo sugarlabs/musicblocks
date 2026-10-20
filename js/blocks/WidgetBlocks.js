@@ -385,7 +385,7 @@ function setupWidgetBlocks(activity) {
                 "temperament",
                 _getWidgetDependencies(
                     typeof TemperamentWidget !== "undefined" ? TemperamentWidget : null,
-                    ["widgets/temperament"]
+                    ["widgets/TemperamentUI", "widgets/temperament"]
                 ),
                 () => new TemperamentWidget(),
                 turtle,
@@ -400,19 +400,20 @@ function setupWidgetBlocks(activity) {
             logo.synth.temperamentChanged(args[0], logo.synth.startingPitch);
             const scale = [];
 
-            if (
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]].name ===
-                "pitch"
-            ) {
-                const pitchBlock =
-                    activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
-                const note = activity.blocks.blockList[pitchBlock.connections[1]].value;
-                const octave = activity.blocks.blockList[pitchBlock.connections[2]].value;
+            const pitchBlock =
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
+            if (pitchBlock && pitchBlock.name === "pitch") {
+                const noteBlock = activity.blocks.blockList[pitchBlock.connections[1]];
+                const octaveBlock = activity.blocks.blockList[pitchBlock.connections[2]];
                 const setKey = activity.blocks.blockList[pitchBlock.connections[3]];
-                scale[0] = activity.blocks.blockList[setKey.connections[1]].value;
-                scale[1] = activity.blocks.blockList[setKey.connections[2]].value;
-                logo.synth.startingPitch = note + octave;
-                logo.temperament.scale = scale;
+                const keyNameBlock = setKey && activity.blocks.blockList[setKey.connections[1]];
+                const keyModeBlock = setKey && activity.blocks.blockList[setKey.connections[2]];
+                if (noteBlock && octaveBlock && keyNameBlock && keyModeBlock) {
+                    scale[0] = keyNameBlock.value;
+                    scale[1] = keyModeBlock.value;
+                    logo.synth.startingPitch = noteBlock.value + octaveBlock.value;
+                    logo.temperament.scale = scale;
+                }
             }
 
             const listenerName = "_temperament_" + turtle;
@@ -476,6 +477,14 @@ function setupWidgetBlocks(activity) {
                 "sample",
                 _getWidgetDependencies(typeof SampleWidget !== "undefined" ? SampleWidget : null, [
                     "widgets/tuner",
+                    "widgets/SamplerBlocks",
+                    "widgets/SamplerPlayback",
+                    "widgets/SamplerPitch",
+                    "widgets/SamplerFiles",
+                    "widgets/SamplerUI",
+                    "widgets/SamplerPieMenu",
+                    "widgets/SamplerCanvas",
+                    "widgets/SamplerTuner",
                     "widgets/sampler"
                 ]),
                 () => new SampleWidget(),
@@ -492,6 +501,7 @@ function setupWidgetBlocks(activity) {
 
             const __listener = event => {
                 logo.sample.init(activity);
+                logo.inSample = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -569,6 +579,10 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "timbre",
                 _getWidgetDependencies(typeof TimbreWidget !== "undefined" ? TimbreWidget : null, [
+                    "widgets/TimbreState",
+                    "widgets/TimbrePanels",
+                    "widgets/TimbreAudio",
+                    "widgets/TimbreBlocks",
                     "widgets/timbre"
                 ]),
                 () => new TimbreWidget(),
@@ -692,7 +706,7 @@ function setupWidgetBlocks(activity) {
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
                         ["widgets/meterwidget"]
                     ),
-                    () => new MeterWidget(activity, blk),
+                    () => new MeterWidget(activity, blk, turtle),
                     () => {
                         logo.insideMeterWidget = false;
                     }
@@ -909,6 +923,13 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "tempo",
                 _getWidgetDependencies(typeof Tempo !== "undefined" ? Tempo : null, [
+                    "widgets/TempoWindow",
+                    "widgets/TempoRows",
+                    "widgets/TempoKeyboard",
+                    "widgets/TempoTap",
+                    "widgets/TempoControls",
+                    "widgets/TempoMetronome",
+                    "widgets/TempoSave",
                     "widgets/tempo"
                 ]),
                 () => new Tempo(),
@@ -921,12 +942,15 @@ function setupWidgetBlocks(activity) {
             logo.inTempo = true;
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
+            logo.tempo.BPMTurtles = [];
+            logo.tempo.beatValues = [];
 
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
                 logo.tempo.init(activity);
+                logo.inTempo = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1075,7 +1099,15 @@ function setupWidgetBlocks(activity) {
                 "pitchDrumMatrix",
                 _getWidgetDependencies(
                     typeof PitchDrumMatrix !== "undefined" ? PitchDrumMatrix : null,
-                    ["widgets/pitchdrummatrix"]
+                    [
+                        "widgets/PitchDrumMatrixWindow",
+                        "widgets/PitchDrumMatrixGrid",
+                        "widgets/PitchDrumMatrixBlocks",
+                        "widgets/PitchDrumMatrixCells",
+                        "widgets/PitchDrumMatrixPlayback",
+                        "widgets/PitchDrumMatrixSave",
+                        "widgets/pitchdrummatrix"
+                    ]
                 ),
                 () => new PitchDrumMatrix(),
                 turtle,
@@ -1094,9 +1126,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                logo.inPitchDrumMatrix = false;
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
-                    logo.pitchDrumMatrix.rowLabels.length === 0
+                    !logo.pitchDrumMatrix.hasPitchRows()
                 ) {
                     activity.errorMsg(
                         _(
@@ -1322,7 +1355,11 @@ function setupWidgetBlocks(activity) {
                 "musicKeyboard",
                 _getWidgetDependencies(
                     typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    ["widgets/MusicKeyboardEditing", "widgets/musickeyboard"]
+                    [
+                        "widgets/MusicKeyboardEditing",
+                        "widgets/MusicKeyboardRendering",
+                        "widgets/musickeyboard"
+                    ]
                 ),
                 () => new MusicKeyboard(activity),
                 turtle,
@@ -1341,7 +1378,12 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_musickeyboard_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // The keyboard plays and saves at this turtle's tempo (the turtle itself, not its
+            // index, which shifts when a turtle is removed). Set when this listener opens it, so
+            // another turtle's Music Keyboard block running in between can't swap it.
+            const keyboardTurtle = activity.turtles.ithTurtle(turtle);
             const __listener = () => {
+                logo.musicKeyboard.turtle = keyboardTurtle;
                 logo.musicKeyboard.init(logo);
             };
 
@@ -1398,7 +1440,15 @@ function setupWidgetBlocks(activity) {
                 "pitchStaircase",
                 _getWidgetDependencies(
                     typeof PitchStaircase !== "undefined" ? PitchStaircase : null,
-                    ["widgets/pitchstaircase"]
+                    [
+                        "widgets/PitchStaircaseTimers",
+                        "widgets/PitchStaircaseLayout",
+                        "widgets/PitchStaircaseSteps",
+                        "widgets/PitchStaircasePlayback",
+                        "widgets/PitchStaircaseSave",
+                        "widgets/PitchStaircaseWindow",
+                        "widgets/pitchstaircase"
+                    ]
                 ),
                 () => new PitchStaircase(),
                 turtle,
@@ -1516,6 +1566,12 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "rhythmRuler",
                 _getWidgetDependencies(typeof RhythmRuler !== "undefined" ? RhythmRuler : null, [
+                    "widgets/RhythmRulerLayout",
+                    "widgets/RhythmRulerHistory",
+                    "widgets/RhythmRulerEditing",
+                    "widgets/RhythmRulerPlayback",
+                    "widgets/RhythmRulerSave",
+                    "widgets/RhythmRulerCircular",
                     "widgets/rhythmruler"
                 ]),
                 () => new RhythmRuler(),
@@ -1527,6 +1583,7 @@ function setupWidgetBlocks(activity) {
 
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
+            logo.rhythmRuler.rulerBlock = blk;
             logo.inRhythmRuler = true;
 
             const listenerName = "_rhythmruler_" + turtle;
@@ -2046,9 +2103,7 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            logo.inSample = true;
-
-            const listenerName = "_sampler_" + turtle;
+            const listenerName = "_aimusic_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
@@ -2194,6 +2249,14 @@ function setupWidgetBlocks(activity) {
                 logo,
                 "legoWidget",
                 _getWidgetDependencies(typeof LegoWidget !== "undefined" ? LegoWidget : null, [
+                    "widgets/LegoBricksRows",
+                    "widgets/LegoBricksLayout",
+                    "widgets/LegoBricksExport",
+                    "widgets/LegoBricksMedia",
+                    "widgets/LegoBricksEyeDropper",
+                    "widgets/LegoBricksColor",
+                    "widgets/LegoBricksPlayback",
+                    "widgets/LegoBricksVisualization",
                     "widgets/legobricks"
                 ]),
                 () => new LegoWidget(),

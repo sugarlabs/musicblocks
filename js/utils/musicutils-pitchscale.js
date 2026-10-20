@@ -401,7 +401,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     if (transposition !== 0) {
         const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
         if (edoPos !== -1) {
-            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
+            let octaveShift = 0;
+            const letterPos = PITCHES.indexOf(pitch.toUpperCase());
+            if (currentEDO === 12 && letterPos !== -1) {
+                octaveShift = Math.floor((letterPos + transposition) / 12);
+            }
+            return (octave + octaveShift) * currentEDO + edoPos - PITCHES.indexOf("A");
         }
     }
 
@@ -574,24 +579,19 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
         // Handle standard diminished intervals not covered by microtonal cases
         else if (interval.startsWith("diminished ")) {
             const intervalNum = interval.split(" ")[1];
-            let baseInterval;
-            if (["4", "5", "8"].includes(intervalNum)) {
-                // Perfect-based
-                baseInterval = "perfect " + intervalNum;
-            } else {
-                // Major-based
-                baseInterval = "major " + intervalNum;
-            }
+            const perfectBased = ["4", "5", "8"].includes(intervalNum);
 
-            majorNote = findMajorInterval(baseInterval);
+            majorNote = findMajorInterval((perfectBased ? "perfect " : "major ") + intervalNum);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
 
-            // Lower by one half-step from the base interval
-            if (index1 === 0) {
-                accidental = priorAttrs[index1] + FLAT;
+            // A diminished interval is a half step below the perfect one, but a
+            // whole step below the major one, because the minor sits between them.
+            const steps = perfectBased ? 1 : 2;
+            if (index1 - steps < 0) {
+                accidental = priorAttrs[0] + FLAT.repeat(steps - index1);
             } else {
-                accidental = priorAttrs[index1 - 1];
+                accidental = priorAttrs[index1 - steps];
             }
         }
 

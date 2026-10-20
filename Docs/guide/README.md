@@ -89,6 +89,7 @@ This guide details the many musical features of the language.
     15. [Arpeggio](#415-arpeggio)
 5. [Beyond Music Blocks](#5-beyond-music-blocks)
     1. [LilyPond (or How to Generate Sheet Music)](#51-lilypond)
+       1. [Recording Notation from a Program](#511-recording-notation-from-a-program)
     2. [Other Exports](#52-other-exports)
     3. [The JavaScript Editor](#53-the-javascript-editor)
 6. [Appendix](#6-appendix)
@@ -2594,6 +2595,23 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
 
+### <a name="RECORD-NOTATION">5.1.1 Recording Notation from a Program</a>
+
+![record notation](./lilypond3.svg "Using the Record notation and Save as Lilypond blocks")
+
+The *Save as Lilypond* option from the Save menu works for a program
+that plays the same music every time. For an interactive program, such
+as a game, use the *Record notation* block to record the music as it is
+played. In the example above, each note's pitch follows the cursor, so
+what is recorded and saved to `song.ly` is what you played.
+
+The *Save as Lilypond*, *Save as ABC* and *Save as MusicXML* blocks
+save what has been recorded so far, under the file name in the block.
+A program can save more than once, for example at the end of each
+level. Each mouse records its own part, and every run starts a new
+recording. The *Save as SVG* block saves the mouse artwork. These
+blocks are on the *Extras* palette (Only available in Advanced Mode).
+
 ## <a name="EXPORTS">5.2 Other Exports</a>
 
 In addition to Lilypond, there are several other export formats
@@ -2660,7 +2678,7 @@ Editor*" (`<>`) button in the auxilliary menu.
 
 For the block stacks (and mouse art generated after running),
 
-![Example Project](../js/js-export/samples/mode-up-down.png)
+![Example Project](../../js/js-export/samples/mode-up-down.png)
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725884337271676&run=True)
 
@@ -2703,7 +2721,7 @@ new Mouse(async mouse => {
 MusicBlocks.run();
 ```
 
-Here's the complete [API](../js/js-export/samples/sample.js) of
+Here's the complete [API](../../js/js-export/samples/sample.js) of
 methods, getters, setters.
 
 ## <a name="APPENDIX">6. Appendix</a>

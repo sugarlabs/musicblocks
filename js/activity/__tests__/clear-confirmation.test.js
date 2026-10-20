@@ -193,6 +193,44 @@ describe("renderClearConfirmation", () => {
 
         expect(document.getElementById("clear-confirm")).toBeNull();
     });
+
+    test("renders backdrop overlay and clicking it closes the dialog", () => {
+        renderClearConfirmation(makeActivity(), { onClearCanvas });
+
+        const modal = document.getElementById("clear-confirm");
+        const backdrop = document.getElementById("clear-confirm-backdrop");
+
+        expect(modal).not.toBeNull();
+        expect(backdrop).not.toBeNull();
+        expect(backdrop.classList.contains("modal-backdrop")).toBe(true);
+
+        // Clicking backdrop closes modal without clearing canvas
+        backdrop.click();
+
+        expect(document.getElementById("clear-confirm")).toBeNull();
+        expect(document.getElementById("clear-confirm-backdrop")).toBeNull();
+        expect(onClearCanvas).not.toHaveBeenCalled();
+    });
+
+    test("activities.css defines responsive sizing and backdrop rules for .modalBox", () => {
+        const fs = require("fs");
+        const path = require("path");
+        const activitiesCss = fs.readFileSync(
+            path.join(__dirname, "..", "..", "..", "css", "activities.css"),
+            "utf8"
+        );
+
+        // Modal backdrop overlay
+        expect(activitiesCss).toMatch(/\.modal-backdrop/);
+
+        // .modalBox box-sizing, max-width and max-height constraints
+        expect(activitiesCss).toMatch(/\.modalBox\s*\{[^}]*box-sizing:\s*border-box/);
+        expect(activitiesCss).toMatch(/\.modalBox\s*\{[^}]*max-width:\s*calc\(100vw\s*-\s*32px\)/);
+        expect(activitiesCss).toMatch(/\.modalBox\s*\{[^}]*max-height:\s*calc\(100vh\s*-\s*32px\)/);
+
+        // Responsive media query for <= 600px
+        expect(activitiesCss).toMatch(/@media\s*\(max-width:\s*600px\)\s*\{[^}]*\.modalBox/);
+    });
 });
 
 describe("requestClear", () => {

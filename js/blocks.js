@@ -261,6 +261,8 @@ class Blocks {
          */
         this._loadQueue = [];
         this._loadInProgress = false;
+        /** Callbacks waiting for the load queue to drain, see runAfterLoad(). */
+        this._afterLoadCallbacks = new Set();
         /**
          * Set while the most recent loadNewBlocks() attempt ended in a
          * chunk-processing failure and cleared at the start of the next
@@ -536,7 +538,7 @@ class Blocks {
             }
 
             this.findStacks();
-            for (const stack in this.stackList) {
+            for (const stack of Object.keys(this.stackList)) {
                 this.adjustDocks(this.stackList[stack], true);
             }
 
@@ -550,7 +552,7 @@ class Blocks {
             /** We reset the protoblock scale on the palettes, but don't */
             /** modify the palettes themselves. */
             for (palette in this.activity.palettes.dict) {
-                for (const blk in this.activity.palettes.dict[palette].protoList) {
+                for (const blk of Object.keys(this.activity.palettes.dict[palette].protoList)) {
                     this.activity.palettes.dict[palette].protoList[blk].scale = scale;
                 }
             }
@@ -1857,7 +1859,7 @@ class Blocks {
         this.updateBlockPositions = () => {
             this._beginDeferCheckBounds();
             for (const [blk, block] of this.blockList.entries()) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 this._moveBlock(blk, block.container.x, block.container.y);
             }
             this._endDeferCheckBounds();
@@ -1872,7 +1874,7 @@ class Blocks {
             this._adjustTheseStacks = [];
 
             for (const [blk, myBlock] of this.blockList.entries()) {
-                if (myBlock.trash) continue;
+                if (!myBlock || myBlock.trash) continue;
                 if (myBlock.connections[0] === null) {
                     this._adjustTheseStacks.push(blk);
                 }
@@ -1901,7 +1903,7 @@ class Blocks {
 
             let onScreen = true;
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.connections[0] === null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2571,7 +2573,7 @@ class Blocks {
          */
         this.changeDisabledStatus = (name, flag) => {
             for (const myBlock of this.blockList) {
-                if (myBlock.trash) continue;
+                if (!myBlock || myBlock.trash) continue;
                 if (myBlock.name === name) {
                     myBlock.protoblock.disabled = flag;
                     myBlock.regenerateArtwork(false);
@@ -2586,7 +2588,7 @@ class Blocks {
          */
         this.unhighlightAll = () => {
             for (const [blk, block] of this.blockList.entries()) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 this.unhighlight(blk);
             }
         };
@@ -2754,7 +2756,7 @@ class Blocks {
          */
         this.hide = () => {
             for (const block of this.blockList) {
-                block.hide();
+                if (block) block.hide();
             }
             this.visible = false;
         };
@@ -2766,7 +2768,7 @@ class Blocks {
          */
         this.show = () => {
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 block.show();
             }
             this.visible = true;
@@ -3404,7 +3406,7 @@ class Blocks {
             // Use Set for O(1) lookup instead of Array.includes() O(n)
             const actionNames = new Set();
             for (const block of this.blockList) {
-                if ((block.name === "text" || block.name === "string") && !block.trash) {
+                if (block && (block.name === "text" || block.name === "string") && !block.trash) {
                     const c = block.connections[0];
                     if (
                         c !== null &&
@@ -3438,7 +3440,7 @@ class Blocks {
             // Use Set for O(1) lookup instead of Array.includes() O(n)
             const noteNames = new Set();
             for (const block of this.blockList) {
-                if (block.name === "text" && !block.trash) {
+                if (block && block.name === "text" && !block.trash) {
                     const c = block.connections[0];
                     if (
                         c !== null &&
@@ -3469,7 +3471,7 @@ class Blocks {
             // Use Set for O(1) lookup instead of Array.includes() O(n)
             const temperamentNames = new Set();
             for (const block of this.blockList) {
-                if (block.name === "text" && !block.trash) {
+                if (block && block.name === "text" && !block.trash) {
                     const c = block.connections[0];
                     if (
                         c !== null &&
@@ -3497,7 +3499,7 @@ class Blocks {
          */
         this._findDrumURLs = () => {
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "text" || block.name === "string") {
                     const c = block.connections[0];
                     if (
@@ -3529,7 +3531,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c !== null && this.blockList[c].name === "box") {
@@ -3571,7 +3573,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c !== null && this.blockList[c].name === "storein") {
@@ -3626,7 +3628,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "storein2") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -3672,7 +3674,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "namedbox") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -3728,7 +3730,7 @@ class Blocks {
                 }
 
                 const myBlock = this.blockList[blk];
-                if (myBlock.trash) {
+                if (!myBlock || myBlock.trash) {
                     continue;
                 }
                 const blkParent = this.blockList[myBlock.connections[0]];
@@ -3786,8 +3788,8 @@ class Blocks {
             const namedBlocks = new Set(["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"]);
 
             /** Update the blocks, do->oldName should be do->newName */
-            for (const blk in this.blockList) {
-                if (this.blockList[blk].trash) {
+            for (const blk of Object.keys(this.blockList)) {
+                if (!this.blockList[blk] || this.blockList[blk].trash) {
                     continue;
                 }
 
@@ -4364,7 +4366,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -4398,7 +4401,8 @@ class Blocks {
                     "setpitchnumberoffset",
                     "invert1",
                     "tofrequency",
-                    "nthmodalpitch"
+                    "nthmodalpitch",
+                    "custompitch"
                 ].includes(this.blockList[blk].name)
             ) {
                 const oblk = this.blockList[blk].connections[2];
@@ -4698,8 +4702,12 @@ class Blocks {
             }
 
             const c2v = this.blockList[c2].value;
+            if (!(c1v > 0 && c2v > 0)) {
+                return;
+            }
+
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
+                if (!this.blockList[i] || this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
                     const bn = this.blockList[i].connections[1];
                     if (bn === null || this.blockList[bn].name !== "number") {
@@ -4726,7 +4734,7 @@ class Blocks {
                     }
 
                     const b2v = this.blockList[b2].value;
-                    bnv *= ((b1v * c2v) / b2v) * c1v;
+                    bnv = (bnv * b1v * c2v) / (b2v * c1v);
 
                     this.blockList[bn].value = bnv;
                     this.updateBlockText(bn);
@@ -4785,7 +4793,7 @@ class Blocks {
             }
 
             /** First, hide the palettes as they will need updating. */
-            for (const name in this.activity.palettes.dict) {
+            for (const name of Object.keys(this.activity.palettes.dict)) {
                 this.activity.palettes.dict[name].hideMenu(true);
             }
 
@@ -4918,9 +4926,17 @@ class Blocks {
                                 []
                             ];
                             break;
-                        default:
-                            blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
+                        default: {
+                            const valObj = { value: myBlock.value };
+                            if (
+                                myBlock.manualAccidental !== undefined &&
+                                myBlock.manualAccidental !== null
+                            ) {
+                                valObj.manualAccidental = myBlock.manualAccidental;
+                            }
+                            blockItem = [b, [myBlock.name, valObj], x, y, []];
                             break;
+                        }
                     }
                 } else if (
                     [
@@ -4989,8 +5005,8 @@ class Blocks {
          * @returns boolean
          */
         this.findBlockInstance = blkName => {
-            for (const blk in this.blockList) {
-                if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
+            for (const blk of Object.keys(this.blockList)) {
+                if (this.blockList[blk]?.name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
             }
@@ -5027,18 +5043,64 @@ class Blocks {
 
         /**
          * Marks the current load as finished and, if another load was
-         * queued while it ran, starts that one.
+         * queued while it ran, starts that one. Otherwise runs whatever
+         * was waiting on runAfterLoad().
          * @private
          * @returns {void}
          */
         this._advanceLoadQueue = () => {
             this._loadInProgress = false;
 
+            // A failed load leaves only part of the project behind, which is
+            // exactly what the waiting callbacks were held back from seeing.
+            // Drop them now, since a queued load clears _lastLoadFailed.
+            if (this._lastLoadFailed) {
+                this._afterLoadCallbacks.clear();
+            }
+
             if (this._loadQueue.length > 0) {
                 const next = this._loadQueue.shift();
                 this._loadInProgress = true;
                 this._loadNewBlocksNow(next.blockObjs, next.loadToken);
+                return;
             }
+
+            const callbacks = [...this._afterLoadCallbacks];
+            this._afterLoadCallbacks.clear();
+
+            for (const callback of callbacks) {
+                try {
+                    callback();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        /**
+         * Whether a project is still being loaded. Until the load finishes,
+         * blockList holds only the blocks created so far, so the workspace
+         * must not be exported or saved.
+         * @public
+         * @returns {boolean}
+         */
+        this.isLoading = () => this._loadInProgress;
+
+        /**
+         * Runs callback once every pending load has finished, or right away
+         * if nothing is loading. Passing the same callback again while it is
+         * waiting does not queue it twice.
+         * @public
+         * @param {Function} callback
+         * @returns {void}
+         */
+        this.runAfterLoad = callback => {
+            if (!this._loadInProgress) {
+                callback();
+                return;
+            }
+
+            this._afterLoadCallbacks.add(callback);
         };
 
         /**
@@ -5202,6 +5264,9 @@ class Blocks {
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
+                    // Nothing was loaded, so a waiting save would only store
+                    // the cleared workspace over the project.
+                    this._afterLoadCallbacks.clear();
                     this._advanceLoadQueue();
                 };
 
@@ -5217,7 +5282,7 @@ class Blocks {
                 const currentActionNames = [];
                 const currentStoreinNames = [];
                 for (let b = 0; b < this.blockList.length; b++) {
-                    if (this.blockList[b].trash) {
+                    if (!this.blockList[b] || this.blockList[b].trash) {
                         continue;
                     }
 
@@ -5367,6 +5432,7 @@ class Blocks {
                 }
 
                 /** Make sure action names are unique. */
+                const renamedActions = new Map(); /** old name: new name */
                 for (const b in actionNames) {
                     /** Is there a proto do block with this name? If so, find a */
                     /** new name. */
@@ -5407,9 +5473,19 @@ class Blocks {
 
                         console.debug("action " + oldName + " is being renamed " + name);
                         blkData[1][1] = { value: name };
+                        if (!renamedActions.has(oldName)) {
+                            renamedActions.set(oldName, name);
+                        }
                     }
+                }
 
-                    /** and any do blocks */
+                /**
+                 * ...and any do blocks. This runs once all the renames are
+                 * known: a do block already moved from "action" to "action1"
+                 * must not be moved again when an incoming "action1" is
+                 * itself renamed to "action11".
+                 */
+                if (renamedActions.size > 0) {
                     let blkName;
                     for (const d in doNames) {
                         const thisBlkData = blockObjs[d];
@@ -5421,18 +5497,20 @@ class Blocks {
                         if (
                             ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(blkName)
                         ) {
-                            if (thisBlkData[1][1]["value"] === oldName) {
-                                thisBlkData[1][1] = { value: name };
+                            const oldName = thisBlkData[1][1]["value"];
+                            if (renamedActions.has(oldName)) {
+                                thisBlkData[1][1] = { value: renamedActions.get(oldName) };
                             }
                         } else {
                             const doBlkData = blockObjs[doNames[d]];
                             if (typeof doBlkData[1][1] === "string") {
-                                if (doBlkData[1][1] === oldName) {
-                                    doBlkData[1][1] = name;
+                                if (renamedActions.has(doBlkData[1][1])) {
+                                    doBlkData[1][1] = renamedActions.get(doBlkData[1][1]);
                                 }
                             } else {
-                                if (doBlkData[1][1]["value"] === oldName) {
-                                    doBlkData[1][1] = { value: name };
+                                const oldName = doBlkData[1][1]["value"];
+                                if (renamedActions.has(oldName)) {
+                                    doBlkData[1][1] = { value: renamedActions.get(oldName) };
                                 }
                             }
                         }
@@ -5973,6 +6051,68 @@ class Blocks {
                             [thisBlock, blkInfo[1]]
                         );
                         break;
+                    case "rhythmruler2":
+                        /** Restore the widget edits, moving the drum ids like connections. */
+                        postProcess = args => {
+                            const rulerHistory = args[1]?.rulerHistory;
+                            if (Array.isArray(rulerHistory)) {
+                                that.blockList[args[0]].rulerHistory = rulerHistory
+                                    .filter(
+                                        entry =>
+                                            Array.isArray(entry) &&
+                                            Array.isArray(entry[0]) &&
+                                            entry[0].every(
+                                                edit =>
+                                                    typeof edit === "number" ||
+                                                    (Array.isArray(edit) &&
+                                                        edit.length > 0 &&
+                                                        !edit.includes(null))
+                                            ) &&
+                                            Number.isInteger(entry[1])
+                                    )
+                                    .map(entry => [entry[0], entry[1] + blockOffset]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
+                    case "matrix":
+                        /** Restore the selected cells, moving the block ids like connections. */
+                        postProcess = args => {
+                            const matrixCells = args[1]?.matrixCells;
+                            if (Array.isArray(matrixCells)) {
+                                that.blockList[args[0]].matrixCells = matrixCells
+                                    .filter(
+                                        cell =>
+                                            Array.isArray(cell) &&
+                                            Number.isInteger(cell[0]) &&
+                                            cell[0] >= 0 &&
+                                            Array.isArray(cell[1]) &&
+                                            Number.isInteger(cell[1][0]) &&
+                                            cell[1][0] >= 0 &&
+                                            Number.isInteger(cell[1][1]) &&
+                                            Number.isInteger(cell[2])
+                                    )
+                                    .map(cell => [
+                                        cell[0] + blockOffset,
+                                        [cell[1][0] + blockOffset, cell[1][1]],
+                                        cell[2]
+                                    ]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
                     case "storein2":
                         /** Named boxes and dos need private data. */
                         postProcess = args => {
@@ -6261,7 +6401,11 @@ class Blocks {
                         postProcess = args => {
                             const thisBlock = args[0];
                             const value = args[1];
+                            const info = args[2];
                             that.blockList[thisBlock].value = value;
+                            if (info && info.manualAccidental !== undefined) {
+                                that.blockList[thisBlock].manualAccidental = info.manualAccidental;
+                            }
                             that.updateBlockText(thisBlock);
                         };
 
@@ -6270,7 +6414,7 @@ class Blocks {
                             blockOffset,
                             blkData[4],
                             postProcess,
-                            [thisBlock, value]
+                            [thisBlock, value, blkInfo[1]]
                         );
                         break;
                     case "drumname":
@@ -6553,6 +6697,22 @@ class Blocks {
                             [thisBlock, value]
                         );
                         break;
+                    case "customsample":
+                        /** The value carries the cent adjustment set in the sampler. */
+                        postProcess = args => {
+                            that.blockList[args[0]].value = Array.isArray(args[1])
+                                ? args[1].slice()
+                                : null;
+                        };
+
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, value]
+                        );
+                        break;
                     default:
                         /** Check that name is in the proto list */
                         if (!(name in this.protoBlockDict) || this.protoBlockDict[name] === null) {
@@ -6737,8 +6897,8 @@ class Blocks {
 
                 /** Do a final check on the action and boxes palettes. */
                 let updatePalettes = false;
-                for (const blk in this.blockList) {
-                    if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
+                for (const blk of Object.keys(this.blockList)) {
+                    if (this.blockList[blk]?.name === "action" && !this.blockList[blk].trash) {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
                         if (
@@ -6765,8 +6925,8 @@ class Blocks {
                 }
 
                 updatePalettes = false;
-                for (const blk in this.blockList) {
-                    if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
+                for (const blk of Object.keys(this.blockList)) {
+                    if (this.blockList[blk]?.name === "storein" && !this.blockList[blk].trash) {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
                         if (c !== null && this.blockList[c].value !== _("box")) {
@@ -6930,9 +7090,9 @@ class Blocks {
             if (actionArg) {
                 const actionName = actionArg.value;
                 /** Look for any "orphan" action blocks. */
-                for (const blk in this.blockList) {
+                for (const blk of Object.keys(this.blockList)) {
                     const thisBlock = this.blockList[blk];
-                    if (thisBlock.trash) continue;
+                    if (!thisBlock || thisBlock.trash) continue;
 
                     /** We are only interested in do and nameddo blocks. */
                     if (
@@ -7252,7 +7412,7 @@ class Blocks {
 
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
-            for (const name in this.activity.palettes.dict) {
+            for (const name of Object.keys(this.activity.palettes.dict)) {
                 this.activity.palettes.dict[name].hideMenu(true);
             }
 
@@ -7293,7 +7453,7 @@ class Blocks {
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
             if (parentBlock !== null) {
-                for (const c in this.blockList[parentBlock].connections) {
+                for (const c of Object.keys(this.blockList[parentBlock].connections)) {
                     if (this.blockList[parentBlock].connections[c] === thisBlock) {
                         this.blockList[parentBlock].connections[c] = null;
                         break;
@@ -7314,12 +7474,18 @@ class Blocks {
                     const comp = this.turtles.turtleList[turtle].companionTurtle;
                     if (comp) {
                         this.turtles.turtleList[comp].inTrash = true;
-                        this.turtles.turtleList[comp].container.visible = false;
+                        if (this.turtles.turtleList[comp].container) {
+                            this.turtles.turtleList[comp].container.visible = false;
+                        }
                         this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        if (this.turtles.turtleList[turtle].container) {
+                            this.turtles.turtleList[turtle].container.visible = false;
+                        }
                     } else {
                         this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        if (this.turtles.turtleList[turtle].container) {
+                            this.turtles.turtleList[turtle].container.visible = false;
+                        }
                     }
                 }
             } else if (myBlock.name === "action") {
@@ -7419,8 +7585,11 @@ class Blocks {
          * @returns {void}
          */
         this.clearParameterBlocks = () => {
-            for (const blk in this.blockList) {
-                if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
+            for (const blk of Object.keys(this.blockList)) {
+                if (
+                    this.blockList[blk]?.protoblock.parameter &&
+                    this.blockList[blk].text !== null
+                ) {
                     /** The audiofile block label is handled in block.js */
                     if (this.blockList[blk].name === "audiofile") {
                         continue;
@@ -7625,7 +7794,7 @@ class Blocks {
          */
         this.isCoordinateOnBlock = function (x, y) {
             return this.blockList.some(block => {
-                if (block.trash) return false;
+                if (!block || block.trash) return false;
 
                 const blockX = block.container.x;
                 const blockY = block.container.y;
