@@ -257,10 +257,18 @@ describe("GlobalCard", () => {
             expect(projectCard.classList.contains("share-popup-open")).toBe(false);
         });
 
-        it("repositions an open share popup when the viewport changes", () => {
+        it("repositions an open share popup on viewport changes using requestAnimationFrame", () => {
             card.init("test-id-1");
 
             const positionSpy = jest.spyOn(card, "_positionShareCard");
+            const frameCallbacks = [];
+
+            const requestFrameSpy = jest
+                .spyOn(window, "requestAnimationFrame")
+                .mockImplementation(callback => {
+                    frameCallbacks.push(callback);
+                    return frameCallbacks.length;
+                });
 
             card.render();
 
@@ -271,14 +279,28 @@ describe("GlobalCard", () => {
             expect(positionSpy).toHaveBeenCalledTimes(1);
 
             window.dispatchEvent(new Event("resize"));
+            window.dispatchEvent(new Event("scroll"));
+
+            // Multiple viewport events before the next frame should schedule only one update.
+            expect(requestFrameSpy).toHaveBeenCalledTimes(1);
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            frameCallbacks[0]();
 
             expect(positionSpy).toHaveBeenCalledTimes(2);
 
+            // After that frame finishes, another viewport change may schedule another update.
             window.dispatchEvent(new Event("scroll"));
+
+            expect(requestFrameSpy).toHaveBeenCalledTimes(2);
+
+            frameCallbacks[1]();
 
             expect(positionSpy).toHaveBeenCalledTimes(3);
 
             shareButton.click();
+
+            requestFrameSpy.mockRestore();
         });
 
         it("stops repositioning after the share popup is closed", () => {
@@ -327,6 +349,43 @@ describe("GlobalCard", () => {
 
             expect(positionSpy).toHaveBeenCalledTimes(1);
             expect(card._shareRepositionHandler).toBeNull();
+        });
+
+        it("cancels a pending reposition frame when the share popup closes", () => {
+            card.init("test-id-1");
+
+            const frameCallback = jest.fn();
+
+            const requestFrameSpy = jest
+                .spyOn(window, "requestAnimationFrame")
+                .mockImplementation(callback => {
+                    frameCallback.mockImplementation(callback);
+                    return 123;
+                });
+
+            const cancelFrameSpy = jest
+                .spyOn(window, "cancelAnimationFrame")
+                .mockImplementation(() => {});
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(requestFrameSpy).toHaveBeenCalledTimes(1);
+            expect(card._shareRepositionFrame).toBe(123);
+
+            shareButton.click();
+
+            expect(cancelFrameSpy).toHaveBeenCalledWith(123);
+            expect(card._shareRepositionFrame).toBeNull();
+            expect(card._shareRepositionHandler).toBeNull();
+
+            requestFrameSpy.mockRestore();
+            cancelFrameSpy.mockRestore();
         });
     });
 

@@ -29,6 +29,7 @@ class GlobalCard {
         this.likePending = false;
         this.clipboard = null;
         this._shareRepositionHandler = null;
+        this._shareRepositionFrame = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
@@ -253,11 +254,16 @@ class GlobalCard {
             const card = trigger.closest(".card");
 
             const stopRepositioning = () => {
-                if (!this._shareRepositionHandler) return;
+                if (this._shareRepositionHandler) {
+                    window.removeEventListener("resize", this._shareRepositionHandler);
+                    window.removeEventListener("scroll", this._shareRepositionHandler, true);
+                    this._shareRepositionHandler = null;
+                }
 
-                window.removeEventListener("resize", this._shareRepositionHandler);
-                window.removeEventListener("scroll", this._shareRepositionHandler, true);
-                this._shareRepositionHandler = null;
+                if (this._shareRepositionFrame !== null) {
+                    window.cancelAnimationFrame(this._shareRepositionFrame);
+                    this._shareRepositionFrame = null;
+                }
             };
 
             if (s.style.display === "none") {
@@ -272,9 +278,17 @@ class GlobalCard {
                 stopRepositioning();
 
                 this._shareRepositionHandler = () => {
-                    if (s.style.display !== "none") {
-                        this._positionShareCard(s, trigger);
+                    if (s.style.display === "none" || this._shareRepositionFrame !== null) {
+                        return;
                     }
+
+                    this._shareRepositionFrame = window.requestAnimationFrame(() => {
+                        this._shareRepositionFrame = null;
+
+                        if (s.style.display !== "none") {
+                            this._positionShareCard(s, trigger);
+                        }
+                    });
                 };
 
                 window.addEventListener("resize", this._shareRepositionHandler);
@@ -418,6 +432,11 @@ class GlobalCard {
             window.removeEventListener("resize", this._shareRepositionHandler);
             window.removeEventListener("scroll", this._shareRepositionHandler, true);
             this._shareRepositionHandler = null;
+        }
+
+        if (this._shareRepositionFrame !== null) {
+            window.cancelAnimationFrame(this._shareRepositionFrame);
+            this._shareRepositionFrame = null;
         }
 
         if (this.likeTimeout) {
