@@ -321,7 +321,7 @@ function setupIntervalsActions(activity) {
                 modeName = name.toLowerCase();
             }
 
-            const listenerName = "_definemode_" + turtle;
+            const listenerName = "_definemode_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
