@@ -2771,15 +2771,34 @@ describe("Block Foundation", () => {
             block.activity = { refreshCanvas: jest.fn() };
             block.container = { x: 100, y: 100, scaleX: 1, scaleY: 1 };
             groupedBlock.container = { x: 200, y: 140, scaleX: 2, scaleY: 3 };
+            const blockTween = { to: jest.fn().mockReturnThis() };
+            const groupedBlockTween = { to: jest.fn().mockReturnThis() };
+            createjs.Tween.get
+                .mockImplementationOnce(target => {
+                    blockTween.target = target;
+                    return blockTween;
+                })
+                .mockImplementationOnce(target => {
+                    groupedBlockTween.target = target;
+                    return groupedBlockTween;
+                });
 
             block._setDragGroupTrashHoverScale(true, 0, 0, true);
 
             expect(createjs.Tween.get).toHaveBeenCalledTimes(2);
-            expect(createjs.Tween.get.mock.results[0].value.to).toHaveBeenCalledWith(
+            expect(createjs.Tween.get).toHaveBeenNthCalledWith(1, block.container, {
+                override: true
+            });
+            expect(createjs.Tween.get).toHaveBeenNthCalledWith(2, groupedBlock.container, {
+                override: true
+            });
+            expect(blockTween.target).toBe(block.container);
+            expect(groupedBlockTween.target).toBe(groupedBlock.container);
+            expect(blockTween.to).toHaveBeenCalledWith(
                 { x: 100, y: 100, scaleX: 0.5, scaleY: 0.5 },
                 0
             );
-            expect(createjs.Tween.get.mock.results[1].value.to).toHaveBeenCalledWith(
+            expect(groupedBlockTween.to).toHaveBeenCalledWith(
                 { x: 150, y: 120, scaleX: 1, scaleY: 1.5 },
                 0
             );
