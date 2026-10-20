@@ -327,14 +327,6 @@ class PlanetInterface {
                         ? projectStorage.getCurrentProjectID()
                         : undefined;
                 const saveProject = image => {
-                    if (this.iframe && this.iframe.style.display === "block") {
-                        if (
-                            projectId === undefined ||
-                            projectStorage.data?.Projects?.[projectId] === undefined
-                        ) {
-                            return Promise.resolve(null);
-                        }
-                    }
                     if (projectId !== undefined) {
                         return projectStorage.saveLocally(data, image, projectId);
                     }

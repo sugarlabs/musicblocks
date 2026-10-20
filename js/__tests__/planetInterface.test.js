@@ -1552,4 +1552,50 @@ describe("PlanetInterface", () => {
             "*"
         );
     });
+
+    test("saveLocally: catches and logs errors occurring inside image.onload thumbnail processing", async () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["blocks"] });
+        mockActivity.blocks = {
+            loadNewBlocks: jest.fn(),
+            isLoading: jest.fn(() => false),
+            runAfterLoad: jest.fn(),
+            palettes: { _hideMenus: jest.fn() },
+            trashStacks: []
+        };
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    throw new Error("Bitmap bounds calculation error");
+                }
+            }
+        };
+
+        const storageData = { CurrentProject: "proj-err", Projects: { "proj-err": {} } };
+        planetInterface.planet = {
+            ProjectStorage: {
+                data: storageData,
+                getCurrentProjectID: () => "proj-err",
+                saveLocally: jest.fn(async () => {})
+            }
+        };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        await planetInterface.saveLocally();
+        expect(pendingImage).toBeDefined();
+        pendingImage.onload();
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
+        consoleErrorSpy.mockRestore();
+    });
 });

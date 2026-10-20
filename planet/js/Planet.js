@@ -454,6 +454,11 @@ class Planet {
                 this.ProjectStorage.data.Projects[currentProjectID] === undefined);
 
         if (projectMissing) {
+            try {
+                window.parent.postMessage({ type: "MB_NEW_PROJECT" }, "*");
+            } catch (e) {
+                /* ignore cross-origin */
+            }
             this.loadNewProject();
         } else if (currentProjectID !== this.oldCurrentProjectID) {
             const data = await this.ProjectStorage.getCurrentProjectData();

@@ -542,9 +542,16 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(doCommitSpy).not.toHaveBeenCalled();
         });
 
-        test("MB_NEW_PROJECT clears all tracking state immediately", () => {
+        test("MB_NEW_PROJECT clears all tracking state immediately and prevents committing to old repo", async () => {
             localStorage.setItem("mbGitRepoName", "old-repo");
+            localStorage.setItem("mbGitHashedKey", "old-key");
             localStorage.setItem("mbGitDisplayName", "Old Project");
+            localStorage.setItem("mbGitLastSavedHash", "hash123");
+            localStorage.setItem("mbGitCurrentSha", "sha123");
+            localStorage.setItem("mbGitCurrentDraftId", "draft123");
+            localStorage.setItem("mbGitCurrentProjectId", "proj123");
+
+            const clearSpy = jest.spyOn(gitDropdown, "clearForNewProject");
 
             window.dispatchEvent(
                 new MessageEvent("message", {
@@ -557,11 +564,26 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
 
             expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(localStorage.getItem("mbGitHashedKey")).toBeNull();
             expect(localStorage.getItem("mbGitDisplayName")).toBeNull();
+            expect(localStorage.getItem("mbGitLastSavedHash")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentSha")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentDraftId")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentProjectId")).toBeNull();
+            expect(clearSpy).toHaveBeenCalled();
             expect(mockBtn.setAttribute).toHaveBeenCalledWith(
                 "data-tooltip",
                 "Start tracking my project"
             );
+
+            // Subsequent commit flow cannot commit to deleted project
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit");
+            await gitDropdown._showCommitFlow();
+            expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
+            );
+            expect(doCommitSpy).not.toHaveBeenCalled();
         });
 
         test("MB_SYNC_COMPLETE invalidates prefetch cache and triggers commits refresh", () => {
