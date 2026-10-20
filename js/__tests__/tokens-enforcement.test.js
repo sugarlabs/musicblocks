@@ -121,6 +121,9 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(darkmodeCss).not.toMatch(
             /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.(?:rollup|close)\s*\{[^}]*background(?:-color)?\s*:\s*#[0-9a-f]{3,8}\b/i
         );
+        expect(themesCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\s*\{[^}]*background-color\s*:\s*var\(--color-bg-tertiary\)\s*;/
+        );
     });
 
     it("verifies themes.css declares no custom properties", () => {
