@@ -231,6 +231,11 @@ function setupRhythmActions(activity) {
          * @returns {void}
          */
         static doRhythmicDot(value, turtle, blk) {
+            if (!Number.isFinite(value)) {
+                activity.errorMsg(_("Dot value must be a finite number."), blk);
+                return;
+            }
+
             const tur = activity.turtles.ithTurtle(turtle);
             const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor *= currentDotFactor;

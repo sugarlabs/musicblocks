@@ -630,6 +630,174 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
     });
 
+    it("rejects non-finite dot values (Infinity, -Infinity, NaN) without mutating rhythmic state or registering side effects", () => {
+        const invalidValues = [Infinity, -Infinity, NaN, undefined, null, "invalid"];
+
+        invalidValues.forEach(val => {
+            targetTurtle.singer.dotCount = 1;
+            targetTurtle.singer.beatFactor = 2;
+
+            activity.errorMsg = jest.fn();
+            activity.logo.setDispatchBlock = jest.fn();
+            activity.logo.setTurtleListener = jest.fn();
+            activity.blocks.blockList = { 1: {} };
+
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            Singer.RhythmActions.doRhythmicDot(val, 0, 1);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBe(2);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+            expect(mockMouse.MB.listeners).toHaveLength(0);
+        });
+        global.MusicBlocks.isRun = false;
+    });
+
+    it("nested dot blocks: invalid inner dot block does not corrupt outer dot block state or its cleanup", () => {
+        const listeners = {};
+        activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
+            listeners[name] = cb;
+        });
+        activity.errorMsg = jest.fn();
+        activity.blocks.blockList = { 1: {}, 2: {}, 3: {} };
+
+        targetTurtle.singer.dotCount = 0;
+        targetTurtle.singer.beatFactor = 1;
+
+        // Valid outer block 1
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        const outerBeatFactor = targetTurtle.singer.beatFactor;
+        expect(outerBeatFactor).not.toBe(1);
+        const outerListener = listeners["_dot_0"];
+        expect(outerListener).toBeDefined();
+
+        // Clear recorded listener so we can check if invalid inner block registers one
+        delete listeners["_dot_0"];
+
+        // Invalid inner block 2 with Infinity
+        Singer.RhythmActions.doRhythmicDot(Infinity, 0, 2);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 2);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
+        expect(listeners["_dot_0"]).toBeUndefined();
+
+        // Invalid inner block 3 with NaN
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 3);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 3);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
+        expect(listeners["_dot_0"]).toBeUndefined();
+
+        // Teardown outer block
+        outerListener();
+        expect(targetTurtle.singer.dotCount).toBe(0);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+    });
+
+    it("nested valid dot blocks preserve and restore dotCount and beatFactor through sequential teardown", () => {
+        let outerListener;
+        let innerListener;
+        activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            if (!outerListener) {
+                outerListener = cb;
+            } else {
+                innerListener = cb;
+            }
+        });
+
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = 2;
+
+        // Outer dot block: +1
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+        expect(targetTurtle.singer.dotCount).toBe(2);
+        const intermediateBeatFactor = targetTurtle.singer.beatFactor;
+
+        // Inner dot block: +2
+        Singer.RhythmActions.doRhythmicDot(2, 0, 2);
+        expect(targetTurtle.singer.dotCount).toBe(4);
+
+        // Teardown inner dot block
+        innerListener();
+        expect(targetTurtle.singer.dotCount).toBe(2);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(intermediateBeatFactor);
+
+        // Teardown outer dot block
+        outerListener();
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
+    });
+
+    it("preserves fractional-dot semantics (-2) with non-default initial state and restores on cleanup", () => {
+        let listener;
+        activity.logo.setTurtleListener = jest.fn((_, __, fn) => {
+            listener = fn;
+        });
+
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = 2;
+
+        Singer.RhythmActions.doRhythmicDot(-2, 0, 1);
+
+        // value = -2 means half dot: increases dotCount by -1 / -2 = 0.5
+        expect(targetTurtle.singer.dotCount).toBe(1.5);
+        expect(targetTurtle.singer.beatFactor).not.toBe(2);
+
+        listener();
+
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
+    });
+
+    it("subsequent note-duration calculations remain correct following invalid input", () => {
+        const listeners = {};
+        activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
+            listeners[name] = cb;
+        });
+        activity.errorMsg = jest.fn();
+        activity.blocks.blockList = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {} };
+
+        targetTurtle.singer.dotCount = 0;
+        targetTurtle.singer.beatFactor = 1;
+
+        // Standalone invalid dot inputs: state remains uncorrupted
+        Singer.RhythmActions.doRhythmicDot(Infinity, 0, 1);
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 2);
+        Singer.RhythmActions.doRhythmicDot(-Infinity, 0, 3);
+
+        // Note duration calculation immediately following invalid input remains correct
+        Singer.RhythmActions.playNote(2, "note", 0, 4);
+        expect(targetTurtle.singer.noteValue[4]).toBeCloseTo(0.5);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[4])).toBe(true);
+
+        // Nested context: valid outer dot, rejected inner dot, subsequent note calculation
+        Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+        const outerListener = listeners["_dot_0"];
+        expect(outerListener).toBeDefined();
+
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 6);
+
+        Singer.RhythmActions.playNote(1, "note", 0, 7);
+        // beatFactor is 2/3 (for 1 dot, duration factor 1.5), noteValue is 1 / (1 * (2/3)) = 1.5
+        expect(targetTurtle.singer.noteValue[7]).toBeCloseTo(1.5);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[7])).toBe(true);
+
+        // Cleanup outer dot block
+        outerListener();
+        expect(targetTurtle.singer.dotCount).toBe(0);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+
+        Singer.RhythmActions.playNote(1, "note", 0, 8);
+        expect(targetTurtle.singer.noteValue[8]).toBeCloseTo(1);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[8])).toBe(true);
+    });
+
     it("multiplies beatFactor correctly", () => {
         targetTurtle.singer.beatFactor = 2;
 
