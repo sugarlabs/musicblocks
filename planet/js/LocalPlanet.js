@@ -95,7 +95,17 @@ class LocalPlanet {
 
             function (evt) {
                 if (t.DeleteModalID !== null) {
-                    t.Planet.ProjectStorage.deleteProject(t.DeleteModalID);
+                    Promise.resolve(t.Planet.ProjectStorage.deleteProject(t.DeleteModalID)).then(
+                        () => {
+                            if (
+                                t.Planet.ProjectStorage.getCurrentProjectID() !==
+                                    t.Planet.oldCurrentProjectID &&
+                                typeof t.Planet.closeButton === "function"
+                            ) {
+                                t.Planet.closeButton();
+                            }
+                        }
+                    );
                 }
             }
         );

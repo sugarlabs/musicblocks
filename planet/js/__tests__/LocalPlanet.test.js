@@ -212,6 +212,20 @@ describe("LocalPlanet", () => {
 
             expect(mockPlanet.ProjectStorage.deleteProject).not.toHaveBeenCalled();
         });
+
+        it("should load the updated current project after deleting the open project", async () => {
+            mockPlanet.oldCurrentProjectID = "testProj1";
+            mockPlanet.closeButton = jest.fn();
+            mockPlanet.ProjectStorage.getCurrentProjectID.mockReturnValue("testProj2");
+            mockPlanet.ProjectStorage.deleteProject.mockResolvedValue();
+            localPlanet.initDeleteModal();
+            localPlanet.DeleteModalID = "testProj1";
+
+            document.getElementById("deleter-button").click();
+            await Promise.resolve();
+
+            expect(mockPlanet.closeButton).toHaveBeenCalled();
+        });
     });
 
     describe("openDeleteModal", () => {

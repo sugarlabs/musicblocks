@@ -669,6 +669,37 @@ describe("ProjectStorage", () => {
             expect(saveSpy).toHaveBeenCalled();
         });
 
+        it("deleteProject should select a remaining project when deleting the current project", async () => {
+            storage.data.CurrentProject = "proj1";
+            storage.data.Projects.proj2 = { ProjectName: "Other Project" };
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            await storage.deleteProject("proj1");
+
+            expect(storage.data.CurrentProject).toBe("proj2");
+            expect(storage.data.Projects.proj1).toBeUndefined();
+        });
+
+        it("deleteProject should clear the current project when deleting the last project", async () => {
+            storage.data.CurrentProject = "proj1";
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            await storage.deleteProject("proj1");
+
+            expect(storage.data.CurrentProject).toBeNull();
+            expect(storage.data.Projects.proj1).toBeUndefined();
+        });
+
+        it("deleteProject should preserve the current project when deleting another project", async () => {
+            storage.data.Projects.proj2 = { ProjectName: "Other Project" };
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            await storage.deleteProject("proj2");
+
+            expect(storage.data.CurrentProject).toBe("proj1");
+            expect(storage.data.Projects.proj2).toBeUndefined();
+        });
+
         it("renameProject should update project name", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             await storage.renameProject("proj1", "New Name");

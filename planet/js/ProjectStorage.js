@@ -58,7 +58,8 @@ class ProjectStorage {
     }
 
     async saveLocally(data, image, projectId) {
-        if (this.data.CurrentProject === undefined) await this.initialiseNewProject();
+        if (this.data.CurrentProject === undefined || this.data.CurrentProject === null)
+            await this.initialiseNewProject();
 
         const c = projectId ?? this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
@@ -326,6 +327,10 @@ class ProjectStorage {
 
     async deleteProject(id) {
         delete this.data.Projects[id];
+        if (this.data.CurrentProject === id) {
+            const remainingProjects = Object.keys(this.data.Projects);
+            this.data.CurrentProject = remainingProjects.length > 0 ? remainingProjects[0] : null;
+        }
         await this.save();
         this.Planet.LocalPlanet.updateProjects();
     }
