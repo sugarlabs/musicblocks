@@ -96,6 +96,8 @@ global.MeterWidget = jest.fn();
 global.MeterWidget.dependencies = ["widgets/meterwidget"];
 global.Oscilloscope = jest.fn();
 global.Oscilloscope.dependencies = ["widgets/oscilloscope"];
+global.HarmonyWidget = jest.fn(() => ({ close: jest.fn() }));
+global.HarmonyWidget.dependencies = ["widgets/HarmonyUtils", "widgets/harmony"];
 global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
@@ -366,6 +368,7 @@ describe("setupWidgetBlocks", () => {
                 "tempo",
                 "sampler",
                 "oscilloscope",
+                "harmony",
                 "pitchdrummatrix",
                 "arpeggiomatrix",
                 "pitchstaircase",
@@ -633,6 +636,32 @@ describe("setupWidgetBlocks", () => {
             const result = oscilloscope.flow(["childBlk"], logo, 0, "oscBlk");
             expect(logo.inOscilloscope).toBe(true);
             expect(result).toEqual(["childBlk", 1]);
+        });
+    });
+
+    describe("HarmonyWidgetBlock", () => {
+        it("puts the hiddennoflow block below the clamp, where the widget listener waits", () => {
+            const macro = getBlock("harmony").macroFunc(10, 20);
+            expect(macro).toEqual([
+                [0, "harmony", 10, 20, [null, null, 1]],
+                [1, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        });
+
+        it("returns the child block", () => {
+            const result = getBlock("harmony").flow(["childBlk"], logo, 0, "harmonyBlk");
+            expect(result).toEqual(["childBlk", 1]);
+        });
+
+        it("closes the widget left open by the previous run", () => {
+            const previous = { close: jest.fn() };
+            logo.harmonyWidget = previous;
+
+            getBlock("harmony").flow(["childBlk"], logo, 0, "harmonyBlk");
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(previous.close).toHaveBeenCalledTimes(1);
+            expect(logo.harmonyWidget).not.toBe(previous);
         });
     });
 
@@ -1043,6 +1072,7 @@ describe("setupWidgetBlocks", () => {
             const lazyLoadWidgetSites = [
                 ["meterWidget", "MeterWidget"],
                 ["Oscilloscope", "Oscilloscope"],
+                ["harmonyWidget", "HarmonyWidget"],
                 ["modeWidget", "ModeWidget"]
             ];
 
@@ -1101,6 +1131,7 @@ describe("setupWidgetBlocks", () => {
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
+            ["harmony", "harmonyBlk", "harmonyWidget", global.HarmonyWidget],
             ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
         ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
             if (type === "meterwidget") {

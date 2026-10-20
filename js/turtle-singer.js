@@ -171,6 +171,8 @@ class Singer {
         this.lastPitchPlayed = {}; // for a stand-alone pitch block
         this.previousNotePlayed = null;
         this.noteStatus = null;
+        // Pitches of the latest pitched note and its span in turtle time (for the harmony widget)
+        this.pitchStatus = null;
         this.noteDirection = 0;
         this.pitchNumberOffset = 39; // 39, C4
         this.currentOctave = 4;
@@ -2278,6 +2280,7 @@ class Singer {
 
                 const notes = [];
                 const drums = [];
+                let hasSetTimbreInSetDrum = false;
                 // let insideChord = -1;
                 // if (
                 //     tur.singer.notePitches[thisBlk].length + tur.singer.oscList[thisBlk].length >
@@ -2559,7 +2562,7 @@ class Singer {
                                 };
 
                                 // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
-                                let hasSetTimbreInSetDrum = false;
+                                hasSetTimbreInSetDrum = false;
                                 // This case is only applicable if the note block is at all inside a setdrum block
                                 if (
                                     tur.singer.drumStyle.length > 0 &&
@@ -2742,6 +2745,22 @@ class Singer {
                         tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                         tur.singer.lastNotePlayed = [notes[0], noteBeatValue];
                         tur.singer.noteStatus = [notes, noteBeatValue];
+                        if (!tur.singer.justCounting.length && !tur.singer.suppressOutput) {
+                            let pitchedNotes = [];
+                            if (!(tur.singer.drumStyle.length > 0 && !hasSetTimbreInSetDrum)) {
+                                pitchedNotes = notes.filter(
+                                    n => !(!hasSetTimbreInSetDrum && n in tur.singer.pitchDrumTable)
+                                );
+                            }
+                            tur.singer.pitchStatus =
+                                pitchedNotes.length > 0
+                                    ? {
+                                          notes: pitchedNotes,
+                                          start: tur.singer.previousTurtleTime,
+                                          end: tur.singer.previousTurtleTime + beatValue
+                                      }
+                                    : null;
+                        }
                         tur.singer.lastPitchPlayed = tur.singer.lastNotePlayed; // for a stand-alone pitch block
                     }
                 }

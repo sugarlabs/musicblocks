@@ -43,6 +43,7 @@ window.widgetWindows = {
         "sampler": "sampler",
         "rhythm maker": "rhythm maker",
         "oscilloscope": "oscilloscope",
+        "harmony": "harmony",
         "temperament": "temperament",
         "meter": "meter",
         "LEGO Bricks": "LEGO Bricks",

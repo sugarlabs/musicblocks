@@ -3133,4 +3133,102 @@ describe("processNote — drum mode parent block traversal null and cycle safety
             activityMock.logo.synth.trigger.mock.calls.some(call => call[3] === "acoustic")
         ).toBe(false);
     });
+
+    describe("pitchStatus - active note duration and drum filtering", () => {
+        it("records sounding duration using beatValue for staccato notes", () => {
+            const blk = "staccatoNoteBlk";
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+            singer.previousTurtleTime = 0;
+            singer.turtleTime = 0;
+            singer.bpm = [60];
+            singer.staccato = [4];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).not.toBeNull();
+            expect(singer.pitchStatus.notes).toEqual(["C4"]);
+            expect(singer.pitchStatus.start).toBe(0);
+            expect(singer.pitchStatus.end).toBe(0.25);
+            expect(singer.turtleTime).toBe(1);
+        });
+
+        it("filters out notes played in drumStyle without settimbre", () => {
+            const blk = "drumOnlyNoteBlk";
+            singer.drumStyle = ["acoustic"];
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toBeNull();
+        });
+
+        it("filters out notes present in pitchDrumTable", () => {
+            const blk = "pitchDrumBlk";
+            singer.pitchDrumTable = { C4: "snare" };
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toBeNull();
+        });
+
+        it("does not update pitchStatus during note-counting passes", () => {
+            const blk = "countingBlk";
+            singer.justCounting = [1];
+            singer.pitchStatus = null;
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toBeNull();
+        });
+    });
 });

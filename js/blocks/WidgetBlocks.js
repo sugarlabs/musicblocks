@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, HarmonyWidget
  */
 
 /*
@@ -38,6 +38,8 @@
     StackClampBlock
    - js/widgets/oscilloscope.js
     Oscilloscope
+   - js/widgets/harmony.js
+    HarmonyWidget
    - js/widgets/tempo.js
     Tempo
    - js/widgets/pitchdrummatrix.js
@@ -789,6 +791,68 @@ function setupWidgetBlocks(activity) {
                     () => new Oscilloscope(activity),
                     () => {
                         logo.inOscilloscope = false;
+                    }
+                );
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+    /**
+     * Represents a block for setting up the Harmony Widget in the workspace.
+     * @extends StackClampBlock
+     */
+    class HarmonyWidgetBlock extends StackClampBlock {
+        /**
+         * Creates a HarmonyWidgetBlock instance.
+         */
+        constructor() {
+            super("harmony");
+            this.setPalette("widgets", activity);
+            this.setHelpString([
+                _(
+                    "The harmony block opens a tool that shows the intervals between the notes the mice are playing."
+                ),
+                "documentation",
+                null,
+                "harmony"
+            ]);
+            this.formBlock({ name: _("harmony"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "harmony", x, y, [null, null, 1]],
+                [1, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        }
+
+        /**
+         * Handles the flow of data for the HarmonyWidgetBlock.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The processed arguments.
+         */
+        flow(args, logo, turtle, blk) {
+            const listenerName = "_harmony_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = () => {
+                _lazyLoadWidget(
+                    logo,
+                    "harmonyWidget",
+                    _getWidgetDependencies(
+                        typeof HarmonyWidget !== "undefined" ? HarmonyWidget : null,
+                        ["widgets/HarmonyUtils", "widgets/harmony"]
+                    ),
+                    () => {
+                        // Stop the refresh loop of a widget left open by a previous run.
+                        if (logo.harmonyWidget) {
+                            logo.harmonyWidget.close();
+                        }
+                        return new HarmonyWidget(activity);
                     }
                 );
             };
@@ -2360,6 +2424,7 @@ function setupWidgetBlocks(activity) {
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);
         new OscilloscopeWidgetBlock().setup(activity);
+        new HarmonyWidgetBlock().setup(activity);
         new PitchDrumMatrixBlock().setup(activity);
         new ArpeggioMatrixBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
