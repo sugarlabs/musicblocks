@@ -43,4 +43,27 @@ describe("Project loading", () => {
             expect(loadedPiHeap, "pi.tb's heap.json loadFile block should be present").to.be.true;
         });
     });
+
+    it("updates the tab title after consecutive file imports (#9716)", { retries: 0 }, () => {
+        for (const [projectName, blockName] of [
+            ["tempo-widget-minimal", "tempo"],
+            ["meter-widget-minimal", "meterwidget"]
+        ]) {
+            cy.get("#load").click();
+            cy.get("#myOpenFile").selectFile(`cypress/fixtures/${projectName}.tb`, { force: true });
+
+            let stableObservations = 0;
+            cy.window({ timeout: 30000 }).should(win => {
+                const { blocks } = win.ActivityContext.getActivity();
+                const fullyLoaded =
+                    blocks._loadCounter === 0 &&
+                    blocks.blockList.some(block => !block.trash && block.name === blockName);
+                stableObservations = fullyLoaded ? stableObservations + 1 : 0;
+                expect(stableObservations, `${projectName} remains fully loaded`).to.be.at.least(5);
+            });
+            cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+            cy.get("#errorText").should("not.be.visible");
+            cy.title().should("equal", projectName);
+        }
+    });
 });
