@@ -820,6 +820,11 @@ describe("Toolbar Class", () => {
 
         const mockOnClick = jest.fn();
         toolbar.activity = {};
+        const handleResize = jest.fn();
+
+        global.window.widgetWindows = {
+            _handleResize: handleResize
+        };
         toolbar.renderMenuIcon(mockOnClick);
 
         expect(elements.toggleAuxBtn.onclick).toBeInstanceOf(Function);
@@ -829,6 +834,7 @@ describe("Toolbar Class", () => {
 
         elements["aux-toolbar"].style.display = "none";
         clickHandler();
+        expect(handleResize).toHaveBeenCalledTimes(1);
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.menu.textContent).toBe("more_vert");
@@ -837,6 +843,7 @@ describe("Toolbar Class", () => {
 
         elements["aux-toolbar"].style.display = "block";
         clickHandler();
+        expect(handleResize).toHaveBeenCalledTimes(2);
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
@@ -844,6 +851,7 @@ describe("Toolbar Class", () => {
         expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.toggleAuxBtn.className).toBe("tooltipped aux-toggle");
         expect(elements.chooseKeyDiv.style.display).toBe("none");
+        delete global.window.widgetWindows;
     });
 
     test("syncToolbarHeight sets --toolbar-total-height and notifies PracticeUI", () => {

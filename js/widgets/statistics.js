@@ -65,14 +65,27 @@ class StatsWindow {
         }
 
         this.widgetWindow.onmaximize = () => {
-            this.widgetWindow.getWidgetBody().textContent = "";
+            const body = this.widgetWindow.getWidgetBody();
+            body.textContent = "";
+
             if (this.widgetWindow.isMaximized()) {
-                this.widgetWindow.getWidgetBody().style.display = "flex";
-                this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";
-                this.widgetWindow.getWidgetBody().style.padding = "0px 2vw";
+                body.style.display = "flex";
+                body.style.justifyContent = "space-between";
+                body.style.alignItems = "flex-start";
+                body.style.flexWrap = "wrap";
+                body.style.gap = "16px";
+                body.style.padding = "0px 2vw";
+                body.style.overflow = "auto";
             } else {
-                this.widgetWindow.getWidgetBody().style.padding = "0px";
+                body.style.display = "";
+                body.style.justifyContent = "";
+                body.style.alignItems = "";
+                body.style.flexWrap = "";
+                body.style.gap = "";
+                body.style.overflow = "";
+                body.style.padding = "0px";
             }
+
             this.doAnalytics();
         };
         this.widgetWindow.sendToCenter();
@@ -166,16 +179,23 @@ class StatsWindow {
             if (!this.isOpen || this._chart !== myRadarChart) {
                 return;
             }
+
             try {
                 const imageData = myRadarChart.toBase64Image();
                 const img = new Image();
                 img.src = imageData;
+
                 if (this.widgetWindow.isMaximized()) {
-                    img.width =
-                        this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
+                    img.width = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
                 } else {
                     img.width = 200;
                 }
+
+                img.style.maxWidth = "100%";
+                img.style.height = "auto";
+                img.style.minWidth = "0";
+                img.style.objectFit = "contain";
+
                 this.widgetWindow.getWidgetBody().appendChild(img);
                 this.activity.blocks.hideBlocks();
                 this.activity.showBlocksAfterRun = false;

@@ -1219,6 +1219,13 @@ class ToolbarUI {
                 docById("movable").style.display = "none";
             }
             this.syncToolbarHeight();
+
+            if (
+                window.widgetWindows &&
+                typeof window.widgetWindows._handleResize === "function"
+            ) {
+                window.widgetWindows._handleResize();
+            }
         };
     }
 
