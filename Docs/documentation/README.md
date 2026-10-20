@@ -330,12 +330,15 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `Alt + B`                 | `Option + B`               | Save the current block artwork.                        |
 | `Alt + C`                 | `Option + C`               | Copy the selected blocks.                              |
 | `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
-| `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
+| `Alt + R`, `Enter` or `Space` | `Option + R`, `Return` or `Space` | Play the project. Activates the play button (stops it if already running). |
 | `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
 | `Alt + H`                 | `Option + H`               | Save help blocks - Generate and save artwork for each block.|
+| `Alt + V`                 | `Option + V`               | Paste the previously copied stack.                     |
 | `Ctrl + V`                | `Command + V`              | Open the paste box.                                    |
-| `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
-| `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
+| `Ctrl + Z`                | `Control + Z`              | Undo the last block action.                            |
+| `Ctrl + Y` or `Ctrl + Shift + Z` | `Control + Y` or `Control + Shift + Z` | Redo the last undone block action. |
+| `Shift + Space`           | `Shift + Space`            | Toggle the zoom level of the stage.                    |
+| `ESC`                     | `ESC`                     | Hide the block search bar when it is open.             |
 
 ### 2. Navigation Shortcuts
 
