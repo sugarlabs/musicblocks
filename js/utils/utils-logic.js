@@ -70,7 +70,7 @@ var deepClone = obj => {
  * Extracts the file extension from a filename or URL.
  */
 var fileExt = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -86,7 +86,7 @@ var fileExt = file => {
  * Extracts the base name (filename without extension) from a filename or URL.
  */
 var fileBasename = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 

@@ -87,6 +87,11 @@ describe("Utility Logic Functions", () => {
             expect(fileExt("filename")).toBe("");
             expect(fileExt(null)).toBe("");
         });
+
+        it("returns empty string when input is undefined or non-string", () => {
+            expect(fileExt(undefined)).toBe("");
+            expect(fileExt(123)).toBe("");
+        });
     });
 
     describe("fileBasename()", () => {
@@ -105,6 +110,11 @@ describe("Utility Logic Functions", () => {
 
         it("returns empty string for null input", () => {
             expect(fileBasename(null)).toBe("");
+        });
+
+        it("returns empty string for undefined or non-string input", () => {
+            expect(fileBasename(undefined)).toBe("");
+            expect(fileBasename(123)).toBe("");
         });
     });
 
