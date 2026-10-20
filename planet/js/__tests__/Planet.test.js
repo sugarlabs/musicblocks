@@ -426,6 +426,203 @@ describe("Planet", () => {
             // - loadProjectFromData is called with null (to load starter workspace)
             expect(planet.loadProjectFromData).toHaveBeenCalledWith(null);
         });
+
+        it("synchronizes Git state with replacement project when active project is deleted, preventing stale Git state in Git menu", async () => {
+            const ProjectStorage = require("../ProjectStorage.js");
+            const storage = new ProjectStorage(planet);
+            const store = {};
+            storage.LocalStorage = {
+                getItem: jest.fn(async k => store[k] ?? null),
+                setItem: jest.fn(async (k, v) => {
+                    store[k] = v;
+                })
+            };
+            storage.fireDataLoaded();
+
+            const proj1Id = "proj-alpha";
+            const proj2Id = "proj-beta";
+            const proj1Git = { repoName: "repo-alpha", hashedKey: "key-alpha" };
+            const proj2Git = { repoName: "repo-beta", hashedKey: "key-beta" };
+
+            // Simulate the parent window Git menu initially holding project A's credentials
+            let currentGitRepo = proj1Git.repoName;
+            let currentGitKey = proj1Git.hashedKey;
+            const parentPostMessage = jest.fn(msg => {
+                if (msg && msg.type === "MB_GIT_STATE") {
+                    currentGitRepo = msg.repoName || null;
+                    currentGitKey = msg.hashedKey || null;
+                }
+            });
+            global.window.parent = { postMessage: parentPostMessage };
+
+            storage.data = {
+                CurrentProject: proj1Id,
+                Projects: {
+                    [proj1Id]: {
+                        ProjectName: "Project Alpha",
+                        ProjectData: JSON.stringify([{ name: "start" }]),
+                        GitRepoData: proj1Git,
+                        DateLastModified: 1000
+                    },
+                    [proj2Id]: {
+                        ProjectName: "Project Beta",
+                        ProjectData: JSON.stringify([{ name: "beta" }]),
+                        GitRepoData: proj2Git,
+                        DateLastModified: 500
+                    }
+                }
+            };
+            planet.ProjectStorage = storage;
+            planet.oldCurrentProjectID = proj1Id;
+
+            // Delete active project A
+            await storage.deleteProject(proj1Id);
+            expect(storage.getCurrentProjectID()).toBe(proj2Id);
+
+            // Close planet
+            await planet.closeButton();
+
+            // Verifies _postGitState posted project B's Git state to parent window
+            expect(parentPostMessage).toHaveBeenCalledWith(
+                {
+                    type: "MB_GIT_STATE",
+                    repoName: proj2Git.repoName,
+                    hashedKey: proj2Git.hashedKey,
+                    projectId: proj2Id,
+                    projectName: "Project Beta"
+                },
+                "*"
+            );
+            expect(parentPostMessage).not.toHaveBeenCalledWith(
+                expect.objectContaining({
+                    repoName: proj1Git.repoName
+                }),
+                "*"
+            );
+
+            // Git menu receives project B's repository/key state rather than retaining project A's
+            expect(currentGitRepo).toBe(proj2Git.repoName);
+            expect(currentGitKey).toBe(proj2Git.hashedKey);
+            expect(currentGitRepo).not.toBe(proj1Git.repoName);
+        });
+
+        it("clears Git state via _postGitState when active project with Git state is deleted and replacement project is untracked", async () => {
+            const ProjectStorage = require("../ProjectStorage.js");
+            const storage = new ProjectStorage(planet);
+            const store = {};
+            storage.LocalStorage = {
+                getItem: jest.fn(async k => store[k] ?? null),
+                setItem: jest.fn(async (k, v) => {
+                    store[k] = v;
+                })
+            };
+            storage.fireDataLoaded();
+
+            const proj1Id = "proj-active";
+            const proj2Id = "proj-remaining";
+            const proj1Git = { repoName: "repo-active", hashedKey: "key-active" };
+
+            // Simulate the parent window Git menu initially holding active project's credentials
+            let currentGitRepo = proj1Git.repoName;
+            let currentGitKey = proj1Git.hashedKey;
+            const parentPostMessage = jest.fn(msg => {
+                if (msg && msg.type === "MB_GIT_STATE") {
+                    currentGitRepo = msg.repoName || null;
+                    currentGitKey = msg.hashedKey || null;
+                }
+            });
+            global.window.parent = { postMessage: parentPostMessage };
+
+            storage.data = {
+                CurrentProject: proj1Id,
+                Projects: {
+                    [proj1Id]: {
+                        ProjectName: "Active Project",
+                        ProjectData: JSON.stringify([{ name: "start" }]),
+                        GitRepoData: proj1Git,
+                        DateLastModified: 1000
+                    },
+                    [proj2Id]: {
+                        ProjectName: "Remaining Untracked Project",
+                        ProjectData: JSON.stringify([{ name: "untracked" }]),
+                        GitRepoData: null,
+                        DateLastModified: 500
+                    }
+                }
+            };
+            planet.ProjectStorage = storage;
+            planet.oldCurrentProjectID = proj1Id;
+
+            await storage.deleteProject(proj1Id);
+            expect(storage.getCurrentProjectID()).toBe(proj2Id);
+
+            await planet.closeButton();
+
+            expect(parentPostMessage).toHaveBeenCalledWith(
+                {
+                    type: "MB_GIT_STATE",
+                    repoName: "",
+                    hashedKey: "",
+                    projectId: proj2Id,
+                    projectName: "Remaining Untracked Project"
+                },
+                "*"
+            );
+
+            // Git menu clears active project's credentials rather than retaining them
+            expect(currentGitRepo).toBeNull();
+            expect(currentGitKey).toBeNull();
+        });
+
+        it("does not post replacement Git state when deleting an inactive project", async () => {
+            const ProjectStorage = require("../ProjectStorage.js");
+            const storage = new ProjectStorage(planet);
+            const store = {};
+            storage.LocalStorage = {
+                getItem: jest.fn(async k => store[k] ?? null),
+                setItem: jest.fn(async (k, v) => {
+                    store[k] = v;
+                })
+            };
+            storage.fireDataLoaded();
+
+            const postGitStateSpy = jest.spyOn(planet, "_postGitState");
+            const parentPostMessage = jest.fn();
+            global.window.parent = { postMessage: parentPostMessage };
+
+            const proj1Id = "proj-active";
+            const proj2Id = "proj-inactive";
+
+            storage.data = {
+                CurrentProject: proj1Id,
+                Projects: {
+                    [proj1Id]: {
+                        ProjectName: "Active Project",
+                        ProjectData: JSON.stringify([{ name: "start" }]),
+                        GitRepoData: { repoName: "active-repo", hashedKey: "active-key" },
+                        DateLastModified: 1000
+                    },
+                    [proj2Id]: {
+                        ProjectName: "Inactive Project",
+                        ProjectData: JSON.stringify([{ name: "inactive" }]),
+                        GitRepoData: { repoName: "inactive-repo", hashedKey: "inactive-key" },
+                        DateLastModified: 500
+                    }
+                }
+            };
+            planet.ProjectStorage = storage;
+            planet.oldCurrentProjectID = proj1Id;
+
+            // Delete the inactive project
+            await storage.deleteProject(proj2Id);
+            expect(storage.getCurrentProjectID()).toBe(proj1Id);
+
+            await planet.closeButton();
+
+            expect(planet.planetClose).toHaveBeenCalled();
+            expect(postGitStateSpy).not.toHaveBeenCalled();
+            expect(parentPostMessage).not.toHaveBeenCalled();
+        });
     });
 
     describe("init", () => {

@@ -457,6 +457,9 @@ class Planet {
             this.loadNewProject();
         } else if (currentProjectID !== this.oldCurrentProjectID) {
             const data = await this.ProjectStorage.getCurrentProjectData();
+            if (typeof this._postGitState === "function") {
+                this._postGitState(currentProjectID);
+            }
             this.loadProjectFromData(data);
         } else this.planetClose();
     }
