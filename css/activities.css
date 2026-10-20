@@ -3062,7 +3062,7 @@ input.timbreName {
     max-width: 55%;
     height: auto;
     position: absolute;
-    top: 60px;
+    top: 70px;
     left: 50%;
     transform: translateX(-50%);
     border-radius: 8px;
@@ -3074,6 +3074,12 @@ input.timbreName {
     text-overflow: ellipsis;
     cursor: pointer;
     visibility: hidden;
+}
+
+@media (max-width: 600px) {
+    .popupMsg {
+        max-width: 90vw;
+    }
 }
 
 .popupMsg a {
