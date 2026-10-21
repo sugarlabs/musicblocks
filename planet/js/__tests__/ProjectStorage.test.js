@@ -36,6 +36,7 @@ function createMockLocalforage() {
 
 function createMockPlanet() {
     return {
+        _postGitState: jest.fn(),
         LocalPlanet: {
             updateProjects: jest.fn()
         }
@@ -669,15 +670,28 @@ describe("ProjectStorage", () => {
             expect(saveSpy).toHaveBeenCalled();
         });
 
-        it("deleteProject should select a remaining project when deleting the current project", async () => {
+        it("deleteProject should clear the current project when deleting it", async () => {
             storage.data.CurrentProject = "proj1";
-            storage.data.Projects.proj2 = { ProjectName: "Other Project" };
-            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.Projects.proj2 = {
+                ProjectName: "Other Project",
+                GitRepoData: { repoName: "other-repo", hashedKey: "other-key" }
+            };
 
             await storage.deleteProject("proj1");
 
-            expect(storage.data.CurrentProject).toBe("proj2");
+            expect(storage.data.CurrentProject).toBeNull();
             expect(storage.data.Projects.proj1).toBeUndefined();
+            expect(storage.data.Projects.proj2.GitRepoData).toEqual({
+                repoName: "other-repo",
+                hashedKey: "other-key"
+            });
+            expect((await storage.get(storage.LocalStorageKey)).Projects.proj2.GitRepoData).toEqual(
+                {
+                    repoName: "other-repo",
+                    hashedKey: "other-key"
+                }
+            );
+            expect(mockPlanet._postGitState).toHaveBeenCalledWith(null);
         });
 
         it("deleteProject should clear the current project when deleting the last project", async () => {
@@ -688,6 +702,7 @@ describe("ProjectStorage", () => {
 
             expect(storage.data.CurrentProject).toBeNull();
             expect(storage.data.Projects.proj1).toBeUndefined();
+            expect(mockPlanet._postGitState).toHaveBeenCalledWith(null);
         });
 
         it("deleteProject should preserve the current project when deleting another project", async () => {
@@ -698,6 +713,7 @@ describe("ProjectStorage", () => {
 
             expect(storage.data.CurrentProject).toBe("proj1");
             expect(storage.data.Projects.proj2).toBeUndefined();
+            expect(mockPlanet._postGitState).not.toHaveBeenCalled();
         });
 
         it("renameProject should update project name", async () => {

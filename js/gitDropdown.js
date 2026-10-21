@@ -61,6 +61,9 @@ class GitDropdownUI {
                 // even after the iframe re-initialises (online-created project + go offline).
                 if (e.data.projectId) {
                     localStorage.setItem("mbGitCurrentProjectId", e.data.projectId);
+                } else if (e.data.projectId === null) {
+                    localStorage.removeItem("mbGitCurrentProjectId");
+                    localStorage.removeItem("mbGitLastSavedHash");
                 }
             } else if (e.data.type === "MB_NEW_PROJECT") {
                 // User confirmed New Project from inside the planet iframe.

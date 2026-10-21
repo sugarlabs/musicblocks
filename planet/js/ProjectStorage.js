@@ -326,12 +326,15 @@ class ProjectStorage {
     }
 
     async deleteProject(id) {
+        const deletingCurrentProject = this.data.CurrentProject === id;
         delete this.data.Projects[id];
-        if (this.data.CurrentProject === id) {
-            const remainingProjects = Object.keys(this.data.Projects);
-            this.data.CurrentProject = remainingProjects.length > 0 ? remainingProjects[0] : null;
+        if (deletingCurrentProject) {
+            this.data.CurrentProject = null;
         }
         await this.save();
+        if (deletingCurrentProject && typeof this.Planet._postGitState === "function") {
+            this.Planet._postGitState(null);
+        }
         this.Planet.LocalPlanet.updateProjects();
     }
 

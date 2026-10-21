@@ -95,17 +95,7 @@ class LocalPlanet {
 
             function (evt) {
                 if (t.DeleteModalID !== null) {
-                    Promise.resolve(t.Planet.ProjectStorage.deleteProject(t.DeleteModalID)).then(
-                        () => {
-                            if (
-                                t.Planet.ProjectStorage.getCurrentProjectID() !==
-                                    t.Planet.oldCurrentProjectID &&
-                                typeof t.Planet.closeButton === "function"
-                            ) {
-                                t.Planet.closeButton();
-                            }
-                        }
-                    );
+                    t.Planet.ProjectStorage.deleteProject(t.DeleteModalID);
                 }
             }
         );

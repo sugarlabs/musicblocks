@@ -462,6 +462,33 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
         });
 
+        test("MB_GIT_STATE with no project clears active tracking but preserves repo keys", () => {
+            localStorage.setItem("mbGitRepoName", "deleted-repo");
+            localStorage.setItem("mbGitHashedKey", "deleted-key");
+            localStorage.setItem("mbGitLastSavedHash", "deleted-hash");
+            localStorage.setItem("mbGitCurrentProjectId", "deleted-project");
+            localStorage.setItem("mb_git_key_deleted-repo", "repo-key");
+
+            window.dispatchEvent(
+                new MessageEvent("message", {
+                    data: {
+                        type: "MB_GIT_STATE",
+                        repoName: "",
+                        hashedKey: "",
+                        projectId: null
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
+                })
+            );
+
+            expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(localStorage.getItem("mbGitHashedKey")).toBeNull();
+            expect(localStorage.getItem("mbGitLastSavedHash")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentProjectId")).toBeNull();
+            expect(localStorage.getItem("mb_git_key_deleted-repo")).toBe("repo-key");
+        });
+
         test("MB_NEW_PROJECT clears all tracking state immediately", () => {
             localStorage.setItem("mbGitRepoName", "old-repo");
             localStorage.setItem("mbGitDisplayName", "Old Project");

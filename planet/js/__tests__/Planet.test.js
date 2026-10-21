@@ -293,9 +293,9 @@ describe("Planet", () => {
             expect(planet.loadProjectFromData).not.toHaveBeenCalled();
         });
 
-        it("should call loadNewProject if project ID changed and no data exists", async () => {
+        it("should load a new project if the current project was deleted", async () => {
             planet.oldCurrentProjectID = "old-id";
-            planet.ProjectStorage.getCurrentProjectID.mockReturnValue("new-id");
+            planet.ProjectStorage.getCurrentProjectID.mockReturnValue(null);
             planet.ProjectStorage.getCurrentProjectData.mockResolvedValue(null);
 
             await planet.closeButton();

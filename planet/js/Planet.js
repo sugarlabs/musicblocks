@@ -103,7 +103,7 @@ class Planet {
      * Called whenever the active project changes inside the planet iframe
      * (openProject from local planet, or after fork/remix from global planet).
      *
-     * @param {string} id - ProjectStorage project ID
+     * @param {string|null} id - ProjectStorage project ID, or null to clear active git state
      */
     _postGitState(id) {
         try {
