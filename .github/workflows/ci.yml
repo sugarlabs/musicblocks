@@ -324,12 +324,13 @@ jobs:
                   node-version: '22'
 
             - name: Resolve dependencies before audit
-              # CodeRabbit: Audit the dependency tree installed by Renovate.
-              # Run npm install --legacy-peer-deps --ignore-scripts before npm audit
-              # so the audit uses the same resolved dependency tree.
+              # Renovate may update the dependency tree beyond the lockfile.
+              # Other runs install the exact dependency tree from the lockfile.
               run: |
                   if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
                     npm install --legacy-peer-deps --ignore-scripts
+                  else
+                    npm ci --ignore-scripts
                   fi
               shell: bash
 
