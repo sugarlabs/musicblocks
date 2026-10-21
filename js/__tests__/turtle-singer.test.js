@@ -2312,6 +2312,151 @@ describe("processPitch internal addPitch behavior", () => {
     });
 });
 
+describe("processPitch shifts the notes of an interval only once", () => {
+    const saved = {};
+    let FreshSinger;
+    let turtleMock;
+    let activityMock;
+
+    beforeAll(() => {
+        // A fresh copy, so its pitch-to-frequency cache does not hold the
+        // mocked 440 Hz values from the tests above.
+        jest.isolateModules(() => {
+            FreshSinger = require("../turtle-singer");
+        });
+    });
+
+    beforeEach(() => {
+        for (const name of ["getNote", "pitchToFrequency", "frequencyToPitch"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new FreshSinger(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+        jest.restoreAllMocks();
+    });
+
+    const notesOf = (singer, blk) =>
+        singer.notePitches[blk].map((pitch, i) => pitch + singer.noteOctaves[blk][i]);
+
+    // Plays C4 inside a note block with the given singer state.
+    const playC4 = state => {
+        const singer = turtleMock.singer;
+        Object.assign(singer, state);
+        singer.inNoteBlock = ["note"];
+        singer.notePitches = { note: [] };
+        singer.noteOctaves = { note: [] };
+        singer.noteCents = { note: [] };
+        singer.noteHertz = { note: [] };
+        singer.noteBeatValues = { note: [] };
+
+        FreshSinger.processPitch(activityMock, "C", 4, 0, 0, "pitch");
+        return notesOf(singer, "note");
+    };
+
+    const majorChord = [
+        [0, 4],
+        [0, 7]
+    ];
+
+    test.each([
+        ["a semi-tone interval of 4", { semitoneIntervals: [[4, 0]] }, ["C4", "E4"]],
+        ["a major chord", { chordIntervals: majorChord }, ["C4", "E4", "G4"]],
+        [
+            "semi-tone transpose 2 and a semi-tone interval of 4",
+            { transposition: 2, semitoneIntervals: [[4, 0]] },
+            ["D4", "F♯4"]
+        ],
+        [
+            "semi-tone transpose 2 and a major chord",
+            { transposition: 2, chordIntervals: majorChord },
+            ["D4", "F♯4", "A4"]
+        ],
+        [
+            "semi-tone transpose 2 and interval 3",
+            { transposition: 2, intervals: [3] },
+            ["D4", "G4"]
+        ],
+        [
+            "semi-tone transpose 2 and a ratio interval of 3/2",
+            { transposition: 2, ratioIntervals: [1.5] },
+            ["D4", "A4"]
+        ],
+        [
+            "a sharp and a semi-tone interval of 4",
+            { transposition: 1, semitoneIntervals: [[4, 0]] },
+            ["C♯4", "F4"]
+        ],
+        [
+            "register 1 and a semi-tone interval of 4",
+            { register: 1, semitoneIntervals: [[4, 0]] },
+            ["C5", "E5"]
+        ],
+        [
+            "register 1 and a major chord",
+            { register: 1, chordIntervals: majorChord },
+            ["C5", "E5", "G5"]
+        ],
+        [
+            "transpose by ratio 2 and a semi-tone interval of 4",
+            { transpositionRatios: [2], semitoneIntervals: [[4, 0]] },
+            ["C5", "E5"]
+        ]
+    ])("with %s", (_, state, expected) => {
+        expect(playC4(state)).toEqual(expected);
+    });
+
+    test("keeps the cents of a fractional transposition on the interval note", () => {
+        expect(playC4({ transposition: 2.5, semitoneIntervals: [[4, 0]] })).toEqual(["D4", "F♯4"]);
+
+        const cents = turtleMock.singer.noteCents.note;
+        expect(cents[0]).toBeCloseTo(50);
+        expect(cents[1]).toBeCloseTo(50);
+    });
+
+    test("builds a ratio interval on the base note's cents", () => {
+        playC4({ transposition: 2.5, ratioIntervals: [1.5] });
+
+        const hertz = turtleMock.singer.noteHertz.note;
+        expect(hertz[1] / hertz[0]).toBeCloseTo(1.5, 3);
+    });
+
+    test("uses one arpeggio step for the whole note, not one per interval note", () => {
+        const state = {
+            arpeggio: [[0, 0], ...majorChord],
+            semitoneIntervals: [[4, 0]]
+        };
+
+        expect(playC4(state)).toEqual(["C4", "E4"]);
+        expect(turtleMock.singer.arpeggioIndex).toBe(1);
+    });
+
+    test("shifts a stand-alone pitch block's interval note only once", () => {
+        const singer = turtleMock.singer;
+        singer.register = 1;
+        singer.semitoneIntervals = [[4, 0]];
+        activityMock.logo.clearNoteParams = jest.fn((tur, blk) => {
+            tur.singer.notePitches[blk] = [];
+            tur.singer.noteOctaves[blk] = [];
+            tur.singer.noteCents[blk] = [];
+            tur.singer.noteHertz[blk] = [];
+            tur.singer.noteBeatValues[blk] = [];
+        });
+        jest.spyOn(FreshSinger, "processNote").mockImplementation(() => {});
+
+        FreshSinger.processPitch(activityMock, "C", 4, 0, 0, "pitch");
+
+        expect(notesOf(singer, "pitch")).toEqual(["C5", "E5"]);
+    });
+});
+
 describe("processNote unhighlight timers", () => {
     let act;
     let tur;
