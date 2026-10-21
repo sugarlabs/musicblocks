@@ -3803,6 +3803,101 @@ describe("Blocks Foundation", () => {
             expect(mockBlock.text.text).toBe("project.mb");
             expect(mockBlock.container.updateCache).toHaveBeenCalled();
         });
+
+        it.each([
+            [
+                "throwing toString method",
+                [
+                    {
+                        toString: () => {
+                            throw new Error("Invalid");
+                        }
+                    }
+                ]
+            ],
+            ["empty array", []],
+            ["empty string element", [""]],
+            ["whitespace-only string element", ["   "]],
+            ["null value", null],
+            ["undefined value", undefined],
+            ["array with null element", [null]],
+            ["array with undefined element", [undefined]]
+        ])("falls back to 'audio file' when audiofile value is %s", (_, invalidValue) => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: invalidValue
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("audio file");
+            expect(global._).toHaveBeenCalledWith("audio file");
+            expect(mockBlock.container.setChildIndex).toHaveBeenCalledWith(mockBlock.text, 0);
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("displays formatted file name on valid audiofile value", () => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: ["beat.wav"]
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("beat.wav");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("truncates non-empty audiofile filename exceeding default maxLength", () => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: ["recording.wav"]
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("recordi...");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("never truncates localized fallback label even when exceeding default maxLength", () => {
+            global._ = jest.fn(() => "archivo de audio");
+
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: null
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("archivo de audio");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("truncates long audiofile label when exceeding TEXTWIDTH", () => {
+            const originalGetTextWidth = global.getTextWidth;
+            global.getTextWidth = jest.fn(() => TEXTWIDTH + 1);
+
+            try {
+                const mockBlock = createMockBlock({
+                    name: "audiofile",
+                    value: ["verylongaudiofilename.wav"]
+                });
+
+                blocks.blockList = [mockBlock];
+                blocks.updateBlockText(0);
+
+                expect(mockBlock.text.text.endsWith("...")).toBe(true);
+                expect(mockBlock.text.text).toBe("verylon...");
+                expect(mockBlock.container.updateCache).toHaveBeenCalled();
+            } finally {
+                global.getTextWidth = originalGetTextWidth;
+            }
+        });
     });
 
     describe("wideLabel Capability Migration", () => {

@@ -2164,12 +2164,17 @@ class Blocks {
                             label = _("audio file");
                         } else {
                             label = myBlock.value[0].toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            if (label.trim() === "") {
+                                label = _("audio file");
+                            } else if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                                 label = label.slice(0, STRINGLEN) + "...";
                             }
                         }
                     } catch (e) {
                         label = _("audio file");
+                    }
+                    if (label === _("audio file")) {
+                        maxLength = label.length;
                     }
                     break;
                 case "solfege":
