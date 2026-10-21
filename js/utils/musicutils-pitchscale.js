@@ -48,6 +48,7 @@ if (typeof module !== "undefined" && module.exports) {
         PITCHES2,
         PITCHES,
         INTERVALVALUES,
+        INTERVAL_ALIASES,
         SOLFNOTES,
         NOTESFLAT2,
         EQUIVALENTFLATS,
@@ -446,16 +447,9 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
         temperament = "equal";
     }
 
-    // INTERVALVALUES keys that are not "<quality> <number>", mapped to the key with the same
-    // entry. The branches below take the letter distance from the number in the name.
-    const ALIASES = {
-        "chromatic semitone": "augmented 1",
-        "whole tone": "major 2",
-        "diminished octave": "diminished 8",
-        "octave": "perfect 8"
-    };
-    if (Object.prototype.hasOwnProperty.call(ALIASES, interval)) {
-        interval = ALIASES[interval];
+    // Read another name for an interval as the "<quality> <number>" name it stands for.
+    if (Object.prototype.hasOwnProperty.call(INTERVAL_ALIASES, interval)) {
+        interval = INTERVAL_ALIASES[interval];
     }
 
     const pitch1 = pitch.substring(0, 1);
