@@ -1613,9 +1613,10 @@ class Singer {
      */
     static processNote(activity, noteValue, isOsc, blk, turtle, callback) {
         const tur = activity.turtles.ithTurtle(turtle);
-        const bpmFactor =
-            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        const bpmValue = Number(last(tur.singer.bpm));
+        const bpmValue = Number(
+            tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM
+        );
+        const bpmFactor = TONEBPM / bpmValue;
 
         let noteBeatValue = isOsc
             ? noteValue === 0
@@ -2481,7 +2482,8 @@ class Singer {
                                         d,
                                         turtle,
                                         bpmValue || 90,
-                                        last(tur.singer.instrumentNames)
+                                        last(tur.singer.instrumentNames),
+                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat]
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {
