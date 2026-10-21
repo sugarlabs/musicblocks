@@ -807,10 +807,37 @@ class SaveInterface {
         // } else {
         //     docById('submitPDF').disabled = true;
         // }
-        docByClass("close")[0].onclick = () => {
+        const closeBtn = docByClass("close")[0];
+        const modal = docById("lilypondModal");
+        const closeModal = () => {
             activity.logo.runningLilypond = false;
-            docById("lilypondModal").style.display = "none";
+            if (modal) {
+                modal.style.display = "none";
+            }
         };
+        if (closeBtn) {
+            closeBtn.onclick = closeModal;
+            closeBtn.onkeydown = e => {
+                if (
+                    e.key === "Enter" ||
+                    e.key === " " ||
+                    e.key === "Spacebar" ||
+                    e.key === "Escape" ||
+                    e.key === "Esc"
+                ) {
+                    e.preventDefault();
+                    closeModal();
+                }
+            };
+        }
+        if (modal) {
+            modal.onkeydown = e => {
+                if (e.key === "Escape" || e.key === "Esc") {
+                    e.preventDefault();
+                    closeModal();
+                }
+            };
+        }
     }
     /**
      * Save Lilypond file with optional PDF conversion.

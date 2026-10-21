@@ -329,17 +329,21 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .close {
+    background: none;
+    border: none;
+    padding: 0;
     color: var(--color-text-tertiary);
     float: right;
     font-size: 28px;
     font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: var(--color-text-primary);
     text-decoration: none;
-    cursor: pointer;
 }
 
 #search[type="text"] {

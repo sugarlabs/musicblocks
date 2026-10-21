@@ -1079,7 +1079,7 @@ describe("saveLilypond Methods", () => {
         document.body.innerHTML = `
             <div id="lilypondModal" style="display: none;">
                 <div class="modal-content" tabindex="-1">
-                    <span class="close">×</span>
+                    <button type="button" class="close" aria-label="Close" tabindex="0">×</button>
                     <div id="fileNameText">File name</div>
                     <input type="text" id="fileName" value="TestProject.ly" tabindex="-1">
                     <p></p>
@@ -1247,6 +1247,43 @@ describe("saveLilypond Methods", () => {
 
         const closeButton = docByClass("close")[0];
         closeButton.click();
+
+        expect(activity.logo.runningLilypond).toBe(false);
+        expect(docById("lilypondModal").style.display).toBe("none");
+    });
+
+    it("should have an accessible close button with role/button semantics and aria-label", () => {
+        const closeButton = docByClass("close")[0];
+        expect(closeButton.tagName).toBe("BUTTON");
+        expect(closeButton.getAttribute("aria-label")).toBe("Close");
+    });
+
+    it.each(["Enter", " ", "Escape"])(
+        "should close the modal when %s key is pressed on the close button",
+        key => {
+            instance.saveLilypond(activity);
+            const closeButton = docByClass("close")[0];
+            const event = new KeyboardEvent("keydown", {
+                key,
+                bubbles: true,
+                cancelable: true
+            });
+            closeButton.dispatchEvent(event);
+
+            expect(activity.logo.runningLilypond).toBe(false);
+            expect(docById("lilypondModal").style.display).toBe("none");
+        }
+    );
+
+    it("should close the modal when Escape is pressed inside the modal dialog", () => {
+        instance.saveLilypond(activity);
+        const modal = docById("lilypondModal");
+        const event = new KeyboardEvent("keydown", {
+            key: "Escape",
+            bubbles: true,
+            cancelable: true
+        });
+        modal.dispatchEvent(event);
 
         expect(activity.logo.runningLilypond).toBe(false);
         expect(docById("lilypondModal").style.display).toBe("none");
