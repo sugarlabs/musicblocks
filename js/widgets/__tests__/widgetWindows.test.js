@@ -1460,6 +1460,29 @@ describe("widgetWindows", () => {
             expect(win._dx).not.toBe(999);
             expect(win._dy).not.toBe(999);
         });
+
+        test("_dragTopHandler maximizes at the visible auxiliary toolbar boundary", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+                const event = {
+                    preventDefault: jest.fn()
+                };
+
+                win.onmaximize = jest.fn();
+                win._frame.style.top = "128px";
+
+                win._dragTopHandler(event);
+
+                expect(win._maximized).toBe(true);
+                expect(win._frame.style.top).toBe("128px");
+                expect(win.onmaximize).toHaveBeenCalledTimes(1);
+                expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            } finally {
+                toolbars.remove();
+            }
+        });
     });
 
     describe("window visibility and management helpers", () => {
