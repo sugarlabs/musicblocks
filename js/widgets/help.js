@@ -296,7 +296,17 @@ class HelpWidget {
 
                     const bodyFragment = document.createDocumentFragment();
                     if (message.length > 1) {
-                        bodyFragment.append(this._makeBlockImageFigure(message[1], name));
+                        bodyFragment.append(
+                            this._makeBlockImageFigure(
+                                message[1],
+                                name,
+                                this._blockImageAlt(
+                                    this.activity.blocks.blockList[this.activity.blocks.activeBlock]
+                                        .protoblock,
+                                    name
+                                )
+                            )
+                        );
                     }
 
                     const messageParagraph = document.createElement("p");
@@ -742,13 +752,15 @@ class HelpWidget {
      * @private
      * @param {string} path - folder from the help string, e.g. "documentation"
      * @param {string} name - block name
+     * @param {string} [alt] - alt text for the image
      * @returns {HTMLElement}
      */
-    _makeBlockImageFigure(path, name) {
+    _makeBlockImageFigure(path, name, alt) {
         const figure = document.createElement("figure");
         figure.classList.add("blockImage-wrapper");
         const img = document.createElement("img");
         img.classList.add("blockImage");
+        if (alt) img.alt = alt;
 
         const defaultSrc = `Docs/${path}/${name}_block.svg`;
         const localizedSrc = `Docs/${this._localizedHelpPath(path)}/${name}_block.svg`;
@@ -764,6 +776,19 @@ class HelpWidget {
 
         figure.append(img);
         return figure;
+    }
+
+    /**
+     * Alt text for a block's help image: the block label, as shown in the
+     * help window title, or the block name for blocks without a label.
+     * @private
+     * @param {Object} protoblock
+     * @param {string} name - block name
+     * @returns {string}
+     */
+    _blockImageAlt(protoblock, name) {
+        const label = protoblock && protoblock.staticLabels && protoblock.staticLabels[0];
+        return label ? _(label) : name;
     }
 
     /**
@@ -1053,7 +1078,13 @@ class HelpWidget {
             if (message) {
                 const bodyFragment = document.createDocumentFragment();
                 if (message.length > 1) {
-                    bodyFragment.append(this._makeBlockImageFigure(message[1], name));
+                    bodyFragment.append(
+                        this._makeBlockImageFigure(
+                            message[1],
+                            name,
+                            this._blockImageAlt(block, name)
+                        )
+                    );
                 }
 
                 const messageParagraph = document.createElement("p");

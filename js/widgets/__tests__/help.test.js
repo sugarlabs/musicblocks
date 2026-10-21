@@ -1626,3 +1626,58 @@ describe("block help artwork", () => {
         expect(img.getAttribute("src")).toBe("Docs/documentation-es/pitch_block.svg");
     });
 });
+
+describe("block help image alt text", () => {
+    test("uses the translated block label", () => {
+        const hw = Object.create(HelpWidget.prototype);
+        expect(hw._blockImageAlt({ staticLabels: ["set instrument"] }, "settimbre")).toBe(
+            "set instrument"
+        );
+    });
+
+    test("falls back to the block name when there is no label", () => {
+        const hw = Object.create(HelpWidget.prototype);
+        expect(hw._blockImageAlt({ staticLabels: [""] }, "heap")).toBe("heap");
+        expect(hw._blockImageAlt({ staticLabels: [] }, "heap")).toBe("heap");
+        expect(hw._blockImageAlt(undefined, "heap")).toBe("heap");
+    });
+
+    test("help for a block on the canvas sets the image alt", () => {
+        const activity = createMockActivity({
+            blockList: [
+                {
+                    name: "settimbre",
+                    protoblock: {
+                        staticLabels: ["set instrument"],
+                        helpString: ["Set instrument help", "documentation"]
+                    }
+                }
+            ]
+        });
+        activity.blocks.activeBlock = 0;
+
+        new HelpWidget(activity, true);
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation/settimbre_block.svg");
+        expect(img.alt).toBe("set instrument");
+    });
+
+    test("help opened for a named block sets the image alt", () => {
+        const block = {
+            name: "pitch",
+            staticLabels: ["pitch"],
+            helpString: ["Pitch help", "documentation"],
+            beginnerModeBlock: true,
+            palette: { name: "pitch", palettes: { showPalette: jest.fn() } }
+        };
+        const activity = createMockActivity({ protoBlockDict: { pitch: block } });
+
+        HelpWidget.showBlockHelp(activity, "pitch");
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.alt).toBe("pitch");
+    });
+});
