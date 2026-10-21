@@ -40,6 +40,14 @@
 /* exported setupToneActions */
 
 /**
+ * Largest partial index accepted by doHarmonic(). Partial h sounds at (h + 1) times
+ * the note's frequency; the lowest pitch Music Blocks represents is C0 (octave 0,
+ * about 16.35 Hz), so any h above 1222 is beyond 20 kHz for every note and only
+ * makes doHarmonic()'s fill loop longer (Infinity never ends).
+ */
+const MAX_HARMONIC = 1222;
+
+/**
  * Sets up all the methods related to different actions for each block in Tone palette.
  * @returns {void}
  */
@@ -405,9 +413,18 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block index in blocks.blockList
          */
         static doHarmonic(harmonic, turtle, blk) {
-            if (typeof harmonic !== "number" || harmonic < 0) {
+            if (typeof harmonic !== "number" || Number.isNaN(harmonic) || harmonic < 0) {
                 //.TRANS: partials components in a harmonic series
                 activity.errorMsg(_("Partial must be greater than or equal to 0."));
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            if (harmonic > MAX_HARMONIC) {
+                activity.errorMsg(
+                    _("Partial must be less than or equal to %s.").replace(/%s/g, MAX_HARMONIC),
+                    blk
+                );
                 activity.logo.stopTurtle = true;
                 return;
             }
