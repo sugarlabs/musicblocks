@@ -209,6 +209,37 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("mergeGlobalProject", () => {
+        beforeEach(() => {
+            gp.cache.remote = { ProjectImage: "remote-image" };
+            jest.spyOn(gp, "getData").mockImplementation((id, callback) => callback("remote-data"));
+            mockPlanet.ProjectStorage.getCurrentProjectData = jest.fn();
+            mockPlanet.ProjectStorage.initialiseNewProject.mockResolvedValue("new-project");
+        });
+
+        it("keeps the current project when it already has data", async () => {
+            mockPlanet.ProjectStorage.getCurrentProjectData.mockResolvedValue("local-data");
+
+            gp.mergeGlobalProject("remote");
+            await Promise.resolve();
+
+            expect(gp.getData).toHaveBeenCalledWith("remote", expect.any(Function), null);
+            expect(mockPlanet.ProjectStorage.initialiseNewProject).not.toHaveBeenCalled();
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("remote-data", true);
+        });
+
+        it("starts a project when there is no current project data", async () => {
+            mockPlanet.ProjectStorage.getCurrentProjectData.mockResolvedValue(null);
+
+            gp.mergeGlobalProject("remote");
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(mockPlanet.ProjectStorage.initialiseNewProject).toHaveBeenCalledTimes(1);
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("remote-data");
+        });
+    });
+
     describe("_cleanupCards", () => {
         it("should call cleanup on each card and reset the array", () => {
             const mockCard1 = { cleanup: jest.fn() };
