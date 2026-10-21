@@ -896,6 +896,16 @@ describe("widgetWindows", () => {
             expect(win._frame.style.display).toBe("block");
         });
 
+        test("show makes isVisible return true again", () => {
+            const win = createTestWindow();
+            window.widgetWindows.hideWindow(win._key);
+            expect(win.isVisible()).toBe(false);
+
+            win.show();
+
+            expect(win.isVisible()).toBe(true);
+        });
+
         test("clear empties widget and toolbar", () => {
             const win = createTestWindow();
             win._widget.innerHTML = "<p>Content</p>";
@@ -1359,6 +1369,8 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1.isVisible()).toBe(false);
+            expect(win2.isVisible()).toBe(false);
             expect(win1._frame.style.zIndex).toBe("10");
             expect(win1._overlayframe.style.zIndex).toBe("-1");
             expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
@@ -1372,6 +1384,7 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow(win._key);
 
             expect(win._frame.style.display).toBe("none");
+            expect(win.isVisible()).toBe(false);
             expect(window.widgetWindows.focused).toBeNull();
         });
 
@@ -1394,6 +1407,8 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("block");
             expect(win2._frame.style.display).toBe("block");
+            expect(win1.isVisible()).toBe(true);
+            expect(win2.isVisible()).toBe(true);
         });
 
         test("clear calls onclose on the named window", () => {

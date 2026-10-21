@@ -882,6 +882,7 @@ class WidgetWindow {
      */
     show() {
         this._frame.style.display = "block";
+        this._visible = true;
         window.widgetWindows._handleResize();
     }
 
@@ -1014,6 +1015,7 @@ window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) {
             win._frame.style.display = "none";
+            win._visible = false;
             win._overlay(false, false);
         }
     });
@@ -1028,6 +1030,7 @@ window.widgetWindows.hideWindow = name => {
     const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     win._frame.style.display = "none";
+    win._visible = false;
     if (window.widgetWindows.focused === win) {
         window.widgetWindows.focused = null;
     }
@@ -1050,7 +1053,10 @@ window.widgetWindows.closeWindow = name => {
  */
 window.widgetWindows.showWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        if (win !== undefined) win._frame.style.display = "block";
+        if (win !== undefined) {
+            win._frame.style.display = "block";
+            win._visible = true;
+        }
     });
     window.widgetWindows._handleResize();
 };
