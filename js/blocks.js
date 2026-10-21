@@ -5095,7 +5095,9 @@ class Blocks {
                 }
 
                 let blockItem;
-                if (myBlock.isValueBlock()) {
+                if (myBlock.unknownBlock !== undefined) {
+                    blockItem = [b, myBlock.unknownBlock, x, y, []];
+                } else if (myBlock.isValueBlock()) {
                     switch (myBlock.name) {
                         case "media":
                         case "audiofile":
@@ -6942,6 +6944,7 @@ class Blocks {
                             const postProcessUnknownBlock = args => {
                                 /** save original block name */
                                 that.blockList[args[0]].privateData = args[1];
+                                that.blockList[args[0]].unknownBlock = blkData[1];
                             };
 
                             let newName = name;

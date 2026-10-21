@@ -727,7 +727,14 @@ class ProjectManager {
             let args = null;
             let exportName = myBlock.name;
 
-            if (
+            if (myBlock.unknownBlock !== undefined) {
+                if (Array.isArray(myBlock.unknownBlock)) {
+                    exportName = myBlock.unknownBlock[0];
+                    args = myBlock.unknownBlock[1] ?? null;
+                } else {
+                    exportName = myBlock.unknownBlock;
+                }
+            } else if (
                 myBlock.isValueBlock() ||
                 myBlock.name === "loadFile" ||
                 myBlock.name === "boolean"
@@ -860,13 +867,6 @@ class ProjectManager {
                         args = {
                             value: myBlock.privateData
                         };
-                        break;
-                    case "nopValueBlock":
-                    case "nopZeroArgBlock":
-                    case "nopOneArgBlock":
-                    case "nopTwoArgBlock":
-                    case "nopThreeArgBlock":
-                        exportName = myBlock.privateData;
                         break;
                     case "matrixData":
                         args = {
