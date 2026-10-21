@@ -427,6 +427,17 @@ describe("Theme Switching & Inline Styles Purity", () => {
         expect(strippedCss).not.toMatch(/#[0-9a-fA-F]{3,6}/);
     });
 
+    it("allows inline toolbar offsets to override mobile window positioning", () => {
+        const windowsCss = fs.readFileSync(
+            path.join(ROOT_DIR, "dist", "css", "windows.css"),
+            "utf8"
+        );
+
+        expect(windowsCss).not.toMatch(
+            /#floatingWindows\s*>\s*\.windowFrame\s*\{[^}]*top:\s*0\s*!important;/
+        );
+    });
+
     it("ensures body element in index.html and activities stylesheets uses tokens without inline styles or !important", () => {
         const indexHtml = fs.readFileSync(path.join(ROOT_DIR, "index.html"), "utf8");
 
