@@ -4159,4 +4159,38 @@ describe("DRUMNAMES Lilypond symbols", () => {
             expect(DEFAULTSYNTHVOLUME[name]).toBeGreaterThan(0);
         });
     });
+
+    it("groups drum families together in DRUMNAMES", () => {
+        const drumNames = DRUMNAMES.map(d => d[1]);
+
+        const snares = ["snare drum", "snare hard", "snare soft", "snare roll"];
+        const snareIndices = snares.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < snareIndices.length; i++) {
+            expect(snareIndices[i]).toBe(snareIndices[i - 1] + 1);
+        }
+
+        const kicks = ["kick drum", "heavy kick", "bass drum"];
+        const kickIndices = kicks.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < kickIndices.length; i++) {
+            expect(kickIndices[i]).toBe(kickIndices[i - 1] + 1);
+        }
+
+        const toms = ["tom tom", "tom hi", "tom mid", "tom lo", "floor tom"];
+        const tomIndices = toms.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < tomIndices.length; i++) {
+            expect(tomIndices[i]).toBe(tomIndices[i - 1] + 1);
+        }
+
+        const cymbals = [
+            "hi hat",
+            "cymbal closed",
+            "cymbal open",
+            "cymbal pedal",
+            "finger cymbals"
+        ];
+        const cymbalIndices = cymbals.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < cymbalIndices.length; i++) {
+            expect(cymbalIndices[i]).toBe(cymbalIndices[i - 1] + 1);
+        }
+    });
 });
