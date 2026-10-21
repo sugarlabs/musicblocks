@@ -154,10 +154,10 @@ describe("setupToneActions", () => {
             expect(targetTurtle.inSetTimbre).toBe(true);
             expect(targetTurtle.singer.instrumentNames).toContain("grand-piano");
             expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "grand-piano");
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_settimbre_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_settimbre_0_1");
 
-            if (listenerCallbacks["_settimbre_0"]) {
-                listenerCallbacks["_settimbre_0"]();
+            if (listenerCallbacks["_settimbre_0_1"]) {
+                listenerCallbacks["_settimbre_0_1"]();
                 expect(targetTurtle.inSetTimbre).toBe(false);
                 expect(targetTurtle.singer.instrumentNames.length).toBe(0);
             }
@@ -171,7 +171,7 @@ describe("setupToneActions", () => {
 
         it("should not re-initialize synthVolume for a synth that was pushed and popped previously", () => {
             Singer.ToneActions.setTimbre("piano", 0, 1);
-            listenerCallbacks["_settimbre_0"]();
+            listenerCallbacks["_settimbre_0_1"]();
             expect(targetTurtle.singer.instrumentNames).not.toContain("grand-piano");
             expect(targetTurtle.singer.synthVolume["grand-piano"]).toBeDefined();
 
@@ -194,7 +194,7 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
             expect(targetTurtle.singer.synthVolume["grand-piano"]).toEqual([0.5]);
 
-            listenerCallbacks["_settimbre_0"]();
+            listenerCallbacks["_settimbre_0_1"]();
             expect(targetTurtle.inSetTimbre).toBe(false);
             expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
         });
@@ -204,7 +204,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_settimbre_0");
+            expect(mouse.MB.listeners).toContain("_settimbre_0_999");
         });
 
         it("should dispatch via neither branch when blk is not in blockList and not running", () => {
@@ -213,7 +213,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).not.toContain("_settimbre_0");
+            expect(mouse.MB.listeners).not.toContain("_settimbre_0_999");
             MusicBlocks.isRun = true;
         });
 
@@ -287,7 +287,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0);
-            expect(mouse.MB.listeners).not.toContain("_settimbre_0");
+            expect(mouse.MB.listeners).not.toContain("_settimbre_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -295,8 +295,41 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0);
-            expect(mouse.MB.listeners).toContain("_settimbre_0");
-            listenerCallbacks["_settimbre_0"]();
+            expect(mouse.MB.listeners).toContain("_settimbre_0_undefined");
+            listenerCallbacks["_settimbre_0_undefined"]();
+            expect(targetTurtle.inSetTimbre).toBe(false);
+        });
+
+        it("should give nested Set Instrument blocks their own cleanup listener", () => {
+            // Set Instrument piano (blk 1) > Set Instrument piano (blk 2). The inner
+            // block does not push, so it must not replace the outer block's pop.
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+            Singer.ToneActions.setTimbre("piano", 0, 2);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+
+            listenerCallbacks["_settimbre_0_2"]();
+            expect(targetTurtle.inSetTimbre).toBe(true);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+
+            listenerCallbacks["_settimbre_0_1"]();
+            expect(targetTurtle.inSetTimbre).toBe(false);
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
+        });
+
+        it("should not leave the middle instrument behind after piano > violin > piano", () => {
+            activity.blocks.blockList[3] = {};
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+            Singer.ToneActions.setTimbre("violin", 0, 2);
+            Singer.ToneActions.setTimbre("piano", 0, 3);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano", "acoustic-violin"]);
+
+            listenerCallbacks["_settimbre_0_3"]();
+            listenerCallbacks["_settimbre_0_2"]();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+            expect(targetTurtle.inSetTimbre).toBe(true);
+
+            listenerCallbacks["_settimbre_0_1"]();
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
             expect(targetTurtle.inSetTimbre).toBe(false);
         });
     });
