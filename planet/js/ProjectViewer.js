@@ -40,6 +40,7 @@ class ProjectViewer {
 
     open(id) {
         const Planet = this.Planet;
+        if (this.id !== id) this.closeReporter();
         this.id = id;
         const proj = this.ProjectCache[id];
 
@@ -217,6 +218,7 @@ class ProjectViewer {
 
     closeReporter() {
         document.getElementById("projectviewer-report-card").style.display = "none";
+        document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
     }
 
     init() {
