@@ -316,12 +316,16 @@ const setupActivityRecorder = activityInstance => {
             }
 
             const handler = async function handler() {
+                if (flag !== 0) {
+                    return;
+                }
+                flag = 1;
+                start.removeEventListener("click", handler);
+
                 try {
                     const stream = await recordScreen();
                     mediaRecorder = createRecorder(stream);
                     if (flag === 1) {
-                        start.removeEventListener("click", handler);
-
                         const stopHandler = function stopHandler() {
                             if (mediaRecorder && mediaRecorder.state === "recording") {
                                 mediaRecorder.stop();
@@ -336,6 +340,7 @@ const setupActivityRecorder = activityInstance => {
                         start.addEventListener("click", stopHandler);
                     }
                 } catch (error) {
+                    cleanupStreams();
                     ErrorHandler.recoverable(error, { operation: "recording" });
                     that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
                     flag = 0;

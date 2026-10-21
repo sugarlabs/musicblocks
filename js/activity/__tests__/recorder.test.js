@@ -333,6 +333,71 @@ describe("recorder", () => {
     });
 
     describe("recordScreenWithTools", () => {
+        it("starts only one capture when Record is clicked again before permission resolves", async () => {
+            let resolveCapture;
+            const capture = new Promise(resolve => {
+                resolveCapture = resolve;
+            });
+            const getDisplayMedia = jest.fn(() => capture);
+            Object.defineProperty(global.navigator, "mediaDevices", {
+                value: { getDisplayMedia },
+                configurable: true
+            });
+            global.localStorage = { getItem: jest.fn(() => null) };
+
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: null } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+
+            const startHandler = mockStart._recordHandler;
+            const firstStart = startHandler();
+            const secondStart = startHandler();
+            await Promise.resolve();
+
+            expect(getDisplayMedia).toHaveBeenCalledTimes(1);
+
+            const track = { stop: jest.fn() };
+            resolveCapture({ getTracks: () => [track] });
+            await Promise.all([firstStart, secondStart]);
+        });
+
+        it("releases a captured stream if its recorder cannot start", async () => {
+            const track = { stop: jest.fn() };
+            Object.defineProperty(global.navigator, "mediaDevices", {
+                value: {
+                    getDisplayMedia: jest.fn().mockResolvedValue({ getTracks: () => [track] })
+                },
+                configurable: true
+            });
+            global.localStorage = { getItem: jest.fn(() => null) };
+            global.MediaRecorder = class {
+                constructor() {
+                    throw new Error("Recorder unavailable");
+                }
+            };
+
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: null } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+
+            await mockStart._recordHandler();
+
+            expect(track.stop).toHaveBeenCalledTimes(1);
+            expect(ErrorHandler.recoverable).toHaveBeenCalled();
+        });
+
         it("stops the getDisplayMedia tracks after recording is stopped", async () => {
             const mockTrack = { stop: jest.fn(), addEventListener: jest.fn() };
             const mockDisplayStream = { getTracks: () => [mockTrack] };
