@@ -63,13 +63,33 @@ function setupToneActions(activity) {
         static setTimbre(instrument, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            const multisample =
+                instrument !== null &&
+                typeof instrument === "object" &&
+                !Array.isArray(instrument) &&
+                instrument.type === "multisample";
+            let synth = instrument;
+            if (multisample) {
+                try {
+                    if (activity.logo.inMatrix) {
+                        throw new Error(
+                            _("Multisample instruments cannot be captured in Phrase Maker yet.")
+                        );
+                    }
+                    synth = activity.logo.synth.registerMultisample(instrument);
+                } catch (error) {
+                    activity.errorMsg(error.message, blk);
+                    activity.logo.stopTurtle = true;
+                    return;
+                }
+            }
+
             // Restored when this block ends, so an inner Set Instrument does not
             // switch off the outer one's timbre effects.
             const wasInSetTimbre = tur.inSetTimbre;
             tur.inSetTimbre = true;
 
             let accounted = false;
-            let synth = instrument;
             for (const voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === instrument) {
                     synth = VOICENAMES[voice][1];
@@ -82,7 +102,7 @@ function setupToneActions(activity) {
                 }
             }
 
-            if (!accounted && typeof instrument === "object") {
+            if (!accounted && typeof instrument === "object" && !multisample) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     // data, pitch, octave and the cent adjustment from the sampler
@@ -109,7 +129,14 @@ function setupToneActions(activity) {
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
                 pushed = true;
-                activity.logo.synth.loadSynth(turtle, synth);
+                const loading = activity.logo.synth.loadSynth(turtle, synth);
+                if (multisample) {
+                    loading.catch(error => {
+                        if (error.name === "AbortError") return;
+                        activity.errorMsg(error.message, blk);
+                        activity.logo.stopTurtle = true;
+                    });
+                }
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any

@@ -234,6 +234,65 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
         });
 
+        it("registers a multisample handle without modifying the legacy sample registry", async () => {
+            const descriptor = { type: "multisample", version: 1, name: "Cello", samples: [] };
+            const previous = { ...CUSTOMSAMPLES };
+            activity.logo.synth.registerMultisample = jest.fn().mockReturnValue("multisample_1");
+            activity.logo.synth.loadSynth.mockResolvedValue({});
+            Singer.ToneActions.setTimbre(descriptor, 0, 1);
+            expect(activity.logo.synth.registerMultisample).toHaveBeenCalledWith(descriptor);
+            expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "multisample_1");
+            expect(targetTurtle.singer.instrumentNames).toEqual(["multisample_1"]);
+            expect(targetTurtle.singer.synthVolume.multisample_1).toEqual([1]);
+            expect(CUSTOMSAMPLES).toEqual(previous);
+            listenerCallbacks._settimbre_0_1();
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
+            expect(targetTurtle.inSetTimbre).toBe(false);
+        });
+
+        it("rejects invalid multisamples before changing timbre or installing a listener", () => {
+            activity.logo.synth.registerMultisample = jest.fn(() => {
+                throw new Error("Invalid roots");
+            });
+            Singer.ToneActions.setTimbre({ type: "multisample" }, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Invalid roots", 1);
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
+            expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+            expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+        });
+
+        it("reports a multisample load failure but ignores cancellation from Stop", async () => {
+            activity.logo.synth.registerMultisample = jest.fn().mockReturnValue("multisample_1");
+            activity.logo.synth.loadSynth.mockRejectedValue(new Error("Unable to decode C4.wav"));
+            Singer.ToneActions.setTimbre({ type: "multisample" }, 0, 1);
+            await Promise.resolve();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unable to decode C4.wav", 1);
+            expect(activity.logo.stopTurtle).toBe(true);
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
+            listenerCallbacks._settimbre_0_1();
+            activity.logo.synth.loadSynth.mockRejectedValue(
+                new DOMException("Stopped", "AbortError")
+            );
+            Singer.ToneActions.setTimbre({ type: "multisample" }, 0, 1);
+            await Promise.resolve();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.logo.stopTurtle).toBe(false);
+        });
+
+        it("does not capture a runtime-only multisample handle in Phrase Maker", () => {
+            activity.logo.inMatrix = true;
+            activity.logo.synth.registerMultisample = jest.fn();
+            Singer.ToneActions.setTimbre({ type: "multisample" }, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Phrase Maker"),
+                1
+            );
+            expect(activity.logo.phraseMaker._instrumentName).toBeNull();
+            expect(activity.logo.synth.registerMultisample).not.toHaveBeenCalled();
+        });
+
         it("should keep the cent adjustment of a custom sample", () => {
             Singer.ToneActions.setTimbre(["tuned", "data", "la", 4, 50], 0, 1);
             expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
