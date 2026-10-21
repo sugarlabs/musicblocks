@@ -2423,8 +2423,10 @@ class Singer {
                                         chordNotes.push(notationNote);
                                     }
 
-                                    if (!chordDrums.includes(tur.singer.noteDrums[thisBlk][0])) {
-                                        chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
+                                    for (const drum of tur.singer.noteDrums[thisBlk]) {
+                                        if (!chordDrums.includes(drum)) {
+                                            chordDrums.push(drum);
+                                        }
                                     }
                                 } else {
                                     if (courtesy[i]) {

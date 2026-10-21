@@ -460,27 +460,28 @@ class SaveInterface {
                     if (!isFinite(duration) || duration <= 0) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
-                            const drumTrack = midi.addTrack();
-                            drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
-                            drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
+                    if (noteData.drum && noteData.drum.length > 0) {
+                        for (const drum of noteData.drum) {
+                            if (!trackMap.has(drum)) {
+                                const drumTrack = midi.addTrack();
+                                drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
+                                drumTrack.channel = 9; // Drums must be on Channel 10
+                                trackMap.set(drum, drumTrack);
+                            }
+
+                            const drumTrack = trackMap.get(drum);
+                            const midiNumber =
+                                Object.prototype.hasOwnProperty.call(drumMIDI, drum) &&
+                                drumMIDI[drum]
+                                    ? drumMIDI[drum]
+                                    : 36; // default to Bass Drum
+                            drumTrack.addNote({
+                                midi: midiNumber,
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.9
+                            });
                         }
-
-                        const drumTrack = trackMap.get(drum);
-
-                        const midiNumber =
-                            Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
-                                ? drumMIDI[drum]
-                                : 36; // default to Bass Drum
-                        drumTrack.addNote({
-                            midi: midiNumber,
-                            time: globalTime,
-                            duration: duration,
-                            velocity: 0.9
-                        });
                     } else {
                         if (!trackMap.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
