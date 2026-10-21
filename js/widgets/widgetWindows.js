@@ -981,7 +981,12 @@ window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        const win = new WidgetWindow(key, title, fullscreen).sendToCenter();
+        const win = new WidgetWindow(key, title, fullscreen);
+        // The constructor restores a previously saved position, so only center
+        // the window the first time it is opened.
+        if (!window.widgetWindows._posCache[key]) {
+            win.sendToCenter();
+        }
         window.widgetWindows.openWindows[key] = win;
     }
 
