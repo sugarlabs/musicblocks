@@ -47,9 +47,20 @@ describe("Harmony widget", () => {
             });
         cy.get("@hw").contains("td", "C4 → G4").should("be.visible");
 
-        cy.get("@hw")
-            .contains("Play two or more notes at the same time.", { timeout: 10000 })
-            .should("be.visible");
-        cy.get("@hw").contains("td", "C2").should("not.exist");
+        // Second beat: while the C4 mouse's second note is still sounding, the
+        // rest and the drum of the other mice must not produce interval rows.
+        cy.window({ timeout: 10000 }).should(win => {
+            const activity = win.ActivityContext.getActivity();
+            const sounds = activity.turtles.turtleList
+                .filter(turtle => !turtle.inTrash && turtle.singer.pitchStatus)
+                .flatMap(turtle => turtle.singer.pitchStatus);
+            const secondC4 = sounds.find(sound => sound.notes[0] === "C4" && sound.start > 0);
+            expect(secondC4, "the C4 mouse is on its second note").to.exist;
+            expect(Date.now(), "that note is still sounding").to.be.below(secondC4.endsAt);
+
+            const frame = win.document.querySelector('.windowFrame[aria-label="harmony"]');
+            expect(frame.querySelectorAll("td"), "no interval rows").to.have.length(0);
+            expect(frame.textContent).to.contain("Play two or more notes at the same time.");
+        });
     });
 });

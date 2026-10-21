@@ -36,9 +36,9 @@ class HarmonyWidget {
     /** AMD module dependencies for lazy loading. */
     static dependencies = ["widgets/HarmonyUtils", "widgets/harmony"];
 
-    // Seconds a note stays listed after its scheduled end, so that the table
-    // does not flicker between back-to-back notes.
-    static END_GRACE = 0.1;
+    // Milliseconds a note is listed before it starts and after it stops
+    // sounding, so that the table does not flicker between back-to-back notes.
+    static END_GRACE = 100;
 
     /**
      * @param {Object} activity - The Activity instance.
@@ -98,27 +98,30 @@ class HarmonyWidget {
      * @returns {Array<string|number>} Note names (e.g. "E4") or frequencies in Hz.
      */
     _soundingNotes() {
-        const logo = this.activity.logo;
-        if (logo.stopTurtle || logo.firstNoteTime === null) {
+        if (this.activity.logo.stopTurtle) {
             return [];
         }
 
-        const now = (Date.now() - logo.firstNoteTime) / 1000;
+        const now = Date.now();
         const notes = [];
         for (const turtle of this.activity.turtles.turtleList) {
             const singer = turtle.singer;
-            const status = singer && singer.pitchStatus;
-            // A rest or a drum-only note moves previousTurtleTime past the
-            // start of the last pitched note, so that note is no longer sounding.
-            if (
-                turtle.inTrash ||
-                !status ||
-                status.start !== singer.previousTurtleTime ||
-                now > status.end + HarmonyWidget.END_GRACE
-            ) {
+            if (turtle.inTrash || !singer || !singer.pitchStatus) {
                 continue;
             }
-            notes.push(...status.notes);
+
+            for (const sound of singer.pitchStatus) {
+                // A rest or a drum-only note moves previousTurtleTime past the
+                // start of the last pitched notes, so they are no longer sounding.
+                // A nested note may also not have started yet.
+                if (
+                    sound.start === singer.previousTurtleTime &&
+                    now >= sound.startsAt - HarmonyWidget.END_GRACE &&
+                    now <= sound.endsAt + HarmonyWidget.END_GRACE
+                ) {
+                    notes.push(...sound.notes);
+                }
+            }
         }
         return notes;
     }

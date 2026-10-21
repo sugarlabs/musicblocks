@@ -36,9 +36,10 @@ const HarmonyWidget = require("../harmony");
 // 12-EDO frequencies, A4 = 440 Hz.
 const FREQUENCIES = { C4: 261.6256, E4: 329.6276, G4: 391.9954, E5: 659.2551 };
 
-const makeTurtle = (pitchStatus, previousTurtleTime = 0) => ({
+// One mouse whose latest note group holds the given sounds.
+const makeTurtle = (sounds, previousTurtleTime = 0) => ({
     inTrash: false,
-    singer: { pitchStatus, previousTurtleTime }
+    singer: { pitchStatus: [].concat(sounds), previousTurtleTime }
 });
 
 describe("HarmonyWidget", () => {
@@ -64,7 +65,6 @@ describe("HarmonyWidget", () => {
         activity = {
             logo: {
                 stopTurtle: false,
-                firstNoteTime: 10000,
                 synth: {
                     inTemperament: "equal",
                     changeInTemperament: false,
@@ -87,11 +87,11 @@ describe("HarmonyWidget", () => {
             .map(tr => Array.from(tr.children).map(td => td.textContent));
 
     it("shows the intervals of notes played by different mice", () => {
-        // 0.5 s into the run: both notes span 0 to 1 s.
+        // Now is 10500 ms; every note sounds from 10000 to 11000 ms.
         activity.turtles.turtleList = [
-            makeTurtle({ notes: ["C4"], start: 0, end: 1 }),
-            makeTurtle({ notes: ["E4"], start: 0, end: 1 }),
-            makeTurtle({ notes: ["G4"], start: 0, end: 1 })
+            makeTurtle({ notes: ["C4"], start: 0, startsAt: 10000, endsAt: 11000 }),
+            makeTurtle({ notes: ["E4"], start: 0, startsAt: 10000, endsAt: 11000 }),
+            makeTurtle({ notes: ["G4"], start: 0, startsAt: 10000, endsAt: 11000 })
         ];
 
         new HarmonyWidget(activity);
@@ -108,7 +108,9 @@ describe("HarmonyWidget", () => {
     });
 
     it("names compound intervals with the extra octaves", () => {
-        activity.turtles.turtleList = [makeTurtle({ notes: ["C4", "E5"], start: 0, end: 1 })];
+        activity.turtles.turtleList = [
+            makeTurtle({ notes: ["C4", "E5"], start: 0, startsAt: 10000, endsAt: 11000 })
+        ];
 
         new HarmonyWidget(activity);
 
@@ -117,8 +119,8 @@ describe("HarmonyWidget", () => {
 
     it("shows a just interval given in hertz as 0.0 cents", () => {
         activity.turtles.turtleList = [
-            makeTurtle({ notes: [200], start: 0, end: 1 }),
-            makeTurtle({ notes: [250], start: 0, end: 1 })
+            makeTurtle({ notes: [200], start: 0, startsAt: 10000, endsAt: 11000 }),
+            makeTurtle({ notes: [250], start: 0, startsAt: 10000, endsAt: 11000 })
         ];
 
         new HarmonyWidget(activity);
@@ -128,9 +130,9 @@ describe("HarmonyWidget", () => {
 
     it("leaves out a mouse that has moved on to a rest or a drum", () => {
         activity.turtles.turtleList = [
-            makeTurtle({ notes: ["C4"], start: 0, end: 1 }),
+            makeTurtle({ notes: ["C4"], start: 0, startsAt: 10000, endsAt: 11000 }),
             // Its last pitched note started at 0, but it is now past a later event.
-            makeTurtle({ notes: ["E4"], start: 0, end: 0.25 }, 0.25)
+            makeTurtle({ notes: ["E4"], start: 0, startsAt: 10000, endsAt: 10250 }, 0.25)
         ];
 
         new HarmonyWidget(activity);
@@ -139,21 +141,25 @@ describe("HarmonyWidget", () => {
         expect(body.textContent).toBe("Play two or more notes at the same time.");
     });
 
-    it("leaves out a note whose time is over", () => {
+    it("leaves out a note once its sound has ended, after a short grace", () => {
+        // A staccato note: its sound ends before the mouse moves on.
         activity.turtles.turtleList = [
-            makeTurtle({ notes: ["C4"], start: 0, end: 1 }),
-            makeTurtle({ notes: ["E4"], start: 0, end: 0.25 })
+            makeTurtle({ notes: ["C4"], start: 0, startsAt: 10000, endsAt: 11000 }),
+            makeTurtle({ notes: ["E4"], start: 0, startsAt: 10000, endsAt: 10250 })
         ];
-
         new HarmonyWidget(activity);
-
         expect(rows()).toEqual([]);
+
+        // Within 100 ms of its end, it is still listed.
+        activity.turtles.turtleList[1].singer.pitchStatus[0].endsAt = 10450;
+        new HarmonyWidget(activity);
+        expect(rows()).toEqual([["C4 → E4", "major 3", "5:4", "1.260", "+13.7"]]);
     });
 
     it("shows nothing once the project is stopped", () => {
         activity.turtles.turtleList = [
-            makeTurtle({ notes: ["C4"], start: 0, end: 1 }),
-            makeTurtle({ notes: ["E4"], start: 0, end: 1 })
+            makeTurtle({ notes: ["C4"], start: 0, startsAt: 10000, endsAt: 11000 }),
+            makeTurtle({ notes: ["E4"], start: 0, startsAt: 10000, endsAt: 11000 })
         ];
         activity.logo.stopTurtle = true;
 
@@ -164,8 +170,8 @@ describe("HarmonyWidget", () => {
 
     it("re-renders only when the sounding notes change", () => {
         activity.turtles.turtleList = [
-            makeTurtle({ notes: ["C4"], start: 0, end: 1 }),
-            makeTurtle({ notes: ["E4"], start: 0, end: 1 })
+            makeTurtle({ notes: ["C4"], start: 0, startsAt: 10000, endsAt: 11000 }),
+            makeTurtle({ notes: ["E4"], start: 0, startsAt: 10000, endsAt: 11000 })
         ];
         const widget = new HarmonyWidget(activity);
         const calls = activity.logo.synth.getFrequency.mock.calls.length;
@@ -173,9 +179,42 @@ describe("HarmonyWidget", () => {
         widget._tick();
         expect(activity.logo.synth.getFrequency.mock.calls.length).toBe(calls);
 
-        activity.turtles.turtleList[1].singer.pitchStatus = { notes: ["G4"], start: 0, end: 1 };
+        activity.turtles.turtleList[1].singer.pitchStatus = [
+            { notes: ["G4"], start: 0, startsAt: 10000, endsAt: 11000 }
+        ];
         widget._tick();
         expect(rows()).toEqual([["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0"]]);
+    });
+
+    it("adds a note nested in another note of the same mouse", () => {
+        // One mouse: a C4 note with an E4 note nested in it; another mouse plays G4.
+        activity.turtles.turtleList = [
+            makeTurtle([
+                { notes: ["E4"], start: 0, startsAt: 10000, endsAt: 10667 },
+                { notes: ["C4"], start: 0, startsAt: 10000, endsAt: 11333 }
+            ]),
+            makeTurtle({ notes: ["G4"], start: 0, startsAt: 10000, endsAt: 12667 })
+        ];
+
+        new HarmonyWidget(activity);
+
+        expect(body.textContent).toContain("C major");
+        expect(rows().map(row => row[0])).toEqual(["C4 → E4", "C4 → G4"]);
+    });
+
+    it("does not list a nested note before it starts", () => {
+        // The second nested note starts at 10667 ms; now is 10500 ms.
+        activity.turtles.turtleList = [
+            makeTurtle([
+                { notes: ["E4"], start: 0, startsAt: 10000, endsAt: 10667 },
+                { notes: ["F4"], start: 0, startsAt: 10667, endsAt: 11333 }
+            ]),
+            makeTurtle({ notes: ["C4"], start: 0, startsAt: 10000, endsAt: 12667 })
+        ];
+
+        new HarmonyWidget(activity);
+
+        expect(rows().map(row => row[0])).toEqual(["C4 → E4"]);
     });
 
     it("stops refreshing when closed", () => {
