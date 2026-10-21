@@ -117,15 +117,12 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
-    it("keeps the floating widget roll-up button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+    it("does not hardcode dark-mode widget title bar button backgrounds", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.(?:rollup|close)\s*\{[^}]*background(?:-color)?\s*:\s*#[0-9a-f]{3,8}\b/i
         );
-    });
-
-    it("keeps the floating widget close button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+        expect(themesCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\s*\{[^}]*background-color\s*:\s*var\(--color-bg-tertiary\)\s*;/
         );
     });
 
