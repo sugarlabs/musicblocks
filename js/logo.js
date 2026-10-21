@@ -490,6 +490,31 @@ class Logo {
     }
 
     /**
+     * Gets the connections of the blocks a duplicate notes clamp has broken,
+     * as _restoreConnections() will leave them, without restoring them.
+     *
+     * @returns {Map<number, Array>} block index -> connections
+     */
+    getRestoredConnections() {
+        const restored = new Map();
+        const connectionsOf = blk => {
+            if (!restored.has(blk)) restored.set(blk, [...this.blockList[blk].connections]);
+            return restored.get(blk);
+        };
+
+        for (const turtle in this.connectionStore) {
+            for (const blk in this.connectionStore[turtle]) {
+                for (const [child, c, next] of this.connectionStore[turtle][blk]) {
+                    connectionsOf(child)[c] = next;
+                    if (next !== null && next !== undefined) connectionsOf(next)[0] = child;
+                }
+            }
+        }
+
+        return restored;
+    }
+
+    /**
      * Preps synths for each turtle.
      *
      * @returns {void}

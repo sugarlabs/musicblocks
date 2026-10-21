@@ -79,7 +79,7 @@ beforeAll(() => {
 
 const makeActivity = (overrides = {}) => ({
     canvas: { width: 800 },
-    logo: { synth: { startingPitch: 392 } },
+    logo: { synth: { startingPitch: 392 }, getRestoredConnections: () => new Map() },
     turtles: {
         running: jest.fn(() => false),
         getTurtleCount: jest.fn(() => 0),
@@ -1140,6 +1140,69 @@ describe("prepareExport", () => {
 
         it("exports only the collapsed state when there are no cells", () => {
             expect(exportMatrix()).toEqual(["matrix", { collapsed: false }]);
+        });
+    });
+
+    describe("while a duplicate notes clamp plays", () => {
+        const block = (name, connections, trash = false) => ({
+            name,
+            trash,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections,
+            isValueBlock: () => false
+        });
+
+        it("saves the clamp as it was built", () => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("duplicatenotes", [null, null, 1, null]),
+                block("newnote", [0, 2]),
+                block("hidden", [1, null]),
+                block("newnote", [null, 4]),
+                block("hidden", [3, null])
+            ];
+            activity.logo.getRestoredConnections = () =>
+                new Map([
+                    [2, [1, 3]],
+                    [3, [2, 4]]
+                ]);
+
+            const result = JSON.parse(new ProjectManager(activity).prepareExport());
+
+            expect(result.map(b => b[4])).toEqual([
+                [null, null, 1, null],
+                [0, 2],
+                [1, 3],
+                [2, 4],
+                [3, null]
+            ]);
+            expect(activity.blocks.blockList[2].connections).toEqual([1, null]);
+            expect(activity.blocks.blockList[3].connections).toEqual([null, 4]);
+        });
+
+        it("renumbers the restored connections past trashed blocks", () => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("note", [null], true),
+                block("newnote", [null, 2]),
+                block("hidden", [1, null]),
+                block("newnote", [null, null])
+            ];
+            activity.logo.getRestoredConnections = () =>
+                new Map([
+                    [2, [1, 3]],
+                    [3, [2, null]]
+                ]);
+
+            const result = JSON.parse(new ProjectManager(activity).prepareExport());
+
+            expect(result.map(b => b[4])).toEqual([
+                [null, 1],
+                [0, 2],
+                [1, null]
+            ]);
         });
     });
 

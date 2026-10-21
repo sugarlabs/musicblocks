@@ -883,6 +883,67 @@ describe("Logo _restoreConnections", () => {
     });
 });
 
+// ─── Logo getRestoredConnections ──────────────────────────────────────────────
+
+describe("Logo getRestoredConnections", () => {
+    let logo;
+
+    // A duplicate notes clamp (0) holding note 1 -> hidden 2 -> note 3 ->
+    // hidden 4, broken apart as it is while the clamp plays.
+    const playingClamp = () => [
+        { connections: [null, 5, 1, 6] },
+        { connections: [0, 2] },
+        { connections: [1, null] },
+        { connections: [null, 4] },
+        { connections: [3, null] }
+    ];
+    const clampStore = () => [
+        [2, 1, 3],
+        [4, 1, null]
+    ];
+
+    beforeEach(() => {
+        setupLogoEnv();
+        logo = new Logo(createMockActivity());
+        logo.blockList = playingClamp();
+        logo.connectionStore = { 0: { 0: clampStore() } };
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test("returns the connections _restoreConnections will put back", () => {
+        const restored = logo.getRestoredConnections();
+
+        expect([...restored.keys()].sort()).toEqual([2, 3, 4]);
+        logo._restoreConnections();
+        for (const [blk, connections] of restored) {
+            expect(connections).toEqual(logo.blockList[blk].connections);
+        }
+    });
+
+    test("leaves the playing clamp broken", () => {
+        logo.getRestoredConnections();
+
+        expect(logo.blockList).toEqual(playingClamp());
+        expect(logo.connectionStore[0][0]).toEqual(clampStore());
+    });
+
+    test("merges turtles that play the same clamp", () => {
+        logo.connectionStore[1] = { 0: clampStore() };
+
+        const restored = logo.getRestoredConnections();
+
+        expect(restored.size).toBe(3);
+        expect(restored.get(2)).toEqual([1, 3]);
+    });
+
+    test("is empty when no clamp is playing", () => {
+        logo.connectionStore = { 0: {} };
+
+        expect(logo.getRestoredConnections().size).toBe(0);
+    });
+});
+
 // ─── Logo doBreak ─────────────────────────────────────────────────────────────
 
 describe("Logo doBreak", () => {
