@@ -388,6 +388,34 @@ describe("Test 8: Title and meter extraction", () => {
         expect(denBlock[1][1].value).toBe(8);
     });
 
+    it.each([
+        ["3+2", "8", 5, 8],
+        ["2+2+3", "8", 7, 8],
+        [" 3 + 2 ", "8", 5, 8],
+        ["x", "4", 4, 4],
+        ["3+", "8", 4, 8],
+        ["+3", "8", 4, 8],
+        ["3++2", "8", 4, 8],
+        ["", "4", 4, 4],
+        ["3", "0", 3, 4]
+    ])(
+        "reads <beats>%s</beats><beat-type>%s</beat-type> as %i/%i",
+        async (beatsText, beatTypeText, beats, beatType) => {
+            const xml = scorePartwise(
+                SIMPLE_NOTE("C", 4, "eighth"),
+                `<divisions>8</divisions><time><beats>${beatsText}</beats><beat-type>${beatTypeText}</beat-type></time>`
+            );
+
+            const { blocks } = await parseAndCapture(xml);
+            const meter = blocks.find(b => blockName(b) === "meter");
+            const numBlock = blocks.find(b => b[0] === meter[4][1]);
+            const divide = blocks.find(b => b[0] === meter[4][2]);
+            const denBlock = blocks.find(b => b[0] === divide[4][2]);
+            expect(numBlock[1][1].value).toBe(beats);
+            expect(denBlock[1][1].value).toBe(beatType);
+        }
+    );
+
     it("defaults to 4/4 when no <time> element is present", async () => {
         const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
 
