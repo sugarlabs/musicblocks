@@ -64,6 +64,18 @@
 */
 // Constants moved to js/block-constants.js
 
+const ACTION_NAME_SLOTS = {
+    action: 1,
+    do: 1,
+    calc: 1,
+    doArg: 1,
+    calcArg: 1,
+    listen: 2,
+    onbeatdo: 2,
+    offbeatdo: 1,
+    everybeatdo: 1
+};
+
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -3738,25 +3750,7 @@ class Blocks {
                     continue;
                 }
 
-                if (
-                    ![
-                        "do",
-                        "calc",
-                        "doArg",
-                        "calcArg",
-                        "action",
-                        "offbeatdo",
-                        "onbeatdo",
-                        "listen"
-                    ].includes(blkParent.name)
-                ) {
-                    continue;
-                }
-
-                if (
-                    (blkParent.name === "onbeatdo" || blkParent.name === "listen") &&
-                    blkParent.connections.indexOf(blk) !== 2
-                ) {
+                if (blkParent.connections.indexOf(blk) !== ACTION_NAME_SLOTS[blkParent.name]) {
                     continue;
                 }
 
@@ -5388,14 +5382,13 @@ class Blocks {
                         case "namedcalcArg":
                             doNames[b] = blkData[1][1]["value"];
                             break;
-                        case "do":
-                        case "stack":
-                            if (blkData[4][1] !== null) {
-                                doNames[b] = blkData[4][1];
+                        default: {
+                            const label = blkData[4][ACTION_NAME_SLOTS[name]];
+                            if (blockObjs[label]?.[1][0] === "text") {
+                                doNames[b] = label;
                             }
                             break;
-                        default:
-                            break;
+                        }
                     }
 
                     const proto = this.protoBlockDict[name];
