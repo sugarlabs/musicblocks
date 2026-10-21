@@ -2373,6 +2373,12 @@ class ToolbarUI {
         updateButtonsList();
     }
 
+    /**
+     * Closes the auxiliary toolbar and updates dependent widget layouts.
+     *
+     * @param {Function} onclick - Callback invoked when the toolbar visibility changes.
+     * @returns {void}
+     */
     closeAuxToolbar = onclick => {
         const auxToolbar = docById("aux-toolbar");
         if (auxToolbar.style.display === "block") {
@@ -2382,6 +2388,13 @@ class ToolbarUI {
             menuIcon.textContent = "menu";
             this._setAuxToolbarButtonState(false);
             this.syncToolbarHeight();
+
+            if (
+                window.widgetWindows &&
+                typeof window.widgetWindows._handleResize === "function"
+            ) {
+                window.widgetWindows._handleResize();
+            }
         }
     };
 

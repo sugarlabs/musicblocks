@@ -90,6 +90,7 @@ describe("Toolbar Class", () => {
     });
 
     afterEach(() => {
+        delete global.window.widgetWindows;
         jest.clearAllMocks();
     });
 
@@ -851,7 +852,6 @@ describe("Toolbar Class", () => {
         expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.toggleAuxBtn.className).toBe("tooltipped aux-toggle");
         expect(elements.chooseKeyDiv.style.display).toBe("none");
-        delete global.window.widgetWindows;
     });
 
     test("syncToolbarHeight sets --toolbar-total-height and notifies PracticeUI", () => {
@@ -1216,7 +1216,13 @@ describe("Toolbar Class", () => {
         global.docById.mockImplementation(id => elements[id] || {});
         const mockOnClick = jest.fn();
         toolbar.activity = {};
+        const handleResize = jest.fn();
+
+        global.window.widgetWindows = {
+            _handleResize: handleResize
+        };
         toolbar.closeAuxToolbar(mockOnClick);
+        expect(handleResize).toHaveBeenCalledTimes(1);
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.textContent).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);

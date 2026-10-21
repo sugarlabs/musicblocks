@@ -226,6 +226,11 @@ window.widgetWindows = {
             }
         }
     },
+    /**
+     * Repositions open widget windows to respect the visible toolbar and viewport bounds.
+     *
+     * @returns {void}
+     */
     _handleResize() {
         const toolbarBottom = this._getToolbarBottom();
 
