@@ -147,7 +147,8 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 __G4 ");
+        // The header opens in M:C, so a barline falls after the fourth quarter note.
+        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 | __G4 ");
     });
 
     it("should support ASCII accidentals without changing lowercase B notes", () => {
@@ -1248,5 +1249,117 @@ describe("saveAbcOutput - forever repeats", () => {
 
     it("writes no repeat bars without a forever", () => {
         expect(notesOf([note("C4"), note("G4")])).toBe("C4 G4 ");
+    });
+});
+
+describe("processABCNotes - bar lines", () => {
+    const abcjs = require("abcjs");
+
+    const note = (pitch, noteValue = 4, dotCount = 0) => [
+        [pitch],
+        noteValue,
+        dotCount,
+        null,
+        null,
+        -1,
+        false
+    ];
+
+    const exportBody = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        return logo.notationNotes["0"];
+    };
+
+    // What each measure of the exported body adds up to, in whole notes, as abcjs
+    // reads it. A measure has to come to exactly what the meter says it does.
+    const measureLengths = body => {
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        expect((tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""))).toEqual([]);
+        const elements = tune.lines.flatMap(line =>
+            (line.staff || []).flatMap(staff => staff.voices.flat())
+        );
+        const lengths = [];
+        let measure = 0;
+        for (const element of elements) {
+            if (element.el_type === "bar") {
+                lengths.push(measure);
+                measure = 0;
+            } else if (element.el_type === "note") {
+                measure += element.duration;
+            }
+        }
+        if (measure > 0) lengths.push(measure);
+        return lengths;
+    };
+
+    const quarters = count => Array.from({ length: count }, () => note("C4"));
+
+    it("closes a measure of 4/4 after four quarter notes", () => {
+        expect(measureLengths(exportBody(["meter", 4, 4, ...quarters(8)]))).toEqual([1, 1]);
+    });
+
+    it("uses the meter the header opens in when none is staged", () => {
+        expect(measureLengths(exportBody(quarters(8)))).toEqual([1, 1]);
+    });
+
+    it.each([
+        [3, 4, 6, 0.75],
+        [6, 8, 6, 0.75],
+        [2, 4, 4, 0.5]
+    ])("closes a measure of %i/%i", (beats, beatType, count, want) => {
+        expect(measureLengths(exportBody(["meter", beats, beatType, ...quarters(count)]))).toEqual([
+            want,
+            want
+        ]);
+    });
+
+    it("counts a dotted note for what it is worth", () => {
+        const staged = ["meter", 6, 8, note("C4", 4, 1), note("D4", 4, 1), note("E4", 4, 1)];
+
+        expect(measureLengths(exportBody(staged))).toEqual([0.75, 0.375]);
+    });
+
+    it("counts a chord once, not once per pitch", () => {
+        const chord = [["C4", "E4", "G4"], 4, 0, null, null, -1, false];
+        const staged = ["meter", 4, 4, chord, ...quarters(3), chord, ...quarters(3)];
+
+        expect(measureLengths(exportBody(staged))).toEqual([1, 1]);
+    });
+
+    it("counts a rest for what it is worth", () => {
+        const staged = ["meter", 4, 4, note("R"), note("C4"), note("R"), note("D4"), note("E4")];
+
+        expect(measureLengths(exportBody(staged))).toEqual([1, 0.25]);
+    });
+
+    it("closes the measure a meter change interrupts", () => {
+        const staged = ["meter", 4, 4, ...quarters(4), "meter", 3, 4, ...quarters(6)];
+
+        expect(measureLengths(exportBody(staged))).toEqual([1, 0.75, 0.75]);
+    });
+
+    it("writes the barline before a decoration already waiting for its note", () => {
+        const staged = ["meter", 4, 4, ...quarters(4), "begin crescendo", note("D4")];
+
+        expect(exportBody(staged)).toContain("| !<(!D4");
+    });
+
+    // A note that runs over a barline would have to be split in two and tied for the
+    // barline to have anywhere to go. Until then it costs that one barline, and the
+    // barlines after it still land where they belong.
+    it("gives up one barline to a note that runs over it, and no more", () => {
+        const staged = [
+            "meter",
+            4,
+            4,
+            ...quarters(3),
+            note("F4", 2),
+            note("G4", 2),
+            note("A4"),
+            note("B4")
+        ];
+
+        expect(measureLengths(exportBody(staged))).toEqual([2, 0.25]);
     });
 });
