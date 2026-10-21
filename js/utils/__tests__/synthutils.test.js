@@ -4231,3 +4231,274 @@ describe("DRUMNAMES Lilypond symbols", () => {
         }
     });
 });
+
+describe("Multisample instruments", () => {
+    const { validateMultisample, MULTISAMPLE_LIMITS } = synthutilsModule;
+    const music = require("../musicutils");
+    let synth;
+    let buffers;
+    let samplers;
+
+    const wavData = (bytes = 108) => {
+        const wav = Buffer.alloc(bytes);
+        wav.write("RIFF");
+        wav.writeUInt32LE(bytes - 8, 4);
+        wav.write("WAVEfmt ", 8);
+        wav.writeUInt32LE(16, 16);
+        wav.writeUInt16LE(1, 20);
+        wav.writeUInt16LE(1, 22);
+        wav.writeUInt32LE(8000, 24);
+        wav.writeUInt32LE(16000, 28);
+        wav.writeUInt16LE(2, 32);
+        wav.writeUInt16LE(16, 34);
+        wav.write("data", 36);
+        wav.writeUInt32LE(bytes - 44, 40);
+        return "data:audio/wav;base64," + wav.toString("base64");
+    };
+    const instrument = () => ({
+        type: "multisample",
+        version: 1,
+        name: "Cello",
+        samples: ["C3", "C4", "C5"].map(root => ({ name: root + ".wav", root, data: wavData() }))
+    });
+
+    beforeEach(() => {
+        global.Tone = require("./tonemock");
+        global.normalizeNoteAccidentals = music.normalizeNoteAccidentals;
+        global.Singer = { masterVolume: [50] };
+        buffers = [];
+        samplers = [];
+        const pitches = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        jest.spyOn(Tone, "Frequency").mockImplementation(root => ({
+            toMidi: () => {
+                const [, letter, accidental, octave] = /^([A-G])([#bx]*)(\d)$/.exec(root);
+                const offset = { "": 0, "#": 1, "##": 2, "b": -1, "bb": -2, "x": 2 }[accidental];
+                return (Number(octave) + 1) * 12 + pitches[letter] + offset;
+            }
+        }));
+        const originalBuffer = Tone.ToneAudioBuffer;
+        jest.spyOn(Tone, "ToneAudioBuffer").mockImplementation(function () {
+            this.audio = { length: 32, numberOfChannels: 1 };
+            this.load = jest.fn().mockResolvedValue(this);
+            this.get = () => this.audio;
+            this.dispose = jest.fn(() => {
+                this.audio = null;
+            });
+            buffers.push(this);
+        });
+        Tone.ToneAudioBuffer.loaded = originalBuffer.loaded;
+        const originalSampler = Tone.Sampler;
+        jest.spyOn(Tone, "Sampler").mockImplementation(function (notes) {
+            const sampler = new originalSampler(notes);
+            sampler.dispose = jest.fn();
+            samplers.push(sampler);
+            return sampler;
+        });
+        synth = new SynthClass();
+    });
+
+    afterEach(() => {
+        synth.disposeAllInstruments();
+        jest.useRealTimers();
+    });
+
+    test("validates a snapshot without modifying the input or sharing recording objects", () => {
+        const value = instrument();
+        value.name = "  Cello  ";
+        value.samples[0].root = "D\u266d3";
+        const snapshot = validateMultisample(value);
+        expect(snapshot.name).toBe("Cello");
+        expect(snapshot.samples[0].root).toBe("Db3");
+        expect(value.samples[0].root).toBe("D\u266d3");
+        expect(snapshot.samples[0]).not.toBe(value.samples[0]);
+        expect(snapshot.samples[0].data).toBe(value.samples[0].data);
+    });
+
+    test.each([
+        null,
+        {},
+        { ...instrument(), version: 2 },
+        { ...instrument(), samples: [] },
+        { ...instrument(), name: " " },
+        { ...instrument(), samples: new Array(1) },
+        { ...instrument(), samples: new Array(17).fill(instrument().samples[0]) }
+    ])("rejects an incomplete or unsupported descriptor before decoding: %p", value => {
+        expect(() => validateMultisample(value)).toThrow();
+        expect(Tone.ToneAudioBuffer).not.toHaveBeenCalled();
+    });
+
+    test.each(["C0", "C9", "Cb1", "B#8", "do4", "A4+20", "^C4", "C4junk"])(
+        "rejects the invalid or out-of-range root %s",
+        root => {
+            const value = instrument();
+            value.samples[0].root = root;
+            expect(() => validateMultisample(value)).toThrow();
+        }
+    );
+
+    test.each([
+        ["C#4", "Db4"],
+        ["Dx4", "E4"],
+        ["B#3", "C4"]
+    ])("rejects enharmonic duplicate roots %s and %s", (first, second) => {
+        const value = instrument();
+        value.samples[0].root = first;
+        value.samples[1].root = second;
+        expect(() => validateMultisample(value)).toThrow("different root pitches");
+    });
+
+    test.each(["audio/x-wav", "audio/wave", "audio/vnd.wave"])(
+        "accepts the WAV MIME alias %s",
+        mime => {
+            const value = instrument();
+            value.samples[0].data = wavData().replace("audio/wav", mime);
+            expect(validateMultisample(value).samples[0].data).toBe(value.samples[0].data);
+        }
+    );
+
+    test.each([
+        "blob:recording",
+        "https://example.com/a.wav",
+        "data:audio/mp3;base64,AAAA",
+        "data:audio/wav;base64,not base64!",
+        "data:audio/wav;base64,AAAA"
+    ])("rejects external, malformed, and non-WAV audio: %s", data => {
+        const value = instrument();
+        value.samples[0].data = data;
+        expect(() => validateMultisample(value)).toThrow("embedded WAV");
+    });
+
+    test("enforces raw per-file and aggregate byte limits", () => {
+        const value = instrument();
+        value.samples[0].data = wavData(MULTISAMPLE_LIMITS.fileBytes + 1);
+        expect(() => validateMultisample(value)).toThrow("size limit");
+        const data = wavData(MULTISAMPLE_LIMITS.fileBytes);
+        value.samples = ["C1", "D1", "E1", "F1", "G1", "A1", "B1", "C2", "D2"].map(root => ({
+            name: root,
+            root,
+            data
+        }));
+        expect(() => validateMultisample(value)).toThrow("size limit");
+    });
+
+    test("reuses a descriptor handle but keeps same-named instruments independent", () => {
+        const value = instrument();
+        const handle = synth.registerMultisample(value);
+        expect(synth.registerMultisample(value)).toBe(handle);
+        expect(synth.registerMultisample(instrument())).not.toBe(handle);
+        expect(Tone.Sampler).not.toHaveBeenCalled();
+    });
+
+    test("loads once per turtle, uses scientific roots, and retains decoded audio after wrapper disposal", async () => {
+        const value = instrument();
+        const handle = synth.registerMultisample(value);
+        const [first, concurrent] = await Promise.all([
+            synth.loadSynth(0, handle),
+            synth.loadSynth(0, handle)
+        ]);
+        expect(first).toBe(concurrent);
+        expect(Object.keys(first.noteDict)).toEqual(["C3", "C4", "C5"]);
+        expect(first.noteDict.C4).toEqual({ length: 32, numberOfChannels: 1 });
+        expect(buffers.map(buffer => buffer.load.mock.calls[0][0])).toEqual(
+            value.samples.map(s => s.data)
+        );
+        expect(buffers.every(buffer => buffer.dispose.mock.calls.length === 1)).toBe(true);
+        expect(synthInstrumentsSource[handle]).toEqual([2, handle]);
+        expect(await synth.loadSynth(0, handle)).toBe(first);
+        expect(Tone.Sampler).toHaveBeenCalledTimes(1);
+        const other = await synth.loadSynth(1, handle);
+        expect(other).not.toBe(first);
+        expect(Tone.Sampler).toHaveBeenCalledTimes(2);
+    });
+
+    test("routes a prepared instrument through the existing voice-note path", async () => {
+        const handle = synth.registerMultisample(instrument());
+        const sampler = await synth.loadSynth(0, handle);
+        await synth.trigger(0, ["C3", "E4", "G5"], 0.5, handle, null, null, false, 0);
+        expect(sampler.triggerAttackRelease).toHaveBeenCalledWith(
+            ["C3", "E4", "G5"],
+            0.5,
+            expect.any(Number)
+        );
+    });
+
+    test("does not publish a partial instrument on decode failure, releases buffers, and permits retry", async () => {
+        const handle = synth.registerMultisample(instrument());
+        const originalBuffer = Tone.ToneAudioBuffer.getMockImplementation();
+        Tone.ToneAudioBuffer.mockImplementationOnce(originalBuffer).mockImplementationOnce(
+            function () {
+                originalBuffer.call(this);
+                this.load.mockRejectedValue(new Error("decoder failed"));
+            }
+        );
+        await expect(synth.loadSynth(0, handle)).rejects.toThrow("C4.wav");
+        expect(synthInstruments[0]?.[handle]).toBeUndefined();
+        expect(buffers.every(buffer => buffer.dispose.mock.calls.length === 1)).toBe(true);
+        expect(Tone.Sampler).not.toHaveBeenCalled();
+        await expect(synth.loadSynth(0, handle)).resolves.toBeDefined();
+    });
+
+    test("rejects empty or oversized decoded audio before publishing", async () => {
+        const originalBuffer = Tone.ToneAudioBuffer.getMockImplementation();
+        Tone.ToneAudioBuffer.mockImplementationOnce(function () {
+            originalBuffer.call(this);
+            this.audio.length = 0;
+        });
+        const handle = synth.registerMultisample(instrument());
+        await expect(synth.loadSynth(0, handle)).rejects.toThrow("no audio");
+        Tone.ToneAudioBuffer.mockImplementationOnce(function () {
+            originalBuffer.call(this);
+            this.audio.length = MULTISAMPLE_LIMITS.decodedBytes / 4 + 1;
+        });
+        await expect(synth.loadSynth(0, handle)).rejects.toThrow("memory limit");
+        expect(Tone.Sampler).not.toHaveBeenCalled();
+    });
+
+    test("Stop rejects a pending load, disposes its late decode, and clears the old handle", async () => {
+        let complete;
+        const originalBuffer = Tone.ToneAudioBuffer.getMockImplementation();
+        Tone.ToneAudioBuffer.mockImplementationOnce(function () {
+            originalBuffer.call(this);
+            this.load.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        complete = () => {
+                            this.audio = { length: 32, numberOfChannels: 1 };
+                            resolve(this);
+                        };
+                    })
+            );
+        });
+        const value = instrument();
+        const handle = synth.registerMultisample(value);
+        const loading = synth.loadSynth(0, handle);
+        const rejected = expect(loading).rejects.toMatchObject({ name: "AbortError" });
+        synth.disposeAllInstruments();
+        await rejected;
+        complete();
+        await Promise.resolve();
+        expect(buffers[0].audio).toBeNull();
+        expect(Tone.Sampler).not.toHaveBeenCalled();
+        await expect(synth.loadSynth(0, handle)).rejects.toThrow("Unknown multisample");
+        expect(synth.registerMultisample(value)).not.toBe(handle);
+    });
+
+    test("times out stalled decoding and disposes a successful sampler on Stop", async () => {
+        jest.useFakeTimers();
+        const originalBuffer = Tone.ToneAudioBuffer.getMockImplementation();
+        Tone.ToneAudioBuffer.mockImplementationOnce(function () {
+            originalBuffer.call(this);
+            this.load.mockReturnValue(new Promise(() => {}));
+        });
+        const handle = synth.registerMultisample(instrument());
+        const rejected = expect(synth.loadSynth(0, handle)).rejects.toThrow("timed out");
+        jest.advanceTimersByTime(MULTISAMPLE_LIMITS.loadTimeout);
+        await rejected;
+        expect(buffers[0].dispose).toHaveBeenCalledTimes(1);
+        await synth.loadSynth(0, handle);
+        synth.disposeAllInstruments();
+        expect(samplers[0].dispose).toHaveBeenCalledTimes(1);
+        expect(synthInstrumentsSource[handle]).toBeUndefined();
+        expect(synthInstruments[0][handle]).toBeUndefined();
+    });
+});

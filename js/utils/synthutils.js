@@ -432,6 +432,83 @@ const MULTIPITCH = {
  */
 const CUSTOMSAMPLES = [];
 
+const MULTISAMPLE_LIMITS = Object.freeze({
+    samples: 16,
+    fileBytes: 1000000,
+    totalBytes: 8000000,
+    decodedBytes: 32 * 1024 * 1024,
+    loadTimeout: 30000
+});
+let nextMultisampleId = 0;
+
+/**
+ * Validates a complete instrument and copies its serializable recording metadata.
+ * Roots use Tone's MIDI convention, independently of the legacy sample converter.
+ * @param {object} instrument - Versioned multisample descriptor.
+ * @returns {object} Validated snapshot, including normalized scientific roots.
+ */
+function validateMultisample(instrument) {
+    if (
+        !instrument ||
+        instrument.type !== "multisample" ||
+        instrument.version !== 1 ||
+        typeof instrument.name !== "string" ||
+        !instrument.name.trim() ||
+        !Array.isArray(instrument.samples) ||
+        instrument.samples.length === 0 ||
+        instrument.samples.length > MULTISAMPLE_LIMITS.samples
+    ) {
+        throw new Error(_("Invalid multisample instrument."));
+    }
+
+    const roots = new Set();
+    let totalBytes = 0;
+    const samples = Array.from(instrument.samples, sample => {
+        if (
+            !sample ||
+            typeof sample.name !== "string" ||
+            !sample.name.trim() ||
+            typeof sample.root !== "string" ||
+            typeof sample.data !== "string"
+        ) {
+            throw new Error(_("Each recording needs a filename, root pitch, and WAV data."));
+        }
+
+        const root = normalizeNoteAccidentals(sample.root);
+        if (/^[v^]/.test(sample.root) || !/^[A-G](?:#{1,2}|b{1,2}|x)?[1-8]$/.test(root)) {
+            throw new Error(_("Recording roots must be notes in octaves 1 through 8."));
+        }
+        const midi = Tone.Frequency(root).toMidi();
+        if (!Number.isInteger(midi) || midi < 24 || midi > 119) {
+            throw new Error(_("Recording roots must be between C1 and B8."));
+        }
+        if (roots.has(midi)) {
+            throw new Error(_("Recordings must have different root pitches."));
+        }
+        roots.add(midi);
+
+        const audio =
+            /^data:audio\/(?:wav|wave|x-wav|vnd\.wave);base64,([A-Za-z0-9+/]+={0,2})$/i.exec(
+                sample.data
+            );
+        if (!audio || audio[1].length % 4 !== 0) {
+            throw new Error(_("Recordings must contain embedded WAV audio."));
+        }
+        const bytes = (audio[1].length / 4) * 3 - (audio[1].match(/=+$/)?.[0].length || 0);
+        totalBytes += bytes;
+        if (bytes > MULTISAMPLE_LIMITS.fileBytes || totalBytes > MULTISAMPLE_LIMITS.totalBytes) {
+            throw new Error(_("Multisample audio exceeds the file or instrument size limit."));
+        }
+        const header = atob(audio[1].slice(0, 16));
+        if (header.slice(0, 4) !== "RIFF" || header.slice(8, 12) !== "WAVE") {
+            throw new Error(_("Recordings must contain embedded WAV audio."));
+        }
+        return { name: sample.name, root, data: sample.data };
+    });
+
+    return { type: "multisample", version: 1, name: instrument.name.trim(), samples };
+}
+
 /**
  * Array of percussion instruments.
  * @constant
@@ -776,6 +853,113 @@ function Synth() {
      * @type {SampleLoader}
      */
     this.sampleLoader = new SampleLoader();
+
+    const multisamples = new Map();
+    let multisampleNames = new WeakMap();
+
+    this.validateMultisample = validateMultisample;
+
+    /**
+     * Registers an immutable descriptor snapshot, without decoding or changing timbre.
+     * Edits must supply a new descriptor object; names are only display metadata.
+     * @param {object} instrument - Complete multisample descriptor.
+     * @returns {string} Session-only instrument handle.
+     */
+    this.registerMultisample = instrument => {
+        const existing = multisampleNames.get(instrument);
+        if (existing) return existing;
+        const descriptor = validateMultisample(instrument);
+        const name = "multisample_" + ++nextMultisampleId;
+        multisampleNames.set(instrument, name);
+        multisamples.set(name, { descriptor, loads: new Map() });
+        return name;
+    };
+
+    /**
+     * Decodes sequentially and publishes one sampler only after every root is ready.
+     * Pending and completed loads are shared by callers for the same turtle/alias.
+     * @param {number|string} turtle - Turtle identifier.
+     * @param {string} instrumentName - Instrument table key.
+     * @param {string} sourceName - Registered multisample handle.
+     * @returns {Promise<Tone.Sampler>} Ready sampler.
+     */
+    const loadMultisample = (turtle, instrumentName, sourceName) => {
+        const source = multisamples.get(sourceName);
+        if (!source) return Promise.reject(new Error(_("Unknown multisample instrument.")));
+        const key = JSON.stringify([String(turtle), instrumentName]);
+        if (source.loads.has(key)) return source.loads.get(key).promise;
+
+        const epoch = this._instrumentEpoch;
+        const entry = { promise: null, cancel: null };
+        source.loads.set(key, entry);
+        entry.promise = new Promise((resolve, reject) => {
+            const buffers = [];
+            let sampler = null;
+            let settled = false;
+            const releaseBuffers = () => {
+                buffers.forEach(buffer => buffer.dispose());
+                buffers.length = 0;
+            };
+            const fail = error => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeout);
+                entry.cancel = null;
+                source.loads.delete(key);
+                releaseBuffers();
+                if (sampler) sampler.dispose();
+                reject(error);
+            };
+            const timeout = setTimeout(
+                () => fail(new Error(_("Multisample audio loading timed out."))),
+                MULTISAMPLE_LIMITS.loadTimeout
+            );
+            entry.cancel = () => fail(new DOMException("Multisample load cancelled", "AbortError"));
+
+            const prepare = async () => {
+                const noteDict = {};
+                let decodedBytes = 0;
+                for (const sample of source.descriptor.samples) {
+                    const buffer = new Tone.ToneAudioBuffer();
+                    buffers.push(buffer);
+                    try {
+                        await buffer.load(sample.data);
+                    } catch {
+                        throw new Error(_("Unable to decode recording:") + " " + sample.name);
+                    }
+                    if (settled) {
+                        // A decoder may complete after Stop/disposal and set its buffer again.
+                        buffer.dispose();
+                        return;
+                    }
+                    const audio = buffer.get();
+                    if (!audio || audio.length <= 0 || audio.numberOfChannels <= 0) {
+                        throw new Error(_("The recording contains no audio:") + " " + sample.name);
+                    }
+                    decodedBytes += audio.length * audio.numberOfChannels * 4;
+                    if (decodedBytes > MULTISAMPLE_LIMITS.decodedBytes) {
+                        throw new Error(_("Decoded multisample audio exceeds the memory limit."));
+                    }
+                    noteDict[sample.root] = audio;
+                }
+                if (this._instrumentEpoch !== epoch) {
+                    entry.cancel();
+                    return;
+                }
+                sampler = new Tone.Sampler(noteDict);
+                instruments[turtle] ||= {};
+                instruments[turtle][instrumentName] = sampler;
+                instrumentsSource[instrumentName] = [2, sourceName];
+                settled = true;
+                clearTimeout(timeout);
+                entry.cancel = null;
+                releaseBuffers();
+                resolve(sampler);
+            };
+            prepare().catch(fail);
+        });
+        return entry.promise;
+    };
 
     // Define a getter/setter for backward compatibility with Synth instance state
     Object.defineProperty(this, "samples", {
@@ -1684,6 +1868,9 @@ function Synth() {
      * @param {Object} params - Additional parameters for synth configuration.
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
+        if (sourceName.startsWith("multisample_")) {
+            return loadMultisample(turtle, instrumentName, sourceName);
+        }
         // Ensure the structure is initialized
         if (this.samples === null) {
             this.loadSamples();
@@ -1866,12 +2053,17 @@ function Synth() {
      */
     this.loadSynth = async (turtle, sourceName) => {
         sourceName = this.resolveInstrumentName(sourceName);
+        const multisample = sourceName.startsWith("multisample_");
+        const epoch = this._instrumentEpoch;
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
         } else {
             console.debug("loading " + sourceName);
         }
         await this.createSynth(turtle, sourceName, sourceName, null);
+        if (multisample && this._instrumentEpoch !== epoch) {
+            throw new DOMException("Multisample load cancelled", "AbortError");
+        }
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
@@ -2936,6 +3128,16 @@ function Synth() {
      */
     this.disposeAllInstruments = () => {
         this._instrumentEpoch++;
+        for (const source of multisamples.values()) {
+            for (const entry of source.loads.values()) {
+                if (entry.cancel) entry.cancel();
+            }
+        }
+        for (const name of Object.keys(instrumentsSource)) {
+            if (multisamples.has(instrumentsSource[name][1])) delete instrumentsSource[name];
+        }
+        multisamples.clear();
+        multisampleNames = new WeakMap();
         _disposeRecordingPlayer();
         _revokeRecordingURL();
 
@@ -3039,6 +3241,8 @@ if (typeof module !== "undefined" && module.exports) {
         instruments,
         instrumentsSource,
         DEFAULTSYNTHVOLUME,
-        SAMPLE_INFO
+        SAMPLE_INFO,
+        validateMultisample,
+        MULTISAMPLE_LIMITS
     };
 }
