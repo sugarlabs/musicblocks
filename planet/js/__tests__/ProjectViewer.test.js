@@ -256,6 +256,30 @@ describe("ProjectViewer", () => {
                 expect(document.getElementById("submittext").textContent).toBe("");
                 expect(mockPlanet.ProjectStorage.report).not.toHaveBeenCalled();
             });
+
+            it("should reset the report card when open() switches projects", () => {
+                mockPlanet.GlobalPlanet.cache["proj-2"] = {
+                    ...mockPlanet.GlobalPlanet.cache["proj-1"],
+                    ProjectName: "Project 2"
+                };
+                projectViewer.open("proj-1");
+                projectViewer.openReporter();
+                document.getElementById("reportdescription").value = "Valid report";
+                projectViewer.submitReporter();
+                const callback = mockPlanet.ServerInterface.reportProject.mock.calls[0][2];
+
+                projectViewer.open("proj-2");
+                callback({ success: true });
+
+                expect(document.getElementById("projectviewer-report-card").style.display).toBe(
+                    "none"
+                );
+                expect(
+                    document.getElementById("projectviewer-report-progress").style.visibility
+                ).toBe("hidden");
+                expect(mockPlanet.ProjectStorage.report).toHaveBeenCalledWith("proj-1", true);
+                expect(mockPlanet.ProjectStorage.report).not.toHaveBeenCalledWith("proj-2", true);
+            });
         });
 
         describe("afterReport", () => {
