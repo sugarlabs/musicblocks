@@ -45,6 +45,48 @@ describe("musicutils-temperament", () => {
         it("is the same value when read through musicutils.js", () => {
             temperament.setOctaveRatio(1.5);
             expect(musicutils.getOctaveRatio()).toBe(1.5);
+            temperament.setOctaveRatio(2);
+        });
+    });
+
+    describe("getEffectiveOctaveRatio", () => {
+        it("defaults to 2 when temperament is unspecified or equal", () => {
+            expect(temperament.getEffectiveOctaveRatio()).toBe(2);
+            expect(temperament.getEffectiveOctaveRatio("equal")).toBe(2);
+            expect(temperament.getEffectiveOctaveRatio("just intonation")).toBe(2);
+        });
+
+        it("reads octaveRatio from custom temperament object or dictionary entry", () => {
+            const customStretched = { octaveRatio: 2.01, isEDO: true, pitchNumber: 12 };
+            expect(temperament.getEffectiveOctaveRatio(customStretched)).toBe(2.01);
+
+            temperament.addTemperamentToDictionary("stretched12", customStretched);
+            expect(temperament.getEffectiveOctaveRatio("stretched12")).toBe(2.01);
+            temperament.deleteTemperamentFromList("stretched12");
+        });
+
+        it("falls back to global getOctaveRatio when temperament lacks octaveRatio", () => {
+            temperament.setOctaveRatio(3);
+            expect(temperament.getEffectiveOctaveRatio({})).toBe(3);
+            expect(temperament.getEffectiveOctaveRatio(null)).toBe(3);
+            temperament.setOctaveRatio(2);
+        });
+
+        it("detects equal division of non-octave periods in isEquallyTempered", () => {
+            const bpRatios = Array.from({ length: 13 }, (_, i) => Math.pow(3, i / 13));
+            const bpTemperament = {
+                octaveRatio: 3,
+                pitchNumber: 13,
+                ratios: bpRatios
+            };
+            expect(temperament.isEquallyTempered(bpTemperament)).toBe(true);
+
+            const stretched19 = {
+                octaveRatio: 2.02,
+                pitchNumber: 19,
+                ratios: Array.from({ length: 19 }, (_, i) => Math.pow(2.02, i / 19))
+            };
+            expect(temperament.isEquallyTempered(stretched19)).toBe(true);
         });
     });
 
@@ -153,6 +195,7 @@ describe("musicutils-temperament", () => {
                 "getTemperamentsList",
                 "addTemperamentToDictionary",
                 "setOctaveRatio",
+                "getEffectiveOctaveRatio",
                 "isEquallyTempered"
             ]) {
                 expect(musicutils[name]).toBe(temperament[name]);
