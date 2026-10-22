@@ -743,13 +743,26 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
-        const canvas = docById("myCanvas");
+        if (
+            window.widgetWindows &&
+            window.widgetWindows._posCache &&
+            this._key &&
+            window.widgetWindows._posCache[this._key] !== undefined
+        ) {
+            return this;
+        }
+        const canvas =
+            typeof docById === "function"
+                ? docById("myCanvas")
+                : document.getElementById("myCanvas");
         if (!canvas) {
             this.setPosition(200, 140);
             return this;
         }
-        const fRect = this._frame.getBoundingClientRect();
-        const cRect = canvas.getBoundingClientRect();
+        const fRect = this._frame ? this._frame.getBoundingClientRect() : { width: 0, height: 0 };
+        const cRect = canvas.getBoundingClientRect
+            ? canvas.getBoundingClientRect()
+            : { width: 0, height: 0 };
 
         if (cRect.width === 0 || cRect.height === 0) {
             // The canvas isn't shown so we set some approximate numbers
@@ -757,7 +770,9 @@ class WidgetWindow {
             return this;
         }
 
-        const navHeight = document.querySelector("nav")?.offsetHeight ?? 64;
+        const navHeight = document.querySelector
+            ? (document.querySelector("nav")?.offsetHeight ?? 64)
+            : 64;
         this.setPosition(
             (cRect.width - fRect.width) / 2,
             (cRect.height - fRect.height + navHeight) / 2
