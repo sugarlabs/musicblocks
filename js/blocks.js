@@ -67,6 +67,7 @@
 const ACTION_NAME_SLOTS = {
     action: 1,
     do: 1,
+    stack: 1,
     calc: 1,
     doArg: 1,
     calcArg: 1,
@@ -5384,7 +5385,7 @@ class Blocks {
                             break;
                         default: {
                             const label = blkData[4][ACTION_NAME_SLOTS[name]];
-                            if (blockObjs[label]?.[1][0] === "text") {
+                            if (["text", "string"].includes(blockObjs[label]?.[1][0])) {
                                 doNames[b] = label;
                             }
                             break;
