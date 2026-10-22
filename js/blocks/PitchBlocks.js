@@ -2045,7 +2045,17 @@ function setupPitchBlocks(activity) {
                         null
                     );
                     if (attr !== NATURAL) {
-                        note += attr;
+                        // A sharp on a flat note of the key, or a flat on a sharp
+                        // one, cancels it (7♭ in G major is F, not F♯♭).
+                        const keyAttr = note.slice(1);
+                        if (
+                            (keyAttr === FLAT && attr === SHARP) ||
+                            (keyAttr === SHARP && attr === FLAT)
+                        ) {
+                            note = note.slice(0, 1);
+                        } else {
+                            note += attr;
+                        }
                     }
 
                     let semitones = ref;

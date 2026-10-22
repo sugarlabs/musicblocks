@@ -844,6 +844,32 @@ describe("setupPitchBlocks", () => {
             expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
         });
 
+        it("cancels the key's accidental with the opposite one on a scale degree", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "plus" };
+
+            global.scaleDegreeToPitchMapping.mockReturnValue("F#");
+            block.flow(["7b", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "F",
+                expect.anything(),
+                0,
+                0,
+                10
+            );
+
+            global.scaleDegreeToPitchMapping.mockReturnValue("Bb");
+            block.flow(["4#", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "B",
+                expect.anything(),
+                0,
+                0,
+                10
+            );
+        });
+
         it("treats a computed number with an accidental as a scale degree", () => {
             const block = createdBlocks["pitch"];
             activity.blocks.blockList[10].connections[1] = 20;
