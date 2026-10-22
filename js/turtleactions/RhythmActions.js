@@ -255,11 +255,16 @@ function setupRhythmActions(activity) {
             }
 
             const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor *= currentDotFactor;
-            tur.singer.dotCount = newDotCount;
+            const newDotFactor = 2 - 1 / Math.pow(2, newDotCount);
+            const newBeatFactor = (tur.singer.beatFactor * currentDotFactor) / newDotFactor;
 
-            const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor /= newDotFactor;
+            if (!Number.isFinite(newBeatFactor) || newBeatFactor <= 0) {
+                activity.errorMsg(_("Dot value must be a finite number."), blk);
+                return;
+            }
+
+            tur.singer.beatFactor = newBeatFactor;
+            tur.singer.dotCount = newDotCount;
 
             const listenerName =
                 blk !== undefined && blk !== null ? "_dot_" + turtle + "_" + blk : "_dot_" + turtle;

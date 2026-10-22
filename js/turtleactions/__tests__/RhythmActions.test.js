@@ -723,6 +723,26 @@ describe("setupRhythmActions", () => {
         expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
     });
 
+    it("rejects valid dot input when computed candidate beatFactor overflows or is non-positive", () => {
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = Number.MAX_VALUE;
+
+        activity.errorMsg = jest.fn();
+        activity.logo.setDispatchBlock = jest.fn();
+        activity.logo.setTurtleListener = jest.fn();
+        activity.blocks.blockList = { 1: {} };
+
+        // dotCount 1 -> currentDotFactor = 1.5; newDotCount 2 -> newDotFactor = 1.75;
+        // beatFactor * 1.5 overflows Number.MAX_VALUE to Infinity
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(Number.MAX_VALUE);
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
     it("nested dot blocks: invalid inner dot block does not corrupt outer dot block state or its cleanup", () => {
         const listeners = {};
         activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
