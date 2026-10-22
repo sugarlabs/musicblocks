@@ -14,11 +14,13 @@
  * MA 02110-1335 USA.
  */
 
-/* global DOMPurify */
+/* global DOMPurify, ReflectionMatrix */
 /*
     Globals location
     - lib/purify.min.js
         DOMPurify
+    - js/widgets/reflection.js
+        ReflectionMatrix
 */
 
 /* exported ReflectionChatLog */
@@ -133,7 +135,7 @@ class ReflectionChatLog {
             this._markdownReplies.add(entry);
         }
 
-        if (this.chatHistory.length > 10) {
+        if (this.chatHistory.length >= ReflectionMatrix.ANALYSIS_MIN_MESSAGES) {
             this.summaryButton.style.removeProperty("background");
         }
 

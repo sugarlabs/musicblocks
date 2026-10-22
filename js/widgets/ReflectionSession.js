@@ -14,11 +14,13 @@
  * MA 02110-1335 USA.
  */
 
-/* global _ */
+/* global _, ReflectionMatrix */
 /*
     Globals location
     - js/utils/utils.js
         _
+    - js/widgets/reflection.js
+        ReflectionMatrix
 */
 
 /* exported ReflectionSession */
@@ -183,7 +185,8 @@ class ReflectionSession {
      * @returns {Promise<void>}
      */
     async getAnalysis() {
-        if (this.chatHistory.length < 10 || this.typingDiv || !this._isWidgetActive()) return;
+        const tooShort = this.chatHistory.length < ReflectionMatrix.ANALYSIS_MIN_MESSAGES;
+        if (tooShort || this.typingDiv || !this._isWidgetActive()) return;
         const generation = this._lifecycle.generation;
         this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();

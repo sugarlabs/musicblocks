@@ -69,6 +69,8 @@ class ReflectionMatrix {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static REQUEST_TIMEOUT = 30000;
+    /** Messages the chat needs before the Summary button can ask for an analysis. */
+    static ANALYSIS_MIN_MESSAGES = 10;
     /**
      * Backend origins the widget may talk to, keyed by host name.
      *

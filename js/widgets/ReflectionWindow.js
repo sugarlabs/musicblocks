@@ -49,7 +49,7 @@ class ReflectionWindow {
 
         this.summaryButton.onclick = () => this.getAnalysis();
 
-        if (this.chatHistory.length < 10) {
+        if (this.chatHistory.length < ReflectionMatrix.ANALYSIS_MIN_MESSAGES) {
             this.summaryButton.style.background = "gray";
         }
 

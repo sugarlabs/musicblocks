@@ -1434,6 +1434,33 @@ describe("ReflectionMatrix", () => {
             ]);
             expect(localStorage.getItem("musicblocks_analysis")).toBe("Second report");
         });
+
+        test("turns the Summary button on once the chat has ten messages", async () => {
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = tenMessages().slice(0, 9);
+            reflection.init(mockActivity);
+            expect(reflection.summaryButton.style.background).toBe("gray");
+            // jsdom does not clear the background shorthand, so watch the call.
+            const removeSpy = jest.spyOn(reflection.summaryButton.style, "removeProperty");
+
+            reflection.appendBotReply({ response: "tenth" }, "meta");
+
+            expect(reflection.chatHistory).toHaveLength(10);
+            expect(removeSpy).toHaveBeenCalledWith("background");
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ response: "Report" })
+            });
+            await reflection.getAnalysis();
+            expect(analysisBodies()).toHaveLength(1);
+        });
+
+        test("opens with the Summary button on when the chat has ten messages", () => {
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = tenMessages();
+            reflection.init(mockActivity);
+
+            expect(reflection.summaryButton.style.background).toBe("");
+        });
     });
 
     describe("Markdown replies", () => {
