@@ -318,7 +318,12 @@ class WidgetWindow {
 
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
-            this.setPosition(_pos[0], _pos[1]);
+            const x = Number(_pos[0]);
+            const y = Number(_pos[1]);
+            if (!Number.isNaN(x) && !Number.isNaN(y)) {
+                const clamped = this._clampPosition(x, y);
+                this.setPosition(clamped[0], clamped[1]);
+            }
         }
 
         this.takeFocus();
@@ -886,15 +891,63 @@ class WidgetWindow {
     }
 
     /**
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @returns {[number, number]}
+     */
+    _clampPosition(x, y) {
+        const navHeight = 64;
+        let clampedX = x;
+        let clampedY = Math.max(y, navHeight);
+
+        const canvas =
+            typeof docById === "function"
+                ? docById("myCanvas")
+                : document.getElementById("myCanvas");
+        const viewportWidth =
+            canvas && canvas.getBoundingClientRect
+                ? canvas.getBoundingClientRect().width
+                : window.innerWidth;
+        const viewportHeight =
+            canvas && canvas.getBoundingClientRect
+                ? canvas.getBoundingClientRect().height + navHeight
+                : window.innerHeight;
+        const fRect = this._frame ? this._frame.getBoundingClientRect() : { width: 0, height: 0 };
+        const width = fRect.width || 470;
+        const height = fRect.height || 420;
+
+        if (viewportWidth > 0 && width > 0) {
+            if (clampedX + width > viewportWidth) {
+                clampedX = Math.max(0, viewportWidth - width);
+            }
+            if (clampedX < 0) {
+                clampedX = 0;
+            }
+        }
+        if (viewportHeight > 0 && height > 0) {
+            if (clampedY + height > viewportHeight) {
+                clampedY = Math.max(navHeight, viewportHeight - height);
+            }
+            if (clampedY < navHeight) {
+                clampedY = navHeight;
+            }
+        }
+
+        return [clampedX, clampedY];
+    }
+
+    /**
      * @public
      * @param {number} x
      * @param {number} y
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
-        this._frame.style.left = `${x}px`;
-        this._frame.style.top = `${Math.max(y, 64)}px`;
-        window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
+        const clamped = this._clampPosition(x, y);
+        this._frame.style.left = `${clamped[0]}px`;
+        this._frame.style.top = `${clamped[1]}px`;
+        window.widgetWindows._posCache[this._key] = [clamped[0], clamped[1]];
         return this;
     }
 
