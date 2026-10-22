@@ -109,7 +109,7 @@ class ReflectionWindow {
 
         this.input = document.createElement("input");
         this.input.className = "input-query";
-        this.input.placeholder = "Type a message";
+        this.input.placeholder = _("Type a message");
         this.input.style.marginLeft = "10px";
         this.inputContainer.appendChild(this.input);
 
@@ -122,7 +122,7 @@ class ReflectionWindow {
         const sendBtn = document.createElement("button");
         sendBtn.className = "confirm-button";
         sendBtn.style.marginRight = "10px";
-        sendBtn.innerText = "Send";
+        sendBtn.innerText = _("Send");
         sendBtn.onclick = () => this.sendMessage();
         this.inputContainer.appendChild(sendBtn);
 

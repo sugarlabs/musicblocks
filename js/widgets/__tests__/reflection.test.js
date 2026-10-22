@@ -1400,6 +1400,54 @@ describe("ReflectionMatrix", () => {
         });
     });
 
+    describe("Translated labels", () => {
+        const english = global._;
+
+        beforeEach(() => {
+            global._ = text => "[" + text + "]";
+        });
+
+        afterEach(() => {
+            global._ = english;
+        });
+
+        test("translates the message box and the Send button", () => {
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = [{ role: "meta", content: "Hi" }];
+            reflection.init(mockActivity);
+
+            expect(reflection.input.placeholder).toBe("[Type a message]");
+            expect(reflection.inputContainer.querySelector("button").innerText).toBe("[Send]");
+        });
+
+        test("translates each typing indicator", async () => {
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = Array.from({ length: 10 }, () => ({
+                role: "meta",
+                content: "Hi"
+            }));
+            reflection.code = "old_code";
+            reflection.init(mockActivity);
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+            const label = () => reflection.typingDiv.firstChild.textContent;
+
+            reflection.showTypingIndicator();
+            expect(label()).toBe("[Thinking]");
+            reflection.hideTypingIndicator();
+
+            reflection.getAnalysis();
+            expect(label()).toBe("[Analyzing]");
+            reflection.hideTypingIndicator();
+
+            mockActivity.prepareExport.mockResolvedValue("new_code");
+            reflection.updateProjectCode();
+            for (let i = 0; i < 5; i++) {
+                await Promise.resolve();
+            }
+            expect(label()).toBe("[Reading code]");
+        });
+    });
+
     describe("Analysis reports", () => {
         afterEach(() => localStorage.clear());
 

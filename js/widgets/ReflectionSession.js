@@ -96,7 +96,7 @@ class ReflectionSession {
         this.startChatTypingTimeout = this._setWidgetTimeout(() => {
             this.startChatTypingTimeout = null;
             if (this.isOpen) {
-                this.showTypingIndicator("Reading code");
+                this.showTypingIndicator(_("Reading code"));
             }
         }, 1000);
 
@@ -152,7 +152,7 @@ class ReflectionSession {
                 return; // No changes in code
             }
 
-            this.showTypingIndicator("Reading code");
+            this.showTypingIndicator(_("Reading code"));
             const data = await this.generateNewAlgorithm(code);
             if (!this._isSameMount(generation)) return;
 
@@ -188,7 +188,7 @@ class ReflectionSession {
         const tooShort = this.chatHistory.length < ReflectionMatrix.ANALYSIS_MIN_MESSAGES;
         if (tooShort || this.typingDiv || !this._isWidgetActive()) return;
         const generation = this._lifecycle.generation;
-        this.showTypingIndicator("Analyzing");
+        this.showTypingIndicator(_("Analyzing"));
         const data = await this.generateAnalysis();
         if (!this._isSameMount(generation)) return;
 

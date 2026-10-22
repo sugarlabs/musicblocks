@@ -14,9 +14,11 @@
  * MA 02110-1335 USA.
  */
 
-/* global DOMPurify, ReflectionMatrix */
+/* global _, DOMPurify, ReflectionMatrix */
 /*
     Globals location
+    - js/utils/utils.js
+        _
     - lib/purify.min.js
         DOMPurify
     - js/widgets/reflection.js
@@ -46,7 +48,7 @@ class ReflectionChatLog {
         this.typingDiv.className = "typing-indicator";
 
         const textElement = document.createElement("span");
-        textElement.textContent = action ? action : "Thinking";
+        textElement.textContent = action ? action : _("Thinking");
         this.typingDiv.appendChild(textElement);
 
         this.dotsContainer = document.createElement("span");
