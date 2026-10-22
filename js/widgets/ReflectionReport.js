@@ -40,6 +40,8 @@ class ReflectionReport {
      */
     saveReport(data) {
         const key = "musicblocks_analysis";
+        // The next analysis is compared with this one, even if it could not be stored.
+        this.summary = data.response;
         try {
             localStorage.setItem(key, data.response);
         } catch (e) {

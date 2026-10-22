@@ -1400,6 +1400,42 @@ describe("ReflectionMatrix", () => {
         });
     });
 
+    describe("Analysis reports", () => {
+        afterEach(() => localStorage.clear());
+
+        const tenMessages = () =>
+            Array.from({ length: 10 }, (_, i) => ({
+                role: i % 2 ? "meta" : "user",
+                content: "message " + i
+            }));
+        const analysisBodies = () =>
+            global.fetch.mock.calls
+                .filter(call => call[0].endsWith("/analysis"))
+                .map(call => JSON.parse(call[1].body));
+
+        test("sends the newest report with the next analysis", async () => {
+            localStorage.setItem("musicblocks_analysis", "Old report");
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = tenMessages();
+            reflection.init(mockActivity);
+
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ response: "First report" })
+            });
+            await reflection.getAnalysis();
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ response: "Second report" })
+            });
+            await reflection.getAnalysis();
+
+            expect(analysisBodies().map(body => body.summary)).toEqual([
+                "Old report",
+                "First report"
+            ]);
+            expect(localStorage.getItem("musicblocks_analysis")).toBe("Second report");
+        });
+    });
+
     describe("Markdown replies", () => {
         let reflection;
 
