@@ -648,7 +648,8 @@ function setupRhythmBlocks(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle + "_" + blk;
+            const listenerName =
+                blk !== undefined && blk !== null ? "_dot_" + turtle + "_" + blk : "_dot_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {

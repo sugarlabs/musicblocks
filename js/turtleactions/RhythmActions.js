@@ -261,7 +261,8 @@ function setupRhythmActions(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle + "_" + blk;
+            const listenerName =
+                blk !== undefined && blk !== null ? "_dot_" + turtle + "_" + blk : "_dot_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
