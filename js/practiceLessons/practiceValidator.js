@@ -315,7 +315,7 @@ const PracticeValidator = {
                 }
             } else if (block.name === "repeat") {
                 const timesId = block.connections?.[1];
-                const rawCount = Number(blockList[timesId]?.value);
+                const rawCount = this.getNumericValue(timesId, blockList);
                 // Match RepeatBlock.flow(): values below 1 or non-numbers run 0 times;
                 // fractional values are floored (see MathUtility.doRepeatCount).
                 const times = Number.isFinite(rawCount) && rawCount >= 1 ? Math.floor(rawCount) : 0;

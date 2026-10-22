@@ -460,6 +460,37 @@ describe("PracticeValidator.getCurrentSequence", () => {
         expect(PracticeValidator.getCurrentSequence()).toEqual([]);
     });
 
+    test("repeat with namedbox count resolves stored value", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "store", null] },
+            store: {
+                name: "storein2",
+                value: "mybox",
+                trash: false,
+                connections: ["start", "storeVal", "rep"]
+            },
+            storeVal: { name: "number", value: 3, trash: false, connections: ["store"] },
+            rep: { name: "repeat", trash: false, connections: ["store", "boxRef", "c0", null] },
+            boxRef: { name: "namedbox", value: "mybox", trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "A", "A"]);
+    });
+
+    test("repeat with divide block count resolves quotient", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "div", "c0", null] },
+            div: { name: "divide", trash: false, connections: ["rep", "num", "den"] },
+            num: { name: "number", value: 6, trash: false, connections: ["div"] },
+            den: { name: "number", value: 3, trash: false, connections: ["div"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "A"]);
+    });
+
     test("maxLength stops sequence extraction early for huge repeat counts", () => {
         useBlocks({
             start: { name: "start", trash: false, connections: [null, "rep", null] },
