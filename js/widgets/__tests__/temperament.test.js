@@ -1045,6 +1045,23 @@ describe("TemperamentWidget basic tests", () => {
                 jest.useRealTimers();
             });
 
+            test.each(["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"])(
+                "%s does not preview an empty temperament",
+                key => {
+                    widget.pitchNumber = 0;
+                    widget.frequencies = [];
+                    widget._visualizerView();
+                    const emptyCanvas = widgetBody.querySelector("canvas");
+                    ctx.clearRect.mockClear();
+                    mockActivity.logo.synth.trigger.mockClear();
+
+                    emptyCanvas.dispatchEvent(new KeyboardEvent("keydown", { key }));
+
+                    expect(mockActivity.logo.synth.trigger).not.toHaveBeenCalled();
+                    expect(ctx.clearRect).not.toHaveBeenCalled();
+                }
+            );
+
             test.each([
                 ["ArrowRight", 2],
                 ["ArrowDown", 2],

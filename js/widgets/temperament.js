@@ -653,7 +653,7 @@ function TemperamentWidget() {
         };
 
         canvas.onkeydown = function (e) {
-            if (that._playAllRunning) return;
+            if (that._playAllRunning || !that.pitchNumber) return;
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
                 highlightDot = (highlightDot + 1) % that.pitchNumber;
