@@ -124,10 +124,14 @@ class ReflectionChatLog {
     appendBotReply(reply, role = this.AImentor, md = false) {
         if (!this._isWidgetActive()) return;
 
-        this.chatHistory.push({
+        const entry = {
             role: role,
             content: reply.response
-        });
+        };
+        this.chatHistory.push(entry);
+        if (md) {
+            this._markdownReplies.add(entry);
+        }
 
         if (this.chatHistory.length > 10) {
             this.summaryButton.style.removeProperty("background");
@@ -195,7 +199,11 @@ class ReflectionChatLog {
             senderName.style.alignSelf = "flex-start";
 
             const userMsg = document.createElement("div");
-            userMsg.innerText = msg.content;
+            if (this._markdownReplies.has(msg)) {
+                this._setMarkdown(userMsg, msg.content);
+            } else {
+                userMsg.innerText = msg.content;
+            }
 
             messageContainer.appendChild(senderName);
             messageContainer.appendChild(userMsg);

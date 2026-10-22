@@ -1434,5 +1434,22 @@ describe("ReflectionMatrix", () => {
             expect(reply.querySelector("a").hasAttribute("href")).toBe(false);
             expect(reply.querySelector("img")).toBeNull();
         });
+
+        test("draws the analysis as Markdown again after reopening", () => {
+            reflection.appendBotReply({ response: "## Report\n**Well done**" }, "meta", true);
+            reflection.appendBotReply({ response: "**not markdown**" }, "meta");
+
+            mockWidgetWindow.onclose();
+            reflection.init(mockActivity);
+
+            const replies = reflection.chatLog.children;
+            expect(replies[1].querySelector("h2").textContent).toBe("Report");
+            expect(replies[1].querySelector("b").textContent).toBe("Well done");
+            expect(replies[2].lastChild.innerText).toBe("**not markdown**");
+            expect(reflection.chatHistory[1]).toEqual({
+                role: "meta",
+                content: "## Report\n**Well done**"
+            });
+        });
     });
 });

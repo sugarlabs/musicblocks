@@ -168,6 +168,14 @@ class ReflectionMatrix {
         this.chatHistory = [];
 
         /**
+         * Chat history entries that are Markdown replies (the analysis), so they are drawn as
+         * Markdown again when the widget reopens. Kept apart from the entries, which are sent to
+         * the backend as they are.
+         * @type {WeakSet<Object>}
+         */
+        this._markdownReplies = new WeakSet();
+
+        /**
          * Default AI mentor
          * @type {string}
          */
