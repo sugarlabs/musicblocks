@@ -137,15 +137,26 @@ class ReflectionWindow {
      */
     _closeWindow() {
         this.isOpen = false;
-        this._lifecycle.unmount();
         this.activity.isInputON = false;
+        this._endSession();
+        this.widgetWindow.destroy();
+    }
+
+    /**
+     * Ends the current open of the widget: stops its timers and requests and drops the queued
+     * messages. Runs when the window closes and when the block runs again while it is open,
+     * since the replies the old open is waiting for are discarded either way.
+     * @private
+     * @returns {void}
+     */
+    _endSession() {
+        this._lifecycle.unmount();
         this.hideTypingIndicator();
         this._clearWidgetTimers();
         this._lifecycle.abortPendingRequests();
         this.pendingMessages = [];
         this.isProcessingPendingMessage = false;
         this._isUpdatingProjectCode = false;
-        this.widgetWindow.destroy();
     }
 
     /**

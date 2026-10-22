@@ -273,6 +273,10 @@ class ReflectionMatrix {
 
     init(activity) {
         this.activity = activity;
+        if (this.isOpen) {
+            // The block ran again with the widget still open.
+            this._endSession();
+        }
         this.isOpen = true;
         this._lifecycle.mount();
         this.isMaximized = false;

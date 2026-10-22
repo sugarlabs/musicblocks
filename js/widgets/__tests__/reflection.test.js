@@ -1249,4 +1249,81 @@ describe("ReflectionMatrix", () => {
             expect(reflection.typingDiv).toBeNull();
         });
     });
+
+    describe("Opening, closing and running the block again", () => {
+        // Each fetch stays pending until the test resolves it, and rejects
+        // like a real one when its request is aborted.
+        let resolvers;
+        const holdFetches = () => {
+            resolvers = [];
+            global.fetch.mockImplementation(
+                (url, request) =>
+                    new Promise((resolve, reject) => {
+                        resolvers.push(resolve);
+                        request.signal.addEventListener("abort", () => {
+                            const error = new Error("aborted");
+                            error.name = "AbortError";
+                            reject(error);
+                        });
+                    })
+            );
+        };
+        const reply = data => ({ json: jest.fn().mockResolvedValue(data) });
+        const settle = async () => {
+            for (let i = 0; i < 20; i++) {
+                await Promise.resolve();
+            }
+        };
+        const sentQueries = () =>
+            global.fetch.mock.calls
+                .map(call => JSON.parse(call[1].body).query)
+                .filter(query => query !== undefined);
+
+        const openWithHistory = () => {
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = [{ role: "meta", content: "Hi" }];
+            reflection.projectAlgorithm = "alg";
+            reflection.code = "old_code";
+            reflection.init(mockActivity);
+            return reflection;
+        };
+
+        test("sends messages typed after the block runs again during a reply", async () => {
+            const reflection = openWithHistory();
+            holdFetches();
+
+            reflection.input.value = "First";
+            reflection.sendMessage();
+            await settle();
+
+            reflection.init(mockActivity);
+            reflection.input.value = "Second";
+            reflection.sendMessage();
+            await settle();
+
+            expect(sentQueries()).toEqual(["First", "Second"]);
+            resolvers[1](reply({ response: "Answer" }));
+            await settle();
+            expect(reflection.chatLog.lastChild.lastChild.innerText).toBe("Answer");
+        });
+
+        test("refreshes after the block runs again while a mentor is typing", async () => {
+            const reflection = openWithHistory();
+            holdFetches();
+
+            reflection.input.value = "First";
+            reflection.sendMessage();
+            await settle();
+            expect(reflection.typingDiv).not.toBeNull();
+
+            reflection.init(mockActivity);
+            expect(reflection.typingDiv).toBeNull();
+
+            reflection.reloadButton.onclick();
+            await settle();
+
+            expect(mockActivity.prepareExport).toHaveBeenCalledTimes(1);
+            expect(reflection.chatLog.querySelector(".typing-indicator")).not.toBeNull();
+        });
+    });
 });
