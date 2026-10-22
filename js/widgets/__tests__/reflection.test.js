@@ -861,9 +861,8 @@ describe("ReflectionMatrix", () => {
             await Promise.resolve();
 
             // The widget is closed and opened again while the request is in flight.
-            reflection._lifecycle.unmount();
+            reflection._endSession();
             reflection._lifecycle.mount();
-            reflection.triggerFirst = false;
 
             resolveFetch({
                 json: jest.fn().mockResolvedValue({ algorithm: "stale_alg", response: "Late" })
@@ -1324,6 +1323,77 @@ describe("ReflectionMatrix", () => {
 
             expect(mockActivity.prepareExport).toHaveBeenCalledTimes(1);
             expect(reflection.chatLog.querySelector(".typing-indicator")).not.toBeNull();
+        });
+
+        const projectCodeRequests = () =>
+            global.fetch.mock.calls.filter(call => call[0].endsWith("/projectcode")).length;
+
+        test("starts the chat again when reopened after closing during the first reply", async () => {
+            const reflection = new ReflectionMatrix();
+            holdFetches();
+            reflection.init(mockActivity);
+            await settle();
+            expect(projectCodeRequests()).toBe(1);
+
+            mockWidgetWindow.onclose();
+            reflection.init(mockActivity);
+            await settle();
+
+            expect(projectCodeRequests()).toBe(2);
+            resolvers[1](reply({ algorithm: "alg", response: "Hello" }));
+            await settle();
+            expect(reflection.inputContainer.style.display).toBe("flex");
+            expect(reflection.chatHistory).toEqual([{ role: "meta", content: "Hello" }]);
+        });
+
+        test("starts the chat again when reopened after the first reply fails", async () => {
+            const reflection = new ReflectionMatrix();
+            holdFetches();
+            reflection.init(mockActivity);
+            await settle();
+            resolvers[0](reply({ error: "Server busy" }));
+            await settle();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith("Server busy", 3000);
+
+            mockWidgetWindow.onclose();
+            reflection.init(mockActivity);
+            await settle();
+
+            expect(projectCodeRequests()).toBe(2);
+        });
+
+        test("starts the chat again when the block runs again during the first reply", async () => {
+            const reflection = new ReflectionMatrix();
+            holdFetches();
+            reflection.init(mockActivity);
+            await settle();
+
+            reflection.init(mockActivity);
+            await settle();
+
+            expect(projectCodeRequests()).toBe(2);
+        });
+
+        test("Refresh starts the chat when the first reply failed", async () => {
+            const reflection = new ReflectionMatrix();
+            holdFetches();
+            reflection.init(mockActivity);
+            await settle();
+            resolvers[0](reply({ error: "Server busy" }));
+            await settle();
+            expect(reflection.inputContainer.style.display).toBe("none");
+
+            reflection.reloadButton.onclick();
+            await settle();
+            resolvers[1](reply({ algorithm: "alg", response: "Hello" }));
+            await settle();
+
+            expect(projectCodeRequests()).toBe(2);
+            expect(global.fetch.mock.calls.some(call => call[0].endsWith("/updatecode"))).toBe(
+                false
+            );
+            expect(reflection.inputContainer.style.display).toBe("flex");
+            expect(reflection.code).toBe("mocked_code");
         });
     });
 });

@@ -118,6 +118,8 @@ class ReflectionSession {
             this.projectAlgorithm = data.algorithm;
             this.code = code;
         } else {
+            // Let Refresh or the next open try again.
+            this.triggerFirst = false;
             this.activity.errorMsg(_(data.error), 3000);
         }
     }
@@ -129,6 +131,11 @@ class ReflectionSession {
     async updateProjectCode() {
         if (this.typingDiv || this._isUpdatingProjectCode || !this._isWidgetActive()) {
             return;
+        }
+
+        // The chat never started, so there is no code to compare against yet.
+        if (this.code === "") {
+            return this.startChatSession();
         }
 
         const generation = this._lifecycle.generation;

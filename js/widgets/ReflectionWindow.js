@@ -157,6 +157,8 @@ class ReflectionWindow {
         this.pendingMessages = [];
         this.isProcessingPendingMessage = false;
         this._isUpdatingProjectCode = false;
+        // A first reply still in flight is aborted, so the next open has to ask again.
+        this.triggerFirst = false;
     }
 
     /**
