@@ -3343,7 +3343,10 @@ describe("calcOctave", () => {
         expect(calcOctave(4, "7", ["C"], "C")).toBe(7);
     });
 
-    it("should clamp a numeric string to the 1..9 octave range", () => {
+    it("should clamp numeric arguments to the 1..9 octave range", () => {
+        expect(calcOctave(4, 0, ["C"], "C")).toBe(1);
+        expect(calcOctave(4, 12, ["C"], "C")).toBe(9);
+        expect(calcOctave(4, 3.7, ["C"], "C")).toBe(3);
         expect(calcOctave(4, "0", ["C"], "C")).toBe(1);
         expect(calcOctave(4, "12", ["C"], "C")).toBe(9);
         expect(calcOctave(4, "3.7", ["C"], "C")).toBe(3);
