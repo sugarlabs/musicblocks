@@ -152,6 +152,13 @@ describe("musicutils-modewheel", () => {
             // widget measure proportional slices and equal slices alike.
             expect(modewheel.getModeSliceArc(200, 30)).toBeCloseTo(fullTurn / 12, 6);
         });
+
+        it("honours a caller-supplied label radius", () => {
+            expect(modewheel.getModeSliceArc(200, 360, 0.5)).toBeCloseTo(
+                modewheel.getModeSliceArc(200, 360) * (0.5 / 0.575),
+                6
+            );
+        });
     });
 
     describe("enforceMinSliceAngles", () => {

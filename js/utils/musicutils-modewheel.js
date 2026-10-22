@@ -106,11 +106,9 @@ var getModeSliceColors = (modes, colors) =>
 /** Group-ring title font, scaled to wheel radius. */
 var getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 
-/**
- * Arc-length of `degrees` of a slice's label track, in px. The label track sits
- * at 0.575 of the wheel radius (midpoint of the 0.4-0.75 name ring).
- */
-var getModeSliceArc = (wheelRadius, degrees) => (2 * Math.PI * 0.575 * wheelRadius * degrees) / 360;
+/** Arc-length of `degrees` of a slice's label track, in px. */
+var getModeSliceArc = (wheelRadius, degrees, labelRadiusPercent = 0.575) =>
+    (2 * Math.PI * labelRadiusPercent * wheelRadius * degrees) / 360;
 
 /** Name-ring label font sized to fit its slice arc. */
 var getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {

@@ -44,6 +44,10 @@ class ModeWidget {
     static ROTATESPEED = 125;
     static RESET_NOTES_DELAY = 500;
     static WHEELSIZE = 400;
+    // Label ring on the mode wheel, as fractions of wheelRadius. The slice
+    // labels sit at its midpoint, so move these together.
+    static MODE_WHEEL_MIN_RADIUS = 0.4;
+    static MODE_WHEEL_MAX_RADIUS = 0.75;
     static MIN_EDO = 5;
     static MAX_EDO = 55;
     static MAX_TITLE_FONT_SIZE = 48;
@@ -1798,6 +1802,8 @@ class ModeWidget {
         if (!Array.isArray(wheel.navItems)) {
             return;
         }
+        const labelRadius =
+            (ModeWidget.MODE_WHEEL_MIN_RADIUS + ModeWidget.MODE_WHEEL_MAX_RADIUS) / 2;
         const fontSize = this._titleFontSize(wheel.navItems.length);
         for (const item of wheel.navItems) {
             const title = typeof item.title === "string" ? item.title.trim() : "";
@@ -1809,7 +1815,7 @@ class ModeWidget {
             ) {
                 continue;
             }
-            const available = getModeSliceArc(wheel.wheelRadius, item.sliceAngle);
+            const available = getModeSliceArc(wheel.wheelRadius, item.sliceAngle, labelRadius);
             // Roughly 0.6em per character is the usual sans-serif advance width.
             item._narrow = available < fontSize * 0.6 * title.length;
             if (item._narrow) {
@@ -1878,8 +1884,8 @@ class ModeWidget {
         const titleFontSize = this._titleFontSize(n);
         configureWheel(this._modeWheel, {
             colors: platformColor.modeWheelcolors,
-            minRadius: 0.4,
-            maxRadius: 0.75,
+            minRadius: ModeWidget.MODE_WHEEL_MIN_RADIUS,
+            maxRadius: ModeWidget.MODE_WHEEL_MAX_RADIUS,
             clickModeRotate: false,
             selectionPaths: true,
             titleFont: "400 " + titleFontSize + "px sans-serif",
