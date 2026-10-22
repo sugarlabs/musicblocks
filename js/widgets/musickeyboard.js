@@ -940,6 +940,7 @@ function MusicKeyboard(activity) {
          * @type {Window}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
+        this._midiClosed = false;
         announceToScreenReader(_("Music Keyboard opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -1027,12 +1028,16 @@ function MusicKeyboard(activity) {
             this._stopOrCloseClicked = true;
             this.playingNow = false;
 
-            // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
-            if (this.midiAccess && this.midiAccess.inputs) {
-                this.midiAccess.inputs.forEach(input => {
-                    input.onmidimessage = null;
+            // Detach only the MIDI listeners this keyboard attached so other
+            // keyboards sharing the same input keep receiving messages.
+            if (this._midiInputs && this._midiHandler) {
+                this._midiInputs.forEach(input => {
+                    input.removeEventListener("midimessage", this._midiHandler);
                 });
+                this._midiInputs.clear();
             }
+            this._midiHandler = null;
+            this._midiClosed = true;
             this.midiON = false;
             // Don't hold on to the turtle once the keyboard is closed.
             this.turtle = null;
@@ -2150,14 +2155,19 @@ function MusicKeyboard(activity) {
          */
         const onMIDISuccess = midiAccess => {
             this.midiAccess = midiAccess;
+            if (this._midiClosed) return;
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
                 activity.textMsg(_("MIDI device present."), 3000);
                 return;
             }
+            this._midiHandler = onMIDIMessage;
+            this._midiInputs = this._midiInputs || new Set();
             midiAccess.inputs.forEach(input => {
-                input.onmidimessage = onMIDIMessage;
+                if (this._midiInputs.has(input)) return;
+                input.addEventListener("midimessage", onMIDIMessage);
+                this._midiInputs.add(input);
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";

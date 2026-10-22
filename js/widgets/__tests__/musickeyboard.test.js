@@ -1980,12 +1980,17 @@ describe("MusicKeyboard core logic", () => {
     });
 
     describe("Web MIDI cleanup on widget close", () => {
-        test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
-            const mockInput1 = { onmidimessage: jest.fn() };
-            const mockInput2 = { onmidimessage: jest.fn() };
+        test("removes MIDI listeners this keyboard added when widgetWindow.onclose is called", async () => {
+            const mockInput1 = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
+            const mockInput2 = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
             const mockMidiAccess = {
-                inputs: [mockInput1, mockInput2]
+                inputs: new Map([
+                    ["1", mockInput1],
+                    ["2", mockInput2]
+                ])
             };
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(mockMidiAccess);
 
             const mockWidgetWindow = {
                 clear: jest.fn(),
@@ -2014,29 +2019,104 @@ describe("MusicKeyboard core logic", () => {
                             singer: { bpm: [90] }
                         })
                     },
-                    logo: { synth: { stopSound: jest.fn() } }
+                    logo: { synth: { stopSound: jest.fn() } },
+                    textMsg: jest.fn()
                 };
 
                 const keyboard = new MusicKeyboard(mockActivity);
                 keyboard._createWidgetWindow();
+                keyboard.midiButton = { style: {} };
 
-                keyboard.midiAccess = mockMidiAccess;
-                keyboard.midiON = true;
+                keyboard.doMIDI();
+                await Promise.resolve();
+                await Promise.resolve();
+
+                expect(mockInput1.addEventListener).toHaveBeenCalledWith(
+                    "midimessage",
+                    expect.any(Function)
+                );
+                const handler = mockInput1.addEventListener.mock.calls[0][1];
 
                 // Trigger actual onclose handler registered on widgetWindow
                 mockWidgetWindow.onclose();
 
-                expect(mockInput1.onmidimessage).toBeNull();
-                expect(mockInput2.onmidimessage).toBeNull();
+                expect(mockInput1.removeEventListener).toHaveBeenCalledWith("midimessage", handler);
+                expect(mockInput2.removeEventListener).toHaveBeenCalledWith("midimessage", handler);
                 expect(keyboard.midiON).toBe(false);
                 expect(mockWidgetWindow.destroy).toHaveBeenCalled();
             } finally {
                 global.window.widgetWindows = origWidgetWindows;
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
+            }
+        });
+
+        test("closing one keyboard leaves another keyboard's MIDI listener attached", async () => {
+            const handlers = new Set();
+            const input = {
+                handlers,
+                addEventListener: (type, handler) => {
+                    if (type === "midimessage") handlers.add(handler);
+                },
+                removeEventListener: (type, handler) => {
+                    if (type === "midimessage") handlers.delete(handler);
+                }
+            };
+            const midiAccess = { inputs: new Map([["1", input]]) };
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(midiAccess);
+
+            const makeWidgetWindow = () => ({
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                takeFocus: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({ append: jest.fn(), style: {} })
+            });
+
+            const origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn(() => makeWidgetWindow())
+            };
+
+            try {
+                const mockActivity = {
+                    turtles: {
+                        ithTurtle: jest.fn().mockReturnValue({ singer: { bpm: [] } })
+                    },
+                    logo: { synth: { stopSound: jest.fn() } },
+                    textMsg: jest.fn()
+                };
+                const first = new MusicKeyboard(mockActivity);
+                const second = new MusicKeyboard(mockActivity);
+                first._createWidgetWindow();
+                second._createWidgetWindow();
+                first.midiButton = { style: {} };
+                second.midiButton = { style: {} };
+
+                first.doMIDI();
+                second.doMIDI();
+                await Promise.resolve();
+                await Promise.resolve();
+
+                expect(handlers.size).toBe(2);
+
+                first.widgetWindow.onclose();
+
+                expect(handlers.size).toBe(1);
+                expect(handlers.has(second._midiHandler)).toBe(true);
+            } finally {
+                global.window.widgetWindows = origWidgetWindows;
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
             }
         });
 
         test("doMIDI stores midiAccess reference when requestMIDIAccess succeeds", async () => {
-            const mockInput = { onmidimessage: null };
+            const mockInput = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
             const mockMidiAccess = {
                 inputs: new Map([["1", mockInput]])
             };
@@ -2055,7 +2135,10 @@ describe("MusicKeyboard core logic", () => {
                 await Promise.resolve();
 
                 expect(keyboard.midiAccess).toBe(mockMidiAccess);
-                expect(mockInput.onmidimessage).toBeDefined();
+                expect(mockInput.addEventListener).toHaveBeenCalledWith(
+                    "midimessage",
+                    expect.any(Function)
+                );
             } finally {
                 global.navigator.requestMIDIAccess = origRequestMIDIAccess;
             }
