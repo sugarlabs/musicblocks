@@ -188,7 +188,11 @@ function MusicKeyboard(activity) {
         if (existing === -1) {
             return;
         }
+        // If another window (or the canvas) already took input, leave it alone.
+        const wasActive =
+            document.onkeydown === this._boundKeyDown && document.onkeyup === this._boundKeyUp;
         stack.splice(existing, 1);
+        if (!wasActive) return;
         const owner = stack[stack.length - 1];
         document.onkeydown = owner ? owner._boundKeyDown : MusicKeyboard._baseKeyDown;
         document.onkeyup = owner ? owner._boundKeyUp : MusicKeyboard._baseKeyUp;
@@ -209,6 +213,15 @@ function MusicKeyboard(activity) {
         stack.push(this);
         document.onkeydown = this._boundKeyDown;
         document.onkeyup = this._boundKeyUp;
+    };
+
+    // Clicking another window or the canvas releases this keyboard's key input.
+    this._blurKeyboardInput = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        if (stack[stack.length - 1] !== this) return;
+        if (typeof this._releaseActiveNotes === "function") this._releaseActiveNotes();
+        document.onkeydown = MusicKeyboard._baseKeyDown;
+        document.onkeyup = MusicKeyboard._baseKeyUp;
     };
 
     this._setWidgetInterval = function (callback, interval) {
@@ -935,6 +948,9 @@ function MusicKeyboard(activity) {
         this._widgetBody = widgetWindow.getWidgetBody();
         // Focus routes physical-key input to this keyboard.
         widgetWindow.onfocused = () => this._focusKeyboardInput();
+        widgetWindow.onblurred = () => this._blurKeyboardInput();
+        // Opening or re-opening an existing window must also take focus and raise it.
+        if (typeof widgetWindow.takeFocus === "function") widgetWindow.takeFocus();
         this.displayLayout = this._keysLayout();
         /**
          * Beats per minute (BPM) for the MusicKeyboard.

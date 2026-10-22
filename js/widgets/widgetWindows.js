@@ -283,9 +283,13 @@ window.widgetWindows = {
             }
         }
 
+        const previous = this.focused;
         this.focused = clickedWindow;
         if (clickedWindow && typeof clickedWindow.onfocused === "function") {
             clickedWindow.onfocused();
+        }
+        if (previous && previous !== clickedWindow && typeof previous.onblurred === "function") {
+            previous.onblurred();
         }
     }
 };

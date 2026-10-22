@@ -142,6 +142,29 @@ describe("MusicKeyboard document key handler ownership", () => {
         expect(document.onkeydown).toBeNull();
     });
 
+    test("blurring a keyboard returns document handlers to the base", () => {
+        const first = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+
+        first._blurKeyboardInput();
+
+        expect(document.onkeydown).toBeNull();
+        expect(document.onkeyup).toBeNull();
+    });
+
+    test("closing a blurred keyboard does not restore its handler", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+
+        second._blurKeyboardInput();
+        second._releaseDocumentKeyHandlers();
+
+        expect(document.onkeydown).toBeNull();
+        expect(document.onkeyup).toBeNull();
+    });
+
     test("pressing a piano key focuses that keyboard so input follows it", () => {
         const first = new MusicKeyboard({});
         const second = new MusicKeyboard({});
@@ -921,6 +944,7 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
                     append: jest.fn(el => document.body.appendChild(el)),
                     style: {}
                 }),
+                takeFocus: jest.fn(),
                 sendToCenter: jest.fn()
             })
         };
@@ -1002,6 +1026,20 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         global.PITCHES = originalPitches;
         global.PITCHES2 = originalPitches2;
         global.SOLFEGENAMES = originalSolfegeNames;
+    });
+
+    test("takes focus only after onfocused is wired", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        keyboard._keysLayout = jest.fn().mockReturnValue([]);
+        const win = window.widgetWindows.windowFor();
+        win.takeFocus = jest.fn(() => {
+            expect(typeof win.onfocused).toBe("function");
+            win.onfocused();
+        });
+
+        keyboard.init();
+
+        expect(win.takeFocus).toHaveBeenCalledTimes(1);
     });
 
     test("wheel events on keyboardDiv and keyTable stop propagation", () => {

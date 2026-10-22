@@ -1151,6 +1151,27 @@ describe("widgetWindows", () => {
             expect(win2.onfocused).not.toHaveBeenCalled();
         });
 
+        test("notifies the window that loses focus via onblurred", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onblurred = jest.fn();
+            win2.onblurred = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win2.onblurred).toHaveBeenCalledTimes(1);
+            expect(win1.onblurred).not.toHaveBeenCalled();
+        });
+
+        test("notifies the focused window when clicking outside all windows", () => {
+            const win1 = createTestWindow("Window 1");
+            win1.onblurred = jest.fn();
+
+            canvas.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onblurred).toHaveBeenCalledTimes(1);
+        });
+
         test("clears focus and dims all windows when clicking outside all windows", () => {
             const win1 = createTestWindow("Window 1");
             const win2 = createTestWindow("Window 2");
