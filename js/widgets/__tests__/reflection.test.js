@@ -1454,6 +1454,21 @@ describe("ReflectionMatrix", () => {
             expect(analysisBodies()).toHaveLength(1);
         });
 
+        test("opens when the browser blocks localStorage", () => {
+            jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+                throw new DOMException("The operation is insecure.", "SecurityError");
+            });
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+            const reflection = new ReflectionMatrix();
+
+            expect(() => reflection.init(mockActivity)).not.toThrow();
+
+            expect(reflection.summary).toBe("No reports available");
+            expect(reflection.chatLog).toBeDefined();
+            expect(mockActivity.prepareExport).toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalled();
+        });
+
         test("opens with the Summary button on when the chat has ten messages", () => {
             const reflection = new ReflectionMatrix();
             reflection.chatHistory = tenMessages();

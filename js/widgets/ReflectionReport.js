@@ -54,8 +54,12 @@ class ReflectionReport {
      */
     readReport() {
         const key = "musicblocks_analysis";
-        const data = localStorage.getItem(key);
-        return data;
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn("Could not read analysis report from localStorage:", e);
+            return null;
+        }
     }
 
     /** Downloads the conversation as a text file.
