@@ -449,6 +449,17 @@ describe("PracticeValidator.getCurrentSequence", () => {
         expect(PracticeValidator.getCurrentSequence()).toEqual([]);
     });
 
+    test("repeat with non-finite count produces no iterations", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: Infinity, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
     test("maxLength stops sequence extraction early for huge repeat counts", () => {
         useBlocks({
             start: { name: "start", trash: false, connections: [null, "rep", null] },
