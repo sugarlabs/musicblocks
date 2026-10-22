@@ -383,17 +383,26 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(gitDropdown._sanitizeRepoName("Café Crème")).toBe("cafe-creme");
         });
 
-        test("gives non-latin names their own fallback instead of a shared one", () => {
-            const now = jest.spyOn(Date, "now");
-            now.mockReturnValueOnce(1000).mockReturnValueOnce(2000);
+        test("gives non-latin names their own fallback even in the same millisecond", () => {
+            const now = jest.spyOn(Date, "now").mockReturnValue(1000);
+            const random = jest.spyOn(Math, "random");
+            random.mockReturnValueOnce(0.1).mockReturnValueOnce(0.2);
 
             const first = gitDropdown._sanitizeRepoName("私の曲");
             const second = gitDropdown._sanitizeRepoName("Мой проект");
 
-            expect(first).toMatch(/^my-music-project-[a-z0-9]+$/);
-            expect(second).toMatch(/^my-music-project-[a-z0-9]+$/);
+            expect(first).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(second).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
             expect(first).not.toBe(second);
             now.mockRestore();
+            random.mockRestore();
+        });
+
+        test("never ends the fallback with a dash, even if Math.random returns 0", () => {
+            const random = jest.spyOn(Math, "random").mockReturnValue(0);
+            const name = gitDropdown._sanitizeRepoName("私の曲");
+            expect(name).toMatch(/^my-music-project-[a-z0-9]+-0000$/);
+            random.mockRestore();
         });
 
         test("never ends with a dash after cutting to 100 characters", () => {
