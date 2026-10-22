@@ -57,7 +57,16 @@ describe("musicutils-pitchinfo", () => {
     });
 
     describe("notes that cross the B/C boundary (#9765)", () => {
-        const synth = { _getFrequency: jest.fn(note => note), changeInTemperament: false };
+        // Equal-tempered frequencies (A4 = 440 Hz) for the notes the remaps resolve to.
+        const FREQUENCIES = {
+            "C♯5": 554.3652619537442,
+            "B♭3": 233.0818807590449,
+            "B4": 493.8833012561241
+        };
+        const synth = {
+            _getFrequency: jest.fn(note => FREQUENCIES[note]),
+            changeInTemperament: false
+        };
         const activity = { logo: { synth } };
         const info = (type, note) => pitchinfo.getPitchInfo(activity, type, note, singerTur());
 
@@ -68,10 +77,19 @@ describe("musicutils-pitchinfo", () => {
             expect(info("pitch number", "C𝄫4")).toBe(info("pitch number", "B♭3"));
         });
 
-        it("asks the synth for the frequency in the right octave", () => {
-            expect(info("pitch in hertz", "B𝄪4")).toBe("C♯5");
-            expect(info("pitch in hertz", "C𝄫4")).toBe("B♭3");
-            expect(info("pitch in hertz", "A𝄪4")).toBe("B4");
+        it("asks the synth for the note in the right octave", () => {
+            info("pitch in hertz", "B𝄪4");
+            expect(synth._getFrequency).toHaveBeenLastCalledWith("C♯5", false);
+            info("pitch in hertz", "C𝄫4");
+            expect(synth._getFrequency).toHaveBeenLastCalledWith("B♭3", false);
+            info("pitch in hertz", "A𝄪4");
+            expect(synth._getFrequency).toHaveBeenLastCalledWith("B4", false);
+        });
+
+        it("returns the frequency of the note they sound as", () => {
+            expect(info("pitch in hertz", "B𝄪4")).toBeCloseTo(554.37, 2);
+            expect(info("pitch in hertz", "C𝄫4")).toBeCloseTo(233.08, 2);
+            expect(info("pitch in hertz", "A𝄪4")).toBeCloseTo(493.88, 2);
         });
 
         it("shades remapped double accidentals by their new octave", () => {
