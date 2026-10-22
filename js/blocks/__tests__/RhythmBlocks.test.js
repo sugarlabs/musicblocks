@@ -415,7 +415,7 @@ describe("RhythmBlocks", () => {
             block.flow([2, true], logo, 0, 10);
 
             expect(turtle.singer.skipFactor).toBe(2);
-            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_skip_0");
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_skip_0_10");
         });
 
         test("handles null skip value", () => {
@@ -424,6 +424,20 @@ describe("RhythmBlocks", () => {
             block.flow([null, true], logo, 0, 10);
 
             expect(turtle.singer.skipFactor).toBe(0);
+        });
+
+        test("nested skip notes blocks each undo their own factor", () => {
+            const listeners = {};
+            logo.setTurtleListener.mockImplementation((t, name, fn) => (listeners[name] = fn));
+            turtle.singer.skipFactor = 1;
+            const block = getBlock("skipnotes");
+            block.flow([3, true], logo, 0, 10);
+            block.flow([2, true], logo, 0, 11);
+
+            listeners._skip_0_11();
+            expect(turtle.singer.skipFactor).toBe(4);
+            listeners._skip_0_10();
+            expect(turtle.singer.skipFactor).toBe(1);
         });
     });
 
