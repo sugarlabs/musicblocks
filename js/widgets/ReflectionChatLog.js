@@ -106,7 +106,7 @@ class ReflectionChatLog {
         senderName.style.color = "var(--color-text-secondary)";
         senderName.style.overflowWrap = "break-word";
         senderName.style.alignSelf = "flex-start";
-        senderName.innerText = "You";
+        senderName.innerText = this.mentorsMap.user;
 
         const userMsg = document.createElement("div");
         userMsg.innerText = text;

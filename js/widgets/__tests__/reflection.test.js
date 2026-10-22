@@ -1400,6 +1400,35 @@ describe("ReflectionMatrix", () => {
         });
     });
 
+    describe("Your messages", () => {
+        test("are labelled the same live, after reopening and in the saved text", async () => {
+            const reflection = new ReflectionMatrix();
+            reflection.chatHistory = [{ role: "meta", content: "Hi" }];
+            reflection.init(mockActivity);
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+
+            reflection.input.value = "My idea";
+            reflection.sendMessage();
+            const yourName = () =>
+                reflection.chatLog.querySelector(".message-container.user .sender-name").innerText;
+            const live = yourName();
+
+            mockWidgetWindow.onclose();
+            reflection.init(mockActivity);
+            const reopened = yourName();
+
+            let transcript;
+            jest.spyOn(global, "Blob").mockImplementation(parts => {
+                transcript = parts[0];
+            });
+            reflection.downloadAsTxt(reflection.chatHistory);
+
+            expect(live).toBe("YOU");
+            expect(reopened).toBe("YOU");
+            expect(transcript).toContain("YOU: My idea");
+        });
+    });
+
     describe("Translated labels", () => {
         const english = global._;
 
