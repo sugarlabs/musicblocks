@@ -17,6 +17,7 @@ class GitDropdownUI {
         this.activity = null;
         this._BASE_URL = "";
         this._prefetchPromise = null;
+        this._prefetchRepo = null;
     }
 
     init(activity) {
@@ -141,8 +142,16 @@ class GitDropdownUI {
         }
     }
 
+    _getProjectGitData() {
+        const planet = this.activity && this.activity.planet;
+        return planet && typeof planet.getCurrentGitRepoData === "function"
+            ? planet.getCurrentGitRepoData()
+            : null;
+    }
+
     _getRepoName() {
-        return localStorage.getItem("mbGitRepoName") || "";
+        const gitData = this._getProjectGitData();
+        return gitData ? gitData.repoName : localStorage.getItem("mbGitRepoName") || "";
     }
     _getDisplayName() {
         let liveName = "";
@@ -164,7 +173,8 @@ class GitDropdownUI {
         );
     }
     _getHashedKey() {
-        return localStorage.getItem("mbGitHashedKey") || "";
+        const gitData = this._getProjectGitData();
+        return gitData ? gitData.hashedKey : localStorage.getItem("mbGitHashedKey") || "";
     }
     _getLastSavedHash() {
         return localStorage.getItem("mbGitLastSavedHash") || "";
@@ -224,6 +234,7 @@ class GitDropdownUI {
         const repoName = this._getRepoName();
         if (!repoName || typeof fetch !== "function") return;
 
+        this._prefetchRepo = repoName;
         this._prefetchPromise = fetch(
             `${this._BASE_URL}/commitHistory?repoName=${encodeURIComponent(repoName)}`
         )
@@ -394,6 +405,7 @@ class GitDropdownUI {
             this._showToast("Could not save your project. Please try again.", "error");
             return;
         }
+        const projectId = this._getProjectGitData()?.projectId || null;
         const thumbnail = this._getThumbnail();
 
         // ── Instant offline pre-check ─────────────────────────────────────────
@@ -419,7 +431,7 @@ class GitDropdownUI {
                     creatorName: "anonymous",
                     thumbnail,
                     tags: [],
-                    projectId: null
+                    projectId
                 },
                 "*"
             );
@@ -530,6 +542,7 @@ class GitDropdownUI {
                 planetIframe.contentWindow.postMessage(
                     {
                         type: "MB_GIT_CREATED",
+                        projectId,
                         repoName: savedRepoName,
                         hashedKey: savedKey,
                         displayName: displayName,
@@ -573,7 +586,7 @@ class GitDropdownUI {
                         creatorName: "anonymous",
                         thumbnail,
                         tags: [],
-                        projectId: null
+                        projectId
                     },
                     "*"
                 );
@@ -736,7 +749,10 @@ class GitDropdownUI {
                 // Pass the project ID so Planet.js can find the right project in IndexedDB.
                 // This covers the case where the project was created online and the iframe
                 // has been re-initialised since then (CurrentProject would be null otherwise).
-                projectId: localStorage.getItem("mbGitCurrentProjectId") || null,
+                projectId:
+                    this._getProjectGitData()?.projectId ||
+                    localStorage.getItem("mbGitCurrentProjectId") ||
+                    null,
                 repoName,
                 hashedKey,
                 projectData,
@@ -782,8 +798,8 @@ class GitDropdownUI {
             return;
         }
 
-        // If a prefetch hasn't been started, start one now
-        if (!this._prefetchPromise) {
+        // If no prefetch has been started for this repo, start one now
+        if (!this._prefetchPromise || this._prefetchRepo !== repoName) {
             this._prefetchCommits();
         }
 
