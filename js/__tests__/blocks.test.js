@@ -2056,6 +2056,7 @@ describe("Blocks Foundation", () => {
                     "namedbox",
                     "nameddo",
                     "do",
+                    "stack",
                     "calc",
                     "doArg",
                     "calcArg",
@@ -2106,6 +2107,28 @@ describe("Blocks Foundation", () => {
 
                 expect(project[6][1][1]).toEqual({ value: "action1" });
                 expect(project[8][1][1]).toEqual({ value: "action11" });
+            });
+
+            it("keeps a legacy stack block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "stack", 0, 0, [4, 6, null]]);
+                project.push([6, ["text", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+            });
+
+            it("keeps a do block named by a legacy string block on its action", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, null]]);
+                project.push([6, ["string", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
             });
 
             it("leaves do blocks alone when no action is renamed", () => {
