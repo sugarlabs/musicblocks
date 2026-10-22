@@ -431,10 +431,10 @@ var getVoiceName = name => {
     }
 
     for (let i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name) {
+        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
             if (VOICENAMES[i][0] !== "") {
                 return VOICENAMES[i][0];
-            } else if (VOICENAMES[i][1] === name) {
+            } else {
                 return VOICENAMES[i][1];
             }
         }
