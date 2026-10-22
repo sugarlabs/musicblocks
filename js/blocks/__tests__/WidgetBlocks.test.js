@@ -1005,6 +1005,25 @@ describe("setupWidgetBlocks", () => {
             expect(logo.reflection.init).toHaveBeenCalledTimes(1);
             expect(logo.inReflectionMatrix).toBe(false);
         });
+
+        it("leaves the Status widget's fields alone", () => {
+            const reflection = getBlock("reflection");
+            const fields = [
+                ["xBlk", "x"],
+                ["bpmBlk", "bpm"]
+            ];
+            logo.statusFields = fields;
+
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(logo.statusFields).toBe(fields);
+            expect(logo.statusFields).toEqual([
+                ["xBlk", "x"],
+                ["bpmBlk", "bpm"]
+            ]);
+        });
     });
 
     describe("Widget dependency resolution", () => {

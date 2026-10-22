@@ -2141,7 +2141,7 @@ function setupWidgetBlocks(activity) {
         }
 
         /**
-         * Handles the flow of data for the status block.
+         * Handles the flow of data for the reflection block.
          * @param {any[]} args - The arguments passed to the block.
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
@@ -2172,8 +2172,6 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
-
-            logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
 
