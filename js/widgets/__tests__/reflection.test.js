@@ -95,6 +95,70 @@ afterEach(() => {
 });
 
 describe("ReflectionMatrix", () => {
+    describe("Modules", () => {
+        const fs = require("fs");
+        const path = require("path");
+        const MODULES = [
+            "ReflectionLifecycle",
+            "ReflectionWindow",
+            "ReflectionChatLog",
+            "ReflectionSession",
+            "ReflectionBackend",
+            "ReflectionReport",
+            "ReflectionMarkdown"
+        ];
+
+        test("loads the lifecycle helper, each module and then the widget", () => {
+            expect(ReflectionMatrix.dependencies).toEqual([
+                "utils/ai-widget-lifecycle",
+                ...MODULES.map(name => "widgets/" + name),
+                "widgets/reflection"
+            ]);
+            for (const id of ReflectionMatrix.dependencies) {
+                expect(fs.existsSync(path.join(__dirname, "../..", id + ".js"))).toBe(true);
+            }
+        });
+
+        test("the Reflection block falls back to the same list", () => {
+            const source = fs.readFileSync(
+                path.join(__dirname, "../../blocks/WidgetBlocks.js"),
+                "utf8"
+            );
+            const block = source.slice(source.indexOf("class ReflectionBlock"));
+            const fallback = block.slice(
+                block.indexOf("[", block.indexOf("ReflectionMatrix : null"))
+            );
+            const list = fallback.slice(0, fallback.indexOf("]") + 1);
+
+            expect(JSON.parse(list)).toEqual(ReflectionMatrix.dependencies);
+        });
+
+        test("installModules copies every module method onto the widget", () => {
+            expect(ReflectionMatrix.installModules()).toBe(true);
+            for (const name of MODULES) {
+                const module = global[name];
+                for (const method of Object.getOwnPropertyNames(module.prototype)) {
+                    if (method !== "constructor") {
+                        expect(ReflectionMatrix.prototype[method]).toBe(module.prototype[method]);
+                    }
+                }
+            }
+        });
+
+        test("installModules waits until every module is loaded", () => {
+            const markdown = global.ReflectionMarkdown;
+            ReflectionMatrix._modulesInstalled = false;
+            delete global.ReflectionMarkdown;
+            try {
+                expect(ReflectionMatrix.installModules()).toBe(false);
+                expect(ReflectionMatrix._modulesInstalled).toBe(false);
+            } finally {
+                global.ReflectionMarkdown = markdown;
+                expect(ReflectionMatrix.installModules()).toBe(true);
+            }
+        });
+    });
+
     describe("Constructor and Constants", () => {
         test("Initializes constants correctly", () => {
             expect(ReflectionMatrix.BUTTONDIVWIDTH).toBe(535);
