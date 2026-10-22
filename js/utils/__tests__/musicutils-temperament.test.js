@@ -72,6 +72,16 @@ describe("musicutils-temperament", () => {
             temperament.setOctaveRatio(2);
         });
 
+        it("ignores invalid temperament and global octave ratios", () => {
+            temperament.setOctaveRatio(3);
+            for (const octaveRatio of [null, 0, 1, -2, Infinity, "not a ratio"]) {
+                expect(temperament.getEffectiveOctaveRatio({ octaveRatio })).toBe(3);
+            }
+
+            temperament.setOctaveRatio(0);
+            expect(temperament.getEffectiveOctaveRatio({})).toBe(2);
+        });
+
         it("detects equal division of non-octave periods in isEquallyTempered", () => {
             const bpRatios = Array.from({ length: 13 }, (_, i) => Math.pow(3, i / 13));
             const bpTemperament = {
