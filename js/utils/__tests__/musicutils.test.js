@@ -2487,6 +2487,13 @@ describe("getModePattern", () => {
             expect(getModePattern("custom", 19)).toEqual(new Array(19).fill(1));
         });
 
+        it("falls back when a step is not a positive integer, even if the sum fits", () => {
+            MUSICALMODES.custom = [4, 3, 0, 3]; // sums to 10, but has a 0 step
+            expect(getModePattern("custom", 10)).toEqual(new Array(10).fill(1));
+            MUSICALMODES.custom = [6, -1, 7]; // sums to 12
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
         it("returns a copy, not the stored array", () => {
             MUSICALMODES.custom = [2, 2, 3, 2, 3];
             const out = getModePattern("custom", 12);

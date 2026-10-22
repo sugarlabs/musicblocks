@@ -573,7 +573,11 @@ function setupIntervalsActions(activity) {
             // EDO, so comparing the length would throw it away.
             const edo = getCurrentEDO(temperament);
             const custom = MUSICALMODES["custom"];
-            if (!Array.isArray(custom) || custom.reduce((a, b) => a + b, 0) !== edo) {
+            if (
+                !Array.isArray(custom) ||
+                !custom.every(step => Number.isInteger(step) && step > 0) ||
+                custom.reduce((a, b) => a + b, 0) !== edo
+            ) {
                 MUSICALMODES["custom"] = new Array(edo).fill(1);
             }
         }

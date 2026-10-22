@@ -1258,6 +1258,13 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
     });
 
+    test("setTemperament rebuilds a custom mode with a 0 step even if the sum fits", () => {
+        global.getCurrentEDO = jest.fn(() => 12);
+        MUSICALMODES.custom = [5, 0, 7]; // sums to 12
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(1));
+    });
+
     describe("getTemperamentLength", () => {
         beforeEach(() => {
             delete global.TEMPERAMENT.custom_edo19;
