@@ -129,7 +129,7 @@ function setupRhythmActions(activity) {
             tur.singer.noteValue[last(tur.singer.inNoteBlock)] =
                 1 / (noteBeatValue * tur.singer.beatFactor);
 
-            const listenerName = "_playnote_" + turtle;
+            const listenerName = "_playnote_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -246,7 +246,7 @@ function setupRhythmActions(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle;
+            const listenerName = "_dot_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
