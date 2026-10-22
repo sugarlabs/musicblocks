@@ -2154,7 +2154,17 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
+                    [
+                        "utils/ai-widget-lifecycle",
+                        "widgets/ReflectionLifecycle",
+                        "widgets/ReflectionWindow",
+                        "widgets/ReflectionChatLog",
+                        "widgets/ReflectionSession",
+                        "widgets/ReflectionBackend",
+                        "widgets/ReflectionReport",
+                        "widgets/ReflectionMarkdown",
+                        "widgets/reflection"
+                    ]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,

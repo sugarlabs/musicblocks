@@ -27,7 +27,15 @@ global.isSafeUrl = isSafeUrl;
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
 
+global.ReflectionLifecycle = require("../ReflectionLifecycle");
+global.ReflectionWindow = require("../ReflectionWindow");
+global.ReflectionChatLog = require("../ReflectionChatLog");
+global.ReflectionSession = require("../ReflectionSession");
+global.ReflectionBackend = require("../ReflectionBackend");
+global.ReflectionReport = require("../ReflectionReport");
+global.ReflectionMarkdown = require("../ReflectionMarkdown");
 const ReflectionMatrix = require("../reflection");
+global.ReflectionMatrix = ReflectionMatrix;
 
 // Mock globals
 global._ = str => str;
