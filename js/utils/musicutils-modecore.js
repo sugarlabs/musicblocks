@@ -890,7 +890,11 @@ var getModePattern = (mode, edo = 12) => {
         // define mode block, set temperament and saved custom modes all
         // replace that array, so the copy taken at load time goes stale.
         const custom = MUSICALMODES.custom;
-        if (Array.isArray(custom) && custom.reduce((a, b) => a + b, 0) === edo) {
+        if (
+            Array.isArray(custom) &&
+            custom.every(step => Number.isInteger(step) && step > 0) &&
+            custom.reduce((a, b) => a + b, 0) === edo
+        ) {
             return custom.slice();
         }
         return new Array(edo).fill(1);
