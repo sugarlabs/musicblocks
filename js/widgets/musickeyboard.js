@@ -1043,17 +1043,8 @@ function MusicKeyboard(activity) {
             this.turtle = null;
 
             selectedNotes = [];
-            const wheelDiv = docById("wheelDivptm");
-            if (wheelDiv && wheelDiv.style) {
-                wheelDiv.style.display = "none";
-            }
-            if (this._menuWheel) this._menuWheel.removeWheel();
-            if (this._pitchWheel) this._pitchWheel.removeWheel();
-            if (this._tabsWheel) this._tabsWheel.removeWheel();
-            if (this._exitWheel) this._exitWheel.removeWheel();
-            if (this._durationWheel) this._durationWheel.removeWheel();
-            if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
-            if (this._octavesWheel) this._octavesWheel.removeWheel();
+            // Only tear down the shared menu if this keyboard still owns it.
+            if (typeof this._closeWheelMenu === "function") this._closeWheelMenu();
             announceToScreenReader(_("Music Keyboard closed"));
             widgetWindow.destroy();
         };

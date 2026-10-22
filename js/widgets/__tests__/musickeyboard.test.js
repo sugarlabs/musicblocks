@@ -23,6 +23,7 @@ const MusicKeyboard = require("../musickeyboard.js");
 // Shared across instances. reset between tests.
 afterEach(() => {
     MusicKeyboard._keyHandlerStack.length = 0;
+    MusicKeyboardEditing._wheelMenuOwner = null;
 });
 
 describe("MusicKeyboard document key handler ownership", () => {
@@ -323,6 +324,34 @@ describe("MusicKeyboard add-row submenu", () => {
             [1, ["solfege", { value: "do" }], 0, 0, [0]],
             [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
+    });
+
+    test("only the keyboard that opened the shared menu can close it", () => {
+        const makeKeyboard = () =>
+            new MusicKeyboard({
+                canvas: { width: 800, height: 600 },
+                getStageScale: () => 1,
+                blocks: { blockList: [], loadNewBlocks: jest.fn() }
+            });
+        const first = makeKeyboard();
+        const second = makeKeyboard();
+        first.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+        second.layout = [{ noteName: "hertz", noteOctave: 436, blockNumber: 100002 }];
+
+        first._createAddRowPieSubmenu();
+        expect(MusicKeyboardEditing._wheelMenuOwner).toBe(first);
+        const firstWheel = first._menuWheel;
+        second._createAddRowPieSubmenu();
+
+        // Taking over tears down the first keyboard's wheels.
+        expect(firstWheel.removeWheel).toHaveBeenCalled();
+        expect(MusicKeyboardEditing._wheelMenuOwner).toBe(second);
+
+        first._closeWheelMenu();
+        expect(docById("wheelDivptm").style.display).not.toBe("none");
+
+        second._closeWheelMenu();
+        expect(docById("wheelDivptm").style.display).toBe("none");
     });
 
     test("positions the Add Note wheel from its own toolbar button, not a sibling window", () => {
