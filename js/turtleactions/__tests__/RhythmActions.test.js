@@ -53,6 +53,7 @@ describe("setupRhythmActions", () => {
                 factorList: [],
                 beatFactor: 1,
                 beatFactorValues: [],
+                dotCount: 0,
                 currentBeat: null,
                 currentMeasure: null,
 
@@ -630,23 +631,68 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
     });
 
-    it("rejects non-finite dot values (Infinity, -Infinity, NaN) without mutating rhythmic state or registering side effects", () => {
-        const invalidValues = [Infinity, -Infinity, NaN, undefined, null, "invalid"];
+    it("rejects non-finite dot values (Infinity, -Infinity, NaN) and overflowing values (-Number.MIN_VALUE) without mutating rhythmic state or registering side effects", () => {
+        const invalidValues = [
+            Infinity,
+            -Infinity,
+            NaN,
+            undefined,
+            null,
+            "invalid",
+            -Number.MIN_VALUE
+        ];
 
-        invalidValues.forEach(val => {
-            targetTurtle.singer.dotCount = 1;
-            targetTurtle.singer.beatFactor = 2;
+        const originalIsRun = global.MusicBlocks.isRun;
+        try {
+            invalidValues.forEach(val => {
+                targetTurtle.singer.dotCount = 1;
+                targetTurtle.singer.beatFactor = 2;
 
-            activity.errorMsg = jest.fn();
-            activity.logo.setDispatchBlock = jest.fn();
-            activity.logo.setTurtleListener = jest.fn();
-            activity.blocks.blockList = { 1: {} };
+                activity.errorMsg = jest.fn();
+                activity.logo.setDispatchBlock = jest.fn();
+                activity.logo.setTurtleListener = jest.fn();
+                activity.blocks.blockList = { 1: {} };
 
-            const mockMouse = { MB: { listeners: [] } };
-            global.MusicBlocks.isRun = true;
-            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+                const mockMouse = { MB: { listeners: [] } };
+                global.MusicBlocks.isRun = true;
+                global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
 
-            Singer.RhythmActions.doRhythmicDot(val, 0, 1);
+                Singer.RhythmActions.doRhythmicDot(val, 0, 1);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "Dot value must be a finite number.",
+                    1
+                );
+                expect(targetTurtle.singer.dotCount).toBe(1);
+                expect(targetTurtle.singer.beatFactor).toBe(2);
+                expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+                expect(mockMouse.MB.listeners).toHaveLength(0);
+            });
+        } finally {
+            global.MusicBlocks.isRun = originalIsRun;
+        }
+    });
+
+    it("rejects -Number.MIN_VALUE whose derived increment overflows to Infinity", () => {
+        expect(Number.isFinite(-Number.MIN_VALUE)).toBe(true);
+        expect(Number.isFinite(-1 / -Number.MIN_VALUE)).toBe(false);
+
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = 2;
+
+        activity.errorMsg = jest.fn();
+        activity.logo.setDispatchBlock = jest.fn();
+        activity.logo.setTurtleListener = jest.fn();
+        activity.blocks.blockList = { 1: {} };
+
+        const mockMouse = { MB: { listeners: [] } };
+        const originalIsRun = global.MusicBlocks.isRun;
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        try {
+            Singer.RhythmActions.doRhythmicDot(-Number.MIN_VALUE, 0, 1);
 
             expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
             expect(targetTurtle.singer.dotCount).toBe(1);
@@ -654,8 +700,27 @@ describe("setupRhythmActions", () => {
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
             expect(mockMouse.MB.listeners).toHaveLength(0);
-        });
-        global.MusicBlocks.isRun = false;
+        } finally {
+            global.MusicBlocks.isRun = originalIsRun;
+        }
+    });
+
+    it("rejects finite input when resulting dotCount would overflow to Infinity", () => {
+        targetTurtle.singer.dotCount = Number.MAX_VALUE;
+        targetTurtle.singer.beatFactor = 1;
+
+        activity.errorMsg = jest.fn();
+        activity.logo.setDispatchBlock = jest.fn();
+        activity.logo.setTurtleListener = jest.fn();
+        activity.blocks.blockList = { 1: {} };
+
+        Singer.RhythmActions.doRhythmicDot(Number.MAX_VALUE, 0, 1);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
+        expect(targetTurtle.singer.dotCount).toBe(Number.MAX_VALUE);
+        expect(targetTurtle.singer.beatFactor).toBe(1);
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
     });
 
     it("nested dot blocks: invalid inner dot block does not corrupt outer dot block state or its cleanup", () => {
@@ -664,7 +729,7 @@ describe("setupRhythmActions", () => {
             listeners[name] = cb;
         });
         activity.errorMsg = jest.fn();
-        activity.blocks.blockList = { 1: {}, 2: {}, 3: {} };
+        activity.blocks.blockList = { 1: {}, 2: {}, 3: {}, 4: {} };
 
         targetTurtle.singer.dotCount = 0;
         targetTurtle.singer.beatFactor = 1;
@@ -690,6 +755,13 @@ describe("setupRhythmActions", () => {
         // Invalid inner block 3 with NaN
         Singer.RhythmActions.doRhythmicDot(NaN, 0, 3);
         expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 3);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
+        expect(listeners["_dot_0"]).toBeUndefined();
+
+        // Invalid inner block 4 with -Number.MIN_VALUE
+        Singer.RhythmActions.doRhythmicDot(-Number.MIN_VALUE, 0, 4);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 4);
         expect(targetTurtle.singer.dotCount).toBe(1);
         expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
         expect(listeners["_dot_0"]).toBeUndefined();
@@ -761,7 +833,17 @@ describe("setupRhythmActions", () => {
             listeners[name] = cb;
         });
         activity.errorMsg = jest.fn();
-        activity.blocks.blockList = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {} };
+        activity.blocks.blockList = {
+            1: {},
+            2: {},
+            3: {},
+            4: {},
+            5: {},
+            6: {},
+            7: {},
+            8: {},
+            9: {}
+        };
 
         targetTurtle.singer.dotCount = 0;
         targetTurtle.singer.beatFactor = 1;
@@ -770,32 +852,33 @@ describe("setupRhythmActions", () => {
         Singer.RhythmActions.doRhythmicDot(Infinity, 0, 1);
         Singer.RhythmActions.doRhythmicDot(NaN, 0, 2);
         Singer.RhythmActions.doRhythmicDot(-Infinity, 0, 3);
+        Singer.RhythmActions.doRhythmicDot(-Number.MIN_VALUE, 0, 4);
 
         // Note duration calculation immediately following invalid input remains correct
-        Singer.RhythmActions.playNote(2, "note", 0, 4);
-        expect(targetTurtle.singer.noteValue[4]).toBeCloseTo(0.5);
-        expect(Number.isFinite(targetTurtle.singer.noteValue[4])).toBe(true);
+        Singer.RhythmActions.playNote(2, "note", 0, 5);
+        expect(targetTurtle.singer.noteValue[5]).toBeCloseTo(0.5);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[5])).toBe(true);
 
         // Nested context: valid outer dot, rejected inner dot, subsequent note calculation
-        Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+        Singer.RhythmActions.doRhythmicDot(1, 0, 6);
         const outerListener = listeners["_dot_0"];
         expect(outerListener).toBeDefined();
 
-        Singer.RhythmActions.doRhythmicDot(NaN, 0, 6);
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 7);
 
-        Singer.RhythmActions.playNote(1, "note", 0, 7);
+        Singer.RhythmActions.playNote(1, "note", 0, 8);
         // beatFactor is 2/3 (for 1 dot, duration factor 1.5), noteValue is 1 / (1 * (2/3)) = 1.5
-        expect(targetTurtle.singer.noteValue[7]).toBeCloseTo(1.5);
-        expect(Number.isFinite(targetTurtle.singer.noteValue[7])).toBe(true);
+        expect(targetTurtle.singer.noteValue[8]).toBeCloseTo(1.5);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[8])).toBe(true);
 
         // Cleanup outer dot block
         outerListener();
         expect(targetTurtle.singer.dotCount).toBe(0);
         expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
 
-        Singer.RhythmActions.playNote(1, "note", 0, 8);
-        expect(targetTurtle.singer.noteValue[8]).toBeCloseTo(1);
-        expect(Number.isFinite(targetTurtle.singer.noteValue[8])).toBe(true);
+        Singer.RhythmActions.playNote(1, "note", 0, 9);
+        expect(targetTurtle.singer.noteValue[9]).toBeCloseTo(1);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[9])).toBe(true);
     });
 
     it("multiplies beatFactor correctly", () => {

@@ -236,17 +236,27 @@ function setupRhythmActions(activity) {
                 return;
             }
 
-            const tur = activity.turtles.ithTurtle(turtle);
-            const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor *= currentDotFactor;
+            let dotIncrement;
             if (value >= 0) {
-                tur.singer.dotCount += value;
+                dotIncrement = value;
             } else if (value === -1) {
                 activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
-                value = 0;
+                dotIncrement = 0;
             } else {
-                tur.singer.dotCount += -1 / value;
+                dotIncrement = -1 / value;
             }
+
+            const tur = activity.turtles.ithTurtle(turtle);
+            const newDotCount = tur.singer.dotCount + dotIncrement;
+
+            if (!Number.isFinite(dotIncrement) || !Number.isFinite(newDotCount)) {
+                activity.errorMsg(_("Dot value must be a finite number."), blk);
+                return;
+            }
+
+            const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            tur.singer.beatFactor *= currentDotFactor;
+            tur.singer.dotCount = newDotCount;
 
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
@@ -262,7 +272,7 @@ function setupRhythmActions(activity) {
             const __listener = () => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
-                tur.singer.dotCount -= value >= 0 ? value : -1 / value;
+                tur.singer.dotCount -= dotIncrement;
                 const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor /= newDotFactor;
             };
