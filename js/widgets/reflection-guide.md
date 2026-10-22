@@ -18,10 +18,24 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ## Components
 
-- **Widget Interface**: `js/widgets/reflection.js`
-- **Block Definition**: `js/blocks/WidgetBlocks.js`
-- **Registration**: `js/activity.js` (line 176) and `js/logo.js` (line 113)
-- **CSS styling**: `css/activities.css` (line 2023 - 2072)
+- **Widget Interface**: `js/widgets/reflection.js` holds the constructor, `init`, the backend
+  URL lookup and `installModules`, which copies the methods of the modules below onto
+  `ReflectionMatrix.prototype`, so `this` in them is the widget.
+- **Block Definition**: `js/blocks/WidgetBlocks.js`. The Reflection block lazy-loads the widget
+  through `ReflectionMatrix.dependencies`, or the same list in the block when the class is not
+  loaded yet, and keeps the one instance in `logo.reflection`.
+- **Shared lifecycle**: `js/utils/ai-widget-lifecycle.js`, also used by the AI Debugger.
+- **CSS styling**: `css/activities.css`, from the `.chatInterface` rules on.
+
+| Module                   | What it holds                                                        |
+| ------------------------ | -------------------------------------------------------------------- |
+| `ReflectionLifecycle.js` | the widget timers, `_isWidgetActive`, `_isSameMount`                 |
+| `ReflectionWindow.js`    | the toolbar, the message box, closing, `_endSession`, `changeMentor` |
+| `ReflectionChatLog.js`   | the typing indicator, adding messages, `renderChatHistory`           |
+| `ReflectionSession.js`   | starting the chat, Refresh, sending queued messages, `getAnalysis`   |
+| `ReflectionBackend.js`   | the `/projectcode`, `/updatecode`, `/chat` and `/analysis` requests  |
+| `ReflectionReport.js`    | `saveReport`, `readReport`, `downloadAsTxt`                          |
+| `ReflectionMarkdown.js`  | `mdToHTML`, `sanitizeHTML`, `isUnsafeUrl`                            |
 
 ## Methods
 
