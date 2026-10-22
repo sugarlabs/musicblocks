@@ -1723,8 +1723,11 @@ describe("committed block help artwork", () => {
             .filter(file => {
                 const svg = fs.readFileSync(path.join(docsDir, folder, file), "utf8");
                 // A cut-off file never closes the <svg>, and an empty one
-                // is saved as a 0x0 <svg> with nothing in it.
-                return !svg.trimEnd().endsWith("</svg>") || /<svg[^>]*\swidth="0"/.test(svg);
+                // is saved with a zero width or height and nothing in it.
+                return (
+                    !svg.trimEnd().endsWith("</svg>") ||
+                    /<svg[^>]*\s(?:width|height)="0(?:\.0+)?(?:px)?"/.test(svg)
+                );
             });
         expect(broken).toEqual([]);
     });
