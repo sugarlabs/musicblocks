@@ -56,6 +56,30 @@ describe("musicutils-pitchinfo", () => {
         expect(pitchinfo.getPitchInfo({}, "pitch number", "C4", singerTur())).toBe(60);
     });
 
+    describe("notes that cross the B/C boundary (#9765)", () => {
+        const synth = { _getFrequency: jest.fn(note => note), changeInTemperament: false };
+        const activity = { logo: { synth } };
+        const info = (type, note) => pitchinfo.getPitchInfo(activity, type, note, singerTur());
+
+        it("gives the pitch number of the note they sound as", () => {
+            expect(info("pitch number", "B♯4")).toBe(info("pitch number", "C5"));
+            expect(info("pitch number", "C♭4")).toBe(info("pitch number", "B3"));
+            expect(info("pitch number", "B𝄪4")).toBe(info("pitch number", "C♯5"));
+            expect(info("pitch number", "C𝄫4")).toBe(info("pitch number", "B♭3"));
+        });
+
+        it("asks the synth for the frequency in the right octave", () => {
+            expect(info("pitch in hertz", "B𝄪4")).toBe("C♯5");
+            expect(info("pitch in hertz", "C𝄫4")).toBe("B♭3");
+            expect(info("pitch in hertz", "A𝄪4")).toBe("B4");
+        });
+
+        it("shades remapped double accidentals by their new octave", () => {
+            expect(info("pitch to shade", "B𝄪4")).toBe(5 * 12.5);
+            expect(info("pitch to shade", "C𝄫4")).toBe(3 * 12.5);
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of ["getStepSizeUp", "getStepSizeDown", "getPitchInfo"]) {
             expect(musicutils[name]).toBe(pitchinfo[name]);

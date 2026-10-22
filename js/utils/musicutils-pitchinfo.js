@@ -162,11 +162,13 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         // Turn the note into pitch and octave.
         [pitch, octave] = _parse_pitch_string(currentNote);
     }
-    // Remap double sharps/double flats.
+    // Remap double sharps/double flats. B𝄪 and C𝄫 cross the B/C boundary, so the octave
+    // moves with the name (B𝄪4 is C♯5, C𝄫4 is B♭3).
     if (pitch.includes(DOUBLESHARP)) {
         pitch = pitch.replace(DOUBLESHARP, "");
         if (pitch === "B") {
             pitch = "C" + SHARP;
+            octave = Number(octave) + 1;
         } else {
             pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
         }
@@ -174,6 +176,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         pitch = pitch.replace(DOUBLEFLAT, "");
         if (pitch === "C") {
             pitch = "B" + FLAT;
+            octave = Number(octave) - 1;
         } else {
             pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
         }

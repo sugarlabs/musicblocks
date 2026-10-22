@@ -205,6 +205,33 @@ describe("musicutils-pitch", () => {
         });
     });
 
+    describe("_calculate_pitch_number across the B/C boundary (#9765)", () => {
+        const fn = (name, octave) => pitch._calculate_pitch_number(name, octave, 0, "equal");
+
+        it("moves B sharps up an octave", () => {
+            expect(fn("B♯", 4)).toBe(fn("C", 5));
+            expect(fn("B#", 4)).toBe(72);
+            expect(fn("B𝄪", 4)).toBe(fn("C♯", 5));
+            expect(fn("Bx", 4)).toBe(73);
+        });
+
+        it("moves C flats down an octave", () => {
+            expect(fn("C♭", 4)).toBe(fn("B", 3));
+            expect(fn("Cb", 4)).toBe(59);
+            expect(fn("C𝄫", 4)).toBe(fn("B♭", 3));
+            expect(fn("C𝄫", 4)).toBe(58);
+        });
+
+        it("leaves spellings that stay inside the octave alone", () => {
+            expect(fn("C", 4)).toBe(60);
+            expect(fn("B", 4)).toBe(71);
+            expect(fn("E♯", 4)).toBe(fn("F", 4));
+            expect(fn("F♭", 4)).toBe(fn("E", 4));
+            expect(fn("A𝄪", 4)).toBe(fn("B", 4));
+            expect(fn("D𝄫", 4)).toBe(fn("C", 4));
+        });
+    });
+
     describe("getNumber", () => {
         it("handles double-sharp accidentals including 'x', '##', '*', and unicode '𝄪'", () => {
             expect(pitch.getNumber("Cx", 4, "equal")).toBe(39);
