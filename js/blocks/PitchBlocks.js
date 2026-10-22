@@ -1712,10 +1712,11 @@ function setupPitchBlocks(activity) {
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inMusicKeyboard) {
-                logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                logo.musicKeyboard.noteNames.push("hertz");
-                logo.musicKeyboard.octaves.push(arg);
-                logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
+                musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                musicKeyboard.noteNames.push("hertz");
+                musicKeyboard.octaves.push(arg);
+                musicKeyboard.addRowBlock(blk);
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];

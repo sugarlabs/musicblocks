@@ -792,6 +792,24 @@ describe("setupWidgetBlocks", () => {
             expect(logo.musicKeyboards.kbdBlk2.blockNo).toBe("kbdBlk2");
         });
 
+        it("routes rows to the keyboard of the turtle that ran the block", () => {
+            const keyboard = getBlock("musickeyboard");
+            const kb1 = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            const kb2 = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            logo.musicKeyboards = { kbdBlk1: kb1, kbdBlk2: kb2 };
+            logo.musicKeyboardByTurtle = {};
+
+            keyboard.flow(["childBlk"], logo, 1, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk2", "received");
+
+            // Both blocks ran, but a turtle's rows must resolve to its own keyboard.
+            const kb1Sink = logo.musicKeyboardByTurtle[1] || logo.musicKeyboard;
+            kb1Sink.instruments.push("snare");
+
+            expect(kb1.instruments).toContain("snare");
+            expect(kb2.instruments).not.toContain("snare");
+        });
+
         it("points logo.musicKeyboard at the block that ran, so clamps land on it", () => {
             const keyboard = getBlock("musickeyboard");
             logo.musicKeyboards = {};

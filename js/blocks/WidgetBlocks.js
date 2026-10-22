@@ -1368,6 +1368,8 @@ function setupWidgetBlocks(activity) {
             // Active instance, so this clamp's pitch/drum/meter rows land here.
             const keyboard = keyboards[blk];
             logo.musicKeyboard = keyboard;
+            logo.musicKeyboardByTurtle = logo.musicKeyboardByTurtle || {};
+            logo.musicKeyboardByTurtle[turtle] = keyboard;
 
             logo.inMusicKeyboard = true;
             keyboard.blockNo = blk;

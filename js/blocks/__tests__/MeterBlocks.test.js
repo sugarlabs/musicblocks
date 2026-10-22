@@ -706,6 +706,20 @@ describe("MeterBlocks setup", () => {
         block.flow([6, 0.125], logo, 1, "meterBlk");
         expect(Singer.MeterActions.setMeter).toHaveBeenCalledWith(6, 0.125, 1);
     });
+
+    it("sets meterArgs on the turtle's own keyboard", () => {
+        const block = getBlock("meter");
+        const own = {};
+        const lastActive = {};
+        logo.inMusicKeyboard = true;
+        logo.musicKeyboard = lastActive;
+        logo.musicKeyboardByTurtle = { 1: own };
+
+        block.flow([4, 0.25], logo, 1, "meterBlk");
+
+        expect(own.meterArgs).toEqual([4, 0.25]);
+        expect(lastActive.meterArgs).toBeUndefined();
+    });
     it("bpmfactor arg pushes to statusFields when inStatusMatrix", () => {
         const block = getBlock("bpmfactor");
         activity.blocks.blockList.bpmBlk = { connections: ["printBlock"], value: 120 };
