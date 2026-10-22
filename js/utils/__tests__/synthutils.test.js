@@ -1339,6 +1339,43 @@ describe("Utility Functions (logic-only)", () => {
             delete global.TEMPERAMENT[customEdoName];
             Synth.inTemperament = originalInTemp;
         });
+
+        it("should scale octave frequencies with dynamic octaveRatio for stretched EDO", () => {
+            const stretchedEdoName = "stretched12EDO";
+            global.TEMPERAMENT[stretchedEdoName] = {
+                isEDO: true,
+                pitchNumber: 12,
+                octaveRatio: 2.01
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = stretchedEdoName;
+
+            const a4 = _getFrequency("A4", false, stretchedEdoName);
+            const a5 = _getFrequency("A5", false, stretchedEdoName);
+            expect(a5 / a4).toBeCloseTo(2.01, 5);
+
+            delete global.TEMPERAMENT[stretchedEdoName];
+            Synth.inTemperament = originalInTemp;
+        });
+
+        it("should scale non-EDO octave frequencies with getEffectiveOctaveRatio", () => {
+            const stretchedJiName = "stretchedJI";
+            global.TEMPERAMENT[stretchedJiName] = {
+                ...global.TEMPERAMENT["just intonation"],
+                octaveRatio: 2.02
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = stretchedJiName;
+            Synth.temperamentChanged(stretchedJiName, "C4");
+
+            const c4 = _getFrequency("C4", false, stretchedJiName);
+            const c5 = _getFrequency("C5", false, stretchedJiName);
+            expect(c5 / c4).toBeCloseTo(2.02, 5);
+
+            delete global.TEMPERAMENT[stretchedJiName];
+            Synth.inTemperament = originalInTemp;
+            Synth.temperamentChanged("equal", "C4");
+        });
     });
     describe("getCustomFrequency", () => {
         it("it should return the custom frequency or frequencies.", () => {

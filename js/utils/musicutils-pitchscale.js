@@ -401,7 +401,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     if (transposition !== 0) {
         const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
         if (edoPos !== -1) {
-            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
+            let octaveShift = 0;
+            const letterPos = PITCHES.indexOf(pitch.toUpperCase());
+            if (currentEDO === 12 && letterPos !== -1) {
+                octaveShift = Math.floor((letterPos + transposition) / 12);
+            }
+            return (octave + octaveShift) * currentEDO + edoPos - PITCHES.indexOf("A");
         }
     }
 

@@ -15,7 +15,7 @@
 
    last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-   getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
+   getOctaveRatio, getEffectiveOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, stripMicrotonalPrefix,
    DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
@@ -822,6 +822,13 @@ function Synth() {
             // For JI/Pythagorean: compute from A0 reference, not 12-EDO Tone.Frequency
             const startParsed = parseNoteString(startingPitch);
             frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
+        } else if (
+            (t && Number.isFinite(Number(t.octaveRatio)) && Number(t.octaveRatio) !== 2) ||
+            (typeof getOctaveRatio === "function" && getOctaveRatio() !== 2)
+        ) {
+            // Non-octave or stretched period: compute via pitchToFrequency to honor powerBase
+            const startParsed = parseNoteString(startingPitch);
+            frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
         } else {
             frequency = Tone.Frequency(startPitch).toFrequency();
         }
@@ -988,7 +995,11 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
+                        const ratio =
+                            typeof getEffectiveOctaveRatio === "function"
+                                ? getEffectiveOctaveRatio(this.inTemperament)
+                                : getOctaveRatio();
+                        return this.noteFrequencies[note][1] * Math.pow(ratio, power);
                     }
                 }
             }
@@ -1046,10 +1057,14 @@ function Synth() {
                             target === _stripCents(n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
+                            const ratio =
+                                typeof getEffectiveOctaveRatio === "function"
+                                    ? getEffectiveOctaveRatio(thisTemperament || customID)
+                                    : getOctaveRatio();
                             return Number(
                                 thisTemperament[pitchNumber][0] *
                                     startPitchFrequency *
-                                    Math.pow(getOctaveRatio(), octaveDiff)
+                                    Math.pow(ratio, octaveDiff)
                             );
                         }
                     }

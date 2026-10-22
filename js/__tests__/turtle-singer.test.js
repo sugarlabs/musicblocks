@@ -1039,6 +1039,23 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.butNotThese).toEqual({});
     });
 
+    test("should isolate and restore enclosing clamp suppressions", () => {
+        const original = { 5: [0], 7: [1] };
+        turtleMock.butNotThese = original;
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        logoMock.runFromBlockNow = jest.fn(() => {
+            expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [0, 1] });
+            turtleMock.butNotThese[5].push(1);
+            turtleMock.butNotThese[9] = [0];
+            expect(original).toEqual({ 5: [0], 7: [1] });
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(turtleMock.butNotThese).toBe(original);
+        expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [1] });
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -1441,6 +1458,23 @@ describe("noteCounter regression behavior", () => {
         expect(turtleMock.butNotThese).toEqual({});
     });
 
+    test("should isolate and restore enclosing clamp suppressions", () => {
+        const original = { 5: [0], 7: [1] };
+        turtleMock.butNotThese = original;
+        turtleMock.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [0, 1] });
+            turtleMock.butNotThese[5].push(1);
+            turtleMock.butNotThese[9] = [0];
+            expect(original).toEqual({ 5: [0], 7: [1] });
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(turtleMock.butNotThese).toBe(original);
+        expect(turtleMock.butNotThese).toEqual({ 5: [0], 7: [1] });
+    });
+
     test("should restore an untouched heap as an array, not an object", () => {
         delete logoMock.turtleHeaps[0];
         // The counted run fills a heap the turtle did not have; restoring it
@@ -1774,11 +1808,63 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         turtleMock.singer.instrumentNames = ["piano"];
         turtleMock.singer.oscList = { [blk]: [] };
 
+        turtleMock.singer.bpm = [90];
+
         Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
 
-        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(["C4"], [], 4, 0, 90, "piano");
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["C4"],
+            [],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4]
+        );
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
+
+    test.each([
+        { bpm: [], masterBPM: 180, recorded: 180 },
+        { bpm: [120], masterBPM: 180, recorded: 120 }
+    ])(
+        "records the note at the tempo it plays at (bpm $bpm, master $masterBPM) and the meter",
+        ({ bpm, masterBPM, recorded }) => {
+            const savedMasterBPM = Singer.masterBPM;
+            Singer.masterBPM = masterBPM;
+            const blk = "tempoNoteBlk";
+            Object.assign(turtleMock.singer, {
+                inNoteBlock: [blk],
+                notePitches: { [blk]: ["C"] },
+                noteOctaves: { [blk]: [4] },
+                noteCents: { [blk]: [0] },
+                noteHertz: { [blk]: [0] },
+                noteDrums: { [blk]: [] },
+                noteBeatValues: { [blk]: [1] },
+                instrumentNames: ["piano"],
+                oscList: { [blk]: [] },
+                bpm,
+                beatsPerMeasure: 6,
+                noteValuePerBeat: 8
+            });
+
+            try {
+                Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            } finally {
+                Singer.masterBPM = savedMasterBPM;
+            }
+
+            expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+                ["C4"],
+                [],
+                4,
+                0,
+                recorded,
+                "piano",
+                [6, 8]
+            );
+        }
+    );
 });
 
 describe("processNote playback path avoids discarded ratio computation", () => {

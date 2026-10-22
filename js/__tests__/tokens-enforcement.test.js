@@ -117,15 +117,12 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
-    it("keeps the floating widget roll-up button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+    it("does not hardcode dark-mode widget title bar button backgrounds", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.(?:rollup|close)\s*\{[^}]*background(?:-color)?\s*:\s*#[0-9a-f]{3,8}\b/i
         );
-    });
-
-    it("keeps the floating widget close button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+        expect(themesCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\s*\{[^}]*background-color\s*:\s*var\(--color-bg-tertiary\)\s*;/
         );
     });
 
@@ -524,5 +521,28 @@ describe("Theme Switching & Inline Styles Purity", () => {
         );
         expect(compliantContrast).toBeGreaterThanOrEqual(7);
         expect(failingContrast).toBeLessThan(4.5);
+    });
+
+    it("ensures themes.css has valid highcontrast properties and avoids black-on-black text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast .blue rules have valid color syntax and do not contain fragmented tokens
+        expect(themesCss).not.toMatch(/var\(--color-text-inverse\)\s*0[0-9a-f]+/i);
+        expect(themesCss).toMatch(
+            /\.highcontrast\s+\.blue\s*\{[^}]*background-color\s*:\s*#000080\s*!important/i
+        );
+        expect(themesCss).toMatch(
+            /\.highcontrast\s+\.blue\.darken-1\s*\{[^}]*background-color\s*:\s*#0000ff\s*!important/i
+        );
+
+        // Verify .highcontrast pitch selector rules use readable var(--color-text-primary)
+        const pitchSelectorElements = ["#chooseKeyDiv", "#movable"];
+        pitchSelectorElements.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-primary\\)`,
+                "i"
+            );
+            expect(themesCss).toMatch(regex);
+        });
     });
 });

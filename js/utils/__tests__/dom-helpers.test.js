@@ -604,6 +604,24 @@ describe("createSharePopup()", () => {
         expect(document.getElementById("togglePopupTest")).toBeNull();
     });
 
+    it("closes when the anchor is clicked a second time", () => {
+        const button = document.createElement("button");
+        const icon = document.createElement("span");
+        button.appendChild(icon);
+        document.body.appendChild(button);
+        button.addEventListener("click", () => {
+            createSharePopup("anchorToggleTest", [["Export", jest.fn()]], button);
+        });
+
+        button.click();
+        expect(document.getElementById("anchorToggleTest")).not.toBeNull();
+
+        icon.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        icon.click();
+
+        expect(document.getElementById("anchorToggleTest")).toBeNull();
+    });
+
     it("updates item styling on mouseenter and mouseleave", () => {
         const popup = createSharePopup("hoverPopupTest", [["Item 1", jest.fn()]], anchor);
         const item = popup.children[0];

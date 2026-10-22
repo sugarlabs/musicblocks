@@ -79,7 +79,7 @@ beforeAll(() => {
 
 const makeActivity = (overrides = {}) => ({
     canvas: { width: 800 },
-    logo: { synth: { startingPitch: 392 } },
+    logo: { synth: { startingPitch: 392 }, getRestoredConnections: () => new Map() },
     turtles: {
         running: jest.fn(() => false),
         getTurtleCount: jest.fn(() => 0),
@@ -1078,6 +1078,134 @@ describe("prepareExport", () => {
         ]);
     });
 
+    describe("Phrase Maker cells", () => {
+        const block = (name, extra = {}) => ({
+            name,
+            trash: false,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections: [null],
+            isValueBlock: () => false,
+            ...extra
+        });
+
+        // Block 0 is in the trash, so the matrix (1), pitch (2) and rhythm (3) become 0, 1 and 2.
+        const exportMatrix = (matrixCells, liveCells) => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("pitch", { trash: true }),
+                block("matrix", { matrixCells }),
+                block("pitch"),
+                block("rhythm2")
+            ];
+            if (liveCells !== undefined) {
+                activity.logo.phraseMaker = { _blockMap: { 1: liveCells } };
+            }
+            const pm = new ProjectManager(activity);
+            return JSON.parse(pm.prepareExport())[0][1];
+        };
+
+        it("exports the selected cells with the block ids renumbered like connections", () => {
+            const cells = [
+                [2, [3, 0], 0],
+                // The same pitch block on the second pass of a repeat.
+                [1000002, [3, 1], 1],
+                // A row in the trash, and an empty entry.
+                [0, [3, 2], 0],
+                [-1, [3, 0], 0]
+            ];
+
+            expect(exportMatrix(undefined, cells)).toEqual([
+                "matrix",
+                {
+                    collapsed: false,
+                    matrixCells: [
+                        [1, [2, 0], 0],
+                        [1000001, [2, 1], 1]
+                    ]
+                }
+            ]);
+        });
+
+        it("exports the cells loaded with the project when the matrix wasn't opened", () => {
+            expect(exportMatrix([[2, [3, 0], 0]])[1].matrixCells).toEqual([[1, [2, 0], 0]]);
+        });
+
+        it("prefers the cells selected in this session over the loaded ones", () => {
+            expect(exportMatrix([[2, [3, 0], 0]], [[2, [3, 3], 0]])[1].matrixCells).toEqual([
+                [1, [2, 3], 0]
+            ]);
+        });
+
+        it("exports only the collapsed state when there are no cells", () => {
+            expect(exportMatrix()).toEqual(["matrix", { collapsed: false }]);
+        });
+    });
+
+    describe("while a duplicate notes clamp plays", () => {
+        const block = (name, connections, trash = false) => ({
+            name,
+            trash,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections,
+            isValueBlock: () => false
+        });
+
+        it("saves the clamp as it was built", () => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("duplicatenotes", [null, null, 1, null]),
+                block("newnote", [0, 2]),
+                block("hidden", [1, null]),
+                block("newnote", [null, 4]),
+                block("hidden", [3, null])
+            ];
+            activity.logo.getRestoredConnections = () =>
+                new Map([
+                    [2, [1, 3]],
+                    [3, [2, 4]]
+                ]);
+
+            const result = JSON.parse(new ProjectManager(activity).prepareExport());
+
+            expect(result.map(b => b[4])).toEqual([
+                [null, null, 1, null],
+                [0, 2],
+                [1, 3],
+                [2, 4],
+                [3, null]
+            ]);
+            expect(activity.blocks.blockList[2].connections).toEqual([1, null]);
+            expect(activity.blocks.blockList[3].connections).toEqual([null, 4]);
+        });
+
+        it("renumbers the restored connections past trashed blocks", () => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("note", [null], true),
+                block("newnote", [null, 2]),
+                block("hidden", [1, null]),
+                block("newnote", [null, null])
+            ];
+            activity.logo.getRestoredConnections = () =>
+                new Map([
+                    [2, [1, 3]],
+                    [3, [2, null]]
+                ]);
+
+            const result = JSON.parse(new ProjectManager(activity).prepareExport());
+
+            expect(result.map(b => b[4])).toEqual([
+                [null, 1],
+                [0, 2],
+                [1, null]
+            ]);
+        });
+    });
+
     describe("customsample", () => {
         const exportSample = connections => {
             const activity = makeActivity();
@@ -1318,6 +1446,7 @@ describe("doLoad / doMergeLoad", () => {
         const pm = new ProjectManager(activity);
         pm.doMergeLoad();
         expect(activity.merging).toBe(true);
+        expect(activity._allClear).not.toHaveBeenCalled();
     });
 
     it("doLoad calls toolbar.closeAuxToolbar", () => {
@@ -1334,11 +1463,11 @@ describe("doLoad / doMergeLoad", () => {
         expect(activity._doHardStopButton).toHaveBeenCalled();
     });
 
-    it("doLoad calls _allClear", () => {
+    it("doLoad preserves the canvas while opening the file chooser", () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
         pm.doLoad();
-        expect(activity._allClear).toHaveBeenCalledWith(true, true);
+        expect(activity._allClear).not.toHaveBeenCalled();
     });
 });
 
@@ -2019,23 +2148,63 @@ describe("prepareExport additional block types", () => {
         expect(result[0][1][1].customName).toBe("myScale");
     });
 
-    it("exports nopValueBlock with privateData as exportName", () => {
+    const makeStandIn = (name, unknownBlock, isValueBlock, connections = [null]) => ({
+        name,
+        trash: false,
+        value: null,
+        collapsed: false,
+        privateData: Array.isArray(unknownBlock) ? unknownBlock[0] : unknownBlock,
+        unknownBlock,
+        container: { x: 0, y: 0 },
+        connections,
+        isValueBlock: () => isValueBlock
+    });
+
+    it("exports nopValueBlock with the name it was loaded with", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [makeStandIn("nopValueBlock", "pi", true)];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toBe("pi");
+    });
+
+    it("exports the math stand-ins with the name they were loaded with", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            makeStandIn("nopOneArgMathBlock", "floor", false, [null, null]),
+            makeStandIn("nopTwoArgMathBlock", "atan2", false, [null, null, null])
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result.map(entry => entry[1])).toEqual(["floor", "atan2"]);
+    });
+
+    it("exports a stand-in with the arguments it was loaded with", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            makeStandIn("nopValueBlock", ["pluginvalue", { value: 7 }], true)
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["pluginvalue", { value: 7 }]);
+    });
+
+    it("never exports a null block name for a stand-in", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
             {
-                name: "nopValueBlock",
+                name: "nopOneArgBlock",
                 trash: false,
                 value: null,
                 collapsed: false,
-                privateData: "myCustomBlock",
                 container: { x: 0, y: 0 },
-                connections: [null],
+                connections: [null, null, null],
                 isValueBlock: () => false
             }
         ];
         const pm = new ProjectManager(activity);
         const result = JSON.parse(pm.prepareExport());
-        expect(result[0][1]).toBe("myCustomBlock");
+        expect(result[0][1]).toBe("nopOneArgBlock");
     });
 
     it("exports matrixData block with notes and count", () => {
@@ -2480,7 +2649,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
         expect(planet.initialiseNewProject).toHaveBeenCalledWith("student-song", false);
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
-        expect(activity._allClear).toHaveBeenCalledWith(false, true);
+        expect(activity._allClear).not.toHaveBeenCalled();
         expect(activity.gitDropdownUI.clearForNewProject).toHaveBeenCalledTimes(1);
         expect(order).toEqual(["save-old", "clear-without-save", "create-project", "load-import"]);
         expect(activity.saveLocally).not.toHaveBeenCalled();

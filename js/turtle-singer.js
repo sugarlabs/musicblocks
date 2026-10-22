@@ -601,6 +601,9 @@ class Singer {
         const savePrevTurtleTime = tur.singer.previousTurtleTime;
         const saveTurtleTime = tur.singer.turtleTime;
 
+        const previousButNotThese = tur.butNotThese;
+        tur.butNotThese = deepClone(tur.butNotThese);
+
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
@@ -660,7 +663,7 @@ class Singer {
         tur.singer.justCounting.pop();
         tur.singer.suppressOutput = saveSuppressStatus;
 
-        tur.butNotThese = {};
+        tur.butNotThese = previousButNotThese;
 
         return returnValue[0] / returnValue[1];
     }
@@ -704,6 +707,9 @@ class Singer {
             meter: saveMeterState(tur.singer),
             tallyNotes: tur.singer.tallyNotes
         };
+
+        const previousButNotThese = tur.butNotThese;
+        tur.butNotThese = deepClone(tur.butNotThese);
 
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
@@ -753,7 +759,7 @@ class Singer {
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
         tur.singer.justCounting.pop();
-        tur.butNotThese = {};
+        tur.butNotThese = previousButNotThese;
 
         return returnValue;
     }
@@ -1607,9 +1613,10 @@ class Singer {
      */
     static processNote(activity, noteValue, isOsc, blk, turtle, callback) {
         const tur = activity.turtles.ithTurtle(turtle);
-        const bpmFactor =
-            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        const bpmValue = Number(last(tur.singer.bpm));
+        const bpmValue = Number(
+            tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM
+        );
+        const bpmFactor = TONEBPM / bpmValue;
 
         let noteBeatValue = isOsc
             ? noteValue === 0
@@ -2475,7 +2482,8 @@ class Singer {
                                         d,
                                         turtle,
                                         bpmValue || 90,
-                                        last(tur.singer.instrumentNames)
+                                        last(tur.singer.instrumentNames),
+                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat]
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {

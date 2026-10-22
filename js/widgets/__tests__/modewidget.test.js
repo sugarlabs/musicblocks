@@ -309,7 +309,7 @@ describe("ModeWidget", () => {
             },
             turtles: {
                 ithTurtle: jest.fn().mockReturnValue({
-                    singer: { keySignature: ["C"] }
+                    singer: { keySignature: "C major" }
                 })
             },
             blocks: {
@@ -323,6 +323,42 @@ describe("ModeWidget", () => {
         };
 
         modeWidget = new ModeWidget(mockActivity);
+    });
+
+    test("should initialize pitch from natural key signature", () => {
+        expect(modeWidget._pitch).toBe("C");
+    });
+
+    test("should initialize pitch without truncating accidental roots in key signature", () => {
+        const testCases = [
+            { keySig: "C major", expectedPitch: "C" },
+            { keySig: "F# major", expectedPitch: "F#" },
+            { keySig: "Bb minor", expectedPitch: "Bb" },
+            { keySig: "Db dorian", expectedPitch: "Db" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
+    });
+
+    test("should handle legacy array keySignature values without error", () => {
+        const testCases = [
+            { keySig: ["C"], expectedPitch: "C" },
+            { keySig: ["F#", "major"], expectedPitch: "F#" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
     });
 
     test("should calculate major scale intervals correctly", () => {
@@ -1161,6 +1197,71 @@ describe("ModeWidget", () => {
             // Test: svg element is null
             modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
             expect(() => modeWidget._scale()).not.toThrow();
+        });
+    });
+
+    describe("Clear during animation", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            modeWidget._setModeName = jest.fn();
+            modeWidget._selectedNotes = Array.from({ length: 12 }, (_, i) =>
+                [0, 2, 4, 5, 7, 9, 11].includes(i)
+            );
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+        });
+
+        test.each(["_rotateRight", "_rotateLeft"])(
+            "Clear stays cleared after %s callbacks would have run",
+            rotate => {
+                modeWidget[rotate]();
+                jest.advanceTimersByTime(250);
+                modeWidget._clear();
+                jest.runAllTimers();
+
+                expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+                expect(modeWidget._locked).toBe(false);
+                for (let i = 1; i < 12; i++) {
+                    expect(modeWidget._noteWheel.navItems[i].navItem.hide).toHaveBeenCalled();
+                }
+                modeWidget._rotateRight();
+                jest.runAllTimers();
+                expect(modeWidget._locked).toBe(false);
+            }
+        );
+
+        test("Clear cancels rotation with the fallback timer implementation", () => {
+            modeWidget._timerManager = null;
+            modeWidget._rotateRight();
+            modeWidget._clear();
+            jest.runAllTimers();
+            expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+            expect(modeWidget._activeTimeouts.size).toBe(0);
+        });
+
+        test("Clear stops playback and restores its button", () => {
+            modeWidget._playing = true;
+            modeWidget._playAll();
+            const triggerCount = mockActivity.logo.synth.trigger.mock.calls.length;
+            const setIcon = jest.spyOn(modeWidget, "_setPlayButtonIcon");
+            modeWidget._clear();
+            jest.runAllTimers();
+
+            expect(modeWidget._playing).toBe(false);
+            expect(modeWidget._locked).toBe(false);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(triggerCount);
+            expect(setIcon).toHaveBeenCalledWith("play-button.svg", "Play all");
+        });
+
+        test("idle Clear preserves the root and can be undone", () => {
+            const original = [...modeWidget._selectedNotes];
+            modeWidget._clear();
+            expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+            modeWidget._undo();
+            expect(modeWidget._selectedNotes).toEqual(original);
         });
     });
 

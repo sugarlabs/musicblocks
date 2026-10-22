@@ -1136,3 +1136,76 @@ describe("Test 12: Repeat bars wrap only their own bars", () => {
         expect(playOrder(blocks)).toBe("CDEFCDEFG");
     });
 });
+
+describe("Meters abcjs reports by name rather than by number", () => {
+    // M:C and M:C| come back as a type with no value array, so reading a number
+    // straight out of one throws and the whole import stops.
+    const meterOf = blocks => {
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const meter = blocksOfType(blocks, "meter")[0];
+        const divide = byIndex.get(meter[4][2]);
+        return {
+            num: byIndex.get(meter[4][1])[1][1].value,
+            den: byIndex.get(divide[4][2])[1][1].value
+        };
+    };
+
+    const tuneWithMeter = meter =>
+        makeTune({
+            staves: [
+                {
+                    meter,
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+
+    it("reads common time as 4/4", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "common_time" }));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("reads cut time as 2/2", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "cut_time" }));
+
+        expect(meterOf(blocks)).toEqual({ num: 2, den: 2 });
+    });
+
+    it("still reads a meter given as numbers", async () => {
+        const blocks = await parseAndCapture(
+            tuneWithMeter({ type: "specified", value: [{ num: "3", den: "4" }] })
+        );
+
+        expect(meterOf(blocks)).toEqual({ num: 3, den: 4 });
+    });
+
+    it("falls back to 4/4 when the tune states no meter at all", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter(undefined));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("falls back to 4/4 when the meter carries an empty value", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "specified", value: [] }));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("keeps the notes a common-time tune carries", async () => {
+        const blocks = await parseAndCapture(
+            makeTune({
+                staves: [
+                    {
+                        meter: { type: "common_time" },
+                        key: { root: "C", mode: "major", accidentals: [] },
+                        voices: [[makeNote("C", 0), makeNote("D", 1), makeNote("E", 2)]]
+                    }
+                ]
+            })
+        );
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
+    });
+});
