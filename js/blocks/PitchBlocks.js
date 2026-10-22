@@ -1982,16 +1982,27 @@ function setupPitchBlocks(activity) {
 
             let note, octave, cents;
 
-            // Is the arg a scaledegree block?
+            // Is the arg a scaledegree block, or a number with an accidental,
+            // typed or computed (e.g. a box plus a sharp)? Either is a scale degree.
             const c = activity.blocks.blockList[blk].connections[1];
             let cname = null;
             if (c !== null) {
                 cname = activity.blocks.blockList[c].name;
             }
+            const degreeArg = String(arg0).replace(/#$/, SHARP).replace(/b$/, FLAT);
+            const isScaleDegree =
+                cname === "scaledegree2" ||
+                (typeof arg0 === "string" &&
+                    [SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT, NATURAL].some(
+                        attr =>
+                            degreeArg.endsWith(attr) &&
+                            /^-?\d+$/.test(degreeArg.slice(0, -attr.length))
+                    ));
 
             if (!isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
-                if (cname === "scaledegree2") {
-                    let scaledegree = activity.blocks.blockList[c].value;
+                if (isScaleDegree) {
+                    let scaledegree =
+                        cname === "scaledegree2" ? activity.blocks.blockList[c].value : degreeArg;
                     let attr;
 
                     if (scaledegree.includes(SHARP)) {
