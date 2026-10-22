@@ -148,8 +148,7 @@ class ReflectionChatLog {
         const botReply = document.createElement("div");
 
         if (md) {
-            let html = this.mdToHTML(reply.response);
-            botReply.innerHTML = DOMPurify.sanitize(html);
+            this._setMarkdown(botReply, reply.response);
         } else {
             botReply.innerText = reply.response;
         }
@@ -159,6 +158,20 @@ class ReflectionChatLog {
 
         this.chatLog.appendChild(messageContainer);
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Shows a Markdown reply in an element.
+     *
+     * mdToHTML marks each link to open in a new tab, but DOMPurify drops the target attribute
+     * unless it is allowed, and a link that opens in this tab leaves the project.
+     * @private
+     * @param {HTMLElement} element - The element to fill.
+     * @param {string} text - The Markdown text.
+     * @returns {void}
+     */
+    _setMarkdown(element, text) {
+        element.innerHTML = DOMPurify.sanitize(this.mdToHTML(text), { ADD_ATTR: ["target"] });
     }
 
     /**

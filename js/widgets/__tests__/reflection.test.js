@@ -37,6 +37,9 @@ global.ReflectionMarkdown = require("../ReflectionMarkdown");
 const ReflectionMatrix = require("../reflection");
 global.ReflectionMatrix = ReflectionMatrix;
 
+// The vendored DOMPurify is a UMD build, so under Jest it exports itself.
+global.DOMPurify = require("../../../lib/purify.min.js");
+
 // Mock globals
 global._ = str => str;
 
@@ -1394,6 +1397,42 @@ describe("ReflectionMatrix", () => {
             );
             expect(reflection.inputContainer.style.display).toBe("flex");
             expect(reflection.code).toBe("mocked_code");
+        });
+    });
+
+    describe("Markdown replies", () => {
+        let reflection;
+
+        beforeEach(() => {
+            reflection = new ReflectionMatrix();
+            reflection.chatHistory = [{ role: "meta", content: "Hi" }];
+            reflection.init(mockActivity);
+        });
+
+        test("opens a link in an analysis in a new tab", () => {
+            reflection.appendBotReply(
+                { response: "## Next steps\nRead [the guide](https://example.com/guide)." },
+                "meta",
+                true
+            );
+
+            const link = reflection.chatLog.lastChild.querySelector("a");
+            expect(link.getAttribute("href")).toBe("https://example.com/guide");
+            expect(link.getAttribute("target")).toBe("_blank");
+            expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+            expect(reflection.chatLog.lastChild.querySelector("h2").textContent).toBe("Next steps");
+        });
+
+        test("still drops unsafe links and markup", () => {
+            reflection.appendBotReply(
+                { response: "[x](javascript:alert(1)) <img src=x onerror=alert(1)>" },
+                "meta",
+                true
+            );
+
+            const reply = reflection.chatLog.lastChild.lastChild;
+            expect(reply.querySelector("a").hasAttribute("href")).toBe(false);
+            expect(reply.querySelector("img")).toBeNull();
         });
     });
 });
