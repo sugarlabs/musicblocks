@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, requirejs
  */
 
 /*
@@ -76,13 +76,47 @@ function setupWidgetBlocks(activity) {
     /**
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
+     * RequireJS reports every module that failed, so onError runs once, and the
+     * failed modules are undefined so that the next request fetches them again.
+     * A failed request still gets its callback once a retry loads the modules,
+     * so that callback is ignored.
      */
-    function _lazyRequire(modules, callback) {
+    function _lazyRequire(modules, callback, onError) {
         if (typeof define === "function" && define.amd) {
-            require(Array.isArray(modules) ? modules : [modules], callback);
+            let failed = false;
+            requirejs(
+                Array.isArray(modules) ? modules : [modules],
+                () => {
+                    if (!failed) callback();
+                },
+                err => {
+                    err.requireModules?.forEach(id => requirejs.undef(id));
+                    if (!failed) {
+                        failed = true;
+                        onError();
+                    }
+                }
+            );
         } else {
             callback();
         }
+    }
+
+    function _widgetLoadFailed() {
+        activity.errorMsg(
+            _("The widget could not be loaded. Check your connection and try again.")
+        );
+    }
+
+    // Blocks waiting for each widget. Those from a run that has since stopped are dropped.
+    const _widgetRequests = {};
+
+    function _takeWidgetRequests(logo, widgetKey) {
+        const requests = _widgetRequests[widgetKey].filter(
+            request => request.run === logo.runGeneration
+        );
+        delete _widgetRequests[widgetKey];
+        return requests;
     }
 
     /**
@@ -111,19 +145,32 @@ function setupWidgetBlocks(activity) {
      * @returns {[null, number, boolean]|null} - Interruption signal or null if already loaded.
      */
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
-        if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
-            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
-            _lazyRequire(modules, () => {
-                logo[widgetKey] = initFn();
-                if (typeof logo.runFromBlockNow === "function") {
-                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
-                }
-            });
-            return [null, 0, true];
-        } else if (logo[widgetKey] === "loading") {
-            return [null, 0, true]; // Still loading, continue to interrupt
+        if ((logo[widgetKey] ?? "loading") !== "loading") {
+            return null;
         }
-        return null;
+
+        (_widgetRequests[widgetKey] ??= []).push({
+            run: logo.runGeneration,
+            resume: () => logo.runFromBlockNow(logo, turtle, blk, true, receivedArg)
+        });
+        if (logo[widgetKey] !== "loading") {
+            logo[widgetKey] = "loading";
+            _lazyRequire(
+                modules,
+                () => {
+                    logo[widgetKey] = initFn();
+                    _takeWidgetRequests(logo, widgetKey).forEach(request => request.resume());
+                },
+                () => {
+                    logo[widgetKey] = null;
+                    if (_takeWidgetRequests(logo, widgetKey).length > 0) {
+                        logo.doStopTurtles();
+                        _widgetLoadFailed();
+                    }
+                }
+            );
+        }
+        return [null, 0, true];
     }
 
     /**
@@ -139,13 +186,25 @@ function setupWidgetBlocks(activity) {
      * @param {string} widgetKey - The key for the widget in the logo object.
      * @param {string[]} modules - The modules to require.
      * @param {Function} factory - Builds the widget instance.
-     * @param {Function} [onReady] - Optional callback run after assignment.
+     * @param {Function} [onDone] - Optional callback run once the load has finished.
      */
-    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, () => {
-            logo[widgetKey] = factory();
-            onReady?.();
-        });
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onDone) {
+        const run = logo.runGeneration;
+        _lazyRequire(
+            modules,
+            () => {
+                if (run === logo.runGeneration) {
+                    logo[widgetKey] = factory();
+                    onDone?.();
+                }
+            },
+            () => {
+                if (run === logo.runGeneration) {
+                    onDone?.();
+                    _widgetLoadFailed();
+                }
+            }
+        );
     }
 
     function _hasValidMeterWidgetInput(logo) {

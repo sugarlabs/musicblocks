@@ -1124,6 +1124,14 @@ describe("Logo doStopTurtles", () => {
         expect(logo.stopTurtle).toBe(true);
     });
 
+    test("ends the run generation so callbacks from the stopped run can tell", () => {
+        const run = logo.runGeneration;
+
+        logo.doStopTurtles();
+
+        expect(logo.runGeneration).not.toBe(run);
+    });
+
     test("marks all turtles as stopped", () => {
         logo.doStopTurtles();
 
@@ -1544,6 +1552,16 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(logo.inTempo).toBe(false);
+    });
+
+    test("starts a new run generation", () => {
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+        const run = logo.runGeneration;
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.runGeneration).not.toBe(run);
     });
 
     test("falls back to default cursor when no start stacks", () => {
