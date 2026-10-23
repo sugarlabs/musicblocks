@@ -1999,7 +1999,7 @@ class Activity {
         // delegation stubs installed by setupContextMenuController() above.
 
         /**
-         * Hide the palettes before update, then deletes everything/sends all to trash.
+         * Hide palettes and dispose the previous project before loading its replacement.
          * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
          * @param {boolean} doNotSave     {if true discards any changes to project}
          * @param {boolean} closeAllWidgets  {if true close all open widgets}
@@ -2015,29 +2015,17 @@ class Activity {
             hideDOMLabel();
             this.refreshCanvas();
 
-            let actionBlockCounter = 0;
-            const dx = 0;
-            const dy = this.cellSize * 3;
+            if (closeAllWidgets) {
+                closeWidgets();
+            }
 
-            // Defer checkBounds during bulk block moves to avoid O(N²)
-            // overhead: each moveBlockRelative call triggers checkBounds()
-            // which scans all blocks, so N moves × N blocks = O(N²).
+            let actionBlockCounter = 0;
+
             this.blocks._beginDeferCheckBounds();
 
             for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
-                // Blocks already in the trash were recorded when they were trashed.
                 if (!myBlock || myBlock.trash) continue;
-
-                // If this block is at the top of a stack, push it
-                // onto the trashStacks list.
-                if (this.blocks.blockList[blk].connections[0] === null) {
-                    const preview = this.blocks.captureStackPreview(blk);
-                    if (preview) {
-                        this.blocks.trashPreviews[blk] = preview;
-                    }
-                    this.blocks.trashStacks.push(blk);
-                }
 
                 if (
                     this.blocks.blockList[blk].name === "start" ||
@@ -2071,27 +2059,21 @@ class Activity {
                     actionBlockCounter += 1;
                 }
 
-                this.blocks.blockList[blk].trash = true;
-                this.blocks.moveBlockRelative(blk, dx, dy);
-                this.blocks.blockList[blk].hide();
-
-                // Free the backing canvas memory for trashed blocks.
-                // Each cached block holds a bitmap canvas (~0.5-2 MB).
-                // This matches the cleanup pattern in sendStackToTrash().
-                if (this.blocks.blockList[blk].container) {
-                    this.blocks.blockList[blk].container.uncache();
-                }
-
-                // Clean up SVG art strings to free memory.
-                if (this.blocks.blockArt[blk]) {
-                    delete this.blocks.blockArt[blk];
-                }
-                if (this.blocks.blockCollapseArt[blk]) {
-                    delete this.blocks.blockCollapseArt[blk];
-                }
+                myBlock.trash = true;
             }
 
-            this.blocks.trimTrashHistory();
+            // Bulk clearing replaces the project; its blocks and undo history
+            // must not remain reachable from the new workspace.
+            for (const blk of Object.keys(this.blocks.blockList)) {
+                if (this.blocks.blockList[blk]) this.blocks.disposeBlock(blk);
+            }
+            this.blocks.activeBlock = null;
+            this.blocks.dragGroup = [];
+            this.blocks.trashStacks = [];
+            this.blocks.trashPreviews = {};
+            this.blocks.actionHistory = [];
+            this.blocks.redoActionHistory = [];
+
             this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
@@ -2110,11 +2092,6 @@ class Activity {
             }, 100 * actionBlockCounter); // 1000
 
             this.update = true;
-
-            // Close any open widgets.
-            if (closeAllWidgets) {
-                closeWidgets();
-            }
         };
 
         // changeBlockVisibility (the helpful-wheel "Show/hide blocks" action) has
