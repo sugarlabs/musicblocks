@@ -381,21 +381,17 @@ describe("ChordBuilderWidget", () => {
             const stack = mockBlocks.loadNewBlocks.mock.calls[0][0];
 
             expect(Array.isArray(stack)).toBe(true);
-            // Stack starts with start block and setbpm block
-            expect(stack[0][1][0]).toBe("start");
-            expect(stack[1][1][0]).toBe("setbpm");
 
-            // setbpm block contains 4 connections with progression in slot 2 and trailing null
-            const setbpmBlock = stack[1];
-            expect(setbpmBlock[4]).toHaveLength(4);
-            expect(setbpmBlock[4][0]).toBe(0); // parent (start)
-            expect(setbpmBlock[4][1]).toBe(2); // bpm value
-            expect(setbpmBlock[4][3]).toBeNull(); // trailing flow slot
+            // Stack starts with start block only — BPM is intentionally omitted
+            expect(stack[0][1][0]).toBe("start");
+            // No setbpm block in the export
+            expect(stack.find(b => b[1][0] === "setbpm")).toBeUndefined();
 
             // Contains chordinterval blocks for each progression chord
             const chordBlocks = stack.filter(b => b[1][0] === "chordinterval");
             expect(chordBlocks).toHaveLength(4);
-            expect(setbpmBlock[4][2]).toBe(chordBlocks[0][0]); // setbpm child is first chord
+            // start block's flow slot (index 1) points to the first chord block
+            expect(stack[0][4][1]).toBe(chordBlocks[0][0]);
 
             // Contains exported playable notes with root and octave
             const noteBlocks = stack.filter(b => b[1][0] === "newnote");
@@ -408,16 +404,18 @@ describe("ChordBuilderWidget", () => {
             expect(notenameBlocks).toHaveLength(4);
             expect(notenameBlocks.map(b => b[1][1].value)).toEqual(["C", "G", "A", "F"]);
 
-            // Octave blocks match widget.octave
+            // No vspace blocks in the export
+            expect(stack.filter(b => b[1][0] === "vspace")).toHaveLength(0);
+
+            // newnote body slot (index 2) connects directly to pitch — no vspace
             chordBlocks.forEach(chordBlock => {
                 const innerNoteId = chordBlock[4][2];
                 const noteBlock = stack.find(b => b[0] === innerNoteId);
                 expect(noteBlock).toBeDefined();
                 expect(noteBlock[1][0]).toBe("newnote");
 
-                const vspaceId = noteBlock[4][2];
-                const vspaceBlock = stack.find(b => b[0] === vspaceId);
-                const pitchId = vspaceBlock[4][1];
+                // Body slot is directly the pitch block, not a vspace
+                const pitchId = noteBlock[4][2];
                 const pitchBlock = stack.find(b => b[0] === pitchId);
                 expect(pitchBlock).toBeDefined();
                 expect(pitchBlock[1][0]).toBe("pitch");
@@ -475,15 +473,18 @@ describe("ChordBuilderWidget", () => {
             expect(widget.progression[0].name).toBe("C");
         });
 
-        it("renders measure/bar badges in progression timeline", () => {
+        it("renders bar-grid table with bar rows and beat columns", () => {
             widget.loadPreset("pop"); // 4 chords
-            const chips = body.querySelectorAll(".progression-chip");
-            expect(chips).toHaveLength(4);
+            const table = body.querySelector("#chordBarGridTable");
+            expect(table).not.toBeNull();
 
-            expect(chips[0].textContent).toContain("m.1");
-            expect(chips[1].textContent).toContain("m.2");
-            expect(chips[2].textContent).toContain("m.3");
-            expect(chips[3].textContent).toContain("m.4");
+            // Default 4 bars × 4 beats = 16 cells
+            const cells = body.querySelectorAll(".bar-grid-cell");
+            expect(cells.length).toBe(widget.numBars * widget.beatsPerBar);
+
+            // First 4 cells (bar 1) should show the pop preset chords
+            const filledCells = Array.from(cells).filter(c => c.querySelector("div") !== null);
+            expect(filledCells.length).toBe(4);
         });
 
         it("allows keyboard activation on chord card via Enter and Space", () => {

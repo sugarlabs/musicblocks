@@ -120,6 +120,9 @@ class ChordBuilderWidget {
         this.octave = 4;
         this.progression = [];
         this.activeStep = -1;
+        // Bar grid: number of bars shown in the meter grid (4 bars × 4 beats)
+        this.numBars = 4;
+        this.beatsPerBar = 4;
 
         // Initialize audio engine
         const AudioClass =
@@ -388,8 +391,11 @@ class ChordBuilderWidget {
             }
         }
         this.diatonicChords = this._buildDiatonicChords(this.rootKey, this.mode);
+        // Clear progression when key changes — chords from old key are no longer valid
+        this.progression = [];
         this._updateKeyModeDisplay();
         this._renderDiatonicChords();
+        this._renderBarGrid();
     }
 
     /**
@@ -428,7 +434,7 @@ class ChordBuilderWidget {
         if (this.audio) {
             this.audio.playChord(chordClone, 0.4, { octave: this.octave });
         }
-        this._renderProgressionTimeline();
+        this._renderBarGrid();
     }
 
     /**
@@ -438,7 +444,7 @@ class ChordBuilderWidget {
     removeChord(index) {
         if (index >= 0 && index < this.progression.length) {
             this.progression.splice(index, 1);
-            this._renderProgressionTimeline();
+            this._renderBarGrid();
         }
     }
 
@@ -448,7 +454,7 @@ class ChordBuilderWidget {
     clearProgression() {
         this._stopPlayback();
         this.progression = [];
-        this._renderProgressionTimeline();
+        this._renderBarGrid();
     }
 
     /**
@@ -465,7 +471,7 @@ class ChordBuilderWidget {
                 this.progression.push({ ...this.diatonicChords[degreeIdx] });
             }
         }
-        this._renderProgressionTimeline();
+        this._renderBarGrid();
     }
 
     /**
@@ -507,6 +513,8 @@ class ChordBuilderWidget {
 
     /**
      * Exports the current progression as MusicBlocks block structures onto the canvas.
+     * The export omits BPM (the user sets that via Set Beats Per Minute block) and
+     * does not include extra vspace spacer blocks.
      */
     saveToBlocks() {
         if (!this.blocks || typeof this.blocks.loadNewBlocks !== "function") {
@@ -524,17 +532,13 @@ class ChordBuilderWidget {
         const startX = 120;
         const startY = 120;
 
-        // Block 0: Start block
+        // Block 0: Start block — BPM is intentionally omitted; the user controls
+        // tempo via the Set Beats Per Minute block on the canvas.
         const startBlockId = idCounter++;
-        const setBpmBlockId = idCounter++;
-        const bpmValId = idCounter++;
+        newStack.push([startBlockId, ["start", {}], startX, startY, [null, null]]);
 
-        newStack.push([startBlockId, ["start", {}], startX, startY, [null, setBpmBlockId]]);
-        newStack.push([setBpmBlockId, ["setbpm", {}], 0, 0, [startBlockId, bpmValId, null, null]]);
-        newStack.push([bpmValId, ["number", { value: this.tempo }], 0, 0, [setBpmBlockId]]);
-
-        let lastFlowId = setBpmBlockId;
-        let lastFlowConnIndex = 2; // flow connection slot
+        let lastFlowId = startBlockId;
+        let lastFlowConnIndex = 1; // flow connection slot for start block
 
         this.progression.forEach(chord => {
             const chordBlockId = idCounter++;
@@ -543,7 +547,6 @@ class ChordBuilderWidget {
             const durationId = idCounter++;
             const durationNumeratorId = idCounter++;
             const durationDenominatorId = idCounter++;
-            const noteBodyId = idCounter++;
             const pitchBlockId = idCounter++;
             const rootId = idCounter++;
             const octaveId = idCounter++;
@@ -563,12 +566,13 @@ class ChordBuilderWidget {
                 [lastFlowId, chordNameId, noteBlockId, null]
             ]);
             newStack.push([chordNameId, ["chordname", { value: chordType }], 0, 0, [chordBlockId]]);
+            // Connect newnote body slot directly to pitch — no vspace needed
             newStack.push([
                 noteBlockId,
                 ["newnote", {}],
                 0,
                 0,
-                [chordBlockId, durationId, noteBodyId, noteEndId]
+                [chordBlockId, durationId, pitchBlockId, noteEndId]
             ]);
             newStack.push([
                 durationId,
@@ -579,28 +583,22 @@ class ChordBuilderWidget {
             ]);
             newStack.push([durationNumeratorId, ["number", { value: 1 }], 0, 0, [durationId]]);
             newStack.push([durationDenominatorId, ["number", { value: 4 }], 0, 0, [durationId]]);
-            newStack.push([noteBodyId, ["vspace", {}], 0, 0, [noteBlockId, pitchBlockId]]);
             newStack.push([
                 pitchBlockId,
                 ["pitch", {}],
                 0,
                 0,
-                [noteBodyId, rootId, octaveId, null]
+                [noteBlockId, rootId, octaveId, null]
             ]);
             newStack.push([rootId, ["notename", { value: chord.root }], 0, 0, [pitchBlockId]]);
             newStack.push([octaveId, ["number", { value: this.octave }], 0, 0, [pitchBlockId]]);
             newStack.push([noteEndId, ["hidden", {}], 0, 0, [noteBlockId, null]]);
 
-            // Link previous block to this chord block
+            // Link previous block's flow slot to this chord block
             newStack[lastFlowId][4][lastFlowConnIndex] = chordBlockId;
             lastFlowId = chordBlockId;
             lastFlowConnIndex = 3;
         });
-
-        // Terminate stack with vspace
-        const vspaceId = idCounter++;
-        newStack.push([vspaceId, ["vspace", {}], 0, 0, [lastFlowId, null]]);
-        newStack[lastFlowId][4][lastFlowConnIndex] = vspaceId;
 
         this.blocks.loadNewBlocks(newStack);
         this.textMsg(_("New chord progression blocks generated."), 3000);
@@ -736,39 +734,81 @@ class ChordBuilderWidget {
         chordsSection.appendChild(this.chordsGrid);
         container.appendChild(chordsSection);
 
-        // Section 2: Progression Timeline
-        const progressionSection = document.createElement("div");
-        const progressionHeaderRow = document.createElement("div");
-        progressionHeaderRow.style.display = "flex";
-        progressionHeaderRow.style.justifyContent = "space-between";
-        progressionHeaderRow.style.alignItems = "center";
-        progressionHeaderRow.style.marginBottom = "6px";
+        // Section 2: Bar grid — shows bars × beats for the user to place chords
+        const barGridSection = document.createElement("div");
+        const barGridHeaderRow = document.createElement("div");
+        barGridHeaderRow.style.display = "flex";
+        barGridHeaderRow.style.justifyContent = "space-between";
+        barGridHeaderRow.style.alignItems = "center";
+        barGridHeaderRow.style.marginBottom = "8px";
 
-        const progressionTitle = document.createElement("div");
-        progressionTitle.style.fontWeight = "bold";
-        progressionTitle.style.fontSize = "13px";
-        progressionTitle.textContent = _("Progression");
+        const barGridTitle = document.createElement("div");
+        barGridTitle.style.fontWeight = "bold";
+        barGridTitle.style.fontSize = "13px";
+        barGridTitle.textContent = _("Progression (bars)");
 
-        const barCountLabel = document.createElement("div");
-        barCountLabel.id = "chordBarCountLabel";
-        barCountLabel.style.fontSize = "11px";
-        barCountLabel.style.color = "#888";
+        // Meter controls: number of bars and beats per bar
+        const meterGroup = document.createElement("div");
+        meterGroup.style.display = "flex";
+        meterGroup.style.alignItems = "center";
+        meterGroup.style.gap = "8px";
+        meterGroup.style.fontSize = "12px";
+        meterGroup.style.color = "#555";
 
-        progressionHeaderRow.append(progressionTitle, barCountLabel);
-        progressionSection.appendChild(progressionHeaderRow);
+        const barsLabel = document.createElement("span");
+        barsLabel.textContent = `${_("Bars")}:`;
+        const barsInput = document.createElement("input");
+        barsInput.id = "chordNumBarsInput";
+        barsInput.type = "number";
+        barsInput.min = "1";
+        barsInput.max = "16";
+        barsInput.value = String(this.numBars);
+        barsInput.style.width = "48px";
+        barsInput.style.padding = "2px 4px";
+        barsInput.style.borderRadius = "4px";
+        barsInput.style.border = "1px solid #ccc";
+        barsInput.style.fontSize = "12px";
+        barsInput.onchange = e => {
+            const n = parseInt(e.target.value, 10);
+            if (n >= 1 && n <= 16) {
+                this.numBars = n;
+                this._renderBarGrid();
+            }
+        };
 
-        this.timelineContainer = document.createElement("div");
-        this.timelineContainer.id = "progressionTimeline";
-        this.timelineContainer.style.display = "flex";
-        this.timelineContainer.style.flexWrap = "wrap";
-        this.timelineContainer.style.gap = "8px";
-        this.timelineContainer.style.minHeight = "46px";
-        this.timelineContainer.style.padding = "8px";
-        this.timelineContainer.style.border = "1px dashed rgba(0, 0, 0, 0.2)";
-        this.timelineContainer.style.borderRadius = "8px";
-        this.timelineContainer.style.alignItems = "center";
-        progressionSection.appendChild(this.timelineContainer);
-        container.appendChild(progressionSection);
+        const beatsLabel = document.createElement("span");
+        beatsLabel.textContent = `${_("Beats")}:`;
+        const beatsSelect = document.createElement("select");
+        beatsSelect.id = "chordBeatsSelect";
+        beatsSelect.style.padding = "2px 4px";
+        beatsSelect.style.borderRadius = "4px";
+        beatsSelect.style.fontSize = "12px";
+        [2, 3, 4, 6].forEach(n => {
+            const opt = document.createElement("option");
+            opt.value = String(n);
+            opt.textContent = String(n);
+            if (n === this.beatsPerBar) opt.selected = true;
+            beatsSelect.appendChild(opt);
+        });
+        beatsSelect.onchange = e => {
+            this.beatsPerBar = parseInt(e.target.value, 10);
+            this._renderBarGrid();
+        };
+
+        meterGroup.append(barsLabel, barsInput, beatsLabel, beatsSelect);
+        barGridHeaderRow.append(barGridTitle, meterGroup);
+        barGridSection.appendChild(barGridHeaderRow);
+
+        // The bar-grid container: bars are rows, beats are columns
+        this.barGridContainer = document.createElement("div");
+        this.barGridContainer.id = "chordBarGrid";
+        this.barGridContainer.style.overflowX = "auto";
+        this.barGridContainer.style.border = "1px solid rgba(0,0,0,0.12)";
+        this.barGridContainer.style.borderRadius = "8px";
+        this.barGridContainer.style.padding = "8px";
+        this.barGridContainer.style.background = "rgba(0,0,0,0.02)";
+        barGridSection.appendChild(this.barGridContainer);
+        container.appendChild(barGridSection);
 
         // Section 3: Action Buttons (Play, Stop, Clear, Save)
         const actionsRow = document.createElement("div");
@@ -813,9 +853,9 @@ class ChordBuilderWidget {
 
         body.appendChild(container);
 
-        // Initial render of chords and timeline
+        // Initial render of chords, bar-grid, and timeline
         this._renderDiatonicChords();
-        this._renderProgressionTimeline();
+        this._renderBarGrid();
     }
 
     /**
@@ -903,7 +943,190 @@ class ChordBuilderWidget {
     }
 
     /**
-     * Renders the progression timeline chips.
+     * Renders the meter bar-grid: rows = bars, columns = beats.
+     * Each bar cell shows the chord assigned to that position and a remove button.
+     * Clicking an empty cell shows a chord-picker populated with diatonic chords.
+     * @private
+     */
+    _renderBarGrid() {
+        if (!this.barGridContainer) return;
+        this.barGridContainer.innerHTML = "";
+
+        const table = document.createElement("table");
+        table.id = "chordBarGridTable";
+        table.style.borderCollapse = "collapse";
+        table.style.width = "100%";
+        table.style.tableLayout = "fixed";
+
+        // Header row: beat numbers
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const cornerTh = document.createElement("th");
+        cornerTh.style.width = "42px";
+        cornerTh.style.padding = "4px 6px";
+        cornerTh.style.fontSize = "11px";
+        cornerTh.style.color = "#888";
+        cornerTh.style.textAlign = "center";
+        cornerTh.textContent = _("Bar");
+        headerRow.appendChild(cornerTh);
+
+        for (let b = 1; b <= this.beatsPerBar; b++) {
+            const th = document.createElement("th");
+            th.style.padding = "4px";
+            th.style.fontSize = "11px";
+            th.style.color = "#888";
+            th.style.textAlign = "center";
+            th.style.fontWeight = "normal";
+            th.textContent = `${_("Beat")} ${b}`;
+            headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        for (let bar = 0; bar < this.numBars; bar++) {
+            const tr = document.createElement("tr");
+
+            // Bar label cell
+            const barLabelTd = document.createElement("td");
+            barLabelTd.style.padding = "4px 6px";
+            barLabelTd.style.fontSize = "11px";
+            barLabelTd.style.color = "#666";
+            barLabelTd.style.textAlign = "center";
+            barLabelTd.style.fontWeight = "bold";
+            barLabelTd.style.background = "rgba(0,0,0,0.03)";
+            barLabelTd.style.borderRight = "1px solid rgba(0,0,0,0.08)";
+            barLabelTd.textContent = `${bar + 1}`;
+            tr.appendChild(barLabelTd);
+
+            for (let beat = 0; beat < this.beatsPerBar; beat++) {
+                const cellIndex = bar * this.beatsPerBar + beat;
+                const chord = this.progression[cellIndex] || null;
+
+                const td = document.createElement("td");
+                td.className = "bar-grid-cell";
+                td.dataset.cellIndex = String(cellIndex);
+                td.style.padding = "4px";
+                td.style.border = "1px solid rgba(0,0,0,0.08)";
+                td.style.verticalAlign = "top";
+                td.style.minWidth = "70px";
+                td.style.minHeight = "50px";
+                td.style.position = "relative";
+
+                if (chord) {
+                    // Filled cell: show chord name + remove button
+                    const isActive = cellIndex === this.activeStep;
+                    td.style.background = isActive ? "#ffd700" : "#eef4fd";
+                    td.style.border = isActive
+                        ? "2px solid #f0a500"
+                        : "1px solid rgba(74,144,226,0.4)";
+
+                    const chordLabel = document.createElement("div");
+                    chordLabel.style.fontWeight = "bold";
+                    chordLabel.style.fontSize = "13px";
+                    chordLabel.style.textAlign = "center";
+                    chordLabel.style.color = "#2a62a7";
+                    chordLabel.style.cursor = "pointer";
+                    chordLabel.title = _("Click to audition");
+                    chordLabel.textContent = chord.roman;
+                    chordLabel.onclick = () => this.auditionChord(chord);
+
+                    const chordName = document.createElement("div");
+                    chordName.style.fontSize = "10px";
+                    chordName.style.textAlign = "center";
+                    chordName.style.color = "#555";
+                    chordName.textContent = chord.name;
+
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "bar-grid-remove-btn";
+                    removeBtn.textContent = "✕";
+                    removeBtn.title = _("Remove chord");
+                    removeBtn.style.position = "absolute";
+                    removeBtn.style.top = "2px";
+                    removeBtn.style.right = "2px";
+                    removeBtn.style.padding = "0 3px";
+                    removeBtn.style.fontSize = "10px";
+                    removeBtn.style.lineHeight = "14px";
+                    removeBtn.style.border = "none";
+                    removeBtn.style.background = "transparent";
+                    removeBtn.style.color = "#999";
+                    removeBtn.style.cursor = "pointer";
+                    removeBtn.onclick = e => {
+                        e.stopPropagation();
+                        this.removeChord(cellIndex);
+                    };
+
+                    td.appendChild(chordLabel);
+                    td.appendChild(chordName);
+                    td.appendChild(removeBtn);
+                } else {
+                    // Empty cell: clicking opens chord picker inline
+                    td.style.background = "transparent";
+                    td.style.cursor = "pointer";
+                    td.style.textAlign = "center";
+                    td.style.color = "#bbb";
+                    td.style.fontSize = "20px";
+                    td.style.lineHeight = "50px";
+                    td.title = _("Click to add chord");
+                    td.textContent = "+";
+
+                    td.onclick = () => {
+                        // Show an inline chord-picker dropdown in this cell
+                        td.innerHTML = "";
+                        td.style.lineHeight = "";
+                        const picker = document.createElement("select");
+                        picker.style.width = "100%";
+                        picker.style.fontSize = "11px";
+                        picker.style.padding = "2px";
+
+                        const blankOpt = document.createElement("option");
+                        blankOpt.value = "";
+                        blankOpt.textContent = `-- ${_("pick")} --`;
+                        picker.appendChild(blankOpt);
+
+                        this.diatonicChords.forEach((c, idx) => {
+                            const opt = document.createElement("option");
+                            opt.value = String(idx);
+                            opt.textContent = `${c.roman} — ${c.name}`;
+                            picker.appendChild(opt);
+                        });
+
+                        picker.onchange = e => {
+                            const idx = parseInt(e.target.value, 10);
+                            if (!isNaN(idx) && this.diatonicChords[idx]) {
+                                // Insert chord at cellIndex position, padding with nulls if needed
+                                while (this.progression.length < cellIndex) {
+                                    this.progression.push(null);
+                                }
+                                if (cellIndex < this.progression.length) {
+                                    this.progression[cellIndex] = { ...this.diatonicChords[idx] };
+                                } else {
+                                    this.progression.push({ ...this.diatonicChords[idx] });
+                                }
+                                this.auditionChord(this.diatonicChords[idx]);
+                                this._renderBarGrid();
+                            }
+                        };
+
+                        picker.onblur = () => this._renderBarGrid();
+                        td.appendChild(picker);
+                        picker.focus();
+                    };
+                }
+
+                tr.appendChild(td);
+            }
+
+            tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        this.barGridContainer.appendChild(table);
+    }
+
+    /**
+     * Renders the progression timeline chips (compact sequential view).
      * @private
      */
     _renderProgressionTimeline() {
@@ -984,17 +1207,22 @@ class ChordBuilderWidget {
      * @param {number} activeIndex
      */
     _highlightActiveStep(activeIndex) {
-        if (!this.timelineContainer) return;
-        const chips = this.timelineContainer.querySelectorAll(".progression-chip");
-        chips.forEach((chip, i) => {
-            if (i === activeIndex) {
-                chip.style.background = "#ffd700";
-                chip.style.transform = "scale(1.05)";
-            } else {
-                chip.style.background = "rgba(0, 0, 0, 0.08)";
-                chip.style.transform = "scale(1.0)";
-            }
-        });
+        // Highlight bar-grid cells
+        if (this.barGridContainer) {
+            const cells = this.barGridContainer.querySelectorAll(".bar-grid-cell");
+            cells.forEach(cell => {
+                const idx = parseInt(cell.dataset.cellIndex, 10);
+                const chord = this.progression[idx] || null;
+                if (!chord) return;
+                if (idx === activeIndex) {
+                    cell.style.background = "#ffd700";
+                    cell.style.border = "2px solid #f0a500";
+                } else {
+                    cell.style.background = "#eef4fd";
+                    cell.style.border = "1px solid rgba(74,144,226,0.4)";
+                }
+            });
+        }
     }
 
     /**
