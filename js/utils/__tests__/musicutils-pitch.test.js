@@ -212,6 +212,15 @@ describe("musicutils-pitch", () => {
             expect(pitch.getNumber("C*", 4, "equal")).toBe(39);
             expect(pitch.getNumber("C𝄪", 4, "equal")).toBe(39);
         });
+
+        it("handles lowercase note names and microtonal prefixes", () => {
+            expect(pitch.getNumber("c", 4, "equal")).toBe(37);
+            expect(pitch.getNumber("d", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("bb", 4, "equal")).toBe(47);
+            expect(pitch.getNumber("c#", 4, "equal")).toBe(38);
+            expect(pitch.getNumber("^C", 4, "equal")).toBe(37);
+            expect(pitch.getNumber("vD", 4, "equal")).toBe(39);
+        });
     });
 
     describe("loaded as classic scripts, the way the browser does", () => {
