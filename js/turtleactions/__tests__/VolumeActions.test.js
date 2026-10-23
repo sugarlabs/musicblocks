@@ -881,6 +881,22 @@ describe("setupVolumeActions", () => {
             );
         });
 
+        it("should preview the synth on the target turtle", () => {
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 1, null);
+
+            jest.advanceTimersByTime(250);
+
+            expect(triggerSpy).toHaveBeenCalledWith(
+                1,
+                "G4",
+                1 / 4,
+                DEFAULTVOICE,
+                null,
+                null,
+                false
+            );
+        });
+
         it("should trigger tone with resolved synth when firstConnection and lastConnection are null", () => {
             Singer.VolumeActions.setSynthVolume("Piano", 70, 0, null);
 
