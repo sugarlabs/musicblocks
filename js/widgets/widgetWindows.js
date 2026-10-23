@@ -783,6 +783,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _restore() {
+        this._restorePending = false;
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
