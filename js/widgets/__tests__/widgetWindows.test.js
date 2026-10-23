@@ -1425,6 +1425,39 @@ describe("widgetWindows", () => {
             expect(win._frame.style.left).toBe("200px");
             expect(win._frame.style.top).toBe("140px");
         });
+
+        test("windowFor keeps a restored position when the widget centers itself", () => {
+            const widget = { blockNo: 97 };
+            const win = windowFor(widget, "Self Centering", undefined, true);
+            win.setPosition(140, 220);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Self Centering", undefined, true);
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("140px");
+            expect(reopened._frame.style.top).toBe("220px");
+        });
+
+        test("windowFor clamps a restored position to the viewport", () => {
+            const widget = { blockNo: 96 };
+            window.widgetWindows._posCache[96] = [5000, 5000];
+
+            const win = windowFor(widget, "Offscreen Window", undefined, true);
+
+            expect(win._frame.style.left).toBe(`${window.innerWidth - 470}px`);
+            expect(win._frame.style.top).toBe(`${window.innerHeight - 420}px`);
+        });
+
+        test("windowFor centers a window saved at the top edge", () => {
+            const widget = { blockNo: 95 };
+            window.widgetWindows._posCache[95] = [120, 64];
+
+            const win = windowFor(widget, "Maximized Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("200px");
+            expect(win._frame.style.top).toBe("140px");
+        });
     });
 
     describe("locale configuration and additional widget controls", () => {
