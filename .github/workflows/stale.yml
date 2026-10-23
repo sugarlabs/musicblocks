@@ -14,12 +14,6 @@ concurrency:
     group: stale-pull-requests
     cancel-in-progress: false
 
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write # remove the stale label
-  actions: write # cache progress between runs
-
 jobs:
     stale:
         runs-on: ubuntu-latest
@@ -43,10 +37,8 @@ jobs:
                         return Number.isFinite(time) ? time : null;
                       }
 
-                      function activityTime(record, createdAt) {
-                        const recorded = parseTime(record && record.pushedAt);
-                        if (recorded !== null) return recorded;
-                        return parseTime(createdAt);
+                      function activityTime(record) {
+                        return parseTime(record && record.pushedAt);
                       }
 
                       function latestStaleLabelTime(events) {
@@ -150,7 +142,7 @@ jobs:
                           core.setFailed(`Could not load push state: ${err.message}`);
                           return "stop";
                         }
-                        const latestPush = activityTime(latestState[String(pr.number)], pr.created_at);
+                        const latestPush = activityTime(latestState[String(pr.number)]);
                         return decideStaleAction({
                           now: Date.now(),
                           lastPush: latestPush,
@@ -161,7 +153,7 @@ jobs:
 
                       async function processPR(pr, state) {
                         const record = state[String(pr.number)];
-                        const lastPush = activityTime(record, pr.created_at);
+                        const lastPush = activityTime(record);
                         const hasStaleLabel =
                           Array.isArray(pr.labels) &&
                           pr.labels.some(label => label.name === STALE_LABEL);
@@ -203,6 +195,13 @@ jobs:
                           if (latestDecision === "stop") return "stop";
                           if (latestDecision !== "label") {
                             core.info(`PR #${pr.number} received newer human activity; not labeling.`);
+                            return;
+                          }
+
+                          if (operations > MAX_OPERATIONS - 2) {
+                            core.warning(
+                              `Operation limit reached before labeling PR #${pr.number}.`
+                            );
                             return;
                           }
 
