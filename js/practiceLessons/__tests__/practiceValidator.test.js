@@ -775,6 +775,28 @@ describe("PracticeValidator huge repeat counts", () => {
 
         expect(PracticeValidator.validateRhythmMakerWorkflow()).toBe(true);
     });
+
+    test("an action after a huge repeat of another action is still found", () => {
+        const drumAction = (id, name) => ({
+            [id]: { name: "action", trash: false, connections: [null, `${id}name`, `${id}body`] },
+            [`${id}name`]: { name: "text", value: name, trash: false, connections: [id] },
+            [`${id}body`]: { name: "playdrum", trash: false, connections: [id, null] }
+        });
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "ca", "cb"] },
+            count: { name: "number", value: 2000, trash: false, connections: ["rep"] },
+            ca: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] },
+            cb: { name: "nameddo", value: "B", trash: false, connections: ["rep", null] },
+            ...drumAction("actA", "A"),
+            ...drumAction("actB", "B")
+        });
+
+        expect(PracticeValidator.getStartActionNames(PracticeValidator.getBlockList())).toEqual(
+            new Set(["A", "B"])
+        );
+        expect(PracticeValidator.validateTwoPartForm()).toBe(true);
+    });
 });
 
 describe("PracticeValidator stored values", () => {

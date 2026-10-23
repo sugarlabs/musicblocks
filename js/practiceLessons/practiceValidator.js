@@ -97,7 +97,7 @@ const TWINKLE_SECTIONS = new Map([
 // The song's form, the bread of the sandwich on the outside and the filling in the middle.
 const TWINKLE_SONG_FORM = ["A1", "A2", "B", "B", "A1", "A2"];
 
-// Upper bound on start-block action references that membership checks expand,
+// Upper bound on start-block action references that counting checks expand,
 // so a huge repeat count cannot build a giant array.
 const MAX_START_ACTION_REFERENCES = 1000;
 
@@ -434,8 +434,8 @@ const PracticeValidator = {
         const exportedActions = this.getRhythmMakerActionNames(blockList);
         if (exportedActions.size === 0) return false;
 
-        const referencedActions = this.getStartActionReferences(blockList);
-        return referencedActions.some(actionName => exportedActions.has(actionName));
+        const referencedActions = this.getStartActionNames(blockList);
+        return [...referencedActions].some(actionName => exportedActions.has(actionName));
     },
 
     getRhythmMakerActionNames(blockList) {
@@ -462,6 +462,38 @@ const PracticeValidator = {
         if (!startBlock) return [];
 
         return this.extractPatternSequence(startBlock.connections?.[1], blockList, maxLength);
+    },
+
+    // Which actions the start flow calls. A repeat body is walked once, however many times it loops.
+    getStartActionNames(blockList) {
+        const startBlock = Object.values(blockList).find(
+            block => block?.name === "start" && !block.trash
+        );
+        if (!startBlock) return new Set();
+
+        return this.collectActionNames(startBlock.connections?.[1], blockList, new Set());
+    },
+
+    collectActionNames(startId, blockList, names) {
+        let currentId = this.unwrapHiddenFlow(startId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) break;
+
+            if (block.name === "nameddo") {
+                const actionName = block.overrideName || block.privateData || block.value;
+                if (actionName) names.add(actionName);
+            } else if (block.name === "repeat") {
+                this.collectActionNames(block.connections?.[2], blockList, names);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return names;
     },
 
     hasChangedRhythmLength() {
@@ -971,8 +1003,8 @@ const PracticeValidator = {
         const exportedActions = this.getPhraseMakerActionNames(blockList);
         if (exportedActions.size === 0) return false;
 
-        const referencedActions = this.getStartActionReferences(blockList);
-        return referencedActions.some(actionName => exportedActions.has(actionName));
+        const referencedActions = this.getStartActionNames(blockList);
+        return [...referencedActions].some(actionName => exportedActions.has(actionName));
     },
 
     validateTwoPartForm() {
@@ -980,7 +1012,7 @@ const PracticeValidator = {
         const exportedActions = this.getPhraseMakerActionNames(blockList);
         if (exportedActions.size < 2) return false;
 
-        const referencedActions = new Set(this.getStartActionReferences(blockList));
+        const referencedActions = this.getStartActionNames(blockList);
         let referencedParts = 0;
         exportedActions.forEach(actionName => {
             if (referencedActions.has(actionName)) {
