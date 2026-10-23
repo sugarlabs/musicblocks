@@ -558,6 +558,61 @@ describe("PracticeValidator variations", () => {
     });
 });
 
+describe("PracticeValidator huge repeat counts", () => {
+    const HUGE = 20000000;
+    const hugeRepeat = () => ({
+        start: { name: "start", trash: false, connections: [null, "rep", null] },
+        rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+        count: { name: "number", value: HUGE, trash: false, connections: ["rep"] },
+        c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+    });
+
+    test("hasCreatedVariation stops expanding once the pattern is exceeded", () => {
+        useBlocks(hugeRepeat());
+        const extract = jest.spyOn(PracticeValidator, "extractPatternSequence");
+
+        expect(PracticeValidator.hasCreatedVariation(["A", "A"])).toBe(true);
+        expect(extract.mock.results[0].value.length).toBeLessThan(10);
+        extract.mockRestore();
+    });
+
+    test("getStartActionReferences caps the expansion at the given length", () => {
+        useBlocks(hugeRepeat());
+
+        const references = PracticeValidator.getStartActionReferences(
+            PracticeValidator.getBlockList(),
+            5
+        );
+
+        expect(references.length).toBeGreaterThan(5);
+        expect(references.length).toBeLessThan(10);
+    });
+
+    test("getStartActionReferences has a default cap", () => {
+        useBlocks(hugeRepeat());
+
+        const references = PracticeValidator.getStartActionReferences(
+            PracticeValidator.getBlockList()
+        );
+
+        expect(references.length).toBeLessThan(HUGE);
+        expect(references.length).toBeLessThan(5000);
+    });
+
+    test("capped lookups still find the referenced action", () => {
+        useBlocks({
+            ...hugeRepeat(),
+            act: { name: "action", trash: false, connections: [null, "actname", "abody", null] },
+            actname: { name: "text", value: "A", trash: false, connections: ["act"] },
+            abody: { name: "rhythm2", trash: false, connections: ["act", "n1", "n2", null] },
+            n1: { name: "number", value: 4, trash: false, connections: ["abody"] },
+            n2: { name: "number", value: 4, trash: false, connections: ["abody"] }
+        });
+
+        expect(PracticeValidator.validateRhythmMakerWorkflow()).toBe(true);
+    });
+});
+
 describe("PracticeValidator stored values", () => {
     test("spots a value toggled with one minus", () => {
         useBlocks({
