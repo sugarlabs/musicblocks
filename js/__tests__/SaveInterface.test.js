@@ -751,6 +751,47 @@ describe("afterSaveMIDI", () => {
             velocity: 0.9
         });
     });
+
+    it("writes both the pitch and the drum of a note that plays both", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                // A note with only a drum is recorded with a rest for its pitch.
+                { note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" },
+                { note: ["G4"], drum: "kick drum", duration: 4, bpm: 90, instrument: "guitar" },
+                { note: ["A4"], duration: 4, bpm: 90, instrument: "guitar" }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - snare drum").addNote.mock.calls).toEqual([
+            [{ midi: 38, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: beat, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
+            [{ name: "G4", time: beat, duration: beat, velocity: 0.8 }],
+            [{ name: "A4", time: 2 * beat, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("adds no instrument track for notes that only play drums", () => {
+        mockActivity.logo._midiData = {
+            0: [{ note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" }]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const names = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value.name);
+        expect(names).toEqual(["Track 1", "Track 1 - snare drum"]);
+    });
 });
 
 describe("afterSaveMIDI tempo and time signatures", () => {
