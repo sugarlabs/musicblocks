@@ -43,15 +43,15 @@ describe("Real project playback", () => {
             const { blockList } = win.ActivityContext.getActivity().blocks;
 
             expect(
-                blockList.some(b => b.name === "newnote"),
+                blockList.some(b => b?.name === "newnote"),
                 "pi.tb should contain a newnote block"
             ).to.be.true;
             expect(
-                blockList.some(b => b.name === "scaledegree"),
+                blockList.some(b => b?.name === "scaledegree"),
                 "pi.tb should contain a scaledegree block"
             ).to.be.true;
             expect(
-                blockList.some(b => b.name === "loadFile" && b.value?.[0] === "heap.json"),
+                blockList.some(b => b?.name === "loadFile" && b.value?.[0] === "heap.json"),
                 "pi.tb's heap.json loadFile block should be present"
             ).to.be.true;
         });
