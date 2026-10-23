@@ -579,6 +579,39 @@ describe("ASTUtils", () => {
             });
         });
 
+        it("should export less_than_or_equal_to as a binary expression with <=", () => {
+            const result = ASTUtils._getArgExpAST("less_than_or_equal_to", [3, 5]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 3 },
+                right: { type: "Literal", value: 5 },
+                operator: "<="
+            });
+        });
+
+        it("should export greater_than_or_equal_to as a binary expression with >=", () => {
+            const result = ASTUtils._getArgExpAST("greater_than_or_equal_to", [7, 4]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 7 },
+                right: { type: "Literal", value: 4 },
+                operator: ">="
+            });
+        });
+
+        it("should export not_equal_to as a binary expression with strict inequality !==", () => {
+            const result = ASTUtils._getArgExpAST("not_equal_to", [1, "1"]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 1 },
+                right: { type: "Literal", value: "1" },
+                operator: "!=="
+            });
+        });
+
         it("should preserve XOR results when compared with Equal", () => {
             const compare = (left, right, expected) => {
                 const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
