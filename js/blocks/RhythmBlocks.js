@@ -478,7 +478,7 @@ function setupRhythmBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.skipFactor += arg;
 
-            const listenerName = "_skip_" + turtle;
+            const listenerName = "_skip_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // Use the validated, floored `arg` so the listener undoes exactly
@@ -648,7 +648,7 @@ function setupRhythmBlocks(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle;
+            const listenerName = "_dot_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {

@@ -17,6 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const { deepClone } = require("../utils-logic");
+global.deepClone = deepClone;
+
 describe("platformstyle", () => {
     const buildDom = () => {
         const meta = document.createElement("meta");
@@ -285,5 +288,38 @@ describe("platformstyle", () => {
 
         expect(global.window.platformColor.header).toBe("#00FFFF");
         expect(global.window.platformColor.background).toBe("#000000");
+    });
+
+    it("clonePlatformTheme creates independent deep clones using deepClone", () => {
+        // global.deepClone is set at module level (like themebox.test.js) so the
+        // fast path is exercised — not the JSON fallback.
+        expect(typeof global.deepClone).toBe("function");
+        const { clonePlatformTheme, platformThemes } = require("../platformstyle");
+        const originalTheme = platformThemes.light;
+        const clonedTheme = clonePlatformTheme(originalTheme);
+
+        expect(clonedTheme).toEqual(originalTheme);
+        expect(clonedTheme).not.toBe(originalTheme);
+        expect(clonedTheme.paletteColors).not.toBe(originalTheme.paletteColors);
+        expect(clonedTheme.paletteColors.action).not.toBe(originalTheme.paletteColors.action);
+    });
+
+    it("clonePlatformTheme falls back to JSON clone when deepClone is not a function", () => {
+        const { clonePlatformTheme, platformThemes } = require("../platformstyle");
+        const originalDeepClone = global.deepClone;
+        const originalWindowDeepClone = global.window ? global.window.deepClone : undefined;
+        try {
+            delete global.deepClone;
+            if (global.window) delete global.window.deepClone;
+            const originalTheme = platformThemes.dark;
+            const clonedTheme = clonePlatformTheme(originalTheme);
+            expect(clonedTheme).toEqual(originalTheme);
+            expect(clonedTheme).not.toBe(originalTheme);
+        } finally {
+            if (originalDeepClone !== undefined) global.deepClone = originalDeepClone;
+            if (global.window && originalWindowDeepClone !== undefined) {
+                global.window.deepClone = originalWindowDeepClone;
+            }
+        }
     });
 });
