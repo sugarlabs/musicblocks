@@ -326,7 +326,7 @@ class ContextMenuController {
             activity.helpfulWheelItems.push({
                 label: "Enable horizontal scrolling",
                 icon: "imgsrc:header-icons/compare-arrows.svg",
-                display: true,
+                display: activity.beginnerMode ? false : true,
                 fn: activity.setScroller
             });
 

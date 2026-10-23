@@ -497,6 +497,39 @@ describe("ContextMenuController", () => {
             expect(dup.fn).toBe(activity.copyMultipleBlocks);
         });
 
+        test("keeps horizontal scrolling hidden in beginner mode after rebuilding", () => {
+            activity.beginnerMode = true;
+
+            controller.setupPaletteMenu();
+            controller.setupPaletteMenu();
+
+            const enableScrolling = activity.helpfulWheelItems.find(
+                ele => ele.label === "Enable horizontal scrolling"
+            );
+            expect(enableScrolling.display).toBe(false);
+        });
+
+        test("keeps Select available in the background wheel", () => {
+            controller.setupPaletteMenu();
+
+            const select = activity.helpfulWheelItems.find(ele => ele.label === "Select");
+            expect(select.display).toBe(true);
+            expect(select.fn).toBe(activity.selectMode);
+        });
+
+        test("shows Clean and Select while keeping Clear hidden in the background wheel", () => {
+            controller.setupPaletteMenu();
+
+            controller.displayHelpfulWheel({ clientX: 10, clientY: 10 });
+
+            expect(wheelInstances[0].labels).toContain("Clean");
+            expect(wheelInstances[0].labels).toContain("Select");
+            expect(wheelInstances[0].labels).not.toContain("Clear");
+            expect(activity.helpfulWheelItems.find(ele => ele.label === "Clean").fn).toBe(
+                activity.findBlocks
+            );
+        });
+
         test("removes any pre-existing bottom toolbar container before rebuilding", () => {
             controller.setupPaletteMenu();
             expect(mockElement.parentNode.removeChild).toHaveBeenCalledWith(mockElement);

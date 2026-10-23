@@ -151,16 +151,17 @@ const loadActivityClass = () => {
 
     vm.createContext(sandbox);
     vm.runInContext(code, sandbox);
-    return sandbox.Activity;
+    return { Activity: sandbox.Activity, sandbox };
 };
 
 describe("Helpful wheel bulk actions (issue #7794)", () => {
     let Activity;
+    let activitySandbox;
     let activity;
     let mockElement;
 
     beforeAll(() => {
-        Activity = loadActivityClass();
+        ({ Activity, sandbox: activitySandbox } = loadActivityClass());
     });
 
     beforeEach(() => {
@@ -189,6 +190,7 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
         window.jQuery = jest.fn(() => ({ tooltip: jest.fn() }));
 
         activity = new Activity();
+        activitySandbox.activity = activity;
 
         activity.cellSize = 40;
         activity.contextMenuController.makeButton = jest.fn(() => mockElement);
@@ -225,6 +227,34 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
             expect(dup).toBeDefined();
             expect(dup.display).toBe(false);
             expect(dup.fn).toBe(activity.copyMultipleBlocks);
+        });
+    });
+
+    describe("horizontal scrolling in beginner mode", () => {
+        test("updates the enabled state and helpful-wheel actions consistently", () => {
+            const enableIcon = { style: {} };
+            const disableIcon = { style: {} };
+            document.getElementById = jest.fn(id =>
+                id === "enableHorizScrollIcon" ? enableIcon : disableIcon
+            );
+            activity.beginnerMode = true;
+            activity.scrollBlockContainer = false;
+            activity.blocks = { activeBlock: 7 };
+            activity.helpfulWheelItems = [
+                { label: "Enable horizontal scrolling", display: true },
+                { label: "Disable horizontal scrolling", display: false }
+            ];
+            activity.textMsg = jest.fn();
+
+            activity._setScroller();
+
+            expect(activity.scrollBlockContainer).toBe(true);
+            expect(activity.blocks.activeBlock).toBeNull();
+            expect(enableIcon.style.display).toBe("none");
+            expect(disableIcon.style.display).toBe("block");
+            expect(activity.helpfulWheelItems[0].display).toBe(false);
+            expect(activity.helpfulWheelItems[1].display).toBe(true);
+            expect(activity.textMsg).toHaveBeenCalledWith("Horizontal scrolling enabled.", 3000);
         });
     });
 
