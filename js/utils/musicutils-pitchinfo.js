@@ -235,12 +235,23 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 return obj[0] + obj[1];
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
-            case "staff y":
+            case "staff y": {
+                // B♯ and C♭ sit where they sound, on the C above and the B below.
+                let letter = pitch[0];
+                let staffOctave = Number(octave);
+                if (pitch === "B" + SHARP) {
+                    letter = "C";
+                    staffOctave += 1;
+                } else if (pitch === "C" + FLAT) {
+                    letter = "B";
+                    staffOctave -= 1;
+                }
                 // These numbers are in relation to the staff artwork.
                 return (
-                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(pitch[0]) * YSTAFFNOTEHEIGHT +
-                    (octave - 4) * YSTAFFOCTAVEHEIGHT
+                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(letter) * YSTAFFNOTEHEIGHT +
+                    (staffOctave - 4) * YSTAFFOCTAVEHEIGHT
                 );
+            }
             case "pitch number":
                 return _calculate_pitch_number(
                     pitch,

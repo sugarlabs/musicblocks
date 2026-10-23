@@ -102,6 +102,20 @@ describe("musicutils-pitchinfo", () => {
             expect(info("pitch to shade", "C♭4")).toBe(info("pitch to shade", "B3"));
         });
 
+        it("puts B/C boundary spellings on the staff where they sound", () => {
+            expect(info("staff y", "B♯4")).toBe(info("staff y", "C5"));
+            expect(info("staff y", "B𝄪4")).toBe(info("staff y", "C5"));
+            expect(info("staff y", "C♭4")).toBe(info("staff y", "B3"));
+            expect(info("staff y", "C𝄫4")).toBe(info("staff y", "B3"));
+            expect(info("staff y", "C5")).toBe(87.5);
+            expect(info("staff y", "B3")).toBe(-12.5);
+        });
+
+        it("keeps the staff position for spellings that stay in the octave", () => {
+            expect(info("staff y", "E♯4")).toBe(info("staff y", "E4"));
+            expect(info("staff y", "F♭4")).toBe(info("staff y", "F4"));
+        });
+
         it("keeps the octave shade for spellings that stay in the octave", () => {
             expect(info("pitch to shade", "E♯4")).toBe(4 * 12.5);
             expect(info("pitch to shade", "F♭4")).toBe(4 * 12.5);
