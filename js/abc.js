@@ -183,6 +183,15 @@ const isSameTuplet = (a, b) =>
 
 const getTupletTime = count => 2 ** Math.floor(Math.log2(Math.max(2, count)));
 
+// A note's length in sixteenths, the unit the header's L:1/16 counts in. The same
+// arithmetic convertDuration() reduces to a fraction, kept as a number so that
+// measures can be counted off.
+const sixteenthsOf = (duration, dotCount = 0) => {
+    const value = Number(duration);
+    if (!Number.isFinite(value) || value <= 0) return 0;
+    return (16 * (2 ** (dotCount + 1) - 1)) / (value * 2 ** dotCount);
+};
+
 const convertDuration = function (duration, dotCount = 0) {
     if (isNaN(Number(duration))) return duration.toString();
 
@@ -215,6 +224,10 @@ class AbcExporter {
 
         this.parts = [];
         this.counter = 0;
+        // Sixteenths written since the last meter, and how many of them make a
+        // measure. The header opens in M:C, which is 4/4.
+        this.sixteenths = 0;
+        this.measureSixteenths = 16;
         this.articulationDepth = 0;
         this.harmonicsDepth = 0;
         this.lastNoteStart = null;
@@ -325,6 +338,15 @@ class AbcExporter {
         }
     }
 
+    // Whether the music so far ends exactly on a barline. Counted from the last meter
+    // rather than note to note, so a note that runs over a barline costs that one
+    // barline and leaves every later one where it belongs.
+    __onBarline() {
+        if (this.measureSixteenths <= 0 || this.sixteenths <= 0) return false;
+        const into = this.sixteenths % this.measureSixteenths;
+        return into < 1e-6 || this.measureSixteenths - into < 1e-6;
+    }
+
     __beginNote() {
         this.lastNoteStart = this.parts.length;
         this.prefixStart = null;
@@ -419,8 +441,13 @@ class AbcExporter {
                 break;
             case "meter":
                 if (Number(this.staging[i + 1]) > 0 && Number(this.staging[i + 2]) > 0) {
+                    // A meter arriving part way through a measure still closes it.
+                    if (this.sixteenths > 0) this.__pushField("| ");
                     this.__pushField(`M:${this.staging[i + 1]}/${this.staging[i + 2]}\n`, true);
                     this.counter = 0;
+                    this.measureSixteenths =
+                        (Number(this.staging[i + 1]) * 16) / Number(this.staging[i + 2]);
+                    this.sixteenths = 0;
                 }
                 i += 2;
                 break;
@@ -500,20 +527,26 @@ class AbcExporter {
             const tupletNotes = this.staging[i + j];
 
             if (typeof tupletNotes[NOTATIONNOTE] === "object") {
+                // A staged note with no pitches is silence for its duration, the same as
+                // one staged as ["R"]. Without this the note is left out and its duration
+                // runs on from the note before it, as in "G44".
+                const pitches =
+                    tupletNotes[NOTATIONNOTE].length > 0 ? tupletNotes[NOTATIONNOTE] : ["R"];
+
                 this.parts.push(this.__decorations());
                 if (tupletNotes[NOTATIONSTACCATO]) {
                     this.parts.push(".");
                 }
 
-                if (tupletNotes[NOTATIONNOTE].length > 1) {
+                if (pitches.length > 1) {
                     this.parts.push("[");
                 }
 
-                for (let ii = 0; ii < tupletNotes[NOTATIONNOTE].length; ii++) {
-                    this.parts.push(this.__toABCnote(tupletNotes[NOTATIONNOTE][ii]));
+                for (let ii = 0; ii < pitches.length; ii++) {
+                    this.parts.push(this.__toABCnote(pitches[ii]));
                 }
 
-                if (tupletNotes[NOTATIONNOTE].length > 1) {
+                if (pitches.length > 1) {
                     this.parts.push("]");
                 }
 
@@ -523,6 +556,16 @@ class AbcExporter {
                         tupletNotes[NOTATIONDOTCOUNT] || 0
                     )
                 );
+                // A tuplet note is written as the value it rounds down to but sounds
+                // shorter, in the ratio its (n:t header states.
+                const inTuplet = tupletNotes[NOTATIONTUPLETVALUE][0];
+                this.sixteenths +=
+                    (sixteenthsOf(
+                        tupletNotes[NOTATIONROUNDDOWN],
+                        tupletNotes[NOTATIONDOTCOUNT] || 0
+                    ) *
+                        getTupletTime(inTuplet)) /
+                    inTuplet;
             }
             j++;
             k++;
@@ -538,6 +581,11 @@ class AbcExporter {
             Array.isArray(this.staging[i - 1]) &&
             this.staging[i - 1][NOTATIONINSIDECHORD] === obj[NOTATIONINSIDECHORD];
 
+        // Through __pushField so the barline lands before any decoration already
+        // waiting for this note, rather than between the decoration and the note.
+        if (!inChordContinuation && this.__onBarline()) {
+            this.__pushField("| ");
+        }
         if (this.counter % 8 === 0 && this.counter > 0 && !inChordContinuation) {
             this.parts.push("\n");
         }
@@ -617,6 +665,7 @@ class AbcExporter {
                 }
 
                 this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
+                this.sixteenths += sixteenthsOf(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]);
             }
 
             if (obj[NOTATIONINSIDECHORD] > 0) {
@@ -640,6 +689,7 @@ class AbcExporter {
                 ) {
                     this.parts.push("]");
                     this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
+                    this.sixteenths += sixteenthsOf(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]);
                 }
             }
         }

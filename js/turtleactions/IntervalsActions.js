@@ -266,7 +266,11 @@ function setupIntervalsActions(activity) {
          * @returns {String}
          */
         static getCurrentMode(turtle) {
-            return activity.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[1];
+            return activity.turtles
+                .ithTurtle(turtle)
+                .singer.keySignature.split(" ")
+                .slice(1)
+                .join(" ");
         }
 
         /**
@@ -317,7 +321,7 @@ function setupIntervalsActions(activity) {
                 modeName = name.toLowerCase();
             }
 
-            const listenerName = "_definemode_" + turtle;
+            const listenerName = "_definemode_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {

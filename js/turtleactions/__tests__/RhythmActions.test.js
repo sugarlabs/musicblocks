@@ -18,7 +18,7 @@
  */
 
 const setupRhythmActions = require("../RhythmActions");
-const { getMeasurePosition } = require("../../utils/musicutils-rhythm");
+const { getMeasurePosition, getMeterAnchor } = require("../../utils/musicutils-rhythm");
 
 describe("setupRhythmActions", () => {
     let activity;
@@ -136,6 +136,56 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.currentMeasure).toBe(2);
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_1_0__");
     });
+
+    // Each case plays one note per beat: an optional quarter-note pickup, then the first
+    // meter, then the second. fired lists the beats after the pickup the event fires on.
+    it.each([
+        { from: [3, 4], to: [4, 4], pickup: 0, notes: [3, 8], every: 4, fired: [4, 8] },
+        { from: [3, 4], to: [4, 4], pickup: 1 / 4, notes: [3, 8], every: 4, fired: [4, 8] },
+        { from: [4, 4], to: [6, 8], pickup: 0, notes: [4, 12], every: 6, fired: [6, 12] },
+        { from: [4, 4], to: [6, 8], pickup: 1 / 4, notes: [4, 12], every: 6, fired: [6, 12] },
+        { from: [4, 4], to: [6, 8], pickup: 1 / 4, notes: [4, 12], every: 4, fired: [4, 8, 12, 16] }
+    ])(
+        "keeps 'every $every beats' counting the beats played from $from to $to, pickup $pickup",
+        ({ from, to, pickup, notes, every, fired }) => {
+            Object.assign(targetTurtle.singer, {
+                pickup,
+                beatsPerMeasure: from[0],
+                noteValuePerBeat: from[1],
+                meterAnchor: null,
+                beatList: [],
+                factorList: [every]
+            });
+            const durations = [
+                ...(pickup ? [pickup] : []),
+                ...Array(notes[0]).fill(1 / from[1]),
+                ...Array(notes[1]).fill(1 / to[1])
+            ];
+            const firstBeat = pickup ? 1 : 0;
+            const changeAt = firstBeat + notes[0];
+            const firedOn = [];
+            let wholeNotes = 0;
+            durations.forEach((duration, n) => {
+                targetTurtle.singer.notesPlayed = [wholeNotes * 64, 64];
+                if (n === changeAt) {
+                    targetTurtle.singer.meterAnchor = getMeterAnchor(targetTurtle.singer);
+                    targetTurtle.singer.beatsPerMeasure = to[0];
+                    targetTurtle.singer.noteValuePerBeat = to[1];
+                }
+                targetTurtle.singer.inNoteBlock = [];
+                activity.stage.dispatchEvent.mockClear();
+
+                Singer.RhythmActions.playNote(duration, "note", 0, 1);
+
+                const calls = activity.stage.dispatchEvent.mock.calls;
+                if (calls.some(call => call[0] === "__beat_" + every + "_0__")) {
+                    firedOn.push(n + 1 - firstBeat);
+                }
+                wholeNotes += duration;
+            });
+            expect(firedOn).toEqual(fired);
+        }
+    );
 
     it("triggers everybeat event when beatList contains 'everybeat'", () => {
         targetTurtle.singer.notesPlayed = [1, 1]; // pickup crossed
@@ -785,7 +835,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.playNote(1, "note", 0, 5);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0_5");
         });
         it("playNote does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
             activity.blocks.blockList = {};
@@ -803,7 +853,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.playNote(1, "note", 0, undefined);
 
-            expect(mockMouse.MB.listeners).toContain("_playnote_0");
+            expect(mockMouse.MB.listeners).toContain("_playnote_0_undefined");
         });
         it("playNote does not throw or dispatch when MusicBlocks.isRun and mouse is null", () => {
             global.MusicBlocks.isRun = true;
@@ -818,7 +868,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.doRhythmicDot(1, 0, 5);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0_5");
         });
         it("doRhythmicDot does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
             activity.blocks.blockList = {};
@@ -836,7 +886,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
 
-            expect(mockMouse.MB.listeners).toContain("_dot_0");
+            expect(mockMouse.MB.listeners).toContain("_dot_0_undefined");
         });
         it("doRhythmicDot does not throw or dispatch when MusicBlocks.isRun and mouse is null", () => {
             global.MusicBlocks.isRun = true;

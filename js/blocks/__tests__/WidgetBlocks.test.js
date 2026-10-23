@@ -791,6 +791,73 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
+    describe("TemperamentBlock", () => {
+        let temperament;
+
+        beforeEach(() => {
+            temperament = getBlock("temperament");
+            logo.temperament = { inTemperament: null, scale: null, init: jest.fn() };
+            logo.synth.temperamentChanged = jest.fn();
+        });
+
+        it("does not throw when the pitch arg has been removed", () => {
+            // connections[2] is where the pitch block docks; a user can drag it
+            // out of the clamp, leaving the slot empty.
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", null, "hiddenBlk"]
+            };
+            expect(() =>
+                temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received")
+            ).not.toThrow();
+            expect(logo.temperament.scale).toBeNull();
+        });
+
+        it("does not throw when a block under the pitch arg has been removed", () => {
+            // Pitch is still docked, but one of the blocks it reads from (here the
+            // set-key notename) has been dragged out, leaving that slot empty.
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", "pitchBlk", "hiddenBlk"]
+            };
+            activity.blocks.blockList["pitchBlk"] = {
+                name: "pitch",
+                connections: ["tempBlk", "noteBlk", "octaveBlk", "setKeyBlk"]
+            };
+            activity.blocks.blockList["noteBlk"] = { value: "C" };
+            activity.blocks.blockList["octaveBlk"] = { value: 4 };
+            activity.blocks.blockList["setKeyBlk"] = {
+                connections: ["pitchBlk", null, "modeBlk"]
+            };
+            activity.blocks.blockList["modeBlk"] = { value: "major" };
+
+            expect(() =>
+                temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received")
+            ).not.toThrow();
+            expect(logo.temperament.scale).toBeNull();
+        });
+
+        it("sets the scale and starting pitch when the full pitch chain is docked", () => {
+            activity.blocks.blockList["tempBlk"] = {
+                connections: [null, "nameBlk", "pitchBlk", "hiddenBlk"]
+            };
+            activity.blocks.blockList["pitchBlk"] = {
+                name: "pitch",
+                connections: ["tempBlk", "noteBlk", "octaveBlk", "setKeyBlk"]
+            };
+            activity.blocks.blockList["noteBlk"] = { value: "D" };
+            activity.blocks.blockList["octaveBlk"] = { value: 4 };
+            activity.blocks.blockList["setKeyBlk"] = {
+                connections: ["pitchBlk", "keyNameBlk", "modeBlk"]
+            };
+            activity.blocks.blockList["keyNameBlk"] = { value: "C" };
+            activity.blocks.blockList["modeBlk"] = { value: "major" };
+
+            temperament.flow(["equal", "childBlk"], logo, 0, "tempBlk", "received");
+
+            expect(logo.temperament.scale).toEqual(["C", "major"]);
+            expect(logo.synth.startingPitch).toBe("D4");
+        });
+    });
+
     describe("StatusBlock", () => {
         it("defines its default macro with all monitors and print wrappers", () => {
             const status = getBlock("status");
@@ -1020,6 +1087,15 @@ describe("setupWidgetBlocks", () => {
             expect(interruption).toEqual([null, 0, true]);
             expect(Widget).toHaveBeenCalledTimes(1);
             expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("tells the Rhythm Maker which block opened it, so its edits are saved there", () => {
+            logo.rhythmRuler = { Rulers: [[[1], []]], Drums: [3] };
+
+            getBlock("rhythmruler2").flow(["childBlk"], logo, 0, "rrBlk");
+
+            expect(logo.rhythmRuler.rulerBlock).toBe("rrBlk");
+            expect(logo.rhythmRuler.Rulers).toEqual([]);
         });
 
         it.each([

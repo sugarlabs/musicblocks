@@ -332,10 +332,10 @@ The Planet is a public forum for sharing projects. Unlike Turtle
 Stitch, the Planet is anonymous. Projects can be downloaded and
 “remixed” from the Planet.
 
-![Music Blocks Planet Button](./documentation/planet_view_icon.png)
+![Music Blocks Planet Button](./Docs/documentation/planet_view_icon.png)
 
-![Music Blocks Planet](./documentation/planet-3.png)
-![Music Blocks Planet](./documentation/planet-4.png)
+![Music Blocks Planet](./Docs/documentation/planet-3.png)
+![Music Blocks Planet](./Docs/documentation/planet-4.png)
 
 ### Widgets
 
@@ -347,9 +347,9 @@ you explore polyrhythms and create drum machines in Music Blocks. The
 Phrase Maker widget lets you “paint” musical phrases and then export
 them as actions to use in your program.
 
-![Music Blocks Rhythm Widget](./guide/rhythm4.svg)
+![Music Blocks Rhythm Widget](./Docs/guide/rhythm4.svg)
 
-![Music Blocks Phrase Maker Widget](./guide/matrix8.svg)
+![Music Blocks Phrase Maker Widget](./Docs/guide/matrix8.svg)
 
 There are widgets for exploring pitch, rhythm, tempo, temperament,
 mode, timbre, et al. There is even a widget that allows you to plug in
@@ -483,6 +483,6 @@ sharing the actions. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=
 
 [Music Blocks README](./README.md) explains where to find Music Blocks.
 
-[Using Music Blocks](./documentation/README.md) has basic instructions.
+[Using Music Blocks](./Docs/documentation/README.md) has basic instructions.
 
-[Music Blocks Guide](./guide/README.md) details on the musical aspects of Music Blocks.
+[Music Blocks Guide](./Docs/guide/README.md) details on the musical aspects of Music Blocks.

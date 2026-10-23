@@ -261,6 +261,7 @@ describe("musicutils", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
         expect(octaveR).toBe(4);
+        setOctaveRatio(2);
     });
 });
 
@@ -479,9 +480,92 @@ describe("Temperament Functions", () => {
         it("1/4 comma meantone labels each ratio with a distinct note", () => {
             const t = getTemperament("1/4 comma meantone");
             expect(new Set(t.noteLabels).size).toBe(t.noteLabels.length);
-            // the perfect fifth must be the 3/2 the table already stores
+            // the fifth is tempered to 5^(1/4), about 696.578 cents, not a pure 3/2
             const g = t.noteLabels.indexOf("G");
-            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(701.955, 2);
+            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(696.578, 2);
+        });
+
+        it("1/4 comma meantone stacks tempered fifths into pure major thirds", () => {
+            const key = "1/4 comma meantone";
+            const t = getTemperament(key);
+            const fifth = Math.pow(5, 1 / 4);
+            // each label sits at its place on the chain of fifths from C
+            const chain = {
+                "C": 0,
+                "G": 1,
+                "D": 2,
+                "A": 3,
+                "E": 4,
+                "B": 5,
+                "F♯": 6,
+                "C♯": 7,
+                "G♯": 8,
+                "D♯": 9,
+                "A♯": 10,
+                "E♯": 11,
+                "B♯": 12,
+                "F": -1,
+                "B♭": -2,
+                "E♭": -3,
+                "A♭": -4,
+                "D♭": -5,
+                "G♭": -6,
+                "C♭": -7,
+                "F♭": -8
+            };
+            t.noteLabels.forEach((label, i) => {
+                const expected =
+                    Math.pow(fifth, chain[label]) /
+                    Math.pow(2, Math.floor(chain[label] * Math.log2(fifth)));
+                expect({ label, ratio: t.ratios[i] }).toEqual({
+                    label,
+                    ratio: expect.closeTo(expected, 6)
+                });
+            });
+            const c4 = pitchToFrequency("C", 4, 0, "C major", key);
+            expect(pitchToFrequency("E", 4, 0, "C major", key) / c4).toBeCloseTo(5 / 4, 6);
+            expect(pitchToFrequency("G", 4, 0, "C major", key) / c4).toBeCloseTo(fifth, 6);
+            // A4 stays at 440, so C4 is a meantone major sixth, 5^(3/4) / 2, below it
+            expect(c4).toBeCloseTo(440 / (Math.pow(5, 3 / 4) / 2), 3);
+        });
+    });
+
+    describe("pitchToFrequency with accidentals in non-EDO tables", () => {
+        // Just Intonation and Pythagorean label sharps "C#" and have no flats, while notes
+        // arrive as "C♯" and "D♭"; those used to fall through to the 12-EDO formula.
+        const freq = (note, octave, key) => pitchToFrequency(note, octave, 0, "C major", key);
+
+        it.each(["just intonation", "Pythagorean"])(
+            "%s gives an accidental its table ratio whatever its spelling",
+            key => {
+                const t = getTemperament(key);
+                const c4 = freq("C", 4, key);
+                expect(freq("C" + SHARP, 4, key) / c4).toBeCloseTo(t.ratios[1], 12);
+                expect(freq("C#", 4, key) / c4).toBeCloseTo(t.ratios[1], 12);
+                expect(freq("D" + FLAT, 4, key)).toBe(freq("C#", 4, key));
+                expect(freq("Db", 4, key)).toBe(freq("C#", 4, key));
+                expect(freq("G" + FLAT, 4, key)).toBe(freq("F#", 4, key));
+                // not the 12-EDO value
+                expect(freq("C" + SHARP, 4, key)).not.toBeCloseTo(
+                    pitchToFrequency("C" + SHARP, 4, 0, "C major", "equal"),
+                    6
+                );
+            }
+        );
+
+        it.each(["just intonation", "Pythagorean"])(
+            "%s moves the octave when an enharmonic spelling crosses C",
+            key => {
+                expect(freq("B" + SHARP, 4, key)).toBe(freq("C", 5, key));
+                expect(freq("C" + FLAT, 4, key)).toBe(freq("B", 3, key));
+            }
+        );
+
+        it("1/4 comma meantone still tells C♯ and D♭ apart", () => {
+            const key = "1/4 comma meantone";
+            expect(freq("C" + SHARP, 4, key)).not.toBe(freq("D" + FLAT, 4, key));
+            expect(freq("C#", 4, key)).toBe(freq("C" + SHARP, 4, key));
+            expect(freq("Db", 4, key)).toBe(freq("D" + FLAT, 4, key));
         });
     });
 
@@ -1887,6 +1971,71 @@ describe("GetNotesForInterval", () => {
             firstNote: "C",
             secondNote: "C",
             octave: 0
+        });
+    });
+
+    it("should handle negative octaves and compute correct octave difference", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1", "E1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "E",
+            octave: 2
+        });
+    });
+
+    it("should handle both notes in negative octaves", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-2", "G-1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "G",
+            octave: 1
+        });
+    });
+
+    it("should handle single note with negative octave without corrupting note name", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+    });
+
+    it("should handle notes with accidentals and negative octaves", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C#-1", "Eb2"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C#",
+            secondNote: "Eb",
+            octave: 3
+        });
+    });
+
+    it("should handle multi-digit and negative octaves across zero", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1", "C10"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 11
         });
     });
 });
@@ -3570,6 +3719,30 @@ describe("scaleDegreeToPitchMapping", () => {
         const result = scaleDegreeToPitchMapping("C major", null, false, "C#");
         expect(result).toEqual(["1", "8"]);
     });
+
+    it("maps altered pitches to correct accidentals in flat and sharp keys", () => {
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B")).toEqual(["4", "♯"]);
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B" + DOUBLEFLAT)).toEqual([
+            "4",
+            "♭"
+        ]);
+        expect(scaleDegreeToPitchMapping("C minor", null, false, "B")).toEqual(["7", "♯"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLESHARP)).toEqual([
+            "7",
+            "♯"
+        ]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F")).toEqual(["7", "♭"]);
+        expect(scaleDegreeToPitchMapping("F major", null, false, "B♭")).toEqual(["4", "♮"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F♯")).toEqual(["7", "♮"]);
+        expect(scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLEFLAT)).toEqual([
+            "1",
+            DOUBLEFLAT,
+            "8",
+            DOUBLEFLAT
+        ]);
+        expect(scaleDegreeToPitchMapping("F♭ major", null, false, "B♯")).toEqual(["4"]);
+        expect(scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLEFLAT)).toEqual(["7"]);
+    });
 });
 
 describe("getPitchInfo", () => {
@@ -3601,6 +3774,8 @@ describe("getPitchInfo", () => {
 
     it("returns correct pitch for 'alphabet'", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
+        // lowercase octave-free 'c' should default to octave 4, capitalize, and return "C" (#9430)
+        expect(getPitchInfo(activity, "alphabet", "c", tur)).toBe("C");
     });
 
     it("should correctly parse string inputs", () => {
@@ -3652,7 +3827,8 @@ describe("getPitchInfo", () => {
 
     it("returns correct alphabet class", () => {
         expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
-        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
+        // D♯ is not in C major and neither is E♭, so it keeps its own letter.
+        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("D");
     });
 
     it("returns correct solfege syllable (fixed do)", () => {
@@ -3728,7 +3904,8 @@ describe("getPitchInfo", () => {
     });
 
     it("handles solfege class with accidental", () => {
-        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("re");
+        // C♯ keeps its spelling (D♭ is not in C major either), so its class is do.
+        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("do");
     });
 
     it("returns pitch number", () => {
@@ -3736,11 +3913,22 @@ describe("getPitchInfo", () => {
         expect(typeof pNum).toBe("number");
     });
 
-    it("handles equivalent sharps mapping", () => {
-        // "Db" translates to "D♭". In C major, "D♭" is not in the scale.
-        // It should look it up in EQUIVALENTSHARPS and convert to "C♯".
-        const pitch = getPitchInfo(activity, "alphabet", "Db4", tur);
-        expect(pitch).toBe("C♯");
+    it("keeps an off-scale spelling whose enharmonic is off the scale too", () => {
+        // "Db" translates to "D♭". In C major neither D♭ nor C♯ is in the scale, so the
+        // note keeps the spelling it was given rather than being swapped for C♯.
+        expect(getPitchInfo(activity, "alphabet", "Db4", tur)).toBe("D♭");
+    });
+
+    it("respells an off-scale note only when its enharmonic is in the scale", () => {
+        tur.singer.keySignature = "F major";
+        // A♯ is B♭ in F major.
+        expect(getPitchInfo(activity, "alphabet", "A#4", tur)).toBe("B♭");
+        expect(getPitchInfo(activity, "scale degree", "A#4", tur)).toBe("4♮");
+        // E♭ and F♯ have no enharmonic in F major; they used to come back as D♯ and G♭.
+        expect(getPitchInfo(activity, "alphabet", "E♭4", tur)).toBe("E♭");
+        expect(getPitchInfo(activity, "scale degree", "E♭4", tur)).toBe("7♭");
+        expect(getPitchInfo(activity, "alphabet", "F♯4", tur)).toBe("F♯");
+        expect(getPitchInfo(activity, "scale degree", "F♯4", tur)).toBe("1♯");
     });
 
     it("handles invalid type", () => {
@@ -4494,9 +4682,28 @@ describe("actual drum lookup helpers", () => {
             expect(_parse_pitch_string("Ebbb2")).toEqual(["E" + FLAT + FLAT + FLAT, 2]);
         });
 
-        it("should fallback when regex fails to match (e.g., missing octave)", () => {
+        it("should fallback when regex fails to match", () => {
             expect(_parse_pitch_string("x")).toEqual(["x", 4]);
             expect(_parse_pitch_string("X#")).toEqual(["X" + SHARP, 4]);
+        });
+
+        it("should parse and normalize pitches when octave is omitted (#9430)", () => {
+            expect(_parse_pitch_string("C")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("c")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("C#")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("Bb")).toEqual(["B" + FLAT, 4]);
+            expect(_parse_pitch_string("Cx")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("F" + DOUBLESHARP)).toEqual(["F" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("Bbb")).toEqual(["B" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("C" + DOUBLEFLAT)).toEqual(["C" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("C#b")).toEqual(["C", 4]);
+        });
+
+        it("should handle pitch strings with leading and trailing whitespace", () => {
+            expect(_parse_pitch_string("  C4  ")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(_parse_pitch_string("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+            expect(_parse_pitch_string("  x  ")).toEqual(["x", 4]);
         });
     });
 });

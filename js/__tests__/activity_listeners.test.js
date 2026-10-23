@@ -383,6 +383,11 @@ describe("Activity Event Listener Management", () => {
         expect(activity._onResize).toHaveBeenCalledWith(false);
         expect(activity.setupPaletteMenu).toHaveBeenCalledTimes(1);
 
+        Object.defineProperty(document, "hidden", {
+            configurable: true,
+            value: false
+        });
+
         jest.useRealTimers();
     });
     test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {

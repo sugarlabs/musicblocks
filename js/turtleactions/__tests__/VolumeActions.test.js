@@ -179,7 +179,7 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.inCrescendo).toContain(true);
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_crescendo_0",
+                "_crescendo_0_1",
                 expect.any(Function)
             );
         });
@@ -191,7 +191,7 @@ describe("setupVolumeActions", () => {
 
             Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_crescendo_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_crescendo_0_1");
             expect(mockMouse.MB.listeners).toHaveLength(0);
 
             MusicBlocks.isRun = false;
@@ -202,7 +202,7 @@ describe("setupVolumeActions", () => {
             expect(Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_crescendo_0",
+                "_crescendo_0_undefined",
                 expect.any(Function)
             );
         });
@@ -243,14 +243,18 @@ describe("setupVolumeActions", () => {
             Singer.VolumeActions.doCrescendo("crescendo", 10, 0, blk);
 
             if (expected.dispatch) {
-                expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(blk, 0, "_crescendo_0");
+                expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
+                    blk,
+                    0,
+                    "_crescendo_0_" + blk
+                );
             } else {
                 expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             }
 
             if (expected.mouse) {
                 expect(Mouse.getMouseFromTurtle).toHaveBeenCalled();
-                expect(mockMouse.MB.listeners).toContain("_crescendo_0");
+                expect(mockMouse.MB.listeners).toContain("_crescendo_0_" + blk);
             } else {
                 expect(Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
             }
@@ -448,7 +452,7 @@ describe("setupVolumeActions", () => {
         it("should use dispatch block when block is provided", () => {
             activity.blocks.blockList[1] = {};
             Singer.VolumeActions.setRelativeVolume(20, 0, 1);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_articulation_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_articulation_0_1");
         });
 
         it("should add listener to mouse when MusicBlocks.isRun is true", () => {
@@ -457,7 +461,7 @@ describe("setupVolumeActions", () => {
 
             Singer.VolumeActions.setRelativeVolume(20, 0);
 
-            expect(mockMouse.MB.listeners).toContain("_articulation_0");
+            expect(mockMouse.MB.listeners).toContain("_articulation_0_undefined");
         });
 
         it("should execute listener correctly", () => {
@@ -501,7 +505,7 @@ describe("setupVolumeActions", () => {
             // but we still register the turtle listener
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_articulation_0",
+                "_articulation_0_undefined",
                 expect.any(Function)
             );
         });
@@ -513,7 +517,7 @@ describe("setupVolumeActions", () => {
             Singer.VolumeActions.setRelativeVolume(20, 0, "missingBlock");
 
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mockMouse.MB.listeners).toContain("_articulation_0");
+            expect(mockMouse.MB.listeners).toContain("_articulation_0_missingBlock");
         });
 
         it("does not dispatch through blockList key coercion when blk is undefined", () => {
@@ -622,6 +626,37 @@ describe("setupVolumeActions", () => {
 
             expect(connectSpy).not.toHaveBeenCalled();
             expect(connectSpyPiano).not.toHaveBeenCalled();
+        });
+
+        it("should fallback to center (0) when panning value is NaN or non-numeric", () => {
+            targetTurtle.singer.panner = new Tone.Panner(0.5);
+
+            Singer.VolumeActions.setPanning(NaN, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(0);
+
+            Singer.VolumeActions.setPanning(undefined, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(0);
+
+            Singer.VolumeActions.setPanning("invalid", 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(0);
+        });
+
+        it("should create centered panner when value is NaN and no panner exists", () => {
+            targetTurtle.singer.panner = null;
+            Tone.Panner.mockClear();
+
+            Singer.VolumeActions.setPanning(NaN, 0);
+            expect(Tone.Panner).toHaveBeenCalledWith(0);
+        });
+
+        it("should clamp infinite panning values to [-1, 1]", () => {
+            targetTurtle.singer.panner = new Tone.Panner(0);
+
+            Singer.VolumeActions.setPanning(Infinity, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(1);
+
+            Singer.VolumeActions.setPanning(-Infinity, 0);
+            expect(targetTurtle.singer.panner.pan.value).toBe(-1);
         });
     });
 
@@ -844,6 +879,14 @@ describe("setupVolumeActions", () => {
                 null,
                 false
             );
+        });
+
+        it("should trigger tone with resolved synth when firstConnection and lastConnection are null", () => {
+            Singer.VolumeActions.setSynthVolume("Piano", 70, 0, null);
+
+            jest.advanceTimersByTime(250);
+
+            expect(triggerSpy).toHaveBeenCalledWith(0, "G4", 1 / 4, "piano", null, null, false);
         });
 
         it("should not trigger tone when connections exist", () => {

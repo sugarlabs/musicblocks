@@ -192,12 +192,20 @@ function setupPitchActions(activity) {
             modeLength = getModeLength(tur.singer.keySignature);
             let scaleDegree;
 
-            // Reference position of the key note within the octave, in EDO steps (0-based).
-            // Uses pitchToNumber for EDO-aware lookup instead of hardcoded 12-EDO NOTESTEP.
+            // Position of a note within the octave, in EDO steps counted from C (0-based),
+            // since octave numbers change at C. pitchToNumber counts from A, so measure the
+            // distance from C in the same octave rather than taking it modulo the EDO.
             const temperament = activity.logo.synth.inTemperament;
-            const ref =
-                pitchToNumber(obj[0], 4, tur.singer.keySignature, temperament) %
-                getCurrentEDO(temperament);
+            const edo = getCurrentEDO(temperament);
+            const cNumber = pitchToNumber("C", 4, tur.singer.keySignature, temperament);
+            const positionInOctave = pitch => {
+                const steps =
+                    pitchToNumber(pitch, 4, tur.singer.keySignature, temperament) - cNumber;
+                return ((steps % edo) + edo) % edo;
+            };
+
+            // Reference position of the key note within the octave.
+            const ref = positionInOctave(obj[0]);
 
             /*
             Number of semitones is used to calculate changes in deltaSemi defined above.
@@ -241,10 +249,7 @@ function setupPitchActions(activity) {
                 getCurrentEDO(temperament)
             );
             let semitones = ref;
-            // EDO-aware position lookup instead of hardcoded 12-EDO NOTESFLAT/NOTESSHARP.
-            const notePos =
-                pitchToNumber(note, 4, tur.singer.keySignature, temperament) %
-                getCurrentEDO(temperament);
+            const notePos = positionInOctave(note);
             semitones += notePos - ref;
             /** calculates changes in reference octave which occur a semitone before the reference key */
             const deltaOctave = Math.floor(number / modeLength);
@@ -695,21 +700,21 @@ function setupPitchActions(activity) {
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {
-                let obj = noteToObj(tur.singer.previousNotePlayed[0]);
+                const prevObj = noteToObj(tur.singer.previousNotePlayed[0]);
                 const previousValue = pitchToNumber(
-                    obj[0],
-                    obj[1],
+                    prevObj[0],
+                    prevObj[1],
                     tur.singer.keySignature,
                     activity.logo.synth.inTemperament
                 );
 
-                obj = noteToObj(tur.singer.lastNotePlayed[0]);
-                let [pitch, octave] = obj;
+                let [pitch, octave] = prevObj;
 
+                const lastObj = noteToObj(tur.singer.lastNotePlayed[0]);
                 let delta =
                     pitchToNumber(
-                        obj[0],
-                        obj[1],
+                        lastObj[0],
+                        lastObj[1],
                         tur.singer.keySignature,
                         activity.logo.synth.inTemperament
                     ) - previousValue;
@@ -739,7 +744,7 @@ function setupPitchActions(activity) {
                                   );
                         delta -= nhalf;
                         scalarDelta += type === "up" ? 1 : -1;
-                        obj = getNote(
+                        const nextObj = getNote(
                             pitch,
                             octave,
                             nhalf,
@@ -749,7 +754,7 @@ function setupPitchActions(activity) {
                             activity.errorMsg,
                             activity.logo.synth.inTemperament
                         );
-                        [pitch, octave] = obj;
+                        [pitch, octave] = nextObj;
 
                         if (i > 100) return;
                     };

@@ -66,7 +66,11 @@ function setupRhythmActions(activity) {
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
-                const { beat: beatValue, measure: measureValue } = getMeasurePosition(
+                const {
+                    beat: beatValue,
+                    measure: measureValue,
+                    beats: beatsPlayed
+                } = getMeasurePosition(
                     tur.singer,
                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
                 );
@@ -98,13 +102,16 @@ function setupRhythmActions(activity) {
                     activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
 
-                const thisBeat =
-                    beatValue + tur.singer.beatsPerMeasure * (tur.singer.currentMeasure - 1);
-                for (let f = 0; f < tur.singer.factorList.length; f++) {
-                    if (thisBeat % tur.singer.factorList[f] === 0) {
-                        const eventName =
-                            "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
-                        activity.stage.dispatchEvent(eventName);
+                // Count the beats actually played since the pickup, so "every N beats" keeps
+                // its rhythm across a meter change. Pickup notes are not counted.
+                if (measureValue !== 0) {
+                    const thisBeat = 1 + beatsPlayed;
+                    for (let f = 0; f < tur.singer.factorList.length; f++) {
+                        if (thisBeat % tur.singer.factorList[f] === 0) {
+                            const eventName =
+                                "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
+                            activity.stage.dispatchEvent(eventName);
+                        }
                     }
                 }
             }
@@ -122,7 +129,7 @@ function setupRhythmActions(activity) {
             tur.singer.noteValue[last(tur.singer.inNoteBlock)] =
                 1 / (noteBeatValue * tur.singer.beatFactor);
 
-            const listenerName = "_playnote_" + turtle;
+            const listenerName = "_playnote_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -239,7 +246,7 @@ function setupRhythmActions(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle;
+            const listenerName = "_dot_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {

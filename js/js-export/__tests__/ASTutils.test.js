@@ -773,6 +773,18 @@ describe("ASTUtils", () => {
             ]);
         });
 
+        it("should return the AST for an if block with iteratorNum", () => {
+            const flows = [["if", ["testArg"], [["action1", ["arg1"]]]]];
+            const iteratorNum = 2;
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+
+            const result = ASTUtils._getBlockAST(flows, iteratorNum);
+            expect(result).toEqual([
+                ASTUtils._getIfAST(["testArg"], [["action1", ["arg1"]]], undefined, iteratorNum)
+            ]);
+        });
+
         it("should return the AST for an if-else block", () => {
             const flows = [["ifthenelse", ["testArg"], ["ifFlow"], ["elseFlow"]]];
             const iteratorNum = 0;
@@ -1156,6 +1168,39 @@ describe("ASTUtils", () => {
             const mouseAst2 = ASTUtils.getMouseAST([]);
             expect(mouseAst1).not.toBe(mouseAst2);
             expect(mouseAst1).not.toBe(ASTUtils._mouseAST);
+        });
+
+        it("should export a repeat containing an if with a nested repeat", async () => {
+            const tree = [
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["if", [["less", [1, 2]]], [["repeat", [3], [["print", ["hello"]]]]]],
+                        ["if", [["less", [2, 1]]], [["print", ["never"]]]]
+                    ]
+                ]
+            ];
+
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+            JSInterface.isGetter.mockReturnValue(false);
+            JSInterface.methodReturns.mockReturnValue(false);
+            JSInterface.getMethodName.mockImplementation(methodName => methodName);
+            JSInterface.rearrangeMethodArgs.mockImplementation((methodName, args) => args);
+
+            const code = astring.generate(ASTUtils.getMouseAST(tree));
+            expect(code).toContain("let i0 = 0");
+            expect(code).toContain("let i1 = 0");
+
+            const printed = [];
+            let flow;
+            new Function("Mouse", code)(function Mouse(mouseFlow) {
+                flow = mouseFlow;
+            });
+            await flow({ print: value => printed.push(value) });
+            expect(printed).toEqual(["hello", "hello", "hello", "hello", "hello", "hello"]);
         });
     });
 });

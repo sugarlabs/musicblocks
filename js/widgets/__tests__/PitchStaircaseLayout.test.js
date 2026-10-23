@@ -35,7 +35,17 @@ global.platformColor = { selectorBackgroundHOVER: "#e0e0e0" };
 global.DEFAULTVOICE = "electronic synth";
 
 const PitchStaircaseLayout = global.PitchStaircaseLayout;
-const METHODS = ["_addButton", "_setButtonIcon", "_makeStairs", "_refresh"];
+const METHODS = [
+    "_addButton",
+    "_setButtonIcon",
+    "_makeStairs",
+    "_refresh",
+    "_findFraction",
+    "_gcd",
+    "_lcm",
+    "_calculateCycles",
+    "_generateWaveSVG"
+];
 
 describe("PitchStaircaseLayout", () => {
     let psc;
@@ -109,11 +119,140 @@ describe("PitchStaircaseLayout", () => {
         expect(playCellOf(1).getAttribute("id")).toBe("1");
     });
 
-    test("_makeStairs draws higher stairs narrower", () => {
+    test("_makeStairs draws all stairs with equal total width", () => {
         psc._makeStairs();
 
         const width = i => parseFloat(stepCellOf(i).style.width);
-        expect(width(0)).toBeLessThan(width(1));
+        expect(width(0)).toBe(width(1));
+        expect(width(0)).toBe(PitchStaircase.INNERWINDOWWIDTH);
+    });
+
+    test("_calculateCycles correctly determines integer cycle ratios", () => {
+        // 3:2 ratio: 330 Hz and 220 Hz
+        psc.Stairs = [
+            ["E", 4, 330],
+            ["A", 3, 220]
+        ];
+        expect(psc._calculateCycles(220)).toBe(2);
+        expect(psc._calculateCycles(330)).toBe(3);
+
+        // Single stair defaults to 2 cycles
+        psc.Stairs = [["A", 3, 220]];
+        expect(psc._calculateCycles(220)).toBe(2);
+
+        // 4:3 ratio: 320 Hz and 240 Hz
+        psc.Stairs = [
+            ["F", 4, 320],
+            ["C", 4, 240]
+        ];
+        expect(psc._calculateCycles(240)).toBe(3);
+        expect(psc._calculateCycles(320)).toBe(4);
+
+        // Octave ratio: 440 Hz and 220 Hz (2:1 ratio)
+        psc.Stairs = [
+            ["A", 4, 440],
+            ["A", 3, 220]
+        ];
+        expect(psc._calculateCycles(220)).toBe(2);
+        expect(psc._calculateCycles(440)).toBe(4);
+
+        // Multi-frequency stairs (3 frequencies): 180, 240, 300 Hz derive shared baseline (3, 4, 5 cycles)
+        psc.Stairs = [
+            ["F", 3, 180],
+            ["B", 3, 240],
+            ["D", 4, 300]
+        ];
+        expect(psc._calculateCycles(180)).toBe(3);
+        expect(psc._calculateCycles(240)).toBe(4);
+        expect(psc._calculateCycles(300)).toBe(5);
+
+        // Multi-frequency stairs (4 frequencies): 200, 300, 400, 500 Hz (2, 3, 4, 5 cycles)
+        psc.Stairs = [
+            ["G", 3, 200],
+            ["D", 4, 300],
+            ["G", 4, 400],
+            ["B", 4, 500]
+        ];
+        expect(psc._calculateCycles(200)).toBe(2);
+        expect(psc._calculateCycles(300)).toBe(3);
+        expect(psc._calculateCycles(400)).toBe(4);
+        expect(psc._calculateCycles(500)).toBe(5);
+
+        // Wide frequency ratio fitting within 16 cycles: 220 and 3520 Hz (16:1 ratio preserved)
+        psc.Stairs = [
+            ["A", 3, 220],
+            ["A", 7, 3520]
+        ];
+        expect(psc._calculateCycles(220)).toBe(1);
+        expect(psc._calculateCycles(3520)).toBe(16);
+        expect(psc._ratioExceedsLimit).toBe(false);
+
+        // Extreme ratio exceeding 16: scales uniformly and sets flag
+        psc.Stairs = [
+            ["G", 2, 100],
+            ["B", 6, 2000]
+        ];
+        expect(psc._calculateCycles(2000)).toBe(16);
+        expect(psc._calculateCycles(100)).toBeCloseTo(0.8, 1);
+        expect(psc._ratioExceedsLimit).toBe(true);
+
+        // UI tooltip indicator when ratio exceeds 16
+        psc._makeStairs();
+        const wideStepCell = stepCellOf(0);
+        expect(wideStepCell.title).toContain("Frequency ratio exceeds displayable range");
+
+        // Invalid inputs handling in _calculateCycles
+        expect(psc._calculateCycles(NaN)).toBeGreaterThan(0);
+        expect(psc._calculateCycles(-440)).toBeGreaterThan(0);
+        expect(psc._calculateCycles("invalid")).toBeGreaterThan(0);
+
+        psc.Stairs = null;
+        expect(psc._calculateCycles(220)).toBe(2);
+
+        psc.Stairs = [];
+        expect(psc._calculateCycles(220)).toBe(2);
+
+        psc.Stairs = [
+            ["A", 4, NaN],
+            ["B", 4, -200],
+            ["C", 4, "text"]
+        ];
+        expect(psc._calculateCycles(220)).toBe(2);
+    });
+
+    test("_generateWaveSVG creates svg with wave path and dashed partition lines", () => {
+        const svg = psc._generateWaveSVG(600, 53, 3);
+        expect(svg).toContain('<svg xmlns="http://www.w3.org/2000/svg"');
+        expect(svg).toContain('width="600"');
+        expect(svg).toContain('height="53"');
+        expect(svg).toContain('<path d="M ');
+        expect(svg).toContain('stroke-dasharray="6,4"');
+        expect(svg).toContain('stroke="#e74c3c"');
+        expect(svg).toContain('stroke="#90c100"');
+    });
+
+    test("_findFraction, _gcd, and _lcm calculate mathematical helpers correctly", () => {
+        expect(psc._gcd(12, 18)).toBe(6);
+        expect(psc._gcd(0, 0)).toBe(1);
+        expect(psc._gcd(NaN, 10)).toBe(10);
+        expect(psc._gcd(-6, 9)).toBe(3);
+
+        expect(psc._lcm(4, 6)).toBe(12);
+        expect(psc._lcm(0, 5)).toBe(0);
+        expect(psc._lcm(NaN, 5)).toBe(0);
+
+        const frac32 = psc._findFraction(1.5);
+        expect(frac32).toEqual({ num: 3, den: 2 });
+
+        const frac43 = psc._findFraction(4 / 3);
+        expect(frac43).toEqual({ num: 4, den: 3 });
+
+        expect(psc._findFraction(-1)).toBeNull();
+        expect(psc._findFraction(0)).toBeNull();
+        expect(psc._findFraction(NaN)).toBeNull();
+        expect(psc._findFraction(Infinity)).toBeNull();
+        expect(psc._findFraction("text")).toBeNull();
+        expect(psc._findFraction(null)).toBeNull();
     });
 
     test("_makeStairs replaces the old rows when rebuilt", () => {

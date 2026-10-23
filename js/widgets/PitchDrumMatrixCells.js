@@ -48,11 +48,8 @@ class PitchDrumMatrixCells {
      */
     makeClickable() {
         const pdmTable = this._pdmTable;
-        const drumTable = this._pdmDrumTable;
         let table;
         let cellRow;
-        let drumRow;
-        let drumCell;
         let cell;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
             table = this._pdmCellTables[i];
@@ -60,10 +57,6 @@ class PitchDrumMatrixCells {
 
             for (let j = 0; j < cellRow.cells.length; j++) {
                 cell = cellRow.cells[j];
-
-                drumRow = drumTable.rows[0];
-
-                drumCell = drumRow.cells[j];
 
                 cell.onclick = e => {
                     const currCell = e.target;

@@ -37,6 +37,7 @@ const ASTUtils = {
     getMethodAST: jest.fn(),
     getMouseAST: jest.fn(),
     setActionNames: jest.fn(),
+    setStoppingActions: jest.fn(),
     getBoxNames: jest.fn(() => [])
 };
 const astring = {

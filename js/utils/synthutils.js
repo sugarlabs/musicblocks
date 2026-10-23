@@ -15,7 +15,7 @@
 
    last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-   getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
+   getOctaveRatio, getEffectiveOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, stripMicrotonalPrefix,
    DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
@@ -157,13 +157,27 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
     //.TRANS: musical instrument
+    [_("snare hard"), "snare hard", "images/snaredrum.svg", "sn", "drum"],
+    //.TRANS: musical instrument
+    [_("snare soft"), "snare soft", "images/snaredrum.svg", "sn", "drum"],
+    //.TRANS: musical instrument
+    [_("snare roll"), "snare roll", "images/snaredrum.svg", "sn", "drum"],
+    //.TRANS: musical instrument
     [_("kick drum"), "kick drum", "images/kick.svg", "bd", "drum"],
+    //.TRANS: musical instrument
+    [_("heavy kick"), "heavy kick", "images/kick.svg", "bd", "drum"],
+    //.TRANS: musical instrument
+    [_("bass drum"), "bass drum", "images/kick.svg", "bd", "drum"],
     //.TRANS: musical instrument
     [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
-    [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
+    [_("tom hi"), "tom hi", "images/tom.svg", "tomh", "drum"],
     //.TRANS: musical instrument
-    [_("bass drum"), "bass drum", "images/kick.svg", "bd", "drum"],
+    [_("tom mid"), "tom mid", "images/tom.svg", "tomml", "drum"],
+    //.TRANS: musical instrument
+    [_("tom lo"), "tom lo", "images/floortom.svg", "tomfl", "drum"],
+    //.TRANS: musical instrument
+    [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
     //.TRANS: a drum made from an inverted cup
     [_("cup drum"), "cup drum", "images/cup.svg", "hh", "drum"],
     //.TRANS: musical instrument
@@ -172,14 +186,22 @@ const DRUMNAMES = [
     [_("taiko"), "japanese drum", "images/tom.svg", "hh", "drum"],
     //.TRANS: musical instrument
     [_("hi hat"), "hi hat", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("cymbal closed"), "cymbal closed", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("cymbal open"), "cymbal open", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("cymbal pedal"), "cymbal pedal", "images/hihat.svg", "hh", "bell"],
+    //.TRANS: musical instrument
+    [_("finger cymbals"), "finger cymbals", "images/fingercymbals.svg", "cymca", "bell"],
     //.TRANS: a small metal bell
     [_("ride bell"), "ride bell", "images/ridebell.svg", "rb", "bell"],
     //.TRANS: musical instrument
     [_("cow bell"), "cow bell", "images/cowbell.svg", "cb", "bell"],
     //.TRANS: musical instrument
-    [_("triangle bell"), "triangle bell", "images/trianglebell.svg", "tri", "bell"],
+    [_("sonic cowbell"), "sonic cowbell", "images/cowbell.svg", "cb", "bell"],
     //.TRANS: musical instrument
-    [_("finger cymbals"), "finger cymbals", "images/fingercymbals.svg", "cymca", "bell"],
+    [_("triangle bell"), "triangle bell", "images/trianglebell.svg", "tri", "bell"],
     //.TRANS: musical instrument
     // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
@@ -273,19 +295,30 @@ const SAMPLE_INFO = {
         "cat": { path: "samples/cat", global: "CAT_SAMPLE" },
         "crash": { path: "samples/crash", global: "CRASH_SAMPLE" },
         "duck": { path: "samples/duck", global: "DUCK_SAMPLE" },
+        "snare drum": { path: "samples/snare", global: "SNARE_SAMPLE" },
+        "snare hard": { path: "samples/snare_hard", global: "SNARE_HARD_SAMPLE" },
+        "snare soft": { path: "samples/snare_soft", global: "SNARE_SOFT_SAMPLE" },
+        "snare roll": { path: "samples/snare_roll", global: "SNARE_ROLL_SAMPLE" },
+        "heavy kick": { path: "samples/heavy_kick", global: "HEAVY_KICK_SAMPLE" },
+        "bass drum": { path: "samples/bassdrum", global: "BASSDRUM_SAMPLE" },
+        "tom hi": { path: "samples/tom_hi", global: "TOM_HI_SAMPLE" },
+        "tom mid": { path: "samples/tom_mid", global: "TOM_MID_SAMPLE" },
+        "tom lo": { path: "samples/tom_lo", global: "TOM_LO_SAMPLE" },
+        "floor tom": { path: "samples/floortom", global: "FLOORTOM_SAMPLE" },
+        "cup drum": { path: "samples/cup", global: "CUP_SAMPLE" },
+        "japanese drum": { path: "samples/japanese_drum", global: "JAPANESE_DRUM_SAMPLE" },
+        "finger cymbals": { path: "samples/fingercymbal", global: "FINGERCYMBAL_SAMPLE" },
+        "cymbal closed": { path: "samples/cymbal_closed", global: "CYMBAL_CLOSED_SAMPLE" },
+        "cymbal open": { path: "samples/cymbal_open", global: "CYMBAL_OPEN_SAMPLE" },
+        "cymbal pedal": { path: "samples/cymbal_pedal", global: "CYMBAL_PEDAL_SAMPLE" },
         "ride bell": { path: "samples/ridebell", global: "RIDEBELL_SAMPLE" },
+        "sonic cowbell": { path: "samples/sonic_cowbell", global: "SONIC_COWBELL_SAMPLE" },
         "triangle bell": { path: "samples/triangle", global: "TRIANGLE_SAMPLE" },
         "chime": { path: "samples/chime", global: "CHIME_SAMPLE" },
         "gong": { path: "samples/gong", global: "GONG_SAMPLE" },
-        "cricket": { path: "samples/cricket", global: "CRICKET_SAMPLE" },
-        "finger cymbals": { path: "samples/fingercymbal", global: "FINGERCYMBAL_SAMPLE" },
-        "slap": { path: "samples/slap", global: "SLAP_SAMPLE" },
-        "japanese drum": { path: "samples/japanese_drum", global: "JAPANESE_DRUM_SAMPLE" },
         "clang": { path: "samples/clang", global: "CLANG_SAMPLE" },
-        "cup drum": { path: "samples/cup", global: "CUP_SAMPLE" },
-        "floor tom": { path: "samples/floortom", global: "FLOORTOM_SAMPLE" },
-        "bass drum": { path: "samples/bassdrum", global: "BASSDRUM_SAMPLE" },
-        "snare drum": { path: "samples/snare", global: "SNARE_SAMPLE" }
+        "slap": { path: "samples/slap", global: "SLAP_SAMPLE" },
+        "cricket": { path: "samples/cricket", global: "CRICKET_SAMPLE" }
     }
 };
 
@@ -334,7 +367,18 @@ const DEFAULTSYNTHVOLUME = {
     "japanese drum": 90,
     "sitar": 100,
     "harmonium": 100,
-    "mandolin": 100
+    "mandolin": 100,
+    "heavy kick": 100,
+    "snare hard": 100,
+    "snare soft": 100,
+    "snare roll": 100,
+    "tom hi": 100,
+    "tom mid": 100,
+    "tom lo": 100,
+    "cymbal closed": 100,
+    "cymbal open": 90,
+    "cymbal pedal": 90,
+    "sonic cowbell": 100
 };
 
 /**
@@ -822,6 +866,13 @@ function Synth() {
             // For JI/Pythagorean: compute from A0 reference, not 12-EDO Tone.Frequency
             const startParsed = parseNoteString(startingPitch);
             frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
+        } else if (
+            (t && Number.isFinite(Number(t.octaveRatio)) && Number(t.octaveRatio) !== 2) ||
+            (typeof getOctaveRatio === "function" && getOctaveRatio() !== 2)
+        ) {
+            // Non-octave or stretched period: compute via pitchToFrequency to honor powerBase
+            const startParsed = parseNoteString(startingPitch);
+            frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
         } else {
             frequency = Tone.Frequency(startPitch).toFrequency();
         }
@@ -988,7 +1039,11 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
+                        const ratio =
+                            typeof getEffectiveOctaveRatio === "function"
+                                ? getEffectiveOctaveRatio(this.inTemperament)
+                                : getOctaveRatio();
+                        return this.noteFrequencies[note][1] * Math.pow(ratio, power);
                     }
                 }
             }
@@ -1046,10 +1101,14 @@ function Synth() {
                             target === _stripCents(n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
+                            const ratio =
+                                typeof getEffectiveOctaveRatio === "function"
+                                    ? getEffectiveOctaveRatio(thisTemperament || customID)
+                                    : getOctaveRatio();
                             return Number(
                                 thisTemperament[pitchNumber][0] *
                                     startPitchFrequency *
-                                    Math.pow(getOctaveRatio(), octaveDiff)
+                                    Math.pow(ratio, octaveDiff)
                             );
                         }
                     }
@@ -2979,6 +3038,7 @@ if (typeof module !== "undefined" && module.exports) {
         instrumentsFilters,
         instruments,
         instrumentsSource,
-        DEFAULTSYNTHVOLUME
+        DEFAULTSYNTHVOLUME,
+        SAMPLE_INFO
     };
 }

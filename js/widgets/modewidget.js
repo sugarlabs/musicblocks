@@ -74,7 +74,10 @@ class ModeWidget {
 
         this._modeBlock = this.logo.modeBlock;
         this._locked = false;
-        this._pitch = this.turtles.ithTurtle(0).singer.keySignature[0];
+        const keySignature = this.turtles.ithTurtle(0).singer.keySignature;
+        this._pitch = Array.isArray(keySignature)
+            ? keySignature[0]
+            : String(keySignature).split(" ")[0];
         this._noteValue = 0.333;
         this._undoStack = [];
         this._playing = false;
@@ -1313,6 +1316,12 @@ class ModeWidget {
 
     _clear() {
         this._saveState();
+        if (this._playing) {
+            this.logo.synth.stop();
+        }
+        this._cancelAnimations();
+        this._setPlayButtonIcon("play-button.svg", _("Play all"));
+        this._selectedNotes[0] = true;
         for (let i = 1; i < this._activeEDO; i++) {
             this._selectedNotes[i] = false;
         }

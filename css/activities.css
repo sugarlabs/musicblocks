@@ -1948,7 +1948,7 @@ table {
     position: absolute;
     top: 0px;
     left: 0px;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85)) !important;
 }
 
 #mkbKeyboardDiv {
@@ -1956,7 +1956,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85)) !important;
     width: 1020px;
 }
 
@@ -1965,7 +1965,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85)) !important;
     width: 1020px;
 }
 
@@ -1974,7 +1974,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85));
 }
 
 #mkbOuterDiv {
@@ -1986,7 +1986,7 @@ table {
     left: 0px;
     top: 140px;
     right: 5em;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85));
 }
 
 #mkbInnerDiv {

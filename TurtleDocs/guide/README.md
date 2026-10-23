@@ -20,7 +20,7 @@ Firefox. You can run it from a [server maintained by Sugar
 Labs](http://turtle.sugarlabs.org), from the [github
 repo](http://sugarlabs.github.io/turtleblocksjs), or by setting up a
 [local
-server](./server.md).
+server](../server.md).
 
 You can also open it directly from `file://` with some browsers, e.g.,
 FireFox.
@@ -39,7 +39,7 @@ program, one block per click.
 
 For more details on how to use Turtle Blocks JS, see [Using Turtle
 Blocks
-JS](./documentation)
+JS](../documentation)
 for more details.
 
 ABOUT THIS GUIDE

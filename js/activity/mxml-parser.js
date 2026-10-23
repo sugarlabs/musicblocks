@@ -62,6 +62,19 @@ const _contentsEqual = (a, b) => {
     return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
 };
 
+// A note's <time-modification> as [actual-notes, normal-notes], the ratio a
+// tuplet is played at, or 1:1 for a note that is not in one. Anything missing or
+// not a positive number is read as 1:1, so a malformed tuplet keeps its written
+// length rather than becoming zero or NaN.
+const _timeModification = noteEl => {
+    const el = noteEl.querySelector(":scope > time-modification");
+    if (el === null) return [1, 1];
+    const actual = Number(_text(el, "actual-notes"));
+    const normal = Number(_text(el, "normal-notes"));
+    if (!(actual > 0) || !(normal > 0)) return [1, 1];
+    return [actual, normal];
+};
+
 /**
  * A note's length as a Music Blocks [numerator, denominator] fraction.
  *
@@ -81,13 +94,29 @@ const _contentsEqual = (a, b) => {
  */
 function _noteDuration(noteEl, divisions) {
     const typeName = _text(noteEl, "type");
-    if (typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
+    const durationText = _text(noteEl, "duration");
+    // A whole-measure rest lasts the measure whatever <type> it is drawn
+    // with: PhotoScore writes a 3/4 bar's rest as <type>whole</type> over a
+    // three-beat <duration> (musescore.org/en/node/51611, the same bug in
+    // MuseScore's importer), and reading the type made every bar after it a
+    // beat late. Its <duration> is the length that counts.
+    // An empty or non-numeric <duration> says nothing, so it doesn't outrank
+    // <type> (Number("") is 0, not "missing").
+    const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
+    const isMeasureRest =
+        noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes" &&
+        Number.isFinite(measureRestLength) &&
+        measureRestLength > 0 &&
+        divisions > 0;
+    if (!isMeasureRest && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
-        return [2 ** (dots + 1) - 1, denominator * 2 ** dots];
+        // <type> is the note as written, so a tuplet note has to be shortened by
+        // its ratio. <duration> below needs no such adjustment, having it already.
+        const [actual, normal] = _timeModification(noteEl);
+        return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
     }
 
-    const durationText = _text(noteEl, "duration");
     if (durationText !== null && divisions > 0) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
         return [Number(durationText), divisions * 4];
@@ -322,9 +351,19 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
 function _initialTimeSignature(partEl) {
     const timeEl = partEl.querySelector("measure attributes time");
     if (!timeEl) return { beats: 4, beatType: 4 };
+    // <beats> can be additive: the MusicXML spec writes a 3+2/8 bar as one
+    // <beats>3+2</beats>/<beat-type>8</beat-type> pair, and it holds the sum.
+    // Number("3+2") is NaN, and the meter block was handed that as its beat
+    // count.
+    // An empty part ("3+", "3++2", or an empty <beats>) is malformed, not
+    // zero, so it falls back to 4 with the rest.
+    const beats = (_text(timeEl, "beats") ?? "4")
+        .split("+")
+        .reduce((total, part) => total + (part.trim() === "" ? NaN : Number(part)), 0);
+    const beatType = Number(_text(timeEl, "beat-type") ?? "4");
     return {
-        beats: Number(_text(timeEl, "beats") ?? "4"),
-        beatType: Number(_text(timeEl, "beat-type") ?? "4")
+        beats: Number.isFinite(beats) && beats > 0 ? beats : 4,
+        beatType: Number.isFinite(beatType) && beatType > 0 ? beatType : 4
     };
 }
 

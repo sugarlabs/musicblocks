@@ -8,7 +8,7 @@ maintained by Sugar Labs](http://turtle.sugarlabs.org), from the
 [github
 repo](https://rawgit.com/sugarlabs/musicblocks/master/index.html),
 or by setting up a [local
-server](./server.md).
+server](../server.md).
 
 Once you've launched it in your browser, start by clicking on (or
 dragging) blocks from the Turtle palette. Use multiple blocks to
