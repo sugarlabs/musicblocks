@@ -476,13 +476,14 @@ const PracticeValidator = {
             if (!block || block.trash || block.name !== "start") return;
 
             const name = this.getLastMouseName(block.connections?.[1], blockList);
-            if (name !== null) names.add(name);
+            if (name) names.add(name);
         });
 
         return names;
     },
 
-    // Walks a stack in the order it runs, keeping the most recent name it sets.
+    // Walks a stack in the order it runs, keeping the most recent name it sets, even an
+    // empty one. Returns null when the stack never sets a name.
     getLastMouseName(blockId, blockList, seen = new Set()) {
         if (blockId === null || blockId === undefined || seen.has(blockId)) return null;
 
@@ -494,7 +495,7 @@ const PracticeValidator = {
         if (MOUSE_NAME_CONNECTION.has(block.name)) {
             const slot = MOUSE_NAME_CONNECTION.get(block.name);
             const value = blockList[block.connections?.[slot]]?.value;
-            if (value !== undefined && value !== null && value !== "") name = String(value);
+            if (value !== undefined && value !== null) name = String(value);
         }
 
         for (const connectionId of (block.connections || []).slice(1)) {

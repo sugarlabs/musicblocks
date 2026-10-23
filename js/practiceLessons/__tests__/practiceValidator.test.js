@@ -1137,6 +1137,12 @@ describe("PracticeValidator piano discoveries", () => {
         expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
     });
 
+    test("a key renamed to an empty name no longer counts under its old name", () => {
+        useBlocks(renameKey(piano(["sol", "mi"]), "k1", ""));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
     test("a copied key counts once it is renamed", () => {
         useBlocks(renameKey(piano(["sol", "sol"]), "k1", "mi"));
 
