@@ -69,7 +69,8 @@ if (typeof module !== "undefined" && module.exports) {
         getCurrentEDO,
         generateNoteNames,
         getEdoNoteNamePosition,
-        getTemperament
+        getTemperament,
+        getEffectiveOctaveRatio
     } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
@@ -1129,6 +1130,13 @@ var getInterval = (interval, keySignature, pitch, edo) => {
 var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
     const t = getTemperament(temperament);
+    const powerBase =
+        typeof getEffectiveOctaveRatio === "function"
+            ? getEffectiveOctaveRatio(t || temperament)
+            : t && Number.isFinite(Number(t.octaveRatio))
+              ? Number(t.octaveRatio)
+              : 2;
+
     if (t && !t.isEDO && t.noteLabels && t.ratios) {
         let noteIdx = t.noteLabels.indexOf(pitch);
         if (noteIdx === -1) {
@@ -1155,9 +1163,9 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
         if (noteIdx !== -1) {
             const aIdx = t.noteLabels.indexOf("A");
             const baseRefFreq = A0 / t.ratios[aIdx];
-            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(2, octave);
+            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(powerBase, octave);
             if (cents !== 0) {
-                freq *= Math.pow(2, cents / 1200);
+                freq *= Math.pow(powerBase, cents / 1200);
             }
             return freq;
         }
@@ -1165,16 +1173,17 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
-    // NOTE: stretched-octave powerBase (widget) vs engine getOctaveRatio() diverge here — this function hard-codes base 2; widget ratioToCents generalizes to powerBase. Full unification deferred.
-    // Frequency = A0 * 2^(pitchNumber / currentEDO)
-    // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
-    // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
-    // Example: 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
-    // Example: 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
+    // Unified stretched-octave powerBase and engine getOctaveRatio: generalizes base 2 to dynamic powerBase.
+    // Frequency = A0 * powerBase^(pitchNumber / currentEDO)
+    // With cents offset: Frequency = A0 * powerBase^((pitchNumber * 100 + cents) / (currentEDO * 100))
+    // This works because 1 semitone = 100 cents, and powerBase^(1/1200) is the cents resolution.
+    // Example (base 2): 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
+    // Example (base 2): 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
+    // Example (stretched): powerBase=2.01, scales exactly with the stretched interval space.
     if (cents === 0) {
-        return A0 * Math.pow(2, 1 / currentEDO) ** pitchNumber;
+        return A0 * Math.pow(powerBase, 1 / currentEDO) ** pitchNumber;
     } else {
-        return A0 * Math.pow(2, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
+        return A0 * Math.pow(powerBase, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
     }
 };
 

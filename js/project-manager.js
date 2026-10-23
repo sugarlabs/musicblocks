@@ -717,6 +717,7 @@ class ProjectManager {
             blockMap.push(blk);
         }
 
+        const restored = activity.logo.getRestoredConnections();
         const data = [];
         for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
             const myBlock = activity.blocks.blockList[blk];
@@ -727,7 +728,14 @@ class ProjectManager {
             let args = null;
             let exportName = myBlock.name;
 
-            if (
+            if (myBlock.unknownBlock !== undefined) {
+                if (Array.isArray(myBlock.unknownBlock)) {
+                    exportName = myBlock.unknownBlock[0];
+                    args = myBlock.unknownBlock[1] ?? null;
+                } else {
+                    exportName = myBlock.unknownBlock;
+                }
+            } else if (
                 myBlock.isValueBlock() ||
                 myBlock.name === "loadFile" ||
                 myBlock.name === "boolean"
@@ -861,13 +869,6 @@ class ProjectManager {
                             value: myBlock.privateData
                         };
                         break;
-                    case "nopValueBlock":
-                    case "nopZeroArgBlock":
-                    case "nopOneArgBlock":
-                    case "nopTwoArgBlock":
-                    case "nopThreeArgBlock":
-                        exportName = myBlock.privateData;
-                        break;
                     case "matrixData":
                         args = {
                             notes: window.savedMatricesNotes,
@@ -896,8 +897,7 @@ class ProjectManager {
             }
 
             const connections = [];
-            for (let c = 0; c < myBlock.connections.length; c++) {
-                const connection = myBlock.connections[c];
+            for (const connection of restored.get(blk) || myBlock.connections) {
                 const mapConnection = blockIndexById.get(connection);
                 if (connection === null || mapConnection === undefined) {
                     connections.push(null);

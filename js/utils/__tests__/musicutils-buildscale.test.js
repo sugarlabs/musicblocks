@@ -66,6 +66,33 @@ describe("musicutils-buildscale", () => {
         });
     });
 
+    it("unifies pitchToFrequency with dynamic powerBase for stretched and non-octave temperaments", () => {
+        // 1. Stretched 12-EDO (octaveRatio: 2.01)
+        const stretched12 = { isEDO: true, edo: 12, octaveRatio: 2.01 };
+        const a4Stretched = buildscale.pitchToFrequency("A", 4, 0, "C major", stretched12);
+        const a5Stretched = buildscale.pitchToFrequency("A", 5, 0, "C major", stretched12);
+        expect(a5Stretched / a4Stretched).toBeCloseTo(2.01, 5);
+
+        // 2. Bohlen-Pierce tritave (octaveRatio: 3, 13 steps per period)
+        const bohlenPierce = { isEDO: true, edo: 13, octaveRatio: 3 };
+        const bpA0 = buildscale.pitchToFrequency("A", 0, 0, "C major", bohlenPierce);
+        const bpA1 = buildscale.pitchToFrequency("A", 1, 0, "C major", bohlenPierce);
+        expect(bpA1 / bpA0).toBeCloseTo(3.0, 5);
+
+        // 3. Stretched non-EDO table (Just Intonation with octaveRatio: 2.02)
+        const jiStretched = {
+            ...musicutils.TEMPERAMENT["just intonation"],
+            octaveRatio: 2.02
+        };
+        const c4Ji = buildscale.pitchToFrequency("C", 4, 0, "C major", jiStretched);
+        const c5Ji = buildscale.pitchToFrequency("C", 5, 0, "C major", jiStretched);
+        expect(c5Ji / c4Ji).toBeCloseTo(2.02, 5);
+
+        // 4. Cents adjustment scales with powerBase (1200 cents = 1 period)
+        const a4With1200Cents = buildscale.pitchToFrequency("A", 4, 1200, "C major", stretched12);
+        expect(a4With1200Cents / a4Stretched).toBeCloseTo(2.01, 5);
+    });
+
     it("still resolves scale degrees, step sizes and intervals", () => {
         expect(buildscale.getModeLength("C major")).toBe(7);
         expect(buildscale.scaleDegreeToPitchMapping("C major", 2, false, null)).toBe("D");

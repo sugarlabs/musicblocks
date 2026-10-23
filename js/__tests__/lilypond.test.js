@@ -112,6 +112,17 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("g''''4 g'''''4 g''''''4 g'''''''4 ");
     });
 
+    test("should format low octaves (0 to 2) with correct LilyPond octave commas and no extra spaces", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["A0"], 4, 0, null, 0, -1, false],
+            [["C1"], 4, 0, null, 0, -1, false],
+            [["C2"], 4, 0, null, 0, -1, false],
+            [["C3"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("a,,,4 c,,4 c,4 c4 ");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);

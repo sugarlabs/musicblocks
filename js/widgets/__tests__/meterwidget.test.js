@@ -283,9 +283,16 @@ describe("Meter Widget", () => {
         // Fast-forward time to unlock click
         jest.advanceTimersByTime(1100);
 
+        for (const item of meterWidget._playWheel.navItems) {
+            item.navItem.hide.mockClear();
+        }
+
         // Click Stop
         playBtnMock.onclick();
         expect(meterWidget._playing).toBe(false);
+        for (const item of meterWidget._playWheel.navItems) {
+            expect(item.navItem.hide).toHaveBeenCalledTimes(1);
+        }
 
         jest.useRealTimers();
     });

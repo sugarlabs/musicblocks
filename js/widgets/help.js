@@ -296,7 +296,17 @@ class HelpWidget {
 
                     const bodyFragment = document.createDocumentFragment();
                     if (message.length > 1) {
-                        bodyFragment.append(this._makeBlockImageFigure(message[1], name));
+                        bodyFragment.append(
+                            this._makeBlockImageFigure(
+                                message[1],
+                                name,
+                                this._blockImageAlt(
+                                    this.activity.blocks.blockList[this.activity.blocks.activeBlock]
+                                        .protoblock,
+                                    name
+                                )
+                            )
+                        );
                     }
 
                     const messageParagraph = document.createElement("p");
@@ -742,13 +752,15 @@ class HelpWidget {
      * @private
      * @param {string} path - folder from the help string, e.g. "documentation"
      * @param {string} name - block name
+     * @param {string} [alt] - alt text for the image
      * @returns {HTMLElement}
      */
-    _makeBlockImageFigure(path, name) {
+    _makeBlockImageFigure(path, name, alt) {
         const figure = document.createElement("figure");
         figure.classList.add("blockImage-wrapper");
         const img = document.createElement("img");
         img.classList.add("blockImage");
+        if (alt) img.alt = alt;
 
         const defaultSrc = `Docs/${path}/${name}_block.svg`;
         const localizedSrc = `Docs/${this._localizedHelpPath(path)}/${name}_block.svg`;
@@ -764,6 +776,19 @@ class HelpWidget {
 
         figure.append(img);
         return figure;
+    }
+
+    /**
+     * Alt text for a block's help image: the block label, as shown in the
+     * help window title, or the block name for blocks without a label.
+     * @private
+     * @param {Object} protoblock
+     * @param {string} name - block name
+     * @returns {string}
+     */
+    _blockImageAlt(protoblock, name) {
+        const label = protoblock && protoblock.staticLabels && protoblock.staticLabels[0];
+        return label ? _(label) : name;
     }
 
     /**
@@ -796,43 +821,46 @@ class HelpWidget {
     }
 
     /**
+     * Normalizes semi-transparent SVG icons (originally designed at 0.4 opacity
+     * for toolbar button templates) to full strength (opacity 1.0) for tour display.
+     *
      * @private
      * @param {string} src
      * @returns {string}
      */
     _getHighContrastHelpIconSrc(src) {
-        if (
-            !document.body.classList.contains("highcontrast") ||
-            !src.startsWith(HELP_SVG_DATA_PREFIX)
-        ) {
+        if (!src || !src.startsWith(HELP_SVG_DATA_PREFIX)) {
             return src;
         }
 
         try {
             const svg = this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length));
-            const highContrastSvg = svg
+            const normalizedSvg = svg
                 .replace(/fill-opacity\s*:\s*0\.[0-9]+/g, "fill-opacity:1")
                 .replace(/stroke-opacity\s*:\s*0\.[0-9]+/g, "stroke-opacity:1")
                 .replace(/opacity\s*:\s*0\.[0-9]+/g, "opacity:1")
                 .replace(/fill-opacity="0\.[0-9]+"/g, 'fill-opacity="1"')
                 .replace(/stroke-opacity="0\.[0-9]+"/g, 'stroke-opacity="1"')
                 .replace(/opacity="0\.[0-9]+"/g, 'opacity="1"');
-            return HELP_SVG_DATA_PREFIX + this._encodeSvgData(highContrastSvg);
+            return HELP_SVG_DATA_PREFIX + this._encodeSvgData(normalizedSvg);
         } catch (e) {
             return src;
         }
     }
 
     /**
+     * Determines whether an SVG icon should receive the white filter for dark or
+     * high contrast backgrounds, preserving icons that already have visible white details.
+     *
      * @private
      * @param {string} src
      * @returns {boolean}
      */
     _usesHighContrastWhiteFilter(src) {
-        if (
-            !document.body.classList.contains("highcontrast") ||
-            !src.startsWith(HELP_SVG_DATA_PREFIX)
-        ) {
+        const isDarkOrHighContrast =
+            document.body.classList.contains("highcontrast") ||
+            document.body.classList.contains("dark");
+        if (!isDarkOrHighContrast || !src || !src.startsWith(HELP_SVG_DATA_PREFIX)) {
             return false;
         }
 
@@ -1050,7 +1078,13 @@ class HelpWidget {
             if (message) {
                 const bodyFragment = document.createDocumentFragment();
                 if (message.length > 1) {
-                    bodyFragment.append(this._makeBlockImageFigure(message[1], name));
+                    bodyFragment.append(
+                        this._makeBlockImageFigure(
+                            message[1],
+                            name,
+                            this._blockImageAlt(block, name)
+                        )
+                    );
                 }
 
                 const messageParagraph = document.createElement("p");

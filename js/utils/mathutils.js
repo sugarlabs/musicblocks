@@ -401,7 +401,7 @@ class MathUtility {
      * @returns {number} - Number of repetitions.
      */
     static doRepeatCount(a) {
-        return typeof a === "number" && a >= 1 ? Math.floor(a) : 0;
+        return Number.isFinite(a) && a >= 1 ? Math.floor(a) : 0;
     }
 }
 // Ensure mathutils.js exports the MathUtility class

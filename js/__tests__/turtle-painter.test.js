@@ -755,14 +755,15 @@ describe("Heading and orientation", () => {
         expect(mockTurtle.container.rotation).toBe(180);
     });
 
-    test("doSetHeading should update cache when not blinking", () => {
+    test("doSetHeading should schedule canvas update and not update cache", () => {
         painter.doSetHeading(90);
-        expect(mockTurtle.updateCache).toHaveBeenCalled();
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        expect(mockTurtle.updateCache).not.toHaveBeenCalled();
     });
 
-    test("doSetHeading should not update cache when blinking", () => {
-        mockTurtle.blinking.mockReturnValue(true);
-        painter.doSetHeading(90);
+    test("doRight should schedule canvas update and not update cache", () => {
+        painter.doRight(90);
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
         expect(mockTurtle.updateCache).not.toHaveBeenCalled();
     });
 

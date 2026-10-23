@@ -743,6 +743,8 @@ describe("FlowBlocks integration", () => {
     test("RepeatBlock validates number and repeats child", () => {
         const block = getBlock("repeat");
         expect(block.flow([0, 90], logo, 0, 9)).toEqual([null, 0]);
+        expect(block.flow([Infinity, 90], logo, 0, 9)).toEqual([null, 0]);
+        expect(block.flow([NaN, 90], logo, 0, 9)).toEqual([null, 0]);
         expect(block.flow([3, 91], logo, 0, 9)).toEqual([91, 3]);
         block.flow([-1, 92], logo, 0, 9);
         expect(activity.errorMsg).toHaveBeenCalledWith(POSNUMBER, 9);
@@ -753,7 +755,7 @@ describe("FlowBlocks integration", () => {
     test("RepeatBlock count matches MathUtility.doRepeatCount", () => {
         const MathUtility = require("../../utils/mathutils");
         const block = getBlock("repeat");
-        for (const count of [4, 1, 3.5, 2.2, 0.5, 0, -1, null, "4"]) {
+        for (const count of [4, 1, 3.5, 2.2, 0.5, 0, -1, null, "4", Infinity, -Infinity, NaN]) {
             expect(block.flow([count, 90], logo, 0, 9)[1]).toBe(MathUtility.doRepeatCount(count));
         }
     });

@@ -300,7 +300,7 @@ function createSharePopup(popupId, items, anchor) {
     };
 
     const closeHandler = e => {
-        if (!popup.contains(e.target)) {
+        if (!popup.contains(e.target) && !anchor.contains?.(e.target)) {
             cleanup();
         }
     };

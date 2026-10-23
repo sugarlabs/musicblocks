@@ -1103,7 +1103,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.defineMode("Custom", 0, "blk");
 
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_definemode_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_definemode_0_blk");
         expect(turtle.singer.inDefineMode).toBe(true);
         expect(turtle.singer.defineMode).toEqual([]);
     });
@@ -1153,7 +1153,7 @@ describe("setupIntervalsActions", () => {
 
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
 
-        expect(mockMouse.MB.listeners).toContain("_definemode_0");
+        expect(mockMouse.MB.listeners).toContain("_definemode_0_undefined");
     });
 
     test("defineMode flags EDOBOUNDEXCEEDED when more pitch numbers than the temperament length are defined", () => {
