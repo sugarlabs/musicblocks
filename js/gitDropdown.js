@@ -393,6 +393,7 @@ class GitDropdownUI {
 
     async _doCreate(repoName, displayName, description) {
         const projectData = this._getProjectData();
+        const projectId = this._getProjectGitData()?.projectId || null;
         const fullDesc = description || `${displayName} — a Music Blocks project`;
 
         try {
@@ -405,7 +406,6 @@ class GitDropdownUI {
             this._showToast("Could not save your project. Please try again.", "error");
             return;
         }
-        const projectId = this._getProjectGitData()?.projectId || null;
         const thumbnail = this._getThumbnail();
 
         // ── Instant offline pre-check ─────────────────────────────────────────
@@ -647,6 +647,7 @@ class GitDropdownUI {
 
     async _doCommit(repoName, hashedKey, commitMessage) {
         const projectData = this._getProjectData();
+        const projectId = this._getProjectGitData()?.projectId;
         const thumbnail = this._getThumbnail();
 
         // ── Step 1: instant offline check ────────────────────────────────────
@@ -654,7 +655,13 @@ class GitDropdownUI {
         // OS network interface changes — no fetch needed, no waiting.
         // If the device has no network right now, skip straight to offline draft.
         if (this._isOffline()) {
-            await this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
+            await this._saveOfflineDraft(
+                repoName,
+                hashedKey,
+                projectData,
+                commitMessage,
+                projectId
+            );
             return;
         }
 
@@ -712,7 +719,13 @@ class GitDropdownUI {
                     "[GitDropdownUI] Network lost during commit — saving offline draft.",
                     e
                 );
-                await this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
+                await this._saveOfflineDraft(
+                    repoName,
+                    hashedKey,
+                    projectData,
+                    commitMessage,
+                    projectId
+                );
             } else {
                 // Server-side error (4xx/5xx that wasn't caught above, or unexpected)
                 console.error("[GitDropdownUI] commit server error:", e);
@@ -733,8 +746,9 @@ class GitDropdownUI {
      * @param {string} hashedKey
      * @param {*}      projectData
      * @param {string} commitMessage
+     * @param {string} [projectId] - The project the commit was started in
      */
-    async _saveOfflineDraft(repoName, hashedKey, projectData, commitMessage) {
+    async _saveOfflineDraft(repoName, hashedKey, projectData, commitMessage, projectId) {
         this._showToast("Saving offline draft…", "info");
 
         const planetIframe = document.getElementById("planet-iframe");
@@ -749,10 +763,7 @@ class GitDropdownUI {
                 // Pass the project ID so Planet.js can find the right project in IndexedDB.
                 // This covers the case where the project was created online and the iframe
                 // has been re-initialised since then (CurrentProject would be null otherwise).
-                projectId:
-                    this._getProjectGitData()?.projectId ||
-                    localStorage.getItem("mbGitCurrentProjectId") ||
-                    null,
+                projectId: projectId || localStorage.getItem("mbGitCurrentProjectId") || null,
                 repoName,
                 hashedKey,
                 projectData,
