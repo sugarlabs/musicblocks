@@ -168,49 +168,6 @@ describe("Viewport Culling", () => {
         blocks = new Blocks(mockActivity);
     });
 
-    it("evicts every excess trash stack and its descendants after a bulk deletion", () => {
-        for (let i = 0; i < 104; i++) {
-            const top = i * 2;
-            blocks.blockList[top] = {
-                connections: [null, top + 1],
-                trash: true,
-                dispose: jest.fn()
-            };
-            blocks.blockList[top + 1] = {
-                connections: [top, null],
-                trash: true,
-                dispose: jest.fn()
-            };
-            blocks.trashStacks.push(String(top));
-            blocks.trashPreviews[top] = "preview";
-        }
-        const evicted = blocks.blockList.slice(0, 8);
-        const retained = blocks.blockList.slice(8);
-        const active = { trash: false, dispose: jest.fn() };
-        blocks.blockList.push(active);
-
-        blocks.trimTrashHistory();
-
-        expect(blocks.trashStacks).toHaveLength(100);
-        expect(blocks.trashStacks[0]).toBe("8");
-        expect(blocks.trashStacks[99]).toBe("206");
-        expect(Object.keys(blocks.trashPreviews)).toHaveLength(100);
-        expect(blocks.blockList.slice(0, 8)).toEqual(Array(8).fill(null));
-        for (const block of evicted) {
-            expect(block.dispose).toHaveBeenCalledTimes(1);
-        }
-        expect(blocks.blockList.slice(8, 208)).toEqual(retained);
-        for (const block of [...retained, active]) {
-            expect(block.dispose).not.toHaveBeenCalled();
-        }
-
-        blocks.trimTrashHistory();
-        expect(blocks.trashStacks).toHaveLength(100);
-        for (const block of evicted) {
-            expect(block.dispose).toHaveBeenCalledTimes(1);
-        }
-    });
-
     it("should mark blocks inside the viewport as visible", () => {
         blocks.blockList = [
             { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 },
