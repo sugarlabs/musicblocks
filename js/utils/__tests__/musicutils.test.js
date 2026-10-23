@@ -3859,6 +3859,14 @@ describe("getPitchInfo", () => {
         expect(deg).toMatch(/^1/);
     });
 
+    it("does not append undefined when a scale degree has no accidental", () => {
+        const flatKeyTurtle = {
+            singer: { keySignature: "F♭ major", movable: false }
+        };
+
+        expect(getPitchInfo(activity, "scale degree", "B♯4", flatKeyTurtle)).toBe("4");
+    });
+
     it("returns correct nth degree", () => {
         // C in C major is index 0
         expect(getPitchInfo(activity, "nth degree", "C4", tur)).toBe(0);
