@@ -531,6 +531,35 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
         });
 
+        test("keeps tracking on the project it started in when the project changes during the save", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            mockActivity.saveLocally.mockImplementation(async () => useProject(copy));
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_GIT_CREATED", projectId: "guitar" }),
+                "*"
+            );
+        });
+
+        test("keeps a draft on the project it started in when the project changes mid-commit", async () => {
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockImplementationOnce(async () => {
+                useProject(copy);
+                throw new TypeError("Failed to fetch");
+            });
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Lost connection");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_OFFLINE_COMMIT", projectId: "guitar" }),
+                "*"
+            );
+        });
+
         test("Time Travel loads the history of the open project's repo", async () => {
             useProject(guitar);
             gitDropdown._prefetchCommits();
