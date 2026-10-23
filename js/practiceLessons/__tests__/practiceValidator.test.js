@@ -1081,13 +1081,53 @@ describe("PracticeValidator piano discoveries", () => {
 
     test.each([
         ["spacedTheKeys", "setxy"],
-        ["spacedTheKeys", "setxyturtle"],
-        ["namedTheKeys", "setturtlename2"],
-        ["namedTheKeys", "turtlename"]
+        ["spacedTheKeys", "setxyturtle"]
     ])("%s is proved by a connected %s block", (criterion, blockName) => {
         useBlocks(connected(blockName));
 
         expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(true);
+    });
+
+    test("the starter's one named key does not prove the keys were named", () => {
+        useBlocks(piano(["sol"]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("a copied key that keeps the starter's name does not prove it either", () => {
+        useBlocks(piano(["sol", "sol"]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("two keys with names of their own prove the keys were named", () => {
+        useBlocks(piano(["sol", "mi"]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
+    });
+
+    test("a name block that has been thrown away does not count", () => {
+        const blocks = piano(["sol", "mi"]);
+        blocks["k1-name"].trash = true;
+        useBlocks(blocks);
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("the older set name block names a key too", () => {
+        useBlocks({
+            ...piano(["sol"]),
+            k1: { name: "start", trash: false, connections: [null, "k1-name", null] },
+            "k1-name": {
+                name: "setturtlename",
+                trash: false,
+                connections: ["k1", "k1-who", "k1-text", null]
+            },
+            "k1-who": { name: "number", value: -1, trash: false, connections: ["k1-name"] },
+            "k1-text": { name: "text", value: "mi", trash: false, connections: ["k1-name"] }
+        });
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
     });
 
     test("the avatar and drum badges reuse the criteria earlier lessons already had", () => {

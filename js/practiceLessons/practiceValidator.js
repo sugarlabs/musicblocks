@@ -42,6 +42,11 @@ const LOOP_BODY_CONNECTION = new Map([
     ["repeat", 2],
     ["forever", 1]
 ]);
+// Each block that names a mouse holds the new name in its own connection slot.
+const MOUSE_NAME_CONNECTION = new Map([
+    ["setturtlename", 2],
+    ["setturtlename2", 1]
+]);
 // A ring passes the beat once the conductor has two mice to call.
 const RING_MOUSE_MINIMUM = 3;
 // A polygon closes whichever way the child turns, so both turn blocks count.
@@ -268,11 +273,7 @@ const PracticeValidator = {
             case "spacedTheKeys":
                 return this.hasConnectedBlockNamed(["setxy", "setxyturtle"]);
             case "namedTheKeys":
-                return this.hasConnectedBlockNamed([
-                    "setturtlename",
-                    "setturtlename2",
-                    "turtlename"
-                ]);
+                return this.getMouseNames().size >= 2;
             case "completeMetronome":
                 return this.validateMetronome();
             case "swungThePendulum":
@@ -462,6 +463,26 @@ const PracticeValidator = {
         const drumNames = this.getSetDrumNames();
 
         return drumNames.some(drumName => drumName && drumName !== "snare drum");
+    },
+
+    // The starter's one key already has a name, so the keys only count as named
+    // once two of them answer to different names.
+    getMouseNames() {
+        const blockList = this.getBlockList();
+        const names = new Set();
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || !MOUSE_NAME_CONNECTION.has(block.name)) return;
+            if (block.connections?.[0] === null || block.connections?.[0] === undefined) return;
+
+            const nameBlock = blockList[block.connections[MOUSE_NAME_CONNECTION.get(block.name)]];
+            const name = nameBlock?.value;
+            if (name !== undefined && name !== null && name !== "") {
+                names.add(String(name));
+            }
+        });
+
+        return names;
     },
 
     getSetDrumNames() {
