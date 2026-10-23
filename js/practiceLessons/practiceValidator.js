@@ -97,6 +97,10 @@ const TWINKLE_SECTIONS = new Map([
 // The song's form, the bread of the sandwich on the outside and the filling in the middle.
 const TWINKLE_SONG_FORM = ["A1", "A2", "B", "B", "A1", "A2"];
 
+// Upper bound on start-block action references that membership checks expand,
+// so a huge repeat count cannot build a giant array.
+const MAX_START_ACTION_REFERENCES = 1000;
+
 const PracticeValidator = {
     validate(problem) {
         if (problem?.expected?.circularRhythmRing) {
@@ -418,7 +422,8 @@ const PracticeValidator = {
     hasCreatedVariation(expectedPattern) {
         if (!Array.isArray(expectedPattern)) return false;
 
-        const sequence = this.getCurrentSequence();
+        // Only need to know whether the sequence is longer than the pattern.
+        const sequence = this.getCurrentSequence(expectedPattern.length + 1);
         if (sequence.length <= expectedPattern.length) return false;
 
         return this.matchesPattern(sequence.slice(0, expectedPattern.length), expectedPattern);
@@ -450,13 +455,13 @@ const PracticeValidator = {
         return names;
     },
 
-    getStartActionReferences(blockList) {
+    getStartActionReferences(blockList, maxLength = MAX_START_ACTION_REFERENCES) {
         const startBlock = Object.values(blockList).find(
             block => block?.name === "start" && !block.trash
         );
         if (!startBlock) return [];
 
-        return this.extractPatternSequence(startBlock.connections?.[1], blockList);
+        return this.extractPatternSequence(startBlock.connections?.[1], blockList, maxLength);
     },
 
     hasChangedRhythmLength() {
@@ -681,9 +686,10 @@ const PracticeValidator = {
         const transcribed = new Set(sectionByActionName.values());
         if ([...TWINKLE_SECTIONS.keys()].some(section => !transcribed.has(section))) return false;
 
-        const performed = this.getStartActionReferences(blockList).map(actionName =>
-            sectionByActionName.get(actionName)
-        );
+        const performed = this.getStartActionReferences(
+            blockList,
+            TWINKLE_SONG_FORM.length + 1
+        ).map(actionName => sectionByActionName.get(actionName));
 
         return JSON.stringify(performed) === JSON.stringify(TWINKLE_SONG_FORM);
     },
