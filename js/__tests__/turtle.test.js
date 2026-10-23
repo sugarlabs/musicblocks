@@ -1629,3 +1629,116 @@ describe("Turtle.TurtleView", () => {
         });
     });
 });
+
+// ---------------------------------------------------------------------------
+// blink
+//
+// A blink must be cancellable. If a second blink starts while the first is
+// still pending, the first one's timer must not end the second one early.
+// ---------------------------------------------------------------------------
+
+describe("Turtle blink()", () => {
+    let turtle;
+    let mockActivity;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        mockActivity = { refreshCanvas: jest.fn() };
+        turtle = new Turtle(mockActivity, 0, "turtle1", {}, null);
+        turtle.container = { visible: true };
+        turtle.listeners = {};
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("hides the turtle, then shows it again after 100 ms", () => {
+        turtle.blink(8, 1);
+        expect(turtle.container.visible).toBe(false);
+        expect(turtle.blinking()).toBe(true);
+
+        jest.advanceTimersByTime(100);
+
+        expect(turtle.container.visible).toBe(true);
+        expect(turtle.blinking()).toBe(false);
+        expect(turtle._blinkTimeout).toBeNull();
+    });
+
+    it("does not blink for very short notes", () => {
+        turtle.blink(32, 1);
+        expect(turtle.container.visible).toBe(true);
+        expect(turtle.blinking()).toBe(false);
+    });
+
+    it("does not let an earlier blink end a later overlapping blink early", () => {
+        turtle.blink(8, 1); // first blink at t=0
+        jest.advanceTimersByTime(50);
+        turtle.blink(8, 1); // second blink at t=50, should last until t=150
+
+        jest.advanceTimersByTime(55); // t=105: the first blink's 100 ms has passed
+        expect(turtle.container.visible).toBe(false);
+        expect(turtle.blinking()).toBe(true);
+
+        jest.advanceTimersByTime(50); // t=155: the second blink is over
+        expect(turtle.container.visible).toBe(true);
+        expect(turtle.blinking()).toBe(false);
+    });
+
+    it("stopBlink() cancels a pending blink so it cannot fire later", () => {
+        turtle.blink(8, 1);
+        turtle.stopBlink();
+        expect(turtle.container.visible).toBe(true);
+
+        turtle.container.visible = false; // something else hides the turtle
+        jest.advanceTimersByTime(200);
+
+        expect(turtle.container.visible).toBe(false); // the stale timer did not run
+    });
+
+    describe("with the execution engine's ManagedTimer", () => {
+        let timers;
+
+        beforeEach(() => {
+            const ManagedTimer = require("../utils/ManagedTimer");
+            timers = new ManagedTimer();
+            mockActivity.logo = { _timerManager: timers };
+        });
+
+        it("tracks the pending blink so it can be cancelled", () => {
+            turtle.blink(8, 1);
+            expect(timers.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(100);
+
+            expect(timers.activeTimeoutCount).toBe(0);
+            expect(turtle.container.visible).toBe(true);
+            expect(turtle._blinkTimeout).toBeNull();
+        });
+
+        it("does not let an earlier blink end a later overlapping blink early", () => {
+            turtle.blink(8, 1);
+            jest.advanceTimersByTime(50);
+            turtle.blink(8, 1);
+
+            expect(timers.activeTimeoutCount).toBe(1);
+            jest.advanceTimersByTime(55); // t=105
+            expect(turtle.container.visible).toBe(false);
+
+            jest.advanceTimersByTime(50); // t=155
+            expect(turtle.container.visible).toBe(true);
+        });
+
+        it("stopBlink() shows the turtle even after the manager clears all timers", () => {
+            turtle.blink(8, 1);
+            timers.clearAll(); // what the Stop button does
+
+            expect(turtle.container.visible).toBe(false);
+            turtle.stopBlink();
+
+            expect(turtle.container.visible).toBe(true);
+            expect(turtle.blinking()).toBe(false);
+            expect(turtle._blinkTimeout).toBeNull();
+        });
+    });
+});
