@@ -1012,18 +1012,146 @@ describe("setupRhythmActions", () => {
             expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
         });
 
-        it("uses fallback listener name _dot_<turtle> when blk is omitted, undefined, or null", () => {
-            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+        it("handles recursive re-entry into the same Dot block ID with distinct listener names, preventing listener overwriting and correctly unwinding nested execution", () => {
+            activity.blocks.blockList = {
+                10: { connections: [null, 1, 2, 11] } // Dot block 10 with hidden clamp-end block 11
+            };
+
+            targetTurtle.singer.dotCount = 0;
+            targetTurtle.singer.beatFactor = 1;
+
+            // Outer execution of Dot block 10 (+1 dot)
+            Singer.RhythmActions.doRhythmicDot(1, 0, 10);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_dot_0_10");
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_dot_0",
+                "_dot_0_10",
+                expect.any(Function)
+            );
+            expect(listeners["_dot_0_10"]).toBeDefined();
+            expect(endOfClampSignals[11]).toEqual(["_dot_0_10"]);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            const outerBeatFactor = targetTurtle.singer.beatFactor;
+
+            // Recursive re-entry into the SAME Dot block 10 (+2 dots) before outer clamp ends
+            Singer.RhythmActions.doRhythmicDot(2, 0, 10);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_dot_0_10_1");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_10_1",
                 expect.any(Function)
             );
 
-            Singer.RhythmActions.doRhythmicDot(1, 0, null);
+            // CRITICAL: Both outer and inner listeners are retained; outer is NOT replaced
+            expect(listeners["_dot_0_10"]).toBeDefined();
+            expect(listeners["_dot_0_10_1"]).toBeDefined();
+            expect(endOfClampSignals[11]).toEqual(["_dot_0_10", "_dot_0_10_1"]);
+            expect(targetTurtle.singer.dotCount).toBe(3);
+
+            // Spy on both listeners to verify exact call counts and isolation
+            const outerSpy = jest.fn(listeners["_dot_0_10"]);
+            const innerSpy = jest.fn(listeners["_dot_0_10_1"]);
+            listeners["_dot_0_10"] = outerSpy;
+            listeners["_dot_0_10_1"] = innerSpy;
+            stageEvents["_dot_0_10"] = outerSpy;
+            stageEvents["_dot_0_10_1"] = innerSpy;
+
+            // Trigger clamp end of inner block (LIFO pop from endOfClampSignals[11])
+            const innerSignal = endOfClampSignals[11].pop();
+            expect(innerSignal).toBe("_dot_0_10_1");
+            activity.stage.dispatchEvent(innerSignal);
+
+            expect(innerSpy).toHaveBeenCalledTimes(1);
+            expect(outerSpy).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(outerBeatFactor);
+
+            // Trigger clamp end of outer block
+            const outerSignal = endOfClampSignals[11].pop();
+            expect(outerSignal).toBe("_dot_0_10");
+            activity.stage.dispatchEvent(outerSignal);
+
+            expect(innerSpy).toHaveBeenCalledTimes(1);
+            expect(outerSpy).toHaveBeenCalledTimes(1);
+            expect(targetTurtle.singer.dotCount).toBe(0);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+            expect(Number.isFinite(targetTurtle.singer.dotCount)).toBe(true);
+            expect(Number.isFinite(targetTurtle.singer.beatFactor)).toBe(true);
+        });
+
+        it("unwinds deeply recursive executions (3 levels) of the same Dot block ID sequentially restoring state at each level", () => {
+            activity.blocks.blockList = {
+                5: { connections: [null, null, null, 55] }
+            };
+
+            targetTurtle.singer.dotCount = 0;
+            targetTurtle.singer.beatFactor = 1;
+
+            // Level 1: +1 dot on block 5
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            const level1BeatFactor = targetTurtle.singer.beatFactor;
+
+            // Level 2: +1 dot on block 5 (re-entry)
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+            expect(targetTurtle.singer.dotCount).toBe(2);
+            const level2BeatFactor = targetTurtle.singer.beatFactor;
+
+            // Level 3: +1 dot on block 5 (re-entry)
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+            expect(targetTurtle.singer.dotCount).toBe(3);
+
+            expect(Object.keys(listeners)).toEqual(
+                expect.arrayContaining(["_dot_0_5", "_dot_0_5_1", "_dot_0_5_2"])
+            );
+            expect(endOfClampSignals[55]).toEqual(["_dot_0_5", "_dot_0_5_1", "_dot_0_5_2"]);
+
+            // Unwind level 3
+            const sig3 = endOfClampSignals[55].pop();
+            expect(sig3).toBe("_dot_0_5_2");
+            activity.stage.dispatchEvent(sig3);
+            expect(targetTurtle.singer.dotCount).toBe(2);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(level2BeatFactor);
+
+            // Unwind level 2
+            const sig2 = endOfClampSignals[55].pop();
+            expect(sig2).toBe("_dot_0_5_1");
+            activity.stage.dispatchEvent(sig2);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(level1BeatFactor);
+
+            // Unwind level 1
+            const sig1 = endOfClampSignals[55].pop();
+            expect(sig1).toBe("_dot_0_5");
+            activity.stage.dispatchEvent(sig1);
+            expect(targetTurtle.singer.dotCount).toBe(0);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+        });
+
+        it("uses fallback listener name _dot_<turtle>_<blk> when blk is omitted or undefined and avoids collisions for concurrent invocations", () => {
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_dot_0",
+                "_dot_0_undefined",
+                expect.any(Function)
+            );
+
+            // Concurrent re-entry without blk yields a distinct suffixed name
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_undefined_1",
+                expect.any(Function)
+            );
+
+            // Once prior listeners are cleared, the base name is available again
+            delete targetTurtle.listeners["_dot_0_undefined"];
+            delete targetTurtle.listeners["_dot_0_undefined_1"];
+
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_undefined",
                 expect.any(Function)
             );
         });

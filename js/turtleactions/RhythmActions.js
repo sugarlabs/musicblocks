@@ -266,8 +266,14 @@ function setupRhythmActions(activity) {
             tur.singer.beatFactor = newBeatFactor;
             tur.singer.dotCount = newDotCount;
 
-            const listenerName =
-                blk !== undefined && blk !== null ? "_dot_" + turtle + "_" + blk : "_dot_" + turtle;
+            const baseListenerName = "_dot_" + turtle + "_" + blk;
+            let listenerName = baseListenerName;
+            if (tur && tur.listeners) {
+                let suffix = 1;
+                while (listenerName in tur.listeners) {
+                    listenerName = baseListenerName + "_" + suffix++;
+                }
+            }
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
