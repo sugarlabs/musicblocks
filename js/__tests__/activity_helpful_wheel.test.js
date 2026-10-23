@@ -12,6 +12,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createInstrumenter } = require("istanbul-lib-instrument");
 
 // Captures every wheelnav instance created by displayHelpfulWheel so tests
 // can assert on the labels passed to initWheel.
@@ -41,6 +42,13 @@ const loadActivityClass = () => {
     if (splitPoint !== -1) {
         code = code.substring(0, splitPoint);
     }
+
+    const instrumenter = createInstrumenter({
+        coverageVariable: "__coverage__",
+        esModules: false,
+        compact: true
+    });
+    code = instrumenter.instrumentSync(code, activityPath);
 
     // ContextMenuController now owns _setupPaletteMenu/_displayHelpfulWheel.
     // Concatenate its source (minus the AMD/CommonJS export tail) ahead of
@@ -121,6 +129,7 @@ const loadActivityClass = () => {
         performance: global.performance || { now: () => Date.now() },
         platformColor: { stopIconcolor: "red", wheelcolors: [] },
         globalActivity: null,
+        __coverage__: global.__coverage__ || (global.__coverage__ = {}),
         LEADING: 0,
         MYDEFINES: [],
 
@@ -255,6 +264,32 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
             expect(activity.helpfulWheelItems[0].display).toBe(false);
             expect(activity.helpfulWheelItems[1].display).toBe(true);
             expect(activity.textMsg).toHaveBeenCalledWith("Horizontal scrolling enabled.", 3000);
+        });
+
+        test("updates the enabled state and helpful-wheel actions when scrolling is disabled", () => {
+            const enableIcon = { style: {} };
+            const disableIcon = { style: {} };
+            document.getElementById = jest.fn(id =>
+                id === "enableHorizScrollIcon" ? enableIcon : disableIcon
+            );
+            activity.beginnerMode = false;
+            activity.scrollBlockContainer = true;
+            activity.blocks = { activeBlock: 7 };
+            activity.helpfulWheelItems = [
+                { label: "Enable horizontal scrolling", display: false },
+                { label: "Disable horizontal scrolling", display: true }
+            ];
+            activity.textMsg = jest.fn();
+
+            activity._setScroller();
+
+            expect(activity.scrollBlockContainer).toBe(false);
+            expect(activity.blocks.activeBlock).toBeNull();
+            expect(enableIcon.style.display).toBe("block");
+            expect(disableIcon.style.display).toBe("none");
+            expect(activity.helpfulWheelItems[0].display).toBe(true);
+            expect(activity.helpfulWheelItems[1].display).toBe(false);
+            expect(activity.textMsg).toHaveBeenCalledWith("Horizontal scrolling disabled.", 3000);
         });
     });
 

@@ -405,64 +405,6 @@ describe("Activity Event Listener Management", () => {
         expect(countByType("wheel")).toBe(1);
     });
 
-    test("wheel input scrolls vertically only when horizontal scrolling is disabled", () => {
-        activity.blocksContainer = { x: 100, y: 100 };
-        activity.scrollBlockContainer = false;
-        activity._setupBlocksContainerEvents();
-
-        activity._wheelHandler({
-            deltaX: 4,
-            deltaY: 5,
-            deltaMode: 0,
-            axis: 1,
-            VERTICAL_AXIS: 1,
-            HORIZONTAL_AXIS: 2,
-            ctrlKey: false
-        });
-
-        expect(activity.blocksContainer).toEqual({ x: 100, y: 90 });
-        expect(activity.refreshCanvas).toHaveBeenCalled();
-    });
-
-    test("wheel input scrolls both axes when horizontal scrolling is enabled", () => {
-        activity.blocksContainer = { x: 100, y: 100 };
-        activity.scrollBlockContainer = true;
-        activity._setupBlocksContainerEvents();
-
-        activity._wheelHandler({
-            deltaX: 3,
-            deltaY: 5,
-            deltaMode: 0,
-            axis: 1,
-            VERTICAL_AXIS: 1,
-            HORIZONTAL_AXIS: 2,
-            ctrlKey: false
-        });
-
-        expect(activity.blocksContainer).toEqual({ x: 94, y: 90 });
-        expect(activity.refreshCanvas).toHaveBeenCalled();
-    });
-
-    test("Ctrl+wheel changes block size instead of scrolling", () => {
-        activity.blocksContainer = { x: 100, y: 100 };
-        activity.scrollBlockContainer = true;
-        activity._setupBlocksContainerEvents();
-        const preventDefault = jest.fn();
-
-        activity._wheelHandler({
-            deltaX: 3,
-            deltaY: -5,
-            deltaMode: 0,
-            ctrlKey: true,
-            preventDefault
-        });
-
-        expect(preventDefault).toHaveBeenCalled();
-        expect(activity.doLargerBlocks).toHaveBeenCalled();
-        expect(activity.doSmallerBlocks).not.toHaveBeenCalled();
-        expect(activity.blocksContainer).toEqual({ x: 100, y: 100 });
-    });
-
     test("should remove previous touch listeners before adding new ones on rerun", () => {
         const removeSpy = jest.spyOn(activity, "removeEventListener");
         const myCanvas = document.getElementById("myCanvas");

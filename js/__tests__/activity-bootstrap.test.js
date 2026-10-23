@@ -61,3 +61,56 @@ describe("Activity bootstrap", () => {
         expect(activity.doContextMenus).toHaveBeenCalledTimes(1);
     });
 });
+
+describe("Activity workspace scrolling", () => {
+    const makeActivity = () => {
+        document.body.innerHTML = '<canvas id="myCanvas"></canvas>';
+        const activity = loadActivitySandbox().activity;
+        activity.blocksContainer = { x: 100, y: 100 };
+        activity.stage = { on: jest.fn() };
+        activity.refreshCanvas = jest.fn();
+        return activity;
+    };
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("wheel input scrolls vertically only when horizontal scrolling is disabled", () => {
+        const activity = makeActivity();
+        activity.scrollBlockContainer = false;
+        activity._setupBlocksContainerEvents();
+
+        activity._wheelHandler({
+            deltaX: 4,
+            deltaY: 5,
+            deltaMode: 0,
+            axis: 1,
+            VERTICAL_AXIS: 1,
+            HORIZONTAL_AXIS: 2,
+            ctrlKey: false
+        });
+
+        expect(activity.blocksContainer).toEqual({ x: 100, y: 90 });
+        expect(activity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    test("wheel input scrolls both axes when horizontal scrolling is enabled", () => {
+        const activity = makeActivity();
+        activity.scrollBlockContainer = true;
+        activity._setupBlocksContainerEvents();
+
+        activity._wheelHandler({
+            deltaX: 3,
+            deltaY: 5,
+            deltaMode: 0,
+            axis: 1,
+            VERTICAL_AXIS: 1,
+            HORIZONTAL_AXIS: 2,
+            ctrlKey: false
+        });
+
+        expect(activity.blocksContainer).toEqual({ x: 94, y: 90 });
+        expect(activity.refreshCanvas).toHaveBeenCalled();
+    });
+});
