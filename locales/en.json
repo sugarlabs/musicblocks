@@ -390,6 +390,7 @@
   "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s": "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s",
   "You must select a file.": "You must select a file.",
   "Infinite loop detected. Execution stopped to prevent browser freeze.": "Infinite loop detected. Execution stopped to prevent browser freeze.",
+  "The widget could not be loaded. Check your connection and try again.": "The widget could not be loaded. Check your connection and try again.",
   "width": "width",
   "height": "height",
   "right (screen)": "right (screen)",
