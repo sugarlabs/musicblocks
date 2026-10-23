@@ -2787,7 +2787,8 @@ input.timbreName {
     margin-left: 200px;
 }
 
-.insideDivSynth input[type="range"] + .thumb {
+.insideDivSynth input[type="range"] + .thumb,
+.insideDivFilter input[type="range"] + .thumb {
     display: none !important;
 }
 
