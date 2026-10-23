@@ -1080,7 +1080,6 @@ describe("Oscilloscope", () => {
             expect(osc.isFrozen).toBe(true);
             expect(mockAnalyser.getValue).toHaveBeenCalled();
             expect(osc._frozenFrames["0:waveform"]).toEqual(analyserValues);
-            expect(osc._frozenFrames["0:waveform"]).toBeUndefined();
             expect(osc._stopAnimation).toHaveBeenCalled();
         });
 
