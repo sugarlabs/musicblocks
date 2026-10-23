@@ -111,12 +111,14 @@ function setupWidgetBlocks(activity) {
     // Blocks waiting for each widget. Those from a run that has since stopped are dropped.
     const _widgetRequests = {};
 
-    function _takeWidgetRequests(logo, widgetKey) {
-        const requests = _widgetRequests[widgetKey].filter(
-            request => request.run === logo.runGeneration
-        );
+    function _takeWidgetRequests(widgetKey) {
+        const requests = _widgetRequests[widgetKey];
         delete _widgetRequests[widgetKey];
         return requests;
+    }
+
+    function _isCurrentRun(logo, run) {
+        return run === logo.runGeneration && !logo.stopTurtle;
     }
 
     /**
@@ -159,11 +161,17 @@ function setupWidgetBlocks(activity) {
                 modules,
                 () => {
                     logo[widgetKey] = initFn();
-                    _takeWidgetRequests(logo, widgetKey).forEach(request => request.resume());
+                    for (const request of _takeWidgetRequests(widgetKey)) {
+                        if (_isCurrentRun(logo, request.run)) request.resume();
+                    }
                 },
                 () => {
                     logo[widgetKey] = null;
-                    if (_takeWidgetRequests(logo, widgetKey).length > 0) {
+                    if (
+                        _takeWidgetRequests(widgetKey).some(request =>
+                            _isCurrentRun(logo, request.run)
+                        )
+                    ) {
                         logo.doStopTurtles();
                         _widgetLoadFailed();
                     }
@@ -193,13 +201,13 @@ function setupWidgetBlocks(activity) {
         _lazyRequire(
             modules,
             () => {
-                if (run === logo.runGeneration) {
+                if (_isCurrentRun(logo, run)) {
                     logo[widgetKey] = factory();
                     onDone?.();
                 }
             },
             () => {
-                if (run === logo.runGeneration) {
+                if (_isCurrentRun(logo, run)) {
                     onDone?.();
                     _widgetLoadFailed();
                 }

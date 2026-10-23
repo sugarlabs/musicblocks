@@ -870,6 +870,24 @@ describe("setupWidgetBlocks", () => {
             );
         });
 
+        it("does not resume the next waiting block once a resumed one stops the run", () => {
+            const temperament = getBlock("temperament");
+            temperament.flow([0, "childBlk"], logo, 0, "tempBlk1", "received");
+            temperament.flow([0, "childBlk"], logo, 1, "tempBlk2", "received");
+            logo.runFromBlockNow.mockImplementation(() => logo.doStopTurtles());
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "tempBlk1",
+                true,
+                "received"
+            );
+        });
+
         it("stays quiet about a failed load from a run that was stopped", () => {
             runTemperament("received");
             logo.runGeneration += 2;
