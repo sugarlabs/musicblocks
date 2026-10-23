@@ -327,17 +327,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     let lastOne, lastTwo;
     if (len > 1) {
         if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
+            lastTwo = pitch.slice(-2);
+            if (lastTwo === "bb" || lastTwo === FLAT + FLAT || lastTwo === DOUBLEFLAT) {
+                pitch = pitch.slice(0, -2);
                 transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "##" || lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
+            } else if (lastTwo === "##" || lastTwo === SHARP + SHARP || lastTwo === DOUBLESHARP) {
+                pitch = pitch.slice(0, -2);
                 transposition += 2;
             } else if (
                 lastTwo === "#b" ||
@@ -345,21 +340,20 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
                 lastTwo === "b#" ||
                 lastTwo === FLAT + SHARP
             ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
+                pitch = pitch.slice(0, -2);
             }
         }
 
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
+        if (transposition === 0 && pitch.length > 1) {
+            lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition -= 1;
             } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 1;
             } else if (lastOne === "x" || lastOne === "*") {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 2;
             }
         }
