@@ -466,23 +466,43 @@ const PracticeValidator = {
     },
 
     // The starter's one key already has a name, so the keys only count as named
-    // once two of them answer to different names.
+    // once two of them answer to different names. Each mouse is one key, and it
+    // answers to the last name its stack gives it.
     getMouseNames() {
         const blockList = this.getBlockList();
         const names = new Set();
 
         Object.values(blockList).forEach(block => {
-            if (!block || block.trash || !MOUSE_NAME_CONNECTION.has(block.name)) return;
-            if (block.connections?.[0] === null || block.connections?.[0] === undefined) return;
+            if (!block || block.trash || block.name !== "start") return;
 
-            const nameBlock = blockList[block.connections[MOUSE_NAME_CONNECTION.get(block.name)]];
-            const name = nameBlock?.value;
-            if (name !== undefined && name !== null && name !== "") {
-                names.add(String(name));
-            }
+            const name = this.getLastMouseName(block.connections?.[1], blockList);
+            if (name !== null) names.add(name);
         });
 
         return names;
+    },
+
+    // Walks a stack in the order it runs, keeping the most recent name it sets.
+    getLastMouseName(blockId, blockList, seen = new Set()) {
+        if (blockId === null || blockId === undefined || seen.has(blockId)) return null;
+
+        const block = blockList[blockId];
+        if (!block || block.trash) return null;
+
+        seen.add(blockId);
+        let name = null;
+        if (MOUSE_NAME_CONNECTION.has(block.name)) {
+            const slot = MOUSE_NAME_CONNECTION.get(block.name);
+            const value = blockList[block.connections?.[slot]]?.value;
+            if (value !== undefined && value !== null && value !== "") name = String(value);
+        }
+
+        for (const connectionId of (block.connections || []).slice(1)) {
+            const laterName = this.getLastMouseName(connectionId, blockList, seen);
+            if (laterName !== null) name = laterName;
+        }
+
+        return name;
     },
 
     getSetDrumNames() {

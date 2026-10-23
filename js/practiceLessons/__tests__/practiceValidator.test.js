@@ -1106,6 +1106,43 @@ describe("PracticeValidator piano discoveries", () => {
         expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
     });
 
+    test("a key with an empty name does not count as named", () => {
+        useBlocks(piano(["sol", ""]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    // Puts a second set name block straight after the key's first one.
+    const renameKey = (blocks, keyId, newName) => {
+        const renameId = `${keyId}-rename`;
+        blocks[`${keyId}-name`].connections[2] = renameId;
+        blocks[`${keyId}-listen`].connections[0] = renameId;
+        blocks[renameId] = {
+            name: "setturtlename2",
+            trash: false,
+            connections: [`${keyId}-name`, `${renameId}-text`, `${keyId}-listen`]
+        };
+        blocks[`${renameId}-text`] = {
+            name: "text",
+            value: newName,
+            trash: false,
+            connections: [renameId]
+        };
+        return blocks;
+    };
+
+    test("one key that is renamed twice is still only one named key", () => {
+        useBlocks(renameKey(piano(["sol"]), "k0", "mi"));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("a copied key counts once it is renamed", () => {
+        useBlocks(renameKey(piano(["sol", "sol"]), "k1", "mi"));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
+    });
+
     test("a name block that has been thrown away does not count", () => {
         const blocks = piano(["sol", "mi"]);
         blocks["k1-name"].trash = true;
