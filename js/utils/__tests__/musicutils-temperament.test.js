@@ -78,8 +78,10 @@ describe("musicutils-temperament", () => {
                 expect(temperament.getEffectiveOctaveRatio({ octaveRatio })).toBe(3);
             }
 
-            temperament.setOctaveRatio(0);
-            expect(temperament.getEffectiveOctaveRatio({})).toBe(2);
+            for (const globalRatio of [0, NaN, Infinity]) {
+                temperament.setOctaveRatio(globalRatio);
+                expect(temperament.getEffectiveOctaveRatio({})).toBe(2);
+            }
         });
 
         it("detects equal division of non-octave periods in isEquallyTempered", () => {
