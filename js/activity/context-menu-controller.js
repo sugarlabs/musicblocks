@@ -371,7 +371,7 @@ class ContextMenuController {
             activity.helpfulWheelItems.push({
                 label: "Select",
                 icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)),
-                display: false,
+                display: true,
                 fn: activity.selectMode
             });
 

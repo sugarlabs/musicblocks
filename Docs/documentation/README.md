@@ -300,7 +300,7 @@ available:
 - **Show/Hide Block**: Toggles the visibility of selected blocks in
     the workspace.
 - **Home**: Centers the workspace view on the initial starting point.
-- **Close**: Exits the contextual menu.
+- **Dismiss**: Click outside the circular menu to close it without selecting an option.
 - **Search for Blocks**: Opens a search bar to locate specific blocks
     within the workspace.
 - **Collapse**: Collapses all blocks to their minimal state.
