@@ -96,6 +96,18 @@ describe("musicutils-pitchinfo", () => {
             expect(info("pitch to shade", "B𝄪4")).toBe(5 * 12.5);
             expect(info("pitch to shade", "C𝄫4")).toBe(3 * 12.5);
         });
+
+        it("shades B♯ and C♭ like the note they sound as", () => {
+            expect(info("pitch to shade", "B♯4")).toBe(info("pitch to shade", "C5"));
+            expect(info("pitch to shade", "C♭4")).toBe(info("pitch to shade", "B3"));
+        });
+
+        it("keeps the octave shade for spellings that stay in the octave", () => {
+            expect(info("pitch to shade", "E♯4")).toBe(4 * 12.5);
+            expect(info("pitch to shade", "F♭4")).toBe(4 * 12.5);
+            expect(info("pitch to shade", "B4")).toBe(4 * 12.5);
+            expect(info("pitch to shade", "C4")).toBe(4 * 12.5);
+        });
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {

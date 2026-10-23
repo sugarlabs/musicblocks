@@ -264,6 +264,12 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
+                // B♯ and C♭ sound in the next and previous octave (B♯4 is C5, C♭4 is B3).
+                if (pitch === "B" + SHARP) {
+                    return (Number(octave) + 1) * 12.5;
+                } else if (pitch === "C" + FLAT) {
+                    return (Number(octave) - 1) * 12.5;
+                }
                 return octave * 12.5;
             default:
                 return "__INVALID_INPUT__";
