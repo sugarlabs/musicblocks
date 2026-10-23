@@ -38,6 +38,15 @@ describe("musicutils-pitch", () => {
         expect(pitch.calcOctaveInterval("5")).toBe(0);
     });
 
+    it("resolves ASCII double accidentals in solfege pitch strings", () => {
+        expect(pitch._calculate_pitch_number("sol##", 4, 0, "equal")).toBe(
+            pitch._calculate_pitch_number("A", 4, 0, "equal")
+        );
+        expect(pitch._calculate_pitch_number("dobb", 4, 0, "equal")).toBe(
+            pitch._calculate_pitch_number("B♭", 3, 0, "equal")
+        );
+    });
+
     it("keeps naming pitches by number across octaves, below zero, and in other tunings", () => {
         const names = [0, 3, 11, 12, 14, 25, -1, -12, -13].map(i =>
             pitch.numberToPitchSharp(i, "equal")

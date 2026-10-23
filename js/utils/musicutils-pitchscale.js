@@ -322,44 +322,42 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
-    const len = pitch.length;
-    let lastOne, lastTwo;
-    if (len > 1) {
-        if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "##" || lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
-                transposition += 2;
-            } else if (
-                lastTwo === "#b" ||
-                lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
-                lastTwo === FLAT + SHARP
-            ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
-            }
-        }
+    if (pitch.length > 1) {
+        const doubleFlat = pitch.endsWith("bb")
+            ? "bb"
+            : pitch.endsWith(DOUBLEFLAT)
+              ? DOUBLEFLAT
+              : null;
+        const doubleSharp = pitch.endsWith("##")
+            ? "##"
+            : pitch.endsWith(DOUBLESHARP)
+              ? DOUBLESHARP
+              : null;
 
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
+        if (doubleFlat) {
+            pitch = pitch.slice(0, -doubleFlat.length);
+            transposition -= 2;
+        } else if (doubleSharp) {
+            pitch = pitch.slice(0, -doubleSharp.length);
+            transposition += 2;
+        } else {
+            const lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition -= 1;
             } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 1;
             } else if (lastOne === "x" || lastOne === "*") {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 2;
+            } else if (
+                pitch.endsWith("#b") ||
+                pitch.endsWith(SHARP + FLAT) ||
+                pitch.endsWith("b#") ||
+                pitch.endsWith(FLAT + SHARP)
+            ) {
+                pitch = pitch.slice(0, -2);
             }
         }
     }
@@ -893,10 +891,15 @@ var getNoteFromSolfege = (
     octave,
     transpositionFloor
 ) => {
-    let sharpFlat = false;
-    if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
-        sharpFlat = true;
-    }
+    const normalizedNoteArg = noteArg.replace(/##$/g, DOUBLESHARP).replace(/bb$/g, DOUBLEFLAT);
+    const doubleSharp = normalizedNoteArg.endsWith(DOUBLESHARP);
+    const doubleFlat = normalizedNoteArg.endsWith(DOUBLEFLAT);
+    const accidentalLength = doubleSharp || doubleFlat ? DOUBLESHARP.length : 0;
+    const solfegeRoot = accidentalLength
+        ? normalizedNoteArg.slice(0, -accidentalLength)
+        : normalizedNoteArg;
+    const sharpFlat =
+        doubleSharp || doubleFlat || ["#", SHARP, FLAT, "b"].includes(normalizedNoteArg.slice(-1));
 
     if (!keySignature) {
         keySignature = "C major";
@@ -943,24 +946,28 @@ var getNoteFromSolfege = (
     }
 
     if (sharpFlat) {
-        if (noteArg.slice(-1) === "#") {
+        if (doubleSharp) {
+            offset += 2;
+        } else if (doubleFlat) {
+            offset -= 2;
+        } else if (normalizedNoteArg.slice(-1) === "#") {
             offset += 1;
-        } else if (noteArg.slice(-1) === SHARP) {
+        } else if (normalizedNoteArg.slice(-1) === SHARP) {
             offset += 1;
-        } else if (noteArg.slice(-1) === FLAT) {
+        } else if (normalizedNoteArg.slice(-1) === FLAT) {
             offset -= 1;
-        } else if (noteArg.slice(-1) === "b") {
+        } else if (normalizedNoteArg.slice(-1) === "b") {
             offset -= 1;
         }
     }
 
     let solfegePart;
-    if (halfSteps.includes(noteArg.slice(0, 1).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 1).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 2).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 2).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 3).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 3).toLowerCase();
+    if (halfSteps.includes(solfegeRoot.slice(0, 1).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 1).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 2).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 2).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 3).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 3).toLowerCase();
     } else {
         // The note should already be translated, but just in case...
         // Reverse any i18n

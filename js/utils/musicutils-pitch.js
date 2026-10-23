@@ -333,6 +333,25 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
         .replaceAll("#", SHARP)
         .replaceAll("b", FLAT);
 
+    // The pitch parser also accepts solfege names. Normalize repeated
+    // accidentals and resolve those names before looking up western notes.
+    // Without this, values such as sol##4 reach the western-note tables as
+    // an unknown literal string and are reported as invalid pitches.
+    if (name.endsWith(SHARP + SHARP)) {
+        name = name.slice(0, -2) + DOUBLESHARP;
+    } else if (name.endsWith(FLAT + FLAT)) {
+        name = name.slice(0, -2) + DOUBLEFLAT;
+    }
+    const fixedSolfege = FIXEDSOLFEGE1[name.toLowerCase()];
+    if (fixedSolfege !== undefined) {
+        if (name.toLowerCase() === "do" + DOUBLEFLAT) {
+            octave -= 1;
+        } else if (name.toLowerCase() === "ti" + DOUBLESHARP) {
+            octave += 1;
+        }
+        name = fixedSolfege;
+    }
+
     // Non-equal temperaments: look up directly against the temperament's own noteLabels.
     // Do NOT use generateNoteNames() which produces EDO-specific names.
     const t = temperament ? getTemperament(temperament) : null;
