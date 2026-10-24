@@ -2141,7 +2141,7 @@ function setupWidgetBlocks(activity) {
         }
 
         /**
-         * Handles the flow of data for the status block.
+         * Handles the flow of data for the reflection block.
          * @param {any[]} args - The arguments passed to the block.
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
@@ -2154,7 +2154,17 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
+                    [
+                        "utils/ai-widget-lifecycle",
+                        "widgets/ReflectionLifecycle",
+                        "widgets/ReflectionWindow",
+                        "widgets/ReflectionChatLog",
+                        "widgets/ReflectionSession",
+                        "widgets/ReflectionBackend",
+                        "widgets/ReflectionReport",
+                        "widgets/ReflectionMarkdown",
+                        "widgets/reflection"
+                    ]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2162,8 +2172,6 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
-
-            logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
 
