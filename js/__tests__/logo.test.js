@@ -875,7 +875,7 @@ describe("Logo step", () => {
     afterEach(() => jest.restoreAllMocks());
 
     test("processes step queue for each turtle", () => {
-        logo.stepQueue = { 0: [1] };
+        logo.stepQueue = { 0: [{ blk: 1, isflow: 0, receivedArg: null }] };
         logo._unhighlightStepQueue = { 0: 5 };
         logo.runFromBlockNow = jest.fn();
         mockActivity.blocks.visible = true;
@@ -883,6 +883,25 @@ describe("Logo step", () => {
         logo.step();
 
         expect(mockActivity.blocks.unhighlight).toHaveBeenCalledWith(5);
+    });
+
+    test("Step preserves the invocation and action arguments queued for each block", () => {
+        const env = [{ type: "multisample", name: "Passed value" }];
+        logo.turtleDelay = TURTLESTEP;
+        logo.runFromBlockNow = jest.fn();
+        logo.runFromBlock(logo, 0, 1, 0, env);
+        logo.step();
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 1, 0, env);
+    });
+
+    test("Step stops iterating when a source failure clears every turtle queue", () => {
+        logo.stepQueue = {
+            0: [{ blk: 1, isflow: 0, receivedArg: null }],
+            1: [{ blk: 2, isflow: 0, receivedArg: null }]
+        };
+        logo.runFromBlockNow = jest.fn(() => logo.doStopTurtles());
+        expect(() => logo.step()).not.toThrow();
+        expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
     });
 
     test("handles empty step queue", () => {
@@ -1684,6 +1703,110 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands();
         dispatches[0]();
         expect(logo.runFromBlock).not.toHaveBeenCalled();
+    });
+
+    test("Stop prevents synchronous notation dispatch", () => {
+        logo.runningLilypond = true;
+        logo.stopTurtle = true;
+        logo.runFromBlockNow = jest.fn();
+        logo.runFromBlock(logo, 0, 0, 0, "stopped");
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+    });
+
+    test("Stop abandons silent export intent so ordinary retry prepares audio", () => {
+        logo.runningLilypond = true;
+        logo.runningAbc = true;
+        logo.runningMxml = true;
+        logo.runningMIDI = true;
+        logo.collectingStats = true;
+        logo.doStopTurtles();
+        expect(logo._exportingNotation).toBe(false);
+        expect(logo.collectingStats).toBe(false);
+    });
+
+    test("a synchronous silent failure does not leave later starts running", async () => {
+        logo.runningLilypond = true;
+        mockActivity.turtles.markAllAsStopped.mockImplementation(() => {
+            turtle0.running = false;
+            turtle1.running = false;
+        });
+        logo.blockList = [
+            { name: "start", value: 0, connections: [] },
+            { name: "start", value: 1, connections: [] }
+        ];
+        mockActivity.blocks.stackList = [0, 1];
+        logo.runFromBlock = jest.fn(() => logo.doStopTurtles());
+        logo.runLogoCommands();
+        await new Promise(resolve => setTimeout(resolve, 10));
+        expect(logo.runFromBlock).toHaveBeenCalledTimes(1);
+        expect(turtle0.running).toBe(false);
+        expect(turtle1.running).toBe(false);
+    });
+
+    test("a bare stack prepares for the fresh turtle when every previous turtle is trashed", async () => {
+        turtle0.inTrash = true;
+        turtle1.inTrash = true;
+        const turtles = mockActivity.turtles;
+        turtles.ithTurtle = jest.fn(i => turtles.turtleList[i]);
+        turtles.getTurtle = turtles.ithTurtle;
+        turtles.turtleCount = jest.fn(() => turtles.turtleList.filter(t => !t.inTrash).length);
+        turtles.getTurtleCount = jest.fn(() => turtles.turtleList.length);
+        turtles.addTurtle = jest.fn(() => turtles.turtleList.push(createMockTurtle()));
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(async () => ({}));
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [
+            { name: "settimbre", connections: [] },
+            { name: "multisample", value: {}, trash: false }
+        ];
+        logo.runLogoCommands(0, "kept");
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.synth.loadSynth).toHaveBeenCalledWith(2, "voice");
+        expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 2, 0, 0, "kept");
+    });
+
+    test.each(["runningLilypond", "runningAbc", "runningMxml", "runningMIDI"])(
+        "%s starts without registering or preparing saved audio",
+        flag => {
+            logo[flag] = true;
+            logo.synth.registerMultisample = jest.fn(() => "voice");
+            logo.synth.loadSynth = jest.fn(() => new Promise(() => {}));
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [
+                { name: "start", value: 0, connections: [] },
+                { name: "multisample", value: {}, trash: false }
+            ];
+            logo.runLogoCommands(0, "silent");
+            expect(logo.synth.registerMultisample).not.toHaveBeenCalled();
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 0, 0, 0, "silent");
+        }
+    );
+
+    test("retains one Step during preparation until ordinary queues are populated", async () => {
+        let ready;
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    ready = resolve;
+                })
+        );
+        logo.blockList = [
+            { name: "start", value: 0, connections: [] },
+            { name: "multisample", value: {}, trash: false }
+        ];
+        mockActivity.blocks.stackList = [0];
+        logo.turtleDelay = TURTLESTEP;
+        logo.runFromBlockNow = jest.fn();
+        logo.runLogoCommands(null, "initial");
+        logo.step();
+        logo.step();
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        ready();
+        await new Promise(resolve => setTimeout(resolve, 10));
+        expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 0, 0, "initial");
     });
 
     test("prepares saved values before startup and resumes the original invocation once", async () => {
