@@ -623,6 +623,107 @@ describe("GlobalPlanet", () => {
             expect(document.getElementById("tagscontainer").style.display).toBe("block");
             expect(refreshSpy).toHaveBeenCalled();
         });
+
+        it("supports live search from the secondary search input", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+
+            gp.init();
+
+            const input = document.getElementById("global-search-2");
+            input.value = "sakura";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("sakura");
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("searches immediately on Enter and cancels the pending debounce", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+
+            gp.init();
+
+            const input = document.getElementById("global-search");
+            input.value = "sakura";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+            expect(gp.searchString).toBe("sakura");
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("searches immediately from the secondary input on Enter", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+
+            gp.init();
+
+            const input = document.getElementById("global-search-2");
+            input.value = "sakura";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+            expect(gp.searchString).toBe("sakura");
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("clears a pending search when the primary clear button is clicked", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+
+            gp.init();
+
+            const input = document.getElementById("global-search");
+            input.value = "sakura";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            document.getElementById("search-close").click();
+
+            expect(input.value).toBe("");
+            expect(gp.searchString).toBe("");
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("clears a pending search when the secondary clear button is clicked", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+
+            gp.init();
+
+            const input = document.getElementById("global-search-2");
+            input.value = "sakura";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            document.getElementById("search-close-2").click();
+
+            expect(input.value).toBe("");
+            expect(gp.searchString).toBe("");
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("destroy", () => {
