@@ -330,12 +330,17 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `Alt + B`                 | `Option + B`               | Save the current block artwork.                        |
 | `Alt + C`                 | `Option + C`               | Copy the selected blocks.                              |
 | `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
-| `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
+| `Alt + R`                 | `Option + R`               | Play the project. Does nothing while the project is running (use `Alt + S` to stop). |
+| `Enter` or `Alt + Enter`  | `Return` or `Option + Return` | Play or stop the project, when no text input or widget is active. |
+| `Space`                   | `Space`                    | Play or stop the project, when no text input or widget is active. |
 | `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
 | `Alt + H`                 | `Option + H`               | Save help blocks - Generate and save artwork for each block.|
+| `Alt + V`                 | `Option + V`               | Paste the previously copied stack.                     |
 | `Ctrl + V`                | `Command + V`              | Open the paste box.                                    |
-| `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
-| `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
+| `Ctrl + Z`                | `Control + Z`              | Undo the last block action.                            |
+| `Ctrl + Y` or `Ctrl + Shift + Z` | `Control + Y` or `Control + Shift + Z` | Redo the last undone block action. |
+| `Shift + Space`           | `Shift + Space`            | Toggle the zoom level of the stage.                    |
+| `ESC`                     | `ESC`                     | Hide the block search bar when the search input is focused. |
 
 ### 2. Navigation Shortcuts
 
