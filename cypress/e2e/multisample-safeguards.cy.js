@@ -81,7 +81,7 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
             "preserves " + destination + " contents and refuses box/action values before output",
             () => {
                 load(project(type));
-                let widget, before, init, decode, errors, output;
+                let widget, before, init, decode, errors, output, startupDecodes;
                 cy.window().then(
                     win =>
                         new Cypress.Promise(resolve => {
@@ -114,6 +114,15 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
                                     decode = cy.spy(win.Tone.ToneAudioBuffer, "load");
                                     errors = cy.spy(activity, "errorMsg");
                                     output = cy.spy(activity, "textMsg");
+                                    const resume = activity.logo._startLogoCommands;
+                                    cy.stub(activity.logo, "_startLogoCommands").callsFake(
+                                        function (...args) {
+                                            startupDecodes = decode.args.filter(
+                                                call => call[0] === value().samples[0].data
+                                            ).length;
+                                            return resume.apply(this, args);
+                                        }
+                                    );
                                     activity.logo.runLogoCommands();
                                     resolve();
                                 });
@@ -128,7 +137,10 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
                     expect(init).not.to.have.been.called;
                     expect(
                         decode.args.filter(args => args[0] === value().samples[0].data)
-                    ).to.have.length(0);
+                    ).to.have.length(startupDecodes);
+                    expect(startupDecodes, "one conservative preparation before dispatch").to.equal(
+                        1
+                    );
                     expect(
                         output.args.some(args => args[0] === "unexpected child output")
                     ).to.equal(false);
