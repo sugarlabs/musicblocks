@@ -23,6 +23,7 @@ const loadActivityClass = (overrides = {}) =>
                     hasActiveTweens: jest.fn(() => false)
                 }
             },
+            closeWidgets: jest.fn(),
             requestAnimationFrame: (...args) => global.requestAnimationFrame(...args),
             cancelAnimationFrame: (...args) => global.cancelAnimationFrame(...args),
             ...overrides
@@ -34,11 +35,13 @@ describe("Activity Toolbar Integration", () => {
     let activity;
     let mockElement;
     let announceToScreenReader;
+    let closeWidgets;
 
     beforeAll(() => {
         const sandbox = loadActivityClass();
         Activity = sandbox.Activity;
         announceToScreenReader = sandbox.announceToScreenReader;
+        closeWidgets = sandbox.closeWidgets;
     });
 
     beforeEach(() => {
@@ -595,7 +598,7 @@ describe("Activity Toolbar Integration", () => {
         });
     });
     describe("sendAllToTrash and pasted Object.keys loop execution", () => {
-        test("sendAllToTrash iterates Object.keys on palettes and blockList to move blocks to trash", () => {
+        test("sendAllToTrash disposes project blocks without recording trash previews", () => {
             const hideMenu = jest.fn();
             activity.palettes = { dict: { rhythm: { hideMenu } } };
             const mockBlock = {
@@ -613,6 +616,7 @@ describe("Activity Toolbar Integration", () => {
                 captureStackPreview: jest.fn(() => "preview"),
                 trashPreviews: {},
                 trashStacks: [],
+                disposeBlock: jest.fn(),
                 moveBlockRelative: jest.fn(),
                 blockArt: {},
                 blockCollapseArt: {}
@@ -622,7 +626,7 @@ describe("Activity Toolbar Integration", () => {
             activity.saveLocally = jest.fn();
             activity.stage = { dispatchEvent: jest.fn() };
 
-            activity.sendAllToTrash(false, true, false);
+            activity.sendAllToTrash(false, true);
 
             expect(activity.blocksContainer.x).toBe(0);
             expect(activity.blocksContainer.y).toBe(0);
@@ -630,13 +634,17 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.blocks._beginDeferCheckBounds).toHaveBeenCalled();
             expect(activity.blocks._endDeferCheckBounds).toHaveBeenCalled();
             expect(mockBlock.trash).toBe(true);
-            expect(mockBlock.hide).toHaveBeenCalled();
-            expect(mockBlock.container.uncache).toHaveBeenCalled();
-            expect(activity.blocks.trashStacks).toContain("0");
-            expect(activity.blocks.trashPreviews["0"]).toBe("preview");
+            expect(activity.blocks.disposeBlock).toHaveBeenCalledWith("0");
+            expect(closeWidgets).toHaveBeenCalledTimes(1);
+            expect(closeWidgets.mock.invocationCallOrder[0]).toBeLessThan(
+                activity.blocks.disposeBlock.mock.invocationCallOrder[0]
+            );
+            expect(activity.blocks.captureStackPreview).not.toHaveBeenCalled();
+            expect(activity.blocks.trashStacks).toEqual([]);
+            expect(activity.blocks.trashPreviews).toEqual({});
         });
 
-        test("sendAllToTrash does not record blocks that are already in the trash again", () => {
+        test("sendAllToTrash disposes existing trash and clears project undo history", () => {
             activity.palettes = { dict: {} };
             const makeBlock = trash => ({
                 connections: [null],
@@ -653,8 +661,15 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
-                trashPreviews: {},
+                trashPreviews: { 0: "old-preview" },
+                actionHistory: [{ type: "move", blockId: 2 }],
+                redoActionHistory: [{ type: "trash", blockId: 0 }],
+                activeBlock: 2,
+                dragGroup: [0, 2],
                 trashStacks: ["0"],
+                disposeBlock: jest.fn(blk => {
+                    activity.blocks.blockList[blk] = null;
+                }),
                 moveBlockRelative: jest.fn(),
                 blockArt: {},
                 blockCollapseArt: {}
@@ -665,9 +680,16 @@ describe("Activity Toolbar Integration", () => {
 
             activity.sendAllToTrash(false, true, false);
 
-            expect(activity.blocks.trashStacks).toEqual(["0", "2"]);
-            expect(activity.blocks.captureStackPreview).toHaveBeenCalledTimes(1);
-            expect(activity.blocks.moveBlockRelative).toHaveBeenCalledTimes(1);
+            expect(activity.blocks.blockList).toEqual([null, null, null]);
+            expect(activity.blocks.disposeBlock.mock.calls).toEqual([["0"], ["2"]]);
+            expect(activity.blocks.trashStacks).toEqual([]);
+            expect(activity.blocks.trashPreviews).toEqual({});
+            expect(activity.blocks.actionHistory).toEqual([]);
+            expect(activity.blocks.redoActionHistory).toEqual([]);
+            expect(activity.blocks.activeBlock).toBeNull();
+            expect(activity.blocks.dragGroup).toEqual([]);
+            expect(activity.blocks.captureStackPreview).not.toHaveBeenCalled();
+            expect(activity.blocks.moveBlockRelative).not.toHaveBeenCalled();
             expect(trashed.hide).not.toHaveBeenCalled();
             expect(live.trash).toBe(true);
         });
@@ -695,6 +717,7 @@ describe("Activity Toolbar Integration", () => {
                 deleteActionBlock: jest.fn(),
                 trashPreviews: {},
                 trashStacks: [],
+                disposeBlock: jest.fn(),
                 moveBlockRelative: jest.fn(),
                 blockArt: {},
                 blockCollapseArt: {}

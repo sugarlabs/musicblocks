@@ -38,7 +38,7 @@ describe("Project loading", () => {
             // loaded blocks confirms this project specifically loaded, not just
             // that some blocks appeared.
             const loadedPiHeap = blockList.some(
-                block => block.name === "loadFile" && block.value?.[0] === "heap.json"
+                block => block?.name === "loadFile" && block.value?.[0] === "heap.json"
             );
             expect(loadedPiHeap, "pi.tb's heap.json loadFile block should be present").to.be.true;
         });
