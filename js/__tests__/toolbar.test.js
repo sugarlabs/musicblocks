@@ -90,6 +90,7 @@ describe("Toolbar Class", () => {
     });
 
     afterEach(() => {
+        delete global.window.widgetWindows;
         jest.clearAllMocks();
     });
 
@@ -820,6 +821,11 @@ describe("Toolbar Class", () => {
 
         const mockOnClick = jest.fn();
         toolbar.activity = {};
+        const handleResize = jest.fn();
+
+        global.window.widgetWindows = {
+            _handleResize: handleResize
+        };
         toolbar.renderMenuIcon(mockOnClick);
 
         expect(elements.toggleAuxBtn.onclick).toBeInstanceOf(Function);
@@ -829,6 +835,7 @@ describe("Toolbar Class", () => {
 
         elements["aux-toolbar"].style.display = "none";
         clickHandler();
+        expect(handleResize).toHaveBeenCalledTimes(1);
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.menu.textContent).toBe("more_vert");
@@ -837,6 +844,7 @@ describe("Toolbar Class", () => {
 
         elements["aux-toolbar"].style.display = "block";
         clickHandler();
+        expect(handleResize).toHaveBeenCalledTimes(2);
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
@@ -1185,7 +1193,13 @@ describe("Toolbar Class", () => {
         global.docById.mockImplementation(id => elements[id] || {});
         const mockOnClick = jest.fn();
         toolbar.activity = {};
+        const handleResize = jest.fn();
+
+        global.window.widgetWindows = {
+            _handleResize: handleResize
+        };
         toolbar.closeAuxToolbar(mockOnClick);
+        expect(handleResize).toHaveBeenCalledTimes(1);
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.textContent).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);

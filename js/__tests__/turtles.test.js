@@ -603,6 +603,10 @@ describe("aux toolbar collapse and expand", () => {
             <div id="buttoncontainerTOP"></div>
         `;
 
+        global.window.widgetWindows = {
+            _handleResize: jest.fn()
+        };
+
         turtles = new Turtles(activityMock);
         turtles.activity = activityMock;
         mixinPrototypes(turtles);
@@ -654,6 +658,7 @@ describe("aux toolbar collapse and expand", () => {
     afterEach(() => {
         global.Image = originalImage;
         global.docById = originalDocById;
+        delete global.window.widgetWindows;
     });
 
     test("collapse removes highlight classes from auxiliary toolbar button", () => {
@@ -662,6 +667,7 @@ describe("aux toolbar collapse and expand", () => {
 
         turtles.collapse();
 
+        expect(global.window.widgetWindows._handleResize).toHaveBeenCalledTimes(1);
         expect(btn.classList.contains("blue")).toBe(false);
         expect(btn.classList.contains("darken-1")).toBe(false);
         expect(turtles.hideMenu).toHaveBeenCalled();
@@ -670,12 +676,22 @@ describe("aux toolbar collapse and expand", () => {
         expect(activityMock.__tick).toHaveBeenCalled();
     });
 
+    test("collapse does not resize widget windows when auxiliary toolbar is already hidden", () => {
+        const auxToolbar = document.getElementById("aux-toolbar");
+        auxToolbar.style.display = "none";
+
+        turtles.collapse();
+
+        expect(global.window.widgetWindows._handleResize).not.toHaveBeenCalled();
+    });
+
     test("expand removes highlight classes from auxiliary toolbar button", () => {
         const btn = document.getElementById("toggleAuxBtn");
         btn.className = "blue darken-1";
 
         turtles.expand();
 
+        expect(global.window.widgetWindows._handleResize).toHaveBeenCalledTimes(1);
         expect(btn.classList.contains("blue")).toBe(false);
         expect(btn.classList.contains("darken-1")).toBe(false);
         expect(turtles.hideMenu).toHaveBeenCalled();
