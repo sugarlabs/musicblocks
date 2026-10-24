@@ -23,9 +23,17 @@ global.createjs = {
         children: [],
         addChild: jest.fn(),
         removeChild: jest.fn(),
+        removeAllChildren: jest.fn(),
         visible: true
     })),
-    Bitmap: jest.fn()
+    Bitmap: jest.fn(),
+    Shape: jest.fn(() => ({
+        graphics: {
+            setStrokeStyle: jest.fn().mockReturnThis(),
+            beginStroke: jest.fn().mockReturnThis(),
+            drawRect: jest.fn().mockReturnThis()
+        }
+    }))
 };
 
 global.window = {
@@ -88,6 +96,14 @@ describe("Boundary Class", () => {
 
         boundary.show();
         expect(boundary._container.visible).toBe(true);
+    });
+
+    it("should show outlines for separated block stacks", () => {
+        boundary.showBlockHighlights([{ x: 10, y: 20, width: 100, height: 50 }]);
+
+        expect(createjs.Shape).toHaveBeenCalled();
+        expect(boundary._highlightContainer.addChild).toHaveBeenCalled();
+        expect(boundary._highlightContainer.visible).toBe(true);
     });
 
     it("should destroy the first child in the container", () => {
