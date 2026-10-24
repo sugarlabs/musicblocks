@@ -346,8 +346,12 @@ class Publisher {
             const existingKey = existingRepoName
                 ? Planet.ServerInterface.getKey(existingRepoName)
                 : null;
+            const isOffline = Planet.ServerInterface.offlineManager?.isOnline === false;
 
-            if (existingRepoName && existingKey) {
+            if (
+                existingRepoName &&
+                (existingKey || (isOffline && projectEntry.pendingRepoCreation))
+            ) {
                 // ── REPO EXISTS: just flip visible=1 ─────────────────────
                 // The project is already on GitHub — no new repo needed.
                 // Also pass the current title, description, and tags so SQLite
@@ -367,6 +371,7 @@ class Publisher {
                     publishData => {
                         const combined = {
                             success: publishData.success,
+                            offline: publishData.offline,
                             error: publishData.error || null
                         };
                         this.afterPublishProject(combined, id, title.value, published);
@@ -374,7 +379,8 @@ class Publisher {
                     title.value, // updated project name
                     descriptionVal, // updated description
                     tagsVal, // updated tags
-                    thumbnailVal // canonical thumbnail = canvas state right now
+                    thumbnailVal, // canonical thumbnail = canvas state right now
+                    id
                 );
             } else {
                 // ── NO REPO YET: create one, then publish ─────────────────
@@ -408,14 +414,16 @@ class Publisher {
                         publishData => {
                             const combined = {
                                 success: publishData.success,
+                                offline: publishData.offline,
                                 error: publishData.error || null
                             };
                             this.afterPublishProject(combined, id, title.value, published);
                         },
-                        undefined, // projectName already set during /create
-                        undefined, // description already set during /create
-                        undefined, // tags already set during /create
-                        thumbnailVal // canonical thumbnail = canvas state right now
+                        title.value,
+                        descriptionVal,
+                        tagsVal,
+                        thumbnailVal, // canonical thumbnail = canvas state right now
+                        id
                     );
                 });
             }
@@ -484,6 +492,15 @@ class Publisher {
 
     afterPublishProject(data, id, name, published) {
         const Planet = this.Planet;
+
+        if (data.offline) {
+            this.hideProgressBar();
+            this.close();
+            Planet.SaveInterface?.showToast?.(
+                _("Publishing queued. It will finish when you reconnect.")
+            );
+            return;
+        }
 
         if (data.success) {
             Planet.ProjectStorage.addPublishedData(id, published);
