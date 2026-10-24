@@ -568,6 +568,114 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("global search interactions", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            jest.spyOn(gp, "search").mockImplementation(() => {});
+            gp.init();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it("should debounce global search input", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = " piano ";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(gp.searchString).toBe("piano");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cancel pending debounce when Enter is pressed", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = " piano ";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            input.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    bubbles: true
+                })
+            );
+
+            expect(gp.searchString).toBe("piano");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should handle Enter on the secondary global search", () => {
+            const input = document.getElementById("global-search-2");
+
+            gp.searchDebounce = setTimeout(() => gp.search(), 300);
+
+            input.value = " drums ";
+            input.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    bubbles: true
+                })
+            );
+
+            expect(gp.searchString).toBe("drums");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cancel pending debounce when primary search is cleared", () => {
+            const input = document.getElementById("global-search");
+            const close = document.getElementById("search-close");
+
+            input.value = "piano";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            close.dispatchEvent(new Event("click", { bubbles: true }));
+
+            expect(input.value).toBe("");
+            expect(gp.searchString).toBe("");
+            expect(close.style.display).toBe("none");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cancel pending debounce when secondary search is cleared", () => {
+            const input = document.getElementById("global-search-2");
+            const close = document.getElementById("search-close-2");
+
+            gp.searchDebounce = setTimeout(() => gp.search(), 300);
+            input.value = "drums";
+            gp.searchString = "drums";
+
+            close.dispatchEvent(new Event("click", { bubbles: true }));
+
+            expect(input.value).toBe("");
+            expect(gp.searchString).toBe("");
+            expect(close.style.display).toBe("none");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("destroy", () => {
         it("should call ProjectViewer.destroy() when ProjectViewer exists", () => {
             const mockDestroy = jest.fn();
@@ -576,6 +684,23 @@ describe("GlobalPlanet", () => {
             gp.destroy();
 
             expect(mockDestroy).toHaveBeenCalled();
+        });
+
+        it("should cancel a pending search debounce timer", () => {
+            jest.useFakeTimers();
+
+            const delayedSearch = jest.fn();
+
+            gp.searchDebounce = setTimeout(delayedSearch, 300);
+
+            gp.destroy();
+
+            jest.advanceTimersByTime(300);
+
+            expect(delayedSearch).not.toHaveBeenCalled();
+            expect(gp.searchDebounce).toBeNull();
+
+            jest.useRealTimers();
         });
 
         it("should not throw when ProjectViewer is null", () => {
