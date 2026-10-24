@@ -405,6 +405,10 @@ describe("Turtle stopBlink()", () => {
     let turtle;
     let mockActivity;
 
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     beforeEach(() => {
         mockActivity = { refreshCanvas: jest.fn() };
         turtle = new Turtle(mockActivity, 0, "turtle1", {}, null);
@@ -456,7 +460,6 @@ describe("Turtle stopBlink()", () => {
         expect(turtle._blinkFinished).toBe(true);
         expect(turtle.container.visible).toBe(true);
         expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
-        jest.useRealTimers();
     });
 
     it("restores visibility when a blink completes normally", () => {
@@ -470,7 +473,6 @@ describe("Turtle stopBlink()", () => {
         expect(turtle._blinkFinished).toBe(true);
         expect(turtle.container.visible).toBe(true);
         expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
-        jest.useRealTimers();
     });
 
     it("leaves a turtle that is not blinking untouched", () => {
