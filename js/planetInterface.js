@@ -403,7 +403,7 @@ class PlanetInterface {
          */
         this.getCurrentGitRepoData = () => {
             const projectStorage = this._getProjectStorage();
-            if (!projectStorage || !projectStorage.data) {
+            if (!projectStorage || !projectStorage.data || !projectStorage.data.Projects) {
                 return null;
             }
 

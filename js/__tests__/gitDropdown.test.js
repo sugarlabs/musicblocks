@@ -560,6 +560,58 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
         });
 
+        test("keeps the Time Travel position of each project", async () => {
+            const drums = { ...guitar, projectId: "drums", repoName: "drum-beat" };
+            useProject(guitar);
+            await gitDropdown._restoreCommit({ sha: "riff-sha", message: "Riff", projectData: {} });
+            useProject(drums);
+            await gitDropdown._restoreCommit({
+                sha: "groove-sha",
+                message: "Groove",
+                projectData: {}
+            });
+            useProject(guitar);
+
+            gitDropdown._renderHistoryPanel([
+                { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" }
+            ]);
+
+            const here = document.querySelector(".git-tt-stop.now-stop .git-tt-msg");
+            expect(here.textContent).toBe("Riff");
+            gitDropdown._closeHistoryPanel();
+        });
+
+        test("does not report unsaved changes saved by another project", () => {
+            useProject(guitar);
+            mockActivity.prepareExport.mockReturnValue("guitar blocks");
+            gitDropdown.onSaveLocally();
+            useProject({ ...guitar, projectId: "drums" });
+            mockActivity.prepareExport.mockReturnValue("drum blocks");
+            gitDropdown.onSaveLocally();
+            useProject(guitar);
+            mockActivity.prepareExport.mockReturnValue("guitar blocks");
+
+            expect(gitDropdown._hasUnsavedChanges()).toBe(false);
+        });
+
+        test("shows the new repo before Planet links it to the project", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                status: 201,
+                json: () => Promise.resolve({ repository: "guitar-song", key: "guitar-key" })
+            });
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(global.fetch).toHaveBeenLastCalledWith(
+                expect.stringContaining("commitHistory?repoName=guitar-song")
+            );
+        });
+
         test("Time Travel loads the history of the open project's repo", async () => {
             useProject(guitar);
             gitDropdown._prefetchCommits();
