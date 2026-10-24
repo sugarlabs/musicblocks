@@ -107,8 +107,8 @@ function setupIntervalsActions(activity) {
          */
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-            let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             const temperament = activity.logo.synth.inTemperament;
+            let { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
             const keySig = tur.singer.keySignature;
             const firstStep = pitchToNumber(firstNote, 0, keySig, temperament);
             const secondStep = pitchToNumber(secondNote, 0, keySig, temperament);
@@ -149,8 +149,8 @@ function setupIntervalsActions(activity) {
 
         static GetCurrentInterval(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-
-            const { firstNote, secondNote, octave } = GetNotesForInterval(tur);
+            const temperament = activity.logo.synth.inTemperament;
+            const { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
 
             const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
             const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));

@@ -48,7 +48,8 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { stripMicrotonalPrefix, normalizeNoteAccidentals, parseNoteString } = MusicUtilsPitch;
+    var { stripMicrotonalPrefix, normalizeNoteAccidentals, parseNoteString, frequencyToPitch } =
+        MusicUtilsPitch;
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
@@ -739,12 +740,18 @@ var getCustomNote = note => {
     return note;
 };
 
-var GetNotesForInterval = tur => {
+var GetNotesForInterval = (tur, temperament) => {
     const parseFn =
         typeof parseNoteString !== "undefined"
             ? parseNoteString
             : typeof MusicUtilsPitch !== "undefined"
               ? MusicUtilsPitch.parseNoteString
+              : null;
+    const freqToPitchFn =
+        typeof frequencyToPitch !== "undefined"
+            ? frequencyToPitch
+            : typeof MusicUtilsPitch !== "undefined"
+              ? MusicUtilsPitch.frequencyToPitch
               : null;
     const noteStatus = tur?.singer?.noteStatus;
     const notePitches = tur?.singer?.notePitches;
@@ -753,14 +760,28 @@ var GetNotesForInterval = tur => {
     let firstNote = "C",
         secondNote = "C",
         octave = 0;
-    if (noteStatus && noteStatus[0]) {
-        const [parsedFirstNote, parsedOctaveA] = parseFn(String(noteStatus[0][0]));
+    if (noteStatus && noteStatus[0]?.length) {
+        const formatNote = note => {
+            if (note === undefined || note === null) {
+                return "";
+            }
+            if (typeof note === "number" && freqToPitchFn) {
+                const [name, noteOct] = freqToPitchFn(note, temperament);
+                return name + noteOct;
+            }
+            return String(note);
+        };
+        const [parsedFirstNote, parsedOctaveA] = parseFn
+            ? parseFn(formatNote(noteStatus[0][0]))
+            : ["C", NaN];
         firstNote = parsedFirstNote || "C";
         if (!noteStatus[0][1]) {
             firstNote = normalizeNoteAccidentals(firstNote);
             return { firstNote, secondNote: firstNote, octave };
         }
-        const [parsedSecondNote, parsedOctaveB] = parseFn(String(noteStatus[0][1]));
+        const [parsedSecondNote, parsedOctaveB] = parseFn
+            ? parseFn(formatNote(noteStatus[0][1]))
+            : ["C", NaN];
         secondNote = parsedSecondNote || "C";
         if (!Number.isNaN(parsedOctaveA) && !Number.isNaN(parsedOctaveB)) {
             octave = parsedOctaveB - parsedOctaveA;
