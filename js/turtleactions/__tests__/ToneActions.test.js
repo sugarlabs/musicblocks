@@ -74,6 +74,9 @@ describe("setupToneActions", () => {
                 blockList: { 1: {}, 2: {} }
             },
             logo: {
+                doStopTurtles: jest.fn(() => {
+                    activity.logo.stopTurtle = true;
+                }),
                 setDispatchBlock: jest.fn(_name => {}),
                 setTurtleListener: jest.fn((_, _name, callback) => {
                     listenerCallbacks[_name] = callback;
