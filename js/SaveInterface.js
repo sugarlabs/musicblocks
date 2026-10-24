@@ -222,6 +222,10 @@ class SaveInterface {
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
+                // downloadURL() won't run to free a Blob URL, so free it here.
+                if (typeof URL.revokeObjectURL === "function") {
+                    URL.revokeObjectURL(dataurl);
+                }
                 return;
             }
 
@@ -601,17 +605,19 @@ class SaveInterface {
      * @instance
      */
     saveSVG(activity, filename) {
-        const svg =
-            "data:image/svg+xml;utf8," +
-            doSVG(
-                activity.canvas,
-                activity.logo,
-                activity.turtles,
-                activity.canvas.width,
-                activity.canvas.height,
-                1.0
-            );
-        activity.save.download("svg", svg, filename || null);
+        const svg = doSVG(
+            activity.canvas,
+            activity.logo,
+            activity.turtles,
+            activity.canvas.width,
+            activity.canvas.height,
+            1.0
+        );
+        // Use a Blob, not a data URL: there the first "#" (a colour like
+        // fill="#ffffff") starts the fragment and cuts the file off.
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, filename || null);
     }
 
     /**
@@ -636,8 +642,11 @@ class SaveInterface {
      * @instance
      */
     saveBlockArtwork(activity) {
-        const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
-        activity.save.download("svg", svg, null);
+        // printBlockSVG() returns the inside of the SVG URI-encoded.
+        const svg = decodeURIComponent(activity.printBlockSVG());
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, null);
     }
 
     /**
