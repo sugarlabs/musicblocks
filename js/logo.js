@@ -944,6 +944,7 @@ class Logo {
         } else if (
             typeof arg1 === "object" &&
             blk !== null &&
+            this.blockList[blk].connections[2] !== null &&
             this.blockList[this.blockList[blk].connections[2]].name === "loadFile"
         ) {
             if (arg1) {
