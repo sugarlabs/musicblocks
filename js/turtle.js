@@ -19,7 +19,7 @@
 /*
    global
 
-   createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
+   createjs, DEFAULTVOLUME, importMembers, Painter, Singer,
    DEFAULTVOICE, retryWithBackoff, base64Encode
  */
 /* exported Turtle */
@@ -170,13 +170,11 @@ class Turtle {
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
 
-    async blink(duration, volume) {
+    blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.
         if ("CursorOver" + this.id in this.listeners || "CursorOut" + this.id in this.listeners)
             return;
-
-        this._blinkTimeout = null;
 
         // No time to blink for really short notes. (t = 1 / duration)
         if (duration > 16) {
@@ -188,10 +186,12 @@ class Turtle {
 
         this.container.visible = false;
         this.activity.refreshCanvas();
-        this._blinkTimeout = await delayExecution(100);
-        this._blinkFinished = true;
-        this.container.visible = true;
-        this.activity.refreshCanvas();
+        this._blinkTimeout = setTimeout(() => {
+            this._blinkTimeout = null;
+            this._blinkFinished = true;
+            this.container.visible = true;
+            this.activity.refreshCanvas();
+        }, 100);
     }
 
     /**
