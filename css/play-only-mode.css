@@ -7,6 +7,20 @@
     min-height: 100vh !important;
 }
 
+/*
+ * The stage holds several off-screen helper surfaces (the stats chart
+ * canvas, the camera video/canvas, the overlay canvas and the oversized
+ * main canvas) that sit in normal flow but are never meant to be seen.
+ * In the editor these are clipped by `body { overflow: hidden }`; making
+ * the body scrollable for play-only mode removes that clip and lets the
+ * surfaces stretch the page into a tall blank region. Clip the stage to
+ * its own viewport-sized box so they cannot add scrollable height,
+ * regardless of screen size or zoom level.
+ */
+.play-only .canvasHolder {
+    overflow: hidden !important;
+}
+
 /* Floating controls container at bottom-right */
 .play-only #buttoncontainerBOTTOM {
     display: flex !important;
