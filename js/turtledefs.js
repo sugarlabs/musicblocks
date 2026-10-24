@@ -36,7 +36,7 @@
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.8.0"; // x-release-please-version
+const VERSION = "3.9.0"; // x-release-please-version
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
