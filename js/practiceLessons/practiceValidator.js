@@ -482,25 +482,26 @@ const PracticeValidator = {
         return names;
     },
 
-    // Walks a stack in the order it runs, keeping the most recent name it sets, even an
-    // empty one. Returns null when the stack never sets a name.
-    getLastMouseName(blockId, blockList, seen = new Set()) {
-        if (blockId === null || blockId === undefined || seen.has(blockId)) return null;
-
-        const block = blockList[blockId];
-        if (!block || block.trash) return null;
-
-        seen.add(blockId);
+    // Follows the top of a stack, keeping the most recent name it sets, even an empty
+    // one. A name set inside a loop or an if may never run, so it is left out.
+    // Returns null when the stack never sets a name.
+    getLastMouseName(blockId, blockList) {
+        let currentId = this.unwrapHiddenFlow(blockId, blockList);
         let name = null;
-        if (MOUSE_NAME_CONNECTION.has(block.name)) {
-            const slot = MOUSE_NAME_CONNECTION.get(block.name);
-            const value = blockList[block.connections?.[slot]]?.value;
-            if (value !== undefined && value !== null) name = String(value);
-        }
+        let guard = 0;
 
-        for (const connectionId of (block.connections || []).slice(1)) {
-            const laterName = this.getLastMouseName(connectionId, blockList, seen);
-            if (laterName !== null) name = laterName;
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) break;
+
+            if (MOUSE_NAME_CONNECTION.has(block.name)) {
+                const slot = MOUSE_NAME_CONNECTION.get(block.name);
+                const value = blockList[block.connections?.[slot]]?.value;
+                if (value !== undefined && value !== null) name = String(value);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
         }
 
         return name;

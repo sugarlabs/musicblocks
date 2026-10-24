@@ -1143,6 +1143,33 @@ describe("PracticeValidator piano discoveries", () => {
         expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
     });
 
+    test("a rename inside an if or a loop does not count, since it may never run", () => {
+        for (const clamp of ["if", "repeat"]) {
+            const blocks = piano(["sol", "sol"]);
+            blocks["k1-name"].connections[2] = "k1-clamp";
+            blocks["k1-listen"].connections[0] = "k1-clamp";
+            blocks["k1-clamp"] = {
+                name: clamp,
+                trash: false,
+                connections: ["k1-name", null, "k1-rename", "k1-listen"]
+            };
+            blocks["k1-rename"] = {
+                name: "setturtlename2",
+                trash: false,
+                connections: ["k1-clamp", "k1-rename-text", null]
+            };
+            blocks["k1-rename-text"] = {
+                name: "text",
+                value: "mi",
+                trash: false,
+                connections: ["k1-rename"]
+            };
+            useBlocks(blocks);
+
+            expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+        }
+    });
+
     test("a copied key counts once it is renamed", () => {
         useBlocks(renameKey(piano(["sol", "sol"]), "k1", "mi"));
 
@@ -1160,7 +1187,7 @@ describe("PracticeValidator piano discoveries", () => {
     test("the older set name block names a key too", () => {
         useBlocks({
             ...piano(["sol"]),
-            k1: { name: "start", trash: false, connections: [null, "k1-name", null] },
+            "k1": { name: "start", trash: false, connections: [null, "k1-name", null] },
             "k1-name": {
                 name: "setturtlename",
                 trash: false,
