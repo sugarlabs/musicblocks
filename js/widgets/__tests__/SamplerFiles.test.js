@@ -84,4 +84,41 @@ describe("SamplerFiles", () => {
             3
         );
     });
+
+    test.each([
+        ["audio/wav", true],
+        ["audio/wave", true],
+        ["audio/x-wav", true],
+        ["audio/x-pn-wav", true],
+        ["audio/mpeg", false]
+    ])("handles a sample labelled %s", async (type, accepted) => {
+        const originalFileReader = global.FileReader;
+        global.FileReader = class {
+            readAsDataURL(file) {
+                this.result = `data:${file.type};base64,UklGRg==`;
+                queueMicrotask(() => this.onload());
+            }
+        };
+        try {
+            const widget = makeWidget();
+            widget.activity = { errorMsg: jest.fn() };
+            widget._addSample = jest.fn();
+            widget.handleFiles({ name: "sample.wav", type });
+            await Promise.resolve();
+
+            if (accepted) {
+                expect(widget.sampleName).toBe("sample.wav");
+                expect(widget._addSample).toHaveBeenCalledTimes(1);
+                expect(widget.activity.errorMsg).not.toHaveBeenCalled();
+            } else {
+                expect(widget._addSample).not.toHaveBeenCalled();
+                expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+                    "Upload failed: Sample is not a .wav file.",
+                    undefined
+                );
+            }
+        } finally {
+            global.FileReader = originalFileReader;
+        }
+    });
 });
