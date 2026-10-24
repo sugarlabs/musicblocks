@@ -79,6 +79,7 @@ describe("setupToneActions", () => {
                     listenerCallbacks[_name] = callback;
                 }),
                 synth: {
+                    getMultisampleName: jest.fn(() => null),
                     loadSynth: jest.fn(),
                     createSynth: jest.fn()
                 },
@@ -244,6 +245,7 @@ describe("setupToneActions", () => {
         });
 
         it("consumes a prepared pair without loading or changing the legacy registry", () => {
+            activity.logo.inTimbre = false;
             const descriptor = multisampleValue();
             const previous = { ...CUSTOMSAMPLES };
             activity.logo.synth.getPreparedMultisample = jest.fn().mockReturnValue("multisample_1");
@@ -261,6 +263,7 @@ describe("setupToneActions", () => {
         it.each([multisampleValue(), { type: "multisample", version: 2, name: "Future" }])(
             "aborts unprepared or unsupported values before timbre/listener mutation: %p",
             descriptor => {
+                activity.logo.inTimbre = false;
                 activity.logo.synth.getPreparedMultisample = jest.fn().mockReturnValue(null);
                 const result = Singer.ToneActions.setTimbre(descriptor, 0, 1);
                 expect(result).toBe(false);
@@ -276,23 +279,43 @@ describe("setupToneActions", () => {
             }
         );
 
-        it("does not capture a prepared alias in Phrase Maker or replace its data", () => {
-            activity.logo.inMatrix = true;
+        it.each([
+            ["inMatrix", "Phrase Maker"],
+            ["inMusicKeyboard", "Music Keyboard"],
+            ["inSample", "Sampler"],
+            ["inRhythmRuler", "Rhythm Ruler"],
+            ["inTimbre", "Timbre"]
+        ])("refuses %s before consuming or capturing a prepared alias", (flag, destination) => {
+            activity.logo.inTimbre = false;
+            activity.logo[flag] = true;
             activity.logo.phraseMaker._instrumentName = "violin";
             activity.logo.synth.getPreparedMultisample = jest.fn().mockReturnValue("multisample_1");
             expect(Singer.ToneActions.setTimbre(multisampleValue(), 0, 1)).toBe(false);
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                expect.stringMatching(/Cello.*Phrase Maker/),
+                expect.stringMatching(new RegExp("Cello.*" + destination)),
                 1
             );
             expect(activity.logo.phraseMaker._instrumentName).toBe("violin");
             expect(activity.logo.synth.getPreparedMultisample).not.toHaveBeenCalled();
             expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
         });
 
         it("should keep the cent adjustment of a custom sample", () => {
             Singer.ToneActions.setTimbre(["tuned", "data", "la", 4, 50], 0, 1);
             expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
+        });
+
+        it("does not classify silent notation or counting as widget capture", () => {
+            activity.logo.inTimbre = false;
+            activity.logo.runningLilypond = true;
+            activity.logo.runningAbc = true;
+            targetTurtle.singer.justCounting = [true];
+            expect(Singer.ToneActions.rejectMultisampleCapture(multisampleValue(), 0, 1)).toBe(
+                false
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should handle empty custom sample name", () => {

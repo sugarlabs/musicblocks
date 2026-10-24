@@ -967,6 +967,13 @@ function setupToneBlocks(activity) {
             this.setCapability("wideLabel");
             this.hidden = true;
             this.formBlock({ outType: "anyout" });
+            this.setHelpString([
+                _(
+                    "Use with Set Instrument in ordinary note programs. Widget capture and JavaScript export are not supported yet. Native project save/export includes the recordings."
+                ),
+                "documentation",
+                ""
+            ]);
         }
 
         arg(logo, turtle, blk) {
@@ -1041,6 +1048,9 @@ function setupToneBlocks(activity) {
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
             } else {
+                if (Singer.ToneActions.setTimbre(args[0], turtle, blk) === false) {
+                    return [null, 0];
+                }
                 if (logo.inRhythmRuler) {
                     logo._currentDrumBlock = blk;
                     logo.rhythmRuler.Drums.push(blk);
@@ -1065,8 +1075,6 @@ function setupToneBlocks(activity) {
                         logo.sample.sampleOctave = 4;
                     }
                 }
-
-                Singer.ToneActions.setTimbre(args[0], turtle, blk);
             }
 
             return [args[1], 1];
