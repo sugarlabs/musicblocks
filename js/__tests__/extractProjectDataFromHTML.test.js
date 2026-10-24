@@ -1,4 +1,4 @@
-const { extractProjectDataFromHTML } = require("../utils/utils");
+const { escapeHTML, extractProjectDataFromHTML, parseProjectFileData } = require("../utils/utils");
 
 describe("extractProjectDataFromHTML", () => {
     it("extracts project data from valid HTML with id=codeBlock", () => {
@@ -39,5 +39,32 @@ describe("extractProjectDataFromHTML", () => {
         const html = '<div class="code">{"blocks":[\n{"name":"start"}\n]}</div>';
         const result = extractProjectDataFromHTML(html);
         expect(result).toBe('{"blocks":[\n{"name":"start"}\n]}');
+    });
+});
+
+describe("parseProjectFileData", () => {
+    const project = [
+        [0, "print", 0, 0, [null, 1, null]],
+        [1, ["text", { value: "see https://example.org/lesson.html" }], 0, 0, [0]]
+    ];
+
+    it("parses a JSON project whose block values contain 'html'", () => {
+        expect(parseProjectFileData(JSON.stringify(project))).toEqual(project);
+    });
+
+    it("parses project data from an HTML export", () => {
+        const html =
+            '<!DOCTYPE html><html><body><div class="code" id="codeBlock">' +
+            escapeHTML(JSON.stringify(project)) +
+            "</div></body></html>";
+        expect(parseProjectFileData(html)).toEqual(project);
+    });
+
+    it("returns null for HTML without project data", () => {
+        expect(parseProjectFileData("<html><body>No project here</body></html>")).toBeNull();
+    });
+
+    it("throws for a file that is neither JSON nor HTML", () => {
+        expect(() => parseProjectFileData("not a project")).toThrow(SyntaxError);
     });
 });
