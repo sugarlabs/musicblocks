@@ -724,6 +724,37 @@ describe("GlobalPlanet", () => {
 
             expect(searchSpy).toHaveBeenCalledTimes(1);
         });
+
+        it("recovers live search after a failed search request", () => {
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+            const offlineSpy = jest.spyOn(gp, "throwOfflineError").mockImplementation(() => {});
+
+            gp.searching = true;
+            gp.oldSearchString = "old-query";
+            gp.searchString = "new-query";
+
+            gp.afterRefreshProjects({ success: false });
+
+            expect(offlineSpy).toHaveBeenCalled();
+            expect(gp.searching).toBe(false);
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("completes the search state when no project cards can be rendered", () => {
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+            jest.spyOn(gp, "throwOfflineError").mockImplementation(() => {});
+
+            gp.searching = true;
+            gp.oldSearchString = "old-query";
+            gp.searchString = "new-query";
+            gp.batchHasOfflineError = true;
+            gp.cache = {};
+
+            gp.render([["missing-project", 123]]);
+
+            expect(gp.searching).toBe(false);
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("destroy", () => {

@@ -238,7 +238,15 @@ class GlobalPlanet {
     }
 
     afterRefreshProjects(data) {
-        data.success ? this.addProjects(data.data) : this.throwOfflineError();
+        if (data.success) {
+            this.addProjects(data.data);
+        } else {
+            this.throwOfflineError();
+
+            if (this.oldSearchString !== "") {
+                this.afterSearch();
+            }
+        }
     }
 
     addProjects(data) {
@@ -428,6 +436,11 @@ class GlobalPlanet {
             } else {
                 this.throwNoProjectsError();
             }
+
+            if (this.oldSearchString !== "") {
+                this.afterSearch();
+            }
+
             return;
         }
 
