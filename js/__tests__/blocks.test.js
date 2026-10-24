@@ -5309,6 +5309,47 @@ describe("sendStackToTrash – turtle container guard", () => {
             expect(child0.size).toBe(4);
             expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
         });
+
+        it("does not expand slot 1 on three-arg or four-arg blocks whose style is twoarg", () => {
+            const threeArgBlock = {
+                name: "rodiPixel",
+                trash: false,
+                connections: [null, 1, 2, null],
+                clampCount: [1, 1],
+                size: 3,
+                protoblock: { args: 3, style: "twoarg" },
+                updateSlots: jest.fn(),
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => true
+            };
+            blocksInstance.blockList.push(threeArgBlock);
+            const blkIndex = blocksInstance.blockList.length - 1;
+
+            blocksInstance._adjustExpandableTwoArgBlock([blkIndex]);
+
+            expect(threeArgBlock.updateSlots).not.toHaveBeenCalledWith(1, expect.any(Number));
+        });
+
+        it("expands setxy slot 0 to fit a distance block with 4 arguments", () => {
+            const distanceBlock = {
+                name: "distance",
+                trash: false,
+                connections: [0, null, null, null, null],
+                clampCount: [1],
+                size: 4,
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true
+            };
+            setxyBlock.connections[1] = 3;
+            blocksInstance.blockList[3] = distanceBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+            expect(setxyBlock.clampCount[0]).toBe(4);
+            expect(setxyBlock.size).toBe(5);
+        });
     });
 
     describe("insideExpandableBlock", () => {

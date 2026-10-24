@@ -1001,9 +1001,10 @@ class Blocks {
 
                 /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy) and two-arg arg blocks (e.g., multiply). */
                 const isTwoArgFlow =
-                    typeof myBlock.isTwoArgBlock === "function"
+                    (typeof myBlock.isTwoArgBlock === "function"
                         ? myBlock.isTwoArgBlock()
-                        : myBlock.name === "setxy";
+                        : myBlock.name === "setxy") &&
+                    (!myBlock.protoblock || myBlock.protoblock.args === 2);
                 const isTwoArgArg =
                     typeof myBlock.isArgBlock === "function" &&
                     myBlock.isArgBlock() &&
