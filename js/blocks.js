@@ -5474,6 +5474,7 @@ class Blocks {
          * @returns {number} this request's load token
          */
         this.loadNewBlocks = blockObjs => {
+            this.activity.logo?.invalidateMultisampleRun?.();
             const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
@@ -8059,6 +8060,7 @@ class Blocks {
             this.findDragGroup(thisBlock);
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const blk = this.dragGroup[b];
+                this.activity.logo?.invalidateMultisampleRun?.(this.blockList[blk]);
                 this.blockList[blk].trash = true;
                 this._updateViewportGrid(blk);
                 this.blockList[blk].hide();

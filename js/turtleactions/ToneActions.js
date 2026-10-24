@@ -121,7 +121,7 @@ function setupToneActions(activity) {
                     }
                 } catch (error) {
                     activity.errorMsg(error.message, blk);
-                    activity.logo.stopTurtle = true;
+                    activity.logo.doStopTurtles();
                     return false;
                 }
             }
