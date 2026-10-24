@@ -88,13 +88,13 @@ function setupMeterActions(activity) {
             // Clear previous default strong beats before setting new ones
             _clearDefaultStrongBeats(tur.singer);
 
-            // Default strong beats only stand in until an on strong beat block picks
-            // some. A meter change after that block must keep the user's beats, not
-            // add the defaults back over them.
-            const userStrongBeats =
-                tur.singer.beatList.some(beat => typeof beat === "number") ||
+            // Default strong beats only stand in until an on strong beat or
+            // on weak beat block picks some. A meter change after that block
+            // must keep the user's beats, not add the defaults back over them.
+            const userBeats =
+                tur.singer.beatList.some(beat => typeof beat === "number" || beat === "offbeat") ||
                 tur.singer.factorList.length > 0;
-            if (!userStrongBeats) {
+            if (!userBeats) {
                 if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 4) {
                     tur.singer.beatList.push(1);
                     tur.singer.beatList.push(3);
