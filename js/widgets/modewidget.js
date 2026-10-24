@@ -422,7 +422,7 @@ class ModeWidget {
                 this._cacheState(oldEDO);
             }
 
-            this.logo.synth.inTemperament = key;
+            this._syncSynthTemperament(key);
             this._activeTemperamentKey = key;
 
             // _translateNotesToEDO() and _restoreState() must run while
@@ -502,10 +502,19 @@ class ModeWidget {
         // intonation, meantone, ...) keep their own key even though their
         // pitch count collides with an equal EDO.
         if (isEquallyTempered(this._activeTemperamentKey)) {
-            this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
+            this._syncSynthTemperament(this._temperamentKeyForEDO(edoCount));
         }
         this._rebuildModeIndex();
         this._piemenuMode();
+    }
+
+    _syncSynthTemperament(key) {
+        if (this.logo && this.logo.synth) {
+            this.logo.synth.inTemperament = key;
+            if (typeof this.logo.synth.temperamentChanged === "function") {
+                this.logo.synth.temperamentChanged(key, this.logo.synth.startingPitch);
+            }
+        }
     }
 
     _clearPieMenu() {
@@ -1600,7 +1609,7 @@ class ModeWidget {
     _applyImportedMode(foundEdo, foundPattern, name) {
         const key = this._temperamentKeyForEDO(foundEdo);
         this._cacheState(this._activeEDO);
-        this.logo.synth.inTemperament = key;
+        this._syncSynthTemperament(key);
         this._activeTemperamentKey = key;
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
