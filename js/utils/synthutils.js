@@ -906,6 +906,9 @@ function Synth() {
         return entry?.sampler && entry.isLive() ? name : null;
     };
 
+    /** Display metadata for a live owned alias, never inferred from a name prefix. */
+    this.getMultisampleName = (turtle, name) => multisampleOwner(turtle, name)?.name ?? null;
+
     /** Releases one preparation/ready owner, including a dedicated preview owner. */
     this.releaseMultisample = (turtle, instrumentName, sourceName = instrumentName) => {
         const source = multisamples.get(sourceName);

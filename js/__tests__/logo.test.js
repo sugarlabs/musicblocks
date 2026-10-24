@@ -718,6 +718,17 @@ describe("Logo clearTurtleListeners", () => {
 
     afterEach(() => jest.restoreAllMocks());
 
+    test("abandons unfinished widget collections before removing their listeners", () => {
+        const abort = jest.fn(() => {
+            logo.instrumentCaptures = [];
+        });
+        logo.instrumentCaptures = [{ abort }];
+        logo.clearTurtleListeners(true);
+        expect(abort).toHaveBeenCalledTimes(1);
+        logo.clearTurtleListeners();
+        expect(abort).toHaveBeenCalledTimes(1);
+    });
+
     test("removes every listener when preservePersistent is not set", () => {
         const persistentListener = jest.fn();
         persistentListener.persistent = true;

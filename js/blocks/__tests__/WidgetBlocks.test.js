@@ -243,6 +243,8 @@ global.MATRIXSOLFEHEIGHT = 10;
 global.MATRIXSOLFEWIDTH = 10;
 global.toFraction = jest.fn();
 global.Singer = jest.fn();
+global.Singer.ToneActions = { rejectMultisampleCapture: jest.fn(() => false) };
+global.deepClone = require("../../utils/utils-logic").deepClone;
 global.SOLFEGECONVERSIONTABLE = {};
 global.slicePath = jest.fn();
 global.wheelnav = jest.fn();
@@ -317,6 +319,7 @@ const createMockLogo = () => {
         Oscilloscope: null,
         oscilloscopeTurtles: [],
         synth: {
+            getMultisampleName: jest.fn(() => null),
             createSynth: jest.fn(),
             startingPitch: null
         },
@@ -343,6 +346,128 @@ describe("setupWidgetBlocks", () => {
     });
 
     const getBlock = type => activity.blockInstances[type];
+
+    describe("multisample capture refusal", () => {
+        const descriptor = { type: "multisample", version: 1, name: "Strings", samples: [] };
+        it("refuses a descriptor as the Timbre name before loading or default substitution", () => {
+            const previousSinger = global.Singer;
+            global.Singer = {};
+            activity.logo = logo;
+            require("../../turtleactions/ToneActions")(activity);
+            try {
+                expect(getBlock("timbre").flow([descriptor, 88], logo, 0, 9)).toEqual([null, 0]);
+                expect(logo.timbre).toBeNull();
+                expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    expect.stringContaining("Strings"),
+                    9
+                );
+            } finally {
+                global.Singer = previousSinger;
+            }
+        });
+        it.each(
+            [
+                ["sampler", "sample", "Sampler"],
+                ["timbre", "timbre", "Timbre"],
+                ["musickeyboard", "musicKeyboard", "Music Keyboard"],
+                ["rhythmruler2", "rhythmRuler", "Rhythm Ruler"],
+                ["matrix", "phraseMaker", "Phrase Maker"]
+            ].flatMap(row =>
+                ["resolved value", "inherited alias", "Stop", "ordinary"].map(mode => [
+                    ...row,
+                    mode
+                ])
+            )
+        )("retains existing %s data when using %s (%s, %s)", (type, key, destination, mode) => {
+            const previousSinger = global.Singer;
+            global.Singer = {};
+            activity.logo = logo;
+            require("../../turtleactions/ToneActions")(activity);
+            const widget = {
+                init: jest.fn(),
+                clearBlocks: jest.fn(),
+                blockNo: 90,
+                sampleName: "kept.wav",
+                sampleData: "kept audio",
+                rowLabels: ["do"],
+                rowArgs: [4],
+                instruments: ["piano"],
+                noteNames: ["do"],
+                octaves: [4],
+                _rowBlocks: [90],
+                Drums: [90],
+                Rulers: [[[4], []]],
+                notesToPlay: [["C4", 4]],
+                synthVals: { oscillator: { source: "sine" }, envelope: { attack: 0.01 } },
+                fmSynthParamvals: { modulationIndex: 10 },
+                amSynthParamvals: { harmonicity: 3 },
+                duoSynthParamVals: { vibratoAmount: 0.5, vibratoRate: 5 },
+                _blockMap: { 9: [[90, [91, 0], 0]] }
+            };
+            logo[key] = widget;
+            const before = { ...widget };
+            try {
+                if (mode === "inherited alias") {
+                    activity.turtles.ithTurtle(0).singer.instrumentNames = ["owned_alias"];
+                    logo.synth.getMultisampleName.mockImplementation((turtle, alias) =>
+                        alias === "owned_alias" ? "Strings" : null
+                    );
+                }
+                const result = getBlock(type).flow(
+                    type === "timbre" ? ["custom", 88] : [88],
+                    logo,
+                    0,
+                    9
+                );
+                if (mode === "ordinary") {
+                    if (type === "matrix") {
+                        logo.tupletRhythms = [["rhythm", 4, 1]];
+                        widget.rowLabels = ["do"];
+                        widget.addNotes = jest.fn();
+                        widget.makeClickable = jest.fn();
+                    }
+                    for (const call of logo.setTurtleListener.mock.calls) call[2]();
+                    expect(widget.init).toHaveBeenCalledTimes(1);
+                    expect(result).toEqual([88, 1]);
+                    expect(logo.instrumentCaptures).toHaveLength(0);
+                    return;
+                }
+                // A box/action has resolved to the value after collection has begun.
+                if (mode === "resolved value") {
+                    if (type === "timbre") {
+                        getBlock("envelope").flow([50, 60, 70, 80], logo, 0, 17);
+                        Singer.ToneActions.defFMSynth(23, 0, 18);
+                        Singer.ToneActions.defAMSynth(7, 0, 19);
+                        Singer.ToneActions.defDuoSynth(8, 40, 0, 20);
+                    }
+                    if (type === "matrix")
+                        require("../../widgets/PhraseMakerGrid").addNode(widget, 92, 93, 0, 9);
+                    expect(Singer.ToneActions.setTimbre(descriptor, 0, 10)).toBe(false);
+                } else if (mode === "Stop") {
+                    logo.stopTurtle = true;
+                } else {
+                    expect(result).toEqual([null, 0]);
+                }
+                for (const call of logo.setTurtleListener.mock.calls) call[2]();
+                expect(widget).toEqual(before);
+                expect(widget.synthVals.envelope.attack).toBe(0.01);
+                expect(widget.fmSynthParamvals).toEqual({ modulationIndex: 10 });
+                expect(widget.amSynthParamvals).toEqual({ harmonicity: 3 });
+                expect(widget.duoSynthParamVals).toEqual({ vibratoAmount: 0.5, vibratoRate: 5 });
+                expect(widget._blockMap).toEqual({ 9: [[90, [91, 0], 0]] });
+                expect(widget.init).not.toHaveBeenCalled();
+                if (mode !== "Stop")
+                    expect(activity.errorMsg).toHaveBeenCalledWith(
+                        expect.stringContaining(destination),
+                        mode === "resolved value" ? 10 : 9
+                    );
+                expect(logo.stopTurtle).toBe(true);
+            } finally {
+                global.Singer = previousSinger;
+            }
+        });
+    });
 
     describe("Block Registration", () => {
         it("registers widget blocks", () => {

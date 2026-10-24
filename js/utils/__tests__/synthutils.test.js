@@ -4453,6 +4453,18 @@ describe("Multisample instruments", () => {
         expect(Tone.Sampler).not.toHaveBeenCalled();
     });
 
+    test("identifies only live owned aliases for unsupported capture diagnostics", async () => {
+        const value = instrument();
+        const alias = synth.registerMultisample(value);
+        expect(synth.getMultisampleName(0, "multisample_legacy")).toBeNull();
+        expect(synth.getMultisampleName(0, alias)).toBeNull();
+        await synth.loadSynth(0, alias);
+        expect(synth.getMultisampleName(0, alias)).toBe(value.name);
+        expect(synth.getMultisampleName(1, alias)).toBeNull();
+        synth.releaseMultisample(0, alias);
+        expect(synth.getMultisampleName(0, alias)).toBeNull();
+    });
+
     test("preserves a legacy Timbre instrument whose name starts with multisample_", async () => {
         synth.samples = { voice: {}, drum: {} };
         synthInstruments[0] ||= {};
