@@ -70,6 +70,25 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.pitchToNumber("Fb", 4, "C major", "equal")).toBe(43);
     });
 
+    it("keeps the full solfege root when parsing double accidentals", () => {
+        expect(pitchscale.pitchToNumber("sol##", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("A", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("do𝄫", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("B♭", 3, "C major", "equal")
+        );
+        expect(pitchscale.getNoteFromSolfege("sol##", "C major", false, 12, 4, 0)).toEqual([
+            "A",
+            4,
+            0
+        ]);
+        expect(pitchscale.getNoteFromSolfege("do𝄫", "C major", false, 12, 4, 0)).toEqual([
+            "B♭",
+            3,
+            0
+        ]);
+    });
+
     it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
         expect(pitchscale.getNoteFromSolfege("sol", "C major", true, 12, 4, 0)).toEqual([
             "G",
