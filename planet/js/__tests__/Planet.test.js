@@ -382,6 +382,39 @@ describe("Planet", () => {
 
             expect(planet.initPlanets).toHaveBeenCalledWith("manifest-data");
         });
+
+        it("links a created repo to the project tracking started in", async () => {
+            const addListener = jest.spyOn(window, "addEventListener");
+            mockProjectStorage.getCurrentProjectID = jest.fn(() => "copy");
+            mockProjectStorage.renameProject = jest.fn().mockResolvedValue();
+            mockProjectStorage.addGitRepoData = jest.fn().mockResolvedValue();
+            planet._postGitState = jest.fn();
+
+            await planet.init();
+            const onMessage = addListener.mock.calls.find(call => call[0] === "message")[1];
+            addListener.mockRestore();
+
+            await onMessage({
+                origin: window.location.origin,
+                data: {
+                    type: "MB_GIT_CREATED",
+                    projectId: "guitar",
+                    repoName: "guitar-song",
+                    hashedKey: "guitar-key",
+                    displayName: "Guitar Song"
+                }
+            });
+
+            expect(mockProjectStorage.renameProject).toHaveBeenCalledWith("guitar", "Guitar Song");
+            expect(mockProjectStorage.addGitRepoData).toHaveBeenCalledWith(
+                "guitar",
+                "guitar-song",
+                "",
+                [],
+                "guitar-key"
+            );
+            expect(planet._postGitState).toHaveBeenCalledWith("guitar");
+        });
     });
 
     describe("initPlanets", () => {
