@@ -1597,14 +1597,10 @@ function MusicKeyboard(activity) {
             return false;
         });
 
-        function removeBlock(that, i) {
-            that._setWidgetTimeout(() => {
-                that._removePitchBlock(that.remove[i]);
+        for (const blockNumber of this.remove) {
+            this._setWidgetTimeout(() => {
+                this._removePitchBlock(blockNumber);
             }, 200);
-        }
-
-        for (let i = 0; i < this.remove.length; i++) {
-            removeBlock(this, i);
         }
 
         const sortedHertzList = sortedList.filter(note => note.noteName === "hertz");
@@ -1960,13 +1956,11 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
+     * Rebuilds the MIDI pitch-to-key map from the current keyboard layout.
+     * @private
      * @memberof MusicKeyboard
      */
-    this.doMIDI = () => {
-        let duration = 0;
-        let startTime = 0;
-
+    this._refreshNoteToKeyMap = () => {
         this.noteToKeyMap = {};
 
         for (let idx = 0; idx < this.layout.length; idx++) {
@@ -1980,6 +1974,17 @@ function MusicKeyboard(activity) {
                 }
             }
         }
+    };
+
+    /**
+     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
+     * @memberof MusicKeyboard
+     */
+    this.doMIDI = () => {
+        let duration = 0;
+        let startTime = 0;
+
+        this._refreshNoteToKeyMap();
 
         /**
          * Handler for starting a note on MIDI interaction.

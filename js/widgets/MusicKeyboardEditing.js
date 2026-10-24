@@ -738,6 +738,14 @@ const MusicKeyboardEditing = {
             }
         };
 
+        const syncRowSources = () => {
+            const rows = this.layout.filter(item => item.blockNumber < FAKEBLOCKNUMBER);
+            this.noteNames = rows.map(item => item.noteName);
+            this.octaves = rows.map(item => item.noteOctave);
+            this.instruments = rows.map(item => item.voice);
+            this._rowBlocks = rows.map(item => item.blockNumber);
+        };
+
         /**
          * Synchronizes this.layout and this.displayLayout, ensuring all notes
          * are aligned, gap-filled, and that real note blocks preserve their
@@ -781,6 +789,7 @@ const MusicKeyboardEditing = {
                 }
                 return { ...note };
             });
+            syncRowSources();
         };
 
         /**
@@ -1024,6 +1033,27 @@ const MusicKeyboardEditing = {
 
             index = displayLayout.length - index - 1;
             const block = displayLayout[index].blockNumber;
+            let changed = false;
+
+            const updateRow = (noteName, noteOctave) => {
+                const sourceIndex = this._rowBlocks.indexOf(block);
+                if (sourceIndex !== -1) {
+                    this.noteNames[sourceIndex] = noteName;
+                    this.octaves[sourceIndex] = noteOctave;
+                }
+                docById("labelcol" + (displayLayout.length - index - 1)).textContent =
+                    i18nSolfege(noteName) + noteOctave;
+                const synthNote =
+                    noteName === "hertz"
+                        ? noteOctave
+                        : resolveSynthNoteName(convertFromSolfege(noteName), noteOctave);
+                for (const note of this._notesPlayed) {
+                    if (note.blockNumber === block) {
+                        note.noteOctave = synthNote;
+                    }
+                }
+                changed = true;
+            };
 
             let noteValue =
                 this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
@@ -1070,6 +1100,33 @@ const MusicKeyboardEditing = {
                     this._accidentalsWheel.removeWheel();
                     this._octavesWheel.removeWheel();
                 }
+                if (changed) {
+                    this.displayLayout = this._keysLayout();
+                    syncRowSources();
+                    this._createKeyboard();
+                    this._refreshNoteToKeyMap();
+                    for (const note of this._notesPlayed) {
+                        const row =
+                            this.displayLayout.find(
+                                item =>
+                                    note.blockNumber < FAKEBLOCKNUMBER &&
+                                    item.blockNumber === note.blockNumber
+                            ) ||
+                            this.displayLayout.find(
+                                item =>
+                                    item.voice === note.voice &&
+                                    (item.noteName === "hertz"
+                                        ? item.noteOctave
+                                        : resolveSynthNoteName(item.noteName, item.noteOctave)) ===
+                                        note.noteOctave
+                            );
+                        note.objId = row ? row.objId : null;
+                        if (row) {
+                            note.blockNumber = row.blockNumber;
+                        }
+                    }
+                    this._createTable();
+                }
             };
 
             /**
@@ -1089,19 +1146,7 @@ const MusicKeyboardEditing = {
                 );
                 this.activity.blocks.blockList[argBlock].updateCache();
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
-                displayLayout[index].noteOctave = parseInt(blockValue, 10);
-                if (this.layout[index]) {
-                    this.layout[index].noteOctave = parseInt(blockValue, 10);
-                }
-                cell.textContent =
-                    displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
-                this._notesPlayed.map(item => {
-                    if (item.objId === displayLayout[index].blockNumber) {
-                        item.noteOctave = parseInt(blockValue, 10);
-                    }
-                    return item;
-                });
+                updateRow("hertz", parseInt(blockValue, 10));
             };
 
             if (condition === "synthsblocks") {
@@ -1125,6 +1170,7 @@ const MusicKeyboardEditing = {
                             .title;
                     if (attr !== "♮") {
                         label += attr;
+                        labelValue += attr;
                     }
                 } else {
                     i = noteLabels.indexOf(label);
@@ -1154,24 +1200,7 @@ const MusicKeyboardEditing = {
                     );
                 }
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
-                displayLayout[index].noteName = label;
-                displayLayout[index].noteOctave = octave;
-                if (this.layout[index]) {
-                    this.layout[index].noteName = label;
-                    this.layout[index].noteOctave = octave;
-                }
-                cell.textContent =
-                    displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
-                const temp1 = label;
-                const temp2 = resolveSynthNoteName(temp1, octave);
-
-                this._notesPlayed.map(item => {
-                    if (item.objId === displayLayout[index].blockNumber) {
-                        item.noteOctave = temp2;
-                    }
-                    return item;
-                });
+                updateRow(labelValue, octave);
             };
 
             /**
