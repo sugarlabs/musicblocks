@@ -855,6 +855,13 @@ class Activity {
                 return;
             }
 
+            // Unlock the Web Audio context while the play click is still a user
+            // gesture. Starting it later from the async playback queue causes
+            // Tone.js to log a suspended-context warning in the console.
+            if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
+                void this.logo.synth.startAudio().catch(() => undefined);
+            }
+
             this._onResize();
             this.blocks.activeBlock = null;
             hideDOMLabel();
