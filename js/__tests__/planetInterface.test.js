@@ -317,6 +317,731 @@ describe("PlanetInterface", () => {
         );
         errorSpy.mockRestore();
     });
+
+    test("saveLocally returns null and skips saving when Planet iframe is open", async () => {
+        const saveLocally = jest.fn().mockResolvedValue();
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally, getCurrentProjectID: () => "proj1" }
+        };
+        planetInterface.iframe = { style: { display: "block" } };
+
+        const result = await planetInterface.saveLocally();
+        expect(result).toBeNull();
+        expect(saveLocally).not.toHaveBeenCalled();
+    });
+
+    test("saveLocally resumes saving normally once Planet iframe is closed", async () => {
+        doSVG.mockReturnValue("");
+        const D = { x: 1 };
+        mockActivity.prepareExport.mockReturnValue(D);
+        const saveLocally = jest.fn().mockResolvedValue();
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally, getCurrentProjectID: () => "proj1" }
+        };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        await planetInterface.saveLocally();
+        expect(saveLocally).toHaveBeenCalledWith(D, null, "proj1");
+    });
+
+    test("saveLocally: pending thumbnail callback executing after Planet opens, active project is deleted, and Planet closes does not overwrite replacement project or recreate deleted project", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["stale-snapshot"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "NEW_BITMAP_URL" };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: "Active Song",
+                    ProjectData: { blocks: ["active-blocks"] },
+                    ProjectImage: "img-A"
+                },
+                proj2: {
+                    ProjectName: "Replacement Song",
+                    ProjectData: { blocks: ["replacement-blocks"] },
+                    ProjectImage: "img-B"
+                }
+            }
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectData = data;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Begin saving workspace data for active project (proj1) and hold thumbnail callback
+        await planetInterface.saveLocally();
+
+        // 2. Open Planet and delete active project
+        planetInterface.iframe.style.display = "block";
+        delete storageData.Projects["proj1"];
+
+        // 3. Select or transition to replacement project (proj2)
+        storageData.CurrentProject = "proj2";
+
+        // 4. Close Planet before the pending thumbnail callback executes
+        planetInterface.iframe.style.display = "none";
+
+        // 5. Resolve the pending callback
+        expect(pendingImage).toBeDefined();
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 6. Verify that replacement project's data, name, image, and identity are NOT overwritten
+        expect(storageData.CurrentProject).toBe("proj2");
+        expect(storageData.Projects["proj2"].ProjectName).toBe("Replacement Song");
+        expect(storageData.Projects["proj2"].ProjectData).toEqual({
+            blocks: ["replacement-blocks"]
+        });
+        expect(storageData.Projects["proj2"].ProjectImage).toBe("img-B");
+
+        // 7. Verify deleted project has NOT been recreated and no unintended project created
+        expect(storageData.Projects["proj1"]).toBeUndefined();
+        expect(Object.keys(storageData.Projects)).toEqual(["proj2"]);
+    });
+
+    test("saveLocally: pending thumbnail callback executing after Planet opens, project is switched, and Planet closes does not overwrite switched project", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["proj1-stale-blocks"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "NEW_BITMAP_URL" };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: "Song 1",
+                    ProjectData: { blocks: ["proj1-blocks"] },
+                    ProjectImage: "img-1"
+                },
+                proj2: {
+                    ProjectName: "Song 2",
+                    ProjectData: { blocks: ["proj2-blocks"] },
+                    ProjectImage: "img-2"
+                }
+            }
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectData = data;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Begin save for proj1
+        await planetInterface.saveLocally();
+
+        // 2. Open Planet, switch to proj2, close Planet
+        planetInterface.iframe.style.display = "block";
+        storageData.CurrentProject = "proj2";
+        planetInterface.iframe.style.display = "none";
+
+        // 3. Resolve pending callback from proj1 save
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 4. Verify proj2 has not been overwritten by proj1's stale snapshot
+        expect(storageData.CurrentProject).toBe("proj2");
+        expect(storageData.Projects["proj2"].ProjectData).toEqual({ blocks: ["proj2-blocks"] });
+        expect(storageData.Projects["proj2"].ProjectImage).toBe("img-2");
+    });
+
+    test("saveLocally: delayed thumbnail callback from older snapshot A does not overwrite newer snapshot B on the same project", async () => {
+        doSVG.mockReturnValue("<svg>thumbnail-A</svg>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["snapshot-A"] });
+        global.base64Encode = jest.fn(s => s);
+
+        const pendingImages = [];
+        global.Image = class {
+            constructor() {
+                pendingImages.push(this);
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                constructor() {}
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = {
+                        getCacheDataURL: () => "THUMBNAIL_URL_A"
+                    };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: "My Project",
+                    ProjectData: { blocks: ["snapshot-orig"] },
+                    ProjectImage: "img-orig"
+                }
+            }
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                if (data !== undefined) {
+                    storageData.Projects[target].ProjectData = data;
+                }
+                storageData.Projects[target].ProjectImage = image;
+            }),
+            saveThumbnail: jest.fn(async (image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Start saving project proj1, capturing workspace data snapshot A
+        await planetInterface.saveLocally();
+        expect(storageData.Projects["proj1"].ProjectData).toEqual({ blocks: ["snapshot-A"] });
+        expect(pendingImages.length).toBe(1);
+        const olderImageCallbackA = pendingImages[0];
+
+        // 2. Initial save completed, thumbnail callback A is deferred.
+        // 3. Make a subsequent legitimate save of newer workspace data snapshot B to proj1
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["snapshot-B"] });
+        doSVG.mockReturnValue("<svg>thumbnail-B</svg>");
+        await planetInterface.saveLocally();
+        expect(storageData.Projects["proj1"].ProjectData).toEqual({ blocks: ["snapshot-B"] });
+
+        // 4. Resolve the older thumbnail callback from snapshot A
+        olderImageCallbackA.onload();
+        await Promise.resolve();
+
+        // 5. Inspect project data: snapshot B must NOT be replaced with stale snapshot A
+        expect(storageData.Projects["proj1"].ProjectData).toEqual({ blocks: ["snapshot-B"] });
+        expect(storageData.Projects["proj1"].ProjectImage).toBe("THUMBNAIL_URL_A");
+        expect(realStorage.saveThumbnail).toHaveBeenCalledWith("THUMBNAIL_URL_A", "proj1");
+    });
+
+    test("saveLocally: delayed thumbnail callback for proj1 executing after user switches to proj2 does not corrupt either project", async () => {
+        doSVG.mockReturnValue("<svg>thumbnail-1</svg>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["proj1-blocks"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "THUMBNAIL_1_URL" };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: "Song 1",
+                    ProjectData: { blocks: ["proj1-blocks"] },
+                    ProjectImage: "img-1-old"
+                },
+                proj2: {
+                    ProjectName: "Song 2",
+                    ProjectData: { blocks: ["proj2-blocks"] },
+                    ProjectImage: "img-2"
+                }
+            }
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                if (data !== undefined) {
+                    storageData.Projects[target].ProjectData = data;
+                }
+                storageData.Projects[target].ProjectImage = image;
+            }),
+            saveThumbnail: jest.fn(async (image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Begin save for proj1
+        await planetInterface.saveLocally();
+
+        // 2. Switch to proj2
+        storageData.CurrentProject = "proj2";
+
+        // 3. Resolve pending callback from proj1 save
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 4. Verify proj1 received its thumbnail without corrupting proj2 or proj1 data
+        expect(storageData.CurrentProject).toBe("proj2");
+        expect(storageData.Projects["proj1"].ProjectData).toEqual({ blocks: ["proj1-blocks"] });
+        expect(storageData.Projects["proj1"].ProjectImage).toBe("THUMBNAIL_1_URL");
+        expect(storageData.Projects["proj2"].ProjectData).toEqual({ blocks: ["proj2-blocks"] });
+        expect(storageData.Projects["proj2"].ProjectImage).toBe("img-2");
+    });
+
+    test("Check B: initial workspace save with no CurrentProject reliably captures projectId so delayed thumbnail does not corrupt switched project", async () => {
+        doSVG.mockReturnValue("<svg>initial-thumbnail</svg>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["initial-project-data"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "RENDERED_INITIAL_THUMB" };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: undefined,
+            Projects: {}
+        };
+
+        let resolveInit;
+        const initPromise = new Promise(resolve => {
+            resolveInit = resolve;
+        });
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                if (id !== undefined) {
+                    if (!storageData.Projects[id]) return;
+                    storageData.Projects[id].ProjectData = data;
+                    storageData.Projects[id].ProjectImage = image;
+                    return;
+                }
+                // Simulate asynchronous initialiseNewProject()
+                await initPromise;
+                const newId = "proj-initial-123";
+                storageData.CurrentProject = newId;
+                storageData.Projects[newId] = {
+                    ProjectName: "My Song",
+                    ProjectData: data,
+                    ProjectImage: image,
+                    DateLastModified: 1000
+                };
+            }),
+            saveThumbnail: jest.fn(async (image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Start first workspace save (starts with CurrentProject === undefined)
+        const firstSavePromise = planetInterface.saveLocally();
+
+        // 2. Control asynchronous initialization and thumbnail generation
+        expect(pendingImage).toBeDefined();
+
+        // 3. Allow project creation to complete
+        resolveInit();
+        await firstSavePromise;
+
+        // Verify initial save completed and created the project
+        expect(storageData.CurrentProject).toBe("proj-initial-123");
+        expect(storageData.Projects["proj-initial-123"].ProjectData).toEqual({
+            blocks: ["initial-project-data"]
+        });
+
+        // 4. Exercise a project switch before thumbnail callback resolves
+        storageData.Projects["proj-other-456"] = {
+            ProjectName: "Other Song",
+            ProjectData: { blocks: ["other-data"] },
+            ProjectImage: "other-image",
+            DateLastModified: 2000
+        };
+        storageData.CurrentProject = "proj-other-456";
+
+        // 5. Resolve callback
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 6. Verify: delayed thumbnail writes to the original created project ("proj-initial-123"), NOT the switched project ("proj-other-456")
+        expect(storageData.CurrentProject).toBe("proj-other-456");
+        expect(storageData.Projects["proj-other-456"].ProjectData).toEqual({
+            blocks: ["other-data"]
+        });
+        expect(storageData.Projects["proj-other-456"].ProjectImage).toBe("other-image");
+
+        expect(storageData.Projects["proj-initial-123"].ProjectImage).toBe(
+            "RENDERED_INITIAL_THUMB"
+        );
+        expect(storageData.Projects["proj-initial-123"].ProjectData).toEqual({
+            blocks: ["initial-project-data"]
+        });
+    });
+
+    test("Check B: initial workspace save with no CurrentProject reliably captures projectId so delayed thumbnail does not recreate deleted project", async () => {
+        doSVG.mockReturnValue("<svg>initial-thumbnail</svg>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["initial-project-data"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "RENDERED_INITIAL_THUMB" };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: undefined,
+            Projects: {}
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                if (id !== undefined) {
+                    if (!storageData.Projects[id]) return;
+                    storageData.Projects[id].ProjectData = data;
+                    storageData.Projects[id].ProjectImage = image;
+                    return;
+                }
+                const newId = "proj-initial-789";
+                storageData.CurrentProject = newId;
+                storageData.Projects[newId] = {
+                    ProjectName: "My Song",
+                    ProjectData: data,
+                    ProjectImage: image,
+                    DateLastModified: 1000
+                };
+            }),
+            saveThumbnail: jest.fn(async (image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Start initial save and complete creation
+        await planetInterface.saveLocally();
+        expect(storageData.CurrentProject).toBe("proj-initial-789");
+
+        // 2. Delete the created project before thumbnail callback resolves
+        delete storageData.Projects["proj-initial-789"];
+        storageData.CurrentProject = undefined;
+
+        // 3. Resolve callback
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 4. Verify deleted project was NOT recreated and no phantom project was created
+        expect(storageData.Projects["proj-initial-789"]).toBeUndefined();
+        expect(Object.keys(storageData.Projects).length).toBe(0);
+        expect(storageData.CurrentProject).toBeUndefined();
+    });
+
+    test("saveLocally: pending thumbnail callback executing while Planet remains open safely drops thumbnail if project was deleted or undefined", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["active-blocks"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "NEW_BITMAP_URL" };
+                }
+            }
+        };
+
+        const storageData = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: "Song 1",
+                    ProjectData: { blocks: ["active-blocks"] },
+                    ProjectImage: "img-1"
+                }
+            }
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectImage: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+            saveLocally: jest.fn(async (data, image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectData = data;
+                storageData.Projects[target].ProjectImage = image;
+            }),
+            saveThumbnail: jest.fn(async (image, id) => {
+                const target = id ?? storageData.CurrentProject;
+                if (!storageData.Projects[target]) return;
+                storageData.Projects[target].ProjectImage = image;
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Begin save while Planet is closed
+        await planetInterface.saveLocally();
+        expect(pendingImage).toBeDefined();
+
+        // 2. User opens Planet and deletes proj1
+        planetInterface.iframe.style.display = "block";
+        delete storageData.Projects["proj1"];
+
+        // 3. Thumbnail callback fires while Planet is STILL OPEN
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 4. Verify thumbnail was NOT written and deleted project was NOT resurrected
+        expect(realStorage.saveThumbnail).not.toHaveBeenCalled();
+        expect(storageData.Projects["proj1"]).toBeUndefined();
+    });
+
+    test("saveLocally: captures newly created projectId during commitThumbnail when initial save had undefined CurrentProject", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["new-blocks"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "NEW_BITMAP_URL" };
+                }
+            }
+        };
+
+        let currentId = undefined;
+        const storageData = {
+            get CurrentProject() {
+                return currentId;
+            },
+            Projects: {}
+        };
+
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: jest.fn(() => currentId),
+            getCurrentProjectImage: () => null,
+            saveLocally: jest.fn(async () => ({ success: true })),
+            saveThumbnail: jest.fn(async (image, id) => {
+                if (storageData.Projects[id]) {
+                    storageData.Projects[id].ProjectImage = image;
+                }
+            })
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. Call saveLocally with no initial CurrentProject (projectId starts undefined)
+        const savePromise = planetInterface.saveLocally();
+
+        // 2. Simulate project ID becoming available when initial data save resolves
+        currentId = "proj-async-created";
+        storageData.Projects["proj-async-created"] = {
+            ProjectName: "New Project",
+            ProjectData: { blocks: ["new-blocks"] },
+            ProjectImage: null
+        };
+
+        await savePromise;
+
+        // 3. Fire thumbnail callback
+        expect(pendingImage).toBeDefined();
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 4. Verify commitThumbnail retrieved currentId via getCurrentProjectID() and saved thumbnail
+        expect(realStorage.saveThumbnail).toHaveBeenCalledWith(
+            "NEW_BITMAP_URL",
+            "proj-async-created"
+        );
+        expect(storageData.Projects["proj-async-created"].ProjectImage).toBe("NEW_BITMAP_URL");
+    });
+
+    test("saveLocally: saveThumbnail safely returns null when projectId cannot be determined and does not save thumbnail", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["blocks"] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "NEW_BITMAP_URL" };
+                }
+            }
+        };
+
+        const realStorage = {
+            data: { Projects: {} },
+            getCurrentProjectID: jest.fn(() => undefined),
+            getCurrentProjectImage: () => null,
+            saveLocally: jest.fn(async () => null),
+            saveThumbnail: jest.fn(async () => {})
+        };
+
+        planetInterface.planet = { ProjectStorage: realStorage };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        // 1. saveLocally starts with undefined project ID
+        await planetInterface.saveLocally();
+
+        // 2. Fire thumbnail callback while getCurrentProjectID continues to return undefined
+        expect(pendingImage).toBeDefined();
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // 3. Verify saveThumbnail safely returned null without calling storage.saveThumbnail with undefined
+        expect(realStorage.saveThumbnail).not.toHaveBeenCalled();
+    });
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
         const D = new Date(2020, 1, 1);
         planetInterface.planet = {
@@ -583,6 +1308,117 @@ describe("PlanetInterface", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
 
+    it("loadProjectFromData calls justLoadStart without errors when data is null", () => {
+        mockActivity.justLoadStart.mockClear();
+        mockActivity.errorMsg.mockClear();
+        planetInterface.iframe = { style: { display: "" } };
+        planetInterface.getCurrentProjectName = jest.fn(() => "Null Project");
+
+        planetInterface.loadProjectFromData(null);
+
+        expect(mockActivity.justLoadStart).toHaveBeenCalled();
+        expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    it("loadProjectFromData calls justLoadStart without errors when data is 'undefined', 'null', empty string, or '[]'", () => {
+        mockActivity.justLoadStart.mockClear();
+        mockActivity.errorMsg.mockClear();
+        planetInterface.iframe = { style: { display: "" } };
+        planetInterface.getCurrentProjectName = jest.fn(() => "Empty Project");
+
+        planetInterface.loadProjectFromData("undefined");
+        expect(mockActivity.justLoadStart).toHaveBeenCalledTimes(1);
+
+        planetInterface.loadProjectFromData("[]");
+        expect(mockActivity.justLoadStart).toHaveBeenCalledTimes(2);
+
+        planetInterface.loadProjectFromData("   [   ]  ");
+        expect(mockActivity.justLoadStart).toHaveBeenCalledTimes(3);
+
+        planetInterface.loadProjectFromData("");
+        expect(mockActivity.justLoadStart).toHaveBeenCalledTimes(4);
+
+        planetInterface.loadProjectFromData("null");
+        expect(mockActivity.justLoadStart).toHaveBeenCalledTimes(5);
+
+        expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    it("retains replacement project and enters valid state when active project is deleted and replacement ProjectData is null", async () => {
+        const storageData = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: "Project 1",
+                    ProjectData: JSON.stringify([{ name: "start" }]),
+                    DateLastModified: 2000
+                },
+                proj2: {
+                    ProjectName: "Project 2",
+                    ProjectData: null,
+                    DateLastModified: 1000
+                }
+            }
+        };
+
+        const initialiseSpy = jest.fn();
+        const realStorage = {
+            data: storageData,
+            getCurrentProjectID: () => storageData.CurrentProject,
+            getCurrentProjectName: () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectName ?? "",
+            getCurrentProjectData: async () =>
+                storageData.Projects[storageData.CurrentProject]?.ProjectData ?? null,
+            deleteProject: async id => {
+                const isCurrent = storageData.CurrentProject === id;
+                delete storageData.Projects[id];
+                if (isCurrent) {
+                    const remaining = Object.keys(storageData.Projects);
+                    storageData.CurrentProject = remaining.length > 0 ? remaining[0] : undefined;
+                }
+            },
+            initialiseNewProject: initialiseSpy
+        };
+
+        mockActivity.justLoadStart.mockClear();
+        mockActivity.errorMsg.mockClear();
+
+        planetInterface.planet = {
+            ProjectStorage: realStorage,
+            loadNewProject: planetInterface.newProject.bind(planetInterface),
+            loadProjectFromData: planetInterface.loadProjectFromData.bind(planetInterface),
+            planetClose: planetInterface.closePlanet.bind(planetInterface),
+            oldCurrentProjectID: "proj1"
+        };
+        planetInterface.iframe = { style: { display: "block" } };
+
+        // 1. Two local projects exist
+        expect(storageData.CurrentProject).toBe("proj1");
+        expect(Object.keys(storageData.Projects)).toEqual(["proj1", "proj2"]);
+
+        // 2. Active project is deleted
+        await realStorage.deleteProject("proj1");
+        expect(storageData.CurrentProject).toBe("proj2");
+
+        // 3. Replacement project's record exists, but ProjectData is null
+        expect(storageData.Projects["proj2"]).toBeDefined();
+        expect(storageData.Projects["proj2"].ProjectData).toBeNull();
+
+        // 4. Planet closes: the replacement project's null data is loaded
+        const data = await realStorage.getCurrentProjectData();
+        planetInterface.loadProjectFromData(data);
+
+        // 5. Assert:
+        // - Existing replacement project is retained as current project
+        expect(realStorage.getCurrentProjectID()).toBe("proj2");
+        // - No unintended extra project is created
+        expect(initialiseSpy).not.toHaveBeenCalled();
+        expect(Object.keys(storageData.Projects)).toEqual(["proj2"]);
+        // - Workspace enters a valid state
+        expect(mockActivity.justLoadStart).toHaveBeenCalled();
+        expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+    });
+
     it("saveLocally handles quota exceeded error and shows storage warning", () => {
         const saved_ = global._;
         global._ = jest.fn(str => str);
@@ -715,5 +1551,51 @@ describe("PlanetInterface", () => {
             { type: "MB_BLOCK_NAMES", payload: { note: "Quarter Note" } },
             "*"
         );
+    });
+
+    test("saveLocally: catches and logs errors occurring inside image.onload thumbnail processing", async () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: ["blocks"] });
+        mockActivity.blocks = {
+            loadNewBlocks: jest.fn(),
+            isLoading: jest.fn(() => false),
+            runAfterLoad: jest.fn(),
+            palettes: { _hideMenus: jest.fn() },
+            trashStacks: []
+        };
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    throw new Error("Bitmap bounds calculation error");
+                }
+            }
+        };
+
+        const storageData = { CurrentProject: "proj-err", Projects: { "proj-err": {} } };
+        planetInterface.planet = {
+            ProjectStorage: {
+                data: storageData,
+                getCurrentProjectID: () => "proj-err",
+                saveLocally: jest.fn(async () => {})
+            }
+        };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        await planetInterface.saveLocally();
+        expect(pendingImage).toBeDefined();
+        pendingImage.onload();
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
+        consoleErrorSpy.mockRestore();
     });
 });
