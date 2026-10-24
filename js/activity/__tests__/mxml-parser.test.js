@@ -1237,3 +1237,21 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
         expect(noteValues(blocks)).toEqual([[8, 96]]);
     });
 });
+
+describe("Test 19: Cue notes", () => {
+    it("imports a cue note as a rest of the same length, since it isn't played", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><cue/><pitch><step>E</step><octave>5</octave></pitch><duration>8</duration><type>quarter</type></note>" +
+                    SIMPLE_NOTE("C", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+    });
+});
