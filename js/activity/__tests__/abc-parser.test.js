@@ -1349,3 +1349,72 @@ describe("Meters abcjs reports by name rather than by number", () => {
         expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
     });
 });
+
+// ---------------------------------------------------------------------------
+// Chords ([CEG]) — abcjs puts every note of the chord in pitches[]
+// ---------------------------------------------------------------------------
+describe("Chords", () => {
+    const cMajor = { root: "C", acc: "", mode: "", accidentals: [] };
+    const chord = (pitches, duration = 0.25) => ({
+        el_type: "note",
+        pitches,
+        duration,
+        startTriplet: null,
+        endTriplet: null
+    });
+
+    test("imports every note of a chord into one note block", async () => {
+        const blocks = await parseAndCapture(
+            makeVoiceTune(cMajor, [
+                chord([
+                    { name: "C", pitch: 0 },
+                    { name: "E", pitch: 2 },
+                    { name: "G", pitch: 4 }
+                ])
+            ])
+        );
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(1);
+        expect(pitchNames(blocks)).toEqual([
+            ["C", 4],
+            ["E", 4],
+            ["G", 4]
+        ]);
+
+        // Chained inside the note's clamp, and the note still reaches its
+        // trailing hidden block.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const [c, e, g] = blocksOfType(blocks, "pitch");
+        const newnote = blocksOfType(blocks, "newnote")[0];
+        expect(byId.get(c[4][0])[1]).toBe("vspace");
+        expect([c[4][3], e[4][0], e[4][3], g[4][0], g[4][3]]).toEqual([
+            e[0],
+            c[0],
+            g[0],
+            e[0],
+            null
+        ]);
+        expect(byId.get(newnote[4][3])[1]).toBe("hidden");
+    });
+
+    test("an accidental inside a chord carries to the end of the bar", async () => {
+        const blocks = await parseAndCapture(
+            makeVoiceTune(cMajor, [
+                chord([
+                    { name: "^F", pitch: 3, accidental: "sharp" },
+                    { name: "A", pitch: 5 }
+                ]),
+                makeNote("F", 3),
+                makeBar(),
+                makeNote("F", 3)
+            ])
+        );
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["A", 4],
+            ["F♯", 4],
+            ["F", 4]
+        ]);
+    });
+});
