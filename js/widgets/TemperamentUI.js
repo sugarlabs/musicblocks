@@ -83,7 +83,7 @@ const _addPreviewDoneButtonPair = (divAppend, container, marginLeft, preview) =>
     doneDiv.textContent = _("done");
     divAppend.appendChild(previewDiv);
     divAppend.appendChild(doneDiv);
-    divAppend.style.textAlign = "center";
+    divAppend.classList.add("mb-text-center");
     divAppend.style.marginLeft = marginLeft;
     divAppend.style.height = "32px";
     divAppend.style.marginTop = "40px";
@@ -126,7 +126,7 @@ const _createDoneButton = (container, marginLeft) => {
     const divAppend = document.createElement("div");
     divAppend.id = "divAppend";
     divAppend.textContent = _("done");
-    divAppend.style.textAlign = "center";
+    divAppend.classList.add("mb-text-center");
     divAppend.style.paddingTop = "5px";
     if (marginLeft) {
         divAppend.style.marginLeft = marginLeft;
@@ -660,7 +660,7 @@ const TemperamentUI = {
             td.textContent = editMenus[i];
             td.style.background = platformColor.selectorBackground;
             td.style.height = 30 + "px";
-            td.style.textAlign = "center";
+            td.classList.add("mb-text-center");
             td.style.fontWeight = "bold";
             menuItems.push(td);
             editOctaveTr.appendChild(td);
