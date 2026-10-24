@@ -4231,3 +4231,824 @@ describe("DRUMNAMES Lilypond symbols", () => {
         }
     });
 });
+
+describe("Multisample instruments", () => {
+    const { validateMultisample, MULTISAMPLE_LIMITS } = synthutilsModule;
+    const music = require("../musicutils");
+    let synth;
+    let samplers;
+    let decode;
+    let originalLoad;
+
+    const pcm = (bytes = 128, channels = 1) => ({
+        length: bytes / channels / 4,
+        numberOfChannels: channels
+    });
+    const deferred = () => {
+        let resolve;
+        let reject;
+        const promise = new Promise((yes, no) => {
+            resolve = yes;
+            reject = no;
+        });
+        return { promise, resolve, reject };
+    };
+    const flush = async () => {
+        for (let i = 0; i < 8; i++) await Promise.resolve();
+    };
+
+    const wavData = (bytes = 108) => {
+        const wav = Buffer.alloc(bytes);
+        wav.write("RIFF");
+        wav.writeUInt32LE(bytes - 8, 4);
+        wav.write("WAVEfmt ", 8);
+        wav.writeUInt32LE(16, 16);
+        wav.writeUInt16LE(1, 20);
+        wav.writeUInt16LE(1, 22);
+        wav.writeUInt32LE(8000, 24);
+        wav.writeUInt32LE(16000, 28);
+        wav.writeUInt16LE(2, 32);
+        wav.writeUInt16LE(16, 34);
+        wav.write("data", 36);
+        wav.writeUInt32LE(bytes - 44, 40);
+        return "data:audio/wav;base64," + wav.toString("base64");
+    };
+    const instrument = () => ({
+        type: "multisample",
+        version: 1,
+        name: "Cello",
+        samples: ["C3", "C4", "C5"].map(root => ({ name: root + ".wav", root, data: wavData() }))
+    });
+
+    beforeEach(() => {
+        global.Tone = require("./tonemock");
+        global.normalizeNoteAccidentals = music.normalizeNoteAccidentals;
+        global.isCustomTemperament = music.isCustomTemperament;
+        global.getOscillatorTypes = () => null;
+        global.Singer = { masterVolume: [50] };
+        samplers = [];
+        const pitches = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        jest.spyOn(Tone, "Frequency").mockImplementation(root => ({
+            toMidi: () => {
+                const [, letter, accidental, octave] = /^([A-G])([#bx]*)(\d)$/.exec(root);
+                const offset = { "": 0, "#": 1, "##": 2, "b": -1, "bb": -2, "x": 2 }[accidental];
+                return (Number(octave) + 1) * 12 + pitches[letter] + offset;
+            }
+        }));
+        originalLoad = Tone.ToneAudioBuffer.load;
+        decode = Tone.ToneAudioBuffer.load = jest.fn(async () => pcm());
+        const originalSampler = Tone.Sampler;
+        jest.spyOn(Tone, "Sampler").mockImplementation(function (notes) {
+            const sampler = new originalSampler(notes);
+            sampler.dispose = jest.fn();
+            sampler.disconnect = jest.fn();
+            samplers.push(sampler);
+            return sampler;
+        });
+        synth = new SynthClass();
+    });
+
+    afterEach(() => {
+        synth.disposeAllInstruments();
+        if (originalLoad) Tone.ToneAudioBuffer.load = originalLoad;
+        else delete Tone.ToneAudioBuffer.load;
+        jest.useRealTimers();
+    });
+
+    test("validates a snapshot without modifying the input or sharing recording objects", () => {
+        const value = instrument();
+        value.name = "  Cello  ";
+        value.samples[0].root = "D\u266d3";
+        const snapshot = validateMultisample(value);
+        expect(snapshot.name).toBe("Cello");
+        expect(snapshot.samples[0].root).toBe("Db3");
+        expect(value.samples[0].root).toBe("D\u266d3");
+        expect(snapshot.samples[0]).not.toBe(value.samples[0]);
+        expect(snapshot.samples[0].data).toBe(value.samples[0].data);
+    });
+
+    test.each([
+        null,
+        {},
+        { ...instrument(), version: 2 },
+        { ...instrument(), samples: [] },
+        { ...instrument(), name: " " },
+        { ...instrument(), samples: new Array(1) },
+        {
+            ...instrument(),
+            samples: Array.from({ length: 17 }, (_, i) => ({
+                name: "root.wav",
+                root:
+                    ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"][i % 12] +
+                    (1 + Math.floor(i / 12)),
+                data: wavData()
+            }))
+        }
+    ])("rejects an incomplete or unsupported descriptor before decoding: %p", value => {
+        expect(() => validateMultisample(value)).toThrow();
+        expect(decode).not.toHaveBeenCalled();
+    });
+
+    test.each(["C0", "C9", "Cb1", "B#8", "do4", "A4+20", "^C4", "C4junk"])(
+        "rejects the invalid or out-of-range root %s",
+        root => {
+            const value = instrument();
+            value.samples[0].root = root;
+            expect(() => validateMultisample(value)).toThrow();
+        }
+    );
+
+    test.each([
+        ["C#4", "Db4"],
+        ["Dx4", "E4"],
+        ["B#3", "C4"]
+    ])("rejects enharmonic duplicate roots %s and %s", (first, second) => {
+        const value = instrument();
+        value.samples[0].root = first;
+        value.samples[1].root = second;
+        expect(() => validateMultisample(value)).toThrow("different root pitches");
+    });
+
+    test.each(["audio/wav", "audio/x-wav", "audio/x-pn-wav", "audio/wave", "audio/vnd.wave"])(
+        "accepts the WAV MIME alias %s",
+        mime => {
+            const value = instrument();
+            value.samples[0].data = wavData().replace("audio/wav", mime);
+            expect(validateMultisample(value).samples[0].data).toBe(value.samples[0].data);
+        }
+    );
+
+    test.each([
+        "blob:recording",
+        "https://example.com/a.wav",
+        "data:audio/mp3;base64,AAAA",
+        "data:audio/wav;base64,not base64!",
+        "data:audio/wav;base64,AAAA",
+        "data:audio/wav;base64,UklGRg==",
+        "data:audio/wav;base64,UklGRgQAAABOT1BF",
+        "data:audio/wav;base64,UklGRgQAAABXQVZF=",
+        "data:;base64,UklGRgQAAABXQVZF",
+        "data:application/octet-stream;base64,UklGRgQAAABXQVZF"
+    ])("rejects external, malformed, and non-WAV audio: %s", data => {
+        const value = instrument();
+        value.samples[0].data = data;
+        expect(() => validateMultisample(value)).toThrow("embedded WAV");
+    });
+
+    test("enforces raw per-file and aggregate byte limits", () => {
+        const value = instrument();
+        value.samples[0].data = wavData(MULTISAMPLE_LIMITS.fileBytes + 1);
+        expect(() => validateMultisample(value)).toThrow("size limit");
+        const data = wavData(MULTISAMPLE_LIMITS.fileBytes);
+        value.samples = ["C1", "D1", "E1", "F1", "G1", "A1", "B1", "C2", "D2"].map(root => ({
+            name: root,
+            root,
+            data
+        }));
+        expect(() => validateMultisample(value)).toThrow("size limit");
+        value.samples.pop();
+        expect(validateMultisample(value).samples).toHaveLength(8);
+        value.samples[7].data = wavData(MULTISAMPLE_LIMITS.fileBytes - 63);
+        value.samples.push({ name: "one-over.wav", root: "D2", data: wavData(64) });
+        expect(() => validateMultisample(value)).toThrow("size limit");
+    });
+
+    test("accepts one/16 recordings and the root endpoints", () => {
+        const roots = [
+            "C1",
+            "D1",
+            "E1",
+            "F1",
+            "G1",
+            "A1",
+            "B1",
+            "C2",
+            "D2",
+            "E2",
+            "F2",
+            "G2",
+            "A2",
+            "B2",
+            "C3",
+            "B8"
+        ];
+        const value = instrument();
+        value.samples = roots.map(root => ({ name: root, root, data: wavData() }));
+        expect(validateMultisample(value).samples).toHaveLength(16);
+        value.samples = [value.samples[15]];
+        expect(validateMultisample(value).samples[0].root).toBe("B8");
+        value.samples[0].root = "C1";
+        expect(validateMultisample(value).samples[0].root).toBe("C1");
+        value.samples[0].name = " ";
+        expect(() => validateMultisample(value)).toThrow("filename");
+        delete value.samples[0].name;
+        expect(() => validateMultisample(value)).toThrow("filename");
+    });
+
+    test("reuses a descriptor handle but keeps same-named instruments independent", () => {
+        const value = instrument();
+        const handle = synth.registerMultisample(value);
+        expect(synth.registerMultisample(value)).toBe(handle);
+        expect(synth.registerMultisample(instrument())).not.toBe(handle);
+        expect(Tone.Sampler).not.toHaveBeenCalled();
+    });
+
+    test("identifies only live owned aliases for unsupported capture diagnostics", async () => {
+        const value = instrument();
+        const alias = synth.registerMultisample(value);
+        expect(synth.getMultisampleName(0, "multisample_legacy")).toBeNull();
+        expect(synth.getMultisampleName(0, alias)).toBeNull();
+        await synth.loadSynth(0, alias);
+        expect(synth.getMultisampleName(0, alias)).toBe(value.name);
+        expect(synth.getMultisampleName(1, alias)).toBeNull();
+        synth.releaseMultisample(0, alias);
+        expect(synth.getMultisampleName(0, alias)).toBeNull();
+    });
+
+    test("preserves a legacy Timbre instrument whose name starts with multisample_", async () => {
+        synth.samples = { voice: {}, drum: {} };
+        synthInstruments[0] ||= {};
+        jest.spyOn(Tone, "FMSynth").mockImplementation(() => new Tone.Synth());
+        await synth.createSynth(0, "multisample_legacy", "fmsynth", null);
+        const legacy = synthInstruments[0].multisample_legacy;
+        expect(await synth.loadSynth(0, "multisample_legacy")).toBe(legacy);
+        expect(synthInstrumentsSource.multisample_legacy).toEqual([0, "poly"]);
+    });
+
+    test("does not allocate an alias already used by a legacy instrument or source", () => {
+        const handle = synth.registerMultisample(instrument());
+        const next = "multisample_" + (Number(handle.split("_")[1]) + 1);
+        synthInstruments[1] ||= {};
+        const legacy = {};
+        synthInstruments[1][next] = legacy;
+        const sourceOnly = "multisample_" + (Number(handle.split("_")[1]) + 2);
+        synthInstrumentsSource[sourceOnly] = [0, "poly"];
+        const fresh = synth.registerMultisample(instrument());
+        expect(fresh).not.toBe(next);
+        expect(fresh).not.toBe(sourceOnly);
+        expect(synthInstruments[1][next]).toBe(legacy);
+        expect(synthInstrumentsSource[sourceOnly]).toEqual([0, "poly"]);
+        delete synthInstrumentsSource[sourceOnly];
+    });
+
+    test("prepares sequentially and publishes complete independent owners", async () => {
+        const first = deferred();
+        const second = deferred();
+        decode.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+        const value = instrument();
+        const alias = synth.registerMultisample(value);
+        const loading = synth.loadSynth(0, alias);
+        const repeated = synth.loadSynth(0, alias);
+        expect(decode).toHaveBeenCalledTimes(1);
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        first.resolve(pcm());
+        await flush();
+        expect(decode).toHaveBeenCalledTimes(2);
+        expect(synthInstruments[0]?.[alias]).toBeUndefined();
+        expect(synth.multisampleBytes).toBe(128);
+        second.resolve(pcm());
+        const sampler = await loading;
+        expect(await repeated).toBe(sampler);
+        expect(synth.getPreparedMultisample(0, value)).toBe(alias);
+        expect(await synth.loadSynth(0, alias)).toBe(sampler);
+        expect(decode).toHaveBeenCalledTimes(3);
+        expect(synth.multisampleBytes).toBe(384);
+        expect(await synth.loadSynth(1, alias)).not.toBe(sampler);
+        const other = synth.registerMultisample(instrument());
+        expect(await synth.loadSynth(0, other)).not.toBe(sampler);
+        expect(decode).toHaveBeenCalledTimes(9);
+        expect(synth.multisampleBytes).toBe(1152);
+        expect(synthInstrumentsSource[alias]).toEqual([2, alias]);
+    });
+
+    test("checks the live saved owner before admission and releases only feature audio", async () => {
+        let current = true;
+        const held = deferred();
+        decode.mockReturnValueOnce(held.promise);
+        const value = instrument();
+        const alias = synth.registerMultisample(value, () => current);
+        const pending = synth.loadSynth(0, alias).catch(error => error);
+        current = false;
+        held.resolve(pcm());
+        expect((await pending).name).toBe("AbortError");
+        expect(decode).toHaveBeenCalledTimes(1);
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        synth.releaseMultisamples();
+        const legacy = { dispose: jest.fn() };
+        synthInstruments[0].kept = legacy;
+        const fresh = synth.registerMultisample(value);
+        await synth.loadSynth(0, fresh);
+        synth.releaseMultisamples();
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        expect(synthInstruments[0].kept).toBe(legacy);
+        expect(legacy.dispose).not.toHaveBeenCalled();
+    });
+
+    test("reports a feature pitch error to its owning run without a fallback", async () => {
+        const failure = new Error("unsupported target");
+        const abort = jest.fn();
+        const alias = synth.registerMultisample(instrument(), () => true, abort);
+        const sampler = await synth.loadSynth(0, alias);
+        sampler.triggerAttackRelease.mockImplementation(() => {
+            throw failure;
+        });
+        await synth.trigger(0, "C4", 0.1, alias, null, null, false, 0);
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(abort.mock.calls[0][0].message).toContain("C4");
+        expect(abort.mock.calls[0][0].message).toContain("unsupported target");
+    });
+
+    test.each([null, 0, 0.2])(
+        "ready voice notes bypass unrelated downloads with effects %p",
+        async distortion => {
+            const effects =
+                distortion === null
+                    ? null
+                    : {
+                          vibratoIntensity: 0,
+                          distortionAmount: distortion,
+                          tremoloFrequency: 0,
+                          rate: 0,
+                          chorusRate: 0
+                      };
+            const alias = synth.registerMultisample(instrument());
+            const sampler = await synth.loadSynth(0, alias);
+            const unrelated = deferred();
+            const queue = jest
+                .spyOn(Tone.ToneAudioBuffer, "loaded")
+                .mockReturnValue(unrelated.promise);
+            const output = {};
+            let completed = false;
+            const playing = synth
+                .trigger(0, ["C3", "E4", "G5"], 0.5, alias, effects, null, false, 0, output)
+                .then(() => {
+                    completed = true;
+                });
+            await flush();
+            expect(completed).toBe(true);
+            expect(queue).not.toHaveBeenCalled();
+            expect(sampler.triggerAttackRelease).toHaveBeenCalledWith(
+                ["C3", "E4", "G5"],
+                0.5,
+                expect.any(Number)
+            );
+            unrelated.resolve();
+            await playing;
+        }
+    );
+
+    test.each([null, 0, 0.2])(
+        "propagates named pitch errors with effects %p and cleans graph nodes",
+        async distortion => {
+            const effects =
+                distortion === null
+                    ? null
+                    : {
+                          vibratoIntensity: 0,
+                          distortionAmount: distortion,
+                          tremoloFrequency: 0,
+                          rate: 0,
+                          chorusRate: 0
+                      };
+            const alias = synth.registerMultisample(instrument());
+            const sampler = await synth.loadSynth(0, alias);
+            sampler.triggerAttackRelease.mockImplementation(() => {
+                throw new Error("No available buffers");
+            });
+            await expect(
+                synth.trigger(0, "C20", 0.5, alias, effects, null, false, 0)
+            ).rejects.toThrow(/Cello.*C20.*No available buffers/);
+            if (distortion)
+                expect(Tone.Distortion.mock.results.at(-1).value.dispose).toHaveBeenCalled();
+        }
+    );
+
+    test("deferred neighbor notes report named pitch errors and ignore a released owner", async () => {
+        jest.useFakeTimers();
+        let play;
+        jest.spyOn(Tone, "Part").mockImplementation(function (callback) {
+            play = callback;
+            this.start = () => this;
+            this.dispose = jest.fn();
+        });
+        const alias = synth.registerMultisample(instrument());
+        const sampler = await synth.loadSynth(0, alias);
+        const effects = {
+            vibratoIntensity: 0,
+            distortionAmount: 0,
+            tremoloFrequency: 0,
+            rate: 0,
+            chorusRate: 0,
+            neighborSynth: true,
+            neighborArgBeat: 0.1,
+            neighborArgCurrentBeat: 0.2,
+            neighborArgNote1: ["C3"],
+            neighborArgNote2: ["D3"]
+        };
+        await synth.trigger(0, "C3", 0.5, alias, effects, null, false, 0);
+        sampler.triggerAttackRelease.mockImplementation(() => {
+            throw new Error("No available buffers");
+        });
+        expect(() => play(1, { note: "C20", duration: 0.1 })).toThrow(
+            /Cello.*C20.*No available buffers/
+        );
+        synth.releaseMultisample(0, alias);
+        sampler.triggerAttackRelease.mockClear();
+        expect(() => play(2, { note: "C3", duration: 0.1 })).not.toThrow();
+        jest.runOnlyPendingTimers();
+        expect(sampler.triggerAttackRelease).not.toHaveBeenCalled();
+        expect(sampler.connect).toHaveBeenCalledTimes(1);
+    });
+
+    test("retains the legacy global wait and swallowed loading-error behavior", async () => {
+        synth.samples = { voice: {}, drum: {} };
+        synthInstruments[0] ||= {};
+        const legacy = await synth.loadSynth(0, "sine");
+        const held = deferred();
+        jest.spyOn(Tone.ToneAudioBuffer, "loaded").mockReturnValue(held.promise);
+        const playing = synth.trigger(0, "C4", 0.1, "sine", null, null, false, 0);
+        await flush();
+        expect(legacy.triggerAttackRelease).not.toHaveBeenCalled();
+        held.reject(new Error("unrelated download failed"));
+        await expect(playing).resolves.toBeUndefined();
+        expect(legacy.triggerAttackRelease).not.toHaveBeenCalled();
+    });
+
+    test("keeps routing and volume independent for separate turtles", async () => {
+        jest.spyOn(Tone, "gainToDb").mockImplementation(gain => 20 * Math.log10(gain));
+        const alias = synth.registerMultisample(instrument());
+        const one = await synth.loadSynth(0, alias);
+        const two = await synth.loadSynth(1, alias);
+        synth.setVolume(0, alias, 25);
+        synth.setVolume(1, alias, 75);
+        expect(one.volume.value).not.toBe(two.volume.value);
+        const left = {};
+        const right = {};
+        await synth.trigger(0, ["C3", "E4", "G5"], 0.1, alias, null, null, false, 0, left);
+        await synth.trigger(1, "C4", 0.1, alias, null, null, false, 0, right);
+        expect(one.connect).toHaveBeenLastCalledWith(left);
+        expect(two.connect).toHaveBeenLastCalledWith(right);
+        synth.releaseMultisample(0, alias);
+        expect(two.dispose).not.toHaveBeenCalled();
+        expect(synth.getPreparedMultisample(1, {})).toBeNull();
+    });
+
+    test.each([0, 1, 2])(
+        "rolls back recording %i failure without erasing saved audio and permits retry",
+        async index => {
+            const value = instrument();
+            const saved = JSON.stringify(value);
+            const alias = synth.registerMultisample(value);
+            for (let i = 0; i < index; i++) decode.mockResolvedValueOnce(pcm());
+            decode.mockRejectedValueOnce(new Error("decoder failed"));
+            await expect(synth.loadSynth(0, alias)).rejects.toThrow(value.samples[index].name);
+            expect(synthInstruments[0]?.[alias]).toBeUndefined();
+            expect(synth.getPreparedMultisample(0, value)).toBeNull();
+            expect(synth.multisampleBytes).toBe(0);
+            expect(Tone.Sampler).not.toHaveBeenCalled();
+            expect(JSON.stringify(value)).toBe(saved);
+            await expect(synth.loadSynth(0, alias)).resolves.toBeDefined();
+            expect(synth.multisampleBytes).toBe(384);
+        }
+    );
+
+    test.each([null, pcm(0), { length: 32, numberOfChannels: 0 }])(
+        "rejects empty audio %p atomically",
+        async audio => {
+            decode.mockResolvedValueOnce(pcm()).mockResolvedValueOnce(audio);
+            const alias = synth.registerMultisample(instrument());
+            await expect(synth.loadSynth(0, alias)).rejects.toThrow("C4.wav");
+            expect(synth.multisampleBytes).toBe(0);
+            expect(synthInstruments[0]?.[alias]).toBeUndefined();
+            expect(Tone.Sampler).not.toHaveBeenCalled();
+        }
+    );
+
+    test("accepts exactly 32 MiB per owner and rolls back one stereo frame over", async () => {
+        const alias = synth.registerMultisample(instrument());
+        decode.mockResolvedValueOnce(pcm(16777216, 2)).mockResolvedValueOnce(pcm(16777088, 2));
+        await synth.loadSynth(0, alias);
+        expect(synth.multisampleBytes).toBe(33554432);
+        synth.releaseMultisample(0, alias);
+        expect(synth.multisampleBytes).toBe(0);
+        decode.mockResolvedValueOnce(pcm(16777216, 2)).mockResolvedValueOnce(pcm(16777096, 2));
+        await expect(synth.loadSynth(0, alias)).rejects.toThrow("memory limit");
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synthInstruments[0]?.[alias]).toBeUndefined();
+    });
+
+    test("counts ready, partial and preview owners together at the exact 64 MiB limit", async () => {
+        const value = { ...instrument(), samples: [instrument().samples[0]] };
+        const alias = synth.registerMultisample(value);
+        decode.mockResolvedValue(pcm(33554432, 2));
+        const ready = await synth.loadSynth(0, alias);
+        const pending = deferred();
+        decode
+            .mockReturnValueOnce(Promise.resolve(pcm(16777216, 2)))
+            .mockReturnValueOnce(pending.promise);
+        const preview = synth.registerMultisample(instrument());
+        const preparing = synth.loadSynth("preview", preview);
+        await flush();
+        expect(synth.multisampleBytes).toBe(50331648);
+        decode.mockResolvedValueOnce(pcm(16777216, 2));
+        await synth.loadSynth(1, alias);
+        expect(synth.multisampleBytes).toBe(67108864);
+        const rejected = expect(preparing).rejects.toThrow("memory limit");
+        pending.resolve(pcm(8, 2));
+        await rejected;
+        expect(synth.multisampleBytes).toBe(50331648);
+        expect(synthInstruments[0][alias]).toBe(ready);
+        expect(ready.dispose).not.toHaveBeenCalled();
+        synth.releaseMultisample(1, alias);
+        expect(synth.multisampleBytes).toBe(33554432);
+        expect(synthInstrumentsSource[alias]).toEqual([2, alias]);
+        synth.releaseMultisample(0, alias);
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synthInstrumentsSource[alias]).toBeUndefined();
+        expect(ready.dispose).toHaveBeenCalledTimes(1);
+        synth.releaseMultisample(0, alias);
+        expect(ready.dispose).toHaveBeenCalledTimes(1);
+    });
+
+    test("concurrent admissions cannot each reserve the last combined capacity", async () => {
+        const value = { ...instrument(), samples: [instrument().samples[0]] };
+        const alias = synth.registerMultisample(value);
+        decode.mockResolvedValue(pcm(33554432));
+        await synth.loadSynth(0, alias);
+        const one = deferred();
+        const two = deferred();
+        decode.mockReturnValueOnce(one.promise).mockReturnValueOnce(two.promise);
+        const first = synth.loadSynth(1, alias);
+        const second = synth.loadSynth(2, alias);
+        const rejected = expect(second).rejects.toThrow("memory limit");
+        one.resolve(pcm(33554432));
+        two.resolve(pcm(33554432));
+        await first;
+        await rejected;
+        expect(synth.multisampleBytes).toBe(67108864);
+        expect(synthInstruments[2]?.[alias]).toBeUndefined();
+        synth.disposeAllInstruments();
+        expect(synth.multisampleBytes).toBe(0);
+    });
+
+    test.each(["resolve", "reject"])(
+        "abandonment releases partial audio and retries before late %s",
+        async settle => {
+            const old = deferred();
+            decode.mockResolvedValueOnce(pcm(33554432)).mockReturnValueOnce(old.promise);
+            const value = instrument();
+            const alias = synth.registerMultisample(value);
+            const abandoned = synth.loadSynth(0, alias);
+            const rejected = expect(abandoned).rejects.toMatchObject({ name: "AbortError" });
+            await flush();
+            expect(synth.multisampleBytes).toBe(33554432);
+            synth.releaseMultisample(0, alias);
+            expect(synth.multisampleBytes).toBe(0);
+            await rejected;
+            const fresh = await synth.loadSynth(0, alias);
+            expect(synth.getPreparedMultisample(0, value)).toBe(alias);
+            const calls = decode.mock.calls.length;
+            old[settle](settle === "resolve" ? pcm(33554432) : new Error("late failure"));
+            await flush();
+            expect(decode).toHaveBeenCalledTimes(calls);
+            expect(synthInstruments[0][alias]).toBe(fresh);
+            expect(synth.multisampleBytes).toBe(384);
+        }
+    );
+
+    test.each(["resolve", "reject"])(
+        "one whole deadline releases partial audio and ignores late %s",
+        async settle => {
+            jest.useFakeTimers();
+            const first = deferred();
+            const last = deferred();
+            decode.mockReturnValueOnce(first.promise).mockReturnValueOnce(last.promise);
+            const alias = synth.registerMultisample(instrument());
+            const rejected = expect(synth.loadSynth(0, alias)).rejects.toThrow("timed out");
+            jest.advanceTimersByTime(20000);
+            first.resolve(pcm(33554432));
+            await flush();
+            expect(synth.multisampleBytes).toBe(33554432);
+            jest.advanceTimersByTime(9999);
+            expect(synth.multisampleBytes).toBe(33554432);
+            jest.advanceTimersByTime(1);
+            await rejected;
+            expect(synth.multisampleBytes).toBe(0);
+            const fresh = await synth.loadSynth(0, alias);
+            const calls = decode.mock.calls.length;
+            last[settle](settle === "resolve" ? pcm() : new Error("late"));
+            await flush();
+            expect(decode).toHaveBeenCalledTimes(calls);
+            expect(synthInstruments[0][alias]).toBe(fresh);
+            expect(synth.multisampleBytes).toBe(384);
+        }
+    );
+
+    test("project disposal releases ready and partial owners without disposing ready audio twice", async () => {
+        const value = instrument();
+        const alias = synth.registerMultisample(value);
+        const ready = await synth.loadSynth(0, alias);
+        const old = deferred();
+        decode.mockResolvedValueOnce(pcm()).mockReturnValueOnce(old.promise);
+        const rejected = expect(synth.loadSynth(1, alias)).rejects.toMatchObject({
+            name: "AbortError"
+        });
+        await flush();
+        synth.disposeAllInstruments();
+        await rejected;
+        expect(synth.multisampleBytes).toBe(0);
+        expect(ready.dispose).toHaveBeenCalledTimes(1);
+        expect(synthInstrumentsSource[alias]).toBeUndefined();
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        const freshAlias = synth.registerMultisample(value);
+        const fresh = await synth.loadSynth(0, freshAlias);
+        old.resolve(pcm());
+        await flush();
+        expect(synth.getPreparedMultisample(0, value)).toBe(freshAlias);
+        expect(synthInstruments[0][freshAlias]).toBe(fresh);
+        expect(synth.multisampleBytes).toBe(384);
+    });
+
+    test("constructor failure rolls back all audio without publishing a fallback", async () => {
+        Tone.Sampler.mockImplementationOnce(() => {
+            throw new Error("constructor failed");
+        });
+        const alias = synth.registerMultisample(instrument());
+        await expect(synth.loadSynth(0, alias)).rejects.toThrow("constructor failed");
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synthInstruments[0]?.[alias]).toBeUndefined();
+        expect(synthInstrumentsSource[alias]).toBeUndefined();
+        await expect(synth.loadSynth(0, alias)).resolves.toBeDefined();
+    });
+
+    test("release after publication cannot route the old continuation over a retry", async () => {
+        const alias = synth.registerMultisample(instrument());
+        const create = synth.createSynth;
+        synth.createSynth = async (...args) => {
+            const sampler = await create(...args);
+            synth.releaseMultisample(0, alias);
+            return sampler;
+        };
+        await expect(synth.loadSynth(0, alias)).rejects.toMatchObject({ name: "AbortError" });
+        expect(synth.multisampleBytes).toBe(0);
+        expect(samplers[0].connect).not.toHaveBeenCalled();
+    });
+
+    test("does not overwrite another source's ready or pending destination", async () => {
+        const one = synth.registerMultisample(instrument());
+        const two = synth.registerMultisample(instrument());
+        const held = deferred();
+        decode.mockReturnValueOnce(held.promise);
+        const loading = synth.createSynth(0, "shared", one, null).catch(error => error);
+        const repeated = synth.loadSynth(0, "shared");
+        await expect(synth.createSynth(0, "shared", two, null)).rejects.toThrow("already in use");
+        expect(decode).toHaveBeenCalledTimes(1);
+        held.resolve(pcm());
+        const ready = await loading;
+        expect(await repeated).toBe(ready);
+        expect(await synth.loadSynth(0, "shared")).toBe(ready);
+        await expect(synth.createSynth(0, "shared", two, null)).rejects.toThrow("already in use");
+        expect(synthInstruments[0].shared).toBe(ready);
+        expect(synth.multisampleBytes).toBe(384);
+        synth.releaseMultisample(0, "shared", one);
+        expect(ready.dispose).toHaveBeenCalledTimes(1);
+        await expect(synth.createSynth(0, "shared", two, null)).resolves.toBeDefined();
+    });
+
+    test("releasing a stale owner preserves its legacy replacement and source metadata", async () => {
+        const value = instrument();
+        const alias = synth.registerMultisample(value);
+        const previous = await synth.loadSynth(0, alias);
+        synth.samples = { voice: {}, drum: {} };
+        await synth.createSynth(0, alias, "sine", null);
+        const legacy = synthInstruments[0][alias];
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        synth.releaseMultisample(0, alias);
+        expect(synthInstruments[0][alias]).toBe(legacy);
+        expect(synthInstrumentsSource[alias]).toEqual([3, "sine"]);
+        expect(synth.multisampleBytes).toBe(0);
+        await expect(synth.loadSynth(0, alias)).resolves.toBe(legacy);
+        expect(synthInstruments[0][alias]).toBe(legacy);
+        expect(previous.dispose).toHaveBeenCalledTimes(1);
+    });
+
+    test("legacy replacement abandons pending audio and cannot be overwritten by late decoding", async () => {
+        const alias = synth.registerMultisample(instrument());
+        const held = deferred();
+        decode.mockResolvedValueOnce(pcm()).mockReturnValueOnce(held.promise);
+        const abandoned = expect(synth.loadSynth(0, alias)).rejects.toMatchObject({
+            name: "AbortError"
+        });
+        await flush();
+        synth.samples = { voice: {}, drum: {} };
+        await synth.createSynth(0, alias, "sine", null);
+        await abandoned;
+        const legacy = synthInstruments[0][alias];
+        expect(synth.multisampleBytes).toBe(0);
+        const calls = decode.mock.calls.length;
+        held.resolve(pcm());
+        await flush();
+        expect(decode).toHaveBeenCalledTimes(calls);
+        expect(synthInstruments[0][alias]).toBe(legacy);
+        expect(synthInstrumentsSource[alias]).toEqual([3, "sine"]);
+        await expect(synth.loadSynth(0, alias)).resolves.toBe(legacy);
+    });
+
+    test.each(["before", "after"])(
+        "legacy replacement %s another turtle prepares preserves both voices",
+        async order => {
+            const alias = synth.registerMultisample(instrument());
+            await synth.loadSynth(0, alias);
+            let sampler;
+            if (order === "before") sampler = await synth.loadSynth(1, alias);
+            synth.samples = { voice: {}, drum: {} };
+            await synth.createSynth(0, alias, "sine", null);
+            const legacy = synthInstruments[0][alias];
+            if (order === "after") sampler = await synth.loadSynth(1, alias);
+            const held = deferred();
+            const queue = jest.spyOn(Tone.ToneAudioBuffer, "loaded").mockReturnValue(held.promise);
+            let completed = false;
+            const chord = ["C3", "E4", "G5"];
+            const playing = synth.trigger(1, chord, 0.1, alias, null, null, false, 0).then(() => {
+                completed = true;
+            });
+            await flush();
+            expect(completed).toBe(true);
+            expect(queue).not.toHaveBeenCalled();
+            expect(sampler.triggerAttackRelease).toHaveBeenCalledWith(
+                chord,
+                0.1,
+                expect.any(Number)
+            );
+            const legacyPlaying = synth.trigger(0, ["C4", "E4"], 0.1, alias, null, null, false, 0);
+            await flush();
+            expect(legacy.triggerAttackRelease).not.toHaveBeenCalled();
+            held.resolve();
+            await legacyPlaying;
+            await playing;
+            expect(legacy.triggerAttackRelease).toHaveBeenCalledWith("C4", 0.1, expect.any(Number));
+            expect(synthInstrumentsSource[alias]).toEqual([3, "sine"]);
+            sampler.triggerAttackRelease.mockImplementation(() => {
+                throw new Error("No available buffers");
+            });
+            await expect(synth.trigger(1, "C20", 0.1, alias, null, null, false, 0)).rejects.toThrow(
+                /Cello.*C20/
+            );
+        }
+    );
+
+    test.each(["pending", "ready"])(
+        "late legacy download releases a %s feature destination at publication",
+        async state => {
+            const originalRequire = global.requirejs;
+            const originalSample = window.PIANO_SAMPLE;
+            const held = deferred();
+            let completeLegacy;
+            let feature;
+            let outcome;
+            try {
+                synth.samples = { voice: { piano: null }, drum: {} };
+                global.requirejs = (_, ready) => {
+                    completeLegacy = ready;
+                };
+                window.PIANO_SAMPLE = () => wavData();
+                const legacyLoading = synth.createSynth(0, "shared", "piano", null);
+                const alias = synth.registerMultisample(instrument());
+                if (state === "pending") decode.mockReturnValueOnce(held.promise);
+                feature = synth.createSynth(0, "shared", alias, null).then(
+                    sampler => {
+                        outcome = sampler;
+                    },
+                    error => {
+                        outcome = error;
+                    }
+                );
+                await flush();
+                const ready = state === "ready" ? outcome : null;
+                completeLegacy();
+                await legacyLoading;
+                await flush();
+                const legacy = synthInstruments[0].shared;
+                if (state === "pending") expect(outcome).toMatchObject({ name: "AbortError" });
+                else expect(ready.dispose).toHaveBeenCalledTimes(1);
+                expect(synth.multisampleBytes).toBe(0);
+                const calls = decode.mock.calls.length;
+                held.resolve(pcm());
+                await feature;
+                await flush();
+                expect(decode).toHaveBeenCalledTimes(calls);
+                expect(synthInstruments[0].shared).toBe(legacy);
+                expect(synthInstrumentsSource.shared).toEqual([2, "piano"]);
+                expect(legacy.dispose).not.toHaveBeenCalled();
+            } finally {
+                synth.disposeAllInstruments();
+                held.resolve(pcm());
+                if (feature) await feature;
+                global.requirejs = originalRequire;
+                window.PIANO_SAMPLE = originalSample;
+            }
+        }
+    );
+});

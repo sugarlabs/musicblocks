@@ -53,15 +53,78 @@ const MAX_HARMONIC = 1222;
  */
 function setupToneActions(activity) {
     Singer.ToneActions = class {
+        /** Refuse an actual unsupported use before collecting data or selecting a voice. */
+        static rejectMultisampleCapture(instrument, turtle, blk, destination) {
+            const logo = activity.logo;
+            destination =
+                destination ||
+                [
+                    ["inMatrix", _("Phrase Maker")],
+                    ["inMusicKeyboard", _("Music Keyboard")],
+                    ["inSample", _("Sampler")],
+                    ["inRhythmRuler", _("Rhythm Ruler")],
+                    ["inTimbre", _("Timbre")]
+                ].find(([flag]) => logo[flag])?.[1];
+            if (!destination) return false;
+            const name =
+                instrument && typeof instrument === "object" && instrument.type === "multisample"
+                    ? typeof instrument.name === "string"
+                        ? instrument.name
+                        : _("Multisample instrument")
+                    : typeof instrument === "string"
+                      ? logo.synth.getMultisampleName(turtle, instrument)
+                      : null;
+            if (name === null || name === undefined) return false;
+            for (const capture of [...(logo.instrumentCaptures || [])].reverse()) capture.abort();
+            activity.errorMsg(
+                name +
+                    ": " +
+                    _("Multisample instruments are not supported in") +
+                    " " +
+                    destination +
+                    ".",
+                blk
+            );
+            logo.stopTurtle = true;
+            return true;
+        }
+
         /**
          * Selects a voice for the synthesizer.
          *
          * @param {String} instrument - timbre name
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} blk - corresponding Block object in blocks.blockList
+         * @returns {false|undefined} False when multisample selection must abort.
          */
         static setTimbre(instrument, turtle, blk) {
+            if (Singer.ToneActions.rejectMultisampleCapture(instrument, turtle, blk)) return false;
             const tur = activity.turtles.ithTurtle(turtle);
+
+            const multisample =
+                instrument !== null &&
+                typeof instrument === "object" &&
+                !Array.isArray(instrument) &&
+                instrument.type === "multisample";
+            let synth = instrument;
+            if (multisample) {
+                try {
+                    const name =
+                        typeof instrument.name === "string"
+                            ? instrument.name
+                            : _("Multisample instrument");
+                    synth = activity.logo.synth.getPreparedMultisample(turtle, instrument);
+                    if (!synth) {
+                        throw new Error(
+                            _("Multisample instrument is not prepared for this run:") + " " + name
+                        );
+                    }
+                } catch (error) {
+                    activity.errorMsg(error.message, blk);
+                    activity.logo.doStopTurtles();
+                    return false;
+                }
+            }
 
             // Restored when this block ends, so an inner Set Instrument does not
             // switch off the outer one's timbre effects.
@@ -69,7 +132,6 @@ function setupToneActions(activity) {
             tur.inSetTimbre = true;
 
             let accounted = false;
-            let synth = instrument;
             for (const voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === instrument) {
                     synth = VOICENAMES[voice][1];
@@ -82,7 +144,7 @@ function setupToneActions(activity) {
                 }
             }
 
-            if (!accounted && typeof instrument === "object") {
+            if (!accounted && typeof instrument === "object" && !multisample) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     // data, pitch, octave and the cent adjustment from the sampler
@@ -109,7 +171,7 @@ function setupToneActions(activity) {
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
                 pushed = true;
-                activity.logo.synth.loadSynth(turtle, synth);
+                if (!multisample) activity.logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
