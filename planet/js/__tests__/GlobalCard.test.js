@@ -82,7 +82,6 @@ describe("GlobalCard", () => {
             expect(card.Planet).toBe(mockPlanet);
             expect(card.ProjectData).toBeNull();
             expect(card.id).toBeNull();
-            expect(card.likeTimeout).toBeNull();
             expect(card.likePending).toBe(false);
             expect(card.clipboard).toBeNull();
         });
@@ -243,14 +242,6 @@ describe("GlobalCard", () => {
     });
 
     describe("cleanup", () => {
-        it("should clear likeTimeout", () => {
-            jest.useFakeTimers();
-            card.likeTimeout = setTimeout(() => {}, 1000);
-            card.cleanup();
-            expect(card.likeTimeout).toBeNull();
-            jest.useRealTimers();
-        });
-
         it("should destroy clipboard and nullify references", () => {
             const mockClipboard = { destroy: jest.fn() };
             card.clipboard = mockClipboard;
@@ -270,29 +261,18 @@ describe("GlobalCard", () => {
 
     describe("like", () => {
         beforeEach(() => {
-            jest.useFakeTimers();
             card.init("test-id-1");
-        });
-
-        afterEach(() => {
-            jest.useRealTimers();
         });
 
         it("should do nothing when likePending is true", () => {
             card.likePending = true;
             card.like();
-            jest.advanceTimersByTime(1000);
             expect(mockPlanet.ServerInterface.likeProject).not.toHaveBeenCalled();
         });
 
-        it("should set likePending to true and schedule server call", () => {
+        it("should send the like immediately", () => {
             card.like();
             expect(card.likePending).toBe(true);
-        });
-
-        it("should call likeProject after 500ms delay", () => {
-            card.like();
-            jest.advanceTimersByTime(500);
             expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledWith(
                 "test-id-1",
                 true,
@@ -303,11 +283,114 @@ describe("GlobalCard", () => {
         it("should unlike when project is already liked", () => {
             mockPlanet.ProjectStorage.isLiked.mockReturnValue(true);
             card.like();
-            jest.advanceTimersByTime(500);
             expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledWith(
                 "test-id-1",
                 false,
                 expect.any(Function)
+            );
+        });
+
+        it("should finish a like after the card is removed", () => {
+            card.render();
+            card.like();
+            card.cleanup();
+            document.getElementById("global-projects").innerHTML = "";
+
+            const callback = mockPlanet.ServerInterface.likeProject.mock.calls[0][2];
+            expect(() => callback({ success: true })).not.toThrow();
+            expect(mockPlanet.ProjectStorage.like).toHaveBeenCalledWith("test-id-1", true);
+        });
+
+        it("should roll back a failed like after the card is removed", () => {
+            card.render();
+            card.like();
+            card.cleanup();
+            document.getElementById("global-projects").innerHTML = "";
+
+            mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({ success: false });
+            expect(mockPlanet.ProjectStorage.like).toHaveBeenLastCalledWith("test-id-1", false);
+        });
+
+        it("should not change a newly rendered server count on failure", () => {
+            card.render();
+            card.like();
+            card.cleanup();
+            document.getElementById("global-projects").innerHTML = "";
+            const newCard = new GlobalCard(mockPlanet);
+            newCard.init("test-id-1");
+            newCard.render();
+
+            mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({ success: false });
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("5");
+            expect(document.getElementById("global-like-icon-test-id-1").textContent).toBe(
+                "favorite_border"
+            );
+        });
+
+        it("should ignore a replacement card's like while the first request is pending", () => {
+            card.render();
+            card.like();
+            card.cleanup();
+            document.getElementById("global-projects").innerHTML = "";
+
+            const newCard = new GlobalCard(mockPlanet);
+            newCard.init("test-id-1");
+            newCard.render();
+            newCard.like();
+
+            expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledTimes(1);
+        });
+
+        it.each([true, false])(
+            "should keep the stored like state consistent when the first request resolves (success=%s)",
+            success => {
+                const liked = {};
+                mockPlanet.ProjectStorage.isLiked.mockImplementation(id => liked[id] === true);
+                mockPlanet.ProjectStorage.like.mockImplementation((id, value) => {
+                    liked[id] = value;
+                });
+
+                card.render();
+                card.like();
+                expect(liked["test-id-1"]).toBe(true);
+                card.cleanup();
+                document.getElementById("global-projects").innerHTML = "";
+
+                const newCard = new GlobalCard(mockPlanet);
+                newCard.init("test-id-1");
+                newCard.render();
+                newCard.like();
+
+                mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({ success });
+
+                expect(liked["test-id-1"]).toBe(success);
+                expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledTimes(1);
+            }
+        );
+
+        it("should allow a later request once the pending like has settled", () => {
+            card.render();
+            card.like();
+            mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({ success: true });
+
+            const newCard = new GlobalCard(mockPlanet);
+            newCard.init("test-id-1");
+            newCard.render();
+            newCard.like();
+
+            expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledTimes(2);
+        });
+
+        it("should roll back the optimistic count and icon when a like fails", () => {
+            card.render();
+            card.like();
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("6");
+
+            mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({ success: false });
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("5");
+            expect(document.getElementById("global-like-icon-test-id-1").textContent).toBe(
+                "favorite_border"
             );
         });
     });
