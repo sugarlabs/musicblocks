@@ -1237,3 +1237,93 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
         expect(noteValues(blocks)).toEqual([[8, 96]]);
     });
 });
+
+describe("Test 18: Transposing parts are imported at sounding pitch", () => {
+    const BB_CLARINET = "<transpose><diatonic>-1</diatonic><chromatic>-2</chromatic></transpose>";
+
+    it("moves a B-flat clarinet's written notes down a major second", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("D", 5, "quarter") +
+                    SIMPLE_NOTE("F", 5, "quarter", "<alter>1</alter>") +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    SIMPLE_NOTE("B", 4, "quarter", "<alter>-1</alter>"),
+                "<divisions>8</divisions>" + BB_CLARINET
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 5 },
+            { name: "E", octave: 5 },
+            { name: "B♭", octave: 3 },
+            { name: "A♭", octave: 4 }
+        ]);
+    });
+
+    it("moves the written key signature to the sounding key", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("D", 5, "quarter"),
+                "<divisions>8</divisions><key><fifths>2</fifths></key>" + BB_CLARINET
+            )
+        );
+
+        expect(keySignatureOf(blocks)).toEqual({ root: "C", mode: "major" });
+    });
+
+    it.each([
+        // Horn in F: written C5 sounds F4.
+        ["<diatonic>-4</diatonic><chromatic>-7</chromatic>", { name: "F", octave: 4 }],
+        // Alto saxophone: written C5 sounds E-flat 4.
+        ["<diatonic>-5</diatonic><chromatic>-9</chromatic>", { name: "E♭", octave: 4 }],
+        // Tenor saxophone: a major ninth down.
+        [
+            "<diatonic>-1</diatonic><chromatic>-2</chromatic><octave-change>-1</octave-change>",
+            { name: "B♭", octave: 3 }
+        ],
+        // Guitar: an octave down, nothing else.
+        [
+            "<diatonic>0</diatonic><chromatic>0</chromatic><octave-change>-1</octave-change>",
+            { name: "C", octave: 4 }
+        ],
+        // No <diatonic>: the nearest step count for two semitones down is one.
+        ["<chromatic>-2</chromatic>", { name: "B♭", octave: 4 }]
+    ])("reads written C5 under <transpose>%s as %o", async (transposeXml, expected) => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 5, "quarter"),
+                `<divisions>8</divisions><transpose>${transposeXml}</transpose>`
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([expected]);
+    });
+
+    it("applies a transposition from the measure it appears in", async () => {
+        const { blocks } = await parseAndCapture(
+            '<score-partwise><part id="P1">' +
+                '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+                SIMPLE_NOTE("D", 5, "quarter") +
+                "</measure>" +
+                `<measure number="2"><attributes>${BB_CLARINET}</attributes>` +
+                SIMPLE_NOTE("D", 5, "quarter") +
+                "</measure></part></score-partwise>"
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "D", octave: 5 },
+            { name: "C", octave: 5 }
+        ]);
+    });
+
+    it("ignores a <transpose> for a staff other than the first", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("D", 5, "quarter"),
+                '<divisions>8</divisions><transpose number="2"><diatonic>-1</diatonic><chromatic>-2</chromatic></transpose>'
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([{ name: "D", octave: 5 }]);
+    });
+});
