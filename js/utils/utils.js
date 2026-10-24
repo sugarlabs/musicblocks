@@ -98,41 +98,31 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
+let _cachedKanaPreference = null;
+
+if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("storage", e => {
+        if (!e || e.key === "kanaPreference") {
+            _cachedKanaPreference = null;
+        }
+    });
+}
 
 function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [
-            ",",
-            "(",
-            ")",
-            "?",
-            "¿",
-            "<",
-            ">",
-            ".",
-            "\n",
-            '"',
-            ":",
-            "%s",
-            "%d",
-            "/",
-            "'",
-            ";",
-            "×",
-            "!",
-            "¡"
-        ];
-        let cleanedText = text;
-        for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
-
         let translated = "";
         const lang = i18next.language;
 
         if (lang.startsWith("ja")) {
-            const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
-            const script = kanaPref === "kana" ? "kana" : "kanji";
+            if (_cachedKanaPreference === null) {
+                _cachedKanaPreference =
+                    (typeof localStorage !== "undefined" &&
+                        localStorage.getItem("kanaPreference")) ||
+                    "kanji";
+            }
+            const script = _cachedKanaPreference === "kana" ? "kana" : "kanji";
 
             const resolveObj = key => {
                 let obj = i18next.t(key, { ...options, ns: undefined, returnObjects: true });
@@ -484,7 +474,10 @@ if (typeof module !== "undefined" && module.exports) {
         getTextWidth,
         doSVG,
         isSVGEmpty,
-        announceToScreenReader
+        announceToScreenReader,
+        _resetKanaCache: () => {
+            _cachedKanaPreference = null;
+        }
     };
 }
 
