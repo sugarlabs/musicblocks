@@ -1285,12 +1285,10 @@ describe("beforeunload warning", () => {
 describe("saveLilypond Methods", () => {
     let activity, saveInterface, mockActivity, mockDocById;
     let originalClipboard;
-    let originalSecureContext;
 
     beforeEach(() => {
         jest.useRealTimers();
         originalClipboard = navigator.clipboard;
-        originalSecureContext = window.isSecureContext;
         // Set up the DOM structure
         document.body.innerHTML = `
             <div id="lilypondModal" style="display: none;">
@@ -1414,10 +1412,10 @@ describe("saveLilypond Methods", () => {
         } else {
             navigator.clipboard = originalClipboard;
         }
-        Object.defineProperty(window, "isSecureContext", {
-            value: originalSecureContext,
-            configurable: true
-        });
+        // Delete instead of redefining: redefining an existing window
+        // property keeps its old value, so the next test's defineProperty
+        // would silently be ignored.
+        delete window.isSecureContext;
     });
 
     it("should give a block-saved Lilypond file the default header and closing sections", () => {
