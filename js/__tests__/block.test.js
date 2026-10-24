@@ -2146,6 +2146,7 @@ describe("Block Foundation", () => {
         it("owns independent whole multisample values and history snapshots", () => {
             const workspace = {
                 ...mockBlocks,
+                activity: { logo: { invalidateMultisampleRun: jest.fn() } },
                 actionHistory: [],
                 redoActionHistory: [],
                 updateBlockText: jest.fn()
@@ -2165,6 +2166,10 @@ describe("Block Foundation", () => {
             expect(workspace.actionHistory[0].newValue.extra.a).toEqual([1, 2]);
             block.setMultisampleValue(JSON.parse(JSON.stringify(block.value)), true);
             expect(workspace.actionHistory).toHaveLength(1);
+            expect(workspace.activity.logo.invalidateMultisampleRun).toHaveBeenCalledTimes(3);
+            expect(workspace.activity.logo.invalidateMultisampleRun).toHaveBeenLastCalledWith(
+                block
+            );
         });
 
         it("never sends a structured instrument to the text editor", () => {

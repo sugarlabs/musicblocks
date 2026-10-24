@@ -4521,6 +4521,45 @@ describe("Multisample instruments", () => {
         expect(synthInstrumentsSource[alias]).toEqual([2, alias]);
     });
 
+    test("checks the live saved owner before admission and releases only feature audio", async () => {
+        let current = true;
+        const held = deferred();
+        decode.mockReturnValueOnce(held.promise);
+        const value = instrument();
+        const alias = synth.registerMultisample(value, () => current);
+        const pending = synth.loadSynth(0, alias).catch(error => error);
+        current = false;
+        held.resolve(pcm());
+        expect((await pending).name).toBe("AbortError");
+        expect(decode).toHaveBeenCalledTimes(1);
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        synth.releaseMultisamples();
+        const legacy = { dispose: jest.fn() };
+        synthInstruments[0].kept = legacy;
+        const fresh = synth.registerMultisample(value);
+        await synth.loadSynth(0, fresh);
+        synth.releaseMultisamples();
+        expect(synth.multisampleBytes).toBe(0);
+        expect(synth.getPreparedMultisample(0, value)).toBeNull();
+        expect(synthInstruments[0].kept).toBe(legacy);
+        expect(legacy.dispose).not.toHaveBeenCalled();
+    });
+
+    test("reports a feature pitch error to its owning run without a fallback", async () => {
+        const failure = new Error("unsupported target");
+        const abort = jest.fn();
+        const alias = synth.registerMultisample(instrument(), () => true, abort);
+        const sampler = await synth.loadSynth(0, alias);
+        sampler.triggerAttackRelease.mockImplementation(() => {
+            throw failure;
+        });
+        await synth.trigger(0, "C4", 0.1, alias, null, null, false, 0);
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(abort.mock.calls[0][0].message).toContain("C4");
+        expect(abort.mock.calls[0][0].message).toContain("unsupported target");
+    });
+
     test.each([null, 0, 0.2])(
         "ready voice notes bypass unrelated downloads with effects %p",
         async distortion => {

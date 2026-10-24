@@ -2528,6 +2528,7 @@ class Block {
     setMultisampleValue(value, recordHistory = false) {
         const snapshot = value === undefined ? undefined : JSON.parse(JSON.stringify(value));
         const previous = this.value;
+        this.blocks.activity?.logo?.invalidateMultisampleRun?.(this);
         this.value = snapshot;
         this.blocks.updateBlockText(this.blockIndex);
         if (recordHistory && JSON.stringify(previous) !== JSON.stringify(snapshot)) {

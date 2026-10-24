@@ -880,9 +880,11 @@ function Synth() {
      * Registers a detached descriptor snapshot, without decoding or changing timbre.
      * Edits must supply a new descriptor object; names are only display metadata.
      * @param {object} instrument - Complete multisample descriptor.
+     * @param {Function} isCurrent - Whether the saved owner and run remain current.
+     * @param {Function} [onError] - Owning run's whole-run playback failure handler.
      * @returns {string} Session-only instrument handle.
      */
-    this.registerMultisample = instrument => {
+    this.registerMultisample = (instrument, isCurrent = () => true, onError) => {
         const existing = multisampleNames.get(instrument);
         if (existing) return existing;
         const descriptor = validateMultisample(instrument);
@@ -895,8 +897,21 @@ function Synth() {
             Object.values(instruments).some(table => name in table)
         );
         multisampleNames.set(instrument, name);
-        multisamples.set(name, { descriptor, loads: new Map() });
+        multisamples.set(name, { descriptor, isCurrent, onError, loads: new Map() });
         return name;
+    };
+
+    this.isMultisampleAlias = name => multisamples.has(name);
+
+    /** Release only feature owners, leaving legacy instruments and routing intact. */
+    this.releaseMultisamples = () => {
+        for (const [name, source] of multisamples) {
+            for (const entry of source.loads.values()) {
+                this.releaseMultisample(entry.turtle, entry.instrumentName, name);
+            }
+        }
+        multisamples.clear();
+        multisampleNames = new WeakMap();
     };
 
     /** Returns a live, completely prepared descriptor/turtle alias without loading. */
@@ -947,6 +962,9 @@ function Synth() {
     const loadMultisample = (turtle, instrumentName, sourceName) => {
         const source = multisamples.get(sourceName);
         const key = loadKey(turtle, instrumentName);
+        if (!source.isCurrent()) {
+            return Promise.reject(new DOMException("Multisample load cancelled", "AbortError"));
+        }
         const previous = source.loads.get(key);
         if (previous?.isLive()) return previous.promise;
         if (previous) this.releaseMultisample(turtle, instrumentName, sourceName);
@@ -961,14 +979,17 @@ function Synth() {
 
         const epoch = this._instrumentEpoch;
         const entry = {
+            turtle,
             instrumentName,
             name: source.descriptor.name,
+            onError: source.onError,
             roots: {},
             bytes: 0,
             sampler: null,
             promise: null,
             cancel: null,
             isLive: () =>
+                source.isCurrent() &&
                 this._instrumentEpoch === epoch &&
                 source.loads.get(key) === entry &&
                 (!entry.sampler || instruments[turtle]?.[instrumentName] === entry.sampler)
@@ -1011,6 +1032,7 @@ function Synth() {
                         );
                     }
                     if (!entry.isLive()) {
+                        entry.cancel?.();
                         return;
                     }
                     if (!audio || audio.length <= 0 || audio.numberOfChannels <= 0) {
@@ -1042,6 +1064,7 @@ function Synth() {
                     audio = null;
                 }
                 if (!entry.isLive()) {
+                    entry.cancel?.();
                     return;
                 }
                 const sampler = new Tone.Sampler(entry.roots);
@@ -2501,8 +2524,18 @@ function Synth() {
                             try {
                                 synth.triggerAttackRelease(value.note, value.duration, time);
                             } catch (error) {
-                                if (multisample)
-                                    throw multisamplePlaybackError(multisample, value.note, error);
+                                if (multisample) {
+                                    const failure = multisamplePlaybackError(
+                                        multisample,
+                                        value.note,
+                                        error
+                                    );
+                                    if (multisample.onError) {
+                                        multisample.onError(failure);
+                                        return;
+                                    }
+                                    throw failure;
+                                }
                                 throw error;
                             }
                         }, obj).start();
@@ -2910,7 +2943,15 @@ function Synth() {
                     break;
             }
         } catch (e) {
-            if (source) throw multisamplePlaybackError(source, notes, e);
+            if (source) {
+                if (epoch !== this._instrumentEpoch || (owner && !owner.isLive())) return;
+                const error = multisamplePlaybackError(source, notes, e);
+                if (owner?.onError) {
+                    owner.onError(error);
+                    return;
+                }
+                throw error;
+            }
             console.error("Error in trigger:", e);
         }
     };
