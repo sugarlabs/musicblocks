@@ -59,6 +59,7 @@ function setupToneActions(activity) {
          * @param {String} instrument - timbre name
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} blk - corresponding Block object in blocks.blockList
+         * @returns {false|undefined} False when multisample selection must abort.
          */
         static setTimbre(instrument, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
@@ -71,16 +72,27 @@ function setupToneActions(activity) {
             let synth = instrument;
             if (multisample) {
                 try {
+                    const name =
+                        typeof instrument.name === "string"
+                            ? instrument.name
+                            : _("Multisample instrument");
                     if (activity.logo.inMatrix) {
                         throw new Error(
-                            _("Multisample instruments cannot be captured in Phrase Maker yet.")
+                            name +
+                                ": " +
+                                _("Multisample instruments cannot be captured in Phrase Maker yet.")
                         );
                     }
-                    synth = activity.logo.synth.registerMultisample(instrument);
+                    synth = activity.logo.synth.getPreparedMultisample(turtle, instrument);
+                    if (!synth) {
+                        throw new Error(
+                            _("Multisample instrument is not prepared for this run:") + " " + name
+                        );
+                    }
                 } catch (error) {
                     activity.errorMsg(error.message, blk);
                     activity.logo.stopTurtle = true;
-                    return;
+                    return false;
                 }
             }
 
@@ -135,14 +147,7 @@ function setupToneActions(activity) {
             }
 
             if (!loaded) {
-                const loading = activity.logo.synth.loadSynth(turtle, synth);
-                if (multisample) {
-                    loading.catch(error => {
-                        if (error.name === "AbortError") return;
-                        activity.errorMsg(error.message, blk);
-                        activity.logo.stopTurtle = true;
-                    });
-                }
+                if (!multisample) activity.logo.synth.loadSynth(turtle, synth);
 
 
                 if (tur.singer.synthVolume[synth] === undefined) {
