@@ -262,6 +262,16 @@ describe("ToolbarController.runSlow", () => {
 });
 
 describe("ToolbarController.runStep", () => {
+    test("additional startup clicks are busy without restarting or queuing steps", () => {
+        const activity = makeMockActivity();
+        const controller = new ToolbarController(activity);
+        activity.logo._executionRequest = { queuesReady: false };
+        expect(controller.runStep()).toBe(null);
+        expect(controller.runStep()).toBe(null);
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+        expect(activity.logo.step).not.toHaveBeenCalled();
+        expect(activity.logo.synth.resume).not.toHaveBeenCalled();
+    });
     let activity;
     let controller;
 

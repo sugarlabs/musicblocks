@@ -1177,7 +1177,9 @@ class Logo {
         }
 
         if (typeof proto.arg === "function") {
-            return (currentBlock.value = proto.arg(logo, turtle, blk, receivedArg));
+            currentBlock.value = proto.arg(logo, turtle, blk, receivedArg);
+            if (currentBlock.name === "multisample" && logo.stopTurtle) logo.doStopTurtles();
+            return currentBlock.value;
         }
 
         const blockName = currentBlock.name;
@@ -1648,6 +1650,12 @@ class Logo {
         this.synth.releaseMultisamples?.();
         this.stopTurtle = true;
         this.runGeneration += 1;
+        this.runningLilypond = false;
+        this.runningAbc = false;
+        this.runningMxml = false;
+        this.runningMIDI = false;
+        this._exportNotationFinished = true;
+        this.collectingStats = false;
         this.turtles.markAllAsStopped();
         this._cancelSpeech();
 
@@ -1735,7 +1743,13 @@ class Logo {
      * @returns {void}
      */
     step() {
+        const request = this._executionRequest;
+        if (request && !request.queuesReady) {
+            request.initialStep = true;
+            return;
+        }
         for (const turtle in this.stepQueue) {
+            if (this.stopTurtle || this._executionRequest !== request) return;
             if (this.stepQueue[turtle].length > 0) {
                 if (
                     turtle in this._unhighlightStepQueue &&
@@ -1879,6 +1893,14 @@ class Logo {
         this.deps.storage.saveLocally(); // Save the state before running.
         request.epoch = this.synth._instrumentEpoch;
 
+        // Ensure the bare-stack owner exists before snapshotting or initializing synths.
+        if (this.turtles.turtleCount() === 0) this.turtles.addTurtle(null);
+
+        if (this._exportingNotation) {
+            this._startLogoCommands(startHere, env, request);
+            return;
+        }
+
         this.blocks.findStacks();
         let participants;
         if (startHere !== null && startHere !== undefined) {
@@ -1980,13 +2002,6 @@ class Logo {
         this.time = new Date().getTime();
         this.firstNoteTime = null;
         this.firstNoteAudioTime = null;
-
-        // Ensure we have at least one turtle that is not in the trash. This
-        // has to happen before prepSynths() and initTurtle() below, or a
-        // turtle added here gets no synth and no notation state.
-        if (this.turtles.turtleCount() === 0) {
-            this.turtles.addTurtle(null);
-        }
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
@@ -2171,10 +2186,19 @@ class Logo {
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
         ===========================================================================
         */
+        const finishStepSetup = () => {
+            if (this._executionRequest !== request) return;
+            request.queuesReady = true;
+            if (request.initialStep && this.turtleDelay === TURTLESTEP) {
+                request.initialStep = false;
+                this.step();
+            }
+        };
         if (this.turtles.turtleCount() === 0) {
             this.deps.errorHandler(NOACTIONERRORMSG, null, _("start"));
             this.runningMIDI = false;
             document.body.style.cursor = "default";
+            finishStepSetup();
             // eslint-disable-next-line eqeqeq
         } else if (startHere != null) {
             // If a block to start from was passed, find its associated
@@ -2201,11 +2225,13 @@ class Logo {
 
             tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
+            finishStepSetup();
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
             const startBlocksLength = startBlocks.length;
             // Look for status and oscilloscope blocks.
             for (let b = 0; b < startBlocksLength; b++) {
+                if (this.stopTurtle || this._executionRequest !== request) return;
                 if (
                     ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
@@ -2236,6 +2262,7 @@ class Logo {
 
                     // If there are multiple start blocks, run them all.
                     for (let b = 0; b < startBlocksLength; b++) {
+                        if (this.stopTurtle || this._executionRequest !== request) return;
                         if (
                             !["status", "oscilloscope"].includes(
                                 this.blockList[startBlocks[b]].name
@@ -2256,6 +2283,7 @@ class Logo {
                             }
                         }
                     }
+                    finishStepSetup();
                 },
                 delayStart,
                 () => this.stopTurtle
@@ -2263,6 +2291,7 @@ class Logo {
         } else {
             this.runningMIDI = false;
             document.body.style.cursor = "default";
+            finishStepSetup();
         }
 
         this.deps.refreshCanvas();
@@ -2293,6 +2322,7 @@ class Logo {
      * @returns {void}
      */
     runFromBlock(logo, turtle, blk, isflow, receivedArg) {
+        if (logo.stopTurtle) return;
         const request = this._executionRequest;
         this._runningBlock = blk;
         // eslint-disable-next-line eqeqeq
@@ -2411,6 +2441,7 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        if (logo.stopTurtle) return;
         const request = logo._executionRequest;
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
@@ -2479,6 +2510,14 @@ class Logo {
                         }
                     } else {
                         args.push(logo.parseArg(logo, turtle, connections[i], blk, receivedArg));
+                    }
+
+                    if (logo._executionRequest !== request || (logo.stopTurtle && !tur.running)) {
+                        if (profilingEnabled) {
+                            Logo._recordBlockTiming(logo, blk, profilingStart);
+                            tracker.exitBlock();
+                        }
+                        return;
                     }
 
                     if (
@@ -2686,6 +2725,14 @@ class Logo {
                 }
 
                 logo.stopTurtle = true;
+            }
+
+            if (logo._executionRequest !== request || (logo.stopTurtle && !tur.running)) {
+                if (profilingEnabled) {
+                    Logo._recordBlockTiming(logo, blk, profilingStart);
+                    tracker.exitBlock();
+                }
+                return;
             }
 
             /*
@@ -2932,6 +2979,7 @@ class Logo {
      * @returns {void}
      */
     _finishTurtle(logo, turtle, queueStart) {
+        const request = logo._executionRequest;
         const tur = logo.turtles.ithTurtle(turtle);
 
         logo._alreadyRunning = false;
@@ -2968,7 +3016,11 @@ class Logo {
         // ensured that the turtle is really finished running
         // yet. Hence the timeout.
         const __checkCompletionState = () => {
-            if (logo._exportNotationFinished) {
+            if (
+                logo.stopTurtle ||
+                logo._executionRequest !== request ||
+                logo._exportNotationFinished
+            ) {
                 return;
             }
 

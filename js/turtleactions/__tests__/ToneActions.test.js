@@ -310,6 +310,48 @@ describe("setupToneActions", () => {
             expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
         });
 
+        it.each(["notation", "suppressed", "counting"])(
+            "validates actual %s use without a prepared alias or audio",
+            mode => {
+                activity.logo.inTimbre = false;
+                activity.logo._exportingNotation = mode === "notation";
+                targetTurtle.singer.suppressOutput = mode === "suppressed";
+                targetTurtle.singer.justCounting = mode === "counting" ? [true] : [];
+                const { validateMultisample } = require("../../utils/synthutils");
+                const savedValidator = global.validateMultisample;
+                const savedNormalize = global.normalizeNoteAccidentals;
+                const savedTone = global.Tone;
+                global.validateMultisample = validateMultisample;
+                global.normalizeNoteAccidentals =
+                    require("../../utils/musicutils").normalizeNoteAccidentals;
+                global.Tone = { Frequency: () => ({ toMidi: () => 60 }) };
+                activity.logo.synth.getPreparedMultisample = jest.fn(() => null);
+                try {
+                    expect(Singer.ToneActions.setTimbre(multisampleValue(), 0, 1)).not.toBe(false);
+                    expect(activity.errorMsg).not.toHaveBeenCalled();
+                    expect(activity.logo.synth.getPreparedMultisample).not.toHaveBeenCalled();
+                    expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+                    expect(targetTurtle.singer.instrumentNames).toEqual([]);
+                    expect(
+                        Singer.ToneActions.setTimbre(
+                            { type: "multisample", version: 2, name: "Future" },
+                            0,
+                            1
+                        )
+                    ).toBe(false);
+                    expect(activity.logo.doStopTurtles).toHaveBeenCalledTimes(1);
+                    expect(activity.errorMsg).toHaveBeenCalledWith(
+                        expect.stringContaining("Future"),
+                        1
+                    );
+                } finally {
+                    global.validateMultisample = savedValidator;
+                    global.normalizeNoteAccidentals = savedNormalize;
+                    global.Tone = savedTone;
+                }
+            }
+        );
+
         it("does not classify silent notation or counting as widget capture", () => {
             activity.logo.inTimbre = false;
             activity.logo.runningLilypond = true;
