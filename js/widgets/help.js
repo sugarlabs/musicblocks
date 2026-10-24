@@ -739,6 +739,8 @@ class HelpWidget {
                 return path + "-es";
             case "pt":
                 return path + "-pt";
+            case "he":
+                return path + "-he";
             default:
                 return path;
         }
