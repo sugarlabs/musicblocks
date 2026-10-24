@@ -50,6 +50,7 @@ class GlobalPlanet {
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
+        this._searchDebounceTimer = null;
         this.remixPrefix = _("Remix of");
 
         /** @type {IntersectionObserver|null} */
@@ -175,6 +176,16 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
+    }
+
+    _scheduleSearch(value) {
+        clearTimeout(this._searchDebounceTimer);
+
+        this._searchDebounceTimer = setTimeout(() => {
+            this._searchDebounceTimer = null;
+            this.searchString = value;
+            this.search();
+        }, 300);
     }
 
     search() {
@@ -698,6 +709,9 @@ class GlobalPlanet {
     }
 
     destroy() {
+        clearTimeout(this._searchDebounceTimer);
+        this._searchDebounceTimer = null;
+
         this.listenerRefs.forEach(({ el, type, bound }) => {
             el.removeEventListener(type, bound);
         });
@@ -790,8 +804,18 @@ class GlobalPlanet {
                 }
             });
 
+            register("global-search", "input", function (evt) {
+                this._scheduleSearch(evt.target.value);
+            });
+
+            register("global-search-2", "input", function (evt) {
+                this._scheduleSearch(evt.target.value);
+            });
+
             register("global-search", "keydown", function (evt) {
                 if (evt.key === "Enter") {
+                    clearTimeout(this._searchDebounceTimer);
+                    this._searchDebounceTimer = null;
                     this.searchString = document.getElementById("global-search").value;
                     this.search();
                 }
@@ -799,12 +823,16 @@ class GlobalPlanet {
 
             register("global-search-2", "keydown", function (evt) {
                 if (evt.key === "Enter") {
+                    clearTimeout(this._searchDebounceTimer);
+                    this._searchDebounceTimer = null;
                     this.searchString = document.getElementById("global-search-2").value;
                     this.search();
                 }
             });
 
             register("search-close", "click", function (evt) {
+                clearTimeout(this._searchDebounceTimer);
+                this._searchDebounceTimer = null;
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
@@ -812,6 +840,8 @@ class GlobalPlanet {
             });
 
             register("search-close-2", "click", function (evt) {
+                clearTimeout(this._searchDebounceTimer);
+                this._searchDebounceTimer = null;
                 document.getElementById("global-search-2").value = "";
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";

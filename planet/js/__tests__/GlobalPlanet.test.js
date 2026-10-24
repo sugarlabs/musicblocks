@@ -568,6 +568,63 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("live search", () => {
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it("searches using the latest input value after the debounce delay", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const searchSpy = jest.spyOn(gp, "search").mockImplementation(() => {});
+
+            gp.init();
+
+            const input = document.getElementById("global-search");
+
+            input.value = "d";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            input.value = "de";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            input.value = "dem";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(searchSpy).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("dem");
+            expect(searchSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("restores the browse view when the search input is cleared", () => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            gp.init();
+
+            gp.searchString = "wrong-query";
+            gp.oldSearchString = "wrong-query";
+            gp.searching = false;
+
+            document.getElementById("tagscontainer").style.display = "none";
+
+            const input = document.getElementById("global-search");
+            input.value = "";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("");
+            expect(gp.oldSearchString).toBe("");
+            expect(document.getElementById("tagscontainer").style.display).toBe("block");
+            expect(refreshSpy).toHaveBeenCalled();
+        });
+    });
+
     describe("destroy", () => {
         it("should call ProjectViewer.destroy() when ProjectViewer exists", () => {
             const mockDestroy = jest.fn();
