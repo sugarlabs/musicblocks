@@ -1081,13 +1081,123 @@ describe("PracticeValidator piano discoveries", () => {
 
     test.each([
         ["spacedTheKeys", "setxy"],
-        ["spacedTheKeys", "setxyturtle"],
-        ["namedTheKeys", "setturtlename2"],
-        ["namedTheKeys", "turtlename"]
+        ["spacedTheKeys", "setxyturtle"]
     ])("%s is proved by a connected %s block", (criterion, blockName) => {
         useBlocks(connected(blockName));
 
         expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(true);
+    });
+
+    test("the starter's one named key does not prove the keys were named", () => {
+        useBlocks(piano(["sol"]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("a copied key that keeps the starter's name does not prove it either", () => {
+        useBlocks(piano(["sol", "sol"]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("two keys with names of their own prove the keys were named", () => {
+        useBlocks(piano(["sol", "mi"]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
+    });
+
+    test("a key with an empty name does not count as named", () => {
+        useBlocks(piano(["sol", ""]));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    // Puts a second set name block straight after the key's first one.
+    const renameKey = (blocks, keyId, newName) => {
+        const renameId = `${keyId}-rename`;
+        blocks[`${keyId}-name`].connections[2] = renameId;
+        blocks[`${keyId}-listen`].connections[0] = renameId;
+        blocks[renameId] = {
+            name: "setturtlename2",
+            trash: false,
+            connections: [`${keyId}-name`, `${renameId}-text`, `${keyId}-listen`]
+        };
+        blocks[`${renameId}-text`] = {
+            name: "text",
+            value: newName,
+            trash: false,
+            connections: [renameId]
+        };
+        return blocks;
+    };
+
+    test("one key that is renamed twice is still only one named key", () => {
+        useBlocks(renameKey(piano(["sol"]), "k0", "mi"));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("a key renamed to an empty name no longer counts under its old name", () => {
+        useBlocks(renameKey(piano(["sol", "mi"]), "k1", ""));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("a rename inside an if or a loop does not count, since it may never run", () => {
+        for (const clamp of ["if", "repeat"]) {
+            const blocks = piano(["sol", "sol"]);
+            blocks["k1-name"].connections[2] = "k1-clamp";
+            blocks["k1-listen"].connections[0] = "k1-clamp";
+            blocks["k1-clamp"] = {
+                name: clamp,
+                trash: false,
+                connections: ["k1-name", null, "k1-rename", "k1-listen"]
+            };
+            blocks["k1-rename"] = {
+                name: "setturtlename2",
+                trash: false,
+                connections: ["k1-clamp", "k1-rename-text", null]
+            };
+            blocks["k1-rename-text"] = {
+                name: "text",
+                value: "mi",
+                trash: false,
+                connections: ["k1-rename"]
+            };
+            useBlocks(blocks);
+
+            expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+        }
+    });
+
+    test("a copied key counts once it is renamed", () => {
+        useBlocks(renameKey(piano(["sol", "sol"]), "k1", "mi"));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
+    });
+
+    test("a name block that has been thrown away does not count", () => {
+        const blocks = piano(["sol", "mi"]);
+        blocks["k1-name"].trash = true;
+        useBlocks(blocks);
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+
+    test("the deprecated set name block, which can rename another mouse, is not counted", () => {
+        useBlocks({
+            ...piano(["sol"]),
+            "k1": { name: "start", trash: false, connections: [null, "k1-name", null] },
+            "k1-name": {
+                name: "setturtlename",
+                trash: false,
+                connections: ["k1", "k1-who", "k1-text", null]
+            },
+            "k1-who": { name: "number", value: -1, trash: false, connections: ["k1-name"] },
+            "k1-text": { name: "text", value: "mi", trash: false, connections: ["k1-name"] }
+        });
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
     });
 
     test("the avatar and drum badges reuse the criteria earlier lessons already had", () => {
