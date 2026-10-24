@@ -840,8 +840,8 @@ describe("ModeWidget", () => {
 
         expect(saveSpy).toHaveBeenCalled();
         const [name, pattern, edo] = saveSpy.mock.calls[0];
-        expect(edo).toBe(48);
-        expect(pattern).toEqual([8, 8, 4, 8, 8, 8, 4]);
+        expect(edo).toBe(12);
+        expect(pattern).toEqual([2, 2, 1, 2, 2, 2, 1]);
         saveSpy.mockRestore();
     });
 
@@ -979,15 +979,37 @@ describe("ModeWidget", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Invalid EDO"));
     });
 
-    test("_findEdoSteps returns largest valid EDO for whole-tone scale", () => {
-        const pitches = [200, 400, 600, 800, 1000, 1200].map(c => ({
-            cents: c,
-            ratio: Math.pow(2, c / 1200)
-        }));
-        const result = modeWidget._findEdoSteps(pitches);
-        expect(result).not.toBeNull();
-        expect(result.edo).toBe(54);
-        expect(result.pattern).toEqual([9, 9, 9, 9, 9, 9]);
+    const toPitches = cents => cents.map(c => ({ cents: c, ratio: Math.pow(2, c / 1200) }));
+
+    test("_findEdoSteps keeps the current EDO when the .scl fits it", () => {
+        modeWidget._activeEDO = 12;
+        const result = modeWidget._findEdoSteps(toPitches([200, 400, 600, 800, 1000, 1200]));
+        expect(result).toEqual({ edo: 12, pattern: [2, 2, 2, 2, 2, 2] });
+    });
+
+    test("_findEdoSteps reads a 12-EDO major scale back as 12-EDO, not 48", () => {
+        // What _exportScl writes for major on the 12-EDO wheel.
+        const pitches = toPitches([200, 400, 500, 700, 900, 1100, 1200]);
+        for (const active of [12, 19, 31]) {
+            modeWidget._activeEDO = active;
+            expect(modeWidget._findEdoSteps(pitches)).toEqual({
+                edo: 12,
+                pattern: [2, 2, 1, 2, 2, 2, 1]
+            });
+        }
+    });
+
+    test("_findEdoSteps picks the coarsest grid that fits when the current EDO doesn't", () => {
+        modeWidget._activeEDO = 12;
+        // 19-EDO major: also fits 38-EDO.
+        const steps = [3, 3, 2, 3, 3, 3, 2];
+        let total = 0;
+        const cents = steps.map(s => ((total += s) * 1200) / 19);
+        expect(modeWidget._findEdoSteps(toPitches(cents))).toEqual({ edo: 19, pattern: steps });
+
+        modeWidget._activeEDO = 19;
+        const wholeTone = modeWidget._findEdoSteps(toPitches([200, 400, 600, 800, 1000, 1200]));
+        expect(wholeTone).toEqual({ edo: 6, pattern: [1, 1, 1, 1, 1, 1] });
     });
 
     test("_findEdoSteps rejects multi-octave .scl files", () => {
