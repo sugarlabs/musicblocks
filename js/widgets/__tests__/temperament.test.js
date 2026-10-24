@@ -614,6 +614,51 @@ describe("TemperamentWidget basic tests", () => {
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
     });
 
+    /** Globals, logo and activity scaffolding shared by the _save tests. */
+    const setupSaveMocks = () => {
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+
+        widget.inTemperament = "custom1";
+        widget._logo = {
+            synth: { stop: jest.fn(), startingPitch: "C4" },
+            customTemperamentDefined: false
+        };
+        widget.activity = {
+            errorMsg: jest.fn(),
+            textMsg: jest.fn(),
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+    };
+
+    test("_save shows an error instead of throwing when pitch data is sparse", () => {
+        global.Singer.clearPitchToFrequencyCache = jest.fn();
+        setupSaveMocks();
+
+        widget.ratios = [1, 1.059463, 1.122462];
+        widget.frequencies = ["261.63", "277.18", "293.66"];
+        widget.cents = [0, 100, 200];
+        widget.pitchNumber = 5;
+        widget.powerBase = 2;
+
+        expect(() => widget._save()).not.toThrow();
+        expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("pitch 4 has no valid octave"),
+            3000
+        );
+        expect(global.addTemperamentToDictionary).not.toHaveBeenCalled();
+    });
+
     test("_save invalidates a frequency already cached under the redefined temperament's name", () => {
         // Exercises the real cache (Singer.getCachedPitchToFrequency /
         // clearPitchToFrequencyCache) instead of a mocked
@@ -623,14 +668,7 @@ describe("TemperamentWidget basic tests", () => {
         const RealSinger = require("../../turtle-singer");
         global.Singer.clearPitchToFrequencyCache = RealSinger.clearPitchToFrequencyCache;
         RealSinger.clearPitchToFrequencyCache();
-
-        global.setOctaveRatio = jest.fn();
-        global.rationalToFraction = jest.fn(() => [1, 1]);
-        global.getOctaveRatio = jest.fn(() => 2);
-        global.isCustomTemperament = jest.fn(() => true);
-        global.deleteTemperamentFromList = jest.fn();
-        global.addTemperamentToDictionary = jest.fn();
-        global.updateTemperaments = jest.fn();
+        setupSaveMocks();
 
         // Play a note under the temperament's original tuning; this caches
         // its frequency under a key keyed on the temperament's name.
@@ -638,32 +676,13 @@ describe("TemperamentWidget basic tests", () => {
         const beforeEdit = RealSinger.getCachedPitchToFrequency("C", 4, 0, null, "custom1");
         expect(beforeEdit).toBe(440);
 
-        widget.inTemperament = "custom1";
         widget.ratios = [1, 2];
         widget.pitchNumber = 2;
         widget.powerBase = 2;
 
-        widget._logo = {
-            synth: {
-                stop: jest.fn(),
-                startingPitch: "C4"
-            },
-            customTemperamentDefined: false
-        };
-
-        widget.activity = {
-            blocks: {
-                loadNewBlocks: jest.fn(),
-                findUniqueTemperamentName: jest.fn(() => "custom1"),
-                protoBlockDict: { custompitch: { hidden: true } },
-                palettes: { updatePalettes: jest.fn() }
-            }
-        };
-
         // Redefine "custom1" with a different tuning, then save under the
         // same name.
         global.pitchToFrequency = jest.fn(() => 466.16);
-        widget.activity.textMsg = jest.fn();
         widget._save();
 
         // The same pitch, under the same temperament name, must now recompute
