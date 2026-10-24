@@ -142,28 +142,56 @@ describe("Publisher", () => {
     });
 
     describe("dataToTags", () => {
-        it("should return music tag when pitch and tone are present", () => {
+        // The shape the git backend's /tagManifest returns: keyed by name, not number.
+        const LIVE_MANIFEST = {
+            music: { TagName: "Music", IsTagUserAddable: "1" },
+            math: { TagName: "Math", IsTagUserAddable: "1" },
+            art: { TagName: "Art", IsTagUserAddable: "1" },
+            interactive: { TagName: "Interactive", IsTagUserAddable: "1" }
+        };
+
+        it("suggests every tag its score earns, by manifest id", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            // mock score: pitch+tone, mouse+pen, number and sensors are all set
             const tags = publisher.dataToTags('[[0,"start",100,100,[null,1]]]');
-            // analyzeProject returns score[1]=true, score[2]=true => "2" (music)
-            expect(tags).toContain("2");
+            expect(tags).toEqual(["music", "art", "interactive", "math"]);
         });
 
-        it("should return art tag when mouse and pen are present", () => {
-            const tags = publisher.dataToTags('[[0,"forward",100,100,[null]]]');
-            // score[3]=true, score[4]=true => "3" (art)
-            expect(tags).toContain("3");
+        it("suggests only the tags the score earns", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 4, 0, 0, 0, 0, 0]);
+            expect(publisher.dataToTags("[]")).toEqual(["music", "math"]);
         });
 
-        it("should return interactive tag when sensors are present", () => {
-            const tags = publisher.dataToTags('[[0,"sensor",100,100,[null]]]');
-            // score[8]=true => "5" (interactive)
-            expect(tags).toContain("5");
+        it("leaves out a tag the manifest doesn't have", () => {
+            // the default fixture has Music and Art only
+            const tags = publisher.dataToTags('[[0,"start",100,100,[null,1]]]');
+            expect(tags).toEqual(["1", "2"]);
         });
 
-        it("should return math tag when number is present", () => {
-            const tags = publisher.dataToTags('[[0,"number",100,100,[null]]]');
-            // score[5]=true => "4" (math)
-            expect(tags).toContain("4");
+        it("scores the project's own blocks rather than the open workspace", () => {
+            publisher.dataToTags(
+                '[[0,"start",100,100,[null,1,null]],[1,["number",{"value":4}],0,0,[0]]]'
+            );
+            expect(mockPlanet.analyzeProject).toHaveBeenCalledWith({
+                blockList: [
+                    { name: "start", connections: [null, 1, null] },
+                    { name: "number", connections: [0] }
+                ]
+            });
+        });
+
+        it("pre-selects the suggested tags when the publish dialog opens", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 4, 0, 0, 0, 0, 0]);
+            const setTagInput = jest.spyOn(publisher, "setTagInput").mockImplementation(() => {});
+
+            publisher.open("proj-1");
+
+            expect(setTagInput).toHaveBeenCalledWith([
+                { tag: "Music", id: "music" },
+                { tag: "Math", id: "math" }
+            ]);
         });
 
         it("should return empty array for invalid JSON", () => {
