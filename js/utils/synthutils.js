@@ -437,6 +437,7 @@ const MULTISAMPLE_LIMITS = Object.freeze({
     fileBytes: 1000000,
     totalBytes: 8000000,
     decodedBytes: 32 * 1024 * 1024,
+    combinedDecodedBytes: 64 * 1024 * 1024,
     loadTimeout: 30000
 });
 let nextMultisampleId = 0;
@@ -488,7 +489,7 @@ function validateMultisample(instrument) {
         roots.add(midi);
 
         const audio =
-            /^data:audio\/(?:wav|wave|x-wav|vnd\.wave);base64,([A-Za-z0-9+/]+={0,2})$/i.exec(
+            /^data:audio\/(?:wav|wave|x-wav|x-pn-wav|vnd\.wave);base64,([A-Za-z0-9+/]+={0,2})$/i.exec(
                 sample.data
             );
         if (!audio || audio[1].length % 4 !== 0) {
@@ -898,10 +899,26 @@ function Synth() {
     const multisamples = new Map();
     let multisampleNames = new WeakMap();
 
-    this.validateMultisample = validateMultisample;
+    let multisampleBytes = 0;
+    // Retained PCM only; native decoders and encoded project data are not counted.
+    Object.defineProperty(this, "multisampleBytes", { get: () => multisampleBytes });
+    const loadKey = (turtle, name) => JSON.stringify([String(turtle), name]);
+    const multisampleOwner = (turtle, name) => {
+        const key = loadKey(turtle, name);
+        for (const source of multisamples.values()) {
+            const entry = source.loads.get(key);
+            if (entry?.isLive()) return entry;
+        }
+        return null;
+    };
+    const releaseAudio = entry => {
+        entry.roots = null;
+        multisampleBytes -= entry.bytes;
+        entry.bytes = 0;
+    };
 
     /**
-     * Registers an immutable descriptor snapshot, without decoding or changing timbre.
+     * Registers a detached descriptor snapshot, without decoding or changing timbre.
      * Edits must supply a new descriptor object; names are only display metadata.
      * @param {object} instrument - Complete multisample descriptor.
      * @returns {string} Session-only instrument handle.
@@ -910,10 +927,51 @@ function Synth() {
         const existing = multisampleNames.get(instrument);
         if (existing) return existing;
         const descriptor = validateMultisample(instrument);
-        const name = "multisample_" + ++nextMultisampleId;
+        let name;
+        do {
+            name = "multisample_" + ++nextMultisampleId;
+        } while (
+            multisamples.has(name) ||
+            name in instrumentsSource ||
+            Object.values(instruments).some(table => name in table)
+        );
         multisampleNames.set(instrument, name);
         multisamples.set(name, { descriptor, loads: new Map() });
         return name;
+    };
+
+    /** Returns a live, completely prepared descriptor/turtle alias without loading. */
+    this.getPreparedMultisample = (turtle, instrument) => {
+        const name = multisampleNames.get(instrument);
+        const entry = multisamples.get(name)?.loads.get(loadKey(turtle, name));
+        return entry?.sampler && entry.isLive() ? name : null;
+    };
+
+    /** Releases one preparation/ready owner, including a dedicated preview owner. */
+    this.releaseMultisample = (turtle, instrumentName, sourceName = instrumentName) => {
+        const source = multisamples.get(sourceName);
+        const key = loadKey(turtle, instrumentName);
+        const entry = source?.loads.get(key);
+        if (!entry) return;
+        if (entry.cancel) {
+            entry.cancel();
+        } else {
+            source.loads.delete(key);
+            releaseAudio(entry);
+            const sampler = entry.sampler;
+            entry.sampler = null;
+            if (instruments[turtle]?.[instrumentName] === sampler) {
+                delete instruments[turtle][instrumentName];
+            }
+            sampler.dispose();
+        }
+        if (
+            instrumentsSource[instrumentName]?.[0] === 2 &&
+            instrumentsSource[instrumentName][1] === sourceName &&
+            ![...source.loads.values()].some(owner => owner.instrumentName === instrumentName)
+        ) {
+            delete instrumentsSource[instrumentName];
+        }
     };
 
     /**
@@ -926,75 +984,119 @@ function Synth() {
      */
     const loadMultisample = (turtle, instrumentName, sourceName) => {
         const source = multisamples.get(sourceName);
-        if (!source) return Promise.reject(new Error(_("Unknown multisample instrument.")));
-        const key = JSON.stringify([String(turtle), instrumentName]);
-        if (source.loads.has(key)) return source.loads.get(key).promise;
+        const key = loadKey(turtle, instrumentName);
+        const previous = source.loads.get(key);
+        if (previous?.isLive()) return previous.promise;
+        if (previous) this.releaseMultisample(turtle, instrumentName, sourceName);
+        if (
+            instruments[turtle]?.[instrumentName] ||
+            [...multisamples.values()].some(other => other.loads.has(key))
+        ) {
+            return Promise.reject(
+                new Error(_("Instrument destination is already in use:") + " " + instrumentName)
+            );
+        }
 
         const epoch = this._instrumentEpoch;
-        const entry = { promise: null, cancel: null };
+        const entry = {
+            instrumentName,
+            name: source.descriptor.name,
+            roots: {},
+            bytes: 0,
+            sampler: null,
+            promise: null,
+            cancel: null,
+            isLive: () =>
+                this._instrumentEpoch === epoch &&
+                source.loads.get(key) === entry &&
+                (!entry.sampler || instruments[turtle]?.[instrumentName] === entry.sampler)
+        };
         source.loads.set(key, entry);
         entry.promise = new Promise((resolve, reject) => {
-            const buffers = [];
-            let sampler = null;
             let settled = false;
-            const releaseBuffers = () => {
-                buffers.forEach(buffer => buffer.dispose());
-                buffers.length = 0;
-            };
             const fail = error => {
                 if (settled) return;
                 settled = true;
                 clearTimeout(timeout);
                 entry.cancel = null;
                 source.loads.delete(key);
-                releaseBuffers();
-                if (sampler) sampler.dispose();
+                releaseAudio(entry);
                 reject(error);
             };
             const timeout = setTimeout(
-                () => fail(new Error(_("Multisample audio loading timed out."))),
+                () =>
+                    fail(
+                        new Error(
+                            _("Multisample audio loading timed out:") + " " + source.descriptor.name
+                        )
+                    ),
                 MULTISAMPLE_LIMITS.loadTimeout
             );
             entry.cancel = () => fail(new DOMException("Multisample load cancelled", "AbortError"));
 
             const prepare = async () => {
-                const noteDict = {};
-                let decodedBytes = 0;
                 for (const sample of source.descriptor.samples) {
-                    const buffer = new Tone.ToneAudioBuffer();
-                    buffers.push(buffer);
+                    let audio;
                     try {
-                        await buffer.load(sample.data);
+                        audio = await Tone.ToneAudioBuffer.load(sample.data);
                     } catch {
-                        throw new Error(_("Unable to decode recording:") + " " + sample.name);
+                        throw new Error(
+                            _("Unable to decode recording:") +
+                                " " +
+                                source.descriptor.name +
+                                " / " +
+                                sample.name
+                        );
                     }
-                    if (settled) {
-                        // A decoder may complete after Stop/disposal and set its buffer again.
-                        buffer.dispose();
+                    if (!entry.isLive()) {
                         return;
                     }
-                    const audio = buffer.get();
                     if (!audio || audio.length <= 0 || audio.numberOfChannels <= 0) {
-                        throw new Error(_("The recording contains no audio:") + " " + sample.name);
+                        throw new Error(
+                            _("The recording contains no audio:") +
+                                " " +
+                                source.descriptor.name +
+                                " / " +
+                                sample.name
+                        );
                     }
-                    decodedBytes += audio.length * audio.numberOfChannels * 4;
-                    if (decodedBytes > MULTISAMPLE_LIMITS.decodedBytes) {
-                        throw new Error(_("Decoded multisample audio exceeds the memory limit."));
+                    const bytes = audio.length * audio.numberOfChannels * 4;
+                    // Admission is synchronous so concurrent owners see the current total.
+                    if (
+                        entry.bytes + bytes > MULTISAMPLE_LIMITS.decodedBytes ||
+                        multisampleBytes + bytes > MULTISAMPLE_LIMITS.combinedDecodedBytes
+                    ) {
+                        throw new Error(
+                            _("Decoded multisample audio exceeds the memory limit:") +
+                                " " +
+                                source.descriptor.name +
+                                " / " +
+                                sample.name
+                        );
                     }
-                    noteDict[sample.root] = audio;
+                    entry.bytes += bytes;
+                    multisampleBytes += bytes;
+                    entry.roots[sample.root] = audio;
+                    audio = null;
                 }
-                if (this._instrumentEpoch !== epoch) {
-                    entry.cancel();
+                if (!entry.isLive()) {
                     return;
                 }
-                sampler = new Tone.Sampler(noteDict);
+                const sampler = new Tone.Sampler(entry.roots);
                 instruments[turtle] ||= {};
                 instruments[turtle][instrumentName] = sampler;
-                instrumentsSource[instrumentName] = [2, sourceName];
+                if (
+                    !instrumentsSource[instrumentName] ||
+                    (instrumentsSource[instrumentName][0] === 2 &&
+                        multisamples.has(instrumentsSource[instrumentName][1]))
+                ) {
+                    instrumentsSource[instrumentName] = [2, sourceName];
+                }
+                entry.sampler = sampler;
+                entry.roots = null;
                 settled = true;
                 clearTimeout(timeout);
                 entry.cancel = null;
-                releaseBuffers();
                 resolve(sampler);
             };
             prepare().catch(fail);
@@ -1909,7 +2011,7 @@ function Synth() {
      * @param {Object} params - Additional parameters for synth configuration.
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
-        if (sourceName.startsWith("multisample_")) {
+        if (multisamples.has(sourceName)) {
             return loadMultisample(turtle, instrumentName, sourceName);
         }
         // Ensure the structure is initialized
@@ -1949,6 +2051,11 @@ function Synth() {
      * Internal implementation of createSynth, called after sample is ensured loaded.
      */
     this.___createSynth = (turtle, instrumentName, sourceName, params) => {
+        for (const [name, source] of multisamples) {
+            if (source.loads.has(loadKey(turtle, instrumentName))) {
+                this.releaseMultisample(turtle, instrumentName, name);
+            }
+        }
         // this._loadSample(sourceName); // Already loaded by __createSynth wrapper
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             if (!instruments[turtle][instrumentName]) {
@@ -2094,15 +2201,26 @@ function Synth() {
      */
     this.loadSynth = async (turtle, sourceName) => {
         sourceName = this.resolveInstrumentName(sourceName);
-        const multisample = sourceName.startsWith("multisample_");
-        const epoch = this._instrumentEpoch;
+        const multisample = multisamples.get(sourceName);
+        const owner = multisampleOwner(turtle, sourceName);
+        const existing = instruments[turtle]?.[sourceName];
+        const replaced = multisample && existing && !owner;
+        if (replaced) {
+            this.releaseMultisample(turtle, sourceName);
+        }
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
         } else {
             console.debug("loading " + sourceName);
         }
-        await this.createSynth(turtle, sourceName, sourceName, null);
-        if (multisample && this._instrumentEpoch !== epoch) {
+        const preparing = owner
+            ? owner.promise
+            : replaced
+              ? Promise.resolve()
+              : this.createSynth(turtle, sourceName, sourceName, null);
+        const entry = owner || multisample?.loads.get(loadKey(turtle, sourceName));
+        await preparing;
+        if (!replaced && (owner || multisample) && !entry?.isLive()) {
             throw new DOMException("Multisample load cancelled", "AbortError");
         }
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
@@ -2115,6 +2233,17 @@ function Synth() {
 
         return null;
     };
+
+    const multisamplePlaybackError = (entry, notes, error) =>
+        new Error(
+            _("Unable to play multisample instrument:") +
+                " " +
+                entry.name +
+                " (" +
+                notes +
+                "): " +
+                error.message
+        );
 
     /**
      * Perform notes using the provided synth, notes, and parameters for effects and filters.
@@ -2129,6 +2258,7 @@ function Synth() {
      * @param {number} future - The time in the future when the notes should be played.
      * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. a panner.
      * @param {number} [cents] - Detune applied to every note, e.g. a custom sample's tuning.
+     * @param {object|null} [multisample] - Prepared owner supplied by trigger.
      */
     this._performNotes = async (
         synth,
@@ -2139,8 +2269,12 @@ function Synth() {
         setNote,
         future,
         output = Tone.Destination,
-        cents = 0
+        cents = 0,
+        multisample = null
     ) => {
+        const isLive = () =>
+            this._instrumentEpoch === epoch &&
+            (!multisample || (multisample.isLive() && multisample.sampler === synth));
         const isStandardNote = note => {
             if (typeof note !== "string") return true;
             if (note.toUpperCase() === "R") return true;
@@ -2210,10 +2344,11 @@ function Synth() {
             if (paramsEffects === null && paramsFilters === null) {
                 // See https://github.com/sugarlabs/musicblocks/issues/2951
                 try {
-                    await Tone.ToneAudioBuffer.loaded();
-                    if (this._instrumentEpoch !== epoch) return;
+                    if (!multisample) await Tone.ToneAudioBuffer.loaded();
+                    if (!isLive()) return;
                     synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                 } catch (e) {
+                    if (multisample) throw e;
                     console.debug("Error triggering note:", e);
                 }
             } else {
@@ -2262,10 +2397,11 @@ function Synth() {
                         }
                     }
                     try {
-                        await Tone.ToneAudioBuffer.loaded();
-                        if (this._instrumentEpoch !== epoch) return;
+                        if (!multisample) await Tone.ToneAudioBuffer.loaded();
+                        if (!isLive()) return;
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                     } catch (e) {
+                        if (multisample) throw e;
                         console.debug("Error triggering note (no-graph-rewire fast path):", e);
                     }
                     return;
@@ -2399,7 +2535,14 @@ function Synth() {
                         }
 
                         neighbor = new Tone.Part((time, value) => {
-                            synth.triggerAttackRelease(value.note, value.duration, time);
+                            if (multisample && !isLive()) return;
+                            try {
+                                synth.triggerAttackRelease(value.note, value.duration, time);
+                            } catch (error) {
+                                if (multisample)
+                                    throw multisamplePlaybackError(multisample, value.note, error);
+                                throw error;
+                            }
                         }, obj).start();
                         effectsToDispose.push(neighbor);
                     }
@@ -2409,7 +2552,7 @@ function Synth() {
 
                 if (!paramsEffects || !paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
-                        if (this._instrumentEpoch !== epoch) return;
+                        if (!isLive()) return;
                         if (synth.oscillator !== undefined) {
                             synth.setNote(notes);
                         } else if (synth.voices !== undefined) {
@@ -2419,11 +2562,12 @@ function Synth() {
                         }
                     } else {
                         try {
-                            await Tone.ToneAudioBuffer.loaded();
-                            if (this._instrumentEpoch === epoch) {
+                            if (!multisample) await Tone.ToneAudioBuffer.loaded();
+                            if (isLive()) {
                                 synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                             }
                         } catch (e) {
+                            if (multisample) throw e;
                             console.debug("Error triggering note:", e);
                         }
                     }
@@ -2455,7 +2599,12 @@ function Synth() {
                         // connection would bypass the in-flight chain.
                         const remaining = (_effectsInFlight.get(synth) || 1) - 1;
                         _effectsInFlight.set(synth, remaining);
-                        if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+                        if (
+                            remaining === 0 &&
+                            synth &&
+                            typeof synth.toDestination === "function" &&
+                            (!multisample || isLive())
+                        ) {
                             try {
                                 synth.disconnect();
                             } catch (_) {
@@ -2483,7 +2632,7 @@ function Synth() {
                 }
             }
         } catch (e) {
-            console.error("Error in _performNotes:", e);
+            if (!multisample) console.error("Error in _performNotes:", e);
             // Clean up any created effects/filters on error
             effectsToDispose.forEach(effect => {
                 if (effect && typeof effect.dispose === "function") {
@@ -2498,9 +2647,15 @@ function Synth() {
 
             const remaining = (_effectsInFlight.get(synth) || 1) - 1;
             _effectsInFlight.set(synth, remaining);
-            if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+            if (
+                remaining === 0 &&
+                synth &&
+                typeof synth.toDestination === "function" &&
+                (!multisample || isLive())
+            ) {
                 synth.connect(_routedOutput.get(synth) || output);
             }
+            if (multisample) throw e;
         }
     };
 
@@ -2593,6 +2748,13 @@ function Synth() {
     ) => {
         // Capture the current instrument epoch to detect disposal during async operations
         const epoch = this._instrumentEpoch;
+        const owner = multisampleOwner(turtle, instrumentName);
+        const multisample = owner?.sampler ? owner : null;
+        const source =
+            owner ||
+            (!instruments[turtle]?.[instrumentName] &&
+                (multisamples.get(instrumentName)?.descriptor ||
+                    multisamples.get(instrumentsSource[instrumentName]?.[1])?.descriptor));
 
         // If audio is not running, try to start it
         if (Tone.context.state !== "running") {
@@ -2618,6 +2780,9 @@ function Synth() {
             }, 2000);
         }
         try {
+            if (source && (!multisample?.sampler || !multisample.isLive())) {
+                throw new Error(_("Multisample instrument is not prepared:") + " " + source.name);
+            }
             // Ensure audio context is started
             if (Tone.context.state !== "running") {
                 await Tone.start();
@@ -2657,7 +2822,7 @@ function Synth() {
             let flag = 0;
             if (instrumentName in instruments[turtle]) {
                 tempSynth = instruments[turtle][instrumentName];
-                flag = instrumentsSource[instrumentName][0];
+                flag = multisample ? 2 : instrumentsSource[instrumentName][0];
             }
 
             // Get note values as per the source of the synth.
@@ -2706,6 +2871,7 @@ function Synth() {
                 return; // Exit gracefully - synth is no longer available
             }
 
+            if (multisample && !multisample.isLive()) return;
             this.routeInstrument(tempSynth, output);
 
             switch (flag) {
@@ -2739,7 +2905,10 @@ function Synth() {
                         setNote,
                         future,
                         output,
-                        this.sampleCentAdjustments[instrumentsSource[instrumentName][1]]
+                        multisample
+                            ? 0
+                            : this.sampleCentAdjustments[instrumentsSource[instrumentName][1]],
+                        multisample
                     );
                     break;
                 case 3: // builtin synth
@@ -2779,6 +2948,7 @@ function Synth() {
                     break;
             }
         } catch (e) {
+            if (source) throw multisamplePlaybackError(source, notes, e);
             console.error("Error in trigger:", e);
         }
     };
@@ -3157,7 +3327,12 @@ function Synth() {
         for (const source of multisamples.values()) {
             for (const entry of source.loads.values()) {
                 if (entry.cancel) entry.cancel();
+                else {
+                    releaseAudio(entry);
+                    entry.sampler = null;
+                }
             }
+            source.loads.clear();
         }
         for (const name of Object.keys(instrumentsSource)) {
             if (multisamples.has(instrumentsSource[name][1])) delete instrumentsSource[name];
