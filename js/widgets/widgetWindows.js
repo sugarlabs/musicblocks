@@ -316,9 +316,22 @@ class WidgetWindow {
 
         window.widgetWindows._initGlobalListeners();
 
+        this._restorePending = false;
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
-            this.setPosition(_pos[0], _pos[1]);
+            const x = Number(_pos[0]);
+            const y = Number(_pos[1]);
+            if (!Number.isNaN(x) && !Number.isNaN(y) && y !== 64) {
+                const clamped = this._clampToViewport(x, y);
+                this.setPosition(clamped[0], clamped[1]);
+                this._restorePending = true;
+            } else {
+                // A cached y of 64 means the window was dragged to the top
+                // edge (i.e. maximized), which cannot be restored faithfully.
+                // Fall back to centering instead of reopening at the top edge,
+                // where a single click would maximize it again.
+                delete window.widgetWindows._posCache[this._key];
+            }
         }
 
         this.takeFocus();
@@ -738,6 +751,10 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
+        if (this._restorePending) {
+            this._restorePending = false;
+            return this;
+        }
         const canvas = docById("myCanvas");
         if (!canvas) {
             this.setPosition(200, 140);
@@ -766,6 +783,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _restore() {
+        this._restorePending = false;
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
@@ -887,6 +905,30 @@ class WidgetWindow {
     }
 
     /**
+     * Keeps a restored position inside the current viewport so that a widget
+     * closed before a browser resize does not reopen off-screen.
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @returns {[number, number]}
+     */
+    _clampToViewport(x, y) {
+        const navHeight = 64;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        if (!viewportWidth || !viewportHeight) return [x, y];
+
+        const fRect = this._frame ? this._frame.getBoundingClientRect() : { width: 0, height: 0 };
+        const width = fRect.width || 470;
+        const height = fRect.height || 420;
+
+        const maxX = Math.max(0, viewportWidth - width);
+        const maxY = Math.max(navHeight, viewportHeight - height);
+
+        return [Math.min(Math.max(x, 0), maxX), Math.min(Math.max(y, navHeight), maxY)];
+    }
+
+    /**
      * @public
      * @param {number} x
      * @param {number} y
@@ -982,7 +1024,12 @@ window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        const win = new WidgetWindow(key, title, fullscreen).sendToCenter();
+        const win = new WidgetWindow(key, title, fullscreen);
+        // The constructor restores a previously saved position, so only center
+        // the window the first time it is opened.
+        if (!window.widgetWindows._posCache[key]) {
+            win.sendToCenter();
+        }
         window.widgetWindows.openWindows[key] = win;
     }
 
