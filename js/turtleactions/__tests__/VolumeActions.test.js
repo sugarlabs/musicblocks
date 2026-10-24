@@ -63,7 +63,8 @@ describe("setupVolumeActions", () => {
         };
         global.DRUMNAMES = {
             Kick: ["Kick", "kick"],
-            Snare: ["Snare", "snare"]
+            Snare: ["Snare", "snare"],
+            HyphenatedDrum: ["Snare-Drum", "snare-drum"]
         };
         global.DEFAULTVOLUME = 50;
         global.DEFAULTVOICE = "default";
@@ -919,6 +920,18 @@ describe("setupVolumeActions", () => {
             targetTurtle.singer.synthVolume.piano = [50, 70];
 
             expect(Singer.VolumeActions.getSynthVolume("piano", 0)).toBe(70);
+        });
+
+        it("should resolve display names before getting synth volume", () => {
+            targetTurtle.singer.synthVolume.piano = [50, 70];
+
+            expect(Singer.VolumeActions.getSynthVolume("Piano", 0)).toBe(70);
+        });
+
+        it("should resolve hyphenated drum display names before getting synth volume", () => {
+            targetTurtle.singer.synthVolume["snare-drum"] = [50, 70];
+
+            expect(Singer.VolumeActions.getSynthVolume("Snare-Drum", 0)).toBe(70);
         });
 
         it("should return 50 when getting volume for non-existent synth", () => {
