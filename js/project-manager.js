@@ -592,9 +592,24 @@ class ProjectManager {
     // New project
     // -----------------------------------------------------------------------
 
-    _afterDelete() {
+    async _afterDelete() {
         const that = this.activity;
         const pm = this;
+
+        const hasNamedPlanetProject =
+            that.planet !== undefined &&
+            that.planet.planet !== null &&
+            that.planet.getCurrentProjectName() !== _("My Project");
+
+        if (hasNamedPlanetProject) {
+            try {
+                const saved = await that.planet.saveLocally({ rejectOnProjectSaveError: true });
+                if (saved === false || saved === null) return;
+            } catch (error) {
+                ErrorHandler.recoverable(error, { operation: "saveProjectBeforeNewProject" });
+                return;
+            }
+        }
 
         if (that.turtles.running()) {
             that._doHardStopButton();
@@ -625,13 +640,7 @@ class ProjectManager {
             that.gitDropdownUI._syncMenuState();
         }
 
-        if (
-            that.planet !== undefined &&
-            that.planet.planet !== null &&
-            that.planet.getCurrentProjectName() !== _("My Project")
-        ) {
-            // Save the current project before switching away from it.
-            that.planet.saveLocally();
+        if (hasNamedPlanetProject) {
             // Create the new project slot and clear the canvas synchronously.
             that.planet.initialiseNewProject();
             // _loadStart is async: it fires loadNewBlocks and then emits
