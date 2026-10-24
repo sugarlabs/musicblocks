@@ -1,4 +1,5 @@
 describe("Multisample value persistence", { testIsolation: true, retries: 0 }, () => {
+    let fixtureName;
     const wav = () => {
         const bytes = new Uint8Array(108);
         const view = new DataView(bytes.buffer);
@@ -24,7 +25,7 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
     const value = () => ({
         type: "multisample",
         version: 1,
-        name: "弦 <b>same</b> & strings",
+        name: "弦 <b>same</b> & strings " + fixtureName,
         samples: [
             { name: "same.wav", root: "C3", data: wav() },
             { name: "same.wav", root: "C4", data: wav().replace("audio/wav", "audio/x-pn-wav") }
@@ -67,6 +68,7 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
             const activity = win.ActivityContext.getActivity();
             expect(activity.blocks.isLoading()).to.equal(false);
             expect(instruments(win)).to.have.length(count);
+            expect(instruments(win)[0].value.name).to.equal(value().name);
         });
     };
     const importFile = (data, fileName = "multisample.tb") => {
@@ -106,7 +108,12 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
         });
 
     beforeEach(() => {
-        cy.visit("http://127.0.0.1:3000");
+        fixtureName = Date.now() + " " + Math.random();
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
         importFile(JSON.stringify(project()));
         waitForValues();

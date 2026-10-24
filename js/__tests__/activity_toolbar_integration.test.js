@@ -595,6 +595,9 @@ describe("Activity Toolbar Integration", () => {
         });
     });
     describe("sendAllToTrash and pasted Object.keys loop execution", () => {
+        beforeEach(() => {
+            activity.logo.invalidateMultisampleRun = jest.fn();
+        });
         test("sendAllToTrash iterates Object.keys on palettes and blockList to move blocks to trash", () => {
             const hideMenu = jest.fn();
             activity.palettes = { dict: { rhythm: { hideMenu } } };
@@ -624,6 +627,7 @@ describe("Activity Toolbar Integration", () => {
 
             activity.sendAllToTrash(false, true, false);
 
+            expect(activity.logo.invalidateMultisampleRun).toHaveBeenCalledTimes(1);
             expect(activity.blocksContainer.x).toBe(0);
             expect(activity.blocksContainer.y).toBe(0);
             expect(hideMenu).toHaveBeenCalledWith(true);
