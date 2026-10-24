@@ -21,10 +21,10 @@
 
     TemperamentUI, _, addTemperamentToDictionary, buildScale,
     deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentsList,
+    getTemperament, getTemperamentKeys, getTemperamentsList,
     getTemperamentRatio, isCustomTemperament, isUnsafeObjectKey, last,
     normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-    PREVIEWVOLUME, rationalToFraction, setOctaveRatio, SHARP, Singer,
+    PREVIEWVOLUME, rationalToFraction, SHARP, Singer,
     TuningFormats, updateTemperaments, frequencyToPitch, clampNumber,
     ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
     closeSharePopup
@@ -1817,7 +1817,6 @@ function TemperamentWidget() {
         addTemperamentToDictionary(name, entry);
         updateTemperaments();
         Singer.clearPitchToFrequencyCache();
-        setOctaveRatio(ratios[pitchNumber]);
 
         this._logo.customTemperamentDefined = true;
         this.activity.blocks.protoBlockDict["custompitch"].hidden = false;
@@ -1903,8 +1902,6 @@ function TemperamentWidget() {
             }
         }
 
-        setOctaveRatio(this.powerBase);
-
         const startPitchParsed = parseNoteString(this._logo.synth.startingPitch);
         const note = startPitchParsed[0];
         const octave = startPitchParsed[1];
@@ -1919,6 +1916,7 @@ function TemperamentWidget() {
         const value = this.activity.blocks.findUniqueTemperamentName(this.inTemperament);
         // Change from temporary "custom" to "custom1" or "custom2" ...
         this.inTemperament = value;
+        const octaveFraction = rationalToFraction(this.powerBase);
         const newStack = [
             [
                 0,
@@ -1938,14 +1936,8 @@ function TemperamentWidget() {
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            // Cache rationalToFraction result to avoid duplicate calls
-            ...(function () {
-                const octaveFraction = rationalToFraction(getOctaveRatio());
-                return [
-                    [7, ["number", { value: octaveFraction[0] }], 0, 0, [6]],
-                    [8, ["number", { value: octaveFraction[1] }], 0, 0, [6]]
-                ];
-            })(),
+            [7, ["number", { value: octaveFraction[0] }], 0, 0, [6]],
+            [8, ["number", { value: octaveFraction[1] }], 0, 0, [6]],
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;

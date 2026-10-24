@@ -527,7 +527,6 @@ describe("TemperamentWidget basic tests", () => {
         jest.useFakeTimers();
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
-        global.getOctaveRatio = jest.fn(() => 2);
 
         widget.inTemperament = "equal";
         widget.ratios = [1, 2];
@@ -568,7 +567,6 @@ describe("TemperamentWidget basic tests", () => {
     test("_save clears the pitch-to-frequency cache when saving a custom temperament", () => {
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
-        global.getOctaveRatio = jest.fn(() => 2);
         global.isCustomTemperament = jest.fn(() => true);
         global.deleteTemperamentFromList = jest.fn();
         global.addTemperamentToDictionary = jest.fn();
@@ -614,6 +612,48 @@ describe("TemperamentWidget basic tests", () => {
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
     });
 
+    test("_save keeps an edited octave space with that temperament only", () => {
+        jest.useFakeTimers();
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(r => [r, 1]);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+        global.Singer.clearPitchToFrequencyCache = jest.fn();
+
+        widget.inTemperament = "custom1";
+        widget.ratios = [1, Math.sqrt(3)];
+        widget.pitchNumber = 2;
+        widget.powerBase = 3;
+        widget._logo = {
+            synth: { stop: jest.fn(), startingPitch: "C4" },
+            customTemperamentDefined: false
+        };
+        widget.activity = {
+            textMsg: jest.fn(),
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        widget._save();
+        jest.advanceTimersByTime(500);
+        jest.useRealTimers();
+
+        expect(global.addTemperamentToDictionary).toHaveBeenCalledWith(
+            "custom1",
+            expect.objectContaining({ octaveRatio: 3 })
+        );
+        expect(global.setOctaveRatio).not.toHaveBeenCalled();
+        const stack = widget.activity.blocks.loadNewBlocks.mock.calls[1][0];
+        expect(stack[7][1]).toEqual(["number", { value: 3 }]);
+        expect(stack[8][1]).toEqual(["number", { value: 1 }]);
+    });
+
     test("_save invalidates a frequency already cached under the redefined temperament's name", () => {
         // Exercises the real cache (Singer.getCachedPitchToFrequency /
         // clearPitchToFrequencyCache) instead of a mocked
@@ -626,7 +666,6 @@ describe("TemperamentWidget basic tests", () => {
 
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
-        global.getOctaveRatio = jest.fn(() => 2);
         global.isCustomTemperament = jest.fn(() => true);
         global.deleteTemperamentFromList = jest.fn();
         global.addTemperamentToDictionary = jest.fn();
@@ -1535,7 +1574,7 @@ describe("TemperamentWidget import tests", () => {
             1: [1.25, "C", 4]
         });
         expect(global.updateTemperaments).toHaveBeenCalled();
-        expect(global.setOctaveRatio).toHaveBeenCalledWith(2);
+        expect(global.setOctaveRatio).not.toHaveBeenCalled();
         expect(widget._logo.customTemperamentDefined).toBe(true);
         expect(widget.activity.blocks.protoBlockDict.custompitch.hidden).toBe(false);
         expect(widget.activity.blocks.palettes.updatePalettes).toHaveBeenCalledWith("pitch");
