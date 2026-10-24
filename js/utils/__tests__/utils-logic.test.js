@@ -439,6 +439,16 @@ describe("Utility Logic Functions", () => {
             expect(formatSeconds(undefined)).toBe("00:00");
             expect(formatSeconds("invalid")).toBe("00:00");
         });
+
+        it("returns fallback 00:00 instead of coercing non-number, non-string inputs", () => {
+            expect(formatSeconds(true)).toBe("00:00");
+            expect(formatSeconds([65])).toBe("00:00");
+            expect(formatSeconds({ valueOf: () => 65 })).toBe("00:00");
+        });
+
+        it("returns fallback 00:00 for symbols without throwing", () => {
+            expect(formatSeconds(Symbol("duration"))).toBe("00:00");
+        });
     });
 
     describe("rgbToHex()", () => {

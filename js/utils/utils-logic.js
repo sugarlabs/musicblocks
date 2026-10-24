@@ -668,7 +668,7 @@ var toArray = val => {
  * @returns {string} Formatted duration string e.g. "02:05" or "01:01:05", defaulting to "00:00" for invalid inputs
  */
 var formatSeconds = seconds => {
-    if (seconds === null || seconds === undefined) return "00:00";
+    if (typeof seconds !== "number" && typeof seconds !== "string") return "00:00";
     const num = Number(seconds);
     if (!Number.isFinite(num) || num < 0) return "00:00";
 
