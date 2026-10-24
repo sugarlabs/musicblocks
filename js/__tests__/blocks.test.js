@@ -5145,3 +5145,157 @@ describe("sendStackToTrash – turtle container guard", () => {
         expect(mockTurtleList[1].inTrash).toBe(true);
     });
 });
+
+describe("checkBounds - off-screen boundary indicator (#9575)", () => {
+    let mockActivity;
+    let mockBoundary;
+    let blocks;
+
+    beforeEach(() => {
+        mockBoundary = {
+            _container: { visible: false },
+            offScreen: jest.fn().mockReturnValue(false),
+            show: jest.fn(function () {
+                this._container.visible = true;
+            }),
+            hide: jest.fn(function () {
+                this._container.visible = false;
+            })
+        };
+
+        mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: mockBoundary,
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("shows boundary and home button when a top-level block is off-screen", () => {
+        const offScreenBlock = {
+            trash: false,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(true)
+        };
+        blocks.blockList = [offScreenBlock];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
+        expect(mockBoundary.show).toHaveBeenCalledTimes(1);
+        expect(mockBoundary._container.visible).toBe(true);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    it("hides boundary and resets home button when all blocks are on-screen", () => {
+        mockBoundary._container.visible = true;
+        const onScreenBlock = {
+            trash: false,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        blocks.blockList = [onScreenBlock];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+        expect(mockBoundary.hide).toHaveBeenCalledTimes(1);
+        expect(mockBoundary._container.visible).toBe(false);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    it("does not trigger extra refreshCanvas if boundary visibility did not change", () => {
+        mockBoundary._container.visible = false;
+        const onScreenBlock = {
+            trash: false,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        blocks.blockList = [onScreenBlock];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+        expect(mockBoundary.hide).toHaveBeenCalled();
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+    });
+
+    it("ignores off-screen child blocks whose connections[0] is not null", () => {
+        const childBlock = {
+            trash: false,
+            connections: [1],
+            offScreen: jest.fn().mockReturnValue(true)
+        };
+        blocks.blockList = [childBlock];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+        expect(mockBoundary.hide).toHaveBeenCalled();
+        expect(mockBoundary.show).not.toHaveBeenCalled();
+    });
+
+    it("ignores trashed blocks even if off-screen", () => {
+        const trashBlock = {
+            trash: true,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(true)
+        };
+        blocks.blockList = [trashBlock];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+        expect(mockBoundary.hide).toHaveBeenCalled();
+        expect(mockBoundary.show).not.toHaveBeenCalled();
+    });
+
+    it("does nothing when _deferCheckBounds is active", () => {
+        blocks._deferCheckBounds = true;
+        const offScreenBlock = {
+            trash: false,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(true)
+        };
+        blocks.blockList = [offScreenBlock];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).not.toHaveBeenCalled();
+        expect(mockBoundary.show).not.toHaveBeenCalled();
+        expect(mockBoundary.hide).not.toHaveBeenCalled();
+    });
+
+    it("handles boundary without _container or methods without throwing", () => {
+        blocks.boundary = {};
+        const offScreenBlock = {
+            trash: false,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(true)
+        };
+        blocks.blockList = [offScreenBlock];
+
+        expect(() => blocks.checkBounds()).not.toThrow();
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+    });
+});
