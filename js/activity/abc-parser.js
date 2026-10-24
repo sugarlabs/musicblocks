@@ -106,20 +106,21 @@ function _abcToStandardValue(pitchValue) {
     return octave;
 }
 
-// Creates pitch which consist of note pitch notename you could
-// see them in the function.
+// Creates the newnote block for one ABC note, rest or chord: a pitch block
+// (pitch, notename, octave) for each note of the chord, chained inside the
+// newnote's clamp, or a rest2 when there are none.
 function _createPitchBlocks(
-    pitches,
+    chord,
     blockId,
     pitchDuration,
     keySignature,
     actionBlock,
     triplet,
     meterDen,
-    inlineAccidental
+    inlineAccidentals
 ) {
     const duration = toFraction(pitchDuration);
-    const hiddenBlockId = blockId + (pitches ? 8 : 6);
+    const hiddenBlockId = blockId + 5 + (chord.length ? 3 * chord.length : 1);
     if (triplet !== null) {
         duration[1] = meterDen * triplet;
     }
@@ -138,24 +139,31 @@ function _createPitchBlocks(
         [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
     ];
 
-    if (pitches) {
+    chord.forEach((pitch, i) => {
+        const id = blockId + 5 + 3 * i;
         const adjustedNote = _adjustPitch(
-            pitches.name,
+            pitch.name,
             keySignature,
-            inlineAccidental
+            inlineAccidentals[i]
         ).toUpperCase();
         noteBlocks.push(
-            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
             [
-                blockId + 7,
-                ["number", { value: _abcToStandardValue(pitches.pitch) }],
+                id,
+                "pitch",
                 0,
                 0,
-                [blockId + 5]
-            ]
+                [
+                    i === 0 ? blockId + 4 : id - 3,
+                    id + 1,
+                    id + 2,
+                    i === chord.length - 1 ? null : id + 3
+                ]
+            ],
+            [id + 1, ["notename", { value: adjustedNote }], 0, 0, [id]],
+            [id + 2, ["number", { value: _abcToStandardValue(pitch.pitch) }], 0, 0, [id]]
         );
-    } else {
+    });
+    if (chord.length === 0) {
         noteBlocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
     }
 
@@ -363,25 +371,26 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
                 tripletFinder = element.startTriplet;
             }
 
-            const pitch = element.pitches?.[0];
-            let accidental = pitch?.accidental;
-            if (pitch) {
-                if (accidental) {
-                    barAccidentals[voiceIdx][pitch.pitch] = accidental;
-                } else {
-                    accidental = barAccidentals[voiceIdx][pitch.pitch];
+            // Every note of a chord ([CEG]) is played, each with its own
+            // carried accidental; reading pitches[0] alone kept just the first.
+            const chord = element.pitches ?? [];
+            const accidentals = chord.map(pitch => {
+                if (pitch.accidental) {
+                    barAccidentals[voiceIdx][pitch.pitch] = pitch.accidental;
+                    return pitch.accidental;
                 }
-            }
+                return barAccidentals[voiceIdx][pitch.pitch];
+            });
 
             blockId += _createPitchBlocks(
-                pitch,
+                chord,
                 blockId,
                 element.duration,
                 staff.key,
                 actionBlock,
                 tripletFinder,
                 staffRecord.meterDen,
-                accidental
+                accidentals
             );
 
             // Check and set tripletFinder to null if element?.endTriplet exists.
