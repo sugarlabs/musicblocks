@@ -961,6 +961,76 @@ describe("ASTUtils", () => {
             const code = astring.generate({ type: "Program", body: ASTUtils._getBlockAST(flows) });
             expect(code).toContain("await chorus(mouse);");
         });
+
+        it("emits a comment for unsupported statement blocks without throwing", () => {
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(false);
+
+            const flows = [["setturtlename2", null, null]];
+            const asts = ASTUtils._getBlockAST(flows);
+            expect(asts).toEqual([
+                {
+                    type: "EmptyStatement",
+                    comments: [
+                        {
+                            type: "Line",
+                            value: ' Not exported (no JavaScript equivalent): "setturtlename2"'
+                        }
+                    ]
+                }
+            ]);
+            const code = astring.generate({ type: "Program", body: asts }, { comments: true });
+            expect(code).toContain('// Not exported (no JavaScript equivalent): "setturtlename2"');
+        });
+
+        it("emits a comment and exports inner flow for unsupported clamp blocks", () => {
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockImplementation(name => name === "forward");
+            JSInterface.isClampBlock.mockReturnValue(false);
+            JSInterface.getMethodName.mockImplementation(name => name);
+
+            const flows = [["duplicatenotes", [2], [["forward", [100]]]]];
+            const asts = ASTUtils._getBlockAST(flows);
+            expect(asts.length).toBe(2);
+            expect(asts[0]).toEqual({
+                type: "EmptyStatement",
+                comments: [
+                    {
+                        type: "Line",
+                        value: ' Not exported (no JavaScript equivalent): "duplicatenotes"'
+                    }
+                ]
+            });
+            const code = astring.generate({ type: "Program", body: asts }, { comments: true });
+            expect(code).toContain('// Not exported (no JavaScript equivalent): "duplicatenotes"');
+            expect(code).toContain("await mouse.forward(100);");
+        });
+
+        it("emits a comment and exports both inner flows for unsupported multi-branch clamp blocks", () => {
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockImplementation(name => name === "forward" || name === "back");
+            JSInterface.isClampBlock.mockReturnValue(false);
+            JSInterface.getMethodName.mockImplementation(name => name);
+
+            const flows = [["unsupportedclamp", null, [["forward", [100]]], [["back", [50]]]]];
+            const asts = ASTUtils._getBlockAST(flows);
+            expect(asts.length).toBe(3);
+            expect(asts[0]).toEqual({
+                type: "EmptyStatement",
+                comments: [
+                    {
+                        type: "Line",
+                        value: ' Not exported (no JavaScript equivalent): "unsupportedclamp"'
+                    }
+                ]
+            });
+            const code = astring.generate({ type: "Program", body: asts }, { comments: true });
+            expect(code).toContain(
+                '// Not exported (no JavaScript equivalent): "unsupportedclamp"'
+            );
+            expect(code).toContain("await mouse.forward(100);");
+            expect(code).toContain("await mouse.back(50);");
+        });
     });
 
     describe("getMethodAST", () => {
