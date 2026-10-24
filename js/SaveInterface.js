@@ -222,6 +222,10 @@ class SaveInterface {
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
+                // downloadURL() won't run to free a Blob URL, so free it here.
+                if (typeof URL.revokeObjectURL === "function") {
+                    URL.revokeObjectURL(dataurl);
+                }
                 return;
             }
 

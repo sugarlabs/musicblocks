@@ -190,6 +190,24 @@ describe("download", () => {
         expect(spy).not.toHaveBeenCalled();
     });
 
+    it("should revoke the Blob URL when the user cancels the prompt", () => {
+        global.URL.revokeObjectURL = jest.fn();
+        window.prompt = jest.fn(() => null);
+        instance.download("svg", "blob:mock-svg", null);
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
+    });
+
+    it("should revoke the Blob URL when the MBDialog prompt is cancelled", async () => {
+        global.URL.revokeObjectURL = jest.fn();
+        let cancelled;
+        window.MBDialog = { prompt: jest.fn(() => (cancelled = Promise.resolve(null))) };
+        instance.download("svg", "blob:mock-svg", null);
+        await cancelled;
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
+    });
+
     it("should handle empty extension gracefully", () => {
         const other = new SaveInterface({
             PlanetInterface: { getCurrentProjectName: () => "Test" }
