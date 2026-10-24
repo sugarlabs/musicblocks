@@ -123,12 +123,13 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         const noteOrPitch = activity;
         let name, octave, pitchNumber;
 
-        if (typeof noteOrPitch === "number") {
+        if (typeof noteOrPitch === "number" && Number.isFinite(noteOrPitch)) {
             const currentEDO = getCurrentEDO(temperament);
             pitchNumber = noteOrPitch;
             octave = Math.floor(pitchNumber / currentEDO) - 1;
             const edoNames = generateNoteNames(currentEDO);
-            name = edoNames[pitchNumber % currentEDO];
+            const index = ((pitchNumber % currentEDO) + currentEDO) % currentEDO;
+            name = edoNames[index];
         } else if (typeof noteOrPitch === "string") {
             [name, octave] = _parse_pitch_string(noteOrPitch);
             pitchNumber = _calculate_pitch_number(name, octave, 0, temperament);
@@ -210,11 +211,11 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                     return SOLFEGECONVERSIONTABLE[pitch];
                 }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
-            case "pitch class":
-                return (
-                    (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) %
-                    getCurrentEDO(temperament)
-                );
+            case "pitch class": {
+                const edo = getCurrentEDO(temperament);
+                const raw = pitchToNumber(pitch, octave, tur.singer.keySignature) - 3;
+                return ((raw % edo) + edo) % edo;
+            }
             case "scalar class":
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
