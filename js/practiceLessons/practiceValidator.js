@@ -97,6 +97,10 @@ const TWINKLE_SECTIONS = new Map([
 // The song's form, the bread of the sandwich on the outside and the filling in the middle.
 const TWINKLE_SONG_FORM = ["A1", "A2", "B", "B", "A1", "A2"];
 
+// Upper bound on start-block action references that counting checks expand,
+// so a huge repeat count cannot build a giant array.
+const MAX_START_ACTION_REFERENCES = 1000;
+
 const PracticeValidator = {
     validate(problem) {
         if (problem?.expected?.circularRhythmRing) {
@@ -137,7 +141,7 @@ const PracticeValidator = {
     },
 
     validatePattern(expectedPattern) {
-        const sequence = this.getCurrentSequence();
+        const sequence = this.getCurrentSequence(expectedPattern.length);
         return this.matchesPattern(sequence, expectedPattern);
     },
 
@@ -172,14 +176,14 @@ const PracticeValidator = {
         return true;
     },
 
-    getCurrentSequence() {
+    getCurrentSequence(maxLength) {
         const blockList = this.getBlockList();
         const startBlock = Object.values(blockList).find(
             block => block?.name === "start" && !block.trash
         );
         if (!startBlock) return [];
 
-        return this.extractPatternSequence(startBlock.connections?.[1], blockList);
+        return this.extractPatternSequence(startBlock.connections?.[1], blockList, maxLength);
     },
 
     assessBadges(problem) {
@@ -296,7 +300,7 @@ const PracticeValidator = {
         }
     },
 
-    extractPatternSequence(startId, blockList) {
+    extractPatternSequence(startId, blockList, maxLength) {
         const sequence = [];
         let currentId = this.unwrapHiddenFlow(startId, blockList);
         let guard = 0;
@@ -309,14 +313,27 @@ const PracticeValidator = {
                 const actionName = block.overrideName || block.privateData || block.value;
                 if (actionName) {
                     sequence.push(actionName);
+                    if (maxLength !== undefined && sequence.length > maxLength) {
+                        return sequence;
+                    }
                 }
             } else if (block.name === "repeat") {
                 const timesId = block.connections?.[1];
                 const times = Number(blockList[timesId]?.value) || 1;
-                const body = this.extractPatternSequence(block.connections?.[2], blockList);
+                const body = this.extractPatternSequence(
+                    block.connections?.[2],
+                    blockList,
+                    maxLength
+                );
 
-                for (let i = 0; i < times; i++) {
-                    sequence.push(...body);
+                if (body.length > 0) {
+                    for (let i = 0; i < times; i++) {
+                        sequence.push(...body);
+                        // Stop once the sequence is longer than the caller will ever accept.
+                        if (maxLength !== undefined && sequence.length > maxLength) {
+                            return sequence;
+                        }
+                    }
                 }
             }
 
@@ -402,7 +419,8 @@ const PracticeValidator = {
     hasCreatedVariation(expectedPattern) {
         if (!Array.isArray(expectedPattern)) return false;
 
-        const sequence = this.getCurrentSequence();
+        // Only need to know whether the sequence is longer than the pattern.
+        const sequence = this.getCurrentSequence(expectedPattern.length + 1);
         if (sequence.length <= expectedPattern.length) return false;
 
         return this.matchesPattern(sequence.slice(0, expectedPattern.length), expectedPattern);
@@ -413,8 +431,8 @@ const PracticeValidator = {
         const exportedActions = this.getRhythmMakerActionNames(blockList);
         if (exportedActions.size === 0) return false;
 
-        const referencedActions = this.getStartActionReferences(blockList);
-        return referencedActions.some(actionName => exportedActions.has(actionName));
+        const referencedActions = this.getStartActionNames(blockList);
+        return [...referencedActions].some(actionName => exportedActions.has(actionName));
     },
 
     getRhythmMakerActionNames(blockList) {
@@ -434,13 +452,89 @@ const PracticeValidator = {
         return names;
     },
 
-    getStartActionReferences(blockList) {
+    getStartActionReferences(blockList, maxLength = MAX_START_ACTION_REFERENCES) {
         const startBlock = Object.values(blockList).find(
             block => block?.name === "start" && !block.trash
         );
         if (!startBlock) return [];
 
-        return this.extractPatternSequence(startBlock.connections?.[1], blockList);
+        return this.extractPatternSequence(startBlock.connections?.[1], blockList, maxLength);
+    },
+
+    // Which actions the start flow calls. A repeat body is walked once, however many times it loops.
+    getStartActionNames(blockList) {
+        const startBlock = Object.values(blockList).find(
+            block => block?.name === "start" && !block.trash
+        );
+        if (!startBlock) return new Set();
+
+        return this.collectActionNames(startBlock.connections?.[1], blockList, new Set());
+    },
+
+    collectActionNames(startId, blockList, names) {
+        let currentId = this.unwrapHiddenFlow(startId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) break;
+
+            if (block.name === "nameddo") {
+                const actionName = block.overrideName || block.privateData || block.value;
+                if (actionName) names.add(actionName);
+            } else if (block.name === "repeat") {
+                this.collectActionNames(block.connections?.[2], blockList, names);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return names;
+    },
+
+    // How many times the start flow calls each action. Repeats multiply the counts of their body
+    // instead of being expanded, so a huge repeat count costs nothing.
+    getStartActionCounts(blockList) {
+        const startBlock = Object.values(blockList).find(
+            block => block?.name === "start" && !block.trash
+        );
+        if (!startBlock) return new Map();
+
+        return this.collectActionCounts(startBlock.connections?.[1], blockList, new Map(), 1);
+    },
+
+    collectActionCounts(startId, blockList, counts, multiplier) {
+        let currentId = this.unwrapHiddenFlow(startId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) break;
+
+            if (block.name === "nameddo") {
+                const actionName = block.overrideName || block.privateData || block.value;
+                if (actionName) {
+                    counts.set(actionName, (counts.get(actionName) || 0) + multiplier);
+                }
+            } else if (block.name === "repeat") {
+                const timesId = block.connections?.[1];
+                const times = Number(blockList[timesId]?.value) || 1;
+                // Same number of passes the expanded loop in extractPatternSequence would make.
+                const passes = Math.max(0, Math.ceil(times));
+                this.collectActionCounts(
+                    block.connections?.[2],
+                    blockList,
+                    counts,
+                    multiplier * passes
+                );
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return counts;
     },
 
     hasChangedRhythmLength() {
@@ -665,9 +759,10 @@ const PracticeValidator = {
         const transcribed = new Set(sectionByActionName.values());
         if ([...TWINKLE_SECTIONS.keys()].some(section => !transcribed.has(section))) return false;
 
-        const performed = this.getStartActionReferences(blockList).map(actionName =>
-            sectionByActionName.get(actionName)
-        );
+        const performed = this.getStartActionReferences(
+            blockList,
+            TWINKLE_SONG_FORM.length + 1
+        ).map(actionName => sectionByActionName.get(actionName));
 
         return JSON.stringify(performed) === JSON.stringify(TWINKLE_SONG_FORM);
     },
@@ -949,8 +1044,8 @@ const PracticeValidator = {
         const exportedActions = this.getPhraseMakerActionNames(blockList);
         if (exportedActions.size === 0) return false;
 
-        const referencedActions = this.getStartActionReferences(blockList);
-        return referencedActions.some(actionName => exportedActions.has(actionName));
+        const referencedActions = this.getStartActionNames(blockList);
+        return [...referencedActions].some(actionName => exportedActions.has(actionName));
     },
 
     validateTwoPartForm() {
@@ -958,7 +1053,7 @@ const PracticeValidator = {
         const exportedActions = this.getPhraseMakerActionNames(blockList);
         if (exportedActions.size < 2) return false;
 
-        const referencedActions = new Set(this.getStartActionReferences(blockList));
+        const referencedActions = this.getStartActionNames(blockList);
         let referencedParts = 0;
         exportedActions.forEach(actionName => {
             if (referencedActions.has(actionName)) {
@@ -1052,11 +1147,12 @@ const PracticeValidator = {
     hasCreatedPhraseVariation() {
         const blockList = this.getBlockList();
         const phraseActions = this.getPhraseMakerActionNames(blockList);
-        const referencedActions = this.getStartActionReferences(blockList).filter(actionName =>
-            phraseActions.has(actionName)
-        );
+        let phraseCalls = 0;
+        this.getStartActionCounts(blockList).forEach((count, actionName) => {
+            if (phraseActions.has(actionName)) phraseCalls += count;
+        });
 
-        return phraseActions.size > 2 || referencedActions.length > 2;
+        return phraseActions.size > 2 || phraseCalls > 2;
     },
 
     actionContainsBlockNamed(actionBlock, blockList, names) {
