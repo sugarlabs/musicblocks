@@ -452,6 +452,53 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("search after an error", () => {
+        it("runs the next search after a failed one", () => {
+            gp.searchString = "drums";
+            gp.search();
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: false,
+                error: "ERROR_CONNECTION_FAILURE"
+            });
+
+            gp.searchString = "piano";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
+            expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("piano");
+        });
+
+        it("clears a failed search back to the tag view", () => {
+            gp.searchMode = "ALL_PROJECTS";
+            gp.searchString = "drums";
+            gp.search();
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({ success: false });
+
+            gp.searchString = "";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.downloadProjectList).toHaveBeenCalledTimes(1);
+            expect(document.getElementById("tagscontainer").style.display).not.toBe("none");
+        });
+
+        it("runs the next search when no result of a search could be loaded", () => {
+            mockPlanet.ServerInterface.getProjectDetails.mockImplementation((id, cb) =>
+                cb({ success: false })
+            );
+            gp.searchString = "drums";
+            gp.search();
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: true,
+                data: [["proj1", 123]]
+            });
+
+            gp.searchString = "piano";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("afterDownloadData", () => {
         it("should store data in cache and call callback on success", () => {
             gp.cache["proj1"] = { ProjectData: null };
