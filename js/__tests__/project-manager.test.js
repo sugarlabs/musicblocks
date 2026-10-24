@@ -77,6 +77,41 @@ beforeAll(() => {
 // Helpers
 // ---------------------------------------------------------------------------
 
+describe("multisample session recovery", () => {
+    it("reports a storage failure without changing embedded values and permits retry/export", () => {
+        const activity = makeActivity();
+        const value = { type: "multisample", version: 9, name: "recover", audio: ["exact bytes"] };
+        activity.blocks.blockList = [
+            {
+                name: "multisample",
+                value,
+                connections: [null],
+                container: { x: 1, y: 2 },
+                isValueBlock: () => true
+            }
+        ];
+        let fail = true;
+        let saved;
+        Object.defineProperty(activity.storage, "SESSIONTest Project", {
+            set(data) {
+                if (fail) throw new DOMException("full", "QuotaExceededError");
+                saved = data;
+            }
+        });
+        const manager = new ProjectManager(activity);
+        const exported = manager.prepareExport();
+        expect(manager.saveLocally()).toBe(false);
+        expect(activity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Retry saving or export")
+        );
+        expect(manager.prepareExport()).toBe(exported);
+        expect(activity.blocks.blockList[0].value).toEqual(value);
+        fail = false;
+        manager.saveLocally();
+        expect(saved).toBe(exported);
+    });
+});
+
 const makeActivity = (overrides = {}) => ({
     canvas: { width: 800 },
     logo: { synth: { startingPitch: 392 }, getRestoredConnections: () => new Map() },

@@ -1105,6 +1105,30 @@ describe("PlanetInterface", () => {
         // 3. Verify saveThumbnail safely returned null without calling storage.saveThumbnail with undefined
         expect(realStorage.saveThumbnail).not.toHaveBeenCalled();
     });
+
+    test("a failed instrument save retains exact export data for native export and retry", async () => {
+        doSVG.mockReturnValue("");
+        const value = {
+            type: "multisample",
+            version: 99,
+            name: "saved",
+            recordings: ["exact bytes"]
+        };
+        const data = JSON.stringify([[0, ["multisample", { value }], 0, 0, [null]]]);
+        mockActivity.prepareExport.mockReturnValue(data);
+        const save = jest
+            .fn()
+            .mockRejectedValueOnce(new DOMException("full", "QuotaExceededError"))
+            .mockResolvedValueOnce(true);
+        planetInterface.planet = { ProjectStorage: { saveLocally: save } };
+        expect(await planetInterface.saveLocally()).toBe(false);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Retry saving or export")
+        );
+        expect(mockActivity.prepareExport()).toBe(data);
+        expect(await planetInterface.saveLocally()).toBe(true);
+        expect(save).toHaveBeenNthCalledWith(2, data, null);
+    });
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
         const D = new Date(2020, 1, 1);
         planetInterface.planet = {
