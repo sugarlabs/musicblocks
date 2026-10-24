@@ -133,7 +133,8 @@ const {
     displayMsg,
     makeKeyboardAccessible,
     announceToScreenReader,
-    _
+    _,
+    _resetKanaCache
 } = require("../utils.js");
 
 const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
@@ -729,6 +730,9 @@ describe("_() i18n translation", () => {
 
     afterEach(() => {
         getItemSpy.mockRestore();
+        if (typeof _resetKanaCache === "function") {
+            _resetKanaCache();
+        }
     });
 
     it("returns empty string for falsy input", () => {
@@ -801,6 +805,18 @@ describe("_() i18n translation", () => {
         i18next.t.mockReturnValue("bonjour");
         _("hello", { ns: "custom" });
         expect(i18next.t).toHaveBeenCalledWith("hello", { ns: "custom" });
+    });
+
+    it("caches kanaPreference so repeated calls do not query localStorage again", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("first")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledWith("kanaPreference");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+        expect(_("second")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
     });
 });
 
