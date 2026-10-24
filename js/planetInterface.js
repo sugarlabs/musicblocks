@@ -288,6 +288,11 @@ class PlanetInterface {
                     console.error(e);
                     this.activity.textMsg(_("Could not save your project."));
                 }
+                this.activity.textMsg(
+                    _(
+                        "Project not saved. Retry saving or export a Music Blocks project to keep your recordings."
+                    )
+                );
                 return false;
             };
             const handleProjectSaveError = e => {

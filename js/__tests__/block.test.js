@@ -2143,6 +2143,39 @@ describe("Block Foundation", () => {
     });
 
     describe("value change undo/redo tracking", () => {
+        it("owns independent whole multisample values and history snapshots", () => {
+            const workspace = {
+                ...mockBlocks,
+                actionHistory: [],
+                redoActionHistory: [],
+                updateBlockText: jest.fn()
+            };
+            const block = new Block({ ...mockProtoBlock, name: "multisample" }, workspace);
+            block.blockIndex = 0;
+            const original = { type: "multisample", version: 2, name: "same", extra: { a: [1] } };
+            block.setMultisampleValue(original);
+            original.extra.a.push(2);
+            expect(block.value.extra.a).toEqual([1]);
+            const replacement = { ...original, name: "edited" };
+            block.setMultisampleValue(replacement, true);
+            replacement.extra.a.push(3);
+            block.value.extra.a.push(4);
+            expect(workspace.actionHistory).toHaveLength(1);
+            expect(workspace.actionHistory[0].oldValue.extra.a).toEqual([1]);
+            expect(workspace.actionHistory[0].newValue.extra.a).toEqual([1, 2]);
+            block.setMultisampleValue(JSON.parse(JSON.stringify(block.value)), true);
+            expect(workspace.actionHistory).toHaveLength(1);
+        });
+
+        it("never sends a structured instrument to the text editor", () => {
+            const block = new Block({ ...mockProtoBlock, name: "multisample" }, mockBlocks);
+            const value = { type: "multisample", version: 99, extra: [1] };
+            block.value = value;
+            block._changeLabel();
+            expect(block.label).toBeNull();
+            expect(block.value).toBe(value);
+        });
+
         it("does not record runtime value assignments", () => {
             const mockBlocksObj = {
                 ...mockBlocks,
