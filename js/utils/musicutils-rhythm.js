@@ -106,6 +106,10 @@ var calcNoteValueToDisplay = (a, b) => {
 var durationToNoteValue = duration => {
     // returns [note value, no. of dots, tuplet factor]
 
+    if (Math.abs(duration - Math.round(duration)) < 1e-9) {
+        duration = Math.round(duration);
+    }
+
     let currentDotFactor;
     let d;
     // Try to find a match or a dotted match.
@@ -143,7 +147,12 @@ var durationToNoteValue = duration => {
 
     j = j / 2;
 
-    return [1, 0, [duration / j, j], roundDown];
+    const oddFactor = duration / j;
+    if (!Number.isInteger(oddFactor) || !Number.isInteger(j) || oddFactor <= 0 || j <= 0) {
+        return [roundDown, 0, null, roundDown];
+    }
+
+    return [1, 0, [oddFactor, j], roundDown];
 };
 
 /**
