@@ -17,6 +17,7 @@ class GitDropdownUI {
         this.activity = null;
         this._BASE_URL = "";
         this._prefetchPromise = null;
+        this._REQUEST_TIMEOUT = 20_000;
     }
 
     init(activity) {
@@ -453,6 +454,10 @@ class GitDropdownUI {
         // and silently queue the repo creation instead of showing an error toast.
         const createController = new AbortController();
         const abortCreateOnOffline = () => createController.abort("offline");
+        const createTimeout = setTimeout(
+            () => createController.abort("timeout"),
+            this._REQUEST_TIMEOUT
+        );
         window.addEventListener("offline", abortCreateOnOffline, { once: true });
 
         const body = {
@@ -532,7 +537,10 @@ class GitDropdownUI {
 
             // Network failure mid-create (abort or TypeError) → silently queue offline
             const isNetworkFailure =
-                e.name === "AbortError" || e instanceof TypeError || this._isOffline();
+                createController.signal.aborted ||
+                e.name === "AbortError" ||
+                e instanceof TypeError ||
+                this._isOffline();
 
             if (isNetworkFailure) {
                 console.warn("[GitDropdownUI] Network lost during create — queuing offline.", e);
@@ -590,6 +598,8 @@ class GitDropdownUI {
                     "error"
                 );
             }
+        } finally {
+            clearTimeout(createTimeout);
         }
     }
 
@@ -638,6 +648,7 @@ class GitDropdownUI {
         // simply wait for the response as usual.
         const controller = new AbortController();
         const abortOnOffline = () => controller.abort("offline");
+        const commitTimeout = setTimeout(() => controller.abort("timeout"), this._REQUEST_TIMEOUT);
         window.addEventListener("offline", abortOnOffline, { once: true });
 
         const body = { repoName, key: hashedKey, projectData, thumbnail, commitMessage };
@@ -676,7 +687,10 @@ class GitDropdownUI {
             // TypeError   = browser-level network failure ("Failed to fetch")
             // !onLine     = network dropped just before the check reached catch
             const isNetworkFailure =
-                e.name === "AbortError" || e instanceof TypeError || this._isOffline();
+                controller.signal.aborted ||
+                e.name === "AbortError" ||
+                e instanceof TypeError ||
+                this._isOffline();
 
             if (isNetworkFailure) {
                 console.warn(
@@ -692,6 +706,8 @@ class GitDropdownUI {
                     "error"
                 );
             }
+        } finally {
+            clearTimeout(commitTimeout);
         }
     }
 
