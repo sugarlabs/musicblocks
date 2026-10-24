@@ -131,7 +131,7 @@
         "@gulp-sourcemaps/identity-map": {
             "postcss": "8.5.28"
         },
-        "body-parser": "2.3.0",
+        "body-parser": "2.4.0",
         "qs": "6.16.0",
         "browserslist": "4.28.9",
         "baseline-browser-mapping": "2.11.22",
