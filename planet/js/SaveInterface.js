@@ -116,7 +116,8 @@ class SaveInterface {
             return;
         }
         const toast = document.createElement("div");
-        toast.className = "toast planet-toast";
+        // Not "toast": Materialize and style.css both style that class and stretch the box.
+        toast.className = "planet-toast";
         toast.textContent = message;
         toast.style.background = isError ? "#d32f2f" : "#323232";
         toast.style.position = "fixed";
@@ -125,6 +126,12 @@ class SaveInterface {
         toast.style.transform = "translateX(-50%)";
         toast.style.zIndex = "10000";
         toast.style.padding = "10px 20px";
+        toast.style.width = "max-content";
+        toast.style.maxWidth = "90vw";
+        toast.style.boxSizing = "border-box";
+        toast.style.textAlign = "center";
+        toast.style.fontSize = "14px";
+        toast.style.lineHeight = "1.4";
         toast.style.borderRadius = "4px";
         toast.style.color = "#fff";
         toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.26)";

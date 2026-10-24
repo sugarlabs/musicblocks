@@ -46,6 +46,16 @@
 	justify-content: center;
 }
 
+/* Materialize colours only <a> in .card-action; give the Remix <button> the same colour. */
+.card .card-action button.project-icon {
+	color: #ffab40;
+	transition: color 0.3s ease;
+}
+
+.card .card-action button.project-icon:hover {
+	color: #ffd8a6;
+}
+
 .projectscontainer {
 	display: -webkit-box;
 	display: -ms-flexbox;
