@@ -1166,6 +1166,120 @@ describe("TemperamentWidget basic tests", () => {
                     expect(widget._vizToolbar.addPitchBeforeBtn.style.pointerEvents).toBe("auto");
                 }
             });
+
+            test("arrow keys update highlighted dot and trigger synth preview", () => {
+                widget.pitchNumber = 3;
+                widget.cents = [0, 100, 200];
+                widget.frequencies = ["261.63", "277.18", "293.66"];
+                widget.ratios = [1, Math.pow(2, 1 / 12), Math.pow(2, 2 / 12)];
+                widget.notes = [
+                    ["C", 4],
+                    ["C#", 4],
+                    ["D", 4]
+                ];
+                widget.intervals = ["unison", "minor second", "major second"];
+                widget.ratiosNotesPair = [
+                    [widget.ratios[0], widget.notes[0]],
+                    [widget.ratios[1], widget.notes[1]],
+                    [widget.ratios[2], widget.notes[2]]
+                ];
+                widget._visualizerView();
+
+                const canvas = widgetBody
+                    ? widgetBody.querySelector("canvas")
+                    : document.querySelector("canvas");
+                expect(canvas).toBeTruthy();
+                expect(typeof canvas.onkeydown).toBe("function");
+
+                mockActivity.logo.synth.trigger.mockClear();
+
+                const rows = widgetBody.querySelectorAll("tbody tr");
+                expect(rows.length).toBe(3);
+                const selectedBg = "var(--color-selector-selected, #3a3a5e)";
+
+                // ArrowRight from initial state (nothing focused) navigates to dot 0
+                canvas.onkeydown({ key: "ArrowRight", preventDefault: jest.fn() });
+                expect(mockActivity.logo.resetSynth).toHaveBeenCalledWith(0);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    261.63,
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null
+                );
+                // Pitch 0 is in the bottom row (rows[2])
+                expect(rows[2].cells[0].style.backgroundColor).toBe(selectedBg);
+
+                // Subsequent ArrowRight advances to dot 1
+                mockActivity.logo.synth.trigger.mockClear();
+                canvas.onkeydown({ key: "ArrowRight", preventDefault: jest.fn() });
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    277.18,
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null
+                );
+                // Pitch 1 is in the middle row (rows[1])
+                expect(rows[1].cells[0].style.backgroundColor).toBe(selectedBg);
+
+                // Clicking table row 0 (top row, which corresponds to highest pitch index 2) updates focus
+                rows[0].onclick();
+                expect(rows[0].cells[0].style.backgroundColor).toBe(selectedBg);
+
+                // ArrowRight advances from dot 2, wrapping to dot 0
+                mockActivity.logo.synth.trigger.mockClear();
+                canvas.onkeydown({ key: "ArrowRight", preventDefault: jest.fn() });
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    261.63,
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null
+                );
+                expect(rows[2].cells[0].style.backgroundColor).toBe(selectedBg);
+
+                // ArrowLeft navigates backward from dot 0, wrapping to dot 2
+                mockActivity.logo.synth.trigger.mockClear();
+                canvas.onkeydown({ key: "ArrowLeft", preventDefault: jest.fn() });
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    293.66,
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null
+                );
+                expect(rows[0].cells[0].style.backgroundColor).toBe(selectedBg);
+
+                // Enter triggers the current focused pitch
+                mockActivity.logo.synth.trigger.mockClear();
+                canvas.onkeydown({ key: "Enter", preventDefault: jest.fn() });
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    293.66,
+                    0.25,
+                    "electronic synth",
+                    null,
+                    null
+                );
+
+                // When _playAllRunning is true, keyboard navigation returns early without triggering preview
+                widget._playAllRunning = true;
+                mockActivity.logo.synth.trigger.mockClear();
+                canvas.onkeydown({ key: "ArrowRight", preventDefault: jest.fn() });
+                expect(mockActivity.logo.synth.trigger).not.toHaveBeenCalled();
+                widget._playAllRunning = false;
+
+                // When pitchNumber is 0, keyboard navigation returns early
+                widget.pitchNumber = 0;
+                mockActivity.logo.synth.trigger.mockClear();
+                canvas.onkeydown({ key: "ArrowRight", preventDefault: jest.fn() });
+                expect(mockActivity.logo.synth.trigger).not.toHaveBeenCalled();
+            });
         });
 
         test("custom transition resets typeOfEdit so save emits ratio blocks", () => {

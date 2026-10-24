@@ -649,6 +649,7 @@ function TemperamentWidget() {
         let focusedDot = -1;
 
         const _triggerFocused = function () {
+            if (focusedDot < 0 || focusedDot >= that.pitchNumber) return;
             that._logo.resetSynth(0);
             that._logo.synth.trigger(
                 0,
@@ -661,15 +662,25 @@ function TemperamentWidget() {
         };
 
         canvas.onkeydown = function (e) {
-            if (that._playAllRunning) return;
+            if (that._playAllRunning || !that.pitchNumber) return;
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
-                focusedDot = (focusedDot + 1) % that.pitchNumber;
+                const cur = focusedDot >= 0 ? focusedDot : highlightDot >= 0 ? highlightDot : -1;
+                focusedDot = (cur + 1) % that.pitchNumber;
+                highlightDot = focusedDot;
                 _triggerFocused();
+                _drawCircle();
+                _highlightTableRow(highlightDot);
+                _updateRemoveButton();
             } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
                 e.preventDefault();
-                focusedDot = (focusedDot - 1 + that.pitchNumber) % that.pitchNumber;
+                const cur = focusedDot >= 0 ? focusedDot : highlightDot >= 0 ? highlightDot : 0;
+                focusedDot = (cur - 1 + that.pitchNumber) % that.pitchNumber;
+                highlightDot = focusedDot;
                 _triggerFocused();
+                _drawCircle();
+                _highlightTableRow(highlightDot);
+                _updateRemoveButton();
             } else if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (focusedDot >= 0) _triggerFocused();
@@ -953,6 +964,7 @@ function TemperamentWidget() {
                 tr.onclick = function () {
                     if (that._playAllRunning) return;
                     highlightDot = i;
+                    focusedDot = i;
                     _drawCircle();
                     _highlightTableRow(i);
                     _updateRemoveButton();
@@ -1423,6 +1435,7 @@ function TemperamentWidget() {
                 lockedDrag = _isLocked(hit);
                 if (!lockedDrag) {
                     highlightDot = hit;
+                    focusedDot = hit;
                     _drawCircle();
                     _highlightTableRow(hit);
                     _updateRemoveButton();
@@ -1430,6 +1443,7 @@ function TemperamentWidget() {
                 window.addEventListener("mouseup", _endDrag);
             } else {
                 highlightDot = -1;
+                focusedDot = -1;
                 _drawCircle();
                 _highlightTableRow(-1);
                 _updateRemoveButton();
@@ -1467,6 +1481,7 @@ function TemperamentWidget() {
                 lockedDrag = _isLocked(hit);
                 if (!lockedDrag) {
                     highlightDot = hit;
+                    focusedDot = hit;
                     _drawCircle();
                     _highlightTableRow(hit);
                     _updateRemoveButton();
