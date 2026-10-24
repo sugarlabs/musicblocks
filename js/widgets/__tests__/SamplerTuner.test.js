@@ -84,4 +84,61 @@ describe("SamplerTuner", () => {
         expect(widget.pitchDetectionAudioContext).toBeNull();
         expect(widget.pitchDetectionAnimationId).toBeNull();
     });
+
+    test.each([
+        [0, "---"],
+        [440, "442.11"],
+        [880, "888.70"]
+    ])(
+        "detects a %i Hz input without copying samples for each lag",
+        async (frequency, expected) => {
+            const samples = Float32Array.from(
+                { length: 2048 },
+                (_, i) => 0.5 * Math.sin((2 * Math.PI * frequency * i) / 48000)
+            );
+            const audioContext = {
+                sampleRate: 48000,
+                createMediaStreamSource: () => ({ connect: jest.fn() }),
+                createAnalyser: () => ({ getFloatTimeDomainData: buffer => buffer.set(samples) }),
+                close: jest.fn().mockResolvedValue()
+            };
+            const originalAudioContext = global.AudioContext;
+            const originalMediaDevices = navigator.mediaDevices;
+            global.AudioContext = jest.fn(() => audioContext);
+            Object.defineProperty(navigator, "mediaDevices", {
+                configurable: true,
+                value: {
+                    getUserMedia: jest.fn().mockResolvedValue({ getTracks: () => [] })
+                }
+            });
+            const requestFrame = jest.spyOn(global, "requestAnimationFrame").mockReturnValue(1);
+            global.TunerUtils = { frequencyToNote: jest.fn(() => ({ note: "A4", cents: 0 })) };
+            const widget = makeWidget();
+            Object.assign(widget, {
+                isPitchDetectionRunning: false,
+                pitchDetectionAnimationId: null,
+                pitchDetectionStream: null,
+                pitchDetectionAudioContext: null
+            });
+            widget.widgetWindow = { getWidgetBody: () => document.body };
+
+            try {
+                widget.makeTuner(400, 300);
+                document.getElementById("start").click();
+                await Promise.resolve();
+                expect(requestFrame).toHaveBeenCalledTimes(1);
+                const slice = jest.spyOn(Float32Array.prototype, "slice");
+
+                requestFrame.mock.calls[0][0]();
+
+                expect(slice).not.toHaveBeenCalled();
+                expect(document.getElementById("pitch").textContent).toBe(expected);
+            } finally {
+                widget.stopPitchDetection();
+                document.body.innerHTML = "";
+                global.AudioContext = originalAudioContext;
+                Object.defineProperty(navigator, "mediaDevices", { value: originalMediaDevices });
+            }
+        }
+    );
 });
