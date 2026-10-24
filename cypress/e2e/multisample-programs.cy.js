@@ -145,9 +145,42 @@ function fixture(options = {}) {
             blocks[set][4][2] = pan;
         }
         blocks[out][4][1] = suffix(out);
+        if (options.drum && index === 1) {
+            const drum = add("setdrum");
+            blocks[drum][4] = [
+                start,
+                val("drumname", "kick drum", drum),
+                set,
+                add("hidden", [drum, null])
+            ];
+            blocks[start][4][1] = drum;
+            blocks[set][4][0] = drum;
+        }
         return { set, voice, first, start };
     };
     const phrases = banks.map(addPhrase);
+    if (options.counter) {
+        const { start, set } = phrases[0];
+        const counter = add(options.counter, [null, set]);
+        blocks[start][4][1] = null;
+        blocks[set][4][0] = counter;
+    }
+    if (options.companion) {
+        const { set } = phrases[0];
+        const parent = blocks[set][4][0];
+        const beat = add("everybeatdonew");
+        blocks[beat][4] = [parent, val("text", "late", beat), null];
+        blocks[parent][4][1] = beat;
+        const action = add("action");
+        blocks[action][4] = [null, val("text", "late", action), set, null];
+        blocks[set][4][0] = action;
+    }
+    if (options.noStart) {
+        for (const { start, set } of phrases) {
+            blocks[start][1] = "hidden";
+            blocks[start][4] = [null, set];
+        }
+    }
     if (options.nested) {
         const { start, set, voice } = phrases[0];
         const store = add("storein");
@@ -181,6 +214,8 @@ function load(options = {}) {
     const made = fixture(options);
     const expected = [];
     const suffix = " " + Date.now() + " " + Math.random();
+    const marker = "Fixture" + suffix;
+    made.blocks.push([made.blocks.length, ["text", { value: marker }], 100, 100, [null]]);
     for (const block of made.blocks) {
         if (!Array.isArray(block[1]) || block[1][0] !== "multisample") continue;
         block[1][1].value.name += suffix;
@@ -197,6 +232,9 @@ function load(options = {}) {
     cy.window().should(win => {
         const workspace = win.ActivityContext.getActivity().blocks;
         expect(workspace.isLoading()).to.equal(false);
+        expect(
+            workspace.blockList.some(b => b && !b.trash && b.value === marker && b.loadComplete)
+        ).to.equal(true);
         const owners = workspace.blockList.filter(b => b && !b.trash && b.name === "multisample");
         expect(owners.map(b => b.value)).to.deep.equal(expected);
         expect(owners.every(b => b.loadComplete)).to.equal(true);
@@ -212,7 +250,7 @@ async function observe(win, delays = [], onPCM) {
     const savedAudio = new Set(
         activity.blocks.blockList
             .filter(block => block && !block.trash && block.name === "multisample")
-            .flatMap(block => block.value.samples.map(sample => sample.data))
+            .flatMap(block => (block.value.samples || []).map(sample => sample.data))
     );
     const trace = { decodes: [], ready: [], dispatch: [], attacks: [], pcm: [], clocks: [] };
     let runTime = logo.time;
@@ -324,7 +362,7 @@ async function observe(win, delays = [], onPCM) {
     });
     const dispatch = logo.runFromBlock;
     Cypress.sinon.stub(logo, "runFromBlock").callsFake(function (...args) {
-        trace.dispatch.push({ turtle: String(args[1]), wall: win.performance.now() });
+        trace.dispatch.push({ turtle: String(args[1]), wall: win.performance.now(), env: args[4] });
         return dispatch.apply(this, args);
     });
     const errors = Cypress.sinon.spy(activity, "errorMsg");
@@ -369,8 +407,411 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
         observed = null;
     });
     after(() =>
-        cy.writeFile(".scratch/multisample-implementation/i07-browser-evidence.json", reports)
+        cy.writeFile(".scratch/multisample-implementation/i08-browser-evidence.json", reports)
     );
+
+    for (const mode of ["start", "drum", "bare", "no-start", "legacy"]) {
+        it("preserves actual selection and invocation: " + mode, () => {
+            load({
+                banks: mode === "legacy" ? [null] : [instrument(), null],
+                drum: true,
+                noStart: mode === "bare" || mode === "no-start"
+            });
+            cy.window().then(async win => {
+                await win.Tone.start();
+                observed = await observe(win, [150, 150]);
+                const { activity, logo, synth } = observed;
+                logo.boxes = { suffix: 0 };
+                const starts = activity.blocks.blockList.filter(
+                    b => b && !b.trash && ["start", "drum"].includes(b.name)
+                );
+                const selected = mode === "drum" ? starts[1] : starts[0];
+                const index =
+                    mode === "bare"
+                        ? activity.blocks.blockList.findIndex(
+                              b => b && !b.trash && b.name === "settimbre"
+                          )
+                        : activity.blocks.blockList.indexOf(selected);
+                const env = { kept: mode };
+                logo.runLogoCommands(mode === "no-start" || mode === "legacy" ? null : index, env);
+                if (mode === "no-start" || mode === "legacy") {
+                    expect(observed.trace.decodes).to.have.length(0);
+                    expect(observed.trace.clocks).to.have.length(1);
+                }
+                if (mode === "no-start") expect(synth.multisampleBytes).to.equal(0);
+            });
+            cy.wrap(null).should(() => {
+                if (mode === "no-start") {
+                    expect(observed.logo.boxes.suffix).to.equal(0);
+                    expect(observed.trace.dispatch).to.have.length(0);
+                } else {
+                    expect(observed.logo.boxes.suffix).to.equal(1);
+                    expect(observed.trace.dispatch[0].env).to.deep.equal({ kept: mode });
+                    if (mode !== "legacy") {
+                        expect(observed.trace.ready).to.have.length(1);
+                        const selected = observed.trace.ready[0].turtle;
+                        expect(
+                            observed.trace.dispatch.every(item => item.turtle === selected)
+                        ).to.equal(true);
+                        expect(observed.trace.attacks).to.have.length(mode === "drum" ? 0 : 3);
+                    }
+                }
+                expect(observed.errors.called).to.equal(false);
+            });
+        });
+    }
+
+    for (const stop of [false, true]) {
+        it("retains one audible Step and treats preparation clicks as busy; Stop=" + stop, () => {
+            load({ nested: true });
+            let executed;
+            cy.window().then(async win => {
+                await win.Tone.start();
+                observed = await observe(win, [250, 250]);
+                const { activity, logo } = observed;
+                executed = Cypress.sinon.spy(logo, "runFromBlockNow");
+                logo.boxes = { suffix: 0, outerSuffix: 0, outerHit: 0, innerHit: 0 };
+                expect(activity.toolbarController.runStep()).to.equal("started");
+                for (let i = 0; i < 5; i++)
+                    expect(activity.toolbarController.runStep()).to.equal(null);
+                expect(executed.callCount).to.equal(0);
+                if (stop) logo.doStopTurtles();
+            });
+            cy.wait(750);
+            cy.then(() => {
+                expect(executed.callCount).to.equal(stop ? 0 : 1);
+                expect(observed.trace.attacks).to.have.length(0);
+                expect(observed.logo.boxes.suffix).to.equal(0);
+                if (stop) {
+                    observed.activity.toolbarController.runStep();
+                }
+            });
+            cy.wrap(null).should(() => expect(executed.callCount).to.equal(1));
+            cy.then(
+                () =>
+                    new Cypress.Promise((resolve, reject) => {
+                        let clicks = 0;
+                        const advance = () => {
+                            if (observed.logo.boxes.outerSuffix === 1) return resolve();
+                            if (++clicks > 100) return reject(new Error("Step did not finish"));
+                            observed.activity.toolbarController.runStep();
+                            setTimeout(advance, 25);
+                        };
+                        advance();
+                    })
+            );
+            cy.then(() => {
+                expect(observed.logo.boxes).to.include({
+                    suffix: 1,
+                    outerSuffix: 1,
+                    outerHit: 1,
+                    innerHit: 1
+                });
+                expect(observed.trace.attacks).to.have.length(3);
+                expect(observed.errors.called).to.equal(false);
+            });
+        });
+    }
+
+    for (const flag of ["runningLilypond", "runningAbc", "runningMxml", "runningMIDI"]) {
+        it("validates actual silent use without audio readiness: " + flag, () => {
+            const unused = instrument();
+            unused.samples[0].data = "data:audio/wav;base64,UklGRgQAAABXQVZF";
+            load({ nested: true, unused: [unused, { ...instrument(), version: 99 }] });
+            cy.window().then(async win => {
+                observed = await observe(win);
+                const { logo, synth } = observed;
+                Cypress.sinon.stub(win.Tone, "start").throws(new Error("no audio device"));
+                const register = Cypress.sinon.spy(synth, "registerMultisample");
+                const prepared = Cypress.sinon.spy(synth, "getPreparedMultisample");
+                const save =
+                    "afterSave" +
+                    {
+                        runningLilypond: "Lilypond",
+                        runningAbc: "Abc",
+                        runningMxml: "Mxml",
+                        runningMIDI: "MIDI"
+                    }[flag];
+                Cypress.sinon.stub(logo.deps.save, save);
+                logo.boxes = { suffix: 0, outerSuffix: 0, outerHit: 0, innerHit: 0 };
+                logo[flag] = true;
+                logo.runLogoCommands();
+                observed.silent = { register, prepared };
+            });
+            cy.wrap(null).should(() => {
+                expect(observed.logo.boxes).to.include({
+                    suffix: 1,
+                    outerSuffix: 1,
+                    outerHit: 1,
+                    innerHit: 1
+                });
+                expect(observed.trace.decodes).to.have.length(0);
+                expect(observed.trace.attacks).to.have.length(0);
+                expect(observed.silent.register.called).to.equal(false);
+                expect(observed.silent.prepared.called).to.equal(false);
+                expect(observed.errors.called).to.equal(false);
+            });
+        });
+    }
+
+    for (const counter of ["notecounter", "notecounter2"]) {
+        it("counts saved values without preparation or an audio device: " + counter, () => {
+            load({ counter });
+            cy.window().then(async win => {
+                observed = await observe(win);
+                const { activity, logo, synth } = observed;
+                Cypress.sinon.stub(win.Tone, "start").throws(new Error("no audio device"));
+                const prepared = Cypress.sinon.spy(synth, "getPreparedMultisample");
+                const register = Cypress.sinon.spy(synth, "registerMultisample");
+                const start = activity.blocks.blockList.find(
+                    b => b && !b.trash && b.name === "start"
+                );
+                logo.initTurtle(start.value);
+                logo.stopTurtle = false;
+                logo.boxes = { suffix: 0 };
+                const id = activity.blocks.blockList.findIndex(
+                    b => b && !b.trash && b.name === counter
+                );
+                const result = logo.parseArg(logo, start.value, id, null);
+                expect(result).to.equal(counter === "notecounter" ? 3 / 16 : 3);
+                expect(logo.boxes.suffix).to.equal(0);
+                expect(prepared.called).to.equal(false);
+                expect(register.called).to.equal(false);
+                expect(observed.trace.decodes).to.have.length(0);
+                expect(observed.trace.attacks).to.have.length(0);
+                expect(observed.errors.called).to.equal(false);
+            });
+        });
+    }
+
+    for (const invalid of [false, true]) {
+        it("silent actual-use validation rejects opaque values; invalid=" + invalid, () => {
+            const bank = instrument();
+            if (invalid) bank.samples = [];
+            else bank.version = 99;
+            load({ banks: [bank, null] });
+            cy.window().then(async win => {
+                observed = await observe(win);
+                const { logo } = observed;
+                observed.save = Cypress.sinon.stub(logo.deps.save, "afterSaveLilypond");
+                logo.runningLilypond = true;
+                logo.boxes = { suffix: 0 };
+                logo.runLogoCommands();
+            });
+            cy.wrap(null).should(() => {
+                expect(observed.errors.called).to.equal(true);
+                expect(observed.logo.stopTurtle).to.equal(true);
+                expect(observed.logo.boxes.suffix).to.equal(0);
+                expect(observed.trace.decodes).to.have.length(0);
+                expect(observed.trace.attacks).to.have.length(0);
+                expect(observed.activity.turtles.running()).to.equal(false);
+                expect(observed.save.called).to.equal(false);
+            });
+            if (!invalid) {
+                cy.window().then(async win => {
+                    await win.Tone.start();
+                    const block = observed.activity.blocks.blockList.find(
+                        b => b && !b.trash && b.name === "multisample"
+                    );
+                    const value = JSON.parse(JSON.stringify(block.value));
+                    value.version = 1;
+                    block.setMultisampleValue(value);
+                    expect(observed.logo._exportingNotation).to.equal(false);
+                    observed.logo.runLogoCommands();
+                });
+                cy.wrap(null).should(() => {
+                    expect(observed.logo.boxes.suffix).to.equal(2);
+                    expect(observed.trace.decodes).to.have.length(4);
+                    expect(observed.trace.attacks).to.have.length(3);
+                    expect(observed.save.called).to.equal(false);
+                });
+            }
+        });
+    }
+
+    it("Stop precedes synchronous silent dispatch", () => {
+        load();
+        cy.window().then(async win => {
+            observed = await observe(win);
+            const { activity, logo } = observed;
+            logo.runningLilypond = true;
+            logo.boxes = { suffix: 0 };
+            const id = activity.blocks.blockList.findIndex(
+                b => b && !b.trash && b.name === "start"
+            );
+            logo.doStopTurtles();
+            logo.runFromBlock(logo, activity.blocks.blockList[id].value, id, 0, null);
+            expect(logo.boxes.suffix).to.equal(0);
+            expect(observed.trace.decodes).to.have.length(0);
+            expect(observed.trace.attacks).to.have.length(0);
+            expect(logo.stopTurtle).to.equal(true);
+        });
+    });
+
+    it("a counting source failure stops synchronous suffix flow", () => {
+        const bank = { ...instrument(), version: 99 };
+        load({ banks: [bank], counter: "notecounter2" });
+        cy.window().then(async win => {
+            observed = await observe(win);
+            const { activity, logo } = observed;
+            const turtle = activity.blocks.blockList.find(
+                b => b && !b.trash && b.name === "start"
+            ).value;
+            const counter = activity.blocks.blockList.findIndex(
+                b => b && !b.trash && b.name === "notecounter2"
+            );
+            logo.initTurtle(turtle);
+            logo.stopTurtle = false;
+            logo.boxes = { suffix: 0 };
+            const suffix = Cypress.sinon.spy(activity.blocks.protoBlockDict.storein, "flow");
+            logo.parseArg(logo, turtle, counter, null);
+            expect(suffix.called).to.equal(false);
+            expect(logo.stopTurtle).to.equal(true);
+            expect(activity.turtles.running()).to.equal(false);
+            expect(observed.trace.decodes).to.have.length(0);
+            expect(observed.trace.attacks).to.have.length(0);
+        });
+    });
+
+    it("a Step source failure stops both turtle queues", () => {
+        load({ banks: [{ ...instrument(), version: 99 }, instrument()] });
+        cy.window().then(async win => {
+            await win.Tone.start();
+            observed = await observe(win);
+            observed.logo.boxes = { suffix: 0 };
+            observed.activity.toolbarController.runStep();
+        });
+        cy.wrap(null).should(() =>
+            expect(observed.logo._executionRequest?.queuesReady).to.equal(true)
+        );
+        cy.then(() => observed.activity.toolbarController.runStep());
+        cy.then(() => {
+            expect(observed.errors.called).to.equal(true);
+            expect(observed.activity.turtles.running()).to.equal(false);
+            expect(observed.logo.stepQueue).to.deep.equal({});
+            expect(observed.logo.boxes.suffix).to.equal(0);
+            expect(observed.trace.attacks).to.have.length(0);
+        });
+    });
+
+    for (const late of ["value", "turtle"]) {
+        it("refuses a runtime-unprepared pair without score-time decoding: " + late, () => {
+            load({
+                nested: late === "value",
+                mid: late === "turtle",
+                companion: late === "turtle"
+            });
+            cy.window().then(async win => {
+                await win.Tone.start();
+                observed = await observe(win);
+                const { activity, logo, synth } = observed;
+                const call = activity.blocks.blockList.findIndex(
+                    b => b && !b.trash && b.name === "nameddoArg"
+                );
+                const bank = activity.blocks.blockList.find(
+                    b => b && !b.trash && b.name === "multisample"
+                ).value;
+                if (late === "value") {
+                    const run = logo.runFromBlockNow;
+                    let injected = false;
+                    Cypress.sinon.stub(logo, "runFromBlockNow").callsFake(function (...args) {
+                        if (args[2] === call && !injected) {
+                            injected = true;
+                            logo.boxes.saved = JSON.parse(JSON.stringify(bank));
+                        }
+                        return run.apply(this, args);
+                    });
+                }
+                logo.boxes = { suffix: 0, outerSuffix: 0, outerHit: 0, innerHit: 0 };
+                logo.runLogoCommands();
+                expect(synth.multisampleBytes).to.equal(0);
+            });
+            cy.wrap(null).should(() => {
+                expect(observed.errors.lastCall.args[0])
+                    .to.include("not prepared for this run")
+                    .and.include("Program strings");
+                expect(observed.trace.decodes).to.have.length(2);
+                expect(observed.trace.attacks).to.have.length(0);
+                expect(observed.logo.boxes.suffix).to.equal(0);
+                expect(observed.synth.multisampleBytes).to.equal(0);
+                expect(observed.activity.turtles.running()).to.equal(false);
+            });
+            if (late === "turtle") {
+                cy.then(() => observed.logo.runLogoCommands());
+                cy.wrap(null).should(() => {
+                    expect(observed.errors.callCount).to.equal(2);
+                    expect(observed.trace.decodes).to.have.length(4);
+                    expect(observed.trace.attacks).to.have.length(0);
+                    expect(observed.synth.multisampleBytes).to.equal(0);
+                });
+            }
+        });
+    }
+
+    it("admits concurrent conservative owners against one combined budget", () => {
+        const bank = instrument();
+        bank.samples = bank.samples.slice(0, 1);
+        load({ banks: [bank, JSON.parse(JSON.stringify(bank))] });
+        cy.window().then(async win => {
+            await win.Tone.start();
+            observed = await observe(win);
+            const nativeLoad = win.Tone.ToneAudioBuffer.load.wrappedMethod;
+            win.Tone.ToneAudioBuffer.load.restore();
+            Cypress.sinon.stub(win.Tone.ToneAudioBuffer, "load").callsFake(async function (
+                ...args
+            ) {
+                const audio = await nativeLoad.apply(this, args);
+                if (!String(args[0]).startsWith("data:")) return audio;
+                // Native controlled PCM admission, not claimed as this WAV's decoded size.
+                return new win.AudioBuffer({
+                    length: 5 * 1024 * 1024,
+                    numberOfChannels: 1,
+                    sampleRate: 48000
+                });
+            });
+            observed.logo.boxes = { suffix: 0 };
+            observed.logo.runLogoCommands();
+        });
+        cy.wrap(null).should(() => {
+            expect(observed.errors.lastCall.args[0])
+                .to.include("memory limit")
+                .and.include("low.wav");
+            expect(observed.trace.dispatch).to.have.length(0);
+            expect(observed.trace.ready.length).to.be.at.most(3);
+            expect(observed.synth.multisampleBytes).to.equal(0);
+            expect(observed.logo.boxes.suffix).to.equal(0);
+        });
+    });
+
+    for (const outcome of ["success", "failure"]) {
+        it("Stop prevents late optional startup callback " + outcome, () => {
+            load();
+            let callbacks;
+            cy.window().then(async win => {
+                observed = await observe(win);
+                const loadModule = win.requirejs;
+                Cypress.sinon
+                    .stub(win, "requirejs")
+                    .callsFake(function (modules, success, failure) {
+                        if (modules.includes("utils/performanceTracker")) {
+                            callbacks = { success, failure };
+                            return;
+                        }
+                        return loadModule.apply(this, arguments);
+                    });
+                win.DEBUG_PERFORMANCE = true;
+                observed.logo.boxes = { suffix: 0 };
+                observed.logo.runLogoCommands();
+                expect(callbacks).to.be.an("object");
+                observed.logo.doStopTurtles();
+                callbacks[outcome]();
+                expect(observed.trace.decodes).to.have.length(0);
+                expect(observed.trace.dispatch).to.have.length(0);
+                expect(observed.logo.stopTurtle).to.equal(true);
+                win.DEBUG_PERFORMANCE = false;
+            });
+        });
+    }
 
     for (const options of [{}, { nested: true }, { mid: true }]) {
         it("holds cold startup and plays exactly once: " + JSON.stringify(options), () => {
@@ -391,6 +832,7 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
                     observed.logo.boxes.suffix,
                     JSON.stringify({ trace: observed.trace, errors: observed.errors.args })
                 ).to.equal(1);
+                if (options.nested) expect(observed.logo.boxes.outerSuffix).to.equal(1);
                 expect(observed.trace.attacks).to.have.length(3);
                 expect(observed.trace.pcm).to.have.length(3);
             });
@@ -611,7 +1053,8 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
         "unused valid",
         "unused undecodable",
         "unused budget failure",
-        "opaque"
+        "opaque",
+        "invalid"
     ]) {
         it("respects conservative startup scope for " + candidate, () => {
             const unused = instrument();
@@ -621,6 +1064,7 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
             if (candidate === "unused budget failure")
                 unused.samples[0].data = recording(200, 3, 640);
             if (candidate === "opaque") unused.version = 99;
+            if (candidate === "invalid") unused.samples = [];
             load({ unused: [unused] });
             cy.window().then(async win => {
                 await win.Tone.start();
@@ -653,7 +1097,9 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
                     expect(observed.synth.multisampleBytes).to.equal(0);
                 } else {
                     expect(observed.logo.boxes.suffix).to.equal(1);
-                    expect(observed.trace.decodes).to.have.length(candidate === "opaque" ? 2 : 4);
+                    expect(observed.trace.decodes).to.have.length(
+                        ["opaque", "invalid"].includes(candidate) ? 2 : 4
+                    );
                 }
             });
         });
