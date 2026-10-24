@@ -378,6 +378,7 @@ class BlockDragController {
         }
 
         // Record position changes for undo/redo
+        let move = null;
         if (blocks.dragStartX !== undefined && blocks.dragStartY !== undefined) {
             const myBlock = blocks.blockList[thisBlock];
             if (myBlock && myBlock.container) {
@@ -386,14 +387,20 @@ class BlockDragController {
                     myBlock.container.y !== blocks.dragStartY
                 ) {
                     if (!blocks.isUndoingOrRedoing) {
-                        blocks.actionHistory.push({
+                        move = {
                             type: "move",
                             blockId: thisBlock,
                             oldX: blocks.dragStartX,
                             oldY: blocks.dragStartY,
                             newX: myBlock.container.x,
-                            newY: myBlock.container.y
-                        });
+                            newY: myBlock.container.y,
+                            from: blocks.dockOf(myBlock),
+                            bottom:
+                                myBlock.docks[0][2] === "out"
+                                    ? blocks.findBottomBlock(thisBlock)
+                                    : null
+                        };
+                        blocks.actionHistory.push(move);
                         blocks.redoActionHistory = [];
                     }
                 }
@@ -845,6 +852,9 @@ class BlockDragController {
                     }
                 } else if (myBlock.isArgBlock()) {
                     blocks.blockList[connection].connections[0] = null;
+                    if (move) {
+                        move.displaced = connection;
+                    }
 
                     /** If we are replacing an arg block, put certain default blocks in the trash */
                     if (
@@ -857,7 +867,7 @@ class BlockDragController {
                             "text"
                         ].includes(blocks.blockList[connection].name)
                     ) {
-                        blocks.sendStackToTrash(blocks.blockList[connection]);
+                        blocks.sendStackToTrash(blocks.blockList[connection], move === null);
                     } else {
                         this.findDragGroup(connection);
                         for (let c = 0; c < blocks.dragGroup.length; c++) {
@@ -1139,6 +1149,9 @@ class BlockDragController {
         blocks.isBlockMoving = false;
         blocks.adjustExpandableClampBlock();
         blocks.activity.refreshCanvas();
+        if (move) {
+            move.to = blocks.dockOf(myBlock);
+        }
 
         if (blocks.activity.turtles.running()) {
             blocks.activity.logo.doStopTurtles();

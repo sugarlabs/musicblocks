@@ -7534,6 +7534,85 @@ class Blocks {
         };
 
         /**
+         * Where a block is docked: its parent and the connection it uses there.
+         * @param {Block} myBlock
+         * @public
+         * @returns {{parent: number|null, slot: number|null}}
+         */
+        this.dockOf = myBlock => {
+            const parent = myBlock.connections[0];
+            return {
+                parent,
+                slot:
+                    parent === null
+                        ? null
+                        : this.blockList[parent].connections.indexOf(myBlock.blockIndex)
+            };
+        };
+
+        /**
+         * Take the stack running from blk down to bottom out of the stack it
+         * is docked in. The blocks below it close the gap, or filler takes
+         * its place when blk sits in an argument slot.
+         * @param {number} blk
+         * @param {number|null} bottom - null for argument blocks
+         * @param {number|null} filler
+         * @private
+         * @returns {void}
+         */
+        this._unlinkStack = (blk, bottom = null, filler = null) => {
+            const parent = this.blockList[blk].connections[0];
+            if (parent === null) {
+                return;
+            }
+
+            const container = this.insideExpandableBlock(blk);
+            const next = bottom === null ? filler : last(this.blockList[bottom].connections);
+            const connections = this.blockList[parent].connections;
+            connections[connections.indexOf(blk)] = next;
+            this.blockList[blk].connections[0] = null;
+            if (next !== null) {
+                this.blockList[next].connections[0] = parent;
+            }
+            if (bottom !== null) {
+                this.blockList[bottom].connections.splice(-1, 1, null);
+            }
+
+            this.addDefaultBlock(container, blk);
+            for (let clamp = container; clamp !== null; clamp = this.insideExpandableBlock(clamp)) {
+                this.clampBlocksToCheck.push([clamp, 0]);
+                if (this.blockList[clamp].name === "ifthenelse") {
+                    this.clampBlocksToCheck.push([clamp, 1]);
+                }
+            }
+            this.adjustExpandableClampBlock();
+            this.adjustDocks(this.findTopBlock(parent), true);
+        };
+
+        /**
+         * Dock a loose stack onto a connection, wherever that connection is now.
+         * @param {number} blk
+         * @param {{parent: number|null, slot: number|null}} dock
+         * @private
+         * @returns {boolean} false when there is nothing to dock onto
+         */
+        this._dockStack = (blk, { parent, slot } = {}) => {
+            const myBlock = this.blockList[blk];
+            const parentBlock = this.blockList[parent];
+            if (!parentBlock || parentBlock.trash || myBlock.trash) {
+                return false;
+            }
+
+            this.moveBlock(
+                blk,
+                parentBlock.container.x + parentBlock.docks[slot][0] - myBlock.docks[0][0],
+                parentBlock.container.y + parentBlock.docks[slot][1] - myBlock.docks[0][1]
+            );
+            this.blockMoved(blk);
+            return true;
+        };
+
+        /**
          * Send a stack of blocks to the trash.
          * @param - myBlock
          * @public
@@ -7549,11 +7628,18 @@ class Blocks {
             this.isUndoingOrRedoing = true;
 
             if (action.type === "move") {
-                this.moveBlock(action.blockId, action.oldX, action.oldY);
-                this.blockMoved(action.blockId);
+                const displaced = this.blockList[action.displaced];
+                if (displaced && displaced.trash) {
+                    this.activity._restoreTrashById(action.displaced);
+                }
+                this._unlinkStack(action.blockId, action.bottom, action.displaced);
+                if (!this._dockStack(action.blockId, action.from)) {
+                    this.moveBlock(action.blockId, action.oldX, action.oldY);
+                }
                 this.activity.refreshCanvas();
             } else if (action.type === "trash") {
                 this.activity._restoreTrashById(action.blockId);
+                this._dockStack(action.blockId, action.from);
             } else if (action.type === "restore") {
                 const block = this.blockList[action.blockId];
                 if (block) this.sendStackToTrash(block);
@@ -7601,8 +7687,10 @@ class Blocks {
             this.isUndoingOrRedoing = true;
 
             if (action.type === "move") {
-                this.moveBlock(action.blockId, action.newX, action.newY);
-                this.blockMoved(action.blockId);
+                this._unlinkStack(action.blockId, action.bottom);
+                if (!this._dockStack(action.blockId, action.to)) {
+                    this.moveBlock(action.blockId, action.newX, action.newY);
+                }
                 this.activity.refreshCanvas();
             } else if (action.type === "trash") {
                 const block = this.blockList[action.blockId];
@@ -7636,7 +7724,7 @@ class Blocks {
             this.isUndoingOrRedoing = false;
         };
 
-        this.sendStackToTrash = myBlock => {
+        this.sendStackToTrash = (myBlock, addToHistory = true) => {
             /** First, hide the palettes as they may need updating. */
             for (const name of Object.keys(this.activity.palettes.dict)) {
                 this.activity.palettes.dict[name].hideMenu(true);
@@ -7654,8 +7742,12 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
-            if (!this.isUndoingOrRedoing) {
-                this.actionHistory.push({ type: "trash", blockId: thisBlock });
+            if (addToHistory && !this.isUndoingOrRedoing) {
+                this.actionHistory.push({
+                    type: "trash",
+                    blockId: thisBlock,
+                    from: this.dockOf(myBlock)
+                });
                 this.redoActionHistory = [];
             }
 

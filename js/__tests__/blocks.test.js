@@ -790,31 +790,221 @@ describe("Blocks Foundation", () => {
             blocks.moveBlock = jest.fn();
             blocks.blockMoved = jest.fn();
             blocks.activity.refreshCanvas = jest.fn();
+            blocks.blockList = [null, { trash: false, connections: [null] }];
 
-            // Push a fake move action
             blocks.actionHistory.push({
                 type: "move",
                 blockId: 1,
                 oldX: 10,
                 oldY: 20,
                 newX: 30,
-                newY: 40
+                newY: 40,
+                from: { parent: null, slot: null },
+                bottom: null,
+                to: { parent: null, slot: null }
             });
 
-            // Undo it
             blocks.undoAction();
             expect(blocks.moveBlock).toHaveBeenCalledWith(1, 10, 20);
-            expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            expect(blocks.blockMoved).not.toHaveBeenCalled();
             expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
             expect(blocks.redoActionHistory.length).toBe(1);
             expect(blocks.actionHistory.length).toBe(0);
 
-            // Redo it
             blocks.redoAction();
             expect(blocks.moveBlock).toHaveBeenCalledWith(1, 30, 40);
-            expect(blocks.blockMoved).toHaveBeenCalledWith(1); // 2nd time
             expect(blocks.actionHistory.length).toBe(1);
             expect(blocks.redoActionHistory.length).toBe(0);
+        });
+
+        describe("restoring connections", () => {
+            const flow = (x, y, connections) => ({
+                trash: false,
+                container: { x, y },
+                docks: [
+                    [0, 0, "out"],
+                    [0, 40, "in"]
+                ],
+                connections
+            });
+
+            let blocks;
+            beforeEach(() => {
+                blocks = new Blocks(mockActivity);
+                blocks.moveBlock = jest.fn();
+                blocks.blockMoved = jest.fn();
+                blocks.addDefaultBlock = jest.fn();
+                blocks.adjustDocks = jest.fn();
+                blocks.adjustExpandableClampBlock = jest.fn();
+                blocks.insideExpandableBlock = jest.fn(() => null);
+                blocks.findTopBlock = jest.fn(blk => blk);
+                blocks.activity.refreshCanvas = jest.fn();
+            });
+
+            it("gives a stack back the blocks that followed an insertion when it is undone", () => {
+                // a -> b was dragged from under 0 and dropped between 2 and 5
+                blocks.blockList = [
+                    flow(100, 100, [null, null]),
+                    flow(400, 100, [null, 2]),
+                    flow(400, 140, [1, 3]),
+                    flow(400, 180, [2, 4]),
+                    flow(400, 220, [3, 5]),
+                    flow(400, 260, [4, null])
+                ];
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 3,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 180,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 4,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                blocks.undoAction();
+
+                expect(blocks.blockList[2].connections).toEqual([1, 5]);
+                expect(blocks.blockList[5].connections[0]).toBe(2);
+                expect(blocks.blockList[3].connections[0]).toBeNull();
+                expect(blocks.blockList[4].connections[1]).toBeNull();
+                expect(blocks.adjustDocks).toHaveBeenCalledWith(2, true);
+                expect(blocks.moveBlock).toHaveBeenCalledWith(3, 100, 140);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(3);
+            });
+
+            it("docks a block moved back up its own stack onto where its old parent is now", () => {
+                // 3 was dragged from under 2 to under 0; undoing must follow 2 to y = 180
+                blocks.blockList = [
+                    flow(100, 100, [null, 3]),
+                    flow(100, 180, [3, 2]),
+                    flow(100, 220, [1, null]),
+                    flow(100, 140, [0, 1])
+                ];
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 3,
+                    oldX: 100,
+                    oldY: 180,
+                    newX: 100,
+                    newY: 140,
+                    from: { parent: 2, slot: 1 },
+                    bottom: 3,
+                    to: { parent: 0, slot: 1 }
+                });
+                blocks.moveBlock = jest.fn((blk, x, y) => {
+                    blocks.blockList[blk].container = { x, y };
+                });
+                blocks.adjustDocks = jest.fn(() => {
+                    blocks.blockList[1].container.y = 140;
+                    blocks.blockList[2].container.y = 180;
+                });
+
+                blocks.undoAction();
+
+                expect(blocks.blockList[0].connections).toEqual([null, 1]);
+                expect(blocks.blockList[1].connections[0]).toBe(0);
+                expect(blocks.moveBlock).toHaveBeenCalledWith(3, 100, 220);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(3);
+            });
+
+            it("puts a replaced argument back into its slot in one undo", () => {
+                const host = {
+                    trash: false,
+                    container: { x: 0, y: 0 },
+                    docks: [
+                        [0, 0, "numberout"],
+                        [20, 0, "numberin"]
+                    ],
+                    connections: [null, 1]
+                };
+                const dropped = { trash: false, connections: [0] };
+                const replaced = { trash: true, connections: [null] };
+                blocks.blockList = [host, dropped, replaced];
+                blocks.activity._restoreTrashById = jest.fn(blk => {
+                    blocks.blockList[blk].trash = false;
+                });
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 300,
+                    oldY: 50,
+                    newX: 20,
+                    newY: 0,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    displaced: 2,
+                    to: { parent: 0, slot: 1 }
+                });
+
+                blocks.undoAction();
+
+                expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(2);
+                expect(host.connections).toEqual([null, 2]);
+                expect(replaced.connections[0]).toBe(0);
+                expect(dropped.connections[0]).toBeNull();
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 300, 50);
+                expect(blocks.actionHistory).toEqual([]);
+            });
+
+            it("redocks a move onto where it was dropped when it is redone", () => {
+                blocks.blockList = [
+                    flow(100, 100, [null, 1]),
+                    flow(100, 140, [0, null]),
+                    flow(400, 100, [null, null])
+                ];
+                blocks.redoActionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 140,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 1,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                blocks.redoAction();
+
+                expect(blocks.blockList[0].connections).toEqual([null, null]);
+                expect(blocks.blockList[1].connections[0]).toBeNull();
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 400, 140);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            });
+
+            it("reconnects a stack restored by undoing its trash", () => {
+                blocks.blockList = [flow(100, 100, [null, null]), flow(100, 300, [null, null])];
+                blocks.activity._restoreTrashById = jest.fn();
+                blocks.actionHistory.push({
+                    type: "trash",
+                    blockId: 1,
+                    from: { parent: 0, slot: 1 }
+                });
+
+                blocks.undoAction();
+
+                expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(1);
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 100, 140);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            });
+
+            it("leaves a stack loose when undoing its trash fails to restore it", () => {
+                blocks.blockList = [flow(100, 100, [null, null]), flow(100, 300, [null, null])];
+                blocks.blockList[1].trash = true;
+                blocks.activity._restoreTrashById = jest.fn();
+                blocks.actionHistory.push({
+                    type: "trash",
+                    blockId: 1,
+                    from: { parent: 0, slot: 1 }
+                });
+
+                blocks.undoAction();
+
+                expect(blocks.moveBlock).not.toHaveBeenCalled();
+                expect(blocks.blockMoved).not.toHaveBeenCalled();
+            });
         });
 
         it("should successfully undo and redo a block trash", () => {
@@ -860,6 +1050,43 @@ describe("Blocks Foundation", () => {
             blocks.isUndoingOrRedoing = true;
             blocks.sendStackToTrash(mockBlock);
             expect(blocks.actionHistory.length).toBe(1); // Should not push again
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("records where a trashed stack was docked, unless told to stay out of the history", () => {
+            const blocks = new Blocks(mockActivity);
+            const flowBlock = {
+                protoblock: { style: "basic" },
+                isTwoArgBlock: () => false,
+                isArgBlock: () => false,
+                isArgClamp: () => false
+            };
+            const parent = { ...flowBlock, name: "start", connections: [null, 1, null] };
+            const mockBlock = {
+                ...flowBlock,
+                name: "dummy",
+                blockIndex: 1,
+                connections: [0],
+                hide: jest.fn()
+            };
+            blocks.blockList = [parent, mockBlock];
+            blocks.turtles = { turtleList: [] };
+            blocks.insideExpandableBlock = jest.fn(() => null);
+            blocks.addDefaultBlock = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory).toEqual([
+                { type: "trash", blockId: 1, from: { parent: 0, slot: 1 } }
+            ]);
+            expect(parent.connections[1]).toBeNull();
+
+            blocks.sendStackToTrash(mockBlock, false);
+            expect(blocks.actionHistory.length).toBe(1);
 
             document.getElementById = originalGetElementById;
         });
@@ -1013,6 +1240,7 @@ describe("Blocks Foundation", () => {
             const mockDiv = { style: { display: "block" } };
             const originalGetElementById = document.getElementById;
             document.getElementById = jest.fn().mockReturnValue(mockDiv);
+            blocks.blockList = [{ trash: false, connections: [null] }];
 
             blocks.actionHistory.push({
                 type: "move",
