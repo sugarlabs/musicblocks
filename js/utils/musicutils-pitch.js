@@ -58,6 +58,10 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
     var { getCurrentEDO, getTemperament, generateNoteNames, isTrueEDO, TEMPERAMENT } =
         MusicUtilsTemperament;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { clampNumber } = UtilsLogic;
 }
 
 /**
@@ -491,10 +495,6 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number") {
-        return Math.max(1, Math.min(Math.floor(arg), 9));
-    }
-
     const currentEDO = getCurrentEDO(temperament);
 
     // The relative octave for tritones are arbitrated as being in the
@@ -547,16 +547,13 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
         case "previous":
             return Math.max(changedCurrent - 1, 1);
         default: {
-            // A "number" passed as a string (e.g. "2") is a documented argument,
-            // but changedCurrent is always >= 1, so testing it for truthiness
-            // first made the numeric conversion unreachable and silently
-            // ignored the requested octave.
-            const parsed = typeof arg === "string" && arg.trim() !== "" ? Number(arg) : NaN;
-            if (!isNaN(parsed)) {
-                return Math.max(1, Math.min(Math.floor(parsed), 9));
-            }
-
-            return changedCurrent;
+            const num =
+                typeof arg === "number"
+                    ? arg
+                    : typeof arg === "string" && arg.trim() !== ""
+                      ? Number(arg)
+                      : NaN;
+            return clampNumber(Math.floor(num), 1, 9, changedCurrent);
         }
     }
 };
