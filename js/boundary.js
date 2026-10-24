@@ -26,9 +26,12 @@ class Boundary {
      */
     constructor(stage) {
         this._container = new createjs.Container();
+        this._highlightContainer = new createjs.Container();
         this._stage = stage;
         this._stage.addChild(this._container);
+        this._stage.addChild(this._highlightContainer);
         this._stage.setChildIndex(this._container, 0);
+        this._highlightContainer.visible = false;
     }
 
     // resizeEvent(scale) {};
@@ -53,6 +56,42 @@ class Boundary {
         if (this._container.children.length > 0) {
             this._container.removeChild(this._container.children[0]);
         }
+        this.clearBlockHighlights();
+    }
+
+    /**
+     * Shows outlines around the supplied block-stack rectangles.
+     * @param {Array<Object>} rectangles
+     * @returns {void}
+     */
+    showBlockHighlights(rectangles) {
+        this.clearBlockHighlights();
+
+        for (const rectangle of rectangles) {
+            const shape = new createjs.Shape();
+            shape.graphics
+                .setStrokeStyle(3)
+                .beginStroke("#e08080")
+                .drawRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+            this._highlightContainer.addChild(shape);
+        }
+
+        this._highlightContainer.visible = rectangles.length > 0;
+    }
+
+    /**
+     * Clears all block-stack outlines.
+     * @returns {void}
+     */
+    clearBlockHighlights() {
+        if (typeof this._highlightContainer.removeAllChildren === "function") {
+            this._highlightContainer.removeAllChildren();
+        } else {
+            while (this._highlightContainer.children.length > 0) {
+                this._highlightContainer.removeChild(this._highlightContainer.children[0]);
+            }
+        }
+        this._highlightContainer.visible = false;
     }
 
     /**

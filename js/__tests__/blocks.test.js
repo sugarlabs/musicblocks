@@ -17,6 +17,7 @@
 /* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
+const Boundary = require("../boundary");
 const ManagedTimer = require("../utils/ManagedTimer");
 
 // blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
@@ -420,7 +421,10 @@ describe("Boundary visibility", () => {
             turtles: {},
             boundary: {
                 hide: jest.fn(),
-                show: jest.fn()
+                show: jest.fn(),
+                showBlockHighlights: jest.fn(),
+                clearBlockHighlights: jest.fn(),
+                offScreen: Boundary.prototype.offScreen
             },
             macroDict: {},
             palettes: { dict: {}, show: jest.fn() },
@@ -444,12 +448,43 @@ describe("Boundary visibility", () => {
         blocks = new Blocks(mockActivity);
     });
 
-    it("shows the boundary when a top-level block is off-screen", () => {
+    it("shows the boundary when a block is off-screen", () => {
         blocks.blockList = [
             {
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn().mockReturnValue(true)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.boundary.show).toHaveBeenCalledTimes(1);
+        expect(mockActivity.boundary.hide).not.toHaveBeenCalled();
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
+    });
+
+    it("shows the boundary when a connected block crosses the viewport edge", () => {
+        mockActivity.boundary.x = 68;
+        mockActivity.boundary.y = 68;
+        mockActivity.boundary.dx = 732;
+        mockActivity.boundary.dy = 464;
+        const connectedBlockPosition = {
+            x: mockActivity.boundary.x + mockActivity.boundary.dx + 1,
+            y: 100
+        };
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                offScreen: jest.fn(() => false)
+            },
+            {
+                trash: false,
+                connections: [0],
+                container: connectedBlockPosition,
+                offScreen: boundary =>
+                    boundary.offScreen(connectedBlockPosition.x, connectedBlockPosition.y)
             }
         ];
 
