@@ -373,6 +373,45 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
     });
 
     // ── 3. Save a Moment Flow (Online & Offline) ────────────────────────────
+    describe("Repo name from the project name (_sanitizeRepoName)", () => {
+        test("keeps latin names as before", () => {
+            expect(gitDropdown._sanitizeRepoName("My Song!")).toBe("my-song");
+        });
+
+        test("drops accents instead of splitting the word", () => {
+            expect(gitDropdown._sanitizeRepoName("Canción")).toBe("cancion");
+            expect(gitDropdown._sanitizeRepoName("Café Crème")).toBe("cafe-creme");
+        });
+
+        test("gives non-latin names their own fallback even in the same millisecond", () => {
+            const now = jest.spyOn(Date, "now").mockReturnValue(1000);
+            const random = jest.spyOn(Math, "random");
+            random.mockReturnValueOnce(0.1).mockReturnValueOnce(0.2);
+
+            const first = gitDropdown._sanitizeRepoName("私の曲");
+            const second = gitDropdown._sanitizeRepoName("Мой проект");
+
+            expect(first).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(second).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(first).not.toBe(second);
+            now.mockRestore();
+            random.mockRestore();
+        });
+
+        test("never ends the fallback with a dash, even if Math.random returns 0", () => {
+            const random = jest.spyOn(Math, "random").mockReturnValue(0);
+            const name = gitDropdown._sanitizeRepoName("私の曲");
+            expect(name).toMatch(/^my-music-project-[a-z0-9]+-0000$/);
+            random.mockRestore();
+        });
+
+        test("never ends with a dash after cutting to 100 characters", () => {
+            const slug = gitDropdown._sanitizeRepoName("a".repeat(99) + " b");
+            expect(slug.length).toBeLessThanOrEqual(100);
+            expect(slug.endsWith("-")).toBe(false);
+        });
+    });
+
     describe("Save a Moment (_doCommit)", () => {
         test("commits to backend online and updates session hashes", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);

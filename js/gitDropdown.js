@@ -1674,13 +1674,22 @@ class GitDropdownUI {
     }
 
     _sanitizeRepoName(name) {
-        return (
-            name
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-+|-+$/g, "")
-                .substring(0, 100) || "my-music-project"
-        );
+        // NFKD splits an accented letter into the letter plus a combining mark,
+        // so "Canción" becomes "cancion" instead of "canci-n".
+        const slug = name
+            .normalize("NFKD")
+            .replace(/[̀-ͯ]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .substring(0, 100)
+            .replace(/^-+|-+$/g, "");
+        // A name with no latin letters or digits (Japanese, Hindi, Russian...)
+        // leaves nothing behind. Repo names are unique on the server, so give
+        // each one its own fallback instead of a single shared name. The random
+        // part keeps two names made in the same millisecond apart.
+        if (slug) return slug;
+        const random = Math.random().toString(36).slice(2, 6).padEnd(4, "0");
+        return "my-music-project-" + Date.now().toString(36) + "-" + random;
     }
 
     _prettifyRepoName(slug) {
