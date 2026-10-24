@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global globalActivity, JSInterface, last, ASTUtils, astring, deepClone */
+/* global globalActivity, JSInterface, last, ASTUtils, astring, deepClone, _ */
 
 /* exported JSGenerate */
 
@@ -47,6 +47,7 @@ class JSGenerate {
     static code = "";
     /** whether code generation has failed */
     static generateFailed = false;
+    static exportError = null;
 
     /**
      * Generates a tree representation of the "start" and "action" block stacks.
@@ -60,6 +61,7 @@ class JSGenerate {
         JSGenerate.startTrees = [];
         JSGenerate.actionTrees = [];
         JSGenerate.actionNames = [];
+        JSGenerate.exportError = null;
 
         globalActivity.blocks.findStacks();
 
@@ -126,6 +128,21 @@ class JSGenerate {
                     // ignore horizontal spacers
                     while (arg.name === "hspace") {
                         arg = globalActivity.blocks.blockList[arg.connections[1]];
+                    }
+
+                    if (arg.name === "multisample") {
+                        const name =
+                            typeof arg.value?.name === "string"
+                                ? arg.value.name
+                                : _("Multisample instrument");
+                        JSGenerate.exportError =
+                            _("JavaScript export does not support multisample instrument") +
+                            " “" +
+                            name +
+                            "” " +
+                            _("yet. Export the Music Blocks project instead.");
+                        args.push(null);
+                        continue;
                     }
 
                     if (arg.protoblock.style === "value") {
@@ -380,10 +397,16 @@ class JSGenerate {
      * @param {Object} activity - the Activity object
      * @param {Boolean} printStacksTree - whether to print the stacks tree in the browser console
      * @param {Boolean} printCode - whether to print the generated code in the browser console
-     * @returns {void}
+     * @returns {false|undefined} False when an unsupported instrument prevents export.
      */
     static run(printStacksTree, printCode) {
         JSGenerate.generateStacksTree();
+        if (JSGenerate.exportError) {
+            JSGenerate.generateFailed = true;
+            JSGenerate.code = "";
+            globalActivity.errorMsg(JSGenerate.exportError);
+            return false;
+        }
         if (printStacksTree) {
             console.log(
                 "\n   " + "%c STACK TREES ",

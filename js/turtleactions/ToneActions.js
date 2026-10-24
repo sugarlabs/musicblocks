@@ -53,6 +53,42 @@ const MAX_HARMONIC = 1222;
  */
 function setupToneActions(activity) {
     Singer.ToneActions = class {
+        /** Refuse an actual unsupported use before collecting data or selecting a voice. */
+        static rejectMultisampleCapture(instrument, turtle, blk, destination) {
+            const logo = activity.logo;
+            destination =
+                destination ||
+                [
+                    ["inMatrix", _("Phrase Maker")],
+                    ["inMusicKeyboard", _("Music Keyboard")],
+                    ["inSample", _("Sampler")],
+                    ["inRhythmRuler", _("Rhythm Ruler")],
+                    ["inTimbre", _("Timbre")]
+                ].find(([flag]) => logo[flag])?.[1];
+            if (!destination) return false;
+            const name =
+                instrument && typeof instrument === "object" && instrument.type === "multisample"
+                    ? typeof instrument.name === "string"
+                        ? instrument.name
+                        : _("Multisample instrument")
+                    : typeof instrument === "string"
+                      ? logo.synth.getMultisampleName(turtle, instrument)
+                      : null;
+            if (name === null || name === undefined) return false;
+            for (const capture of [...(logo.instrumentCaptures || [])].reverse()) capture.abort();
+            activity.errorMsg(
+                name +
+                    ": " +
+                    _("Multisample instruments are not supported in") +
+                    " " +
+                    destination +
+                    ".",
+                blk
+            );
+            logo.stopTurtle = true;
+            return true;
+        }
+
         /**
          * Selects a voice for the synthesizer.
          *
@@ -62,6 +98,7 @@ function setupToneActions(activity) {
          * @returns {false|undefined} False when multisample selection must abort.
          */
         static setTimbre(instrument, turtle, blk) {
+            if (Singer.ToneActions.rejectMultisampleCapture(instrument, turtle, blk)) return false;
             const tur = activity.turtles.ithTurtle(turtle);
 
             const multisample =
@@ -76,13 +113,6 @@ function setupToneActions(activity) {
                         typeof instrument.name === "string"
                             ? instrument.name
                             : _("Multisample instrument");
-                    if (activity.logo.inMatrix) {
-                        throw new Error(
-                            name +
-                                ": " +
-                                _("Multisample instruments cannot be captured in Phrase Maker yet.")
-                        );
-                    }
                     synth = activity.logo.synth.getPreparedMultisample(turtle, instrument);
                     if (!synth) {
                         throw new Error(

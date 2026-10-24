@@ -1038,6 +1038,7 @@ class Logo {
      * @returns {void}
      */
     clearTurtleListeners(preservePersistent = false) {
+        for (const capture of [...(this.instrumentCaptures || [])].reverse()) capture.abort();
         for (const turtle of this.turtles.turtleList) {
             if (turtle && turtle.listeners) {
                 for (const listenerName in turtle.listeners) {
@@ -1868,6 +1869,9 @@ class Logo {
             this.initTurtle(turtle);
         }
 
+        // Restore unfinished widget collections before resetting their run flags/data.
+        this.clearTurtleListeners();
+
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
         this.inLegoWidget = false;
@@ -1896,9 +1900,6 @@ class Logo {
         this.addingNotesToTuplet = {};
         this.modeBlock = null;
         this._meterBlock = null;
-
-        // Remove any listeners that might be still active.
-        this.clearTurtleListeners();
 
         // Init the graphic state.
         for (const turtle of Object.keys(this.turtles.turtleList)) {
