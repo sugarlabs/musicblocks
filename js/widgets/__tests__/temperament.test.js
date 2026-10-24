@@ -1017,6 +1017,95 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget.ratios[14]).toBeCloseTo(Math.pow(2, 14 / 15), 10);
         });
 
+        describe("keyboard pitch previews", () => {
+            let canvas;
+            let rows;
+            let ctx;
+
+            beforeEach(() => {
+                jest.useFakeTimers();
+                widget.pitchNumber = 3;
+                widget.powerBase = 2;
+                widget.cents = [0, 200, 400];
+                widget.ratios = [1, 1.125, 1.25];
+                widget.frequencies = [440, 495, 550];
+                widget.notes = [
+                    ["C", 4],
+                    ["D", 4],
+                    ["E", 4]
+                ];
+                widget._visualizerView();
+                canvas = widgetBody.querySelector("canvas");
+                rows = widgetBody.querySelectorAll("tbody tr");
+                ctx = canvas.getContext("2d");
+            });
+
+            afterEach(() => {
+                widget._clearWidgetTimers();
+                jest.useRealTimers();
+            });
+
+            test.each(["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"])(
+                "%s does not preview an empty temperament",
+                key => {
+                    widget.pitchNumber = 0;
+                    widget.frequencies = [];
+                    widget._visualizerView();
+                    const emptyCanvas = widgetBody.querySelector("canvas");
+                    ctx.clearRect.mockClear();
+                    mockActivity.logo.synth.trigger.mockClear();
+
+                    emptyCanvas.dispatchEvent(new KeyboardEvent("keydown", { key }));
+
+                    expect(mockActivity.logo.synth.trigger).not.toHaveBeenCalled();
+                    expect(ctx.clearRect).not.toHaveBeenCalled();
+                }
+            );
+
+            test.each([
+                ["ArrowRight", 2],
+                ["ArrowDown", 2],
+                ["ArrowLeft", 0],
+                ["ArrowUp", 0]
+            ])("%s previews and selects the pitch next to the mouse selection", (key, index) => {
+                rows[1].click();
+                ctx.fillText.mockClear();
+
+                canvas.dispatchEvent(new KeyboardEvent("keydown", { key }));
+                jest.advanceTimersByTime(200);
+
+                expect(mockActivity.logo.synth.trigger.mock.calls.at(-1)[1]).toBe(
+                    widget.frequencies[index]
+                );
+                expect(ctx.fillText).toHaveBeenLastCalledWith(
+                    expect.stringContaining(`${widget.frequencies[index]} Hz`),
+                    expect.any(Number),
+                    expect.any(Number)
+                );
+                expect(rows[2 - index].cells[0].style.backgroundColor).toContain(
+                    "--color-selector-selected"
+                );
+                expect(widget._vizToolbar.removePitchBtn.style.pointerEvents).toBe(
+                    index === 0 ? "none" : "auto"
+                );
+            });
+
+            test.each(["Enter", " "])("%s replays the mouse-selected pitch", key => {
+                rows[1].click();
+                canvas.dispatchEvent(new KeyboardEvent("keydown", { key }));
+
+                expect(mockActivity.logo.synth.trigger.mock.calls.at(-1)[1]).toBe(495);
+            });
+
+            test("ArrowLeft starts at the last pitch and ArrowRight wraps to the tonic", () => {
+                canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+                expect(mockActivity.logo.synth.trigger.mock.calls.at(-1)[1]).toBe(550);
+
+                canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+                expect(mockActivity.logo.synth.trigger.mock.calls.at(-1)[1]).toBe(440);
+            });
+        });
+
         describe("playAll", () => {
             const playedFrequencies = () =>
                 mockActivity.logo.synth.trigger.mock.calls.map(call => call[1]);
