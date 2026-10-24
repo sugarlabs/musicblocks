@@ -2696,4 +2696,174 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.chatLog.children.length).toBe(1);
         });
     });
+
+    describe("Edit tab", () => {
+        const before = JSON.stringify([[0, "start", 100, 100, [null, null, null]]]);
+        const fixed = [[0, "start", 100, 100, [null, 1, null]]];
+        const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+        let widget;
+        let activity;
+        let originalFetch;
+
+        beforeEach(() => {
+            originalFetch = global.fetch;
+            global.fetch = jest.fn();
+            activity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => before),
+                sendAllToTrash: jest.fn(),
+                blocks: { loadNewBlocks: jest.fn() }
+            };
+            widget = new AIDebuggerWidget();
+            widget.activity = activity;
+            widget.chatLog = document.createElement("div");
+            widget.widgetWindow = {};
+            widget._undoButton = document.createElement("div");
+            widget._undoButton.style.display = "none";
+            widget._consentGiven = true;
+            widget._lifecycle.mount();
+            widget.chatHistory = [
+                { type: "user", content: "It should play three times", timestamp: "" }
+            ];
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+        });
+
+        test("asks what to change when there is no request and no chat", () => {
+            widget.chatHistory = [];
+            widget._fixProject("");
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(widget.chatLog.textContent).toContain("Tell me what to change first");
+        });
+
+        test("sends a typed change as the prompt, not twice in the history", async () => {
+            widget.chatHistory = [];
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "Done.", project: fixed })
+            });
+
+            widget._fixProject("make it play three times");
+            await flushPromises();
+
+            const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+            expect(body.prompt).toBe("make it play three times");
+            expect(body.history).toEqual([]);
+            expect(widget.chatHistory[0]).toEqual(
+                expect.objectContaining({ type: "user", content: "make it play three times" })
+            );
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+        });
+
+        test("makes a new project and keeps the old one for Undo", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "I made **Drums**.", project: fixed })
+            });
+
+            widget._makeProject("a rock drum beat");
+            await flushPromises();
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://localhost:8000/make",
+                expect.objectContaining({
+                    body: JSON.stringify({ description: "a rock drum beat", code: before })
+                })
+            );
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+            expect(widget._projectBeforeFix).toBe(before);
+        });
+
+        test("asks what to make when the description is empty", () => {
+            widget._makeProject("  ");
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(widget.chatLog.textContent).toContain("Tell me what project to make");
+        });
+
+        test("loads the fixed project and keeps the old one for Undo", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "I changed repeat to 3.", project: fixed })
+            });
+
+            widget._fixProject();
+            await flushPromises();
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://localhost:8000/fix",
+                expect.objectContaining({
+                    body: expect.stringContaining("It should play three times")
+                })
+            );
+            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true, false);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+            expect(widget._projectBeforeFix).toBe(before);
+            expect(widget._undoButton.style.display).toBe("");
+            expect(widget.chatHistory[widget.chatHistory.length - 1].content).toBe(
+                "I changed repeat to 3."
+            );
+            expect(widget._isProcessing).toBe(false);
+
+            widget._undoFix();
+            expect(activity.blocks.loadNewBlocks).toHaveBeenLastCalledWith(JSON.parse(before));
+            expect(widget._projectBeforeFix).toBeNull();
+            expect(widget._undoButton.style.display).toBe("none");
+        });
+
+        test("block names in a reply light up the matching blocks on hover", () => {
+            const block = (name, label) => ({
+                name: name,
+                trash: false,
+                protoblock: { staticLabels: [label] },
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            });
+            activity.refreshCanvas = jest.fn();
+            activity.blocks.blockList = [
+                block("repeat", "repeat"),
+                block("settimbre", "set instrument"),
+                block("pitch", "pitch"),
+                { ...block("repeat", "repeat"), trash: true },
+                block("setmasterbpm2", "beats per minute"),
+                block("octave", "octave")
+            ];
+
+            expect(widget._blocksNamedBy("repeat 4")).toEqual([0]);
+            expect(widget._blocksNamedBy("set instrument guitar")).toEqual([1]);
+            expect(widget._blocksNamedBy("pitch name E, octave 5")).toEqual([2]);
+            expect(widget._blocksNamedBy("master beats per minute bpm 180")).toEqual([4]);
+            expect(widget._blocksNamedBy("forever")).toEqual([]);
+
+            const body = document.createElement("div");
+            body.innerHTML = "<p>Use <code>repeat 4</code> and <code>forever</code>.</p>";
+            widget._linkBlockNames(body);
+            const [linked, plain] = body.querySelectorAll("code");
+            expect(linked.classList.contains("ai-block-link")).toBe(true);
+            expect(plain.classList.contains("ai-block-link")).toBe(false);
+
+            linked.dispatchEvent(new Event("mouseenter"));
+            expect(activity.blocks.blockList[0].highlight).toHaveBeenCalled();
+            linked.dispatchEvent(new Event("mouseleave"));
+            expect(activity.blocks.blockList[0].unhighlight).toHaveBeenCalled();
+            expect(activity.blocks.blockList[3].highlight).not.toHaveBeenCalled();
+        });
+
+        test("shows the backend's error and leaves the project alone", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                json: async () => ({ error: "I can't change this project automatically." })
+            });
+
+            widget._fixProject();
+            await flushPromises();
+
+            expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(widget.chatLog.textContent).toContain(
+                "I can't change this project automatically."
+            );
+            expect(widget._projectBeforeFix).toBeNull();
+        });
+    });
 });
