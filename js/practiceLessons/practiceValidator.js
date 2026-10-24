@@ -493,6 +493,50 @@ const PracticeValidator = {
         return names;
     },
 
+    // How many times the start flow calls each action. Repeats multiply the counts of their body
+    // instead of being expanded, so a huge repeat count costs nothing.
+    getStartActionCounts(blockList) {
+        const startBlock = Object.values(blockList).find(
+            block => block?.name === "start" && !block.trash
+        );
+        if (!startBlock) return new Map();
+
+        return this.collectActionCounts(startBlock.connections?.[1], blockList, new Map(), 1);
+    },
+
+    collectActionCounts(startId, blockList, counts, multiplier) {
+        let currentId = this.unwrapHiddenFlow(startId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) break;
+
+            if (block.name === "nameddo") {
+                const actionName = block.overrideName || block.privateData || block.value;
+                if (actionName) {
+                    counts.set(actionName, (counts.get(actionName) || 0) + multiplier);
+                }
+            } else if (block.name === "repeat") {
+                const timesId = block.connections?.[1];
+                const times = Number(blockList[timesId]?.value) || 1;
+                // Same number of passes the expanded loop in extractPatternSequence would make.
+                const passes = Math.max(0, Math.ceil(times));
+                this.collectActionCounts(
+                    block.connections?.[2],
+                    blockList,
+                    counts,
+                    multiplier * passes
+                );
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return counts;
+    },
+
     hasChangedRhythmLength() {
         const blockList = this.getBlockList();
 
@@ -1103,11 +1147,12 @@ const PracticeValidator = {
     hasCreatedPhraseVariation() {
         const blockList = this.getBlockList();
         const phraseActions = this.getPhraseMakerActionNames(blockList);
-        const referencedActions = this.getStartActionReferences(blockList).filter(actionName =>
-            phraseActions.has(actionName)
-        );
+        let phraseCalls = 0;
+        this.getStartActionCounts(blockList).forEach((count, actionName) => {
+            if (phraseActions.has(actionName)) phraseCalls += count;
+        });
 
-        return phraseActions.size > 2 || referencedActions.length > 2;
+        return phraseActions.size > 2 || phraseCalls > 2;
     },
 
     actionContainsBlockNamed(actionBlock, blockList, names) {

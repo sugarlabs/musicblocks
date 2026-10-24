@@ -633,6 +633,44 @@ describe("PracticeValidator huge repeat counts", () => {
         );
         expect(PracticeValidator.validateTwoPartForm()).toBe(true);
     });
+
+    test("phrase calls after a huge repeat of another action are still counted", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "cn", "p1"] },
+            count: { name: "number", value: 2000, trash: false, connections: ["rep"] },
+            cn: { name: "nameddo", value: "N", trash: false, connections: ["rep", null] },
+            p1: { name: "nameddo", value: "P", trash: false, connections: ["rep", "p2"] },
+            p2: { name: "nameddo", value: "P", trash: false, connections: ["p1", "p3"] },
+            p3: { name: "nameddo", value: "P", trash: false, connections: ["p2", null] },
+            actN: { name: "action", trash: false, connections: [null, "actNname", "actNbody"] },
+            actNname: { name: "text", value: "N", trash: false, connections: ["actN"] },
+            actNbody: { name: "forward", trash: false, connections: ["actN", null] },
+            actP: { name: "action", trash: false, connections: [null, "actPname", "actPbody"] },
+            actPname: { name: "text", value: "P", trash: false, connections: ["actP"] },
+            actPbody: { name: "playdrum", trash: false, connections: ["actP", null] }
+        });
+
+        const counts = PracticeValidator.getStartActionCounts(PracticeValidator.getBlockList());
+        expect(counts.get("N")).toBe(2000);
+        expect(counts.get("P")).toBe(3);
+        expect(PracticeValidator.hasCreatedPhraseVariation()).toBe(true);
+    });
+
+    test("action counts multiply through nested repeats without expanding them", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "outer", null] },
+            outer: { name: "repeat", trash: false, connections: ["start", "n1", "inner", null] },
+            n1: { name: "number", value: HUGE, trash: false, connections: ["outer"] },
+            inner: { name: "repeat", trash: false, connections: ["outer", "n2", "c0", null] },
+            n2: { name: "number", value: 3, trash: false, connections: ["inner"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["inner", null] }
+        });
+
+        expect(
+            PracticeValidator.getStartActionCounts(PracticeValidator.getBlockList()).get("A")
+        ).toBe(HUGE * 3);
+    });
 });
 
 describe("PracticeValidator stored values", () => {
