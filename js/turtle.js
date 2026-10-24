@@ -19,7 +19,7 @@
 /*
    global
 
-   createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
+   createjs, DEFAULTVOLUME, importMembers, Painter, Singer,
    DEFAULTVOICE, retryWithBackoff, base64Encode
  */
 /* exported Turtle */
@@ -157,7 +157,12 @@ class Turtle {
     stopBlink() {
         // eslint-disable-next-line eqeqeq
         if (this._blinkTimeout != null || !this._blinkFinished) {
-            clearTimeout(this._blinkTimeout);
+            const timers = this._getTimerManager();
+            if (timers) {
+                timers.clearTimeout(this._blinkTimeout);
+            } else {
+                clearTimeout(this._blinkTimeout);
+            }
             this._blinkTimeout = null;
 
             this.container.visible = true;
@@ -167,31 +172,43 @@ class Turtle {
     }
 
     /**
-     * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
+     * Causes turtle to blink (hide briefly, then show again after 100 ms).
+     *
+     * A new blink cancels any blink still in progress, so an earlier blink's
+     * timer can never end a later blink early.
      */
-
-    async blink(duration, volume) {
+    blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.
         if ("CursorOver" + this.id in this.listeners || "CursorOut" + this.id in this.listeners)
             return;
-
-        this._blinkTimeout = null;
 
         // No time to blink for really short notes. (t = 1 / duration)
         if (duration > 16) {
             return;
         }
 
+        // Clears the pending timer (if any) and makes the turtle visible again.
         this.stopBlink();
         this._blinkFinished = false;
 
         this.container.visible = false;
         this.activity.refreshCanvas();
-        this._blinkTimeout = await delayExecution(100);
-        this._blinkFinished = true;
-        this.container.visible = true;
-        this.activity.refreshCanvas();
+        const restore = () => {
+            this._blinkTimeout = null;
+            this._blinkFinished = true;
+            this.container.visible = true;
+            this.activity.refreshCanvas();
+        };
+        const timers = this._getTimerManager();
+        this._blinkTimeout = timers ? timers.setTimeout(restore, 100) : setTimeout(restore, 100);
+    }
+
+    /**
+     * @returns {Object|null} The execution engine's ManagedTimer, if one is available.
+     */
+    _getTimerManager() {
+        return (this.activity && this.activity.logo && this.activity.logo._timerManager) || null;
     }
 
     /**
