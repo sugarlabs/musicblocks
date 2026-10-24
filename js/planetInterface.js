@@ -212,6 +212,7 @@ class PlanetInterface {
         /**
          * Initializes a new project with the provided name or a default name.
          * Resets project state and optionally clears and refreshes the workspace.
+         * Refreshes the browser title after project initialization succeeds.
          * @param {string} [name] - The name of the new project.
          * @param {boolean} [clearWorkspace=true] - Whether to clear the current workspace.
          */
@@ -225,7 +226,10 @@ class PlanetInterface {
                 this.activity.refreshCanvas();
             }
             this._resetTrashHistory();
-            return initialization;
+            return initialization.then(projectID => {
+                document.title = this.getCurrentProjectName();
+                return projectID;
+            });
         };
 
         /**
