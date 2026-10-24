@@ -98,7 +98,8 @@ class GitDropdownUI {
         }
     }
 
-    onSaveLocally() {
+    onSaveLocally(projectId = this._getProjectGitData()?.projectId) {
+        if (!this._isOpenProject(projectId)) return;
         try {
             const data = this.activity.prepareExport();
             if (data) {
@@ -145,9 +146,12 @@ class GitDropdownUI {
             : null;
     }
 
-    _projectKey(key) {
-        const gitData = this._getProjectGitData();
-        return gitData && gitData.projectId ? key + ":" + gitData.projectId : key;
+    _projectKey(key, projectId = this._getProjectGitData()?.projectId) {
+        return projectId ? key + ":" + projectId : key;
+    }
+
+    _isOpenProject(projectId) {
+        return this._getProjectGitData()?.projectId === projectId;
     }
 
     _getRepoName() {
@@ -393,7 +397,7 @@ class GitDropdownUI {
 
     async _doCreate(repoName, displayName, description) {
         const projectData = this._getProjectData();
-        const projectId = this._getProjectGitData()?.projectId || null;
+        const projectId = this._getProjectGitData()?.projectId;
         const fullDesc = description || `${displayName} — a Music Blocks project`;
 
         try {
@@ -443,7 +447,7 @@ class GitDropdownUI {
                     localStorage.setItem("mbGitRepoName", offlineRepo);
                     localStorage.setItem("mbGitHashedKey", "");
                     localStorage.setItem("mbGitDisplayName", (displayName || "").trim());
-                    this.onSaveLocally();
+                    this.onSaveLocally(projectId);
                     this._syncMenuState();
                     this._showToast(
                         "Got it! We will set up tracking when you are back online. ✔",
@@ -527,11 +531,13 @@ class GitDropdownUI {
             // Store the user-facing display name so the toolbar tooltip shows
             // "My project: Guitar Song" instead of the sanitised repo slug.
             localStorage.setItem("mbGitDisplayName", displayName);
-            localStorage.removeItem(this._projectKey("mbGitCurrentSha"));
-            localStorage.removeItem(this._projectKey("mbGitCurrentDraftId"));
-            this.onSaveLocally();
-            this._syncMenuState(savedRepoName);
-            this._prefetchCommits(savedRepoName); // Refresh cache for this new repo
+            localStorage.removeItem(this._projectKey("mbGitCurrentSha", projectId));
+            localStorage.removeItem(this._projectKey("mbGitCurrentDraftId", projectId));
+            this.onSaveLocally(projectId);
+            if (this._isOpenProject(projectId)) {
+                this._syncMenuState(savedRepoName);
+                this._prefetchCommits(savedRepoName); // Refresh cache for this new repo
+            }
 
             // Notify the planet iframe so it:
             //   1. Renames the local project to the user's chosen display name.
@@ -596,7 +602,7 @@ class GitDropdownUI {
                         localStorage.setItem("mbGitRepoName", result.repository);
                         localStorage.setItem("mbGitHashedKey", "");
                         localStorage.setItem("mbGitDisplayName", displayName);
-                        this.onSaveLocally();
+                        this.onSaveLocally(projectId);
                         this._syncMenuState();
                         this._showToast(
                             "Got it! We will set up tracking when you are back online. ✔",
@@ -699,9 +705,9 @@ class GitDropdownUI {
                 throw new Error(err.message || `HTTP ${res.status}`);
             }
 
-            this.onSaveLocally();
-            localStorage.removeItem(this._projectKey("mbGitCurrentSha"));
-            localStorage.removeItem(this._projectKey("mbGitCurrentDraftId"));
+            this.onSaveLocally(projectId);
+            localStorage.removeItem(this._projectKey("mbGitCurrentSha", projectId));
+            localStorage.removeItem(this._projectKey("mbGitCurrentDraftId", projectId));
             this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
         } catch (e) {
@@ -775,7 +781,7 @@ class GitDropdownUI {
         try {
             const result = await this._waitForMessage("MB_OFFLINE_COMMIT_RESULT");
             if (result.success) {
-                this.onSaveLocally();
+                this.onSaveLocally(projectId);
                 this._showToast("Saved offline ✔ — will sync when you reconnect.", "success");
             } else if (result.error === "OFFLINE_DRAFT_CAP_REACHED") {
                 this._showToast(

@@ -777,6 +777,54 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
         });
 
+        test("finishes a commit on its own project after a switch", async () => {
+            localStorage.setItem("mbGitCurrentSha:guitar", "riff-sha");
+            localStorage.setItem("mbGitCurrentSha:drums", "groove-sha");
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockImplementationOnce(async () => {
+                useProject({ ...guitar, projectId: "drums", repoName: "drum-beat" });
+                return { ok: true, status: 200, json: () => Promise.resolve({ success: true }) };
+            });
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Chorus");
+
+            expect(localStorage.getItem("mbGitCurrentSha:guitar")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentSha:drums")).toBe("groove-sha");
+            expect(localStorage.getItem("mbGitLastSavedHash:drums")).toBeNull();
+        });
+
+        test("does not show a new repo on a project opened while tracking started", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockImplementationOnce(async () => {
+                useProject(copy);
+                return {
+                    ok: true,
+                    status: 201,
+                    json: () => Promise.resolve({ repository: "guitar-song", key: "guitar-key" })
+                };
+            });
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockItemCommit.style.display).toBe("none");
+            expect(localStorage.getItem("mbGitLastSavedHash:copy")).toBeNull();
+        });
+
+        test("finishes an offline draft on its own project after a switch", async () => {
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            jest.spyOn(gitDropdown, "_waitForMessage").mockImplementation(async () => {
+                useProject(copy);
+                return { success: true };
+            });
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Offline snapshot");
+
+            expect(localStorage.getItem("mbGitLastSavedHash:copy")).toBeNull();
+        });
+
         test("Time Travel loads the history of the open project's repo", async () => {
             useProject(guitar);
             gitDropdown._prefetchCommits();
