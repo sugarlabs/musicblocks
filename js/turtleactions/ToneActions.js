@@ -20,7 +20,7 @@
    global
 
    _, Singer, VOICENAMES, MusicBlocks, Mouse, last, instrumentsEffects,
-   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE, safeNumber
+   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE, safeNumber, validateMultisample
 */
 
 /*
@@ -113,6 +113,18 @@ function setupToneActions(activity) {
                         typeof instrument.name === "string"
                             ? instrument.name
                             : _("Multisample instrument");
+                    if (
+                        activity.logo._exportingNotation ||
+                        tur.singer.suppressOutput ||
+                        tur.singer.justCounting?.length > 0
+                    ) {
+                        try {
+                            validateMultisample(instrument);
+                        } catch (error) {
+                            throw new Error(name + ": " + error.message);
+                        }
+                        return;
+                    }
                     synth = activity.logo.synth.getPreparedMultisample(turtle, instrument);
                     if (!synth) {
                         throw new Error(
