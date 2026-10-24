@@ -1238,7 +1238,7 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
     });
 });
 
-describe("Test 18: Cue notes", () => {
+describe("Test 19: Cue notes", () => {
     it("imports a cue note as a rest of the same length, since it isn't played", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
