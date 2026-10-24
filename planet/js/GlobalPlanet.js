@@ -431,7 +431,11 @@ class GlobalPlanet {
         if (this.oldSearchString !== "") this.afterSearch();
     }
 
+    // Both error screens end whatever list was loading. A search that ends here never
+    // reaches afterSearch(), so clear the flag too, or search() ignores every later
+    // query (and the clear button) until reload.
     throwOfflineError() {
+        this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
 
@@ -441,6 +445,7 @@ class GlobalPlanet {
     }
 
     throwNoProjectsError() {
+        this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
 
