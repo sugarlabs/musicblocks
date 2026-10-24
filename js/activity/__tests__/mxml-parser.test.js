@@ -22,7 +22,7 @@ function makeActivity() {
     const activity = {
         errorMsg: jest.fn(),
         blocks: {
-            loadNewBlocks: jest.fn()
+            loadNewBlocks: jest.fn(() => 42)
         }
     };
     setupActivityMxmlParser(activity);
@@ -148,6 +148,13 @@ describe("Test 1: A single pitched note", () => {
         const newnote = blocks.find(b => blockName(b) === "newnote");
         expect(newnote[4][0]).toBe(settimbre[0]);
         expect(settimbre[4][2]).toBe(newnote[0]);
+    });
+
+    it("returns loadNewBlocks's own token so callers can track this load's completion", async () => {
+        const activity = makeActivity();
+        const result = await activity.parseMXML(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
+
+        expect(result).toBe(activity.blocks.loadNewBlocks.mock.results[0].value);
     });
 });
 
@@ -428,18 +435,23 @@ describe("Test 8: Title and meter extraction", () => {
 describe("Test 9: Degenerate input guards", () => {
     it("reports an error and does not throw for unparseable XML", async () => {
         const activity = makeActivity();
-        await activity.parseMXML("not xml at all <<<");
+        const result = await activity.parseMXML("not xml at all <<<");
 
         expect(activity.errorMsg).toHaveBeenCalled();
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        // A null return tells project-manager.js's wiring that no block load
+        // was started, so it doesn't wait on a "finishedLoading" event that
+        // will never come.
+        expect(result).toBeNull();
     });
 
     it("reports an error when the file has no <part>", async () => {
         const activity = makeActivity();
-        await activity.parseMXML("<score-partwise></score-partwise>");
+        const result = await activity.parseMXML("<score-partwise></score-partwise>");
 
         expect(activity.errorMsg).toHaveBeenCalled();
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(result).toBeNull();
     });
 
     it("loads just the preamble, with settimbre's note dock left null, for a part with no notes", async () => {

@@ -781,8 +781,12 @@ const setupActivityMxmlParser = activityInstance => {
         // settimbre/voicename/hidden despite having lower ids).
         allBlocks.sort((a, b) => a[0] - b[0]);
 
-        this.blocks.loadNewBlocks(allBlocks);
-        return null;
+        // Returned so callers (js/project-manager.js) can tell this load's
+        // "finishedLoading"/"loadFailed" pubsub events apart from any other
+        // in-flight load -- loadNewBlocks() finishes asynchronously, so a
+        // null return (the early-exit paths above) is the only way to tell
+        // "never started a load" apart from "started one".
+        return this.blocks.loadNewBlocks(allBlocks);
     };
 };
 
