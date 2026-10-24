@@ -1184,7 +1184,7 @@ describe("PracticeValidator piano discoveries", () => {
         expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
     });
 
-    test("the older set name block names a key too", () => {
+    test("the deprecated set name block, which can rename another mouse, is not counted", () => {
         useBlocks({
             ...piano(["sol"]),
             "k1": { name: "start", trash: false, connections: [null, "k1-name", null] },
@@ -1197,7 +1197,7 @@ describe("PracticeValidator piano discoveries", () => {
             "k1-text": { name: "text", value: "mi", trash: false, connections: ["k1-name"] }
         });
 
-        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(true);
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
     });
 
     test("the avatar and drum badges reuse the criteria earlier lessons already had", () => {

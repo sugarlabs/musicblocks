@@ -42,11 +42,9 @@ const LOOP_BODY_CONNECTION = new Map([
     ["repeat", 2],
     ["forever", 1]
 ]);
-// Each block that names a mouse holds the new name in its own connection slot.
-const MOUSE_NAME_CONNECTION = new Map([
-    ["setturtlename", 2],
-    ["setturtlename2", 1]
-]);
+// The set name block holds the new name in this connection slot. The older, deprecated
+// setturtlename block is left out: it can rename a different mouse than its own.
+const MOUSE_NAME_CONNECTION = new Map([["setturtlename2", 1]]);
 // A ring passes the beat once the conductor has two mice to call.
 const RING_MOUSE_MINIMUM = 3;
 // A polygon closes whichever way the child turns, so both turn blocks count.
