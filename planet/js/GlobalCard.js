@@ -354,7 +354,11 @@ class GlobalCard {
             // GitServerInterface.likeProject uses repoName (this.id) directly
             Planet.ServerInterface.likeProject(this.id, like, data => {
                 this.likePending = false;
-                if (!data.success) {
+                if (data.success && Number.isFinite(data.likes)) {
+                    this.ProjectData.ProjectLikes = data.likes;
+                    const currentLikes = document.getElementById(`global-project-likes-${this.id}`);
+                    if (currentLikes) currentLikes.textContent = data.likes.toString();
+                } else if (!data.success) {
                     // Roll back optimistic update on failure
                     if (document.getElementById(`global-project-likes-${this.id}`)) {
                         this.setLike(!like);
