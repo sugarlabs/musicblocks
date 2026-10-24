@@ -1656,8 +1656,8 @@ class Logo {
      *     builds the named-action table by scanning `blocks.stackList`.
      *
      *   Phase 2 — Dispatch: kicks off execution by calling `runFromBlock` for
-     *     each start/drum/status/oscilloscope block found on the canvas.
-     *     Status and oscilloscope blocks run first (with a 250 ms head-start so
+     *     each start/drum/status/oscilloscope/harmony block found on the canvas.
+     *     Status, oscilloscope and harmony blocks run first (with a 250 ms head-start so
      *     they can display their widgets before music begins); all other start
      *     blocks follow together in a single guarded timeout.
      *
@@ -1877,7 +1877,7 @@ class Logo {
         const stackListLength = this.blocks.stackList.length;
         for (let blk = 0; blk < stackListLength; blk++) {
             if (
-                ["start", "drum", "status", "oscilloscope"].includes(
+                ["start", "drum", "status", "oscilloscope", "harmony"].includes(
                     this.blockList[this.blocks.stackList[blk]].name
                 )
             ) {
@@ -1963,10 +1963,12 @@ class Logo {
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
             const startBlocksLength = startBlocks.length;
-            // Look for status and oscilloscope blocks.
+            // Look for status, oscilloscope and harmony blocks.
             for (let b = 0; b < startBlocksLength; b++) {
                 if (
-                    ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
+                    ["status", "oscilloscope", "harmony"].includes(
+                        this.blockList[startBlocks[b]].name
+                    ) &&
                     !this.blockList[startBlocks[b]].trash
                 ) {
                     const turtle = 0;
@@ -1986,7 +1988,7 @@ class Logo {
             this._timerManager.setGuardedTimeout(
                 () => {
                     if (delayStart !== 0) {
-                        // Launching status/oscilloscope block would have hidden the
+                        // Launching status/oscilloscope/harmony block would have hidden the
                         // Stop Button so show it again.
                         this.onRunTurtle();
                     }
@@ -1994,7 +1996,7 @@ class Logo {
                     // If there are multiple start blocks, run them all.
                     for (let b = 0; b < startBlocksLength; b++) {
                         if (
-                            !["status", "oscilloscope"].includes(
+                            !["status", "oscilloscope", "harmony"].includes(
                                 this.blockList[startBlocks[b]].name
                             )
                         ) {
