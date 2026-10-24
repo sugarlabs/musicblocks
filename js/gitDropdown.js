@@ -130,10 +130,6 @@ class GitDropdownUI {
             localStorage.removeItem("mbGitHashedKey");
             localStorage.removeItem("mbGitDisplayName");
         }
-        // Reset the current-SHA so the history panel marks the latest commit
-        // as current whenever we switch to a different project.
-        localStorage.removeItem("mbGitCurrentSha");
-        localStorage.removeItem("mbGitCurrentDraftId");
         this._syncMenuState();
         if (repoName) {
             // Reset and restart the prefetch for the new project.
@@ -147,6 +143,11 @@ class GitDropdownUI {
         return planet && typeof planet.getCurrentGitRepoData === "function"
             ? planet.getCurrentGitRepoData()
             : null;
+    }
+
+    _projectKey(key) {
+        const gitData = this._getProjectGitData();
+        return gitData && gitData.projectId ? key + ":" + gitData.projectId : key;
     }
 
     _getRepoName() {
@@ -177,10 +178,10 @@ class GitDropdownUI {
         return gitData ? gitData.hashedKey : localStorage.getItem("mbGitHashedKey") || "";
     }
     _getLastSavedHash() {
-        return localStorage.getItem("mbGitLastSavedHash") || "";
+        return localStorage.getItem(this._projectKey("mbGitLastSavedHash")) || "";
     }
     _setLastSavedHash(h) {
-        localStorage.setItem("mbGitLastSavedHash", h);
+        localStorage.setItem(this._projectKey("mbGitLastSavedHash"), h);
     }
 
     // ─── Connectivity detection ───────────────────────────────────────────────
@@ -230,8 +231,7 @@ class GitDropdownUI {
         });
     }
 
-    _prefetchCommits() {
-        const repoName = this._getRepoName();
+    _prefetchCommits(repoName = this._getRepoName()) {
         if (!repoName || typeof fetch !== "function") return;
 
         this._prefetchRepo = repoName;
@@ -256,8 +256,8 @@ class GitDropdownUI {
             });
     }
 
-    _syncMenuState() {
-        const hasRepo = !!this._getRepoName();
+    _syncMenuState(repoName = this._getRepoName()) {
+        const hasRepo = !!repoName;
         const itemCreate = document.getElementById("git-item-create");
         const itemCommit = document.getElementById("git-item-commit");
         const itemHistory = document.getElementById("git-item-history");
@@ -527,11 +527,11 @@ class GitDropdownUI {
             // Store the user-facing display name so the toolbar tooltip shows
             // "My project: Guitar Song" instead of the sanitised repo slug.
             localStorage.setItem("mbGitDisplayName", displayName);
-            localStorage.removeItem("mbGitCurrentSha");
-            localStorage.removeItem("mbGitCurrentDraftId");
+            localStorage.removeItem(this._projectKey("mbGitCurrentSha"));
+            localStorage.removeItem(this._projectKey("mbGitCurrentDraftId"));
             this.onSaveLocally();
-            this._syncMenuState();
-            this._prefetchCommits(); // Refresh cache for this new repo
+            this._syncMenuState(savedRepoName);
+            this._prefetchCommits(savedRepoName); // Refresh cache for this new repo
 
             // Notify the planet iframe so it:
             //   1. Renames the local project to the user's chosen display name.
@@ -700,8 +700,8 @@ class GitDropdownUI {
             }
 
             this.onSaveLocally();
-            localStorage.removeItem("mbGitCurrentSha");
-            localStorage.removeItem("mbGitCurrentDraftId");
+            localStorage.removeItem(this._projectKey("mbGitCurrentSha"));
+            localStorage.removeItem(this._projectKey("mbGitCurrentDraftId"));
             this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
         } catch (e) {
@@ -1022,8 +1022,8 @@ class GitDropdownUI {
               ? originTarget.sha
               : originTarget;
 
-        const currentSha = localStorage.getItem("mbGitCurrentSha");
-        const currentDraftId = localStorage.getItem("mbGitCurrentDraftId");
+        const currentSha = localStorage.getItem(this._projectKey("mbGitCurrentSha"));
+        const currentDraftId = localStorage.getItem(this._projectKey("mbGitCurrentDraftId"));
 
         // Separate counter for non-now icon/colour assignment
         // so that each commit's icon stays stable regardless of which commit is "now".
@@ -1596,15 +1596,15 @@ class GitDropdownUI {
 
             if (draftId) {
                 // Pending offline draft — track by draftId, clear any SHA
-                localStorage.setItem("mbGitCurrentDraftId", draftId);
-                localStorage.removeItem("mbGitCurrentSha");
+                localStorage.setItem(this._projectKey("mbGitCurrentDraftId"), draftId);
+                localStorage.removeItem(this._projectKey("mbGitCurrentSha"));
             } else if (sha) {
                 // Live GitHub commit — track by SHA, clear any draftId
-                localStorage.setItem("mbGitCurrentSha", sha);
-                localStorage.removeItem("mbGitCurrentDraftId");
+                localStorage.setItem(this._projectKey("mbGitCurrentSha"), sha);
+                localStorage.removeItem(this._projectKey("mbGitCurrentDraftId"));
             } else {
-                localStorage.removeItem("mbGitCurrentSha");
-                localStorage.removeItem("mbGitCurrentDraftId");
+                localStorage.removeItem(this._projectKey("mbGitCurrentSha"));
+                localStorage.removeItem(this._projectKey("mbGitCurrentDraftId"));
             }
 
             const displayLabel = /add (metadata|metaData|projectdata|projectData)\.json/i.test(

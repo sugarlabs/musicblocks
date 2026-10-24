@@ -258,6 +258,11 @@ describe("PlanetInterface", () => {
             planetInterface.planet = null;
             expect(planetInterface.getCurrentGitRepoData()).toBeNull();
         });
+
+        test("returns null while the project table is not loaded", () => {
+            useProjects("guitar", undefined);
+            expect(planetInterface.getCurrentGitRepoData()).toBeNull();
+        });
     });
 
     test("initialiseNewProject should reset project state", () => {
