@@ -433,8 +433,10 @@ describe("Theme Switching & Inline Styles Purity", () => {
             "utf8"
         );
 
-        expect(windowsCss).not.toMatch(
-            /#floatingWindows\s*>\s*\.windowFrame\s*\{[^}]*top:\s*0\s*!important;/
+        const strippedWindowsCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
+
+        expect(strippedWindowsCss).not.toMatch(
+            /[^{}]*\.windowFrame\s*\{[^}]*\btop:\s*0\s*!important;/
         );
     });
 
