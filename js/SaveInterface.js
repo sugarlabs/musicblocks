@@ -608,10 +608,11 @@ class SaveInterface {
             activity.canvas.height,
             1.0
         );
-        // A "#" starts the fragment of a URL, so the file would stop at the
-        // first colour like fill="#ffffff" unless it is encoded.
-        const dataurl = "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-        activity.save.download("svg", dataurl, filename || null);
+        // Use a Blob, not a data URL: there the first "#" (a colour like
+        // fill="#ffffff") starts the fragment and cuts the file off.
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, filename || null);
     }
 
     /**
@@ -636,8 +637,11 @@ class SaveInterface {
      * @instance
      */
     saveBlockArtwork(activity) {
-        const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
-        activity.save.download("svg", svg, null);
+        // printBlockSVG() returns the inside of the SVG URI-encoded.
+        const svg = decodeURIComponent(activity.printBlockSVG());
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, null);
     }
 
     /**

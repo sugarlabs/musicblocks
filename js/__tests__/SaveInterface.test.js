@@ -943,12 +943,21 @@ describe("save artwork methods", () => {
     let instance;
     const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };
 
+    // jsdom's Blob has no text(), so read it back with a FileReader.
+    const readBlob = blob =>
+        new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsText(blob);
+        });
+
     beforeEach(() => {
         instance = new SaveInterface(mockActivity);
         document.body.innerHTML = `
             <canvas id="overlayCanvas"></canvas>
         `;
         docById.mockImplementation(id => document.getElementById(id));
+        global.URL.createObjectURL = jest.fn(() => "blob:mock-svg");
     });
 
     afterEach(() => {
@@ -977,14 +986,11 @@ describe("save artwork methods", () => {
             activity.canvas.height,
             1.0
         );
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8," + encodeURIComponent("<svg>Mock SVG</svg>"),
-            null
-        );
+        expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", null);
     });
 
-    it("should keep the whole SVG when it has '#' colours", () => {
+    it("should keep the whole SVG when it has '#' colours", async () => {
         const svgData =
             '<svg><rect fill="#ffffff"/><text fill="#ff0031">C#</text>' +
             '<path d="M 0,0 10,10 " /></svg>';
@@ -999,10 +1005,9 @@ describe("save artwork methods", () => {
         };
 
         instance.saveSVG(activity);
-        const dataurl = mockDownload.mock.calls[0][1];
-        const url = new URL(dataurl);
-        expect(url.hash).toBe("");
-        expect(decodeURIComponent(url.pathname.replace("image/svg+xml;utf8,", ""))).toBe(svgData);
+        const blob = URL.createObjectURL.mock.calls[0][0];
+        expect(blob.type).toBe("image/svg+xml;charset=utf-8");
+        expect(await readBlob(blob)).toBe(svgData);
     });
 
     it("should save the SVG under a given file name", () => {
@@ -1017,11 +1022,7 @@ describe("save artwork methods", () => {
         };
 
         instance.saveSVG(activity, "drawing.svg");
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8," + encodeURIComponent("<svg>Mock SVG</svg>"),
-            "drawing.svg"
-        );
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", "drawing.svg");
     });
 
     it("should call toDataURL and download the PNG file", () => {
@@ -1038,8 +1039,10 @@ describe("save artwork methods", () => {
         expect(mockDownload).toHaveBeenCalledWith("png", "data:image/png;base64,mockdata", null);
     });
 
-    it("should call printBlockSVG and download the SVG file", () => {
-        const mockPrintBlockSVG = jest.fn(() => "<svg>Mock SVG</svg>");
+    it("should call printBlockSVG and download the SVG file", async () => {
+        const mockPrintBlockSVG = jest.fn(
+            () => "<svg>" + encodeURIComponent('<rect fill="#ffffff"/></svg>')
+        );
         const activity = {
             save: {
                 download: mockDownload
@@ -1049,11 +1052,9 @@ describe("save artwork methods", () => {
         instance.saveBlockArtwork(activity);
 
         expect(mockPrintBlockSVG).toHaveBeenCalled();
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            null
-        );
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", null);
+        const blob = URL.createObjectURL.mock.calls[0][0];
+        expect(await readBlob(blob)).toBe('<svg><rect fill="#ffffff"/></svg>');
     });
 
     it("should call printBlockPNG and download the PNG file", async () => {
