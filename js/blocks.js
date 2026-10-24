@@ -1025,6 +1025,30 @@ class Blocks {
                     }
                 }
 
+                // Clean up any legacy or orphaned vspace blocks below a two-arg flow block
+                if (isTwoArgFlow) {
+                    while (true) {
+                        const lastConnIdx = myBlock.connections.length - 1;
+                        const nextBlkIdx = myBlock.connections[lastConnIdx];
+                        const nextBlk = this.blockList[nextBlkIdx];
+                        if (nextBlk && nextBlk.name === "vspace") {
+                            const afterVspace = nextBlk.connections[1];
+                            myBlock.connections[lastConnIdx] = afterVspace;
+                            if (afterVspace !== null && this.blockList[afterVspace]) {
+                                this.blockList[afterVspace].connections[0] = blk;
+                            }
+                            nextBlk.connections = [null, null];
+                            nextBlk.trash = true;
+                            if (typeof nextBlk.hide === "function") {
+                                nextBlk.hide();
+                            }
+                            updated = true;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
                 if (updated) {
                     this.adjustDocks(blk, true);
                 }
@@ -1039,6 +1063,12 @@ class Blocks {
          */
         this._addRemoveVspaceBlock = blk => {
             const myBlock = this.blockList[blk];
+            if (!myBlock) return;
+
+            // Two-arg flow blocks (e.g., setxy) size their own artwork and do not use vspace blocks
+            if (typeof myBlock.isTwoArgBlock === "function" && myBlock.isTwoArgBlock()) {
+                return;
+            }
 
             const c = myBlock.connections[myBlock.connections.length - 2];
             let secondArgumentSize = 1;

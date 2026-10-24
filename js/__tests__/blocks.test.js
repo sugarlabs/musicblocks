@@ -5350,6 +5350,65 @@ describe("sendStackToTrash – turtle container guard", () => {
             expect(setxyBlock.clampCount[0]).toBe(4);
             expect(setxyBlock.size).toBe(5);
         });
+
+        it("removes legacy vspace blocks below setxy when adjusting two-arg flow block", () => {
+            const vspaceBlock = {
+                name: "vspace",
+                trash: false,
+                connections: [0, 4],
+                hide: jest.fn()
+            };
+            const pendownBlock = {
+                name: "pendown",
+                trash: false,
+                connections: [3, null]
+            };
+            setxyBlock.connections[3] = 3;
+            blocksInstance.blockList[3] = vspaceBlock;
+            blocksInstance.blockList[4] = pendownBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.connections[3]).toBe(4);
+            expect(pendownBlock.connections[0]).toBe(0);
+            expect(vspaceBlock.trash).toBe(true);
+            expect(vspaceBlock.connections).toEqual([null, null]);
+            expect(vspaceBlock.hide).toHaveBeenCalled();
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("removes legacy vspace blocks and contracts when compound second argument is disconnected", () => {
+            const vspaceBlock = {
+                name: "vspace",
+                trash: false,
+                connections: [0, 4],
+                hide: jest.fn()
+            };
+            const pendownBlock = {
+                name: "pendown",
+                trash: false,
+                connections: [3, null]
+            };
+            setxyBlock.clampCount = [1, 2];
+            setxyBlock.connections = [null, null, null, 3];
+            blocksInstance.blockList[3] = vspaceBlock;
+            blocksInstance.blockList[4] = pendownBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, -1);
+            expect(setxyBlock.clampCount[1]).toBe(1);
+            expect(setxyBlock.connections[3]).toBe(4);
+            expect(pendownBlock.connections[0]).toBe(0);
+            expect(vspaceBlock.trash).toBe(true);
+        });
+
+        it("ignores two-arg flow blocks in _addRemoveVspaceBlock", () => {
+            const vspaceAdjusterSpy = jest.spyOn(blocksInstance, "_makeNewBlockWithConnections");
+            setxyBlock.connections = [null, 1, 2, null];
+            blocksInstance._addRemoveVspaceBlock(0);
+            expect(vspaceAdjusterSpy).not.toHaveBeenCalled();
+        });
     });
 
     describe("insideExpandableBlock", () => {
