@@ -251,6 +251,56 @@ describe("transcribeMidi", () => {
         expect(drumNames).toEqual(["kick drum", "snare drum"]);
     });
 
+    const drumTrack = notes => ({
+        header: mockMidi.header,
+        tracks: [{ instrument: { name: "drums", percussion: true }, channel: 9, notes }]
+    });
+    const blockNamed = (blocks, name) =>
+        blocks.filter(block => (Array.isArray(block[1]) ? block[1][0] : block[1]) === name);
+
+    it("should play every drum struck together, not just the first", async () => {
+        await transcribeMidi(
+            drumTrack([
+                { name: "C2", midi: 36, time: 0, duration: 0.5 },
+                { name: "D2", midi: 38, time: 0, duration: 0.5 },
+                { name: "C2", midi: 36, time: 0.5, duration: 0.5 }
+            ])
+        );
+
+        const blocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(blockNamed(blocks, "drumname").map(block => block[1][1].value)).toEqual([
+            "kick drum",
+            "snare drum",
+            "kick drum"
+        ]);
+        expect(blockNamed(blocks, "newnote")).toHaveLength(2);
+
+        // The two hits share one note: the kick's playdrum hangs off the note's
+        // vspace and the snare's off the kick, both ways round.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const [kick, snare] = blockNamed(blocks, "playdrum");
+        expect(byId.get(kick[4][0])[1]).toBe("vspace");
+        expect(kick[4][2]).toBe(snare[0]);
+        expect(snare[4][0]).toBe(kick[0]);
+        expect(snare[4][2]).toBeNull();
+    });
+
+    it("should not strike a drum again while it is still sounding", async () => {
+        await transcribeMidi(
+            drumTrack([
+                { name: "C2", midi: 36, time: 0, duration: 0.5 },
+                { name: "D2", midi: 38, time: 0, duration: 0.25 }
+            ])
+        );
+
+        const blocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(blockNamed(blocks, "drumname").map(block => block[1][1].value)).toEqual([
+            "kick drum",
+            "snare drum"
+        ]);
+        expect(blockNamed(blocks, "rest2")).toHaveLength(1);
+    });
+
     it("should preserve a leading rest before a note", async () => {
         const delayedNoteMidi = {
             header: mockMidi.header,
