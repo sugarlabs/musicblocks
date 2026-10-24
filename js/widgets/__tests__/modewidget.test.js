@@ -46,6 +46,7 @@ global.last = arr => arr[arr.length - 1];
 // Mock utils
 global.docById = jest.fn().mockImplementation(id => ({
     style: {},
+    classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
     innerHTML: "",
     append: jest.fn(),
     appendChild: jest.fn(),
@@ -56,6 +57,7 @@ global.docById = jest.fn().mockImplementation(id => ({
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
             innerHTML: "",
             appendChild: jest.fn(),
             append: jest.fn()
@@ -260,6 +262,7 @@ if (typeof document === "undefined") {
 }
 document.createElement = jest.fn().mockImplementation(tag => ({
     style: {},
+    classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
     setAttribute: jest.fn(),
     innerHTML: "",
     append: jest.fn(),
@@ -277,6 +280,7 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn() },
             innerHTML: ""
         })
     }),
