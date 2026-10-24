@@ -979,9 +979,30 @@ describe("save artwork methods", () => {
         );
         expect(mockDownload).toHaveBeenCalledWith(
             "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
+            "data:image/svg+xml;utf8," + encodeURIComponent("<svg>Mock SVG</svg>"),
             null
         );
+    });
+
+    it("should keep the whole SVG when it has '#' colours", () => {
+        const svgData =
+            '<svg><rect fill="#ffffff"/><text fill="#ff0031">C#</text>' +
+            '<path d="M 0,0 10,10 " /></svg>';
+        global.doSVG = jest.fn(() => svgData);
+        const activity = {
+            save: {
+                download: mockDownload
+            },
+            canvas: { width: 500, height: 500 },
+            logo: "mockLogo",
+            turtles: "mockTurtles"
+        };
+
+        instance.saveSVG(activity);
+        const dataurl = mockDownload.mock.calls[0][1];
+        const url = new URL(dataurl);
+        expect(url.hash).toBe("");
+        expect(decodeURIComponent(url.pathname.replace("image/svg+xml;utf8,", ""))).toBe(svgData);
     });
 
     it("should save the SVG under a given file name", () => {
@@ -998,7 +1019,7 @@ describe("save artwork methods", () => {
         instance.saveSVG(activity, "drawing.svg");
         expect(mockDownload).toHaveBeenCalledWith(
             "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
+            "data:image/svg+xml;utf8," + encodeURIComponent("<svg>Mock SVG</svg>"),
             "drawing.svg"
         );
     });

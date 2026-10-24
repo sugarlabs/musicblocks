@@ -600,17 +600,18 @@ class SaveInterface {
      * @instance
      */
     saveSVG(activity, filename) {
-        const svg =
-            "data:image/svg+xml;utf8," +
-            doSVG(
-                activity.canvas,
-                activity.logo,
-                activity.turtles,
-                activity.canvas.width,
-                activity.canvas.height,
-                1.0
-            );
-        activity.save.download("svg", svg, filename || null);
+        const svg = doSVG(
+            activity.canvas,
+            activity.logo,
+            activity.turtles,
+            activity.canvas.width,
+            activity.canvas.height,
+            1.0
+        );
+        // A "#" starts the fragment of a URL, so the file would stop at the
+        // first colour like fill="#ffffff" unless it is encoded.
+        const dataurl = "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+        activity.save.download("svg", dataurl, filename || null);
     }
 
     /**
