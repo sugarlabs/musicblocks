@@ -1,0 +1,277 @@
+name: Track PR Push Activity
+
+# Records human code pushes for stale detection.
+# Fork pushes do not emit a push event on this repository, and pull_request
+# runs from forks are read-only. pull_request_target runs the workflow from
+# the default branch with permission to update the state branch.
+# This job never checks out a repository and never runs pull request code.
+# It only reads event metadata and writes pr-push-state.json.
+
+on:
+    push:
+        branches:
+            - "**"
+    pull_request_target:
+        types: [opened, synchronize]
+
+permissions:
+    contents: write
+    pull-requests: read
+
+concurrency:
+    group: pr-push-state
+    cancel-in-progress: false
+
+jobs:
+    track:
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Record human push activity
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      function parseTime(value) {
+                        if (typeof value !== "string" || value.length === 0) return null;
+                        const time = Date.parse(value);
+                        return Number.isFinite(time) ? time : null;
+                      }
+
+                      function humanActor(actor, sender) {
+                        if (!sender || typeof sender !== "object") return null;
+                        const login = typeof sender.login === "string" ? sender.login.trim() : "";
+                        const type = typeof sender.type === "string" ? sender.type.trim() : "";
+                        if (!login || type !== "User") return null;
+                        if (login.includes("[bot]")) return null;
+
+                        const actorLogin = typeof actor === "string" ? actor.trim() : "";
+                        if (actorLogin && actorLogin.toLowerCase() !== login.toLowerCase()) return null;
+                        return login;
+                      }
+
+                      function branchFromRef(ref) {
+                        const prefix = "refs/heads/";
+                        if (typeof ref !== "string" || !ref.startsWith(prefix)) return null;
+                        const branch = ref.slice(prefix.length);
+                        return branch.length > 0 ? branch : null;
+                      }
+
+                      function openPullRequest(pr) {
+                        if (!pr || !Number.isFinite(pr.number) || pr.state !== "open") return null;
+                        return pr;
+                      }
+
+                      function pullNumber(payload) {
+                        if (!payload || typeof payload !== "object") return null;
+                        if (payload.pull_request && Number.isFinite(payload.pull_request.number)) {
+                          return payload.pull_request.number;
+                        }
+                        if (Number.isFinite(payload.number)) return payload.number;
+                        return null;
+                      }
+
+                      function prsForBranch(openPrs, owner, repo, branch) {
+                        if (!owner || !repo || !branch || !Array.isArray(openPrs)) return [];
+                        const fullName = `${owner}/${repo}`;
+                        return openPrs.filter(pr => {
+                          const head = pr && pr.head;
+                          const headRepo = head && head.repo && head.repo.full_name;
+                          if (typeof headRepo !== "string" || headRepo.length === 0) return false;
+                          return headRepo === fullName && head.ref === branch;
+                        });
+                      }
+
+                      function newerPush(existing, pushedAt) {
+                        const next = parseTime(pushedAt);
+                        if (next === null) return false;
+                        const previous = parseTime(existing && existing.pushedAt);
+                        if (previous === null) return true;
+                        return next >= previous;
+                      }
+
+                      function pushRecord(pr, pushedAt, actor, sha) {
+                        const head = (pr && pr.head) || {};
+                        const headRepo =
+                          head.repo &&
+                          typeof head.repo.full_name === "string" &&
+                          head.repo.full_name.length > 0
+                            ? head.repo.full_name
+                            : null;
+                        const eventSha = typeof sha === "string" && sha.length > 0 ? sha : null;
+                        const headSha = typeof head.sha === "string" && head.sha.length > 0 ? head.sha : null;
+                        return {
+                          pushedAt,
+                          sha: eventSha || headSha,
+                          actor: actor || null,
+                          branch: typeof head.ref === "string" && head.ref.length > 0 ? head.ref : null,
+                          headRepo
+                        };
+                      }
+
+                      function decodeState(data) {
+                        if (!data || Array.isArray(data) || typeof data.content !== "string") {
+                          throw new Error("Activity state file is missing or is not a file.");
+                        }
+                        let parsed;
+                        try {
+                          parsed = JSON.parse(Buffer.from(data.content, "base64").toString("utf8"));
+                        } catch (err) {
+                          throw new Error("Activity state file is not valid JSON.");
+                        }
+                        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+                          throw new Error("Activity state file is not a JSON object.");
+                        }
+                        return parsed;
+                      }
+
+                      async function run() {
+                        const owner = context.repo.owner;
+                        const repo = context.repo.repo;
+                        const payload = context.payload || {};
+                        const actor = humanActor(context.actor, payload.sender);
+
+                        if (!actor) {
+                          core.info("Actor is missing, not a user, or ambiguous; not recording activity.");
+                          return;
+                        }
+
+                        let matching = [];
+
+                        if (context.eventName === "pull_request_target") {
+                          const fromPayload = openPullRequest(payload.pull_request);
+                          if (fromPayload) {
+                            matching = [fromPayload];
+                          } else {
+                            const number = pullNumber(payload);
+                            if (!number) {
+                              core.info("Pull request event is missing pull request metadata; skipping.");
+                              return;
+                            }
+                            try {
+                              const response = await github.rest.pulls.get({
+                                owner,
+                                repo,
+                                pull_number: number
+                              });
+                              const fetched = openPullRequest(response.data);
+                              if (!fetched) return;
+                              matching = [fetched];
+                            } catch (err) {
+                              core.warning(`Could not load PR #${number}: ${err.message}`);
+                              return;
+                            }
+                          }
+                        } else if (context.eventName === "push") {
+                          if (payload.deleted || !context.sha) {
+                            core.info("Ignoring branch deletion or push without a SHA.");
+                            return;
+                          }
+                          const branch = branchFromRef(context.ref);
+                          if (!branch) {
+                            core.info("Push ref is missing or is not a branch; skipping.");
+                            return;
+                          }
+                          const prs = await github.paginate(github.rest.pulls.list, {
+                            owner,
+                            repo,
+                            state: "open",
+                            per_page: 100
+                          });
+                          matching = prsForBranch(prs, owner, repo, branch);
+                        } else {
+                          core.info(`Ignoring unsupported event: ${context.eventName}`);
+                          return;
+                        }
+
+                        if (matching.length === 0) {
+                          core.info("No matching open PR found for this push.");
+                          return;
+                        }
+
+                        const stateBranch = "automation/pr-push-state";
+                        const statePath = "pr-push-state.json";
+                        const pushedAt = new Date().toISOString();
+                        const eventSha = context.eventName === "push" ? context.sha : null;
+                        const branchRef = `heads/${stateBranch}`;
+                        const maxAttempts = 3;
+
+                        try {
+                          await github.rest.git.getRef({ owner, repo, ref: branchRef });
+                        } catch (refError) {
+                          if (refError.status !== 404) throw refError;
+                          core.info(`Branch ${stateBranch} does not exist. Creating it from the default branch.`);
+                          const repoInfo = await github.rest.repos.get({ owner, repo });
+                          const defaultBranch = repoInfo.data.default_branch || "master";
+                          const defaultRef = await github.rest.git.getRef({
+                            owner,
+                            repo,
+                            ref: `heads/${defaultBranch}`
+                          });
+                          await github.rest.git.createRef({
+                            owner,
+                            repo,
+                            ref: `refs/${branchRef}`,
+                            sha: defaultRef.data.object.sha
+                          });
+                        }
+
+                        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                          let state = {};
+                          let fileSha = null;
+
+                          try {
+                            const response = await github.rest.repos.getContent({
+                              owner,
+                              repo,
+                              path: statePath,
+                              ref: stateBranch
+                            });
+                            state = decodeState(response.data);
+                            fileSha = response.data.sha;
+                          } catch (error) {
+                            if (error.status !== 404) {
+                              core.setFailed(error.message);
+                              return;
+                            }
+                            core.info("pr-push-state.json not found. Initializing new state object.");
+                          }
+
+                          let updated = false;
+                          for (const pr of matching) {
+                            const key = String(pr.number);
+                            if (!newerPush(state[key], pushedAt)) continue;
+                            state[key] = pushRecord(pr, pushedAt, actor, eventSha);
+                            core.info(`Recorded push for PR #${pr.number} by ${actor} at ${pushedAt}.`);
+                            updated = true;
+                          }
+
+                          if (!updated) {
+                            core.info("No state updates needed.");
+                            return;
+                          }
+
+                          const params = {
+                            owner,
+                            repo,
+                            path: statePath,
+                            message: "chore: update PR push activity state",
+                            content: Buffer.from(JSON.stringify(state, null, 2) + "\n").toString("base64"),
+                            branch: stateBranch
+                          };
+                          if (fileSha) params.sha = fileSha;
+
+                          try {
+                            await github.rest.repos.createOrUpdateFileContents(params);
+                            return;
+                          } catch (error) {
+                            const conflict = error.status === 409 || error.status === 422;
+                            if (!conflict || attempt === maxAttempts) throw error;
+                            core.warning(
+                              `State file changed while updating; retrying (${attempt} of ${maxAttempts}).`
+                            );
+                          }
+                        }
+                      }
+
+                      await run();
