@@ -662,6 +662,20 @@ describe("setupToneBlocks", () => {
     });
 
     describe("SetTimbreBlock", () => {
+        it("aborts before child flow or specialized capture when selection refuses", () => {
+            logo.inSample = true;
+            logo.sample = { sampleName: "kept", sampleData: "audio", timbreBlock: 12 };
+            Singer.ToneActions.setTimbre.mockReturnValueOnce(false);
+            expect(getBlock("settimbre").flow([{ type: "multisample" }, 88], logo, 0, 9)).toEqual([
+                null,
+                0
+            ]);
+            expect(logo.sample).toEqual({
+                sampleName: "kept",
+                sampleData: "audio",
+                timbreBlock: 12
+            });
+        });
         it("should error if argument is null", () => {
             const setTimbre = getBlock("settimbre");
             setTimbre.flow([null, 66], logo, 0, "setTimbreBlk");
