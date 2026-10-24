@@ -14,7 +14,7 @@ const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
 
 /* global
 
-   _, docById, getMacroExpansion, HELPCONTENT,
+   _, docById, getMacroExpansion, HELPCONTENT, FirstProjectTutorial,
 */
 /*
      Globals locations
@@ -35,14 +35,19 @@ class HelpWidget {
 
     /**
      * @param {Activity} activity
+     * @param {boolean} useActiveBlock - Show help for the active block
+     * @param {object} [customCard] - Optional custom card to show instead of the pages
+     * @param {string} [blockHelpName] - Optional block name to show help for
+     * @param {number} [startPage] - Optional starting page index (0-indexed)
      */
-    constructor(activity, useActiveBlock, customCard, blockHelpName) {
+    constructor(activity, useActiveBlock, customCard, blockHelpName, startPage = 0) {
         this.activity = activity;
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
+        this.startPage = startPage;
         this._keydownHandler = null;
         this._usesCustomCard = !!customCard || !!blockHelpName;
         this._standaloneBlockHelp = false;
@@ -91,7 +96,7 @@ class HelpWidget {
             } else if (customCard) {
                 this._setupCustomCard(customCard);
             } else {
-                this._setup(useActiveBlock, 0);
+                this._setup(useActiveBlock, this.startPage);
             }
         });
 
@@ -120,6 +125,56 @@ class HelpWidget {
      */
     static showBlockHelp(activity, blockName) {
         return new HelpWidget(activity, false, null, blockName);
+    }
+
+    /**
+     * Static method to get the index of the Interface Tour card
+     * @returns {number} The index of the tour card
+     */
+    static getFirstProjectTutorialIndex() {
+        if (typeof HELPCONTENT !== "undefined") {
+            for (let i = 0; i < HELPCONTENT.length; i++) {
+                const title = HELPCONTENT[i][0];
+                if (
+                    title.includes("Interface Tour") ||
+                    title.includes("Build Your First Project") ||
+                    title.includes("First Project")
+                ) {
+                    return i;
+                }
+            }
+        }
+        // Default fallback - the tour card is typically at position 3
+        return 3;
+    }
+
+    /**
+     * Static method to open help widget directly at the Interface Tour card
+     * @param {Activity} activity
+     */
+    static openFirstProjectTutorial(activity) {
+        const tutorialIndex = HelpWidget.getFirstProjectTutorialIndex();
+        return new HelpWidget(activity, false, null, null, tutorialIndex);
+    }
+
+    /**
+     * Whether a help page is the Interface Tour launcher card.
+     * @private
+     * @param {string} pageTitle
+     * @returns {boolean}
+     */
+    static _isInterfaceTourCard(pageTitle) {
+        if (!pageTitle) {
+            return false;
+        }
+        const lower = pageTitle.toLowerCase();
+        return (
+            pageTitle.includes("Interface Tour") ||
+            pageTitle.includes("Build Your First Project") ||
+            pageTitle.includes("First Project") ||
+            lower.includes("interface tour") ||
+            lower.includes("build your first")
+        );
     }
 
     /**
@@ -508,6 +563,10 @@ class HelpWidget {
         leftArrow.classList.toggle("disabled", page === 0);
         leftArrow.setAttribute("aria-disabled", page === 0 ? "true" : "false");
 
+        // Check if this is the Interface Tour launcher card
+        const pageTitle = HELPCONTENT[page][0];
+        const isInterfaceTour = HelpWidget._isInterfaceTourCard(pageTitle);
+
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
         const imageP = document.createElement("p");
@@ -564,7 +623,35 @@ class HelpWidget {
             bodyFragment.append(linkParagraph);
         }
 
-        if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
+        // Add Start Tour and Skip buttons for the Interface Tour card
+        if (isInterfaceTour) {
+            const buttonContainer = document.createElement("div");
+            buttonContainer.id = "tutorial-buttons-container";
+            buttonContainer.style.cssText =
+                "display: flex; flex-direction: row; gap: 12px; margin-top: 20px; " +
+                "justify-content: center;";
+
+            const startBtn = document.createElement("button");
+            startBtn.id = "start-tutorial-btn";
+            startBtn.type = "button";
+            startBtn.textContent = "▶ " + _("Start Tour");
+            startBtn.style.cssText =
+                "padding: 12px 24px; background: #4CAF50; color: white; border: none; " +
+                "border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;";
+
+            const skipBtn = document.createElement("button");
+            skipBtn.id = "skip-tutorial-btn";
+            skipBtn.type = "button";
+            skipBtn.textContent = _("Skip") + " →";
+            skipBtn.style.cssText =
+                "padding: 12px 24px; background: #e0e0e0; color: #505050; border: none; " +
+                "border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;";
+
+            buttonContainer.append(startBtn, skipBtn);
+            bodyFragment.append(buttonContainer);
+        }
+
+        if ([_("Congratulations."), _("Congratulations!")].includes(HELPCONTENT[page][0])) {
             const cell = docById("right-arrow");
 
             cell.onclick = () => {
@@ -605,6 +692,36 @@ class HelpWidget {
         }
 
         helpBody.append(bodyFragment);
+
+        // Setup tour button handlers if on Interface Tour page
+        if (isInterfaceTour) {
+            const startBtn = docById("start-tutorial-btn");
+            const skipBtn = docById("skip-tutorial-btn");
+
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    this.widgetWindow.close();
+
+                    if (typeof FirstProjectTutorial !== "undefined") {
+                        const tutorial = new FirstProjectTutorial(this.activity);
+                        tutorial.start();
+                    } else {
+                        console.error("FirstProjectTutorial is not loaded");
+                    }
+                };
+            }
+
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    page = page + 1;
+                    if (page >= HELPCONTENT.length) {
+                        page = 0;
+                    }
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                    this._showPage(page);
+                };
+            }
+        }
 
         this.widgetWindow.takeFocus();
     }
@@ -797,14 +914,16 @@ class HelpWidget {
      * @returns {boolean}
      */
     _isLargeTourImage(title) {
-        return [
-            _("Welcome to Music Blocks"),
-            _("Meet Mr. Mouse!"),
-            _("Guide"),
-            _("About"),
-            _("Congratulations."),
-            _("Congratulations!")
-        ].includes(title);
+        return (
+            [
+                _("Welcome to Music Blocks"),
+                _("Meet Mr. Mouse!"),
+                _("Guide"),
+                _("About"),
+                _("Congratulations."),
+                _("Congratulations!")
+            ].includes(title) || HelpWidget._isInterfaceTourCard(title)
+        );
     }
 
     /**
