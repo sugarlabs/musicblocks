@@ -85,7 +85,6 @@ class ContextMenuController {
             event => {
                 event.preventDefault();
                 event.stopPropagation();
-                if (activity.beginnerMode) return;
                 if (activity.searchUI.isHelpfulSearchWidgetOn) {
                     this._hideHelpfulSearchWidget();
                 }
@@ -360,6 +359,14 @@ class ContextMenuController {
                 fn: piemenuGrid
             });
 
+        if (!activity.helpfulWheelItems.find(ele => ele.label === "Clean"))
+            activity.helpfulWheelItems.push({
+                label: "Clean",
+                icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)),
+                display: true,
+                fn: activity.findBlocks
+            });
+
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Select"))
             activity.helpfulWheelItems.push({
                 label: "Select",
@@ -388,7 +395,7 @@ class ContextMenuController {
             activity.helpfulWheelItems.push({
                 label: "Clear",
                 icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)),
-                display: true,
+                display: false,
                 fn: () => activity._allClear(false)
             });
 
@@ -424,14 +431,6 @@ class ContextMenuController {
                 display: false,
                 fn: activity.turtles.expand
             });
-        if (!activity.helpfulWheelItems.find(ele => ele.label === "Close"))
-            activity.helpfulWheelItems.push({
-                label: "Close",
-                icon: "imgsrc:header-icons/cancel-button.svg",
-                display: true,
-                fn: this._hideHelpfulSearchWidget.bind(this)
-            });
-
         // Initialize tooltips after all bottom-toolbar buttons have been appended.
         if (!(activity.toolbar && activity.toolbar.tooltipsDisabled)) {
             window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip({
