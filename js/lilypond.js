@@ -154,6 +154,38 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     const staged = logo.notation.notationStaging[turtle];
     const lastRepeat = staged.lastIndexOf("begin repeat");
     const repeatStart = staged.slice(lastRepeat + 1).some(Array.isArray) ? lastRepeat : -1;
+    // Lilypond cannot end a slur or hairpin on the note it starts on ("cannot end
+    // slur", "unterminated slur"), so one that covers fewer than two notes is left
+    // out: both its begin and its end marker are skipped.
+    const skippedSpanners = new Set();
+    const openSpanners = { slur: [], crescendo: [], decrescendo: [] };
+    let notesStaged = 0;
+    for (let s = 0; s < staged.length; s++) {
+        const entry = staged[s];
+        if (Array.isArray(entry)) {
+            notesStaged++;
+            continue;
+        }
+        if (entry === "markup" || entry === "markdown") {
+            s++; // The text that follows is not a marker.
+            continue;
+        }
+        const match =
+            typeof entry === "string" && entry.match(/^(begin|end) (slur|crescendo|decrescendo)$/);
+        if (!match) {
+            continue;
+        }
+        const [, edge, kind] = match;
+        if (edge === "begin") {
+            openSpanners[kind].push({ index: s, notesBefore: notesStaged });
+        } else if (openSpanners[kind].length > 0) {
+            const begin = openSpanners[kind].pop();
+            if (notesStaged - begin.notesBefore < 2) {
+                skippedSpanners.add(begin.index);
+                skippedSpanners.add(s);
+            }
+        }
+    }
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
@@ -245,7 +277,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         while (
             ["end slur", "end crescendo", "end decrescendo", "markup", "markdown"].includes(nextObj)
         ) {
-            if (nextObj === "end slur") {
+            if (skippedSpanners.has(i + j)) {
+                j += 1; // Its begin marker was skipped too.
+            } else if (nextObj === "end slur") {
                 logo.notationNotes[turtle] += ")  ";
                 j += 1;
             } else if (nextObj === "end crescendo" || nextObj === "end decrescendo") {
@@ -274,6 +308,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     };
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
+        if (skippedSpanners.has(i)) {
+            continue;
+        }
         let obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
