@@ -1339,6 +1339,43 @@ describe("Utility Functions (logic-only)", () => {
             delete global.TEMPERAMENT[customEdoName];
             Synth.inTemperament = originalInTemp;
         });
+
+        it("should scale octave frequencies with dynamic octaveRatio for stretched EDO", () => {
+            const stretchedEdoName = "stretched12EDO";
+            global.TEMPERAMENT[stretchedEdoName] = {
+                isEDO: true,
+                pitchNumber: 12,
+                octaveRatio: 2.01
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = stretchedEdoName;
+
+            const a4 = _getFrequency("A4", false, stretchedEdoName);
+            const a5 = _getFrequency("A5", false, stretchedEdoName);
+            expect(a5 / a4).toBeCloseTo(2.01, 5);
+
+            delete global.TEMPERAMENT[stretchedEdoName];
+            Synth.inTemperament = originalInTemp;
+        });
+
+        it("should scale non-EDO octave frequencies with getEffectiveOctaveRatio", () => {
+            const stretchedJiName = "stretchedJI";
+            global.TEMPERAMENT[stretchedJiName] = {
+                ...global.TEMPERAMENT["just intonation"],
+                octaveRatio: 2.02
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = stretchedJiName;
+            Synth.temperamentChanged(stretchedJiName, "C4");
+
+            const c4 = _getFrequency("C4", false, stretchedJiName);
+            const c5 = _getFrequency("C5", false, stretchedJiName);
+            expect(c5 / c4).toBeCloseTo(2.02, 5);
+
+            delete global.TEMPERAMENT[stretchedJiName];
+            Synth.inTemperament = originalInTemp;
+            Synth.temperamentChanged("equal", "C4");
+        });
     });
     describe("getCustomFrequency", () => {
         it("it should return the custom frequency or frequencies.", () => {
@@ -4060,5 +4097,137 @@ describe("DRUMNAMES Lilypond symbols", () => {
     it("leaves the snare drum and the hi hat alone", () => {
         expect(symbolFor("snare drum")).toBe("sn");
         expect(symbolFor("hi hat")).toBe("hh");
+    });
+
+    it("registers all 11 Sonic Pi drum samples with correct metadata and symbols", () => {
+        const expectedDrums = [
+            {
+                name: "heavy kick",
+                symbol: "bd",
+                category: "drum",
+                global: "HEAVY_KICK_SAMPLE",
+                file: "heavy_kick"
+            },
+            {
+                name: "snare hard",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_HARD_SAMPLE",
+                file: "snare_hard"
+            },
+            {
+                name: "snare soft",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_SOFT_SAMPLE",
+                file: "snare_soft"
+            },
+            {
+                name: "snare roll",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_ROLL_SAMPLE",
+                file: "snare_roll"
+            },
+            {
+                name: "tom mid",
+                symbol: "tomml",
+                category: "drum",
+                global: "TOM_MID_SAMPLE",
+                file: "tom_mid"
+            },
+            {
+                name: "tom hi",
+                symbol: "tomh",
+                category: "drum",
+                global: "TOM_HI_SAMPLE",
+                file: "tom_hi"
+            },
+            {
+                name: "tom lo",
+                symbol: "tomfl",
+                category: "drum",
+                global: "TOM_LO_SAMPLE",
+                file: "tom_lo"
+            },
+            {
+                name: "cymbal closed",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_CLOSED_SAMPLE",
+                file: "cymbal_closed"
+            },
+            {
+                name: "cymbal open",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_OPEN_SAMPLE",
+                file: "cymbal_open"
+            },
+            {
+                name: "cymbal pedal",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_PEDAL_SAMPLE",
+                file: "cymbal_pedal"
+            },
+            {
+                name: "sonic cowbell",
+                symbol: "cb",
+                category: "bell",
+                global: "SONIC_COWBELL_SAMPLE",
+                file: "sonic_cowbell"
+            }
+        ];
+
+        const { SAMPLE_INFO, DEFAULTSYNTHVOLUME } = synthutilsModule;
+
+        expectedDrums.forEach(({ name, symbol, category, global: globalVar, file }) => {
+            const entry = DRUMNAMES.find(d => d[1] === name);
+            expect(entry).toBeDefined();
+            expect(entry[3]).toBe(symbol);
+            expect(entry[4]).toBe(category);
+
+            expect(SAMPLE_INFO.drum[name]).toEqual({
+                path: `samples/${file}`,
+                global: globalVar
+            });
+
+            expect(DEFAULTSYNTHVOLUME[name]).toBeGreaterThan(0);
+        });
+    });
+
+    it("groups drum families together in DRUMNAMES", () => {
+        const drumNames = DRUMNAMES.map(d => d[1]);
+
+        const snares = ["snare drum", "snare hard", "snare soft", "snare roll"];
+        const snareIndices = snares.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < snareIndices.length; i++) {
+            expect(snareIndices[i]).toBe(snareIndices[i - 1] + 1);
+        }
+
+        const kicks = ["kick drum", "heavy kick", "bass drum"];
+        const kickIndices = kicks.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < kickIndices.length; i++) {
+            expect(kickIndices[i]).toBe(kickIndices[i - 1] + 1);
+        }
+
+        const toms = ["tom tom", "tom hi", "tom mid", "tom lo", "floor tom"];
+        const tomIndices = toms.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < tomIndices.length; i++) {
+            expect(tomIndices[i]).toBe(tomIndices[i - 1] + 1);
+        }
+
+        const cymbals = [
+            "hi hat",
+            "cymbal closed",
+            "cymbal open",
+            "cymbal pedal",
+            "finger cymbals"
+        ];
+        const cymbalIndices = cymbals.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < cymbalIndices.length; i++) {
+            expect(cymbalIndices[i]).toBe(cymbalIndices[i - 1] + 1);
+        }
     });
 });

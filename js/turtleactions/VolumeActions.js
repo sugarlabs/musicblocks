@@ -74,7 +74,7 @@ function setupVolumeActions(activity) {
 
             tur.singer.inCrescendo.push(true);
 
-            const listenerName = "_crescendo_" + turtle;
+            const listenerName = "_crescendo_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -148,7 +148,7 @@ function setupVolumeActions(activity) {
                 activity.logo.notation.notationBeginArticulation(turtle);
             }
 
-            const listenerName = "_articulation_" + turtle;
+            const listenerName = "_articulation_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {

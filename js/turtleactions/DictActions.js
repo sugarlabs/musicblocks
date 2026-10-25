@@ -23,7 +23,7 @@
    global
 
    _, Turtle, Singer, getNote, INVALIDPITCH, pitchToNumber,
-   getTargetTurtle, frequencyToPitch, noteToObj
+   getTargetTurtle, frequencyToPitch, noteToObj, isUnsafeObjectKey
  */
 
 /*
@@ -40,6 +40,8 @@
         INVALIDPITCH
     js/blocks/EnsembleBlocks.js
         getTargetTurtle
+    js/utils/utils-logic.js
+        isUnsafeObjectKey
 */
 
 /* exported setupDictActions */
@@ -293,7 +295,7 @@ function setupDictActions(activity) {
             }
 
             return JSON.stringify(
-                dict in activity.logo.turtleDicts[turtle]
+                Object.prototype.hasOwnProperty.call(activity.logo.turtleDicts[turtle], dict)
                     ? activity.logo.turtleDicts[turtle][dict]
                     : {}
             );
@@ -337,7 +339,17 @@ function setupDictActions(activity) {
                 dict = target;
             }
 
-            if (!(dict in activity.logo.turtleDicts[turtle])) {
+            // Assigning these names on a plain object reaches Object.prototype.
+            if (isUnsafeObjectKey(dict)) {
+                activity.errorMsg(_("The dictionary name is reserved."));
+                return;
+            }
+            if (isUnsafeObjectKey(key)) {
+                activity.errorMsg(_("The key name is reserved."));
+                return;
+            }
+
+            if (!Object.prototype.hasOwnProperty.call(activity.logo.turtleDicts[turtle], dict)) {
                 activity.logo.turtleDicts[turtle][dict] = {};
             }
             activity.logo.turtleDicts[turtle][dict][key] = value;
@@ -379,11 +391,12 @@ function setupDictActions(activity) {
                 return turtleDict[key];
             }
 
-            if (!(dict in activity.logo.turtleDicts[turtle])) {
+            const dicts = activity.logo.turtleDicts[turtle];
+            if (!Object.prototype.hasOwnProperty.call(dicts, dict)) {
                 const msg = _("Dictionary with this name does not exist");
                 activity.errorMsg(msg, blk);
                 return 0;
-            } else if (!(key in activity.logo.turtleDicts[turtle][dict])) {
+            } else if (!Object.prototype.hasOwnProperty.call(dicts[dict], key)) {
                 const msg = _("Key with this name does not exist in %s").replace(/%s/g, dict);
                 activity.errorMsg(msg, blk);
                 return 0;

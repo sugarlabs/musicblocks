@@ -70,7 +70,7 @@ var deepClone = obj => {
  * Extracts the file extension from a filename or URL.
  */
 var fileExt = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -86,7 +86,7 @@ var fileExt = file => {
  * Extracts the base name (filename without extension) from a filename or URL.
  */
 var fileBasename = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -453,6 +453,9 @@ var rationalSum = (a, b) => {
  * Finds the nearest beat for a given fraction.
  */
 var nearestBeat = (d, b) => {
+    if (typeof b !== "number" || b <= 0 || !Number.isFinite(b) || !Number.isFinite(d)) {
+        return [0, typeof b === "number" && Number.isFinite(b) && b > 0 ? b : 0];
+    }
     let sum = 1 / (2 * b);
     let count = 0;
     const dd = d / 100;

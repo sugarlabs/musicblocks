@@ -142,6 +142,59 @@ describe("Activity Toolbar Integration", () => {
         jest.clearAllMocks();
     });
 
+    test("keeps coordinate grids aligned with the turtle stage after resize", () => {
+        const canvas = { width: 0, height: 0 };
+        const overlayCanvas = { width: 0, height: 0 };
+        const makeBitmap = () => ({ x: 0, y: 0 });
+        const gridNames = [
+            "cartesian",
+            "polar",
+            "treble",
+            "grand",
+            "soprano",
+            "alto",
+            "tenor",
+            "bass"
+        ];
+        const accidentalNames = ["grand", "treble", "soprano", "alto", "tenor", "bass"];
+
+        activity.canvas = canvas;
+        activity.stage = { canvas, scaleX: 1, scaleY: 1 };
+        activity.toolbarHeight = 80;
+        activity.turtleBlocksScale = 1;
+        activity.turtles = {
+            doScale: jest.fn(),
+            getTurtleCount: jest.fn(() => 0)
+        };
+        activity.boundary = { setScale: jest.fn() };
+        activity.trashcan = { resizeEvent: jest.fn() };
+        activity.setupPaletteMenu = jest.fn();
+        activity.palettes = { setMobile: jest.fn() };
+        activity.blocks = { checkBounds: jest.fn() };
+
+        for (const name of gridNames) {
+            activity[`${name}Bitmap`] = makeBitmap();
+        }
+
+        for (const name of accidentalNames) {
+            activity[`${name}SharpBitmap`] = Array.from({ length: 7 }, makeBitmap);
+            activity[`${name}FlatBitmap`] = Array.from({ length: 7 }, makeBitmap);
+        }
+
+        document.getElementById = jest.fn(id =>
+            id === "overlayCanvas" ? overlayCanvas : mockElement
+        );
+
+        activity._onResize(true);
+
+        expect(activity.cartesianBitmap.y).toBe(
+            canvas.height / (2 * activity.turtleBlocksScale) - 450 + activity.toolbarHeight
+        );
+        expect(activity.grandSharpBitmap[1].y).toBe(
+            canvas.height / (2 * activity.turtleBlocksScale) - 412.5 + activity.toolbarHeight
+        );
+    });
+
     describe("_doFastButton", () => {
         test("calls highlightStop and delegates runFast when not already running", () => {
             activity.turtles.running.mockReturnValue(false);

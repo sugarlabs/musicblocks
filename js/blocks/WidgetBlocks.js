@@ -1315,25 +1315,14 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
-            if (activity.beginnerMode && this.lang === "ja") {
-                this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
-                    "documentation",
-                    null,
-                    "musickeyboardja"
-                ]);
-            } else {
-                this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
-                    "documentation",
-                    null,
-                    "musickeyboard2"
-                ]);
-            }
+            this.setHelpString([
+                _(
+                    "The Music keyboard block opens a piano keyboard that can be used to create notes."
+                ),
+                "documentation",
+                null,
+                "musickeyboard2"
+            ]);
 
             //.TRANS: widget to generate pitches using a slider
             this.formBlock({ name: _("music keyboard"), canCollapse: true });

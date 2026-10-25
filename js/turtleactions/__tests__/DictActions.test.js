@@ -41,6 +41,7 @@ describe("setupDictActions", () => {
         global.getTargetTurtle = jest.fn();
         global.frequencyToPitch = jest.fn().mockReturnValue(["A", 4]);
         global.noteToObj = require("../../utils/musicutils").noteToObj;
+        global.isUnsafeObjectKey = require("../../utils/utils-logic").isUnsafeObjectKey;
     });
 
     beforeEach(() => {
@@ -534,6 +535,57 @@ describe("setupDictActions", () => {
                 "Key with this name does not exist in target",
                 3
             );
+        });
+
+        it("should not return inherited properties as dictionaries or keys", () => {
+            activity.logo.turtleDicts[turtle] = { testDict: { key: "value" } };
+            expect(Turtle.DictActions.getValue("constructor", "name", turtle, 3)).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Dictionary with this name does not exist",
+                3
+            );
+            expect(Turtle.DictActions.getValue("testDict", "constructor", turtle, 3)).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in testDict",
+                3
+            );
+        });
+    });
+
+    describe("reserved names", () => {
+        afterEach(() => {
+            delete Object.prototype.polluted;
+        });
+
+        it("should not let a dictionary named __proto__ reach Object.prototype", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("__proto__", "polluted", 42, turtle);
+            expect({}.polluted).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith("The dictionary name is reserved.");
+        });
+
+        it("should not store a key named __proto__", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", "__proto__", { polluted: 1 }, turtle);
+            expect(activity.logo.turtleDicts[turtle].testDict).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith("The key name is reserved.");
+        });
+
+        it("should not store a key named __proto__ under a turtle name", () => {
+            Turtle.DictActions.setValue("target", "__proto__", { polluted: 1 }, turtle);
+            expect(activity.errorMsg).toHaveBeenCalledWith("The key name is reserved.");
+            expect(Turtle.DictActions.getDict("target", turtle)).not.toContain("polluted");
+        });
+
+        it("should create a dictionary named after an inherited method", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("toString", "key", "value", turtle);
+            expect(Turtle.DictActions.getValue("toString", "key", turtle, 3)).toBe("value");
+        });
+
+        it("should show an empty dictionary for an inherited property name", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            expect(Turtle.DictActions.getDict("constructor", turtle)).toBe("{}");
         });
     });
 

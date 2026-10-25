@@ -173,10 +173,10 @@ describe("setupDrumActions", () => {
     });
 
     const actionConfigs = [
-        ["setDrum", "_setdrum_0", true],
-        ["mapPitchToDrum", "_mapdrum_0", false]
+        ["setDrum", blk => "_setdrum_0_" + blk, true],
+        ["mapPitchToDrum", () => "_mapdrum_0", false]
     ];
-    describe.each(actionConfigs)("%s", (actionName, prefix, resetPitchDrumTable) => {
+    describe.each(actionConfigs)("%s", (actionName, listenerName, resetPitchDrumTable) => {
         beforeEach(() => {
             targetTurtle.singer.drumStyle = [];
             targetTurtle.singer.pitchDrumTable = {};
@@ -189,10 +189,10 @@ describe("setupDrumActions", () => {
         it("sets drum style and listener", () => {
             Singer.DrumActions[actionName]("d1", 0, 1);
             expect(targetTurtle.singer.drumStyle).toContain("drum1");
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, prefix);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, listenerName(1));
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                prefix,
+                listenerName(1),
                 expect.any(Function)
             );
         });
@@ -203,7 +203,7 @@ describe("setupDrumActions", () => {
             global.Mouse.getMouseFromTurtle.mockReturnValue(mockMouse);
             Singer.DrumActions[actionName]("d1", 0);
             expect(targetTurtle.singer.drumStyle).toContain("drum1");
-            expect(mockMouse.MB.listeners).toContain(prefix);
+            expect(mockMouse.MB.listeners).toContain(listenerName(undefined));
         });
 
         it("handles direct drum name input", () => {
@@ -271,7 +271,7 @@ describe("setupDrumActions", () => {
             expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                prefix,
+                listenerName(999),
                 expect.any(Function)
             );
         });
@@ -285,7 +285,7 @@ describe("setupDrumActions", () => {
                 expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
                 expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                     0,
-                    prefix,
+                    listenerName(undefined),
                     expect.any(Function)
                 );
             } finally {

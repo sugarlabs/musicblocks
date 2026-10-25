@@ -18,7 +18,13 @@
  */
 
 global.Midi = jest.fn().mockImplementation(() => ({
-    header: { ticksPerBeat: 480 },
+    header: {
+        ticksPerBeat: 480,
+        tempos: [],
+        timeSignatures: [],
+        secondsToTicks: jest.fn(() => 0),
+        update: jest.fn()
+    },
     addTrack: jest.fn(() => ({
         addNote: jest.fn(),
         name: "",
@@ -182,6 +188,24 @@ describe("download", () => {
         const spy = jest.spyOn(other, "downloadURL");
         other.download("abc", "data", null);
         expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should revoke the Blob URL when the user cancels the prompt", () => {
+        global.URL.revokeObjectURL = jest.fn();
+        window.prompt = jest.fn(() => null);
+        instance.download("svg", "blob:mock-svg", null);
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
+    });
+
+    it("should revoke the Blob URL when the MBDialog prompt is cancelled", async () => {
+        global.URL.revokeObjectURL = jest.fn();
+        let cancelled;
+        window.MBDialog = { prompt: jest.fn(() => (cancelled = Promise.resolve(null))) };
+        instance.download("svg", "blob:mock-svg", null);
+        await cancelled;
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
     });
 
     it("should handle empty extension gracefully", () => {
@@ -393,6 +417,30 @@ describe("save HTML methods", () => {
 
         expect(html).toContain('window.addEventListener("load", function() {');
         expect(html).not.toContain("window.onload = function()");
+    });
+
+    it("should not expand $ replacement patterns from project data in prepareHTML", () => {
+        const { unescapeHTML, extractProjectDataFromHTML } = require("../utils/utils");
+        const data = JSON.stringify([
+            [0, ["text", { value: "Price: 5$" }], 0, 0, [null]],
+            [1, ["text", { value: "cost $$5" }], 0, 0, [null]],
+            [2, ["text", { value: "a$<b $' $&" }], 0, 0, [null]]
+        ]);
+        const si = new SaveInterface({
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "My $& project"),
+                getCurrentProjectDescription: jest.fn(() => "Costs 5$'"),
+                getCurrentProjectImage: jest.fn(() => "")
+            },
+            prepareExport: jest.fn(() => data)
+        });
+
+        const html = si.prepareHTML();
+
+        expect(html).toContain("<title>My $&amp; project</title>");
+        expect(html).toContain("<p>Costs 5$&#039;</p>");
+        const extracted = extractProjectDataFromHTML(html.replace(/\n/g, " "));
+        expect(unescapeHTML(extracted)).toBe(data);
     });
 
     it("escapeHTML should encode all five HTML special characters", () => {
@@ -747,9 +795,203 @@ describe("afterSaveMIDI", () => {
     });
 });
 
+describe("afterSaveMIDI tempo and time signatures", () => {
+    const { Midi: ToneMidi } = require("@tonejs/midi");
+    let mockMidi;
+    let instance;
+    let exported;
+
+    // Exports the notes through the real MIDI library and reads the file back.
+    const exportMidi = data => {
+        instance.activity.logo._midiData = data;
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+        return new ToneMidi(exported);
+    };
+
+    const note = (name, duration, bpm, meter) => ({
+        note: [name],
+        duration,
+        bpm,
+        instrument: "guitar",
+        meter
+    });
+
+    const noteTicks = (midi, trackName) =>
+        midi.tracks
+            .find(track => track.name === trackName)
+            .notes.map(n => [n.ticks, n.durationTicks]);
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        mockMidi = global.Midi;
+        global.Midi = class extends ToneMidi {
+            toArray() {
+                exported = super.toArray();
+                return exported;
+            }
+        };
+        const activity = { logo: {}, save: { download: jest.fn() } };
+        instance = new SaveInterface(activity);
+        instance.activity = activity;
+        global.URL.createObjectURL = jest.fn(() => "mockURL");
+        global.getMidiInstrument = jest.fn(() => ({ default: 0, guitar: 25 }));
+        global.getMidiDrum = jest.fn(() => ({}));
+    });
+
+    afterEach(() => {
+        global.Midi = mockMidi;
+        jest.useRealTimers();
+    });
+
+    it("writes the tempo and meter, so a quarter note lasts one beat", () => {
+        const meter = [3, 4];
+        const midi = exportMidi({
+            0: [note("G4", 4, 90, meter), note("A4", 4, 90, meter), note("B4", 4, 90, meter)]
+        });
+
+        // MIDI stores a tempo in whole microseconds per beat.
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 90]]);
+        expect(midi.header.timeSignatures.map(t => [t.ticks, t.timeSignature])).toEqual([
+            [0, [3, 4]]
+        ]);
+        expect(noteTicks(midi, "Track 1 - guitar")).toEqual([
+            [0, 480],
+            [480, 480],
+            [960, 480]
+        ]);
+    });
+
+    it("writes a tempo change where it happens", () => {
+        const meter = [4, 4];
+        const midi = exportMidi({
+            0: [
+                note("G4", 4, 90, meter),
+                note("A4", 4, 90, meter),
+                note("B4", 4, 180, meter),
+                note("C5", 4, 180, meter)
+            ]
+        });
+
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([
+            [0, 90],
+            [960, 180]
+        ]);
+        expect(noteTicks(midi, "Track 1 - guitar")).toEqual([
+            [0, 480],
+            [480, 480],
+            [960, 480],
+            [1440, 480]
+        ]);
+        // The notes still play at the project's tempo.
+        const seconds = midi.tracks
+            .find(track => track.name === "Track 1 - guitar")
+            .notes.map(n => n.time);
+        expect(seconds[2]).toBeCloseTo(4 / 3, 5);
+        expect(seconds[3]).toBeCloseTo(4 / 3 + 1 / 3, 5);
+    });
+
+    it("writes a meter change from 3/4 to 6/8 where it happens", () => {
+        const midi = exportMidi({
+            0: [
+                ...Array(3).fill(note("G4", 4, 90, [3, 4])),
+                ...Array(6).fill(note("A4", 8, 90, [6, 8]))
+            ]
+        });
+
+        expect(midi.header.timeSignatures.map(t => [t.ticks, t.timeSignature])).toEqual([
+            [0, [3, 4]],
+            [1440, [6, 8]]
+        ]);
+        expect(noteTicks(midi, "Track 1 - guitar").slice(3, 5)).toEqual([
+            [1440, 240],
+            [1680, 240]
+        ]);
+    });
+
+    it("writes no time signature for a meter MIDI cannot hold, but still the tempo", () => {
+        const midi = exportMidi({
+            0: [note("G4", 4, 120, [5, 3]), note("A4", 4, 120, undefined)]
+        });
+
+        expect(midi.header.timeSignatures).toEqual([]);
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 120]]);
+        expect(noteTicks(midi, "Track 1 - guitar")).toEqual([
+            [0, 480],
+            [480, 480]
+        ]);
+    });
+
+    it("takes the tempo from the first track and keeps other tracks at their own timing", () => {
+        const midi = exportMidi({
+            0: [note("G4", 4, 90, [4, 4]), note("A4", 4, 90, [4, 4])],
+            1: [note("C4", 4, 180, [4, 4]), note("D4", 4, 180, [4, 4])]
+        });
+
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 90]]);
+        const seconds = midi.tracks
+            .find(track => track.name === "Track 2 - guitar")
+            .notes.map(n => n.time);
+        expect(seconds[0]).toBeCloseTo(0, 5);
+        expect(seconds[1]).toBeCloseTo(1 / 3, 5);
+    });
+
+    it("takes the tempo from the first track with notes, not one with only rests", () => {
+        const midi = exportMidi({
+            0: [note("R", 4, 120, [3, 4]), note("R", 4, 120, [3, 4])],
+            1: [note("G4", 4, 90, [4, 4]), note("A4", 4, 90, [4, 4])],
+            2: [{ ...note("C2", 4, 60, [2, 4]), drum: "kick drum" }]
+        });
+
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 90]]);
+        expect(midi.header.timeSignatures.map(t => [t.ticks, t.timeSignature])).toEqual([
+            [0, [4, 4]]
+        ]);
+        expect(noteTicks(midi, "Track 2 - guitar")).toEqual([
+            [0, 480],
+            [480, 480]
+        ]);
+    });
+
+    it("takes the tempo from a track with only drums", () => {
+        const midi = exportMidi({
+            0: [{ ...note("C2", 4, 60, [2, 4]), drum: "kick drum" }],
+            1: [note("G4", 4, 90, [4, 4])]
+        });
+
+        expect(midi.header.tempos.map(t => [t.ticks, Math.round(t.bpm)])).toEqual([[0, 60]]);
+        expect(midi.header.timeSignatures.map(t => [t.ticks, t.timeSignature])).toEqual([
+            [0, [2, 4]]
+        ]);
+    });
+
+    it("writes neither tempo nor time signature when no note is written", () => {
+        const midi = exportMidi({
+            0: [
+                note("G4", 0, 90, [4, 4]),
+                { ...note("A4", 4, 90, [4, 4]), note: [] },
+                // A note value so small that the note would last forever.
+                note("B4", Number.MIN_VALUE, 90, [4, 4])
+            ]
+        });
+
+        expect(midi.header.tempos).toEqual([]);
+        expect(midi.header.timeSignatures).toEqual([]);
+        expect(midi.tracks.every(track => track.notes.length === 0)).toBe(true);
+    });
+});
+
 describe("save artwork methods", () => {
     let instance;
     const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };
+
+    // jsdom's Blob has no text(), so read it back with a FileReader.
+    const readBlob = blob =>
+        new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsText(blob);
+        });
 
     beforeEach(() => {
         instance = new SaveInterface(mockActivity);
@@ -757,6 +999,7 @@ describe("save artwork methods", () => {
             <canvas id="overlayCanvas"></canvas>
         `;
         docById.mockImplementation(id => document.getElementById(id));
+        global.URL.createObjectURL = jest.fn(() => "blob:mock-svg");
     });
 
     afterEach(() => {
@@ -785,11 +1028,28 @@ describe("save artwork methods", () => {
             activity.canvas.height,
             1.0
         );
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            null
-        );
+        expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", null);
+    });
+
+    it("should keep the whole SVG when it has '#' colours", async () => {
+        const svgData =
+            '<svg><rect fill="#ffffff"/><text fill="#ff0031">C#</text>' +
+            '<path d="M 0,0 10,10 " /></svg>';
+        global.doSVG = jest.fn(() => svgData);
+        const activity = {
+            save: {
+                download: mockDownload
+            },
+            canvas: { width: 500, height: 500 },
+            logo: "mockLogo",
+            turtles: "mockTurtles"
+        };
+
+        instance.saveSVG(activity);
+        const blob = URL.createObjectURL.mock.calls[0][0];
+        expect(blob.type).toBe("image/svg+xml;charset=utf-8");
+        expect(await readBlob(blob)).toBe(svgData);
     });
 
     it("should save the SVG under a given file name", () => {
@@ -804,11 +1064,7 @@ describe("save artwork methods", () => {
         };
 
         instance.saveSVG(activity, "drawing.svg");
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            "drawing.svg"
-        );
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", "drawing.svg");
     });
 
     it("should call toDataURL and download the PNG file", () => {
@@ -825,8 +1081,10 @@ describe("save artwork methods", () => {
         expect(mockDownload).toHaveBeenCalledWith("png", "data:image/png;base64,mockdata", null);
     });
 
-    it("should call printBlockSVG and download the SVG file", () => {
-        const mockPrintBlockSVG = jest.fn(() => "<svg>Mock SVG</svg>");
+    it("should call printBlockSVG and download the SVG file", async () => {
+        const mockPrintBlockSVG = jest.fn(
+            () => "<svg>" + encodeURIComponent('<rect fill="#ffffff"/></svg>')
+        );
         const activity = {
             save: {
                 download: mockDownload
@@ -836,11 +1094,9 @@ describe("save artwork methods", () => {
         instance.saveBlockArtwork(activity);
 
         expect(mockPrintBlockSVG).toHaveBeenCalled();
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            null
-        );
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", null);
+        const blob = URL.createObjectURL.mock.calls[0][0];
+        expect(await readBlob(blob)).toBe('<svg><rect fill="#ffffff"/></svg>');
     });
 
     it("should call printBlockPNG and download the PNG file", async () => {

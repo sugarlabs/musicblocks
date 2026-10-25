@@ -126,3 +126,38 @@ describe("builtin macro connections", () => {
         expect(expansion[note[4][3]]).toEqual([25, "hidden", 0, 0, [17, null]]);
     });
 });
+
+describe("block help examples", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const blocksDir = path.join(__dirname, "..", "blocks");
+    const mockActivity = { blocks: { protoBlockDict: {} } };
+
+    // Blocks whose class defines its own macro, which getMacroExpansion
+    // reads from protoBlockDict at runtime.
+    const blockMacros = new Set();
+    // [file, macro name] for every help string that names an example.
+    const helpExamples = [];
+    for (const file of fs.readdirSync(blocksDir).filter(f => f.endsWith(".js"))) {
+        const source = fs.readFileSync(path.join(blocksDir, file), "utf8");
+        for (const body of source.split(/\n\s*class /)) {
+            const name = /super\("(\w+)"/.exec(body);
+            if (name && body.includes("this.makeMacro(")) blockMacros.add(name[1]);
+        }
+        const helpString = /"documentation",\s*(?:null|"[^"]*"),\s*"(\w*)"\s*\]/g;
+        for (const match of source.matchAll(helpString)) helpExamples.push([file, match[1]]);
+    }
+
+    test("finds the help examples in js/blocks", () => {
+        expect(helpExamples.length).toBeGreaterThan(100);
+        expect(helpExamples).toContainEqual(["IntervalsBlocks.js", "arpeggiohelp"]);
+    });
+
+    // The "Load this block" button and saveHelpBlocks() pass the expansion
+    // straight to loadNewBlocks(), which throws on null.
+    test.each(helpExamples)("%s names an example that exists: %s", (file, macro) => {
+        const found =
+            blockMacros.has(macro) || getMacroExpansion(mockActivity, macro, 0, 0) !== null;
+        expect(found).toBe(true);
+    });
+});

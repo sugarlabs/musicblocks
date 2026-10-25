@@ -309,7 +309,7 @@ describe("ModeWidget", () => {
             },
             turtles: {
                 ithTurtle: jest.fn().mockReturnValue({
-                    singer: { keySignature: ["C"] }
+                    singer: { keySignature: "C major" }
                 })
             },
             blocks: {
@@ -323,6 +323,42 @@ describe("ModeWidget", () => {
         };
 
         modeWidget = new ModeWidget(mockActivity);
+    });
+
+    test("should initialize pitch from natural key signature", () => {
+        expect(modeWidget._pitch).toBe("C");
+    });
+
+    test("should initialize pitch without truncating accidental roots in key signature", () => {
+        const testCases = [
+            { keySig: "C major", expectedPitch: "C" },
+            { keySig: "F# major", expectedPitch: "F#" },
+            { keySig: "Bb minor", expectedPitch: "Bb" },
+            { keySig: "Db dorian", expectedPitch: "Db" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
+    });
+
+    test("should handle legacy array keySignature values without error", () => {
+        const testCases = [
+            { keySig: ["C"], expectedPitch: "C" },
+            { keySig: ["F#", "major"], expectedPitch: "F#" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
     });
 
     test("should calculate major scale intervals correctly", () => {

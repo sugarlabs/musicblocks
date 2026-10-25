@@ -45,8 +45,8 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
@@ -81,8 +81,8 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22.x'
-                  cache: 'npm'
+                  node-version: "22.x"
+                  cache: "npm"
 
             - name: Install dependencies
               run: |
@@ -154,7 +154,7 @@ jobs:
               uses: actions/setup-node@v5
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: 'npm'
+                  cache: "npm"
 
             - name: Install dependencies
               # For Renovate branches the lockfile may be out of sync with
@@ -190,8 +190,8 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Install dependencies
               run: |
@@ -239,8 +239,8 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Install dependencies
               run: |
@@ -270,8 +270,8 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Install dependencies
               # cypress-io/github-action's install-command does not support
@@ -286,11 +286,11 @@ jobs:
               shell: bash
 
             - name: Run Cypress E2E tests
-              uses: cypress-io/github-action@v6
+              uses: cypress-io/github-action@v7
               with:
                   install: false
                   start: npm start
-                  wait-on: 'http://127.0.0.1:3000'
+                  wait-on: "http://127.0.0.1:3000"
                   wait-on-timeout: 120
                   browser: chrome
                   config: video=false
@@ -321,15 +321,16 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
+                  node-version: "22"
 
             - name: Resolve dependencies before audit
-              # CodeRabbit: Audit the dependency tree installed by Renovate.
-              # Run npm install --legacy-peer-deps --ignore-scripts before npm audit
-              # so the audit uses the same resolved dependency tree.
+              # Renovate may update the dependency tree beyond the lockfile.
+              # Other runs install the exact dependency tree from the lockfile.
               run: |
                   if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
                     npm install --legacy-peer-deps --ignore-scripts
+                  else
+                    npm ci --ignore-scripts
                   fi
               shell: bash
 

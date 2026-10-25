@@ -161,6 +161,35 @@ describe("Test 2: Rests", () => {
         expect(blocks.filter(b => blockName(b) === "pitch")).toHaveLength(0);
     });
 
+    it("reads a whole-measure rest's length from <duration>, not its whole-note <type>", async () => {
+        // PhotoScore writes a 3/4 bar's rest this way; reading <type> made it four beats.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<note><rest measure="yes"/><duration>24</duration><type>whole</type></note>' +
+                    SIMPLE_NOTE("C", 4, "quarter"),
+                "<divisions>8</divisions><time><beats>3</beats><beat-type>4</beat-type></time>"
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [24, 32],
+            [1, 4]
+        ]);
+    });
+
+    it.each([
+        ["no <duration>", ""],
+        ["an empty <duration>", "<duration></duration>"],
+        ["a non-numeric <duration>", "<duration>abc</duration>"],
+        ["a zero <duration>", "<duration>0</duration>"]
+    ])("keeps <type> for a whole-measure rest with %s", async (_label, durationXml) => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(`<note><rest measure="yes"/>${durationXml}<type>whole</type></note>`)
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 1]]);
+    });
+
     it("treats a <note> with neither <pitch> nor <rest/> as a rest rather than crashing", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise("<note><duration>8</duration><type>quarter</type></note>")
@@ -358,6 +387,34 @@ describe("Test 8: Title and meter extraction", () => {
         const denBlock = blocks.find(b => b[0] === divide[4][2]);
         expect(denBlock[1][1].value).toBe(8);
     });
+
+    it.each([
+        ["3+2", "8", 5, 8],
+        ["2+2+3", "8", 7, 8],
+        [" 3 + 2 ", "8", 5, 8],
+        ["x", "4", 4, 4],
+        ["3+", "8", 4, 8],
+        ["+3", "8", 4, 8],
+        ["3++2", "8", 4, 8],
+        ["", "4", 4, 4],
+        ["3", "0", 3, 4]
+    ])(
+        "reads <beats>%s</beats><beat-type>%s</beat-type> as %i/%i",
+        async (beatsText, beatTypeText, beats, beatType) => {
+            const xml = scorePartwise(
+                SIMPLE_NOTE("C", 4, "eighth"),
+                `<divisions>8</divisions><time><beats>${beatsText}</beats><beat-type>${beatTypeText}</beat-type></time>`
+            );
+
+            const { blocks } = await parseAndCapture(xml);
+            const meter = blocks.find(b => blockName(b) === "meter");
+            const numBlock = blocks.find(b => b[0] === meter[4][1]);
+            const divide = blocks.find(b => b[0] === meter[4][2]);
+            const denBlock = blocks.find(b => b[0] === divide[4][2]);
+            expect(numBlock[1][1].value).toBe(beats);
+            expect(denBlock[1][1].value).toBe(beatType);
+        }
+    );
 
     it("defaults to 4/4 when no <time> element is present", async () => {
         const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));

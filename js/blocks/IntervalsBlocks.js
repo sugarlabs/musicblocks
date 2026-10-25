@@ -756,7 +756,7 @@ function setupIntervalsBlocks(activity) {
                     _("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
                 null,
-                ""
+                "arpeggiohelp"
             ]);
 
             this.formBlock({
@@ -1196,7 +1196,7 @@ function setupIntervalsBlocks(activity) {
                 ),
                 "documentation",
                 null,
-                "moveablehelp"
+                "movablehelp"
             ]);
             this.size = 0;
             this.formBlock({
