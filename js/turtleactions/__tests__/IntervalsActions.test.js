@@ -1038,6 +1038,28 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.custom).toEqual([5, 7]);
     });
 
+    test("defineMode tells the user when the result does not fit the tuning", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 4, 7, 7);
+        listener();
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "This mode does not fit the current tuning."
+        );
+    });
+
+    test("defineMode does not warn about the tuning when the mode fits", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.errorMsg).not.toHaveBeenCalledWith(
+            "This mode does not fit the current tuning."
+        );
+    });
+
     test("defineMode listener does not update block text when there is no connected child block", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
@@ -1256,6 +1278,23 @@ describe("setupIntervalsActions", () => {
         MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
         Singer.IntervalsActions.setTemperament("equal19", "C", 4);
         expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+    });
+
+    test("setTemperament tells the user when it drops a defined custom mode", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "The custom mode does not fit the new tuning, so it was reset."
+        );
+    });
+
+    test("setTemperament stays quiet when it only resizes the default chromatic mode", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = new Array(12).fill(1);
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+        expect(activity.errorMsg).not.toHaveBeenCalled();
     });
 
     test("setTemperament rebuilds a custom mode with a 0 step even if the sum fits", () => {

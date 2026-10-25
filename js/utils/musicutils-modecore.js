@@ -14,7 +14,7 @@
 
    _b64Cache, wholeNoteImg, halfNoteImg, quarterNoteImg, eighthNoteImg,
    sixteenthNoteImg, thirtysecondNoteImg, sixtyfourthNoteImg, CHORDVALUES,
-   setCustomChord, MUSICALMODES, customMode, getModeNumbers,
+   setCustomChord, MUSICALMODES, getModeNumbers,
    getNonEDOModeSteps, getArticulation, modeMapper, getCustomNote,
    GetNotesForInterval, base64Encode, MOVABLE_TONIC_DEGREE, scalePatternToEDO,
    PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern, MusicUtilsModeCore
@@ -228,12 +228,6 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 
 // User definition overrides this constant.
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-
-/**
- * Custom mode from the musical modes dictionary.
- * @constant {Object}
- */
-var customMode = MUSICALMODES["custom"];
 
 /**
  * Get the mode numbers for a specific mode name.
@@ -905,7 +899,7 @@ var getModePattern = (mode, edo = 12) => {
         return overrides[mode].slice();
     }
     if (mode.toLowerCase() === "custom") {
-        // Read MUSICALMODES.custom on each call rather than customMode: the
+        // Read MUSICALMODES.custom on each call instead of keeping a copy: the
         // define mode block, set temperament and saved custom modes all
         // replace that array, so the copy taken at load time goes stale.
         const custom = MUSICALMODES.custom;
@@ -936,7 +930,6 @@ var MusicUtilsModeCore = {
     CHORDVALUES,
     setCustomChord,
     MUSICALMODES,
-    customMode,
     getModeNumbers,
     getNonEDOModeSteps,
     getArticulation,

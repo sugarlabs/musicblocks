@@ -44,8 +44,18 @@ if (typeof module !== "undefined" && module.exports) {
 var getSavedCustomModes = () => {
     try {
         const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
+        // Only keep modes whose pattern is a list of positive whole steps, so
+        // a broken saved entry can't show up in the menus and then play as
+        // something else.
         return Array.isArray(customModes)
-            ? customModes.filter(m => m && typeof m.name === "string")
+            ? customModes.filter(
+                  m =>
+                      m &&
+                      typeof m.name === "string" &&
+                      Array.isArray(m.pattern) &&
+                      m.pattern.length > 0 &&
+                      m.pattern.every(step => Number.isInteger(step) && step > 0)
+              )
             : [];
     } catch (e) {
         return [];

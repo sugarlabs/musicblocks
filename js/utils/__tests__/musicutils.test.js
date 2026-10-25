@@ -71,7 +71,6 @@ const {
     deleteTemperamentFromList,
     DEFAULTINVERT,
     DEFAULTMODE,
-    customMode,
     getInvertMode,
     getIntervalNumber,
     getIntervalDirection,
@@ -657,12 +656,6 @@ describe("Constants", () => {
     it("should have correct default values", () => {
         expect(DEFAULTINVERT).toBe("even");
         expect(DEFAULTMODE).toBe("major");
-    });
-});
-
-describe("customMode", () => {
-    it("should return custom mode from MUSICALMODES", () => {
-        expect(customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     });
 });
 
@@ -5296,6 +5289,20 @@ describe("mode pie menu shared helpers", () => {
                 JSON.stringify([{ name: "my mode", pattern: [1, 2] }, { pattern: [1] }, null])
             );
             expect(getSavedCustomModes()).toEqual([{ name: "my mode", pattern: [1, 2] }]);
+        });
+
+        it("drops saved modes whose pattern isn't a list of positive whole steps", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "good", pattern: [2, 2, 3, 2, 3] },
+                    { name: "zero step", pattern: [4, 3, 0, 3] },
+                    { name: "fraction", pattern: [1.5, 10.5] },
+                    { name: "empty", pattern: [] },
+                    { name: "no pattern" }
+                ])
+            );
+            expect(getSavedCustomModes()).toEqual([{ name: "good", pattern: [2, 2, 3, 2, 3] }]);
         });
 
         it("returns an empty list for corrupt or non-array data", () => {

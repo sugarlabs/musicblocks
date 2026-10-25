@@ -211,10 +211,9 @@ var buildScale = (keySignature, edo) => {
             idx = 0;
         }
 
-        // For "custom" (chromatic) mode in non-12 EDO, getModePattern returns a
-        // full EDO-length scale with step=1 for every pitch class, instead of
-        // converting the hardcoded 12-element customMode array (which would only
-        // produce ~12 notes and leave many pitch classes unreachable).
+        // For "custom" mode in non-12 EDO, getModePattern returns the current
+        // custom pattern when its steps fit the EDO, and otherwise one step per
+        // pitch class, so no pitch class is left unreachable.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
         const scale = [myKeySignature];
