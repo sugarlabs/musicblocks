@@ -343,6 +343,64 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
  * @param {number} voiceIdx - The voice's index within the staff.
  * @returns {number} newBlockId
  */
+/**
+ * Folds each tied note into the note it continues, summing their durations,
+ * so "C2- | C2" plays one held C rather than striking it twice. abcjs marks
+ * the tie on each pitch (startTie on the first note, endTie on the next).
+ * A note continues the tie only when every one of its pitches ends a tie
+ * from the same pitch; a repeat bar line in between, or a triplet on either
+ * side, leaves the two notes as they are.
+ *
+ * @param {Array} voice - The voice's abcjs elements.
+ * @returns {Array} The elements with tied continuations folded in.
+ */
+function _mergeTies(voice) {
+    const merged = [];
+    let held = null;
+    let inTriplet = false;
+
+    voice.forEach(element => {
+        if (element.el_type !== "note") {
+            if (element.el_type === "bar" && _ABC_REPEAT_BARS.includes(element.type)) {
+                held = null;
+            }
+            merged.push(element);
+            return;
+        }
+
+        if (element.startTriplet !== null && element.startTriplet !== undefined) {
+            inTriplet = true;
+        }
+        const pitches = element.pitches ?? [];
+        const open = held === null ? null : merged[held];
+        const continues =
+            open !== null &&
+            !inTriplet &&
+            pitches.length === open.pitches.length &&
+            pitches.every((pitch, i) => pitch.endTie && pitch.pitch === open.pitches[i].pitch);
+
+        if (continues) {
+            open.duration += element.duration;
+            if (!pitches.every(pitch => pitch.startTie)) {
+                held = null;
+            }
+        } else {
+            // A copy, so lengthening it leaves the parsed tune untouched.
+            merged.push({ ...element });
+            held =
+                !inTriplet && pitches.length > 0 && pitches.every(pitch => pitch.startTie)
+                    ? merged.length - 1
+                    : null;
+        }
+
+        if (element.endTriplet !== null && element.endTriplet !== undefined) {
+            inTriplet = false;
+        }
+    });
+
+    return merged;
+}
+
 function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
     // Reset triplet state at every voice boundary so that an unclosed
     // triplet in one voice cannot affect timing in subsequent voices.
@@ -356,7 +414,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
     }
     let actionBlock = [];
 
-    voice.forEach(element => {
+    _mergeTies(voice).forEach(element => {
         if (element.el_type === "note") {
             //check if triplet exists
             if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
