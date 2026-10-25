@@ -371,6 +371,10 @@ requirejs.config({
             deps: ["utils/utils", "utils/dom-helpers"],
             exports: "widgetWindows"
         },
+        "widgets/multisample": {
+            deps: ["utils/utils", "utils/synthutils", "widgets/widgetWindows"],
+            exports: "MultisampleEditor"
+        },
         "widgets/help": {
             deps: ["utils/utils", "utils/dom-helpers", "widgets/widgetWindows"],
             exports: "HelpWidget"
