@@ -15,7 +15,7 @@
    TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
    saveLilypondOutput, escapeLilypondString, saveMxmlOutput, getMidiInstrument, getMidiDrum,
-   Midi, activity, normalizeNoteAccidentals
+   Midi, activity, normalizeNoteAccidentals, frequencyToPitch
  */
 
 /**
@@ -500,12 +500,40 @@ class SaveInterface {
             const midi = new Midi();
             midi.header.ticksPerBeat = 480;
 
+            const isRest = pitch => typeof pitch === "string" && pitch.includes("R");
+
+            const getFreqToPitch = () => {
+                if (typeof frequencyToPitch === "function") return frequencyToPitch;
+                if (
+                    typeof globalThis !== "undefined" &&
+                    typeof globalThis.frequencyToPitch === "function"
+                ) {
+                    return globalThis.frequencyToPitch;
+                }
+                return null;
+            };
+
+            const toNoteName = pitch => {
+                if (typeof pitch === "number") {
+                    const f2p = getFreqToPitch();
+                    if (f2p) {
+                        const temperament = this.activity?.logo?.synth?.inTemperament;
+                        const pitchObj = f2p(pitch, temperament);
+                        if (Array.isArray(pitchObj) && pitchObj.length >= 2) {
+                            return normalizeNoteAccidentals(`${pitchObj[0]}${pitchObj[1]}`);
+                        }
+                    }
+                    return null;
+                }
+                return normalizeNoteAccidentals(pitch);
+            };
+
             // The first track with a drum or pitch written to the file, not just rests.
             const firstTrack = Object.values(data).find(notes =>
                 notes.some(
                     noteData =>
                         noteSeconds(noteData) !== null &&
-                        (noteData.drum || noteData.note.some(pitch => !pitch.includes("R")))
+                        (noteData.drum || noteData.note.some(pitch => !isRest(pitch)))
                 )
             );
             if (firstTrack) {
@@ -561,13 +589,37 @@ class SaveInterface {
                         const instrumentTrack = trackMap.get(instrument);
 
                         noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
+                            if (!isRest(pitch)) {
+                                if (typeof pitch === "number") {
+                                    const noteName = toNoteName(pitch);
+                                    if (noteName) {
+                                        instrumentTrack.addNote({
+                                            name: noteName,
+                                            time: globalTime,
+                                            duration: duration,
+                                            velocity: 0.8
+                                        });
+                                    } else {
+                                        const midiNumber = Math.round(
+                                            69 + 12 * Math.log2(pitch / 440)
+                                        );
+                                        if (midiNumber >= 0 && midiNumber <= 127) {
+                                            instrumentTrack.addNote({
+                                                midi: midiNumber,
+                                                time: globalTime,
+                                                duration: duration,
+                                                velocity: 0.8
+                                            });
+                                        }
+                                    }
+                                } else {
+                                    instrumentTrack.addNote({
+                                        name: normalizeNoteAccidentals(pitch),
+                                        time: globalTime,
+                                        duration: duration,
+                                        velocity: 0.8
+                                    });
+                                }
                             }
                         });
                     }
