@@ -121,6 +121,211 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         })
     );
 
+    it("repairs a real mixed batch in picker order without silently applying the successful subset", () => {
+        cy.contains("button", "New multisample instrument…").click();
+        cy.get(editor + ' input[type="file"]')
+            .should("have.prop", "multiple", true)
+            .selectFile(
+                [
+                    { contents: wav(), fileName: "same.wav", mimeType: "audio/x-pn-wav" },
+                    {
+                        contents: Cypress.Buffer.alloc(16),
+                        fileName: "broken.wav",
+                        mimeType: "audio/wav"
+                    },
+                    { contents: wav(1200), fileName: "same.wav", mimeType: "audio/vnd.wave" }
+                ],
+                { force: true }
+            );
+        cy.get(editor + " select")
+            .first()
+            .should("not.be.disabled")
+            .should("be.focused")
+            .select("C3");
+        cy.get(editor + " select")
+            .eq(2)
+            .select("C4");
+        cy.contains(editor + " button", /^Apply$/).should("be.disabled");
+        cy.contains(editor + ' [role="status"]', "broken.wav");
+        cy.window().then(win =>
+            expect(activity(win).multisampleEditor.draft.samples.map(s => s.name)).to.deep.equal([
+                "same.wav",
+                "broken.wav",
+                "same.wav"
+            ])
+        );
+        cy.get(editor + ' button[aria-label^="Replace recording"]')
+            .eq(1)
+            .click();
+        cy.get(editor + ' input[type="file"]')
+            .should("have.prop", "multiple", false)
+            .selectFile(
+                {
+                    contents: wav(1000),
+                    fileName: "repaired.wav",
+                    mimeType: "application/octet-stream"
+                },
+                { force: true }
+            );
+        cy.get(editor + " select")
+            .eq(1)
+            .should("not.be.disabled")
+            .should("have.value", "")
+            .select("D3");
+        cy.contains(editor, "Root kept; check it matches the new recording.");
+        cy.get(editor).screenshot("i10-recording-batch-desktop");
+        cy.viewport(480, 600);
+        cy.get(editor).then($root => {
+            const rect = $root[0].getBoundingClientRect();
+            expect(rect.left).to.be.at.least(0);
+            expect(rect.right).to.be.at.most(480);
+        });
+        cy.get(editor).screenshot("i10-recording-batch-small");
+        cy.get(editor + ' button[aria-label^="Remove recording"]')
+            .eq(1)
+            .click();
+        cy.get(editor + " select")
+            .last()
+            .should("be.focused");
+        cy.contains(editor + " button", "Undo removal").click();
+        cy.get(editor + " select")
+            .eq(1)
+            .should("have.value", "D3")
+            .should("be.focused");
+        apply();
+        cy.window().then(win => {
+            const saved = owners(win)[0].value.samples;
+            expect(saved.map(s => [s.name, s.root])).to.deep.equal([
+                ["same.wav", "C3"],
+                ["repaired.wav", "D3"],
+                ["same.wav", "C4"]
+            ]);
+            expect(saved.map(s => s.data)).to.deep.equal(
+                [wav(), wav(1000), wav(1200)].map(
+                    bytes => "data:audio/wav;base64," + bytes.toString("base64")
+                )
+            );
+        });
+        reopen();
+        cy.get(editor + " select").should("have.length", 3);
+    });
+
+    it("keeps the saved snapshot through replacement cancellation, invalid upload and decode failure", () => {
+        create();
+        let original;
+        cy.window().then(win => {
+            original = JSON.parse(JSON.stringify(owners(win)[0].value));
+        });
+        reopen();
+        cy.get(editor + ' button[aria-label^="Replace recording"]').click();
+        cy.get(editor + ' input[type="file"]').trigger("cancel", { force: true });
+        cy.get(editor + " select").should("have.value", "C3");
+        cy.get(editor + ' button[aria-label^="Replace recording"]').click();
+        upload(Cypress.Buffer.alloc(16), "audio/wav");
+        cy.contains(editor + ' [role="status"]', "WAV");
+        cy.window().then(win =>
+            expect(activity(win).multisampleEditor.draft).to.deep.equal(original)
+        );
+        cy.get(editor + ' button[aria-label^="Replace recording"]').click();
+        upload(Cypress.Buffer.from("RIFF0000WAVE"), "audio/wav");
+        cy.get(editor + " select").should("have.value", "C3");
+        cy.contains(editor + " button", /^Apply$/).click();
+        cy.contains(editor + ' [role="status"]', "Unable to decode", { timeout: 40000 });
+        cy.get(editor + ' button[aria-label^="Replace recording"]').should("be.focused");
+        cy.contains(editor + " button", /^Cancel$/)
+            .should("not.be.disabled")
+            .click();
+        cy.contains(editor + " button", "Discard changes").click();
+        cy.window().then(win => expect(owners(win)[0].value).to.deep.equal(original));
+        reopen();
+        cy.get(editor + ' button[aria-label^="Replace recording"]').click();
+        upload(wav(1000));
+        cy.get(editor + " select").should("have.value", "C3");
+        apply();
+        cy.window().then(win =>
+            expect(owners(win)[0].value.samples[0].data).to.equal(
+                "data:audio/wav;base64," + wav(1000).toString("base64")
+            )
+        );
+        cy.get("body").trigger("keydown", { keyCode: 90, ctrlKey: true });
+        cy.window().should(win => expect(owners(win)[0].value).to.deep.equal(original));
+    });
+
+    it("caps a 17-file batch at 16, removes down to zero and restores a valid single recording", () => {
+        cy.contains("button", "New multisample instrument…").click();
+        cy.get(editor + ' input[type="file"]').selectFile(
+            Array.from({ length: 17 }, (_, i) => ({
+                contents: wav(),
+                fileName: i + ".wav",
+                mimeType: "audio/wav"
+            })),
+            { force: true }
+        );
+        cy.get(editor + " select")
+            .should("have.length", 16)
+            .first()
+            .should("not.be.disabled");
+        cy.contains(editor + ' [role="status"]', "16.wav");
+        cy.contains(editor + " button", "Add recordings…").should("be.disabled");
+        cy.get(editor + " select").each(($select, index) =>
+            cy
+                .wrap($select)
+                .select("C" + (1 + Math.floor(index / 2)))
+                .then(() => {
+                    if (index % 2) cy.wrap($select).select("D" + (1 + Math.floor(index / 2)));
+                })
+        );
+        cy.contains(editor + " button", /^Apply$/).should("not.be.disabled");
+        for (let i = 0; i < 16; i++)
+            cy.get(editor + ' button[aria-label^="Remove recording"]')
+                .first()
+                .click();
+        cy.contains(editor + ' [role="status"]', "Add at least one recording");
+        cy.contains(editor + " button", "Add recordings…").should("be.focused");
+        cy.contains(editor + " button", /^Apply$/).should("be.disabled");
+        cy.contains(editor + " button", "Undo removal").click();
+        cy.get(editor + " select")
+            .should("have.length", 1)
+            .should("have.value", "D8");
+        apply();
+        cy.window().then(win => expect(owners(win)[0].value.samples).to.have.length(1));
+    });
+
+    it("keeps Cancel usable during sequential reads and ignores a late read after dirty Close", () => {
+        cy.contains("button", "New multisample instrument…").click();
+        let release;
+        cy.window().then(win => {
+            const nativeRead = win.FileReader.prototype.readAsDataURL;
+            cy.stub(win.FileReader.prototype, "readAsDataURL").callsFake(function (file) {
+                release = () => nativeRead.call(this, file);
+            });
+        });
+        cy.get(editor + ' input[type="file"]').selectFile(
+            [
+                { contents: wav(), fileName: "pending.wav", mimeType: "audio/wav" },
+                { contents: wav(), fileName: "next.wav", mimeType: "audio/wav" }
+            ],
+            { force: true }
+        );
+        cy.contains(editor + " button", /^Apply$/).should("be.disabled");
+        cy.get(editor + ' button[aria-label^="Remove recording"]')
+            .first()
+            .should("be.disabled");
+        cy.get(editor + ' input[type="text"]').should("be.disabled");
+        cy.contains(editor + " button", /^Cancel$/).click();
+        cy.contains(editor + " button", "Keep editing")
+            .should("be.focused")
+            .click();
+        cy.contains(editor + ' [role="status"]', "Reading cancelled");
+        cy.contains(editor + " button", /^Apply$/).should("be.disabled");
+        cy.contains(editor + " button", /^Cancel$/).click();
+        cy.contains(editor + " button", "Discard changes").click();
+        cy.contains("button", "New multisample instrument…").click();
+        cy.then(() => release());
+        cy.get(editor + " select").should("not.exist");
+        cy.window().then(win => expect(owners(win)).to.have.length(0));
+    });
+
     it("creates exact embedded audio, reopens, edits, cancels and restores complete history", () => {
         create();
         let original;
@@ -268,7 +473,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
             expect($select[0].getBoundingClientRect().width).to.be.greaterThan(100);
             expect($select[0].selectedOptions[0].textContent).to.equal("C3");
         });
-        cy.contains(editor + " button", "Add recording…").click();
+        cy.contains(editor + " button", "Add recordings…").click();
         upload();
         cy.get(editor + " select")
             .should("have.length", 2)
