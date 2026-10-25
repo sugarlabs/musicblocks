@@ -818,7 +818,14 @@ describe("Blocks Foundation", () => {
         });
 
         describe("restoring connections", () => {
+            const shape = (style = "flow") => ({
+                isArgClamp: () => style === "argclamp",
+                isTwoArgBlock: () => style === "twoarg",
+                isArgBlock: () => false,
+                isExpandableBlock: () => style !== "flow"
+            });
             const flow = (x, y, connections) => ({
+                ...shape(),
                 trash: false,
                 container: { x, y },
                 docks: [
@@ -909,8 +916,35 @@ describe("Blocks Foundation", () => {
                 expect(blocks.blockMoved).toHaveBeenCalledWith(3);
             });
 
+            it.each([
+                ["twoarg", "_adjustExpandableTwoArgBlock"],
+                ["argclamp", "_adjustArgClampBlock"]
+            ])("resizes the %s block an undone argument leaves", (style, resize) => {
+                const host = { ...shape(style), trash: false, connections: [null, 1, null] };
+                blocks.blockList = [host, { trash: false, connections: [0] }];
+                blocks._adjustExpandableTwoArgBlock = jest.fn();
+                blocks._adjustArgClampBlock = jest.fn();
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 300,
+                    oldY: 50,
+                    newX: 20,
+                    newY: 0,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    to: { parent: 0, slot: 1 }
+                });
+
+                blocks.undoAction();
+
+                expect(host.connections).toEqual([null, null, null]);
+                expect(blocks[resize]).toHaveBeenCalledWith([0]);
+            });
+
             it("puts a replaced argument back into its slot in one undo", () => {
                 const host = {
+                    ...shape(),
                     trash: false,
                     container: { x: 0, y: 0 },
                     docks: [

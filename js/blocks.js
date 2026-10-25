@@ -7568,14 +7568,23 @@ class Blocks {
 
             const container = this.insideExpandableBlock(blk);
             const next = bottom === null ? filler : last(this.blockList[bottom].connections);
-            const connections = this.blockList[parent].connections;
-            connections[connections.indexOf(blk)] = next;
+            const parentBlock = this.blockList[parent];
+            parentBlock.connections[parentBlock.connections.indexOf(blk)] = next;
             this.blockList[blk].connections[0] = null;
             if (next !== null) {
                 this.blockList[next].connections[0] = parent;
             }
             if (bottom !== null) {
                 this.blockList[bottom].connections.splice(-1, 1, null);
+            }
+
+            if (parentBlock.isArgClamp()) {
+                this._adjustArgClampBlock([parent]);
+            } else if (
+                parentBlock.isTwoArgBlock() ||
+                (parentBlock.isArgBlock() && parentBlock.isExpandableBlock())
+            ) {
+                this._adjustExpandableTwoArgBlock([parent]);
             }
 
             this.addDefaultBlock(container, blk);
