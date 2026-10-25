@@ -1673,6 +1673,22 @@ describe("Logo runLogoCommands", () => {
         expect(mockActivity.refreshCanvas).toHaveBeenCalled();
     });
 
+    test("an active instrument editor blocks Play, selected stacks and Step before side effects", () => {
+        mockActivity.multisampleEditor = {};
+        logo.runFromBlock = jest.fn();
+        logo.synth.releaseMultisamples = jest.fn();
+        logo.runLogoCommands(null);
+        logo.runLogoCommands(0);
+        logo.step();
+        expect(mockActivity.errorMsg).toHaveBeenCalledTimes(3);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            "Finish or cancel instrument editing first."
+        );
+        expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+        expect(logo.synth.releaseMultisamples).not.toHaveBeenCalled();
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+    });
+
     test("Stop in a startup action prevents clocks and dispatch from restarting", () => {
         logo.safePluginExecute = jest.fn(() => logo.doStopTurtles());
         logo.evalOnStartList = { first: "stop", second: "obsolete" };

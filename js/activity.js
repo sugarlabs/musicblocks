@@ -215,7 +215,8 @@ let MYDEFINES = [
     "activity/blocks/MediaBlocks",
     "activity/blocks/SensorsBlocks",
     "activity/blocks/EnsembleBlocks",
-    "widgets/widgetWindows"
+    "widgets/widgetWindows",
+    "widgets/multisample"
 ];
 
 // Optional widget implementations are loaded by WidgetBlocks on first use.
@@ -2024,6 +2025,11 @@ class Activity {
          * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
         this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
+            this.multisampleProjectGeneration = (this.multisampleProjectGeneration || 0) + 1;
+            if (this.multisampleEditor) {
+                this.multisampleEditor.close(false);
+                this.textMsg(_("Unapplied instrument edits were discarded."));
+            }
             this.logo.invalidateMultisampleRun();
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
@@ -2292,6 +2298,10 @@ class Activity {
         };
 
         this._doOpenSamples = () => {
+            if (this.multisampleEditor) {
+                this.multisampleEditor.requestClose(() => this._doOpenSamples());
+                return;
+            }
             if (document.getElementById("palette").style.display !== "none")
                 document.getElementById("palette").style.display = "none";
             this.toolbar.closeAuxToolbar(this.showHideAuxMenu);
@@ -2306,6 +2316,10 @@ class Activity {
          * Uploads MB file to Planet
          */
         this.doUploadToPlanet = () => {
+            if (this.multisampleEditor) {
+                this.multisampleEditor.requestClose(() => this.doUploadToPlanet());
+                return;
+            }
             this.planet.openPlanet();
         };
 
@@ -3006,6 +3020,7 @@ class Activity {
                 document,
                 "keydown",
                 event => {
+                    if (event.target.closest?.("[data-multisample-editor]")) return;
                     if ((event.ctrlKey || event.metaKey) && event.code === "Space") {
                         event.preventDefault();
                         event.stopImmediatePropagation();

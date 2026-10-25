@@ -34,7 +34,7 @@
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
-   widgetWindows, Turtle, ManagedTimer, validateMultisample
+   widgetWindows, Turtle, ManagedTimer, validateMultisample, MultisampleEditor
  */
 
 /*
@@ -2526,6 +2526,8 @@ class Block {
      * @param {boolean} recordHistory - Record one completed replacement.
      */
     setMultisampleValue(value, recordHistory = false) {
+        this.blocks.activity?.multisampleEditor?.invalidateOwner(this);
+        this._multisampleRevision = (this._multisampleRevision || 0) + 1;
         const snapshot = value === undefined ? undefined : JSON.parse(JSON.stringify(value));
         const previous = this.value;
         this.blocks.activity?.logo?.invalidateMultisampleRun?.(this);
@@ -3534,6 +3536,10 @@ class Block {
             }
 
             hideDOMLabel();
+            if (that.name === "multisample" && !moved && !that.trash) {
+                MultisampleEditor.open(that.activity, that, that.accessibleElement);
+                return;
+            }
             that._checkWidgets(false);
 
             let topBlk;

@@ -4597,6 +4597,87 @@ describe("Multisample instruments", () => {
         expect(snapshot.samples[0].data).toBe(value.samples[0].data);
     });
 
+    test("unregisters only the Apply owner and permits an independent fresh attempt", async () => {
+        const draft = instrument();
+        const alias = synth.registerMultisample(draft);
+        const other = synth.registerMultisample(instrument());
+        await synth.__createSynth("multisample-editor", alias, alias, {});
+        await synth.loadSynth(0, other);
+        expect(synth.multisampleBytes).toBe(768);
+        synth.unregisterMultisample(draft);
+        expect(synth.isMultisampleAlias(alias)).toBe(false);
+        expect(synth.isMultisampleAlias(other)).toBe(true);
+        expect(synth.multisampleBytes).toBe(384);
+        const retry = synth.registerMultisample(draft);
+        expect(retry).not.toBe(alias);
+        await synth.__createSynth("multisample-editor", retry, retry, {});
+        expect(synth.multisampleBytes).toBe(768);
+        synth.unregisterMultisample(draft);
+        synth.unregisterMultisample(draft);
+        expect(synth.multisampleBytes).toBe(384);
+    });
+
+    test("abandoning a widget audition held in the legacy queue leaves ordinary playback intact", async () => {
+        await synth.createSynth(0, "audition", "sine", null);
+        const voice = synthInstruments[0].audition;
+        const queue = deferred();
+        const loaded = jest.spyOn(Tone.ToneAudioBuffer, "loaded").mockReturnValue(queue.promise);
+        let current = true;
+        const audition = synth.trigger(
+            0,
+            ["C4"],
+            1,
+            "audition",
+            null,
+            null,
+            false,
+            0,
+            undefined,
+            () => current
+        );
+        const ordinary = synth.trigger(0, ["D4"], 1, "audition", null, null, false, 0);
+        current = false;
+        queue.resolve();
+        await Promise.all([audition, ordinary]);
+        expect(voice.triggerAttackRelease).toHaveBeenCalledTimes(1);
+        expect(voice.triggerAttackRelease.mock.calls[0][0]).toBe("D4");
+        loaded.mockRestore();
+    });
+
+    test.each(["start", "load"])(
+        "a paused recorded audition cannot resume after delayed %s",
+        async boundary => {
+            const gate = deferred();
+            const player = {
+                toDestination() {
+                    return this;
+                },
+                load: jest.fn(() => (boundary === "load" ? gate.promise : Promise.resolve())),
+                start: jest.fn(),
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+            const makePlayer = jest.spyOn(Tone, "Player").mockImplementation(() => player);
+            const start = jest
+                .spyOn(Tone, "start")
+                .mockImplementation(() =>
+                    boundary === "start" ? gate.promise : Promise.resolve()
+                );
+            synth.audioURL = "blob:recorded-audition";
+            let current = true;
+            const playing = synth.playRecording(jest.fn(), () => current);
+            await flush();
+            current = false;
+            synth.stopPlayBackRecording();
+            gate.resolve();
+            await playing;
+            expect(player.start).not.toHaveBeenCalled();
+            if (boundary === "load") expect(player.dispose).toHaveBeenCalledTimes(1);
+            makePlayer.mockRestore();
+            start.mockRestore();
+        }
+    );
+
     test.each([
         null,
         {},

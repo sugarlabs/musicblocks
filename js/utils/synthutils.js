@@ -944,6 +944,18 @@ function Synth() {
 
     this.isMultisampleAlias = name => multisamples.has(name);
 
+    /** Release a detached editor preparation and its descriptor registration. */
+    this.unregisterMultisample = instrument => {
+        const name = multisampleNames.get(instrument);
+        const source = multisamples.get(name);
+        if (!source) return;
+        for (const entry of source.loads.values()) {
+            this.releaseMultisample(entry.turtle, entry.instrumentName, name);
+        }
+        multisamples.delete(name);
+        multisampleNames.delete(instrument);
+    };
+
     /** Release only feature owners, leaving legacy instruments and routing intact. */
     this.releaseMultisamples = () => {
         for (const [name, source] of multisamples) {
@@ -2285,6 +2297,7 @@ function Synth() {
      * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. a panner.
      * @param {number} [cents] - Detune applied to every note, e.g. a custom sample's tuning.
      * @param {object|null} [multisample] - Prepared owner supplied by trigger.
+     * @param {Function|null} [isCurrent] - Optional widget audition lifetime.
      */
     this._performNotes = async (
         synth,
@@ -2296,9 +2309,11 @@ function Synth() {
         future,
         output = Tone.Destination,
         cents = 0,
-        multisample = null
+        multisample = null,
+        isCurrent = null
     ) => {
         const isLive = () =>
+            (!isCurrent || isCurrent()) &&
             this._instrumentEpoch === epoch &&
             (!multisample || (multisample.isLive() && multisample.sampler === synth));
         const isStandardNote = note => {
@@ -2561,7 +2576,7 @@ function Synth() {
                         }
 
                         neighbor = new Tone.Part((time, value) => {
-                            if (multisample && !isLive()) return;
+                            if ((multisample || isCurrent) && !isLive()) return;
                             try {
                                 synth.triggerAttackRelease(value.note, value.duration, time);
                             } catch (error) {
@@ -2770,6 +2785,7 @@ function Synth() {
      * @param {boolean} setNote - Indicates whether to set the note on the synth.
      * @param {number} future - The time in the future when the notes should be played.
      * @param {Tone.ToneAudioNode} [output] - The node to play into, e.g. the turtle's panner.
+     * @param {Function|null} [isCurrent] - Optional widget audition lifetime.
      */
     this.trigger = async (
         turtle,
@@ -2780,8 +2796,10 @@ function Synth() {
         paramsFilters,
         setNote,
         future,
-        output
+        output,
+        isCurrent = null
     ) => {
+        if (isCurrent && !isCurrent()) return;
         // Capture the current instrument epoch to detect disposal during async operations
         const epoch = this._instrumentEpoch;
         const owner = multisampleOwner(turtle, instrumentName);
@@ -2801,7 +2819,11 @@ function Synth() {
             // Set a "Watchdog Timer" (Wait 2 seconds to avoid false positives)
             setTimeout(function () {
                 // If it is STILL suspended after 2 seconds, it is definitely blocked
-                if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
+                if (
+                    (!isCurrent || isCurrent()) &&
+                    Tone.context.state !== "running" &&
+                    !window.hasShownAudioWarning
+                ) {
                     window.hasShownAudioWarning = true;
                     const notice = _(
                         "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
@@ -2908,6 +2930,7 @@ function Synth() {
             }
 
             if (multisample && !multisample.isLive()) return;
+            if (isCurrent && !isCurrent()) return;
             this.routeInstrument(tempSynth, output);
 
             switch (flag) {
@@ -2944,7 +2967,8 @@ function Synth() {
                         multisample
                             ? 0
                             : this.sampleCentAdjustments[instrumentsSource[instrumentName][1]],
-                        multisample
+                        multisample,
+                        isCurrent
                     );
                     break;
                 case 3: // builtin synth
@@ -2961,7 +2985,10 @@ function Synth() {
                         paramsFilters,
                         setNote,
                         future,
-                        output
+                        output,
+                        0,
+                        null,
+                        isCurrent
                     );
                     break;
                 case 4:
@@ -2979,7 +3006,10 @@ function Synth() {
                         paramsFilters,
                         setNote,
                         future,
-                        output
+                        output,
+                        0,
+                        null,
+                        isCurrent
                     );
                     break;
             }
@@ -3284,7 +3314,8 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async onEnded => {
+    this.playRecording = async (onEnded, isCurrent = null) => {
+        if (isCurrent && !isCurrent()) return;
         _disposeRecordingPlayer();
         if (!this.audioURL) {
             if (typeof onEnded === "function") {
@@ -3293,6 +3324,7 @@ function Synth() {
             return;
         }
         await Tone.start();
+        if (isCurrent && !isCurrent()) return;
         if (
             Tone.context &&
             Tone.context.state !== "running" &&
@@ -3300,9 +3332,11 @@ function Synth() {
         ) {
             await Tone.context.resume();
         }
+        if (isCurrent && !isCurrent()) return;
         this.player = new Tone.Player().toDestination();
         let endedCalled = false;
         const handleEnded = () => {
+            if (isCurrent && !isCurrent()) return;
             if (endedCalled) return;
             endedCalled = true;
             if (this._recordingPlayTimeout) {
@@ -3317,7 +3351,13 @@ function Synth() {
         if ("onended" in this.player) {
             this.player.onended = handleEnded;
         }
-        await this.player.load(this.audioURL);
+        try {
+            await this.player.load(this.audioURL);
+        } catch (error) {
+            if (isCurrent && !isCurrent()) return;
+            throw error;
+        }
+        if (isCurrent && !isCurrent()) return;
         this.player.start();
         if (this.player.buffer && this.player.buffer.duration) {
             const durationMs = Math.ceil(this.player.buffer.duration * 1000) + 100;
