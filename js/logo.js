@@ -1743,6 +1743,10 @@ class Logo {
      * @returns {void}
      */
     step() {
+        if (this.activity.multisampleEditor) {
+            this.activity.errorMsg(_("Finish or cancel instrument editing first."));
+            return;
+        }
         const request = this._executionRequest;
         if (request && !request.queuesReady) {
             request.initialStep = true;
@@ -1806,6 +1810,10 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        if (this.activity.multisampleEditor) {
+            this.activity.errorMsg(_("Finish or cancel instrument editing first."));
+            return;
+        }
         if (
             this._executionRequest?.owners.length &&
             (!this._executionRequest.started || this.turtles.running())
