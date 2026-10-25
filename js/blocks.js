@@ -7551,31 +7551,45 @@ class Blocks {
         };
 
         /**
-         * Take the stack running from blk down to bottom out of the stack it
-         * is docked in. The blocks below it close the gap, or filler takes
-         * its place when blk sits in an argument slot.
-         * @param {number} blk
-         * @param {number|null} bottom - null for argument blocks
+         * Take the stack a move history entry is about (its block down to its
+         * bottom) out of the stack it is docked in, then dock it onto dock or
+         * leave it loose at x, y. The blocks below it close the gap, or filler
+         * takes its place when it sits in an argument slot. The blocks it left
+         * are resized once it is docked again, so a stack going back into the
+         * same clamp does not redraw that clamp twice.
+         * @param {object} action
+         * @param {{parent: number|null, slot: number|null}} dock
+         * @param {number} x
+         * @param {number} y
          * @param {number|null} filler
          * @private
-         * @returns {void}
+         * @returns {Promise}
          */
-        this._unlinkStack = (blk, bottom = null, filler = null) => {
+        this._moveStack = async (action, dock, x, y, filler = null) => {
+            const { blockId: blk, bottom = null } = action;
             const parent = this.blockList[blk].connections[0];
-            if (parent === null) {
-                return;
+            const parentBlock = this.blockList[parent];
+            const container = parentBlock ? this.insideExpandableBlock(blk) : null;
+            if (parentBlock) {
+                const next = bottom === null ? filler : last(this.blockList[bottom].connections);
+                parentBlock.connections[parentBlock.connections.indexOf(blk)] = next;
+                this.blockList[blk].connections[0] = null;
+                if (next !== null) {
+                    this.blockList[next].connections[0] = parent;
+                }
+                if (bottom !== null) {
+                    this.blockList[bottom].connections.splice(-1, 1, null);
+                }
+                this.addDefaultBlock(container, blk);
+                this.adjustDocks(this.findTopBlock(parent), true);
             }
 
-            const container = this.insideExpandableBlock(blk);
-            const next = bottom === null ? filler : last(this.blockList[bottom].connections);
-            const parentBlock = this.blockList[parent];
-            parentBlock.connections[parentBlock.connections.indexOf(blk)] = next;
-            this.blockList[blk].connections[0] = null;
-            if (next !== null) {
-                this.blockList[next].connections[0] = parent;
+            if (!(await this._dockStack(blk, dock))) {
+                this.moveBlock(blk, x, y);
             }
-            if (bottom !== null) {
-                this.blockList[bottom].connections.splice(-1, 1, null);
+
+            if (!parentBlock) {
+                return;
             }
 
             if (parentBlock.isArgClamp()) {
@@ -7586,8 +7600,6 @@ class Blocks {
             ) {
                 this._adjustExpandableTwoArgBlock([parent]);
             }
-
-            this.addDefaultBlock(container, blk);
             for (let clamp = container; clamp !== null; clamp = this.insideExpandableBlock(clamp)) {
                 this.clampBlocksToCheck.push([clamp, 0]);
                 if (this.blockList[clamp].name === "ifthenelse") {
@@ -7657,10 +7669,13 @@ class Blocks {
                 if (displaced && displaced.trash) {
                     this.activity._restoreTrashById(action.displaced);
                 }
-                this._unlinkStack(action.blockId, action.bottom, action.displaced);
-                if (!(await this._dockStack(action.blockId, action.from))) {
-                    this.moveBlock(action.blockId, action.oldX, action.oldY);
-                }
+                await this._moveStack(
+                    action,
+                    action.from,
+                    action.oldX,
+                    action.oldY,
+                    action.displaced
+                );
                 this.activity.refreshCanvas();
             } else if (action.type === "trash") {
                 this.activity._restoreTrashById(action.blockId);
@@ -7712,10 +7727,7 @@ class Blocks {
             this.isUndoingOrRedoing = true;
 
             if (action.type === "move") {
-                this._unlinkStack(action.blockId, action.bottom);
-                if (!(await this._dockStack(action.blockId, action.to))) {
-                    this.moveBlock(action.blockId, action.newX, action.newY);
-                }
+                await this._moveStack(action, action.to, action.newX, action.newY);
                 this.activity.refreshCanvas();
             } else if (action.type === "trash") {
                 const block = this.blockList[action.blockId];

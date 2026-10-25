@@ -881,6 +881,37 @@ describe("Blocks Foundation", () => {
                 expect(blocks.blockMoved).toHaveBeenCalledWith(3);
             });
 
+            it("resizes the clamp a stack left only once the stack is docked again", async () => {
+                blocks.blockList = [
+                    flow(100, 100, [null, null]),
+                    flow(400, 100, [null, 2]),
+                    flow(400, 140, [1, 3]),
+                    flow(400, 180, [2, null])
+                ];
+                blocks.insideExpandableBlock = jest.fn(blk => (blk === 3 ? 1 : null));
+                let resizedBeforeDocking = null;
+                blocks.blockMoved = jest.fn(() => {
+                    resizedBeforeDocking = blocks.adjustExpandableClampBlock.mock.calls.length > 0;
+                });
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 3,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 180,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 3,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(resizedBeforeDocking).toBe(false);
+                expect(blocks.clampBlocksToCheck).toEqual([[1, 0]]);
+                expect(blocks.adjustExpandableClampBlock).toHaveBeenCalledTimes(1);
+            });
+
             it("docks a block moved back up its own stack onto where its old parent is now", async () => {
                 // 3 was dragged from under 2 to under 0; undoing must follow 2 to y = 180
                 blocks.blockList = [
