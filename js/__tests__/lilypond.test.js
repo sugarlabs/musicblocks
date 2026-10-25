@@ -190,34 +190,73 @@ describe("processLilypondNotes", () => {
         }
     );
 
-    test("should process a slur correctly", () => {
+    test("should process a slur covering multiple notes correctly", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin slur",
+            [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
+            "end slur"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  a'4 )  ");
+    });
+
+    test("should omit a slur covering only a single note", () => {
         logo.notation.notationStaging[turtle] = [
             "begin slur",
             [["G4"], 4, 0, null, 0, -1, false],
             "end slur"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  )  ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 ");
+        expect(logo.notationNotes[turtle]).not.toContain("(");
+        expect(logo.notationNotes[turtle]).not.toContain(")");
     });
 
-    test("should process a crescendo correctly", () => {
+    test("should process a crescendo covering multiple notes correctly", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin crescendo",
+            [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
+            "end crescendo"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< a'4 \\! ");
+    });
+
+    test("should omit a crescendo covering only a single note", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
             [["G4"], 4, 0, null, 0, -1, false],
             "end crescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 ");
+        expect(logo.notationNotes[turtle]).not.toContain("\\<");
+        expect(logo.notationNotes[turtle]).not.toContain("\\!");
     });
 
-    test("should process a decrescendo correctly", () => {
+    test("should process a decrescendo covering multiple notes correctly", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin decrescendo",
+            [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
+            "end decrescendo"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> a'4 \\! ");
+    });
+
+    test("should omit a decrescendo covering only a single note", () => {
         logo.notation.notationStaging[turtle] = [
             "begin decrescendo",
             [["G4"], 4, 0, null, 0, -1, false],
             "end decrescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 ");
+        expect(logo.notationNotes[turtle]).not.toContain("\\>");
+        expect(logo.notationNotes[turtle]).not.toContain("\\!");
     });
 
     test("should process a tuplet correctly", () => {

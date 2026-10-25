@@ -151,6 +151,45 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     const staged = logo.notation.notationStaging[turtle];
     const lastRepeat = staged.lastIndexOf("begin repeat");
     const repeatStart = staged.slice(lastRepeat + 1).some(Array.isArray) ? lastRepeat : -1;
+
+    // Slurs and hairpins that cover fewer than 2 notes cannot be rendered
+    // properly by LilyPond (which cannot end a spanner on the note where it begins).
+    // Omit single-note and empty spanners so the output compiles without warnings.
+    const omittedSpanners = new Set();
+    const spannerTypes = [
+        { begin: "begin slur", end: "end slur" },
+        { begin: "begin crescendo", end: "end crescendo" },
+        { begin: "begin decrescendo", end: "end decrescendo" }
+    ];
+
+    for (const { begin, end } of spannerTypes) {
+        const stack = [];
+        for (let idx = 0; idx < staged.length; idx++) {
+            const item = staged[idx];
+            if (item === begin) {
+                stack.push({ beginIndex: idx, noteCount: 0 });
+            } else if (item === end) {
+                if (stack.length > 0) {
+                    const spanner = stack.pop();
+                    if (spanner.noteCount < 2) {
+                        omittedSpanners.add(spanner.beginIndex);
+                        omittedSpanners.add(idx);
+                    }
+                } else {
+                    omittedSpanners.add(idx);
+                }
+            } else if (Array.isArray(item)) {
+                for (const active of stack) {
+                    active.noteCount++;
+                }
+            }
+        }
+        for (const unclosed of stack) {
+            if (unclosed.noteCount < 2) {
+                omittedSpanners.add(unclosed.beginIndex);
+            }
+        }
+    }
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
@@ -243,10 +282,14 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             ["end slur", "end crescendo", "end decrescendo", "markup", "markdown"].includes(nextObj)
         ) {
             if (nextObj === "end slur") {
-                logo.notationNotes[turtle] += ")  ";
+                if (!omittedSpanners.has(i + j)) {
+                    logo.notationNotes[turtle] += ")  ";
+                }
                 j += 1;
             } else if (nextObj === "end crescendo" || nextObj === "end decrescendo") {
-                logo.notationNotes[turtle] += "\\! ";
+                if (!omittedSpanners.has(i + j)) {
+                    logo.notationNotes[turtle] += "\\! ";
+                }
                 j += 1;
             } else if (nextObj === "markup") {
                 logo.notationNotes[turtle] +=
@@ -325,25 +368,37 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     articulation = false;
                     break;
                 case "begin crescendo":
-                    logo.notationNotes[turtle] += "  ";
-                    queueCrescendo = true;
+                    if (!omittedSpanners.has(i)) {
+                        logo.notationNotes[turtle] += "  ";
+                        queueCrescendo = true;
+                    }
                     break;
                 case "begin decrescendo":
-                    logo.notationNotes[turtle] += "  ";
-                    queueDecrescendo = true;
+                    if (!omittedSpanners.has(i)) {
+                        logo.notationNotes[turtle] += "  ";
+                        queueDecrescendo = true;
+                    }
                     break;
                 case "end crescendo":
-                    logo.notationNotes[turtle] += "\\! ";
+                    if (!omittedSpanners.has(i)) {
+                        logo.notationNotes[turtle] += "\\! ";
+                    }
                     break;
                 case "end decrescendo":
-                    logo.notationNotes[turtle] += "\\! ";
+                    if (!omittedSpanners.has(i)) {
+                        logo.notationNotes[turtle] += "\\! ";
+                    }
                     break;
                 case "begin slur":
-                    // The ( is added after the first note.
-                    queueSlur = true;
+                    if (!omittedSpanners.has(i)) {
+                        // The ( is added after the first note.
+                        queueSlur = true;
+                    }
                     break;
                 case "end slur":
-                    logo.notationNotes[turtle] += ")  ";
+                    if (!omittedSpanners.has(i)) {
+                        logo.notationNotes[turtle] += ")  ";
+                    }
                     break;
                 case "begin repeat":
                     if (i === repeatStart) {
