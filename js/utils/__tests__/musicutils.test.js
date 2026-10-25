@@ -1024,6 +1024,26 @@ describe("getNoiseName", () => {
         expect(getNoiseName("noise1")).toBe("white noise");
         expect(getNoiseName("noise3")).toBe("pink noise");
     });
+    it("should return corresponding display name when searching by display name", () => {
+        expect(getNoiseName("white noise")).toBe("white noise");
+        expect(getNoiseName("pink noise")).toBe("pink noise");
+        expect(getNoiseName("brown noise")).toBe("brown noise");
+    });
+    it("should return identifier when display name is empty", () => {
+        expect(getNoiseName("custom noise")).toBe("custom noise");
+    });
+    it("should resolve localized and cross-language noise display names via _()", () => {
+        const savedTranslate = global._;
+        global._ = str => (str === "pink noise" ? "ruido rosa" : str);
+        global.NOISENAMES = [["ruido rosa", "noise3", "images/noise3.svg"]];
+        try {
+            expect(getNoiseName("ruido rosa")).toBe("ruido rosa");
+            expect(getNoiseName("pink noise")).toBe("ruido rosa");
+            expect(getNoiseName("noise3")).toBe("ruido rosa");
+        } finally {
+            global._ = savedTranslate;
+        }
+    });
 });
 
 describe("getNoiseIcon", () => {
