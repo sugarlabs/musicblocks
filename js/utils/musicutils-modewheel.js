@@ -44,9 +44,10 @@ if (typeof module !== "undefined" && module.exports) {
 var getSavedCustomModes = () => {
     try {
         const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
-        // Only keep modes whose pattern is a list of positive whole steps, so
-        // a broken saved entry can't show up in the menus and then play as
-        // something else.
+        // Only keep modes whose pattern is a list of positive whole steps (that
+        // add up to the saved EDO, when one is saved), so a broken saved entry
+        // can't show up in the menus and then play as something else. The sum
+        // is checked against the mode's own EDO, not the current tuning.
         return Array.isArray(customModes)
             ? customModes.filter(
                   m =>
@@ -54,7 +55,11 @@ var getSavedCustomModes = () => {
                       typeof m.name === "string" &&
                       Array.isArray(m.pattern) &&
                       m.pattern.length > 0 &&
-                      m.pattern.every(step => Number.isInteger(step) && step > 0)
+                      m.pattern.every(step => Number.isInteger(step) && step > 0) &&
+                      (!Object.prototype.hasOwnProperty.call(m, "edo") ||
+                          (Number.isInteger(m.edo) &&
+                              m.edo > 0 &&
+                              m.pattern.reduce((a, b) => a + b, 0) === m.edo))
               )
             : [];
     } catch (e) {

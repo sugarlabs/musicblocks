@@ -5305,6 +5305,19 @@ describe("mode pie menu shared helpers", () => {
             expect(getSavedCustomModes()).toEqual([{ name: "good", pattern: [2, 2, 3, 2, 3] }]);
         });
 
+        it("keeps a saved mode only when its steps add up to its own saved EDO", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "fits 12", pattern: [2, 2, 3, 2, 3], edo: 12 },
+                    { name: "fits 19", pattern: [3, 3, 2, 3, 3, 3, 2], edo: 19 },
+                    { name: "wrong sum", pattern: [2, 2, 3, 2, 3], edo: 19 },
+                    { name: "bad edo", pattern: [2, 2, 3, 2, 3], edo: "12" }
+                ])
+            );
+            expect(getSavedCustomModes().map(m => m.name)).toEqual(["fits 12", "fits 19"]);
+        });
+
         it("returns an empty list for corrupt or non-array data", () => {
             localStorage.setItem("customModes", "{not json");
             expect(getSavedCustomModes()).toEqual([]);
