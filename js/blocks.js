@@ -7603,9 +7603,9 @@ class Blocks {
          * @param {number} blk
          * @param {{parent: number|null, slot: number|null}} dock
          * @private
-         * @returns {boolean} false when there is nothing to dock onto
+         * @returns {Promise<boolean>} false when there is nothing to dock onto
          */
-        this._dockStack = (blk, { parent, slot } = {}) => {
+        this._dockStack = async (blk, { parent, slot } = {}) => {
             const myBlock = this.blockList[blk];
             const parentBlock = this.blockList[parent];
             if (!parentBlock || parentBlock.trash || myBlock.trash) {
@@ -7617,9 +7617,25 @@ class Blocks {
                 parentBlock.container.x + parentBlock.docks[slot][0] - myBlock.docks[0][0],
                 parentBlock.container.y + parentBlock.docks[slot][1] - myBlock.docks[0][1]
             );
-            this.blockMoved(blk);
+            await this.blockMoved(blk);
             return true;
         };
+
+        /**
+         * Run undo and redo steps one at a time, so a stack that is still
+         * docking is in place before the next step reads the connections.
+         * @param {Function} step
+         * @private
+         * @returns {Promise}
+         */
+        this._historyQueue = Promise.resolve();
+        this._queueHistoryStep = step => {
+            this._historyQueue = this._historyQueue.then(step, step);
+            return this._historyQueue;
+        };
+
+        this.undoAction = () => this._queueHistoryStep(this._undoStep);
+        this.redoAction = () => this._queueHistoryStep(this._redoStep);
 
         /**
          * Send a stack of blocks to the trash.
@@ -7627,7 +7643,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.undoAction = () => {
+        this._undoStep = async () => {
             if (!this.actionHistory || this.actionHistory.length === 0) {
                 this.activity.textMsg(_("Nothing to undo."), 3000);
                 return;
@@ -7642,13 +7658,13 @@ class Blocks {
                     this.activity._restoreTrashById(action.displaced);
                 }
                 this._unlinkStack(action.blockId, action.bottom, action.displaced);
-                if (!this._dockStack(action.blockId, action.from)) {
+                if (!(await this._dockStack(action.blockId, action.from))) {
                     this.moveBlock(action.blockId, action.oldX, action.oldY);
                 }
                 this.activity.refreshCanvas();
             } else if (action.type === "trash") {
                 this.activity._restoreTrashById(action.blockId);
-                this._dockStack(action.blockId, action.from);
+                await this._dockStack(action.blockId, action.from);
             } else if (action.type === "restore") {
                 const block = this.blockList[action.blockId];
                 if (block) this.sendStackToTrash(block);
@@ -7686,7 +7702,7 @@ class Blocks {
             }
         };
 
-        this.redoAction = () => {
+        this._redoStep = async () => {
             if (!this.redoActionHistory || this.redoActionHistory.length === 0) {
                 this.activity.textMsg(_("Nothing to redo."), 3000);
                 return;
@@ -7697,7 +7713,7 @@ class Blocks {
 
             if (action.type === "move") {
                 this._unlinkStack(action.blockId, action.bottom);
-                if (!this._dockStack(action.blockId, action.to)) {
+                if (!(await this._dockStack(action.blockId, action.to))) {
                     this.moveBlock(action.blockId, action.newX, action.newY);
                 }
                 this.activity.refreshCanvas();
