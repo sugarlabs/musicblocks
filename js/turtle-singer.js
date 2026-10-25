@@ -2480,8 +2480,16 @@ class Singer {
                                 activity.logo.runningMIDI;
                             if (typeof d === "number" && d > 0 && isFinite(d)) {
                                 if (exporting) {
+                                    // A note with cents or set in hertz is a frequency; MIDI
+                                    // takes the nearest 12-EDO note name.
                                     activity.logo.notationMIDI(
-                                        chordNotes,
+                                        chordNotes.map(note => {
+                                            if (typeof note !== "number") {
+                                                return note;
+                                            }
+                                            const [name, octave] = frequencyToPitch(note);
+                                            return name + octave;
+                                        }),
                                         chordDrums,
                                         d,
                                         turtle,

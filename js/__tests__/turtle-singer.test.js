@@ -1824,6 +1824,40 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 
+    test("passes a hertz note to notationMIDI as its nearest note name", () => {
+        const blk = "hertzNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["A"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [39] };
+        turtleMock.singer.noteHertz = { [blk]: [450] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        const savedFrequencyToPitch = global.frequencyToPitch;
+        global.frequencyToPitch = jest.fn(() => ["A", 4, 39.1]);
+        try {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        } finally {
+            global.frequencyToPitch = savedFrequencyToPitch;
+        }
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["A4"],
+            [],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4]
+        );
+        // The other notations read frequencies themselves.
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
+    });
+
     test.each([
         { bpm: [], masterBPM: 180, recorded: 180 },
         { bpm: [120], masterBPM: 180, recorded: 120 }
