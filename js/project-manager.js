@@ -713,6 +713,10 @@ class ProjectManager {
 
     _loadProject(projectID, flags) {
         const that = this.activity;
+        if (that.multisampleEditor) {
+            that.multisampleEditor.requestClose(() => this._loadProject(projectID, flags));
+            return;
+        }
 
         if (that.planet === undefined) {
             return;
@@ -884,6 +888,10 @@ class ProjectManager {
     }
 
     newProject() {
+        if (this.activity.multisampleEditor) {
+            this.activity.multisampleEditor.requestClose(() => this.newProject());
+            return;
+        }
         this._afterDelete();
     }
 
@@ -893,6 +901,10 @@ class ProjectManager {
 
     _doLoad(merge) {
         const that = this.activity;
+        if (!merge && that.multisampleEditor) {
+            that.multisampleEditor.requestClose(() => this._doLoad(merge));
+            return;
+        }
 
         that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
         if (merge === undefined) {
@@ -1448,6 +1460,19 @@ class ProjectManager {
         };
 
         const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+            if (that.multisampleEditor) {
+                finishLoading();
+                that.multisampleEditor.requestClose(() => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+                    replaceProjectFromFile(obj, file, errorOperation, clearCanvas).catch(error => {
+                        ErrorHandler.capture(error, { operation: errorOperation });
+                        finishLoading();
+                    });
+                });
+                return;
+            }
             if (that.planet) {
                 try {
                     await that.planet.saveLocally({ rejectOnProjectSaveError: true });
