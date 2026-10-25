@@ -4558,13 +4558,19 @@ describe("Multisample instruments", () => {
         global.Singer = { masterVolume: [50] };
         samplers = [];
         const pitches = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-        jest.spyOn(Tone, "Frequency").mockImplementation(root => ({
-            toMidi: () => {
+        jest.spyOn(Tone, "Frequency").mockImplementation(root => {
+            const midi = () => {
+                if (typeof root === "number") return Math.round(69 + 12 * Math.log2(root / 440));
                 const [, letter, accidental, octave] = /^([A-G])([#bx]*)(\d)$/.exec(root);
                 const offset = { "": 0, "#": 1, "##": 2, "b": -1, "bb": -2, "x": 2 }[accidental];
                 return (Number(octave) + 1) * 12 + pitches[letter] + offset;
-            }
-        }));
+            };
+            return {
+                toMidi: midi,
+                toFrequency: () =>
+                    typeof root === "number" ? root : 440 * Math.pow(2, (midi() - 69) / 12)
+            };
+        });
         originalLoad = Tone.ToneAudioBuffer.load;
         decode = Tone.ToneAudioBuffer.load = jest.fn(async () => pcm());
         const originalSampler = Tone.Sampler;
@@ -4615,6 +4621,61 @@ describe("Multisample instruments", () => {
         synth.unregisterMultisample(draft);
         synth.unregisterMultisample(draft);
         expect(synth.multisampleBytes).toBe(384);
+    });
+
+    test("bounds natural audition cleanup without selecting or retaining another audio copy", async () => {
+        const draft = instrument();
+        draft.samples = draft.samples.slice(0, 1);
+        decode.mockResolvedValue({ ...pcm(), duration: 2 });
+        const alias = synth.registerMultisample(draft);
+        await synth.__createSynth("multisample-editor", alias, alias, {});
+        expect(synth.getMultisampleDuration("multisample-editor", alias, "C3")).toBeCloseTo(2);
+        expect(synth.getMultisampleDuration("multisample-editor", alias, "C2")).toBeCloseTo(4);
+        expect(synth.getMultisampleDuration("multisample-editor", alias, "C4")).toBeCloseTo(1);
+        synth.unregisterMultisample(draft);
+        expect(synth.getMultisampleDuration("multisample-editor", alias, "C3")).toBeNull();
+        expect(synth.multisampleBytes).toBe(0);
+    });
+
+    test("natural cleanup preserves a downward fractional target's complete tail", async () => {
+        const draft = instrument();
+        draft.samples = [{ ...draft.samples[0], root: "C4" }];
+        decode.mockResolvedValue({ ...pcm(), duration: 10 });
+        const alias = synth.registerMultisample(draft);
+        await synth.__createSynth("multisample-editor", alias, alias, {});
+        expect(synth.getMultisampleDuration("multisample-editor", alias, 254.3246)).toBeGreaterThan(
+            10.28
+        );
+        expect(synth.getMultisampleDuration("multisample-editor", alias, 254.3246)).toBeLessThan(
+            10.3
+        );
+    });
+
+    test("distant unused roots cannot strand a short audition or overflow its timer", async () => {
+        const draft = instrument();
+        draft.samples = [
+            { ...draft.samples[0], root: "C1" },
+            { ...draft.samples[1], root: "B8" }
+        ];
+        decode
+            .mockResolvedValueOnce({ ...pcm(), duration: 1 })
+            .mockResolvedValueOnce({ ...pcm(), duration: 60 });
+        const alias = synth.registerMultisample(draft);
+        await synth.__createSynth("multisample-editor", alias, alias, {});
+        expect(synth.getMultisampleDuration("multisample-editor", alias, "C0")).toBeCloseTo(2);
+    });
+
+    test("midpoint cleanup safely bounds both candidate durations without choosing playback", async () => {
+        const draft = instrument();
+        draft.samples = draft.samples.slice(0, 2);
+        decode
+            .mockResolvedValueOnce({ ...pcm(), duration: 10 })
+            .mockResolvedValueOnce({ ...pcm(), duration: 1 });
+        const alias = synth.registerMultisample(draft);
+        await synth.__createSynth("multisample-editor", alias, alias, {});
+        expect(synth.getMultisampleDuration("multisample-editor", alias, "F#3")).toBeCloseTo(
+            7.071067812
+        );
     });
 
     test("abandoning a widget audition held in the legacy queue leaves ordinary playback intact", async () => {

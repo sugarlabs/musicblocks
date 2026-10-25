@@ -15,7 +15,7 @@ const editor = "[data-multisample-editor]";
 const activity = win => win.ActivityContext.getActivity();
 const owners = win =>
     activity(win).blocks.blockList.filter(b => b && !b.trash && b.name === "multisample");
-const wav = (frames = 800) => {
+const wav = (frames = 800, frequency = 130.8128, harmonic = 0) => {
     const bytes = Cypress.Buffer.alloc(44 + frames * 2);
     bytes.write("RIFF");
     bytes.writeUInt32LE(bytes.length - 8, 4);
@@ -29,11 +29,15 @@ const wav = (frames = 800) => {
     bytes.writeUInt16LE(16, 34);
     bytes.write("data", 36);
     bytes.writeUInt32LE(frames * 2, 40);
-    for (let i = 0; i < frames; i++)
+    for (let i = 0; i < frames; i++) {
+        const phase = (2 * Math.PI * frequency * i) / 8000;
         bytes.writeInt16LE(
-            Math.round(14000 * Math.sin((2 * Math.PI * 130.8128 * i) / 8000)),
+            Math.round(
+                14000 * (Math.sin(phase) + (harmonic ? 0.5 * Math.sin(harmonic * phase) : 0))
+            ),
             44 + 2 * i
         );
+    }
     return bytes;
 };
 const upload = (contents = wav(), mimeType = "application/octet-stream") => {
@@ -68,14 +72,62 @@ const create = () => {
     cy.get(editor + " select")
         .should("have.value", "")
         .select("C3");
-    cy.get(editor + ' input[type="text"]')
+    cy.get(editor + ' input[name="multisample-name"]')
         .clear()
         .type("弦 <b>Instrument</b>", { parseSpecialCharSequences: false });
     apply();
     cy.window().should(win => expect(owners(win)).to.have.length(1));
 };
 
+const savedAudition = () => {
+    const descriptor = {
+        type: "multisample",
+        version: 1,
+        name: "I11 saved audition",
+        samples: [
+            {
+                name: "low.wav",
+                root: "C3",
+                data: "data:audio/wav;base64," + wav(24000).toString("base64")
+            },
+            {
+                name: "high.wav",
+                root: "C4",
+                data: "data:audio/wav;base64," + wav(24000, 261.6255653, 3).toString("base64")
+            }
+        ]
+    };
+    const project = [
+        [0, "settimbre", 100, 100, [null, 1, null, 2]],
+        [1, ["multisample", { value: descriptor }], 0, 0, [0]],
+        [2, "hidden", 0, 0, [0, null]]
+    ];
+    cy.get("#myOpenFile").selectFile(
+        { contents: Cypress.Buffer.from(JSON.stringify(project)), fileName: "audition.tb" },
+        { force: true }
+    );
+    cy.window().should(win => {
+        expect(activity(win).blocks.isLoading()).to.equal(false);
+        expect(owners(win)).to.have.length(1);
+        expect(owners(win)[0].value.name).to.equal(descriptor.name);
+        expect(activity(win).logo._synthsInitialized).to.equal(false);
+    });
+    reopen();
+};
+
+const amplitude = (samples, rate, frequency) => {
+    let real = 0,
+        imaginary = 0;
+    for (let i = 0; i < samples.length; i++) {
+        const phase = (2 * Math.PI * frequency * i) / rate;
+        real += samples[i] * Math.cos(phase);
+        imaginary += samples[i] * Math.sin(phase);
+    }
+    return (2 * Math.hypot(real, imaginary)) / samples.length;
+};
+
 describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, () => {
+    let auditionMeter;
     beforeEach(() => {
         const marker = "I09 Sampler " + Date.now() + " " + Math.random();
         cy.visit("http://127.0.0.1:3000", { onBeforeLoad: win => win.localStorage.clear() });
@@ -116,10 +168,187 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
 
     afterEach(() =>
         cy.window().then(win => {
+            auditionMeter?.dispose();
+            auditionMeter = null;
             activity(win).multisampleEditor?.close();
             activity(win).logo?.doStopTurtles();
         })
     );
+
+    it("listens to an unassigned row at original pitch and previews Tone's higher midpoint source", () => {
+        savedAudition();
+        let attacks;
+        cy.window().then(win => {
+            attacks = [];
+            const original = win.Tone.Sampler.prototype.triggerAttack;
+            cy.stub(win.Tone.Sampler.prototype, "triggerAttack").callsFake(function (...args) {
+                auditionMeter?.dispose();
+                auditionMeter = new win.Tone.Analyser("waveform", 8192);
+                this.connect(auditionMeter);
+                attacks.push(args[0]);
+                return original.apply(this, args);
+            });
+        });
+        cy.get(editor + " select")
+            .first()
+            .select("");
+        cy.contains(editor + " button", "Preview instrument").should("be.disabled");
+        cy.get(editor + ' button[aria-label^="Listen to recording"]')
+            .first()
+            .click();
+        cy.window().should(win => {
+            const pcm = auditionMeter.getValue();
+            const rate = win.Tone.getContext().sampleRate;
+            expect(amplitude(pcm, rate, 130.8128)).to.be.greaterThan(0.03);
+            expect(amplitude(pcm, rate, 261.6256)).to.be.lessThan(0.02);
+            expect(activity(win).multisampleEditor.draft.samples[0].root).to.equal("");
+            const synth = activity(win).logo.synth;
+            expect(
+                synth.getPreparedMultisample(
+                    "multisample-editor",
+                    activity(win).multisampleEditor.work.descriptor
+                )
+            ).to.be.a("string");
+        });
+        cy.contains(editor + " button", /^Stop$/).click();
+        cy.window().should(() =>
+            expect(Math.max(...Array.from(auditionMeter.getValue(), Math.abs))).to.be.lessThan(
+                0.002
+            )
+        );
+        cy.get(editor + " select")
+            .first()
+            .select("C3");
+        cy.get(editor + ' input[list="multisample-preview-pitches"]')
+            .should("have.value", "C4")
+            .clear()
+            .type("F#3");
+        cy.contains(editor + " button", "Preview instrument").click();
+        cy.window().should(win => {
+            const pcm = auditionMeter.getValue();
+            const rate = win.Tone.getContext().sampleRate;
+            const frequency = 184.9972114;
+            const fundamental = amplitude(pcm, rate, frequency);
+            expect(fundamental).to.be.greaterThan(0.03);
+            expect(amplitude(pcm, rate, frequency * 3) / fundamental).to.be.within(0.3, 0.7);
+            expect(amplitude(pcm, rate, frequency * 2) / fundamental).to.be.lessThan(0.12);
+            expect(attacks).to.deep.equal(["C4", "F#3"]);
+        });
+        cy.window({ timeout: 10000 }).should(win => {
+            expect(activity(win).logo.synth.multisampleBytes).to.equal(0);
+            expect(activity(win).multisampleEditor.work).to.equal(null);
+            expect(activity(win).multisampleEditor.busy).to.equal(null);
+            expect(owners(win)[0].value.samples.map(s => s.root)).to.deep.equal(["C3", "C4"]);
+        });
+    });
+
+    it("Stop/retry never waits for a held decoder or sounds its late result", () => {
+        savedAudition();
+        let release;
+        let load;
+        let attacks;
+        cy.window().then(win => {
+            const original = win.Tone.ToneAudioBuffer.load;
+            load = cy.stub(win.Tone.ToneAudioBuffer, "load");
+            load.onFirstCall().returns(
+                new Promise(resolve => {
+                    release = () =>
+                        original
+                            .call(win.Tone.ToneAudioBuffer, owners(win)[0].value.samples[0].data)
+                            .then(resolve);
+                })
+            );
+            load.callThrough();
+            attacks = cy.spy(win.Tone.Sampler.prototype, "triggerAttack");
+        });
+        cy.get(editor + ' button[aria-label^="Listen to recording"]')
+            .first()
+            .click();
+        cy.get(editor + ' [role="status"]').should("contain.text", "Preparing audition");
+        cy.contains(editor + " button", /^Stop$/)
+            .should("be.visible")
+            .click();
+        cy.get(editor + ' button[aria-label^="Listen to recording"]')
+            .last()
+            .click();
+        cy.get(editor + ' [role="status"]').should("contain.text", "Playing audition");
+        cy.then(() => release());
+        cy.window().then(win => {
+            expect(attacks).to.have.been.calledOnce;
+            expect(load).to.have.been.calledTwice;
+            expect(activity(win).logo.synth.multisampleBytes).to.be.greaterThan(0);
+        });
+        cy.contains(editor + " button", /^Stop$/).click();
+        cy.window().then(win => expect(activity(win).logo.synth.multisampleBytes).to.equal(0));
+    });
+
+    it("repairs audition failure and keeps Stop, pitch and Apply reachable in a narrow window", () => {
+        cy.viewport(480, 600);
+        savedAudition();
+        let load;
+        cy.window().then(win => {
+            load = cy.stub(win.Tone.ToneAudioBuffer, "load");
+            load.onFirstCall().rejects(new Error("controlled failure"));
+            load.callThrough();
+        });
+        cy.get(editor + ' button[aria-label^="Listen to recording"]')
+            .first()
+            .click();
+        cy.get(editor + ' [role="status"]')
+            .should("contain.text", "low.wav")
+            .and("contain.text", "Unable to decode");
+        cy.window().then(win => expect(activity(win).logo.synth.multisampleBytes).to.equal(0));
+        cy.get(editor + ' input[list="multisample-preview-pitches"]')
+            .scrollIntoView()
+            .focus()
+            .should("be.focused")
+            .trigger("keydown", { key: "ArrowDown" })
+            .trigger("keydown", { key: "Escape" });
+        cy.get(editor).should("exist");
+        cy.contains(editor + " button", "Preview instrument")
+            .scrollIntoView()
+            .click();
+        cy.get(editor + ' [role="status"]').should("contain.text", "Playing audition");
+        cy.contains(editor + " button", /^Stop$/)
+            .scrollIntoView()
+            .should("be.visible")
+            .click();
+        cy.get(editor + ' input[name="multisample-name"]')
+            .clear()
+            .type("I11 applied after audition");
+        apply();
+        cy.window().then(win => {
+            expect(owners(win)[0].value.name).to.equal("I11 applied after audition");
+            expect(activity(win).logo.synth.multisampleBytes).to.equal(0);
+        });
+    });
+
+    it("repeated real auditions and project replacement release their dedicated owners", () => {
+        savedAudition();
+        let disposals;
+        cy.window().then(win => {
+            disposals = cy.spy(win.Tone.Sampler.prototype, "dispose");
+        });
+        for (let i = 0; i < 10; i++) {
+            cy.get(editor + ' button[aria-label^="Listen to recording"]')
+                .first()
+                .click();
+            cy.get(editor + ' [role="status"]').should("contain.text", "Playing audition");
+            cy.contains(editor + " button", "Preview instrument").click();
+            cy.get(editor + ' [role="status"]').should("contain.text", "Playing audition");
+            cy.contains(editor + " button", /^Stop$/).click();
+            cy.window().then(win => {
+                expect(activity(win).logo.synth.multisampleBytes).to.equal(0);
+                expect(activity(win).multisampleEditor.work).to.equal(null);
+            });
+        }
+        cy.then(() => expect(disposals.callCount).to.equal(20));
+        cy.contains(editor + " button", "Preview instrument").click();
+        cy.get(editor + ' [role="status"]').should("contain.text", "Playing audition");
+        cy.window().then(win => activity(win).projectManager.newProject());
+        cy.get(editor).should("not.exist");
+        cy.window().then(win => expect(activity(win).logo.synth.multisampleBytes).to.equal(0));
+    });
 
     it("repairs a real mixed batch in picker order without silently applying the successful subset", () => {
         cy.contains("button", "New multisample instrument…").click();
@@ -311,7 +540,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.get(editor + ' button[aria-label^="Remove recording"]')
             .first()
             .should("be.disabled");
-        cy.get(editor + ' input[type="text"]').should("be.disabled");
+        cy.get(editor + ' input[name="multisample-name"]').should("be.disabled");
         cy.contains(editor + " button", /^Cancel$/).click();
         cy.contains(editor + " button", "Keep editing")
             .should("be.focused")
@@ -342,7 +571,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.get("body").trigger("keydown", { keyCode: 89, ctrlKey: true });
         cy.window().should(win => expect(owners(win)[0].value).to.deep.equal(original));
         reopen();
-        cy.get(editor + ' input[type="text"]')
+        cy.get(editor + ' input[name="multisample-name"]')
             .clear()
             .type("Edited");
         cy.get(editor + " select").select("C4");
@@ -356,7 +585,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.get("body").trigger("keydown", { keyCode: 89, ctrlKey: true });
         cy.window().should(win => expect(owners(win)[0].value.name).to.equal("Edited"));
         reopen();
-        cy.get(editor + ' input[type="text"]')
+        cy.get(editor + ' input[name="multisample-name"]')
             .clear()
             .type("Discarded");
         cy.contains(editor + " button", /^Cancel$/).click();
@@ -388,7 +617,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
             expect(owners(win)).to.have.length(2);
         });
         reopen(1);
-        cy.get(editor + ' input[type="text"]')
+        cy.get(editor + ' input[name="multisample-name"]')
             .clear()
             .type("Independent copy");
         cy.get(editor + " select").select("B8");
@@ -507,7 +736,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
             expect(act.turtles.running()).to.equal(false);
             act.multisampleEditor.bringForward();
         });
-        cy.get(editor + ' input[type="text"]')
+        cy.get(editor + ' input[name="multisample-name"]')
             .focus()
             .trigger("keydown", { key: "Escape" });
         cy.get(editor).should("not.exist");
@@ -516,7 +745,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
     it("offers dirty project-switch choices and invalidates equal-value owner replacements", () => {
         create();
         reopen();
-        cy.get(editor + ' input[type="text"]').type(" dirty");
+        cy.get(editor + ' input[name="multisample-name"]').type(" dirty");
         cy.window().then(win => {
             activity(win).multisampleEditor.widgetWindow._rollup();
             activity(win).projectManager.newProject();
@@ -586,7 +815,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
     it("offers a dirty choice before a native project drop replaces any blocks", () => {
         create();
         reopen();
-        cy.get(editor + ' input[type="text"]').type(" dirty");
+        cy.get(editor + ' input[name="multisample-name"]').type(" dirty");
         const project = [
             [0, "start", 200, 100, [null, null, null]],
             [1, ["text", { value: "I09 drop replacement" }], 300, 100, [null]]
