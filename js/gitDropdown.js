@@ -372,7 +372,7 @@ class GitDropdownUI {
         });
         if (desc === null) return;
 
-        const repoName = this._sanitizeRepoName(rawName.trim());
+        const repoName = this._sanitizeRepoName(rawName.trim()) || this._fallbackRepoName();
 
         await this._doCreate(repoName, rawName.trim(), desc.trim());
     }
@@ -1674,20 +1674,25 @@ class GitDropdownUI {
     }
 
     _sanitizeRepoName(name) {
-        // NFKD splits an accented letter into the letter plus a combining mark,
-        // so "Canción" becomes "cancion" instead of "canci-n".
-        const slug = name
+        // Letters that NFKD does not split into a base letter plus a mark.
+        const LETTER_MAP = { ł: "l", ø: "o", ß: "ss", đ: "d", æ: "ae", œ: "oe" };
+        // NFKD splits an accented letter into the letter plus a combining mark
+        // (U+0300 to U+036F), so "Canción" becomes "cancion".
+        return name
             .normalize("NFKD")
-            .replace(/[̀-ͯ]/g, "")
+            .replace(/[\u0300-\u036f]/g, "")
             .toLowerCase()
+            .replace(/[łøßđæœ]/g, ch => LETTER_MAP[ch])
             .replace(/[^a-z0-9]+/g, "-")
             .substring(0, 100)
             .replace(/^-+|-+$/g, "");
-        // A name with no latin letters or digits (Japanese, Hindi, Russian...)
-        // leaves nothing behind. Repo names are unique on the server, so give
-        // each one its own fallback instead of a single shared name. The random
-        // part keeps two names made in the same millisecond apart.
-        if (slug) return slug;
+    }
+
+    // Used when _sanitizeRepoName leaves nothing behind (e.g. Japanese, Hindi
+    // or Russian names). Repo names are unique on the server, so each project
+    // gets its own name. Not deterministic on purpose: the time and random
+    // parts keep two names made at the same moment apart.
+    _fallbackRepoName() {
         const random = Math.random().toString(36).slice(2, 6).padEnd(4, "0");
         return "my-music-project-" + Date.now().toString(36) + "-" + random;
     }
