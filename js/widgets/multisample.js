@@ -88,23 +88,28 @@ class MultisampleEditor {
         );
         this.picker = document.createElement("input");
         this.picker.type = "file";
+        this.picker.multiple = true;
         this.picker.accept = ".wav,audio/wav,audio/x-wav,audio/x-pn-wav,audio/vnd.wave";
         this.picker.hidden = true;
-        this.picker.setAttribute("aria-label", _("Add recording"));
+        this.picker.setAttribute("aria-label", _("Add recordings"));
         this.root.append(this.picker);
         this.picker.onchange = () => {
             this.pickerOpen = false;
-            return this.addRecording(this.picker.files[0]);
+            const row = this.replacing;
+            this.replacing = null;
+            const files = [...this.picker.files];
+            this.picker.value = "";
+            return row ? this.replaceRecording(row, files[0]) : this.addRecordings(files);
         };
         this.picker.oncancel = () => {
             this.pickerOpen = false;
-        };
-        this.addButton = this.button(_("Add recording…"), () => {
+            this.replacing = null;
             this.picker.value = "";
-            this.pickerOpen = true;
-            this.picker.click();
-        });
+        };
+        this.addButton = this.button(_("Add recordings…"), () => this.chooseRecording());
         this.list = this.element("div");
+        this.list.style.cssText = "max-height:40vh;overflow:auto;overflow-wrap:anywhere;";
+        this.undoButton = this.button(_("Undo removal"), () => this.undoRemoval());
         this.status = this.element("p");
         this.status.setAttribute("role", "status");
         this.status.setAttribute("aria-live", "polite");
@@ -145,8 +150,12 @@ class MultisampleEditor {
         if (!this.draft.samples.length) problems.push(_("Add at least one recording."));
         this.draft.samples.forEach((sample, index) => {
             const row = this.rows[index];
-            let message = !sample.root ? _("Choose a root pitch.") : "";
+            let message = row.pending
+                ? _("Reading recording…")
+                : row.error || (!sample.root ? _("Choose a root pitch.") : "");
             if (
+                !row.error &&
+                !row.pending &&
                 sample.root &&
                 this.draft.samples.some(
                     (other, i) =>
@@ -158,9 +167,10 @@ class MultisampleEditor {
             ) {
                 message = _("Recordings must have different root pitches.");
             }
-            row.problem.textContent = message;
+            row.problem.textContent = [message, row.notice].filter(Boolean).join(" ");
             row.select.setAttribute("aria-invalid", String(Boolean(message)));
-            row.select.disabled = Boolean(this.busy);
+            row.select.disabled = Boolean(this.busy || this.invalid || !sample.data);
+            row.replace.disabled = row.remove.disabled = Boolean(this.busy || this.invalid);
             if (message) problems.push(sample.name + ": " + message);
         });
         if (!problems.length) {
@@ -172,13 +182,19 @@ class MultisampleEditor {
         }
         this.problem = problems.join(" ");
         this.applyButton.disabled = Boolean(this.problem || this.busy || this.invalid);
-        this.nameInput.disabled = Boolean(this.busy);
+        this.nameInput.disabled = Boolean(this.busy || this.invalid);
         this.addButton.disabled = Boolean(
             this.busy || this.invalid || this.draft.samples.length >= MULTISAMPLE_LIMITS.samples
         );
-        this.status.textContent = this.invalid || this.busy || this.problem;
+        this.undoButton.hidden = !this.removed;
+        this.undoButton.disabled = Boolean(this.busy || this.invalid || !this.canUndoRemoval());
+        this.undoButton.title = this.undoButton.disabled
+            ? _("Undo removal would exceed the recording count or byte limit.")
+            : "";
+        this.status.textContent =
+            this.invalid || this.busy || [this.notice, this.problem].filter(Boolean).join(" ");
         this.applyButton.title = this.status.textContent;
-        this.stopButton.hidden = !this.busy || this.publishing;
+        this.stopButton.hidden = !this.busy || this.publishing || Boolean(this.work?.uploads);
         this.cancelButton.disabled = Boolean(this.publishing);
     }
 
@@ -222,80 +238,214 @@ class MultisampleEditor {
             }
             select.value = sample.root;
             select.onchange = () => {
+                if (!this.canMutate()) return;
                 sample.root = select.value;
                 this.draftRevision++;
                 this.stop();
             };
             row.select = select;
             row.problem = this.element("p", "", section);
+            row.problem.id = "multisample-problem-" + index;
+            select.setAttribute("aria-describedby", row.problem.id);
+            row.replace = this.button(_("Replace…"), () => this.chooseRecording(row), section);
+            row.replace.setAttribute("aria-label", _("Replace recording") + " — " + sample.name);
+            row.replace.setAttribute("aria-describedby", row.problem.id);
+            row.remove = this.button(_("Remove"), () => this.removeRecording(row), section);
+            row.remove.setAttribute("aria-label", _("Remove recording") + " — " + sample.name);
         });
         this.update();
     }
 
-    async addRecording(file) {
-        if (!file || this.closed || this.busy || this.invalid) return;
-        const work = {};
-        this.work = work;
-        this.busy = _("Reading recording…");
-        this.update();
+    canMutate() {
+        return this.isCurrent() && !this.busy && !this.choice;
+    }
+
+    chooseRecording(row = null) {
+        if (!this.canMutate()) return;
+        this.replacing = row;
+        this.picker.multiple = !row;
+        this.picker.setAttribute("aria-label", row ? _("Replace recording") : _("Add recordings"));
+        this.picker.value = "";
+        this.pickerOpen = true;
+        this.picker.click();
+    }
+
+    recordingBytes(sample) {
+        if (!sample.data) return 0;
+        const base64 = sample.data.split(",")[1];
+        return (base64.length / 4) * 3 - (base64.match(/=+$/)?.[0].length || 0);
+    }
+
+    totalBytes() {
+        return this.draft.samples.reduce((sum, sample) => sum + this.recordingBytes(sample), 0);
+    }
+
+    uploadSizeError(file, total) {
+        return file.size > MULTISAMPLE_LIMITS.fileBytes ||
+            total + file.size > MULTISAMPLE_LIMITS.totalBytes
+            ? _("Multisample audio exceeds the file or instrument size limit.")
+            : "";
+    }
+
+    async readRecording(file, work) {
+        const mime = file.type.toLowerCase();
+        if (
+            mime &&
+            mime !== "application/octet-stream" &&
+            !/^audio\/(wav|wave|x-wav|x-pn-wav|vnd\.wave)$/.test(mime)
+        ) {
+            throw new Error(_("Recordings must contain embedded WAV audio."));
+        }
+        const reader = new FileReader();
+        work.reader = reader;
         try {
-            const mime = file.type.toLowerCase();
-            const total = this.draft.samples.reduce((sum, sample) => {
-                const base64 = sample.data.split(",")[1];
-                return sum + (base64.length / 4) * 3 - (base64.match(/=+$/)?.[0].length || 0);
-            }, 0);
-            if (
-                this.draft.samples.length >= MULTISAMPLE_LIMITS.samples ||
-                file.size > MULTISAMPLE_LIMITS.fileBytes ||
-                total + file.size > MULTISAMPLE_LIMITS.totalBytes
-            )
-                throw new Error(_("Multisample audio exceeds the file or instrument size limit."));
-            if (
-                mime &&
-                mime !== "application/octet-stream" &&
-                !/^audio\/(wav|wave|x-wav|x-pn-wav|vnd\.wave)$/.test(mime)
-            ) {
-                throw new Error(_("Recordings must contain embedded WAV audio."));
-            }
             const data = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                work.reader = reader;
                 reader.onload = () =>
                     resolve("data:audio/wav;base64," + reader.result.split(",")[1]);
                 reader.onerror = () => reject(new Error(_("Unable to read recording.")));
                 reader.onabort = () => reject(new DOMException("Cancelled", "AbortError"));
                 reader.readAsDataURL(file);
             });
-            if (this.work !== work || !this.isCurrent()) return;
-            // Validate only the upload here; the draft root remains explicitly unassigned.
+            // Upload normalization does not relax the strict saved-value contract.
             validateMultisample({
                 type: "multisample",
                 version: 1,
                 name: "upload",
                 samples: [{ name: file.name, root: "C1", data }]
             });
-            this.draft.samples.push({ name: file.name, root: "", data });
-            this.draftRevision++;
-            this.rows.push({});
-            this.busy = null;
-            this.renderRows();
-            this.rows[this.rows.length - 1].select.focus();
-        } catch (error) {
-            if (this.work === work && !this.closed && error.name !== "AbortError") {
-                this.busy = null;
-                this.update();
-                this.status.textContent = file.name + ": " + error.message;
-            }
+            return data;
         } finally {
-            if (work.reader) {
-                work.reader.onload = work.reader.onerror = work.reader.onabort = null;
-                work.reader = null;
+            reader.onload = reader.onerror = reader.onabort = null;
+            if (work.reader === reader) work.reader = null;
+        }
+    }
+
+    async addRecordings(files) {
+        if (!files.length || !this.canMutate()) return;
+        this.stop();
+        this.notice = "";
+        const work = { uploads: [] };
+        this.work = work;
+        this.busy = _("Reading recording…");
+        let total = this.totalBytes();
+        const excess = [];
+        for (const file of files) {
+            if (this.rows.length >= MULTISAMPLE_LIMITS.samples) {
+                excess.push(
+                    file.name + ": " + _("Recording count exceeds the size limit of 16 recordings.")
+                );
+                continue;
             }
-            if (this.work === work) {
+            const error = this.uploadSizeError(file, total);
+            const row = { error, pending: !error };
+            const sample = { name: file.name, root: "", data: "" };
+            if (!error) total += file.size;
+            this.rows.push(row);
+            this.draft.samples.push(sample);
+            work.uploads.push({ row, sample, file });
+        }
+        if (work.uploads.length) this.draftRevision++;
+        this.notice = excess.join(" ");
+        this.renderRows();
+        for (const { row, sample, file } of work.uploads) {
+            if (!row.pending) continue;
+            this.busy = _("Reading recording…") + " " + file.name;
+            this.update();
+            try {
+                const data = await this.readRecording(file, work);
+                if (this.work !== work || !this.isCurrent()) return;
+                sample.data = data;
+            } catch (error) {
+                if (this.work !== work || !this.isCurrent()) return;
+                row.error = error.message;
+            }
+            row.pending = false;
+        }
+        if (this.work === work && this.isCurrent()) {
+            this.work = null;
+            this.busy = null;
+            this.update();
+            const first = work.uploads.find(({ sample }) => sample.data) || work.uploads[0];
+            if (first) this.focusRow(first.row);
+        }
+    }
+
+    async replaceRecording(row, file) {
+        if (!file || !this.canMutate() || !this.rows.includes(row)) return;
+        this.stop();
+        const sample = this.draft.samples[this.rows.indexOf(row)];
+        const work = { uploads: [] };
+        this.work = work;
+        this.busy = _("Reading recording…") + " " + file.name;
+        this.update();
+        try {
+            const error = this.uploadSizeError(
+                file,
+                this.totalBytes() - this.recordingBytes(sample)
+            );
+            if (error) throw new Error(error);
+            const data = await this.readRecording(file, work);
+            if (this.work !== work || !this.isCurrent() || !this.rows.includes(row)) return;
+            sample.name = file.name;
+            sample.data = data;
+            row.error = "";
+            row.notice = _("Root kept; check it matches the new recording.");
+            this.notice = "";
+            this.draftRevision++;
+        } catch (error) {
+            if (this.work !== work || !this.isCurrent()) return;
+            row.notice = file.name + ": " + error.message;
+            this.notice = row.notice;
+        } finally {
+            if (this.work === work && !this.closed) {
                 this.work = null;
                 this.busy = null;
+                this.renderRows();
+                this.focusRow(row);
             }
         }
+    }
+
+    focusRow(row) {
+        (row?.select.disabled ? row.replace : row?.select)?.focus();
+        if (!row) this.addButton.focus();
+    }
+
+    removeRecording(row) {
+        if (!this.canMutate()) return;
+        const index = this.rows.indexOf(row);
+        if (index < 0) return;
+        this.stop();
+        this.removed = { row, sample: this.draft.samples[index], index };
+        this.rows.splice(index, 1);
+        this.draft.samples.splice(index, 1);
+        this.draftRevision++;
+        this.notice =
+            this.removed.sample.name + ": " + _("Recording removed. Undo removal is available.");
+        this.renderRows();
+        this.focusRow(this.rows[Math.min(index, this.rows.length - 1)]);
+    }
+
+    canUndoRemoval() {
+        return (
+            this.removed &&
+            this.rows.length < MULTISAMPLE_LIMITS.samples &&
+            this.totalBytes() + this.recordingBytes(this.removed.sample) <=
+                MULTISAMPLE_LIMITS.totalBytes
+        );
+    }
+
+    undoRemoval() {
+        if (!this.canMutate() || !this.canUndoRemoval()) return;
+        this.stop();
+        const { row, sample, index } = this.removed;
+        this.rows.splice(index, 0, row);
+        this.draft.samples.splice(index, 0, sample);
+        this.removed = null;
+        this.draftRevision++;
+        this.notice = sample.name + ": " + _("Recording restored.");
+        this.renderRows();
+        this.focusRow(row);
     }
 
     bringForward() {
@@ -330,6 +480,12 @@ class MultisampleEditor {
         const work = this.work;
         this.work = null;
         if (work?.reader) work.reader.abort();
+        for (const { row } of work?.uploads || []) {
+            if (row.pending) {
+                row.pending = false;
+                row.error = _("Reading cancelled. Replace or remove this recording.");
+            }
+        }
         if (work?.descriptor) this.activity.logo.synth.unregisterMultisample(work.descriptor);
         this.busy = null;
         if (!this.closed) this.update();
@@ -339,10 +495,11 @@ class MultisampleEditor {
         if (!this.isCurrent() || this.busy || this.choice) return;
         this.update();
         if (this.problem) {
-            (
-                this.rows.find(row => row.select.getAttribute("aria-invalid") === "true")?.select ||
-                this.nameInput
-            ).focus();
+            if (!this.draft.name.trim()) this.nameInput.focus();
+            else
+                this.focusRow(
+                    this.rows.find(row => row.select.getAttribute("aria-invalid") === "true")
+                );
             return;
         }
         const snapshot = validateMultisample(this.draft);
@@ -387,7 +544,13 @@ class MultisampleEditor {
                 this.busy = null;
                 this.publishing = false;
                 this.update();
-                if (error.name !== "AbortError") this.status.textContent = error.message;
+                if (error.name !== "AbortError") {
+                    this.status.textContent = error.message;
+                    const index = this.draft.samples.findIndex(sample =>
+                        error.message.endsWith(" / " + sample.name)
+                    );
+                    this.rows[index]?.replace.focus();
+                }
             }
         } finally {
             if (work.descriptor) this.activity.logo.synth.unregisterMultisample(work.descriptor);
@@ -560,6 +723,7 @@ class MultisampleEditor {
         if (returnFocus) this.origin?.focus?.();
         this.draft = null;
         this.rows = [];
+        this.removed = this.replacing = null;
         this.owner = null;
         this.ownerValue = null;
         this.initial = null;
@@ -569,6 +733,7 @@ class MultisampleEditor {
             this.stopButton =
             this.cancelButton =
             this.addButton =
+            this.undoButton =
             this.choice =
                 null;
         this.widgetWindow = this.focusHandler = null;
