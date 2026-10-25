@@ -221,7 +221,7 @@ function AIDebuggerWidget() {
         };
 
         this._createLayout();
-        this._showConsentBanner();
+        this._showStart();
         widgetWindow.sendToCenter();
         this.activity.textMsg(_("Debugger initialized"));
     };
@@ -503,6 +503,15 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * What the widget shows when it opens. Nothing is sent yet, so the child
+     * goes straight to asking in Chat or changing the project in Edit project.
+     * @private
+     */
+    this._showStart = function () {
+        this._addWelcomeMessage();
+    };
+
+    /**
      * Sends a message
      * @private
      */
@@ -512,7 +521,7 @@ function AIDebuggerWidget() {
         if (!this._isWidgetActive() || this._isProcessing) return;
 
         if (!this._consentGiven) {
-            this._showConsentBanner();
+            this._showConsentBanner(() => this._sendMessage());
             return;
         }
 
@@ -783,10 +792,16 @@ function AIDebuggerWidget() {
 
     /**
      * Shows a consent banner explaining what data will be sent and where.
-     * No project data leaves the browser until the user explicitly agrees.
+     * No project data leaves the browser until the user explicitly agrees. It
+     * is asked the first time something is about to be sent, and that request
+     * is sent once agreed, so the child goes on with what they pressed.
+     * @param {Function} [afterConsent] - The request to send once the user agrees.
      * @private
      */
-    this._showConsentBanner = function () {
+    this._showConsentBanner = function (afterConsent) {
+        for (const old of this.chatLog.querySelectorAll(".aidebugger-consent-banner")) {
+            old.remove();
+        }
         const banner = document.createElement("div");
         banner.className = "aidebugger-consent-banner";
         banner.style.padding = "16px 20px";
@@ -820,7 +835,7 @@ function AIDebuggerWidget() {
         btnRow.style.marginTop = "4px";
 
         const acceptBtn = document.createElement("button");
-        acceptBtn.textContent = _("Analyze my project");
+        acceptBtn.textContent = _("Agree and continue");
         acceptBtn.style.padding = "8px 16px";
         acceptBtn.style.border = "none";
         acceptBtn.style.borderRadius = "6px";
@@ -844,16 +859,18 @@ function AIDebuggerWidget() {
         acceptBtn.onclick = () => {
             this._consentGiven = true;
             banner.remove();
-            this._loadProjectAndInitialize();
+            if (afterConsent) {
+                afterConsent();
+            } else {
+                this._loadProjectAndInitialize();
+            }
         };
 
         declineBtn.onclick = () => {
             banner.remove();
             const msg = {
                 type: "system",
-                content: _(
-                    "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
-                ),
+                content: _("Nothing was sent. Your project stays here until you agree."),
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(msg);
@@ -1173,7 +1190,9 @@ function AIDebuggerWidget() {
         if (!this._isWidgetActive() || this._isProcessing) return;
 
         if (!this._consentGiven) {
-            this._showConsentBanner();
+            this._showConsentBanner(() =>
+                this._requestProject(endpoint, makePayload, userText, doneMessage)
+            );
             return;
         }
 
@@ -1277,7 +1296,11 @@ function AIDebuggerWidget() {
         this._removeTypingIndicator(null);
         this.chatLog.replaceChildren();
 
-        this._loadProjectAndInitialize();
+        if (this._consentGiven) {
+            this._loadProjectAndInitialize();
+        } else {
+            this._showStart();
+        }
         this._updateMessageCount();
         this.activity.textMsg(_("Conversation reset."));
     };

@@ -857,6 +857,18 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget._sendToBackend).not.toHaveBeenCalled();
         });
 
+        test("sends the waiting message once consent is given", () => {
+            debuggerWidget._consentGiven = false;
+            debuggerWidget.messageInput.value = "Hello AI";
+            debuggerWidget._showConsentBanner = jest.fn();
+            debuggerWidget._sendMessage();
+
+            debuggerWidget._consentGiven = true;
+            debuggerWidget._showConsentBanner.mock.calls[0][0]();
+            expect(debuggerWidget.chatHistory).toHaveLength(1);
+            expect(debuggerWidget._sendToBackend).toHaveBeenCalledWith("Hello AI");
+        });
+
         test("sends message and clears input", () => {
             debuggerWidget.messageInput.value = "Hello AI";
             debuggerWidget._consentGiven = true;
@@ -884,6 +896,7 @@ describe("AIDebuggerWidget", () => {
         test("resets chat history and prompt count", () => {
             debuggerWidget.chatHistory = [{ type: "user", content: "test" }];
             debuggerWidget.promptCount = 5;
+            debuggerWidget._consentGiven = true;
             const oldId = debuggerWidget.conversationId;
 
             debuggerWidget._resetConversation();
@@ -892,6 +905,16 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.promptCount).toBe(0);
             expect(debuggerWidget.conversationId).not.toBe(oldId);
             expect(debuggerWidget._loadProjectAndInitialize).toHaveBeenCalled();
+        });
+
+        test("sends nothing on reset before consent", () => {
+            debuggerWidget._consentGiven = false;
+            debuggerWidget._showStart = jest.fn();
+
+            debuggerWidget._resetConversation();
+
+            expect(debuggerWidget._loadProjectAndInitialize).not.toHaveBeenCalled();
+            expect(debuggerWidget._showStart).toHaveBeenCalled();
         });
     });
 
@@ -1103,6 +1126,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget._lifecycle.isMounted = true;
             debuggerWidget.chatHistory = [{ type: "user", content: "hello" }];
             debuggerWidget.promptCount = 3;
+            debuggerWidget._consentGiven = true;
 
             const abortSpy = jest.fn();
             debuggerWidget._lifecycle.pendingRequests.add({ abort: abortSpy });
@@ -1628,8 +1652,22 @@ describe("AIDebuggerWidget", () => {
             );
             const buttons = banner.querySelectorAll("button");
             expect(buttons.length).toBe(2);
-            expect(buttons[0].textContent).toBe("Analyze my project");
+            expect(buttons[0].textContent).toBe("Agree and continue");
             expect(buttons[1].textContent).toBe("Cancel");
+        });
+
+        test("opening shows only the welcome, with no banner or button, and sends nothing", () => {
+            const loadProjectSpy = jest
+                .spyOn(debuggerWidget, "_loadProjectAndInitialize")
+                .mockImplementation(() => {});
+
+            debuggerWidget._showStart();
+
+            expect(debuggerWidget.chatLog.querySelector(".aidebugger-consent-banner")).toBeNull();
+            expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
+            expect(debuggerWidget.chatLog.textContent).toContain("Welcome to");
+            expect(loadProjectSpy).not.toHaveBeenCalled();
+            loadProjectSpy.mockRestore();
         });
 
         test("accepting banner sets consent, removes banner, and loads project", () => {
@@ -1649,13 +1687,13 @@ describe("AIDebuggerWidget", () => {
 
         test("canceling banner removes banner and adds system decline message", () => {
             debuggerWidget._showConsentBanner();
-            const declineBtn = debuggerWidget.chatLog.querySelectorAll("button")[1];
+            const declineBtn = debuggerWidget.chatLog.querySelector(".aidebugger-cancel-btn");
             declineBtn.onclick();
 
             expect(debuggerWidget._consentGiven).toBe(false);
             expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
             expect(debuggerWidget.chatLog.textContent).toContain(
-                "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
+                "Nothing was sent. Your project stays here until you agree."
             );
         });
     });
@@ -2283,12 +2321,12 @@ describe("AIDebuggerWidget", () => {
 
         test("re-prompts with consent banner if message submitted when consent was declined", () => {
             debuggerWidget._showConsentBanner();
-            const declineBtn = debuggerWidget.chatLog.querySelectorAll("button")[1];
+            const declineBtn = debuggerWidget.chatLog.querySelector(".aidebugger-cancel-btn");
             declineBtn.onclick();
 
             expect(debuggerWidget._consentGiven).toBe(false);
             expect(debuggerWidget.chatLog.textContent).toContain(
-                "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
+                "Nothing was sent. Your project stays here until you agree."
             );
 
             // User types message and sends
@@ -2774,6 +2812,27 @@ describe("AIDebuggerWidget", () => {
             );
             expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
             expect(widget._projectBeforeFix).toBe(before);
+        });
+
+        test("makes a new project after consent without analyzing the old one", async () => {
+            widget._consentGiven = false;
+            const loadProjectSpy = jest.spyOn(widget, "_loadProjectAndInitialize");
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "I made **Drums**.", project: fixed })
+            });
+
+            widget._makeProject("a rock drum beat");
+            expect(global.fetch).not.toHaveBeenCalled();
+            const buttons = widget.chatLog.querySelectorAll(".aidebugger-consent-banner button");
+            expect(buttons[0].textContent).toBe("Agree and continue");
+            buttons[0].onclick();
+            await flushPromises();
+
+            expect(loadProjectSpy).not.toHaveBeenCalled();
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(global.fetch.mock.calls[0][0]).toBe("http://localhost:8000/make");
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
         });
 
         test("asks what to make when the description is empty", () => {
