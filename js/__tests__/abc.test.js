@@ -545,7 +545,9 @@ describe("OCTAVE_NOTATION_MAP", () => {
         expect(OCTAVE_NOTATION_MAP[10]).toBe("'''''");
         expect(OCTAVE_NOTATION_MAP[2]).toBe(",,");
         expect(OCTAVE_NOTATION_MAP[1]).toBe(",,,");
-        expect(OCTAVE_NOTATION_MAP[0]).toBeUndefined();
+        expect(OCTAVE_NOTATION_MAP[0]).toBe(",,,,");
+        expect(OCTAVE_NOTATION_MAP[-1]).toBe(",,,,,");
+        expect(OCTAVE_NOTATION_MAP[-2]).toBe(",,,,,,");
     });
 });
 
@@ -1361,5 +1363,20 @@ describe("processABCNotes - bar lines", () => {
         ];
 
         expect(measureLengths(exportBody(staged))).toEqual([2, 0.25]);
+    });
+
+    it("formats negative octaves (-1, -2) and octave 0 correctly", () => {
+        const staged = [
+            note("C0"),
+            note("C-1"),
+            note("D-2"),
+            note("F♯-1")
+        ];
+        const body = exportBody(staged);
+        expect(body).toContain("C,,,,4");
+        expect(body).toContain("C,,,,,4");
+        expect(body).toContain("D,,,,,,4");
+        expect(body).toContain("^F,,,,,4");
+        expect(body).not.toContain("-");
     });
 });

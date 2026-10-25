@@ -123,6 +123,17 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("a,,,4 c,,4 c,4 c4 ");
     });
 
+    test("should format negative octaves (-1, -2) with correct LilyPond octave commas and no stray hyphen", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C-1"], 4, 0, null, 0, -1, false],
+            [["D-2"], 4, 0, null, 0, -1, false],
+            [["F♯-1"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("c,,,,4 d,,,,,4 fis,,,,4 ");
+        expect(logo.notationNotes[turtle]).not.toContain("-");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);

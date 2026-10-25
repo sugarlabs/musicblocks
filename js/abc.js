@@ -31,7 +31,10 @@ const OCTAVE_NOTATION_MAP = {
     4: "",
     3: ",",
     2: ",,",
-    1: ",,,"
+    1: ",,,",
+    0: ",,,,",
+    "-1": ",,,,,",
+    "-2": ",,,,,,"
 };
 
 const ACCIDENTAL_MAP = {
@@ -51,7 +54,7 @@ const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]
 // A staged pitch name: a letter, then accidentals, an octave, and the accidental a courtesy
 // natural adds after the octave ("C♯4", "F4♮").
 const STAGED_PITCH_PATTERN = new RegExp(
-    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
+    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(-?\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
     "u"
 );
 
@@ -322,10 +325,10 @@ class AbcExporter {
             note = note.replace(accidentalSymbols, "");
         }
 
-        const match = note.match(/\d+$/);
+        const match = note.match(/-?\d+$/);
         const octave = match ? parseInt(match[0], 10) : null;
         if (octave !== null && OCTAVE_NOTATION_MAP[octave] !== undefined) {
-            note = note.replace(/\d+$/, OCTAVE_NOTATION_MAP[octave]);
+            note = note.replace(/-?\d+$/, OCTAVE_NOTATION_MAP[octave]);
         }
 
         if (octave !== null) {
