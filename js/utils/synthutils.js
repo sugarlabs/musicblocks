@@ -977,6 +977,24 @@ function Synth() {
     /** Display metadata for a live owned alias, never inferred from a name prefix. */
     this.getMultisampleName = (turtle, name) => multisampleOwner(turtle, name)?.name ?? null;
 
+    /** End-time bound only: include both nearest candidates; Tone alone selects audio. */
+    this.getMultisampleDuration = (turtle, name, pitch) => {
+        const entry = multisampleOwner(turtle, name);
+        if (!entry?.sampler) return null;
+        const target = Tone.Frequency(pitch);
+        const midi = target.toMidi();
+        const distance = Math.min(...entry.durations.map(sample => Math.abs(sample.midi - midi)));
+        return Math.max(
+            ...entry.durations
+                .filter(sample => Math.abs(sample.midi - midi) === distance)
+                .map(
+                    sample =>
+                        (sample.duration * (440 * Math.pow(2, (sample.midi - 69) / 12))) /
+                        target.toFrequency()
+                )
+        );
+    };
+
     /** Releases one preparation/ready owner, including a dedicated preview owner. */
     this.releaseMultisample = (turtle, instrumentName, sourceName = instrumentName) => {
         const source = multisamples.get(sourceName);
@@ -1038,6 +1056,7 @@ function Synth() {
             onError: source.onError,
             roots: {},
             bytes: 0,
+            durations: [],
             sampler: null,
             promise: null,
             cancel: null,
@@ -1113,6 +1132,10 @@ function Synth() {
                     }
                     entry.bytes += bytes;
                     multisampleBytes += bytes;
+                    entry.durations.push({
+                        midi: Tone.Frequency(sample.root).toMidi(),
+                        duration: audio.duration
+                    });
                     entry.roots[sample.root] = audio;
                     audio = null;
                 }

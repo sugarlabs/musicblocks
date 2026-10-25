@@ -73,6 +73,7 @@ class MultisampleEditor {
         const label = this.element("label", _("Instrument name"));
         this.nameInput = document.createElement("input");
         this.nameInput.type = "text";
+        this.nameInput.name = "multisample-name";
         this.nameInput.style.cssText = "display:block;width:100%;box-sizing:border-box;";
         this.nameInput.value = value.name;
         this.nameInput.oninput = () => {
@@ -113,6 +114,20 @@ class MultisampleEditor {
         this.status = this.element("p");
         this.status.setAttribute("role", "status");
         this.status.setAttribute("aria-live", "polite");
+        const previewLabel = this.element("label", _("Preview pitch"));
+        this.previewPitch = this.element("input", "", previewLabel);
+        this.previewPitch.type = "text";
+        this.previewPitch.value = "C4";
+        this.previewPitch.setAttribute("list", "multisample-preview-pitches");
+        const pitches = this.element("datalist");
+        pitches.id = "multisample-preview-pitches";
+        for (let octave = 0; octave <= 9; octave++) {
+            for (const note of ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]) {
+                this.element("option", "", pitches).value = note + octave;
+            }
+        }
+        this.previewPitch.oninput = () => this.stop();
+        this.previewButton = this.button(_("Preview instrument"), () => this.audition());
         this.actions = this.element("div");
         this.applyButton = this.button(_("Apply"), () => this.apply(), this.actions);
         this.stopButton = this.button(_("Stop"), () => this.stop(), this.actions);
@@ -145,6 +160,7 @@ class MultisampleEditor {
     }
 
     update() {
+        const locked = this.busy && !this.work?.audition;
         const problems = [];
         if (!this.draft.name.trim()) problems.push(_("Enter an instrument name."));
         if (!this.draft.samples.length) problems.push(_("Add at least one recording."));
@@ -169,8 +185,9 @@ class MultisampleEditor {
             }
             row.problem.textContent = [message, row.notice].filter(Boolean).join(" ");
             row.select.setAttribute("aria-invalid", String(Boolean(message)));
-            row.select.disabled = Boolean(this.busy || this.invalid || !sample.data);
-            row.replace.disabled = row.remove.disabled = Boolean(this.busy || this.invalid);
+            row.select.disabled = Boolean(locked || this.invalid || !sample.data);
+            row.listen.disabled = Boolean(locked || this.invalid || !sample.data || row.pending);
+            row.replace.disabled = row.remove.disabled = Boolean(locked || this.invalid);
             if (message) problems.push(sample.name + ": " + message);
         });
         if (!problems.length) {
@@ -181,19 +198,22 @@ class MultisampleEditor {
             }
         }
         this.problem = problems.join(" ");
-        this.applyButton.disabled = Boolean(this.problem || this.busy || this.invalid);
-        this.nameInput.disabled = Boolean(this.busy || this.invalid);
+        this.applyButton.disabled = this.previewButton.disabled = Boolean(
+            this.problem || locked || this.invalid
+        );
+        this.nameInput.disabled = this.previewPitch.disabled = Boolean(locked || this.invalid);
         this.addButton.disabled = Boolean(
-            this.busy || this.invalid || this.draft.samples.length >= MULTISAMPLE_LIMITS.samples
+            locked || this.invalid || this.draft.samples.length >= MULTISAMPLE_LIMITS.samples
         );
         this.undoButton.hidden = !this.removed;
-        this.undoButton.disabled = Boolean(this.busy || this.invalid || !this.canUndoRemoval());
+        this.undoButton.disabled = Boolean(locked || this.invalid || !this.canUndoRemoval());
         this.undoButton.title = this.undoButton.disabled
             ? _("Undo removal would exceed the recording count or byte limit.")
             : "";
         this.status.textContent =
             this.invalid || this.busy || [this.notice, this.problem].filter(Boolean).join(" ");
         this.applyButton.title = this.status.textContent;
+        this.previewButton.title = this.problem || this.invalid || "";
         this.stopButton.hidden = !this.busy || this.publishing || Boolean(this.work?.uploads);
         this.cancelButton.disabled = Boolean(this.publishing);
     }
@@ -247,6 +267,9 @@ class MultisampleEditor {
             row.problem = this.element("p", "", section);
             row.problem.id = "multisample-problem-" + index;
             select.setAttribute("aria-describedby", row.problem.id);
+            row.listen = this.button(_("Listen"), () => this.audition(row), section);
+            row.listen.setAttribute("aria-label", _("Listen to recording") + " — " + sample.name);
+            row.listen.setAttribute("aria-describedby", row.problem.id);
             row.replace = this.button(_("Replace…"), () => this.chooseRecording(row), section);
             row.replace.setAttribute("aria-label", _("Replace recording") + " — " + sample.name);
             row.replace.setAttribute("aria-describedby", row.problem.id);
@@ -257,11 +280,12 @@ class MultisampleEditor {
     }
 
     canMutate() {
-        return this.isCurrent() && !this.busy && !this.choice;
+        return this.isCurrent() && (!this.busy || this.work?.audition) && !this.choice;
     }
 
     chooseRecording(row = null) {
         if (!this.canMutate()) return;
+        this.stop();
         this.replacing = row;
         this.picker.multiple = !row;
         this.picker.setAttribute("aria-label", row ? _("Replace recording") : _("Add recordings"));
@@ -479,6 +503,7 @@ class MultisampleEditor {
     stop() {
         const work = this.work;
         this.work = null;
+        clearTimeout(work?.timeout);
         if (work?.reader) work.reader.abort();
         for (const { row } of work?.uploads || []) {
             if (row.pending) {
@@ -491,8 +516,98 @@ class MultisampleEditor {
         if (!this.closed) this.update();
     }
 
+    async audition(row = null) {
+        if (!this.canMutate()) return;
+        this.stop();
+        this.notice = "";
+        let snapshot;
+        let pitch;
+        try {
+            if (row) {
+                const sample = this.draft.samples[this.rows.indexOf(row)];
+                if (!sample?.data || row.pending) return;
+                // This private preparation mapping plays at rate 1; it never assigns a draft root.
+                pitch = "C4";
+                snapshot = validateMultisample({
+                    type: "multisample",
+                    version: 1,
+                    name: this.draft.name.trim() || _("My instrument"),
+                    samples: [{ ...sample, root: pitch }]
+                });
+            } else {
+                if (this.problem) return;
+                snapshot = validateMultisample(this.draft);
+                pitch = this.previewPitch.value.trim();
+            }
+            const work = { descriptor: snapshot, revision: this.draftRevision, audition: true };
+            this.work = work;
+            const current = () =>
+                this.isCurrent() && this.work === work && work.revision === this.draftRevision;
+            this.busy =
+                _("Preparing audition…") + " " + (row ? snapshot.samples[0].name : snapshot.name);
+            this.update();
+            work.timeout = setTimeout(() => {
+                if (!current()) return;
+                this.stop();
+                this.notice = _("Multisample audio loading timed out:") + " " + snapshot.name;
+                this.update();
+            }, MULTISAMPLE_LIMITS.loadTimeout);
+            const synth = this.activity.logo.synth;
+            const alias = synth.registerMultisample(snapshot, current);
+            try {
+                const [sampler] = await Promise.all([
+                    synth.__createSynth("multisample-editor", alias, alias, {}),
+                    Tone.start?.()
+                ]);
+                if (!current()) return;
+                const duration = synth.getMultisampleDuration("multisample-editor", alias, pitch);
+                if (duration === null) {
+                    this.stop();
+                    return;
+                }
+                if (!Number.isFinite(duration) || duration <= 0)
+                    throw new Error(_("Invalid preview pitch:") + " " + pitch);
+                sampler.toDestination();
+                synth.setVolume("multisample-editor", alias, 50);
+                sampler.triggerAttack(pitch);
+                clearTimeout(work.timeout);
+                this.busy =
+                    _("Playing audition…") + " " + (row ? snapshot.samples[0].name : snapshot.name);
+                const finishAfter = remaining => {
+                    const delay = Math.min(remaining, 2147483647);
+                    work.timeout = setTimeout(() => {
+                        if (this.work !== work) return;
+                        if (remaining > delay) finishAfter(remaining - delay);
+                        else this.stop();
+                    }, delay);
+                };
+                finishAfter((duration + sampler.context.lookAhead) * 1000);
+                this.update();
+            } catch (error) {
+                if (!current()) return;
+                this.stop();
+                if (error.name !== "AbortError") {
+                    this.notice =
+                        (row ? snapshot.samples[0].name : snapshot.name) +
+                        " / " +
+                        pitch +
+                        ": " +
+                        error.message;
+                    this.update();
+                }
+            } finally {
+                if (this.work !== work) synth.unregisterMultisample(snapshot);
+            }
+        } catch (error) {
+            this.stop();
+            this.notice = error.message;
+            this.update();
+        }
+    }
+
     async apply() {
-        if (!this.isCurrent() || this.busy || this.choice) return;
+        if (!this.isCurrent() || (this.busy && !this.work?.audition) || this.choice) return;
+        this.stop();
         this.update();
         if (this.problem) {
             if (!this.draft.name.trim()) this.nameInput.focus();
@@ -659,6 +774,7 @@ class MultisampleEditor {
             }
             if (
                 !["SELECT", "OPTION"].includes(event.target.tagName) &&
+                event.target !== this.previewPitch &&
                 event.target.type !== "file"
             ) {
                 event.preventDefault();
@@ -715,7 +831,11 @@ class MultisampleEditor {
         this.widgetWindow.destroy();
         this.root.onkeydown = null;
         this.root.removeEventListener("focusin", this.focusHandler);
-        this.nameInput.oninput = this.picker.onchange = this.picker.oncancel = null;
+        this.nameInput.oninput =
+            this.previewPitch.oninput =
+            this.picker.onchange =
+            this.picker.oncancel =
+                null;
         for (const row of this.rows) row.select.onchange = null;
         this.root.replaceChildren();
         const samplerFrame = this.activity.logo.sample?.widgetWindow?.getWidgetFrame();
@@ -729,6 +849,7 @@ class MultisampleEditor {
         this.initial = null;
         this.origin = null;
         this.root = this.list = this.nameInput = this.picker = this.actions = this.status = null;
+        this.previewPitch = this.previewButton = null;
         this.applyButton =
             this.stopButton =
             this.cancelButton =
