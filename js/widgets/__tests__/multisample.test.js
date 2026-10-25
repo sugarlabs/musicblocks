@@ -16,12 +16,13 @@ global.MULTISAMPLE_LIMITS = MULTISAMPLE_LIMITS;
 global.normalizeNoteAccidentals =
     require("../../utils/musicutils-pitch.js").normalizeNoteAccidentals;
 global.Tone = {
-    Frequency: root => ({
-        toMidi: () =>
-            ({ C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 })[root[0]] +
+    Frequency: root => {
+        const midi =
+            { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[root[0]] +
             (root.includes("#") ? 1 : root.includes("b") ? -1 : 0) +
-            12 * (Number(root.slice(-1)) + 1)
-    })
+            12 * (Number(root.slice(-1)) + 1);
+        return { toMidi: () => midi, toFrequency: () => 440 * Math.pow(2, (midi - 69) / 12) };
+    }
 };
 const wav = () => new Uint8Array([..."RIFF0000WAVE"].map(c => c.charCodeAt(0)));
 const value = () => ({
@@ -71,6 +72,290 @@ describe("Focused multisample authoring", () => {
 
     afterEach(() => activity.multisampleEditor?.close());
 
+    test("Listen prepares only an unassigned recording and leaves the draft unchanged", async () => {
+        const sampler = {
+            toDestination: jest.fn(),
+            triggerAttack: jest.fn(),
+            context: { lookAhead: 0 }
+        };
+        activity.logo.synth = {
+            registerMultisample: jest.fn(() => "audition"),
+            __createSynth: jest.fn().mockResolvedValue(sampler),
+            getMultisampleDuration: () => 1,
+            setVolume: jest.fn(),
+            unregisterMultisample: jest.fn()
+        };
+        MultisampleEditor.open(activity);
+        await upload();
+        const session = activity.multisampleEditor;
+        const before = JSON.stringify(session.draft);
+        expect(button("Preview instrument").disabled).toBe(true);
+        await button("Listen").onclick();
+        expect(activity.logo.synth.registerMultisample.mock.calls[0][0].samples).toEqual([
+            { ...session.draft.samples[0], root: "C4" }
+        ]);
+        expect(sampler.triggerAttack).toHaveBeenCalledWith("C4");
+        expect(sampler.toDestination).toHaveBeenCalled();
+        expect(JSON.stringify(session.draft)).toBe(before);
+        expect(button("Stop").hidden).toBe(false);
+        button("Stop").click();
+        expect(activity.logo.synth.unregisterMultisample).toHaveBeenCalledTimes(1);
+    });
+
+    describe("audition with shared Synth preparation", () => {
+        const { Synth, instruments } = require("../../utils/synthutils.js");
+        let originalTone;
+        let originalClamp;
+        let nodes;
+        let decode;
+        let synth;
+        const pcm = (bytes = 32000) => ({ length: bytes / 4, numberOfChannels: 1, duration: 1 });
+        const deferred = () => {
+            let resolve, reject;
+            const promise = new Promise((yes, no) => {
+                resolve = yes;
+                reject = no;
+            });
+            return { promise, resolve, reject };
+        };
+        const flush = async () => {
+            for (let i = 0; i < 12; i++) await Promise.resolve();
+        };
+        const open = () => {
+            const descriptor = value();
+            descriptor.samples.push({ ...descriptor.samples[0], name: "high.wav", root: "C4" });
+            const owner = { blockIndex: 0, value: descriptor };
+            activity.blocks.blockList.push(owner);
+            MultisampleEditor.open(activity, owner);
+            return activity.multisampleEditor;
+        };
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            originalClamp = global.clampNumber;
+            global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
+            originalTone = global.Tone;
+            nodes = [];
+            decode = jest.fn().mockResolvedValue(pcm());
+            global.Tone = {
+                ...require("../../utils/__tests__/tonemock.js"),
+                Frequency: originalTone.Frequency,
+                ToneAudioBuffer: { load: decode },
+                start: jest.fn().mockResolvedValue(),
+                Sampler: class extends require("../../utils/__tests__/tonemock.js").Sampler {
+                    constructor() {
+                        super();
+                        this.context = { lookAhead: 0 };
+                        this.dispose = jest.fn();
+                        nodes.push(this);
+                    }
+                }
+            };
+            synth = new Synth();
+            activity.logo.synth = synth;
+        });
+
+        afterEach(() => {
+            activity.multisampleEditor?.close();
+            synth.disposeAllInstruments();
+            global.Tone = originalTone;
+            if (originalClamp === undefined) delete global.clampNumber;
+            else global.clampNumber = originalClamp;
+            jest.useRealTimers();
+        });
+
+        test("prepares the whole instrument before one selected note and releases naturally", async () => {
+            const session = open();
+            const last = deferred();
+            decode.mockResolvedValueOnce(pcm()).mockReturnValueOnce(last.promise);
+            expect(session.previewPitch.value).toBe("C4");
+            session.previewPitch.value = "D4";
+            const pending = button("Preview instrument").onclick();
+            await flush();
+            expect(nodes).toHaveLength(0);
+            expect(synth.multisampleBytes).toBe(32000);
+            expect(button("Stop").hidden).toBe(false);
+            last.resolve(pcm());
+            await pending;
+            expect(nodes).toHaveLength(1);
+            expect(nodes[0].triggerAttack).toHaveBeenCalledWith("D4");
+            expect(synth.multisampleBytes).toBe(64000);
+            jest.advanceTimersByTime(1001);
+            expect(nodes[0].dispose).toHaveBeenCalledTimes(1);
+            expect(synth.multisampleBytes).toBe(0);
+            expect(button("Stop").hidden).toBe(true);
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test.each(["resolve", "reject"])("Stop/retry is independent of a late %s", async settle => {
+            open();
+            const old = deferred();
+            decode.mockReturnValueOnce(old.promise);
+            const abandoned = button("Listen").onclick();
+            button("Stop").click();
+            await button("Listen").onclick();
+            expect(nodes).toHaveLength(1);
+            old[settle](settle === "resolve" ? pcm() : new Error("old decode failure"));
+            await abandoned;
+            expect(nodes).toHaveLength(1);
+            expect(nodes[0].triggerAttack).toHaveBeenCalledTimes(1);
+            expect(nodes[0].dispose).not.toHaveBeenCalled();
+            expect(synth.multisampleBytes).toBe(32000);
+            expect(activity.multisampleEditor.status.textContent).toContain("Playing audition");
+        });
+
+        test.each(["name", "root", "target", "remove", "picker", "owner", "close", "project"])(
+            "%s stops audition before late preparation can sound",
+            async change => {
+                const session = open();
+                const old = deferred();
+                decode.mockReturnValueOnce(old.promise);
+                const pending = button("Listen").onclick();
+                if (change === "name") session.nameInput.dispatchEvent(new Event("input"));
+                if (change === "root")
+                    document.querySelector("select").dispatchEvent(new Event("change"));
+                if (change === "target") session.previewPitch.dispatchEvent(new Event("input"));
+                if (change === "remove") button("Remove").click();
+                if (change === "picker") button("Replace…").click();
+                if (change === "owner") session.invalidateOwner(session.owner);
+                if (change === "close") session.close();
+                if (change === "project") {
+                    activity.multisampleProjectGeneration =
+                        (activity.multisampleProjectGeneration || 0) + 1;
+                    session.close();
+                }
+                old.resolve(pcm());
+                await pending;
+                expect(nodes).toHaveLength(0);
+                expect(synth.multisampleBytes).toBe(0);
+                expect(jest.getTimerCount()).toBe(0);
+            }
+        );
+
+        test("a named decode failure preserves saved audio and permits a complete retry", async () => {
+            const session = open();
+            const saved = JSON.stringify(session.owner.value);
+            decode.mockResolvedValueOnce(pcm()).mockRejectedValueOnce(new Error("bad WAV"));
+            await button("Preview instrument").onclick();
+            expect(nodes).toHaveLength(0);
+            expect(synth.multisampleBytes).toBe(0);
+            expect(session.status.textContent).toContain("Original / high.wav");
+            expect(JSON.stringify(session.owner.value)).toBe(saved);
+            expect(button("Preview instrument").disabled).toBe(false);
+            await button("Preview instrument").onclick();
+            expect(nodes[0].triggerAttack).toHaveBeenCalledWith("C4");
+        });
+
+        test("whole-attempt timeout releases partial PCM and retry never waits for old decoding", async () => {
+            const session = open();
+            const old = deferred();
+            decode.mockResolvedValueOnce(pcm()).mockReturnValueOnce(old.promise);
+            const pending = button("Preview instrument").onclick();
+            await flush();
+            jest.advanceTimersByTime(30000);
+            await pending;
+            expect(session.status.textContent).toContain("timed out: Original");
+            expect(synth.multisampleBytes).toBe(0);
+            await button("Listen").onclick();
+            old.resolve(pcm());
+            await flush();
+            expect(nodes).toHaveLength(1);
+            expect(nodes[0].triggerAttack).toHaveBeenCalledTimes(1);
+        });
+
+        test("audition counts ready and partial owners without evicting either", async () => {
+            const session = open();
+            const ready = synth.registerMultisample(value());
+            decode.mockResolvedValueOnce(pcm(32 * 1024 * 1024));
+            const readyNode = await synth.__createSynth(0, ready, ready, {});
+            const partial = synth.registerMultisample(session.draft);
+            const held = deferred();
+            decode.mockResolvedValueOnce(pcm(32 * 1024 * 1024)).mockReturnValueOnce(held.promise);
+            const preparing = synth.__createSynth(1, partial, partial, {});
+            await flush();
+            await button("Listen").onclick();
+            expect(session.status.textContent).toContain("memory limit");
+            expect(synth.multisampleBytes).toBe(64 * 1024 * 1024);
+            expect(readyNode.dispose).not.toHaveBeenCalled();
+            synth.releaseMultisample(1, partial);
+            await expect(preparing).rejects.toMatchObject({ name: "AbortError" });
+            held.resolve(pcm());
+            await button("Listen").onclick();
+            expect(instruments[0][ready]).toBe(readyNode);
+            expect(synth.multisampleBytes).toBe(32 * 1024 * 1024 + 32000);
+        });
+
+        test("Apply releases audition before fresh whole-bank preparation", async () => {
+            const session = open();
+            session.nameInput.value = "Edited";
+            session.nameInput.dispatchEvent(new Event("input"));
+            await button("Preview instrument").onclick();
+            const old = nodes[0];
+            const checking = deferred();
+            decode.mockReturnValueOnce(checking.promise);
+            const pending = button("Apply").onclick();
+            expect(old.dispose).toHaveBeenCalledTimes(1);
+            expect(synth.multisampleBytes).toBe(0);
+            button("Stop").click();
+            checking.resolve(pcm());
+            await pending;
+            expect(session.owner.value.name).toBe("Original");
+            expect(synth.multisampleBytes).toBe(0);
+            expect(button("Preview instrument").disabled).toBe(false);
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test("invalid target reports the instrument and pitch without losing recordings", async () => {
+            const session = open();
+            session.previewPitch.value = "not a pitch";
+            await button("Preview instrument").onclick();
+            expect(session.status.textContent).toContain("Original / not a pitch");
+            expect(nodes[0].triggerAttack).not.toHaveBeenCalled();
+            expect(synth.multisampleBytes).toBe(0);
+            session.previewPitch.value = "C4";
+            await button("Preview instrument").onclick();
+            expect(nodes[1].triggerAttack).toHaveBeenCalledWith("C4");
+        });
+
+        test("long natural durations cannot overflow browser timers and remain stoppable", async () => {
+            open();
+            decode.mockResolvedValue({ ...pcm(), duration: 3000000 });
+            await button("Listen").onclick();
+            jest.advanceTimersByTime(2147483647);
+            expect(nodes[0].dispose).not.toHaveBeenCalled();
+            expect(button("Stop").hidden).toBe(false);
+            button("Stop").click();
+            expect(nodes[0].dispose).toHaveBeenCalledTimes(1);
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test("Escape dismisses native preview suggestions without closing a clean saved draft", () => {
+            const session = open();
+            const escape = new KeyboardEvent("keydown", {
+                key: "Escape",
+                bubbles: true,
+                cancelable: true
+            });
+            session.previewPitch.dispatchEvent(escape);
+            expect(escape.defaultPrevented).toBe(false);
+            expect(activity.multisampleEditor).toBe(session);
+            expect(document.querySelector('[role="alertdialog"]')).toBeNull();
+        });
+
+        test("repeated auditions and disposal return timers, nodes and accounting to baseline", async () => {
+            open();
+            for (let i = 0; i < 10; i++) {
+                await button("Listen").onclick();
+                await button("Preview instrument").onclick();
+                expect(nodes[2 * i].dispose).toHaveBeenCalledTimes(1);
+                button("Stop").click();
+                expect(nodes[2 * i + 1].dispose).toHaveBeenCalledTimes(1);
+                expect(synth.multisampleBytes).toBe(0);
+                expect(jest.getTimerCount()).toBe(0);
+            }
+        });
+    });
+
     test("keeps picker order and named failures until each incomplete row is repaired or removed", async () => {
         MultisampleEditor.open(activity);
         const picker = document.querySelector('input[type="file"]');
@@ -109,7 +394,7 @@ describe("Focused multisample authoring", () => {
 
     test("opens an empty named draft and requires an explicit discard after editing", () => {
         MultisampleEditor.open(activity);
-        const name = document.querySelector('input[type="text"]');
+        const name = document.querySelector('input[name="multisample-name"]');
         expect(name.value).toBe("My instrument");
         expect(document.querySelectorAll("select")).toHaveLength(0);
         expect(button("Apply").disabled).toBe(true);
@@ -188,7 +473,7 @@ describe("Focused multisample authoring", () => {
         activity.saveLocally = jest.fn().mockResolvedValue(undefined);
         activity.blocks.highlight = jest.fn();
         MultisampleEditor.open(activity, owner);
-        const name = document.querySelector('input[type="text"]');
+        const name = document.querySelector('input[name="multisample-name"]');
         name.value = "Edited";
         name.dispatchEvent(new Event("input"));
         const applying = button("Apply").onclick();
@@ -734,7 +1019,7 @@ describe("Focused multisample authoring", () => {
             unregisterMultisample: jest.fn()
         };
         MultisampleEditor.open(activity, owner);
-        const name = document.querySelector('input[type="text"]');
+        const name = document.querySelector('input[name="multisample-name"]');
         name.value = "Changed";
         name.dispatchEvent(new Event("input"));
         await button("Apply").onclick();
