@@ -444,6 +444,18 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(create).toHaveBeenCalledWith("fallback-name", "私の曲", "my description");
         });
 
+        test("is used when only digits are left of a non-latin name", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("私の曲 1")
+                .mockResolvedValueOnce("my description");
+            jest.spyOn(gitDropdown, "_fallbackRepoName").mockReturnValue("fallback-name");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(create).toHaveBeenCalledWith("fallback-name", "私の曲 1", "my description");
+        });
+
         test("is not used by the create flow for latin names", async () => {
             window.MBDialog.prompt
                 .mockResolvedValueOnce("My Song")

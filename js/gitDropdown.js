@@ -372,7 +372,10 @@ class GitDropdownUI {
         });
         if (desc === null) return;
 
-        const repoName = this._sanitizeRepoName(rawName.trim()) || this._fallbackRepoName();
+        // Use the unique fallback when no latin letter is left: an empty slug,
+        // or only digits ("私の曲 1" -> "1"), which many names would share.
+        const slug = this._sanitizeRepoName(rawName.trim());
+        const repoName = /[a-z]/.test(slug) ? slug : this._fallbackRepoName();
 
         await this._doCreate(repoName, rawName.trim(), desc.trim());
     }
