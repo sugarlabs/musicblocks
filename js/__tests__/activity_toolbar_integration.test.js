@@ -612,6 +612,7 @@ describe("Activity Toolbar Integration", () => {
                 palettes: activity.palettes,
                 blockList: [mockBlock],
                 _beginDeferCheckBounds: jest.fn(),
+                abandonLoads: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
                 trashPreviews: {},
@@ -635,6 +636,10 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.blocks._endDeferCheckBounds).toHaveBeenCalled();
             expect(mockBlock.trash).toBe(true);
             expect(activity.blocks.disposeBlock).toHaveBeenCalledWith("0");
+            expect(activity.blocks.abandonLoads).toHaveBeenCalledTimes(1);
+            expect(activity.blocks.abandonLoads.mock.invocationCallOrder[0]).toBeLessThan(
+                activity.blocks.disposeBlock.mock.invocationCallOrder[0]
+            );
             expect(closeWidgets).toHaveBeenCalledTimes(1);
             expect(closeWidgets.mock.invocationCallOrder[0]).toBeLessThan(
                 activity.blocks.disposeBlock.mock.invocationCallOrder[0]
@@ -659,6 +664,7 @@ describe("Activity Toolbar Integration", () => {
                 palettes: activity.palettes,
                 blockList: [trashed, null, live],
                 _beginDeferCheckBounds: jest.fn(),
+                abandonLoads: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
                 trashPreviews: { 0: "old-preview" },
@@ -712,6 +718,7 @@ describe("Activity Toolbar Integration", () => {
                 palettes: activity.palettes,
                 blockList: [start, action],
                 _beginDeferCheckBounds: jest.fn(),
+                abandonLoads: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(),
                 deleteActionBlock: jest.fn(),

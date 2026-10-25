@@ -2411,6 +2411,32 @@ describe("Blocks Foundation", () => {
             expect(blocks._loadQueue).toHaveLength(1);
         });
 
+        it("stops a load abandoned mid-chunk so its remaining blocks never run", async () => {
+            blocks.loadNewBlocks(makeBatch(25));
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+
+            blocks.abandonLoads();
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+        });
+
+        it("drops queued loads when abandoned, then loads a new project normally", async () => {
+            blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(makeBatch(5));
+
+            blocks.abandonLoads();
+            blocks.loadNewBlocks(makeBatch(3));
+            await new Promise(r => setTimeout(r, 50));
+
+            // 20 from the abandoned load's first chunk, then the 3 blocks of
+            // the new load. The abandoned chunk and the queued 5 never run.
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(23);
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
         it("assigns a queued call its own token immediately, distinct from the running load's", () => {
             // A caller needs its own request's token the moment it calls
             // loadNewBlocks(), not whatever load happens to be active once

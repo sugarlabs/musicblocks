@@ -2021,6 +2021,8 @@ class Activity {
 
             let actionBlockCounter = 0;
 
+            // Stop any project still loading before its blocks are disposed.
+            this.blocks.abandonLoads();
             this.blocks._beginDeferCheckBounds();
 
             for (const blk of Object.keys(this.blocks.blockList)) {

@@ -5353,6 +5353,23 @@ class Blocks {
         this.isLoading = () => this._loadInProgress;
 
         /**
+         * Drops the load in progress and every queued load. Used before the
+         * workspace is cleared, so chunks still waiting on setTimeout and
+         * queued requests cannot add the old project's blocks to the new one.
+         * Bumping _activeLoadGeneration marks the abandoned chunks and their
+         * completions as stale.
+         * @public
+         * @returns {void}
+         */
+        this.abandonLoads = () => {
+            this._activeLoadGeneration += 1;
+            this._loadQueue = [];
+            this._loadCounter = 0;
+            this.activity._suppressRefresh = false;
+            this._advanceLoadQueue();
+        };
+
+        /**
          * Runs callback once every pending load has finished, or right away
          * if nothing is loading. Passing the same callback again while it is
          * waiting does not queue it twice.
@@ -6156,6 +6173,10 @@ class Blocks {
                     }
                 }
 
+                // abandonLoads() bumps the generation when the workspace is
+                // cleared mid-load; a chunk still waiting on setTimeout must
+                // then stop instead of writing into the replacement project.
+                const loadGeneration = this._activeLoadGeneration;
                 const processChunk = () => {
                     const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
                     for (let b = bIndex; b < chunkEnd; b++) {
@@ -6184,6 +6205,7 @@ class Blocks {
                         // tell any listener synchronously via pubsub, the same
                         // channel "finishedLoading" already uses for success.
                         this.setTimeout(() => {
+                            if (loadGeneration !== this._activeLoadGeneration) return;
                             try {
                                 processChunk();
                             } catch (e) {
