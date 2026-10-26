@@ -63,11 +63,28 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
         win.ActivityContext.getActivity().blocks.blockList.filter(
             block => block && !block.trash && block.name === "multisample"
         );
+    const visitFresh = () => {
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+                // IndexedDB fallback survives localStorage.clear(), including quota recovery.
+                win.localStorage.currentProject =
+                    "Persistence " + fixtureName + " " + Math.random();
+            }
+        });
+        cy.waitForAppReady();
+        cy.window({ timeout: 60000 }).should(win => {
+            const activity = win.ActivityContext.getActivity();
+            expect(activity.keyboardEnableFlag, "initial session restoration finished").to.equal(1);
+            expect(activity.blocks.isLoading()).to.equal(false);
+        });
+    };
     const waitForValues = (count = 3) => {
         cy.window({ timeout: 60000 }).should(win => {
             const activity = win.ActivityContext.getActivity();
             expect(activity.blocks.isLoading()).to.equal(false);
-            expect(instruments(win)).to.have.length(count);
+            // Keep embedded audio and complete block graphs out of retry assertion logs.
+            expect(instruments(win).length).to.equal(count);
             expect(instruments(win)[0].value.name).to.equal(value().name);
         });
     };
@@ -109,12 +126,7 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
 
     beforeEach(() => {
         fixtureName = Date.now() + " " + Math.random();
-        cy.visit("http://127.0.0.1:3000", {
-            onBeforeLoad(win) {
-                win.localStorage.clear();
-            }
-        });
-        cy.waitForAppReady();
+        visitFresh();
         importFile(JSON.stringify(project()));
         waitForValues();
     });
@@ -138,6 +150,78 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
         );
         waitForValues();
         verify();
+    });
+
+    it("reopens connected legacy samples without changing four/five-element values or cents", () => {
+        let fixture;
+        let exported;
+        const samples = win =>
+            win.ActivityContext.getActivity().blocks.blockList.filter(
+                block => block && !block.trash && block.name === "customsample"
+            );
+        const check = () =>
+            cy.window().should(win => {
+                const activity = win.ActivityContext.getActivity();
+                expect(activity.blocks.isLoading()).to.equal(false);
+                expect(samples(win)).to.have.length(2);
+                for (const [i, block] of samples(win).entries()) {
+                    const expected = fixture.filter(row => row[1]?.[0] === "customsample")[i];
+                    expect(block.value).to.deep.equal(expected[1][1].value);
+                    for (let slot = 1; slot <= 3; slot++) {
+                        const child = activity.blocks.blockList[block.connections[slot]];
+                        expect(child.value).to.deep.equal(fixture[expected[4][slot]][1][1].value);
+                        expect(child.connections[0]).to.equal(block.blockIndex);
+                    }
+                }
+            });
+        cy.fixture("legacy-connected-samples.tb").then(text => {
+            fixture = JSON.parse(text);
+            importFile(text, "legacy-connected.tb");
+        });
+        check();
+        cy.window().then(win => {
+            exported = win.ActivityContext.getActivity().prepareExport();
+        });
+        visitFresh();
+        cy.then(() => importFile(exported, "legacy-reopened.tb"));
+        check();
+        cy.window().then(win => {
+            const activity = win.ActivityContext.getActivity();
+            for (const [i, block] of samples(win).entries()) {
+                const expected = fixture
+                    .filter(row => row[1]?.[0] === "customsample")
+                    [i][1][1].value.slice();
+                expected[1] = fixture.filter(row => row[1]?.[0] === "audiofile")[i][1][1].value[1];
+                expect(
+                    activity.logo.parseArg(activity.logo, 0, block.blockIndex, null, null)
+                ).to.deep.equal(expected);
+            }
+            const saved = JSON.parse(activity.prepareExport());
+            expect(
+                saved.filter(row => row[1]?.[0] === "customsample").map(row => row[1][1].value)
+            ).to.deep.equal(
+                fixture.filter(row => row[1]?.[0] === "customsample").map(row => row[1][1].value)
+            );
+            expect(
+                saved.filter(row => row[1]?.[0] === "audiofile").map(row => row[1][1].value)
+            ).to.deep.equal(
+                fixture.filter(row => row[1]?.[0] === "audiofile").map(row => row[1][1].value)
+            );
+        });
+        let attacks;
+        cy.window().then(async win => {
+            await win.Tone.start();
+            attacks = cy.spy(win.Tone.Sampler.prototype, "triggerAttackRelease");
+            win.ActivityContext.getActivity().logo.runLogoCommands();
+        });
+        cy.window().should(win => {
+            expect(attacks).to.have.callCount(6);
+            const synth = win.ActivityContext.getActivity().logo.synth;
+            expect(synth.multisampleBytes).to.equal(0);
+            expect(synth.sampleCentAdjustments["customsample_legacy-four.wav"]).to.equal(0);
+            expect(synth.sampleCentAdjustments["customsample_legacy-five.wav"]).to.equal(37);
+        });
+        cy.window().then(win => win.ActivityContext.getActivity().logo.doStopTurtles());
     });
 
     it("keeps copies, append, saved custom stacks, replacement and history independent", () => {
@@ -291,6 +375,97 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
             expect(message).to.have.been.calledWithMatch("Retry saving or export");
             save.restore();
             await activity.saveLocally();
+        });
+    });
+
+    it("recovers independent eight-megabyte banks through native export after session quota failure", () => {
+        const bytes = new Uint8Array(1000000);
+        const view = new DataView(bytes.buffer);
+        const text = (offset, value) =>
+            [...value].forEach((c, i) => {
+                bytes[offset + i] = c.charCodeAt(0);
+            });
+        text(0, "RIFF");
+        view.setUint32(4, bytes.length - 8, true);
+        text(8, "WAVEfmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, 48000, true);
+        view.setUint32(28, 96000, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        text(36, "data");
+        view.setUint32(40, bytes.length - 44, true);
+        const data = "data:audio/wav;base64," + Cypress.Buffer.from(bytes).toString("base64");
+        const descriptor = {
+            type: "multisample",
+            version: 1,
+            name: "I12 encoded boundary " + fixtureName,
+            samples: Array.from({ length: 8 }, (_, i) => ({
+                name: "root-" + i + ".wav",
+                root: "C" + (i + 1),
+                data
+            }))
+        };
+        let exported;
+        cy.window().then(win => {
+            const activity = win.ActivityContext.getActivity();
+            instruments(win)[0].setMultisampleValue(descriptor);
+            activity.blocks.selectedStack = instruments(win)[0].connections[0];
+            activity.blocks.loadNewBlocks(activity.blocks._copyBlocksToObj(false));
+        });
+        cy.window({ timeout: 60000 }).should(win => {
+            expect(win.ActivityContext.getActivity().blocks.isLoading()).to.equal(false);
+            expect(instruments(win).length).to.equal(4);
+            expect(
+                JSON.stringify(instruments(win)[3].value) === JSON.stringify(descriptor)
+            ).to.equal(true);
+            expect(instruments(win)[3].value.samples).not.to.equal(
+                instruments(win)[0].value.samples
+            );
+        });
+        cy.window().then(win => {
+            const activity = win.ActivityContext.getActivity();
+            const messages = cy.spy(activity, "textMsg");
+            expect(activity.__saveLocally()).to.equal(false);
+            expect(messages).to.have.been.calledWithMatch(
+                "Could not write the local-storage session"
+            );
+            exported = activity.prepareExport();
+            expect(
+                JSON.stringify(instruments(win)[0].value) === JSON.stringify(descriptor)
+            ).to.equal(true);
+            activity.logo.synth.disposeAllInstruments();
+        });
+        visitFresh();
+        cy.then(() => importFile(exported, "encoded-boundary.tb"));
+        cy.window({ timeout: 60000 }).should(win => {
+            const activity = win.ActivityContext.getActivity();
+            expect(activity.blocks.isLoading()).to.equal(false);
+            expect(instruments(win).length).to.equal(4);
+            for (const owner of [instruments(win)[0], instruments(win)[3]]) {
+                expect(JSON.stringify(owner.value) === JSON.stringify(descriptor)).to.equal(true);
+            }
+            expect(instruments(win)[3].value.samples).not.to.equal(
+                instruments(win)[0].value.samples
+            );
+        });
+        cy.window().then({ timeout: 60000 }, async win => {
+            const synth = win.ActivityContext.getActivity().logo.synth;
+            let retained = 0;
+            for (const owner of [instruments(win)[0], instruments(win)[3]]) {
+                const alias = synth.registerMultisample(owner.value);
+                await synth.loadSynth(0, alias, alias);
+                expect(JSON.stringify(owner.value) === JSON.stringify(descriptor)).to.equal(true);
+                expect(synth.multisampleBytes).to.be.greaterThan(retained);
+                retained = synth.multisampleBytes;
+            }
+            expect(synth.multisampleBytes)
+                .to.be.greaterThan(0)
+                .and.at.most(64 * 1024 * 1024);
+            synth.disposeAllInstruments();
+            expect(synth.multisampleBytes).to.equal(0);
         });
     });
 

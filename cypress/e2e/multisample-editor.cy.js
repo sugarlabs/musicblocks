@@ -130,8 +130,20 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
     let auditionMeter;
     beforeEach(() => {
         const marker = "I09 Sampler " + Date.now() + " " + Math.random();
-        cy.visit("http://127.0.0.1:3000", { onBeforeLoad: win => win.localStorage.clear() });
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+                win.localStorage.currentProject = marker;
+            }
+        });
         cy.waitForAppReady();
+        cy.window({ timeout: 60000 }).should(win => {
+            expect(
+                activity(win).keyboardEnableFlag,
+                "initial session restoration finished"
+            ).to.equal(1);
+            expect(activity(win).blocks.isLoading()).to.equal(false);
+        });
         // Run a real Sampler block, rather than substituting the widget constructor.
         const project = [
             [0, "sampler", 250, 100, [null, 1, 2]],
@@ -603,6 +615,34 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         );
     });
 
+    it(
+        "preserves the viewport when Apply and Cancel return focus to the saved block",
+        { scrollBehavior: false },
+        () => {
+            let initial;
+            cy.window().then(win => {
+                const rect = win.document.getElementById("myCanvas").getBoundingClientRect();
+                initial = { x: rect.x, y: rect.y, scrollX: win.scrollX, scrollY: win.scrollY };
+            });
+            const verify = () =>
+                cy.window().should(win => {
+                    const rect = win.document.getElementById("myCanvas").getBoundingClientRect();
+                    expect(win.document.activeElement).to.equal(owners(win)[0].accessibleElement);
+                    expect({
+                        x: rect.x,
+                        y: rect.y,
+                        scrollX: win.scrollX,
+                        scrollY: win.scrollY
+                    }).to.deep.equal(initial);
+                });
+            create();
+            verify();
+            reopen();
+            cy.contains(editor + " button", /^Cancel$/).click();
+            verify();
+        }
+    );
+
     it("edits an ordinary independent copy without changing the authored original", () => {
         create();
         let original;
@@ -634,65 +674,150 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.window().then(win => expect(owners(win)[1].value.name).to.equal("Independent copy"));
     });
 
-    it("plays a native round trip of the authored value through ordinary Set Instrument notes", () => {
-        create();
-        let expected;
-        cy.window().then(win => {
-            expected = JSON.parse(JSON.stringify(owners(win)[0].value));
-            const project = JSON.parse(activity(win).prepareExport());
-            const set = project.find(row => row[1] === "settimbre" || row[1]?.[0] === "settimbre");
-            let tail;
-            for (const pitch of ["C", "D", "E"]) {
-                const n = project.length;
-                if (tail === undefined) set[4][2] = n;
-                else project[tail][4][1] = n;
-                project.push(
-                    [n, "newnote", 0, 0, [tail ?? set[0], n + 1, n + 4, n + 7]],
-                    [n + 1, "divide", 0, 0, [n, n + 2, n + 3]],
-                    [n + 2, ["number", { value: 1 }], 0, 0, [n + 1]],
-                    [n + 3, ["number", { value: 16 }], 0, 0, [n + 1]],
-                    [n + 4, "pitch", 0, 0, [n, n + 5, n + 6, null]],
-                    [n + 5, ["notename", { value: pitch }], 0, 0, [n + 4]],
-                    [n + 6, ["number", { value: 4 }], 0, 0, [n + 4]],
-                    [n + 7, "hidden", 0, 0, [n, null]]
-                );
-                tail = n + 7;
+    for (const format of ["native", "HTML", "session"]) {
+        it(
+            "plays a fresh " + format + " round trip of an authored batch through ordinary notes",
+            () => {
+                create();
+                reopen();
+                upload(wav(800, 261.6255653, 3));
+                cy.get(editor + " select")
+                    .last()
+                    .select("C4");
+                cy.get(editor + ' input[list="multisample-preview-pitches"]')
+                    .clear()
+                    .type("F#3");
+                cy.contains(editor + " button", "Preview instrument").click();
+                cy.contains(editor + " button", /^Stop$/)
+                    .should("not.be.disabled")
+                    .click();
+                apply();
+                let expected;
+                let exported;
+                cy.window().then(win => {
+                    expected = JSON.parse(JSON.stringify(owners(win)[0].value));
+                    const project = JSON.parse(activity(win).prepareExport());
+                    const set = project.find(
+                        row => row[1] === "settimbre" || row[1]?.[0] === "settimbre"
+                    );
+                    let tail;
+                    for (const pitch of ["C", "D", "E"]) {
+                        const n = project.length;
+                        if (tail === undefined) set[4][2] = n;
+                        else project[tail][4][1] = n;
+                        project.push(
+                            [n, "newnote", 0, 0, [tail ?? set[0], n + 1, n + 4, n + 7]],
+                            [n + 1, "divide", 0, 0, [n, n + 2, n + 3]],
+                            [n + 2, ["number", { value: 1 }], 0, 0, [n + 1]],
+                            [n + 3, ["number", { value: 16 }], 0, 0, [n + 1]],
+                            [n + 4, "pitch", 0, 0, [n, n + 5, n + 6, null]],
+                            [n + 5, ["notename", { value: pitch }], 0, 0, [n + 4]],
+                            [n + 6, ["number", { value: 4 }], 0, 0, [n + 4]],
+                            [n + 7, "hidden", 0, 0, [n, null]]
+                        );
+                        tail = n + 7;
+                    }
+                    const suffix = project.length;
+                    project[set[4][3]][4][1] = suffix;
+                    project.push(
+                        [
+                            suffix,
+                            ["storein2", { value: "i09done" }],
+                            0,
+                            0,
+                            [set[4][3], suffix + 1, null]
+                        ],
+                        [suffix + 1, ["number", { value: 1 }], 0, 0, [suffix]]
+                    );
+                    cy.get("#myOpenFile").selectFile(
+                        {
+                            contents: Cypress.Buffer.from(JSON.stringify(project)),
+                            fileName: "authored-notes.tb"
+                        },
+                        { force: true }
+                    );
+                });
+                cy.window().should(win => {
+                    expect(activity(win).blocks.isLoading()).to.equal(false);
+                    expect(owners(win)[0].value).to.deep.equal(expected);
+                    expect(
+                        activity(win).blocks.blockList.filter(
+                            b => b && !b.trash && b.name === "newnote"
+                        )
+                    ).to.have.length(3);
+                });
+                cy.window().then(win => {
+                    if (format === "session") {
+                        activity(win).__saveLocally();
+                        expect(
+                            activity(win).storage["SESSION" + activity(win).storage.currentProject]
+                        ).to.equal(activity(win).prepareExport());
+                    } else {
+                        exported =
+                            format === "HTML"
+                                ? activity(win).save.prepareHTML()
+                                : activity(win).prepareExport();
+                    }
+                    activity(win).logo.synth.disposeAllInstruments();
+                });
+                if (format === "session") {
+                    cy.reload();
+                } else {
+                    cy.visit("http://127.0.0.1:3000", {
+                        onBeforeLoad(win) {
+                            win.localStorage.clear();
+                            win.localStorage.currentProject =
+                                "Fresh editor " + Date.now() + " " + Math.random();
+                        }
+                    });
+                }
+                cy.waitForAppReady();
+                cy.window({ timeout: 60000 }).should(win => {
+                    expect(
+                        activity(win).keyboardEnableFlag,
+                        "initial session restoration finished"
+                    ).to.equal(1);
+                    expect(activity(win).blocks.isLoading()).to.equal(false);
+                });
+                if (format !== "session") {
+                    cy.then(() =>
+                        cy.get("#myOpenFile").selectFile(
+                            {
+                                contents: Cypress.Buffer.from(exported),
+                                fileName: "fresh." + (format === "HTML" ? "html" : "tb")
+                            },
+                            { force: true }
+                        )
+                    );
+                }
+                cy.window().should(win => {
+                    expect(activity(win).blocks.isLoading()).to.equal(false);
+                    expect(owners(win)).to.have.length(1);
+                    expect(owners(win)[0].value).to.deep.equal(expected);
+                    expect(activity(win).logo.synth.multisampleBytes).to.equal(0);
+                    for (let i = 0; i < expected.samples.length; i++) {
+                        expect(
+                            win.atob(owners(win)[0].value.samples[i].data.split(",")[1])
+                        ).to.equal(atob(expected.samples[i].data.split(",")[1]));
+                    }
+                    expect(win.document.querySelector(editor)).to.equal(null);
+                });
+                let attacks;
+                cy.window().then(async win => {
+                    await win.Tone.start();
+                    attacks = cy.spy(win.Tone.Sampler.prototype, "triggerAttackRelease");
+                    activity(win)
+                        .blocks.blockList.find(b => b && !b.trash && b.name === "settimbre")
+                        .activate();
+                });
+                cy.window().should(win => expect(activity(win).logo.boxes.i09done).to.equal(1));
+                cy.then(() => {
+                    expect(attacks).to.have.been.calledThrice;
+                    expect(attacks.args.map(args => args[0])).to.deep.equal(["C4", "D4", "E4"]);
+                });
             }
-            const suffix = project.length;
-            project[set[4][3]][4][1] = suffix;
-            project.push(
-                [suffix, ["storein2", { value: "i09done" }], 0, 0, [set[4][3], suffix + 1, null]],
-                [suffix + 1, ["number", { value: 1 }], 0, 0, [suffix]]
-            );
-            cy.get("#myOpenFile").selectFile(
-                {
-                    contents: Cypress.Buffer.from(JSON.stringify(project)),
-                    fileName: "authored-notes.tb"
-                },
-                { force: true }
-            );
-        });
-        cy.window().should(win => {
-            expect(activity(win).blocks.isLoading()).to.equal(false);
-            expect(owners(win)[0].value).to.deep.equal(expected);
-            expect(
-                activity(win).blocks.blockList.filter(b => b && !b.trash && b.name === "newnote")
-            ).to.have.length(3);
-        });
-        let attacks;
-        cy.window().then(async win => {
-            await win.Tone.start();
-            attacks = cy.spy(win.Tone.Sampler.prototype, "triggerAttackRelease");
-            activity(win)
-                .blocks.blockList.find(b => b && !b.trash && b.name === "settimbre")
-                .activate();
-        });
-        cy.window().should(win => expect(activity(win).logo.boxes.i09done).to.equal(1));
-        cy.then(() => {
-            expect(attacks).to.have.been.calledThrice;
-            expect(attacks.args.map(args => args[0])).to.deep.equal(["C4", "D4", "E4"]);
-        });
-    });
+        );
+    }
 
     it("keeps same-file rows independent and identifies both duplicate roots", () => {
         cy.contains("button", "New multisample instrument…").click();
@@ -892,6 +1017,27 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.window().then(win => {
             expect(activity(win).logo.sample.isMoving).to.equal(false);
             expect(activity(win).logo.sample.widgetWindow.getWidgetFrame().inert).to.equal(false);
+        });
+        cy.get(samplerFrame + ' [aria-label="Save sample"]').click();
+        cy.window().should(win => {
+            const saved = activity(win).blocks.blockList.find(
+                b => b && !b.trash && b.name === "customsample" && b.value?.[0] === "legacy.wav"
+            );
+            expect(saved).to.exist;
+            expect(saved.value).to.deep.equal([
+                "legacy.wav",
+                "data:audio/wav;base64," + wav(24000).toString("base64"),
+                activity(win).logo.sample.samplePitch,
+                activity(win).logo.sample.sampleOctave,
+                37
+            ]);
+            const exported = JSON.parse(activity(win).prepareExport());
+            expect(exported.find(row => row[1]?.[0] === "customsample")[1][1].value[4]).to.equal(
+                37
+            );
+            expect(exported.find(row => row[1]?.[0] === "audiofile")[1][1].value[1]).to.equal(
+                saved.value[1]
+            );
         });
     });
 
