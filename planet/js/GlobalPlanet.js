@@ -50,6 +50,7 @@ class GlobalPlanet {
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
+        this._requestId = 0;
         this.remixPrefix = _("Remix of");
 
         /** @type {IntersectionObserver|null} */
@@ -126,6 +127,7 @@ class GlobalPlanet {
 
     refreshProjects() {
         const Planet = this.Planet;
+        const requestId = ++this._requestId;
 
         this.index = 0;
         this._cleanupCards();
@@ -139,7 +141,7 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         } else {
             Planet.ServerInterface.downloadProjectList(
@@ -147,13 +149,14 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         }
     }
 
     loadMoreProjects() {
         const Planet = this.Planet;
+        const requestId = this._requestId;
 
         this.showLoading();
         this.hideLoadMore();
@@ -164,7 +167,7 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         } else {
             Planet.ServerInterface.downloadProjectList(
@@ -172,7 +175,7 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         }
     }
@@ -192,6 +195,7 @@ class GlobalPlanet {
         }
 
         // A real search query — go into search mode.
+        const requestId = ++this._requestId;
         this.searching = true;
         this.hideTags();
         this.oldSearchString = this.searchString;
@@ -205,7 +209,7 @@ class GlobalPlanet {
             this.sortBy,
             this.index,
             this.index + this.page + 1,
-            this.afterRefreshProjects.bind(this)
+            data => this.afterRefreshProjects(data, requestId)
         );
     }
 
@@ -226,11 +230,12 @@ class GlobalPlanet {
         if (this.searchString !== this.oldSearchString) this.search();
     }
 
-    afterRefreshProjects(data) {
-        data.success ? this.addProjects(data.data) : this.throwOfflineError();
+    afterRefreshProjects(data, requestId = this._requestId) {
+        if (requestId !== this._requestId) return;
+        data.success ? this.addProjects(data.data, requestId) : this.throwOfflineError();
     }
 
-    addProjects(data) {
+    addProjects(data, requestId = this._requestId) {
         const toDownload = [];
 
         for (let i = 0; i < data.length; i++) {
@@ -265,7 +270,8 @@ class GlobalPlanet {
                 function () {
                     this.render(data);
                     this.showLoadMore();
-                }.bind(this)
+                }.bind(this),
+                requestId
             );
         } else {
             this.downloadProjectsToCache(
@@ -273,12 +279,13 @@ class GlobalPlanet {
                 function () {
                     this.render(data);
                     this.hideLoadMore();
-                }.bind(this)
+                }.bind(this),
+                requestId
             );
         }
     }
 
-    downloadProjectsToCache(data, callback) {
+    downloadProjectsToCache(data, callback, requestId = this._requestId) {
         const Planet = this.Planet;
         this.loadCount = data.length;
         this.batchHasOfflineError = false;
@@ -289,6 +296,7 @@ class GlobalPlanet {
                 Planet.ServerInterface.getProjectDetails(
                     id,
                     function (d) {
+                        if (requestId !== this._requestId) return;
                         const tempid = id;
                         this.addProjectToCache(tempid, d, callback);
                     }.bind(this)
@@ -431,7 +439,11 @@ class GlobalPlanet {
         if (this.oldSearchString !== "") this.afterSearch();
     }
 
+    // Both error screens end whatever list was loading. A search that ends here never
+    // reaches afterSearch(), so clear the flag too, or search() ignores every later
+    // query (and the clear button) until reload.
     throwOfflineError() {
+        this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
 
@@ -441,6 +453,7 @@ class GlobalPlanet {
     }
 
     throwNoProjectsError() {
+        this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
 
