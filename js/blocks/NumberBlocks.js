@@ -60,7 +60,7 @@ function setupNumberBlocks(activity) {
         let numberValue = value;
         if (typeof value === "string") {
             const str = value.trim();
-            if (str === "") {
+            if (str === "" || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(str)) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);
                 return null;

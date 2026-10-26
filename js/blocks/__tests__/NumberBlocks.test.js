@@ -492,6 +492,20 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(0);
         });
 
+        it("should reject non-decimal numeric strings like '0x10' with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "0x10";
+                if (c === "c2") return 100;
+                if (c === "c3") return 0.5;
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
         it("should handle errors thrown by MathUtility.doLerp", () => {
             activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
             logo.parseArg = jest.fn(() => 5);
@@ -571,6 +585,19 @@ describe("setupNumberBlocks", () => {
             activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
             logo.parseArg = jest.fn((l, t, c) => {
                 if (c === "c1") return "5abc";
+                if (c === "c2") return 18;
+            });
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject non-decimal strings like '0x10' with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "0x10";
                 if (c === "c2") return 18;
             });
             const gcdBlock = createdBlocks["gcd"];
