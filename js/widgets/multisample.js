@@ -650,7 +650,7 @@ class MultisampleEditor {
             const activity = this.activity;
             this.close(false);
             activity.blocks.highlight(saved.blockIndex);
-            saved.accessibleElement?.focus();
+            saved.accessibleElement?.focus({ preventScroll: true });
             activity.refreshCanvas?.();
             activity.textMsg(_("Instrument applied to blocks in this project."), 3000);
             return MultisampleEditor.saveAppliedProject(activity, this.projectGeneration);
@@ -840,7 +840,7 @@ class MultisampleEditor {
         this.root.replaceChildren();
         const samplerFrame = this.activity.logo.sample?.widgetWindow?.getWidgetFrame();
         if (samplerFrame) samplerFrame.inert = false;
-        if (returnFocus) this.origin?.focus?.();
+        if (returnFocus) this.origin?.focus?.({ preventScroll: true });
         this.draft = null;
         this.rows = [];
         this.removed = this.replacing = null;
