@@ -59,6 +59,17 @@ const SCROLL_CANVAS_SCALE = 3;
 const MAX_ARC_ANGLE = 45000;
 
 /**
+ * Upper bound on the steps doForward() accepts in Wrap Mode. Wrapping draws the
+ * line in 5-step segments in a synchronous loop, and each segment adds to the SVG
+ * output, so very large values freeze the page and eventually overflow the SVG
+ * string. A million steps takes well under a second and crosses a typical canvas
+ * hundreds of times. The limit is fixed rather than derived from the canvas size so
+ * that a project behaves the same on every screen. Without wrapping, the line is
+ * drawn in one call and no limit is needed.
+ */
+const MAX_WRAP_STEPS = 1000000;
+
+/**
  * Class pertaining to visual actions for each turtle.
  *
  * @class
@@ -890,6 +901,16 @@ class Painter {
             this._move(ox, oy, nx, ny, true, linePart);
             this._scheduleCanvasUpdate();
         } else {
+            if (Math.abs(steps) > MAX_WRAP_STEPS) {
+                this.turtles.activity.errorMsg(
+                    _("Steps must be within -%s to %s when Wrap Mode is on.").replace(
+                        /%s/g,
+                        MAX_WRAP_STEPS
+                    )
+                );
+                return;
+            }
+
             const stepUnit = 5;
             let xIncrease, yIncrease;
             if (steps > 0) {
@@ -918,6 +939,11 @@ class Painter {
                     this.turtle.container.y = h;
                     this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
                 }
+
+                // Start a new path for each segment; otherwise every stroke() redraws
+                // all the earlier segments and the loop slows down quadratically.
+                this.turtle.ctx.beginPath();
+                this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
 
                 // Get old turtle point
                 oy = turtles.screenY2turtleY(this.turtle.container.y);

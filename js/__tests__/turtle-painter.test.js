@@ -580,6 +580,75 @@ describe("Drawing - doForward", () => {
         expect(mockTurtle.container.y).toBe(595);
     });
 
+    test("doForward with wrap ON strokes each segment on its own path", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(100);
+
+        const ctx = mockTurtle.ctx;
+        const calls = [
+            ...ctx.beginPath.mock.invocationCallOrder.map(order => [order, "beginPath"]),
+            ...ctx.lineTo.mock.invocationCallOrder.map(order => [order, "lineTo"]),
+            ...ctx.stroke.mock.invocationCallOrder.map(order => [order, "stroke"])
+        ].sort((a, b) => a[0] - b[0]);
+
+        let linesInPath = 0;
+        let strokes = 0;
+        for (const [, name] of calls) {
+            if (name === "beginPath") {
+                linesInPath = 0;
+            } else if (name === "lineTo") {
+                linesInPath++;
+            } else {
+                strokes++;
+                expect(linesInPath).toBe(1);
+            }
+        }
+        expect(strokes).toBeGreaterThan(1);
+    });
+
+    test.each([1000001, -1000001])(
+        "doForward with wrap ON rejects %p steps without moving",
+        steps => {
+            painter.wrap = true;
+            mockTurtle.container.x = 795;
+            mockTurtle.orientation = 90;
+            mockTurtle.turtleX2screenX = jest.fn(x => x);
+            mockTurtle.turtleY2screenY = jest.fn(y => y);
+            painter.doForward(steps);
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+                "Steps must be within -1000000 to 1000000 when Wrap Mode is on."
+            );
+            expect(mockTurtle.container.x).toBe(795);
+            expect(mockTurtle.ctx.stroke).not.toHaveBeenCalled();
+        }
+    );
+
+    test("doForward with wrap ON accepts the largest step count", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(1000000);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
+    test("doForward with wrap OFF does not limit large step counts", () => {
+        painter.wrap = false;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(1e9);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
+        expect(mockTurtle.container.x).toBe(795 + 1e9);
+    });
+
     test("doForward with wrap OFF and out of bounds should stop at edge", () => {
         painter.wrap = false;
         mockTurtle.container.x = 795;
