@@ -41,6 +41,7 @@ const PracticeUI = {
     noticeTimer: null,
     currentLevel: null,
     starterBlockCount: null,
+    starterLoadGeneration: 0,
     PANEL_WIDTH: 360,
     PANEL_GAP: 16,
     COLLAPSE_TOGGLE_WIDTH: 24,
@@ -418,6 +419,7 @@ const PracticeUI = {
     },
 
     loadStarterBlocks(level) {
+        const loadGeneration = ++this.starterLoadGeneration;
         this.starterBlockCount = null;
         const activity = this.getActivity();
         if (!activity?.blocks) return;
@@ -441,10 +443,14 @@ const PracticeUI = {
         fetch(`js/practice_projects/${file}`)
             .then(res => res.text())
             .then(data => {
+                if (loadGeneration !== this.starterLoadGeneration) return;
+
                 const projectData = JSON.parse(data);
                 this.loadProjectData(activity, projectData);
                 activity.blocks.runAfterLoad(() => {
-                    this.starterBlockCount = this.countLiveBlocks();
+                    if (loadGeneration === this.starterLoadGeneration) {
+                        this.starterBlockCount = projectData.length;
+                    }
                 });
             })
             .catch(err => {

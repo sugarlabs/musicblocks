@@ -105,6 +105,7 @@ beforeEach(() => {
     global.PracticeValidator = { validate: () => false, assessBadges: () => [] };
     PracticeUI.currentLevel = null;
     PracticeUI.starterBlockCount = null;
+    PracticeUI.starterLoadGeneration = 0;
     delete window.ActivityContext;
 });
 
@@ -712,7 +713,9 @@ describe("PracticeUI canvas loading", () => {
     test("fetches the starter file for the level and records its block count", async () => {
         const activity = stubActivity({ a: {}, b: {} });
         activity.blocks.runAfterLoad = jest.fn(callback => callback());
-        global.fetch = jest.fn(() => Promise.resolve({ text: () => Promise.resolve("[]") }));
+        global.fetch = jest.fn(() =>
+            Promise.resolve({ text: () => Promise.resolve('[[0,"start"],[1,"forward"]]') })
+        );
 
         PracticeUI.loadStarterBlocks(1);
         await flushPromises();
@@ -749,13 +752,42 @@ describe("PracticeUI canvas loading", () => {
         projectData.slice(20).forEach((_, index) => {
             blockList[index + 20] = {};
         });
+        blockList[25] = {};
         finishLoading();
 
         expect(PracticeUI.starterBlockCount).toBe(25);
-        expect(PracticeUI.countLiveBlocks()).toBe(PracticeUI.starterBlockCount);
-
-        blockList[25] = {};
         expect(PracticeUI.countLiveBlocks()).toBeGreaterThan(PracticeUI.starterBlockCount);
+        delete global.fetch;
+    });
+
+    test("ignores completion callbacks from earlier lesson loads", async () => {
+        const activity = stubActivity({});
+        const callbacks = [];
+        const fetchResolvers = [];
+        activity.blocks.runAfterLoad = callback => callbacks.push(callback);
+        global.fetch = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    fetchResolvers.push(resolve);
+                })
+        );
+
+        PracticeUI.loadStarterBlocks(1);
+        const firstProject = Array.from({ length: 63 }, () => []);
+        fetchResolvers[0]({ text: () => Promise.resolve(JSON.stringify(firstProject)) });
+        await flushPromises();
+
+        PracticeUI.loadStarterBlocks(2);
+        callbacks[0]();
+
+        expect(PracticeUI.starterBlockCount).toBeNull();
+
+        const secondProject = Array.from({ length: 25 }, () => []);
+        fetchResolvers[1]({ text: () => Promise.resolve(JSON.stringify(secondProject)) });
+        await flushPromises();
+        callbacks[1]();
+
+        expect(PracticeUI.starterBlockCount).toBe(25);
         delete global.fetch;
     });
 
