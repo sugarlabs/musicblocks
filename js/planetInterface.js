@@ -86,6 +86,14 @@ class PlanetInterface {
             ) {
                 this.activity.gitDropdownUI._syncMenuState();
             }
+
+            if (
+                this.activity &&
+                this.activity.toolbar &&
+                typeof this.activity.toolbar.syncToolbarHeight === "function"
+            ) {
+                this.activity.toolbar.syncToolbarHeight();
+            }
         };
 
         /**
