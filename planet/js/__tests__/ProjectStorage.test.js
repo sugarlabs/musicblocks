@@ -713,6 +713,19 @@ describe("ProjectStorage", () => {
             expect(saveSpy).toHaveBeenCalled();
         });
 
+        it("adds a project without switching to it when makeCurrent is false", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.CurrentProject = "open";
+
+            const id = await storage.initialiseNewProject("Copy", "data", "img", null, {
+                makeCurrent: false
+            });
+
+            expect(storage.data.CurrentProject).toBe("open");
+            expect(storage.data.Projects[id].ProjectName).toBe("Copy");
+            expect(saveSpy).toHaveBeenCalled();
+        });
+
         it("should use default name when none provided", async () => {
             jest.spyOn(storage, "save").mockResolvedValue();
             await storage.initialiseNewProject();

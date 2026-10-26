@@ -328,7 +328,9 @@ describe("LocalCard", () => {
             expect(planet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
                 "My Project (Copy)",
                 "<xml/>",
-                "img.png"
+                "img.png",
+                null,
+                { makeCurrent: false }
             );
             expect(planet.LocalPlanet.updateProjects).toHaveBeenCalled();
         });

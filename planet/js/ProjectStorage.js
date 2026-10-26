@@ -105,14 +105,16 @@ class ProjectStorage {
         return this.ImageDataURL;
     }
 
-    async initialiseNewProject(name, data, image, publishedData) {
+    // makeCurrent: false adds the project without switching to it, e.g. a duplicate
+    // made from the Local Planet while another project is open.
+    async initialiseNewProject(name, data, image, publishedData, { makeCurrent = true } = {}) {
         name = name ?? this.defaultProjectName;
         data = data ?? null;
         image = image ?? null;
         publishedData = publishedData ?? null;
 
         const c = this.generateID();
-        this.data.CurrentProject = c;
+        if (makeCurrent) this.data.CurrentProject = c;
         this.data.Projects[c] = {};
         this.data.Projects[c].ProjectName = name;
         this.data.Projects[c].ProjectData = data;

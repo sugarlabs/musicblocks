@@ -314,6 +314,43 @@ describe("Planet", () => {
             expect(planet.loadProjectFromData).toHaveBeenCalledWith("project-data");
             expect(planet.planetClose).not.toHaveBeenCalled();
         });
+
+        it("keeps the open project after duplicating another one in the Local Planet", async () => {
+            global._ = jest.fn(str => str);
+            const ProjectStorage = require("../ProjectStorage.js");
+            const { LocalCard } = require("../LocalCard.js");
+            const store = {};
+            planet.ProjectStorage = new ProjectStorage(planet);
+            planet.ProjectStorage.LocalStorage = {
+                setItem: async (k, v) => {
+                    store[k] = v;
+                },
+                getItem: async k => store[k] ?? null
+            };
+            planet.ProjectStorage.data = {
+                CurrentProject: "editing",
+                Projects: {
+                    editing: { ProjectName: "Editing", ProjectData: "[EDITING]" },
+                    other: { ProjectName: "Other", ProjectData: "[OTHER]" }
+                }
+            };
+            planet.ProjectStorage.fireDataLoaded();
+            planet.LocalPlanet = {
+                ProjectTable: planet.ProjectStorage.data.Projects,
+                updateProjects: jest.fn()
+            };
+            planet.oldCurrentProjectID = "editing";
+
+            const card = new LocalCard(planet);
+            card.init("other");
+            card.duplicate();
+            await planet.closeButton();
+
+            expect(planet.ProjectStorage.getCurrentProjectID()).toBe("editing");
+            expect(planet.loadProjectFromData).not.toHaveBeenCalled();
+            expect(planet.planetClose).toHaveBeenCalled();
+            expect(Object.keys(planet.ProjectStorage.data.Projects)).toHaveLength(3);
+        });
     });
 
     describe("init", () => {
