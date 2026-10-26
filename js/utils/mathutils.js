@@ -490,7 +490,12 @@ class MathUtility {
      * @throws {Error} NanError if any argument is not a valid number.
      */
     static doGcd(a, b) {
-        if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
+        if (
+            MathUtility._isNumber(a) &&
+            MathUtility._isNumber(b) &&
+            Number.isFinite(a) &&
+            Number.isFinite(b)
+        ) {
             let x = Math.abs(Math.trunc(a));
             let y = Math.abs(Math.trunc(b));
             while (y !== 0) {
@@ -514,7 +519,12 @@ class MathUtility {
      * @throws {Error} NanError if any argument is not a valid number.
      */
     static doLcm(a, b) {
-        if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
+        if (
+            MathUtility._isNumber(a) &&
+            MathUtility._isNumber(b) &&
+            Number.isFinite(a) &&
+            Number.isFinite(b)
+        ) {
             const x = Math.abs(Math.trunc(a));
             const y = Math.abs(Math.trunc(b));
             const gcd = MathUtility.doGcd(x, y);

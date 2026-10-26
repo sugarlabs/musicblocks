@@ -1015,35 +1015,16 @@ function setupNumberBlocks(activity) {
 
             if (!validateConnections([cblk1, cblk2, cblk3], blk)) return 0;
 
-            const toNumberLocal = value => {
-                if (typeof value === "string") {
-                    const str = value.trim();
-                    if (str === "") {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return null;
-                    }
-                    const num = Number(str);
-                    if (isNaN(num)) {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return null;
-                    }
-                    return num;
-                }
-                return value;
-            };
-
             let val = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            val = toNumberLocal(val);
+            val = toNumber(logo, val, blk);
             if (val === null) return 0;
 
             let min = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            min = toNumberLocal(min);
+            min = toNumber(logo, min, blk);
             if (min === null) return 0;
 
             let max = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
-            max = toNumberLocal(max);
+            max = toNumber(logo, max, blk);
             if (max === null) return 0;
 
             try {
@@ -1144,11 +1125,11 @@ function setupNumberBlocks(activity) {
             if (!validateConnections([cblk1, cblk2], blk)) return 0;
 
             let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            a = toInteger(logo, a, blk);
+            a = toNumber(logo, a, blk);
             if (a === null) return 0;
 
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            b = toInteger(logo, b, blk);
+            b = toNumber(logo, b, blk);
             if (b === null) return 0;
 
             try {
@@ -1192,11 +1173,11 @@ function setupNumberBlocks(activity) {
             if (!validateConnections([cblk1, cblk2], blk)) return 0;
 
             let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            a = toInteger(logo, a, blk);
+            a = toNumber(logo, a, blk);
             if (a === null) return 0;
 
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            b = toInteger(logo, b, blk);
+            b = toNumber(logo, b, blk);
             if (b === null) return 0;
 
             try {

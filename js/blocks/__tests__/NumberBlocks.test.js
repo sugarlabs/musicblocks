@@ -539,6 +539,19 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(0);
         });
 
+        it("should reject strings with trailing characters like '5abc'", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "5abc";
+                if (c === "c2") return 18;
+            });
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
         it("should handle errors thrown by MathUtility.doGcd", () => {
             activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
             logo.parseArg = jest.fn(() => 10);
@@ -611,6 +624,19 @@ describe("setupNumberBlocks", () => {
             const lcmBlock = createdBlocks["lcm"];
             const result = lcmBlock.arg(logo, 0, 110, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject strings with trailing characters like '5abc'", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 4;
+                if (c === "c2") return "5abc";
+            });
+            const lcmBlock = createdBlocks["lcm"];
+            const result = lcmBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
             expect(result).toEqual(0);
         });
 

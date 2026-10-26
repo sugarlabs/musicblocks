@@ -1042,6 +1042,10 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doGcd(12, NaN)).toThrow("NanError");
             expect(() => MathUtility.doGcd("12", 18)).toThrow("NanError");
             expect(() => MathUtility.doGcd(null, 18)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(Infinity, 12)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(12, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(-Infinity, 12)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(12, -Infinity)).toThrow("NanError");
         });
     });
 
@@ -1069,6 +1073,10 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doLcm(4, NaN)).toThrow("NanError");
             expect(() => MathUtility.doLcm("4", 6)).toThrow("NanError");
             expect(() => MathUtility.doLcm(null, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(Infinity, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(4, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(-Infinity, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(4, -Infinity)).toThrow("NanError");
         });
     });
 });
