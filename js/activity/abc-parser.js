@@ -114,15 +114,10 @@ function _createPitchBlocks(
     pitchDuration,
     keySignature,
     actionBlock,
-    triplet,
-    meterDen,
     inlineAccidental
 ) {
     const duration = toFraction(pitchDuration);
     const hiddenBlockId = blockId + (pitches ? 8 : 6);
-    if (triplet !== null) {
-        duration[1] = meterDen * triplet;
-    }
 
     const noteBlocks = [
         [
@@ -356,8 +351,7 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
  * stretch between repeat bars, so a repeat can start or end mid-line.
  * Voices that produced no note blocks add nothing.
  *
- * tripletFinder is initialized fresh for each voice so that triplet state
- * never bleeds from one voice into the next.
+ * Tuplet ratios are tracked per voice and retained across staff lines.
  *
  * @param {Array} voice - The voice element array.
  * @param {number} blockId - Current block ID counter.
@@ -368,9 +362,7 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
  * @returns {number} newBlockId
  */
 function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
-    // Reset triplet state at every voice boundary so that an unclosed
-    // triplet in one voice cannot affect timing in subsequent voices.
-    let tripletFinder = null;
+    const tuplets = staffRecord.tuplets;
     // An inline accidental holds for the same pitch until the next bar line,
     // but abcjs only sets it on the note that carries the mark. A bar can run
     // across staff lines, so the state lives on the staff record per voice.
@@ -382,9 +374,13 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
 
     voice.forEach(element => {
         if (element.el_type === "note") {
-            //check if triplet exists
             if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
-                tripletFinder = element.startTriplet;
+                // abcjs supplies the ratio, including explicit p:q:r tuplets.
+                // Apply it to each written duration, independently of the meter.
+                tuplets[voiceIdx] = {
+                    multiplier: element.tripletMultiplier ?? 1,
+                    remaining: element.tripletR ?? element.startTriplet
+                };
             }
 
             const pitch = element.pitches?.[0];
@@ -400,17 +396,18 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
             blockId += _createPitchBlocks(
                 pitch,
                 blockId,
-                element.duration,
+                element.duration * (tuplets[voiceIdx]?.multiplier ?? 1),
                 staff.key,
                 actionBlock,
-                tripletFinder,
-                staffRecord.meterDen,
                 accidental
             );
 
-            // Check and set tripletFinder to null if element?.endTriplet exists.
-            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
-                tripletFinder = null;
+            if (tuplets[voiceIdx]) {
+                // abcjs can omit endTriplet when the group crosses a staff line.
+                tuplets[voiceIdx].remaining--;
+                if (element.endTriplet || tuplets[voiceIdx].remaining === 0) {
+                    tuplets[voiceIdx] = null;
+                }
             }
         } else if (element.el_type === "bar") {
             barAccidentals[voiceIdx] = {};
@@ -529,7 +526,8 @@ const setupActivityAbcParser = activityInstance => {
                         repeatStart: null,
                         repeatFrom: 0,
                         nameddoIds: [],
-                        barAccidentals: []
+                        barAccidentals: [],
+                        tuplets: []
                     };
                     blockId = newBlockId;
                 }

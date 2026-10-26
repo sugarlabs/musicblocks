@@ -13,6 +13,7 @@
 
 const { setupActivityAbcParser } = require("../abc-parser.js");
 const ABCJS = require("../../../lib/abc.min.js");
+const { toFraction } = require("../../utils/utils-logic.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -51,6 +52,7 @@ function makeNote(name, pitch, duration = 0.25, opts = {}) {
         pitches: [pitchObj],
         duration,
         startTriplet: opts.startTriplet ?? null,
+        tripletMultiplier: opts.tripletMultiplier,
         endTriplet: opts.endTriplet ?? null
     };
 }
@@ -91,20 +93,10 @@ function blocksOfType(blocks, type) {
 }
 
 // ---------------------------------------------------------------------------
-// Mock toFraction globally (musicutils.js is not loaded in this unit context)
+// Use the same fraction conversion as the importer at runtime.
 // ---------------------------------------------------------------------------
 beforeAll(() => {
-    global.toFraction = duration => {
-        // Simplified: return [numerator, denominator] for common durations
-        const map = {
-            0.0625: [1, 16],
-            0.125: [1, 8],
-            0.25: [1, 4],
-            0.5: [1, 2],
-            1: [1, 1]
-        };
-        return map[duration] ?? [Math.round(duration * 8), 8];
-    };
+    global.toFraction = toFraction;
 });
 
 afterEach(() => {
@@ -330,6 +322,44 @@ describe("Test 3: Repeat bars", () => {
 // Test 4 — Triplets
 // ---------------------------------------------------------------------------
 describe("Test 4: Triplets", () => {
+    test.each([
+        ["quarter-note triplets", "4/4", "1/4", "(3CDE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        ["sixteenth-note triplets", "4/4", "1/16", "(3CDE F|", [1 / 24, 1 / 24, 1 / 24, 1 / 16]],
+        ["triplets in cut time", "2/2", "1/8", "(3CDE F|", [1 / 12, 1 / 12, 1 / 12, 1 / 8]],
+        ["duplets in compound time", "6/8", "1/8", "(2CD E|", [3 / 16, 3 / 16, 1 / 8]],
+        [
+            "an explicit tuplet ratio",
+            "4/4",
+            "1/8",
+            "(5:4:5CDEFG A|",
+            [0.1, 0.1, 0.1, 0.1, 0.1, 1 / 8]
+        ],
+        ["a rest in a tuplet", "4/4", "1/4", "(3CzE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        [
+            "unequal note lengths in a tuplet",
+            "4/4",
+            "1/8",
+            "(3C>D E F|",
+            [1 / 8, 1 / 24, 1 / 12, 1 / 8]
+        ],
+        [
+            "a tuplet spanning staff lines",
+            "4/4",
+            "1/8",
+            "(3C\nDE F|",
+            [1 / 12, 1 / 12, 1 / 12, 1 / 8]
+        ]
+    ])("preserves %s from parsed ABC", async (_name, meter, unit, music, expected) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:${meter}\nL:${unit}\nK:C\n${music}`)[0];
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual(expected);
+    });
+
     const tune = makeTune({
         title: "Triplet Test",
         staves: [
@@ -338,7 +368,7 @@ describe("Test 4: Triplets", () => {
                 key: { root: "C", mode: "major", accidentals: [] },
                 voices: [
                     [
-                        makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                        makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                         makeNote("D", 1, 0.125),
                         makeNote("E", 2, 0.125, { endTriplet: 3 }),
                         makeNote("F", 3, 0.25)
@@ -385,7 +415,7 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                             makeNote("D", 1, 0.125),
                             makeNote("E", 2, 0.125, { endTriplet: 3 })
                         ],
@@ -426,7 +456,7 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                             makeNote("D", 1, 0.125),
                             makeNote("E", 2, 0.125)
                         ],
