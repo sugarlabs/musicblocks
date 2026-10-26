@@ -42,6 +42,7 @@ const PracticeUI = {
     currentLevel: null,
     starterBlockCount: null,
     starterLoadGeneration: 0,
+    starterLoadPending: false,
     PANEL_WIDTH: 360,
     PANEL_GAP: 16,
     COLLAPSE_TOGGLE_WIDTH: 24,
@@ -421,6 +422,7 @@ const PracticeUI = {
     loadStarterBlocks(level) {
         const loadGeneration = ++this.starterLoadGeneration;
         this.starterBlockCount = null;
+        this.starterLoadPending = false;
         const activity = this.getActivity();
         if (!activity?.blocks) return;
 
@@ -440,6 +442,7 @@ const PracticeUI = {
         const file = projectFiles[level];
         if (!file) return;
 
+        this.starterLoadPending = true;
         fetch(`js/practice_projects/${file}`)
             .then(res => res.text())
             .then(data => {
@@ -450,10 +453,14 @@ const PracticeUI = {
                 activity.blocks.runAfterLoad(() => {
                     if (loadGeneration === this.starterLoadGeneration) {
                         this.starterBlockCount = projectData.length;
+                        this.starterLoadPending = false;
                     }
                 });
             })
             .catch(err => {
+                if (loadGeneration === this.starterLoadGeneration) {
+                    this.starterLoadPending = false;
+                }
                 console.error("Failed to load practice project", err);
             });
     },
@@ -536,6 +543,8 @@ const PracticeUI = {
         const nextButton = document.getElementById("next-level");
         if (nextButton) {
             nextButton.onclick = () => {
+                if (this.starterLoadPending) return;
+
                 const confirmed =
                     !this.hasExtraBlocks() ||
                     confirm(
