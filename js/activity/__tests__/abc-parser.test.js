@@ -12,6 +12,7 @@
 "use strict";
 
 const { setupActivityAbcParser } = require("../abc-parser.js");
+const ABCJS = require("../../../lib/abc.min.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -113,6 +114,66 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 // Test 1 — Simple melody (single voice, G major, 4/4)
 // ---------------------------------------------------------------------------
+describe("Header tempo", () => {
+    test.each([
+        ["1/4=120", 120, 1 / 4],
+        ["3/8=60", 60, 3 / 8],
+        ["1/4 1/8=60", 60, 3 / 8],
+        ["120", 120, 1 / 8],
+        ['"Allegro" 1/4=120', 120, 1 / 4]
+    ])("imports Q:%s with its own beat unit", async (header, bpm, beatValue) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:6/8\nL:1/8\nQ:${header}\nK:C\nCDE|`)[0];
+        const blocks = await parseAndCapture(tune);
+        const tempos = blocksOfType(blocks, "setbpm3");
+        expect(tempos).toHaveLength(1);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const tempo = tempos[0];
+        const beat = byId.get(tempo[4][2]);
+        expect(byId.get(tempo[4][1])[1][1].value).toBe(bpm);
+        expect(byId.get(beat[4][1])[1][1].value / byId.get(beat[4][2])[1][1].value).toBe(beatValue);
+
+        const key = blocksOfType(blocks, "setkey2")[0];
+        const spacer = byId.get(tempo[4][3]);
+        const timbre = blocksOfType(blocks, "settimbre")[0];
+        expect(key[4][3]).toBe(tempo[0]);
+        expect(tempo[4][0]).toBe(key[0]);
+        expect(spacer[4]).toEqual([tempo[0], timbre[0]]);
+        expect(timbre[4][0]).toBe(spacer[0]);
+        expect(byId.get(timbre[4][2])[1][0]).toBe("nameddo");
+        expect(new Set(blocks.map(block => block[0])).size).toBe(blocks.length);
+    });
+
+    test.each(["", 'Q:"Allegro"\n'])("does not invent a numeric tempo from %j", async header => {
+        const tune = ABCJS.parseOnly(`X:1\nM:4/4\nL:1/4\n${header}K:C\nCDE|`)[0];
+        expect(blocksOfType(await parseAndCapture(tune), "setbpm3")).toHaveLength(0);
+    });
+
+    test("sets the header tempo for every staff", async () => {
+        const staff = {
+            meter: { value: [{ num: 4, den: 4 }] },
+            key: { root: "C", mode: "major", accidentals: [] },
+            voices: [[makeNote("C", 0)]]
+        };
+        const tune = makeTune({ staves: [staff, staff] });
+        tune.metaText.tempo = { bpm: 120, duration: [0.25] };
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "setbpm3")).toHaveLength(2);
+        expect(new Set(blocks.map(block => block[0])).size).toBe(blocks.length);
+    });
+
+    test.each([
+        { bpm: 0, duration: [0.25] },
+        { bpm: Infinity, duration: [0.25] },
+        { bpm: 120, duration: [] },
+        { bpm: 120, duration: [NaN] }
+    ])("ignores an invalid tempo %j", async tempo => {
+        const tune = makeTune();
+        tune.metaText.tempo = tempo;
+        expect(blocksOfType(await parseAndCapture(tune), "setbpm3")).toHaveLength(0);
+    });
+});
+
 describe("Test 1: Simple melody", () => {
     const tune = makeTune({
         title: "Twinkle",
