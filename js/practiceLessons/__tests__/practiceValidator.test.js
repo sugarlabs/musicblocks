@@ -821,6 +821,44 @@ describe("PracticeValidator huge repeat counts", () => {
         expect(PracticeValidator.hasCreatedPhraseVariation()).toBe(true);
     });
 
+    test("start action names skip a repeat that runs zero times", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "ca", null] },
+            count: { name: "number", value: 0, trash: false, connections: ["rep"] },
+            ca: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getStartActionNames(PracticeValidator.getBlockList())).toEqual(
+            new Set()
+        );
+    });
+
+    test("start action names skip a repeat with no count block", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", null, "ca", null] },
+            ca: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getStartActionNames(PracticeValidator.getBlockList())).toEqual(
+            new Set()
+        );
+    });
+
+    test("start action names include a repeat that runs at least once", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "ca", null] },
+            count: { name: "number", value: 2, trash: false, connections: ["rep"] },
+            ca: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getStartActionNames(PracticeValidator.getBlockList())).toEqual(
+            new Set(["A"])
+        );
+    });
+
     test("action counts multiply through nested repeats without expanding them", () => {
         useBlocks({
             start: { name: "start", trash: false, connections: [null, "outer", null] },

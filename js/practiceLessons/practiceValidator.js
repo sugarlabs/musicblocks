@@ -300,6 +300,13 @@ const PracticeValidator = {
         }
     },
 
+    // Match RepeatBlock.flow(): values below 1 or non-numbers run 0 times;
+    // fractional values are floored (see MathUtility.doRepeatCount).
+    getRepeatPasses(block, blockList) {
+        const rawCount = this.getNumericValue(block.connections?.[1], blockList);
+        return Number.isFinite(rawCount) && rawCount >= 1 ? Math.floor(rawCount) : 0;
+    },
+
     extractPatternSequence(startId, blockList, maxLength) {
         const sequence = [];
         let currentId = this.unwrapHiddenFlow(startId, blockList);
@@ -318,11 +325,7 @@ const PracticeValidator = {
                     }
                 }
             } else if (block.name === "repeat") {
-                const timesId = block.connections?.[1];
-                const rawCount = this.getNumericValue(timesId, blockList);
-                // Match RepeatBlock.flow(): values below 1 or non-numbers run 0 times;
-                // fractional values are floored (see MathUtility.doRepeatCount).
-                const times = Number.isFinite(rawCount) && rawCount >= 1 ? Math.floor(rawCount) : 0;
+                const times = this.getRepeatPasses(block, blockList);
                 const body = this.extractPatternSequence(
                     block.connections?.[2],
                     blockList,
@@ -485,7 +488,7 @@ const PracticeValidator = {
             if (block.name === "nameddo") {
                 const actionName = block.overrideName || block.privateData || block.value;
                 if (actionName) names.add(actionName);
-            } else if (block.name === "repeat") {
+            } else if (block.name === "repeat" && this.getRepeatPasses(block, blockList) > 0) {
                 this.collectActionNames(block.connections?.[2], blockList, names);
             }
 
@@ -521,11 +524,7 @@ const PracticeValidator = {
                     counts.set(actionName, (counts.get(actionName) || 0) + multiplier);
                 }
             } else if (block.name === "repeat") {
-                const timesId = block.connections?.[1];
-                const rawCount = this.getNumericValue(timesId, blockList);
-                // Same number of passes the expanded loop in extractPatternSequence makes.
-                const passes =
-                    Number.isFinite(rawCount) && rawCount >= 1 ? Math.floor(rawCount) : 0;
+                const passes = this.getRepeatPasses(block, blockList);
                 this.collectActionCounts(
                     block.connections?.[2],
                     blockList,
