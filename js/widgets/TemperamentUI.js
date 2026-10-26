@@ -427,14 +427,11 @@ const TemperamentUI = {
         tw.wheel.titleRotateAngle = 90;
         tw.wheel.navItemsEnabled = false;
 
-        const minutes = [];
-        const angle = [];
+        const minutes = new Array(pitchNumber).fill("|");
+        const angle = Array.from({ length: pitchNumber }, (_, i) =>
+            ratioToWheelAngle(ratios[i], tw.powerBase)
+        );
         const angle1 = [];
-        for (let i = 0; i < pitchNumber; i++) {
-            // Change angles of outer circle
-            minutes.push("|");
-            angle[i] = ratioToWheelAngle(ratios[i], tw.powerBase);
-        }
 
         tw.wheel.navAngle = 270 + (angle[1] - angle[0]) / 2;
         tw.wheel.initWheel(minutes);

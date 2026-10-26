@@ -519,7 +519,18 @@ class ModeWidget {
             const label = isEquallyTempered(key)
                 ? edoCount + "-EDO"
                 : TEMPERAMENT[key]?.name || key;
-            this._ensureDropdownOption(select, key, label);
+            // The dropdown may lack an option for an unusual value (e.g. 21
+            // from 1/4 comma meantone); add it so .value sticks. Compare option
+            // values instead of building a selector: `key` is a temperament key
+            // from the saved project, and temperament blocks are user-renamable,
+            // so it can contain characters that break a selector.
+            if (![...select.options].some(option => option.value === key)) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = label;
+                select.appendChild(opt);
+            }
+            select.value = key;
         }
         this._rebuildModeIndex();
         this._piemenuMode();
@@ -693,44 +704,6 @@ class ModeWidget {
 
     _isValidEDO(edo) {
         return !isNaN(edo) && edo >= ModeWidget.MIN_EDO && edo <= ModeWidget.MAX_EDO;
-    }
-
-    _ensureDropdownOption(select, value, label) {
-        // The dropdown may lack an option for an unusual value (e.g. 21
-        // from 1/4 comma meantone); add it so .value sticks. Compare option
-        // values instead of building a selector: `value` is a temperament key
-        // from the saved project, and temperament blocks are user-renamable,
-        // so it can contain characters that break a selector.
-        if (![...select.options].some(option => option.value === value)) {
-            const opt = document.createElement("option");
-            opt.value = value;
-            opt.textContent = label;
-            select.appendChild(opt);
-        }
-        select.value = value;
-    }
-
-    /** Restores the temperament a custom mode was saved with. Returns true when restored. */
-    _restoreSavedTemperament(custom, modeName, edoSelect) {
-        const savedKey = custom && custom.temperamentKey ? custom.temperamentKey : null;
-        const nativeEDO = custom && custom.edo ? custom.edo : this._activeEDO;
-        if (
-            !savedKey ||
-            !this._isKnownTemperament(savedKey) ||
-            (savedKey === this._activeTemperamentKey && savedKey === this.logo.synth.inTemperament)
-        ) {
-            return false;
-        }
-        // A key whose pitch count cannot serve this mode's EDO would put the
-        // ring and the sound back into disagreement.
-        if (!this._isValidEDO(nativeEDO) || getCurrentEDO(savedKey) !== nativeEDO) {
-            return false;
-        }
-        const savedName = TEMPERAMENT[savedKey]?.name || savedKey;
-        this._activeTemperamentKey = savedKey;
-        this._rebuildWheel(nativeEDO, edoSelect);
-        this.textMsg(_(`Mode ${modeName} restored temperament ${savedName}.`), 3000);
-        return true;
     }
 
     // ── Bottom control bar ────────────────────────────────────────
@@ -971,19 +944,22 @@ class ModeWidget {
     _loadMode(modeName, mode, edoSelect) {
         const custom = getSavedCustomModes().find(m => m.name === modeName);
         const nativeEDO = custom && custom.edo ? custom.edo : null;
+        const modeEDO = nativeEDO || this._activeEDO;
+        const savedKey = custom && custom.temperamentKey ? custom.temperamentKey : null;
         // A mode carries its tuning. Adopt the saved key when it serves the
         // mode's pitch count, otherwise equal N; never draw one tuning's ring
         // over another tuning's playback.
+        const savedKeyMatches =
+            savedKey &&
+            this._isKnownTemperament(savedKey) &&
+            this._isValidEDO(modeEDO) &&
+            getCurrentEDO(savedKey) === modeEDO;
         if (nativeEDO && nativeEDO !== this._activeEDO) {
             const oldEDO = this._activeEDO;
             this._cacheState(oldEDO);
-            const savedKey = custom.temperamentKey;
-            this._activeTemperamentKey =
-                savedKey &&
-                this._isKnownTemperament(savedKey) &&
-                getCurrentEDO(savedKey) === nativeEDO
-                    ? savedKey
-                    : this._temperamentKeyForEDO(nativeEDO);
+            this._activeTemperamentKey = savedKeyMatches
+                ? savedKey
+                : this._temperamentKeyForEDO(nativeEDO);
             this._rebuildWheel(nativeEDO, edoSelect);
             this.textMsg(
                 _(
@@ -991,8 +967,14 @@ class ModeWidget {
                 ),
                 3000
             );
-        } else {
-            this._restoreSavedTemperament(custom, modeName, edoSelect);
+        } else if (
+            savedKeyMatches &&
+            (savedKey !== this._activeTemperamentKey || savedKey !== this.logo.synth.inTemperament)
+        ) {
+            const savedName = TEMPERAMENT[savedKey]?.name || savedKey;
+            this._activeTemperamentKey = savedKey;
+            this._rebuildWheel(modeEDO, edoSelect);
+            this.textMsg(_(`Mode ${modeName} restored temperament ${savedName}.`), 3000);
         }
         // Built-in mode patterns are resolved via _modeStepPattern so
         // non-EDO temperaments use ratio-derived steps. Custom modes carry

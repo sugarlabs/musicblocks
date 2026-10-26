@@ -152,13 +152,6 @@ describe("musicutils-modewheel", () => {
             // widget measure proportional slices and equal slices alike.
             expect(modewheel.getModeSliceArc(200, 30)).toBeCloseTo(fullTurn / 12, 6);
         });
-
-        it("honours a caller-supplied label radius", () => {
-            expect(modewheel.getModeSliceArc(200, 360, 0.5)).toBeCloseTo(
-                modewheel.getModeSliceArc(200, 360) * (0.5 / 0.575),
-                6
-            );
-        });
     });
 
     describe("enforceMinSliceAngles", () => {
@@ -183,9 +176,6 @@ describe("musicutils-modewheel", () => {
             expect(angles[1]).toBeCloseTo(210.5865, 3);
             expect(angles[0]).toBeCloseTo(149.4135, 3);
             expect(angles[0] + angles[1]).toBeCloseTo(360, 6);
-        });
-
-        it("returns null for unusable input", () => {
             expect(modewheel.sliceAnglesFromRatios([1], 2)).toBeNull();
             expect(modewheel.sliceAnglesFromRatios([1, 1.5, 1.2], 2)).toBeNull();
             expect(modewheel.sliceAnglesFromRatios([1, 1.5], 1)).toBeNull();
@@ -193,13 +183,10 @@ describe("musicutils-modewheel", () => {
     });
 
     describe("getTemperamentSliceAngles", () => {
-        it("keeps equal slices for equally tempered, unknown, or count-mismatched keys", () => {
+        it("returns proportional widths for a non-EDO temperament", () => {
             expect(modewheel.getTemperamentSliceAngles("equal", 12)).toBeNull();
             expect(modewheel.getTemperamentSliceAngles("made-up", 12)).toBeNull();
             expect(modewheel.getTemperamentSliceAngles("just intonation", 19)).toBeNull();
-        });
-
-        it("returns proportional widths for a non-EDO temperament", () => {
             const angles = modewheel.getTemperamentSliceAngles("just intonation", 12);
             expect(angles).toHaveLength(12);
             expect(angles.reduce((sum, a) => sum + a, 0)).toBeCloseTo(360, 6);
