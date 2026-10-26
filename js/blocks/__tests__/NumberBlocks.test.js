@@ -331,6 +331,18 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(50.25);
         });
 
+        it("should accept strings with leading/trailing whitespace like ' 12.5 '", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return " 12.5 ";
+                if (c === "c2") return 0;
+                if (c === "c3") return 100;
+            });
+            const clampBlock = createdBlocks["clampNumber"];
+            const result = clampBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(12.5);
+        });
+
         it("should reject invalid numeric-prefix strings", () => {
             activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
             logo.parseArg = jest.fn((l, t, c) => {

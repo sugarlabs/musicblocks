@@ -56,10 +56,10 @@ function setupNumberBlocks(activity) {
     /**
      * Safely convert string to number with error handling
      */
-    const toNumber = (logo, value, blk) => {
+    const toNumber = (logo, value, blk, allowWhitespace = false) => {
         let numberValue = value;
         if (typeof value === "string") {
-            const str = value;
+            const str = allowWhitespace ? value.trim() : value;
             if (str === "" || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(str)) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);
@@ -1016,15 +1016,15 @@ function setupNumberBlocks(activity) {
             if (!validateConnections([cblk1, cblk2, cblk3], blk)) return 0;
 
             let val = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            val = toNumber(logo, val, blk);
+            val = toNumber(logo, val, blk, true);
             if (val === null) return 0;
 
             let min = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            min = toNumber(logo, min, blk);
+            min = toNumber(logo, min, blk, true);
             if (min === null) return 0;
 
             let max = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
-            max = toNumber(logo, max, blk);
+            max = toNumber(logo, max, blk, true);
             if (max === null) return 0;
 
             try {

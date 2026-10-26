@@ -973,6 +973,69 @@ describe("AST2BlockList Class", () => {
         );
     });
 
+    describe("Math blocks export (lerp, gcd, lcm, map)", () => {
+        const ASTUtils = require("../ASTutils");
+        const JSInterface = require("../interface");
+        const MathUtility = require("../../utils/mathutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = JSInterface;
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+        });
+
+        const exportArg = arg => astring.generate(ASTUtils._getArgsAST([arg])[0]);
+        const exportPrint = arg =>
+            astring.generate(ASTUtils._getMethodCallAST("print", [arg], { statement: true }));
+
+        test("exporting gcd block generates MathUtility.doGcd and executes without error", () => {
+            const expr = exportArg(["gcd", [12, 18]]);
+            expect(expr).toBe("MathUtility.doGcd(12, 18)");
+
+            const statement = exportPrint(["gcd", [12, 18]]);
+            expect(statement).toBe("await mouse.print(MathUtility.doGcd(12, 18));");
+
+            const result = new Function("MathUtility", `return ${expr};`)(MathUtility);
+            expect(result).toBe(MathUtility.doGcd(12, 18));
+        });
+
+        test("exporting lcm block generates MathUtility.doLcm and executes without error", () => {
+            const expr = exportArg(["lcm", [4, 6]]);
+            expect(expr).toBe("MathUtility.doLcm(4, 6)");
+
+            const statement = exportPrint(["lcm", [4, 6]]);
+            expect(statement).toBe("await mouse.print(MathUtility.doLcm(4, 6));");
+
+            const result = new Function("MathUtility", `return ${expr};`)(MathUtility);
+            expect(result).toBe(MathUtility.doLcm(4, 6));
+        });
+
+        test("exporting lerp block generates MathUtility.doLerp and executes without error", () => {
+            const expr = exportArg(["lerp", [0, 100, 0.5]]);
+            expect(expr).toBe("MathUtility.doLerp(0, 100, 0.5)");
+
+            const statement = exportPrint(["lerp", [0, 100, 0.5]]);
+            expect(statement).toBe("await mouse.print(MathUtility.doLerp(0, 100, 0.5));");
+
+            const result = new Function("MathUtility", `return ${expr};`)(MathUtility);
+            expect(result).toBe(MathUtility.doLerp(0, 100, 0.5));
+        });
+
+        test("exporting map block generates MathUtility.doMap and executes without error", () => {
+            const expr = exportArg(["map", [5, 0, 10, 0, 100]]);
+            expect(expr).toBe("MathUtility.doMap(5, 0, 10, 0, 100)");
+
+            const statement = exportPrint(["map", [5, 0, 10, 0, 100]]);
+            expect(statement).toBe("await mouse.print(MathUtility.doMap(5, 0, 10, 0, 100));");
+
+            const result = new Function("MathUtility", `return ${expr};`)(MathUtility);
+            expect(result).toBe(MathUtility.doMap(5, 0, 10, 0, 100));
+        });
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
