@@ -348,7 +348,7 @@ var getNonEDOModeSteps = (mode, temperament) => {
  */
 var getArticulation = note => {
     const stripped = stripMicrotonalPrefix(note);
-    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-Ga-g])(.*)/);
     return match ? match[1] : stripped;
 };
 

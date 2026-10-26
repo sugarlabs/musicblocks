@@ -37,6 +37,17 @@ const musicutils = require("../musicutils");
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
 describe("musicutils-pitchscale", () => {
+    it.each([
+        ["cx", "D", 4],
+        ["c##", "D", 4],
+        ["c𝄪", "D", 4],
+        ["cbb", "A♯", 3],
+        ["c𝄫", "A♯", 3],
+        ["b##", "C♯", 5]
+    ])("resolves lowercase %s as a pitch instead of a rest", (input, note, octave) => {
+        expect(pitchscale.getNote(input, 4, 0, "C major")).toEqual([note, octave, 0]);
+    });
+
     it("still resolves a pitch, a scale degree number, and a key signature's mode", () => {
         expect(pitchscale.getNote("F", 4, 0, "G major")).toEqual(["F", 4, 0]);
         expect(pitchscale.pitchToNumber("C", 4, "C major", "equal")).toBe(39);
