@@ -711,6 +711,7 @@ describe("PracticeUI canvas loading", () => {
 
     test("fetches the starter file for the level and records its block count", async () => {
         const activity = stubActivity({ a: {}, b: {} });
+        activity.blocks.runAfterLoad = jest.fn(callback => callback());
         global.fetch = jest.fn(() => Promise.resolve({ text: () => Promise.resolve("[]") }));
 
         PracticeUI.loadStarterBlocks(1);
@@ -718,7 +719,43 @@ describe("PracticeUI canvas loading", () => {
 
         expect(global.fetch).toHaveBeenCalledWith("js/practice_projects/hcb_level1.tb");
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledWith(expect.any(Function));
         expect(PracticeUI.starterBlockCount).toBe(2);
+        delete global.fetch;
+    });
+
+    test("records the full starter count after a chunked project load completes", async () => {
+        const blockList = {};
+        const activity = stubActivity(blockList);
+        const projectData = Array.from({ length: 25 }, (_, index) => [index]);
+        let finishLoading;
+        activity.blocks.loadNewBlocks.mockImplementation(blocks => {
+            blocks.slice(0, 20).forEach((_, index) => {
+                blockList[index] = {};
+            });
+        });
+        activity.blocks.runAfterLoad = jest.fn(callback => {
+            finishLoading = callback;
+        });
+        global.fetch = jest.fn(() =>
+            Promise.resolve({ text: () => Promise.resolve(JSON.stringify(projectData)) })
+        );
+
+        PracticeUI.loadStarterBlocks(1);
+        await flushPromises();
+
+        expect(PracticeUI.starterBlockCount).toBeNull();
+
+        projectData.slice(20).forEach((_, index) => {
+            blockList[index + 20] = {};
+        });
+        finishLoading();
+
+        expect(PracticeUI.starterBlockCount).toBe(25);
+        expect(PracticeUI.countLiveBlocks()).toBe(PracticeUI.starterBlockCount);
+
+        blockList[25] = {};
+        expect(PracticeUI.countLiveBlocks()).toBeGreaterThan(PracticeUI.starterBlockCount);
         delete global.fetch;
     });
 

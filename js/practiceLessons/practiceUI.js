@@ -443,7 +443,9 @@ const PracticeUI = {
             .then(data => {
                 const projectData = JSON.parse(data);
                 this.loadProjectData(activity, projectData);
-                this.starterBlockCount = this.countLiveBlocks();
+                activity.blocks.runAfterLoad(() => {
+                    this.starterBlockCount = this.countLiveBlocks();
+                });
             })
             .catch(err => {
                 console.error("Failed to load practice project", err);
