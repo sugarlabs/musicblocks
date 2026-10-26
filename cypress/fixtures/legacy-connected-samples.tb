@@ -1,0 +1,448 @@
+[
+    [0, "start", 100, 100, [null, 1, null]],
+    [1, "settimbre", 280, 100, [0, 2, 3, 27]],
+    [
+        2,
+        [
+            "customsample",
+            {
+                "value": ["legacy-four.wav", "", "do", 3]
+            }
+        ],
+        460,
+        100,
+        [1, 60, 61, 62]
+    ],
+    [3, "newnote", 100, 100, [1, 4, 7, 10]],
+    [4, "divide", 280, 100, [3, 5, 6]],
+    [
+        5,
+        [
+            "number",
+            {
+                "value": 1
+            }
+        ],
+        460,
+        100,
+        [4]
+    ],
+    [
+        6,
+        [
+            "number",
+            {
+                "value": 16
+            }
+        ],
+        100,
+        100,
+        [4]
+    ],
+    [7, "pitch", 280, 100, [3, 8, 9, null]],
+    [
+        8,
+        [
+            "notename",
+            {
+                "value": "C"
+            }
+        ],
+        460,
+        100,
+        [7]
+    ],
+    [
+        9,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        100,
+        100,
+        [7]
+    ],
+    [10, "hidden", 280, 100, [3, 11]],
+    [11, "newnote", 460, 100, [10, 12, 15, 18]],
+    [12, "divide", 100, 100, [11, 13, 14]],
+    [
+        13,
+        [
+            "number",
+            {
+                "value": 1
+            }
+        ],
+        280,
+        100,
+        [12]
+    ],
+    [
+        14,
+        [
+            "number",
+            {
+                "value": 16
+            }
+        ],
+        460,
+        100,
+        [12]
+    ],
+    [15, "pitch", 100, 100, [11, 16, 17, null]],
+    [
+        16,
+        [
+            "notename",
+            {
+                "value": "D"
+            }
+        ],
+        280,
+        100,
+        [15]
+    ],
+    [
+        17,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        460,
+        100,
+        [15]
+    ],
+    [18, "hidden", 100, 100, [11, 19]],
+    [19, "newnote", 280, 100, [18, 20, 23, 26]],
+    [20, "divide", 460, 100, [19, 21, 22]],
+    [
+        21,
+        [
+            "number",
+            {
+                "value": 1
+            }
+        ],
+        100,
+        100,
+        [20]
+    ],
+    [
+        22,
+        [
+            "number",
+            {
+                "value": 16
+            }
+        ],
+        280,
+        100,
+        [20]
+    ],
+    [23, "pitch", 460, 100, [19, 24, 25, null]],
+    [
+        24,
+        [
+            "notename",
+            {
+                "value": "E"
+            }
+        ],
+        100,
+        100,
+        [23]
+    ],
+    [
+        25,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        280,
+        100,
+        [23]
+    ],
+    [26, "hidden", 460, 100, [19, null]],
+    [27, "hidden", 100, 100, [1, 28]],
+    [28, "print", 280, 100, [27, 29, null]],
+    [
+        29,
+        [
+            "text",
+            {
+                "value": "suffix"
+            }
+        ],
+        100,
+        100,
+        [28]
+    ],
+    [30, "start", 280, 100, [null, 31, null]],
+    [31, "settimbre", 460, 100, [30, 32, 33, 57]],
+    [
+        32,
+        [
+            "customsample",
+            {
+                "value": ["legacy-five.wav", "", "la", 4, 37]
+            }
+        ],
+        100,
+        100,
+        [31, 63, 64, 65]
+    ],
+    [33, "newnote", 280, 100, [31, 34, 37, 40]],
+    [34, "divide", 460, 100, [33, 35, 36]],
+    [
+        35,
+        [
+            "number",
+            {
+                "value": 1
+            }
+        ],
+        100,
+        100,
+        [34]
+    ],
+    [
+        36,
+        [
+            "number",
+            {
+                "value": 16
+            }
+        ],
+        280,
+        100,
+        [34]
+    ],
+    [37, "pitch", 460, 100, [33, 38, 39, null]],
+    [
+        38,
+        [
+            "notename",
+            {
+                "value": "C"
+            }
+        ],
+        100,
+        100,
+        [37]
+    ],
+    [
+        39,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        280,
+        100,
+        [37]
+    ],
+    [40, "hidden", 460, 100, [33, 41]],
+    [41, "newnote", 100, 100, [40, 42, 45, 48]],
+    [42, "divide", 280, 100, [41, 43, 44]],
+    [
+        43,
+        [
+            "number",
+            {
+                "value": 1
+            }
+        ],
+        460,
+        100,
+        [42]
+    ],
+    [
+        44,
+        [
+            "number",
+            {
+                "value": 16
+            }
+        ],
+        100,
+        100,
+        [42]
+    ],
+    [45, "pitch", 280, 100, [41, 46, 47, null]],
+    [
+        46,
+        [
+            "notename",
+            {
+                "value": "D"
+            }
+        ],
+        460,
+        100,
+        [45]
+    ],
+    [
+        47,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        100,
+        100,
+        [45]
+    ],
+    [48, "hidden", 280, 100, [41, 49]],
+    [49, "newnote", 460, 100, [48, 50, 53, 56]],
+    [50, "divide", 100, 100, [49, 51, 52]],
+    [
+        51,
+        [
+            "number",
+            {
+                "value": 1
+            }
+        ],
+        280,
+        100,
+        [50]
+    ],
+    [
+        52,
+        [
+            "number",
+            {
+                "value": 16
+            }
+        ],
+        460,
+        100,
+        [50]
+    ],
+    [53, "pitch", 100, 100, [49, 54, 55, null]],
+    [
+        54,
+        [
+            "notename",
+            {
+                "value": "E"
+            }
+        ],
+        280,
+        100,
+        [53]
+    ],
+    [
+        55,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        460,
+        100,
+        [53]
+    ],
+    [56, "hidden", 100, 100, [49, null]],
+    [57, "hidden", 280, 100, [31, 58]],
+    [58, "print", 460, 100, [57, 59, null]],
+    [
+        59,
+        [
+            "text",
+            {
+                "value": "suffix"
+            }
+        ],
+        280,
+        100,
+        [58]
+    ],
+    [
+        60,
+        [
+            "audiofile",
+            {
+                "value": [
+                    "legacy-four.wav",
+                    "data:audio/wav;base64,UklGRiQFAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAFAAAAAM8EkAk4DroSCRcaG+EeVSJtJR8oZio5LJYtdy7bLsAuJy4SLYIrfikJJysk6yBTHWsZPhXZEEUMkQfIAvj9Lfl19Nzvbus450Xjn99R3GPZ3dbH1CXT/NFQ0SHRcdE/0ojTStV+1yDaKd2P4ErkUOiW7BHxs/Vy+kD/DwTUCIENCRJgFnwaTx7RIfgkuycSKvgrZy1cLtMuzS5HLkUtySvWKXInpCRzIegdDBrpFYwR/wxPCIgDuP7s+TD1kfAb7Nzn3uMr4M/c0dk71xPVXtMi0mLRINFc0RfSTdP81B/XsNmp3AHgsOOr5+jrW/D49LP5f/5PAxYIyAxXEbcV3Bm8HUshgCRTJ7wptCs2LT4uyS7WLmQudS0MLCsq2ScbJfkhex6rGpMWPhK3DQwJSAR5/6v66/VH8crsguh45LngT91C2pvXYdWa00zSeNEi0UvR8dEU07HUwtZD2Szcdt8X4wfnO+um7z309fi//Y8CWQcODKMQCxU7GSYdwiAGJOkmYyltKwItHS68Ltwufi6jLUwsfio9KI8lfCIMH0gbOxfuEm8OyAkIBTkAavuo9v7xe+0p6RXlSuHS3bba/tez1drTeNKR0SfRPNHP0d/SadRo1tjYsdvs3oHiZeaP6vLug/M3+P/8zwGaBlQL7w9fFJgYjhw4IIojfSYHKSMryiz5Lasu4C6VLs0tiizOKp4oASb9Ipsf5BvhF54TJQ+ECscF+gAq/GT3tvIs7tLptOXc4VbeK9tk2AfWHNSn0q3RL9Ew0bDRrNIj1BDWb9g422Xe7OHF5eTpP+7K8nn3P/wPAdwFmQo5D7ET8xf1G6sfCyMNJqko1iqQLNItmC7gLqku9S3ELBsr/ShxJnwjKCB+HIYYTBTbDz8Lhga6Aer8Ivhv89/ufOpU5nHi3d6k28zYXtZh1NnSzNE70SjRlNF90uHTvNUJ2MLa4N1a4SblO+mO7RLyvPZ/+04AHAXdCYMOARNNF1kbHB+KIpwlSCiHKlMsqC2BLt0uui4ZLvwsZStZKd0m+SOzIBUdKRn5FJAQ+gtEB3oCqv3g+Cn0ku8o6/bmB+Nn3x7cN9m41qnUDtPt0UnRItF70VDSodNq1abXT9pd3cngieSU6N7sW/EA9sD6jv9dBCAJyw1REqUWvBqLHgciKCXkJzQqEyx7LWcu1y7ILjsuMC2sK7IpSCdzJDwhqx3LGaQVQxG0DAIIOgNq/p755PRH8NXrmeef4/Lfm9yk2RXX89RH0xLSWtEg0WTRJ9Jl0xvVRdfd2d3cO+Du4+7nLuyl8ET1AfrN/p0DYwgTDZ8R/BUdGvgdgiGxJH4n3ynQK0otSy7OLtIuWS5iLfErCSqwJ+skwyE/HmoaThb1EWwNvwj6Ayv/Xfqf9f3wg+w+6Dnkf+Ab3RTadNdB1YLTOtJv0SHRUdEA0ivTz9Tn1m/ZXtyu31XjSueB6+/vifRC+Q3+3QKmB1oM7BBRFXwZYx36IDgkFSeHKYorFy0rLsIu2i50LpEtMixdKhUoYCVHItEeCBv3FqcSJA58CboE6/8c+1v2tPEz7eXo1eQP4ZzdhtrW15HVwNNl0obRJdFC0d3R9NKF1IzWA9ni2yTfvuKn5tTqO+/P84T4Tf0dAugGoAs4EKUU2hjMHHAgvSOpJi0pQSvhLAgusi7fLowuvC1xLK4qdyjTJckiYR+lG54XVxPbDg=="
+                ]
+            }
+        ],
+        0,
+        0,
+        [2]
+    ],
+    [
+        61,
+        [
+            "solfege",
+            {
+                "value": "do"
+            }
+        ],
+        0,
+        0,
+        [2]
+    ],
+    [
+        62,
+        [
+            "number",
+            {
+                "value": 3
+            }
+        ],
+        0,
+        0,
+        [2]
+    ],
+    [
+        63,
+        [
+            "audiofile",
+            {
+                "value": [
+                    "legacy-five.wav",
+                    "data:audio/wav;base64,UklGRiQFAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAFAAAAAM8EkAk4DroSCRcaG+EeVSJtJR8oZio5LJYtdy7bLsAuJy4SLYIrfikJJysk6yBTHWsZPhXZEEUMkQfIAvj9Lfl19Nzvbus450Xjn99R3GPZ3dbH1CXT/NFQ0SHRcdE/0ojTStV+1yDaKd2P4ErkUOiW7BHxs/Vy+kD/DwTUCIENCRJgFnwaTx7RIfgkuycSKvgrZy1cLtMuzS5HLkUtySvWKXInpCRzIegdDBrpFYwR/wxPCIgDuP7s+TD1kfAb7Nzn3uMr4M/c0dk71xPVXtMi0mLRINFc0RfSTdP81B/XsNmp3AHgsOOr5+jrW/D49LP5f/5PAxYIyAxXEbcV3Bm8HUshgCRTJ7wptCs2LT4uyS7WLmQudS0MLCsq2ScbJfkhex6rGpMWPhK3DQwJSAR5/6v66/VH8crsguh45LngT91C2pvXYdWa00zSeNEi0UvR8dEU07HUwtZD2Szcdt8X4wfnO+um7z309fi//Y8CWQcODKMQCxU7GSYdwiAGJOkmYyltKwItHS68Ltwufi6jLUwsfio9KI8lfCIMH0gbOxfuEm8OyAkIBTkAavuo9v7xe+0p6RXlSuHS3bba/tez1drTeNKR0SfRPNHP0d/SadRo1tjYsdvs3oHiZeaP6vLug/M3+P/8zwGaBlQL7w9fFJgYjhw4IIojfSYHKSMryiz5Lasu4C6VLs0tiizOKp4oASb9Ipsf5BvhF54TJQ+ECscF+gAq/GT3tvIs7tLptOXc4VbeK9tk2AfWHNSn0q3RL9Ew0bDRrNIj1BDWb9g422Xe7OHF5eTpP+7K8nn3P/wPAdwFmQo5D7ET8xf1G6sfCyMNJqko1iqQLNItmC7gLqku9S3ELBsr/ShxJnwjKCB+HIYYTBTbDz8Lhga6Aer8Ivhv89/ufOpU5nHi3d6k28zYXtZh1NnSzNE70SjRlNF90uHTvNUJ2MLa4N1a4SblO+mO7RLyvPZ/+04AHAXdCYMOARNNF1kbHB+KIpwlSCiHKlMsqC2BLt0uui4ZLvwsZStZKd0m+SOzIBUdKRn5FJAQ+gtEB3oCqv3g+Cn0ku8o6/bmB+Nn3x7cN9m41qnUDtPt0UnRItF70VDSodNq1abXT9pd3cngieSU6N7sW/EA9sD6jv9dBCAJyw1REqUWvBqLHgciKCXkJzQqEyx7LWcu1y7ILjsuMC2sK7IpSCdzJDwhqx3LGaQVQxG0DAIIOgNq/p755PRH8NXrmeef4/Lfm9yk2RXX89RH0xLSWtEg0WTRJ9Jl0xvVRdfd2d3cO+Du4+7nLuyl8ET1AfrN/p0DYwgTDZ8R/BUdGvgdgiGxJH4n3ynQK0otSy7OLtIuWS5iLfErCSqwJ+skwyE/HmoaThb1EWwNvwj6Ayv/Xfqf9f3wg+w+6Dnkf+Ab3RTadNdB1YLTOtJv0SHRUdEA0ivTz9Tn1m/ZXtyu31XjSueB6+/vifRC+Q3+3QKmB1oM7BBRFXwZYx36IDgkFSeHKYorFy0rLsIu2i50LpEtMixdKhUoYCVHItEeCBv3FqcSJA58CboE6/8c+1v2tPEz7eXo1eQP4ZzdhtrW15HVwNNl0obRJdFC0d3R9NKF1IzWA9ni2yTfvuKn5tTqO+/P84T4Tf0dAugGoAs4EKUU2hjMHHAgvSOpJi0pQSvhLAgusi7fLowuvC1xLK4qdyjTJckiYR+lG54XVxPbDg=="
+                ]
+            }
+        ],
+        0,
+        0,
+        [32]
+    ],
+    [
+        64,
+        [
+            "solfege",
+            {
+                "value": "la"
+            }
+        ],
+        0,
+        0,
+        [32]
+    ],
+    [
+        65,
+        [
+            "number",
+            {
+                "value": 4
+            }
+        ],
+        0,
+        0,
+        [32]
+    ]
+]
