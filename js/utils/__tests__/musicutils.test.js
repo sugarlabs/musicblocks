@@ -1426,6 +1426,18 @@ describe("getArticulation", () => {
         // Crucially, it no longer removes A, G, E, or D from the middle.
         expect(getArticulation("BAGPIPE_D")).toBe("AGPIPE_D");
     });
+    it("should extract accidental articulations from lowercase letter names", () => {
+        expect(getArticulation("c#")).toBe("#");
+        expect(getArticulation("cx")).toBe("x");
+        expect(getArticulation("c##")).toBe("##");
+        expect(getArticulation("cbb")).toBe("bb");
+        expect(getArticulation("c𝄪")).toBe("𝄪");
+        expect(getArticulation("c𝄫")).toBe("𝄫");
+        expect(getArticulation("dx")).toBe("x");
+        expect(getArticulation("dbb")).toBe("bb");
+        expect(getArticulation("fx")).toBe("x");
+        expect(getArticulation("Do#")).toBe("#");
+    });
 });
 
 describe("keySignatureToMode", () => {
@@ -2104,6 +2116,16 @@ describe("getNote", () => {
         const result = getNote("c", 4, 0, "C major");
         expect(result[0]).toBeDefined();
         expect(result[1]).toBe(4);
+    });
+
+    it("should resolve lowercase notes with double accidentals matching uppercase results", () => {
+        expect(getNote("cx", 4, 0, "C major")).toEqual(getNote("Cx", 4, 0, "C major"));
+        expect(getNote("c##", 4, 0, "C major")).toEqual(getNote("C##", 4, 0, "C major"));
+        expect(getNote("cbb", 4, 0, "C major")).toEqual(getNote("Cbb", 4, 0, "C major"));
+        expect(getNote("c𝄪", 4, 0, "C major")).toEqual(getNote("C𝄪", 4, 0, "C major"));
+        expect(getNote("c𝄫", 4, 0, "C major")).toEqual(getNote("C𝄫", 4, 0, "C major"));
+        expect(getNote("dx", 4, 0, "C major")).toEqual(["E", 4, 0]);
+        expect(getNote("dbb", 4, 0, "C major")).toEqual(["C", 4, 0]);
     });
 
     it("should preserve sharp accidental when no transposition", () => {
