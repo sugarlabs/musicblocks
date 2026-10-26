@@ -168,6 +168,13 @@ describe("musicutils-modewheel", () => {
         });
     });
 
+    describe("rotateSliceAngles", () => {
+        it("re-anchors slice i to span pitch i..i+1, wrapping the last gap", () => {
+            expect(modewheel.rotateSliceAngles([10, 20, 30])).toEqual([20, 30, 10]);
+            expect(modewheel.rotateSliceAngles(null)).toBeNull();
+        });
+    });
+
     describe("sliceAnglesFromRatios", () => {
         it("sizes each slice by the log2 size of the interval it spans", () => {
             const angles = modewheel.sliceAnglesFromRatios([1, 1.5], 2);

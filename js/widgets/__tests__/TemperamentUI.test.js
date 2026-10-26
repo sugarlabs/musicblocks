@@ -1288,11 +1288,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(mainSnap.navAngle).toBe(270);
+            expect(mainSnap.navAngle).toBeCloseTo(300.58650025961623, 6);
             expect(mainSnap.menuRadius).toBeCloseTo(28.559933214452663, 6);
             expect(mainSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(mainSnap.sliceAngles).toEqual([
-                33.519386, 61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001
+                61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001, 33.519386
             ]);
 
             // 2. createInnerWheel (radius 128)
@@ -1302,11 +1302,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(innerSnap.navAngle).toBe(270);
+            expect(innerSnap.navAngle).toBeCloseTo(300.58650025961623, 6);
             expect(innerSnap.menuRadius).toBeCloseTo(24.371143009666273, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                33.519386, 61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001
+                61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001, 33.519386
             ]);
 
             // 3. createOuterWheel
@@ -1334,11 +1334,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(mainSnap.navAngle).toBe(270);
+            expect(mainSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(mainSnap.menuRadius).toBeCloseTo(22.439947525641376, 6);
             expect(mainSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(mainSnap.sliceAngles).toEqual([
-                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // 2. createInnerWheel (radius 128)
@@ -1348,11 +1348,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(innerSnap.navAngle).toBe(270);
+            expect(innerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(innerSnap.menuRadius).toBeCloseTo(19.148755221880645, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // 3. createOuterWheel
@@ -1382,7 +1382,7 @@ describe("TemperamentUI module", () => {
             );
             expect(mainSnap.menuRadius).toBeCloseTo(22.439947525641376, 6);
             expect(mainSnap.sliceAngles).toEqual([
-                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // 2. createOuterWheel pins proportional widths
@@ -1412,11 +1412,11 @@ describe("TemperamentUI module", () => {
                 7
             );
 
-            // Angles, labels, and navAngle still match master exactly:
-            expect(innerSnap.navAngle).toBe(270);
+            // Angles, labels, and navAngle stay aligned with the other rings:
+            expect(innerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                5.219845, 72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // Intended fix assertion:

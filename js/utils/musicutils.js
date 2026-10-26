@@ -172,6 +172,7 @@ if (typeof module !== "undefined" && module.exports) {
         getModeSliceFont,
         getTemperamentSliceAngles,
         sliceAnglesFromRatios,
+        rotateSliceAngles,
         enforceMinSliceAngles,
         applySliceAngles
     } = MusicUtilsModeWheel;
@@ -445,6 +446,7 @@ if (typeof module !== "undefined" && module.exports) {
         getModeSliceFont,
         getTemperamentSliceAngles,
         sliceAnglesFromRatios,
+        rotateSliceAngles,
         enforceMinSliceAngles,
         applySliceAngles,
         getNonEDOFrequency

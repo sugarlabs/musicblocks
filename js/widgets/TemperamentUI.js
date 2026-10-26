@@ -20,7 +20,7 @@
 
 /* global
    _, docById, platformColor, wheelnav, slicePath, ratioToWheelAngle,
-   sliceAnglesFromRatios, applySliceAngles,
+   sliceAnglesFromRatios, rotateSliceAngles, applySliceAngles,
    frequencyToPitch,
    Singer
  */
@@ -190,7 +190,17 @@ const _highlightTab = (menuItems, activeIndex) => {
 const _applyWheelGeometry = (wheelInstance, ratios, powerBase, pitchNumber, radius) => {
     // Proportional widths from the temperament ratios; null keeps equal slices.
     const widths = sliceAnglesFromRatios(ratios.slice(0, wheelInstance.navItemCount), powerBase);
-    applySliceAngles(wheelInstance, widths);
+    // Equal-width rings keep their original start; only genuinely proportional
+    // rings rotate so slice i spans pitch i..i+1 and labels sit mid-interval.
+    const proportional =
+        widths !== null && widths.some(width => Math.abs(width - widths[0]) > 1e-9);
+    if (proportional) {
+        const rotated = rotateSliceAngles(widths);
+        applySliceAngles(wheelInstance, rotated);
+        wheelInstance.navAngle = 270 + rotated[0] / 2;
+    } else {
+        applySliceAngles(wheelInstance, widths);
+    }
 
     let menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
     if (widths !== null && widths.some(width => width < 11)) {
@@ -432,7 +442,7 @@ const TemperamentUI = {
         // helper's pitch i-1..i convention into place.
         const proportional = sliceAnglesFromRatios(ratios.slice(0, pitchNumber), tw.powerBase);
         if (proportional) {
-            const widths = [...proportional.slice(1), proportional[0]];
+            const widths = rotateSliceAngles(proportional);
             applySliceAngles(tw.wheel, widths);
             for (let i = 0; i < pitchNumber; i++) {
                 angle1[i] = angle[i] + widths[i] / 2;

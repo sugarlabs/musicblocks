@@ -75,6 +75,7 @@ const {
     CENTSSYMBOL,
     MUSICALMODES,
     sliceAnglesFromRatios,
+    rotateSliceAngles,
     applySliceAngles,
     getTemperamentSliceAngles,
     enforceMinSliceAngles,
@@ -111,6 +112,7 @@ global.FIXEDSOLFEGE1 = FIXEDSOLFEGE1;
 global.CENTSSYMBOL = CENTSSYMBOL;
 global.MUSICALMODES = MUSICALMODES;
 global.sliceAnglesFromRatios = sliceAnglesFromRatios;
+global.rotateSliceAngles = rotateSliceAngles;
 global.applySliceAngles = applySliceAngles;
 global.getTemperamentSliceAngles = getTemperamentSliceAngles;
 global.enforceMinSliceAngles = enforceMinSliceAngles;

@@ -140,6 +140,14 @@ var sliceAnglesFromRatios = (ratios, octaveRatio = 2) => {
     return angles.every(a => a > 0) ? angles : null;
 };
 
+/** Re-anchors widths so slice i spans pitch i..i+1; slice 0 held the wrap gap. */
+var rotateSliceAngles = sliceAngles => {
+    if (!Array.isArray(sliceAngles)) {
+        return null;
+    }
+    return [...sliceAngles.slice(1), sliceAngles[0]];
+};
+
 /** Proportional slice angles for a TEMPERAMENT entry, or null to keep equal slices. */
 var getTemperamentSliceAngles = (temperamentKey, pitchCount) => {
     const entry = getTemperament(temperamentKey);
@@ -201,6 +209,7 @@ var MusicUtilsModeWheel = {
     getModeSliceFont,
     getTemperamentSliceAngles,
     sliceAnglesFromRatios,
+    rotateSliceAngles,
     enforceMinSliceAngles,
     applySliceAngles
 };
