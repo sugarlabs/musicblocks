@@ -337,7 +337,7 @@ var getNonEDOModeSteps = (mode, temperament) => {
  * stripping the leading note-name prefix.
  *
  * Valid prefixes are the seven solfege syllables (do, re, mi, fa, sol, la, ti)
- * and the seven letter note names (A–G). The prefix is matched only at the
+ * and the seven letter note names (A–G or a–g). The prefix is matched only at the
  * start of the string so that custom note names that happen to contain these
  * letters elsewhere are not mangled.
  *
@@ -348,7 +348,7 @@ var getNonEDOModeSteps = (mode, temperament) => {
  */
 var getArticulation = note => {
     const stripped = stripMicrotonalPrefix(note);
-    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-Ga-g])(.*)/);
     return match ? match[1] : stripped;
 };
 

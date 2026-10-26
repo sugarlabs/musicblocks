@@ -1412,6 +1412,13 @@ describe("getArticulation", () => {
         expect(getArticulation("do^")).toBe("^");
         expect(getArticulation("C^^")).toBe("^^");
     });
+    it("should extract accidentals after lowercase note names", () => {
+        expect(getArticulation("cx")).toBe("x");
+        expect(getArticulation("c##")).toBe("##");
+        expect(getArticulation("cbb")).toBe("bb");
+        expect(getArticulation("c𝄪")).toBe("𝄪");
+        expect(getArticulation("c𝄫")).toBe("𝄫");
+    });
     it("should preserve non-articulation characters", () => {
         expect(getArticulation("X")).toBe("X");
         expect(getArticulation("123")).toBe("123");
@@ -2104,6 +2111,14 @@ describe("getNote", () => {
         const result = getNote("c", 4, 0, "C major");
         expect(result[0]).toBeDefined();
         expect(result[1]).toBe(4);
+    });
+
+    it("should resolve lowercase notes with double accidentals", () => {
+        expect(getNote("cx", 4, 0, "C major")).toEqual(["D", 4, 0]);
+        expect(getNote("c##", 4, 0, "C major")).toEqual(["D", 4, 0]);
+        expect(getNote("c𝄪", 4, 0, "C major")).toEqual(["D", 4, 0]);
+        expect(getNote("cbb", 4, 0, "C major")).toEqual(["A♯", 3, 0]);
+        expect(getNote("c𝄫", 4, 0, "C major")).toEqual(["A♯", 3, 0]);
     });
 
     it("should preserve sharp accidental when no transposition", () => {
