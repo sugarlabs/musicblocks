@@ -201,6 +201,27 @@ describe("Tuner with the real Synth", () => {
         delete window.ActivityContext;
     });
 
+    test.each([
+        [0, -1],
+        [440, 442.1130161667321],
+        [880, 888.702284967564]
+    ])(
+        "detects a %i Hz input without copying samples for each lag",
+        async (frequency, expected) => {
+            jest.spyOn(tuner.audioInput, "getSampleRate").mockReturnValue(48000);
+            await tuner.startTuner();
+            tuner.stopTuner();
+
+            const buffer = bufferForFrequency(frequency, 48000).map(sample => sample / 2);
+            const original = buffer.slice();
+            const slice = jest.spyOn(Float32Array.prototype, "slice");
+
+            expect(tuner.detectPitch(buffer)).toBe(expected);
+            expect(slice).not.toHaveBeenCalled();
+            expect(buffer).toEqual(original);
+        }
+    );
+
     test("startTuner and updatePitch in chromatic mode across all pitch and cent ranges", async () => {
         await tuner.startTuner();
         expect(tuner._tunerActive).toBe(true);

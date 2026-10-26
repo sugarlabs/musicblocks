@@ -1973,6 +1973,71 @@ describe("GetNotesForInterval", () => {
             octave: 0
         });
     });
+
+    it("should handle negative octaves and compute correct octave difference", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1", "E1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "E",
+            octave: 2
+        });
+    });
+
+    it("should handle both notes in negative octaves", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-2", "G-1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "G",
+            octave: 1
+        });
+    });
+
+    it("should handle single note with negative octave without corrupting note name", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+    });
+
+    it("should handle notes with accidentals and negative octaves", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C#-1", "Eb2"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C#",
+            secondNote: "Eb",
+            octave: 3
+        });
+    });
+
+    it("should handle multi-digit and negative octaves across zero", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1", "C10"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 11
+        });
+    });
 });
 
 describe("base64Encode", () => {
@@ -3841,6 +3906,101 @@ describe("getPitchInfo", () => {
     it("handles solfege class with accidental", () => {
         // C♯ keeps its spelling (D♭ is not in C major either), so its class is do.
         expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("do");
+    });
+
+    describe("solfege for every spelling (#9776)", () => {
+        const solfege = (type, note, keySignature, movable) =>
+            getPitchInfo(activity, type, note, { singer: { keySignature, movable } });
+
+        it("gives fixed Do syllables for E♯ and F♭", () => {
+            expect(solfege("solfege syllable", "E♯4", "C major", false)).toBe("mi♯");
+            expect(solfege("solfege syllable", "F♭4", "C major", false)).toBe("fa♭");
+            expect(solfege("solfege class", "E♯4", "C major", false)).toBe("mi");
+            expect(solfege("solfege class", "F♭4", "C major", false)).toBe("fa");
+        });
+
+        it("keeps the fixed Do syllables the table already had", () => {
+            expect(solfege("solfege syllable", "C♯4", "C major", false)).toBe("do♯");
+            expect(solfege("solfege syllable", "C♭4", "C major", false)).toBe("do♭");
+            expect(solfege("solfege syllable", "B♯4", "C major", false)).toBe("ti♯");
+            expect(solfege("solfege syllable", "R", "C major", false)).toBe("rest");
+        });
+
+        it("gives the movable Do class of the key's own sharps and flats", () => {
+            expect(solfege("solfege class", "F♯4", "D major", true)).toBe("mi");
+            expect(solfege("solfege class", "C♯4", "D major", true)).toBe("ti");
+            expect(solfege("solfege class", "B♭4", "F major", true)).toBe("fa");
+        });
+
+        it("gives movable Do syllables for notes outside the key", () => {
+            expect(solfege("solfege syllable", "C♯4", "C major", true)).toBe("do♯");
+            expect(solfege("solfege syllable", "C4", "D major", true)).toBe("ti♭");
+            expect(solfege("solfege syllable", "G♯4", "D major", true)).toBe("fa♯");
+            expect(solfege("solfege class", "C4", "D major", true)).toBe("ti");
+        });
+
+        it("drops a double accidental from the movable Do class", () => {
+            // C♭ is two steps below the C♯ of C♯ major.
+            expect(solfege("solfege syllable", "C♭4", "C♯ major", true)).toBe("do𝄫");
+            expect(solfege("solfege class", "C♭4", "C♯ major", true)).toBe("do");
+        });
+
+        it("measures an outside note against the mode's own scale", () => {
+            // F is mi in D minor, so F♯ is mi♯ rather than the major scale's mi.
+            expect(solfege("solfege syllable", "F4", "D minor", true)).toBe("mi");
+            expect(solfege("solfege syllable", "F♯4", "D minor", true)).toBe("mi♯");
+        });
+
+        it("gives a syllable past the seventh note of a longer scale", () => {
+            // B is the eighth note of C algerian, so its index runs off the end of the names.
+            expect(solfege("solfege syllable", "B4", "C algerian", true)).toBe("ti");
+        });
+
+        it("leaves notes inside the key as they were", () => {
+            expect(solfege("solfege syllable", "D4", "D major", true)).toBe("do");
+            expect(solfege("solfege syllable", "F♯4", "D major", true)).toBe("mi");
+            expect(solfege("solfege syllable", "D4", "F major", true)).toBe("la");
+        });
+
+        it("still returns undefined for text that is not a note", () => {
+            expect(solfege("solfege syllable", "xyz", "C major", false)).toBeUndefined();
+            expect(solfege("solfege class", "xyz", "D major", true)).toBeUndefined();
+        });
+
+        it("gives a syllable for every spelling in every key and mode", () => {
+            const notes = [];
+            for (const letter of ["C", "D", "E", "F", "G", "A", "B"]) {
+                notes.push(letter, letter + SHARP, letter + FLAT);
+            }
+            const keys = ["C", "C♯", "D", "E♭", "F♯", "A", "B♭", "C♭"];
+            const syllables = "(do|re|mi|fa|sol|la|ti)";
+            const pattern = {
+                "solfege syllable": new RegExp(
+                    `^${syllables}(${SHARP}|${FLAT}|${DOUBLESHARP}|${DOUBLEFLAT})?$`,
+                    "u"
+                ),
+                "solfege class": new RegExp(`^${syllables}$`)
+            };
+            for (const mode of Object.keys(MUSICALMODES)) {
+                for (const key of keys) {
+                    const keySignature = key + " " + mode;
+                    for (const note of notes) {
+                        for (const movable of [false, true]) {
+                            for (const type of Object.keys(pattern)) {
+                                const result = solfege(type, note + "4", keySignature, movable);
+                                expect([keySignature, note, movable, type, result]).toEqual([
+                                    keySignature,
+                                    note,
+                                    movable,
+                                    type,
+                                    expect.stringMatching(pattern[type])
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     });
 
     it("returns pitch number", () => {

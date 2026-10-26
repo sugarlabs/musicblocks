@@ -215,6 +215,7 @@ class Block {
         this._labelLock = false;
         this._piemenuExitTime = null;
         this._triggerLongPress = false;
+        this._longPressButton = 0;
 
         // Don't trigger notes on top of each other.
         this._triggerLock = false;
@@ -1994,7 +1995,6 @@ class Block {
             }
         }
 
-        this.updateCache();
         this.activity.refreshCanvas();
         this._removeAccessibleElement();
     }
@@ -3555,6 +3555,11 @@ class Block {
         this.container.on("mousedown", event => {
             docById("contextWheelDiv").style.display = "none";
 
+            that._longPressButton =
+                event.nativeEvent && typeof event.nativeEvent.button === "number"
+                    ? event.nativeEvent.button
+                    : 0;
+
             // Reset any stale hover-scaling state from prior drags.
             this._trashHoverGroupState = null;
             this._dragPointerDown = true;
@@ -3570,7 +3575,7 @@ class Block {
             const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
-                window._contextWheelIgnoreNextClick = true;
+                window._contextWheelIgnoreNextClick = that._longPressButton === 0;
                 window._contextWheelIgnoreNextMouseUp = true;
                 that.blocks.triggerLongPress();
             };
