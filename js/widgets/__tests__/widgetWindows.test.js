@@ -536,6 +536,45 @@ describe("widgetWindows", () => {
             expect(event.defaultPrevented).toBe(true);
             expect(window.onscroll).toBe(existingScrollHandler);
         });
+
+        const scrollableLog = win => {
+            const log = document.createElement("div");
+            log.style.overflowY = "auto";
+            Object.defineProperty(log, "scrollHeight", { value: 500 });
+            Object.defineProperty(log, "clientHeight", { value: 100 });
+            const message = document.createElement("p");
+            log.appendChild(message);
+            win._widget.appendChild(log);
+            return { log, message };
+        };
+
+        test("scrolls an inner scroll area under the pointer, such as a chat log", () => {
+            const win = createTestWindow();
+            const { log, message } = scrollableLog(win);
+
+            const event = new window.WheelEvent("wheel", {
+                deltaY: 30,
+                bubbles: true,
+                cancelable: true
+            });
+            message.dispatchEvent(event);
+
+            expect(log.scrollTop).toBe(30);
+            expect(win._widget.scrollTop).toBe(0);
+            expect(event.defaultPrevented).toBe(true);
+        });
+
+        test("scrolls the widget once the inner area cannot scroll further", () => {
+            const win = createTestWindow();
+            const { log, message } = scrollableLog(win);
+
+            message.dispatchEvent(
+                new window.WheelEvent("wheel", { deltaY: -30, bubbles: true, cancelable: true })
+            );
+
+            expect(log.scrollTop).toBe(0);
+            expect(win._scrollTargetFor(message, 0, -30)).toBe(win._widget);
+        });
     });
 
     describe("sendToCenter", () => {

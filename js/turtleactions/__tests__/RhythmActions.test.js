@@ -835,7 +835,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.playNote(1, "note", 0, 5);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0_5");
         });
         it("playNote does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
             activity.blocks.blockList = {};
@@ -853,7 +853,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.playNote(1, "note", 0, undefined);
 
-            expect(mockMouse.MB.listeners).toContain("_playnote_0");
+            expect(mockMouse.MB.listeners).toContain("_playnote_0_undefined");
         });
         it("playNote does not throw or dispatch when MusicBlocks.isRun and mouse is null", () => {
             global.MusicBlocks.isRun = true;
@@ -868,7 +868,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.doRhythmicDot(1, 0, 5);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0_5");
         });
         it("doRhythmicDot does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
             activity.blocks.blockList = {};
@@ -886,7 +886,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
 
-            expect(mockMouse.MB.listeners).toContain("_dot_0");
+            expect(mockMouse.MB.listeners).toContain("_dot_0_undefined");
         });
         it("doRhythmicDot does not throw or dispatch when MusicBlocks.isRun and mouse is null", () => {
             global.MusicBlocks.isRun = true;

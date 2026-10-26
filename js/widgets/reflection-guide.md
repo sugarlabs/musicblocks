@@ -25,6 +25,8 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
   through `ReflectionMatrix.dependencies`, or the same list in the block when the class is not
   loaded yet, and keeps the one instance in `logo.reflection`.
 - **Shared lifecycle**: `js/utils/ai-widget-lifecycle.js`, also used by the AI Debugger.
+- **Shared Markdown**: `js/utils/ai-markdown.js` draws mentor replies, also used by the AI
+  Debugger. `mdToHTML` in `ReflectionMarkdown.js` is the fallback when it is not loaded.
 - **CSS styling**: `css/activities.css`, from the `.chatInterface` rules on.
 
 | Module                   | What it holds                                                        |

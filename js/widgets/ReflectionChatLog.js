@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, DOMPurify, ReflectionMatrix */
+/* global _, DOMPurify, ReflectionMatrix, renderChatMarkdown */
 /*
     Globals location
     - js/utils/utils.js
@@ -23,6 +23,8 @@
         DOMPurify
     - js/widgets/reflection.js
         ReflectionMatrix
+    - js/utils/ai-markdown.js
+        renderChatMarkdown
 */
 
 /* exported ReflectionChatLog */
@@ -155,7 +157,14 @@ class ReflectionChatLog {
 
         const botReply = document.createElement("div");
 
-        if (md) {
+        const render =
+            (typeof renderChatMarkdown !== "undefined" && renderChatMarkdown) ||
+            (typeof window !== "undefined" && window.renderChatMarkdown);
+        if (render) {
+            // Every reply may use Markdown. Escaped and sanitized in utils/ai-markdown.js.
+            botReply.className = "ai-chat-markdown";
+            botReply.innerHTML = render(reply.response);
+        } else if (md) {
             this._setMarkdown(botReply, reply.response);
         } else {
             botReply.innerText = reply.response;
@@ -203,7 +212,14 @@ class ReflectionChatLog {
             senderName.style.alignSelf = "flex-start";
 
             const userMsg = document.createElement("div");
-            if (this._markdownReplies.has(msg)) {
+            const render =
+                msg.role !== "user" &&
+                ((typeof renderChatMarkdown !== "undefined" && renderChatMarkdown) ||
+                    (typeof window !== "undefined" && window.renderChatMarkdown));
+            if (render) {
+                userMsg.className = "ai-chat-markdown";
+                userMsg.innerHTML = render(msg.content);
+            } else if (this._markdownReplies.has(msg)) {
                 this._setMarkdown(userMsg, msg.content);
             } else {
                 userMsg.innerText = msg.content;

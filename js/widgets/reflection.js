@@ -52,6 +52,7 @@ class ReflectionMatrix {
     /** AMD module dependencies for lazy loading. */
     static dependencies = [
         "utils/ai-widget-lifecycle",
+        "utils/ai-markdown",
         "widgets/ReflectionLifecycle",
         "widgets/ReflectionWindow",
         "widgets/ReflectionChatLog",
@@ -83,7 +84,8 @@ class ReflectionMatrix {
     static BACKENDS = {
         "localhost": "http://localhost:8000",
         "127.0.0.1": "http://127.0.0.1:8000",
-        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org"
+        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org",
+        "sugarlabs.github.io": "https://api.musicblocks.sugarlabs.org"
     };
 
     /**

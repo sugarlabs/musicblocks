@@ -1973,6 +1973,71 @@ describe("GetNotesForInterval", () => {
             octave: 0
         });
     });
+
+    it("should handle negative octaves and compute correct octave difference", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1", "E1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "E",
+            octave: 2
+        });
+    });
+
+    it("should handle both notes in negative octaves", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-2", "G-1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "G",
+            octave: 1
+        });
+    });
+
+    it("should handle single note with negative octave without corrupting note name", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+    });
+
+    it("should handle notes with accidentals and negative octaves", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C#-1", "Eb2"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C#",
+            secondNote: "Eb",
+            octave: 3
+        });
+    });
+
+    it("should handle multi-digit and negative octaves across zero", () => {
+        const tur = {
+            singer: {
+                noteStatus: [["C-1", "C10"]]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 11
+        });
+    });
 });
 
 describe("base64Encode", () => {

@@ -55,7 +55,10 @@ global.platformThemes = {
         paletteColors: {}
     }
 };
-global.clonePlatformTheme = theme => JSON.parse(JSON.stringify(theme));
+const { deepClone } = require("../utils/utils-logic");
+
+global.deepClone = deepClone;
+global.clonePlatformTheme = theme => deepClone(theme);
 
 // Mock document elements
 document.body.innerHTML = `

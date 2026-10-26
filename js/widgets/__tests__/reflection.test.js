@@ -111,6 +111,7 @@ describe("ReflectionMatrix", () => {
         test("loads the lifecycle helper, each module and then the widget", () => {
             expect(ReflectionMatrix.dependencies).toEqual([
                 "utils/ai-widget-lifecycle",
+                "utils/ai-markdown",
                 ...MODULES.map(name => "widgets/" + name),
                 "widgets/reflection"
             ]);
@@ -196,6 +197,12 @@ describe("ReflectionMatrix", () => {
 
         test("uses the HTTPS API on the hosted site", () => {
             expect(ReflectionMatrix.backendURL("musicblocks.sugarlabs.org")).toBe(
+                "https://api.musicblocks.sugarlabs.org"
+            );
+        });
+
+        test("uses the HTTPS API on the GitHub Pages site", () => {
+            expect(ReflectionMatrix.backendURL("sugarlabs.github.io")).toBe(
                 "https://api.musicblocks.sugarlabs.org"
             );
         });
