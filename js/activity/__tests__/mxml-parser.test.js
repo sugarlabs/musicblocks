@@ -979,6 +979,25 @@ describe("Test 16: Ties", () => {
         expect(numerator / denominator).toBe(5 / 12);
     });
 
+    it.each([
+        ["decimal durations", 0.1, 1],
+        ["decimal divisions", 1, 0.3]
+    ])("preserves tied %s without integer GCD rounding", async (_name, duration, divisions) => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${duration}</duration><tie type="${tie}"/></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), `<divisions>${divisions}</divisions>`)
+        );
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+        const [[numerator, denominator]] = values;
+        expect(numerator / denominator).toBeCloseTo((2 * duration) / (divisions * 4));
+        expect(Math.abs(numerator)).toBeLessThan(Number.MAX_SAFE_INTEGER);
+        expect(Math.abs(denominator)).toBeLessThan(Number.MAX_SAFE_INTEGER);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("emits the accumulated duration for a malformed file that ends mid-tie", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(tiedNote("C", 4, '<tie type="start"/>'))
