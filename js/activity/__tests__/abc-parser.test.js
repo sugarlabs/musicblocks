@@ -336,6 +336,20 @@ describe("Test 4: Triplets", () => {
         ],
         ["a rest in a tuplet", "4/4", "1/4", "(3CzE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
         [
+            "a spacer within a tuplet",
+            "4/4",
+            "1/4",
+            "(3CyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "a spacer across tuplet staff lines",
+            "4/4",
+            "1/4",
+            "(3C\nyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
             "unequal note lengths in a tuplet",
             "4/4",
             "1/8",

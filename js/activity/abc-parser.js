@@ -374,6 +374,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
 
     voice.forEach(element => {
         if (element.el_type === "note") {
+            const isSpacerRest = element.rest?.type === "spacer";
             if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
                 // abcjs supplies the ratio, including explicit p:q:r tuplets.
                 // Apply it to each written duration, independently of the meter.
@@ -396,13 +397,13 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
             blockId += _createPitchBlocks(
                 pitch,
                 blockId,
-                element.duration * (tuplets[voiceIdx]?.multiplier ?? 1),
+                element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
                 staff.key,
                 actionBlock,
                 accidental
             );
 
-            if (tuplets[voiceIdx]) {
+            if (tuplets[voiceIdx] && !isSpacerRest) {
                 // abcjs can omit endTriplet when the group crosses a staff line.
                 tuplets[voiceIdx].remaining--;
                 if (element.endTriplet || tuplets[voiceIdx].remaining === 0) {
