@@ -87,8 +87,9 @@ describe("SamplerTuner", () => {
 
     test.each([
         [0, "---"],
-        [440, "442.11"],
-        [880, "888.70"]
+        [82.41, "82.41"],
+        [440, "440.01"],
+        [880, "880.02"]
     ])(
         "detects a %i Hz input without copying samples for each lag",
         async (frequency, expected) => {

@@ -203,8 +203,8 @@ describe("Tuner with the real Synth", () => {
 
     test.each([
         [0, -1],
-        [440, 442.1130161667321],
-        [880, 888.702284967564]
+        [440, 440.00958859237556],
+        [880, 880.0214228079158]
     ])(
         "detects a %i Hz input without copying samples for each lag",
         async (frequency, expected) => {
@@ -219,6 +219,30 @@ describe("Tuner with the real Synth", () => {
             expect(tuner.detectPitch(buffer)).toBe(expected);
             expect(slice).not.toHaveBeenCalled();
             expect(buffer).toEqual(original);
+        }
+    );
+
+    test.each([
+        [44100, 65.41],
+        [44100, 82.41],
+        [44100, 110],
+        [48000, 146.83],
+        [48000, 196],
+        [48000, 261.63],
+        [48000, 523.25],
+        [48000, 880],
+        [48000, 1046.5]
+    ])(
+        "detects a pure tone within one cent at %i Hz sample rate: %f Hz",
+        async (sampleRate, frequency) => {
+            jest.spyOn(tuner.audioInput, "getSampleRate").mockReturnValue(sampleRate);
+            await tuner.startTuner();
+            tuner.stopTuner();
+
+            const detected = tuner.detectPitch(bufferForFrequency(frequency, sampleRate));
+
+            expect(detected).toBeGreaterThan(0);
+            expect(Math.abs(1200 * Math.log2(detected / frequency))).toBeLessThan(1);
         }
     );
 
