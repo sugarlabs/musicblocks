@@ -57,6 +57,7 @@ function setupNumberBlocks(activity) {
      * Safely convert string to number with error handling
      */
     const toNumber = (logo, value, blk) => {
+        let numberValue = value;
         if (typeof value === "string") {
             const str = value.trim();
             if (str === "") {
@@ -64,15 +65,14 @@ function setupNumberBlocks(activity) {
                 activity.errorMsg(NANERRORMSG, blk);
                 return null;
             }
-            const num = Number(str);
-            if (isNaN(num)) {
-                logo.stopTurtle = true;
-                activity.errorMsg(NANERRORMSG, blk);
-                return null;
-            }
-            return num;
+            numberValue = Number(str);
         }
-        return value;
+        if (typeof numberValue === "number" && !Number.isFinite(numberValue)) {
+            logo.stopTurtle = true;
+            activity.errorMsg(NANERRORMSG, blk);
+            return null;
+        }
+        return numberValue;
     };
 
     /**
