@@ -229,7 +229,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                     tur.singer.movable,
                     pitch
                 );
-                return obj[0] + obj[1];
+                return (obj[0] ?? "") + (obj[1] ?? "");
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
             case "staff y":
