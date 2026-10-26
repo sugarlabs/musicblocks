@@ -1062,6 +1062,17 @@ describe("Utility Functions (logic-only)", () => {
                 expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
                 resolveSpy.mockRestore();
             });
+
+            test("treats inherited property names as unconfigured instruments", () => {
+                // "constructor" and "toString" exist on Object.prototype, so `in` would
+                // match them; Object.hasOwn must not, so they fall back to uncalibrated.
+                calculateInstrumentVolumeDb("constructor", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+
+                jest.clearAllMocks();
+                calculateInstrumentVolumeDb("toString", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            });
         });
     });
 

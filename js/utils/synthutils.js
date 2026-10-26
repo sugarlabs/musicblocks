@@ -742,7 +742,7 @@ function calculateInstrumentVolumeDb(instrumentName, volume, resolveFn) {
     volume = clampNumber(volume, 0, 100);
 
     let nv;
-    if (instrumentName in DEFAULTSYNTHVOLUME) {
+    if (Object.hasOwn(DEFAULTSYNTHVOLUME, instrumentName)) {
         const sv = DEFAULTSYNTHVOLUME[instrumentName];
         if (volume > 50) {
             const d = 100 - sv;
