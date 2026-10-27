@@ -143,6 +143,12 @@ class JSGenerate {
                         } else {
                             if (arg.name === "namedbox") {
                                 args.push("box_" + arg.privateData);
+                            } else if (
+                                typeof arg.protoblock.arg === "function" &&
+                                !arg.protoblock.hasCapability("valueDrivenLabel")
+                            ) {
+                                // value holds what arg() computed in the last run, not a literal
+                                args.push([arg.name, ParseArg(arg)]);
                             } else {
                                 args.push(arg.value);
                             }
@@ -326,6 +332,7 @@ class JSGenerate {
         JSGenerate.generateFailed = false;
 
         JSGenerate.AST = ASTUtils.BAREBONE_AST;
+        ASTUtils.unsupportedArgBlocks.clear();
 
         try {
             ASTUtils.setActionNames(
@@ -367,6 +374,11 @@ class JSGenerate {
             const AST = ASTUtils.BAREBONE_AST;
             AST["body"].splice(0, 0, ASTUtils.getMouseAST([]));
             JSGenerate.code = astring.generate(AST);
+        } else if (ASTUtils.unsupportedArgBlocks.size > 0) {
+            console.warn(
+                "No JavaScript equivalent for these blocks; exported as undefined: " +
+                    [...ASTUtils.unsupportedArgBlocks].join(", ")
+            );
         }
     }
 
