@@ -977,6 +977,20 @@ describe("Turtle.TurtleView", () => {
             expect(view._decorationBitmap.y).toBe(0);
             expect(view._decorationBitmap.scale).toBe(0);
         });
+
+        it("safely returns without error when _decorationBitmap is null or undefined (e.g. drum start blocks)", () => {
+            const view = makeView();
+            view._decorationBitmap = null;
+
+            expect(() => {
+                view.resizeDecoration(2, 200);
+            }).not.toThrow();
+
+            view._decorationBitmap = undefined;
+            expect(() => {
+                view.resizeDecoration(1.5, 150);
+            }).not.toThrow();
+        });
     });
 
     describe("_updateMediaPositions", () => {
