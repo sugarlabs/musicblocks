@@ -490,6 +490,31 @@ class Logo {
     }
 
     /**
+     * Gets the connections of the blocks a duplicate notes clamp has broken,
+     * as _restoreConnections() will leave them, without restoring them.
+     *
+     * @returns {Map<number, Array>} block index -> connections
+     */
+    getRestoredConnections() {
+        const restored = new Map();
+        const connectionsOf = blk => {
+            if (!restored.has(blk)) restored.set(blk, [...this.blockList[blk].connections]);
+            return restored.get(blk);
+        };
+
+        for (const turtle in this.connectionStore) {
+            for (const blk in this.connectionStore[turtle]) {
+                for (const [child, c, next] of this.connectionStore[turtle][blk]) {
+                    connectionsOf(child)[c] = next;
+                    if (next !== null && next !== undefined) connectionsOf(next)[0] = child;
+                }
+            }
+        }
+
+        return restored;
+    }
+
+    /**
      * Preps synths for each turtle.
      *
      * @returns {void}
@@ -1049,6 +1074,7 @@ class Logo {
                     ) {
                         if (!tur.singer.runningFromEvent) {
                             this.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
+                            tur.endOfClampSignals[b][i] = null;
                         }
                     }
                 }
@@ -1278,14 +1304,16 @@ class Logo {
      * @param {number} turtle - Index of the active turtle.
      * @param {number} bpm - Tempo in beats per minute at the time of the note.
      * @param {string} instrument - Instrument name for the note.
+     * @param {number[]} [meter] - The meter at the time of the note, as
+     *     [beats per measure, note value per beat].
      * @returns {void}
      */
-    notationMIDI(note, drum, duration, turtle, bpm, instrument) {
+    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
         if (drum) drum = drum[0];
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum });
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum, meter });
     }
 
     // ========================================================================

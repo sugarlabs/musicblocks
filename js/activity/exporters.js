@@ -102,8 +102,16 @@ const printBlockSVG = activity => {
             }
 
             if (target) {
-                const val = activity.blocks.blockList[i].value;
-                target.textContent = typeof val === "string" ? _(val) : val;
+                const block = activity.blocks.blockList[i];
+                // Use the label shown on the canvas, which is shortened
+                // with "..." to fit the block, so a long value doesn't run
+                // past the edge of the block in the artwork.
+                if (block.text && typeof block.text.text === "string" && block.text.text !== "") {
+                    target.textContent = block.text.text;
+                } else {
+                    const val = block.value;
+                    target.textContent = typeof val === "string" ? _(val) : val;
+                }
             }
 
             // serialize without outer <svg> wrapper (matches previous behavior)

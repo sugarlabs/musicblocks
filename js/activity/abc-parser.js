@@ -211,9 +211,26 @@ function _organizeStaffs(lines) {
  * @param {string} staffIdx - The staff index key.
  * @returns {{ startBlock: Array, newBlockId: number }}
  */
+// A staff's meter as a numerator and denominator. abcjs spells M:C and M:C| as
+// named types with no value to read a number out of, so they are named here; every
+// other meter carries one.
+const _ABC_NAMED_METERS = {
+    common_time: { num: 4, den: 4 },
+    cut_time: { num: 2, den: 2 }
+};
+
+function _meterOf(staff) {
+    const meter = staff?.meter;
+    const named = _ABC_NAMED_METERS[meter?.type];
+    if (named !== undefined) return named;
+    const value = meter?.value?.[0];
+    return { num: Number(value?.num) || 4, den: Number(value?.den) || 4 };
+}
+
 function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
     const keyRoot = staff.key.root + (_ABC_KEY_ACC_SUFFIX[staff.key.acc] || "");
     const keyMode = _ABC_MODE_MAP[staff.key.mode] || "major";
+    const meter = _meterOf(staff);
 
     const startBlock = [
         [blockId, ["start", { collapsed: false }], 100, 100, [null, blockId + 1, null]],
@@ -228,10 +245,10 @@ function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
             [blockId + 3]
         ],
         [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
-        [blockId + 6, ["number", { value: staff?.meter?.value[0]?.num || 4 }], 0, 0, [blockId + 5]],
+        [blockId + 6, ["number", { value: meter.num }], 0, 0, [blockId + 5]],
         [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
         [blockId + 8, ["number", { value: 1 }], 0, 0, [blockId + 7]],
-        [blockId + 9, ["number", { value: staff?.meter?.value[0]?.den || 4 }], 0, 0, [blockId + 7]],
+        [blockId + 9, ["number", { value: meter.den }], 0, 0, [blockId + 7]],
         [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
         [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
         [blockId + 12, ["notename", { value: keyRoot }], 0, 0, [blockId + 11]],
@@ -474,9 +491,10 @@ const setupActivityAbcParser = activityInstance => {
                         instruction,
                         staffIdx
                     );
+                    const staffMeter = _meterOf(staff);
                     staffBlocksMap[staffIdx] = {
-                        meterNum: staff?.meter?.value[0]?.num || 4,
-                        meterDen: staff?.meter?.value[0]?.den || 4,
+                        meterNum: staffMeter.num,
+                        meterDen: staffMeter.den,
                         keySignature: staff.key,
                         baseBlocks: [],
                         startBlock,

@@ -84,8 +84,9 @@ const MusicKeyboardRendering = {
         // an invisible spacer occupying a gap position in the piano layout.
         const appendSpacerKey = (parentEl, keyElement) => {
             parentEl.appendChild(keyElement);
-            keyElement.style.background = "transparent";
-            keyElement.style.border = "none";
+            keyElement.className = "spacer";
+            keyElement.style.setProperty("background", "transparent", "important");
+            keyElement.style.setProperty("border", "none", "important");
             keyElement.style.zIndex = "10";
             keyElement.style.position = "relative";
         };
@@ -333,7 +334,7 @@ const MusicKeyboardRendering = {
                     this._cellScale * MATRIXSOLFEHEIGHT * (this.displayLayout.length + 4) + "px";
             }
 
-            outerDiv.style.backgroundColor = "white";
+            outerDiv.style.backgroundColor = "var(--color-bg-secondary)";
             outerDiv.style.marginTop = "15px";
 
             docById("mkbInnerDiv").style.marginLeft = 0;
@@ -521,7 +522,7 @@ const MusicKeyboardRendering = {
             keyboardHolder2.style.bottom = "10px";
             keyboardHolder2.style.left = "0px";
             keyboardHolder2.style.height = "145px";
-            keyboardHolder2.style.backgroundColor = "white";
+            keyboardHolder2.style.backgroundColor = "var(--color-bg-secondary)";
             const blackTables = document.getElementsByClassName("black");
             blackTables[0].style.top = "1px";
             blackTables[0].style.borderSpacing = "0px 0px 20px";

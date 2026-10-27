@@ -45,6 +45,60 @@ describe("musicutils-temperament", () => {
         it("is the same value when read through musicutils.js", () => {
             temperament.setOctaveRatio(1.5);
             expect(musicutils.getOctaveRatio()).toBe(1.5);
+            temperament.setOctaveRatio(2);
+        });
+    });
+
+    describe("getEffectiveOctaveRatio", () => {
+        it("defaults to 2 when temperament is unspecified or equal", () => {
+            expect(temperament.getEffectiveOctaveRatio()).toBe(2);
+            expect(temperament.getEffectiveOctaveRatio("equal")).toBe(2);
+            expect(temperament.getEffectiveOctaveRatio("just intonation")).toBe(2);
+        });
+
+        it("reads octaveRatio from custom temperament object or dictionary entry", () => {
+            const customStretched = { octaveRatio: 2.01, isEDO: true, pitchNumber: 12 };
+            expect(temperament.getEffectiveOctaveRatio(customStretched)).toBe(2.01);
+
+            temperament.addTemperamentToDictionary("stretched12", customStretched);
+            expect(temperament.getEffectiveOctaveRatio("stretched12")).toBe(2.01);
+            temperament.deleteTemperamentFromList("stretched12");
+        });
+
+        it("falls back to global getOctaveRatio when temperament lacks octaveRatio", () => {
+            temperament.setOctaveRatio(3);
+            expect(temperament.getEffectiveOctaveRatio({})).toBe(3);
+            expect(temperament.getEffectiveOctaveRatio(null)).toBe(3);
+            temperament.setOctaveRatio(2);
+        });
+
+        it("ignores invalid temperament and global octave ratios", () => {
+            temperament.setOctaveRatio(3);
+            for (const octaveRatio of [null, 0, 1, -2, Infinity, "not a ratio"]) {
+                expect(temperament.getEffectiveOctaveRatio({ octaveRatio })).toBe(3);
+            }
+
+            for (const globalRatio of [0, NaN, Infinity]) {
+                temperament.setOctaveRatio(globalRatio);
+                expect(temperament.getEffectiveOctaveRatio({})).toBe(2);
+            }
+        });
+
+        it("detects equal division of non-octave periods in isEquallyTempered", () => {
+            const bpRatios = Array.from({ length: 13 }, (_, i) => Math.pow(3, i / 13));
+            const bpTemperament = {
+                octaveRatio: 3,
+                pitchNumber: 13,
+                ratios: bpRatios
+            };
+            expect(temperament.isEquallyTempered(bpTemperament)).toBe(true);
+
+            const stretched19 = {
+                octaveRatio: 2.02,
+                pitchNumber: 19,
+                ratios: Array.from({ length: 19 }, (_, i) => Math.pow(2.02, i / 19))
+            };
+            expect(temperament.isEquallyTempered(stretched19)).toBe(true);
         });
     });
 
@@ -91,6 +145,59 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("getEdoNoteNamePosition", () => {
+        it("resolves enharmonic note spellings in 12-EDO via EQUIVALENTNATURALS", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B♯", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♭", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("F♭", 12)).toBe(4);
+        });
+
+        it("resolves ASCII single and double accidental spellings in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("E#", 12)).toBe(5);
+            expect(temperament.getEdoNoteNamePosition("B#", 12)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("Cb", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("Fb", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("D##", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("Cbb", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("Fbb", 12)).toBe(3);
+        });
+
+        it("resolves double-accidental natural and chained equivalents in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("D𝄪", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("D♯♯", 12)).toBe(4);
+            expect(temperament.getEdoNoteNamePosition("A𝄪", 12)).toBe(11);
+            expect(temperament.getEdoNoteNamePosition("C𝄫", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("C♭♭", 12)).toBe(10);
+            expect(temperament.getEdoNoteNamePosition("F𝄫", 12)).toBe(3);
+            expect(temperament.getEdoNoteNamePosition("F♭♭", 12)).toBe(3);
+            expect(temperament.getEdoNoteNamePosition("B𝄪", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("E𝄪", 12)).toBe(6);
+        });
+
+        it("keeps resolving standard sharps and flats in 12-EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("C♯", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("D♭", 12)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("F♯", 12)).toBe(6);
+            expect(temperament.getEdoNoteNamePosition("G♭", 12)).toBe(6);
+            expect(temperament.getEdoNoteNamePosition("A", 12)).toBe(9);
+        });
+
+        it("preserves non-12 EDO distinct pitch positions", () => {
+            expect(temperament.getEdoNoteNamePosition("E♯", 19)).toBe(7);
+            expect(temperament.getEdoNoteNamePosition("F", 19)).toBe(8);
+            expect(temperament.getEdoNoteNamePosition("B♯", 19)).toBe(18);
+            expect(temperament.getEdoNoteNamePosition("C", 19)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♯", 19)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("D♭", 19)).toBe(2);
+        });
+
+        it("returns -1 for invalid or unresolvable pitch names", () => {
+            expect(temperament.getEdoNoteNamePosition("H", 12)).toBe(-1);
+            expect(temperament.getEdoNoteNamePosition("invalid", 12)).toBe(-1);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [
@@ -100,6 +207,7 @@ describe("musicutils-temperament", () => {
                 "getTemperamentsList",
                 "addTemperamentToDictionary",
                 "setOctaveRatio",
+                "getEffectiveOctaveRatio",
                 "isEquallyTempered"
             ]) {
                 expect(musicutils[name]).toBe(temperament[name]);

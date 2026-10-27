@@ -124,8 +124,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "♯": "is",
             "♭": "es",
             "10": "'''''''",
-            "1": ",, ",
-            "2": ", ",
+            "0": ",,,",
+            "1": ",,",
+            "2": ",",
             "3": "",
             "4": "'",
             "5": "''",
@@ -136,7 +137,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         };
 
         return (
-            note.replace(/[♮♯♭𝄪𝄫]|10|[1-9]/gu, match => replacements[match]).toLowerCase() +
+            note.replace(/[♮♯♭𝄪𝄫]|10|[0-9]/gu, match => replacements[match]).toLowerCase() +
             (natural ? "!" : "")
         );
     };

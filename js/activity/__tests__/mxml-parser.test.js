@@ -13,6 +13,12 @@
 
 const { setupActivityMxmlParser } = require("../mxml-parser.js");
 
+// Globals in the browser (js/utils/musicutils-constants.js); the drum-name
+// lookup reads them.
+const { DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP } = require("../../utils/musicutils-constants.js");
+global.DRUM_MIDI_MAP = DRUM_MIDI_MAP;
+global.REVERSE_DRUM_MIDI_MAP = REVERSE_DRUM_MIDI_MAP;
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -159,6 +165,35 @@ describe("Test 2: Rests", () => {
 
         expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
         expect(blocks.filter(b => blockName(b) === "pitch")).toHaveLength(0);
+    });
+
+    it("reads a whole-measure rest's length from <duration>, not its whole-note <type>", async () => {
+        // PhotoScore writes a 3/4 bar's rest this way; reading <type> made it four beats.
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<note><rest measure="yes"/><duration>24</duration><type>whole</type></note>' +
+                    SIMPLE_NOTE("C", 4, "quarter"),
+                "<divisions>8</divisions><time><beats>3</beats><beat-type>4</beat-type></time>"
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [24, 32],
+            [1, 4]
+        ]);
+    });
+
+    it.each([
+        ["no <duration>", ""],
+        ["an empty <duration>", "<duration></duration>"],
+        ["a non-numeric <duration>", "<duration>abc</duration>"],
+        ["a zero <duration>", "<duration>0</duration>"]
+    ])("keeps <type> for a whole-measure rest with %s", async (_label, durationXml) => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(`<note><rest measure="yes"/>${durationXml}<type>whole</type></note>`)
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 1]]);
     });
 
     it("treats a <note> with neither <pitch> nor <rest/> as a rest rather than crashing", async () => {
@@ -358,6 +393,34 @@ describe("Test 8: Title and meter extraction", () => {
         const denBlock = blocks.find(b => b[0] === divide[4][2]);
         expect(denBlock[1][1].value).toBe(8);
     });
+
+    it.each([
+        ["3+2", "8", 5, 8],
+        ["2+2+3", "8", 7, 8],
+        [" 3 + 2 ", "8", 5, 8],
+        ["x", "4", 4, 4],
+        ["3+", "8", 4, 8],
+        ["+3", "8", 4, 8],
+        ["3++2", "8", 4, 8],
+        ["", "4", 4, 4],
+        ["3", "0", 3, 4]
+    ])(
+        "reads <beats>%s</beats><beat-type>%s</beat-type> as %i/%i",
+        async (beatsText, beatTypeText, beats, beatType) => {
+            const xml = scorePartwise(
+                SIMPLE_NOTE("C", 4, "eighth"),
+                `<divisions>8</divisions><time><beats>${beatsText}</beats><beat-type>${beatTypeText}</beat-type></time>`
+            );
+
+            const { blocks } = await parseAndCapture(xml);
+            const meter = blocks.find(b => blockName(b) === "meter");
+            const numBlock = blocks.find(b => b[0] === meter[4][1]);
+            const divide = blocks.find(b => b[0] === meter[4][2]);
+            const denBlock = blocks.find(b => b[0] === divide[4][2]);
+            expect(numBlock[1][1].value).toBe(beats);
+            expect(denBlock[1][1].value).toBe(beatType);
+        }
+    );
 
     it("defaults to 4/4 when no <time> element is present", async () => {
         const { blocks } = await parseAndCapture(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
@@ -839,6 +902,73 @@ describe("Test 15: Drum/unpitched parts", () => {
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
         expect(drumNames(blocks)).toEqual(["snare drum"]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});
+
+describe("Test 15b: drum kits named by other programs", () => {
+    const kitScore = (kit, ids = kit.map(([id]) => id)) =>
+        '<score-partwise><part-list><score-part id="P1">' +
+        kit
+            .map(
+                ([id, name]) =>
+                    `<score-instrument id="P1-${id}"><instrument-name>${name}</instrument-name></score-instrument>`
+            )
+            .join("") +
+        kit
+            .map(
+                ([id, , unpitched]) =>
+                    `<midi-instrument id="P1-${id}"><midi-channel>10</midi-channel><midi-unpitched>${unpitched}</midi-unpitched></midi-instrument>`
+            )
+            .join("") +
+        "</score-part></part-list>" +
+        '<part id="P1"><measure number="1"><attributes><divisions>8</divisions></attributes>' +
+        ids
+            .map(
+                id =>
+                    "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+                    `<duration>8</duration><type>quarter</type><instrument id="P1-${id}"/></note>`
+            )
+            .join("") +
+        "</measure></part></score-partwise>";
+
+    it("imports the MusicXML tutorial's drum kit as its own drums, not five kicks", async () => {
+        // The kit in https://www.w3.org/2021/06/musicxml40/tutorial/percussion
+        const { blocks } = await parseAndCapture(
+            kitScore([
+                ["X4", "Snare Drum", 39],
+                ["X2", "Kick Drum", 37],
+                ["X13", "Crash Cymbal", 50],
+                ["X6", "Hi-Hat Closed", 43],
+                ["X1", "Cowbell", 57]
+            ])
+        );
+
+        expect(drumNames(blocks)).toEqual([
+            "snare drum",
+            "kick drum",
+            "crash",
+            "hi hat",
+            "cow bell"
+        ]);
+    });
+
+    it("maps General MIDI kit pieces Music Blocks has no exact drum for to the nearest one", async () => {
+        const { blocks } = await parseAndCapture(
+            kitScore([
+                ["I36", "Acoustic Bass Drum", 36],
+                ["I47", "Open Hi-Hat", 47],
+                ["I52", "Ride Cymbal 1", 52],
+                ["I49", "Hi-Mid Tom", 49]
+            ])
+        );
+
+        expect(drumNames(blocks)).toEqual(["kick drum", "hi hat", "ride bell", "tom tom"]);
+    });
+
+    it("prefers a Music Blocks drum name over <midi-unpitched>", async () => {
+        const { blocks } = await parseAndCapture(kitScore([["X", "Clap", 39]]));
+
+        expect(drumNames(blocks)).toEqual(["clap"]);
     });
 });
 

@@ -112,54 +112,44 @@ class PitchDrumMatrixWindow {
      * @returns {void}
      */
     _onMaximize(widgetWindow) {
+        const win = widgetWindow || this.widgetWindow;
+        if (!win || typeof win.getWidgetBody !== "function") {
+            return;
+        }
+        const body = win.getWidgetBody();
+        if (!body || !body.style) {
+            return;
+        }
         const outerDiv = docById("pdmOuterDiv");
         const innerDiv = docById("pdmInnerDiv");
-        if (widgetWindow._maximized) {
-            widgetWindow.getWidgetBody().style.position = "absolute";
-            widgetWindow.getWidgetBody().style.height = "calc(-95px + 100vh)";
-            widgetWindow.getWidgetBody().style.width = "calc(-55px + 100vw)";
-            widgetWindow.getWidgetBody().style.left = "55px";
-            outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
-            outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
-            innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
-            innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+
+        if (win._maximized) {
+            body.style.position = "absolute";
+            body.style.height = "calc(-95px + 100vh)";
+            body.style.width = "calc(-55px + 100vw)";
+            body.style.left = "55px";
+            if (outerDiv && outerDiv.style) {
+                outerDiv.style.height = body.style.height;
+                outerDiv.style.width = body.style.width;
+            }
+            if (innerDiv && innerDiv.style) {
+                innerDiv.style.height = body.style.height;
+                innerDiv.style.width = body.style.width;
+            }
         } else {
-            widgetWindow.getWidgetBody().style.position = "relative";
-            widgetWindow.getWidgetBody().style.left = "0px";
-            widgetWindow.getWidgetBody().style.height = "400px";
-            widgetWindow.getWidgetBody().style.width = "500px";
-            outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
-            outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
-            innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
-            innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+            body.style.position = "relative";
+            body.style.left = "0px";
+            body.style.height = "400px";
+            body.style.width = "500px";
+            if (outerDiv && outerDiv.style) {
+                outerDiv.style.height = body.style.height;
+                outerDiv.style.width = body.style.width;
+            }
+            if (innerDiv && innerDiv.style) {
+                innerDiv.style.height = body.style.height;
+                innerDiv.style.width = body.style.width;
+            }
         }
-    }
-
-    /**
-     * Handles the scaling of the widget.
-     *
-     * @private
-     * @returns {void}
-     */
-    _scale() {
-        const windowHeight =
-            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
-        const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized() ? windowHeight / widgetBody.offsetHeight : 1;
-        widgetBody.style.display = "flex";
-        widgetBody.style.flexDirection = "column";
-        widgetBody.style.alignItems = "center";
-        widgetBody.children[0].style.display = "flex";
-        widgetBody.children[0].style.flexDirection = "column";
-        widgetBody.children[0].style.alignItems = "center";
-
-        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
-        svg.style.pointerEvents = "none";
-        svg.setAttribute("height", `${400 * scale}px`);
-        svg.setAttribute("width", `${400 * scale}px`);
-        setTimeout(() => {
-            svg.style.pointerEvents = "auto";
-        }, 100);
     }
 }
 

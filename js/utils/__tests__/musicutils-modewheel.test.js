@@ -144,6 +144,59 @@ describe("musicutils-modewheel", () => {
         }
     });
 
+    describe("getModeSliceArc", () => {
+        it("is the circumference at the label radius, scaled by the slice angle", () => {
+            const fullTurn = modewheel.getModeSliceArc(200, 360);
+            expect(fullTurn).toBeCloseTo(2 * Math.PI * 0.575 * 200, 6);
+            // Half the degrees is half the arc: this is what lets the mode
+            // widget measure proportional slices and equal slices alike.
+            expect(modewheel.getModeSliceArc(200, 30)).toBeCloseTo(fullTurn / 12, 6);
+        });
+    });
+
+    describe("enforceMinSliceAngles", () => {
+        it("raises slices below the floor and takes the excess from wider slices", () => {
+            expect(modewheel.enforceMinSliceAngles([8.9, 351.1], 12)).toEqual([12, 348]);
+            expect(modewheel.enforceMinSliceAngles(null, 12)).toBeNull();
+        });
+    });
+
+    describe("rotateSliceAngles", () => {
+        it("re-anchors slice i to span pitch i..i+1, wrapping the last gap", () => {
+            expect(modewheel.rotateSliceAngles([10, 20, 30])).toEqual([20, 30, 10]);
+            expect(modewheel.rotateSliceAngles(null)).toBeNull();
+        });
+    });
+
+    describe("sliceAnglesFromRatios", () => {
+        it("sizes each slice by the log2 size of the interval it spans", () => {
+            const angles = modewheel.sliceAnglesFromRatios([1, 1.5], 2);
+            expect(angles).toHaveLength(2);
+            // 3/2 is 701.955 cents = 210.5865 degrees; slice 0 wraps the rest.
+            expect(angles[1]).toBeCloseTo(210.5865, 3);
+            expect(angles[0]).toBeCloseTo(149.4135, 3);
+            expect(angles[0] + angles[1]).toBeCloseTo(360, 6);
+            expect(modewheel.sliceAnglesFromRatios([1], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5, 1.2], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5], 1)).toBeNull();
+        });
+    });
+
+    describe("getTemperamentSliceAngles", () => {
+        it("returns proportional widths for a non-EDO temperament", () => {
+            expect(modewheel.getTemperamentSliceAngles("equal", 12)).toBeNull();
+            expect(modewheel.getTemperamentSliceAngles("made-up", 12)).toBeNull();
+            expect(modewheel.getTemperamentSliceAngles("just intonation", 19)).toBeNull();
+            const angles = modewheel.getTemperamentSliceAngles("just intonation", 12);
+            expect(angles).toHaveLength(12);
+            expect(angles.reduce((sum, a) => sum + a, 0)).toBeCloseTo(360, 6);
+            // 5-limit JI extremes: 6/5 to 5/4 is the narrowest slice,
+            // 5/3 to 9/5 the widest; equal slices would be 30 each.
+            expect(Math.min(...angles)).toBeCloseTo(21.2, 1);
+            expect(Math.max(...angles)).toBeCloseTo(39.97, 1);
+        });
+    });
+
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
             "musicutils-constants.js",

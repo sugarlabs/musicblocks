@@ -1315,25 +1315,14 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
-            if (activity.beginnerMode && this.lang === "ja") {
-                this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
-                    "documentation",
-                    null,
-                    "musickeyboardja"
-                ]);
-            } else {
-                this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
-                    "documentation",
-                    null,
-                    "musickeyboard2"
-                ]);
-            }
+            this.setHelpString([
+                _(
+                    "The Music keyboard block opens a piano keyboard that can be used to create notes."
+                ),
+                "documentation",
+                null,
+                "musickeyboard2"
+            ]);
 
             //.TRANS: widget to generate pitches using a slider
             this.formBlock({ name: _("music keyboard"), canCollapse: true });
@@ -2165,7 +2154,7 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
+                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/reflection"]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2334,7 +2323,7 @@ function setupWidgetBlocks(activity) {
                 "aiDebugger",
                 _getWidgetDependencies(
                     typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
-                    ["utils/ai-widget-lifecycle", "widgets/aidebugger"]
+                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/aidebugger"]
                 ),
                 () => new AIDebuggerWidget(),
                 turtle,

@@ -48,6 +48,7 @@ if (typeof module !== "undefined" && module.exports) {
         PITCHES2,
         PITCHES,
         INTERVALVALUES,
+        INTERVAL_ALIASES,
         SOLFNOTES,
         NOTESFLAT2,
         EQUIVALENTFLATS,
@@ -401,7 +402,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     if (transposition !== 0) {
         const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
         if (edoPos !== -1) {
-            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
+            let octaveShift = 0;
+            const letterPos = PITCHES.indexOf(pitch.toUpperCase());
+            if (currentEDO === 12 && letterPos !== -1) {
+                octaveShift = Math.floor((letterPos + transposition) / 12);
+            }
+            return (octave + octaveShift) * currentEDO + edoPos - PITCHES.indexOf("A");
         }
     }
 
@@ -432,7 +438,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
  * Get the note based on a given pitch and interval.
  * @function
  * @param {string} pitch - The pitch, including the note name and octave (e.g., "C4").
- * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+ * @param {string} interval - An INTERVALVALUES key, e.g. "major 3" or "octave".
  * @param {string} [temperament="equal"] - The temperament to use for pitch calculations.
  * @returns {Array} An array containing the note and octave.
  */
@@ -440,6 +446,12 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+
+    // Read another name for an interval as the "<quality> <number>" name it stands for.
+    if (Object.prototype.hasOwnProperty.call(INTERVAL_ALIASES, interval)) {
+        interval = INTERVAL_ALIASES[interval];
+    }
+
     const pitch1 = pitch.substring(0, 1);
     const parsed = parseNoteString(pitch);
     const note1 = parsed[0];
@@ -451,7 +463,7 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     /**
      * Find the note that corresponds to a major interval.
      * @function
-     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3").
      * @returns {Array} An array containing the note and octave.
      */
     const findMajorInterval = interval => {

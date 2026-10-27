@@ -718,6 +718,181 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("isDisconnected()", () => {
+        it("should return false when disconnected artwork is unavailable", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            expect(block.isDisconnected()).toBe(false);
+        });
+
+        it("should return false when the block has a parent connection", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [4, null];
+
+            expect(block.isDisconnected()).toBe(false);
+        });
+
+        it("should return true for an unconnected argument block", () => {
+            mockProtoBlock.style = "arg";
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, 2];
+
+            expect(block.isDisconnected()).toBe(true);
+        });
+
+        it("should return true for an unconnected command block with no child", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, null];
+
+            expect(block.isDisconnected()).toBe(true);
+        });
+
+        it("should recognize a hidden child with no parent as disconnected", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, 1];
+            mockBlocks.blockList = [block, { name: "hidden", connections: [null] }];
+
+            expect(block.isDisconnected()).toBe(true);
+        });
+
+        it("should not treat a non-inline collapsible block as disconnected", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, null];
+
+            expect(block.isDisconnected()).toBe(false);
+        });
+    });
+
+    describe("block type and layout helpers", () => {
+        it.each([
+            ["value", "isValueBlock", true],
+            ["arg", "isArgBlock", true],
+            ["twoarg", "isTwoArgBlock", true],
+            ["argflowclamp", "isArgFlowClampBlock", true],
+            ["doubleclamp", "isDoubleClampBlock", true],
+            ["argclamp", "isArgClamp", true],
+            ["argclamparg", "isArgClamp", true],
+            ["command", "isValueBlock", false]
+        ])("%s style returns %s for %s", (style, method, expected) => {
+            const block = new Block({ ...mockProtoBlock, style }, mockBlocks);
+
+            expect(block[method]()).toBe(expected);
+        });
+
+        it("recognizes boolean comparison block names", () => {
+            expect(
+                ["equal", "greater", "less"].map(name => {
+                    const block = new Block({ ...mockProtoBlock, name }, mockBlocks);
+                    return block.isTwoArgBooleanBlock();
+                })
+            ).toEqual([true, true, true]);
+
+            const block = new Block({ ...mockProtoBlock, name: "forward" }, mockBlocks);
+            expect(block.isTwoArgBooleanBlock()).toBe(false);
+        });
+
+        it("recognizes left clamp, no-run, and expandable metadata", () => {
+            const action = new Block(
+                { ...mockProtoBlock, name: "action", isLeftClamp: true, expandable: true },
+                mockBlocks
+            );
+
+            expect(action.isLeftClampBlock()).toBe(true);
+            expect(action.isNoRunBlock()).toBe(true);
+            expect(action.isExpandableBlock()).toBe(true);
+        });
+
+        it("returns false for non-expandable and non-left-clamp blocks", () => {
+            const block = new Block(
+                { ...mockProtoBlock, name: "forward", isLeftClamp: false, expandable: false },
+                mockBlocks
+            );
+
+            expect(block.isLeftClampBlock()).toBe(false);
+            expect(block.isNoRunBlock()).toBe(false);
+            expect(block.isExpandableBlock()).toBe(false);
+        });
+
+        it("uses protoblock capability methods when available", () => {
+            const protoblock = {
+                ...mockProtoBlock,
+                hasCapability: jest.fn().mockReturnValue(true),
+                getCapability: jest.fn().mockReturnValue("configured")
+            };
+            const block = new Block(protoblock, mockBlocks);
+
+            expect(block.hasCapability("custom")).toBe(true);
+            expect(block.getCapability("custom")).toBe("configured");
+            expect(protoblock.hasCapability).toHaveBeenCalledWith("custom");
+            expect(protoblock.getCapability).toHaveBeenCalledWith("custom");
+        });
+
+        it("returns ARG for a two-argument block's first argument slot", () => {
+            const block = new Block({ ...mockProtoBlock, style: "twoarg" }, mockBlocks);
+            block.connections = [null, null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+        });
+
+        it("returns ARG for expandable argument blocks", () => {
+            const block = new Block(
+                { ...mockProtoBlock, style: "value", expandable: true },
+                mockBlocks
+            );
+            block.connections = [null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+        });
+
+        it("returns FLOW for a flow input at the final connection", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.connections = [null, null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(1)).toBe("FLOW");
+        });
+
+        it("returns null for invalid, argument-clamp, and unrelated connections", () => {
+            const block = new Block({ ...mockProtoBlock, style: "argclamp" }, mockBlocks);
+            block.connections = [null, null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(-1)).toBeNull();
+            expect(block.getLayoutUpdateType(1)).toBeNull();
+            expect(block.getLayoutUpdateType(0)).toBeNull();
+        });
+
+        it("builds a stable id from the block index", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 37;
+
+            expect(block.getBlockId()).toBe("_37");
+        });
+    });
+
     describe("Action label changed behavior", () => {
         let mockBlocksForRename;
         let showPalette;
@@ -1311,6 +1486,55 @@ describe("Block Foundation", () => {
     });
 
     describe("hide", () => {
+        it.each([
+            ["ordinary", false, false],
+            ["expanded", true, false],
+            ["collapsed", true, true]
+        ])(
+            "should defer cache updates until showing a %s block",
+            async (_, collapsible, collapsed) => {
+                mockProtoBlock.capabilities.collapsible = collapsible;
+                const b = new Block(mockProtoBlock, mockBlocks);
+                b.container = {
+                    visible: true,
+                    bitmapCache: {},
+                    updateCache: jest.fn(),
+                    uncache: jest.fn()
+                };
+                b.bounds = { x: 0, y: 0, width: 100, height: 100 };
+                b.collapsed = collapsed;
+                b.collapseText = { visible: true };
+                b.expandButtonBitmap = { visible: true };
+                b.collapseButtonBitmap = { visible: true };
+                b._removeAccessibleElement = jest.fn();
+                b._setupAccessibleElement = jest.fn();
+
+                b.hide();
+
+                expect(b.container.visible).toBe(false);
+                expect(b.container.updateCache).not.toHaveBeenCalled();
+                expect(b.container.uncache).not.toHaveBeenCalled();
+                expect(b._removeAccessibleElement).toHaveBeenCalledTimes(1);
+                if (collapsible) {
+                    expect(b.collapseText.visible).toBe(false);
+                    expect(b.expandButtonBitmap.visible).toBe(false);
+                    expect(b.collapseButtonBitmap.visible).toBe(false);
+                }
+
+                b.show();
+                await Promise.resolve();
+
+                expect(b.container.visible).toBe(true);
+                expect(b.container.updateCache).toHaveBeenCalledTimes(1);
+                expect(b._setupAccessibleElement).toHaveBeenCalledTimes(1);
+                if (collapsible) {
+                    expect(b.collapseText.visible).toBe(collapsed);
+                    expect(b.expandButtonBitmap.visible).toBe(collapsed);
+                    expect(b.collapseButtonBitmap.visible).toBe(!collapsed);
+                }
+            }
+        );
+
         it("should not throw when container is null", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = null;
@@ -1359,6 +1583,55 @@ describe("Block Foundation", () => {
             b.disconnectedHighlightBitmap = null;
             b.show();
             expect(b.container.visible).toBe(true);
+        });
+
+        it("should restore collapsed artwork and controls for a collapsed block", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.collapsed = true;
+            b.bitmap = { visible: true };
+            b.highlightBitmap = { visible: true };
+            b.collapseBlockBitmap = { visible: false };
+            b.highlightCollapseBlockBitmap = { visible: true };
+            b.collapseText = { visible: false };
+            b.expandButtonBitmap = { visible: false };
+            b.collapseButtonBitmap = { visible: true };
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b.container.visible).toBe(true);
+            expect(b.bitmap.visible).toBe(false);
+            expect(b.highlightBitmap.visible).toBe(false);
+            expect(b.collapseBlockBitmap.visible).toBe(true);
+            expect(b.highlightCollapseBlockBitmap.visible).toBe(false);
+            expect(b.collapseText.visible).toBe(true);
+            expect(b.expandButtonBitmap.visible).toBe(true);
+            expect(b.collapseButtonBitmap.visible).toBe(false);
+            expect(b.updateCache).toHaveBeenCalled();
+            expect(b._setupAccessibleElement).toHaveBeenCalled();
+        });
+
+        it("should show disconnected artwork for an unconnected block", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.connections = [null, null];
+            b.bitmap = { visible: true };
+            b.highlightBitmap = { visible: true };
+            b.disconnectedBitmap = { visible: false };
+            b.disconnectedHighlightBitmap = { visible: true };
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b.disconnectedBitmap.visible).toBe(true);
+            expect(b.bitmap.visible).toBe(false);
+            expect(b.highlightBitmap.visible).toBe(false);
+            expect(b.disconnectedHighlightBitmap.visible).toBe(false);
+            expect(b.updateCache).toHaveBeenCalled();
         });
     });
 
@@ -2534,6 +2807,210 @@ describe("Block Foundation", () => {
             // Expand: should call _setupAccessibleElement
             block._toggle_inline(0, true);
             expect(childBlock._setupAccessibleElement).toHaveBeenCalled();
+        });
+    });
+
+    describe("trash hover scaling", () => {
+        it("shrinks every block in the active drag group around the group origin", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const groupedBlock = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.dragGroup = [0, 1];
+            block.blocks.blockList = [block, groupedBlock];
+            block.activity = { refreshCanvas: jest.fn() };
+            block.container = { x: 100, y: 100, scaleX: 1, scaleY: 1 };
+            groupedBlock.container = { x: 200, y: 140, scaleX: 2, scaleY: 3 };
+            const blockTween = { to: jest.fn().mockReturnThis() };
+            const groupedBlockTween = { to: jest.fn().mockReturnThis() };
+            createjs.Tween.get
+                .mockImplementationOnce(target => {
+                    blockTween.target = target;
+                    return blockTween;
+                })
+                .mockImplementationOnce(target => {
+                    groupedBlockTween.target = target;
+                    return groupedBlockTween;
+                });
+
+            block._setDragGroupTrashHoverScale(true, 0, 0, true);
+
+            expect(createjs.Tween.get).toHaveBeenCalledTimes(2);
+            expect(createjs.Tween.get).toHaveBeenNthCalledWith(1, block.container, {
+                override: true
+            });
+            expect(createjs.Tween.get).toHaveBeenNthCalledWith(2, groupedBlock.container, {
+                override: true
+            });
+            expect(blockTween.target).toBe(block.container);
+            expect(groupedBlockTween.target).toBe(groupedBlock.container);
+            expect(blockTween.to).toHaveBeenCalledWith(
+                { x: 100, y: 100, scaleX: 0.5, scaleY: 0.5 },
+                0
+            );
+            expect(groupedBlockTween.to).toHaveBeenCalledWith(
+                { x: 150, y: 120, scaleX: 1, scaleY: 1.5 },
+                0
+            );
+            expect(block.activity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("restores original positions and scales when leaving the trash", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.dragGroup = [0];
+            block.blocks.blockList = [block];
+            block.activity = { refreshCanvas: jest.fn() };
+            block.container = { x: 80, y: 60, scaleX: 1.5, scaleY: 2 };
+
+            block._setDragGroupTrashHoverScale(true, 10, 20, true);
+            createjs.Tween.get.mockClear();
+            block._setDragGroupTrashHoverScale(false, 0, 0, true);
+
+            expect(createjs.Tween.get).toHaveBeenCalledTimes(1);
+            expect(createjs.Tween.get.mock.results[0].value.to).toHaveBeenCalledWith(
+                { x: 90, y: 80, scaleX: 1.5, scaleY: 2 },
+                0
+            );
+            expect(block._trashHoverGroupState).toBeNull();
+        });
+
+        it("does nothing when the drag group has no usable containers", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.dragGroup = [0, 1];
+            block.blocks.blockList = [block, { container: null }];
+            block.activity = { refreshCanvas: jest.fn() };
+            block.container = null;
+
+            block._setDragGroupTrashHoverScale(true);
+
+            expect(createjs.Tween.get).not.toHaveBeenCalled();
+            expect(block.activity.refreshCanvas).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("collapsed state transitions", () => {
+        it("marks a block as collapsed and hides it", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.hide = jest.fn();
+
+            block.setCollapsedState();
+
+            expect(block.inCollapsed).toBe(true);
+            expect(block.hide).toHaveBeenCalledTimes(1);
+        });
+
+        it("shows a block when its containing block is not collapsed", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 1;
+            block.show = jest.fn();
+            mockBlocks.blockList = [{ collapsed: false }, block];
+
+            block.setUncollapsedState(0);
+
+            expect(block.inCollapsed).toBe(false);
+            expect(block.show).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps a block hidden when its containing block is still collapsed", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 1;
+            block.inCollapsed = true;
+            block.show = jest.fn();
+            mockBlocks.blockList = [{ collapsed: true }, block];
+
+            block.setUncollapsedState(0);
+
+            expect(block.inCollapsed).toBe(true);
+            expect(block.show).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getLayoutUpdateType()", () => {
+        let block;
+        let mockPb;
+
+        beforeEach(() => {
+            mockPb = {
+                style: "twoarg",
+                expandable: true,
+                dockTypes: ["out", "numberin", "numberin", "in"]
+            };
+            block = new Block(mockPb, mockBlocks);
+            block.connections = [null, null, null, null];
+            block.docks = [
+                [0, 0, "out"],
+                [10, 10, "numberin"],
+                [10, 30, "numberin"],
+                [0, 40, "in"]
+            ];
+        });
+
+        it("returns null for negative connectionIndex", () => {
+            expect(block.getLayoutUpdateType(-1)).toBeNull();
+        });
+
+        it("returns 'ARG' for connectionIndex 1 and 2 on twoArgBlock", () => {
+            expect(block.isTwoArgBlock()).toBe(true);
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+            expect(block.getLayoutUpdateType(2)).toBe("ARG");
+        });
+
+        it("returns 'ARG' for connectionIndex 1 and 2 on expandable arg blocks", () => {
+            mockPb.style = "arg";
+            mockPb.expandable = true;
+            expect(block.isArgBlock()).toBe(true);
+            expect(block.isExpandableBlock()).toBe(true);
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+            expect(block.getLayoutUpdateType(2)).toBe("ARG");
+        });
+
+        it("returns 'FLOW' for flow connections (connectionIndex === n - 2)", () => {
+            mockPb.style = "flow";
+            mockPb.expandable = false;
+            block.connections = [null, null];
+            block.docks = [
+                [0, 0, "out"],
+                [0, 20, "in"]
+            ];
+            expect(block.getLayoutUpdateType(0)).toBe("FLOW");
+        });
+
+        it("returns null for other connection indices", () => {
+            expect(block.getLayoutUpdateType(0)).toBeNull();
+            expect(block.getLayoutUpdateType(3)).toBeNull();
+        });
+    });
+
+    describe("_newArtwork() clamp counts propagation", () => {
+        let block;
+        let mockPb;
+
+        beforeEach(() => {
+            mockPb = {
+                style: "arg",
+                expandable: true,
+                generator: jest.fn(() => ["<svg></svg>", [[0, 0]], 100, 40, 40])
+            };
+            block = new Block(mockPb, mockBlocks);
+            block.clampCount = [2, 3];
+            block.isInlineCollapsible = () => false;
+            block.isCollapsible = () => false;
+        });
+
+        it("passes both clamp counts to generator for argument blocks", () => {
+            block.name = "multiply";
+            block._newArtwork(1);
+            expect(mockPb.generator).toHaveBeenCalledWith(2, 3);
+        });
+
+        it("passes both clamp counts to generator for comparison blocks", () => {
+            for (const compName of ["equal", "greater", "less"]) {
+                block.name = compName;
+                mockPb.generator.mockClear();
+                block._newArtwork(1);
+                expect(mockPb.generator).toHaveBeenCalledWith(2, 3);
+            }
         });
     });
 });

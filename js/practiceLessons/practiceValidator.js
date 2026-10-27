@@ -137,7 +137,7 @@ const PracticeValidator = {
     },
 
     validatePattern(expectedPattern) {
-        const sequence = this.getCurrentSequence();
+        const sequence = this.getCurrentSequence(expectedPattern.length);
         return this.matchesPattern(sequence, expectedPattern);
     },
 
@@ -172,14 +172,14 @@ const PracticeValidator = {
         return true;
     },
 
-    getCurrentSequence() {
+    getCurrentSequence(maxLength) {
         const blockList = this.getBlockList();
         const startBlock = Object.values(blockList).find(
             block => block?.name === "start" && !block.trash
         );
         if (!startBlock) return [];
 
-        return this.extractPatternSequence(startBlock.connections?.[1], blockList);
+        return this.extractPatternSequence(startBlock.connections?.[1], blockList, maxLength);
     },
 
     assessBadges(problem) {
@@ -296,7 +296,7 @@ const PracticeValidator = {
         }
     },
 
-    extractPatternSequence(startId, blockList) {
+    extractPatternSequence(startId, blockList, maxLength) {
         const sequence = [];
         let currentId = this.unwrapHiddenFlow(startId, blockList);
         let guard = 0;
@@ -309,14 +309,30 @@ const PracticeValidator = {
                 const actionName = block.overrideName || block.privateData || block.value;
                 if (actionName) {
                     sequence.push(actionName);
+                    if (maxLength !== undefined && sequence.length > maxLength) {
+                        return sequence;
+                    }
                 }
             } else if (block.name === "repeat") {
                 const timesId = block.connections?.[1];
-                const times = Number(blockList[timesId]?.value) || 1;
-                const body = this.extractPatternSequence(block.connections?.[2], blockList);
+                const rawCount = this.getNumericValue(timesId, blockList);
+                // Match RepeatBlock.flow(): values below 1 or non-numbers run 0 times;
+                // fractional values are floored (see MathUtility.doRepeatCount).
+                const times = Number.isFinite(rawCount) && rawCount >= 1 ? Math.floor(rawCount) : 0;
+                const body = this.extractPatternSequence(
+                    block.connections?.[2],
+                    blockList,
+                    maxLength
+                );
 
-                for (let i = 0; i < times; i++) {
-                    sequence.push(...body);
+                if (body.length > 0) {
+                    for (let i = 0; i < times; i++) {
+                        sequence.push(...body);
+                        // Stop once the sequence is longer than the caller will ever accept.
+                        if (maxLength !== undefined && sequence.length > maxLength) {
+                            return sequence;
+                        }
+                    }
                 }
             }
 

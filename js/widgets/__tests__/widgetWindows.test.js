@@ -536,6 +536,45 @@ describe("widgetWindows", () => {
             expect(event.defaultPrevented).toBe(true);
             expect(window.onscroll).toBe(existingScrollHandler);
         });
+
+        const scrollableLog = win => {
+            const log = document.createElement("div");
+            log.style.overflowY = "auto";
+            Object.defineProperty(log, "scrollHeight", { value: 500 });
+            Object.defineProperty(log, "clientHeight", { value: 100 });
+            const message = document.createElement("p");
+            log.appendChild(message);
+            win._widget.appendChild(log);
+            return { log, message };
+        };
+
+        test("scrolls an inner scroll area under the pointer, such as a chat log", () => {
+            const win = createTestWindow();
+            const { log, message } = scrollableLog(win);
+
+            const event = new window.WheelEvent("wheel", {
+                deltaY: 30,
+                bubbles: true,
+                cancelable: true
+            });
+            message.dispatchEvent(event);
+
+            expect(log.scrollTop).toBe(30);
+            expect(win._widget.scrollTop).toBe(0);
+            expect(event.defaultPrevented).toBe(true);
+        });
+
+        test("scrolls the widget once the inner area cannot scroll further", () => {
+            const win = createTestWindow();
+            const { log, message } = scrollableLog(win);
+
+            message.dispatchEvent(
+                new window.WheelEvent("wheel", { deltaY: -30, bubbles: true, cancelable: true })
+            );
+
+            expect(log.scrollTop).toBe(0);
+            expect(win._scrollTargetFor(message, 0, -30)).toBe(win._widget);
+        });
     });
 
     describe("sendToCenter", () => {
@@ -894,6 +933,16 @@ describe("widgetWindows", () => {
             win.show();
 
             expect(win._frame.style.display).toBe("block");
+        });
+
+        test("show makes isVisible return true again", () => {
+            const win = createTestWindow();
+            window.widgetWindows.hideWindow(win._key);
+            expect(win.isVisible()).toBe(false);
+
+            win.show();
+
+            expect(win.isVisible()).toBe(true);
         });
 
         test("clear empties widget and toolbar", () => {
@@ -1359,6 +1408,8 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1.isVisible()).toBe(false);
+            expect(win2.isVisible()).toBe(false);
             expect(win1._frame.style.zIndex).toBe("10");
             expect(win1._overlayframe.style.zIndex).toBe("-1");
             expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
@@ -1372,6 +1423,7 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow(win._key);
 
             expect(win._frame.style.display).toBe("none");
+            expect(win.isVisible()).toBe(false);
             expect(window.widgetWindows.focused).toBeNull();
         });
 
@@ -1394,6 +1446,8 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("block");
             expect(win2._frame.style.display).toBe("block");
+            expect(win1.isVisible()).toBe(true);
+            expect(win2.isVisible()).toBe(true);
         });
 
         test("clear calls onclose on the named window", () => {

@@ -14,7 +14,7 @@
  * This file establishes the mocking infrastructure for the 7,500-line blocks.js.
  */
 
-/* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
+/* global jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
 const ManagedTimer = require("../utils/ManagedTimer");
@@ -1227,6 +1227,52 @@ describe("Blocks Foundation", () => {
             const copiedSolfege = blocks._copyBlocksToObj(false);
             expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
         });
+
+        it("copies a stand-in as the block it was loaded from", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.blockList = [
+                {
+                    name: "nopOneArgBlock",
+                    privateData: "eat",
+                    unknownBlock: "eat",
+                    connections: [null, 1, null],
+                    isValueBlock: jest.fn().mockReturnValue(false)
+                },
+                {
+                    name: "nopValueBlock",
+                    privateData: "apple",
+                    unknownBlock: ["apple", { value: 2 }],
+                    connections: [0],
+                    isValueBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+            blocks.selectedStack = 0;
+
+            expect(blocks._copyBlocksToObj(false)).toEqual([
+                [0, "eat", 75, 75, [null, 1, null]],
+                [1, ["apple", { value: 2 }], 0, 0, [0]]
+            ]);
+        });
+    });
+
+    describe("Unknown Blocks", () => {
+        it("keeps the entry an unknown block was loaded from on its stand-in", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks._makeNewBlockWithConnections = jest.fn((name, offset, conns, post, arg) => {
+                blocks.blockList.push({ name, connections: [] });
+                post(arg);
+            });
+            const entry = ["pluginblock", { value: 3 }];
+
+            blocks._processOneBlock(0, [[0, entry, 0, 0, [null, null]]], 0, 0);
+
+            expect(blocks._makeNewBlockWithConnections.mock.calls[0][0]).toBe("nopZeroArgBlock");
+            expect(blocks.blockList[0].privateData).toBe("pluginblock");
+            expect(blocks.blockList[0].unknownBlock).toBe(entry);
+        });
     });
 
     describe("Parameter Block Cache Updates", () => {
@@ -1291,6 +1337,27 @@ describe("Blocks Foundation", () => {
 
             expect(() => blocks._findTwoArgs()).not.toThrow();
             expect(blocks._expandablesList).toEqual([1]);
+        });
+
+        it("should include two-arg blocks and sort by nesting depth in _findTwoArgs", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._getNestingDepth = jest.fn(i => (i === 1 ? 5 : 2));
+            blocks.blockList = [
+                null,
+                {
+                    trash: false,
+                    isArgBlock: jest.fn().mockReturnValue(false),
+                    isTwoArgBlock: jest.fn().mockReturnValue(true)
+                },
+                {
+                    trash: false,
+                    isArgBlock: jest.fn().mockReturnValue(false),
+                    isTwoArgBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+
+            blocks._findTwoArgs();
+            expect(blocks._expandablesList).toEqual([2, 1]);
         });
 
         describe("after disposeBlock evicts a trashed stack", () => {
@@ -1805,6 +1872,45 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[2].rulerHistory).toEqual([[[[0, 2]], 3]]);
         });
 
+        it("restores the Phrase Maker cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                matrix: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const matrixCells = [
+                [1, [2, 0], 0],
+                // A row on the second pass of a repeat.
+                [1000001, [2, 1], 1],
+                "not a cell",
+                [-1, [2, 0], 0],
+                [1, null, 0],
+                [1, [2, "0"], 0]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["matrix", { collapsed: false, matrixCells }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].matrixCells).toEqual([
+                [3, [4, 0], 0],
+                [1000003, [4, 1], 1]
+            ]);
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is
@@ -2030,6 +2136,181 @@ describe("Blocks Foundation", () => {
 
             expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
             expect(mockActivity._suppressRefresh).toBe(false);
+        });
+    });
+
+    // ---------------------------------------------------------------------------
+    // Regression: invalid block connections in imported project data
+    // ---------------------------------------------------------------------------
+    // Each test below pins a specific corrupt-input shape against the real
+    // _processOneBlock path (no mock) to prove that the loader either aborts
+    // cleanly via abortLoad() or does NOT throw an unhandled exception.
+    //
+    // The four cases correspond to real failure modes that can occur when
+    // loading hand-edited or externally generated project JSON:
+    //
+    //   Case 1 – out-of-range parent pointer on an unknown block:
+    //     dock[0] of a block not in protoBlockDict references index 99, which
+    //     does not exist. _processOneBlock reaches the NOP-substitution path
+    //     and calls blockObjs[99][4].indexOf(b), which is a TypeError on
+    //     undefined. Expected: abortLoad fires (errorMsg called, no throw).
+    //
+    //   Case 2 – out-of-range last-connection pointer on an unknown block:
+    //     dock[0] is null (top-level block), but the last dock references
+    //     index 99. Same NOP path, same crash site one branch later.
+    //     Expected: abortLoad fires (errorMsg called, no throw).
+    //
+    //   Case 3 – non-array connections field:
+    //     blkData[4] is the string "bad" instead of an array. The metadata-
+    //     strip guard pops entries only when the *last* element is non-array;
+    //     a single non-array element at index 0 survives and reaches
+    //     _processOneBlock where blkData[4].length is "bad".length (3),
+    //     producing unexpected behavior. Expected: no throw, _loadInProgress
+    //     false.
+    //
+    //   Case 4 – connections array containing a negative index:
+    //     A value of -1 is syntactically valid JSON but semantically illegal.
+    //     blockObjs[-1] is undefined; the NOP path must not crash when it
+    //     tries to inspect that parent block. Expected: no throw,
+    //     _loadInProgress false.
+    // ---------------------------------------------------------------------------
+    describe("invalid block connections – regression (import load)", () => {
+        const { PubSub } = require("../pubsub");
+        let loadContainer;
+
+        /** Minimal activity stub that satisfies every code path _loadNewBlocksNow visits. */
+        function makeActivity() {
+            return {
+                storage: {},
+                trashcan: {},
+                turtles: { getTurtleCount: jest.fn(() => 0), addTurtle: jest.fn() },
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn(),
+                        preloadProjectSamples: jest.fn()
+                    },
+                    customTemperamentDefined: false
+                },
+                blocksContainer: { x: 0, y: 0, addChild: jest.fn(), children: [] },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+        }
+
+        /** Minimal Blocks instance wired up for the synchronous load path. */
+        function makeBlocks(activity, protoNames) {
+            const b = new Blocks(activity);
+            b.blockList = [];
+            b.protoBlockDict = {};
+            for (const name of protoNames || []) {
+                b.protoBlockDict[name] = {
+                    hasCapability: () => false,
+                    dockTypes: [],
+                    style: "flow"
+                };
+            }
+            b.setActionProtoVisibility = jest.fn();
+            b.customTemperamentDefined = true;
+            // Stub cleanup helpers that would require full DOM/audio.
+            b._findDrumURLs = jest.fn();
+            b.updateBlockPositions = jest.fn();
+            b._rebuildSpatialGrid = jest.fn();
+            b._cleanupStacks = jest.fn();
+            b.newNameddoBlock = jest.fn(() => false);
+            b.newStorein2Block = jest.fn();
+            b.newNamedboxBlock = jest.fn();
+            b.actionMetadata = jest.fn(() => ({ hasReturn: false, hasArgs: false }));
+            return b;
+        }
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        // Case 1 ----------------------------------------------------------------
+        it("does not throw when an unknown block's dock[0] points to a missing block index", () => {
+            // Block 0 is an unrecognised name, so _processOneBlock falls into the
+            // NOP-substitution branch. dock[0] = 99 is not in blockObjs.
+            // Without a guard, the code reaches blockObjs[99][4].indexOf(0) and
+            // throws "Cannot read properties of undefined".
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [
+                // [id, name, x, y, connections]
+                [0, "unknownBlockType", 100, 100, [99, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            // The load must finish (success or abortLoad); _loadInProgress must
+            // not remain stuck at true.
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
+        // Case 2 ----------------------------------------------------------------
+        it("does not throw when an unknown block's last dock points to a missing block index", () => {
+            // dock[0] is null so the NOP path tries the last-dock branch instead.
+            // last([null, 99]) === 99, and blockObjs[99] is undefined, so
+            // blockObjs[99][4].indexOf(b) throws without a guard.
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [[0, "unknownBlockType", 100, 100, [null, 99]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
+        // Case 3 ----------------------------------------------------------------
+        it("does not leave _loadInProgress stuck when the connections field is not an array", () => {
+            // Corrupt project data: blkData[4] is a string. The metadata-strip
+            // guard only removes the *last* element when it is non-array; a
+            // single non-array element at index 0 survives and reaches
+            // _processOneBlock. The load must not stall with _loadInProgress
+            // permanently true.
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [[0, "forward", 100, 100, "bad"]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+        });
+
+        // Case 4 ----------------------------------------------------------------
+        it("does not throw when a connections entry is a negative index", () => {
+            // -1 is valid JSON but an illegal block reference. blockObjs[-1] is
+            // undefined; the NOP substitution path must not crash when it reads
+            // that entry to determine the block's role (flow vs. arg).
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, []);
+
+            const blockObjs = [[0, "unknownBlockType", 100, 100, [-1, null]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
         });
     });
 
@@ -3622,6 +3903,383 @@ describe("Blocks Foundation", () => {
             expect(blocksInstance.blockList[0]).toBeNull();
         });
     });
+
+    describe("Batched block highlighting", () => {
+        const ArtworkBlock = require("../block");
+        let blocks;
+        let frames;
+        let realRequestAnimationFrame;
+
+        /** Run every callback queued for the next frame. */
+        function tick() {
+            const pending = frames;
+            frames = [];
+            for (const callback of pending) {
+                callback();
+            }
+        }
+
+        /** Run frames until the highlight queue drains, with a guard against a stuck queue. */
+        function drain() {
+            let guard = 0;
+            while (frames.length > 0) {
+                if (++guard > 50) {
+                    throw new Error("highlight queue never drained");
+                }
+                tick();
+            }
+        }
+
+        /**
+         * A stand-in for a Block that records the order in which highlight and
+         * unhighlight reached its artwork, so a test can assert that no state in a
+         * transition was skipped.
+         */
+        function makeHighlightableBlock() {
+            const rendered = [];
+            const block = {
+                trash: false,
+                inCollapsed: false,
+                collapsed: false,
+                container: { visible: true },
+                bitmap: { visible: true },
+                disconnectedBitmap: null,
+                highlightBitmap: { visible: false },
+                disconnectedHighlightBitmap: null,
+                highlightCollapseBlockBitmap: null,
+                collapseBlockBitmap: null,
+                collapseText: null,
+                isDisconnected: () => false,
+                isCollapsible: () => false,
+                updateCache: jest.fn(),
+                rendered,
+                highlight: jest.fn(() => {
+                    ArtworkBlock.prototype.highlight.call(block);
+                    rendered.push(true);
+                }),
+                unhighlight: jest.fn(() => {
+                    ArtworkBlock.prototype.unhighlight.call(block);
+                    rendered.push(false);
+                })
+            };
+            return block;
+        }
+
+        beforeEach(() => {
+            frames = [];
+            realRequestAnimationFrame = global.requestAnimationFrame;
+            global.requestAnimationFrame = callback => {
+                frames.push(callback);
+                return frames.length;
+            };
+
+            blocks = new Blocks(mockActivity);
+            blocks.visible = true;
+            blocks.blockList = [
+                makeHighlightableBlock(),
+                makeHighlightableBlock(),
+                makeHighlightableBlock()
+            ];
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = realRequestAnimationFrame;
+        });
+
+        it("defers artwork updates to an animation frame rather than writing synchronously", () => {
+            blocks.highlight(0, false);
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBe(0);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("batches every block queued during a frame into a single scheduled flush", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(1, false);
+            blocks.highlight(2, false);
+
+            // One frame is scheduled no matter how many blocks were queued.
+            expect(frames.length).toBe(1);
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[2].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("lights one block per frame, handing over without ever showing two", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(1, false);
+            blocks.highlight(2, false);
+
+            tick();
+            expect(blocks.blockList[0].rendered).toEqual([true]);
+            expect(blocks.blockList[1].rendered).toEqual([]);
+
+            // The outgoing block is turned off in the same frame the next one is lit,
+            // so the highlight is handed over rather than duplicated or dropped.
+            tick();
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+            expect(blocks.blockList[1].rendered).toEqual([true]);
+
+            tick();
+            expect(blocks.blockList[1].rendered).toEqual([true, false]);
+            expect(blocks.blockList[2].rendered).toEqual([true]);
+        });
+
+        it("never leaves two blocks highlighted at the same time", () => {
+            // Several blocks running between two frames is the case that made a
+            // per-block queue light all of them at once.
+            const lit = new Set();
+            for (const [index, block] of blocks.blockList.entries()) {
+                block.highlight.mockImplementation(() => {
+                    block.rendered.push(true);
+                    lit.add(index);
+                    expect(lit.size).toBeLessThanOrEqual(1);
+                });
+                block.unhighlight.mockImplementation(() => {
+                    block.rendered.push(false);
+                    lit.delete(index);
+                });
+            }
+
+            for (let i = 0; i < 3; i++) {
+                blocks.highlight(i, true);
+                blocks.unhighlight(i);
+            }
+
+            drain();
+
+            expect(lit.size).toBe(0);
+        });
+
+        it("collapses repeated requests for the state a block is already heading to", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(0, false);
+            blocks.highlight(0, false);
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("still renders a highlight that is unhighlighted within the same frame", () => {
+            // At full playback speed a block is highlighted and unhighlighted between two
+            // frames. The highlight must survive rather than being coalesced away.
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+        });
+
+        it("keeps the backlog bounded when a block flashes repeatedly in one frame", () => {
+            for (let i = 0; i < 20; i++) {
+                blocks.highlight(0, false);
+                blocks.unhighlight(0);
+            }
+
+            // A bounded queue means the block never falls more than one frame behind.
+            const pendingForBlock0 = blocks._highlightQueue.filter(step => step.blk === 0);
+            expect(pendingForBlock0.length).toBeLessThanOrEqual(2);
+
+            drain();
+
+            // The block still visibly flashes, and ends up unhighlighted as requested.
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("bounds a burst across many blocks and finishes with every highlight cleared", () => {
+            blocks.blockList = Array.from({ length: 40 }, makeHighlightableBlock);
+            blocks.highlight(0, false);
+            tick();
+
+            for (let i = 1; i < blocks.blockList.length; i++) {
+                blocks.highlight(i, false);
+                blocks.unhighlight(i);
+                expect(blocks._highlightQueue.length).toBeLessThanOrEqual(24);
+            }
+
+            drain();
+
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+            expect(blocks.blockList[39].rendered).toEqual([true, false]);
+            expect(blocks.blockList.every(block => !block.highlightBitmap.visible)).toBe(true);
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(blocks._highlightQueue).toHaveLength(0);
+        });
+
+        it("does not queue a redundant off/on pair when re-highlighting the same block", () => {
+            blocks.highlight(0, true);
+            drain();
+
+            blocks.highlight(0, true);
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("unhighlights the previously highlighted block when moving to a new one", () => {
+            blocks.highlight(0, true);
+            drain();
+
+            blocks.highlight(1, true);
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.highlightedBlock).toBe(1);
+        });
+
+        it("skips blocks that were trashed before the queue was flushed", () => {
+            blocks.highlight(0, false);
+            blocks.blockList[0].trash = true;
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks._renderedHighlight).toBeNull();
+        });
+
+        const undrawable = [
+            ["removed", list => delete list[1]],
+            ["null", list => (list[1] = null)],
+            ["trashed", list => (list[1].trash = true)],
+            ["in a collapsed stack", list => (list[1].inCollapsed = true)],
+            ["hidden", list => (list[1].container.visible = false)],
+            ["without a container", list => (list[1].container = null)],
+            ["without artwork", list => (list[1].bitmap = null)],
+            ["with hidden artwork", list => (list[1].bitmap.visible = false)],
+            [
+                "with both normal and disconnected artwork hidden",
+                list => {
+                    list[1].bitmap.visible = false;
+                    list[1].disconnectedBitmap = { visible: false };
+                }
+            ]
+        ];
+
+        it.each(undrawable)(
+            "keeps the current highlight when the next block is %s",
+            (_reason, makeUndrawable) => {
+                blocks.highlight(0, false);
+                tick();
+                const skipped = blocks.blockList[1];
+                blocks.highlight(1, false);
+                makeUndrawable(blocks.blockList);
+
+                tick();
+
+                expect(skipped.highlight).not.toHaveBeenCalled();
+                expect(blocks.blockList[0].highlightBitmap.visible).toBe(true);
+                expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+                expect(blocks._renderedHighlight).toBe(0);
+                expect(frames).toHaveLength(0);
+            }
+        );
+
+        it.each(undrawable)(
+            "renders the next visible block in the same frame when a queued block is %s",
+            (_reason, makeUndrawable) => {
+                blocks.highlight(0, false);
+                tick();
+                const skipped = blocks.blockList[1];
+                blocks.highlight(1, false);
+                blocks.unhighlight(1);
+                blocks.highlight(2, false);
+                makeUndrawable(blocks.blockList);
+
+                tick();
+
+                expect(skipped.highlight).not.toHaveBeenCalled();
+                expect(blocks.blockList[0].highlightBitmap.visible).toBe(false);
+                expect(blocks.blockList[2].highlightBitmap.visible).toBe(true);
+                expect(blocks._renderedHighlight).toBe(2);
+                expect(frames).toHaveLength(0);
+            }
+        );
+
+        it("highlights a block whose disconnected artwork is visible", () => {
+            const block = blocks.blockList[0];
+            block.bitmap.visible = false;
+            block.disconnectedBitmap = { visible: true };
+            block.disconnectedHighlightBitmap = { visible: false };
+            block.isDisconnected = () => true;
+            blocks.highlight(0, false);
+
+            tick();
+
+            expect(block.disconnectedHighlightBitmap.visible).toBe(true);
+            expect(blocks._renderedHighlight).toBe(0);
+        });
+
+        it("unhighlightAll clears highlights drawn directly outside the queue", () => {
+            for (const block of blocks.blockList) {
+                block.highlight();
+            }
+            blocks.blockList.push(null, { trash: true, unhighlight: jest.fn() });
+
+            blocks.unhighlightAll();
+
+            for (const block of blocks.blockList.slice(0, 3)) {
+                expect(block.highlightBitmap.visible).toBe(false);
+                expect(block.unhighlight).toHaveBeenCalledTimes(1);
+            }
+            expect(blocks.blockList[4].unhighlight).not.toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBeNull();
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(frames).toHaveLength(0);
+        });
+
+        it("unhighlightAll cancels pending transitions so a later frame cannot relight blocks", () => {
+            blocks.highlight(0, false);
+            tick();
+            blocks.highlight(1, true);
+            blocks.highlight(2, true);
+
+            blocks.unhighlightAll();
+            drain();
+
+            expect(blocks._highlightQueue).toHaveLength(0);
+            expect(blocks.highlightedBlock).toBeNull();
+            expect(blocks._renderedHighlight).toBeNull();
+            expect(blocks.blockList[0].highlightBitmap.visible).toBe(false);
+            expect(blocks.blockList[1].highlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[2].highlight).not.toHaveBeenCalled();
+
+            blocks.highlight(2, true);
+            tick();
+            expect(blocks.blockList[2].highlightBitmap.visible).toBe(true);
+        });
+
+        it("queues nothing and leaves artwork alone while the blocks are hidden", () => {
+            blocks.blockList[0].highlight();
+            blocks.visible = false;
+
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+            blocks.unhighlightAll();
+
+            expect(frames.length).toBe(0);
+            expect(blocks._highlightQueue.length).toBe(0);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[0].highlightBitmap.visible).toBe(true);
+        });
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -4506,5 +5164,364 @@ describe("sendStackToTrash – turtle container guard", () => {
         expect(container1.visible).toBe(false);
         expect(mockTurtleList[0].inTrash).toBe(true);
         expect(mockTurtleList[1].inTrash).toBe(true);
+    });
+
+    describe("_adjustExpandableTwoArgBlock", () => {
+        let blocksInstance;
+        let setxyBlock;
+        let child0;
+        let child1;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+            blocksInstance.adjustDocks = jest.fn();
+
+            setxyBlock = {
+                name: "setxy",
+                trash: false,
+                connections: [null, null, null, null],
+                clampCount: [1, 1],
+                size: 2,
+                updateSlots: jest.fn((clamp, plusMinus) => {
+                    setxyBlock.clampCount[clamp] += plusMinus;
+                    setxyBlock.size += plusMinus;
+                }),
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => true
+            };
+
+            child0 = {
+                name: "multiply",
+                trash: false,
+                connections: [0, null, null],
+                clampCount: [1, 1],
+                size: 2,
+                protoblock: { args: 2 },
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isExpandableBlock: () => true
+            };
+
+            child1 = {
+                name: "random",
+                trash: false,
+                connections: [0, null, null],
+                clampCount: [1, 1],
+                size: 3,
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isExpandableBlock: () => false
+            };
+
+            blocksInstance.blockList = [setxyBlock, child0, child1];
+        });
+
+        it("does nothing when input array is empty or falsy", () => {
+            blocksInstance._adjustExpandableTwoArgBlock([]);
+            blocksInstance._adjustExpandableTwoArgBlock(null);
+            expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
+            expect(blocksInstance.adjustDocks).not.toHaveBeenCalled();
+        });
+
+        it("skips trashed or missing blocks in argBlocksToCheck", () => {
+            blocksInstance.blockList[5] = { trash: true };
+            blocksInstance._adjustExpandableTwoArgBlock([5, 99]);
+            expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
+        });
+
+        it("expands slot 0 when first argument child has size > 1", () => {
+            setxyBlock.connections[1] = 1;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 1);
+            expect(setxyBlock.clampCount[0]).toBe(2);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands slot 1 when second argument child has size > 1", () => {
+            setxyBlock.connections[2] = 2;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(setxyBlock.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands both slots when both argument children have size > 1", () => {
+            setxyBlock.connections[1] = 1;
+            setxyBlock.connections[2] = 2;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 1);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(setxyBlock.clampCount[0]).toBe(2);
+            expect(setxyBlock.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("contracts slots back to 1 when argument children are disconnected", () => {
+            setxyBlock.clampCount = [3, 2];
+            setxyBlock.connections[1] = null;
+            setxyBlock.connections[2] = null;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, -2);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, -1);
+            expect(setxyBlock.clampCount[0]).toBe(1);
+            expect(setxyBlock.clampCount[1]).toBe(1);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands slot 1 on expandable two-arg arg blocks when second argument has size > 1", () => {
+            child0.connections[2] = 2;
+            child0.updateSlots = jest.fn((clamp, plusMinus) => {
+                child0.clampCount[clamp] += plusMinus;
+                child0.size += plusMinus;
+            });
+
+            blocksInstance._adjustExpandableTwoArgBlock([1]);
+
+            expect(child0.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(child0.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(1, true);
+        });
+
+        it("processes deeper nested blocks first so parent reads updated child size", () => {
+            child0.updateSlots = jest.fn((clamp, plusMinus) => {
+                child0.clampCount[clamp] += plusMinus;
+                child0.size += plusMinus;
+            });
+            child0.connections = [0, 2, null];
+            setxyBlock.connections = [null, 1, null, null];
+
+            blocksInstance.insideExpandableBlock = jest.fn(blk => {
+                if (blk === 2) return 1;
+                if (blk === 1) return 0;
+                return null;
+            });
+
+            blocksInstance._adjustExpandableTwoArgBlock([0, 1]);
+
+            expect(child0.updateSlots).toHaveBeenCalledWith(0, 2);
+            expect(child0.size).toBe(4);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+        });
+
+        it("does not expand slot 1 on three-arg or four-arg blocks whose style is twoarg", () => {
+            const threeArgBlock = {
+                name: "rodiPixel",
+                trash: false,
+                connections: [null, 1, 2, null],
+                clampCount: [1, 1],
+                size: 3,
+                protoblock: { args: 3, style: "twoarg" },
+                updateSlots: jest.fn(),
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => true
+            };
+            blocksInstance.blockList.push(threeArgBlock);
+            const blkIndex = blocksInstance.blockList.length - 1;
+
+            blocksInstance._adjustExpandableTwoArgBlock([blkIndex]);
+
+            expect(threeArgBlock.updateSlots).not.toHaveBeenCalledWith(1, expect.any(Number));
+        });
+
+        it("expands setxy slot 0 to fit a distance block with 4 arguments", () => {
+            const distanceBlock = {
+                name: "distance",
+                trash: false,
+                connections: [0, null, null, null, null],
+                clampCount: [1],
+                size: 4,
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true
+            };
+            setxyBlock.connections[1] = 3;
+            blocksInstance.blockList[3] = distanceBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+            expect(setxyBlock.clampCount[0]).toBe(4);
+            expect(setxyBlock.size).toBe(5);
+        });
+
+        it("removes legacy vspace blocks below setxy when adjusting two-arg flow block", () => {
+            const vspaceBlock = {
+                name: "vspace",
+                trash: false,
+                connections: [0, 4],
+                hide: jest.fn()
+            };
+            const pendownBlock = {
+                name: "pendown",
+                trash: false,
+                connections: [3, null]
+            };
+            setxyBlock.connections[3] = 3;
+            blocksInstance.blockList[3] = vspaceBlock;
+            blocksInstance.blockList[4] = pendownBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.connections[3]).toBe(4);
+            expect(pendownBlock.connections[0]).toBe(0);
+            expect(vspaceBlock.trash).toBe(true);
+            expect(vspaceBlock.connections).toEqual([null, null]);
+            expect(vspaceBlock.hide).toHaveBeenCalled();
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("removes legacy vspace blocks and contracts when compound second argument is disconnected", () => {
+            const vspaceBlock = {
+                name: "vspace",
+                trash: false,
+                connections: [0, 4],
+                hide: jest.fn()
+            };
+            const pendownBlock = {
+                name: "pendown",
+                trash: false,
+                connections: [3, null]
+            };
+            setxyBlock.clampCount = [1, 2];
+            setxyBlock.connections = [null, null, null, 3];
+            blocksInstance.blockList[3] = vspaceBlock;
+            blocksInstance.blockList[4] = pendownBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, -1);
+            expect(setxyBlock.clampCount[1]).toBe(1);
+            expect(setxyBlock.connections[3]).toBe(4);
+            expect(pendownBlock.connections[0]).toBe(0);
+            expect(vspaceBlock.trash).toBe(true);
+        });
+
+        it("ignores two-arg flow blocks in _addRemoveVspaceBlock", () => {
+            const vspaceAdjusterSpy = jest.spyOn(blocksInstance, "_makeNewBlockWithConnections");
+            setxyBlock.connections = [null, 1, 2, null];
+            blocksInstance._addRemoveVspaceBlock(0);
+            expect(vspaceAdjusterSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("insideExpandableBlock", () => {
+        let blocksInstance;
+        let setxyBlock;
+        let multiplyBlock;
+        let plusBlock;
+        let randomBlock;
+        let pendownBlock;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+
+            setxyBlock = {
+                name: "setxy",
+                connections: [null, 1, null, 4],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => true,
+                isArgBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            multiplyBlock = {
+                name: "multiply",
+                connections: [0, null, 2],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            plusBlock = {
+                name: "plus",
+                connections: [1, null, 3],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            randomBlock = {
+                name: "random",
+                connections: [2, null, null],
+                isExpandableBlock: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            pendownBlock = {
+                name: "pendown",
+                connections: [0, null],
+                isExpandableBlock: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            blocksInstance.blockList = [
+                setxyBlock,
+                multiplyBlock,
+                plusBlock,
+                randomBlock,
+                pendownBlock
+            ];
+        });
+
+        it("returns null if blk is null or not in blockList", () => {
+            expect(blocksInstance.insideExpandableBlock(null)).toBeNull();
+            expect(blocksInstance.insideExpandableBlock(99)).toBeNull();
+        });
+
+        it("returns null for a root block without a parent connection", () => {
+            expect(blocksInstance.insideExpandableBlock(0)).toBeNull();
+        });
+
+        it("returns the parent expandable block for a child connected to first argument slot", () => {
+            expect(blocksInstance.insideExpandableBlock(1)).toBe(0);
+        });
+
+        it("returns the parent arg block when a child expression is in the second argument slot", () => {
+            expect(blocksInstance.insideExpandableBlock(2)).toBe(1);
+        });
+
+        it("correctly traverses nested expressions in second argument slots", () => {
+            expect(blocksInstance.insideExpandableBlock(3)).toBe(2);
+            expect(blocksInstance.insideExpandableBlock(2)).toBe(1);
+            expect(blocksInstance.insideExpandableBlock(1)).toBe(0);
+        });
+
+        it("calculates accurate nesting depths for nested expressions in the second argument slot", () => {
+            const depth3 = blocksInstance._getNestingDepth(3);
+            const depth2 = blocksInstance._getNestingDepth(2);
+            const depth1 = blocksInstance._getNestingDepth(1);
+            const depth0 = blocksInstance._getNestingDepth(0);
+
+            expect(depth3).toBe(4);
+            expect(depth2).toBe(3);
+            expect(depth1).toBe(2);
+            expect(depth0).toBe(1);
+
+            expect(depth3).toBeGreaterThan(depth2);
+            expect(depth2).toBeGreaterThan(depth1);
+            expect(depth1).toBeGreaterThan(depth0);
+        });
+
+        it("treats the last connection of a flow block as downstream flow rather than inside the block", () => {
+            expect(blocksInstance.insideExpandableBlock(4)).toBeNull();
+        });
     });
 });

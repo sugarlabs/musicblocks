@@ -37,7 +37,7 @@ function setupOrnamentActions(activity) {
         /**
          * Shortens the length of the actual note while maintaining the specified rhythmic value of the notes.
          *
-         * @param {Number} value - staccato value
+         * @param {Number} value - staccato value (must be a positive finite number)
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} [blk] - corresponding Block index in blocks.blockList
          * @returns {void}
@@ -45,8 +45,8 @@ function setupOrnamentActions(activity) {
         static setStaccato(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (!Number.isFinite(value) || value === 0) {
-                activity.errorMsg(_("Staccato value must be non-zero."), blk);
+            if (!Number.isFinite(value) || value <= 0 || !Number.isFinite(1 / value)) {
+                activity.errorMsg(_("Staccato value must be a positive number."), blk);
                 return;
             }
             tur.singer.staccato.push(1 / value);
@@ -67,7 +67,7 @@ function setupOrnamentActions(activity) {
         /**
          * Lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.
          *
-         * @param {Number} value - slur value
+         * @param {Number} value - slur value (must be a positive finite number)
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} [blk] - corresponding Block index in blocks.blockList
          * @returns {void}
@@ -75,8 +75,8 @@ function setupOrnamentActions(activity) {
         static setSlur(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (!Number.isFinite(value) || value === 0) {
-                activity.errorMsg(_("Slur value must be non-zero."), blk);
+            if (!Number.isFinite(value) || value <= 0 || !Number.isFinite(1 / value)) {
+                activity.errorMsg(_("Slur value must be a positive number."), blk);
                 return;
             }
             tur.singer.staccato.push(-1 / value);

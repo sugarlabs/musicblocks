@@ -601,6 +601,9 @@ class Singer {
         const savePrevTurtleTime = tur.singer.previousTurtleTime;
         const saveTurtleTime = tur.singer.turtleTime;
 
+        const previousButNotThese = tur.butNotThese;
+        tur.butNotThese = deepClone(tur.butNotThese);
+
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
@@ -660,7 +663,7 @@ class Singer {
         tur.singer.justCounting.pop();
         tur.singer.suppressOutput = saveSuppressStatus;
 
-        tur.butNotThese = {};
+        tur.butNotThese = previousButNotThese;
 
         return returnValue[0] / returnValue[1];
     }
@@ -704,6 +707,9 @@ class Singer {
             meter: saveMeterState(tur.singer),
             tallyNotes: tur.singer.tallyNotes
         };
+
+        const previousButNotThese = tur.butNotThese;
+        tur.butNotThese = deepClone(tur.butNotThese);
 
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
@@ -753,7 +759,7 @@ class Singer {
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
         tur.singer.justCounting.pop();
-        tur.butNotThese = {};
+        tur.butNotThese = previousButNotThese;
 
         return returnValue;
     }
@@ -1234,10 +1240,11 @@ class Singer {
                 activity.logo.legoWidget.rowArgs.push(noteObj[1]);
             }
         } else if (tur.singer.inNoteBlock.length > 0) {
-            const addPitch = (note, octave, cents, direction) => {
-                // Apply transpositions
-                const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
+            const addPitch = (note, octave, cents, isInterval, direction) => {
+                // Apply transpositions, but only to the base note of an
+                // interval: the interval notes are built from it.
+                const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
+                const alen = isInterval ? 0 : tur.singer.arpeggio.length;
                 let atrans = transposition;
                 let anote = note;
                 let noteObj;
@@ -1273,7 +1280,8 @@ class Singer {
                     }
                 }
 
-                const pitchTransform = atrans + tur.singer.register * getOctaveInterval(activity);
+                const register = isInterval ? 0 : tur.singer.register;
+                const pitchTransform = atrans + register * getOctaveInterval(activity);
                 noteObj = getNote(
                     anote,
                     octave,
@@ -1290,7 +1298,7 @@ class Singer {
                 // (2) apply ratio
                 // (3) convert back to pitch, octave, cents
                 let ratio = 1;
-                const transpositionRatios = tur.singer.transpositionRatios;
+                const transpositionRatios = isInterval ? [] : tur.singer.transpositionRatios;
                 for (let i = 0, len = transpositionRatios.length; i < len; i++) {
                     ratio *= transpositionRatios[i];
                 }
@@ -1341,7 +1349,8 @@ class Singer {
                           )
                 );
 
-                return noteObj;
+                // Return the cents too, so the interval notes can keep them.
+                return [noteObj[0], noteObj[1], cents];
             };
 
             const noteObj1 = addPitch(note, octave, cents);
@@ -1358,7 +1367,7 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
             }
 
             const semitoneIntervals = tur.singer.semitoneIntervals;
@@ -1374,7 +1383,7 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents, semitoneInterval[1]);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true, semitoneInterval[1]);
             }
 
             // Combo of a scalar interval and a semitone interval
@@ -1392,14 +1401,14 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
             }
 
             const ratioIntervals = tur.singer.ratioIntervals;
             const baseFrequency = getCachedPitchToFrequency(
                 noteObj1[0],
                 noteObj1[1],
-                0,
+                noteObj1[2],
                 tur.singer.keySignature,
                 activity.logo.synth.inTemperament
             );
@@ -1410,7 +1419,7 @@ class Singer {
                 // (3) convert it to pitch, octave, cents
                 const hertz = baseFrequency * ratioIntervals[i];
                 const noteObj2 = frequencyToPitch(hertz);
-                addPitch(noteObj2[0], noteObj2[1], noteObj2[2]);
+                addPitch(noteObj2[0], noteObj2[1], noteObj2[2], true);
             }
 
             if (tur.singer.inNoteBlock.length > 0) {
@@ -1498,12 +1507,13 @@ class Singer {
 
             tur.singer.inNoteBlock.push(blk);
 
-            const addPitch = (note, octave, cents, direction) => {
-                // Apply transpositions
-                const transposition = 2 * delta + tur.singer.transposition;
+            const addPitch = (note, octave, cents, isInterval, direction) => {
+                // Apply transpositions, but only to the base note of an
+                // interval: the interval notes are built from it.
+                const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
+                const register = isInterval ? 0 : tur.singer.register;
 
-                const pitchTransform =
-                    transposition + tur.singer.register * getOctaveInterval(activity);
+                const pitchTransform = transposition + register * getOctaveInterval(activity);
                 const noteObj = getNote(
                     note,
                     octave,
@@ -1559,7 +1569,7 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents);
+                addPitch(noteObj2[0], noteObj2[1], cents, true);
             }
 
             const semitoneIntervals = tur.singer.semitoneIntervals;
@@ -1575,7 +1585,7 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents, semitoneInterval[1]);
+                addPitch(noteObj2[0], noteObj2[1], cents, true, semitoneInterval[1]);
             }
 
             if (tur.singer.inNoteBlock.length > 0) {
@@ -1607,9 +1617,10 @@ class Singer {
      */
     static processNote(activity, noteValue, isOsc, blk, turtle, callback) {
         const tur = activity.turtles.ithTurtle(turtle);
-        const bpmFactor =
-            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        const bpmValue = Number(last(tur.singer.bpm));
+        const bpmValue = Number(
+            tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM
+        );
+        const bpmFactor = TONEBPM / bpmValue;
 
         let noteBeatValue = isOsc
             ? noteValue === 0
@@ -2475,7 +2486,8 @@ class Singer {
                                         d,
                                         turtle,
                                         bpmValue || 90,
-                                        last(tur.singer.instrumentNames)
+                                        last(tur.singer.instrumentNames),
+                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat]
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {

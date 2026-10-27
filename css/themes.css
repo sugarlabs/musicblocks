@@ -563,11 +563,11 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse) 080 !important;
+    background-color: #000080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse) 0ff !important;
+    background-color: #0000ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -654,12 +654,12 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .highcontrast #chooseKeyDiv {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #movable {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .dropdown-content li > a {
@@ -1678,4 +1678,39 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: var(--color-bg-primary) !important;
     color: var(--color-text-primary) !important;
     border: 1px solid var(--color-border-primary) !important;
+}
+
+/* Music Keyboard Widget & Keys across themes */
+table.white > tbody > tr > td {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+table.black > tbody > tr > td:not(.spacer) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+table.black > tbody > tr > td.spacer {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.dark #mkbKeyboardDiv,
+.dark #mkbTableDiv,
+.dark #mkbButtonsDiv,
+.dark #keyboardHolder2,
+.dark #mkbOuterDiv {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.highcontrast #mkbKeyboardDiv,
+.highcontrast #mkbTableDiv,
+.highcontrast #mkbButtonsDiv,
+.highcontrast #keyboardHolder2,
+.highcontrast #mkbOuterDiv {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
 }

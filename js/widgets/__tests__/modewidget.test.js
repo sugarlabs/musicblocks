@@ -309,7 +309,7 @@ describe("ModeWidget", () => {
             },
             turtles: {
                 ithTurtle: jest.fn().mockReturnValue({
-                    singer: { keySignature: ["C"] }
+                    singer: { keySignature: "C major" }
                 })
             },
             blocks: {
@@ -323,6 +323,42 @@ describe("ModeWidget", () => {
         };
 
         modeWidget = new ModeWidget(mockActivity);
+    });
+
+    test("should initialize pitch from natural key signature", () => {
+        expect(modeWidget._pitch).toBe("C");
+    });
+
+    test("should initialize pitch without truncating accidental roots in key signature", () => {
+        const testCases = [
+            { keySig: "C major", expectedPitch: "C" },
+            { keySig: "F# major", expectedPitch: "F#" },
+            { keySig: "Bb minor", expectedPitch: "Bb" },
+            { keySig: "Db dorian", expectedPitch: "Db" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
+    });
+
+    test("should handle legacy array keySignature values without error", () => {
+        const testCases = [
+            { keySig: ["C"], expectedPitch: "C" },
+            { keySig: ["F#", "major"], expectedPitch: "F#" }
+        ];
+
+        testCases.forEach(({ keySig, expectedPitch }) => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: { keySignature: keySig }
+            });
+            const widget = new ModeWidget(mockActivity);
+            expect(widget._pitch).toBe(expectedPitch);
+        });
     });
 
     test("should calculate major scale intervals correctly", () => {
@@ -511,18 +547,6 @@ describe("ModeWidget", () => {
     });
 
     describe("_wireEdoSelect", () => {
-        // Fires the real listener _wireEdoSelect registered via
-        // addEventListener, since this file stubs document.createElement
-        // to a plain mock (see top of file) rather than a real jsdom
-        // element that supports dispatchEvent.
-        function fireEdoChange(select, value) {
-            select.value = value;
-            const handler = select.addEventListener.mock.calls.find(
-                call => call[0] === "change"
-            )[1];
-            handler();
-        }
-
         test("rescales _selectedNotes to a never-before-visited EDO instead of leaving it untranslated", () => {
             modeWidget._activeTemperamentKey = "equal";
             modeWidget.logo.synth.inTemperament = "equal";
@@ -543,6 +567,7 @@ describe("ModeWidget", () => {
                 true
             ];
             modeWidget._edoNoteCache = {};
+            const select = prepareSelect(modeWidget);
 
             const savedGetCurrentEDO = global.getCurrentEDO;
             const savedTemperament = global.TEMPERAMENT;
@@ -552,7 +577,7 @@ describe("ModeWidget", () => {
                 equal19: { isEDO: true, pitchNumber: 19 }
             };
 
-            fireEdoChange(modeWidget._edoSelect, "equal19");
+            fireEdoChange(select, "equal19");
 
             expect(modeWidget._activeEDO).toBe(19);
             expect(modeWidget._selectedNotes).toHaveLength(19);
@@ -588,6 +613,7 @@ describe("ModeWidget", () => {
             ];
             modeWidget._selectedNotes = twelveEdoNotes.slice();
             modeWidget._edoNoteCache = {};
+            const select = prepareSelect(modeWidget);
 
             const savedGetCurrentEDO = global.getCurrentEDO;
             const savedTemperament = global.TEMPERAMENT;
@@ -598,8 +624,8 @@ describe("ModeWidget", () => {
             };
 
             // Visit 19-EDO once, then switch back to 12-EDO.
-            fireEdoChange(modeWidget._edoSelect, "equal19");
-            fireEdoChange(modeWidget._edoSelect, "equal");
+            fireEdoChange(select, "equal19");
+            fireEdoChange(select, "equal");
 
             expect(modeWidget._activeEDO).toBe(12);
             expect(modeWidget._selectedNotes).toEqual(twelveEdoNotes);
@@ -699,6 +725,171 @@ describe("ModeWidget", () => {
         modeNameSpy.mockRestore();
     });
 
+    // Shared 41-EDO custom-mode fixture for the tuning-persistence tests.
+    function setup41EDOMode() {
+        MUSICALMODES["m41"] = Array(41).fill(1);
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([
+                { name: "m41", pattern: Array(41).fill(1), edo: 41, temperamentKey: "equal41" }
+            ])
+        );
+        global.TEMPERAMENT.equal41 = { isEDO: true, edo: 41, pitchNumber: 41 };
+        // Fidelity note: global.isEquallyTempered here is the REAL function and the
+        // real temperament dict has no equal41, so without this override the widget
+        // takes the non-equal path and the repro is unfaithful:
+        const savedIsEquallyTempered = global.isEquallyTempered;
+        global.isEquallyTempered = k => k === "equal" || k === "equal41";
+        const savedGetCurrentEDO = global.getCurrentEDO;
+        global.getCurrentEDO = k => (k === "equal41" ? 41 : 12);
+        return () => {
+            delete MUSICALMODES["m41"];
+            delete global.TEMPERAMENT.equal41;
+            localStorage.removeItem("customModes");
+            delete mockActivity.logo.synth.inTemperament; // shared mock: restore pristine shape
+            global.isEquallyTempered = savedIsEquallyTempered;
+            global.getCurrentEDO = savedGetCurrentEDO;
+        };
+    }
+
+    // Fires the real listener _wireEdoSelect registered via addEventListener,
+    // since this file stubs document.createElement to a plain mock (see top of
+    // file) rather than a real jsdom element that supports dispatchEvent.
+    function fireEdoChange(select, value) {
+        select.value = value;
+        const handler = select.addEventListener.mock.calls.find(call => call[0] === "change")[1];
+        handler();
+    }
+
+    function prepareSelect(widget) {
+        widget._edoSelect.options = [];
+        widget._edoSelect.appendChild = jest.fn(o => widget._edoSelect.options.push(o));
+        return widget._edoSelect;
+    }
+
+    test("opening a legacy 41-EDO mode adopts 41-EDO and unlocks the dropdown", () => {
+        const teardown = setup41EDOMode();
+        try {
+            const modes = JSON.parse(localStorage.getItem("customModes"));
+            delete modes[0].temperamentKey;
+            localStorage.setItem("customModes", JSON.stringify(modes));
+            global.keySignatureToMode.mockReturnValue(["C", "ionian"]);
+            global.getModePattern.mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+            const w2 = new ModeWidget(mockActivity);
+            const select = prepareSelect(w2);
+            fireEdoChange(select, "equal");
+            expect(w2._activeEDO).toBe(12);
+
+            w2._loadMode("m41", Array(41).fill(1), select);
+
+            expect(w2._activeEDO).toBe(41);
+            expect(w2._activeTemperamentKey).toBe("equal41");
+            expect(w2.logo.synth.inTemperament).toBe("equal41");
+            expect(select.value).toBe("equal41");
+
+            // The reported lock: the dropdown used to match a stale key and no-op.
+            fireEdoChange(select, "equal");
+
+            expect(w2._activeEDO).toBe(12);
+            expect(w2._activeTemperamentKey).toBe("equal");
+            expect(w2.logo.synth.inTemperament).toBe("equal");
+            expect(select.value).toBe("equal");
+            expect(w2._modeWheel.navItems).toHaveLength(12);
+            expect(w2._modeLabelCell.textContent).toBe("C ionian");
+        } finally {
+            teardown();
+        }
+    });
+
+    test("a 41-EDO mode saved with a 12-pitch key falls back to equal 41-EDO", () => {
+        const teardown = setup41EDOMode();
+        try {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    {
+                        name: "m41",
+                        pattern: Array(41).fill(1),
+                        edo: 41,
+                        temperamentKey: "just intonation"
+                    }
+                ])
+            );
+            global.keySignatureToMode.mockReturnValue(["C", "ionian"]);
+            global.getModePattern.mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+            const w2 = new ModeWidget(mockActivity);
+            const select = prepareSelect(w2);
+            w2._activeTemperamentKey = "just intonation";
+            w2.logo.synth.inTemperament = "just intonation";
+            w2._activeEDO = 12;
+
+            w2._loadMode("m41", Array(41).fill(1), select);
+
+            expect(w2._activeEDO).toBe(41);
+            expect(w2._activeTemperamentKey).toBe("equal41");
+            expect(w2.logo.synth.inTemperament).toBe("equal41");
+            expect(select.value).toBe("equal41");
+        } finally {
+            teardown();
+        }
+    });
+
+    test("ignores inherited object names in saved tuning keys", () => {
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([
+                {
+                    name: "protoMode",
+                    pattern: [2, 2, 1, 2, 2, 2, 1],
+                    edo: 12,
+                    temperamentKey: "__proto__"
+                }
+            ])
+        );
+        modeWidget._activeEDO = 12;
+        modeWidget._activeTemperamentKey = "equal";
+        modeWidget.logo.synth.inTemperament = "equal";
+
+        try {
+            modeWidget._loadMode("protoMode", [2, 2, 1, 2, 2, 2, 1], null);
+
+            expect(modeWidget._isKnownTemperament("equal")).toBe(true);
+            expect(modeWidget._isKnownTemperament("__proto__")).toBe(false);
+            expect(modeWidget._isKnownTemperament("toString")).toBe(false);
+            expect(modeWidget._activeEDO).toBe(12);
+            expect(modeWidget._activeTemperamentKey).toBe("equal");
+            expect(modeWidget.logo.synth.inTemperament).toBe("equal");
+        } finally {
+            localStorage.removeItem("customModes");
+        }
+    });
+
+    test("should persist and restore the temperament key with a custom mode", () => {
+        const pattern = Array(12).fill(1);
+        modeWidget._activeTemperamentKey = "just intonation";
+        modeWidget._activeEDO = 12;
+
+        expect(modeWidget._saveCustomMode("jiChromatic", pattern)).toBe(true);
+        expect(
+            JSON.parse(localStorage.getItem("customModes")).find(m => m.name === "jiChromatic")
+        ).toMatchObject({ temperamentKey: "just intonation" });
+
+        modeWidget._activeTemperamentKey = "equal";
+        modeWidget.logo.synth.inTemperament = "equal";
+        const fakeSelect = { options: [], appendChild: jest.fn() };
+
+        modeWidget._loadMode("jiChromatic", pattern, fakeSelect);
+
+        // Both the live synth tuning and the cached key follow the saved mode.
+        expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        expect(modeWidget._activeTemperamentKey).toBe("just intonation");
+        expect(modeWidget._activeEDO).toBe(12);
+        expect(modeWidget._selectedNotes).toEqual(Array(12).fill(true));
+        expect(fakeSelect.value).toBe("just intonation");
+
+        modeWidget._deleteCustomMode("jiChromatic");
+    });
+
     test("should detect a built-in mode at a non-12 EDO", () => {
         modeWidget._activeEDO = 19;
         modeWidget._modeLabelCell = { textContent: "" };
@@ -716,6 +907,46 @@ describe("ModeWidget", () => {
         modeWidget._setModeName();
 
         expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
+    });
+
+    describe("cross-EDO custom mode shadowing", () => {
+        // 41-EDO major: rescales to 12-EDO major, so only the EDO guard
+        // decides the match. All patterns resolve alike via the getModePattern mock.
+        const EDO41_MAJOR = [7, 7, 4, 7, 7, 7, 2];
+        const MAJOR12 = [2, 2, 1, 2, 2, 2, 1];
+        const CASES = [
+            ["another EDO", "EDO-41", 41, EDO41_MAJOR, "ionian"],
+            ["no edo at all", "legacy", undefined, MAJOR12, "legacy"]
+        ];
+        let savedCustomModes;
+
+        beforeEach(() => {
+            savedCustomModes = localStorage.getItem("customModes");
+            global.getModePattern.mockImplementation(() => MAJOR12);
+            modeWidget._activeEDO = 12;
+            modeWidget._activeTemperamentKey = "equal";
+        });
+
+        afterEach(() => {
+            CASES.forEach(([, name]) => delete MUSICALMODES[name]);
+            if (savedCustomModes === null) {
+                localStorage.removeItem("customModes");
+            } else {
+                localStorage.setItem("customModes", savedCustomModes);
+            }
+            modeWidget._rebuildModeIndex();
+        });
+
+        test.each(CASES)(
+            "a custom saved at %s resolves to %s",
+            (_label, name, edo, pattern, expected) => {
+                localStorage.setItem("customModes", JSON.stringify([{ name, pattern, edo }]));
+                MUSICALMODES[name] = pattern;
+                modeWidget._rebuildModeIndex();
+
+                expect(modeWidget._findModeNameForPattern(MAJOR12)).toBe(expected);
+            }
+        );
     });
 
     test("should refuse to overwrite a built-in mode on save", () => {
@@ -748,7 +979,12 @@ describe("ModeWidget", () => {
 
         modeWidget._importFile();
 
-        expect(saveSpy).toHaveBeenCalledWith("major (31 EDO)", [3, 4, 2, 3, 4, 3, 3], 31);
+        expect(saveSpy).toHaveBeenCalledWith(
+            "major (31 EDO)",
+            [3, 4, 2, 3, 4, 3, 3],
+            31,
+            "equal31"
+        );
         saveSpy.mockRestore();
         delete MUSICALMODES["major"];
     });
@@ -769,7 +1005,7 @@ describe("ModeWidget", () => {
 
         modeWidget._importFile();
 
-        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12);
+        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12, "equal");
         saveSpy.mockRestore();
     });
 
@@ -1078,6 +1314,43 @@ describe("ModeWidget", () => {
         });
     });
 
+    describe("narrow slice labels", () => {
+        // 48px font: "10" needs 57.6px, so 30deg fits and 10deg does not.
+        const makeItem = (title, sliceAngle) => ({
+            title,
+            sliceAngle,
+            selected: false,
+            navTitle: { hide: jest.fn(), show: jest.fn() },
+            navItem: { mouseover: jest.fn(), mouseout: jest.fn() }
+        });
+
+        let wheel;
+
+        beforeEach(() => {
+            wheel = {
+                // wheelnav derives this from WHEELSIZE / 2 (modewidget.js:1862).
+                wheelRadius: 200,
+                navItems: [makeItem("0", 30), makeItem("10", 10)]
+            };
+            modeWidget._hideNarrowLabels(wheel);
+        });
+
+        test("hides labels that do not fit, selection keeps the narrow one visible", () => {
+            const [wide, narrow] = wheel.navItems;
+
+            expect(wide._narrow).toBe(false);
+            expect(narrow._narrow).toBe(true);
+            expect(wide.navTitle.show).toHaveBeenCalled();
+            expect(wide.navTitle.hide).not.toHaveBeenCalled();
+            expect(narrow.navTitle.hide).toHaveBeenCalled();
+
+            narrow.selected = true;
+            modeWidget._syncNarrowLabels(wheel);
+            expect(narrow.navTitle.show).toHaveBeenCalled();
+            expect(wide.navTitle.hide).not.toHaveBeenCalled();
+        });
+    });
+
     describe("window maximization and scaling", () => {
         test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
             const widget = new ModeWidget(mockActivity);
@@ -1161,6 +1434,71 @@ describe("ModeWidget", () => {
             // Test: svg element is null
             modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
             expect(() => modeWidget._scale()).not.toThrow();
+        });
+    });
+
+    describe("Clear during animation", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            modeWidget._setModeName = jest.fn();
+            modeWidget._selectedNotes = Array.from({ length: 12 }, (_, i) =>
+                [0, 2, 4, 5, 7, 9, 11].includes(i)
+            );
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+        });
+
+        test.each(["_rotateRight", "_rotateLeft"])(
+            "Clear stays cleared after %s callbacks would have run",
+            rotate => {
+                modeWidget[rotate]();
+                jest.advanceTimersByTime(250);
+                modeWidget._clear();
+                jest.runAllTimers();
+
+                expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+                expect(modeWidget._locked).toBe(false);
+                for (let i = 1; i < 12; i++) {
+                    expect(modeWidget._noteWheel.navItems[i].navItem.hide).toHaveBeenCalled();
+                }
+                modeWidget._rotateRight();
+                jest.runAllTimers();
+                expect(modeWidget._locked).toBe(false);
+            }
+        );
+
+        test("Clear cancels rotation with the fallback timer implementation", () => {
+            modeWidget._timerManager = null;
+            modeWidget._rotateRight();
+            modeWidget._clear();
+            jest.runAllTimers();
+            expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+            expect(modeWidget._activeTimeouts.size).toBe(0);
+        });
+
+        test("Clear stops playback and restores its button", () => {
+            modeWidget._playing = true;
+            modeWidget._playAll();
+            const triggerCount = mockActivity.logo.synth.trigger.mock.calls.length;
+            const setIcon = jest.spyOn(modeWidget, "_setPlayButtonIcon");
+            modeWidget._clear();
+            jest.runAllTimers();
+
+            expect(modeWidget._playing).toBe(false);
+            expect(modeWidget._locked).toBe(false);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(triggerCount);
+            expect(setIcon).toHaveBeenCalledWith("play-button.svg", "Play all");
+        });
+
+        test("idle Clear preserves the root and can be undone", () => {
+            const original = [...modeWidget._selectedNotes];
+            modeWidget._clear();
+            expect(modeWidget._selectedNotes).toEqual(modeWidget._blankNotes(12));
+            modeWidget._undo();
+            expect(modeWidget._selectedNotes).toEqual(original);
         });
     });
 
@@ -1321,6 +1659,36 @@ describe("ModeWidget", () => {
 
             expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
             expect(widget._playing).toBe(false);
+        });
+    });
+
+    describe("proportional slice wiring", () => {
+        beforeEach(() => {
+            modeWidget._activeEDO = 12;
+            modeWidget._activeTemperamentKey = "just intonation";
+        });
+
+        test("one floored proportional array feeds all three rings from pitch 0", () => {
+            modeWidget._piemenuMode();
+
+            const widths = modeWidget._modeWheel.navItems.map(item => item.sliceAngle);
+            expect(widths).toHaveLength(12);
+            const navAngle = -90 + widths[0] / 2;
+            for (const wheel of [
+                modeWidget._modeWheel,
+                modeWidget._noteWheel,
+                modeWidget._playWheel
+            ]) {
+                expect(wheel.navItems.map(item => item.sliceAngle)).toEqual(widths);
+                expect(wheel.navAngle).toBeCloseTo(navAngle, 6);
+            }
+        });
+
+        test("equal temperament keeps its slice start at -90", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget._piemenuMode();
+
+            expect(modeWidget._modeWheel.navAngle).toBe(-90);
         });
     });
 });

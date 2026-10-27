@@ -125,6 +125,12 @@ describe("ReflectionMatrix", () => {
             );
         });
 
+        test("uses the HTTPS API on the GitHub Pages site", () => {
+            expect(ReflectionMatrix.backendURL("sugarlabs.github.io")).toBe(
+                "https://api.musicblocks.sugarlabs.org"
+            );
+        });
+
         test("uses the HTTPS API on a subdomain of the hosted site", () => {
             expect(ReflectionMatrix.backendURL("staging.musicblocks.sugarlabs.org")).toBe(
                 "https://api.musicblocks.sugarlabs.org"

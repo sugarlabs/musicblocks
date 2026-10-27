@@ -139,7 +139,7 @@ function setupDrumActions(activity) {
             // mapping that happens to exist when this clamp closes.
             const pitchDrumTableSnapshot = { ...tur.singer.pitchDrumTable };
 
-            const listenerName = "_setdrum_" + turtle;
+            const listenerName = "_setdrum_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {

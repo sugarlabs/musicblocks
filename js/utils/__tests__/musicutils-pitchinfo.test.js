@@ -56,6 +56,11 @@ describe("musicutils-pitchinfo", () => {
         expect(pitchinfo.getPitchInfo({}, "pitch number", "C4", singerTur())).toBe(60);
     });
 
+    it("resolves scale degree without 'undefined' suffix when accidental is omitted", () => {
+        const turFb = { singer: { keySignature: "F♭ major", movable: false } };
+        expect(pitchinfo.getPitchInfo({}, "scale degree", "B♯4", turFb)).toBe("4");
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of ["getStepSizeUp", "getStepSizeDown", "getPitchInfo"]) {
             expect(musicutils[name]).toBe(pitchinfo[name]);

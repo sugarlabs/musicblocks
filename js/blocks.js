@@ -75,6 +75,23 @@
  * @returns {void}
  */
 
+/**
+ * Maximum number of highlight transitions retained while the batched highlight
+ * queue is being drained. One block is lit per animation frame, so this bounds how
+ * far the highlight can trail the run queue: 24 transitions is at most 12 pending
+ * highlights, about a fifth of a second at 60fps. Bursts stay intact; a program
+ * that sustained more than one highlight per frame would drift without this.
+ */
+const MAXPENDINGHIGHLIGHTS = 24;
+
+/**
+ * Maximum number of unrendered transitions retained for any single block. A block
+ * that flashes repeatedly between two frames would otherwise strobe for as many
+ * frames as it has pending states, and hold up everything queued behind it. Two
+ * keeps the imminent state plus one more, so the flash is still drawn once.
+ */
+const MAXPENDINGPERBLOCK = 2;
+
 class Blocks {
     constructor(activityOrDeps) {
         // Build dependencies container
@@ -240,6 +257,17 @@ class Blocks {
 
         /** Which block, if any, is highlighted? */
         this.highlightedBlock = null;
+
+        /** Highlight transitions that have not been rendered yet, in the order they
+         * were requested. Each entry is { blk, state } with state true = highlighted.
+         * A single ordered queue, rather than one queue per block, is what keeps two
+         * blocks from ever being lit at the same time. */
+        this._highlightQueue = [];
+        /** Which block is currently drawn highlighted, as opposed to which block the
+         * run queue has most recently asked for. */
+        this._renderedHighlight = null;
+        /** Is a flush of the highlight queue already scheduled for the next frame? */
+        this._highlightScheduled = false;
         /** Which block, if any, is active? */
         this.activeBlock = null;
         /** Are the blocks visible? */
@@ -939,25 +967,90 @@ class Blocks {
          * @returns {void}
          */
         this._adjustExpandableTwoArgBlock = argBlocksToCheck => {
-            if (argBlocksToCheck.length === 0) {
+            if (!argBlocksToCheck || argBlocksToCheck.length === 0) {
                 return;
             }
 
-            const blk = argBlocksToCheck.pop();
-            const myBlock = this.blockList[blk];
+            // Filter out missing or trashed blocks before sorting
+            const validBlocks = argBlocksToCheck.filter(
+                blk => this.blockList[blk] && !this.blockList[blk].trash
+            );
 
-            /** Determine the size of the first argument. */
-            const c = myBlock.connections[1];
-            let firstArgumentSize = 1; /** Minimum size */
-            if (c !== null) {
-                firstArgumentSize = Math.max(this._getBlockSize(c), 1);
-            }
+            // Sort so deepest nested blocks are processed first when popped from the end
+            validBlocks.sort((a, b) => this._getNestingDepth(a) - this._getNestingDepth(b));
 
-            /** Expand/contract block by plusMinus. */
-            const plusMinus = firstArgumentSize - myBlock.clampCount[0];
-            if (plusMinus !== 0) {
-                if (!(firstArgumentSize === 0)) {
-                    myBlock.updateSlots(0, plusMinus);
+            while (validBlocks.length > 0) {
+                const blk = validBlocks.pop();
+                const myBlock = this.blockList[blk];
+
+                /** Determine the size of the first argument. */
+                const c1 = myBlock.connections[1];
+                let firstArgumentSize = 1; /** Minimum size */
+                if (c1 !== null && c1 !== undefined) {
+                    firstArgumentSize = Math.max(this._getBlockSize(c1), 1);
+                }
+
+                let updated = false;
+
+                /** Expand/contract slot 0 by plusMinus1. */
+                const plusMinus1 = firstArgumentSize - myBlock.clampCount[0];
+                if (plusMinus1 !== 0) {
+                    myBlock.updateSlots(0, plusMinus1);
+                    updated = true;
+                }
+
+                /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy) and two-arg arg blocks (e.g., multiply). */
+                const isTwoArgFlow =
+                    (typeof myBlock.isTwoArgBlock === "function"
+                        ? myBlock.isTwoArgBlock()
+                        : myBlock.name === "setxy") &&
+                    (!myBlock.protoblock || myBlock.protoblock.args === 2);
+                const isTwoArgArg =
+                    typeof myBlock.isArgBlock === "function" &&
+                    myBlock.isArgBlock() &&
+                    myBlock.protoblock &&
+                    myBlock.protoblock.args === 2;
+                if (isTwoArgFlow || isTwoArgArg) {
+                    /** Determine the size of the second argument. */
+                    const c2 = myBlock.connections[2];
+                    let secondArgumentSize = 1; /** Minimum size */
+                    if (c2 !== null && c2 !== undefined) {
+                        secondArgumentSize = Math.max(this._getBlockSize(c2), 1);
+                    }
+
+                    const plusMinus2 = secondArgumentSize - myBlock.clampCount[1];
+                    if (plusMinus2 !== 0) {
+                        myBlock.updateSlots(1, plusMinus2);
+                        updated = true;
+                    }
+                }
+
+                // Clean up any legacy or orphaned vspace blocks below a two-arg flow block
+                if (isTwoArgFlow) {
+                    while (true) {
+                        const lastConnIdx = myBlock.connections.length - 1;
+                        const nextBlkIdx = myBlock.connections[lastConnIdx];
+                        const nextBlk = this.blockList[nextBlkIdx];
+                        if (nextBlk && nextBlk.name === "vspace") {
+                            const afterVspace = nextBlk.connections[1];
+                            myBlock.connections[lastConnIdx] = afterVspace;
+                            if (afterVspace !== null && this.blockList[afterVspace]) {
+                                this.blockList[afterVspace].connections[0] = blk;
+                            }
+                            nextBlk.connections = [null, null];
+                            nextBlk.trash = true;
+                            if (typeof nextBlk.hide === "function") {
+                                nextBlk.hide();
+                            }
+                            updated = true;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                if (updated) {
+                    this.adjustDocks(blk, true);
                 }
             }
         };
@@ -970,6 +1063,12 @@ class Blocks {
          */
         this._addRemoveVspaceBlock = blk => {
             const myBlock = this.blockList[blk];
+            if (!myBlock) return;
+
+            // Two-arg flow blocks (e.g., setxy) size their own artwork and do not use vspace blocks
+            if (typeof myBlock.isTwoArgBlock === "function" && myBlock.isTwoArgBlock()) {
+                return;
+            }
 
             const c = myBlock.connections[myBlock.connections.length - 2];
             let secondArgumentSize = 1;
@@ -2465,6 +2564,9 @@ class Blocks {
                     this._expandablesList.push(i);
                 }
             }
+            this._expandablesList.sort(
+                (a, b) => this._getNestingDepth(a) - this._getNestingDepth(b)
+            );
         };
 
         /**
@@ -2587,9 +2689,20 @@ class Blocks {
          * @returns {void}
          */
         this.unhighlightAll = () => {
-            for (const [blk, block] of this.blockList.entries()) {
+            if (!this.visible) {
+                return;
+            }
+
+            // Drag and snap feedback can highlight artwork outside this queue.
+            // Cancel pending playback transitions before clearing every block.
+            this._highlightQueue.length = 0;
+            this._renderedHighlight = null;
+            this.highlightedBlock = null;
+            for (const block of this.blockList) {
                 if (!block || block.trash) continue;
-                this.unhighlight(blk);
+                if (typeof block.unhighlight === "function") {
+                    block.unhighlight();
+                }
             }
         };
 
@@ -2609,10 +2722,7 @@ class Blocks {
             }
 
             if (thisBlock !== null) {
-                const block = this.blockList[thisBlock];
-                if (block && typeof block.unhighlight === "function") {
-                    block.unhighlight();
-                }
+                this._queueHighlightState(thisBlock, false);
             }
 
             if (this.highlightedBlock === thisBlock) {
@@ -2633,10 +2743,13 @@ class Blocks {
             }
 
             if (blk !== null) {
-                if (unhighlight) {
+                // Re-highlighting the block that is already highlighted would queue a
+                // redundant off/on pair, so only clear a *different* block.
+                if (unhighlight && this.highlightedBlock !== blk) {
                     this.unhighlight(null);
                 }
-                this.blockList[blk].highlight();
+
+                this._queueHighlightState(blk, true);
                 this.highlightedBlock = blk;
             }
         };
@@ -2746,6 +2859,156 @@ class Blocks {
             }
             if (this._snapIndicatorShape) {
                 this._snapIndicatorShape.visible = false;
+            }
+        };
+
+        /**
+         * Record the desired highlight state of a block, to be written to the DOM on a
+         * later animation frame.
+         *
+         * Repeated requests for the state a block is already heading to collapse into
+         * one, but a highlight that is superseded within the same frame is still
+         * rendered for one frame rather than being dropped.
+         *
+         * The queue itself holds nothing once it drains. What outlives it is
+         * _renderedHighlight, the block currently drawn lit, which is what lets the
+         * next highlight turn its predecessor off in the same frame. Should the
+         * artwork be regenerated under it, the worst case is one redundant
+         * unhighlight() on whatever now occupies that index.
+         * @private
+         * @param - blk - block number
+         * @param - state - true to highlight, false to unhighlight
+         * @returns {void}
+         */
+        this._queueHighlightState = (blk, state) => {
+            const queue = this._highlightQueue;
+
+            // Where is this block headed once everything already queued has been
+            // drawn? Nowhere pending means it is wherever it is drawn right now.
+            let heading = this._renderedHighlight === blk;
+            for (let i = queue.length - 1; i >= 0; i--) {
+                if (queue[i].blk === blk) {
+                    heading = queue[i].state;
+                    break;
+                }
+            }
+            if (heading === state) {
+                // Already heading to this state, so this request adds nothing.
+                return;
+            }
+
+            queue.push({ blk, state });
+
+            // Bound how far one block can run ahead. The first pending entry is left
+            // alone so the state it is about to be drawn in still gets a frame; whole
+            // on/off cycles are dropped after it, which keeps the alternation and so
+            // leaves the block ending in the state last asked for.
+            let mine = [];
+            const indices = () => {
+                mine = [];
+                for (let i = 0; i < queue.length; i++) {
+                    if (queue[i].blk === blk) mine.push(i);
+                }
+            };
+            indices();
+            while (mine.length > MAXPENDINGPERBLOCK) {
+                queue.splice(mine[2], 1);
+                queue.splice(mine[1], 1);
+                indices();
+            }
+
+            // Drop the oldest transitions rather than the newest: a highlight that
+            // is this far behind would be drawn long after the block ran, and the
+            // tail is what determines where the highlight finally rests.
+            while (queue.length > MAXPENDINGHIGHLIGHTS) {
+                queue.shift();
+            }
+
+            this._scheduleHighlightFlush();
+        };
+
+        /**
+         * Schedule a flush of the highlight queue on the next animation frame.
+         * @private
+         * @returns {void}
+         */
+        this._scheduleHighlightFlush = () => {
+            if (this._highlightScheduled) {
+                return;
+            }
+
+            this._highlightScheduled = true;
+            requestAnimationFrame(() => {
+                this._flushHighlightQueue();
+            });
+        };
+
+        /**
+         * Advance the highlight by one block, batching the frame's artwork writes
+         * together.
+         *
+         * Every pending unhighlight is applied, but only one block is lit per frame:
+         * a block stays lit until its successor is actually drawn, and the two are
+         * swapped within the same frame. That keeps each executed block on screen for
+         * a whole frame without ever showing two highlights at once, which is what a
+         * per-block queue does when several blocks run between two frames.
+         * @private
+         * @returns {void}
+         */
+        this._flushHighlightQueue = () => {
+            this._highlightScheduled = false;
+
+            const draw = (blk, state) => {
+                const block = this.blockList[blk];
+                if (!block || block.trash) {
+                    return;
+                }
+                if (state) {
+                    block.highlight();
+                } else if (typeof block.unhighlight === "function") {
+                    block.unhighlight();
+                }
+            };
+
+            const queue = this._highlightQueue;
+            while (queue.length > 0) {
+                const next = queue[0];
+
+                if (!next.state) {
+                    queue.shift();
+                    draw(next.blk, false);
+                    if (this._renderedHighlight === next.blk) {
+                        this._renderedHighlight = null;
+                    }
+                    continue;
+                }
+
+                queue.shift();
+                const block = this.blockList[next.blk];
+                // Match Block.highlight()'s artwork guards before clearing the
+                // predecessor. An undrawable entry must not consume this frame.
+                if (
+                    !block ||
+                    block.trash ||
+                    block.inCollapsed ||
+                    !block.container?.visible ||
+                    !block.bitmap ||
+                    (!block.bitmap.visible && !block.disconnectedBitmap?.visible)
+                ) {
+                    continue;
+                }
+
+                // One drawable block lit per frame; the rest wait for the next one.
+                if (this._renderedHighlight !== null && this._renderedHighlight !== next.blk) {
+                    draw(this._renderedHighlight, false);
+                }
+                draw(next.blk, true);
+                this._renderedHighlight = next.blk;
+                break;
+            }
+
+            if (queue.length > 0) {
+                this._scheduleHighlightFlush();
             }
         };
 
@@ -4150,7 +4413,7 @@ class Blocks {
          * @returns expandable block
          */
         this.insideExpandableBlock = blk => {
-            if (this.blockList[blk] === null) {
+            if (this.blockList[blk] === null || this.blockList[blk] === undefined) {
                 /** race condition? */
 
                 console.debug("null block in blockList? " + blk);
@@ -4163,7 +4426,8 @@ class Blocks {
                     /** If it is the last connection, keep searching. */
                     if (
                         this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
+                        this.blockList[cblk].isLeftClampBlock() ||
+                        this.blockList[cblk].isArgBlock()
                     ) {
                         return cblk;
                     } else if (blk === last(this.blockList[cblk].connections)) {
@@ -4906,7 +5170,9 @@ class Blocks {
                 }
 
                 let blockItem;
-                if (myBlock.isValueBlock()) {
+                if (myBlock.unknownBlock !== undefined) {
+                    blockItem = [b, myBlock.unknownBlock, x, y, []];
+                } else if (myBlock.isValueBlock()) {
                     switch (myBlock.name) {
                         case "media":
                         case "audiofile":
@@ -5813,6 +6079,40 @@ class Blocks {
                     }
                 }
 
+                /**
+                 * General out-of-range connection guard: every non-null
+                 * connection must reference a valid index inside blockObjs.
+                 * Connections outside [0, blockObjs.length) produce undefined
+                 * when looked up in _processOneBlock and cause an unhandled
+                 * TypeError in the NOP-substitution branch (and potentially
+                 * elsewhere). Abort early here so no partial workspace is left
+                 * behind, consistent with the existing dangling-next-block
+                 * checks for clamp blocks above.
+                 */
+                for (let b = 0; b < blockObjs.length; b++) {
+                    const blkData = blockObjs[b];
+                    if (!Array.isArray(blkData[4])) {
+                        continue;
+                    }
+                    for (let c = 0; c < blkData[4].length; c++) {
+                        const connId = blkData[4][c];
+                        if (connId === null || connId === undefined) {
+                            continue;
+                        }
+                        if (!Number.isInteger(connId) || connId < 0 || connId >= blockObjs.length) {
+                            abortLoad(
+                                "Out-of-range connection " +
+                                    connId +
+                                    " in block " +
+                                    b +
+                                    ": punting loading of new blocks!",
+                                blkData
+                            );
+                            return;
+                        }
+                    }
+                }
+
                 /** Append to the current set of blocks. */
                 this._adjustTheseStacks = [];
                 this._adjustTheseDocks = [];
@@ -6071,6 +6371,38 @@ class Blocks {
                                             Number.isInteger(entry[1])
                                     )
                                     .map(entry => [entry[0], entry[1] + blockOffset]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
+                    case "matrix":
+                        /** Restore the selected cells, moving the block ids like connections. */
+                        postProcess = args => {
+                            const matrixCells = args[1]?.matrixCells;
+                            if (Array.isArray(matrixCells)) {
+                                that.blockList[args[0]].matrixCells = matrixCells
+                                    .filter(
+                                        cell =>
+                                            Array.isArray(cell) &&
+                                            Number.isInteger(cell[0]) &&
+                                            cell[0] >= 0 &&
+                                            Array.isArray(cell[1]) &&
+                                            Number.isInteger(cell[1][0]) &&
+                                            cell[1][0] >= 0 &&
+                                            Number.isInteger(cell[1][1]) &&
+                                            Number.isInteger(cell[2])
+                                    )
+                                    .map(cell => [
+                                        cell[0] + blockOffset,
+                                        [cell[1][0] + blockOffset, cell[1][1]],
+                                        cell[2]
+                                    ]);
                             }
                         };
                         this._makeNewBlockWithConnections(
@@ -6687,6 +7019,7 @@ class Blocks {
                             const postProcessUnknownBlock = args => {
                                 /** save original block name */
                                 that.blockList[args[0]].privateData = args[1];
+                                that.blockList[args[0]].unknownBlock = blkData[1];
                             };
 
                             let newName = name;
@@ -6697,7 +7030,7 @@ class Blocks {
                             let flowBlock = true;
                             /** Is the first connection attached to a flow block? */
                             const c = blkData[4][0];
-                            if (c !== null) {
+                            if (c !== null && blockObjs[c] !== undefined) {
                                 const cc = blockObjs[c][4].indexOf(b);
                                 if (typeof blockObjs[c][1] === "string") {
                                     if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
@@ -6722,7 +7055,7 @@ class Blocks {
                             } else {
                                 /** Or the last connection attached to a flow block? */
                                 const c = last(blkData[4]);
-                                if (c !== null) {
+                                if (c !== null && blockObjs[c] !== undefined) {
                                     const cc = blockObjs[c][4].indexOf(b);
                                     if (typeof blockObjs[c][1] === "string") {
                                         if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {

@@ -40,6 +40,14 @@
 /* exported setupToneActions */
 
 /**
+ * Largest partial index accepted by doHarmonic(). Partial h sounds at (h + 1) times
+ * the note's frequency; the lowest pitch Music Blocks represents is C0 (octave 0,
+ * about 16.35 Hz), so any h above 1222 is beyond 20 kHz for every note and only
+ * makes doHarmonic()'s fill loop longer (Infinity never ends).
+ */
+const MAX_HARMONIC = 1222;
+
+/**
  * Sets up all the methods related to different actions for each block in Tone palette.
  * @returns {void}
  */
@@ -55,6 +63,9 @@ function setupToneActions(activity) {
         static setTimbre(instrument, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // Restored when this block ends, so an inner Set Instrument does not
+            // switch off the outer one's timbre effects.
+            const wasInSetTimbre = tur.inSetTimbre;
             tur.inSetTimbre = true;
 
             let accounted = false;
@@ -111,7 +122,10 @@ function setupToneActions(activity) {
                 }
             }
 
-            const listenerName = "_settimbre_" + turtle;
+            // One listener per block: nested Set Instrument blocks would otherwise
+            // share a name, and the inner block's cleanup (with its own `pushed`)
+            // would replace the outer one's.
+            const listenerName = "_settimbre_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -120,7 +134,7 @@ function setupToneActions(activity) {
             }
 
             const __listener = () => {
-                tur.inSetTimbre = false;
+                tur.inSetTimbre = wasInSetTimbre;
                 if (pushed) {
                     tur.singer.instrumentNames.pop();
                 }
@@ -170,7 +184,7 @@ function setupToneActions(activity) {
             tur.singer.vibratoIntensity.push(intensity / 100);
             tur.singer.vibratoRate.push(1 / rate);
 
-            const listenerName = "_vibrato_" + turtle;
+            const listenerName = "_vibrato_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -230,7 +244,7 @@ function setupToneActions(activity) {
             tur.singer.delayTime.push(delayTime);
             tur.singer.chorusDepth.push(chorusDepth);
 
-            const listenerName = "_chorus_" + turtle;
+            const listenerName = "_chorus_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -279,7 +293,7 @@ function setupToneActions(activity) {
             tur.singer.octaves.push(octaves);
             tur.singer.baseFrequency.push(baseFrequency);
 
-            const listenerName = "_phaser_" + turtle;
+            const listenerName = "_phaser_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -334,7 +348,7 @@ function setupToneActions(activity) {
             tur.singer.tremoloFrequency.push(frequency);
             tur.singer.tremoloDepth.push(depth);
 
-            const listenerName = "_tremolo_" + turtle;
+            const listenerName = "_tremolo_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -384,7 +398,7 @@ function setupToneActions(activity) {
 
             tur.singer.distortionAmount.push(distortion);
 
-            const listenerName = "_distortion_" + turtle;
+            const listenerName = "_distortion_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -405,9 +419,18 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block index in blocks.blockList
          */
         static doHarmonic(harmonic, turtle, blk) {
-            if (typeof harmonic !== "number" || harmonic < 0) {
+            if (typeof harmonic !== "number" || Number.isNaN(harmonic) || harmonic < 0) {
                 //.TRANS: partials components in a harmonic series
                 activity.errorMsg(_("Partial must be greater than or equal to 0."));
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            if (harmonic > MAX_HARMONIC) {
+                activity.errorMsg(
+                    _("Partial must be less than or equal to %s.").replace(/%s/g, MAX_HARMONIC),
+                    blk
+                );
                 activity.logo.stopTurtle = true;
                 return;
             }
