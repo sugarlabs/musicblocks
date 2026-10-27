@@ -496,6 +496,22 @@ describe("saveAbcOutput", () => {
         expect(result).toContain("V:t1\nK:C\nC4 F4 [K:D]F4 =c4 ");
     });
 
+    it("writes a key change on a barline after the barline", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("A4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nC4 D4 E4 F4 | [K:D]F4 A4 ");
+    });
+
     it("writes a return to the starting key", () => {
         activity.logo.notation.notationStaging[0] = [
             note("F4"),

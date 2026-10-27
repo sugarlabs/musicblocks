@@ -608,6 +608,8 @@ class AbcExporter {
                 const changed = abcKeySignature(`${this.staging[i + 1]} ${this.staging[i + 2]}`);
                 if (changed.field !== this.keyField) {
                     if (this.hasNotes) {
+                        // A key change on a barline belongs to the measure after it.
+                        if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
                         this.__pushField(`[K:${changed.field}]`);
                     } else {
                         this.startKeyField = changed.field;
