@@ -1404,6 +1404,19 @@ describe("cents calculations", () => {
 });
 
 describe("getArticulation", () => {
+    it.each(["x", "##", "bb", "𝄪", "𝄫"])(
+        "extracts %s from lowercase note names without changing solfege parsing",
+        accidental => {
+            for (const note of ["a", "b", "c", "d", "e", "f", "g"]) {
+                expect(getArticulation(note + accidental)).toBe(accidental);
+                expect(getArticulation(note.toUpperCase() + accidental)).toBe(accidental);
+                expect(getArticulation("^" + note + accidental)).toBe(accidental);
+            }
+            expect(getArticulation("do" + accidental)).toBe(accidental);
+            expect(getArticulation("fa" + accidental)).toBe(accidental);
+        }
+    );
+
     it("should remove solfege syllables", () => {
         expect(getArticulation("do")).toBe("");
         expect(getArticulation("re")).toBe("");
