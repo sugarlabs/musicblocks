@@ -167,15 +167,18 @@ function _(text, options = {}) {
  * @returns {string} The formatted string.
  */
 let format = (str, data) => {
+    if (typeof str !== "string") return "";
+
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         let x = data;
-        name.split(".").forEach(v => {
-            if (x === undefined) {
-                console.debug("Undefined value in template string", str, name, x, v);
+        const parts = name.split(".");
+        for (let i = 0; i < parts.length; i++) {
+            if (x === null || x === undefined) {
+                x = undefined;
+                break;
             }
-
-            x = x[v];
-        });
+            x = x[parts[i]];
+        }
 
         return x === undefined ? "" : x;
     });
