@@ -80,6 +80,7 @@ class ProjectManager {
         this.activity = activity;
         this._loadAnimationIntervalId = null;
         this._saveAfterLoad = () => this.saveLocally();
+        this._newProjectPending = false;
     }
 
     // -----------------------------------------------------------------------
@@ -601,12 +602,17 @@ class ProjectManager {
             that.planet.planet !== null &&
             that.planet.getCurrentProjectName() !== _("My Project");
 
+        // saveLocally() snapshots the workspace before it writes. Edits made
+        // while the write is pending are not captured and are cleared below.
         if (hasNamedPlanetProject) {
             try {
                 const saved = await that.planet.saveLocally({ rejectOnProjectSaveError: true });
                 if (saved === false || saved === null) return;
             } catch (error) {
                 ErrorHandler.recoverable(error, { operation: "saveProjectBeforeNewProject" });
+                that.errorMsg(
+                    _("Could not save the current project, so the new project was not created.")
+                );
                 return;
             }
         }
@@ -670,7 +676,12 @@ class ProjectManager {
     }
 
     newProject() {
-        this._afterDelete();
+        if (this._newProjectPending) return;
+
+        this._newProjectPending = true;
+        return Promise.resolve(this._afterDelete()).finally(() => {
+            this._newProjectPending = false;
+        });
     }
 
     // -----------------------------------------------------------------------

@@ -1426,6 +1426,36 @@ describe("newProject / _afterDelete", () => {
         expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
             operation: "saveProjectBeforeNewProject"
         });
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not save the current project, so the new project was not created."
+        );
+    });
+
+    it("ignores a second New project request while the first save is pending", async () => {
+        let finishSave;
+        const pendingSave = new Promise(resolve => {
+            finishSave = resolve;
+        });
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockReturnValueOnce(pendingSave).mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        const first = pm.newProject();
+        const second = pm.newProject();
+
+        expect(second).toBeUndefined();
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+
+        finishSave();
+        await first;
+
+        expect(planet.initialiseNewProject).toHaveBeenCalledTimes(1);
     });
 
     it("does not use planet path when project name is 'My Project'", () => {
