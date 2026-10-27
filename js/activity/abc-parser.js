@@ -227,10 +227,21 @@ function _meterOf(staff) {
     return { num: Number(value?.num) || 4, den: Number(value?.den) || 4 };
 }
 
-function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
+function _tempoOf(tempo) {
+    if (!Number.isFinite(tempo?.bpm) || tempo.bpm <= 0 || tempo.suppressBpm) return null;
+    // An ABC tempo may define its beat as a sum, such as Q:1/4 1/8=60.
+    const beatValue = tempo.duration?.reduce((total, value) => total + value, 0);
+    if (!Number.isFinite(beatValue) || beatValue <= 0) return null;
+    return { bpm: tempo.bpm, duration: toFraction(beatValue) };
+}
+
+function _buildStartBlock(blockId, staff, title, instruction, staffIdx, tempo) {
     const keyRoot = staff.key.root + (_ABC_KEY_ACC_SUFFIX[staff.key.acc] || "");
     const keyMode = _ABC_MODE_MAP[staff.key.mode] || "major";
     const meter = _meterOf(staff);
+    const tempoId = blockId + 14;
+    const timbreId = tempoId + (tempo ? 6 : 0);
+    const beforeTimbreId = tempo ? tempoId + 5 : blockId + 11;
 
     const startBlock = [
         [blockId, ["start", { collapsed: false }], 100, 100, [null, blockId + 1, null]],
@@ -254,10 +265,23 @@ function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
         [blockId + 12, ["notename", { value: keyRoot }], 0, 0, [blockId + 11]],
         [blockId + 13, ["modename", { value: keyMode }], 0, 0, [blockId + 11]],
         // Connection to first nameddo is resolved during finalization.
-        [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, null, blockId + 16]],
-        [blockId + 15, ["voicename", { value: instruction }], 0, 0, [blockId + 14]],
-        [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
+        [timbreId, "settimbre", 0, 0, [beforeTimbreId, timbreId + 1, null, timbreId + 2]],
+        [timbreId + 1, ["voicename", { value: instruction }], 0, 0, [timbreId]],
+        [timbreId + 2, "hidden", 0, 0, [timbreId, null]]
     ];
+
+    if (tempo) {
+        startBlock.splice(
+            14,
+            0,
+            [tempoId, "setbpm3", 0, 0, [blockId + 11, tempoId + 1, tempoId + 2, tempoId + 5]],
+            [tempoId + 1, ["number", { value: tempo.bpm }], 0, 0, [tempoId]],
+            [tempoId + 2, "divide", 0, 0, [tempoId, tempoId + 3, tempoId + 4]],
+            [tempoId + 3, ["number", { value: tempo.duration[0] }], 0, 0, [tempoId + 2]],
+            [tempoId + 4, ["number", { value: tempo.duration[1] }], 0, 0, [tempoId + 2]],
+            [tempoId + 5, "vspace", 0, 0, [tempoId, timbreId]]
+        );
+    }
 
     return { startBlock, newBlockId: blockId + startBlock.length };
 }
@@ -479,6 +503,7 @@ const setupActivityAbcParser = activityInstance => {
         let blockId = 0;
         const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
         const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
+        const tempo = _tempoOf(tune.metaText?.tempo);
 
         const organizedStaffs = _organizeStaffs(tune.lines ?? []);
         Object.keys(organizedStaffs).forEach(staffIdx => {
@@ -489,7 +514,8 @@ const setupActivityAbcParser = activityInstance => {
                         staff,
                         title,
                         instruction,
-                        staffIdx
+                        staffIdx,
+                        tempo
                     );
                     const staffMeter = _meterOf(staff);
                     staffBlocksMap[staffIdx] = {
