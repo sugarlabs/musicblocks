@@ -38,17 +38,22 @@ function setupNumberBlocks(activity) {
     };
 
     /**
-     * Safely convert string to integer with error handling
+     * Check if a string is a number and nothing else, e.g. "2.5" or "-1e3" but not "3 apples"
      */
-    const toInteger = (logo, value, blk) => {
+    const isNumericText = value =>
+        typeof value === "string" && value.trim() !== "" && !isNaN(Number(value));
+
+    /**
+     * Convert a number given as text to a number, stopping with an error if it is not one
+     */
+    const toNumber = (logo, value, blk) => {
         if (typeof value === "string") {
-            const result = parseInt(value, 10);
-            if (isNaN(result)) {
+            if (!isNumericText(value)) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);
                 return null;
             }
-            return result;
+            return Number(value);
         }
         return value;
     };
@@ -134,7 +139,7 @@ function setupNumberBlocks(activity) {
         if (!validateConnections([cblk], blk)) {
             return null;
         }
-        return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+        return toNumber(logo, logo.parseArg(logo, turtle, cblk, blk, receivedArg), blk);
     };
 
     /**
@@ -157,10 +162,10 @@ function setupNumberBlocks(activity) {
         }
 
         let a = calculateValueWithOctave(logo, turtle, cblk1, blk, receivedArg, isOctaveContext);
-        a = toInteger(logo, a, blk) || a;
+        a = toNumber(logo, a, blk) || a;
 
         let b = calculateValueWithOctave(logo, turtle, cblk2, blk, receivedArg, isOctaveContext);
-        b = toInteger(logo, b, blk) || b;
+        b = toNumber(logo, b, blk) || b;
 
         return { a, b };
     };
@@ -226,11 +231,11 @@ function setupNumberBlocks(activity) {
             if (!validateConnections([cblk1, cblk2], blk)) return 0;
 
             let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            a = toInteger(logo, a, blk);
+            a = toNumber(logo, a, blk);
             if (a === null) return 0;
 
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            b = toInteger(logo, b, blk);
+            b = toNumber(logo, b, blk);
             if (b === null) return 0;
 
             try {
@@ -278,8 +283,11 @@ function setupNumberBlocks(activity) {
                 return cblk1 !== null ? logo.parseArg(logo, turtle, cblk1, blk, receivedArg) : 0;
             }
 
-            const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            const a = toNumber(logo, logo.parseArg(logo, turtle, cblk1, blk, receivedArg), blk);
+            if (a === null) return 0;
+
+            const b = toNumber(logo, logo.parseArg(logo, turtle, cblk2, blk, receivedArg), blk);
+            if (b === null) return 0;
 
             try {
                 return MathUtility.doPower(a, b);
@@ -411,10 +419,17 @@ function setupNumberBlocks(activity) {
 
             if (!validateConnections([cblk1, cblk2, cblk3, cblk4], blk)) return 0;
 
-            const x1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            const y1 = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            const x2 = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
-            const y2 = logo.parseArg(logo, turtle, cblk4, blk, receivedArg);
+            const coords = [];
+            for (const cblk of [cblk1, cblk2, cblk3, cblk4]) {
+                const value = toNumber(
+                    logo,
+                    logo.parseArg(logo, turtle, cblk, blk, receivedArg),
+                    blk
+                );
+                if (value === null) return 0;
+                coords.push(value);
+            }
+            const [x1, y1, x2, y2] = coords;
 
             try {
                 return MathUtility.doCalculateDistance(x1, y1, x2, y2);
@@ -465,11 +480,11 @@ function setupNumberBlocks(activity) {
             }
 
             let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            a = toInteger(logo, a, blk);
+            a = toNumber(logo, a, blk);
             if (a === null) return 0;
 
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            b = toInteger(logo, b, blk);
+            b = toNumber(logo, b, blk);
             if (b === null) return 0;
 
             try {
@@ -554,11 +569,11 @@ function setupNumberBlocks(activity) {
                         : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             } else {
                 a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                a = toInteger(logo, a, blk);
+                a = toNumber(logo, a, blk);
                 if (a === null) return 0;
 
                 b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                b = toInteger(logo, b, blk);
+                b = toNumber(logo, b, blk);
                 if (b === null) return 0;
             }
 
@@ -601,8 +616,10 @@ function setupNumberBlocks(activity) {
             }
 
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            a = toInteger(logo, a, blk);
-            if (a === null) return 0;
+            // Words stay as text so doNegate can reverse them.
+            if (isNumericText(a)) {
+                a = Number(a);
+            }
 
             try {
                 return MathUtility.doNegate(a);
@@ -681,11 +698,11 @@ function setupNumberBlocks(activity) {
                         : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             } else {
                 a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                a = toInteger(logo, a, blk);
+                a = toNumber(logo, a, blk);
                 if (a === null) return 0;
 
                 b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                b = toInteger(logo, b, blk);
+                b = toNumber(logo, b, blk);
                 if (b === null) return 0;
             }
 
@@ -993,35 +1010,16 @@ function setupNumberBlocks(activity) {
 
             if (!validateConnections([cblk1, cblk2, cblk3], blk)) return 0;
 
-            const toNumber = value => {
-                if (typeof value === "string") {
-                    const str = value.trim();
-                    if (str === "") {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return null;
-                    }
-                    const num = Number(str);
-                    if (isNaN(num)) {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return null;
-                    }
-                    return num;
-                }
-                return value;
-            };
-
             let val = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            val = toNumber(val);
+            val = toNumber(logo, val, blk);
             if (val === null) return 0;
 
             let min = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            min = toNumber(min);
+            min = toNumber(logo, min, blk);
             if (min === null) return 0;
 
             let max = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
-            max = toNumber(max);
+            max = toNumber(logo, max, blk);
             if (max === null) return 0;
 
             try {
