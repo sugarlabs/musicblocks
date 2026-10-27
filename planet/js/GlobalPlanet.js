@@ -320,6 +320,7 @@ class GlobalPlanet {
     }
 
     forceAddToCache(id, callback) {
+        this.hideBadgeError();
         this.Planet.ServerInterface.getProjectDetails(
             id,
             function (d) {
@@ -333,8 +334,32 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
+            this.hideBadgeError();
             callback();
-        } else this.throwOfflineError();
+        } else if (data.error === "PROJECT_NOT_FOUND") {
+            delete this.cache[id];
+            this.showBadgeError(_("This project is no longer available."));
+        } else {
+            this.showBadgeError(_("Could not load the published project. Try again."));
+        }
+    }
+
+    showBadgeError(message) {
+        this.hideBadgeError();
+
+        const list = document.getElementById("global-projects");
+        if (!list || !list.parentNode) return;
+
+        const error = document.createElement("div");
+        error.id = "global-badge-error";
+        error.className = "container center-align";
+        error.textContent = message;
+        list.parentNode.insertBefore(error, list);
+    }
+
+    hideBadgeError() {
+        const error = document.getElementById("global-badge-error");
+        if (error) error.remove();
     }
 
     getData(id, callback, error) {
