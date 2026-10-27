@@ -186,7 +186,8 @@ class StatsWindow {
                 img.src = imageData;
 
                 if (this.widgetWindow.isMaximized()) {
-                    img.width = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
+                    img.width =
+                        this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
                 } else {
                     img.width = 200;
                 }
