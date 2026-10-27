@@ -56,6 +56,74 @@ describe("musicutils-pitchinfo", () => {
         expect(pitchinfo.getPitchInfo({}, "pitch number", "C4", singerTur())).toBe(60);
     });
 
+    describe("notes that cross the B/C boundary (#9765)", () => {
+        // Equal-tempered frequencies (A4 = 440 Hz) for the notes the remaps resolve to.
+        const FREQUENCIES = {
+            "C♯5": 554.3652619537442,
+            "B♭3": 233.0818807590449,
+            "B4": 493.8833012561241
+        };
+        const synth = {
+            _getFrequency: jest.fn(note => FREQUENCIES[note]),
+            changeInTemperament: false
+        };
+        const activity = { logo: { synth } };
+        const info = (type, note) => pitchinfo.getPitchInfo(activity, type, note, singerTur());
+
+        it("gives the pitch number of the note they sound as", () => {
+            expect(info("pitch number", "B♯4")).toBe(info("pitch number", "C5"));
+            expect(info("pitch number", "C♭4")).toBe(info("pitch number", "B3"));
+            expect(info("pitch number", "B𝄪4")).toBe(info("pitch number", "C♯5"));
+            expect(info("pitch number", "C𝄫4")).toBe(info("pitch number", "B♭3"));
+        });
+
+        it("asks the synth for the note in the right octave", () => {
+            info("pitch in hertz", "B𝄪4");
+            expect(synth._getFrequency).toHaveBeenLastCalledWith("C♯5", false);
+            info("pitch in hertz", "C𝄫4");
+            expect(synth._getFrequency).toHaveBeenLastCalledWith("B♭3", false);
+            info("pitch in hertz", "A𝄪4");
+            expect(synth._getFrequency).toHaveBeenLastCalledWith("B4", false);
+        });
+
+        it("returns the frequency of the note they sound as", () => {
+            expect(info("pitch in hertz", "B𝄪4")).toBeCloseTo(554.37, 2);
+            expect(info("pitch in hertz", "C𝄫4")).toBeCloseTo(233.08, 2);
+            expect(info("pitch in hertz", "A𝄪4")).toBeCloseTo(493.88, 2);
+        });
+
+        it("shades remapped double accidentals by their new octave", () => {
+            expect(info("pitch to shade", "B𝄪4")).toBe(5 * 12.5);
+            expect(info("pitch to shade", "C𝄫4")).toBe(3 * 12.5);
+        });
+
+        it("shades B♯ and C♭ like the note they sound as", () => {
+            expect(info("pitch to shade", "B♯4")).toBe(info("pitch to shade", "C5"));
+            expect(info("pitch to shade", "C♭4")).toBe(info("pitch to shade", "B3"));
+        });
+
+        it("puts B/C boundary spellings on the staff where they sound", () => {
+            expect(info("staff y", "B♯4")).toBe(info("staff y", "C5"));
+            expect(info("staff y", "B𝄪4")).toBe(info("staff y", "C5"));
+            expect(info("staff y", "C♭4")).toBe(info("staff y", "B3"));
+            expect(info("staff y", "C𝄫4")).toBe(info("staff y", "B3"));
+            expect(info("staff y", "C5")).toBe(87.5);
+            expect(info("staff y", "B3")).toBe(-12.5);
+        });
+
+        it("keeps the staff position for spellings that stay in the octave", () => {
+            expect(info("staff y", "E♯4")).toBe(info("staff y", "E4"));
+            expect(info("staff y", "F♭4")).toBe(info("staff y", "F4"));
+        });
+
+        it("keeps the octave shade for spellings that stay in the octave", () => {
+            expect(info("pitch to shade", "E♯4")).toBe(4 * 12.5);
+            expect(info("pitch to shade", "F♭4")).toBe(4 * 12.5);
+            expect(info("pitch to shade", "B4")).toBe(4 * 12.5);
+            expect(info("pitch to shade", "C4")).toBe(4 * 12.5);
+        });
+    });
+
     it("resolves scale degree without 'undefined' suffix when accidental is omitted", () => {
         const turFb = { singer: { keySignature: "F♭ major", movable: false } };
         expect(pitchinfo.getPitchInfo({}, "scale degree", "B♯4", turFb)).toBe("4");

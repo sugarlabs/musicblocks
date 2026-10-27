@@ -162,11 +162,13 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         // Turn the note into pitch and octave.
         [pitch, octave] = _parse_pitch_string(currentNote);
     }
-    // Remap double sharps/double flats.
+    // Remap double sharps/double flats. B𝄪 and C𝄫 cross the B/C boundary, so the octave
+    // moves with the name (B𝄪4 is C♯5, C𝄫4 is B♭3).
     if (pitch.includes(DOUBLESHARP)) {
         pitch = pitch.replace(DOUBLESHARP, "");
         if (pitch === "B") {
             pitch = "C" + SHARP;
+            octave = Number(octave) + 1;
         } else {
             pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
         }
@@ -174,6 +176,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         pitch = pitch.replace(DOUBLEFLAT, "");
         if (pitch === "C") {
             pitch = "B" + FLAT;
+            octave = Number(octave) - 1;
         } else {
             pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
         }
@@ -277,12 +280,23 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 return (obj[0] ?? "") + (obj[1] ?? "");
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
-            case "staff y":
+            case "staff y": {
+                // B♯ and C♭ sit where they sound, on the C above and the B below.
+                let letter = pitch[0];
+                let staffOctave = Number(octave);
+                if (pitch === "B" + SHARP) {
+                    letter = "C";
+                    staffOctave += 1;
+                } else if (pitch === "C" + FLAT) {
+                    letter = "B";
+                    staffOctave -= 1;
+                }
                 // These numbers are in relation to the staff artwork.
                 return (
-                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(pitch[0]) * YSTAFFNOTEHEIGHT +
-                    (octave - 4) * YSTAFFOCTAVEHEIGHT
+                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(letter) * YSTAFFNOTEHEIGHT +
+                    (staffOctave - 4) * YSTAFFOCTAVEHEIGHT
                 );
+            }
             case "pitch number":
                 return _calculate_pitch_number(
                     pitch,
@@ -306,6 +320,12 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
+                // B♯ and C♭ sound in the next and previous octave (B♯4 is C5, C♭4 is B3).
+                if (pitch === "B" + SHARP) {
+                    return (Number(octave) + 1) * 12.5;
+                } else if (pitch === "C" + FLAT) {
+                    return (Number(octave) - 1) * 12.5;
+                }
                 return octave * 12.5;
             default:
                 return "__INVALID_INPUT__";

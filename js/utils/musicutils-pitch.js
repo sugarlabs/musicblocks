@@ -389,6 +389,18 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
     }
 
     // 12-EDO path: use EQUIVALENT lookups then NOTESSHARP / NOTESFLAT.
+    // The lookups only rename the note, so an accidental that crosses the B/C boundary
+    // (B♯4 is C5, C♭4 is B3) has to move the octave too, as pitchToNumber does.
+    let octaveShift = 0;
+    const letterIndex = NOTESSHARP.indexOf(name.charAt(0));
+    if (letterIndex !== -1) {
+        let semitones = letterIndex;
+        for (const char of name.slice(1)) {
+            semitones += ACCIDENTAL_SEMITONE_MAP[char] || 0;
+        }
+        octaveShift = Math.floor(semitones / 12);
+    }
+
     if (EQUIVALENTSHARPS[name]) {
         name = EQUIVALENTSHARPS[name];
     } else if (EQUIVALENTFLATS[name]) {
@@ -406,7 +418,7 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
         return INVALIDPITCH;
     }
 
-    return (parseInt(octave, 10) + 1) * currentEDO + pitchIndex - applyOffset;
+    return (parseInt(octave, 10) + 1 + octaveShift) * currentEDO + pitchIndex - applyOffset;
 }
 
 /**
