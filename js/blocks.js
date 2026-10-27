@@ -2109,9 +2109,10 @@ class Blocks {
             // avoiding repeated O(depth) findTopBlock walks.
             if (this._topBlockCache === null) {
                 this._topBlockCache = new Map();
+                const roots = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
                     if (!this.blockList[i] || this.blockList[i].trash) continue;
-                    this._topBlockCache.set(i, this.findTopBlock(i));
+                    this._topBlockCache.set(i, this.findTopBlock(i, roots));
                 }
             }
 
@@ -2324,10 +2325,11 @@ class Blocks {
         /**
          * Find the top block in the stack.
          * @param - blk - block
+         * @param {Map|null} roots - resolved ancestor paths for a batch of lookups
          * @public
          * @returns blk
          */
-        this.findTopBlock = blk => {
+        this.findTopBlock = (blk, roots = null) => {
             /** Find the top block in a stack. */
             if (blk === null) {
                 return null;
@@ -2362,8 +2364,13 @@ class Blocks {
                 return blk;
             }
 
+            const path = roots === null ? null : [];
             let topBlockLoop = 0;
             while (myBlock.connections[0] !== null) {
+                if (roots !== null && roots.has(blk)) {
+                    blk = roots.get(blk);
+                    break;
+                }
                 topBlockLoop += 1;
                 if (topBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
@@ -2371,12 +2378,18 @@ class Blocks {
                     if (myBlock.garbage) {
                         console.debug(myBlock.blockIndex + " " + myBlock.name);
                     }
-                    break;
+                    return blk;
                 }
+                if (path !== null) path.push(blk);
                 blk = myBlock.connections[0];
                 myBlock = this.blockList[blk];
             }
 
+            // Only share paths that reached a root, not malformed-data fallback results.
+            if (roots !== null) {
+                roots.set(blk, blk);
+                for (const index of path) roots.set(index, blk);
+            }
             return blk;
         };
 

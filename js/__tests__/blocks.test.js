@@ -1303,6 +1303,85 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Edge-scroll root cache", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks(mockActivity);
+            blocks.moveBlockRelativeBatched = jest.fn();
+            blocks._beginDeferCheckBounds = jest.fn();
+            blocks._endDeferCheckBounds = jest.fn();
+        });
+
+        it("resolves a deep stack without repeatedly reading shared ancestors", () => {
+            let reads = 0;
+            blocks.blockList = Array.from({ length: 200 }, (_, i) => ({
+                connections: {
+                    length: 1,
+                    get 0() {
+                        reads++;
+                        return i === 199 ? null : i + 1;
+                    }
+                }
+            }));
+
+            blocks.moveAllBlocksExcept(blocks.blockList[0], 0, 10);
+
+            expect([...blocks._topBlockCache.values()]).toEqual(Array(200).fill(199));
+            expect(blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
+            expect(reads).toBeLessThan(200 * 10);
+        });
+
+        it("reuses roots until invalidated and excludes the dragged stack", () => {
+            blocks.blockList = [
+                { connections: [null] },
+                { connections: [0] },
+                { connections: [null] },
+                { connections: [2], trash: true },
+                undefined,
+                { connections: [3] }
+            ];
+            blocks.moveAllBlocksExcept(blocks.blockList[1], 10, -10);
+            expect([...blocks._topBlockCache]).toEqual([
+                [0, 0],
+                [1, 0],
+                [2, 2],
+                [5, 2]
+            ]);
+            expect(blocks.moveBlockRelativeBatched.mock.calls).toEqual([
+                [2, 10, -10],
+                [5, 10, -10]
+            ]);
+            const cache = blocks._topBlockCache;
+            blocks.moveAllBlocksExcept(null, 0, 0);
+            expect(blocks._topBlockCache).toBe(cache);
+
+            blocks.blockList[1].connections[0] = 2;
+            blocks.invalidateTopBlockCache();
+            expect(blocks._topBlockCache).toBeNull();
+            blocks.moveAllBlocksExcept(blocks.blockList[1], 0, 10);
+            expect(blocks._topBlockCache.get(1)).toBe(2);
+        });
+
+        it.each([
+            [null, [], [null]],
+            [[null], [0, 0], [1]],
+            [[1], [0], [1]],
+            [[1], [2], [0], [1]],
+            [[0]]
+        ])("preserves uncached roots for malformed connections: %j", (...connections) => {
+            blocks.blockList = connections.map(value => ({ connections: value, name: "forward" }));
+            const expected = blocks.blockList.map((_, i) => blocks.findTopBlock(i));
+
+            blocks.moveAllBlocksExcept(blocks.blockList[0], 0, 10);
+
+            expect([...blocks._topBlockCache.values()]).toEqual(expected);
+            expect(blocks.moveBlockRelativeBatched.mock.calls.map(call => call[0])).toEqual(
+                expected.flatMap((root, i) => (root === expected[0] ? [] : [i]))
+            );
+        });
+    });
+
     describe("Sparse Array Safety", () => {
         it("should not throw TypeError in findStacks when blockList is sparse", () => {
             const blocks = new Blocks(mockActivity);
