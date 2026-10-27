@@ -235,7 +235,7 @@ describe("Tuner with the real Synth", () => {
         [48000, 880],
         [48000, 1046.5]
     ])(
-        "detects a pure tone within one cent at %i Hz sample rate: %f Hz",
+        "detects a pure tone within 0.4 cents at %i Hz sample rate: %f Hz",
         async (sampleRate, frequency) => {
             jest.spyOn(tuner.audioInput, "getSampleRate").mockReturnValue(sampleRate);
             await tuner.startTuner();
@@ -244,7 +244,7 @@ describe("Tuner with the real Synth", () => {
             const detected = tuner.detectPitch(bufferForFrequency(frequency, sampleRate));
 
             expect(detected).toBeGreaterThan(0);
-            expect(Math.abs(1200 * Math.log2(detected / frequency))).toBeLessThan(1);
+            expect(Math.abs(1200 * Math.log2(detected / frequency))).toBeLessThan(0.4);
         }
     );
 
