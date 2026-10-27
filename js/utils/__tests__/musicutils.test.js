@@ -943,6 +943,12 @@ describe("getOscillatorTypes", () => {
         expect(getOscillatorTypes("invalid")).toBe(null);
         expect(getOscillatorTypes("random")).toBe(null);
     });
+    it("should return null for empty string or non-string inputs", () => {
+        expect(getOscillatorTypes("")).toBe(null);
+        expect(getOscillatorTypes(null)).toBe(null);
+        expect(getOscillatorTypes(undefined)).toBe(null);
+        expect(getOscillatorTypes(123)).toBe(null);
+    });
 });
 
 describe("getDrumIcon", () => {
