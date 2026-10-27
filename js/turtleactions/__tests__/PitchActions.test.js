@@ -282,7 +282,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.previousNotePlayed).toEqual(["X9", 9]);
         });
 
-        test("non-numeric lastNotePlayed is sliced into pitch name and octave correctly", () => {
+        test("lastNotePlayed with accidental is sliced into pitch name and octave correctly", () => {
             Singer.addScalarTransposition.mockClear();
             turtle.singer.lastNotePlayed = ["F#4", 4];
             activity.logo.inMatrix = true; // avoid the reset-to-G4 guard
@@ -293,6 +293,48 @@ describe("Tests for Singer.PitchActions setup", () => {
                 "F#",
                 4,
                 1
+            );
+        });
+
+        test("stepPitch parses multi-digit octaves correctly without interpreting octave as 0", () => {
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["C10", 4];
+            activity.logo.inMatrix = true; // avoid the reset-to-G4 guard
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "C",
+                10,
+                1
+            );
+            expect(Singer.addScalarTransposition).not.toHaveBeenCalledWith(
+                expect.anything(),
+                expect.anything(),
+                "C1",
+                0,
+                expect.anything()
+            );
+        });
+
+        test("stepPitch parses multi-digit octaves with accidental correctly", () => {
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["C#10", 4];
+            activity.logo.inMatrix = true; // avoid the reset-to-G4 guard
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "C#",
+                10,
+                1
+            );
+            expect(Singer.addScalarTransposition).not.toHaveBeenCalledWith(
+                expect.anything(),
+                expect.anything(),
+                "C#1",
+                0,
+                expect.anything()
             );
         });
 

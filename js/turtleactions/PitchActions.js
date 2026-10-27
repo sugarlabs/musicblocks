@@ -122,11 +122,7 @@ function setupPitchActions(activity) {
                 octave = lastNotePlayed[1];
                 cents = lastNotePlayed[2];
             } else {
-                pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
-                octave = parseInt(
-                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length),
-                    10
-                );
+                [pitchName, octave] = noteToObj(lastNotePlayed[0]);
             }
             if (tur.singer.invertList.length > 0) {
                 // If the last note is inverted then inverting it
