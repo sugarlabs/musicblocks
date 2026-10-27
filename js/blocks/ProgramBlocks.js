@@ -655,7 +655,8 @@ function setupProgramBlocks(activity) {
             if (args[0] !== null && turtle in logo.turtleHeaps) {
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleHeaps[turtle]),
+                    "data:text/json;charset-utf-8," +
+                        encodeURIComponent(JSON.stringify(logo.turtleHeaps[turtle])),
                     args[0]
                 );
             }
@@ -753,14 +754,14 @@ function setupProgramBlocks(activity) {
                         : {};
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," + JSON.stringify(dictData),
+                    "data:text/json;charset-utf-8," + encodeURIComponent(JSON.stringify(dictData)),
                     args[1]
                 );
             } else {
                 activity.save.download(
                     "json",
                     "data:text/json;charset-utf-8," +
-                        Turtle.DictActions.SerializeDict(target, turtle),
+                        encodeURIComponent(Turtle.DictActions.SerializeDict(target, turtle)),
                     args[1]
                 );
             }
