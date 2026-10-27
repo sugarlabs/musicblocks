@@ -111,6 +111,16 @@ describe("PlanetInterface", () => {
         expect(document.querySelector("#canvas").style.display).toBe("");
     });
 
+    test("showMusicBlocks synchronizes toolbar height when activity.toolbar is present", () => {
+        mockActivity.planet = { getCurrentProjectName: jest.fn(() => "Test Project") };
+        mockActivity.toolbar = { syncToolbarHeight: jest.fn() };
+
+        planetInterface.showMusicBlocks();
+
+        expect(mockActivity.toolbar.syncToolbarHeight).toHaveBeenCalled();
+        delete mockActivity.toolbar;
+    });
+
     test("hidePlanet hides the planet interface", () => {
         planetInterface.iframe = document.querySelector("#planet-iframe");
         planetInterface.hidePlanet();

@@ -678,6 +678,9 @@ class ContextMenuController {
         }
 
         activity.refreshCanvas();
+        if (activity.toolbar && typeof activity.toolbar.syncToolbarHeight === "function") {
+            activity.toolbar.syncToolbarHeight();
+        }
     }
 
     /*

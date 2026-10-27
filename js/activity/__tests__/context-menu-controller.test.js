@@ -123,7 +123,7 @@ function makeActivity() {
         cellSize: 40,
         findBlocks: jest.fn(),
         boundary: { hide: jest.fn() },
-        toolbar: { changeWrap: jest.fn() },
+        toolbar: { changeWrap: jest.fn(), syncToolbarHeight: jest.fn() },
         _changeBlockVisibility: jest.fn(),
         _toggleCollapsibleStacks: jest.fn(),
         _restoreTrashById: jest.fn(),
@@ -741,6 +741,7 @@ describe("ContextMenuController", () => {
             expect(activity.turtles.deltaY).toHaveBeenCalledWith(128);
             expect(canvasButton.style.top).toBe("204px");
             expect(activity.refreshCanvas).toHaveBeenCalled();
+            expect(activity.toolbar.syncToolbarHeight).toHaveBeenCalled();
 
             controller._showHideAuxMenu(true);
             expect(canvasButton.style.top).toBe("76px");
