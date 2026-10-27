@@ -82,6 +82,10 @@ var getReverseDrumMidi = () => {
  * @returns {string} The name of the invert mode.
  */
 var getInvertMode = name => {
+    if (typeof name !== "string" || !name) {
+        return name;
+    }
+
     for (const interval in INVERTMODES) {
         if (
             INVERTMODES[interval][0] === name ||
@@ -251,7 +255,7 @@ var getDrumSymbol = name => {
  * @returns {string} The filter type, or the default filter type if not found.
  */
 var getFilterTypes = name => {
-    if (name === "") {
+    if (typeof name !== "string" || name === "") {
         name = DEFAULTFILTERTYPE;
     }
 

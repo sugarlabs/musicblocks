@@ -672,6 +672,13 @@ describe("getInvertMode", () => {
         expect(getInvertMode("scalar")).toBe("scalar");
         expect(getInvertMode("nonexistent")).toBe("nonexistent");
     });
+    it("should safely return non-string or nullish inputs without throwing", () => {
+        expect(getInvertMode(null)).toBeNull();
+        expect(getInvertMode(undefined)).toBeUndefined();
+        expect(getInvertMode(123)).toBe(123);
+        expect(getInvertMode({})).toEqual({});
+        expect(getInvertMode("")).toBe("");
+    });
 });
 
 describe("getIntervalNumber", () => {
@@ -918,6 +925,12 @@ describe("getFilterTypes", () => {
     it("should return correct filter types", () => {
         expect(getFilterTypes("highpass")).toBe("highpass");
         expect(getFilterTypes("notch")).toBe("notch");
+    });
+    it("should return default filter type for non-string or nullish inputs", () => {
+        expect(getFilterTypes(null)).toBe("highpass");
+        expect(getFilterTypes(undefined)).toBe("highpass");
+        expect(getFilterTypes(123)).toBe("highpass");
+        expect(getFilterTypes({})).toBe("highpass");
     });
 });
 
