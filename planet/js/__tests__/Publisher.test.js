@@ -386,6 +386,22 @@ describe("Publisher", () => {
         });
     });
 
+    describe("open", () => {
+        it("titles the dialog with the translated publish string", () => {
+            publisher.open("proj-1");
+            expect(global._).toHaveBeenCalledWith("Publish project");
+            expect(document.getElementById("publisher-ptitle").textContent).toBe("Publish project");
+        });
+
+        it("titles the dialog with the translated republish string", () => {
+            publisher.open("proj-2");
+            expect(global._).toHaveBeenCalledWith("Republish project");
+            expect(document.getElementById("publisher-ptitle").textContent).toBe(
+                "Republish project"
+            );
+        });
+    });
+
     describe("initSubmit", () => {
         it("should add click listener to publisher-submit button", () => {
             const btn = document.getElementById("publisher-submit");

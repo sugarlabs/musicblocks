@@ -1339,6 +1339,27 @@ describe("Blocks Foundation", () => {
             expect(blocks._expandablesList).toEqual([1]);
         });
 
+        it("should include two-arg blocks and sort by nesting depth in _findTwoArgs", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._getNestingDepth = jest.fn(i => (i === 1 ? 5 : 2));
+            blocks.blockList = [
+                null,
+                {
+                    trash: false,
+                    isArgBlock: jest.fn().mockReturnValue(false),
+                    isTwoArgBlock: jest.fn().mockReturnValue(true)
+                },
+                {
+                    trash: false,
+                    isArgBlock: jest.fn().mockReturnValue(false),
+                    isTwoArgBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+
+            blocks._findTwoArgs();
+            expect(blocks._expandablesList).toEqual([2, 1]);
+        });
+
         describe("after disposeBlock evicts a trashed stack", () => {
             let blocks;
 
@@ -5143,5 +5164,364 @@ describe("sendStackToTrash – turtle container guard", () => {
         expect(container1.visible).toBe(false);
         expect(mockTurtleList[0].inTrash).toBe(true);
         expect(mockTurtleList[1].inTrash).toBe(true);
+    });
+
+    describe("_adjustExpandableTwoArgBlock", () => {
+        let blocksInstance;
+        let setxyBlock;
+        let child0;
+        let child1;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+            blocksInstance.adjustDocks = jest.fn();
+
+            setxyBlock = {
+                name: "setxy",
+                trash: false,
+                connections: [null, null, null, null],
+                clampCount: [1, 1],
+                size: 2,
+                updateSlots: jest.fn((clamp, plusMinus) => {
+                    setxyBlock.clampCount[clamp] += plusMinus;
+                    setxyBlock.size += plusMinus;
+                }),
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => true
+            };
+
+            child0 = {
+                name: "multiply",
+                trash: false,
+                connections: [0, null, null],
+                clampCount: [1, 1],
+                size: 2,
+                protoblock: { args: 2 },
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isExpandableBlock: () => true
+            };
+
+            child1 = {
+                name: "random",
+                trash: false,
+                connections: [0, null, null],
+                clampCount: [1, 1],
+                size: 3,
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isExpandableBlock: () => false
+            };
+
+            blocksInstance.blockList = [setxyBlock, child0, child1];
+        });
+
+        it("does nothing when input array is empty or falsy", () => {
+            blocksInstance._adjustExpandableTwoArgBlock([]);
+            blocksInstance._adjustExpandableTwoArgBlock(null);
+            expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
+            expect(blocksInstance.adjustDocks).not.toHaveBeenCalled();
+        });
+
+        it("skips trashed or missing blocks in argBlocksToCheck", () => {
+            blocksInstance.blockList[5] = { trash: true };
+            blocksInstance._adjustExpandableTwoArgBlock([5, 99]);
+            expect(setxyBlock.updateSlots).not.toHaveBeenCalled();
+        });
+
+        it("expands slot 0 when first argument child has size > 1", () => {
+            setxyBlock.connections[1] = 1;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 1);
+            expect(setxyBlock.clampCount[0]).toBe(2);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands slot 1 when second argument child has size > 1", () => {
+            setxyBlock.connections[2] = 2;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(setxyBlock.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands both slots when both argument children have size > 1", () => {
+            setxyBlock.connections[1] = 1;
+            setxyBlock.connections[2] = 2;
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 1);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(setxyBlock.clampCount[0]).toBe(2);
+            expect(setxyBlock.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("contracts slots back to 1 when argument children are disconnected", () => {
+            setxyBlock.clampCount = [3, 2];
+            setxyBlock.connections[1] = null;
+            setxyBlock.connections[2] = null;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, -2);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, -1);
+            expect(setxyBlock.clampCount[0]).toBe(1);
+            expect(setxyBlock.clampCount[1]).toBe(1);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("expands slot 1 on expandable two-arg arg blocks when second argument has size > 1", () => {
+            child0.connections[2] = 2;
+            child0.updateSlots = jest.fn((clamp, plusMinus) => {
+                child0.clampCount[clamp] += plusMinus;
+                child0.size += plusMinus;
+            });
+
+            blocksInstance._adjustExpandableTwoArgBlock([1]);
+
+            expect(child0.updateSlots).toHaveBeenCalledWith(1, 2);
+            expect(child0.clampCount[1]).toBe(3);
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(1, true);
+        });
+
+        it("processes deeper nested blocks first so parent reads updated child size", () => {
+            child0.updateSlots = jest.fn((clamp, plusMinus) => {
+                child0.clampCount[clamp] += plusMinus;
+                child0.size += plusMinus;
+            });
+            child0.connections = [0, 2, null];
+            setxyBlock.connections = [null, 1, null, null];
+
+            blocksInstance.insideExpandableBlock = jest.fn(blk => {
+                if (blk === 2) return 1;
+                if (blk === 1) return 0;
+                return null;
+            });
+
+            blocksInstance._adjustExpandableTwoArgBlock([0, 1]);
+
+            expect(child0.updateSlots).toHaveBeenCalledWith(0, 2);
+            expect(child0.size).toBe(4);
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+        });
+
+        it("does not expand slot 1 on three-arg or four-arg blocks whose style is twoarg", () => {
+            const threeArgBlock = {
+                name: "rodiPixel",
+                trash: false,
+                connections: [null, 1, 2, null],
+                clampCount: [1, 1],
+                size: 3,
+                protoblock: { args: 3, style: "twoarg" },
+                updateSlots: jest.fn(),
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => true
+            };
+            blocksInstance.blockList.push(threeArgBlock);
+            const blkIndex = blocksInstance.blockList.length - 1;
+
+            blocksInstance._adjustExpandableTwoArgBlock([blkIndex]);
+
+            expect(threeArgBlock.updateSlots).not.toHaveBeenCalledWith(1, expect.any(Number));
+        });
+
+        it("expands setxy slot 0 to fit a distance block with 4 arguments", () => {
+            const distanceBlock = {
+                name: "distance",
+                trash: false,
+                connections: [0, null, null, null, null],
+                clampCount: [1],
+                size: 4,
+                isInlineCollapsible: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true
+            };
+            setxyBlock.connections[1] = 3;
+            blocksInstance.blockList[3] = distanceBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(0, 3);
+            expect(setxyBlock.clampCount[0]).toBe(4);
+            expect(setxyBlock.size).toBe(5);
+        });
+
+        it("removes legacy vspace blocks below setxy when adjusting two-arg flow block", () => {
+            const vspaceBlock = {
+                name: "vspace",
+                trash: false,
+                connections: [0, 4],
+                hide: jest.fn()
+            };
+            const pendownBlock = {
+                name: "pendown",
+                trash: false,
+                connections: [3, null]
+            };
+            setxyBlock.connections[3] = 3;
+            blocksInstance.blockList[3] = vspaceBlock;
+            blocksInstance.blockList[4] = pendownBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.connections[3]).toBe(4);
+            expect(pendownBlock.connections[0]).toBe(0);
+            expect(vspaceBlock.trash).toBe(true);
+            expect(vspaceBlock.connections).toEqual([null, null]);
+            expect(vspaceBlock.hide).toHaveBeenCalled();
+            expect(blocksInstance.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("removes legacy vspace blocks and contracts when compound second argument is disconnected", () => {
+            const vspaceBlock = {
+                name: "vspace",
+                trash: false,
+                connections: [0, 4],
+                hide: jest.fn()
+            };
+            const pendownBlock = {
+                name: "pendown",
+                trash: false,
+                connections: [3, null]
+            };
+            setxyBlock.clampCount = [1, 2];
+            setxyBlock.connections = [null, null, null, 3];
+            blocksInstance.blockList[3] = vspaceBlock;
+            blocksInstance.blockList[4] = pendownBlock;
+
+            blocksInstance._adjustExpandableTwoArgBlock([0]);
+
+            expect(setxyBlock.updateSlots).toHaveBeenCalledWith(1, -1);
+            expect(setxyBlock.clampCount[1]).toBe(1);
+            expect(setxyBlock.connections[3]).toBe(4);
+            expect(pendownBlock.connections[0]).toBe(0);
+            expect(vspaceBlock.trash).toBe(true);
+        });
+
+        it("ignores two-arg flow blocks in _addRemoveVspaceBlock", () => {
+            const vspaceAdjusterSpy = jest.spyOn(blocksInstance, "_makeNewBlockWithConnections");
+            setxyBlock.connections = [null, 1, 2, null];
+            blocksInstance._addRemoveVspaceBlock(0);
+            expect(vspaceAdjusterSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("insideExpandableBlock", () => {
+        let blocksInstance;
+        let setxyBlock;
+        let multiplyBlock;
+        let plusBlock;
+        let randomBlock;
+        let pendownBlock;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+
+            setxyBlock = {
+                name: "setxy",
+                connections: [null, 1, null, 4],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => true,
+                isArgBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            multiplyBlock = {
+                name: "multiply",
+                connections: [0, null, 2],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            plusBlock = {
+                name: "plus",
+                connections: [1, null, 3],
+                isExpandableBlock: () => true,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            randomBlock = {
+                name: "random",
+                connections: [2, null, null],
+                isExpandableBlock: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => true,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            pendownBlock = {
+                name: "pendown",
+                connections: [0, null],
+                isExpandableBlock: () => false,
+                isTwoArgBlock: () => false,
+                isArgBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false
+            };
+
+            blocksInstance.blockList = [
+                setxyBlock,
+                multiplyBlock,
+                plusBlock,
+                randomBlock,
+                pendownBlock
+            ];
+        });
+
+        it("returns null if blk is null or not in blockList", () => {
+            expect(blocksInstance.insideExpandableBlock(null)).toBeNull();
+            expect(blocksInstance.insideExpandableBlock(99)).toBeNull();
+        });
+
+        it("returns null for a root block without a parent connection", () => {
+            expect(blocksInstance.insideExpandableBlock(0)).toBeNull();
+        });
+
+        it("returns the parent expandable block for a child connected to first argument slot", () => {
+            expect(blocksInstance.insideExpandableBlock(1)).toBe(0);
+        });
+
+        it("returns the parent arg block when a child expression is in the second argument slot", () => {
+            expect(blocksInstance.insideExpandableBlock(2)).toBe(1);
+        });
+
+        it("correctly traverses nested expressions in second argument slots", () => {
+            expect(blocksInstance.insideExpandableBlock(3)).toBe(2);
+            expect(blocksInstance.insideExpandableBlock(2)).toBe(1);
+            expect(blocksInstance.insideExpandableBlock(1)).toBe(0);
+        });
+
+        it("calculates accurate nesting depths for nested expressions in the second argument slot", () => {
+            const depth3 = blocksInstance._getNestingDepth(3);
+            const depth2 = blocksInstance._getNestingDepth(2);
+            const depth1 = blocksInstance._getNestingDepth(1);
+            const depth0 = blocksInstance._getNestingDepth(0);
+
+            expect(depth3).toBe(4);
+            expect(depth2).toBe(3);
+            expect(depth1).toBe(2);
+            expect(depth0).toBe(1);
+
+            expect(depth3).toBeGreaterThan(depth2);
+            expect(depth2).toBeGreaterThan(depth1);
+            expect(depth1).toBeGreaterThan(depth0);
+        });
+
+        it("treats the last connection of a flow block as downstream flow rather than inside the block", () => {
+            expect(blocksInstance.insideExpandableBlock(4)).toBeNull();
+        });
     });
 });

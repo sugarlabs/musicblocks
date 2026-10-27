@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _THIS_IS_MUSIC_BLOCKS_ */
+/* global _THIS_IS_MUSIC_BLOCKS_, renderChatMarkdown */
 
 if (typeof module !== "undefined" && module.exports) {
     // Under Jest the shared helper resolves through CommonJS. In the browser it
@@ -23,7 +23,11 @@ if (typeof module !== "undefined" && module.exports) {
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
 /** AMD module dependencies for lazy loading. */
-AIDebuggerWidget.dependencies = ["utils/ai-widget-lifecycle", "widgets/aidebugger"];
+AIDebuggerWidget.dependencies = [
+    "utils/ai-widget-lifecycle",
+    "utils/ai-markdown",
+    "widgets/aidebugger"
+];
 
 /**
  * Represents a AI Widget.
@@ -41,7 +45,8 @@ function AIDebuggerWidget() {
     const ALLOWED_BACKENDS = {
         "localhost": "http://localhost:8000",
         "127.0.0.1": "http://127.0.0.1:8000",
-        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org"
+        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org",
+        "sugarlabs.github.io": "https://api.musicblocks.sugarlabs.org"
     };
 
     const BACKEND_CONFIG = {
@@ -64,9 +69,13 @@ function AIDebuggerWidget() {
             return null;
         })(),
         ENDPOINTS: {
-            ANALYZE: "/analyze"
+            ANALYZE: "/analyze",
+            FIX: "/fix",
+            MAKE: "/make"
         },
-        TIMEOUT: 30000
+        TIMEOUT: 30000,
+        // Rewriting a project takes the model longer than a chat reply.
+        FIX_TIMEOUT: 120000
     };
 
     /**
@@ -124,6 +133,12 @@ function AIDebuggerWidget() {
     this._isProcessing = false;
 
     /**
+     * The project as it was before the last change from the Edit tab, for Undo.
+     * @type {string|null}
+     */
+    this._projectBeforeFix = null;
+
+    /**
      * Whether the user has consented to send project data to the backend.
      * No data leaves the browser until this is true.
      * @type {boolean}
@@ -174,6 +189,7 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
+            this._clearBlockHighlights();
             this._lifecycle.unmount();
             this._lifecycle.abortPendingRequests();
             this._isProcessing = false;
@@ -194,8 +210,18 @@ function AIDebuggerWidget() {
             this._exportChat();
         };
 
+        this._undoButton = widgetWindow.addButton(
+            "restore-button.svg",
+            ICONSIZE,
+            _("Undo the change")
+        );
+        this._undoButton.style.display = this._projectBeforeFix ? "" : "none";
+        this._undoButton.onclick = () => {
+            this._undoFix();
+        };
+
         this._createLayout();
-        this._showConsentBanner();
+        this._showStart();
         widgetWindow.sendToCenter();
         this.activity.textMsg(_("Debugger initialized"));
     };
@@ -265,10 +291,40 @@ function AIDebuggerWidget() {
         chatContainer.style.flexDirection = "column";
         chatContainer.style.height = "100%";
 
+        // Both tabs share one chat log, so an edit can use what the chat found.
+        const tabBar = document.createElement("div");
+        tabBar.className = "aidebugger-tabs";
+        tabBar.style.display = "flex";
+        tabBar.style.borderBottom = "1px solid var(--color-border-primary)";
+        tabBar.style.backgroundColor = "var(--color-bg-primary)";
+        this._tabButtons = {};
+        [
+            ["chat", _("Chat")],
+            ["edit", _("Edit project")]
+        ].forEach(([name, label]) => {
+            const tab = document.createElement("button");
+            tab.className = "aidebugger-tab";
+            tab.textContent = label;
+            tab.style.flex = "1";
+            tab.style.padding = "10px";
+            tab.style.border = "none";
+            tab.style.background = "transparent";
+            tab.style.color = "var(--color-text-primary)";
+            tab.style.cursor = "pointer";
+            tab.style.fontSize = "14px";
+            tab.style.fontWeight = "bold";
+            tab.onclick = () => this._showTab(name);
+            this._tabButtons[name] = tab;
+            tabBar.appendChild(tab);
+        });
+        chatContainer.appendChild(tabBar);
+
         // Chat log area
         this.chatLog = document.createElement("div");
         this.chatLog.className = "chatLog aidebugger-chat-log";
         this.chatLog.style.flex = "1";
+        // Without this a flex child grows with its messages instead of scrolling.
+        this.chatLog.style.minHeight = "0";
         this.chatLog.style.overflowY = "auto";
         this.chatLog.style.padding = "15px";
         this.chatLog.style.backgroundColor = "var(--color-bg-primary)";
@@ -346,7 +402,89 @@ function AIDebuggerWidget() {
         inputContainer.appendChild(this.messageInput);
         inputContainer.appendChild(this.sendButton);
         chatContainer.appendChild(inputContainer);
+        this._chatInput = inputContainer;
+
+        const editContainer = document.createElement("div");
+        editContainer.className = "aidebugger-input-container";
+        editContainer.style.display = "none";
+        editContainer.style.flexDirection = "column";
+        editContainer.style.padding = "15px";
+        editContainer.style.gap = "10px";
+        editContainer.style.backgroundColor = "var(--color-bg-primary)";
+        editContainer.style.borderTop = "1px solid var(--color-border-primary)";
+
+        this.editInput = document.createElement("textarea");
+        this.editInput.className = "aidebugger-input";
+        this.editInput.rows = 2;
+        this.editInput.placeholder = _(
+            "What should I change in your project, or what new project should I make?"
+        );
+        this.editInput.style.padding = "12px";
+        this.editInput.style.border = "1px solid #ddd";
+        this.editInput.style.borderRadius = "12px";
+        this.editInput.style.fontSize = "14px";
+        this.editInput.style.resize = "none";
+        this.editInput.style.fontFamily = "inherit";
+
+        const editButtons = document.createElement("div");
+        editButtons.style.display = "flex";
+        editButtons.style.gap = "10px";
+        editButtons.appendChild(
+            this._createActionButton(_("Change my project"), () =>
+                this._fixProject(this.editInput.value)
+            )
+        );
+        editButtons.appendChild(
+            this._createActionButton(_("Make a new project"), () =>
+                this._makeProject(this.editInput.value)
+            )
+        );
+
+        editContainer.appendChild(this.editInput);
+        editContainer.appendChild(editButtons);
+        chatContainer.appendChild(editContainer);
+        this._editInput = editContainer;
+
         container.appendChild(chatContainer);
+        this._showTab("chat");
+    };
+
+    /**
+     * Creates a blue rounded button like Send.
+     * @param {string} label
+     * @param {Function} onClick
+     * @returns {HTMLButtonElement}
+     * @private
+     */
+    this._createActionButton = function (label, onClick) {
+        const button = document.createElement("button");
+        button.textContent = label;
+        button.style.flex = "1";
+        button.style.padding = "10px 16px";
+        button.style.backgroundColor = "#2196F3";
+        button.style.color = "white";
+        button.style.border = "none";
+        button.style.borderRadius = "25px";
+        button.style.cursor = "pointer";
+        button.style.fontSize = "14px";
+        button.style.fontWeight = "bold";
+        button.onclick = onClick;
+        return button;
+    };
+
+    /**
+     * Shows the Chat or the Edit input under the shared chat log.
+     * @param {string} name - "chat" or "edit".
+     * @private
+     */
+    this._showTab = function (name) {
+        this._activeTab = name;
+        this._chatInput.style.display = name === "chat" ? "flex" : "none";
+        this._editInput.style.display = name === "edit" ? "flex" : "none";
+        for (const [tab, button] of Object.entries(this._tabButtons)) {
+            button.style.borderBottom =
+                tab === name ? "3px solid #2196F3" : "3px solid transparent";
+        }
     };
 
     /**
@@ -365,6 +503,15 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * What the widget shows when it opens. Nothing is sent yet, so the child
+     * goes straight to asking in Chat or changing the project in Edit project.
+     * @private
+     */
+    this._showStart = function () {
+        this._addWelcomeMessage();
+    };
+
+    /**
      * Sends a message
      * @private
      */
@@ -374,7 +521,7 @@ function AIDebuggerWidget() {
         if (!this._isWidgetActive() || this._isProcessing) return;
 
         if (!this._consentGiven) {
-            this._showConsentBanner();
+            this._showConsentBanner(() => this._sendMessage());
             return;
         }
 
@@ -429,7 +576,19 @@ function AIDebuggerWidget() {
             messageDiv.style.backgroundColor = "var(--color-bg-tertiary)";
             messageDiv.style.color = "var(--color-text-primary)";
             messageDiv.style.border = "1px solid var(--color-border-primary)";
-            messageDiv.textContent = message.content;
+            const render =
+                (typeof renderChatMarkdown !== "undefined" && renderChatMarkdown) ||
+                window.renderChatMarkdown;
+            if (render) {
+                // Escaped and sanitized in utils/ai-markdown.js.
+                const body = document.createElement("div");
+                body.className = "ai-chat-markdown";
+                body.innerHTML = render(message.content);
+                this._linkBlockNames(body);
+                messageDiv.appendChild(body);
+            } else {
+                messageDiv.textContent = message.content;
+            }
             messageDiv.appendChild(timeDiv);
         } else if (message.type === "system") {
             messageDiv.className = "aidebugger-message aidebugger-message-system";
@@ -633,10 +792,16 @@ function AIDebuggerWidget() {
 
     /**
      * Shows a consent banner explaining what data will be sent and where.
-     * No project data leaves the browser until the user explicitly agrees.
+     * No project data leaves the browser until the user explicitly agrees. It
+     * is asked the first time something is about to be sent, and that request
+     * is sent once agreed, so the child goes on with what they pressed.
+     * @param {Function} [afterConsent] - The request to send once the user agrees.
      * @private
      */
-    this._showConsentBanner = function () {
+    this._showConsentBanner = function (afterConsent) {
+        for (const old of this.chatLog.querySelectorAll(".aidebugger-consent-banner")) {
+            old.remove();
+        }
         const banner = document.createElement("div");
         banner.className = "aidebugger-consent-banner";
         banner.style.padding = "16px 20px";
@@ -670,7 +835,7 @@ function AIDebuggerWidget() {
         btnRow.style.marginTop = "4px";
 
         const acceptBtn = document.createElement("button");
-        acceptBtn.textContent = _("Analyze my project");
+        acceptBtn.textContent = _("Agree and continue");
         acceptBtn.style.padding = "8px 16px";
         acceptBtn.style.border = "none";
         acceptBtn.style.borderRadius = "6px";
@@ -694,16 +859,18 @@ function AIDebuggerWidget() {
         acceptBtn.onclick = () => {
             this._consentGiven = true;
             banner.remove();
-            this._loadProjectAndInitialize();
+            if (afterConsent) {
+                afterConsent();
+            } else {
+                this._loadProjectAndInitialize();
+            }
         };
 
         declineBtn.onclick = () => {
             banner.remove();
             const msg = {
                 type: "system",
-                content: _(
-                    "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
-                ),
+                content: _("Nothing was sent. Your project stays here until you agree."),
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(msg);
@@ -854,6 +1021,270 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * Blocks on the canvas that a reply's `code` span names, such as
+     * "repeat 4" or "pitch name E, octave 5". A label at the start of the
+     * text beats one further in, as in "master beats per minute bpm 180" for
+     * the "beats per minute" block. Then the longest label wins.
+     * @param {string} text
+     * @returns {number[]} Block ids.
+     * @private
+     */
+    this._blocksNamedBy = function (text) {
+        const blocks = this.activity && this.activity.blocks;
+        if (!blocks || !blocks.blockList) return [];
+
+        const wanted = String(text).trim().toLowerCase();
+        const padded = ` ${wanted} `;
+        let best = 0;
+        let found = [];
+        Object.keys(blocks.blockList).forEach(id => {
+            const block = blocks.blockList[id];
+            if (!block || block.trash || !block.protoblock) return;
+            const staticLabels = block.protoblock.staticLabels || [];
+            const labels = [block.name, staticLabels[0]]
+                .filter(label => typeof label === "string" && label.trim())
+                .map(label => label.trim().toLowerCase());
+            for (const label of labels) {
+                const atStart = wanted === label || wanted.startsWith(label + " ");
+                if (!atStart && !padded.includes(` ${label} `)) continue;
+                const score = (atStart ? 1000 : 0) + label.length;
+                if (score > best) {
+                    best = score;
+                    found = [];
+                }
+                if (score === best && !found.includes(Number(id))) {
+                    found.push(Number(id));
+                }
+            }
+        });
+        return found;
+    };
+
+    /**
+     * Makes each `code` span that names blocks on the canvas light them up on hover.
+     * @param {HTMLElement} body - A rendered reply.
+     * @private
+     */
+    this._linkBlockNames = function (body) {
+        body.querySelectorAll("code").forEach(code => {
+            if (this._blocksNamedBy(code.textContent).length === 0) return;
+            code.classList.add("ai-block-link");
+            code.title = _("Hover to see this block in your project");
+            code.addEventListener("mouseenter", () => this._highlightBlocks(code.textContent));
+            code.addEventListener("mouseleave", () => this._clearBlockHighlights());
+        });
+    };
+
+    /**
+     * Highlights the blocks a reply names, as Music Blocks does while running.
+     * @param {string} text
+     * @private
+     */
+    this._highlightBlocks = function (text) {
+        this._clearBlockHighlights();
+        const blocks = this.activity.blocks;
+        this._highlightedBlocks = this._blocksNamedBy(text);
+        this._highlightedBlocks.forEach(id => blocks.blockList[id].highlight());
+        if (typeof this.activity.refreshCanvas === "function") this.activity.refreshCanvas();
+    };
+
+    /**
+     * Removes the highlights added by _highlightBlocks.
+     * @private
+     */
+    this._clearBlockHighlights = function () {
+        const ids = this._highlightedBlocks || [];
+        this._highlightedBlocks = [];
+        if (ids.length === 0 || !this.activity || !this.activity.blocks) return;
+        ids.forEach(id => {
+            const block = this.activity.blocks.blockList[id];
+            if (block) block.unhighlight();
+        });
+        if (typeof this.activity.refreshCanvas === "function") this.activity.refreshCanvas();
+    };
+
+    /**
+     * Replaces the blocks on the canvas, keeping this widget open. The old
+     * blocks go to the trash, as when a saved moment is restored.
+     * @param {Array} blocks - Project data, as prepareExport() makes it.
+     * @private
+     */
+    this._loadBlocks = function (blocks) {
+        this.activity.sendAllToTrash(false, true, false);
+        this.activity.blocks.loadNewBlocks(blocks);
+    };
+
+    /**
+     * Adds a system notice to the chat.
+     * @param {string} content
+     * @private
+     */
+    this._notice = function (content) {
+        this._addMessageToUI({
+            type: "system",
+            content: content,
+            timestamp: new Date().toISOString()
+        });
+    };
+
+    /**
+     * The Edit tab's "Change my project". Asks the backend to change the
+     * project as the request and the chat describe, then loads the result.
+     * With no request, the chat so far says what to fix.
+     * @param {string} [requestText]
+     * @private
+     */
+    this._fixProject = function (requestText) {
+        const request = (requestText || "").trim();
+        if (!request && !this.chatHistory.some(msg => msg.type === "user")) {
+            this._notice(_("Tell me what to change first, then I can do it for you."));
+            return;
+        }
+
+        // Taken before the request is added to the chat. The request goes as
+        // the prompt, so the backend would see it twice otherwise.
+        const history = this.chatHistory
+            .filter(msg => msg.type !== "system")
+            .map(msg => ({
+                role: msg.type === "user" ? "user" : "assistant",
+                content: msg.content
+            }));
+        this._requestProject(
+            BACKEND_CONFIG.ENDPOINTS.FIX,
+            code => ({ code: code, prompt: request, history: history }),
+            request,
+            _("I changed your project. Press Undo to go back.")
+        );
+    };
+
+    /**
+     * The Edit tab's "Make a new project". Loads a new project in place of the
+     * current one, which is kept for Undo.
+     * @param {string} description
+     * @private
+     */
+    this._makeProject = function (description) {
+        const text = (description || "").trim();
+        if (text.length < 3) {
+            this._notice(_("Tell me what project to make, for example a drum beat or a song."));
+            return;
+        }
+
+        this._requestProject(
+            BACKEND_CONFIG.ENDPOINTS.MAKE,
+            code => ({ description: text, code: code }),
+            `${_("Make")}: ${text}`,
+            _("I made a new project. Press Undo to get yours back.")
+        );
+    };
+
+    /**
+     * Sends an Edit request and loads the project the backend returns.
+     * @param {string} endpoint - Backend path.
+     * @param {Function} makePayload - Builds the request body from the current project.
+     * @param {string} userText - What to show as the child's message, or "".
+     * @param {string} doneMessage - Status message after loading.
+     * @private
+     */
+    this._requestProject = function (endpoint, makePayload, userText, doneMessage) {
+        if (!this._isWidgetActive() || this._isProcessing) return;
+
+        if (!this._consentGiven) {
+            this._showConsentBanner(() =>
+                this._requestProject(endpoint, makePayload, userText, doneMessage)
+            );
+            return;
+        }
+
+        if (!BACKEND_CONFIG.BASE_URL) {
+            this._notice(_("AI Debugger backend is not configured for this host."));
+            return;
+        }
+
+        this._isProcessing = true;
+        const projectBefore = this.activity.prepareExport();
+        const payload = makePayload(projectBefore);
+
+        if (userText) {
+            const userMessage = {
+                type: "user",
+                content: userText,
+                timestamp: new Date().toISOString()
+            };
+            this.chatHistory.push(userMessage);
+            this._addMessageToUI(userMessage);
+            if (this.editInput) this.editInput.value = "";
+        }
+
+        const typingIndicator = this._showTypingIndicator();
+        const generation = this._lifecycle.generation;
+        const failed = _("Could not change the project. Please try again.");
+
+        this._lifecycle
+            .postJSON(
+                `${BACKEND_CONFIG.BASE_URL}${endpoint}`,
+                payload,
+                BACKEND_CONFIG.FIX_TIMEOUT,
+                failed
+            )
+            .then(data => {
+                if (!this._isSameMount(generation) || !this._isWidgetActive() || !data) {
+                    return;
+                }
+
+                if (data.error || !Array.isArray(data.project)) {
+                    this._notice(data.error || failed);
+                    return;
+                }
+
+                this._loadBlocks(data.project);
+                this._projectBeforeFix = projectBefore;
+                this._undoButton.style.display = "";
+
+                const botResponse = {
+                    type: "bot",
+                    content: data.response,
+                    timestamp: new Date().toISOString()
+                };
+                this.chatHistory.push(botResponse);
+                this._addMessageToUI(botResponse);
+                this._updateMessageCount();
+                this.activity.textMsg(doneMessage);
+            })
+            .finally(() => {
+                if (!this._isSameMount(generation)) {
+                    return;
+                }
+
+                this._removeTypingIndicator(typingIndicator);
+                this._isProcessing = false;
+            });
+    };
+
+    /**
+     * Puts back the project from before the last fix.
+     * @private
+     */
+    this._undoFix = function () {
+        if (!this._projectBeforeFix || this._isProcessing) return;
+
+        try {
+            this._loadBlocks(JSON.parse(this._projectBeforeFix));
+        } catch (error) {
+            console.error("Could not undo the fix:", error);
+            return;
+        }
+
+        this._projectBeforeFix = null;
+        this._undoButton.style.display = "none";
+        this._addMessageToUI({
+            type: "system",
+            content: _("Your project is back to how it was before the change."),
+            timestamp: new Date().toISOString()
+        });
+    };
+
+    /**
      * Resets the conversation and initializes with project data
      * @private
      */
@@ -865,7 +1296,11 @@ function AIDebuggerWidget() {
         this._removeTypingIndicator(null);
         this.chatLog.replaceChildren();
 
-        this._loadProjectAndInitialize();
+        if (this._consentGiven) {
+            this._loadProjectAndInitialize();
+        } else {
+            this._showStart();
+        }
         this._updateMessageCount();
         this.activity.textMsg(_("Conversation reset."));
     };

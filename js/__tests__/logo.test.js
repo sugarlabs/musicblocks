@@ -2655,6 +2655,28 @@ describe("Logo runFromBlockNow", () => {
             expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
         });
 
+        test("dispatchUnissuedSignals does not double-dispatch previously issued signals", () => {
+            turtle0.endOfClampSignals = { 7: ["_transposition_0", "_tie_0"] };
+            turtle0.butNotThese = { 7: [0] };
+
+            logo.dispatchUnissuedSignals(turtle0);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_transposition_0");
+
+            mockActivity.stage.dispatchEvent.mockClear();
+
+            // When dispatchUnissuedSignals is called again (e.g. at turtle completion
+            // after butNotThese is restored), _tie_0 must not fire again.
+            turtle0.butNotThese = {};
+            logo.dispatchUnissuedSignals(turtle0);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_transposition_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_tie_0");
+        });
+
         test("a note counter's silent run keeps its signals on a premature restart", () => {
             logo._prematureRestart = true;
             turtle0.singer.justCounting = [true];

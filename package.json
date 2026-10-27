@@ -114,7 +114,7 @@
         "path-to-regexp": "^8.4.0",
         "picomatch": "^4.0.4",
         "yaml": "^2.8.3",
-        "follow-redirects": "^1.16.0",
+        "follow-redirects": "^1.16.1",
         "systeminformation": "^5.31.17",
         "ip-address": "^10.2.0",
         "ajv": "^6.14.0",
@@ -131,8 +131,8 @@
         "@gulp-sourcemaps/identity-map": {
             "postcss": "8.5.28"
         },
-        "body-parser": "2.3.0",
-        "qs": "6.16.0",
+        "body-parser": "2.4.0",
+        "qs": "6.16.1",
         "browserslist": "4.28.9",
         "baseline-browser-mapping": "2.11.22",
         "decode-uri-component": "0.5.0",
