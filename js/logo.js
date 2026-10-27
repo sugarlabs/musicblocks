@@ -1911,6 +1911,7 @@ class Logo {
             turtle.parentFlowQueue = [];
             turtle.unhighlightQueue = [];
             turtle.parameterQueue = [];
+            turtle.actionBoundaries = [];
         }
 
         if (this.turtleDelay === 0) {
@@ -1958,6 +1959,7 @@ class Logo {
             tur.parentFlowQueue = [];
             tur.unhighlightQueue = [];
             tur.parameterQueue = [];
+            tur.actionBoundaries = [];
 
             tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
@@ -1977,6 +1979,7 @@ class Logo {
                     tur.parentFlowQueue = [];
                     tur.unhighlightQueue = [];
                     tur.parameterQueue = [];
+                    tur.actionBoundaries = [];
 
                     tur.running = true;
                     delayStart = 250;
@@ -2006,6 +2009,7 @@ class Logo {
                             tur.parentFlowQueue = [];
                             tur.unhighlightQueue = [];
                             tur.parameterQueue = [];
+                            tur.actionBoundaries = [];
 
                             if (!tur.inTrash) {
                                 tur.running = true;
@@ -2210,6 +2214,7 @@ class Logo {
 ===========================================================================
 */
         const tur = logo.turtles.ithTurtle(turtle);
+        if (tur && !tur.actionBoundaries) tur.actionBoundaries = [];
         const args = [];
 
         if (proto.args > 0) {
@@ -2356,11 +2361,29 @@ class Logo {
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) {
-                    if (profilingEnabled) {
-                        Logo._recordBlockTiming(logo, blk, profilingStart);
-                        tracker.exitBlock();
+                    if (currentBlock.name === "return") {
+                        const boundary =
+                            tur.actionBoundaries && tur.actionBoundaries.length > 0
+                                ? tur.actionBoundaries.pop()
+                                : queueStart;
+                        while (tur.queue.length > boundary) {
+                            const popped = tur.queue.pop();
+                            if (popped && popped.blk in tur.endOfClampSignals) {
+                                while (tur.endOfClampSignals[popped.blk].length > 0) {
+                                    const signal = tur.endOfClampSignals[popped.blk].pop();
+                                    if (signal !== null && signal !== undefined) {
+                                        logo.stage.dispatchEvent(signal);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if (profilingEnabled) {
+                            Logo._recordBlockTiming(logo, blk, profilingStart);
+                            tracker.exitBlock();
+                        }
+                        return ret;
                     }
-                    return ret;
                 }
             }
         } else {
@@ -2447,6 +2470,12 @@ class Logo {
             // eslint-disable-next-line eqeqeq
             if (tur.parentFlowQueue != undefined) {
                 tur.parentFlowQueue.push(blk);
+                if (["do", "nameddo", "doArg", "nameddoArg"].includes(blockName)) {
+                    if (!tur.actionBoundaries) {
+                        tur.actionBoundaries = [];
+                    }
+                    tur.actionBoundaries.push(tur.queue.length);
+                }
                 tur.queue.push(queueBlock);
             }
         }
@@ -2454,6 +2483,14 @@ class Logo {
         let nextBlock = null;
         let parentBlk = null;
         let passArg = null;
+
+        if (
+            tur.actionBoundaries &&
+            tur.actionBoundaries.length > 0 &&
+            tur.queue.length <= logo.deps.utils.last(tur.actionBoundaries)
+        ) {
+            tur.actionBoundaries.pop();
+        }
 
         // Run the last flow in the queue.
         if (tur.queue.length > queueStart) {

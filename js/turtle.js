@@ -352,6 +352,20 @@ class Turtle {
     }
 
     /**
+     * @param {number[]} boundaries
+     */
+    set actionBoundaries(boundaries) {
+        this._actionBoundaries = boundaries;
+    }
+
+    /**
+     * @returns {number[]}
+     */
+    get actionBoundaries() {
+        return this._actionBoundaries;
+    }
+
+    /**
      * @param {Function[]} listeners - list of listeners
      */
     set listeners(listeners) {
@@ -569,6 +583,7 @@ Turtle.TurtleModel = class {
         this._parentFlowQueue = [];
         this._unhighlightQueue = [];
         this._parameterQueue = [];
+        this._actionBoundaries = [];
 
         this._listeners = {}; // Event listeners
         // When we leave a clamp block, we need to dispatch a signal
