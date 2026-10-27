@@ -657,6 +657,26 @@ class ContextMenuController {
             activity.bassBitmap.y -= dy;
         }
 
+        const gridShift = activity.toolbarHeight === 0 ? -dy : dy;
+        for (const bitmaps of [
+            activity.grandSharpBitmap,
+            activity.grandFlatBitmap,
+            activity.trebleSharpBitmap,
+            activity.trebleFlatBitmap,
+            activity.sopranoSharpBitmap,
+            activity.sopranoFlatBitmap,
+            activity.altoSharpBitmap,
+            activity.altoFlatBitmap,
+            activity.tenorSharpBitmap,
+            activity.tenorFlatBitmap,
+            activity.bassSharpBitmap,
+            activity.bassFlatBitmap
+        ]) {
+            for (const bitmap of bitmaps) {
+                bitmap.y += gridShift;
+            }
+        }
+
         activity.refreshCanvas();
     }
 
