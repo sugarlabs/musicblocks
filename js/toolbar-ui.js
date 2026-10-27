@@ -1220,10 +1220,7 @@ class ToolbarUI {
             }
             this.syncToolbarHeight();
 
-            if (
-                window.widgetWindows &&
-                typeof window.widgetWindows._handleResize === "function"
-            ) {
+            if (window.widgetWindows && typeof window.widgetWindows._handleResize === "function") {
                 window.widgetWindows._handleResize();
             }
         };
@@ -2389,10 +2386,7 @@ class ToolbarUI {
             this._setAuxToolbarButtonState(false);
             this.syncToolbarHeight();
 
-            if (
-                window.widgetWindows &&
-                typeof window.widgetWindows._handleResize === "function"
-            ) {
+            if (window.widgetWindows && typeof window.widgetWindows._handleResize === "function") {
                 window.widgetWindows._handleResize();
             }
         }
