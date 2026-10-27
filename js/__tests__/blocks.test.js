@@ -1954,6 +1954,56 @@ describe("Blocks Foundation", () => {
             });
         });
 
+        // The AI Debugger and Reflection windows open when the clamp's flow
+        // reaches the hiddennoflow block below it. Without one the window
+        // never opened.
+        describe.each(["aidebugger", "reflection"])("hidden block below a %s clamp", name => {
+            const load = project => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.protoBlockDict = {};
+                for (const known of [name, "print", "text", "hiddennoflow"]) {
+                    blocks.protoBlockDict[known] = { hasCapability: () => false, dockTypes: [] };
+                }
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+                mockActivity._suppressRefresh = true;
+                mockActivity.errorMsg.mockClear();
+                blocks.loadNewBlocks(project);
+                expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+                return blocks._makeNewBlockWithConnections.mock.calls.map(call => [
+                    call[0],
+                    call[2]
+                ]);
+            };
+
+            const widget = connections => [
+                [0, name, 100, 100, connections],
+                [1, "print", 0, 0, [0, 2, null]],
+                [2, ["text", { value: "hi" }], 0, 0, [1]]
+            ];
+
+            it("adds one to a block saved with the old two-slot macro", () => {
+                const built = load(widget([null, 1]));
+                expect(built[0]).toEqual([name, [null, 1, 3]]);
+                expect(built[3]).toEqual(["hiddennoflow", [0, null]]);
+            });
+
+            it("adds one when the tail is empty", () => {
+                const built = load(widget([null, 1, null]));
+                expect(built[0]).toEqual([name, [null, 1, 3]]);
+                expect(built[3]).toEqual(["hiddennoflow", [0, null]]);
+            });
+
+            it("leaves a block that already has one alone", () => {
+                const project = widget([null, 1, 3]);
+                project.push([3, "hiddennoflow", 0, 0, [0, null]]);
+                const built = load(project);
+                expect(built).toHaveLength(4);
+                expect(built[0]).toEqual([name, [null, 1, 3]]);
+            });
+        });
+
         // Merging a project whose actions use the default names "action" and
         // "action1" into a workspace that already has an "action" renames the
         // incoming ones to "action1" and "action11". Each do block must follow

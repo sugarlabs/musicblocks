@@ -2178,12 +2178,6 @@ function setupWidgetBlocks(activity) {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // The window opens on a signal from the block below the clamp.
-            // Blocks saved before the palette added one, or rebuilt by an AI
-            // edit, can have nothing there, so the window would never open.
-            const block = activity.blocks.blockList[blk];
-            if (block && last(block.connections) === null) __listener();
-
             if (args.length === 1) return [args[0], 1];
         }
     }
@@ -2348,11 +2342,6 @@ function setupWidgetBlocks(activity) {
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
-
-            // As in the Reflection block, older and AI-edited blocks can have
-            // nothing below the clamp to signal from.
-            const block = activity.blocks.blockList[blk];
-            if (block && last(block.connections) === null) __listener();
 
             return [args[0], 1];
         }

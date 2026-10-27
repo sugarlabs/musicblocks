@@ -86,7 +86,7 @@ function renderChatMarkdown(markdown) {
     };
     const closeList = () => {
         if (list) {
-            const start = list.start ? ` start="${list.start}"` : "";
+            const start = list.start === undefined ? "" : ` start="${list.start}"`;
             out.push(`<${list.tag}${start}>${list.items.join("")}</${list.tag}>`);
             list = null;
         }

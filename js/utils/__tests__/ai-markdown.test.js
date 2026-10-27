@@ -21,6 +21,12 @@ describe("ai-markdown", () => {
         expect(renderChatMarkdown("1. one\n- detail\n2. two")).toContain('<ol start="2">');
     });
 
+    it("keeps a list that starts at zero", () => {
+        expect(renderChatMarkdown("0. zero\n1. one")).toBe(
+            '<ol start="0"><li>zero</li><li>one</li></ol>'
+        );
+    });
+
     it("turns headings into bold lines", () => {
         expect(renderChatMarkdown("## What you made")).toBe(
             '<p class="ai-chat-heading"><strong>What you made</strong></p>'

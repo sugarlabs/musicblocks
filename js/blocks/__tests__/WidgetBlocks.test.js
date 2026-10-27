@@ -724,19 +724,6 @@ describe("setupWidgetBlocks", () => {
                 expect(tail[4]).toEqual([0, null]);
             }
         );
-
-        it.each([
-            ["aidebugger", "aiDebugger"],
-            ["reflection", "reflection"]
-        ])("opens the %s window when nothing is below the clamp", (name, field) => {
-            // Saved with two slots and the print removed, or rebuilt by an edit
-            // with an empty tail, the clamp end has no block to signal from.
-            activity.blocks.blockList.oldBlk = { connections: [null, null] };
-            const block = getBlock(name);
-            block.flow([null], logo, 0, "oldBlk", "received");
-            block.flow([null], logo, 0, "oldBlk");
-            expect(logo[field].init).toHaveBeenCalledTimes(1);
-        });
     });
 
     describe("First-Click Flow (Lazy Loading)", () => {
