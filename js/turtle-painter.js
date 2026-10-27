@@ -850,8 +850,11 @@ class Painter {
      * Takes in turtle functions to reset the turtle position, pen, skin, media.
      *
      * @param steps - the number of steps the turtle goes forward by
+     * @param linePart - "first", "middle" or "last" when drawing part of a longer move
+     * @param totalSteps - the whole move that steps is part of, checked against
+     *     MAX_WRAP_STEPS (defaults to steps)
      */
-    doForward(steps, linePart) {
+    doForward(steps, linePart, totalSteps = steps) {
         steps = Number(steps);
         if (!Number.isFinite(steps)) {
             this.turtles.activity.errorMsg(NANERRORMSG);
@@ -901,7 +904,7 @@ class Painter {
             this._move(ox, oy, nx, ny, true, linePart);
             this._scheduleCanvasUpdate();
         } else {
-            if (Math.abs(steps) > MAX_WRAP_STEPS) {
+            if (Math.abs(totalSteps) > MAX_WRAP_STEPS) {
                 this.turtles.activity.errorMsg(
                     _("Steps must be within -%s to %s when Wrap Mode is on.").replace(
                         /%s/g,

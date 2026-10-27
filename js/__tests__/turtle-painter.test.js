@@ -627,6 +627,20 @@ describe("Drawing - doForward", () => {
         }
     );
 
+    test("doForward with wrap ON rejects a part of a move whose total is too large", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(250000, "middle", 2000000);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+            "Steps must be within -1000000 to 1000000 when Wrap Mode is on."
+        );
+        expect(mockTurtle.container.x).toBe(795);
+        expect(mockTurtle.ctx.stroke).not.toHaveBeenCalled();
+    });
+
     test("doForward with wrap ON accepts the largest step count", () => {
         painter.wrap = true;
         mockTurtle.container.x = 795;
