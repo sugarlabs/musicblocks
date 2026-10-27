@@ -23,7 +23,10 @@ global._THIS_IS_MUSIC_BLOCKS_ = true;
 global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
 
-global.rationalToFraction = jest.fn().mockReturnValue([4, 1]);
+const { rationalToFraction: realRationalToFraction } = require("../../utils/utils-logic.js");
+
+const mockRationalToFraction = jest.fn().mockReturnValue([4, 1]);
+global.rationalToFraction = mockRationalToFraction;
 global.mixedNumber = jest
     .fn()
     .mockImplementation(val => (val !== null && val !== undefined ? val.toString() : ""));
@@ -758,7 +761,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["C4"], 0.25]
+                                noteStatus: [["C4"], 4]
                             }
                         };
                     case 1:
@@ -766,7 +769,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["X4"], 0.25]
+                                noteStatus: [["X4"], 4]
                             }
                         };
                     case 2:
@@ -774,7 +777,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["E4"], 0.5]
+                                noteStatus: [["E4"], 2]
                             }
                         };
                     default:
@@ -793,16 +796,24 @@ describe("StatusMatrix Widget", () => {
         });
 
         test("displays note names from noteStatus", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "E4"], 0.25]
+                    noteStatus: [["C4", "E4"], 4]
                 }
             });
 
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
             statusMatrix.updateAll();
-            expect(rationalToFraction).toHaveBeenCalledWith(0.25);
+            expect(rationalToFraction).toHaveBeenCalledWith(4);
+            expect(mockCell.textContent).toContain("C4");
+            expect(mockCell.textContent).toContain("E4");
+            expect(mockCell.textContent).toBe("C4 E4 1/4");
         });
 
         test("collapses duplicate note names in the note row display", () => {
@@ -813,7 +824,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["G4", "G4"], 0.125]
+                    noteStatus: [["G4", "G4"], 8]
                 }
             });
 
@@ -824,17 +835,77 @@ describe("StatusMatrix Widget", () => {
             expect(mockCell.textContent).toBe("G4 1/8");
         });
 
-        test("formats numeric frequencies with Hz suffix", () => {
+        test("renders note duration fraction for non-unit fractions (e.g. 3/8 for dotted quarter note)", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [[440], 0.25]
+                    noteStatus: [["A4"], 8 / 3]
                 }
             });
 
+            rationalToFraction.mockReturnValueOnce([8, 3]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("A4 3/8");
+        });
+
+        test("fails if duration fraction numerator and denominator are inverted", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            // Unit fraction: beat value 4 (quarter note) -> helper returns [4, 1] -> duration must be 1/4, not 4/1
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], 4]
+                }
+            });
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("C4 1/4");
+            expect(mockCell.textContent).not.toBe("C4 4/1");
+
+            // Non-unit fraction: beat value 8/3 (dotted quarter) -> helper returns [8, 3] -> duration must be 3/8, not 8/3
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["D4"], 8 / 3]
+                }
+            });
+            rationalToFraction.mockReturnValueOnce([8, 3]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("D4 3/8");
+            expect(mockCell.textContent).not.toBe("D4 8/3");
+        });
+
+        test("formats numeric frequencies with Hz suffix", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [[440], 4]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
             statusMatrix.updateAll();
             expect(toFixed2).toHaveBeenCalledWith(440);
+            expect(mockCell.textContent).toBe("440.00Hz 1/4");
         });
 
         test("replaces # with ♯ in note display", () => {
@@ -845,13 +916,14 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C#4"], 0.25]
+                    noteStatus: [["C#4"], 4]
                 }
             });
 
             statusMatrix.updateAll();
 
             expect(mockCell.textContent).toContain("♯");
+            expect(mockCell.textContent).toBe("C♯4 1/4");
         });
 
         test("replaces b with ♭ in note display", () => {
@@ -859,24 +931,79 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["Bb4"], 0.25]
+                    noteStatus: [["Bb4"], 4]
                 }
             });
 
             statusMatrix.updateAll();
             expect(statusMatrix._statusTable.rows[2].cells[1].textContent).toContain("♭");
+            expect(statusMatrix._statusTable.rows[2].cells[1].textContent).toBe("B♭4 1/4");
         });
 
         test("handles empty noteStatus array", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [[], 0.25]
+                    noteStatus: [[], 4]
                 }
             });
 
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
             expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockCell.textContent).toBe("1/4");
+        });
+
+        test("omits fraction when noteStatus duration value is null or undefined", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], null]
+                }
+            });
+
+            statusMatrix.updateAll();
+            expect(mockCell.textContent).toBe("C4 ");
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], undefined]
+                }
+            });
+
+            statusMatrix.updateAll();
+            expect(mockCell.textContent).toBe("C4 ");
+        });
+
+        test("omits fraction when rationalToFraction returns null or incomplete array", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], 4]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce(null);
+            statusMatrix.updateAll();
+            expect(mockCell.textContent).toBe("C4 ");
+
+            rationalToFraction.mockReturnValueOnce([4]);
+            statusMatrix.updateAll();
+            expect(mockCell.textContent).toBe("C4 ");
         });
     });
 
@@ -1161,7 +1288,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "C4", 440], 0.25]
+                    noteStatus: [["C4", "C4", 440], 4]
                 }
             });
 
@@ -1311,7 +1438,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 2,
-                    noteStatus: [["C4"], 0.25]
+                    noteStatus: [["C4"], 4]
                 }
             });
 
@@ -1391,6 +1518,260 @@ describe("StatusMatrix Widget", () => {
             expect(totalRows).toBe(7);
             expect(theadRows).toBe(1);
             expect(tbodyRows).toBe(6);
+        });
+    });
+
+    describe("Real rationalToFraction Integration", () => {
+        beforeEach(() => {
+            global.rationalToFraction = realRationalToFraction;
+            statusMatrix.init(mockActivity);
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+        });
+
+        afterEach(() => {
+            global.rationalToFraction = mockRationalToFraction;
+        });
+
+        test("formats durations correctly across musical note values using production rationalToFraction", () => {
+            // Quarter note: beat value 4 -> helper returns [4, 1] -> displays 1/4
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], 4]
+                }
+            });
+            statusMatrix.updateAll();
+            let noteCell = statusMatrix._statusTable.rows[1].cells[1];
+            expect(noteCell.textContent).toBe("C4 1/4");
+
+            // Half note: beat value 2 -> helper returns [2, 1] -> displays 1/2
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["G4"], 2]
+                }
+            });
+            statusMatrix.updateAll();
+            noteCell = statusMatrix._statusTable.rows[1].cells[1];
+            expect(noteCell.textContent).toBe("G4 1/2");
+
+            // Eighth note: beat value 8 -> helper returns [8, 1] -> displays 1/8
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["E4"], 8]
+                }
+            });
+            statusMatrix.updateAll();
+            noteCell = statusMatrix._statusTable.rows[1].cells[1];
+            expect(noteCell.textContent).toBe("E4 1/8");
+
+            // Dotted quarter note: beat value 8/3 -> helper returns [8, 3] -> displays 3/8
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["D4"], 8 / 3]
+                }
+            });
+            statusMatrix.updateAll();
+            noteCell = statusMatrix._statusTable.rows[1].cells[1];
+            expect(noteCell.textContent).toBe("D4 3/8");
+        });
+    });
+
+    describe("Producer-to-Renderer Integration (Singer.processNote -> StatusMatrix)", () => {
+        const Singer = require("../../turtle-singer.js");
+        const musicUtils = require("../../utils/musicutils.js");
+
+        let originalGetNote;
+        let originalRationalSum;
+        let originalLast;
+        let originalIsCustomTemperament;
+        let originalIsEquallyTempered;
+        let originalTemperamentHasRatios;
+        let originalIsNonEDO;
+        let originalGetTemperament;
+        let originalGetCurrentEDO;
+        let originalNormalizeNoteAccidentals;
+        let originalBtoa;
+
+        let turtleFixture;
+        let activityFixture;
+        let statusFixture;
+
+        beforeEach(() => {
+            originalGetNote = global.getNote;
+            originalRationalSum = global.rationalSum;
+            originalLast = global.last;
+            originalIsCustomTemperament = global.isCustomTemperament;
+            originalIsEquallyTempered = global.isEquallyTempered;
+            originalTemperamentHasRatios = global.temperamentHasRatios;
+            originalIsNonEDO = global.isNonEDO;
+            originalGetTemperament = global.getTemperament;
+            originalGetCurrentEDO = global.getCurrentEDO;
+            originalNormalizeNoteAccidentals = global.normalizeNoteAccidentals;
+            originalBtoa = global.window.btoa;
+
+            global.rationalToFraction = realRationalToFraction;
+            global.getNote = musicUtils.getNote;
+            global.rationalSum = (a, b) => [[a[0] + b[0], a[1] + b[1]], null];
+            global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
+            global.isCustomTemperament = () => false;
+            global.isEquallyTempered = () => true;
+            global.temperamentHasRatios = () => false;
+            global.isNonEDO = () => false;
+            global.getTemperament = () => ({ pitchNumber: 12 });
+            global.getCurrentEDO = () => 12;
+            global.normalizeNoteAccidentals = n => n;
+            global.DEFAULTVOLUME = 100;
+            global.TARGETBPM = 120;
+            global.TONEBPM = 60;
+            global.DEFAULTVOICE = "DEFAULTVOICE";
+            global.DEFAULTVOICES = ["DEFAULTVOICE"];
+            global.MIN_HIGHLIGHT_DURATION_MS = 100;
+            global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
+            if (!global.window.btoa) {
+                global.window.btoa = s => Buffer.from(s).toString("base64");
+            }
+
+            turtleFixture = {
+                name: "Mouse1",
+                inTrash: false,
+                turtles: [],
+                synthVolume: { DEFAULTVOICE: [100] },
+                inNoteBlock: ["blk1"],
+                notePitches: { blk1: [] },
+                noteOctaves: { blk1: [] },
+                noteCents: { blk1: [] },
+                noteHertz: { blk1: [] },
+                oscList: { blk1: false },
+                noteBeat: { blk1: 1 },
+                noteBeatValues: { blk1: 4 },
+                noteDrums: { blk1: [] },
+                embeddedGraphics: { blk1: [] },
+                doWait: jest.fn(),
+                blink: jest.fn()
+            };
+            turtleFixture.singer = new Singer(turtleFixture);
+            turtleFixture.singer.suppressOutput = true;
+
+            activityFixture = {
+                stageDirty: false,
+                stage: { update: jest.fn() },
+                turtles: {
+                    turtleList: [turtleFixture],
+                    ithTurtle: jest.fn().mockReturnValue(turtleFixture),
+                    getIndexOfTurtle: jest.fn().mockReturnValue(0)
+                },
+                blocks: {
+                    visible: true,
+                    unhighlight: jest.fn(),
+                    blockList: {
+                        blk1: { connections: [0, 0] }
+                    }
+                },
+                logo: {
+                    statusFields: [],
+                    updatingStatusMatrix: false,
+                    inStatusMatrix: false,
+                    parseArg: jest.fn(),
+                    boxes: {},
+                    synth: {
+                        setMasterVolume: jest.fn(),
+                        setVolume: jest.fn(),
+                        rampTo: jest.fn(),
+                        trigger: jest.fn(),
+                        getFrequency: jest.fn().mockReturnValue(440),
+                        getCustomFrequency: jest.fn().mockReturnValue(440),
+                        start: jest.fn()
+                    },
+                    pitchDrumMatrix: { addRowBlock: jest.fn() },
+                    notation: { notationInsertTie: jest.fn(), notationRemoveTie: jest.fn() },
+                    dispatchTurtleSignals: jest.fn(),
+                    firstNoteTime: null,
+                    stopTurtle: false,
+                    specialArgs: [],
+                    _timerManager: {
+                        setGuardedTimeout: jest.fn((cb, delay) => setTimeout(cb, delay)),
+                        setTimeout: jest.fn((cb, delay) => setTimeout(cb, delay)),
+                        clearTimeout: jest.fn(),
+                        clearAll: jest.fn(() => 0)
+                    }
+                }
+            };
+
+            statusFixture = new StatusMatrix();
+            statusFixture.init(activityFixture);
+            statusFixture._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+        });
+
+        afterEach(() => {
+            global.rationalToFraction = mockRationalToFraction;
+            global.getNote = originalGetNote;
+            global.rationalSum = originalRationalSum;
+            global.last = originalLast;
+            global.isCustomTemperament = originalIsCustomTemperament;
+            global.isEquallyTempered = originalIsEquallyTempered;
+            global.temperamentHasRatios = originalTemperamentHasRatios;
+            global.isNonEDO = originalIsNonEDO;
+            global.getTemperament = originalGetTemperament;
+            global.getCurrentEDO = originalGetCurrentEDO;
+            global.normalizeNoteAccidentals = originalNormalizeNoteAccidentals;
+            global.window.btoa = originalBtoa;
+        });
+
+        const executeProcessNote = (pitch, octave, noteValue) => {
+            const blk = "blk1";
+            turtleFixture.singer.inNoteBlock = [blk];
+            turtleFixture.singer.notePitches[blk] = [pitch];
+            turtleFixture.singer.noteOctaves[blk] = [octave];
+            turtleFixture.singer.noteCents[blk] = [0];
+            turtleFixture.singer.noteHertz[blk] = [0];
+            turtleFixture.singer.oscList[blk] = false;
+            turtleFixture.singer.noteBeat[blk] = 1;
+            turtleFixture.singer.noteBeatValues[blk] = noteValue;
+            turtleFixture.singer.noteDrums[blk] = [];
+            turtleFixture.singer.embeddedGraphics[blk] = [];
+
+            // Execute the genuine producer path
+            Singer.processNote(activityFixture, noteValue, false, blk, 0, jest.fn());
+
+            // Execute the genuine renderer path reading from the same turtle
+            statusFixture.updateAll();
+            return statusFixture._statusTable.rows[1].cells[1].textContent;
+        };
+
+        test("processes half note through Singer.processNote and renders duration fraction 1/2", () => {
+            // Half note (noteValue = 2, pitch G4) -> producer stores noteBeatValue = 2 -> renderer displays G4 1/2
+            const rendered = executeProcessNote("G", 4, 2);
+            expect(turtleFixture.singer.noteStatus).toEqual([["G4"], 2]);
+            expect(rendered).toBe("G4 1/2");
+        });
+
+        test("processes quarter note through Singer.processNote and renders duration fraction 1/4", () => {
+            // Quarter note (noteValue = 4, pitch C4) -> producer stores noteBeatValue = 4 -> renderer displays C4 1/4
+            const rendered = executeProcessNote("C", 4, 4);
+            expect(turtleFixture.singer.noteStatus).toEqual([["C4"], 4]);
+            expect(rendered).toBe("C4 1/4");
+        });
+
+        test("processes dotted quarter note through Singer.processNote and renders duration fraction 3/8", () => {
+            // Dotted quarter note (noteValue = 8/3, pitch D4) -> producer stores noteBeatValue = 8/3 -> renderer displays D4 3/8
+            const rendered = executeProcessNote("D", 4, 8 / 3);
+            expect(turtleFixture.singer.noteStatus).toEqual([["D4"], 8 / 3]);
+            expect(rendered).toBe("D4 3/8");
         });
     });
 });
