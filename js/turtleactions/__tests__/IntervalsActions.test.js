@@ -972,6 +972,18 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.custom).toEqual([4, 3, 5]);
     });
 
+    test("defineMode calculates the same steps after ignoring a repeated pitch", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        turtle.singer.defineMode.push(0, 4, 7, 7);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
+        expect(MUSICALMODES.custom).toEqual([4, 3, 5]);
+    });
+
     test("defineMode does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
         activity.blocks.blockList["undefined"] = {};
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
@@ -1017,13 +1029,13 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).not.toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
     });
 
-    test("defineMode keeps a leading duplicate zero's step as 0, not wrapped to the temperament length", () => {
+    test("defineMode removes a leading duplicate zero before calculating steps", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
         turtle.singer.defineMode.push(0, 0, 5);
         listener();
-        expect(MUSICALMODES.custom).toEqual([0, 7]);
+        expect(MUSICALMODES.custom).toEqual([5, 7]);
     });
 
     test("defineMode listener does not update block text when there is no connected child block", () => {
@@ -1096,7 +1108,7 @@ describe("setupIntervalsActions", () => {
 
         expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
         // A null mode name still falls back to the "custom" key, not an empty string.
-        expect(MUSICALMODES.custom).toEqual([4, 0]);
+        expect(MUSICALMODES.custom).toEqual([4, 8]);
     });
 
     test("defineMode sets dispatch, resets turtle state, and lowercases the mode name", () => {
@@ -1127,7 +1139,7 @@ describe("setupIntervalsActions", () => {
 
         expect(activity.errorMsg).toHaveBeenCalledWith(_("Adding missing pitch number 0."));
         expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
-        expect(MUSICALMODES.custom).toEqual([4, 3, 0, 3]);
+        expect(MUSICALMODES.custom).toEqual([4, 3, 2, 3]);
         expect(activity.blocks.updateBlockText).toHaveBeenCalledWith("text1");
         expect(turtle.singer.inDefineMode).toBe(false);
     });
@@ -1156,18 +1168,19 @@ describe("setupIntervalsActions", () => {
         expect(mockMouse.MB.listeners).toContain("_definemode_0_undefined");
     });
 
-    test("defineMode flags EDOBOUNDEXCEEDED when more pitch numbers than the temperament length are defined", () => {
+    test("defineMode ignores duplicates when counting pitch numbers", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
 
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
 
-        // 13 in-range (0-11) pitch numbers for a default 12-EDO temperament
-        // exceeds temperamentLength even though none of them are individually out of bounds.
+        // Twelve unique pitch numbers plus one repeated tonic should fit in
+        // the default 12-EDO temperament after duplicate removal.
         turtle.singer.defineMode.push(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0);
         listener();
 
-        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+        expect(activity.errorMsg).not.toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
     });
 
     test("setTemperament state changes", () => {

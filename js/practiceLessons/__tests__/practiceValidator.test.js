@@ -363,14 +363,14 @@ describe("PracticeValidator.getCurrentSequence", () => {
         expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "B", "A", "B", "A", "B"]);
     });
 
-    test("treats a repeat with no count as playing once", () => {
+    test("treats a repeat with no count block as running zero times", () => {
         useBlocks({
             start: { name: "start", trash: false, connections: [null, "rep", null] },
             rep: { name: "repeat", trash: false, connections: ["start", null, "c0", null] },
             c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
         });
 
-        expect(PracticeValidator.getCurrentSequence()).toEqual(["A"]);
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
     });
 
     test("sees through the hidden blocks Music Blocks inserts inside clamps", () => {
@@ -389,6 +389,170 @@ describe("PracticeValidator.getCurrentSequence", () => {
         useBlocks(blocks);
 
         expect(PracticeValidator.getCurrentSequence()).toEqual(["A"]);
+    });
+
+    // --- Regression tests for issue #9608 ---
+
+    test("repeat with count 0 produces no iterations", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: 0, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("repeat with fractional count floors to match RepeatBlock", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: 2.7, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        // Math.floor(2.7) = 2, not 3
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "A"]);
+    });
+
+    test("repeat with count below 1 produces no iterations", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: 0.5, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("repeat with negative count produces no iterations", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: -3, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("repeat with non-numeric string count produces no iterations", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "text", value: "abc", trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("repeat with non-finite count produces no iterations", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: Infinity, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("repeat with namedbox count resolves stored value", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "store", null] },
+            store: {
+                name: "storein2",
+                value: "mybox",
+                trash: false,
+                connections: ["start", "storeVal", "rep"]
+            },
+            storeVal: { name: "number", value: 3, trash: false, connections: ["store"] },
+            rep: { name: "repeat", trash: false, connections: ["store", "boxRef", "c0", null] },
+            boxRef: { name: "namedbox", value: "mybox", trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "A", "A"]);
+    });
+
+    test("repeat with divide block count resolves quotient", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "div", "c0", null] },
+            div: { name: "divide", trash: false, connections: ["rep", "num", "den"] },
+            num: { name: "number", value: 6, trash: false, connections: ["div"] },
+            den: { name: "number", value: 3, trash: false, connections: ["div"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "A"]);
+    });
+
+    test("maxLength stops sequence extraction early for huge repeat counts", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: 10000, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        // With maxLength=6, the sequence should stop after exceeding 6 elements.
+        const blockList = PracticeValidator.getBlockList();
+        const startBlock = Object.values(blockList).find(b => b?.name === "start" && !b.trash);
+        const result = PracticeValidator.extractPatternSequence(
+            startBlock.connections?.[1],
+            blockList,
+            6
+        );
+
+        // The result should be longer than 6 (it exceeds the cap) but much shorter than 10000.
+        expect(result.length).toBeGreaterThan(6);
+        expect(result.length).toBeLessThan(100);
+    });
+
+    test("nested repeats do not cause excessive array growth", () => {
+        useBlocks({
+            "start": { name: "start", trash: false, connections: [null, "rep-outer", null] },
+            "rep-outer": {
+                name: "repeat",
+                trash: false,
+                connections: ["start", "count-outer", "rep-inner", null]
+            },
+            "count-outer": {
+                name: "number",
+                value: 100,
+                trash: false,
+                connections: ["rep-outer"]
+            },
+            "rep-inner": {
+                name: "repeat",
+                trash: false,
+                connections: ["rep-outer", "count-inner", "c0", null]
+            },
+            "count-inner": {
+                name: "number",
+                value: 100,
+                trash: false,
+                connections: ["rep-inner"]
+            },
+            "c0": { name: "nameddo", value: "A", trash: false, connections: ["rep-inner", null] }
+        });
+
+        // Without maxLength, the full 100*100=10000 elements are produced.
+        // With maxLength=4, it stops early.
+        const blockList = PracticeValidator.getBlockList();
+        const startBlock = Object.values(blockList).find(b => b?.name === "start" && !b.trash);
+        const result = PracticeValidator.extractPatternSequence(
+            startBlock.connections?.[1],
+            blockList,
+            4
+        );
+
+        expect(result.length).toBeGreaterThan(4);
+        expect(result.length).toBeLessThan(10000);
     });
 });
 
