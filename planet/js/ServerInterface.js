@@ -179,9 +179,10 @@ class ServerInterface {
     /**
      * Low-level GET — returns parsed JSON or null on network error.
      * @param {string} path  e.g. "/allRepos?page=1"
-     * @returns {Promise<any|null>}
+     * @param {boolean} [includeStatus=false] Preserve HTTP status for non-OK responses.
+     * @returns {Promise<any|null|{__httpError: boolean, status: number}>}
      */
-    async _get(path) {
+    async _get(path, includeStatus = false) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), this.RequestTimeout);
         try {
@@ -192,6 +193,14 @@ class ServerInterface {
             });
             if (!res.ok) {
                 console.warn(`[ServerInterface] GET ${path} → HTTP ${res.status}`);
+
+                if (includeStatus) {
+                    return {
+                        __httpError: true,
+                        status: res.status
+                    };
+                }
+
                 return null;
             }
             return await res.json();
@@ -480,16 +489,27 @@ class ServerInterface {
             };
             const sortParam = sortMap[sort] || "createdAt";
 
-            // Resolve topic filter from legacy tag array
+            // Resolve topic filter from tag array (JSON string, Array, or comma-separated string)
             let topicParam = "";
             if (tags && tags !== "ALL_PROJECTS" && tags !== "USER_PROJECTS") {
-                try {
-                    const tagArray = JSON.parse(tags);
-                    if (Array.isArray(tagArray) && tagArray.length > 0) {
-                        topicParam = `&topic=${encodeURIComponent(tagArray[0])}`;
+                let tagArray = [];
+                if (Array.isArray(tags)) {
+                    tagArray = tags;
+                } else {
+                    try {
+                        const parsed = JSON.parse(tags);
+                        tagArray = Array.isArray(parsed) ? parsed : [parsed];
+                    } catch (_) {
+                        tagArray = typeof tags === "string" ? tags.split(",") : [tags];
                     }
-                } catch (_) {
-                    topicParam = `&topic=${encodeURIComponent(tags)}`;
+                }
+
+                const cleanedTags = tagArray
+                    .map(t => String(t).trim().toLowerCase())
+                    .filter(Boolean);
+
+                if (cleanedTags.length > 0) {
+                    topicParam = `&topic=${cleanedTags.map(encodeURIComponent).join(",")}`;
                 }
             }
 
@@ -591,9 +611,19 @@ class ServerInterface {
                 }
             }
 
-            const response = await this._get(`/project/${encodeURIComponent(repoName)}`);
+            const response = await this._get(`/project/${encodeURIComponent(repoName)}`, true);
 
-            if (!response || response.error) {
+            if (response?.__httpError && response.status === 404) {
+                await this.cacheManager.deleteMetadata(repoName);
+
+                callback({
+                    success: false,
+                    error: "PROJECT_NOT_FOUND"
+                });
+                return;
+            }
+
+            if (!response || response.error || response.__httpError) {
                 if (skipCache) {
                     const fallback = await this.cacheManager.getMetadata(repoName);
                     if (fallback) {

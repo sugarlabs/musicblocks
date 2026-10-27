@@ -478,13 +478,20 @@ function setupRhythmBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.skipFactor += arg;
 
-            const listenerName = "_skip_" + turtle;
+            // Each clamp counts its notes from zero, so an identical clamp (or the
+            // next pass of a Repeat) skips the same notes. The enclosing count is
+            // saved and resumed, including the notes counted inside this clamp.
+            const outerSkipIndex = tur.singer.skipIndex;
+            tur.singer.skipIndex = 0;
+
+            const listenerName = "_skip_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // Use the validated, floored `arg` so the listener undoes exactly
             // what was added above — no residual drift in skipFactor.
             const __listener = () => {
                 tur.singer.skipFactor -= arg;
+                tur.singer.skipIndex = outerSkipIndex + tur.singer.skipIndex;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -648,7 +655,14 @@ function setupRhythmBlocks(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle;
+            const baseListenerName = "_dot_" + turtle + "_" + blk;
+            let listenerName = baseListenerName;
+            if (tur && tur.listeners) {
+                let suffix = 1;
+                while (listenerName in tur.listeners) {
+                    listenerName = baseListenerName + "_" + suffix++;
+                }
+            }
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {

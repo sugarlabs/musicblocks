@@ -1589,6 +1589,68 @@ describe("Palettes Class", () => {
             expect(paletteItems.style.maxHeight).toBe("calc(100vh - 180px)");
             expect(paletteItems.style.overflow).toBe("auto");
             expect(paletteItems.style.overflowX).toBe("hidden");
+            expect(paletteItems.style.boxSizing).toBe("border-box");
+            expect(paletteItems.style.padding).toBe("8px");
+        });
+
+        test("showMenu removes existing PaletteBody if present", () => {
+            const mockRemove = jest.fn();
+            const existingBody = { remove: mockRemove };
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
+            };
+            const paletteBody = {
+                appendChild: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, { style: {} }],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    },
+                    {}
+                ]
+            };
+            global.document.createElement = jest.fn(tag =>
+                tag === "table"
+                    ? paletteBody
+                    : {
+                          style: {},
+                          children: [],
+                          appendChild: jest.fn(),
+                          removeAttribute: jest.fn(),
+                          setAttribute: jest.fn()
+                      }
+            );
+            global.docById = jest.fn(id => {
+                if (id === "palette") return palDiv;
+                if (id === "PaletteBody") return existingBody;
+                return null;
+            });
+
+            palettes.add("testRemove");
+            const palette = palettes.dict.testRemove;
+            palette._showMenuItems = jest.fn();
+
+            palette.showMenu(false);
+
+            expect(mockRemove).toHaveBeenCalled();
+        });
+
+        test("_hideMenuItems does not throw when PaletteBody is absent", () => {
+            global.docById = jest.fn(() => null);
+            palettes.add("testAbsent");
+            const palette = palettes.dict.testAbsent;
+
+            expect(() => palette._hideMenuItems()).not.toThrow();
         });
 
         test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {

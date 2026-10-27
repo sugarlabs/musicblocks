@@ -10,7 +10,7 @@
 }
 
 table {
-    table-layout:fixed;
+    table-layout: fixed;
 }
 
 table.white {
@@ -41,6 +41,7 @@ table.white > tbody > tr > td {
     height: 100%;
     vertical-align: bottom;
     background-color: white;
+    color: black;
     border: 1px solid black;
 }
 

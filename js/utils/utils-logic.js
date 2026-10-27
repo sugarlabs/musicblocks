@@ -70,7 +70,7 @@ var deepClone = obj => {
  * Extracts the file extension from a filename or URL.
  */
 var fileExt = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -86,7 +86,7 @@ var fileExt = file => {
  * Extracts the base name (filename without extension) from a filename or URL.
  */
 var fileBasename = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -208,10 +208,13 @@ var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
  */
 var toFixed2 = n => {
     if (typeof n !== "number") return n;
-    const s = n.toString();
-    const decimalIndex = s.indexOf(".");
-    if (decimalIndex === -1) return s;
-    return n.toFixed(2).replace(/\.?0+$/, "");
+    // Integers are shown as they are. Everything else is rounded, including values
+    // whose toString() has no "." because it is in exponent form: a turtle at x = 0
+    // after a quarter turn holds 6.1e-15, which used to be shown as "6.123...e-15".
+    if (Number.isInteger(n)) return n.toString();
+    const s = n.toFixed(2).replace(/\.?0+$/, "");
+    // A small negative value rounds to "-0.00", which should read as 0.
+    return s === "-0" ? "0" : s;
 };
 
 /**
@@ -450,6 +453,9 @@ var rationalSum = (a, b) => {
  * Finds the nearest beat for a given fraction.
  */
 var nearestBeat = (d, b) => {
+    if (typeof b !== "number" || b <= 0 || !Number.isFinite(b) || !Number.isFinite(d)) {
+        return [0, typeof b === "number" && Number.isFinite(b) && b > 0 ? b : 0];
+    }
     let sum = 1 / (2 * b);
     let count = 0;
     const dd = d / 100;

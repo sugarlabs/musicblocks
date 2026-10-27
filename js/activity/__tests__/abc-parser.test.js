@@ -1039,3 +1039,173 @@ describe("Test 11: Inline accidentals last for the rest of the bar", () => {
         ]);
     });
 });
+
+/**
+ * Walks the imported start stack the way Logo runs it and returns the note
+ * letters in play order: repeat blocks play their clamp twice and nameddo
+ * blocks run their action.
+ */
+function playOrder(blocks) {
+    const byId = new Map(blocks.map(b => [b[0], b]));
+    const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
+    const value = id => byId.get(id)[1][1].value;
+    const actions = new Map(
+        blocksOfType(blocks, "action").map(a => [value(a[4][1]), byId.get(a[4][2])])
+    );
+    const notes = [];
+    const run = block => {
+        for (; block; block = byId.get(block[4][block[4].length - 1])) {
+            if (type(block) === "repeat") {
+                run(byId.get(block[4][2]));
+                run(byId.get(block[4][2]));
+            } else if (type(block) === "nameddo") {
+                run(byId.get(actions.get(value(block[0]))[4][1]));
+            } else if (type(block) === "newnote") {
+                const pitch = byId.get(byId.get(block[4][2])[4][1]);
+                notes.push(value(pitch[4][1]));
+            }
+        }
+    };
+    const settimbre = blocksOfType(blocks, "settimbre")[0];
+    run(byId.get(settimbre[4][2]));
+    return notes.join("");
+}
+
+// ---------------------------------------------------------------------------
+// Test 12 — Repeat bars wrap only their own bars
+// ---------------------------------------------------------------------------
+describe("Test 12: Repeat bars wrap only their own bars", () => {
+    const key = { root: "C", acc: "", mode: "", accidentals: [] };
+    const melody = (letters, pitch = 0) => [...letters].map((l, i) => makeNote(l, pitch + i));
+    const parseLines = lines =>
+        parseAndCapture({
+            metaText: { title: "Repeats", instruction: "guitar" },
+            lines: lines.map(voice => ({
+                staff: [{ meter: { value: [{ num: 4, den: 4 }] }, key, voices: [voice] }]
+            }))
+        });
+
+    test("a repeat that ends mid-line repeats only its own bars", async () => {
+        const blocks = await parseLines([
+            [
+                makeBar("bar_left_repeat"),
+                ...melody("CDEF"),
+                makeBar("bar_right_repeat"),
+                ...melody("GABC", 4),
+                makeBar()
+            ]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABC");
+    });
+
+    test("a :| with no |: repeats from the start of the tune", async () => {
+        const blocks = await parseLines([
+            [...melody("CDEF"), makeBar(), ...melody("GABC", 4), makeBar("bar_right_repeat")]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFGABCCDEFGABC");
+    });
+
+    test(":: ends one repeat and starts the next", async () => {
+        const blocks = await parseLines([
+            [
+                makeBar("bar_left_repeat"),
+                ...melody("CDEF"),
+                makeBar("bar_dbl_repeat"),
+                ...melody("GABC", 4),
+                makeBar("bar_right_repeat")
+            ]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABCGABC");
+    });
+
+    test("music after a repeated line plays once, after the repeat", async () => {
+        const blocks = await parseLines([
+            [makeBar("bar_left_repeat"), ...melody("CDEF"), makeBar("bar_right_repeat")],
+            [...melody("GABC", 4), makeBar()],
+            [makeBar("bar_left_repeat"), ...melody("DEFG", 8), makeBar("bar_right_repeat")],
+            [...melody("ABC", 12), makeBar()]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABCDEFGDEFGABC");
+    });
+
+    test("a repeat can span two lines", async () => {
+        const blocks = await parseLines([
+            [makeBar("bar_left_repeat"), ...melody("CD"), makeBar()],
+            [...melody("EF", 2), makeBar("bar_right_repeat"), ...melody("G", 4), makeBar()]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFG");
+    });
+});
+
+describe("Meters abcjs reports by name rather than by number", () => {
+    // M:C and M:C| come back as a type with no value array, so reading a number
+    // straight out of one throws and the whole import stops.
+    const meterOf = blocks => {
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const meter = blocksOfType(blocks, "meter")[0];
+        const divide = byIndex.get(meter[4][2]);
+        return {
+            num: byIndex.get(meter[4][1])[1][1].value,
+            den: byIndex.get(divide[4][2])[1][1].value
+        };
+    };
+
+    const tuneWithMeter = meter =>
+        makeTune({
+            staves: [
+                {
+                    meter,
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+
+    it("reads common time as 4/4", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "common_time" }));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("reads cut time as 2/2", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "cut_time" }));
+
+        expect(meterOf(blocks)).toEqual({ num: 2, den: 2 });
+    });
+
+    it("still reads a meter given as numbers", async () => {
+        const blocks = await parseAndCapture(
+            tuneWithMeter({ type: "specified", value: [{ num: "3", den: "4" }] })
+        );
+
+        expect(meterOf(blocks)).toEqual({ num: 3, den: 4 });
+    });
+
+    it("falls back to 4/4 when the tune states no meter at all", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter(undefined));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("falls back to 4/4 when the meter carries an empty value", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "specified", value: [] }));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("keeps the notes a common-time tune carries", async () => {
+        const blocks = await parseAndCapture(
+            makeTune({
+                staves: [
+                    {
+                        meter: { type: "common_time" },
+                        key: { root: "C", mode: "major", accidentals: [] },
+                        voices: [[makeNote("C", 0), makeNote("D", 1), makeNote("E", 2)]]
+                    }
+                ]
+            })
+        );
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
+    });
+});

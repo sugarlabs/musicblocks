@@ -288,15 +288,16 @@ describe("rubrics.js test suite", () => {
 
         it("counts tuplet groupings, tracks the pitch range and reads articulation markers", () => {
             const freq = { C4: 300, D4: 100, F4: 400, G4: 500 };
+            // Staging items are [notes, note value, dots, tuplet, roundDown, ...].
             const activity = {
                 logo: {
                     notation: {
                         notationStaging: {
                             0: [
-                                [["C4"], 2],
-                                [["D4", "F4"], 3],
-                                [["G4"], 5],
-                                [["R"], 4],
+                                [["C4"], 2, 0, null, undefined],
+                                [["D4", "F4"], 1, 0, [3, 4], 8],
+                                [["G4"], 1, 0, [5, 4], 16],
+                                [["R"], 4, 0, null, undefined],
                                 "begin articulation",
                                 "end articulation"
                             ]
@@ -326,7 +327,8 @@ describe("rubrics.js test suite", () => {
 
             const stats = getStatsFromNotation(activity);
 
-            expect(stats.duples).toBe(1);
+            // The half note C4 is not a tuplet.
+            expect(stats.duples).toBe(0);
             expect(stats.triplets).toBe(1);
             expect(stats.quintuplets).toBe(1);
             // C4, D4, F4, G4 and the rest "R" each count as a note.
@@ -346,6 +348,38 @@ describe("rubrics.js test suite", () => {
             expect(stats.articulation.begin.length + stats.articulation.end.length).toBe(2);
             expect(stats.rests).toBe(1);
             expect(stats.ornaments).toBe(1);
+        });
+
+        it("counts tuplets from the notation that real note values produce", () => {
+            const { durationToNoteValue } = require("../utils/musicutils-rhythm");
+            // A half note, three triplet eighths (1/12) and two quintuplet
+            // sixteenths (1/20), staged the way doUpdateNotation stages them.
+            const notes = [
+                ["C4", 2],
+                ["D4", 4],
+                ["E4", 12],
+                ["F4", 12],
+                ["G4", 12],
+                ["A4", 20],
+                ["B4", 20]
+            ];
+            const staging = notes.map(([note, duration]) => {
+                const obj = durationToNoteValue(duration);
+                return [[note], obj[0], obj[1], obj[2], obj[3], false, false, null];
+            });
+            const activity = {
+                logo: {
+                    notation: { notationStaging: { 0: staging } },
+                    synth: { inTemperament: "equal", _getFrequency: jest.fn(() => 440) }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.duples).toBe(0);
+            expect(stats.triplets).toBe(3);
+            expect(stats.quintuplets).toBe(2);
         });
 
         it("pushes multiple 'end articulation' markers into .end, not .begin (regression)", () => {

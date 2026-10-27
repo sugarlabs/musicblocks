@@ -134,7 +134,9 @@ class TrashController {
             const turtle = restoredBlock.value;
             const primaryTurtle = activity.turtles.getTurtle(turtle);
             primaryTurtle.inTrash = false;
-            primaryTurtle.container.visible = true;
+            if (primaryTurtle.container) {
+                primaryTurtle.container.visible = true;
+            }
 
             // FIX: Restore the companion turtle if one exists.
             // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
@@ -148,7 +150,9 @@ class TrashController {
                 const companionTurtle = activity.turtles.getTurtle(comp);
                 if (companionTurtle) {
                     companionTurtle.inTrash = false;
-                    companionTurtle.container.visible = true;
+                    if (companionTurtle.container) {
+                        companionTurtle.container.visible = true;
+                    }
                 }
             }
         } else if (restoredBlock.name === "action") {

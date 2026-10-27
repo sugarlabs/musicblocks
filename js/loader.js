@@ -80,6 +80,10 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/platformstyle": {
+            deps: ["utils/utils-logic"],
+            exports: "platformThemes"
+        },
         "utils/plugin-utils": {
             exports: "PluginUtils"
         },
@@ -203,7 +207,7 @@ requirejs.config({
             exports: "PieMenuUtils"
         },
         "utils/musicutils-modewheel": {
-            deps: ["utils/utils", "utils/musicutils-constants"],
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-temperament"],
             exports: "MusicUtilsModeWheel"
         },
         "utils/musicutils-modecore": {
@@ -377,14 +381,17 @@ requirejs.config({
         "utils/ai-widget-lifecycle": {
             exports: "createWidgetLifecycle"
         },
+        "utils/ai-markdown": {
+            exports: "renderChatMarkdown"
+        },
         "utils/tuningformats": {
             exports: "TuningFormats"
         },
         "widgets/reflection": {
-            deps: ["utils/ai-widget-lifecycle"]
+            deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
         },
         "widgets/aidebugger": {
-            deps: ["utils/ai-widget-lifecycle"]
+            deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
         }
     },
     paths: {
@@ -721,6 +728,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             const CORE_BOOTSTRAP_MODULES = [
                 "easeljs.min",
                 "tweenjs.min",
+                "utils/utils-logic",
                 "utils/platformstyle",
                 "utils/dom-helpers",
                 "utils/utils",

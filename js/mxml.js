@@ -20,7 +20,15 @@ const MXML_TUPLETVALUE = 3;
 const MXML_ROUNDDOWN = 4;
 const MXML_DRUM = 7;
 
-const _gcd = (a, b) => (b === 0 ? a : _gcd(b, a % b));
+// Iterative, and only defined for finite numbers: Infinity % b is NaN, which never reaches
+// the b === 0 base case, so the recursive form ran until the stack overflowed.
+const _gcd = (a, b) => {
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return 1;
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) [a, b] = [b, a % b];
+    return a;
+};
 const _lcm = (a, b) => (a * b) / _gcd(a, b);
 
 // Tuplet durations can still land off an integer in extreme cases (e.g. a tuplet fine
@@ -36,6 +44,13 @@ const DIVISIONS_EPSILON = 1e-6;
 // constant alone could represent.
 const DIVISIONS_PER_WHOLE_NOTE = 32;
 
+// Largest grid _resolveDivisionsPerWholeNote will build. A staged duration that came out of
+// floating-point arithmetic can carry a huge or fractional "tuplet" factor (Linus-and-Lucy
+// stages 5153, 5159 and 6213; Bartok-fib-color 13.333...), and taking the LCM of those gave
+// <duration> values up to 1e197 and, once, Infinity. Notes that would push the grid past this
+// are written with a rounded duration instead.
+const MAX_DIVISIONS_PER_WHOLE_NOTE = 2 ** 20;
+
 // The <type> name MusicXML gives each note-value denominator.
 const MXML_NOTE_TYPES = new Map([
     [1, "whole"],
@@ -48,6 +63,36 @@ const MXML_NOTE_TYPES = new Map([
     [128, "128th"],
     [256, "256th"]
 ]);
+
+// The <mode> value MusicXML defines for each mode this exporter can name. Restricted to
+// the ones the element actually carries, the same set js/activity/mxml-parser.js reads back;
+// a mode outside it (pentatonic, blues, whole tone) is written without a <mode> at all.
+const _MXML_MODE_NAMES = new Map([
+    ["major", "major"],
+    ["ionian", "major"],
+    ["lydian", "lydian"],
+    ["mixolydian", "mixolydian"],
+    ["dorian", "dorian"],
+    ["minor", "minor"],
+    ["m", "minor"],
+    ["aeolian", "minor"],
+    ["natural minor", "minor"],
+    ["phrygian", "phrygian"],
+    ["locrian", "locrian"]
+]);
+
+const _keyMode = mode =>
+    _MXML_MODE_NAMES.get(
+        String(mode ?? "")
+            .toLowerCase()
+            .trim()
+    ) ?? null;
+
+// The <mode> element for a mode MusicXML can name, or nothing for one it cannot.
+const _modeElement = mode => {
+    const name = _keyMode(mode);
+    return name === null ? "" : ` <mode>${name}</mode>`;
+};
 
 /**
  * Converts a LilyPond duration, the form notation.js stages pickups and tempo beats in
@@ -110,6 +155,16 @@ const _escapeWords = text =>
  */
 const _tupletNotesRatio = (tupletRatio, roundDown) => {
     const noteValue = tupletRatio[0] * tupletRatio[1];
+    // Only a whole-number factoring is a tuplet MusicXML can write; anything else is
+    // floating-point residue from the duration and is written as a plain, rounded note.
+    if (
+        !Number.isInteger(noteValue) ||
+        noteValue <= 0 ||
+        !Number.isInteger(roundDown) ||
+        roundDown <= 0
+    ) {
+        return null;
+    }
     const divisor = _gcd(noteValue, roundDown);
     return { actualNotes: noteValue / divisor, normalNotes: roundDown / divisor };
 };
@@ -130,11 +185,11 @@ const _resolveDivisionsPerWholeNote = notes => {
         if (!Array.isArray(entry)) continue;
 
         if (Array.isArray(entry[MXML_TUPLETVALUE])) {
-            const { actualNotes } = _tupletNotesRatio(
-                entry[MXML_TUPLETVALUE],
-                entry[MXML_ROUNDDOWN]
-            );
-            scaleFactor = _lcm(scaleFactor, actualNotes);
+            const ratio = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
+            if (ratio !== null) {
+                const next = _lcm(scaleFactor, ratio.actualNotes);
+                if (perWholeNote * next <= MAX_DIVISIONS_PER_WHOLE_NOTE) scaleFactor = next;
+            }
             continue;
         }
 
@@ -144,7 +199,8 @@ const _resolveDivisionsPerWholeNote = notes => {
         const noteValue = Number(entry[1]);
         const dots = Number(entry[2]);
         if (Number.isInteger(noteValue) && noteValue > 0 && Number.isInteger(dots) && dots >= 0) {
-            perWholeNote = _lcm(perWholeNote, noteValue * 2 ** dots);
+            const next = _lcm(perWholeNote, noteValue * 2 ** dots);
+            if (next * scaleFactor <= MAX_DIVISIONS_PER_WHOLE_NOTE) perWholeNote = next;
         }
     }
     return perWholeNote * scaleFactor;
@@ -318,10 +374,13 @@ class MusicXMLExporter {
      * Writes a key signature on its own, for a change that arrives when the
      * measure attributes are not being written anyway.
      * @param {number} fifths - sharps, or flats as a negative.
+     * @param {string} mode - the mode the key is in, written when MusicXML can name it.
      * @returns {void}
      */
-    addKeyAttributes(fifths) {
-        this.add(`<attributes> <key> <fifths>${fifths}</fifths> </key> </attributes>`);
+    addKeyAttributes(fifths, mode) {
+        this.add(
+            `<attributes> <key> <fifths>${fifths}</fifths>${_modeElement(mode)} </key> </attributes>`
+        );
     }
 
     addMeasureAttributes(
@@ -331,12 +390,13 @@ class MusicXMLExporter {
         beatType,
         implicit = false,
         isPercussion = false,
-        fifths = 0
+        fifths = 0,
+        mode = null
     ) {
         this.add(
             isPercussion
                 ? `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
-                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
+                : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>${fifths}</fifths>${_modeElement(mode)} </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
     }
 
@@ -495,6 +555,9 @@ class MusicXMLExporter {
                 let previousNote = -1;
                 // Sharps, or flats as a negative, for the key this voice is in.
                 let fifths = 0;
+                // A minor and C major share a signature, so the mode is the only thing that
+                // tells them apart, and has to be tracked and compared in its own right.
+                let keyMode = "major";
                 // A key change still waiting to be written. The meter is tracked
                 // separately, because a measure can begin without a new meter.
                 let keyChanged = false;
@@ -526,8 +589,10 @@ class MusicXMLExporter {
 
                     if (obj === "key") {
                         const staged = _keyFifths(notes[i + 1], notes[i + 2]);
-                        if (staged !== null && staged !== fifths) {
+                        const stagedMode = notes[i + 2];
+                        if (staged !== null && (staged !== fifths || stagedMode !== keyMode)) {
                             fifths = staged;
+                            keyMode = stagedMode;
                             keyChanged = true;
                         }
                         i += 2;
@@ -674,11 +739,28 @@ class MusicXMLExporter {
                         const tupletRatio = obj[MXML_TUPLETVALUE];
                         let preciseDur, dur, timeModification;
 
-                        if (Array.isArray(tupletRatio)) {
-                            const { actualNotes, normalNotes } = _tupletNotesRatio(
-                                tupletRatio,
-                                obj[MXML_ROUNDDOWN]
-                            );
+                        const ratio = Array.isArray(tupletRatio)
+                            ? _tupletNotesRatio(tupletRatio, obj[MXML_ROUNDDOWN])
+                            : null;
+                        if (ratio === null && Array.isArray(tupletRatio)) {
+                            // Not a writable tuplet (see _tupletNotesRatio): give the note its
+                            // true length on the grid, rounded, without a <time-modification>.
+                            // A factor that isn't a positive finite number (NaN, 0) falls back to
+                            // the staged power-of-two note value, so no NaN reaches <duration>.
+                            const staged = tupletRatio[0] * tupletRatio[1];
+                            const roundDown = obj[MXML_ROUNDDOWN];
+                            const noteValue =
+                                Number.isFinite(staged) && staged > 0
+                                    ? staged
+                                    : Number.isFinite(roundDown) && roundDown > 0
+                                      ? roundDown
+                                      : 4;
+                            dur = Math.max(1, Math.round(divisionsPerWholeNote / noteValue));
+                            // Measures are filled by what is written, so count the rounded length.
+                            preciseDur = dur;
+                            timeModification = null;
+                        } else if (ratio !== null) {
+                            const { actualNotes, normalNotes } = ratio;
                             // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
                             // to be an exact multiple of every tuplet's actualNotes count in this
                             // voice, so this is already a whole number, not an approximation.
@@ -686,12 +768,20 @@ class MusicXMLExporter {
                                 (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) *
                                 (normalNotes / actualNotes);
                             // Rounding only guards extreme cases (e.g. a tuplet fine enough that
-                            // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
+                            // divisionsPerWholeNote can't represent it exactly, or one left out of
+                            // the grid by MAX_DIVISIONS_PER_WHOLE_NOTE); it's a no-op otherwise.
+                            // When it does round, measures are filled by the written length.
                             dur = Math.max(1, Math.round(preciseDur));
+                            preciseDur = dur;
                             timeModification = { actualNotes, normalNotes };
                         } else {
                             preciseDur =
                                 (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
+                            // Whole unless the grid hit MAX_DIVISIONS_PER_WHOLE_NOTE; then the
+                            // rounded length is what is written, and what the measure counts.
+                            if (!Number.isInteger(preciseDur)) {
+                                preciseDur = Math.max(1, Math.round(preciseDur));
+                            }
                             dur = preciseDur;
                             timeModification = null;
                         }
@@ -739,7 +829,8 @@ class MusicXMLExporter {
                                         beatType,
                                         isPickup,
                                         part.isPercussion,
-                                        fifths
+                                        fifths,
+                                        keyMode
                                     );
                                     firstMeasure = false;
                                     beatsChanged = false;
@@ -761,7 +852,7 @@ class MusicXMLExporter {
                             // already open, still has to carry a key change. The
                             // percussion clef is written without a key at all.
                             if (keyChanged) {
-                                if (!part.isPercussion) this.addKeyAttributes(fifths);
+                                if (!part.isPercussion) this.addKeyAttributes(fifths, keyMode);
                                 keyChanged = false;
                             }
 

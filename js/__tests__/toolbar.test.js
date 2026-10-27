@@ -846,6 +846,29 @@ describe("Toolbar Class", () => {
         expect(elements.chooseKeyDiv.style.display).toBe("none");
     });
 
+    test("syncToolbarHeight sets --toolbar-total-height and notifies PracticeUI", () => {
+        const originalGetElementById = document.getElementById;
+        document.getElementById = jest.fn(id => {
+            if (id === "toolbars") {
+                return { offsetHeight: 120 };
+            }
+            return typeof originalGetElementById === "function" ? originalGetElementById(id) : null;
+        });
+
+        const mockRefresh = jest.fn();
+        window.PracticeUI = { refreshOnToolbarChange: mockRefresh };
+
+        toolbar.syncToolbarHeight();
+
+        expect(document.documentElement.style.getPropertyValue("--toolbar-total-height")).toBe(
+            "120px"
+        );
+        expect(mockRefresh).toHaveBeenCalled();
+
+        delete window.PracticeUI;
+        document.getElementById = originalGetElementById;
+    });
+
     test("renderRunSlowlyIcon sets onclick and triggers slow run functionality", () => {
         const runSlowlyIcon = {
             onclick: null,

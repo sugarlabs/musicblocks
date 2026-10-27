@@ -234,8 +234,6 @@ class PitchDrumMatrix {
             this._closeWindow(widgetWindow);
         };
 
-        this.widgetWindow.onmaximize = this._scale;
-
         // We use an outer div to scroll vertically and an inner div to scroll horizontally.
         const outerDivTmp = document.createElement("div");
         outerDivTmp.id = "pdmOuterDiv";

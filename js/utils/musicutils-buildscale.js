@@ -69,7 +69,8 @@ if (typeof module !== "undefined" && module.exports) {
         getCurrentEDO,
         generateNoteNames,
         getEdoNoteNamePosition,
-        getTemperament
+        getTemperament,
+        getEffectiveOctaveRatio
     } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
@@ -640,6 +641,54 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     let finalScale = [];
     const sd = [];
 
+    const getScaleDegreeAccidental = (scaleNote, pitchNote) => {
+        if (scaleNote === pitchNote) {
+            return NATURAL;
+        }
+        const getOffset = note => {
+            if (note.includes(DOUBLESHARP)) {
+                return 2;
+            }
+            if (note.includes(SHARP)) {
+                return 1;
+            }
+            if (note.includes(DOUBLEFLAT)) {
+                return -2;
+            }
+            if (note.includes(FLAT)) {
+                return -1;
+            }
+            return 0;
+        };
+        if (
+            pitchNote.length > 1 &&
+            !pitchNote.includes(DOUBLESHARP) &&
+            !pitchNote.includes(SHARP) &&
+            !pitchNote.includes(DOUBLEFLAT) &&
+            !pitchNote.includes(FLAT) &&
+            !pitchNote.includes(NATURAL)
+        ) {
+            return null;
+        }
+        const diff = getOffset(pitchNote) - getOffset(scaleNote);
+        if (diff === 0) {
+            return NATURAL;
+        }
+        if (diff === 1) {
+            return SHARP;
+        }
+        if (diff === -1) {
+            return FLAT;
+        }
+        if (diff === 2) {
+            return DOUBLESHARP;
+        }
+        if (diff === -2) {
+            return DOUBLEFLAT;
+        }
+        return null;
+    };
+
     // if movable do is present just return the major/perfect tones
     if (movable) {
         finalScale = buildScale(chosenMode[0] + " major", edo)[0];
@@ -651,18 +700,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
             for (const i in finalScale) {
                 if (finalScale[i][0] === pitch[0]) {
                     sd.push(String(Number(i) + 1));
-                    if (finalScale[i] === pitch) {
-                        sd.push(NATURAL);
-                    } else {
-                        if (finalScale[i].includes(SHARP)) {
-                            sd.push(FLAT);
-                        } else if (finalScale[i].includes(FLAT)) {
-                            sd.push(FLAT);
-                        } else if (pitch.includes(SHARP)) {
-                            sd.push(SHARP);
-                        } else if (pitch.includes(FLAT)) {
-                            sd.push(FLAT);
-                        }
+                    const accidental = getScaleDegreeAccidental(finalScale[i], pitch);
+                    if (accidental) {
+                        sd.push(accidental);
                     }
                 }
             }
@@ -678,18 +718,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                 for (const i in chosenModeScale) {
                     if (chosenModeScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (chosenModeScale[i] === pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (chosenModeScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (chosenModeScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
+                        const accidental = getScaleDegreeAccidental(chosenModeScale[i], pitch);
+                        if (accidental) {
+                            sd.push(accidental);
                         }
                     }
                 }
@@ -762,18 +793,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                 for (const i in finalScale) {
                     if (finalScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (finalScale[i] === pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (finalScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (finalScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
+                        const accidental = getScaleDegreeAccidental(finalScale[i], pitch);
+                        if (accidental) {
+                            sd.push(accidental);
                         }
                     }
                 }
@@ -875,18 +897,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                 for (const i in finalScale) {
                     if (finalScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (finalScale[i] === pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (finalScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (finalScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
+                        const accidental = getScaleDegreeAccidental(finalScale[i], pitch);
+                        if (accidental) {
+                            sd.push(accidental);
                         }
                     }
                 }
@@ -1117,14 +1130,42 @@ var getInterval = (interval, keySignature, pitch, edo) => {
 var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
     const t = getTemperament(temperament);
+    const powerBase =
+        typeof getEffectiveOctaveRatio === "function"
+            ? getEffectiveOctaveRatio(t || temperament)
+            : t && Number.isFinite(Number(t.octaveRatio))
+              ? Number(t.octaveRatio)
+              : 2;
+
     if (t && !t.isEDO && t.noteLabels && t.ratios) {
-        const noteIdx = t.noteLabels.indexOf(pitch);
+        let noteIdx = t.noteLabels.indexOf(pitch);
+        if (noteIdx === -1) {
+            // The labels are not spelled like the notes that reach here: Just Intonation and
+            // Pythagorean write sharps as "C#" and have no flats, while notes arrive as "C♯"
+            // and "D♭". Match the same spelling in either notation first (the meantones label
+            // C♯ and D♭ as different pitches), then, in a 12-note table, the one label that
+            // sounds the same, which is how the synth resolves a D♭ there. Without this the
+            // note fell through to the 12-EDO formula below.
+            const pitchClass = _notePitchClass(pitch);
+            noteIdx = t.noteLabels.findIndex(
+                label => label[0] === pitch[0] && _notePitchClass(label) === pitchClass
+            );
+            if (noteIdx === -1 && t.noteLabels.length === 12) {
+                noteIdx = t.noteLabels.findIndex(label => _notePitchClass(label) === pitchClass);
+                // A spelling that crosses C lands in the next or previous octave of the table:
+                // B♯4 is C5 and C♭4 is B3.
+                const letter = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[pitch[0]];
+                if (noteIdx !== -1 && letter !== undefined) {
+                    octave += Math.floor((letter + ((pitchClass - letter + 18) % 12) - 6) / 12);
+                }
+            }
+        }
         if (noteIdx !== -1) {
             const aIdx = t.noteLabels.indexOf("A");
             const baseRefFreq = A0 / t.ratios[aIdx];
-            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(2, octave);
+            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(powerBase, octave);
             if (cents !== 0) {
-                freq *= Math.pow(2, cents / 1200);
+                freq *= Math.pow(powerBase, cents / 1200);
             }
             return freq;
         }
@@ -1132,16 +1173,17 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
-    // NOTE: stretched-octave powerBase (widget) vs engine getOctaveRatio() diverge here — this function hard-codes base 2; widget ratioToCents generalizes to powerBase. Full unification deferred.
-    // Frequency = A0 * 2^(pitchNumber / currentEDO)
-    // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
-    // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
-    // Example: 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
-    // Example: 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
+    // Unified stretched-octave powerBase and engine getOctaveRatio: generalizes base 2 to dynamic powerBase.
+    // Frequency = A0 * powerBase^(pitchNumber / currentEDO)
+    // With cents offset: Frequency = A0 * powerBase^((pitchNumber * 100 + cents) / (currentEDO * 100))
+    // This works because 1 semitone = 100 cents, and powerBase^(1/1200) is the cents resolution.
+    // Example (base 2): 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
+    // Example (base 2): 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
+    // Example (stretched): powerBase=2.01, scales exactly with the stretched interval space.
     if (cents === 0) {
-        return A0 * Math.pow(2, 1 / currentEDO) ** pitchNumber;
+        return A0 * Math.pow(powerBase, 1 / currentEDO) ** pitchNumber;
     } else {
-        return A0 * Math.pow(2, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
+        return A0 * Math.pow(powerBase, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
     }
 };
 

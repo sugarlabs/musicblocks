@@ -178,16 +178,18 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
             pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
         }
     }
-    // Map the pitch to the current scale.
+    // Map the pitch to the current scale: an off-scale spelling whose enharmonic is in the
+    // scale takes that spelling (A♯ is B♭ in F major). One whose enharmonic is off the scale
+    // too keeps the spelling it was given; swapping it anyway turned E♭ in F major into D♯.
     pitch = pitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
-    if (
-        getCurrentEDO(temperament) === 12 &&
-        !buildScale(tur.singer.keySignature)[0].includes(pitch)
-    ) {
-        if (pitch in EQUIVALENTFLATS) {
-            pitch = EQUIVALENTFLATS[pitch];
-        } else if (pitch in EQUIVALENTSHARPS) {
-            pitch = EQUIVALENTSHARPS[pitch];
+    if (getCurrentEDO(temperament) === 12) {
+        const scale = buildScale(tur.singer.keySignature)[0];
+        if (!scale.includes(pitch)) {
+            const enharmonic =
+                pitch in EQUIVALENTFLATS ? EQUIVALENTFLATS[pitch] : EQUIVALENTSHARPS[pitch];
+            if (enharmonic !== undefined && scale.includes(enharmonic)) {
+                pitch = enharmonic;
+            }
         }
     }
 
@@ -199,15 +201,60 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
             case "letter class":
                 return pitch[0];
             case "solfege syllable":
-            case "solfege class":
-                if (type === "solfege class") {
-                    // Remove sharps and flats.
-                    pitch = pitch.replace(SHARP, "").replace(FLAT, "");
-                }
+            case "solfege class": {
+                let syllable;
                 if (tur.singer.movable === false) {
-                    return SOLFEGECONVERSIONTABLE[pitch];
+                    syllable = SOLFEGECONVERSIONTABLE[pitch];
+                    // The table has no E♯ or F♭, so build those from the letter.
+                    if (
+                        syllable === undefined &&
+                        "CDEFGAB".includes(pitch[0]) &&
+                        [SHARP, FLAT].includes(pitch.slice(1))
+                    ) {
+                        syllable = SOLFEGECONVERSIONTABLE[pitch[0]] + pitch.slice(1);
+                    }
+                } else {
+                    const index = buildScale(tur.singer.keySignature)[0].indexOf(pitch);
+                    if (index !== -1 && index < SOLFEGENAMES.length) {
+                        syllable = SOLFEGENAMES[index];
+                    } else {
+                        // A note outside the key, or past the seventh note of a longer scale,
+                        // takes its scale degree plus the accidental. Modes without that
+                        // letter fall back to the major scale of the tonic.
+                        let degree = scaleDegreeToPitchMapping(
+                            tur.singer.keySignature,
+                            null,
+                            false,
+                            pitch
+                        );
+                        if (degree.length === 0) {
+                            degree = scaleDegreeToPitchMapping(
+                                tur.singer.keySignature,
+                                null,
+                                true,
+                                pitch
+                            );
+                        }
+                        if (degree.length > 0) {
+                            const accidental = [SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(
+                                degree[1]
+                            )
+                                ? degree[1]
+                                : "";
+                            syllable = SOLFEGENAMES[degree[0] - 1] + accidental;
+                        }
+                    }
                 }
-                return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
+                if (syllable !== undefined && type === "solfege class") {
+                    // Remove sharps and flats.
+                    return syllable
+                        .replace(DOUBLESHARP, "")
+                        .replace(DOUBLEFLAT, "")
+                        .replace(SHARP, "")
+                        .replace(FLAT, "");
+                }
+                return syllable;
+            }
             case "pitch class":
                 return (
                     (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) %
@@ -227,7 +274,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                     tur.singer.movable,
                     pitch
                 );
-                return obj[0] + obj[1];
+                return (obj[0] ?? "") + (obj[1] ?? "");
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
             case "staff y":

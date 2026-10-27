@@ -169,6 +169,60 @@ describe("musicutils-pitch", () => {
         expect(pitch.calcOctaveInterval(undefined)).toBe(0);
     });
 
+    describe("_parse_pitch_string (#9430)", () => {
+        const { SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
+        const fn = pitch._parse_pitch_string;
+
+        it("normalizes double accidentals without an octave", () => {
+            expect(fn("Cx")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(fn("Bbb")).toEqual(["B" + DOUBLEFLAT, 4]);
+            expect(fn("C#b")).toEqual(["C", 4]);
+        });
+
+        it("capitalizes and defaults octave to 4 for bare letter", () => {
+            expect(fn("c")).toEqual(["C", 4]);
+            expect(fn("C#")).toEqual(["C" + SHARP, 4]);
+        });
+
+        it("trims leading and trailing whitespace before parsing", () => {
+            expect(fn("  C4  ")).toEqual(["C", 4]);
+            expect(fn("\tCx\n")).toEqual(["C" + DOUBLESHARP, 4]);
+            expect(fn("   Bbb-1   ")).toEqual(["B" + DOUBLEFLAT, -1]);
+            expect(fn("   ")).toEqual(["", 4]);
+        });
+
+        it("keeps existing behaviour with octave present", () => {
+            expect(fn("C4")).toEqual(["C", 4]);
+            expect(fn("Bb-1")).toEqual(["B" + FLAT, -1]);
+        });
+
+        it("handles non-string inputs safely", () => {
+            expect(fn(440)).toEqual([440, 4]);
+            expect(fn(null)).toEqual(["", 4]);
+            expect(fn(undefined)).toEqual(["", 4]);
+            expect(fn(-1)).toEqual(["", 4]);
+            expect(fn(0)).toEqual(["", 4]);
+        });
+    });
+
+    describe("getNumber", () => {
+        it("handles double-sharp accidentals including 'x', '##', '*', and unicode '𝄪'", () => {
+            expect(pitch.getNumber("Cx", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C##", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C*", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("C𝄪", 4, "equal")).toBe(39);
+        });
+
+        it("handles lowercase note names and microtonal prefixes", () => {
+            expect(pitch.getNumber("c", 4, "equal")).toBe(37);
+            expect(pitch.getNumber("d", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("bb", 4, "equal")).toBe(47);
+            expect(pitch.getNumber("c#", 4, "equal")).toBe(38);
+            expect(pitch.getNumber("^C", 4, "equal")).toBe(37);
+            expect(pitch.getNumber("vD", 4, "equal")).toBe(39);
+        });
+    });
+
     describe("loaded as classic scripts, the way the browser does", () => {
         const order = [
             "musicutils-constants.js",

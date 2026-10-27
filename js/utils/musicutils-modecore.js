@@ -48,7 +48,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { stripMicrotonalPrefix, normalizeNoteAccidentals } = MusicUtilsPitch;
+    var { stripMicrotonalPrefix, normalizeNoteAccidentals, parseNoteString } = MusicUtilsPitch;
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
@@ -348,7 +348,7 @@ var getNonEDOModeSteps = (mode, temperament) => {
  */
 var getArticulation = note => {
     const stripped = stripMicrotonalPrefix(note);
-    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-Ga-g])(.*)/);
     return match ? match[1] : stripped;
 };
 
@@ -740,23 +740,32 @@ var getCustomNote = note => {
 };
 
 var GetNotesForInterval = tur => {
-    const noteStatus = tur.singer.noteStatus;
-    const notePitches = tur.singer.notePitches;
-    const intervals = tur.singer.intervals;
-    const noteOctave = tur.singer.noteOctaves;
+    const parseFn =
+        typeof parseNoteString !== "undefined"
+            ? parseNoteString
+            : typeof MusicUtilsPitch !== "undefined"
+              ? MusicUtilsPitch.parseNoteString
+              : null;
+    const noteStatus = tur?.singer?.noteStatus;
+    const notePitches = tur?.singer?.notePitches;
+    const intervals = tur?.singer?.intervals;
+    const noteOctave = tur?.singer?.noteOctaves;
     let firstNote = "C",
         secondNote = "C",
         octave = 0;
     if (noteStatus && noteStatus[0]) {
-        firstNote = noteStatus[0][0].replace(/\d/g, ""); //removing all numbers like '1'
+        const [parsedFirstNote, parsedOctaveA] = parseFn(String(noteStatus[0][0]));
+        firstNote = parsedFirstNote || "C";
         if (!noteStatus[0][1]) {
+            firstNote = normalizeNoteAccidentals(firstNote);
             return { firstNote, secondNote: firstNote, octave };
         }
-        secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
-        octave = octaveb - octavea;
-    } else if (notePitches && notePitches[last(tur.singer.inNoteBlock)]?.length) {
+        const [parsedSecondNote, parsedOctaveB] = parseFn(String(noteStatus[0][1]));
+        secondNote = parsedSecondNote || "C";
+        if (!Number.isNaN(parsedOctaveA) && !Number.isNaN(parsedOctaveB)) {
+            octave = parsedOctaveB - parsedOctaveA;
+        }
+    } else if (notePitches && notePitches[last(tur?.singer?.inNoteBlock)]?.length) {
         // Outside a note block there is no pitch list to read from, so keep
         // the C to C default instead of indexing into undefined.
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
@@ -766,7 +775,7 @@ var GetNotesForInterval = tur => {
 
     if (intervals && intervals.length) {
         octave = Math.floor(intervals[0] / 7);
-    } else if (noteOctave && noteOctave[last(tur.singer.inNoteBlock)]) {
+    } else if (noteOctave && noteOctave[last(tur?.singer?.inNoteBlock)]) {
         const octaveblk = noteOctave[last(tur.singer.inNoteBlock)];
         octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
     }

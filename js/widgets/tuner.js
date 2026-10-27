@@ -430,11 +430,13 @@ function Tuner() {
 
             // Autocorrelation Function
             const autocorrelation = buffer =>
-                buffer.map((_, lag) =>
-                    buffer
-                        .slice(0, buffer.length - lag)
-                        .reduce((sum, value, index) => sum + value * buffer[index + lag], 0)
-                );
+                buffer.map((_, lag) => {
+                    let sum = 0;
+                    for (let i = 0; i < buffer.length - lag; i++) {
+                        sum += buffer[i] * buffer[i + lag];
+                    }
+                    return sum;
+                });
 
             // Difference Function
             const difference = buffer => {

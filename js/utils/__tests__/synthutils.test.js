@@ -66,6 +66,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
+        calculateInstrumentVolumeDb,
+        getCalibratedVolumeDb,
         Synth,
         transport;
 
@@ -168,6 +170,7 @@ describe("Utility Functions (logic-only)", () => {
                 VOICENAMES: typeof VOICENAMES !== "undefined" ? VOICENAMES : undefined,
                 DRUMNAMES: typeof DRUMNAMES !== "undefined" ? DRUMNAMES : undefined,
                 NOISENAMES: typeof NOISENAMES !== "undefined" ? NOISENAMES : undefined,
+                calculateInstrumentVolumeDb: typeof calculateInstrumentVolumeDb !== "undefined" ? calculateInstrumentVolumeDb : undefined,
                   };
         `);
         const results = wrapper();
@@ -209,6 +212,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
+        calculateInstrumentVolumeDb = Synth.calculateInstrumentVolumeDb;
+        getCalibratedVolumeDb = Synth.getCalibratedVolumeDb;
         transport = Synth.transport;
     });
 
@@ -769,6 +774,66 @@ describe("Utility Functions (logic-only)", () => {
             expect(Tone.gainToDb).not.toHaveBeenCalled();
             expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).not.toHaveBeenCalled();
         });
+
+        test("verifies calibrated instrument at volumes 0, 50, and 100 preserving ramp scheduling", () => {
+            const now = 3000;
+            Tone.now.mockReturnValue(now);
+            const rampTime = 2.5;
+
+            // Volume 0
+            rampTo("turtle1", "flute", 50, 0, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                now + rampTime
+            );
+
+            // Volume 50
+            rampTo("turtle1", "flute", 0, 50, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                now + rampTime
+            );
+
+            // Volume 100
+            rampTo("turtle1", "flute", 50, 100, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                now + rampTime
+            );
+        });
+
+        test("verifies default instrument at volumes 0, 50, and 100 preserving ramp scheduling", () => {
+            if (!instruments.turtle1.custom_synth) {
+                instruments.turtle1.custom_synth = new Tone.Sampler();
+            }
+            const now = 4000;
+            Tone.now.mockReturnValue(now);
+            const rampTime = 3;
+
+            // Volume 0
+            rampTo("turtle1", "custom_synth", 50, 0, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(
+                instruments.turtle1.custom_synth.volume.linearRampToValueAtTime
+            ).toHaveBeenCalledWith(4, now + rampTime);
+
+            // Volume 50
+            rampTo("turtle1", "custom_synth", 0, 50, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            expect(
+                instruments.turtle1.custom_synth.volume.linearRampToValueAtTime
+            ).toHaveBeenCalledWith(4, now + rampTime);
+
+            // Volume 100
+            rampTo("turtle1", "custom_synth", 50, 100, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(
+                instruments.turtle1.custom_synth.volume.linearRampToValueAtTime
+            ).toHaveBeenCalledWith(4, now + rampTime);
+        });
     });
 
     describe("setVolume function", () => {
@@ -803,6 +868,211 @@ describe("Utility Functions (logic-only)", () => {
 
         test("should not throw error if instrument is not found in turtle", () => {
             expect(() => setVolume("turtle1", "nonexistent", 50)).not.toThrow();
+        });
+
+        test("verifies calibrated instrument at volumes 0, 50, and 100 with click-prevention scheduling", () => {
+            const fluteSynth = instruments.turtle1.flute;
+            const now = 1000;
+            Tone.now.mockReturnValue(now);
+
+            // Volume 0
+            fluteSynth.volume.value = 10;
+            setVolume("turtle1", "flute", 0);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(fluteSynth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(fluteSynth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(fluteSynth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 50
+            fluteSynth.volume.value = 10;
+            setVolume("turtle1", "flute", 50);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+            expect(fluteSynth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(fluteSynth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(fluteSynth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 100
+            fluteSynth.volume.value = 10;
+            setVolume("turtle1", "flute", 100);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(fluteSynth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(fluteSynth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(fluteSynth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+        });
+
+        test("verifies default instrument at volumes 0, 50, and 100 with click-prevention scheduling", () => {
+            if (!instruments.turtle1.synth) {
+                instruments.turtle1.synth = new Tone.Sampler();
+            }
+            const synth = instruments.turtle1.synth;
+            const now = 2000;
+            Tone.now.mockReturnValue(now);
+
+            // Volume 0
+            synth.volume.value = 10;
+            setVolume("turtle1", "synth", 0);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(synth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(synth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(synth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 50
+            synth.volume.value = 10;
+            setVolume("turtle1", "synth", 50);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            expect(synth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(synth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(synth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 100
+            synth.volume.value = 10;
+            setVolume("turtle1", "synth", 100);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(synth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(synth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(synth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+        });
+
+        test("skips scheduling when volume in decibels does not change (flutter prevention)", () => {
+            const fluteSynth = instruments.turtle1.flute;
+            // When synth.volume.value is already close to db (4), no ramp should be scheduled
+            fluteSynth.volume.value = 4;
+            fluteSynth.volume.linearRampToValueAtTime.mockClear();
+
+            setVolume("turtle1", "flute", 50);
+            expect(fluteSynth.volume.linearRampToValueAtTime).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("calculateInstrumentVolumeDb and getCalibratedVolumeDb", () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
+        describe("calibrated instruments (DEFAULTSYNTHVOLUME)", () => {
+            test("calculates volume at 0 (minimum audio boundary safety gain 0.0001)", () => {
+                const db = calculateInstrumentVolumeDb("flute", 0);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+                expect(db).toBe(Tone.gainToDb(0.0001));
+            });
+
+            test("calculates volume at 50 (calibrated default volume level)", () => {
+                // flute default volume is 90, so at vol 50, nv is (50/50)*90 = 90, gain = 0.9
+                const db = calculateInstrumentVolumeDb("flute", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+                expect(db).toBe(Tone.gainToDb(0.9));
+            });
+
+            test("calculates volume at 100 (maximum calibrated level)", () => {
+                // at vol 100, nv is ((100-50)/50)*(100-90) + 90 = 100, gain = 1.0
+                const db = calculateInstrumentVolumeDb("flute", 100);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+                expect(db).toBe(Tone.gainToDb(1));
+            });
+
+            test("calculates calibrated volume with different default volumes (sv = 20, sv = 100)", () => {
+                // viola has default volume 20
+                calculateInstrumentVolumeDb("viola", 0);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+
+                calculateInstrumentVolumeDb("viola", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.2);
+
+                calculateInstrumentVolumeDb("viola", 100);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+
+                // piano has default volume 100
+                calculateInstrumentVolumeDb("piano", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("default / uncalibrated instruments", () => {
+            test("calculates volume at 0 (minimum gain 0.0001)", () => {
+                const db = calculateInstrumentVolumeDb("synth", 0);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+                expect(db).toBe(Tone.gainToDb(0.0001));
+            });
+
+            test("calculates volume at 50 (linear raw volume level)", () => {
+                const db = calculateInstrumentVolumeDb("synth", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+                expect(db).toBe(Tone.gainToDb(0.5));
+            });
+
+            test("calculates volume at 100 (maximum volume level)", () => {
+                const db = calculateInstrumentVolumeDb("synth", 100);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+                expect(db).toBe(Tone.gainToDb(1));
+            });
+        });
+
+        describe("boundary clamping and safety", () => {
+            test("clamps negative volume to 0 (gain 0.0001)", () => {
+                calculateInstrumentVolumeDb("flute", -25);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+
+                calculateInstrumentVolumeDb("synth", -50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            });
+
+            test("clamps volume above 100 to 100 (gain 1.0)", () => {
+                calculateInstrumentVolumeDb("flute", 150);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+
+                calculateInstrumentVolumeDb("synth", 200);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("audio decibel verification", () => {
+            test("verifies decibel conversion aligns with 20 * log10(gain)", () => {
+                const realGainToDb = gain => 20 * Math.log10(gain);
+                Tone.gainToDb.mockImplementation(realGainToDb);
+
+                expect(calculateInstrumentVolumeDb("synth", 100)).toBeCloseTo(0, 5); // 0 dB
+                expect(calculateInstrumentVolumeDb("synth", 50)).toBeCloseTo(realGainToDb(0.5), 5); // ~ -6.02 dB
+                expect(calculateInstrumentVolumeDb("synth", 0)).toBeCloseTo(-80, 5); // 20 * log10(0.0001) = -80 dB
+                expect(calculateInstrumentVolumeDb("flute", 50)).toBeCloseTo(realGainToDb(0.9), 5); // ~ -0.915 dB
+
+                Tone.gainToDb.mockImplementation(() => 4);
+            });
+        });
+
+        describe("alias and name resolution", () => {
+            test("getCalibratedVolumeDb returns identical result to calculateInstrumentVolumeDb", () => {
+                expect(getCalibratedVolumeDb("flute", 50)).toBe(
+                    calculateInstrumentVolumeDb("flute", 50)
+                );
+            });
+
+            test("resolves localized instrument name if resolver is provided", () => {
+                const mockResolve = jest.fn(() => "flute");
+                calculateInstrumentVolumeDb("flûte", 50, mockResolve);
+                expect(mockResolve).toHaveBeenCalledWith("flûte");
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+            });
+
+            test("resolves localized instrument name via resolveInstrumentName by default", () => {
+                const resolveSpy = jest
+                    .spyOn(Synth, "resolveInstrumentName")
+                    .mockReturnValue("flute");
+                calculateInstrumentVolumeDb("flûte", 50);
+                expect(resolveSpy).toHaveBeenCalledWith("flûte");
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+                resolveSpy.mockRestore();
+            });
+
+            test("treats inherited property names as unconfigured instruments", () => {
+                // "constructor" and "toString" exist on Object.prototype, so `in` would
+                // match them; Object.hasOwn must not, so they fall back to uncalibrated.
+                calculateInstrumentVolumeDb("constructor", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+
+                jest.clearAllMocks();
+                calculateInstrumentVolumeDb("toString", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            });
         });
     });
 
@@ -1338,6 +1608,43 @@ describe("Utility Functions (logic-only)", () => {
 
             delete global.TEMPERAMENT[customEdoName];
             Synth.inTemperament = originalInTemp;
+        });
+
+        it("should scale octave frequencies with dynamic octaveRatio for stretched EDO", () => {
+            const stretchedEdoName = "stretched12EDO";
+            global.TEMPERAMENT[stretchedEdoName] = {
+                isEDO: true,
+                pitchNumber: 12,
+                octaveRatio: 2.01
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = stretchedEdoName;
+
+            const a4 = _getFrequency("A4", false, stretchedEdoName);
+            const a5 = _getFrequency("A5", false, stretchedEdoName);
+            expect(a5 / a4).toBeCloseTo(2.01, 5);
+
+            delete global.TEMPERAMENT[stretchedEdoName];
+            Synth.inTemperament = originalInTemp;
+        });
+
+        it("should scale non-EDO octave frequencies with getEffectiveOctaveRatio", () => {
+            const stretchedJiName = "stretchedJI";
+            global.TEMPERAMENT[stretchedJiName] = {
+                ...global.TEMPERAMENT["just intonation"],
+                octaveRatio: 2.02
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = stretchedJiName;
+            Synth.temperamentChanged(stretchedJiName, "C4");
+
+            const c4 = _getFrequency("C4", false, stretchedJiName);
+            const c5 = _getFrequency("C5", false, stretchedJiName);
+            expect(c5 / c4).toBeCloseTo(2.02, 5);
+
+            delete global.TEMPERAMENT[stretchedJiName];
+            Synth.inTemperament = originalInTemp;
+            Synth.temperamentChanged("equal", "C4");
         });
     });
     describe("getCustomFrequency", () => {
@@ -4060,5 +4367,137 @@ describe("DRUMNAMES Lilypond symbols", () => {
     it("leaves the snare drum and the hi hat alone", () => {
         expect(symbolFor("snare drum")).toBe("sn");
         expect(symbolFor("hi hat")).toBe("hh");
+    });
+
+    it("registers all 11 Sonic Pi drum samples with correct metadata and symbols", () => {
+        const expectedDrums = [
+            {
+                name: "heavy kick",
+                symbol: "bd",
+                category: "drum",
+                global: "HEAVY_KICK_SAMPLE",
+                file: "heavy_kick"
+            },
+            {
+                name: "snare hard",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_HARD_SAMPLE",
+                file: "snare_hard"
+            },
+            {
+                name: "snare soft",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_SOFT_SAMPLE",
+                file: "snare_soft"
+            },
+            {
+                name: "snare roll",
+                symbol: "sn",
+                category: "drum",
+                global: "SNARE_ROLL_SAMPLE",
+                file: "snare_roll"
+            },
+            {
+                name: "tom mid",
+                symbol: "tomml",
+                category: "drum",
+                global: "TOM_MID_SAMPLE",
+                file: "tom_mid"
+            },
+            {
+                name: "tom hi",
+                symbol: "tomh",
+                category: "drum",
+                global: "TOM_HI_SAMPLE",
+                file: "tom_hi"
+            },
+            {
+                name: "tom lo",
+                symbol: "tomfl",
+                category: "drum",
+                global: "TOM_LO_SAMPLE",
+                file: "tom_lo"
+            },
+            {
+                name: "cymbal closed",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_CLOSED_SAMPLE",
+                file: "cymbal_closed"
+            },
+            {
+                name: "cymbal open",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_OPEN_SAMPLE",
+                file: "cymbal_open"
+            },
+            {
+                name: "cymbal pedal",
+                symbol: "hh",
+                category: "bell",
+                global: "CYMBAL_PEDAL_SAMPLE",
+                file: "cymbal_pedal"
+            },
+            {
+                name: "sonic cowbell",
+                symbol: "cb",
+                category: "bell",
+                global: "SONIC_COWBELL_SAMPLE",
+                file: "sonic_cowbell"
+            }
+        ];
+
+        const { SAMPLE_INFO, DEFAULTSYNTHVOLUME } = synthutilsModule;
+
+        expectedDrums.forEach(({ name, symbol, category, global: globalVar, file }) => {
+            const entry = DRUMNAMES.find(d => d[1] === name);
+            expect(entry).toBeDefined();
+            expect(entry[3]).toBe(symbol);
+            expect(entry[4]).toBe(category);
+
+            expect(SAMPLE_INFO.drum[name]).toEqual({
+                path: `samples/${file}`,
+                global: globalVar
+            });
+
+            expect(DEFAULTSYNTHVOLUME[name]).toBeGreaterThan(0);
+        });
+    });
+
+    it("groups drum families together in DRUMNAMES", () => {
+        const drumNames = DRUMNAMES.map(d => d[1]);
+
+        const snares = ["snare drum", "snare hard", "snare soft", "snare roll"];
+        const snareIndices = snares.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < snareIndices.length; i++) {
+            expect(snareIndices[i]).toBe(snareIndices[i - 1] + 1);
+        }
+
+        const kicks = ["kick drum", "heavy kick", "bass drum"];
+        const kickIndices = kicks.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < kickIndices.length; i++) {
+            expect(kickIndices[i]).toBe(kickIndices[i - 1] + 1);
+        }
+
+        const toms = ["tom tom", "tom hi", "tom mid", "tom lo", "floor tom"];
+        const tomIndices = toms.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < tomIndices.length; i++) {
+            expect(tomIndices[i]).toBe(tomIndices[i - 1] + 1);
+        }
+
+        const cymbals = [
+            "hi hat",
+            "cymbal closed",
+            "cymbal open",
+            "cymbal pedal",
+            "finger cymbals"
+        ];
+        const cymbalIndices = cymbals.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < cymbalIndices.length; i++) {
+            expect(cymbalIndices[i]).toBe(cymbalIndices[i - 1] + 1);
+        }
     });
 });

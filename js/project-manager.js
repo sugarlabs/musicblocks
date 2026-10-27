@@ -686,7 +686,6 @@ class ProjectManager {
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
         that._doHardStopButton();
-        that._allClear(true, true);
     }
 
     doLoad() {
@@ -718,6 +717,7 @@ class ProjectManager {
             blockMap.push(blk);
         }
 
+        const restored = activity.logo.getRestoredConnections();
         const data = [];
         for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
             const myBlock = activity.blocks.blockList[blk];
@@ -728,7 +728,14 @@ class ProjectManager {
             let args = null;
             let exportName = myBlock.name;
 
-            if (
+            if (myBlock.unknownBlock !== undefined) {
+                if (Array.isArray(myBlock.unknownBlock)) {
+                    exportName = myBlock.unknownBlock[0];
+                    args = myBlock.unknownBlock[1] ?? null;
+                } else {
+                    exportName = myBlock.unknownBlock;
+                }
+            } else if (
                 myBlock.isValueBlock() ||
                 myBlock.name === "loadFile" ||
                 myBlock.name === "boolean"
@@ -806,9 +813,7 @@ class ProjectManager {
                     case "interval":
                     case "newnote":
                     case "action":
-                    case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -818,6 +823,42 @@ class ProjectManager {
                             collapsed: myBlock.collapsed
                         };
                         break;
+                    case "rhythmruler2":
+                        args = {
+                            collapsed: myBlock.collapsed
+                        };
+                        // The edits made in the widget, keyed by drum block. Drop the drums
+                        // that are no longer in the project.
+                        if (Array.isArray(myBlock.rulerHistory)) {
+                            args.rulerHistory = myBlock.rulerHistory
+                                .filter(entry => blockIndexById.has(entry[1]))
+                                .map(entry => [entry[0], blockIndexById.get(entry[1])]);
+                        }
+                        break;
+                    case "matrix": {
+                        args = {
+                            collapsed: myBlock.collapsed
+                        };
+                        // The selected cells, as [row block, [rhythm block, n], j]. A row block
+                        // inside a repeat has 1000000 added for each pass, which is kept. Drop
+                        // the cells whose blocks are no longer in the project.
+                        const cells =
+                            activity.logo?.phraseMaker?._blockMap?.[blk] ?? myBlock.matrixCells;
+                        if (Array.isArray(cells)) {
+                            args.matrixCells = [];
+                            for (const [rowBlock, [rhythmBlock, n], j] of cells) {
+                                const row = rowBlock % 1000000;
+                                if (blockIndexById.has(row) && blockIndexById.has(rhythmBlock)) {
+                                    args.matrixCells.push([
+                                        blockIndexById.get(row) + rowBlock - row,
+                                        [blockIndexById.get(rhythmBlock), n],
+                                        j
+                                    ]);
+                                }
+                            }
+                        }
+                        break;
+                    }
                     case "storein2":
                     case "nameddo":
                     case "nameddoArg":
@@ -827,13 +868,6 @@ class ProjectManager {
                         args = {
                             value: myBlock.privateData
                         };
-                        break;
-                    case "nopValueBlock":
-                    case "nopZeroArgBlock":
-                    case "nopOneArgBlock":
-                    case "nopTwoArgBlock":
-                    case "nopThreeArgBlock":
-                        exportName = myBlock.privateData;
                         break;
                     case "matrixData":
                         args = {
@@ -863,8 +897,7 @@ class ProjectManager {
             }
 
             const connections = [];
-            for (let c = 0; c < myBlock.connections.length; c++) {
-                const connection = myBlock.connections[c];
+            for (const connection of restored.get(blk) || myBlock.connections) {
                 const mapConnection = blockIndexById.get(connection);
                 if (connection === null || mapConnection === undefined) {
                     connections.push(null);
@@ -1191,12 +1224,9 @@ class ProjectManager {
             that.sendAllToTrash(false, true);
             if (clearCanvas) {
                 that._allClear(false, true);
-                if (
-                    that.gitDropdownUI &&
-                    typeof that.gitDropdownUI.clearForNewProject === "function"
-                ) {
-                    that.gitDropdownUI.clearForNewProject();
-                }
+            }
+            if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+                that.gitDropdownUI.clearForNewProject();
             }
 
             try {
@@ -1267,7 +1297,7 @@ class ProjectManager {
                                         obj,
                                         that.fileChooser.files[0],
                                         "loadProjectFromFile",
-                                        true
+                                        false
                                     );
                                 } else {
                                     that.merging = false;

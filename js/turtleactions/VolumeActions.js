@@ -74,7 +74,7 @@ function setupVolumeActions(activity) {
 
             tur.singer.inCrescendo.push(true);
 
-            const listenerName = "_crescendo_" + turtle;
+            const listenerName = "_crescendo_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -148,7 +148,7 @@ function setupVolumeActions(activity) {
                 activity.logo.notation.notationBeginArticulation(turtle);
             }
 
-            const listenerName = "_articulation_" + turtle;
+            const listenerName = "_articulation_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -209,7 +209,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setPanning(value, turtle) {
-            value = clampNumber(value, -100, 100) / 100;
+            value = clampNumber(value, -100, 100, 0) / 100;
 
             const tur = activity.turtles.ithTurtle(turtle);
             if (!tur.singer.panner) {
@@ -295,15 +295,7 @@ function setupVolumeActions(activity) {
                 if (firstConnection === null && lastConnection === null) {
                     activity.logo._timerManager.setGuardedTimeout(
                         () => {
-                            activity.logo.synth.trigger(
-                                0,
-                                "G4",
-                                1 / 4,
-                                synthname,
-                                null,
-                                null,
-                                false
-                            );
+                            activity.logo.synth.trigger(0, "G4", 1 / 4, synth, null, null, false);
                         },
                         250,
                         () => activity.logo.stopTurtle

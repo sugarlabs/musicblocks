@@ -540,9 +540,9 @@
       "hasRestParam": false,
       "isAsync": false,
       "isGenerator": false,
-      "returns": 1,
+      "returns": 2,
       "throws": 0,
-      "branches": 0
+      "branches": 7
     },
     {
       "name": "oneHundredToFraction",
@@ -677,7 +677,7 @@
       "isGenerator": false,
       "returns": 3,
       "throws": 0,
-      "branches": 2
+      "branches": 3
     },
     {
       "name": "toFraction",
@@ -1004,8 +1004,8 @@
     }
   ],
   "totals": {
-    "branches": 202,
-    "returns": 107,
+    "branches": 210,
+    "returns": 108,
     "throws": 0
   }
 }

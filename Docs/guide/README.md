@@ -89,6 +89,7 @@ This guide details the many musical features of the language.
     15. [Arpeggio](#415-arpeggio)
 5. [Beyond Music Blocks](#5-beyond-music-blocks)
     1. [LilyPond (or How to Generate Sheet Music)](#51-lilypond)
+       1. [Recording Notation from a Program](#511-recording-notation-from-a-program)
     2. [Other Exports](#52-other-exports)
     3. [The JavaScript Editor](#53-the-javascript-editor)
 6. [Appendix](#6-appendix)
@@ -2067,15 +2068,22 @@ saved modes.
 
 The *EDO/Temperament* dropdown lets you select how many equal
 divisions the octave is split into. The default is `12-EDO` (standard
-Western tuning). Selecting a different EDO (such as `5`, `17`, `19`,
-or `31`) redraws the pie wheel with that many slices. The mode wheel
-shows numeric indices (`0`, `1`, `2`, ...) while the note wheel uses
-`x` markers to indicate selected scale degrees.
+Western tuning). Selecting a different tuning (the `5`, `7`, `17`, `19`, and
+`31` EDOs, or a non-EDO temperament) redraws the pie wheel with that many
+slices. The mode wheel shows numeric indices (`0`, `1`, `2`, ...) while the
+note wheel uses `x` markers to indicate selected scale degrees.
 
 Non-EDO temperaments (*5-limit Just Intonation*, *Pythagorean
 Tuning*, *1/3 Comma Meantone*, *1/4 Comma Meantone*) use ratio-based
-tuning rather than equal divisions. The pie wheel shows the closest
-scale degrees for the selected temperament.
+tuning rather than equal divisions. For these the pie wheel draws
+each slice in proportion to that interval's real size, so a wide
+interval such as a major third takes up visibly more of the circle
+than a narrow one. Each slice spans the interval from its pitch to the
+next, so the numeric labels sit in the centres of those intervals;
+equal EDOs keep evenly sized slices and their original label positions.
+Degree labels are hidden on slices too narrow to
+hold them; the `x` markers on the outer ring still show which degrees
+are selected.
 
 State is cached per-EDO when switching between equally-tempered
 settings, so switching back to a previous EDO restores your previous
@@ -2083,6 +2091,12 @@ notes. Selecting a non-EDO temperament replaces the current tuning
 state entirely. When playing under non-EDO temperaments, frequencies
 are computed from the temperament's ratios rather than
 equal-temperament formulas.
+
+A custom mode also remembers the tuning it was saved in. Opening a
+mode adopts that mode's EDO and temperament, switching from the
+current tuning if necessary. If the stored tuning cannot serve the
+mode's pitch count, the widget falls back to equal divisions of that
+EDO.
 
 ![widget](./mode_scalar_21edo.svg "widget with 1/4 Comma Meantone selected")
 
@@ -2594,6 +2608,23 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
 
+### <a name="RECORD-NOTATION">5.1.1 Recording Notation from a Program</a>
+
+![record notation](./lilypond3.svg "Using the Record notation and Save as Lilypond blocks")
+
+The *Save as Lilypond* option from the Save menu works for a program
+that plays the same music every time. For an interactive program, such
+as a game, use the *Record notation* block to record the music as it is
+played. In the example above, each note's pitch follows the cursor, so
+what is recorded and saved to `song.ly` is what you played.
+
+The *Save as Lilypond*, *Save as ABC* and *Save as MusicXML* blocks
+save what has been recorded so far, under the file name in the block.
+A program can save more than once, for example at the end of each
+level. Each mouse records its own part, and every run starts a new
+recording. The *Save as SVG* block saves the mouse artwork. These
+blocks are on the *Extras* palette (Only available in Advanced Mode).
+
 ## <a name="EXPORTS">5.2 Other Exports</a>
 
 In addition to Lilypond, there are several other export formats
@@ -2660,7 +2691,7 @@ Editor*" (`<>`) button in the auxilliary menu.
 
 For the block stacks (and mouse art generated after running),
 
-![Example Project](../js/js-export/samples/mode-up-down.png)
+![Example Project](../../js/js-export/samples/mode-up-down.png)
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725884337271676&run=True)
 
@@ -2703,7 +2734,7 @@ new Mouse(async mouse => {
 MusicBlocks.run();
 ```
 
-Here's the complete [API](../js/js-export/samples/sample.js) of
+Here's the complete [API](../../js/js-export/samples/sample.js) of
 methods, getters, setters.
 
 ## <a name="APPENDIX">6. Appendix</a>

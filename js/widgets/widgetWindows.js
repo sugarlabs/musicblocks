@@ -465,6 +465,47 @@ class WidgetWindow {
         this._toolbar.setAttribute("aria-label", _("Widget toolbar"));
 
         this._widget = this._create("div", "wfbWidget", this._body);
+
+        /**
+         * The innermost element under the pointer that can still scroll in
+         * the wheel's direction, or the widget itself.
+         * @param {EventTarget} target
+         * @param {number} deltaX
+         * @param {number} deltaY
+         * @returns {HTMLElement}
+         */
+        this._scrollTargetFor = (target, deltaX, deltaY) => {
+            const canScroll = (overflow, position, size, view, delta) =>
+                /(auto|scroll)/.test(overflow) &&
+                size > view &&
+                ((delta < 0 && position > 0) || (delta > 0 && position + view < size));
+
+            let node = target instanceof Element ? target : null;
+            while (node && node !== this._widget && this._widget.contains(node)) {
+                const style = window.getComputedStyle(node);
+                if (
+                    canScroll(
+                        style.overflowY,
+                        node.scrollTop,
+                        node.scrollHeight,
+                        node.clientHeight,
+                        deltaY
+                    ) ||
+                    canScroll(
+                        style.overflowX,
+                        node.scrollLeft,
+                        node.scrollWidth,
+                        node.clientWidth,
+                        deltaX
+                    )
+                ) {
+                    return node;
+                }
+                node = node.parentElement;
+            }
+            return this._widget;
+        };
+
         this._widgetWheelHandler = event => {
             const deltaY =
                 typeof event.deltaY === "number"
@@ -474,8 +515,11 @@ class WidgetWindow {
                       : 0;
             const deltaX = typeof event.deltaX === "number" ? event.deltaX : 0;
 
-            this._widget.scrollTop += deltaY;
-            this._widget.scrollLeft += deltaX;
+            // Scrolling only this._widget left inner scroll areas, such as the
+            // AI Debugger's chat log, unable to scroll at all.
+            const scroller = this._scrollTargetFor(event.target, deltaX, deltaY);
+            scroller.scrollTop += deltaY;
+            scroller.scrollLeft += deltaX;
 
             if (event.cancelable) {
                 event.preventDefault();
@@ -882,6 +926,7 @@ class WidgetWindow {
      */
     show() {
         this._frame.style.display = "block";
+        this._visible = true;
         window.widgetWindows._handleResize();
     }
 
@@ -1014,6 +1059,7 @@ window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) {
             win._frame.style.display = "none";
+            win._visible = false;
             win._overlay(false, false);
         }
     });
@@ -1028,6 +1074,7 @@ window.widgetWindows.hideWindow = name => {
     const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     win._frame.style.display = "none";
+    win._visible = false;
     if (window.widgetWindows.focused === win) {
         window.widgetWindows.focused = null;
     }
@@ -1050,7 +1097,10 @@ window.widgetWindows.closeWindow = name => {
  */
 window.widgetWindows.showWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        if (win !== undefined) win._frame.style.display = "block";
+        if (win !== undefined) {
+            win._frame.style.display = "block";
+            win._visible = true;
+        }
     });
     window.widgetWindows._handleResize();
 };
