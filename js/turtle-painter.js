@@ -1298,6 +1298,13 @@ class Painter {
                     '<path d="M ' + ix * turtlesScale + "," + iy * turtlesScale + " ";
             }
 
+            // Start a new path like forward and arc do, or the stroke below
+            // also paints the previous block's line again in this colour.
+            if (!this._fillState) {
+                this.turtle.ctx.beginPath();
+                this.turtle.ctx.moveTo(ix, iy);
+            }
+
             const nstepsCurve = this._estimateBezierSteps(ix, iy, cx1, cy1, cx2, cy2, fx, fy);
 
             this._svgBezier(nstepsCurve, ix, iy, cx1, cy1, cx2, cy2, fx, fy, true);
@@ -1307,6 +1314,9 @@ class Painter {
 
             // draw it
             this.turtle.ctx.stroke();
+            if (!this._fillState) {
+                this.turtle.ctx.closePath();
+            }
         } else {
             this.turtle.x = x2;
             this.turtle.y = y2;

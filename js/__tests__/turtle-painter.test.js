@@ -1207,6 +1207,34 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.svgOutput).toContain('<path d="M');
     });
 
+    test("doBezier starts a new path so the previous line is not stroked again", () => {
+        const ctx = mockTurtle.ctx;
+        painter.turtle.x = 20;
+        painter.turtle.y = 30;
+        painter.cp1x = 10;
+        painter.cp1y = 10;
+        painter.cp2x = 50;
+        painter.cp2y = 50;
+
+        painter.doBezier(100, 100);
+        expect(ctx.beginPath).toHaveBeenCalled();
+        expect(ctx.moveTo).toHaveBeenCalledWith(20, 30);
+        expect(ctx.beginPath.mock.invocationCallOrder[0]).toBeLessThan(
+            ctx.lineTo.mock.invocationCallOrder[0]
+        );
+        expect(ctx.closePath.mock.invocationCallOrder[0]).toBeGreaterThan(
+            ctx.stroke.mock.invocationCallOrder[0]
+        );
+    });
+
+    test("doBezier inside a fill keeps adding to the fill path", () => {
+        painter._fillState = true;
+        painter.doBezier(100, 100);
+        expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.closePath).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
     test("doBezier with penUp", () => {
         painter._penDown = false;
         painter.doBezier(100, 100);
