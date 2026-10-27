@@ -1032,7 +1032,7 @@ class Activity {
             this.scrollBlockContainer = !this.scrollBlockContainer;
             const enableHorizScrollIcon = document.getElementById("enableHorizScrollIcon");
             const disableHorizScrollIcon = document.getElementById("disableHorizScrollIcon");
-            if (this.scrollBlockContainer && !this.beginnerMode) {
+            if (this.scrollBlockContainer) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
 
@@ -3234,8 +3234,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
 
         if (globalsReady) {
             activity.setupDependencies();
-            activity.domReady(doc);
-            activity.doContextMenus();
+            activity.domReady(doc).then(() => activity.doContextMenus());
             activity.doPluginsAndPaletteCols();
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
@@ -3245,8 +3244,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
                 waitForReadiness(
                     () => {
                         activity.setupDependencies();
-                        activity.domReady(doc);
-                        activity.doContextMenus();
+                        activity.domReady(doc).then(() => activity.doContextMenus());
                         activity.doPluginsAndPaletteCols();
                     },
                     {

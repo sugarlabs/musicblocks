@@ -33,6 +33,15 @@
 /* exported setupGraphicsBlocks */
 
 function setupGraphicsBlocks(activity) {
+    function recordMatrixRow(logo, blk, rowArgs) {
+        logo.phraseMaker.addRowBlock(blk);
+        if (!logo.pitchBlocks.includes(blk)) {
+            logo.pitchBlocks.push(blk);
+        }
+        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+        logo.phraseMaker.rowArgs.push(rowArgs);
+    }
+
     /**
      * Represents a block for retrieving the orientation or compass direction.
      * @extends {ValueBlock}
@@ -331,12 +340,7 @@ function setupGraphicsBlocks(activity) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (!logo.pitchBlocks.includes(blk)) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push([args[0], args[1]]);
+                    recordMatrixRow(logo, blk, [args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -635,12 +639,7 @@ function setupGraphicsBlocks(activity) {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
-                        logo.phraseMaker.addRowBlock(blk);
-                        if (!logo.pitchBlocks.includes(blk)) {
-                            logo.pitchBlocks.push(blk);
-                        }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                        logo.phraseMaker.rowArgs.push([args[0], args[1]]);
+                        recordMatrixRow(logo, blk, [args[0], args[1]]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
@@ -707,12 +706,7 @@ function setupGraphicsBlocks(activity) {
                 if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (!logo.pitchBlocks.includes(blk)) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push(args[0]);
+                    recordMatrixRow(logo, blk, args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -794,12 +788,7 @@ function setupGraphicsBlocks(activity) {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
-                        logo.phraseMaker.addRowBlock(blk);
-                        if (!logo.pitchBlocks.includes(blk)) {
-                            logo.pitchBlocks.push(blk);
-                        }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                        logo.phraseMaker.rowArgs.push([args[0], args[1]]);
+                        recordMatrixRow(logo, blk, [args[0], args[1]]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
@@ -875,12 +864,7 @@ function setupGraphicsBlocks(activity) {
                 if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (!logo.pitchBlocks.includes(blk)) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push(args[0]);
+                    recordMatrixRow(logo, blk, args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -955,12 +939,7 @@ function setupGraphicsBlocks(activity) {
                 if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (!logo.pitchBlocks.includes(blk)) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push(args[0]);
+                    recordMatrixRow(logo, blk, args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -1043,12 +1022,7 @@ function setupGraphicsBlocks(activity) {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
-                        logo.phraseMaker.addRowBlock(blk);
-                        if (!logo.pitchBlocks.includes(blk)) {
-                            logo.pitchBlocks.push(blk);
-                        }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                        logo.phraseMaker.rowArgs.push(args[0]);
+                        recordMatrixRow(logo, blk, args[0]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
@@ -1132,12 +1106,7 @@ function setupGraphicsBlocks(activity) {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
-                        logo.phraseMaker.addRowBlock(blk);
-                        if (!logo.pitchBlocks.includes(blk)) {
-                            logo.pitchBlocks.push(blk);
-                        }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                        logo.phraseMaker.rowArgs.push(args[0]);
+                        recordMatrixRow(logo, blk, args[0]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {

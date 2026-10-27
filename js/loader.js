@@ -207,7 +207,7 @@ requirejs.config({
             exports: "PieMenuUtils"
         },
         "utils/musicutils-modewheel": {
-            deps: ["utils/utils", "utils/musicutils-constants"],
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-temperament"],
             exports: "MusicUtilsModeWheel"
         },
         "utils/musicutils-modecore": {
@@ -380,14 +380,17 @@ requirejs.config({
         "utils/ai-widget-lifecycle": {
             exports: "createWidgetLifecycle"
         },
+        "utils/ai-markdown": {
+            exports: "renderChatMarkdown"
+        },
         "utils/tuningformats": {
             exports: "TuningFormats"
         },
         "widgets/reflection": {
-            deps: ["utils/ai-widget-lifecycle"]
+            deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
         },
         "widgets/aidebugger": {
-            deps: ["utils/ai-widget-lifecycle"]
+            deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
         }
     },
     paths: {

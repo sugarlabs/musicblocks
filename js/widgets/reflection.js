@@ -11,7 +11,7 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
-/* global _, escapeHTML, isSafeUrl, DOMPurify, ManagedTimer */
+/* global _, escapeHTML, isSafeUrl, DOMPurify, ManagedTimer, renderChatMarkdown */
 
 /*
    Globals location
@@ -34,7 +34,7 @@ if (typeof module !== "undefined" && module.exports) {
 
 class ReflectionMatrix {
     /** AMD module dependencies for lazy loading. */
-    static dependencies = ["utils/ai-widget-lifecycle", "widgets/reflection"];
+    static dependencies = ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/reflection"];
 
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
@@ -55,7 +55,8 @@ class ReflectionMatrix {
     static BACKENDS = {
         "localhost": "http://localhost:8000",
         "127.0.0.1": "http://127.0.0.1:8000",
-        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org"
+        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org",
+        "sugarlabs.github.io": "https://api.musicblocks.sugarlabs.org"
     };
 
     /**
@@ -577,7 +578,14 @@ class ReflectionMatrix {
 
         const botReply = document.createElement("div");
 
-        if (md) {
+        const render =
+            (typeof renderChatMarkdown !== "undefined" && renderChatMarkdown) ||
+            (typeof window !== "undefined" && window.renderChatMarkdown);
+        if (render) {
+            // Every reply may use Markdown. Escaped and sanitized in utils/ai-markdown.js.
+            botReply.className = "ai-chat-markdown";
+            botReply.innerHTML = render(reply.response);
+        } else if (md) {
             let html = this.mdToHTML(reply.response);
             botReply.innerHTML = DOMPurify.sanitize(html);
         } else {
@@ -952,7 +960,16 @@ class ReflectionMatrix {
             senderName.style.alignSelf = "flex-start";
 
             const userMsg = document.createElement("div");
-            userMsg.innerText = msg.content;
+            const render =
+                msg.role !== "user" &&
+                ((typeof renderChatMarkdown !== "undefined" && renderChatMarkdown) ||
+                    (typeof window !== "undefined" && window.renderChatMarkdown));
+            if (render) {
+                userMsg.className = "ai-chat-markdown";
+                userMsg.innerHTML = render(msg.content);
+            } else {
+                userMsg.innerText = msg.content;
+            }
 
             messageContainer.appendChild(senderName);
             messageContainer.appendChild(userMsg);

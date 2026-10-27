@@ -282,7 +282,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.previousNotePlayed).toEqual(["X9", 9]);
         });
 
-        test("non-numeric lastNotePlayed is sliced into pitch name and octave correctly", () => {
+        test("non-numeric lastNotePlayed is parsed into pitch name and octave correctly", () => {
             Singer.addScalarTransposition.mockClear();
             turtle.singer.lastNotePlayed = ["F#4", 4];
             activity.logo.inMatrix = true; // avoid the reset-to-G4 guard
@@ -292,6 +292,42 @@ describe("Tests for Singer.PitchActions setup", () => {
                 0,
                 "F#",
                 4,
+                1
+            );
+
+            // Multi-digit octave (e.g. 10)
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["C10", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "C",
+                10,
+                1
+            );
+
+            // Multi-digit octave with accidental
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["F#10", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "F#",
+                10,
+                1
+            );
+
+            // Negative octave
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["D-1", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "D",
+                -1,
                 1
             );
         });

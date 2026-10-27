@@ -44,7 +44,8 @@
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
         SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament, getCurrentEDO
+        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament, getCurrentEDO,
+        noteToObj
 */
 
 /*exported setupPitchActions*/
@@ -116,17 +117,15 @@ function setupPitchActions(activity) {
             // pitchname-octave and the notevalue, e.g., ["C3", 8]
             // We only care about the pitchname and octave.
             if (typeof lastNotePlayed[0] === "number") {
-                // Convert freq tp o pitch.
+                // Convert freq to pitch.
                 lastNotePlayed = frequencyToPitch(lastNotePlayed[0]);
                 pitchName = lastNotePlayed[0];
                 octave = lastNotePlayed[1];
                 cents = lastNotePlayed[2];
             } else {
-                pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
-                octave = parseInt(
-                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length),
-                    10
-                );
+                const noteObj = noteToObj(lastNotePlayed[0]);
+                pitchName = noteObj[0];
+                octave = noteObj[1];
             }
             if (tur.singer.invertList.length > 0) {
                 // If the last note is inverted then inverting it

@@ -13,6 +13,12 @@
 
 const { setupActivityMxmlParser } = require("../mxml-parser.js");
 
+// Globals in the browser (js/utils/musicutils-constants.js); the drum-name
+// lookup reads them.
+const { DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP } = require("../../utils/musicutils-constants.js");
+global.DRUM_MIDI_MAP = DRUM_MIDI_MAP;
+global.REVERSE_DRUM_MIDI_MAP = REVERSE_DRUM_MIDI_MAP;
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -896,6 +902,73 @@ describe("Test 15: Drum/unpitched parts", () => {
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
         expect(drumNames(blocks)).toEqual(["snare drum"]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});
+
+describe("Test 15b: drum kits named by other programs", () => {
+    const kitScore = (kit, ids = kit.map(([id]) => id)) =>
+        '<score-partwise><part-list><score-part id="P1">' +
+        kit
+            .map(
+                ([id, name]) =>
+                    `<score-instrument id="P1-${id}"><instrument-name>${name}</instrument-name></score-instrument>`
+            )
+            .join("") +
+        kit
+            .map(
+                ([id, , unpitched]) =>
+                    `<midi-instrument id="P1-${id}"><midi-channel>10</midi-channel><midi-unpitched>${unpitched}</midi-unpitched></midi-instrument>`
+            )
+            .join("") +
+        "</score-part></part-list>" +
+        '<part id="P1"><measure number="1"><attributes><divisions>8</divisions></attributes>' +
+        ids
+            .map(
+                id =>
+                    "<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>" +
+                    `<duration>8</duration><type>quarter</type><instrument id="P1-${id}"/></note>`
+            )
+            .join("") +
+        "</measure></part></score-partwise>";
+
+    it("imports the MusicXML tutorial's drum kit as its own drums, not five kicks", async () => {
+        // The kit in https://www.w3.org/2021/06/musicxml40/tutorial/percussion
+        const { blocks } = await parseAndCapture(
+            kitScore([
+                ["X4", "Snare Drum", 39],
+                ["X2", "Kick Drum", 37],
+                ["X13", "Crash Cymbal", 50],
+                ["X6", "Hi-Hat Closed", 43],
+                ["X1", "Cowbell", 57]
+            ])
+        );
+
+        expect(drumNames(blocks)).toEqual([
+            "snare drum",
+            "kick drum",
+            "crash",
+            "hi hat",
+            "cow bell"
+        ]);
+    });
+
+    it("maps General MIDI kit pieces Music Blocks has no exact drum for to the nearest one", async () => {
+        const { blocks } = await parseAndCapture(
+            kitScore([
+                ["I36", "Acoustic Bass Drum", 36],
+                ["I47", "Open Hi-Hat", 47],
+                ["I52", "Ride Cymbal 1", 52],
+                ["I49", "Hi-Mid Tom", 49]
+            ])
+        );
+
+        expect(drumNames(blocks)).toEqual(["kick drum", "hi hat", "ride bell", "tom tom"]);
+    });
+
+    it("prefers a Music Blocks drum name over <midi-unpitched>", async () => {
+        const { blocks } = await parseAndCapture(kitScore([["X", "Clap", 39]]));
+
+        expect(drumNames(blocks)).toEqual(["clap"]);
     });
 });
 

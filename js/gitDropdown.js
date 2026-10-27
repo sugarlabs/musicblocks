@@ -465,14 +465,27 @@ class GitDropdownUI {
             tags: []
         };
 
-        try {
-            this._showToast("Setting up tracking…", "info");
-            const res = await fetch(`${this._BASE_URL}/create`, {
+        const postCreate = name =>
+            fetch(`${this._BASE_URL}/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
+                body: JSON.stringify({ ...body, repoName: name }),
                 signal: createController.signal
             });
+
+        try {
+            this._showToast("Setting up tracking…", "info");
+            let createdName = repoName;
+            let res = await postCreate(createdName);
+
+            // Repo names are shared by everyone, so a common name may already be
+            // taken. The display name is stored separately, so retry once with a
+            // short suffix (like the offline path does) before asking to rename.
+            if (res.status === 422) {
+                const suffix = Math.random().toString(36).slice(2, 6).padEnd(4, "0");
+                createdName = repoName.substring(0, 95).replace(/-+$/, "") + "-" + suffix;
+                res = await postCreate(createdName);
+            }
 
             window.removeEventListener("offline", abortCreateOnOffline);
 
@@ -491,7 +504,7 @@ class GitDropdownUI {
             }
 
             const data = await res.json();
-            const savedRepoName = data.repoName || data.repository || repoName;
+            const savedRepoName = data.repoName || data.repository || createdName;
             const savedKey = data.hashedKey || data.key || "";
             localStorage.setItem("mbGitRepoName", savedRepoName);
             localStorage.setItem("mbGitHashedKey", savedKey);
