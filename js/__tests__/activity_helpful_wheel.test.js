@@ -122,6 +122,7 @@ const loadActivityClass = () => {
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),
+        setupActivityMxmlParser: jest.fn(),
         AlertController: {
             MSG_TIMEOUT: 60000,
             ERROR_MSG_TIMEOUT: 15000
