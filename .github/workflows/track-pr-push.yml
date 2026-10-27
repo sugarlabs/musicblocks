@@ -21,6 +21,7 @@ permissions:
 concurrency:
     group: pr-push-state
     cancel-in-progress: false
+    queue: max
 
 jobs:
     track:
