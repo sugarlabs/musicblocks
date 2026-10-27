@@ -616,9 +616,11 @@ function setupNumberBlocks(activity) {
             }
 
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            // Words stay as text so doNegate can reverse them.
-            if (isNumericText(a)) {
-                a = Number(a);
+            // Words stay as text so doNegate can reverse them. Blank text and text that starts
+            // like a number, such as "2.7x", go through toNumber and stop with the NaN error.
+            if (typeof a === "string" && (a.trim() === "" || /^\s*[-+]?\.?\d/.test(a))) {
+                a = toNumber(logo, a, blk);
+                if (a === null) return 0;
             }
 
             try {

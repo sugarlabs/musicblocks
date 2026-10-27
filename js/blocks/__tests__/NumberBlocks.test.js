@@ -1387,6 +1387,8 @@ describe("setupNumberBlocks", () => {
             ["sqrt", ["6.25x"]],
             ["abs", ["   "]],
             ["int", ["2.7x"]],
+            ["neg", ["2.7x"]],
+            ["neg", ["   "]],
             ["distance", ["0", "0", "3", "4 units"]]
         ])("%s stops with the NaN error for %j", (name, values) => {
             expect(run(name, values)).toBe(0);
