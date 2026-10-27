@@ -186,6 +186,16 @@ async function run({ github, context, core }) {
     const changelogUrlFor = version =>
         `${context.serverUrl}/${owner}/${repo}/blob/v${version}/CHANGELOG.md`;
     const capped = capNotesFile(text, changelogUrlFor);
+    if (capped.version === null) {
+        // release-please changed how it stores the notes. Say so loudly rather
+        // than skip quietly, since a long release would then fail to publish.
+        core.warning(
+            `${NOTES_FILE} on ${branch} has no <details><summary>VERSION</summary> block, so ` +
+                `the release body was not checked or trimmed (${text.length} characters). ` +
+                `If it is over ${GITHUB_RELEASE_BODY_LIMIT}, creating the release will fail.`
+        );
+        return;
+    }
     if (capped.dropped === 0) {
         core.info(`Release notes for ${capped.version || "this release"} fit; nothing to cap.`);
         return;

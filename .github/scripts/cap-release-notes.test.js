@@ -192,7 +192,7 @@ describe("run", () => {
             sha: SHA,
             serverUrl: "https://github.com"
         };
-        const core = { info: jest.fn(), notice: jest.fn() };
+        const core = { info: jest.fn(), notice: jest.fn(), warning: jest.fn() };
         return { github, context, core };
     }
 
@@ -242,6 +242,17 @@ describe("run", () => {
             })
         );
         expect(args.github.rest.repos.createOrUpdateFileContents).not.toHaveBeenCalled();
+    });
+
+    it("warns instead of skipping quietly when the notes file has an unexpected layout", async () => {
+        const args = setup({ prs: [releasePr(OVERFLOW)], fileText: "x".repeat(130000) });
+
+        await run(args);
+
+        expect(args.github.rest.repos.createOrUpdateFileContents).not.toHaveBeenCalled();
+        expect(args.core.warning).toHaveBeenCalledTimes(1);
+        expect(args.core.warning.mock.calls[0][0]).toContain("130000 characters");
+        expect(args.core.info).not.toHaveBeenCalledWith(expect.stringContaining("fit"));
     });
 
     it("writes the capped notes back where release-please reads them", async () => {
