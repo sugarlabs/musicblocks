@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP */
+/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP, toFraction */
 
 /* exported setupActivityMxmlParser */
 
@@ -55,10 +55,11 @@ const _fractionGcd = (a, b) => {
 // Keep tie durations reduced as they accumulate. Multiplying denominators on
 // every note can overflow before the resulting divide block is ever evaluated.
 const _addFractions = ([n1, d1], [n2, d2]) => {
-    // MusicXML duration/divisions can be decimal. Accumulate decimal-valued
-    // durations directly so repeated ties do not grow their operands exponentially.
+    // MusicXML duration/divisions can be decimal. Accumulate their numeric value
+    // and convert it back to a bounded fraction so repeated ties neither grow
+    // operands exponentially nor lose the note-value denominator.
     if (![n1, d1, n2, d2].every(Number.isInteger)) {
-        return [n1 / d1 + n2 / d2, 1];
+        return toFraction(n1 / d1 + n2 / d2);
     }
     const common = _fractionGcd(d1, d2);
     const numerator = n1 * (d2 / common) + n2 * (d1 / common);
