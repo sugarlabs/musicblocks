@@ -780,6 +780,18 @@ describe("GlobalPlanet", () => {
             expect(gp.loadCount).toBe(0);
         });
 
+        it("forceAddToCache should not disturb a list that is still loading", () => {
+            const cb = jest.fn();
+            gp.loadCount = 2;
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: true, data: { ProjectName: "Test" } });
+
+            expect(cb).toHaveBeenCalledTimes(1);
+            expect(gp.loadCount).toBe(2);
+        });
+
         it("downloadDataToCache should pass expectedUpdatedAt from cache to downloadProject", () => {
             gp.cache["repo-1"] = {
                 ProjectLastUpdated: "2026-10-01T12:00:00Z"
