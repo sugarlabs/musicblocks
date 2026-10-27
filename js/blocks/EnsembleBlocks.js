@@ -1317,8 +1317,6 @@ function setupEnsembleBlocks(activity) {
                 } else {
                     activity.errorMsg(`${_("Cannot find turtle")} ${args[0]}`, blk);
                 }
-            } else {
-                activity.turtles.getTurtle(turtle).rename(args[1]);
             }
         }
     }
