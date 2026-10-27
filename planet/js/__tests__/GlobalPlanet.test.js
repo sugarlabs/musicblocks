@@ -236,6 +236,11 @@ describe("GlobalPlanet", () => {
             await Promise.resolve();
 
             expect(mockPlanet.ProjectStorage.initialiseNewProject).toHaveBeenCalledTimes(1);
+            expect(mockPlanet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
+                "My Project",
+                "remote-data",
+                "remote-image"
+            );
             expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("remote-data");
         });
     });

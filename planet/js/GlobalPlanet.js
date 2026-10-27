@@ -693,7 +693,16 @@ class GlobalPlanet {
             async data => {
                 const currentData = await Planet.ProjectStorage.getCurrentProjectData();
                 if (currentData === null) {
-                    await Planet.ProjectStorage.initialiseNewProject();
+                    const remixedName =
+                        id in this.cache
+                            ? Planet.ProjectStorage.getCurrentProjectName()
+                            : `${this.remixPrefix}  ${_("My Project")}`;
+                    const projectImage = id in this.cache ? this.cache[id].ProjectImage : null;
+                    await Planet.ProjectStorage.initialiseNewProject(
+                        remixedName,
+                        data,
+                        projectImage
+                    );
                     Planet.loadProjectFromData(data);
                 } else {
                     Planet.loadProjectFromData(data, true);
