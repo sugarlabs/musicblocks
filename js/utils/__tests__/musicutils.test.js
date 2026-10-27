@@ -3424,6 +3424,7 @@ describe("calcOctave", () => {
         );
         expect(calcOctave(4, "", ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
         expect(calcOctave(4, NaN, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, NaN, ["C"], "G")).toBe(3);
         expect(calcOctave(4, null, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
         expect(calcOctave(4, undefined, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
     });
