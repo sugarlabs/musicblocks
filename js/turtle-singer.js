@@ -742,6 +742,10 @@ class Singer {
         });
         restoreMeterState(tur.singer, saveState.meter);
 
+        tur.painter.doPenUp();
+        tur.painter.doSetXY(saveState.x, saveState.y);
+        tur.painter.doSetHeading(saveState.orientation);
+
         Object.assign(tur.painter, {
             color: saveState.color,
             value: saveState.value,
@@ -755,9 +759,6 @@ class Singer {
         activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? [];
         activity.logo.turtleDicts[turtle] = saveState.turtleDicts ?? {};
 
-        tur.painter.doPenUp();
-        tur.painter.doSetXY(saveState.x, saveState.y);
-        tur.painter.doSetHeading(saveState.orientation);
         tur.singer.justCounting.pop();
         tur.butNotThese = previousButNotThese;
 
