@@ -14,6 +14,13 @@ describe("ai-markdown", () => {
         expect(renderChatMarkdown("1. one\n2. two")).toBe("<ol><li>one</li><li>two</li></ol>");
     });
 
+    it("keeps step numbers when a numbered list is split by blank lines or bullets", () => {
+        expect(renderChatMarkdown("1. one\n\n2. two")).toBe(
+            '<ol><li>one</li></ol><ol start="2"><li>two</li></ol>'
+        );
+        expect(renderChatMarkdown("1. one\n- detail\n2. two")).toContain('<ol start="2">');
+    });
+
     it("turns headings into bold lines", () => {
         expect(renderChatMarkdown("## What you made")).toBe(
             '<p class="ai-chat-heading"><strong>What you made</strong></p>'

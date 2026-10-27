@@ -2134,9 +2134,10 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("reflection"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "reflection", x, y, [null, 1]],
+                [0, "reflection", x, y, [null, 1, 3]],
                 [1, "print", 0, 0, [0, 2, null]],
-                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]]
+                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -2176,6 +2177,12 @@ function setupWidgetBlocks(activity) {
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
+
+            // The window opens on a signal from the block below the clamp.
+            // Blocks saved before the palette added one, or rebuilt by an AI
+            // edit, can have nothing there, so the window would never open.
+            const block = activity.blocks.blockList[blk];
+            if (block && last(block.connections) === null) __listener();
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -2303,9 +2310,10 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("debugger"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "aidebugger", x, y, [null, 1]],
+                [0, "aidebugger", x, y, [null, 1, 3]],
                 [1, "print", 0, 0, [0, 2, null]],
-                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]]
+                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -2340,6 +2348,11 @@ function setupWidgetBlocks(activity) {
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
+
+            // As in the Reflection block, older and AI-edited blocks can have
+            // nothing below the clamp to signal from.
+            const block = activity.blocks.blockList[blk];
+            if (block && last(block.connections) === null) __listener();
 
             return [args[0], 1];
         }

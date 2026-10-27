@@ -713,6 +713,30 @@ describe("setupWidgetBlocks", () => {
             expect(result).toEqual(["childBlk", 1]);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
+
+        it.each(["aidebugger", "reflection"])(
+            "gives the %s block a hidden block below its clamp to open the window from",
+            name => {
+                const macro = getBlock(name).macroFunc(0, 0);
+                const tail = macro[macro[0][4][2]];
+                expect(macro[0][4]).toHaveLength(3);
+                expect(tail[1]).toBe("hiddennoflow");
+                expect(tail[4]).toEqual([0, null]);
+            }
+        );
+
+        it.each([
+            ["aidebugger", "aiDebugger"],
+            ["reflection", "reflection"]
+        ])("opens the %s window when nothing is below the clamp", (name, field) => {
+            // Saved with two slots and the print removed, or rebuilt by an edit
+            // with an empty tail, the clamp end has no block to signal from.
+            activity.blocks.blockList.oldBlk = { connections: [null, null] };
+            const block = getBlock(name);
+            block.flow([null], logo, 0, "oldBlk", "received");
+            block.flow([null], logo, 0, "oldBlk");
+            expect(logo[field].init).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("First-Click Flow (Lazy Loading)", () => {

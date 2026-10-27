@@ -30,7 +30,15 @@
  * number that async work captures before it awaits and rechecks afterwards.
  */
 
-/* global module, window */
+/* global module, window, _ */
+
+/**
+ * Whether the child agreed to send their project to the AI server. Reflection
+ * and the AI Debugger read the same flag, so a child agrees once for both. It
+ * lives only in the page, so a reload asks again.
+ * @type {{given: boolean}}
+ */
+const aiWidgetConsent = { given: false };
 
 /**
  * Creates the shared lifecycle tracker for a widget.
@@ -100,6 +108,123 @@ function createWidgetLifecycle(widget, isActive) {
         },
 
         /**
+         * Returns true once the child agreed, in either AI widget, to send
+         * their project to the server.
+         * @returns {boolean}
+         */
+        hasConsent() {
+            return aiWidgetConsent.given;
+        },
+
+        /**
+         * Records that the child agreed to send their project to the server.
+         * @returns {void}
+         */
+        giveConsent() {
+            aiWidgetConsent.given = true;
+        },
+
+        /**
+         * Shows the banner that asks before anything is sent to the server.
+         * Both widgets use it, so the question looks the same in each.
+         * @param {HTMLElement} container - The widget's chat log.
+         * @param {Object} options
+         * @param {string} options.classPrefix - Widget name for the banner's classes.
+         * @param {string} options.text - What the widget sends, ending before the URL.
+         * @param {string} options.url - The server the project goes to.
+         * @param {Function} options.onAgree - Sends the waiting request.
+         * @param {Function} options.onDecline - Tells the child that nothing was sent.
+         * @returns {HTMLElement} The banner.
+         */
+        showConsentBanner(container, options) {
+            // Pressing again while the banner is up would stack a second one.
+            for (const old of container.querySelectorAll(
+                `.${options.classPrefix}-consent-banner`
+            )) {
+                old.remove();
+            }
+
+            const banner = document.createElement("div");
+            banner.className = `${options.classPrefix}-consent-banner`;
+            banner.style.padding = "16px 20px";
+            banner.style.margin = "12px";
+            banner.style.borderRadius = "12px";
+            banner.style.backgroundColor = "var(--color-warning-bg)";
+            banner.style.border = "1px solid var(--color-border-primary)";
+            banner.style.color = "var(--color-text-primary)";
+            banner.style.fontSize = "13px";
+            banner.style.lineHeight = "1.5";
+
+            const title = document.createElement("div");
+            title.style.fontWeight = "bold";
+            title.style.marginBottom = "8px";
+            title.style.fontSize = "14px";
+            title.textContent = _("Before we start");
+
+            const body = document.createElement("div");
+            body.style.marginBottom = "12px";
+            body.textContent = options.text;
+
+            const urlSpan = document.createElement("strong");
+            urlSpan.textContent = options.url;
+            body.appendChild(urlSpan);
+
+            // Agreeing here also lets the other AI widget send, so the child
+            // is told before agreeing, not after.
+            const shared = document.createElement("div");
+            shared.textContent = _(
+                "Agreeing counts for all the AI tools until you reload the page."
+            );
+            body.appendChild(shared);
+
+            const btnRow = document.createElement("div");
+            btnRow.style.display = "flex";
+            btnRow.style.gap = "8px";
+            btnRow.style.marginTop = "4px";
+
+            const acceptBtn = document.createElement("button");
+            acceptBtn.textContent = _("Agree and continue");
+            acceptBtn.style.padding = "8px 16px";
+            acceptBtn.style.border = "none";
+            acceptBtn.style.borderRadius = "6px";
+            acceptBtn.style.backgroundColor = "#198754";
+            acceptBtn.style.color = "white";
+            acceptBtn.style.cursor = "pointer";
+            acceptBtn.style.fontSize = "13px";
+            acceptBtn.style.fontWeight = "600";
+
+            const declineBtn = document.createElement("button");
+            declineBtn.className = `cancel-button ${options.classPrefix}-cancel-btn`;
+            declineBtn.textContent = _("Cancel");
+            declineBtn.style.padding = "8px 16px";
+            declineBtn.style.border = "1px solid var(--color-border-primary)";
+            declineBtn.style.borderRadius = "6px";
+            declineBtn.style.backgroundColor = "var(--color-bg-primary)";
+            declineBtn.style.color = "var(--color-text-primary)";
+            declineBtn.style.cursor = "pointer";
+            declineBtn.style.fontSize = "13px";
+
+            acceptBtn.onclick = () => {
+                this.giveConsent();
+                banner.remove();
+                options.onAgree();
+            };
+
+            declineBtn.onclick = () => {
+                banner.remove();
+                options.onDecline();
+            };
+
+            btnRow.appendChild(acceptBtn);
+            btnRow.appendChild(declineBtn);
+            banner.appendChild(title);
+            banner.appendChild(body);
+            banner.appendChild(btnRow);
+            container.appendChild(banner);
+            return banner;
+        },
+
+        /**
          * Aborts all in-flight requests.
          * @returns {void}
          */
@@ -150,7 +275,16 @@ function createWidgetLifecycle(widget, isActive) {
                 const response = await fetch(url, request);
 
                 if (throwOnError && !response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    // The server says what went wrong in the reply, such as a
+                    // rate limit, so the widget can show that instead.
+                    try {
+                        error.reply = await response.json();
+                    } catch (parseError) {
+                        // A proxy's error page is not JSON, so there is no reason to show.
+                        error.reply = null;
+                    }
+                    throw error;
                 }
 
                 const data = await response.json();
@@ -184,7 +318,7 @@ function createWidgetLifecycle(widget, isActive) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { createWidgetLifecycle };
+    module.exports = { createWidgetLifecycle, aiWidgetConsent };
 } else if (typeof window !== "undefined") {
     window.createWidgetLifecycle = createWidgetLifecycle;
 }
