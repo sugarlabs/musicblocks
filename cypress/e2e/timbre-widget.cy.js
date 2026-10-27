@@ -20,6 +20,7 @@ const openTimbre = () => {
         force: true
     });
 
+    cy.get("#load-container").should("be.visible");
     let stableObservations = 0;
     cy.window({ timeout: 30000 }).should(win => {
         const { blocks } = win.ActivityContext.getActivity();
@@ -43,7 +44,7 @@ const openSynthPanel = () => {
     cy.get(`${timbreDialog} #timbreTable`).should("be.visible");
 };
 
-describe("Timbre widget", () => {
+describe("Timbre widget", { testIsolation: true }, () => {
     beforeEach(() => {
         cy.visit("http://127.0.0.1:3000");
         cy.clearLocalStorage();
@@ -119,6 +120,19 @@ describe("Timbre widget", () => {
                 const parentIndex = blocks.blockList[synthIndex].connections[0];
                 expect(parentIndex, "synth is connected inside the timbre clamp").not.to.be.null;
                 expect(blocks.blockList[parentIndex].connections).to.include(synthIndex);
+                const timbreIndex = blocks.blockList.findIndex(
+                    block => !block.trash && block.name === "timbre"
+                );
+                expect(timbreIndex, "fixture timbre block exists").to.be.at.least(0);
+                const clampFlow = new Set();
+                let current = blocks.blockList[timbreIndex].connections[2];
+                while (current !== null && current !== undefined && !clampFlow.has(current)) {
+                    clampFlow.add(current);
+                    current = blocks.blockList[current].connections.at(-1);
+                }
+                expect([...clampFlow], "selected synth belongs to the timbre body").to.include(
+                    synthIndex
+                );
             });
         }
     });
