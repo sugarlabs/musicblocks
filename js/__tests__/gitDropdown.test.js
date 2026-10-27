@@ -370,6 +370,74 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 "error"
             );
         });
+
+        describe("when the repo name is already taken", () => {
+            const taken = () =>
+                Promise.resolve({ ok: false, status: 422, json: () => Promise.resolve({}) });
+            const created = repository =>
+                Promise.resolve({
+                    ok: true,
+                    status: 201,
+                    json: () => Promise.resolve({ success: true, repository, key: "key-1" })
+                });
+            const sentNames = () =>
+                global.fetch.mock.calls
+                    .filter(c => String(c[0]).endsWith("/create"))
+                    .map(c => JSON.parse(c[1].body).repoName);
+
+            beforeEach(() => {
+                jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            });
+
+            test("does not retry when the first name is free", async () => {
+                global.fetch.mockImplementationOnce(() => created("my-song"));
+
+                await gitDropdown._doCreate("my-song", "My Song", "desc");
+
+                expect(sentNames()).toEqual(["my-song"]);
+                expect(localStorage.getItem("mbGitRepoName")).toBe("my-song");
+            });
+
+            test("retries once with a short suffix and keeps the display name", async () => {
+                jest.spyOn(Math, "random").mockReturnValue(0.5);
+                global.fetch
+                    .mockImplementationOnce(taken)
+                    .mockImplementationOnce(() => created(undefined));
+
+                await gitDropdown._doCreate("my-song", "My Song", "desc");
+
+                const names = sentNames();
+                expect(names).toHaveLength(2);
+                expect(names[0]).toBe("my-song");
+                expect(names[1]).toMatch(/^my-song-[a-z0-9]{4}$/);
+                expect(localStorage.getItem("mbGitRepoName")).toBe(names[1]);
+                expect(localStorage.getItem("mbGitDisplayName")).toBe("My Song");
+                expect(window.MBDialog.alert).not.toHaveBeenCalled();
+            });
+
+            test("keeps the name within 100 characters when adding the suffix", async () => {
+                global.fetch
+                    .mockImplementationOnce(taken)
+                    .mockImplementationOnce(() => created(undefined));
+
+                await gitDropdown._doCreate("a".repeat(100), "Long", "desc");
+
+                expect(sentNames()[1].length).toBeLessThanOrEqual(100);
+            });
+
+            test("still asks the user to rename when the retry is taken too", async () => {
+                global.fetch.mockImplementationOnce(taken).mockImplementationOnce(taken);
+
+                await gitDropdown._doCreate("my-song", "My Song", "desc");
+
+                expect(sentNames()).toHaveLength(2);
+                expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                    expect.stringContaining("That name is already taken"),
+                    "Name Already Taken"
+                );
+                expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            });
+        });
     });
 
     // ── 3. Save a Moment Flow (Online & Offline) ────────────────────────────
