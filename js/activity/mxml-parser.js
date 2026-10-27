@@ -45,12 +45,27 @@ const _MXML_TYPE_DENOMINATOR = {
 
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
-// Adds two [numerator, denominator] fractions without reducing the result --
-// same choice as js/utils/utils-logic.js's rationalSum, whose own doc comment
-// explains why: the "divide" block computes the reduction at runtime anyway,
-// so there's nothing to gain from doing it here, and an unreduced result is
-// just as correct.
-const _addFractions = ([n1, d1], [n2, d2]) => [n1 * d2 + n2 * d1, d1 * d2];
+const _fractionGcd = (a, b) => {
+    while (b) {
+        [a, b] = [b, a % b];
+    }
+    return Math.abs(a);
+};
+
+// Keep tie durations reduced as they accumulate. Multiplying denominators on
+// every note can overflow before the resulting divide block is ever evaluated.
+const _addFractions = ([n1, d1], [n2, d2]) => {
+    // MusicXML duration/divisions can be decimal; integer GCD reduction would
+    // amplify floating-point remainders into very large block operands.
+    if (![n1, d1, n2, d2].every(Number.isInteger)) {
+        return [n1 * d2 + n2 * d1, d1 * d2];
+    }
+    const common = _fractionGcd(d1, d2);
+    const numerator = n1 * (d2 / common) + n2 * (d1 / common);
+    const denominator = (d1 / common) * d2;
+    const divisor = _fractionGcd(numerator, denominator);
+    return [numerator / divisor, denominator / divisor];
+};
 
 // Whether two note "content" values (pitch/drum/rest, as built in
 // _processPart) are the same. A real tie is always same-pitch; used to

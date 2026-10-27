@@ -984,9 +984,8 @@ describe("Test 16: Ties", () => {
             )
         );
 
-        // Two tied quarter notes (1/4 + 1/4, unreduced) = 8/16, which the
-        // "divide" block itself resolves to 1/2 at runtime -- one half note.
-        expect(noteValues(blocks)).toEqual([[8, 16]]);
+        // Two tied quarter notes become one half note.
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
@@ -1001,9 +1000,8 @@ describe("Test 16: Ties", () => {
             )
         );
 
-        // Three tied quarter notes, unreduced: (1/4+1/4)=8/16, then
-        // 8/16+1/4=48/64, which reduces to 3/4 -- a dotted-half-note's worth.
-        expect(noteValues(blocks)).toEqual([[48, 64]]);
+        // Three tied quarter notes become one dotted half note.
+        expect(noteValues(blocks)).toEqual([[3, 4]]);
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
     });
 
@@ -1020,6 +1018,56 @@ describe("Test 16: Ties", () => {
             { name: "C", octave: 4 },
             { name: "D", octave: 4 }
         ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps a long tie chain finite when importing its combined duration", async () => {
+        const notes = Array.from({ length: 512 }, (_, index) => {
+            const ties =
+                (index > 0 ? '<tie type="stop"/>' : "") +
+                (index < 511 ? '<tie type="start"/>' : "");
+            return tiedNote("C", 4, ties);
+        }).join("");
+        const { blocks } = await parseAndCapture(scorePartwise(notes));
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+        const [numerator, denominator] = values[0];
+        expect(numerator / denominator).toBe(128);
+        expect(Number.isSafeInteger(numerator)).toBe(true);
+        expect(Number.isSafeInteger(denominator)).toBe(true);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves the exact sum when tied notes have different denominators", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+                    "<duration>1</duration><type>quarter</type><time-modification>" +
+                    "<actual-notes>3</actual-notes><normal-notes>2</normal-notes>" +
+                    '</time-modification><tie type="stop"/></note>'
+            )
+        );
+        const [[numerator, denominator]] = noteValues(blocks);
+        expect(numerator / denominator).toBe(5 / 12);
+    });
+
+    it.each([
+        ["decimal durations", 0.1, 1],
+        ["decimal divisions", 1, 0.3]
+    ])("preserves tied %s without integer GCD rounding", async (_name, duration, divisions) => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${duration}</duration><tie type="${tie}"/></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), `<divisions>${divisions}</divisions>`)
+        );
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+        const [[numerator, denominator]] = values;
+        expect(numerator / denominator).toBeCloseTo((2 * duration) / (divisions * 4));
+        expect(Math.abs(numerator)).toBeLessThan(Number.MAX_SAFE_INTEGER);
+        expect(Math.abs(denominator)).toBeLessThan(Number.MAX_SAFE_INTEGER);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
