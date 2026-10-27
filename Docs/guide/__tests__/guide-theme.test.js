@@ -86,9 +86,9 @@ describe("Music Blocks Guide theme", () => {
     });
 
     test("updates when the saved theme changes in another tab", () => {
-        window.addEventListener = jest.fn();
+        const addEventListener = jest.spyOn(window, "addEventListener");
         loadGuideTheme();
-        const onStorage = window.addEventListener.mock.calls.find(
+        const onStorage = addEventListener.mock.calls.find(
             ([eventName]) => eventName === "storage"
         )[1];
         localStorage.setItem("themePreference", "dark");
@@ -100,9 +100,9 @@ describe("Music Blocks Guide theme", () => {
     test("updates when the saved theme is cleared in another tab", () => {
         localStorage.setItem("themePreference", "dark");
         window.matchMedia.mockReturnValue({ matches: true });
-        window.addEventListener = jest.fn();
+        const addEventListener = jest.spyOn(window, "addEventListener");
         loadGuideTheme();
-        const onStorage = window.addEventListener.mock.calls.find(
+        const onStorage = addEventListener.mock.calls.find(
             ([eventName]) => eventName === "storage"
         )[1];
         localStorage.removeItem("themePreference");
