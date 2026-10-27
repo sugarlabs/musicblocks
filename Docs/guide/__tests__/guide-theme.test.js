@@ -16,7 +16,11 @@ describe("Music Blocks Guide theme", () => {
     beforeEach(() => {
         localStorage.clear();
         document.documentElement.removeAttribute("data-theme");
-        window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+        window.matchMedia = jest.fn().mockReturnValue({
+            matches: false,
+            addEventListener: jest.fn(),
+            addListener: jest.fn()
+        });
     });
 
     const loadGuideTheme = () => {
@@ -31,7 +35,6 @@ describe("Music Blocks Guide theme", () => {
 
         expect(applyGuideTheme()).toBe(theme);
         expect(document.documentElement.dataset.theme).toBe(theme);
-        expect(window.matchMedia).not.toHaveBeenCalled();
     });
 
     test("uses the system dark theme when no theme is saved", () => {
@@ -49,5 +52,62 @@ describe("Music Blocks Guide theme", () => {
         const { applyGuideTheme } = loadGuideTheme();
 
         expect(applyGuideTheme()).toBe("dark");
+    });
+
+    test("updates when the system color scheme changes without a saved preference", () => {
+        const mediaQuery = {
+            matches: false,
+            addEventListener: jest.fn()
+        };
+        window.matchMedia.mockReturnValue(mediaQuery);
+
+        loadGuideTheme();
+        const onChange = mediaQuery.addEventListener.mock.calls[0][1];
+        mediaQuery.matches = true;
+        onChange();
+
+        expect(document.documentElement.dataset.theme).toBe("dark");
+    });
+
+    test("keeps the saved theme when the system color scheme changes", () => {
+        localStorage.setItem("themePreference", "highcontrast");
+        const mediaQuery = {
+            matches: false,
+            addEventListener: jest.fn()
+        };
+        window.matchMedia.mockReturnValue(mediaQuery);
+
+        loadGuideTheme();
+        const onChange = mediaQuery.addEventListener.mock.calls[0][1];
+        mediaQuery.matches = true;
+        onChange();
+
+        expect(document.documentElement.dataset.theme).toBe("highcontrast");
+    });
+
+    test("updates when the saved theme changes in another tab", () => {
+        window.addEventListener = jest.fn();
+        loadGuideTheme();
+        const onStorage = window.addEventListener.mock.calls.find(
+            ([eventName]) => eventName === "storage"
+        )[1];
+        localStorage.setItem("themePreference", "dark");
+        onStorage({ key: "themePreference" });
+
+        expect(document.documentElement.dataset.theme).toBe("dark");
+    });
+
+    test("updates when the saved theme is cleared in another tab", () => {
+        localStorage.setItem("themePreference", "dark");
+        window.matchMedia.mockReturnValue({ matches: true });
+        window.addEventListener = jest.fn();
+        loadGuideTheme();
+        const onStorage = window.addEventListener.mock.calls.find(
+            ([eventName]) => eventName === "storage"
+        )[1];
+        localStorage.removeItem("themePreference");
+        onStorage({ key: null });
+
+        expect(document.documentElement.dataset.theme).toBe("dark");
     });
 });

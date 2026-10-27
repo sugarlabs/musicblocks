@@ -13,6 +13,9 @@
  */
 
 const GUIDE_THEMES = ["light", "dark", "highcontrast"];
+const systemColorScheme = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
 
 function getGuideTheme() {
     let theme;
@@ -27,9 +30,7 @@ function getGuideTheme() {
         return theme;
     }
 
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+    return systemColorScheme && systemColorScheme.matches ? "dark" : "light";
 }
 
 function applyGuideTheme() {
@@ -39,6 +40,20 @@ function applyGuideTheme() {
 }
 
 applyGuideTheme();
+
+window.addEventListener("storage", event => {
+    if (event.key === "themePreference" || event.key === null) {
+        applyGuideTheme();
+    }
+});
+
+if (systemColorScheme) {
+    if (typeof systemColorScheme.addEventListener === "function") {
+        systemColorScheme.addEventListener("change", applyGuideTheme);
+    } else if (typeof systemColorScheme.addListener === "function") {
+        systemColorScheme.addListener(applyGuideTheme);
+    }
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { applyGuideTheme, getGuideTheme };
