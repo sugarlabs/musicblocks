@@ -58,9 +58,29 @@ class ProjectStorage {
     }
 
     async saveLocally(data, image, projectId) {
-        if (this.data.CurrentProject === undefined) await this.initialiseNewProject();
+        if (!this.data || !this.data.Projects) return;
 
-        const c = projectId ?? this.data.CurrentProject;
+        if (projectId !== undefined) {
+            if (this.data.Projects[projectId] === undefined) {
+                return;
+            }
+            if (data !== undefined) {
+                this.data.Projects[projectId].ProjectData = data;
+                this.data.Projects[projectId].DateLastModified = Date.now();
+            }
+            this.data.Projects[projectId].ProjectImage = image;
+            await this.save();
+            return;
+        }
+
+        if (
+            this.data.CurrentProject === undefined ||
+            this.data.Projects[this.data.CurrentProject] === undefined
+        ) {
+            await this.initialiseNewProject();
+        }
+
+        const c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             this.data.Projects[c] = {};
             this.data.Projects[c].ProjectName = this.defaultProjectName;
@@ -70,9 +90,22 @@ class ProjectStorage {
             this.data.Projects[c].DateLastModified = Date.now();
         }
 
-        this.data.Projects[c].ProjectData = data;
+        if (data !== undefined) {
+            this.data.Projects[c].ProjectData = data;
+            this.data.Projects[c].DateLastModified = Date.now();
+        }
         this.data.Projects[c].ProjectImage = image;
-        this.data.Projects[c].DateLastModified = Date.now();
+        await this.save();
+    }
+
+    async saveThumbnail(image, projectId) {
+        if (!this.data || !this.data.Projects || projectId === undefined) return;
+
+        if (this.data.Projects[projectId] === undefined) {
+            return;
+        }
+
+        this.data.Projects[projectId].ProjectImage = image;
         await this.save();
     }
 
@@ -324,10 +357,49 @@ class ProjectStorage {
         await this.save();
     }
 
+    getLatestProjectID() {
+        if (!this.data || !this.data.Projects) return null;
+        const projectIDs = Object.keys(this.data.Projects).filter(id =>
+            Boolean(this.data.Projects[id])
+        );
+        if (projectIDs.length === 0) return null;
+
+        projectIDs.sort((a, b) => {
+            const timeA = this.data.Projects[a]?.DateLastModified || 0;
+            const timeB = this.data.Projects[b]?.DateLastModified || 0;
+            if (timeB !== timeA) {
+                return timeB - timeA;
+            }
+            return String(b).localeCompare(String(a));
+        });
+
+        return projectIDs[0];
+    }
+
     async deleteProject(id) {
+        if (!this.data || !this.data.Projects) return;
+
+        const deletedCurrentProject = this.data.CurrentProject === id;
         delete this.data.Projects[id];
+
+        if (deletedCurrentProject) {
+            const nextProjectID = this.getLatestProjectID();
+
+            if (nextProjectID === null) {
+                delete this.data.CurrentProject;
+            } else {
+                this.data.CurrentProject = nextProjectID;
+            }
+        }
+
         await this.save();
-        this.Planet.LocalPlanet.updateProjects();
+        if (
+            this.Planet &&
+            this.Planet.LocalPlanet &&
+            typeof this.Planet.LocalPlanet.updateProjects === "function"
+        ) {
+            this.Planet.LocalPlanet.updateProjects();
+        }
     }
 
     getCurrentProjectID() {

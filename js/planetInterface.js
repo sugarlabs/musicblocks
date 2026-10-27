@@ -177,8 +177,26 @@ class PlanetInterface {
             pubsub.on("finishedLoading", __afterLoad);
 
             try {
-                const obj = JSON.parse(data);
-                this.activity.blocks.loadNewBlocks(obj);
+                if (
+                    data === null ||
+                    data === "undefined" ||
+                    data === "null" ||
+                    data === "[]" ||
+                    (typeof data === "string" && data.trim() === "")
+                ) {
+                    this.activity.justLoadStart();
+                } else {
+                    const obj = typeof data === "string" ? JSON.parse(data) : data;
+                    if (
+                        obj === null ||
+                        obj === undefined ||
+                        (Array.isArray(obj) && obj.length === 0)
+                    ) {
+                        this.activity.justLoadStart();
+                    } else {
+                        this.activity.blocks.loadNewBlocks(obj);
+                    }
+                }
             } catch (e) {
                 this.activity.errorMsg(e);
             }
@@ -259,6 +277,13 @@ class PlanetInterface {
                 return rejectOnProjectSaveError ? Promise.reject(error) : Promise.resolve(null);
             }
 
+            // Do not save workspace state to Planet storage while Planet is open,
+            // because the user may be switching or deleting projects in Planet,
+            // and the hidden workspace still contains the previous project's blocks.
+            if (this.iframe && this.iframe.style.display === "block") {
+                return Promise.resolve(null);
+            }
+
             // The project being loaded is already the current one, so saving
             // now would overwrite its stored copy with the blocks loaded so
             // far. Its stored copy is still complete, so save once it is done.
@@ -301,14 +326,57 @@ class PlanetInterface {
             };
             try {
                 const projectStorage = this.planet.ProjectStorage;
-                const projectId =
+                let projectId =
                     typeof projectStorage.getCurrentProjectID === "function"
                         ? projectStorage.getCurrentProjectID()
                         : undefined;
-                const saveProject = image =>
-                    projectId === undefined
-                        ? projectStorage.saveLocally(data, image)
-                        : projectStorage.saveLocally(data, image, projectId);
+                const saveProject = image => {
+                    if (projectId !== undefined) {
+                        return projectStorage.saveLocally(data, image, projectId);
+                    }
+                    const result = projectStorage.saveLocally(data, image);
+                    if (typeof projectStorage.getCurrentProjectID === "function") {
+                        projectId = projectStorage.getCurrentProjectID();
+                    }
+                    if (result && typeof result.then === "function") {
+                        return result.then(res => {
+                            if (
+                                projectId === undefined &&
+                                typeof projectStorage.getCurrentProjectID === "function"
+                            ) {
+                                projectId = projectStorage.getCurrentProjectID();
+                            }
+                            return res;
+                        });
+                    }
+                    return result;
+                };
+                const saveThumbnail = image => {
+                    if (this.iframe && this.iframe.style.display === "block") {
+                        if (
+                            projectId === undefined ||
+                            projectStorage.data?.Projects?.[projectId] === undefined
+                        ) {
+                            return Promise.resolve(null);
+                        }
+                    }
+                    if (
+                        projectId === undefined &&
+                        typeof projectStorage.getCurrentProjectID === "function"
+                    ) {
+                        projectId = projectStorage.getCurrentProjectID();
+                    }
+                    if (typeof projectStorage.saveThumbnail === "function") {
+                        if (projectId === undefined) {
+                            return Promise.resolve(null);
+                        }
+                        return projectStorage.saveThumbnail(image, projectId);
+                    }
+                    if (projectId !== undefined) {
+                        return projectStorage.saveLocally(data, image, projectId);
+                    }
+                    return projectStorage.saveLocally(data, image);
+                };
                 if (svgData === null || svgData === undefined || svgData === "") {
                     return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
                 } else {
@@ -325,9 +393,23 @@ class PlanetInterface {
                             const bitmap = new createjs.Bitmap(img);
                             const bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                            Promise.resolve(
-                                saveProject(bitmap.bitmapCache.getCacheDataURL())
-                            ).catch(reportSaveError);
+                            const thumbUrl = bitmap.bitmapCache.getCacheDataURL();
+                            const commitThumbnail = () => {
+                                if (
+                                    projectId === undefined &&
+                                    typeof projectStorage.getCurrentProjectID === "function"
+                                ) {
+                                    projectId = projectStorage.getCurrentProjectID();
+                                }
+                                return saveThumbnail(thumbUrl);
+                            };
+                            if (projectId !== undefined) {
+                                Promise.resolve(commitThumbnail()).catch(reportSaveError);
+                            } else {
+                                Promise.resolve(savePromise)
+                                    .then(commitThumbnail)
+                                    .catch(reportSaveError);
+                            }
                         } catch (error) {
                             console.error(error);
                         }

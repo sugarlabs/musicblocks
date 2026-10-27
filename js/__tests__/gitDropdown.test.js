@@ -462,9 +462,96 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
         });
 
-        test("MB_NEW_PROJECT clears all tracking state immediately", () => {
+        test("MB_GIT_STATE updates git state when active project is deleted and replaced by a tracked project", async () => {
+            // Project A was active and had Git state
+            localStorage.setItem("mbGitRepoName", "project-a-repo");
+            localStorage.setItem("mbGitHashedKey", "project-a-key");
+            localStorage.setItem("mbGitDisplayName", "Project A");
+            localStorage.setItem("mbGitCurrentProjectId", "proj-a");
+
+            // Project A is deleted and project B becomes active, sending MB_GIT_STATE
+            window.dispatchEvent(
+                new MessageEvent("message", {
+                    data: {
+                        type: "MB_GIT_STATE",
+                        repoName: "project-b-repo",
+                        hashedKey: "project-b-key",
+                        projectName: "Project B",
+                        projectId: "proj-b"
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
+                })
+            );
+
+            // Git menu receives project B's credentials rather than retaining project A's
+            expect(localStorage.getItem("mbGitRepoName")).toBe("project-b-repo");
+            expect(localStorage.getItem("mbGitHashedKey")).toBe("project-b-key");
+            expect(localStorage.getItem("mbGitDisplayName")).toBe("Project B");
+            expect(localStorage.getItem("mbGitCurrentProjectId")).toBe("proj-b");
+
+            // Subsequent Git actions commit to project B's repository, NOT project A's
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit").mockResolvedValue();
+            await gitDropdown._showCommitFlow();
+            expect(doCommitSpy).toHaveBeenCalledWith(
+                "project-b-repo",
+                "project-b-key",
+                expect.any(String)
+            );
+            expect(doCommitSpy).not.toHaveBeenCalledWith(
+                "project-a-repo",
+                expect.anything(),
+                expect.anything()
+            );
+        });
+
+        test("MB_GIT_STATE clears git state when active project is deleted and replacement project is untracked", async () => {
+            // Project A was active and had Git state
+            localStorage.setItem("mbGitRepoName", "project-a-repo");
+            localStorage.setItem("mbGitHashedKey", "project-a-key");
+            localStorage.setItem("mbGitDisplayName", "Project A");
+            localStorage.setItem("mbGitCurrentProjectId", "proj-a");
+
+            // Project A is deleted and replacement Project B has no git state
+            window.dispatchEvent(
+                new MessageEvent("message", {
+                    data: {
+                        type: "MB_GIT_STATE",
+                        repoName: "",
+                        hashedKey: "",
+                        projectName: "Project B",
+                        projectId: "proj-b"
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
+                })
+            );
+
+            // Git menu clears project A's credentials rather than retaining them
+            expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(localStorage.getItem("mbGitHashedKey")).toBeNull();
+            expect(localStorage.getItem("mbGitDisplayName")).toBeNull();
+
+            // Subsequent Git actions cannot accidentally associate project B's data with project A's repository
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit");
+            await gitDropdown._showCommitFlow();
+            expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
+            );
+            expect(doCommitSpy).not.toHaveBeenCalled();
+        });
+
+        test("MB_NEW_PROJECT clears all tracking state immediately and prevents committing to old repo", async () => {
             localStorage.setItem("mbGitRepoName", "old-repo");
+            localStorage.setItem("mbGitHashedKey", "old-key");
             localStorage.setItem("mbGitDisplayName", "Old Project");
+            localStorage.setItem("mbGitLastSavedHash", "hash123");
+            localStorage.setItem("mbGitCurrentSha", "sha123");
+            localStorage.setItem("mbGitCurrentDraftId", "draft123");
+            localStorage.setItem("mbGitCurrentProjectId", "proj123");
+
+            const clearSpy = jest.spyOn(gitDropdown, "clearForNewProject");
 
             window.dispatchEvent(
                 new MessageEvent("message", {
@@ -477,11 +564,26 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
 
             expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(localStorage.getItem("mbGitHashedKey")).toBeNull();
             expect(localStorage.getItem("mbGitDisplayName")).toBeNull();
+            expect(localStorage.getItem("mbGitLastSavedHash")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentSha")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentDraftId")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentProjectId")).toBeNull();
+            expect(clearSpy).toHaveBeenCalled();
             expect(mockBtn.setAttribute).toHaveBeenCalledWith(
                 "data-tooltip",
                 "Start tracking my project"
             );
+
+            // Subsequent commit flow cannot commit to deleted project
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit");
+            await gitDropdown._showCommitFlow();
+            expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
+            );
+            expect(doCommitSpy).not.toHaveBeenCalled();
         });
 
         test("MB_SYNC_COMPLETE invalidates prefetch cache and triggers commits refresh", () => {
