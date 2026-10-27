@@ -1330,4 +1330,77 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(Number(6.789).toFixed(2));
         });
     });
+
+    describe("numbers given as text (#9864)", () => {
+        const RealMathUtility = require("../../utils/mathutils");
+        let mockMathUtility;
+
+        beforeEach(() => {
+            mockMathUtility = global.MathUtility;
+            global.MathUtility = RealMathUtility;
+        });
+
+        afterEach(() => {
+            global.MathUtility = mockMathUtility;
+        });
+
+        // Runs a block with each input coming from a block that holds the given value.
+        const run = (name, values) => {
+            activity.blocks.blockList[900] = {
+                name,
+                connections: [null, ...values.map((_, i) => "in" + i)]
+            };
+            logo.stopTurtle = false;
+            logo.parseArg = jest.fn((l, t, cblk) => values[Number(cblk.slice(2))]);
+            return createdBlocks[name].arg(logo, 0, 900, null);
+        };
+
+        it.each([
+            ["multiply", ["2.5", 2], 5],
+            ["multiply", ["1e3", 2], 2000],
+            ["divide", ["7.5", 2], 3.75],
+            ["minus", ["10", "0.5"], 9.5],
+            ["mod", ["7.5", 2], 1.5],
+            ["power", ["2.5", 2], 6.25],
+            ["sqrt", ["6.25"], 2.5],
+            ["abs", ["-1.5"], 1.5],
+            ["int", ["2.7"], 3],
+            ["neg", ["1.5"], -1.5],
+            ["distance", ["0", "0", "3", "4"], 5],
+            ["clampNumber", ["2.5", "0", "10"], 2.5]
+        ])("%s keeps the whole number in %j", (name, values, expected) => {
+            expect(run(name, values)).toBe(expected);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("gives the same result for text and for a number", () => {
+            expect(run("multiply", ["2.5", "4"])).toBe(run("multiply", [2.5, 4]));
+            expect(run("divide", [" 9 ", "0.25"])).toBe(run("divide", [9, 0.25]));
+        });
+
+        it.each([
+            ["multiply", ["3 apples", 2]],
+            ["divide", ["7.5x", 2]],
+            ["minus", ["10", "0.5.1"]],
+            ["mod", ["", 2]],
+            ["power", ["2", "two"]],
+            ["sqrt", ["6.25x"]],
+            ["abs", ["   "]],
+            ["int", ["2.7x"]],
+            ["distance", ["0", "0", "3", "4 units"]]
+        ])("%s stops with the NaN error for %j", (name, values) => {
+            expect(run(name, values)).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 900);
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        it("neg reverses a word instead of stopping", () => {
+            expect(run("neg", ["hello"])).toBe("olleh");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("leaves plus joining text as before", () => {
+            expect(run("plus", ["2.5", 1])).toBe("2.51");
+        });
+    });
 });
