@@ -1136,6 +1136,35 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it.each([
+        ["decimal durations", 0.1, 1],
+        ["decimal divisions", 1, 0.3]
+    ])("keeps a long tie chain with %s finite", async (_name, duration, divisions) => {
+        const notes = Array.from({ length: 512 }, (_, index) => {
+            const ties =
+                (index > 0 ? '<tie type="stop"/>' : "") +
+                (index < 511 ? '<tie type="start"/>' : "");
+
+            return (
+                "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+                `<duration>${duration}</duration>${ties}</note>`
+            );
+        }).join("");
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(notes, `<divisions>${divisions}</divisions>`)
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator / denominator).toBeCloseTo((512 * duration) / (divisions * 4));
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("emits the accumulated duration for a malformed file that ends mid-tie", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(tiedNote("C", 4, '<tie type="start"/>'))
