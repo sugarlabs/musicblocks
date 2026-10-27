@@ -52,7 +52,7 @@ const sampleBlocks = win =>
         block => !block.trash && block.name === "customsample"
     );
 
-describe("Sampler upload and save", { retries: 0 }, () => {
+describe("Sampler upload and save", { testIsolation: true }, () => {
     beforeEach(() => {
         cy.clearLocalStorage();
         cy.visit("http://127.0.0.1:3000");
@@ -66,6 +66,7 @@ describe("Sampler upload and save", { retries: 0 }, () => {
 
         cy.get("#load").click();
         cy.get("#myOpenFile").selectFile("cypress/fixtures/sampler-minimal.tb", { force: true });
+        cy.get("#load-container").should("be.visible");
         let stableObservations = 0;
         cy.window({ timeout: 30000 }).should(win => {
             const { blocks } = win.ActivityContext.getActivity();
@@ -109,8 +110,9 @@ describe("Sampler upload and save", { retries: 0 }, () => {
         cy.window({ timeout: 30000 }).should(win => {
             const samples = sampleBlocks(win);
             expect(samples).to.have.length(2);
-            const saved = samples.find(block => block.value[0] === "tone.wav");
-            expect(saved, "generated sample").to.exist;
+            const generated = samples.filter(block => block.value[0] === "tone.wav");
+            expect(generated, "generated sample").to.have.length(1);
+            const saved = generated[0];
             expect(saved.value).to.deep.equal(["tone.wav", dataUrl, "do", 4, 25]);
             const { blockList } = win.ActivityContext.getActivity().blocks;
             expect(blockList[saved.connections[0]].name).to.equal("settimbre");
