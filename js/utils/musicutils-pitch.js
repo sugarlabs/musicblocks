@@ -247,9 +247,10 @@ var getNumber = (notename, octave, temperament, edo) => {
         num = currentEDO * (octave - 1);
     }
 
-    notename = String(notename);
-    if (notename.substring(0, 1) in NOTESTEP) {
-        num += Math.round((NOTESTEP[notename.substring(0, 1)] / 12) * currentEDO);
+    notename = stripMicrotonalPrefix(String(notename));
+    const letter = notename.substring(0, 1).toUpperCase();
+    if (letter in NOTESTEP) {
+        num += Math.round((NOTESTEP[letter] / 12) * currentEDO);
         if (notename.length >= 1) {
             const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {

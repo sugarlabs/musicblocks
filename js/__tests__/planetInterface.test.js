@@ -177,7 +177,7 @@ describe("PlanetInterface", () => {
     });
     test("initialiseNewProject should reset project state", () => {
         planetInterface.planet = {
-            ProjectStorage: { initialiseNewProject: jest.fn() }
+            ProjectStorage: { initialiseNewProject: jest.fn().mockResolvedValue() }
         };
         planetInterface.initialiseNewProject("New Name");
         expect(planetInterface.planet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
@@ -209,6 +209,50 @@ describe("PlanetInterface", () => {
         expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
         expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
         expect(mockActivity.blocks.trashStacks).toEqual([]);
+    });
+
+    test.each([
+        ["Imported Project", false, "Imported Project"],
+        [undefined, true, "My Project"]
+    ])(
+        "initialiseNewProject refreshes the title after initializing %s (#9716)",
+        async (name, clearWorkspace, storedName) => {
+            let finishInitialization;
+            const initialization = new Promise(resolve => {
+                finishInitialization = resolve;
+            });
+            planetInterface.planet = {
+                ProjectStorage: {
+                    initialiseNewProject: jest.fn(() => initialization),
+                    getCurrentProjectName: jest.fn(() => storedName)
+                }
+            };
+            document.title = "Previous Project";
+
+            const result = planetInterface.initialiseNewProject(name, clearWorkspace);
+            expect(document.title).toBe("Previous Project");
+            finishInitialization("new-project-id");
+
+            await expect(result).resolves.toBe("new-project-id");
+            expect(document.title).toBe(storedName);
+        }
+    );
+
+    test("initialiseNewProject preserves the title and rejection when initialization fails", async () => {
+        const error = new Error("Could not save project");
+        planetInterface.planet = {
+            ProjectStorage: {
+                initialiseNewProject: jest.fn().mockRejectedValue(error),
+                getCurrentProjectName: jest.fn(() => "Unsaved Project")
+            }
+        };
+        document.title = "Previous Project";
+
+        await expect(planetInterface.initialiseNewProject("Unsaved Project", false)).rejects.toBe(
+            error
+        );
+        expect(document.title).toBe("Previous Project");
+        expect(planetInterface.planet.ProjectStorage.getCurrentProjectName).not.toHaveBeenCalled();
     });
 
     // Regression test for #7350: when running from file:///index.html,

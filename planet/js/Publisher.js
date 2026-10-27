@@ -199,9 +199,8 @@ class Publisher {
                   ? gitRepoData.tags
                   : this.dataToTags(DATA);
 
-        document.getElementById("publisher-ptitle").textContent = _(
-            `${published !== null ? "Republish" : "Publish"}  Project`
-        );
+        document.getElementById("publisher-ptitle").textContent =
+            published !== null ? _("Republish project") : _("Publish project");
 
         const Planet = this.Planet;
 

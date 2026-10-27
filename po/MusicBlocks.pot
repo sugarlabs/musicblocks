@@ -8511,7 +8511,12 @@ msgstr ""
 
 #: planet/js/LocalCard.js:44
 #: planet/js/StringHelper.js:37
+#: planet/js/Publisher.js:203
 msgid "Publish project"
+msgstr ""
+
+#: planet/js/Publisher.js:203
+msgid "Republish project"
 msgstr ""
 
 #: planet/js/LocalCard.js:55

@@ -1074,6 +1074,7 @@ class Logo {
                     ) {
                         if (!tur.singer.runningFromEvent) {
                             this.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
+                            tur.endOfClampSignals[b][i] = null;
                         }
                     }
                 }
