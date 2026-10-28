@@ -1174,6 +1174,22 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it.each([
+        ["empty", ""],
+        ["whitespace-only", "   "],
+        ["zero", "0"],
+        ["negative", "-1"]
+    ])("falls back safely for tied notes with %s duration", async (_name, duration) => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${duration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(scorePartwise(note("start") + note("stop")));
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("falls back safely for tied notes with non-finite divisions", async () => {
         const note = tie =>
             "<note><pitch><step>C</step><octave>4</octave></pitch>" +

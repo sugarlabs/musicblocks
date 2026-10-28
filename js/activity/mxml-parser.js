@@ -175,13 +175,13 @@ function _noteDuration(noteEl, divisions) {
     if (durationText !== null && hasValidDivisions) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
         const duration = Number(durationText);
-        if (Number.isFinite(duration)) {
+        if (durationText.trim() !== "" && Number.isFinite(duration) && duration > 0) {
             return [duration, divisions * 4];
         }
     }
 
-    // Malformed note with neither <type> nor <duration>: treat as a quarter note
-    // rather than producing a zero/NaN-length block.
+    // A note with no usable <type> or positive <duration> falls back to a quarter
+    // note rather than producing a zero, negative, or non-finite-length block.
     return [1, 4];
 }
 
