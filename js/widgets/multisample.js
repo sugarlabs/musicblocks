@@ -30,6 +30,14 @@ class MultisampleEditor {
             else current.requestClose(() => MultisampleEditor.open(activity, owner, origin));
             return;
         }
+        if (
+            Object.values(window.widgetWindows.openWindows || {}).some(
+                widget => widget && widget !== activity.logo.sample?.widgetWindow
+            )
+        ) {
+            activity.errorMsg(_("Close other widgets before editing this instrument."));
+            return;
+        }
         let value = { type: "multisample", version: 1, name: _("My instrument"), samples: [] };
         if (owner) {
             try {
