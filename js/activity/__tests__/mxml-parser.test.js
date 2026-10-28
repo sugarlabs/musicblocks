@@ -1372,6 +1372,22 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
 });
 
 describe("Test 19: Cue notes", () => {
+    it("takes a cue note's length from <duration>, not its drawn <type>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><cue/><pitch><step>E</step><octave>5</octave></pitch><duration>8</duration><type>half</type></note>" +
+                    SIMPLE_NOTE("C", 4, "quarter")
+            )
+        );
+
+        // divisions 8: a duration of 8 is a quarter, whatever <type> says.
+        expect(noteValues(blocks)).toEqual([
+            [8, 32],
+            [1, 4]
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+    });
+
     it("imports a cue note as a rest of the same length, since it isn't played", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
@@ -1381,7 +1397,7 @@ describe("Test 19: Cue notes", () => {
         );
 
         expect(noteValues(blocks)).toEqual([
-            [1, 4],
+            [8, 32],
             [1, 4]
         ]);
         expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
