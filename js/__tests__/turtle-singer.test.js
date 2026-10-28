@@ -988,7 +988,9 @@ describe("numberOfNotes — state restoration and tally logic", () => {
             stroke: 3,
             canvasAlpha: 1,
             penState: true,
-            doPenUp: jest.fn(),
+            doPenUp: jest.fn(() => {
+                turtleMock.painter.penState = false;
+            }),
             doSetXY: jest.fn(),
             doSetHeading: jest.fn()
         };
@@ -1024,6 +1026,49 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(result).toBe(5);
         expect(turtleMock.singer.tallyNotes).toBe(2);
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
+        expect(turtleMock.painter.penState).toBe(true);
+    });
+
+    test("should restore pen state when pen starts down and keep pen up during position restore", () => {
+        turtleMock.painter.penState = true;
+        let penStateDuringSetXY;
+        turtleMock.painter.doSetXY = jest.fn(() => {
+            penStateDuringSetXY = turtleMock.painter.penState;
+        });
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(penStateDuringSetXY).toBe(false);
+        expect(turtleMock.painter.penState).toBe(true);
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
+    });
+
+    test("should keep pen up when pen starts up even if altered during counted run", () => {
+        turtleMock.painter.penState = false;
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            turtleMock.painter.penState = true;
+            turtleMock.x = 42;
+            turtleMock.y = 84;
+            turtleMock.orientation = 180;
+        });
+
+        let penStateDuringSetXY;
+        turtleMock.painter.doSetXY = jest.fn(() => {
+            penStateDuringSetXY = turtleMock.painter.penState;
+        });
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(penStateDuringSetXY).toBe(false);
+        expect(turtleMock.painter.penState).toBe(false);
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
     });
 
     test("should hold back the enclosing clamp signals by index", () => {
