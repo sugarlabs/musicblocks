@@ -1034,6 +1034,10 @@ describe("MathUtility", () => {
             expect(MathUtility.doLcm(4.9, 6.1)).toBe(12);
         });
 
+        test("avoids intermediate overflow for large numbers", () => {
+            expect(MathUtility.doLcm(1e155, 1e155)).toBe(1e155);
+        });
+
         test("throws NanError for invalid or NaN inputs", () => {
             expect(() => MathUtility.doLcm(NaN, 6)).toThrow("NanError");
             expect(() => MathUtility.doLcm(4, NaN)).toThrow("NanError");
@@ -1043,6 +1047,32 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doLcm(4, Infinity)).toThrow("NanError");
             expect(() => MathUtility.doLcm(-Infinity, 6)).toThrow("NanError");
             expect(() => MathUtility.doLcm(4, -Infinity)).toThrow("NanError");
+        });
+    });
+
+    describe("fallback when GCD is not available", () => {
+        let isolatedMathUtility;
+
+        beforeAll(() => {
+            jest.isolateModules(() => {
+                const origGCD = global.GCD;
+                delete global.GCD;
+                jest.doMock("../utils-logic", () => ({}), { virtual: true });
+                isolatedMathUtility = require("../mathutils");
+                if (origGCD !== undefined) global.GCD = origGCD;
+            });
+        });
+
+        test("doGcd computes GCD via local Euclidean algorithm when _GCD is unavailable", () => {
+            expect(isolatedMathUtility.doGcd(12, 18)).toBe(6);
+            expect(isolatedMathUtility.doGcd(0, 5)).toBe(5);
+            expect(isolatedMathUtility.doGcd(5, 0)).toBe(5);
+            expect(isolatedMathUtility.doGcd(0, 0)).toBe(0);
+        });
+
+        test("doLcm computes LCM when _GCD is unavailable", () => {
+            expect(isolatedMathUtility.doLcm(4, 6)).toBe(12);
+            expect(isolatedMathUtility.doLcm(0, 5)).toBe(0);
         });
     });
 });
