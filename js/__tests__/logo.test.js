@@ -458,6 +458,11 @@ describe("Logo constructor", () => {
         expect(logo.firstNoteTime).toBeNull();
     });
 
+    test("initializes iteration budget and maximum iterations", () => {
+        expect(logo._MAX_ITERATIONS).toBe(1000000);
+        expect(logo._iterationBudget).toBe(1000001);
+    });
+
     test("initializes widget properties to null/false", () => {
         expect(logo.reflection).toBeNull();
         expect(logo.phraseMaker).toBeNull();
