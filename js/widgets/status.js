@@ -206,7 +206,7 @@ class StatusMatrix {
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.textAlign = "center";
+                cell.classList.add("mb-text-center");
             }
         }
 
@@ -238,7 +238,7 @@ class StatusMatrix {
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.textAlign = "center";
+                cell.classList.add("mb-text-center");
             }
         }
         this.widgetWindow.sendToCenter();

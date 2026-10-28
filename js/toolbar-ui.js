@@ -410,7 +410,7 @@ class ToolbarUI {
         if (this.language === "ja") {
             logoIcon.textContent = "";
             const logoImg = document.createElement("img");
-            logoImg.style.width = "100%";
+            logoImg.classList.add("mb-w-full");
             logoImg.style.transform = "scale(0.85)";
             logoImg.src = "images/logo-ja.svg";
             logoIcon.appendChild(logoImg);

@@ -2508,6 +2508,35 @@ input.timbreName {
 }
 
 /* ==========================================================================
+   Shared Token-Backed Utility Classes
+   Replace static inline .style assignments in widget/UI scripts.
+   ========================================================================== */
+
+.mb-text-center {
+    text-align: center;
+}
+
+.mb-w-full {
+    width: 100%;
+}
+
+.mb-bg-primary {
+    background-color: var(--color-bg-primary);
+}
+
+.mb-bg-tertiary {
+    background-color: var(--color-bg-tertiary);
+}
+
+.mb-bg-warning {
+    background-color: var(--color-warning-bg);
+}
+
+.mb-bg-label {
+    background-color: var(--color-label-bg);
+}
+
+/* ==========================================================================
    PhraseMaker Widget Token-Backed Component Styles
    ========================================================================== */
 

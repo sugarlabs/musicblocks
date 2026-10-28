@@ -305,7 +305,7 @@ function LegoBricksMedia() {
         let startX, startY, initialX, initialY;
 
         // Set fixed dimensions for the wrapper
-        wrapper.style.width = "100%";
+        wrapper.classList.add("mb-w-full");
         wrapper.style.height = "100%";
         wrapper.style.overflow = "hidden";
 

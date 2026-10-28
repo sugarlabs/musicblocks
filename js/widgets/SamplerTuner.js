@@ -272,7 +272,7 @@ const SamplerTuner = {
             const heading = document.createElement("h1");
             heading.textContent = _("Tuner");
             heading.style.color = "#282828";
-            heading.style.textAlign = "center";
+            heading.classList.add("mb-text-center");
             heading.style.marginBottom = "20px";
 
             const startButton = document.createElement("button");
@@ -291,7 +291,7 @@ const SamplerTuner = {
             const pitchParagraph = document.createElement("p");
             pitchParagraph.textContent = _("Detected Pitch: ");
             pitchParagraph.style.color = "#282828";
-            pitchParagraph.style.textAlign = "center";
+            pitchParagraph.classList.add("mb-text-center");
             pitchParagraph.style.fontSize = "18px";
             const pitchSpan = document.createElement("span");
             pitchSpan.id = "pitch";
@@ -300,7 +300,7 @@ const SamplerTuner = {
             const noteParagraph = document.createElement("p");
             noteParagraph.textContent = _("Note: ");
             noteParagraph.style.color = "#282828";
-            noteParagraph.style.textAlign = "center";
+            noteParagraph.classList.add("mb-text-center");
             noteParagraph.style.fontSize = "18px";
             const noteSpan = document.createElement("span");
             noteSpan.id = "note";

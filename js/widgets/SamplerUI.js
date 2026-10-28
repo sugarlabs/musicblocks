@@ -274,7 +274,7 @@ const SamplerUI = {
             // Create the frequency display
             this.frequencyDisplay = document.createElement("div");
             this.frequencyDisplay.style.fontSize = "smaller";
-            this.frequencyDisplay.style.textAlign = "center";
+            this.frequencyDisplay.classList.add("mb-text-center");
             this.frequencyDisplay.style.color = platformColor.textColor;
             this.frequencyDisplay.textContent = "261 Hz";
             this.pitchBtnContainer.appendChild(this.frequencyDisplay);
@@ -714,7 +714,7 @@ const SamplerUI = {
                     centAdjustmentContainer.style.position = "absolute";
                     centAdjustmentContainer.style.top = "0";
                     centAdjustmentContainer.style.left = "0";
-                    centAdjustmentContainer.style.width = "100%";
+                    centAdjustmentContainer.classList.add("mb-w-full");
                     centAdjustmentContainer.style.height = "100%";
                     centAdjustmentContainer.style.backgroundColor = "#d8d8d8"; // Grey color to match tuner
                     centAdjustmentContainer.style.zIndex = "1000";
@@ -728,7 +728,7 @@ const SamplerUI = {
                         "¢";
                     valueDisplay.style.fontSize = "24px";
                     valueDisplay.style.fontWeight = "bold";
-                    valueDisplay.style.textAlign = "center";
+                    valueDisplay.classList.add("mb-text-center");
 
                     // Adjust positioning based on whether the window is maximized
                     if (this.widgetWindow.isMaximized()) {
@@ -838,7 +838,7 @@ const SamplerUI = {
 
                     // Add reset button
                     const resetButtonContainer = document.createElement("div");
-                    resetButtonContainer.style.textAlign = "center";
+                    resetButtonContainer.classList.add("mb-text-center");
                     resetButtonContainer.style.marginTop = "30px";
 
                     const resetButton = document.createElement("button");
