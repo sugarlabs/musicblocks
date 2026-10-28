@@ -393,7 +393,7 @@ class RhythmRulerLayout {
             rulerCellTable.id = "rulerCellTable" + i;
             rulerCell.appendChild(rulerCellTable);
 
-            rulerCellTable.style.textAlign = "center";
+            rulerCellTable.classList.add("mb-text-center");
             rulerCellTable.style.border = "0px";
             rulerCellTable.style.borderCollapse = "collapse";
             rulerCellTable.cellSpacing = "0px";

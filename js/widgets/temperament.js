@@ -316,7 +316,7 @@ function TemperamentWidget() {
      */
     this._visualizerView = function () {
         temperamentTableDiv.textContent = "";
-        temperamentTableDiv.style.backgroundColor = "var(--color-bg-primary, #1a1a2e)";
+        temperamentTableDiv.classList.add("mb-bg-primary");
         temperamentTableDiv.style.color = "var(--color-text-primary, #e0e0e0)";
         temperamentTableDiv.style.fontFamily = "sans-serif";
         temperamentTableDiv.style.padding = "8px";
@@ -590,7 +590,7 @@ function TemperamentWidget() {
         const canvas = document.createElement("canvas");
         canvas.width = canvasSize;
         canvas.height = canvasSize;
-        canvas.style.width = "100%";
+        canvas.classList.add("mb-w-full");
         canvas.style.maxWidth = canvasSize + "px";
         canvas.style.display = "block";
         canvas.style.margin = "0 auto";
@@ -778,12 +778,12 @@ function TemperamentWidget() {
 
         // ── Table ──
         const tableDiv = document.createElement("div");
-        tableDiv.style.width = "100%";
+        tableDiv.classList.add("mb-w-full");
         tableDiv.style.marginTop = "8px";
         temperamentTableDiv.appendChild(tableDiv);
 
         const table = document.createElement("table");
-        table.style.width = "100%";
+        table.classList.add("mb-w-full");
         table.style.borderCollapse = "collapse";
         table.style.fontSize = "12px";
         tableDiv.appendChild(table);
@@ -801,8 +801,7 @@ function TemperamentWidget() {
             th.textContent = h;
             th.style.border = "1px solid var(--color-border-secondary, #333)";
             th.style.padding = "6px 8px";
-            th.style.textAlign = "center";
-            th.style.backgroundColor = "var(--color-bg-tertiary, #2a2a3e)";
+            th.classList.add("mb-text-center", "mb-bg-tertiary");
             th.style.color = "var(--color-text-secondary, #ccc)";
             th.style.fontWeight = "bold";
             thead.appendChild(th);
@@ -830,7 +829,7 @@ function TemperamentWidget() {
             el.style.color = "var(--color-text-primary, #e0e0e0)";
             el.style.border = "1px solid var(--color-border-primary, #555)";
             el.style.borderRadius = "3px";
-            el.style.textAlign = "center";
+            el.classList.add("mb-text-center");
         };
         const _makeEditable = (td, i, getPrev, getNext, getCur, opts, onCommit) => {
             td.style.cursor = _isLocked(i) ? "default" : "text";
@@ -918,7 +917,7 @@ function TemperamentWidget() {
                 for (const td of [tdName, tdStep, tdFreq, tdCents, tdRatio]) {
                     td.style.border = "1px solid var(--color-border-secondary, #333)";
                     td.style.padding = "6px 8px";
-                    td.style.textAlign = "center";
+                    td.classList.add("mb-text-center");
                     td.style.backgroundColor = bgColor;
                     tr.appendChild(td);
                 }
@@ -1052,7 +1051,7 @@ function TemperamentWidget() {
 
         const hint = document.createElement("div");
         hint.textContent = _("scroll for all") + " " + that.pitchNumber + " " + _("pitches");
-        hint.style.textAlign = "center";
+        hint.classList.add("mb-text-center");
         hint.style.fontSize = "11px";
         hint.style.color = "var(--color-text-tertiary, #777)";
         hint.style.marginTop = "4px";
