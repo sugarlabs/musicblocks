@@ -1637,10 +1637,21 @@ class Logo {
                     this._unhighlightStepQueue[turtle] = null;
                 }
 
-                const blk = this.stepQueue[turtle].pop();
-                // eslint-disable-next-line eqeqeq
-                if (blk != null) {
-                    this.runFromBlockNow(this, turtle, blk, 0, null);
+                const stepItem = this.stepQueue[turtle].shift();
+                if (stepItem !== null && stepItem !== undefined) {
+                    const blk =
+                        typeof stepItem === "object" && stepItem !== null ? stepItem.blk : stepItem;
+                    const isflow =
+                        typeof stepItem === "object" && stepItem !== null
+                            ? (stepItem.isflow ?? 0)
+                            : 0;
+                    const receivedArg =
+                        typeof stepItem === "object" && stepItem !== null
+                            ? (stepItem.receivedArg ?? null)
+                            : null;
+                    if (blk !== null && blk !== undefined) {
+                        this.runFromBlockNow(this, turtle, blk, isflow, receivedArg);
+                    }
                 }
             }
         }
@@ -2090,7 +2101,11 @@ class Logo {
                 if (!(turtle in logo.stepQueue)) {
                     logo.stepQueue[turtle] = [];
                 }
-                logo.stepQueue[turtle].push(blk);
+                logo.stepQueue[turtle].push({
+                    blk: blk,
+                    isflow: isflow,
+                    receivedArg: receivedArg
+                });
             } else if (
                 logo.turtleDelay === 0 &&
                 delay > 0 &&
