@@ -1658,6 +1658,13 @@ describe("pitchToNumber", () => {
         expect(pitchToNumber("C#b", 4, "C major")).toBe(39);
         expect(pitchToNumber("c#", 4, "C major")).toBe(40);
     });
+    it("should cancel a mixed accidental regardless of sharp/flat order", () => {
+        // Regression: a trailing "#b" or "b#" must be stripped as one unit
+        // (a cancelled accidental, net zero), not caught by the single-flat
+        // or single-sharp check first, which would strip only one character.
+        expect(pitchToNumber("C#b", 4, "C major")).toBe(pitchToNumber("C", 4, "C major"));
+        expect(pitchToNumber("Cb#", 4, "C major")).toBe(pitchToNumber("C", 4, "C major"));
+    });
     it("should use solfege mapping when pitch not in PITCHES", () => {
         expect(pitchToNumber("do", 4, "C major")).toBe(39);
     });

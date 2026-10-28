@@ -340,6 +340,17 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
         } else if (doubleSharp) {
             pitch = pitch.slice(0, -doubleSharp.length);
             transposition += 2;
+        } else if (
+            pitch.endsWith("#b") ||
+            pitch.endsWith(SHARP + FLAT) ||
+            pitch.endsWith("b#") ||
+            pitch.endsWith(FLAT + SHARP)
+        ) {
+            // Mixed sharp+flat cancels out to a natural; this must be checked
+            // before the single-accidental checks below, since a mixed suffix
+            // also ends in "b" or "#" and would otherwise be caught by those
+            // first, stripping only one character instead of both.
+            pitch = pitch.slice(0, -2);
         } else {
             const lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
@@ -351,13 +362,6 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
             } else if (lastOne === "x" || lastOne === "*") {
                 pitch = pitch.slice(0, -1);
                 transposition += 2;
-            } else if (
-                pitch.endsWith("#b") ||
-                pitch.endsWith(SHARP + FLAT) ||
-                pitch.endsWith("b#") ||
-                pitch.endsWith(FLAT + SHARP)
-            ) {
-                pitch = pitch.slice(0, -2);
             }
         }
     }
@@ -1009,8 +1013,15 @@ var getNoteFromSolfege = (
         let note = thisScale[index];
         // In non-12 EDO temperaments, enharmonic spellings are distinct
         // pitches, so the resolved note must honor the input's accidental.
+        // Use the already-parsed doubleSharp/normalizedNoteArg values rather
+        // than re-checking the raw noteArg, so ASCII ("##") and Unicode
+        // (DOUBLESHARP) double-sharp spellings resolve the same way.
         if (octaveLength !== 12 && sharpFlat) {
-            if (noteArg.slice(-1) === "#" || noteArg.slice(-1) === SHARP) {
+            if (
+                doubleSharp ||
+                normalizedNoteArg.slice(-1) === "#" ||
+                normalizedNoteArg.slice(-1) === SHARP
+            ) {
                 note = NOTESSHARP[index];
             } else {
                 note = NOTESFLAT[index];

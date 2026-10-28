@@ -98,6 +98,18 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.getNoteFromSolfege("xyz", "C major", true, 12, 4, 0)).toBeNull();
     });
 
+    it("spells ASCII and Unicode double accidentals the same way in non-12 EDO", () => {
+        // Regression: the downstream spelling branch must use the already-parsed
+        // doubleSharp flag, not re-check the raw noteArg, so "mi##" and its
+        // Unicode equivalent pick the same enharmonic spelling in e.g. 19-EDO.
+        expect(pitchscale.getNoteFromSolfege("mi##", "C major", true, 19, 4, 0)).toEqual(
+            pitchscale.getNoteFromSolfege("mi𝄪", "C major", true, 19, 4, 0)
+        );
+        expect(pitchscale.getNoteFromSolfege("mibb", "C major", true, 19, 4, 0)).toEqual(
+            pitchscale.getNoteFromSolfege("mi𝄫", "C major", true, 19, 4, 0)
+        );
+    });
+
     it("gives a key signature's scale, solfege slots, tonic and mode together", () => {
         const [scale, solfege, tonic, mode] = pitchscale.getScaleAndHalfSteps("C major");
         expect(scale).toHaveLength(12);
