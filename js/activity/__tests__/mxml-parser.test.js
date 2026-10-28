@@ -1235,6 +1235,45 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("keeps a large decimal-denominator tie finite when direct addition overflows", async () => {
+        const hugeDuration = `1${"0".repeat(308)}`;
+        const divisions = 1.025;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), `<divisions>${divisions}</divisions>`)
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        const expected = (Number(hugeDuration) / (divisions * 4)) * 2;
+
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(expected);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely when a tied duration sum exceeds the numeric range", async () => {
+        const hugeDuration = `17${"0".repeat(307)}`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>0.275</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("falls back safely for a tied note with a non-numeric duration", async () => {
         const note = tie =>
             "<note><pitch><step>C</step><octave>4</octave></pitch>" +
