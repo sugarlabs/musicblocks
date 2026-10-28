@@ -1439,6 +1439,12 @@ describe("getArticulation", () => {
         expect(getArticulation("")).toBe("");
         expect(getArticulation("doremifa")).toBe("remifa"); // Only strips the first prefix
     });
+    it("should return an empty string for invalid inputs", () => {
+        expect(getArticulation(null)).toBe("");
+        expect(getArticulation(undefined)).toBe("");
+        expect(getArticulation(42)).toBe("");
+        expect(getArticulation({})).toBe("");
+    });
     it("should handle custom note names like BAGPIPE_D correctly", () => {
         // "BAGPIPE_D" should not have internal letters stripped.
         // If "B" is seen as a note name prefix, it extracts "AGPIPE_D".

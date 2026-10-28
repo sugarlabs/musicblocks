@@ -71,9 +71,12 @@ if (typeof module !== "undefined" && module.exports) {
  * @param {string} note
  * @returns {string}
  */
-var stripMicrotonalPrefix = s => s.replace(/^[v^]{1,2}/, "");
+var stripMicrotonalPrefix = s => (typeof s === "string" ? s.replace(/^[v^]{1,2}/, "") : "");
 
 function normalizeNoteAccidentals(note) {
+    if (typeof note !== "string") {
+        return "";
+    }
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     // Strip at most two leading ^ / v so "^C"/"vvD♭" resolve but "^^^C" keeps a "^"
     return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
