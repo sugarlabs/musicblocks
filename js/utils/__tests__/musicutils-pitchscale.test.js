@@ -79,6 +79,18 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.pitchToNumber("Cb", 5, "C major", "equal")).toBe(50);
         expect(pitchscale.pitchToNumber("E#", 4, "C major", "equal")).toBe(44);
         expect(pitchscale.pitchToNumber("Fb", 4, "C major", "equal")).toBe(43);
+        expect(pitchscale.pitchToNumber("sol𝄪", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("G𝄪", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("sol##", 4, "C major", "equal")).toBe(48);
+        expect(pitchscale.pitchToNumber("sol♯♯", 4, "C major", "equal")).toBe(48);
+        expect(pitchscale.pitchToNumber("sol♭♭", 4, "C major", "equal")).toBe(44);
+        expect(pitchscale.pitchToNumber("do𝄫", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C𝄫", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("dobb", 4, "C major", "equal")).toBe(37);
+        expect(pitchscale.pitchToNumber("do♭♭", 4, "C major", "equal")).toBe(37);
+        expect(pitchscale.pitchToNumber("do♯♯", 4, "C major", "equal")).toBe(41);
     });
 
     it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
