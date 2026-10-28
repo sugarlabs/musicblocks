@@ -98,6 +98,14 @@ describe("musicutils-pitch", () => {
             expect(pitch.numberToPitchSharp(0, "equal31")).toEqual(["A", 0]);
             expect(pitch.numberToPitchSharp(-31, "equal31")).toEqual(["A", -1]);
         });
+
+        it("preserves rounding for fractional pitch numbers", () => {
+            expect(pitch.numberToPitchSharp(0.6, "equal")).toEqual(["A♯", 0]);
+            expect(pitch.numberToPitchSharp(0.4, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-0.4, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-0.6, "equal")).toEqual(["G♯", 0]);
+            expect(pitch.numberToPitchSharp(2.6, "equal")).toEqual(["C", 0]);
+        });
     });
 
     it("strips at most two microtonal prefix characters from the start of a note", () => {

@@ -183,7 +183,7 @@ var numberToPitchSharp = (i, temperament) => {
     if (currentEDO === 12) {
         const aIndex = 9;
         const octave = Math.floor((i + aIndex) / 12);
-        const nameIndex = (((i + aIndex) % 12) + 12) % 12;
+        const nameIndex = Math.round((((i + aIndex) % 12) + 12) % 12) % 12;
         return [PITCHES2[nameIndex], octave];
     }
     const edoNames = generateNoteNames(currentEDO);
@@ -192,7 +192,8 @@ var numberToPitchSharp = (i, temperament) => {
         aIndex = Math.round((9 / 12) * currentEDO);
     }
     const octave = Math.floor((i + aIndex) / currentEDO);
-    const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
+    const nameIndex =
+        Math.round((((i + aIndex) % currentEDO) + currentEDO) % currentEDO) % currentEDO;
     return [edoNames[nameIndex], octave];
 };
 
