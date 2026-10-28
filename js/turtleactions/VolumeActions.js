@@ -57,11 +57,11 @@ function setupVolumeActions(activity) {
             const displayName = DRUMNAMES[drum][0];
             const technicalName = DRUMNAMES[drum][1];
 
-            if (displayName === synthname || displayName.replace("-", " ") === synthname) {
+            if (displayName.replace("-", " ") === synthname) {
                 return technicalName;
             }
 
-            if (technicalName === synthname || technicalName.replace("-", " ") === synthname) {
+            if (technicalName.replace("-", " ") === synthname) {
                 return synthname;
             }
         }
