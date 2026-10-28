@@ -136,6 +136,12 @@ class ReflectionMatrix {
          */
         this.summarizedUpTo = 0;
 
+        /**
+         * The id of the project this conversation is about
+         * @type {string|undefined}
+         */
+        this._projectId = undefined;
+
         this.startChatTypingTimeout = null;
         this.dotsInterval = null;
 
@@ -336,6 +342,19 @@ class ReflectionMatrix {
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = ReflectionMatrix.backendURL();
+
+        // The chat is kept between opens, but it is about one project. After the
+        // child starts or opens another, the old chat and description would make
+        // the mentor talk about blocks that are gone, so the new project gets a
+        // new conversation.
+        const projectId = this._lifecycle.projectId();
+        if (this.chatHistory.length > 0 && projectId !== this._projectId) {
+            this.chatHistory = [];
+            this.projectAlgorithm = "";
+            this.code = "";
+            this.triggerFirst = false;
+        }
+        this._projectId = projectId;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;

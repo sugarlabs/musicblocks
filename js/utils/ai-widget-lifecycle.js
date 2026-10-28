@@ -125,6 +125,18 @@ function createWidgetLifecycle(widget, isActive) {
         },
 
         /**
+         * The id of the project open now. It changes when the child starts a
+         * new project or opens another one, so a widget can tell that its
+         * conversation was about a different project.
+         * @returns {string|undefined} The id, or undefined before Planet loads.
+         */
+        projectId() {
+            const planet = widget.activity && widget.activity.planet;
+            if (!planet || typeof planet.getCurrentProjectID !== "function") return undefined;
+            return planet.getCurrentProjectID();
+        },
+
+        /**
          * Shows the banner that asks before anything is sent to the server.
          * Both widgets use it, so the question looks the same in each.
          * @param {HTMLElement} container - The widget's chat log.

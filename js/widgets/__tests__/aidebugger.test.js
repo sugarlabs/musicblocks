@@ -1565,6 +1565,21 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget._undoButton.style.display).toBe("");
         });
 
+        test("drops Undo when reopened in a different project", () => {
+            let projectId = "first";
+            mockActivity.planet = { getCurrentProjectID: () => projectId };
+            debuggerWidget.init(mockActivity);
+            debuggerWidget._projectBeforeFix = "[]";
+            debuggerWidget._projectBeforeFixId = "first";
+            mockWidgetWindow.onclose();
+
+            // New project, or another one opened from a file or Planet.
+            projectId = "second";
+            debuggerWidget.init(mockActivity);
+            expect(debuggerWidget._projectBeforeFix).toBeNull();
+            expect(debuggerWidget._undoButton.style.display).toBe("none");
+        });
+
         test("generates new conversationId if null when initializing", () => {
             debuggerWidget.conversationId = null;
             debuggerWidget.init(mockActivity);

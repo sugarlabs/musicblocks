@@ -401,6 +401,20 @@ class PlanetInterface {
         };
 
         /**
+         * Retrieves the id of the current project. It changes whenever a new
+         * project is started or another one is opened.
+         * @returns {string|undefined} - The id, or undefined before Planet loads.
+         */
+        this.getCurrentProjectID = () => {
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || typeof projectStorage.getCurrentProjectID !== "function") {
+                return undefined;
+            }
+
+            return projectStorage.getCurrentProjectID();
+        };
+
+        /**
          * Retrieves the description of the current project.
          * @returns {string} - The description of the current project.
          */

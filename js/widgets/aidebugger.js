@@ -139,6 +139,12 @@ function AIDebuggerWidget() {
     this._projectBeforeFix = null;
 
     /**
+     * The id of the project _projectBeforeFix was taken from.
+     * @type {string|undefined}
+     */
+    this._projectBeforeFixId = undefined;
+
+    /**
      * Shared mount tracking, request cancellation and consent for chat
      * widgets. No project data leaves the browser until the child agrees.
      * @type {object}
@@ -179,10 +185,16 @@ function AIDebuggerWidget() {
 
         // The window below is built empty, so the conversation starts fresh too.
         // Otherwise the next question would send a chat the child can no longer see.
-        // _projectBeforeFix stays: Undo is about the canvas, which closing does not change.
         this.chatHistory = [];
         this.promptCount = 0;
         this.conversationId = this._generateConversationId();
+
+        // Undo stays across a close and reopen, since closing does not change
+        // the canvas. In a new or different project it would bring back the
+        // old project's blocks, so it goes.
+        if (this._lifecycle.projectId() !== this._projectBeforeFixId) {
+            this._projectBeforeFix = null;
+        }
 
         const widgetWindow = window.widgetWindows.windowFor(this, "Debugger");
         this.widgetWindow = widgetWindow;
@@ -1228,6 +1240,7 @@ function AIDebuggerWidget() {
 
                 this._loadBlocks(data.project);
                 this._projectBeforeFix = projectBefore;
+                this._projectBeforeFixId = this._lifecycle.projectId();
                 this._undoButton.style.display = "";
 
                 const botResponse = {

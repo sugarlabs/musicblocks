@@ -381,6 +381,34 @@ describe("ReflectionMatrix", () => {
             expect(reflection.renderChatHistory).toHaveBeenCalled();
             expect(reflection.inputContainer.style.display).toBe("flex");
         });
+
+        test("Starts a new conversation when reopened in a different project", () => {
+            let projectId = "first";
+            mockActivity.planet = { getCurrentProjectID: () => projectId };
+            const reflection = new ReflectionMatrix();
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+            jest.spyOn(reflection, "renderChatHistory").mockImplementation(() => {});
+
+            reflection.init(mockActivity);
+            reflection.chatHistory = [{ role: "user", content: "Hi" }];
+            reflection.projectAlgorithm = "1. Play a C major scale.";
+            reflection.code = "old code";
+            reflection.triggerFirst = true;
+            mockWidgetWindow.onclose();
+
+            // Reopened in the same project, the chat comes back.
+            reflection.init(mockActivity);
+            expect(reflection.renderChatHistory).toHaveBeenCalledTimes(1);
+            mockWidgetWindow.onclose();
+
+            projectId = "second";
+            reflection.init(mockActivity);
+            expect(reflection.chatHistory).toEqual([]);
+            expect(reflection.projectAlgorithm).toBe("");
+            expect(reflection.code).toBe("");
+            expect(reflection.renderChatHistory).toHaveBeenCalledTimes(1);
+            expect(reflection.startChatSession).toHaveBeenCalledTimes(2);
+        });
     });
 
     describe("Consent before sending", () => {

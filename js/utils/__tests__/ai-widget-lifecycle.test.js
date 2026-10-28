@@ -196,6 +196,15 @@ describe("ai-widget-lifecycle", () => {
         ).rejects.toMatchObject({ reply: { error: "Please wait a little." } });
     });
 
+    it("reads the open project's id, or undefined before Planet loads", () => {
+        const widget = {};
+        const tracker = createWidgetLifecycle(widget, () => true);
+        expect(tracker.projectId()).toBeUndefined();
+
+        widget.activity = { planet: { getCurrentProjectID: () => "1234" } };
+        expect(tracker.projectId()).toBe("1234");
+    });
+
     describe("consent", () => {
         let container;
 
