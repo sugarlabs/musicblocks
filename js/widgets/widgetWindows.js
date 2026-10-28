@@ -49,7 +49,8 @@ window.widgetWindows = {
         "pitch slider": "slider",
         "pitch staircase": "pitch staircase",
         "music keyboard": "music keyboard",
-        "status": "status"
+        "status": "status",
+        "chord progression": "chord progression"
     },
 
     /**
@@ -79,7 +80,8 @@ window.widgetWindows = {
         "meter",
         "temperament",
         "mode",
-        "timbre"
+        "timbre",
+        "chord progression"
     ]),
 
     /**
