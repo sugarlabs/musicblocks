@@ -71,6 +71,33 @@ function createTestWindow(title = "Test Title", fullscreen = true) {
     return win;
 }
 
+function createToolbarLayout(auxDisplay = "none") {
+    const toolbars = document.createElement("div");
+    toolbars.id = "toolbars";
+
+    const mainToolbar = document.createElement("div");
+    mainToolbar.className = "main-nav-container";
+    mainToolbar.getBoundingClientRect = () => ({
+        top: 0,
+        bottom: 64,
+        height: 64
+    });
+
+    const auxToolbar = document.createElement("div");
+    auxToolbar.id = "aux-toolbar";
+    auxToolbar.style.display = auxDisplay;
+    auxToolbar.getBoundingClientRect = () => ({
+        top: 64,
+        bottom: 128,
+        height: 64
+    });
+
+    toolbars.append(mainToolbar, auxToolbar);
+    document.body.appendChild(toolbars);
+
+    return { toolbars, auxToolbar };
+}
+
 beforeEach(() => {
     if (window.widgetWindows._boundHandleGlobalKeyDown) {
         document.removeEventListener(
@@ -661,6 +688,69 @@ describe("widgetWindows", () => {
                 window.innerWidth = originalWidth;
             }
         });
+
+        test("updates maximized windows on small viewports without moving floating windows", () => {
+            const { toolbars, auxToolbar } = createToolbarLayout("block");
+            const originalWidth = window.innerWidth;
+
+            window.innerWidth = 500;
+
+            try {
+                const maximized = createTestWindow("Maximized");
+                maximized._maximize();
+
+                expect(maximized._frame.style.top).toBe("128px");
+                expect(maximized._frame.style.height).toBe("calc(100vh - 128px)");
+
+                const floating = createTestWindow("Floating");
+                floating.setPosition(100, 200);
+
+                const leftBefore = floating._frame.style.left;
+                const topBefore = floating._frame.style.top;
+
+                auxToolbar.style.display = "none";
+                window.widgetWindows._handleResize();
+
+                expect(maximized._frame.style.top).toBe("64px");
+                expect(maximized._frame.style.height).toBe("calc(100vh - 64px)");
+                expect(floating._frame.style.left).toBe(leftBefore);
+                expect(floating._frame.style.top).toBe(topBefore);
+            } finally {
+                window.innerWidth = originalWidth;
+                toolbars.remove();
+            }
+        });
+
+        test("updates a maximized window when the auxiliary toolbar opens and closes", () => {
+            const { toolbars, auxToolbar } = createToolbarLayout("none");
+            const originalWidth = window.innerWidth;
+
+            window.innerWidth = 1024;
+
+            try {
+                const win = createTestWindow();
+
+                win._maximize();
+
+                expect(win._frame.style.top).toBe("64px");
+                expect(win._frame.style.height).toBe("calc(100vh - 64px)");
+
+                auxToolbar.style.display = "block";
+                window.widgetWindows._handleResize();
+
+                expect(win._frame.style.top).toBe("128px");
+                expect(win._frame.style.height).toBe("calc(100vh - 128px)");
+
+                auxToolbar.style.display = "none";
+                window.widgetWindows._handleResize();
+
+                expect(win._frame.style.top).toBe("64px");
+                expect(win._frame.style.height).toBe("calc(100vh - 64px)");
+            } finally {
+                window.innerWidth = originalWidth;
+                toolbars.remove();
+            }
+        });
     });
 
     describe("_maximize and _restore", () => {
@@ -754,6 +844,21 @@ describe("widgetWindows", () => {
             win._restore();
 
             expect(win._savedPos).toBeNull();
+        });
+
+        test("_maximize starts below the visible auxiliary toolbar", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+
+                win._maximize();
+
+                expect(win._frame.style.top).toBe("128px");
+                expect(win._frame.style.height).toBe("calc(100vh - 128px)");
+            } finally {
+                toolbars.remove();
+            }
         });
     });
 
@@ -1393,6 +1498,29 @@ describe("widgetWindows", () => {
             // _dx and _dy should have been recalculated (no longer 999)
             expect(win._dx).not.toBe(999);
             expect(win._dy).not.toBe(999);
+        });
+
+        test("_dragTopHandler maximizes at the visible auxiliary toolbar boundary", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+                const event = {
+                    preventDefault: jest.fn()
+                };
+
+                win.onmaximize = jest.fn();
+                win._frame.style.top = "128px";
+
+                win._dragTopHandler(event);
+
+                expect(win._maximized).toBe(true);
+                expect(win._frame.style.top).toBe("128px");
+                expect(win.onmaximize).toHaveBeenCalledTimes(1);
+                expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            } finally {
+                toolbars.remove();
+            }
         });
     });
 
