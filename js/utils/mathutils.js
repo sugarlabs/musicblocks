@@ -16,7 +16,7 @@
  */
 
 /*
-   global SOLFEGENAMES, GCD, LCD
+   global SOLFEGENAMES, GCD
  */
 
 /*
@@ -24,18 +24,16 @@
     js/utils/musicutils.js
         SOLFEGENAMES
     js/utils/utils-logic.js
-        GCD, LCD
+        GCD
  */
 
 /* exported MathUtility */
 
 let _GCD = typeof GCD !== "undefined" ? GCD : null;
-let _LCD = typeof LCD !== "undefined" ? LCD : null;
-if (typeof require !== "undefined" && (!_GCD || !_LCD)) {
+if (typeof require !== "undefined" && !_GCD) {
     try {
         const utilsLogic = require("./utils-logic");
         if (!_GCD) _GCD = utilsLogic.GCD;
-        if (!_LCD) _LCD = utilsLogic.LCD;
     } catch (e) {
         // browser environment
     }
@@ -522,10 +520,8 @@ class MathUtility {
             const x = Math.abs(Math.trunc(a));
             const y = Math.abs(Math.trunc(b));
             if (x === 0 || y === 0) return 0;
-            if (_LCD) {
-                return _LCD(x, y);
-            }
             const gcd = MathUtility.doGcd(x, y);
+            if (gcd === 0) return 0;
             return (x / gcd) * y;
         } else {
             throw new Error("NanError");
