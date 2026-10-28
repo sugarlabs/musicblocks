@@ -187,6 +187,59 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         })
     );
 
+    it("requires closing Pitch Slider before editing and preserves its independent controls", () => {
+        let slider;
+        cy.window().then(win => {
+            activity(win).blocks.loadNewBlocks([
+                [0, "pitchslider", 400, 100, [null, 1, 3]],
+                [1, "hertz", 0, 0, [0, 2, null]],
+                [2, ["number", { value: 392 }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        });
+        cy.window().should(win => {
+            expect(activity(win).blocks.isLoading()).to.equal(false);
+            expect(
+                activity(win).blocks.blockList.some(
+                    block =>
+                        block && !block.trash && block.name === "pitchslider" && block.loadComplete
+                )
+            ).to.equal(true);
+        });
+        cy.window().then(win =>
+            activity(win)
+                .blocks.blockList.find(block => block?.name === "pitchslider")
+                .activate()
+        );
+        cy.get('.windowFrame[aria-label="pitch slider"] input[type="range"]').should("be.visible");
+        cy.window().should(win => {
+            expect(activity(win).turtles.running()).to.equal(false);
+            expect(activity(win).logo._synthsInitialized).to.equal(false);
+        });
+        cy.window().then(win => {
+            slider = activity(win).logo.pitchSlider;
+            slider.widgetWindow.setPosition(400, 200);
+            cy.spy(activity(win), "errorMsg").as("entryError");
+        });
+        cy.contains("button", "New multisample instrument…").click({ force: true });
+        cy.get("@entryError").should(
+            "have.been.calledWith",
+            "Close other widgets before editing this instrument."
+        );
+        cy.get(editor).should("not.exist");
+        cy.window().then(win => {
+            expect(activity(win).logo.pitchSlider).to.equal(slider);
+            expect(slider.frequencies).to.deep.equal([392]);
+        });
+        cy.get('.windowFrame[aria-label="pitch slider"] [aria-label="Move up"]').click();
+        cy.window().should(() => expect(slider.frequencies[0]).to.be.greaterThan(392));
+        cy.get('.windowFrame[aria-label="pitch slider"] .wftButton.close').click();
+        cy.contains("button", "New multisample instrument…").click();
+        cy.get(editor).should("be.visible");
+        cy.contains(editor + " button", /^Cancel$/).click();
+        cy.get(editor).should("not.exist");
+    });
+
     it("listens to an unassigned row at original pitch and previews Tone's higher midpoint source", () => {
         savedAudition();
         let attacks;

@@ -39,7 +39,7 @@
    exported
 
    NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES, CUSTOMSAMPLES,
-   instrumentsEffects, instrumentsFilters, Synth
+   instrumentsEffects, instrumentsFilters, Synth, validateMultisample, MULTISAMPLE_LIMITS
 */
 
 /**
