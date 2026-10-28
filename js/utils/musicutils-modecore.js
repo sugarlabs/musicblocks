@@ -237,6 +237,9 @@ MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
  * @returns {string} The mode numbers.
  */
 var getModeNumbers = name => {
+    if (typeof name !== "string") {
+        return "";
+    }
     const __convert = obj => {
         let n = 0;
         let m = "";
@@ -346,6 +349,9 @@ var getNonEDOModeSteps = (mode, temperament) => {
  *     or the full string unchanged if no recognised prefix is found.
  */
 var getArticulation = note => {
+    if (typeof note !== "string") {
+        return "";
+    }
     const stripped = stripMicrotonalPrefix(note);
     const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-Ga-g])(.*)/);
     return match ? match[1] : stripped;

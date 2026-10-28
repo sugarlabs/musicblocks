@@ -177,6 +177,20 @@ describe("musicutils-pitch", () => {
             expect(pitch.normalizeNoteAccidentals("C♭ D♯ E𝄫 F𝄪")).toBe("Cb D# Ebb Fx");
             expect(pitch.normalizeNoteAccidentals("Sol♭")).toBe("Solb");
         });
+
+        it("handles nullish, empty, and non-string inputs safely", () => {
+            expect(pitch.stripMicrotonalPrefix(null)).toBe("");
+            expect(pitch.stripMicrotonalPrefix(undefined)).toBe("");
+            expect(pitch.stripMicrotonalPrefix(123)).toBe("");
+            expect(pitch.stripMicrotonalPrefix({})).toBe("");
+            expect(pitch.stripMicrotonalPrefix([])).toBe("");
+
+            expect(pitch.normalizeNoteAccidentals(null)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(undefined)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(123)).toBe("");
+            expect(pitch.normalizeNoteAccidentals({})).toBe("");
+            expect(pitch.normalizeNoteAccidentals([])).toBe("");
+        });
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {

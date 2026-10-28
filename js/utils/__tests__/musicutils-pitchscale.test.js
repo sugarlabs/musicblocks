@@ -56,6 +56,17 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.getSharpFlatPreference("G major")).toBe("sharp");
     });
 
+    it("handles nullish, empty, and non-string inputs safely in keySignatureToMode", () => {
+        expect(pitchscale.keySignatureToMode("")).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode("   ")).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(null)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(undefined)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(42)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(true)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode({})).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode([])).toEqual(["C", "major"]);
+    });
+
     it("calculates pitch numbers accurately for enharmonic notes and boundary shifts in 12-EDO", () => {
         expect(pitchscale.pitchToNumber("B♯", 4, "C major", "equal")).toBe(
             pitchscale.pitchToNumber("C", 5, "C major", "equal")
