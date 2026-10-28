@@ -157,7 +157,13 @@ class Turtle {
     stopBlink() {
         // eslint-disable-next-line eqeqeq
         if (this._blinkTimeout != null || !this._blinkFinished) {
-            clearTimeout(this._blinkTimeout);
+            const timerManager =
+                this.activity && this.activity.logo ? this.activity.logo._timerManager : null;
+            if (timerManager && typeof timerManager.clearTimeout === "function") {
+                timerManager.clearTimeout(this._blinkTimeout);
+            } else {
+                clearTimeout(this._blinkTimeout);
+            }
             this._blinkTimeout = null;
 
             this.container.visible = true;
@@ -186,12 +192,18 @@ class Turtle {
 
         this.container.visible = false;
         this.activity.refreshCanvas();
-        this._blinkTimeout = setTimeout(() => {
+        const finishBlink = () => {
             this._blinkTimeout = null;
             this._blinkFinished = true;
             this.container.visible = true;
             this.activity.refreshCanvas();
-        }, 100);
+        };
+        const timerManager =
+            this.activity && this.activity.logo ? this.activity.logo._timerManager : null;
+        this._blinkTimeout =
+            timerManager && typeof timerManager.setTimeout === "function"
+                ? timerManager.setTimeout(finishBlink, 100)
+                : setTimeout(finishBlink, 100);
     }
 
     /**

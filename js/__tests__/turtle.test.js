@@ -466,6 +466,25 @@ describe("Turtle stopBlink()", () => {
         expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
     });
 
+    it("registers and cancels blink timers through the Logo timer manager", () => {
+        jest.useFakeTimers();
+        const timerManager = {
+            setTimeout: jest.fn((callback, delay) => setTimeout(callback, delay)),
+            clearTimeout: jest.fn(id => clearTimeout(id))
+        };
+        mockActivity.logo = { _timerManager: timerManager };
+        turtle.listeners = {};
+
+        turtle.blink(16, 50);
+        const blinkTimeout = turtle._blinkTimeout;
+        turtle.stopBlink();
+        jest.advanceTimersByTime(100);
+
+        expect(timerManager.setTimeout).toHaveBeenCalledWith(expect.any(Function), 100);
+        expect(timerManager.clearTimeout).toHaveBeenCalledWith(blinkTimeout);
+        expect(turtle.container.visible).toBe(true);
+    });
+
     it("restores visibility when a blink completes normally", () => {
         jest.useFakeTimers();
         turtle.listeners = {};
