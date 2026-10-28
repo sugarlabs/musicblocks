@@ -8133,7 +8133,7 @@ class Blocks {
         this._dockStack = async (blk, { parent, slot } = {}) => {
             const myBlock = this.blockList[blk];
             const parentBlock = this.blockList[parent];
-            if (!parentBlock || parentBlock.trash || myBlock.trash) {
+            if (!parentBlock || parentBlock.trash || !parentBlock.docks[slot] || myBlock.trash) {
                 return false;
             }
 
@@ -8155,7 +8155,9 @@ class Blocks {
          */
         this._historyQueue = Promise.resolve();
         this._queueHistoryStep = step => {
-            this._historyQueue = this._historyQueue.then(step, step);
+            this._historyQueue = this._historyQueue.then(step, step).finally(() => {
+                this.isUndoingOrRedoing = false;
+            });
             return this._historyQueue;
         };
 
@@ -8274,7 +8276,7 @@ class Blocks {
             this.isUndoingOrRedoing = false;
         };
 
-        this.sendStackToTrash = (myBlock, addToHistory = true) => {
+        this.sendStackToTrash = (myBlock, addToHistory = true, from = this.dockOf(myBlock)) => {
             /** First, hide the palettes as they may need updating. */
             for (const name of Object.keys(this.activity.palettes.dict)) {
                 this.activity.palettes.dict[name].hideMenu(true);
@@ -8296,7 +8298,7 @@ class Blocks {
                 this.actionHistory.push({
                     type: "trash",
                     blockId: thisBlock,
-                    from: this.dockOf(myBlock)
+                    from
                 });
                 this.redoActionHistory = [];
             }

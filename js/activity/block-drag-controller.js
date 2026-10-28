@@ -889,7 +889,10 @@ class BlockDragController {
                             "text"
                         ].includes(blocks.blockList[connection].name)
                     ) {
-                        blocks.sendStackToTrash(blocks.blockList[connection], move === null);
+                        blocks.sendStackToTrash(blocks.blockList[connection], move === null, {
+                            parent: newBlock,
+                            slot: newConnection
+                        });
                     } else {
                         this.findDragGroup(connection);
                         for (let c = 0; c < blocks.dragGroup.length; c++) {

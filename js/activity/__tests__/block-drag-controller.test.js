@@ -712,7 +712,7 @@ describe("BlockDragController", () => {
     });
 
     describe("dock snapping (blockMoved) — argument, action, storein, and widget branches", () => {
-        it("sends a default-value occupant (e.g. a bare number block) to the trash when it is replaced", async () => {
+        it("sends a replaced default-value occupant to the trash with the slot it held", async () => {
             const occupant = makeMovingArg({ value: "5" });
             occupant.name = "number";
             occupant.container = { x: 0, y: 0 };
@@ -723,7 +723,10 @@ describe("BlockDragController", () => {
 
             await blocks.blockMoved(2);
 
-            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant, true);
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant, true, {
+                parent: 0,
+                slot: 1
+            });
             expect(moving.connections[0]).toBe(0);
         });
 
@@ -1941,7 +1944,10 @@ describe("BlockDragController", () => {
 
             await blocks.blockMoved(2);
 
-            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant, false);
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant, false, {
+                parent: 0,
+                slot: 1
+            });
             expect(blocks.actionHistory).toEqual([
                 expect.objectContaining({
                     blockId: 2,

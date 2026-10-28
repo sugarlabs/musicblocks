@@ -1615,6 +1615,40 @@ describe("Blocks Foundation", () => {
                 expect(blocks.blockMoved).not.toHaveBeenCalled();
             });
 
+            it("leaves a stack loose when its dock no longer exists on the parent", async () => {
+                blocks.blockList = [flow(100, 100, [null, null]), flow(300, 300, [null, null])];
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 120,
+                    oldY: 400,
+                    newX: 300,
+                    newY: 300,
+                    from: { parent: 0, slot: 5 },
+                    bottom: 1,
+                    to: { parent: null, slot: null }
+                });
+
+                await blocks.undoAction();
+
+                expect(blocks.blockMoved).not.toHaveBeenCalled();
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 120, 400);
+            });
+
+            it("clears the undo flag when a step fails and keeps running later steps", async () => {
+                blocks.blockList = [flow(100, 100, [null, null])];
+                blocks.actionHistory.push({ type: "trash", blockId: 0, from: { parent: null } });
+                blocks.actionHistory.push({ type: "move", blockId: 7, from: {}, to: {} });
+
+                await expect(blocks.undoAction()).rejects.toThrow();
+                expect(blocks.isUndoingOrRedoing).toBe(false);
+
+                blocks.activity._restoreTrashById = jest.fn();
+                await blocks.undoAction();
+                expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(0);
+                expect(blocks.isUndoingOrRedoing).toBe(false);
+            });
+
             it("waits for a redo that is still docking before it undoes", async () => {
                 blocks.blockList = [
                     flow(100, 100, [null, 1]),
