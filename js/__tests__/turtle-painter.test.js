@@ -1311,8 +1311,8 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
 
         expect(painter.turtles.canvas1).toBeDefined();
         expect(turtle1.painter._processColor).toHaveBeenCalled();
-        expect(painter.turtles.gx).toBe(790); // 800 - 10
-        expect(painter.turtles.gy).toBe(580); // 600 - 20
+        expect(painter.turtles.gx).toBe(390); // (1600 - 800) / 2 - 10
+        expect(painter.turtles.gy).toBe(280); // (1200 - 600) / 2 - 20
         expect(mockTurtle.ctx.beginPath).toHaveBeenCalled();
         expect(mockTurtle.ctx.moveTo).toHaveBeenCalledWith(20, 40); // 10+10, 20+20
         expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(10, 20);
@@ -1322,6 +1322,44 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doScrollXY(1000, 1000);
         expect(painter.turtles.gx).toBe(0);
         expect(painter.turtles.gy).toBe(0);
+    });
+
+    test("doScrollXY with negative values keeps the read inside the scroll buffer", () => {
+        // The buffer gets its own context, so its reads are not mixed up with the turtle canvas
+        const bufferImage = { width: 800, height: 600, data: [] };
+        const bufferCtx = {
+            rect: jest.fn(),
+            fill: jest.fn(),
+            putImageData: jest.fn(),
+            getImageData: jest.fn(() => bufferImage)
+        };
+        HTMLCanvasElement.prototype.getContext.mockReturnValueOnce(bufferCtx);
+
+        painter.doScrollXY(-100, -100);
+        expect(painter.turtles.c1ctx).toBe(bufferCtx);
+        expect(painter.turtles.canvas1.width).toBe(1600);
+        expect(painter.turtles.canvas1.height).toBe(1200);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(500, 400, 800, 600);
+        expect(mockTurtle.ctx.putImageData).toHaveBeenLastCalledWith(bufferImage, 0, 0);
+
+        painter.doScrollXY(-1000, -1000);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(800, 600, 800, 600);
+    });
+
+    test("doClear with resetPosition moves the scroll back to the middle of the buffer", () => {
+        painter.doScrollXY(-1000, -1000);
+        expect(painter.turtles.gx).toBe(800);
+
+        painter.doClear(false, false, true);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+    });
+
+    test("doScrollXY creates the scroll buffer with willReadFrequently", () => {
+        painter.doScrollXY(10, 20);
+        expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith("2d", {
+            willReadFrequently: true
+        });
     });
 });
 

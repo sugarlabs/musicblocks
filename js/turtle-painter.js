@@ -1377,8 +1377,7 @@ class Painter {
             this.turtle.x = 0;
             this.turtle.y = 0;
             this.turtle.orientation = 0.0;
-            turtles.gx = this.turtle.ctx.canvas.width;
-            turtles.gy = this.turtle.ctx.canvas.height;
+            this._centerScroll();
         }
 
         const i = turtles.getIndexOfTurtle(this.turtle) % 10;
@@ -1460,6 +1459,20 @@ class Painter {
     }
 
     /**
+     * Puts the visible area in the middle of the scroll buffer, so that it can
+     * scroll the same distance in every direction.
+     */
+    _centerScroll() {
+        const turtles = this.turtles;
+        if (!turtles.canvas1) {
+            // doScrollXY centers it when it creates the buffer
+            return;
+        }
+        turtles.gx = Math.floor((turtles.canvas1.width - this.turtle.ctx.canvas.width) / 2);
+        turtles.gy = Math.floor((turtles.canvas1.height - this.turtle.ctx.canvas.height) / 2);
+    }
+
+    /**
      * As the canvas scrolls the turtle is drawn under.
      *
      * @param dx - change in x coordinate
@@ -1477,14 +1490,13 @@ class Painter {
 
         const turtles = this.turtles;
         if (!turtles.canvas1) {
-            turtles.gx = this.turtle.ctx.canvas.width;
-            turtles.gy = this.turtle.ctx.canvas.height;
             turtles.canvas1 = document.createElement("canvas");
             // Use 2x viewport instead of 3x to save ~40 MB of memory.
             // At 1920x1080: 2x = 3840x2160x4 = 33 MB vs 3x = 5760x3240x4 = 75 MB.
             turtles.canvas1.width = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
             turtles.canvas1.height = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
-            turtles.c1ctx = turtles.canvas1.getContext("2d");
+            this._centerScroll();
+            turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
             turtles.c1ctx.rect(
                 0,
                 0,
@@ -1499,9 +1511,9 @@ class Painter {
 
         turtles.gy -= dy;
         turtles.gx -= dx;
-        // Clamp scroll position to stay within buffer canvas bounds
-        const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
-        const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
+        // Clamp scroll position so the visible area stays inside the buffer canvas
+        const maxScrollX = turtles.canvas1.width - this.turtle.ctx.canvas.width;
+        const maxScrollY = turtles.canvas1.height - this.turtle.ctx.canvas.height;
         turtles.gx = clampNumber(turtles.gx, 0, maxScrollX);
         turtles.gy = clampNumber(turtles.gy, 0, maxScrollY);
 
