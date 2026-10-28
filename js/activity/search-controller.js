@@ -384,29 +384,49 @@ class SearchController {
                             img.style.top = pageY - img.offsetHeight / 2 + "px";
                         };
 
+                        let rAFId = null;
+                        let ticking = false;
+                        let lastX, lastY;
                         const onMouseMove = e => {
                             e.preventDefault();
-                            let x, y;
                             if (e.type === "touchstart" || e.type === "touchmove") {
-                                x = e.touches[0].pageX;
-                                y = e.touches[0].pageY;
+                                const touch = e.touches && e.touches[0];
+                                if (touch) {
+                                    lastX = touch.pageX !== undefined ? touch.pageX : touch.clientX;
+                                    lastY = touch.pageY !== undefined ? touch.pageY : touch.clientY;
+                                }
                             } else {
-                                x = e.pageX;
-                                y = e.pageY;
+                                lastX = e.pageX;
+                                lastY = e.pageY;
                             }
-                            moveAt(x, y);
+                            if (!ticking) {
+                                ticking = true;
+                                rAFId = window.requestAnimationFrame(() => {
+                                    moveAt(lastX, lastY);
+                                    ticking = false;
+                                });
+                            }
                         };
                         onMouseMove(event);
 
                         document.addEventListener("touchmove", onMouseMove, { passive: false });
                         document.addEventListener("mousemove", onMouseMove);
 
-                        const up = () => {
+                        let cancel;
+                        const up = (event, cancelled = false) => {
                             document.body.style.cursor = "default";
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
                             document.removeEventListener("mouseup", up);
                             document.removeEventListener("touchend", up);
+                            document.removeEventListener("touchcancel", cancel);
+
+                            if (rAFId) {
+                                window.cancelAnimationFrame(rAFId);
+                                rAFId = null;
+                                ticking = false;
+                                moveAt(lastX, lastY);
+                            }
 
                             const x = parseInt(img.style.left, 10);
                             const y = parseInt(img.style.top, 10);
@@ -417,6 +437,7 @@ class SearchController {
                                 document.body.removeChild(img);
                             }
 
+                            if (cancelled) return;
                             if (isNaN(x) && isNaN(y)) return;
 
                             const protoblk = item.specialDict;
@@ -437,9 +458,11 @@ class SearchController {
                                 }
                             );
                         };
+                        cancel = () => up(null, true);
 
                         document.addEventListener("mouseup", up, { once: true });
                         document.addEventListener("touchend", up, { once: true });
+                        document.addEventListener("touchcancel", cancel, { once: true });
                     };
 
                     li[0].addEventListener("mousedown", down, true);
