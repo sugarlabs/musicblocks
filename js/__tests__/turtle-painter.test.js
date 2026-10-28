@@ -1283,8 +1283,8 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
 
         expect(painter.turtles.canvas1).toBeDefined();
         expect(turtle1.painter._processColor).toHaveBeenCalled();
-        expect(painter.turtles.gx).toBe(790); // 800 - 10
-        expect(painter.turtles.gy).toBe(580); // 600 - 20
+        expect(painter.turtles.gx).toBe(390); // (1600 - 800) / 2 - 10
+        expect(painter.turtles.gy).toBe(280); // (1200 - 600) / 2 - 20
         expect(mockTurtle.ctx.beginPath).toHaveBeenCalled();
         expect(mockTurtle.ctx.moveTo).toHaveBeenCalledWith(20, 40); // 10+10, 20+20
         expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(10, 20);
@@ -1294,6 +1294,35 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doScrollXY(1000, 1000);
         expect(painter.turtles.gx).toBe(0);
         expect(painter.turtles.gy).toBe(0);
+    });
+
+    test("doScrollXY with negative values keeps the read inside the scroll buffer", () => {
+        painter.doScrollXY(-100, -100);
+        expect(painter.turtles.canvas1.width).toBe(1600);
+        expect(painter.turtles.canvas1.height).toBe(1200);
+        expect(painter.turtles.gx).toBe(500);
+        expect(painter.turtles.gy).toBe(400);
+
+        painter.doScrollXY(-1000, -1000);
+        expect(painter.turtles.gx).toBe(800);
+        expect(painter.turtles.gy).toBe(600);
+        expect(mockTurtle.ctx.getImageData).toHaveBeenLastCalledWith(800, 600, 800, 600);
+    });
+
+    test("doClear with resetPosition moves the scroll back to the middle of the buffer", () => {
+        painter.doScrollXY(-1000, -1000);
+        expect(painter.turtles.gx).toBe(800);
+
+        painter.doClear(false, false, true);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+    });
+
+    test("doScrollXY creates the scroll buffer with willReadFrequently", () => {
+        painter.doScrollXY(10, 20);
+        expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith("2d", {
+            willReadFrequently: true
+        });
     });
 });
 
