@@ -16,16 +16,30 @@
  */
 
 /*
-   global SOLFEGENAMES
+   global SOLFEGENAMES, GCD, LCD
  */
 
 /*
    Global location
     js/utils/musicutils.js
         SOLFEGENAMES
+    js/utils/utils-logic.js
+        GCD, LCD
  */
 
 /* exported MathUtility */
+
+let _GCD = typeof GCD !== "undefined" ? GCD : null;
+let _LCD = typeof LCD !== "undefined" ? LCD : null;
+if (typeof require !== "undefined" && (!_GCD || !_LCD)) {
+    try {
+        const utilsLogic = require("./utils-logic");
+        if (!_GCD) _GCD = utilsLogic.GCD;
+        if (!_LCD) _LCD = utilsLogic.LCD;
+    } catch (e) {
+        // browser environment
+    }
+}
 
 /**
  * Utility class for managing math operations.
@@ -405,31 +419,6 @@ class MathUtility {
     }
 
     /**
-     * Clamps a value within an inclusive minimum and maximum range.
-     * Swaps min and max automatically if min > max.
-     *
-     * @static
-     * @param {number} val - The value to clamp.
-     * @param {number} min - Lower bound.
-     * @param {number} max - Upper bound.
-     * @returns {number} - Clamped value.
-     * @throws {Error} NanError if any argument is not a valid number.
-     */
-    static doClamp(val, min, max) {
-        if (
-            MathUtility._isNumber(val) &&
-            MathUtility._isNumber(min) &&
-            MathUtility._isNumber(max)
-        ) {
-            const lower = Math.min(min, max);
-            const upper = Math.max(min, max);
-            return Math.min(Math.max(val, lower), upper);
-        } else {
-            throw new Error("NanError");
-        }
-    }
-
-    /**
      * Computes linear interpolation between start and stop for an amount amt.
      *
      * @static
@@ -481,7 +470,7 @@ class MathUtility {
     }
 
     /**
-     * Computes the greatest common divisor of two integers using Euclid's algorithm.
+     * Computes the greatest common divisor of two integers.
      *
      * @static
      * @param {number} a
@@ -496,14 +485,19 @@ class MathUtility {
             Number.isFinite(a) &&
             Number.isFinite(b)
         ) {
-            let x = Math.abs(Math.trunc(a));
-            let y = Math.abs(Math.trunc(b));
-            while (y !== 0) {
-                const temp = y;
-                y = x % y;
-                x = temp;
+            const x = Math.abs(Math.trunc(a));
+            const y = Math.abs(Math.trunc(b));
+            if (_GCD) {
+                return _GCD(x, y);
             }
-            return x;
+            let m = x;
+            let n = y;
+            while (n !== 0) {
+                const temp = n;
+                n = m % n;
+                m = temp;
+            }
+            return m;
         } else {
             throw new Error("NanError");
         }
@@ -527,8 +521,11 @@ class MathUtility {
         ) {
             const x = Math.abs(Math.trunc(a));
             const y = Math.abs(Math.trunc(b));
+            if (x === 0 || y === 0) return 0;
+            if (_LCD) {
+                return _LCD(x, y);
+            }
             const gcd = MathUtility.doGcd(x, y);
-            if (gcd === 0) return 0;
             return (x / gcd) * y;
         } else {
             throw new Error("NanError");

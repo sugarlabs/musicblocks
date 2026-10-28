@@ -927,40 +927,6 @@ describe("MathUtility", () => {
         });
     });
 
-    describe("doClamp", () => {
-        test("returns the value when inside range", () => {
-            expect(MathUtility.doClamp(5, 0, 10)).toBe(5);
-        });
-
-        test("clamps to lower bound when value is below min", () => {
-            expect(MathUtility.doClamp(-5, 0, 10)).toBe(0);
-        });
-
-        test("clamps to upper bound when value is above max", () => {
-            expect(MathUtility.doClamp(15, 0, 10)).toBe(10);
-        });
-
-        test("handles swapped bounds gracefully (min > max)", () => {
-            expect(MathUtility.doClamp(5, 10, 0)).toBe(5);
-            expect(MathUtility.doClamp(-2, 10, 0)).toBe(0);
-            expect(MathUtility.doClamp(12, 10, 0)).toBe(10);
-        });
-
-        test("handles negative ranges and decimals", () => {
-            expect(MathUtility.doClamp(-1.5, -2.5, -0.5)).toBe(-1.5);
-            expect(MathUtility.doClamp(-3.0, -2.5, -0.5)).toBe(-2.5);
-            expect(MathUtility.doClamp(0.5, -2.5, -0.5)).toBe(-0.5);
-        });
-
-        test("throws NanError for invalid or NaN inputs", () => {
-            expect(() => MathUtility.doClamp(NaN, 0, 10)).toThrow("NanError");
-            expect(() => MathUtility.doClamp(5, NaN, 10)).toThrow("NanError");
-            expect(() => MathUtility.doClamp(5, 0, NaN)).toThrow("NanError");
-            expect(() => MathUtility.doClamp("5", 0, 10)).toThrow("NanError");
-            expect(() => MathUtility.doClamp(null, 0, 10)).toThrow("NanError");
-        });
-    });
-
     describe("doLerp", () => {
         test("returns start value when amt is 0", () => {
             expect(MathUtility.doLerp(10, 20, 0)).toBe(10);
