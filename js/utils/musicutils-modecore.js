@@ -366,8 +366,8 @@ var getArticulation = note => {
 var modeMapper = (key, mode) => {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
-    key = typeof key === "string" && key.trim() !== "" ? key.toLowerCase() : "c";
-    mode = typeof mode === "string" && mode.trim() !== "" ? mode.toLowerCase() : "major";
+    key = typeof key === "string" && key.trim() !== "" ? key.trim().toLowerCase() : "c";
+    mode = typeof mode === "string" && mode.trim() !== "" ? mode.trim().toLowerCase() : "major";
 
     switch (mode) {
         case "ionian":

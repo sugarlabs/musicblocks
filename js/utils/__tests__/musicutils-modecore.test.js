@@ -81,6 +81,8 @@ describe("musicutils-modecore", () => {
             expect(modecore.modeMapper("C", undefined)).toEqual(["c", "major"]);
             expect(modecore.modeMapper(123, 456)).toEqual(["c", "major"]);
             expect(modecore.modeMapper("", "")).toEqual(["c", "major"]);
+            expect(modecore.modeMapper("   ", "   ")).toEqual(["c", "major"]);
+            expect(modecore.modeMapper("  d  ", "  dorian  ")).toEqual(["c", "major"]);
             expect(modecore.modeMapper("D", "dorian")).toEqual(["c", "major"]);
         });
 
@@ -88,6 +90,7 @@ describe("musicutils-modecore", () => {
             const major12 = [2, 2, 1, 2, 2, 2, 1];
             expect(modecore.getModePattern(undefined)).toEqual(major12);
             expect(modecore.getModePattern(null)).toEqual(major12);
+            expect(modecore.getModePattern(null, 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
             expect(modecore.getModePattern(123)).toEqual(major12);
             expect(modecore.getModePattern({})).toEqual(major12);
             expect(modecore.getModePattern("unknownMode")).toEqual(major12);
