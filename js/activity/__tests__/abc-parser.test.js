@@ -487,8 +487,8 @@ describe("Test 4: Triplets", () => {
         expect(denomWith4.length).toBeGreaterThanOrEqual(3);
     });
 
-    test("tripletFinder does not bleed across voice boundaries even if triplet is unclosed", async () => {
-        // Voice 1: triplet C D E (no endTriplet, i.e., unclosed triplet).
+    test("tripletFinder does not bleed across voice boundaries while a triplet is still open", async () => {
+        // Voice 1: only C D of a three-note triplet, leaving one note outstanding.
         // Voice 2: plain quarter notes only — must NOT inherit the triplet state
         // and must produce standard denominator (4).
         const twoVoiceTune = makeTune({
@@ -500,8 +500,7 @@ describe("Test 4: Triplets", () => {
                     voices: [
                         [
                             makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
-                            makeNote("D", 1, 0.125),
-                            makeNote("E", 2, 0.125)
+                            makeNote("D", 1, 0.125)
                         ],
                         [makeNote("G", 4, 0.25), makeNote("A", 5, 0.25)]
                     ]
@@ -511,18 +510,13 @@ describe("Test 4: Triplets", () => {
 
         const blocks = await parseAndCapture(twoVoiceTune);
 
-        // Voice 1 notes will all be processed under triplet state because it started and never closed,
-        // so all 3 notes get denominator 12.
-        const denomWith12 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 12
-        );
-        expect(denomWith12).toHaveLength(3);
-
-        // Voice 2 notes must not be affected. They must have standard denominator 4.
-        const denomWith4 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 4
-        );
-        expect(denomWith4.length).toBeGreaterThanOrEqual(3);
+        // Follow each note's duration connection, excluding meter and pitch numbers.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 4, 1 / 4]);
     });
 });
 
