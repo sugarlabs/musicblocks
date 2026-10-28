@@ -1679,7 +1679,11 @@ class ModeWidget {
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
         this._selectedModeName = name;
-        this.textMsg(_("Mode imported: ") + name, 3000);
+        // A .scl file doesn't say which EDO it was written on, so the import
+        // picks one (the current wheel when the file fits it, otherwise the
+        // coarsest grid that does); name it, so a 12-EDO file landing on a
+        // 24-EDO wheel, or whole tone becoming 6-EDO, isn't a surprise.
+        this.textMsg(_("Mode imported: ") + name + " (" + foundEdo + "-EDO)", 3000);
         this._updateModeDisplay(name);
         if (this._modeBlock !== null) {
             const modeBlock = this.blocks.blockList[this._modeBlock];

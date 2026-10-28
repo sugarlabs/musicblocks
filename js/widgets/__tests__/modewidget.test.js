@@ -1042,6 +1042,11 @@ describe("ModeWidget", () => {
         const [name, pattern, edo] = saveSpy.mock.calls[0];
         expect(edo).toBe(12);
         expect(pattern).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        // The message names the EDO the import chose.
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Mode imported: Major scale (12-EDO)",
+            3000
+        );
         saveSpy.mockRestore();
     });
 
