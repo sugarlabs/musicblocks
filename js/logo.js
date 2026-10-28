@@ -337,8 +337,8 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
+        this._iterationBudget = this._MAX_ITERATIONS + 1;
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
