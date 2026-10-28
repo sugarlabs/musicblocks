@@ -27,6 +27,7 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
     beforeEach(() => {
         localStorage.clear();
+        GitDropdownUI.gitStorage._reset();
         iframeMessages = [];
 
         global.window.MBDialog = {
@@ -602,17 +603,18 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             gitDropdown._prefetchCommits = jest.fn();
         });
 
-        test("a failed persist does not replace a value storage can still return", () => {
+        test("a failed persist is the repo the menu shows", () => {
             expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
 
-            expect(gitDropdown._getRepoName()).toBe("");
-            expect(gitDropdown._getHashedKey()).toBe("");
-            expect(mockItemCreate.style.display).toBe("list-item");
-            expect(mockItemCommit.style.display).toBe("none");
-            expect(mockItemHistory.style.display).toBe("none");
+            expect(gitDropdown._getRepoName()).toBe("my-repo");
+            expect(gitDropdown._getHashedKey()).toBe("key-1");
+            expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(mockItemCreate.style.display).toBe("none");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
         });
 
-        test("a failed persist leaves the repo storage already holds", () => {
+        test("a failed switch shows the repo we tried to store", () => {
             Storage.prototype.setItem.mockRestore();
             localStorage.setItem("mbGitRepoName", "old-repo");
             expect(gitDropdown._getRepoName()).toBe("old-repo");
@@ -622,7 +624,19 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
             expect(() => gitDropdown._applyGitState("new-repo", "key-2", "New Repo")).not.toThrow();
 
-            expect(gitDropdown._getRepoName()).toBe("old-repo");
+            expect(gitDropdown._getRepoName()).toBe("new-repo");
+            expect(localStorage.getItem("mbGitRepoName")).toBe("old-repo");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemCreate.style.display).toBe("none");
+        });
+
+        test("a second menu keeps a value storage rejected", () => {
+            gitDropdown._applyGitState("kept-repo", "key-kept", "Kept");
+
+            const second = new GitDropdownUI();
+            second.init(mockActivity);
+
+            expect(second._getRepoName()).toBe("kept-repo");
             expect(mockItemCommit.style.display).toBe("list-item");
         });
 

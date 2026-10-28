@@ -15,10 +15,12 @@
 /**
  * The git menu keeps a handful of small keys describing the current project.
  * localStorage throws when the profile blocks storage or has no room left,
- * so read and write through here. A read uses localStorage, and the memory
- * copy only when that read throws. A write updates memory only when
- * localStorage itself throws, so a value stored by another caller is what
- * the next successful read returns.
+ * so read and write through here. A write or removal that localStorage
+ * rejects stays in memory, and that is what the next read returns, so a
+ * failed switch does not keep showing the previous project. A write or
+ * removal that succeeds drops the memory copy, and the next read uses
+ * localStorage, including a value another caller stored. The memory lasts
+ * for the page; constructing another menu does not clear it.
  */
 const gitStorage = {
     _memory: Object.create(null),
@@ -28,13 +30,13 @@ const gitStorage = {
     },
 
     getItem(key) {
+        if (Object.prototype.hasOwnProperty.call(this._memory, key)) {
+            return this._memory[key];
+        }
         try {
             return localStorage.getItem(key);
         } catch (e) {
             console.warn(`Could not read the stored git state (${key}):`, e);
-            if (Object.prototype.hasOwnProperty.call(this._memory, key)) {
-                return this._memory[key];
-            }
             return null;
         }
     },
@@ -65,7 +67,6 @@ class GitDropdownUI {
         this.activity = null;
         this._BASE_URL = "";
         this._prefetchPromise = null;
-        gitStorage._reset();
     }
 
     init(activity) {
@@ -1827,8 +1828,11 @@ class GitDropdownUI {
 
 // Expose globally so activity.js (which runs inside an AMD require callback)
 // can access the class via `typeof GitDropdownUI !== "undefined"`.
+// project-manager.js writes the same mbGit* keys through gitStorage.
 window.GitDropdownUI = GitDropdownUI;
+window.gitStorage = gitStorage;
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = GitDropdownUI;
+    module.exports.gitStorage = gitStorage;
 }

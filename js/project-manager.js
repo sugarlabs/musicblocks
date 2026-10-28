@@ -75,6 +75,30 @@ const _KNOWN_URL_PARAMS = new Set([
 // up on it and loading the project without an initial argument.
 const _ENV_ARG_TIMEOUT = 10000;
 
+// The git menu reads these keys through gitStorage. Use that helper when the
+// page has it, so a quota error cannot leave the menu on a different repo.
+function _writeGitKey(storage, key, value) {
+    const shared = typeof window !== "undefined" ? window.gitStorage : undefined;
+    if (shared && typeof shared.setItem === "function") {
+        shared.setItem(key, value);
+        return;
+    }
+    storage[key] = value;
+}
+
+function _removeGitKey(storage, key) {
+    const shared = typeof window !== "undefined" ? window.gitStorage : undefined;
+    if (shared && typeof shared.removeItem === "function") {
+        shared.removeItem(key);
+        return;
+    }
+    if (storage && typeof storage.removeItem === "function") {
+        storage.removeItem(key);
+    } else if (storage) {
+        delete storage[key];
+    }
+}
+
 class ProjectManager {
     constructor(activity) {
         this.activity = activity;
@@ -277,11 +301,11 @@ class ProjectManager {
                 const repoData =
                     that.planet.getCurrentGitRepoData && that.planet.getCurrentGitRepoData();
                 if (repoData && repoData.repoName) {
-                    that.storage.mbGitRepoName = repoData.repoName;
-                    that.storage.mbGitHashedKey = repoData.hashedKey || "";
-                    that.storage.mbGitCurrentProjectId = repoData.projectId || "";
+                    _writeGitKey(that.storage, "mbGitRepoName", repoData.repoName);
+                    _writeGitKey(that.storage, "mbGitHashedKey", repoData.hashedKey || "");
+                    _writeGitKey(that.storage, "mbGitCurrentProjectId", repoData.projectId || "");
                     if (repoData.displayName) {
-                        that.storage.mbGitDisplayName = repoData.displayName;
+                        _writeGitKey(that.storage, "mbGitDisplayName", repoData.displayName);
                     }
                 }
             } catch (gitRestoreErr) {
@@ -613,11 +637,7 @@ class ProjectManager {
             "mbGitCurrentProjectId"
         ];
         for (const key of gitKeys) {
-            if (typeof that.storage.removeItem === "function") {
-                that.storage.removeItem(key);
-            } else {
-                delete that.storage[key];
-            }
+            _removeGitKey(that.storage, key);
         }
         if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
             that.gitDropdownUI.clearForNewProject();
