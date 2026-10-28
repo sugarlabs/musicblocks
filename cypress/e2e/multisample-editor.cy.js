@@ -220,17 +220,60 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
             slider = activity(win).logo.pitchSlider;
             slider.widgetWindow.setPosition(400, 200);
             cy.spy(activity(win), "errorMsg").as("entryError");
+            cy.spy(activity(win), "textMsg").as("entryNotice");
         });
         cy.contains("button", "New multisample instrument…").click({ force: true });
-        cy.get("@entryError").should(
-            "have.been.calledWith",
-            "Close other widgets before editing this instrument."
-        );
+        cy.get("@entryError").should("not.have.been.called");
+        cy.get("@entryNotice")
+            .should("have.been.calledOnce")
+            .and(
+                "have.been.calledWith",
+                "Close other widgets before editing this instrument.",
+                3000
+            );
+        cy.get("#printText").should("be.visible").and("contain.text", "Close other widgets");
+        cy.get("#errorText").should("not.be.visible");
+        cy.window().then(win => {
+            expect(
+                activity(win).errorMsgText.parent.visible,
+                "no duplicate canvas warning"
+            ).to.equal(false);
+        });
+        cy.get("#printText").then(notice => {
+            const bounds = notice[0].getBoundingClientRect();
+            expect(bounds.left).to.be.at.least(0);
+            expect(bounds.right).to.be.at.most(notice[0].ownerDocument.defaultView.innerWidth);
+        });
         cy.get(editor).should("not.exist");
         cy.window().then(win => {
             expect(activity(win).logo.pitchSlider).to.equal(slider);
             expect(slider.frequencies).to.deep.equal([392]);
         });
+        cy.viewport(480, 640);
+        cy.clock(Date.now(), ["setTimeout", "clearTimeout"]);
+        cy.contains("button", "New multisample instrument…").click({ force: true });
+        cy.get("#printText")
+            .should("be.visible")
+            .then(notice => {
+                const bounds = notice[0].getBoundingClientRect();
+                expect(bounds.left).to.be.at.least(0);
+                expect(bounds.right).to.be.at.most(480);
+                const hit = notice[0].ownerDocument.elementFromPoint(
+                    bounds.left + bounds.width / 2,
+                    bounds.top + bounds.height / 2
+                );
+                expect(
+                    notice[0].contains(hit),
+                    "notification is above the focused widget: " + hit?.outerHTML.slice(0, 150)
+                ).to.equal(true);
+            });
+        cy.get("@entryNotice").should("have.been.calledTwice");
+        cy.get("@entryError").should("not.have.been.called");
+        cy.screenshot("i14-widget-entry-notice", { capture: "viewport" });
+        cy.tick(3000);
+        cy.get("#printText").should("not.be.visible");
+        cy.clock().then(clock => clock.restore());
+        cy.viewport(1280, 800);
         cy.get('.windowFrame[aria-label="pitch slider"] [aria-label="Move up"]').click();
         cy.window().should(() => expect(slider.frequencies[0]).to.be.greaterThan(392));
         cy.get('.windowFrame[aria-label="pitch slider"] .wftButton.close').click();
