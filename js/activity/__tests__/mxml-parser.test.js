@@ -1163,6 +1163,30 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("falls back safely for a tied note with a non-numeric duration", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>abc</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(scorePartwise(note("start") + note("stop")));
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely for tied notes with non-finite divisions", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>1</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>Infinity</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it.each([
         ["decimal durations", 0.1, 1],
         ["decimal divisions", 1, 0.3]
@@ -1460,11 +1484,16 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
         expect(noteValues(blocks)).toEqual([[1, 4]]);
     });
 
-    it("ignores a malformed time-modification rather than producing a zero length", async () => {
-        const { blocks } = await parseAndCapture(scorePartwise(TUPLET_NOTE("C", "quarter", 0, 2)));
+    it.each([0, Infinity])(
+        "ignores malformed actual-notes %s rather than producing an invalid length",
+        async actual => {
+            const { blocks } = await parseAndCapture(
+                scorePartwise(TUPLET_NOTE("C", "quarter", actual, 2))
+            );
 
-        expect(noteValues(blocks)).toEqual([[1, 4]]);
-    });
+            expect(noteValues(blocks)).toEqual([[1, 4]]);
+        }
+    );
 
     it("does not touch a note that falls back to duration, which already has the ratio", async () => {
         const { blocks } = await parseAndCapture(

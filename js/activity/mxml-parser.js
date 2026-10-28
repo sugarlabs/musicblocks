@@ -114,7 +114,11 @@ const _timeModification = noteEl => {
     if (el === null) return [1, 1];
     const actual = Number(_text(el, "actual-notes"));
     const normal = Number(_text(el, "normal-notes"));
-    if (!(actual > 0) || !(normal > 0)) return [1, 1];
+
+    if (!Number.isFinite(actual) || !Number.isFinite(normal) || actual <= 0 || normal <= 0) {
+        return [1, 1];
+    }
+
     return [actual, normal];
 };
 
@@ -138,6 +142,7 @@ const _timeModification = noteEl => {
 function _noteDuration(noteEl, divisions) {
     const typeName = _text(noteEl, "type");
     const durationText = _text(noteEl, "duration");
+    const hasValidDivisions = Number.isFinite(divisions) && divisions > 0;
     // A whole-measure rest lasts the measure whatever <type> it is drawn
     // with: PhotoScore writes a 3/4 bar's rest as <type>whole</type> over a
     // three-beat <duration> (musescore.org/en/node/51611, the same bug in
@@ -149,13 +154,15 @@ function _noteDuration(noteEl, divisions) {
     // <duration> is what advances the position; its <type> only says how the
     // small cue is drawn.
     const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
-    const isMeasureRest = noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
+    const isMeasureRest =
+        noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
     const isCue = noteEl.querySelector(":scope > cue") !== null;
     const durationWins =
         (isMeasureRest || isCue) &&
         Number.isFinite(measureRestLength) &&
         measureRestLength > 0 &&
-        divisions > 0;
+        hasValidDivisions;
+
     if (!durationWins && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
@@ -165,9 +172,12 @@ function _noteDuration(noteEl, divisions) {
         return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
     }
 
-    if (durationText !== null && divisions > 0) {
+    if (durationText !== null && hasValidDivisions) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
-        return [Number(durationText), divisions * 4];
+        const duration = Number(durationText);
+        if (Number.isFinite(duration)) {
+            return [duration, divisions * 4];
+        }
     }
 
     // Malformed note with neither <type> nor <duration>: treat as a quarter note
