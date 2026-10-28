@@ -1297,16 +1297,23 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
     });
 
     test("doScrollXY with negative values keeps the read inside the scroll buffer", () => {
+        // The buffer gets its own context, so its reads are not mixed up with the turtle canvas
+        const bufferCtx = {
+            rect: jest.fn(),
+            fill: jest.fn(),
+            putImageData: jest.fn(),
+            getImageData: jest.fn(() => ({ data: [] }))
+        };
+        HTMLCanvasElement.prototype.getContext.mockReturnValueOnce(bufferCtx);
+
         painter.doScrollXY(-100, -100);
+        expect(painter.turtles.c1ctx).toBe(bufferCtx);
         expect(painter.turtles.canvas1.width).toBe(1600);
         expect(painter.turtles.canvas1.height).toBe(1200);
-        expect(painter.turtles.gx).toBe(500);
-        expect(painter.turtles.gy).toBe(400);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(500, 400, 800, 600);
 
         painter.doScrollXY(-1000, -1000);
-        expect(painter.turtles.gx).toBe(800);
-        expect(painter.turtles.gy).toBe(600);
-        expect(mockTurtle.ctx.getImageData).toHaveBeenLastCalledWith(800, 600, 800, 600);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(800, 600, 800, 600);
     });
 
     test("doClear with resetPosition moves the scroll back to the middle of the buffer", () => {
