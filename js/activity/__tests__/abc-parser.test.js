@@ -11,6 +11,8 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const { setupActivityAbcParser } = require("../abc-parser.js");
 const ABCJS = require("../../../lib/abc.min.js");
 const { toFraction } = require("../../utils/utils-logic.js");
@@ -322,6 +324,33 @@ describe("Test 3: Repeat bars", () => {
 // Test 4 — Triplets
 // ---------------------------------------------------------------------------
 describe("Test 4: Triplets", () => {
+    test("imports the downloadable quarter-note triplet example", async () => {
+        const abc = fs.readFileSync(
+            path.join(__dirname, "fixtures", "quarter-note-triplets.abc"),
+            "utf8"
+        );
+        const tune = ABCJS.parseOnly(abc)[0];
+        expect(tune.warnings).toBeUndefined();
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4,
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4
+        ]);
+    });
+
     test.each([
         ["quarter-note triplets", "4/4", "1/4", "(3CDE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
         ["sixteenth-note triplets", "4/4", "1/16", "(3CDE F|", [1 / 24, 1 / 24, 1 / 24, 1 / 16]],
