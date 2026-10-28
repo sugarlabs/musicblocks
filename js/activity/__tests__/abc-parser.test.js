@@ -490,7 +490,7 @@ describe("Test 4: Triplets", () => {
     test("tripletFinder does not bleed across voice boundaries while a triplet is still open", async () => {
         // Voice 1: only C D of a three-note triplet, leaving one note outstanding.
         // Voice 2: plain quarter notes only — must NOT inherit the triplet state
-        // and must produce standard denominator (4).
+        // and must produce standard denominator (4). Voice 1 resumes on the next line.
         const twoVoiceTune = makeTune({
             title: "Unclosed Triplet Bleed Test",
             staves: [
@@ -507,6 +507,18 @@ describe("Test 4: Triplets", () => {
                 }
             ]
         });
+        twoVoiceTune.lines.push({
+            staff: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [makeNote("E", 2, 0.125, { endTriplet: 3 }), makeNote("F", 3, 0.25)],
+                        [makeNote("B", 6, 0.25)]
+                    ]
+                }
+            ]
+        });
 
         const blocks = await parseAndCapture(twoVoiceTune);
 
@@ -516,7 +528,7 @@ describe("Test 4: Triplets", () => {
             const divide = byId.get(note[4][1]);
             return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
         });
-        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 4, 1 / 4]);
+        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 12, 1 / 4, 1 / 4]);
     });
 });
 
