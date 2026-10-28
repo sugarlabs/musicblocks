@@ -229,9 +229,9 @@ describe("LocalPlanet", () => {
     });
 
     describe("openProject", () => {
-        it("should set current project ID and load project from data", () => {
+        it("should set current project ID and load project from data", async () => {
             localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
-            localPlanet.openProject("testProj1");
+            await localPlanet.openProject("testProj1");
 
             expect(mockPlanet.ProjectStorage.setCurrentProjectID).toHaveBeenCalledWith("testProj1");
             expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
