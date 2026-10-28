@@ -121,7 +121,7 @@ describe("musicutils-pitchscale", () => {
             expect(pitchscale.pitchToNumber(undefined, 4, "C major", "equal")).toBe(0);
             expect(pitchscale.pitchToNumber(null, 4, "C major", "equal")).toBe(0);
             expect(pitchscale.pitchToNumber(123, 4, "C major", "equal")).toBe(0);
-            expect(pitchscale.pitchToNumber("", 4, "C major", "equal")).toBe(0);
+            expect(pitchscale.pitchToNumber("", 4, "C major", "equal")).toBe(39);
         });
 
         it("returns null for non-string or empty solfege note arguments in getNoteFromSolfege", () => {

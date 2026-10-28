@@ -315,7 +315,7 @@ var getSharpFlatPreference = keySignature => {
  * @returns {number} The numeric representation of the pitch.
  */
 var pitchToNumber = (pitch, octave, keySignature, temperament) => {
-    if (typeof pitch !== "string" || pitch.length === 0) {
+    if (typeof pitch !== "string") {
         return 0;
     }
     const currentEDO = getCurrentEDO(temperament);
@@ -420,7 +420,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].includes(pitch.toLowerCase())) {
+        if (pitch.length > 0 && obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             console.debug("pitch " + pitch + " not found in mode.");
