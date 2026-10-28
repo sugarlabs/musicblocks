@@ -74,7 +74,8 @@ const ACTION_NAME_SLOTS = {
     listen: 2,
     onbeatdo: 2,
     offbeatdo: 1,
-    everybeatdo: 1
+    everybeatdo: 1,
+    everybeatdonew: 1
 };
 
 /**

@@ -479,16 +479,22 @@ describe("renameDos", () => {
             expect(blocks.blockList[1].container.updateCache).toHaveBeenCalled();
         });
 
-        it.each(["do", "calc", "doArg", "calcArg", "action", "offbeatdo", "everybeatdo"])(
-            "renames the argument of a %s block",
-            name => {
-                blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
+        it.each([
+            "do",
+            "calc",
+            "doArg",
+            "calcArg",
+            "action",
+            "offbeatdo",
+            "everybeatdo",
+            "everybeatdonew"
+        ])("renames the argument of a %s block", name => {
+            blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
 
-                blocks.renameDos("myAction", "newAction");
+            blocks.renameDos("myAction", "newAction");
 
-                expect(blocks.blockList[1].value).toBe("newAction");
-            }
-        );
+            expect(blocks.blockList[1].value).toBe("newAction");
+        });
 
         it("leaves a value passed to a do with arguments alone", () => {
             blocks.blockList = [
@@ -2063,7 +2069,8 @@ describe("Blocks Foundation", () => {
                     "listen",
                     "onbeatdo",
                     "offbeatdo",
-                    "everybeatdo"
+                    "everybeatdo",
+                    "everybeatdonew"
                 ]) {
                     blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
                 }
@@ -2152,7 +2159,8 @@ describe("Blocks Foundation", () => {
                 ["listen", 2],
                 ["onbeatdo", 2],
                 ["offbeatdo", 1],
-                ["everybeatdo", 1]
+                ["everybeatdo", 1],
+                ["everybeatdonew", 1]
             ])("keeps each %s block on the action it called", (name, slot) => {
                 const project = actionsNamedByDefault();
                 const caller = (id, prev, next, action) => {
