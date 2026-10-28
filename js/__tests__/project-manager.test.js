@@ -389,6 +389,38 @@ describe("loadStartWrapper", () => {
 // ---------------------------------------------------------------------------
 
 describe("_loadStart", () => {
+    it("restores planet git keys through gitStorage", async () => {
+        const shared = { setItem: jest.fn(), removeItem: jest.fn() };
+        window.gitStorage = shared;
+        try {
+            const storage = {
+                currentProject: "Test",
+                removeItem: jest.fn()
+            };
+            const activity = makeActivity({
+                storage,
+                planet: {
+                    openCurrentProject: jest.fn().mockResolvedValue(null),
+                    getCurrentGitRepoData: jest.fn(() => ({
+                        repoName: "restored-repo",
+                        hashedKey: "hk",
+                        projectId: "p1",
+                        displayName: "Restored"
+                    }))
+                }
+            });
+            const pm = new ProjectManager(activity);
+            await pm._loadStart(activity);
+            expect(shared.setItem).toHaveBeenCalledWith("mbGitRepoName", "restored-repo");
+            expect(shared.setItem).toHaveBeenCalledWith("mbGitHashedKey", "hk");
+            expect(shared.setItem).toHaveBeenCalledWith("mbGitCurrentProjectId", "p1");
+            expect(shared.setItem).toHaveBeenCalledWith("mbGitDisplayName", "Restored");
+            expect(storage.mbGitRepoName).toBeUndefined();
+        } finally {
+            delete window.gitStorage;
+        }
+    });
+
     it("falls back to justLoadStart when no session data", async () => {
         const activity = makeActivity({
             storage: { currentProject: undefined, removeItem: jest.fn() }
@@ -1397,6 +1429,29 @@ describe("newProject / _afterDelete", () => {
         expect(planet.saveLocally).toHaveBeenCalled();
         expect(planet.initialiseNewProject).toHaveBeenCalled();
         expect(pm._loadStart).toHaveBeenCalled();
+    });
+
+    it("clears git keys through gitStorage when it is loaded", () => {
+        const shared = { setItem: jest.fn(), removeItem: jest.fn() };
+        window.gitStorage = shared;
+        const removeItem = jest.fn(() => {
+            throw new Error("QuotaExceededError");
+        });
+        try {
+            const activity = makeActivity({
+                planet: undefined,
+                storage: { removeItem, currentProject: "Test Project" }
+            });
+            const pm = new ProjectManager(activity);
+            jest.useFakeTimers();
+            expect(() => pm._afterDelete()).not.toThrow();
+            expect(shared.removeItem).toHaveBeenCalledWith("mbGitRepoName");
+            expect(shared.removeItem).toHaveBeenCalledWith("mbGitCurrentProjectId");
+            expect(removeItem).not.toHaveBeenCalled();
+            jest.useRealTimers();
+        } finally {
+            delete window.gitStorage;
+        }
     });
 
     it("does not use planet path when project name is 'My Project'", () => {

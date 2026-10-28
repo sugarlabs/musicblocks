@@ -27,6 +27,7 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
     beforeEach(() => {
         localStorage.clear();
+        GitDropdownUI.gitStorage._reset();
         iframeMessages = [];
 
         global.window.MBDialog = {
@@ -671,6 +672,152 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
 
             expect(prefetchSpy).toHaveBeenCalled();
+        });
+    });
+
+    // ── Storage failures ─────────────────────────────────────────────────────
+    describe("Unavailable storage", () => {
+        beforeEach(() => {
+            jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+            gitDropdown._prefetchCommits = jest.fn();
+        });
+
+        test("applies the git state and refreshes the menu when the store is full", () => {
+            expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("my-repo");
+            expect(gitDropdown._getHashedKey()).toBe("key-1");
+            expect(mockItemCreate.style.display).toBe("none");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
+            expect(mockBtn.setAttribute).toHaveBeenCalledWith(
+                "data-tooltip",
+                "My project: My Repo"
+            );
+            expect(gitDropdown._prefetchCommits).toHaveBeenCalled();
+        });
+
+        test("reads fall back to empty values when the store cannot be read", () => {
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(gitDropdown._getHashedKey()).toBe("");
+            expect(gitDropdown._getLastSavedHash()).toBe("");
+        });
+
+        test("clears a new project and stores a hash without throwing", () => {
+            gitDropdown._applyGitState("my-repo", "key-1", "My Repo");
+
+            expect(() => gitDropdown.clearForNewProject()).not.toThrow();
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(mockItemCreate.style.display).toBe("list-item");
+            expect(mockItemCommit.style.display).toBe("none");
+            expect(mockItemHistory.style.display).toBe("none");
+
+            expect(() => gitDropdown._setLastSavedHash("hash-1")).not.toThrow();
+            expect(gitDropdown._getLastSavedHash()).toBe("hash-1");
+        });
+
+        test("MB_GIT_STATE and MB_NEW_PROJECT keep the menu usable when storage throws", () => {
+            expect(() => {
+                window.dispatchEvent(
+                    new MessageEvent("message", {
+                        data: {
+                            type: "MB_GIT_STATE",
+                            repoName: "planet-project-xyz",
+                            hashedKey: "planet-key-xyz",
+                            projectName: "Planet Project",
+                            projectId: "p99"
+                        },
+                        origin: window.location.origin,
+                        source: mockIframe.contentWindow
+                    })
+                );
+            }).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("planet-project-xyz");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
+
+            expect(() => {
+                window.dispatchEvent(
+                    new MessageEvent("message", {
+                        data: {
+                            type: "MB_NEW_PROJECT"
+                        },
+                        origin: window.location.origin,
+                        source: mockIframe.contentWindow
+                    })
+                );
+            }).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("");
+            expect(mockItemCreate.style.display).toBe("list-item");
+            expect(mockItemCommit.style.display).toBe("none");
+        });
+    });
+
+    describe("Quota-exceeded writes", () => {
+        beforeEach(() => {
+            jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+            gitDropdown._prefetchCommits = jest.fn();
+        });
+
+        test("a failed persist is the repo the menu shows", () => {
+            expect(() => gitDropdown._applyGitState("my-repo", "key-1", "My Repo")).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("my-repo");
+            expect(gitDropdown._getHashedKey()).toBe("key-1");
+            expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(mockItemCreate.style.display).toBe("none");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemHistory.style.display).toBe("list-item");
+        });
+
+        test("a failed switch shows the repo we tried to store", () => {
+            Storage.prototype.setItem.mockRestore();
+            localStorage.setItem("mbGitRepoName", "old-repo");
+            expect(gitDropdown._getRepoName()).toBe("old-repo");
+            jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                throw new Error("QuotaExceededError");
+            });
+
+            expect(() => gitDropdown._applyGitState("new-repo", "key-2", "New Repo")).not.toThrow();
+
+            expect(gitDropdown._getRepoName()).toBe("new-repo");
+            expect(localStorage.getItem("mbGitRepoName")).toBe("old-repo");
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(mockItemCreate.style.display).toBe("none");
+        });
+
+        test("a second menu keeps a value storage rejected", () => {
+            gitDropdown._applyGitState("kept-repo", "key-kept", "Kept");
+
+            const second = new GitDropdownUI();
+            second.init(mockActivity);
+
+            expect(second._getRepoName()).toBe("kept-repo");
+            expect(mockItemCommit.style.display).toBe("list-item");
+        });
+
+        test("a repo written straight to localStorage is the next read", () => {
+            Storage.prototype.setItem.mockRestore();
+            gitDropdown._applyGitState("repo-a", "key-a", "Project A");
+            expect(gitDropdown._getRepoName()).toBe("repo-a");
+
+            localStorage.setItem("mbGitRepoName", "repo-b");
+
+            expect(gitDropdown._getRepoName()).toBe("repo-b");
         });
     });
 });
