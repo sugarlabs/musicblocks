@@ -75,14 +75,14 @@ class MultisampleEditor {
         const body = this.widgetWindow.getWidgetBody();
         this.root = document.createElement("div");
         this.root.dataset.multisampleEditor = "";
-        this.root.style.cssText =
-            "padding:16px;box-sizing:border-box;width:min(600px,90vw);max-height:calc(100vh - 150px);overflow:auto;color:var(--color-text);background:var(--color-background);";
         body.append(this.root);
-        const label = this.element("label", _("Instrument name"));
+        const content = this.element("div");
+        content.className = "multisample-content";
+        const label = this.element("label", _("Instrument name"), content);
         this.nameInput = document.createElement("input");
         this.nameInput.type = "text";
         this.nameInput.name = "multisample-name";
-        this.nameInput.style.cssText = "display:block;width:100%;box-sizing:border-box;";
+        this.nameInput.setAttribute("aria-describedby", "multisample-status");
         this.nameInput.value = value.name;
         this.nameInput.oninput = () => {
             this.draft.name = this.nameInput.value;
@@ -90,11 +90,18 @@ class MultisampleEditor {
             this.stop();
         };
         label.append(this.nameInput);
-        this.element("p", _("Saves to blocks in this project."));
-        this.element(
+        const header = this.element("div", "", content);
+        header.className = "multisample-recording-header";
+        this.element("h3", _("Recordings"), header);
+        this.addButton = this.button(_("Add recordings…"), () => this.chooseRecording(), header);
+        const limits = this.element(
             "p",
-            _("WAV only: up to 16 recordings, 1,000,000 bytes each, 8,000,000 bytes total.")
+            _("WAV only: up to 16 recordings, 1,000,000 bytes each, 8,000,000 bytes total."),
+            content
         );
+        limits.id = "multisample-limits";
+        limits.className = "multisample-help";
+        this.addButton.setAttribute("aria-describedby", limits.id);
         this.picker = document.createElement("input");
         this.picker.type = "file";
         this.picker.multiple = true;
@@ -115,14 +122,36 @@ class MultisampleEditor {
             this.replacing = null;
             this.picker.value = "";
         };
-        this.addButton = this.button(_("Add recordings…"), () => this.chooseRecording());
-        this.list = this.element("div");
-        this.list.style.cssText = "max-height:40vh;overflow:auto;overflow-wrap:anywhere;";
-        this.undoButton = this.button(_("Undo removal"), () => this.undoRemoval());
-        this.status = this.element("p");
+        this.list = this.element("div", "", content);
+        this.undoButton = this.button(_("Undo removal"), () => this.undoRemoval(), content);
+        this.details = this.element("p", "", content);
+        this.details.id = "multisample-details";
+        this.details.setAttribute("role", "note");
+        this.details.setAttribute("aria-label", _("Recording details"));
+        this.element(
+            "p",
+            _(
+                "Apply updates blocks in this project. Save or export the project to keep recordings."
+            ),
+            content
+        ).className = "multisample-help";
+        this.element(
+            "p",
+            _(
+                "Use with Set Instrument in ordinary note programs. Widget capture and JavaScript export are not supported yet."
+            ),
+            content
+        ).className = "multisample-help";
+        const footer = this.element("div");
+        footer.className = "multisample-footer";
+        this.status = this.element("p", "", footer);
+        this.status.id = "multisample-status";
         this.status.setAttribute("role", "status");
         this.status.setAttribute("aria-live", "polite");
-        const previewLabel = this.element("label", _("Preview pitch"));
+        this.status.setAttribute("aria-describedby", this.details.id);
+        const preview = this.element("div", "", footer);
+        preview.className = "multisample-preview";
+        const previewLabel = this.element("label", _("Preview pitch"), preview);
         this.previewPitch = this.element("input", "", previewLabel);
         this.previewPitch.type = "text";
         this.previewPitch.value = "C4";
@@ -135,17 +164,16 @@ class MultisampleEditor {
             }
         }
         this.previewPitch.oninput = () => this.stop();
-        this.previewButton = this.button(_("Preview instrument"), () => this.audition());
-        this.actions = this.element("div");
-        this.applyButton = this.button(_("Apply"), () => this.apply(), this.actions);
-        this.stopButton = this.button(_("Stop"), () => this.stop(), this.actions);
+        this.previewButton = this.button(_("Preview instrument"), () => this.audition(), preview);
+        this.previewButton.setAttribute("aria-describedby", this.details.id);
+        this.stopButton = this.button(_("Stop"), () => this.stop(), preview);
+        this.actions = this.element("div", "", footer);
+        this.actions.className = "multisample-actions";
         this.cancelButton = this.button(_("Cancel"), () => this.requestClose(), this.actions);
-        this.element(
-            "p",
-            _(
-                "Use with Set Instrument in ordinary note programs. Widget capture and JavaScript export are not supported yet. Native project save/export includes the recordings."
-            )
-        );
+        this.cancelButton.className = "cancel-button";
+        this.applyButton = this.button(_("Apply"), () => this.apply(), this.actions);
+        this.applyButton.className = "confirm-button";
+        this.applyButton.setAttribute("aria-describedby", this.details.id);
         this.root.onkeydown = event => this.handleKeyDown(event);
         this.focusHandler = () => this.widgetWindow.takeFocus();
         this.root.addEventListener("focusin", this.focusHandler);
@@ -172,6 +200,9 @@ class MultisampleEditor {
         const problems = [];
         if (!this.draft.name.trim()) problems.push(_("Enter an instrument name."));
         if (!this.draft.samples.length) problems.push(_("Add at least one recording."));
+        const summary = problems.slice();
+        let missingRoots = 0;
+        let rowErrors = 0;
         this.draft.samples.forEach((sample, index) => {
             const row = this.rows[index];
             let message = row.pending
@@ -192,20 +223,30 @@ class MultisampleEditor {
                 message = _("Recordings must have different root pitches.");
             }
             row.problem.textContent = [message, row.notice].filter(Boolean).join(" ");
+            row.problem.classList.toggle("multisample-error", Boolean(message));
             row.select.setAttribute("aria-invalid", String(Boolean(message)));
             row.select.disabled = Boolean(locked || this.invalid || !sample.data);
             row.listen.disabled = Boolean(locked || this.invalid || !sample.data || row.pending);
             row.replace.disabled = row.remove.disabled = Boolean(locked || this.invalid);
-            if (message) problems.push(sample.name + ": " + message);
+            if (message) {
+                problems.push(sample.name + ": " + message);
+                if (!row.pending && !row.error && !sample.root) missingRoots++;
+                else rowErrors++;
+            }
         });
         if (!problems.length) {
             try {
                 validateMultisample(this.draft);
             } catch (error) {
                 problems.push(error.message);
+                summary.push(error.message);
             }
         }
         this.problem = problems.join(" ");
+        if (missingRoots)
+            summary.push(_("Choose a root pitch for each recording.") + " (" + missingRoots + ")");
+        if (rowErrors) summary.push(_("Review recording errors.") + " (" + rowErrors + ")");
+        this.nameInput.setAttribute("aria-invalid", String(!this.draft.name.trim()));
         this.applyButton.disabled = this.previewButton.disabled = Boolean(
             this.problem || locked || this.invalid
         );
@@ -218,9 +259,14 @@ class MultisampleEditor {
         this.undoButton.title = this.undoButton.disabled
             ? _("Undo removal would exceed the recording count or byte limit.")
             : "";
+        this.details.textContent = this.notice || "";
         this.status.textContent =
-            this.invalid || this.busy || [this.notice, this.problem].filter(Boolean).join(" ");
-        this.applyButton.title = this.status.textContent;
+            this.invalid ||
+            this.busy ||
+            [this.notice ? _("Review recording details above.") : "", ...summary]
+                .filter(Boolean)
+                .join(" ");
+        this.applyButton.title = this.invalid || this.busy || this.problem || this.notice || "";
         this.previewButton.title = this.problem || this.invalid || "";
         this.stopButton.hidden = !this.busy || this.publishing || Boolean(this.work?.uploads);
         this.cancelButton.disabled = Boolean(this.publishing);
@@ -228,14 +274,18 @@ class MultisampleEditor {
 
     renderRows() {
         this.list.replaceChildren();
+        if (!this.draft.samples.length)
+            this.element("p", _("Add WAV recordings, then choose their root pitches."), this.list);
         this.draft.samples.forEach((sample, index) => {
             const row = this.rows[index];
             const section = this.element("div", "", this.list);
-            section.style.cssText = "padding:8px 0;border-bottom:1px solid currentColor;";
-            this.element("p", sample.name, section);
-            const label = this.element("label", _("Root pitch") + " — " + sample.name, section);
+            section.className = "multisample-recording";
+            this.element("p", sample.name, section).className = "multisample-filename";
+            const controls = this.element("div", "", section);
+            controls.className = "multisample-row-controls";
+            const label = this.element("label", _("Root pitch"), controls);
             const select = this.element("select", "", label);
-            select.style.cssText = "display:block;width:10em;max-width:100%;";
+            select.setAttribute("aria-label", _("Root pitch") + " — " + sample.name);
             this.element("option", _("Choose root…"), select).value = "";
             for (let octave = 1; octave <= 8; octave++) {
                 const group = this.element("optgroup", "", select);
@@ -275,13 +325,13 @@ class MultisampleEditor {
             row.problem = this.element("p", "", section);
             row.problem.id = "multisample-problem-" + index;
             select.setAttribute("aria-describedby", row.problem.id);
-            row.listen = this.button(_("Listen"), () => this.audition(row), section);
+            row.listen = this.button(_("Listen"), () => this.audition(row), controls);
             row.listen.setAttribute("aria-label", _("Listen to recording") + " — " + sample.name);
             row.listen.setAttribute("aria-describedby", row.problem.id);
-            row.replace = this.button(_("Replace…"), () => this.chooseRecording(row), section);
+            row.replace = this.button(_("Replace…"), () => this.chooseRecording(row), controls);
             row.replace.setAttribute("aria-label", _("Replace recording") + " — " + sample.name);
             row.replace.setAttribute("aria-describedby", row.problem.id);
-            row.remove = this.button(_("Remove"), () => this.removeRecording(row), section);
+            row.remove = this.button(_("Remove"), () => this.removeRecording(row), controls);
             row.remove.setAttribute("aria-label", _("Remove recording") + " — " + sample.name);
         });
         this.update();
@@ -381,7 +431,7 @@ class MultisampleEditor {
         this.renderRows();
         for (const { row, sample, file } of work.uploads) {
             if (!row.pending) continue;
-            this.busy = _("Reading recording…") + " " + file.name;
+            this.busy = _("Reading recording…");
             this.update();
             try {
                 const data = await this.readRecording(file, work);
@@ -408,7 +458,7 @@ class MultisampleEditor {
         const sample = this.draft.samples[this.rows.indexOf(row)];
         const work = { uploads: [] };
         this.work = work;
-        this.busy = _("Reading recording…") + " " + file.name;
+        this.busy = _("Reading recording…");
         this.update();
         try {
             const error = this.uploadSizeError(
@@ -551,8 +601,7 @@ class MultisampleEditor {
             this.work = work;
             const current = () =>
                 this.isCurrent() && this.work === work && work.revision === this.draftRevision;
-            this.busy =
-                _("Preparing audition…") + " " + (row ? snapshot.samples[0].name : snapshot.name);
+            this.busy = _("Preparing audition…");
             this.update();
             work.timeout = setTimeout(() => {
                 if (!current()) return;
@@ -579,8 +628,7 @@ class MultisampleEditor {
                 synth.setVolume("multisample-editor", alias, 50);
                 sampler.triggerAttack(pitch);
                 clearTimeout(work.timeout);
-                this.busy =
-                    _("Playing audition…") + " " + (row ? snapshot.samples[0].name : snapshot.name);
+                this.busy = _("Playing audition…");
                 const finishAfter = remaining => {
                     const delay = Math.min(remaining, 2147483647);
                     work.timeout = setTimeout(() => {
@@ -666,9 +714,9 @@ class MultisampleEditor {
             if (this.work === work && !this.closed) {
                 this.busy = null;
                 this.publishing = false;
+                if (error.name !== "AbortError") this.notice = error.message;
                 this.update();
                 if (error.name !== "AbortError") {
-                    this.status.textContent = error.message;
                     const index = this.draft.samples.findIndex(sample =>
                         error.message.endsWith(" / " + sample.name)
                     );
@@ -806,7 +854,8 @@ class MultisampleEditor {
             this.choice.querySelector("button").focus();
             return;
         }
-        this.choice = this.element("div");
+        this.choice = this.element("div", "", this.actions.parentElement);
+        this.choice.className = "multisample-close-choice";
         this.choice.setAttribute("role", "alertdialog");
         this.choice.setAttribute("aria-label", _("Discard changes?"));
         this.element("p", _("Discard changes?"), this.choice);
@@ -857,6 +906,7 @@ class MultisampleEditor {
         this.initial = null;
         this.origin = null;
         this.root = this.list = this.nameInput = this.picker = this.actions = this.status = null;
+        this.details = null;
         this.previewPitch = this.previewButton = null;
         this.applyButton =
             this.stopButton =
