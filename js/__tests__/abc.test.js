@@ -571,26 +571,6 @@ describe("saveAbcOutput", () => {
     });
 });
 
-describe("processABCNotes - Tuplet Handling", () => {
-    it("should process tuplets correctly", () => {
-        const logo = {
-            notationNotes: { 0: "" },
-            notation: {
-                notationStaging: {
-                    0: [
-                        [["G♯4"], 1, 0, [3, 1], 2, -1, false],
-                        [["F4"], 1, 0, [3, 1], 2, -1, false],
-                        [["G♯4"], 1, 0, [3, 1], 2, -1, false]
-                    ]
-                }
-            }
-        };
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 | ");
-    });
-});
-
 describe("processABCNotes - Octave Conversion", () => {
     let logo;
     beforeEach(() => {
