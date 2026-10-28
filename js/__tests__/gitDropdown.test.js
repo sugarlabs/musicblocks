@@ -441,6 +441,103 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
     });
 
     // ── 3. Save a Moment Flow (Online & Offline) ────────────────────────────
+    describe("Repo name from the project name (_sanitizeRepoName)", () => {
+        test("keeps latin names as before", () => {
+            expect(gitDropdown._sanitizeRepoName("My Song!")).toBe("my-song");
+        });
+
+        test("drops accents instead of splitting the word", () => {
+            expect(gitDropdown._sanitizeRepoName("Canción")).toBe("cancion");
+            expect(gitDropdown._sanitizeRepoName("Café Crème")).toBe("cafe-creme");
+        });
+
+        test("maps letters that NFKD does not split", () => {
+            expect(gitDropdown._sanitizeRepoName("Łódź")).toBe("lodz");
+            expect(gitDropdown._sanitizeRepoName("Ørsted")).toBe("orsted");
+            expect(gitDropdown._sanitizeRepoName("Straße")).toBe("strasse");
+            expect(gitDropdown._sanitizeRepoName("Đorđe")).toBe("dorde");
+            expect(gitDropdown._sanitizeRepoName("Æsir")).toBe("aesir");
+            expect(gitDropdown._sanitizeRepoName("Cœur")).toBe("coeur");
+        });
+
+        test("returns an empty string for names with no latin letters or digits", () => {
+            expect(gitDropdown._sanitizeRepoName("私の曲")).toBe("");
+            expect(gitDropdown._sanitizeRepoName("Мой проект")).toBe("");
+        });
+
+        test("gives the same result for the same name", () => {
+            expect(gitDropdown._sanitizeRepoName("Łódź Song")).toBe(
+                gitDropdown._sanitizeRepoName("Łódź Song")
+            );
+        });
+
+        test("never ends with a dash after cutting to 100 characters", () => {
+            const slug = gitDropdown._sanitizeRepoName("a".repeat(99) + " b");
+            expect(slug.length).toBeLessThanOrEqual(100);
+            expect(slug.endsWith("-")).toBe(false);
+        });
+    });
+
+    describe("Fallback repo name (_fallbackRepoName)", () => {
+        test("gives two different names even in the same millisecond", () => {
+            const now = jest.spyOn(Date, "now").mockReturnValue(1000);
+            const random = jest.spyOn(Math, "random");
+            random.mockReturnValueOnce(0.1).mockReturnValueOnce(0.2);
+
+            const first = gitDropdown._fallbackRepoName();
+            const second = gitDropdown._fallbackRepoName();
+
+            expect(first).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(second).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(first).not.toBe(second);
+            now.mockRestore();
+            random.mockRestore();
+        });
+
+        test("never ends with a dash, even if Math.random returns 0", () => {
+            const random = jest.spyOn(Math, "random").mockReturnValue(0);
+            expect(gitDropdown._fallbackRepoName()).toMatch(/^my-music-project-[a-z0-9]+-0000$/);
+            random.mockRestore();
+        });
+
+        test("is used by the create flow when the name has no latin letters", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("私の曲")
+                .mockResolvedValueOnce("my description");
+            jest.spyOn(gitDropdown, "_fallbackRepoName").mockReturnValue("fallback-name");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(create).toHaveBeenCalledWith("fallback-name", "私の曲", "my description");
+        });
+
+        test("is used when only digits are left of a non-latin name", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("私の曲 1")
+                .mockResolvedValueOnce("my description");
+            jest.spyOn(gitDropdown, "_fallbackRepoName").mockReturnValue("fallback-name");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(create).toHaveBeenCalledWith("fallback-name", "私の曲 1", "my description");
+        });
+
+        test("is not used by the create flow for latin names", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("My Song")
+                .mockResolvedValueOnce("my description");
+            const fallback = jest.spyOn(gitDropdown, "_fallbackRepoName");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(fallback).not.toHaveBeenCalled();
+            expect(create).toHaveBeenCalledWith("my-song", "My Song", "my description");
+        });
+    });
+
     describe("Save a Moment (_doCommit)", () => {
         test("commits to backend online and updates session hashes", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
