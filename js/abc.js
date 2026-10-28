@@ -255,6 +255,9 @@ class AbcExporter {
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
         this.keyAlterations = keyAlterations;
+        // The voice's K: field: the key it starts in, or one set before its first note.
+        this.startKeyField = keyField;
+        this.hasNotes = false;
         this.accidentalsInForce = {};
         this.pitchesInDoubt = new Set();
     }
@@ -604,7 +607,13 @@ class AbcExporter {
             case "key": {
                 const changed = abcKeySignature(`${this.staging[i + 1]} ${this.staging[i + 2]}`);
                 if (changed.field !== this.keyField) {
-                    this.__pushField(`[K:${changed.field}]`);
+                    if (this.hasNotes) {
+                        // A key change on a barline belongs to the measure after it.
+                        if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
+                        this.__pushField(`[K:${changed.field}]`);
+                    } else {
+                        this.startKeyField = changed.field;
+                    }
                     this.keyField = changed.field;
                     this.keyAlterations = changed.alterations;
                 }
@@ -719,6 +728,7 @@ class AbcExporter {
 
     processNoteArray(obj, i) {
         this.firstMeasure = false;
+        this.hasNotes = true;
         const inChordContinuation =
             obj[NOTATIONINSIDECHORD] > 0 &&
             i > 0 &&
@@ -870,13 +880,17 @@ class AbcExporter {
  * Processes musical notes and converts them into ABC notation format.
  * @param {object} logo - The logo object containing notationNotes to update.
  * @param {string} turtle - The identifier for the turtle.
- * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
- *   pitches are absolute, so this is what the accidentals are written against.
+ * @param {string} [keySignature] - the key the turtle starts in, e.g. "G major". Staged
+ *   pitches are absolute, so accidentals are written against it until a staged key change.
  * @param {string} [voiceId] - the ABC voice these notes belong to. Staged voice
  *   changes are written inside it, so they cannot move notes to another turtle.
+ * @returns {string} the voice's K: field: the starting key, or a key set before its
+ *   first note.
  */
 const processABCNotes = function (logo, turtle, keySignature = "C major", voiceId = "") {
-    new AbcExporter(logo, turtle, keySignature, voiceId).process();
+    const exporter = new AbcExporter(logo, turtle, keySignature, voiceId);
+    exporter.process();
+    return exporter.startKeyField;
 };
 
 /**
@@ -897,10 +911,11 @@ const saveAbcOutput = function (activity) {
             continue;
         }
 
-        const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
         voice += 1;
         const voiceId = "t" + voice;
-        processABCNotes(activity.logo, t, keySignature, voiceId);
+        // Every turtle starts a run in C major (Singer.reset()); its staged key changes
+        // follow. The turtle's keySignature is the key it ended in.
+        const keyField = processABCNotes(activity.logo, t, "C major", voiceId);
         const notes = activity.logo.notationNotes[t];
         // A V: or K: field is only a field at the start of a line.
         if (!atLineStart) {
@@ -908,7 +923,7 @@ const saveAbcOutput = function (activity) {
         }
         // Without a V: field every turtle lands in one voice, one after another.
         outputParts.push("V:" + voiceId + "\n");
-        outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
+        outputParts.push("K:" + keyField + "\n");
         outputParts.push(notes);
         atLineStart = notes === "" || notes.endsWith("\n");
     }

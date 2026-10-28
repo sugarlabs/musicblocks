@@ -466,14 +466,89 @@ describe("saveAbcOutput", () => {
     });
 
     it("should generate the correct ABC notation output with key signature replacements", () => {
-        activity.turtles.ithTurtle = () => ({
-            singer: { keySignature: "B ♭ major" }
-        });
+        // A key set before the first note is the key the voice starts in.
+        activity.logo.notation.notationStaging[0].unshift("key", "B♭", "major");
 
         const result = saveAbcOutput(activity);
 
         expect(result).toContain("K:Bb\n");
+        expect(result).not.toContain("[K:");
         expect(result).toContain("b");
+    });
+
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    it("starts in C major and writes a later key change where it happens", () => {
+        // The turtle's keySignature is the key the run ended in.
+        activity.turtles.ithTurtle = () => ({ singer: { keySignature: "D major" } });
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("C5")
+        ];
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("V:t1\nK:C\nC4 F4 [K:D]F4 =c4 ");
+    });
+
+    it("writes a key change on a barline after the barline", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("A4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nC4 D4 E4 F4 | [K:D]F4 A4 ");
+    });
+
+    it("writes a return to the starting key", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            "key",
+            "C",
+            "major",
+            note("F4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nF4 [K:D]F4 [K:C]F4 ");
+    });
+
+    it("writes each voice's own starting key", () => {
+        activity.logo.notationNotes[1] = "";
+        activity.logo.notation.notationStaging = {
+            0: ["key", "G", "major", note("F♯4"), note("G4")],
+            1: [note("B♭4"), "key", "F", "major", note("B♭4")]
+        };
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("V:t1\nK:G\nF4 G4 ");
+        expect(result).toContain("V:t2\nK:C\n_B4 [K:F]B4 ");
+    });
+
+    it("returns the voice's starting key from processABCNotes", () => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: ["key", "E♭", "major", note("E♭4")] } }
+        };
+
+        expect(processABCNotes(logo, "0")).toBe("Eb");
+        expect(logo.notationNotes["0"]).toBe("E4 ");
     });
 });
 
