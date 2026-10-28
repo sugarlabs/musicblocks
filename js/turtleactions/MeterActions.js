@@ -348,7 +348,7 @@ function setupMeterActions(activity) {
         }
 
         static getNotesPlayed(noteValue, turtle) {
-            if (noteValue === null || noteValue === 0) return 0;
+            if (!Number.isFinite(noteValue) || noteValue <= 0) return 0;
 
             const tur = activity.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / noteValue;
