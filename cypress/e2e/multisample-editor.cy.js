@@ -187,6 +187,197 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         })
     );
 
+    for (const width of [1280, 480, 360, 320]) {
+        it(
+            "keeps actions visible with one content scroller at " + width + "px",
+            { viewportWidth: width, viewportHeight: 800 },
+            () => {
+                cy.contains("button", "New multisample instrument…").click();
+                cy.get(editor + ' input[name="multisample-name"]').should("be.focused");
+                cy.contains(editor + " button", "Add recordings…").focus();
+                cy.contains(editor + " button", "Add recordings…").should("be.focused");
+                cy.get(editor + ' input[type="file"]').selectFile(
+                    Array.from({ length: 16 }, (_, index) => ({
+                        contents: wav(),
+                        fileName:
+                            index === 0
+                                ? "Cello-" + "sustained".repeat(20) + ".wav"
+                                : index + ".wav",
+                        mimeType: "audio/wav"
+                    })),
+                    { force: true }
+                );
+                cy.get(editor + " select")
+                    .first()
+                    .should("be.focused");
+                cy.get(editor + " select").each(($select, index) => {
+                    cy.wrap($select).select(index + 1);
+                });
+                cy.get(editor).should($root => {
+                    const root = $root[0];
+                    expect(root.scrollWidth).to.be.at.most(root.clientWidth);
+                    expect(
+                        root.closest(".windowFrame").getBoundingClientRect().right
+                    ).to.be.at.most(width);
+                    for (const select of root.querySelectorAll("select")) {
+                        expect(select.labels).to.have.length(1);
+                        expect(select.getAttribute("aria-label")).to.include("Root pitch — ");
+                        expect(
+                            select.ownerDocument.getElementById(
+                                select.getAttribute("aria-describedby")
+                            )
+                        ).to.exist;
+                    }
+                    for (const text of ["Preview instrument", "Cancel", "Apply"]) {
+                        const button = [...root.querySelectorAll("button")].find(
+                            b => b.textContent === text
+                        );
+                        const bounds = button.getBoundingClientRect();
+                        expect(button.disabled, text).to.equal(false);
+                        expect(bounds.height, text).to.be.at.least(44);
+                        expect(bounds.bottom, text).to.be.at.most(800);
+                        expect(bounds.top, text).to.be.at.least(0);
+                    }
+                });
+                cy.get(editor + " .multisample-content").scrollTo("bottom");
+                cy.get(editor).should($root => {
+                    expect($root[0].scrollTop).to.equal(0);
+                    const content = $root[0].querySelector(".multisample-content");
+                    expect(content.scrollTop).to.be.greaterThan(0);
+                    expect(content.scrollWidth).to.be.at.most(content.clientWidth);
+                    expect(
+                        activity($root[0].ownerDocument.defaultView).multisampleEditor.list
+                            .scrollTop
+                    ).to.equal(0);
+                });
+                cy.contains(editor + " button", /^Cancel$/).click();
+                cy.contains(editor + ' [role="alertdialog"] button', "Keep editing").should(
+                    "be.focused"
+                );
+                cy.contains(editor + ' [role="alertdialog"] button', "Keep editing").click();
+                cy.get(editor + ' input[name="multisample-name"]').should("be.focused");
+            }
+        );
+    }
+
+    it(
+        "keeps failed recordings and long rejected-file details scrollable without hiding actions",
+        { viewportWidth: 480, viewportHeight: 800 },
+        () => {
+            cy.contains("button", "New multisample instrument…").click();
+            const rejected = "rejected-" + "recording".repeat(20) + ".wav";
+            cy.get(editor + ' input[type="file"]').selectFile(
+                Array.from({ length: 32 }, (_, index) => ({
+                    contents: Cypress.Buffer.from("not a WAV"),
+                    fileName: index < 16 ? "broken-" + index + ".wav" : index + rejected,
+                    mimeType: "audio/wav"
+                })),
+                { force: true }
+            );
+            cy.window().should(win => expect(activity(win).multisampleEditor.busy).to.equal(null));
+            cy.get(editor + ' [role="status"]').should(
+                "contain.text",
+                "Review recording errors. (16)"
+            );
+            cy.get(editor + " #multisample-details").should("contain.text", "31" + rejected);
+            cy.get(editor + " .multisample-content").scrollTo("bottom");
+            cy.get(editor).should($root => {
+                const root = $root[0];
+                expect(root.scrollWidth).to.be.at.most(root.clientWidth);
+                expect(root.querySelector(".multisample-content").clientHeight).to.be.greaterThan(
+                    100
+                );
+                for (const text of ["Preview instrument", "Cancel", "Apply"]) {
+                    const button = [...root.querySelectorAll("button")].find(
+                        b => b.textContent === text
+                    );
+                    expect(button.getBoundingClientRect().bottom, text).to.be.at.most(800);
+                }
+            });
+            cy.contains(editor + " button", /^Cancel$/).click();
+            cy.contains(editor + ' [role="alertdialog"] button', "Keep editing").should(
+                "be.focused"
+            );
+        }
+    );
+
+    for (const theme of ["light", "dark", "highcontrast"]) {
+        it("keeps native controls, focus and text legible in " + theme, () => {
+            cy.window().then(win => {
+                win.document.body.classList.remove("dark", "highcontrast");
+                if (theme !== "light") win.document.body.classList.add(theme);
+            });
+            cy.contains("button", "New multisample instrument…").click();
+            const luminance = color => {
+                const channels = color
+                    .match(/[\d.]+/g)
+                    .slice(0, 3)
+                    .map(Number)
+                    .map(c => {
+                        const value = c / 255;
+                        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+                    });
+                return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+            };
+            const checkContrast = () =>
+                cy.get(editor).should($root => {
+                    const win = $root[0].ownerDocument.defaultView;
+                    for (const control of $root[0].querySelectorAll(
+                        "button,input:not([type=file]),select"
+                    )) {
+                        if (control.hidden) continue;
+                        const style = win.getComputedStyle(control);
+                        const text = luminance(style.color);
+                        const background = luminance(style.backgroundColor);
+                        expect(
+                            (Math.max(text, background) + 0.05) /
+                                (Math.min(text, background) + 0.05),
+                            control.textContent || control.name
+                        ).to.be.at.least(4.5);
+                    }
+                });
+            checkContrast();
+            upload();
+            cy.get(editor + " select").should("have.attr", "aria-invalid", "true");
+            cy.get(editor + " select").should($select => {
+                const style = $select[0].ownerDocument.defaultView.getComputedStyle($select[0]);
+                expect(style.outlineStyle).not.to.equal("none");
+                expect(parseFloat(style.outlineWidth)).to.be.at.least(2);
+            });
+            checkContrast();
+            cy.get(editor + " select").select("C3");
+            checkContrast();
+            cy.get(editor + " select").type("{esc}");
+            cy.get(editor).should("be.visible");
+            cy.get(editor + ' [role="alertdialog"]').should("not.exist");
+        });
+    }
+
+    it(
+        "keeps all actions reachable in a short viewport",
+        { viewportWidth: 480, viewportHeight: 400 },
+        () => {
+            cy.contains("button", "New multisample instrument…").click();
+            upload();
+            cy.get(editor + " select").select("C3");
+            cy.contains(editor + " button", /^Apply$/)
+                .scrollIntoView()
+                .should("be.visible");
+            cy.get(editor).should($root => {
+                const win = $root[0].ownerDocument.defaultView;
+                expect(win.getComputedStyle($root[0]).overflowY).to.equal("auto");
+                expect(
+                    win.getComputedStyle($root[0].querySelector(".multisample-content")).overflowY
+                ).to.equal("visible");
+                expect($root[0].scrollWidth).to.be.at.most($root[0].clientWidth);
+            });
+            cy.contains(editor + " button", /^Cancel$/).click();
+            cy.contains(editor + ' [role="alertdialog"] button', "Keep editing")
+                .should("be.focused")
+                .and("be.visible");
+        }
+    );
+
     it("requires closing Pitch Slider before editing and preserves its independent controls", () => {
         let slider;
         cy.window().then(win => {
@@ -402,7 +593,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.get(editor + ' button[aria-label^="Listen to recording"]')
             .first()
             .click();
-        cy.get(editor + ' [role="status"]')
+        cy.get(editor + " #multisample-details")
             .should("contain.text", "low.wav")
             .and("contain.text", "Unable to decode");
         cy.window().then(win => expect(activity(win).logo.synth.multisampleBytes).to.equal(0));
@@ -483,7 +674,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
             .eq(2)
             .select("C4");
         cy.contains(editor + " button", /^Apply$/).should("be.disabled");
-        cy.contains(editor + ' [role="status"]', "broken.wav");
+        cy.contains(editor, "broken.wav");
         cy.window().then(win =>
             expect(activity(win).multisampleEditor.draft.samples.map(s => s.name)).to.deep.equal([
                 "same.wav",
@@ -559,7 +750,10 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.get(editor + " select").should("have.value", "C3");
         cy.get(editor + ' button[aria-label^="Replace recording"]').click();
         upload(Cypress.Buffer.alloc(16), "audio/wav");
-        cy.contains(editor + ' [role="status"]', "WAV");
+        cy.contains(
+            editor + " #multisample-details",
+            "Recordings must contain embedded WAV audio."
+        );
         cy.window().then(win =>
             expect(activity(win).multisampleEditor.draft).to.deep.equal(original)
         );
@@ -567,7 +761,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         upload(Cypress.Buffer.from("RIFF0000WAVE"), "audio/wav");
         cy.get(editor + " select").should("have.value", "C3");
         cy.contains(editor + " button", /^Apply$/).click();
-        cy.contains(editor + ' [role="status"]', "Unable to decode", { timeout: 40000 });
+        cy.contains(editor, "Unable to decode", { timeout: 40000 });
         cy.get(editor + ' button[aria-label^="Replace recording"]').should("be.focused");
         cy.contains(editor + " button", /^Cancel$/)
             .should("not.be.disabled")
@@ -602,7 +796,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
             .should("have.length", 16)
             .first()
             .should("not.be.disabled");
-        cy.contains(editor + ' [role="status"]', "16.wav");
+        cy.contains(editor, "16.wav");
         cy.contains(editor + " button", "Add recordings…").should("be.disabled");
         cy.get(editor + " select").each(($select, index) =>
             cy
@@ -653,7 +847,7 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         cy.contains(editor + " button", "Keep editing")
             .should("be.focused")
             .click();
-        cy.contains(editor + ' [role="status"]', "Reading cancelled");
+        cy.contains(editor, "Reading cancelled");
         cy.contains(editor + " button", /^Apply$/).should("be.disabled");
         cy.contains(editor + " button", /^Cancel$/).click();
         cy.contains(editor + " button", "Discard changes").click();
@@ -1021,7 +1215,10 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         });
         cy.get(editor).should("be.visible").screenshot("i09-small-editor");
         cy.contains(editor + " button", /^Apply$/).click();
-        cy.get(editor + ' [role="status"]').should("contain.text", "Unable to decode recording");
+        cy.get(editor + " #multisample-details").should(
+            "contain.text",
+            "Unable to decode recording"
+        );
         cy.window().then(win => {
             expect(owners(win)).to.have.length(0);
             expect(activity(win).logo.synth.multisampleBytes).to.equal(0);
