@@ -193,6 +193,8 @@ describe("Focused multisample authoring", () => {
 
         test("prepares the whole instrument before one selected note and releases naturally", async () => {
             const session = open();
+            session.nameInput.value = "Long instrument name ".repeat(1000);
+            session.nameInput.dispatchEvent(new Event("input"));
             const last = deferred();
             decode.mockResolvedValueOnce(pcm()).mockReturnValueOnce(last.promise);
             expect(session.previewPitch.value).toBe("C4");
@@ -202,10 +204,12 @@ describe("Focused multisample authoring", () => {
             expect(nodes).toHaveLength(0);
             expect(synth.multisampleBytes).toBe(32000);
             expect(button("Stop").hidden).toBe(false);
+            expect(session.status.textContent).toBe("Preparing audition…");
             last.resolve(pcm());
             await pending;
             expect(nodes).toHaveLength(1);
             expect(nodes[0].triggerAttack).toHaveBeenCalledWith("D4");
+            expect(session.status.textContent).toBe("Playing audition…");
             expect(synth.multisampleBytes).toBe(64000);
             jest.advanceTimersByTime(1001);
             expect(nodes[0].dispose).toHaveBeenCalledTimes(1);
@@ -266,7 +270,7 @@ describe("Focused multisample authoring", () => {
             await button("Preview instrument").onclick();
             expect(nodes).toHaveLength(0);
             expect(synth.multisampleBytes).toBe(0);
-            expect(session.status.textContent).toContain("Original / high.wav");
+            expect(session.details.textContent).toContain("Original / high.wav");
             expect(JSON.stringify(session.owner.value)).toBe(saved);
             expect(button("Preview instrument").disabled).toBe(false);
             await button("Preview instrument").onclick();
@@ -281,7 +285,7 @@ describe("Focused multisample authoring", () => {
             await flush();
             jest.advanceTimersByTime(30000);
             await pending;
-            expect(session.status.textContent).toContain("timed out: Original");
+            expect(session.details.textContent).toContain("timed out: Original");
             expect(synth.multisampleBytes).toBe(0);
             await button("Listen").onclick();
             old.resolve(pcm());
@@ -301,7 +305,7 @@ describe("Focused multisample authoring", () => {
             const preparing = synth.__createSynth(1, partial, partial, {});
             await flush();
             await button("Listen").onclick();
-            expect(session.status.textContent).toContain("memory limit");
+            expect(session.details.textContent).toContain("memory limit");
             expect(synth.multisampleBytes).toBe(64 * 1024 * 1024);
             expect(readyNode.dispose).not.toHaveBeenCalled();
             synth.releaseMultisample(1, partial);
@@ -336,7 +340,7 @@ describe("Focused multisample authoring", () => {
             const session = open();
             session.previewPitch.value = "not a pitch";
             await button("Preview instrument").onclick();
-            expect(session.status.textContent).toContain("Original / not a pitch");
+            expect(session.details.textContent).toContain("Original / not a pitch");
             expect(nodes[0].triggerAttack).not.toHaveBeenCalled();
             expect(synth.multisampleBytes).toBe(0);
             session.previewPitch.value = "C4";
@@ -411,7 +415,7 @@ describe("Focused multisample authoring", () => {
             selects[index].dispatchEvent(new Event("change"));
         }
         expect(button("Apply").disabled).toBe(true);
-        expect(session.status.textContent).toContain("broken.wav");
+        expect(session.root.textContent).toContain("broken.wav");
         document.querySelectorAll('button[aria-label^="Remove"]')[1].click();
         expect(button("Apply").disabled).toBe(false);
         button("Undo removal").click();
@@ -478,7 +482,9 @@ describe("Focused multisample authoring", () => {
             expect(activity.multisampleEditor.draft.samples).toEqual([
                 { name: "same.wav", root: "", data: "" }
             ]);
-            expect(document.querySelector('[role="status"]').textContent).toContain("same.wav");
+            expect(document.querySelector("[data-multisample-editor]").textContent).toContain(
+                "same.wav"
+            );
             expect(button("Apply").disabled).toBe(true);
         }
     );
@@ -504,7 +510,7 @@ describe("Focused multisample authoring", () => {
         name.value = "Edited";
         name.dispatchEvent(new Event("input"));
         const applying = button("Apply").onclick();
-        expect(document.querySelector('[role="status"]').textContent).toContain(
+        expect(document.querySelector("[data-multisample-editor]").textContent).toContain(
             "Checking recordings"
         );
         expect(owner.value.name).toBe("Original");
@@ -543,15 +549,17 @@ describe("Focused multisample authoring", () => {
         document.querySelector('button[aria-label^="Replace"]').click();
         await upload(new Uint8Array(16), "audio/wav", "bad.wav");
         expect(JSON.stringify(session.draft)).toBe(original);
-        expect(session.status.textContent).toContain("bad.wav");
+        expect(session.details.textContent).toContain("bad.wav");
         expect(button("Apply").disabled).toBe(false);
         document.querySelector('button[aria-label^="Replace"]').click();
         await upload(wav(), "audio/vnd.wave", "new.wav");
         expect(session.draft.samples[0]).toEqual({ ...value().samples[0], name: "new.wav" });
         expect(document.querySelector("select").value).toBe("C3");
-        expect(document.querySelector("select").parentElement.parentElement.textContent).toContain(
-            "Root kept"
-        );
+        expect(
+            document.getElementById(
+                document.querySelector("select").getAttribute("aria-describedby")
+            ).textContent
+        ).toContain("Root kept");
         expect(owner.value).toEqual(value());
         button("Cancel").click();
         button("Discard changes").click();
@@ -570,9 +578,11 @@ describe("Focused multisample authoring", () => {
         expect(document.querySelector("select").value).toBe("");
         expect(document.activeElement).toBe(document.querySelector("select"));
         expect(button("Apply").disabled).toBe(true);
-        expect(document.querySelector("select").parentElement.parentElement.textContent).toContain(
-            "Root kept"
-        );
+        expect(
+            document.getElementById(
+                document.querySelector("select").getAttribute("aria-describedby")
+            ).textContent
+        ).toContain("Root kept");
     });
 
     test("accepts exact original-byte boundaries in order and retains an over-budget placeholder", async () => {
@@ -592,8 +602,8 @@ describe("Focused multisample authoring", () => {
             session.draft.samples.slice(0, 8).every(sample => sample.data.length > 1000000)
         ).toBe(true);
         expect(session.draft.samples[8]).toEqual({ name: "part8.wav", root: "", data: "" });
-        expect(session.status.textContent).toContain("part8.wav");
-        expect(session.status.textContent).toContain("size limit");
+        expect(session.root.textContent).toContain("part8.wav");
+        expect(session.root.textContent).toContain("size limit");
         expect(button("Apply").disabled).toBe(true);
         document.querySelectorAll('button[aria-label^="Remove"]')[0].click();
         // A replacement must account for the retained bank while excluding its own old bytes.
@@ -623,9 +633,7 @@ describe("Focused multisample authoring", () => {
         document.querySelector('button[aria-label^="Remove"]').click();
         expect(document.activeElement).toBe(button("Add recordings…"));
         expect(button("Apply").disabled).toBe(true);
-        expect(activity.multisampleEditor.status.textContent).toContain(
-            "Add at least one recording"
-        );
+        expect(activity.multisampleEditor.root.textContent).toContain("Add at least one recording");
         button("Undo removal").click();
         expect(activity.multisampleEditor.draft.samples.map(sample => sample.name)).toEqual([
             "last.wav"
@@ -670,8 +678,8 @@ describe("Focused multisample authoring", () => {
             expect(button("Keep editing")).toBe(document.activeElement);
             button("Keep editing").click();
             await pending;
-            expect(session.status.textContent).toContain("16.wav");
-            expect(session.status.textContent).toContain("Reading cancelled");
+            expect(session.root.textContent).toContain("16.wav");
+            expect(session.root.textContent).toContain("Reading cancelled");
             expect(session.draft.samples).toHaveLength(16);
             expect(reads).toHaveLength(1);
         } finally {
@@ -856,6 +864,44 @@ describe("Focused multisample authoring", () => {
         expect(activity.multisampleEditor.draft.samples).toEqual([]);
     });
 
+    test("summarizes unassigned roots while retaining row labels, errors and Apply guards", async () => {
+        MultisampleEditor.open(activity);
+        await upload();
+        await upload();
+        const session = activity.multisampleEditor;
+        expect(session.status.textContent).toBe("Choose a root pitch for each recording. (2)");
+        for (const select of document.querySelectorAll("select")) {
+            expect(select.labels[0].textContent).not.toContain("same.wav");
+            expect(select.getAttribute("aria-label")).toBe("Root pitch — same.wav");
+            expect(
+                document.getElementById(select.getAttribute("aria-describedby")).textContent
+            ).toBe("Choose a root pitch.");
+        }
+        expect(button("Apply").disabled).toBe(true);
+        expect(button("Preview instrument").disabled).toBe(true);
+        expect(session.problem).toContain("same.wav: Choose a root pitch.");
+    });
+
+    test("summarizes row errors and retains named rejection details through their association", async () => {
+        MultisampleEditor.open(activity);
+        for (let index = 0; index < 16; index++)
+            await upload(new Uint8Array(16), "audio/wav", "broken-" + index + ".wav");
+        const session = activity.multisampleEditor;
+        expect(session.status.textContent).toBe("Review recording errors. (16)");
+        expect(session.problem).toContain("broken-15.wav");
+        expect(
+            document.getElementById(session.rows[15].select.getAttribute("aria-describedby"))
+                .textContent
+        ).toContain("Recordings must contain embedded WAV audio.");
+        await upload(wav(), "audio/wav", "rejected.wav");
+        const details = document.getElementById(button("Apply").getAttribute("aria-describedby"));
+        expect(details.textContent).toContain(
+            "rejected.wav: Recording count exceeds the size limit of 16 recordings."
+        );
+        expect(session.status.textContent).toContain("Review recording details above.");
+        expect(button("Apply").disabled).toBe(true);
+    });
+
     test("marks both conflicting roots and keeps repeated filenames independent", async () => {
         MultisampleEditor.open(activity);
         await upload();
@@ -972,7 +1018,9 @@ describe("Focused multisample authoring", () => {
         await upload(new Uint8Array(1000001));
         expect(JSON.stringify(activity.multisampleEditor.draft.samples.slice(0, 1))).toBe(original);
         expect(activity.multisampleEditor.draft.samples[1].data).toBe("");
-        expect(document.querySelector('[role="status"]').textContent).toContain("size limit");
+        expect(document.querySelector("[data-multisample-editor]").textContent).toContain(
+            "size limit"
+        );
         expect(button("Apply").disabled).toBe(true);
         document.querySelectorAll('button[aria-label^="Remove"]')[1].click();
         expect(button("Apply").disabled).toBe(false);
@@ -990,7 +1038,7 @@ describe("Focused multisample authoring", () => {
         MultisampleEditor.open(activity, owner);
         await upload();
         expect(activity.multisampleEditor.draft.samples).toHaveLength(9);
-        expect(activity.multisampleEditor.status.textContent).toContain("size limit");
+        expect(activity.multisampleEditor.root.textContent).toContain("size limit");
     });
 
     test("requires a name and rejects the seventeenth recording without merging duplicate filenames", async () => {
@@ -999,10 +1047,10 @@ describe("Focused multisample authoring", () => {
         expect(button("Add recordings…").disabled).toBe(true);
         await upload();
         expect(activity.multisampleEditor.draft.samples).toHaveLength(16);
-        expect(activity.multisampleEditor.status.textContent).toContain("size limit");
+        expect(activity.multisampleEditor.root.textContent).toContain("size limit");
         activity.multisampleEditor.nameInput.value = "   ";
         activity.multisampleEditor.nameInput.dispatchEvent(new Event("input"));
-        expect(activity.multisampleEditor.status.textContent).toContain("Enter an instrument name");
+        expect(activity.multisampleEditor.root.textContent).toContain("Enter an instrument name");
         expect(button("Apply").disabled).toBe(true);
     });
 
@@ -1020,7 +1068,7 @@ describe("Focused multisample authoring", () => {
         activity.multisampleEditor.nameInput.value = "Changed";
         activity.multisampleEditor.nameInput.dispatchEvent(new Event("input"));
         await button("Apply").onclick();
-        expect(activity.multisampleEditor.status.textContent).toContain("same.wav");
+        expect(activity.multisampleEditor.root.textContent).toContain("same.wav");
         expect(owner.value).toEqual(value());
         expect(owner.setMultisampleValue).not.toHaveBeenCalled();
         expect(button("Apply").disabled).toBe(false);
