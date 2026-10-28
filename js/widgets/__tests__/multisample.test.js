@@ -72,6 +72,30 @@ describe("Focused multisample authoring", () => {
 
     afterEach(() => activity.multisampleEditor?.close());
 
+    test.each(["slider", "7"])(
+        "keeps an existing widget %s intact and requires closing it before editing",
+        key => {
+            const other = { getWidgetFrame: () => document.createElement("div") };
+            const samplerWindow = { getWidgetFrame: () => document.createElement("div") };
+            activity.logo.sample = {
+                widgetWindow: samplerWindow,
+                pauseForMultisample: jest.fn()
+            };
+            window.widgetWindows.openWindows = { sampler: samplerWindow, [key]: other };
+            MultisampleEditor.open(activity);
+            expect(Boolean(activity.multisampleEditor)).toBe(false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Close other widgets before editing this instrument."
+            );
+            expect(window.widgetWindows.openWindows[key]).toBe(other);
+            expect(activity.logo.sample.pauseForMultisample).not.toHaveBeenCalled();
+            delete window.widgetWindows.openWindows[key];
+            MultisampleEditor.open(activity);
+            expect(activity.multisampleEditor).toBeInstanceOf(MultisampleEditor);
+            expect(activity.logo.sample.pauseForMultisample).toHaveBeenCalledTimes(1);
+        }
+    );
+
     test("Listen prepares only an unassigned recording and leaves the draft unchanged", async () => {
         const sampler = {
             toDestination: jest.fn(),
