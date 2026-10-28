@@ -713,6 +713,17 @@ describe("setupWidgetBlocks", () => {
             expect(result).toEqual(["childBlk", 1]);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
+
+        it.each(["aidebugger", "reflection"])(
+            "gives the %s block a hidden block below its clamp to open the window from",
+            name => {
+                const macro = getBlock(name).macroFunc(0, 0);
+                const tail = macro[macro[0][4][2]];
+                expect(macro[0][4]).toHaveLength(3);
+                expect(tail[1]).toBe("hiddennoflow");
+                expect(tail[4]).toEqual([0, null]);
+            }
+        );
     });
 
     describe("First-Click Flow (Lazy Loading)", () => {

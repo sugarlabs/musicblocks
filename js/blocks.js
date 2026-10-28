@@ -6074,6 +6074,33 @@ class Blocks {
                                 }
                             }
                             break;
+                        case "aidebugger":
+                        case "reflection":
+                            /**
+                             * The window opens when the clamp's flow reaches the
+                             * hiddennoflow block below it (Logo.setDispatchBlock).
+                             * Blocks saved before the macro added one, with only
+                             * [parent, clamp], or rebuilt by an AI edit with an
+                             * empty tail, have none, so the window never opened.
+                             */
+                            if (blockObjs[b][4].length === 2) {
+                                blockObjs[b][4].push(null);
+                            }
+                            if (blockObjs[b][4].length === 3 && blockObjs[b][4][2] === null) {
+                                console.debug(
+                                    "last connection of " + name + " is null: adding hidden block"
+                                );
+                                blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
+                                blockObjs.push([
+                                    blockObjsLength + extraBlocksLength,
+                                    "hiddennoflow",
+                                    0,
+                                    0,
+                                    [b, null]
+                                ]);
+                                extraBlocksLength += 1;
+                            }
+                            break;
                         default:
                             break;
                     }

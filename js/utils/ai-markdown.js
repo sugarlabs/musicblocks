@@ -86,7 +86,8 @@ function renderChatMarkdown(markdown) {
     };
     const closeList = () => {
         if (list) {
-            out.push(`<${list.tag}>${list.items.join("")}</${list.tag}>`);
+            const start = list.start === undefined ? "" : ` start="${list.start}"`;
+            out.push(`<${list.tag}${start}>${list.items.join("")}</${list.tag}>`);
             list = null;
         }
     };
@@ -109,7 +110,7 @@ function renderChatMarkdown(markdown) {
         }
         const heading = line.match(/^\s*(#{1,6})\s+(.*)$/);
         const bullet = line.match(/^\s*[-*•]\s+(.*)$/);
-        const numbered = line.match(/^\s*\d+[.)]\s+(.*)$/);
+        const numbered = line.match(/^\s*(\d+)[.)]\s+(.*)$/);
         if (heading) {
             closeParagraph();
             closeList();
@@ -121,8 +122,13 @@ function renderChatMarkdown(markdown) {
             if (!list || list.tag !== tag) {
                 closeList();
                 list = { tag, items: [] };
+                // Models often put a blank line or a bullet between steps,
+                // which starts a new list. Without start every step is 1.
+                if (numbered && Number(numbered[1]) !== 1) {
+                    list.start = Number(numbered[1]);
+                }
             }
-            list.items.push(`<li>${renderInline((bullet || numbered)[1])}</li>`);
+            list.items.push(`<li>${renderInline(bullet ? bullet[1] : numbered[2])}</li>`);
         } else if (!line.trim()) {
             closeParagraph();
             closeList();

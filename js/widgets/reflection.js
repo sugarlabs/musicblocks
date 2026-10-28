@@ -101,7 +101,9 @@ class ReflectionMatrix {
             user: "YOU",
             meta: "ROHAN",
             music: "BEETHOVEN",
-            code: "ALAN"
+            code: "ALAN",
+            // The Summary report, so it is not shown or saved as a mentor's turn.
+            report: "REPORT"
         };
 
         /**
@@ -133,6 +135,12 @@ class ReflectionMatrix {
          * @type {number}
          */
         this.summarizedUpTo = 0;
+
+        /**
+         * The id of the project this conversation is about
+         * @type {string|undefined}
+         */
+        this._projectId = undefined;
 
         this.startChatTypingTimeout = null;
         this.dotsInterval = null;
@@ -169,6 +177,12 @@ class ReflectionMatrix {
          * @type {boolean}
          */
         this.isProcessingPendingMessage = false;
+
+        /**
+         * The user turn in chatHistory whose reply is still on its way
+         * @type {Object|null}
+         */
+        this._unansweredTurn = null;
 
         /**
          * Whether a project-code refresh is in flight
@@ -315,12 +329,32 @@ class ReflectionMatrix {
      */
 
     init(activity) {
+        // Running the block again while the window is open calls init again.
+        // The old session is closed first, or its unanswered request and
+        // typing indicator would leave the new window blank.
+        if (this.isOpen && this.widgetWindow) {
+            this.widgetWindow.onclose();
+        }
+
         this.activity = activity;
         this.isOpen = true;
         this._lifecycle.mount();
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = ReflectionMatrix.backendURL();
+
+        // The chat is kept between opens, but it is about one project. After the
+        // child starts or opens another, the old chat and description would make
+        // the mentor talk about blocks that are gone, so the new project gets a
+        // new conversation.
+        const projectId = this._lifecycle.projectId();
+        if (this.chatHistory.length > 0 && projectId !== this._projectId) {
+            this.chatHistory = [];
+            this.projectAlgorithm = "";
+            this.code = "";
+            this.triggerFirst = false;
+        }
+        this._projectId = projectId;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -329,8 +363,26 @@ class ReflectionMatrix {
         widgetWindow.getWidgetBody().style.height = ReflectionMatrix.OUTERWINDOWHEIGHT;
         widgetWindow.getWidgetBody().style.width = ReflectionMatrix.OUTERWINDOWWIDTH;
 
+        // The chat has a fixed size, so without this it stays small in a
+        // maximized window.
+        widgetWindow.onmaximize = () => {
+            const maximized = widgetWindow.isMaximized();
+            const body = widgetWindow.getWidgetBody();
+            body.style.width = maximized ? "100%" : ReflectionMatrix.OUTERWINDOWWIDTH;
+            body.style.height = maximized ? "100%" : ReflectionMatrix.OUTERWINDOWHEIGHT;
+        };
+
         widgetWindow.onclose = () => {
             this.isOpen = false;
+            // Its request is aborted below, so the message would stay in the
+            // history with no reply and no notice.
+            if (this._unansweredTurn) {
+                const index = this.chatHistory.indexOf(this._unansweredTurn);
+                if (index !== -1) this.chatHistory.splice(index, 1);
+                this._unansweredTurn = null;
+            }
+            // Closed before the first reply came, so the next open has to ask again.
+            if (this.chatHistory.length === 0) this.triggerFirst = false;
             this._lifecycle.unmount();
             this.activity.isInputON = false;
             this.hideTypingIndicator();
@@ -416,10 +468,15 @@ class ReflectionMatrix {
         this.input.className = "input-query";
         this.input.placeholder = "Type a message";
         this.input.style.marginLeft = "10px";
+        // The server refuses longer messages. A refused message stays in the
+        // history, and one over 4000 characters made every later request fail.
+        this.input.maxLength = 2000;
         this.inputContainer.appendChild(this.input);
 
         this.input.onkeydown = e => {
-            if (e.key === "Enter") {
+            // Enter also confirms a word typed with an input method (Japanese,
+            // Chinese), which must not send the half-typed message.
+            if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) {
                 this.sendMessage();
             }
         };
@@ -560,7 +617,8 @@ class ReflectionMatrix {
             content: reply.response
         });
 
-        if (this.chatHistory.length > 10) {
+        // Same count as getAnalysis, which already works at 10.
+        if (this.chatHistory.length >= 10) {
             this.summaryButton.style.removeProperty("background");
         }
 
@@ -612,10 +670,12 @@ class ReflectionMatrix {
         while (this.pendingMessages.length > 0 && this._isWidgetActive()) {
             const nextMessage = this.pendingMessages.shift();
 
-            this.chatHistory.push({
+            const turn = {
                 role: "user",
                 content: nextMessage.text
-            });
+            };
+            this.chatHistory.push(turn);
+            this._unansweredTurn = turn;
 
             const reply = await this.generateBotReply(
                 nextMessage.text,
@@ -627,6 +687,7 @@ class ReflectionMatrix {
             // The widget was reopened while this reply was in flight. Its queue
             // and flag belong to the new session now, so leave both alone.
             if (!this._isSameMount(generation)) return;
+            this._unansweredTurn = null;
 
             if (!this._isWidgetActive() || !reply) {
                 continue;
@@ -634,7 +695,8 @@ class ReflectionMatrix {
 
             if (reply.error) {
                 this.hideTypingIndicator();
-                this.activity.errorMsg(_("Failed to send message."), 3000);
+                // The server's text says what to do, such as to wait a minute.
+                this.activity.errorMsg(_(reply.error), 3000);
                 continue;
             }
 
@@ -677,6 +739,13 @@ class ReflectionMatrix {
     async startChatSession() {
         if (this.triggerFirst === true || !this._isWidgetActive()) return;
 
+        // This is the first request that sends the project, so it asks first,
+        // as the AI Debugger does. Agreeing calls this again.
+        if (!this._lifecycle.hasConsent()) {
+            this.showConsentBanner();
+            return;
+        }
+
         const generation = this._lifecycle.generation;
         this.triggerFirst = true;
 
@@ -711,7 +780,33 @@ class ReflectionMatrix {
             this.code = code;
         } else {
             this.activity.errorMsg(_(data.error), 3000);
+            // So reopening the window asks again instead of staying blank.
+            this.triggerFirst = false;
         }
+    }
+
+    /**
+     * Asks before the project is sent to the server, with the AI Debugger's
+     * banner. Agreeing starts the session. Declining sends nothing.
+     * @returns {void}
+     */
+    showConsentBanner() {
+        this._lifecycle.showConsentBanner(this.chatLog, {
+            classPrefix: "reflection",
+            text: _(
+                "Reflection will send your current project data to an external server for analysis. Your project blocks and structure will be shared with: "
+            ),
+            url: this.PORT,
+            onAgree: () => this.startChatSession(),
+            onDecline: () => {
+                const notice = document.createElement("div");
+                notice.className = "message-container";
+                notice.textContent = _(
+                    "Nothing was sent. Your project stays here until you agree."
+                );
+                this.chatLog.appendChild(notice);
+            }
+        });
     }
 
     /**
@@ -722,6 +817,18 @@ class ReflectionMatrix {
         if (this.typingDiv || this._isUpdatingProjectCode || !this._isWidgetActive()) {
             return;
         }
+
+        // Refresh sends the project too. Before consent there is no first
+        // description yet, so this asks and then starts the session.
+        if (!this._lifecycle.hasConsent()) {
+            this.showConsentBanner();
+            return;
+        }
+
+        // The first description is still on its way and describes the same
+        // project. The typing indicator shows only after a second, so the
+        // check above does not catch an early click.
+        if (this.triggerFirst && this.chatHistory.length === 0) return;
 
         const generation = this._lifecycle.generation;
         this._isUpdatingProjectCode = true;
@@ -746,6 +853,9 @@ class ReflectionMatrix {
             }
 
             if (!data.error) {
+                // Hidden still if the first description failed and this
+                // refresh is the first reply.
+                this.inputContainer.style.display = "flex";
                 if (data.algorithm !== "unchanged") {
                     this.projectAlgorithm = data.algorithm; // update algorithm
                     this.code = code;
@@ -781,12 +891,18 @@ class ReflectionMatrix {
             return Promise.resolve(null);
         }
 
-        return this._lifecycle.postJSON(
-            `${this.PORT}${path}`,
-            payload,
-            ReflectionMatrix.REQUEST_TIMEOUT,
-            "Failed to send message"
-        );
+        // With the full stop, so _() finds the translation.
+        const failed = "Failed to send message.";
+        return this._lifecycle
+            .postJSON(`${this.PORT}${path}`, payload, ReflectionMatrix.REQUEST_TIMEOUT, failed)
+            .then(data => {
+                // Every route answers with a response or an error. Any other
+                // reply, such as {"detail": "Not Found"}, showed as an empty message.
+                if (data && !data.error && typeof data.response !== "string") {
+                    return { error: failed };
+                }
+                return data;
+            });
     }
 
     /**
@@ -855,7 +971,15 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async getAnalysis() {
-        if (this.chatHistory.length < 10 || this.typingDiv || !this._isWidgetActive()) return;
+        if (this.typingDiv || !this._isWidgetActive()) return;
+        if (this.chatHistory.length < 10) {
+            // The button is grayed out, but pressing it said nothing at all.
+            this.activity.textMsg(
+                _("Chat a little longer first. The summary needs at least 10 messages."),
+                3000
+            );
+            return;
+        }
         const generation = this._lifecycle.generation;
         this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();
@@ -863,7 +987,7 @@ class ReflectionMatrix {
 
         this.hideTypingIndicator();
         if (data && this._isWidgetActive()) {
-            this.botReplyDiv(data, false, true);
+            this.botReplyDiv(data, false, true, "report");
             // Expected errors in data.error:
             // 1. Server-side errors returned by the API (e.g., 500s or rate limits).
             // 2. Network failures caught by generateAnalysis().
@@ -888,10 +1012,13 @@ class ReflectionMatrix {
      * Appends the bot's reply to the chat log.
      * @param {string} message - The bot's reply message.
      * @param {boolean} user_query - Flag indicating if the message is from the user.
+     * @param {boolean} md - Whether the reply should be rendered as markdown.
+     * @param {string} [role] - Who the reply is from. The selected mentor,
+     *     or "report" for the Summary.
      * @returns {Promise<void>}
      */
-    async botReplyDiv(message, user_query = true, md = false) {
-        const replyMentor = this.AImentor;
+    async botReplyDiv(message, user_query = true, md = false, role = this.AImentor) {
+        const replyMentor = role;
         const generation = this._lifecycle.generation;
         let reply;
         // check if message is from user or bot
@@ -915,7 +1042,7 @@ class ReflectionMatrix {
 
         if (reply.error) {
             this.hideTypingIndicator();
-            this.activity.errorMsg(_("Failed to send message."), 3000);
+            this.activity.errorMsg(_(reply.error), 3000);
             return;
         }
 
@@ -1005,8 +1132,14 @@ class ReflectionMatrix {
      */
     readReport() {
         const key = "musicblocks_analysis";
-        const data = localStorage.getItem(key);
-        return data;
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            // Reading throws when the browser blocks storage, which stopped
+            // the window from opening at all.
+            console.warn("Could not read analysis report from localStorage:", e);
+            return null;
+        }
     }
 
     /** Downloads the conversation as a text file.
