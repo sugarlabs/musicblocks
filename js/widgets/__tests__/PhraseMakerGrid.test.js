@@ -672,6 +672,22 @@ describe("PhraseMakerGrid", () => {
 
             expect(result).toEqual([1]);
         });
+
+        test("returns empty array without throwing when connections[1] is null (empty clamp body)", () => {
+            // Regression: mapNotesBlocks reads blockList[pm.blockNo].connections[1] (blk)
+            // then immediately dereferences blockList[blk] (myBlock) with no null check.
+            // When the PhraseMaker clamp body is empty, connections[1] === null, so
+            // blockList[null] === undefined and myBlock.name throws a TypeError.
+            // Expected: return [] gracefully, matching every other "no results" path.
+            const pm = createMockPM();
+            pm.blockNo = 0;
+            pm.activity.blocks.blockList = [
+                { name: "start", connections: [null, null] } // connections[1] = null → empty clamp
+            ];
+
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "newnote")).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "newnote")).toEqual([]);
+        });
     });
 
     describe("lookForNoteBlocksOrRepeat", () => {

@@ -133,7 +133,14 @@ const PhraseMakerGrid = {
     mapNotesBlocks(pm, blockName, withName) {
         const notesBlockMap = [];
         let blk = pm.activity.blocks.blockList[pm.blockNo].connections[1];
+        if (blk === null || blk === undefined) {
+            return notesBlockMap;
+        }
+
         let myBlock = pm.activity.blocks.blockList[blk];
+        if (!myBlock) {
+            return notesBlockMap;
+        }
 
         let bottomBlockLoop = 0;
         if (
