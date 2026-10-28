@@ -84,6 +84,9 @@ const parseSclFile = content => {
                 throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
             }
             ratio = Math.pow(2, cents / 1200);
+            if (!Number.isFinite(ratio) || ratio === 0) {
+                throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
+            }
         } else if (cleaned.includes("/")) {
             const parts = cleaned.split("/");
             if (parts.length !== 2 || !/^\d+$/.test(parts[0]) || !/^\d+$/.test(parts[1])) {
@@ -95,6 +98,9 @@ const parseSclFile = content => {
                 throw new Error("Invalid .scl file: invalid ratio: " + cleaned);
             }
             ratio = num / den;
+            if (!Number.isFinite(ratio) || ratio === 0) {
+                throw new Error("Invalid .scl file: invalid ratio: " + cleaned);
+            }
             cents = 1200 * Math.log2(ratio);
         } else {
             if (!/^\d+$/.test(cleaned)) {
@@ -105,6 +111,9 @@ const parseSclFile = content => {
                 throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
             }
             ratio = val;
+            if (!Number.isFinite(ratio)) {
+                throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
+            }
             cents = 1200 * Math.log2(val);
         }
 

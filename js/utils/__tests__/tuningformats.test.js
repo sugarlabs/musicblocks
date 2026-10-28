@@ -233,6 +233,15 @@ describe("parseSclFile", () => {
         const content = ["! neg.scl", "!", "Neg", "1", "-3/2 G"].join("\n");
         expect(() => parseSclFile(content)).toThrow("invalid ratio: -3/2");
     });
+
+    it.each([
+        ["2000000.0", "invalid cents value"],
+        ["-2000000.0", "invalid cents value"],
+        [`1/${"9".repeat(400)}`, "invalid ratio"],
+        ["9".repeat(400), "invalid pitch value"]
+    ])("rejects a pitch that cannot produce a finite positive ratio: %s", (pitch, error) => {
+        expect(() => parseSclFile(["Overflow", "1", pitch].join("\n"))).toThrow(error);
+    });
 });
 
 describe("parseModeJson", () => {
