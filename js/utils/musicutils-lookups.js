@@ -274,8 +274,8 @@ var getFilterTypes = name => {
  * @returns {string|null} The oscillator type, or null if not found.
  */
 var getOscillatorTypes = name => {
-    if (name === "") {
-        name = null; // DEFAULTOSCILLATORTYPE;
+    if (typeof name !== "string" || name === "") {
+        return null;
     }
 
     for (let type = 0; type < OSCTYPES.length; type++) {
