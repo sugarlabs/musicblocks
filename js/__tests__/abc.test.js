@@ -38,7 +38,8 @@ const {
     processABCNotes,
     saveAbcOutput,
     ACCIDENTAL_MAP,
-    OCTAVE_NOTATION_MAP
+    OCTAVE_NOTATION_MAP,
+    AbcExporter
 } = require("../abc");
 
 describe("getABCHeader", () => {
@@ -97,6 +98,24 @@ describe("processABCNotes - Basic Note Processing", () => {
         processABCNotes(logo, "0");
         // Check if newline exists in the output
         expect(logo.notationNotes["0"]).toMatch(/\n/);
+    });
+
+    it("should format octave 0 and negative octaves (-1 and -2) with correct ABC octave commas and no hyphens", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C0"], 4, 0, null, null, -1, false],
+            [["C-1"], 4, 0, null, null, -1, false],
+            [["D-2"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0", "C major");
+        expect(logo.notationNotes["0"]).toBe("C,,,,4 C,,,,,4 D,,,,,,4 ");
+    });
+
+    it("should format signed octaves in unkeyed __toABCnote fallback", () => {
+        const mockLogo = { notation: { notationStaging: { 0: [] } } };
+        const exporter = new AbcExporter(mockLogo, "0", "C major", "0");
+        expect(exporter.__toABCnote("C♯♯♯0")).toBe("^^^C,,,,");
+        expect(exporter.__toABCnote("C♯♯♯-1")).toBe("^^^C,,,,,");
+        expect(exporter.__toABCnote("C♯♯♯-2")).toBe("^^^C,,,,,,");
     });
 });
 describe("processABCNotes - Advanced Note Handling", () => {
@@ -620,7 +639,9 @@ describe("OCTAVE_NOTATION_MAP", () => {
         expect(OCTAVE_NOTATION_MAP[10]).toBe("'''''");
         expect(OCTAVE_NOTATION_MAP[2]).toBe(",,");
         expect(OCTAVE_NOTATION_MAP[1]).toBe(",,,");
-        expect(OCTAVE_NOTATION_MAP[0]).toBeUndefined();
+        expect(OCTAVE_NOTATION_MAP[0]).toBe(",,,,");
+        expect(OCTAVE_NOTATION_MAP[-1]).toBe(",,,,,");
+        expect(OCTAVE_NOTATION_MAP[-2]).toBe(",,,,,,");
     });
 });
 
