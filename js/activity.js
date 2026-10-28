@@ -249,11 +249,12 @@ function lazyLoad(modulePaths) {
 let globalActivity;
 
 /**
- * Performs analysis on the project using the global activity.
+ * Performs analysis on a project: the given blocks, or the open workspace if none.
+ * @param {{blockList: Array}} [blocks] - blocks parsed from a saved project.
  * @returns {object} - The analysis result.
  */
-const doAnalyzeProject = function () {
-    return analyzeProject(globalActivity);
+const doAnalyzeProject = function (blocks) {
+    return analyzeProject(blocks ? { blocks } : globalActivity);
 };
 
 /**
