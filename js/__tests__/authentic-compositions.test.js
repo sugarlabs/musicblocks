@@ -275,6 +275,39 @@ describe("Authentic Musical Compositions & Multi-Turtle Fixtures", () => {
             expect(turtleIds.size).toBe(3);
         });
 
+        it("positions the three mice at (-100, 0), (0, 0), and (100, 0) via pen up and set xy", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            const startBlocks = blocks.filter(b => Array.isArray(b[1]) && b[1][0] === "start");
+            expect(startBlocks).toHaveLength(3);
+
+            const expectedPositions = [
+                { x: -100, y: 0 },
+                { x: 0, y: 0 },
+                { x: 100, y: 0 }
+            ];
+
+            startBlocks.forEach((startBlk, idx) => {
+                const exp = expectedPositions[idx];
+                expect(startBlk[1][1].xcor).toBe(exp.x);
+                expect(startBlk[1][1].ycor).toBe(exp.y);
+
+                const penupId = startBlk[4][1];
+                const penupBlk = blocks[penupId];
+                expect(penupBlk[1]).toBe("penup");
+
+                const setxyId = penupBlk[4][1];
+                const setxyBlk = blocks[setxyId];
+                expect(setxyBlk[1]).toBe("setxy");
+
+                const xVal = blocks[setxyBlk[4][1]][1][1].value;
+                const yVal = blocks[setxyBlk[4][2]][1][1].value;
+                expect(xVal).toBe(exp.x);
+                expect(yVal).toBe(exp.y);
+            });
+        });
+
         it("configures 5-limit Just Intonation, 3-against-2 subdivisions, and percussion", () => {
             const tbContent = fs.readFileSync(tbPath, "utf8");
             const blocks = JSON.parse(tbContent);
