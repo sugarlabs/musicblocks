@@ -411,7 +411,7 @@ describe("Test 7: Chords join their note, a second voice is skipped", () => {
 
         // C+E tied to C+E is one half note; C+E "tied" to C+F is two notes.
         expect(noteValues(blocks)).toEqual([
-            [8, 16],
+            [1, 2],
             [1, 4],
             [1, 4]
         ]);
