@@ -84,9 +84,12 @@ describe("Focused multisample authoring", () => {
             window.widgetWindows.openWindows = { sampler: samplerWindow, [key]: other };
             MultisampleEditor.open(activity);
             expect(Boolean(activity.multisampleEditor)).toBe(false);
-            expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Close other widgets before editing this instrument."
+            expect(activity.textMsg).toHaveBeenCalledTimes(1);
+            expect(activity.textMsg).toHaveBeenCalledWith(
+                "Close other widgets before editing this instrument.",
+                3000
             );
+            expect(activity.errorMsg).not.toHaveBeenCalled();
             expect(window.widgetWindows.openWindows[key]).toBe(other);
             expect(activity.logo.sample.pauseForMultisample).not.toHaveBeenCalled();
             delete window.widgetWindows.openWindows[key];

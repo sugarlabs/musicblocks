@@ -35,7 +35,7 @@ class MultisampleEditor {
                 widget => widget && widget !== activity.logo.sample?.widgetWindow
             )
         ) {
-            activity.errorMsg(_("Close other widgets before editing this instrument."));
+            activity.textMsg(_("Close other widgets before editing this instrument."), 3000);
             return;
         }
         let value = { type: "multisample", version: 1, name: _("My instrument"), samples: [] };

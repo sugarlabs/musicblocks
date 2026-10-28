@@ -3102,7 +3102,7 @@ table {
 
 #printText {
     border: 2px solid rgb(150, 150, 150);
-    z-index: 100;
+    z-index: 10001;
     width: auto;
     word-wrap: break-word;
     overflow: auto;
