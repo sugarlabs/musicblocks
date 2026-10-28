@@ -454,6 +454,18 @@ class SVG {
     }
 
     /**
+     * Calculates the effective height of the block for label positioning.
+     * Preserves vertical centering shifts from first-slot expansion (_expandY)
+     * while ignoring second-slot bottom expansion (_expandY2).
+     * @private
+     * @returns {number}
+     */
+    _labelBaseHeight() {
+        const expandY2Px = (this._expandY2 || 0) * this._scale;
+        return this._height - expandY2Px;
+    }
+
+    /**
      * @private
      * @param {number} x
      * @param {number} y
@@ -1080,7 +1092,7 @@ class SVG {
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        let ty = this._height / 2 + this._fontSize / (5 / this._scale);
+        let ty = this._labelBaseHeight() / 2 + this._fontSize / (5 / this._scale);
 
         // If we have an odd number of innie slots, we need to avoid a
         // collision between the block label and the slot label.
@@ -1326,7 +1338,7 @@ class SVG {
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        const ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._labelBaseHeight() / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -1440,7 +1452,7 @@ class SVG {
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        const ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._labelBaseHeight() / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
