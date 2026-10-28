@@ -309,6 +309,30 @@ describe("ProjectStorage", () => {
             expect(version).toBe(storage.Version);
         });
 
+        it("should keep saved projects when the version key is missing", async () => {
+            const savedProjects = { Projects: { saved: { ProjectName: "Saved Project" } } };
+            await storage.set(storage.LocalStorageKey, savedProjects);
+            const setSpy = jest.spyOn(storage, "set");
+
+            await storage.port();
+
+            expect(await storage.get(storage.LocalStorageKey)).toEqual(savedProjects);
+            expect(setSpy).not.toHaveBeenCalledWith(storage.LocalStorageKey, expect.anything());
+            expect(await storage.get(storage.VersionKey)).toBe(storage.Version);
+        });
+
+        it("should keep IndexedDB projects over older localStorage data", async () => {
+            const savedProjects = { Projects: { saved: { ProjectName: "Saved Project" } } };
+            await storage.set(storage.LocalStorageKey, savedProjects);
+            jest.spyOn(Storage.prototype, "getItem").mockReturnValueOnce(
+                JSON.stringify({ Projects: { legacy: { ProjectName: "Old Project" } } })
+            );
+
+            await storage.port();
+
+            expect(await storage.get(storage.LocalStorageKey)).toEqual(savedProjects);
+        });
+
         it("should not re-port if already at current version", async () => {
             await storage.set(storage.VersionKey, storage.Version);
             const setSpy = jest.spyOn(storage, "set");
@@ -1285,6 +1309,19 @@ describe("ProjectStorage", () => {
             expect(storage.data.Projects[id].ProjectName).toBe("My Song");
             expect(storage.data.Projects[id].ProjectData).toBe("data");
             expect(storage.data.Projects[id].ProjectImage).toBe("img");
+            expect(saveSpy).toHaveBeenCalled();
+        });
+
+        it("adds a project without switching to it when makeCurrent is false", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.CurrentProject = "open";
+
+            const id = await storage.initialiseNewProject("Copy", "data", "img", null, {
+                makeCurrent: false
+            });
+
+            expect(storage.data.CurrentProject).toBe("open");
+            expect(storage.data.Projects[id].ProjectName).toBe("Copy");
             expect(saveSpy).toHaveBeenCalled();
         });
 

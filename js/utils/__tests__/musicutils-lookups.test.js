@@ -67,6 +67,11 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
 
+        expect(lookups.getOscillatorTypes("")).toBeNull();
+        expect(lookups.getOscillatorTypes(null)).toBeNull();
+        expect(lookups.getOscillatorTypes(undefined)).toBeNull();
+        expect(lookups.getOscillatorTypes(123)).toBeNull();
+
         expect(lookups.getIntervalNumber(undefined)).toBe(0);
         expect(lookups.getIntervalNumber(null)).toBe(0);
         expect(lookups.getIntervalNumber(123)).toBe(0);

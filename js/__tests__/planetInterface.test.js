@@ -185,6 +185,15 @@ describe("PlanetInterface", () => {
         };
         expect(planetInterface.getCurrentProjectName()).toBe("ProjectX");
     });
+
+    test("getCurrentProjectID returns the id from ProjectStorage, or undefined before it loads", () => {
+        planetInterface.planet = undefined;
+        expect(planetInterface.getCurrentProjectID()).toBeUndefined();
+        planetInterface.planet = {
+            ProjectStorage: { getCurrentProjectID: jest.fn(() => "1234") }
+        };
+        expect(planetInterface.getCurrentProjectID()).toBe("1234");
+    });
     test("initialiseNewProject should reset project state", () => {
         planetInterface.planet = {
             ProjectStorage: { initialiseNewProject: jest.fn().mockResolvedValue() }
