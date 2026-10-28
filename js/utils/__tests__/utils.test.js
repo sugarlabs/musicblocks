@@ -510,6 +510,21 @@ describe("Utility Functions (logic-only)", () => {
             const result = format("Hello world", { name: "User" });
             expect(result).toBe("Hello world");
         });
+
+        it("should handle deeply nested missing properties without throwing", () => {
+            expect(format("Street: {user.address.street}", { user: {} })).toBe("Street: ");
+            expect(format("Value: {a.b.c.d}", {})).toBe("Value: ");
+        });
+
+        it("should handle null or undefined data safely", () => {
+            expect(format("Hello {name}!", null)).toBe("Hello !");
+            expect(format("Hello {name}!", undefined)).toBe("Hello !");
+        });
+
+        it("should handle non-string template input safely", () => {
+            expect(format(null, { name: "test" })).toBe("");
+            expect(format(undefined, { name: "test" })).toBe("");
+        });
     });
     describe("rationalSum()", () => {
         it("adds simple fractions", () => {
