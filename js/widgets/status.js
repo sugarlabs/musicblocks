@@ -123,12 +123,14 @@ class StatusMatrix {
 
         // console.debug("active turtles: " + turtles.turtleList.length);
 
+        const body = this._statusTable.createTBody();
+
         // One row per field, one column per mouse (plus the labels)
         let label;
         const statusFields = this.activity?.logo?.statusFields || [];
         const blockList = this.activity?.blocks?.blockList || {};
         for (const statusField of statusFields) {
-            const row = header.insertRow();
+            const row = body.insertRow();
 
             cell = row.insertCell(); // i + 1);
             cell.style.fontSize =
@@ -213,7 +215,7 @@ class StatusMatrix {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const selectorBg = "var(--color-selector-bg)";
             const selectorText = "var(--color-selector-text)";
-            const row = header.insertRow();
+            const row = body.insertRow();
             cell = row.insertCell();
             cell.style.fontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";

@@ -33,6 +33,11 @@ global.platformColor = {
     selectorBackground: "#aaa"
 };
 
+if (typeof global.TextDecoder === "undefined") {
+    const { TextDecoder } = require("util");
+    global.TextDecoder = TextDecoder;
+}
+
 const createMockElement = tagName => ({
     tagName,
     style: {},
@@ -49,6 +54,11 @@ const createMockElement = tagName => ({
         insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
     })),
     createTHead: jest.fn().mockImplementation(() => ({
+        insertRow: jest.fn().mockImplementation(() => ({
+            insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
+        }))
+    })),
+    createTBody: jest.fn().mockImplementation(() => ({
         insertRow: jest.fn().mockImplementation(() => ({
             insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
         }))
@@ -1159,6 +1169,228 @@ describe("StatusMatrix Widget", () => {
             const noteCell = statusMatrix._statusTable.rows[1].cells[1];
             expect(noteCell.textContent.match(/C4/g) || []).toHaveLength(1);
             expect(noteCell.textContent).toBe("C4 440.00Hz 1/4");
+        });
+    });
+
+    describe("Table Section Structure (thead vs tbody)", () => {
+        let originalCreateElement;
+        let originalCreateTextNode;
+        let originalWindow;
+        let originalIsMusicBlocks;
+
+        beforeEach(() => {
+            const { JSDOM } = require("jsdom");
+            const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+
+            originalCreateElement = global.document.createElement;
+            originalCreateTextNode = global.document.createTextNode;
+            originalWindow = global.window;
+            originalIsMusicBlocks = global._THIS_IS_MUSIC_BLOCKS_;
+
+            global.document.createElement = dom.window.document.createElement.bind(
+                dom.window.document
+            );
+            global.document.createTextNode = dom.window.document.createTextNode.bind(
+                dom.window.document
+            );
+            global.window = dom.window;
+            global.window.innerWidth = 1200;
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+
+            const realWidgetBody = dom.window.document.createElement("div");
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: () => realWidgetBody,
+                    sendToCenter: jest.fn(),
+                    destroy: jest.fn(),
+                    onclose: null,
+                    onmaximize: null
+                })
+            };
+        });
+
+        afterEach(() => {
+            global.document.createElement = originalCreateElement;
+            if (originalCreateTextNode !== undefined) {
+                global.document.createTextNode = originalCreateTextNode;
+            } else {
+                delete global.document.createTextNode;
+            }
+            global.window = originalWindow;
+            global._THIS_IS_MUSIC_BLOCKS_ = originalIsMusicBlocks;
+        });
+
+        test("places turtle/icon header row in thead and keeps dynamic data rows out of thead", () => {
+            mockActivity.logo.statusFields = [
+                [0, "letterclass"],
+                [1, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead).not.toBeNull();
+            expect(table.tHead.rows).toHaveLength(1);
+
+            const headerRow = table.tHead.rows[0];
+            const mouseImg = headerRow.querySelector("img");
+            expect(mouseImg).not.toBeNull();
+            expect(mouseImg.getAttribute("src")).toBe("images/mouse.svg");
+        });
+
+        test("places dynamic status rows in tbody", () => {
+            mockActivity.logo.statusFields = [
+                [0, "letterclass"],
+                [1, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tBodies).toHaveLength(1);
+            const tbody = table.tBodies[0];
+
+            // 2 status fields + 1 note row = 3 rows in tbody
+            expect(tbody.rows).toHaveLength(3);
+            expect(tbody.rows[0].cells[0].textContent).toContain("Letter class");
+            expect(tbody.rows[1].cells[0].textContent).toContain("Beat count");
+        });
+
+        test("places Note row in tbody when Music Blocks is enabled", () => {
+            mockActivity.logo.statusFields = [[0, "beatvalue"]];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const tbody = statusMatrix._statusTable.tBodies[0];
+            const noteRow = tbody.rows[tbody.rows.length - 1];
+            expect(noteRow.cells[0].textContent).toContain("Note");
+        });
+
+        test("omits Note row in tbody when Music Blocks path is disabled", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            mockActivity.logo.statusFields = [[0, "beatvalue"]];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead.rows).toHaveLength(1);
+            expect(table.tBodies[0].rows).toHaveLength(1);
+            expect(table.tBodies[0].rows[0].cells[0].textContent).toContain("Beat count");
+        });
+
+        test("preserves row and cell indexing so updateAll updates data cells across sections", () => {
+            mockActivity.logo.statusFields = [
+                [0, "beatvalue"],
+                [1, "measurevalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 },
+                1: {
+                    name: "measurevalue",
+                    protoblock: { staticLabels: ["measure count"] },
+                    value: 2
+                }
+            };
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 2,
+                    noteStatus: [["C4"], 0.25]
+                }
+            });
+
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            const table = statusMatrix._statusTable;
+            // Row 0 is header in thead
+            // Row 1 is beatvalue in tbody
+            expect(table.rows[1].cells[1].textContent).toBe("1");
+            // Row 2 is measurevalue in tbody
+            expect(table.rows[2].cells[1].textContent).toBe("2");
+            // Row 3 is note row in tbody
+            expect(table.rows[3].cells[1].textContent).toBe("C4 1/4");
+        });
+
+        test("handles empty status fields gracefully without exceptions or misindexing", () => {
+            mockActivity.logo.statusFields = [];
+            mockActivity.blocks.blockList = {};
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead.rows).toHaveLength(1);
+            expect(table.tBodies[0].rows).toHaveLength(1); // Note row only
+            expect(table.rows).toHaveLength(2);
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+        });
+
+        test("handles missing block references without throwing or misaligning cells", () => {
+            mockActivity.logo.statusFields = [
+                [999, "missingBlock"],
+                [0, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+
+            const table = statusMatrix._statusTable;
+            expect(table.tBodies[0].rows).toHaveLength(3); // missing, beatvalue, note
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(table.rows[1].cells[1].textContent).toBe("");
+            expect(table.rows[2].cells[1].textContent).toBe("1");
+        });
+
+        test("preserves 7-row table distribution matching the observed defect", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "x", protoblock: { staticLabels: ["beat count"] }, value: "0/1" },
+                2: { name: "x", protoblock: { staticLabels: ["measure count"] }, value: 0 },
+                3: {
+                    name: "x",
+                    protoblock: { staticLabels: ["whole notes played"] },
+                    value: "0/1"
+                },
+                4: { name: "bpm", protoblock: { staticLabels: ["beats per minute"] }, value: 90 }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "outputtools"],
+                [1, "outputtools"],
+                [2, "outputtools"],
+                [3, "outputtools"],
+                [4, "bpm"]
+            ];
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            const totalRows = table.rows.length;
+            const theadRows = table.tHead?.rows.length ?? 0;
+            const tbodyRows = [...table.tBodies].reduce((n, b) => n + b.rows.length, 0);
+
+            expect(totalRows).toBe(7);
+            expect(theadRows).toBe(1);
+            expect(tbodyRows).toBe(6);
         });
     });
 });
