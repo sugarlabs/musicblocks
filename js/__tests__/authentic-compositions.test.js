@@ -154,6 +154,39 @@ describe("Authentic Musical Compositions & Multi-Turtle Fixtures", () => {
             expect(turtle0Id).not.toEqual(turtle1Id);
         });
 
+        it("positions the two mice side-by-side at (-50, 0) and (50, 0) via pen up and set xy", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            const startBlocks = blocks.filter(b => Array.isArray(b[1]) && b[1][0] === "start");
+            expect(startBlocks).toHaveLength(2);
+
+            // Flute mouse at (-50, 0)
+            expect(startBlocks[0][1][1].xcor).toBe(-50);
+            expect(startBlocks[0][1][1].ycor).toBe(0);
+
+            // Cello mouse at (50, 0)
+            expect(startBlocks[1][1][1].xcor).toBe(50);
+            expect(startBlocks[1][1][1].ycor).toBe(0);
+
+            // Verify both start stacks route through penup then setxy
+            [startBlocks[0], startBlocks[1]].forEach((startBlk, idx) => {
+                const penupId = startBlk[4][1];
+                const penupBlk = blocks[penupId];
+                expect(penupBlk[1]).toBe("penup");
+
+                const setxyId = penupBlk[4][1];
+                const setxyBlk = blocks[setxyId];
+                expect(setxyBlk[1]).toBe("setxy");
+
+                const expectedX = idx === 0 ? -50 : 50;
+                const xVal = blocks[setxyBlk[4][1]][1][1].value;
+                const yVal = blocks[setxyBlk[4][2]][1][1].value;
+                expect(xVal).toBe(expectedX);
+                expect(yVal).toBe(0);
+            });
+        });
+
         it("configures 19-EDO temperament and appropriate voices", () => {
             const tbContent = fs.readFileSync(tbPath, "utf8");
             const blocks = JSON.parse(tbContent);
