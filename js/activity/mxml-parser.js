@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP, toFraction */
+/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP */
 
 /* exported setupActivityMxmlParser */
 
@@ -52,19 +52,46 @@ const _fractionGcd = (a, b) => {
     return Math.abs(a);
 };
 
+const _decimalToFraction = value => {
+    if (Number.isInteger(value)) {
+        return [value, 1];
+    }
+
+    const [mantissa, exponentText] = value.toString().toLowerCase().split("e");
+    const exponent = Number(exponentText ?? 0);
+    const decimalPlaces = (mantissa.split(".")[1] ?? "").length;
+    const scale = 10 ** Math.max(0, decimalPlaces - exponent);
+    const numerator = Math.round(value * scale);
+    const divisor = _fractionGcd(numerator, scale);
+
+    return [numerator / divisor, scale / divisor];
+};
+
+const _toIntegerFraction = ([numerator, denominator]) => {
+    const [numeratorValue, numeratorScale] = _decimalToFraction(numerator);
+    const [denominatorValue, denominatorScale] = _decimalToFraction(denominator);
+
+    const top = numeratorValue * denominatorScale;
+    const bottom = numeratorScale * denominatorValue;
+    const divisor = _fractionGcd(top, bottom);
+
+    return [top / divisor, bottom / divisor];
+};
+
 // Keep tie durations reduced as they accumulate. Multiplying denominators on
 // every note can overflow before the resulting divide block is ever evaluated.
 const _addFractions = ([n1, d1], [n2, d2]) => {
-    // MusicXML duration/divisions can be decimal. Accumulate their numeric value
-    // and convert it back to a bounded fraction so repeated ties neither grow
-    // operands exponentially nor lose the note-value denominator.
+    // Convert decimal MusicXML components into integer fractions before adding
+    // them so very small durations are preserved without iterative approximation.
     if (![n1, d1, n2, d2].every(Number.isInteger)) {
-        return toFraction(n1 / d1 + n2 / d2);
+        return _addFractions(_toIntegerFraction([n1, d1]), _toIntegerFraction([n2, d2]));
     }
+
     const common = _fractionGcd(d1, d2);
     const numerator = n1 * (d2 / common) + n2 * (d1 / common);
     const denominator = (d1 / common) * d2;
     const divisor = _fractionGcd(numerator, denominator);
+
     return [numerator / divisor, denominator / divisor];
 };
 

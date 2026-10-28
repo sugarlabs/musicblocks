@@ -16,11 +16,9 @@ const { setupActivityMxmlParser } = require("../mxml-parser.js");
 // Globals in the browser (js/utils/musicutils-constants.js); the drum-name
 // lookup reads them.
 const { DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP } = require("../../utils/musicutils-constants.js");
-const { toFraction } = require("../../utils/utils-logic.js");
 
 global.DRUM_MIDI_MAP = DRUM_MIDI_MAP;
 global.REVERSE_DRUM_MIDI_MAP = REVERSE_DRUM_MIDI_MAP;
-global.toFraction = toFraction;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1149,6 +1147,19 @@ describe("Test 16: Ties", () => {
         );
 
         expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves very small decimal tie durations", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>0.0001</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 20000]]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
