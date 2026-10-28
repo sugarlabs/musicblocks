@@ -855,48 +855,58 @@ class Activity {
                 return;
             }
 
+            // The rest of the Play action starts the Transport, which touches
+            // the Web Audio context synchronously. Tone.start()/context.resume()
+            // are async, so running that logic in parallel (fire-and-forget)
+            // still hits Tone's suspended-context check before the context has
+            // actually resumed, logging a warning every time. Wait for the
+            // unlock to settle first so the Transport only starts once the
+            // context is (or is as close as it will get to) running.
+            const runPlayAction = () => {
+                this._onResize();
+                this.blocks.activeBlock = null;
+                hideDOMLabel();
+
+                // If music is currently playing, stop it first
+                if (this.turtles.running()) {
+                    this.logo.doStopTurtles();
+                }
+
+                const currentDelay = this.logo.turtleDelay;
+
+                // Delegate logic / execution control to the ToolbarController
+                this.toolbarController.runFast(env, currentDelay);
+
+                // Keep DOM queries, colors, and block visibilities in activity.js
+                const tempoTitle = document.getElementById("tempoWidgetID");
+                if (tempoTitle) {
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
+                    }
+
+                    this.logo.tempo.resume();
+                }
+
+                if (!this.turtles.running()) {
+                    if (!this.turtles.isShrunk()) {
+                        this.blocks.hideBlocks();
+                        this.showBlocksAfterRun = true;
+                    }
+
+                    this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+                } else {
+                    if (currentDelay === 0) {
+                        this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
+                    }
+                }
+            };
+
             // Unlock the Web Audio context while the play click is still a user
-            // gesture. Starting it later from the async playback queue causes
-            // Tone.js to log a suspended-context warning in the console.
+            // gesture, then run the rest of the Play action once that settles.
             if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
-                void this.logo.synth.startAudio().catch(() => undefined);
-            }
-
-            this._onResize();
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
-
-            // If music is currently playing, stop it first
-            if (this.turtles.running()) {
-                this.logo.doStopTurtles();
-            }
-
-            const currentDelay = this.logo.turtleDelay;
-
-            // Delegate logic / execution control to the ToolbarController
-            this.toolbarController.runFast(env, currentDelay);
-
-            // Keep DOM queries, colors, and block visibilities in activity.js
-            const tempoTitle = document.getElementById("tempoWidgetID");
-            if (tempoTitle) {
-                if (this.logo.tempo.isMoving) {
-                    this.logo.tempo.pause();
-                }
-
-                this.logo.tempo.resume();
-            }
-
-            if (!this.turtles.running()) {
-                if (!this.turtles.isShrunk()) {
-                    this.blocks.hideBlocks();
-                    this.showBlocksAfterRun = true;
-                }
-
-                this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+                this.logo.synth.startAudio().then(runPlayAction).catch(runPlayAction);
             } else {
-                if (currentDelay === 0) {
-                    this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
-                }
+                runPlayAction();
             }
         };
 
