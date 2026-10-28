@@ -273,6 +273,34 @@ describe("Test 5: Duration/divisions fallback when <type> is absent", () => {
 
         expect(noteValues(blocks)).toEqual([[1, 4]]);
     });
+
+    it("falls back safely when finite divisions overflow the computed denominator", async () => {
+        const hugeDivisions = `1${"0".repeat(308)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration></note>",
+                `<divisions>${hugeDivisions}</divisions>`
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("falls back safely when the computed duration underflows to zero", async () => {
+        const tinyDuration = `0.${"0".repeat(308)}1`;
+        const hugeDivisions = `1${"0".repeat(307)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                `<note><pitch><step>D</step><octave>4</octave></pitch>` +
+                    `<duration>${tinyDuration}</duration></note>`,
+                `<divisions>${hugeDivisions}</divisions>`
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
 });
 
 describe("Test 6: Multiple notes chain correctly", () => {
@@ -1163,6 +1191,50 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("keeps an extremely small decimal tie finite when integer conversion cannot scale it", async () => {
+        const tinyDuration = `0.${"0".repeat(308)}1`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${tinyDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(Number(tinyDuration) / 2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("reduces huge integer tie operands before addition can overflow", async () => {
+        const hugeDuration = `1${"0".repeat(308)}`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(Number(hugeDuration) / 2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("falls back safely for a tied note with a non-numeric duration", async () => {
         const note = tie =>
             "<note><pitch><step>C</step><octave>4</octave></pitch>" +
@@ -1510,6 +1582,17 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
             expect(noteValues(blocks)).toEqual([[1, 4]]);
         }
     );
+
+    it("uses the duration fallback when a finite tuplet ratio overflows", async () => {
+        const hugeActual = `1${"0".repeat(308)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(TUPLET_NOTE("C", "quarter", hugeActual, 2))
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 32]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
 
     it("does not touch a note that falls back to duration, which already has the ratio", async () => {
         const { blocks } = await parseAndCapture(
