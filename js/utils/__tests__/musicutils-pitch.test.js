@@ -58,6 +58,48 @@ describe("musicutils-pitch", () => {
         expect(pitch.numberToPitchSharp(-1, "equal19")).toEqual(["A♭", 0]);
     });
 
+    describe("numberToPitchSharp constant-time calculations", () => {
+        it("accurately computes boundary pitch and octave transitions across positive and negative ranges", () => {
+            // C0 boundary: i = -9 is C0, i = -10 is B-1
+            expect(pitch.numberToPitchSharp(-9, "equal")).toEqual(["C", 0]);
+            expect(pitch.numberToPitchSharp(-10, "equal")).toEqual(["B", -1]);
+
+            // C-1 boundary: i = -21 is C-1, i = -22 is B-2
+            expect(pitch.numberToPitchSharp(-21, "equal")).toEqual(["C", -1]);
+            expect(pitch.numberToPitchSharp(-22, "equal")).toEqual(["B", -2]);
+
+            // Octave intervals: multiples of 12 from A0 (i = 0)
+            expect(pitch.numberToPitchSharp(-12, "equal")).toEqual(["A", -1]);
+            expect(pitch.numberToPitchSharp(-24, "equal")).toEqual(["A", -2]);
+            expect(pitch.numberToPitchSharp(-36, "equal")).toEqual(["A", -3]);
+            expect(pitch.numberToPitchSharp(-48, "equal")).toEqual(["A", -4]);
+            expect(pitch.numberToPitchSharp(12, "equal")).toEqual(["A", 1]);
+            expect(pitch.numberToPitchSharp(24, "equal")).toEqual(["A", 2]);
+            expect(pitch.numberToPitchSharp(36, "equal")).toEqual(["A", 3]);
+            expect(pitch.numberToPitchSharp(48, "equal")).toEqual(["A", 4]);
+        });
+
+        it("handles deep negative and large positive pitch numbers in constant time", () => {
+            // -120 semitones = -10 octaves from A0 -> A-10
+            expect(pitch.numberToPitchSharp(-120, "equal")).toEqual(["A", -10]);
+            // -117 semitones = 3 semitones above A-10 -> C-9
+            expect(pitch.numberToPitchSharp(-117, "equal")).toEqual(["C", -9]);
+            // 120 semitones = +10 octaves from A0 -> A10
+            expect(pitch.numberToPitchSharp(120, "equal")).toEqual(["A", 10]);
+        });
+
+        it("accurately calculates microtonal octaves and pitch names below zero", () => {
+            // In 19-EDO, A0 is at i = 0.
+            expect(pitch.numberToPitchSharp(0, "equal19")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-19, "equal19")).toEqual(["A", -1]);
+            expect(pitch.numberToPitchSharp(-38, "equal19")).toEqual(["A", -2]);
+
+            // In 31-EDO
+            expect(pitch.numberToPitchSharp(0, "equal31")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-31, "equal31")).toEqual(["A", -1]);
+        });
+    });
+
     it("strips at most two microtonal prefix characters from the start of a note", () => {
         expect(pitch.stripMicrotonalPrefix("^C4")).toBe("C4");
         expect(pitch.stripMicrotonalPrefix("^^C4")).toBe("C4");
