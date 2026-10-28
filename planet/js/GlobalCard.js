@@ -157,8 +157,11 @@ class GlobalCard {
         const tagcontainer = frag.getElementById(`global-project-tags-${this.id}`);
         tagcontainer.classList.add("global-tags-container");
 
-        for (let i = 0; i < this.ProjectData.ProjectTags.length; i++) {
-            const tag = this.ProjectData.ProjectTags[i];
+        const projectTags = this.ProjectData.ProjectTags || [];
+        const visibleTagCount = 3;
+
+        for (let i = 0; i < Math.min(projectTags.length, visibleTagCount); i++) {
+            const tag = projectTags[i];
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
             const entry = Planet.TagsManifest && Planet.TagsManifest[tag];
@@ -166,6 +169,24 @@ class GlobalCard {
                 ? _(entry.TagName)
                 : _(tag.charAt(0).toUpperCase() + tag.slice(1));
             tagcontainer.appendChild(chip);
+        }
+
+        if (projectTags.length > visibleTagCount) {
+            const remainingTagCount = projectTags.length - visibleTagCount;
+            const moreTags = document.createElement("button");
+            moreTags.type = "button";
+            moreTags.classList.add("chipselect", "global-tags-more");
+            const moreTagsIcon = document.createElement("i");
+            moreTagsIcon.classList.add("material-icons");
+            moreTagsIcon.setAttribute("aria-hidden", "true");
+            moreTagsIcon.textContent = "add";
+            moreTags.appendChild(moreTagsIcon);
+            moreTags.title = _("Show all tags");
+            moreTags.setAttribute("aria-label", `${_("Show all tags")}: ${remainingTagCount}`);
+            moreTags.addEventListener("click", () => {
+                Planet.GlobalPlanet.ProjectViewer.open(this.id);
+            });
+            tagcontainer.appendChild(moreTags);
         }
 
         // set project title text and tooltip
