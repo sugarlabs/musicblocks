@@ -64,6 +64,10 @@ describe("musicutils-pitch", () => {
         expect(pitch.stripMicrotonalPrefix("vvC4")).toBe("C4");
         expect(pitch.stripMicrotonalPrefix("^^^C4")).toBe("^C4");
         expect(pitch.stripMicrotonalPrefix("x^C4")).toBe("x^C4");
+        expect(pitch.stripMicrotonalPrefix(undefined)).toBe("");
+        expect(pitch.stripMicrotonalPrefix(null)).toBe("");
+        expect(pitch.stripMicrotonalPrefix(42)).toBe("");
+        expect(pitch.stripMicrotonalPrefix({})).toBe("");
     });
 
     describe("normalizeNoteAccidentals", () => {
@@ -90,6 +94,10 @@ describe("musicutils-pitch", () => {
             expect(pitch.normalizeNoteAccidentals("D4")).toBe("D4");
             expect(pitch.normalizeNoteAccidentals("A0")).toBe("A0");
             expect(pitch.normalizeNoteAccidentals("")).toBe("");
+            expect(pitch.normalizeNoteAccidentals(undefined)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(null)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(42)).toBe("");
+            expect(pitch.normalizeNoteAccidentals({})).toBe("");
             expect(pitch.normalizeNoteAccidentals("Do")).toBe("Do");
             expect(pitch.normalizeNoteAccidentals("rest")).toBe("rest");
         });

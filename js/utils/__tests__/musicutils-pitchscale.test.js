@@ -98,6 +98,40 @@ describe("musicutils-pitchscale", () => {
         expect(mode).toBe("major");
     });
 
+    describe("input validation and type guards (#9900)", () => {
+        it("returns ['C', 'major'] for nullish, non-string, or empty key signatures in keySignatureToMode", () => {
+            expect(pitchscale.keySignatureToMode(undefined)).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode(null)).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode("")).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode("   ")).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode(42)).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode(true)).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode({})).toEqual(["C", "major"]);
+            expect(pitchscale.keySignatureToMode([])).toEqual(["C", "major"]);
+        });
+
+        it("safely handles nullish and non-string inputs in getSharpFlatPreference", () => {
+            expect(pitchscale.getSharpFlatPreference(undefined)).toBe("natural");
+            expect(pitchscale.getSharpFlatPreference(null)).toBe("natural");
+            expect(pitchscale.getSharpFlatPreference(123)).toBe("natural");
+            expect(pitchscale.getSharpFlatPreference("")).toBe("natural");
+        });
+
+        it("safely handles nullish and non-string inputs in pitchToNumber", () => {
+            expect(pitchscale.pitchToNumber(undefined, 4, "C major", "equal")).toBe(0);
+            expect(pitchscale.pitchToNumber(null, 4, "C major", "equal")).toBe(0);
+            expect(pitchscale.pitchToNumber(123, 4, "C major", "equal")).toBe(0);
+            expect(pitchscale.pitchToNumber("", 4, "C major", "equal")).toBe(0);
+        });
+
+        it("returns null for non-string or empty solfege note arguments in getNoteFromSolfege", () => {
+            expect(pitchscale.getNoteFromSolfege(undefined, "C major", true, 12, 4, 0)).toBeNull();
+            expect(pitchscale.getNoteFromSolfege(null, "C major", true, 12, 4, 0)).toBeNull();
+            expect(pitchscale.getNoteFromSolfege(42, "C major", true, 12, 4, 0)).toBeNull();
+            expect(pitchscale.getNoteFromSolfege("", "C major", true, 12, 4, 0)).toBeNull();
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "keySignatureToMode",

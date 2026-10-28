@@ -73,6 +73,43 @@ describe("musicutils-modecore", () => {
         expect(modecore.wholeNoteImg).toMatch(/^data:image\/svg\+xml;base64,/);
     });
 
+    describe("input validation and type guards (#9900)", () => {
+        it("safely handles nullish and non-string inputs in modeMapper", () => {
+            expect(modecore.modeMapper(null, "major")).toEqual(["c", "major"]);
+            expect(modecore.modeMapper(undefined, "major")).toEqual(["c", "major"]);
+            expect(modecore.modeMapper("C", null)).toEqual(["c", "major"]);
+            expect(modecore.modeMapper("C", undefined)).toEqual(["c", "major"]);
+            expect(modecore.modeMapper(123, 456)).toEqual(["c", "major"]);
+            expect(modecore.modeMapper("", "")).toEqual(["c", "major"]);
+            expect(modecore.modeMapper("D", "dorian")).toEqual(["c", "major"]);
+        });
+
+        it("safely falls back to major mode pattern for non-string inputs in getModePattern", () => {
+            const major12 = [2, 2, 1, 2, 2, 2, 1];
+            expect(modecore.getModePattern(undefined)).toEqual(major12);
+            expect(modecore.getModePattern(null)).toEqual(major12);
+            expect(modecore.getModePattern(123)).toEqual(major12);
+            expect(modecore.getModePattern({})).toEqual(major12);
+            expect(modecore.getModePattern("unknownMode")).toEqual(major12);
+        });
+
+        it("returns an empty string for non-string inputs in getModeNumbers", () => {
+            expect(modecore.getModeNumbers(undefined)).toBe("");
+            expect(modecore.getModeNumbers(null)).toBe("");
+            expect(modecore.getModeNumbers(42)).toBe("");
+            expect(modecore.getModeNumbers({})).toBe("");
+            expect(modecore.getModeNumbers([])).toBe("");
+        });
+
+        it("safely returns an empty string for nullish, non-string, or empty array inputs in getCustomNote", () => {
+            expect(modecore.getCustomNote(null)).toBe("");
+            expect(modecore.getCustomNote(undefined)).toBe("");
+            expect(modecore.getCustomNote([])).toBe("");
+            expect(modecore.getCustomNote(123)).toBe("");
+            expect(modecore.getCustomNote({})).toBe("");
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "MUSICALMODES",

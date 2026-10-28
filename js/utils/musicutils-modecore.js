@@ -257,6 +257,10 @@ var getModeNumbers = name => {
         return m;
     };
 
+    if (typeof name !== "string") {
+        return "";
+    }
+
     const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
         if (mode.toLowerCase() === lowercaseName) {
@@ -362,8 +366,8 @@ var getArticulation = note => {
 var modeMapper = (key, mode) => {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
-    key = key.toLowerCase();
-    mode = mode.toLowerCase();
+    key = typeof key === "string" && key.trim() !== "" ? key.toLowerCase() : "c";
+    mode = typeof mode === "string" && mode.trim() !== "" ? mode.toLowerCase() : "major";
 
     switch (mode) {
         case "ionian":
@@ -700,8 +704,11 @@ var modeMapper = (key, mode) => {
  */
 var getCustomNote = note => {
     // For custom temperament note
-    if (note instanceof Array) {
+    if (Array.isArray(note)) {
         note = note[0];
+    }
+    if (typeof note !== "string") {
+        return "";
     }
 
     let centsInfo = "";
@@ -887,6 +894,9 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * @returns {Array} Integer step pattern.
  */
 var getModePattern = (mode, edo = 12) => {
+    if (typeof mode !== "string") {
+        return scalePatternToEDO(MUSICALMODES.major, edo);
+    }
     const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
     if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
         return overrides[mode].slice();

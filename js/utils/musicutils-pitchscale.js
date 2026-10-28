@@ -119,7 +119,7 @@ var NOTESYMBOLS = {
  */
 var keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature === null) {
+    if (typeof keySignature !== "string" || keySignature.trim() === "") {
         return ["C", "major"];
     }
 
@@ -315,6 +315,9 @@ var getSharpFlatPreference = keySignature => {
  * @returns {number} The numeric representation of the pitch.
  */
 var pitchToNumber = (pitch, octave, keySignature, temperament) => {
+    if (typeof pitch !== "string" || pitch.length === 0) {
+        return 0;
+    }
     const currentEDO = getCurrentEDO(temperament);
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
@@ -900,6 +903,9 @@ var getNoteFromSolfege = (
     octave,
     transpositionFloor
 ) => {
+    if (typeof noteArg !== "string" || noteArg.length === 0) {
+        return null;
+    }
     let sharpFlat = false;
     if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
         sharpFlat = true;
