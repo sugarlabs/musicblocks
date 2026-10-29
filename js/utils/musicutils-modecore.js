@@ -682,6 +682,13 @@ var modeMapper = (key, mode) => {
         case "natural minor":
             mode = "minor";
             break;
+        case "major pentatonic":
+            mode = "major";
+            break;
+        case "minor pentatonic":
+        case "minyo":
+            mode = "minor";
+            break;
         case "major":
         case "minor":
         default:

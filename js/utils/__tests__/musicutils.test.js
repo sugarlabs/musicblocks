@@ -1571,6 +1571,14 @@ describe("modeMapper", () => {
     ])("should map %s %s to the flat key %j", (key, mode, expected) => {
         expect(modeMapper(key, mode)).toEqual(expected);
     });
+
+    it.each([
+        ["D", "major pentatonic", ["d", "major"]],
+        ["B", "minor pentatonic", ["b", "minor"]],
+        ["B", "minyo", ["b", "minor"]]
+    ])("should map %s %s to its parent key %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
+    });
 });
 
 describe("getSharpFlatPreference", () => {
@@ -2356,6 +2364,28 @@ describe("buildScale", () => {
         ["G melodic minor", "G A B♭ C D E F♯ G"]
     ])("should spell %s with one letter per degree", (keySignature, expected) => {
         expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it.each([
+        ["D major pentatonic", "D E F♯ A B D"],
+        ["A major pentatonic", "A B C♯ E F♯ A"],
+        ["E major pentatonic", "E F♯ G♯ B C♯ E"],
+        ["B major pentatonic", "B C♯ D♯ F♯ G♯ B"],
+        ["B minor pentatonic", "B D E F♯ A B"],
+        ["B minyo", "B D E F♯ A B"],
+        ["B♭ major pentatonic", "B♭ C D F G B♭"],
+        ["F minor pentatonic", "F A♭ B♭ C E♭ F"]
+    ])("should spell %s with the accidentals of its key", (keySignature, expected) => {
+        expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it("should give each note of D major pentatonic one scale degree", () => {
+        expect(scaleDegreeToPitchMapping("D major pentatonic", 3, false, null)).toBe("F♯");
+        expect(scaleDegreeToPitchMapping("D major pentatonic", null, false, "G")).toEqual([
+            "4",
+            "♮"
+        ]);
+        expect(getSharpFlatPreference("D major pentatonic")).toBe("sharp");
     });
 
     it("should not repeat a letter in any seven-note scale it can spell", () => {
