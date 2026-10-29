@@ -373,6 +373,67 @@ describe("ChordBuilderWidget", () => {
             expect(mockBlocks.loadNewBlocks).not.toHaveBeenCalled();
         });
 
+        it("shows error message if all beats are empty", () => {
+            widget.progression = [null, null, null];
+            widget.saveToBlocks();
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Add chords to your progression before saving."
+            );
+            expect(mockBlocks.loadNewBlocks).not.toHaveBeenCalled();
+        });
+
+        it.each([[[3]], [[0, 2]], [[1, 3]]])(
+            "preserves empty beats when saving chords in cells %j",
+            cells => {
+                const body = mockWindow.getWidgetBody();
+                cells.forEach(cellIndex => {
+                    body.querySelectorAll(".bar-grid-cell")[cellIndex].click();
+                    const picker = body.querySelector(".bar-grid-cell select");
+                    picker.value = "0";
+                    picker.dispatchEvent(new Event("change", { bubbles: true }));
+                });
+                const progression = widget.progression.slice();
+
+                body.querySelector("#chordSaveBtn").click();
+
+                expect(mockBlocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+                const stack = mockBlocks.loadNewBlocks.mock.calls[0][0];
+                const notes = stack.filter(block => block[1][0] === "newnote");
+                expect(notes).toHaveLength(cells[cells.length - 1] + 1);
+                let previousBlock = stack[0];
+                notes.forEach((note, index) => {
+                    const content = stack[note[4][2]];
+                    const isChord = cells.includes(index);
+                    const flowBlock = isChord ? stack[note[4][0]] : note;
+                    expect(previousBlock[4][previousBlock[4].length - 1]).toBe(flowBlock[0]);
+                    expect(flowBlock[4][0]).toBe(previousBlock[0]);
+                    expect(content[1][0]).toBe(isChord ? "pitch" : "rest2");
+                    expect(content[4][0]).toBe(note[0]);
+                    if (isChord) {
+                        expect(flowBlock[1][0]).toBe("chordinterval");
+                        expect(flowBlock[4][2]).toBe(note[0]);
+                        expect(stack[content[4][1]][1][1].value).toBe("C");
+                    }
+                    const duration = stack[note[4][1]];
+                    expect(duration[1][0]).toBe("divide");
+                    expect(stack[duration[4][1]][1][1].value).toBe(1);
+                    expect(stack[duration[4][2]][1][1].value).toBe(4);
+                    previousBlock = isChord ? flowBlock : stack[note[4][3]];
+                });
+                expect(previousBlock[4][previousBlock[4].length - 1]).toBeNull();
+                expect(stack.filter(block => block[1][0] === "chordinterval")).toHaveLength(
+                    cells.length
+                );
+                expect(widget.progression).toEqual(progression);
+                expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+                expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                    "New chord progression blocks generated.",
+                    3000
+                );
+            }
+        );
+
         it("generates and loads block stack for chord progression", () => {
             widget.loadPreset("pop"); // 4 chords: C, G, Am, F
             widget.saveToBlocks();
