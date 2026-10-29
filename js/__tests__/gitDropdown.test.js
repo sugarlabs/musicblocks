@@ -370,9 +370,174 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 "error"
             );
         });
+
+        describe("when the repo name is already taken", () => {
+            const taken = () =>
+                Promise.resolve({ ok: false, status: 422, json: () => Promise.resolve({}) });
+            const created = repository =>
+                Promise.resolve({
+                    ok: true,
+                    status: 201,
+                    json: () => Promise.resolve({ success: true, repository, key: "key-1" })
+                });
+            const sentNames = () =>
+                global.fetch.mock.calls
+                    .filter(c => String(c[0]).endsWith("/create"))
+                    .map(c => JSON.parse(c[1].body).repoName);
+
+            beforeEach(() => {
+                jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            });
+
+            test("does not retry when the first name is free", async () => {
+                global.fetch.mockImplementationOnce(() => created("my-song"));
+
+                await gitDropdown._doCreate("my-song", "My Song", "desc");
+
+                expect(sentNames()).toEqual(["my-song"]);
+                expect(localStorage.getItem("mbGitRepoName")).toBe("my-song");
+            });
+
+            test("retries once with a short suffix and keeps the display name", async () => {
+                jest.spyOn(Math, "random").mockReturnValue(0.5);
+                global.fetch
+                    .mockImplementationOnce(taken)
+                    .mockImplementationOnce(() => created(undefined));
+
+                await gitDropdown._doCreate("my-song", "My Song", "desc");
+
+                const names = sentNames();
+                expect(names).toHaveLength(2);
+                expect(names[0]).toBe("my-song");
+                expect(names[1]).toMatch(/^my-song-[a-z0-9]{4}$/);
+                expect(localStorage.getItem("mbGitRepoName")).toBe(names[1]);
+                expect(localStorage.getItem("mbGitDisplayName")).toBe("My Song");
+                expect(window.MBDialog.alert).not.toHaveBeenCalled();
+            });
+
+            test("keeps the name within 100 characters when adding the suffix", async () => {
+                global.fetch
+                    .mockImplementationOnce(taken)
+                    .mockImplementationOnce(() => created(undefined));
+
+                await gitDropdown._doCreate("a".repeat(100), "Long", "desc");
+
+                expect(sentNames()[1].length).toBeLessThanOrEqual(100);
+            });
+
+            test("still asks the user to rename when the retry is taken too", async () => {
+                global.fetch.mockImplementationOnce(taken).mockImplementationOnce(taken);
+
+                await gitDropdown._doCreate("my-song", "My Song", "desc");
+
+                expect(sentNames()).toHaveLength(2);
+                expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                    expect.stringContaining("That name is already taken"),
+                    "Name Already Taken"
+                );
+                expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            });
+        });
     });
 
     // ── 3. Save a Moment Flow (Online & Offline) ────────────────────────────
+    describe("Repo name from the project name (_sanitizeRepoName)", () => {
+        test("keeps latin names as before", () => {
+            expect(gitDropdown._sanitizeRepoName("My Song!")).toBe("my-song");
+        });
+
+        test("drops accents instead of splitting the word", () => {
+            expect(gitDropdown._sanitizeRepoName("Canción")).toBe("cancion");
+            expect(gitDropdown._sanitizeRepoName("Café Crème")).toBe("cafe-creme");
+        });
+
+        test("maps letters that NFKD does not split", () => {
+            expect(gitDropdown._sanitizeRepoName("Łódź")).toBe("lodz");
+            expect(gitDropdown._sanitizeRepoName("Ørsted")).toBe("orsted");
+            expect(gitDropdown._sanitizeRepoName("Straße")).toBe("strasse");
+            expect(gitDropdown._sanitizeRepoName("Đorđe")).toBe("dorde");
+            expect(gitDropdown._sanitizeRepoName("Æsir")).toBe("aesir");
+            expect(gitDropdown._sanitizeRepoName("Cœur")).toBe("coeur");
+        });
+
+        test("returns an empty string for names with no latin letters or digits", () => {
+            expect(gitDropdown._sanitizeRepoName("私の曲")).toBe("");
+            expect(gitDropdown._sanitizeRepoName("Мой проект")).toBe("");
+        });
+
+        test("gives the same result for the same name", () => {
+            expect(gitDropdown._sanitizeRepoName("Łódź Song")).toBe(
+                gitDropdown._sanitizeRepoName("Łódź Song")
+            );
+        });
+
+        test("never ends with a dash after cutting to 100 characters", () => {
+            const slug = gitDropdown._sanitizeRepoName("a".repeat(99) + " b");
+            expect(slug.length).toBeLessThanOrEqual(100);
+            expect(slug.endsWith("-")).toBe(false);
+        });
+    });
+
+    describe("Fallback repo name (_fallbackRepoName)", () => {
+        test("gives two different names even in the same millisecond", () => {
+            const now = jest.spyOn(Date, "now").mockReturnValue(1000);
+            const random = jest.spyOn(Math, "random");
+            random.mockReturnValueOnce(0.1).mockReturnValueOnce(0.2);
+
+            const first = gitDropdown._fallbackRepoName();
+            const second = gitDropdown._fallbackRepoName();
+
+            expect(first).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(second).toMatch(/^my-music-project-[a-z0-9]+-[a-z0-9]{4}$/);
+            expect(first).not.toBe(second);
+            now.mockRestore();
+            random.mockRestore();
+        });
+
+        test("never ends with a dash, even if Math.random returns 0", () => {
+            const random = jest.spyOn(Math, "random").mockReturnValue(0);
+            expect(gitDropdown._fallbackRepoName()).toMatch(/^my-music-project-[a-z0-9]+-0000$/);
+            random.mockRestore();
+        });
+
+        test("is used by the create flow when the name has no latin letters", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("私の曲")
+                .mockResolvedValueOnce("my description");
+            jest.spyOn(gitDropdown, "_fallbackRepoName").mockReturnValue("fallback-name");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(create).toHaveBeenCalledWith("fallback-name", "私の曲", "my description");
+        });
+
+        test("is used when only digits are left of a non-latin name", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("私の曲 1")
+                .mockResolvedValueOnce("my description");
+            jest.spyOn(gitDropdown, "_fallbackRepoName").mockReturnValue("fallback-name");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(create).toHaveBeenCalledWith("fallback-name", "私の曲 1", "my description");
+        });
+
+        test("is not used by the create flow for latin names", async () => {
+            window.MBDialog.prompt
+                .mockResolvedValueOnce("My Song")
+                .mockResolvedValueOnce("my description");
+            const fallback = jest.spyOn(gitDropdown, "_fallbackRepoName");
+            const create = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(fallback).not.toHaveBeenCalled();
+            expect(create).toHaveBeenCalledWith("my-song", "My Song", "my description");
+        });
+    });
+
     describe("Save a Moment (_doCommit)", () => {
         test("commits to backend online and updates session hashes", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
@@ -462,9 +627,96 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
         });
 
-        test("MB_NEW_PROJECT clears all tracking state immediately", () => {
+        test("MB_GIT_STATE updates git state when active project is deleted and replaced by a tracked project", async () => {
+            // Project A was active and had Git state
+            localStorage.setItem("mbGitRepoName", "project-a-repo");
+            localStorage.setItem("mbGitHashedKey", "project-a-key");
+            localStorage.setItem("mbGitDisplayName", "Project A");
+            localStorage.setItem("mbGitCurrentProjectId", "proj-a");
+
+            // Project A is deleted and project B becomes active, sending MB_GIT_STATE
+            window.dispatchEvent(
+                new MessageEvent("message", {
+                    data: {
+                        type: "MB_GIT_STATE",
+                        repoName: "project-b-repo",
+                        hashedKey: "project-b-key",
+                        projectName: "Project B",
+                        projectId: "proj-b"
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
+                })
+            );
+
+            // Git menu receives project B's credentials rather than retaining project A's
+            expect(localStorage.getItem("mbGitRepoName")).toBe("project-b-repo");
+            expect(localStorage.getItem("mbGitHashedKey")).toBe("project-b-key");
+            expect(localStorage.getItem("mbGitDisplayName")).toBe("Project B");
+            expect(localStorage.getItem("mbGitCurrentProjectId")).toBe("proj-b");
+
+            // Subsequent Git actions commit to project B's repository, NOT project A's
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit").mockResolvedValue();
+            await gitDropdown._showCommitFlow();
+            expect(doCommitSpy).toHaveBeenCalledWith(
+                "project-b-repo",
+                "project-b-key",
+                expect.any(String)
+            );
+            expect(doCommitSpy).not.toHaveBeenCalledWith(
+                "project-a-repo",
+                expect.anything(),
+                expect.anything()
+            );
+        });
+
+        test("MB_GIT_STATE clears git state when active project is deleted and replacement project is untracked", async () => {
+            // Project A was active and had Git state
+            localStorage.setItem("mbGitRepoName", "project-a-repo");
+            localStorage.setItem("mbGitHashedKey", "project-a-key");
+            localStorage.setItem("mbGitDisplayName", "Project A");
+            localStorage.setItem("mbGitCurrentProjectId", "proj-a");
+
+            // Project A is deleted and replacement Project B has no git state
+            window.dispatchEvent(
+                new MessageEvent("message", {
+                    data: {
+                        type: "MB_GIT_STATE",
+                        repoName: "",
+                        hashedKey: "",
+                        projectName: "Project B",
+                        projectId: "proj-b"
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
+                })
+            );
+
+            // Git menu clears project A's credentials rather than retaining them
+            expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(localStorage.getItem("mbGitHashedKey")).toBeNull();
+            expect(localStorage.getItem("mbGitDisplayName")).toBeNull();
+
+            // Subsequent Git actions cannot accidentally associate project B's data with project A's repository
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit");
+            await gitDropdown._showCommitFlow();
+            expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
+            );
+            expect(doCommitSpy).not.toHaveBeenCalled();
+        });
+
+        test("MB_NEW_PROJECT clears all tracking state immediately and prevents committing to old repo", async () => {
             localStorage.setItem("mbGitRepoName", "old-repo");
+            localStorage.setItem("mbGitHashedKey", "old-key");
             localStorage.setItem("mbGitDisplayName", "Old Project");
+            localStorage.setItem("mbGitLastSavedHash", "hash123");
+            localStorage.setItem("mbGitCurrentSha", "sha123");
+            localStorage.setItem("mbGitCurrentDraftId", "draft123");
+            localStorage.setItem("mbGitCurrentProjectId", "proj123");
+
+            const clearSpy = jest.spyOn(gitDropdown, "clearForNewProject");
 
             window.dispatchEvent(
                 new MessageEvent("message", {
@@ -477,11 +729,26 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
 
             expect(localStorage.getItem("mbGitRepoName")).toBeNull();
+            expect(localStorage.getItem("mbGitHashedKey")).toBeNull();
             expect(localStorage.getItem("mbGitDisplayName")).toBeNull();
+            expect(localStorage.getItem("mbGitLastSavedHash")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentSha")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentDraftId")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentProjectId")).toBeNull();
+            expect(clearSpy).toHaveBeenCalled();
             expect(mockBtn.setAttribute).toHaveBeenCalledWith(
                 "data-tooltip",
                 "Start tracking my project"
             );
+
+            // Subsequent commit flow cannot commit to deleted project
+            const doCommitSpy = jest.spyOn(gitDropdown, "_doCommit");
+            await gitDropdown._showCommitFlow();
+            expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
+            );
+            expect(doCommitSpy).not.toHaveBeenCalled();
         });
 
         test("MB_SYNC_COMPLETE invalidates prefetch cache and triggers commits refresh", () => {
@@ -501,6 +768,52 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             );
 
             expect(prefetchSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe("_makeDraggable", () => {
+        test("handles drag and drop correctly with requestAnimationFrame", () => {
+            const previousRaf = window.requestAnimationFrame;
+            const previousCancelRaf = window.cancelAnimationFrame;
+
+            let rafCallback = null;
+            window.requestAnimationFrame = jest.fn(cb => {
+                rafCallback = cb;
+                return 456;
+            });
+            window.cancelAnimationFrame = jest.fn();
+
+            try {
+                const frame = document.createElement("div");
+                frame.getBoundingClientRect = () => ({ left: 10, top: 20 });
+                Object.defineProperty(frame, "offsetWidth", { value: 100 });
+                Object.defineProperty(frame, "offsetHeight", { value: 100 });
+                frame.style.left = "0px";
+                frame.style.top = "0px";
+                const handle = document.createElement("div");
+
+                gitDropdown._makeDraggable(frame, handle);
+
+                const mousedown = new MouseEvent("mousedown", { clientX: 50, clientY: 60 });
+                handle.dispatchEvent(mousedown);
+
+                const mousemove = new MouseEvent("mousemove", { clientX: 100, clientY: 120 });
+                document.dispatchEvent(mousemove);
+
+                expect(window.requestAnimationFrame).toHaveBeenCalled();
+                expect(rafCallback).not.toBeNull();
+
+                const mouseup = new MouseEvent("mouseup");
+                document.dispatchEvent(mouseup);
+
+                expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
+
+                expect(frame.style.left).toBe("60px");
+                expect(frame.style.top).toBe("80px");
+            } finally {
+                window.requestAnimationFrame = previousRaf;
+                window.cancelAnimationFrame = previousCancelRaf;
+            }
         });
     });
 });

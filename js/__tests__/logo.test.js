@@ -239,6 +239,7 @@ function createMockTurtle(overrides = {}) {
         parentFlowQueue: [],
         unhighlightQueue: [],
         parameterQueue: [],
+        actionBoundaries: [],
         listeners: {},
         endOfClampSignals: {},
         butNotThese: {},
@@ -456,6 +457,11 @@ describe("Logo constructor", () => {
         expect(logo.stopTurtle).toBe(false);
         expect(logo.time).toBe(0);
         expect(logo.firstNoteTime).toBeNull();
+    });
+
+    test("initializes iteration budget and maximum iterations", () => {
+        expect(logo._MAX_ITERATIONS).toBe(1000000);
+        expect(logo._iterationBudget).toBe(1000001);
     });
 
     test("initializes widget properties to null/false", () => {
@@ -845,6 +851,70 @@ describe("Logo step", () => {
         logo.step();
 
         expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+    });
+
+    test("processes step queue in FIFO order (shift instead of pop)", () => {
+        const executionOrder = [];
+        logo.stepQueue = { 0: [{ blk: 1 }, { blk: 2 }, { blk: 3 }] };
+        logo.runFromBlockNow = jest.fn((self, turtle, blk) => {
+            executionOrder.push(blk);
+        });
+
+        logo.step();
+        expect(executionOrder).toEqual([1]);
+        expect(logo.stepQueue[0]).toEqual([{ blk: 2 }, { blk: 3 }]);
+
+        logo.step();
+        expect(executionOrder).toEqual([1, 2]);
+        expect(logo.stepQueue[0]).toEqual([{ blk: 3 }]);
+
+        logo.step();
+        expect(executionOrder).toEqual([1, 2, 3]);
+        expect(logo.stepQueue[0]).toEqual([]);
+    });
+
+    test("forwards isflow and receivedArg from queued stepItem into runFromBlockNow", () => {
+        logo.stepQueue = {
+            0: [
+                {
+                    blk: 42,
+                    isflow: 1,
+                    receivedArg: 100
+                }
+            ]
+        };
+        logo.runFromBlockNow = jest.fn();
+
+        logo.step();
+
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 42, 1, 100);
+    });
+
+    test("handles primitive numbers in stepQueue for backward compatibility", () => {
+        logo.stepQueue = { 0: [10] };
+        logo.runFromBlockNow = jest.fn();
+
+        logo.step();
+
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 10, 0, null);
+    });
+
+    test("runFromBlock enqueues object with blk, isflow, and receivedArg in TURTLESTEP mode", () => {
+        const mockTurtle = createMockTurtle();
+        mockActivity.turtles.ithTurtle = jest.fn().mockReturnValue(mockTurtle);
+        logo.turtleDelay = TURTLESTEP;
+        logo.stopTurtle = false;
+        logo.stepQueue = {};
+
+        logo.runFromBlock(logo, 0, 12, 1, "test-arg");
+
+        expect(logo.stepQueue[0]).toEqual([
+            {
+                blk: 12,
+                isflow: 1,
+                receivedArg: "test-arg"
+            }
+        ]);
     });
 });
 
@@ -2655,6 +2725,28 @@ describe("Logo runFromBlockNow", () => {
             expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
         });
 
+        test("dispatchUnissuedSignals does not double-dispatch previously issued signals", () => {
+            turtle0.endOfClampSignals = { 7: ["_transposition_0", "_tie_0"] };
+            turtle0.butNotThese = { 7: [0] };
+
+            logo.dispatchUnissuedSignals(turtle0);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_transposition_0");
+
+            mockActivity.stage.dispatchEvent.mockClear();
+
+            // When dispatchUnissuedSignals is called again (e.g. at turtle completion
+            // after butNotThese is restored), _tie_0 must not fire again.
+            turtle0.butNotThese = {};
+            logo.dispatchUnissuedSignals(turtle0);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_transposition_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_tie_0");
+        });
+
         test("a note counter's silent run keeps its signals on a premature restart", () => {
             logo._prematureRestart = true;
             turtle0.singer.justCounting = [true];
@@ -3805,6 +3897,102 @@ describe("Logo.processSpeak", () => {
 
             expect(engine.cancel).toHaveBeenCalledTimes(1);
             expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("flow halt and queue unwinding on ret signal", () => {
+        test("unwinds action queue back to queueStart and cancels downstream blocks", () => {
+            const executed = [];
+            const returnBlock = {
+                ...makeFlowBlock("return", [null, null, true]),
+                connections: [null, null, 1]
+            };
+            const forwardBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null, null]
+            };
+            forwardBlock.protoblock.flow = jest.fn(() => {
+                executed.push("forward");
+            });
+
+            logo.blockList = [returnBlock, forwardBlock];
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(executed).not.toContain("forward");
+            expect(logo.turtles.ithTurtle(0).queue).toEqual([]);
+            expect(logo.turtles.ithTurtle(0).running).toBe(false);
+        });
+
+        test("preserves and executes caller continuation after action returns", () => {
+            const executed = [];
+            const doBlock = {
+                ...makeFlowBlock("do", [1, 1]),
+                connections: [null, null, 2]
+            };
+            const returnBlock = {
+                ...makeFlowBlock("return", [null, null, true]),
+                connections: [1, null, 3]
+            };
+            const printBlock = {
+                ...makeFlowBlock("print"),
+                connections: [0, null, null]
+            };
+            printBlock.protoblock.flow = jest.fn(() => {
+                executed.push("print");
+            });
+            const forwardBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [1, null, null]
+            };
+            forwardBlock.protoblock.flow = jest.fn(() => {
+                executed.push("forward");
+            });
+
+            logo.blockList = [doBlock, returnBlock, printBlock, forwardBlock];
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(executed).toEqual(["print"]);
+            expect(logo.turtles.ithTurtle(0).running).toBe(false);
+        });
+
+        test("preserves caller continuation below nonzero queueStart boundary", () => {
+            const returnBlock = {
+                ...makeFlowBlock("return", [null, null, true]),
+                connections: [null, null, 2]
+            };
+            const continuationBlock = makeFlowBlock("continuation");
+            const forwardBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null, null]
+            };
+            logo.blockList = [returnBlock, continuationBlock, forwardBlock];
+            const tur = logo.turtles.ithTurtle(0);
+            tur.queue = [new Queue(1, 1, null, null)];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 1);
+
+            expect(forwardBlock.protoblock.flow).not.toHaveBeenCalled();
+            expect(tur.queue).toEqual([new Queue(1, 1, null, null)]);
+        });
+
+        test("dispatches endOfClampSignals when unwinding queued blocks on return", () => {
+            const returnBlock = {
+                ...makeFlowBlock("return", [null, null, true]),
+                connections: [null, null, 1]
+            };
+            const clampBlock = {
+                ...makeFlowBlock("note"),
+                connections: [0, null, null]
+            };
+            logo.blockList = [returnBlock, clampBlock];
+            const tur = logo.turtles.ithTurtle(0);
+            tur.endOfClampSignals[1] = ["restore_volume_signal"];
+            logo.stage = { dispatchEvent: jest.fn() };
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(logo.stage.dispatchEvent).toHaveBeenCalledWith("restore_volume_signal");
+            expect(tur.queue).toEqual([]);
         });
     });
 });

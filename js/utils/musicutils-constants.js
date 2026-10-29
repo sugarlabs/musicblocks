@@ -26,7 +26,7 @@
    TWELVEHUNDRETHROOT2, A0, C8, C10, YSTAFFNOTEHEIGHT, YSTAFFOCTAVEHEIGHT,
    MATRIXSOLFEWIDTH, EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
    MATRIXSOLFEHEIGHT, ACCIDENTALNAMES, ACCIDENTALVALUES, CHORDNAMES,
-   DEFAULTCHORD, INTERVALVALUES, MODE_PIE_MENUS, MODEPIEMENU_SLOT_COUNT,
+   DEFAULTCHORD, INTERVALVALUES, INTERVAL_ALIASES, MODE_PIE_MENUS, MODEPIEMENU_SLOT_COUNT,
    MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
    MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
    MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
@@ -957,6 +957,17 @@ var INTERVALVALUES = {
     "augmented 8": [13, 1, 25 / 12]
 };
 
+// INTERVALVALUES keys that are another name for an interval, mapped to its
+// "<quality> <number>" name. The entries match, but getNoteFromInterval takes the
+// number of letter names to move from the number in the name, so it reads these
+// names through this map.
+var INTERVAL_ALIASES = {
+    "chromatic semitone": "augmented 1",
+    "whole tone": "major 2",
+    "diminished octave": "diminished 8",
+    "octave": "perfect 8"
+};
+
 /**
  * Modes available in the pie menu associated with the mode name block.
  * @constant {Object}
@@ -1384,6 +1395,7 @@ var MusicUtilsConstants = {
     CHORDNAMES,
     DEFAULTCHORD,
     INTERVALVALUES,
+    INTERVAL_ALIASES,
     MODE_PIE_MENUS,
     MODEPIEMENU_SLOT_COUNT,
     MODEPIEMENU_GROUP_RING,

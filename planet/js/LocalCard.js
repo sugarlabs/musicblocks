@@ -109,10 +109,14 @@ class LocalCard {
 
     duplicate() {
         const Planet = this.Planet;
+        // Keep the open project: closing the Planet loads whatever is current, so
+        // making the copy current would swap the workspace to it.
         Planet.ProjectStorage.initialiseNewProject(
             this.ProjectData.ProjectName + " " + this.CopySuffix,
             this.ProjectData.ProjectData,
-            this.ProjectData.ProjectImage
+            this.ProjectData.ProjectImage,
+            null,
+            { makeCurrent: false }
         );
         Planet.LocalPlanet.updateProjects();
     }

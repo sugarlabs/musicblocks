@@ -59,28 +59,30 @@ class Publisher {
             blocks.blockList.push(block);
         }
 
-        //convert blocks to score.
-        const score = this.Planet.analyzeProject();
+        // Score this project's blocks, not the workspace: a card in the Local Planet is
+        // often not the project that is open.
+        const score = this.Planet.analyzeProject(blocks);
 
         //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
         //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
 
-        //use score to map tags.
-        const tags = [];
+        // Map scores to tag names and look the ids up in the manifest, since its keys
+        // changed with the backend (numeric ids before, "music", "math", ... now).
+        const names = [];
 
         //Pitch, Tone, and/or Rhythm
-        if (score[1] && score[2]) tags.push("2"); // music
+        if (score[1] && score[2]) names.push("Music");
 
         //pen,mouse
-        if (score[3] && score[4]) tags.push("3"); // art
+        if (score[3] && score[4]) names.push("Art");
 
         //sensors
-        if (score[8]) tags.push("5"); // interactive
+        if (score[8]) names.push("Interactive");
 
         //number
-        if (score[5]) tags.push("4"); // math
+        if (score[5]) names.push("Math");
 
-        return tags;
+        return names.map(name => this.findTagWithName(name)).filter(id => id !== null);
     }
 
     findTagWithName(name) {
@@ -199,9 +201,8 @@ class Publisher {
                   ? gitRepoData.tags
                   : this.dataToTags(DATA);
 
-        document.getElementById("publisher-ptitle").textContent = _(
-            `${published !== null ? "Republish" : "Publish"}  Project`
-        );
+        document.getElementById("publisher-ptitle").textContent =
+            published !== null ? _("Republish project") : _("Publish project");
 
         const Planet = this.Planet;
 

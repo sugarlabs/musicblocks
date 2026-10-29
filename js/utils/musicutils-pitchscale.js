@@ -48,6 +48,7 @@ if (typeof module !== "undefined" && module.exports) {
         PITCHES2,
         PITCHES,
         INTERVALVALUES,
+        INTERVAL_ALIASES,
         SOLFNOTES,
         NOTESFLAT2,
         EQUIVALENTFLATS,
@@ -118,7 +119,7 @@ var NOTESYMBOLS = {
  */
 var keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature === null) {
+    if (typeof keySignature !== "string" || keySignature.trim() === "") {
         return ["C", "major"];
     }
 
@@ -314,6 +315,9 @@ var getSharpFlatPreference = keySignature => {
  * @returns {number} The numeric representation of the pitch.
  */
 var pitchToNumber = (pitch, octave, keySignature, temperament) => {
+    if (typeof pitch !== "string") {
+        return 0;
+    }
     const currentEDO = getCurrentEDO(temperament);
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
@@ -326,17 +330,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     let lastOne, lastTwo;
     if (len > 1) {
         if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
+            lastTwo = pitch.slice(-2);
+            if (lastTwo === "bb" || lastTwo === FLAT + FLAT || lastTwo === DOUBLEFLAT) {
+                pitch = pitch.slice(0, -2);
                 transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "##" || lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
+            } else if (lastTwo === "##" || lastTwo === SHARP + SHARP || lastTwo === DOUBLESHARP) {
+                pitch = pitch.slice(0, -2);
                 transposition += 2;
             } else if (
                 lastTwo === "#b" ||
@@ -344,21 +343,20 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
                 lastTwo === "b#" ||
                 lastTwo === FLAT + SHARP
             ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
+                pitch = pitch.slice(0, -2);
             }
         }
 
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
+        if (transposition === 0 && pitch.length > 1) {
+            lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition -= 1;
             } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 1;
             } else if (lastOne === "x" || lastOne === "*") {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 2;
             }
         }
@@ -416,7 +414,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].includes(pitch.toLowerCase())) {
+        if (pitch.length > 0 && obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             console.debug("pitch " + pitch + " not found in mode.");
@@ -437,7 +435,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
  * Get the note based on a given pitch and interval.
  * @function
  * @param {string} pitch - The pitch, including the note name and octave (e.g., "C4").
- * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+ * @param {string} interval - An INTERVALVALUES key, e.g. "major 3" or "octave".
  * @param {string} [temperament="equal"] - The temperament to use for pitch calculations.
  * @returns {Array} An array containing the note and octave.
  */
@@ -445,6 +443,12 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+
+    // Read another name for an interval as the "<quality> <number>" name it stands for.
+    if (Object.prototype.hasOwnProperty.call(INTERVAL_ALIASES, interval)) {
+        interval = INTERVAL_ALIASES[interval];
+    }
+
     const pitch1 = pitch.substring(0, 1);
     const parsed = parseNoteString(pitch);
     const note1 = parsed[0];
@@ -456,7 +460,7 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     /**
      * Find the note that corresponds to a major interval.
      * @function
-     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3").
      * @returns {Array} An array containing the note and octave.
      */
     const findMajorInterval = interval => {
@@ -893,6 +897,9 @@ var getNoteFromSolfege = (
     octave,
     transpositionFloor
 ) => {
+    if (typeof noteArg !== "string" || noteArg.length === 0) {
+        return null;
+    }
     let sharpFlat = false;
     if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
         sharpFlat = true;

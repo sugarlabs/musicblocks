@@ -133,7 +133,8 @@ const {
     displayMsg,
     makeKeyboardAccessible,
     announceToScreenReader,
-    _
+    _,
+    _resetKanaCache
 } = require("../utils.js");
 
 const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
@@ -509,6 +510,21 @@ describe("Utility Functions (logic-only)", () => {
             const result = format("Hello world", { name: "User" });
             expect(result).toBe("Hello world");
         });
+
+        it("should handle deeply nested missing properties without throwing", () => {
+            expect(format("Street: {user.address.street}", { user: {} })).toBe("Street: ");
+            expect(format("Value: {a.b.c.d}", {})).toBe("Value: ");
+        });
+
+        it("should handle null or undefined data safely", () => {
+            expect(format("Hello {name}!", null)).toBe("Hello !");
+            expect(format("Hello {name}!", undefined)).toBe("Hello !");
+        });
+
+        it("should handle non-string template input safely", () => {
+            expect(format(null, { name: "test" })).toBe("");
+            expect(format(undefined, { name: "test" })).toBe("");
+        });
     });
     describe("rationalSum()", () => {
         it("adds simple fractions", () => {
@@ -729,6 +745,9 @@ describe("_() i18n translation", () => {
 
     afterEach(() => {
         getItemSpy.mockRestore();
+        if (typeof _resetKanaCache === "function") {
+            _resetKanaCache();
+        }
     });
 
     it("returns empty string for falsy input", () => {
@@ -801,6 +820,81 @@ describe("_() i18n translation", () => {
         i18next.t.mockReturnValue("bonjour");
         _("hello", { ns: "custom" });
         expect(i18next.t).toHaveBeenCalledWith("hello", { ns: "custom" });
+    });
+
+    it("caches kanaPreference so repeated calls do not query localStorage again", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("first")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledWith("kanaPreference");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+        expect(_("second")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("resets cached kanaPreference when _resetKanaCache is called directly or via window", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("first")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+        expect(typeof window._resetKanaCache).toBe("function");
+        window._resetKanaCache();
+
+        expect(_("second")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(2);
+
+        _resetKanaCache();
+        expect(_("third")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it("invalidates cached kanaPreference on storage event for kanaPreference", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("first")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+        const event = new Event("storage");
+        event.key = "kanaPreference";
+        window.dispatchEvent(event);
+
+        expect(_("second")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it("invalidates cached kanaPreference on storage event with null key (clear)", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("first")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+        const event = new Event("storage");
+        event.key = null;
+        window.dispatchEvent(event);
+
+        expect(_("second")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it("does not invalidate cache on storage event for an unrelated key", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("first")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+        const event = new Event("storage");
+        event.key = "otherSetting";
+        window.dispatchEvent(event);
+
+        expect(_("second")).toBe("かなテキスト");
+        expect(getItemSpy).toHaveBeenCalledTimes(1);
     });
 });
 

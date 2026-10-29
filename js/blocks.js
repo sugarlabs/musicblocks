@@ -64,6 +64,20 @@
 */
 // Constants moved to js/block-constants.js
 
+const ACTION_NAME_SLOTS = {
+    action: 1,
+    do: 1,
+    stack: 1,
+    calc: 1,
+    doArg: 1,
+    calcArg: 1,
+    listen: 2,
+    onbeatdo: 2,
+    offbeatdo: 1,
+    everybeatdo: 1,
+    everybeatdonew: 1
+};
+
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -967,25 +981,90 @@ class Blocks {
          * @returns {void}
          */
         this._adjustExpandableTwoArgBlock = argBlocksToCheck => {
-            if (argBlocksToCheck.length === 0) {
+            if (!argBlocksToCheck || argBlocksToCheck.length === 0) {
                 return;
             }
 
-            const blk = argBlocksToCheck.pop();
-            const myBlock = this.blockList[blk];
+            // Filter out missing or trashed blocks before sorting
+            const validBlocks = argBlocksToCheck.filter(
+                blk => this.blockList[blk] && !this.blockList[blk].trash
+            );
 
-            /** Determine the size of the first argument. */
-            const c = myBlock.connections[1];
-            let firstArgumentSize = 1; /** Minimum size */
-            if (c !== null) {
-                firstArgumentSize = Math.max(this._getBlockSize(c), 1);
-            }
+            // Sort so deepest nested blocks are processed first when popped from the end
+            validBlocks.sort((a, b) => this._getNestingDepth(a) - this._getNestingDepth(b));
 
-            /** Expand/contract block by plusMinus. */
-            const plusMinus = firstArgumentSize - myBlock.clampCount[0];
-            if (plusMinus !== 0) {
-                if (!(firstArgumentSize === 0)) {
-                    myBlock.updateSlots(0, plusMinus);
+            while (validBlocks.length > 0) {
+                const blk = validBlocks.pop();
+                const myBlock = this.blockList[blk];
+
+                /** Determine the size of the first argument. */
+                const c1 = myBlock.connections[1];
+                let firstArgumentSize = 1; /** Minimum size */
+                if (c1 !== null && c1 !== undefined) {
+                    firstArgumentSize = Math.max(this._getBlockSize(c1), 1);
+                }
+
+                let updated = false;
+
+                /** Expand/contract slot 0 by plusMinus1. */
+                const plusMinus1 = firstArgumentSize - myBlock.clampCount[0];
+                if (plusMinus1 !== 0) {
+                    myBlock.updateSlots(0, plusMinus1);
+                    updated = true;
+                }
+
+                /** Expand/contract slot 1 only for two-arg flow blocks (e.g., setxy) and two-arg arg blocks (e.g., multiply). */
+                const isTwoArgFlow =
+                    (typeof myBlock.isTwoArgBlock === "function"
+                        ? myBlock.isTwoArgBlock()
+                        : myBlock.name === "setxy") &&
+                    (!myBlock.protoblock || myBlock.protoblock.args === 2);
+                const isTwoArgArg =
+                    typeof myBlock.isArgBlock === "function" &&
+                    myBlock.isArgBlock() &&
+                    myBlock.protoblock &&
+                    myBlock.protoblock.args === 2;
+                if (isTwoArgFlow || isTwoArgArg) {
+                    /** Determine the size of the second argument. */
+                    const c2 = myBlock.connections[2];
+                    let secondArgumentSize = 1; /** Minimum size */
+                    if (c2 !== null && c2 !== undefined) {
+                        secondArgumentSize = Math.max(this._getBlockSize(c2), 1);
+                    }
+
+                    const plusMinus2 = secondArgumentSize - myBlock.clampCount[1];
+                    if (plusMinus2 !== 0) {
+                        myBlock.updateSlots(1, plusMinus2);
+                        updated = true;
+                    }
+                }
+
+                // Clean up any legacy or orphaned vspace blocks below a two-arg flow block
+                if (isTwoArgFlow) {
+                    while (true) {
+                        const lastConnIdx = myBlock.connections.length - 1;
+                        const nextBlkIdx = myBlock.connections[lastConnIdx];
+                        const nextBlk = this.blockList[nextBlkIdx];
+                        if (nextBlk && nextBlk.name === "vspace") {
+                            const afterVspace = nextBlk.connections[1];
+                            myBlock.connections[lastConnIdx] = afterVspace;
+                            if (afterVspace !== null && this.blockList[afterVspace]) {
+                                this.blockList[afterVspace].connections[0] = blk;
+                            }
+                            nextBlk.connections = [null, null];
+                            nextBlk.trash = true;
+                            if (typeof nextBlk.hide === "function") {
+                                nextBlk.hide();
+                            }
+                            updated = true;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                if (updated) {
+                    this.adjustDocks(blk, true);
                 }
             }
         };
@@ -998,6 +1077,12 @@ class Blocks {
          */
         this._addRemoveVspaceBlock = blk => {
             const myBlock = this.blockList[blk];
+            if (!myBlock) return;
+
+            // Two-arg flow blocks (e.g., setxy) size their own artwork and do not use vspace blocks
+            if (typeof myBlock.isTwoArgBlock === "function" && myBlock.isTwoArgBlock()) {
+                return;
+            }
 
             const c = myBlock.connections[myBlock.connections.length - 2];
             let secondArgumentSize = 1;
@@ -2038,9 +2123,10 @@ class Blocks {
             // avoiding repeated O(depth) findTopBlock walks.
             if (this._topBlockCache === null) {
                 this._topBlockCache = new Map();
+                const roots = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
                     if (!this.blockList[i] || this.blockList[i].trash) continue;
-                    this._topBlockCache.set(i, this.findTopBlock(i));
+                    this._topBlockCache.set(i, this.findTopBlock(i, roots));
                 }
             }
 
@@ -2253,10 +2339,11 @@ class Blocks {
         /**
          * Find the top block in the stack.
          * @param - blk - block
+         * @param {Map|null} roots - resolved ancestor paths for a batch of lookups
          * @public
          * @returns blk
          */
-        this.findTopBlock = blk => {
+        this.findTopBlock = (blk, roots = null) => {
             /** Find the top block in a stack. */
             if (blk === null) {
                 return null;
@@ -2291,8 +2378,13 @@ class Blocks {
                 return blk;
             }
 
+            const path = roots === null ? null : [];
             let topBlockLoop = 0;
             while (myBlock.connections[0] !== null) {
+                if (roots !== null && roots.has(blk)) {
+                    blk = roots.get(blk);
+                    break;
+                }
                 topBlockLoop += 1;
                 if (topBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
@@ -2300,12 +2392,18 @@ class Blocks {
                     if (myBlock.garbage) {
                         console.debug(myBlock.blockIndex + " " + myBlock.name);
                     }
-                    break;
+                    return blk;
                 }
+                if (path !== null) path.push(blk);
                 blk = myBlock.connections[0];
                 myBlock = this.blockList[blk];
             }
 
+            // Only share paths that reached a root, not malformed-data fallback results.
+            if (roots !== null) {
+                roots.set(blk, blk);
+                for (const index of path) roots.set(index, blk);
+            }
             return blk;
         };
 
@@ -2493,6 +2591,9 @@ class Blocks {
                     this._expandablesList.push(i);
                 }
             }
+            this._expandablesList.sort(
+                (a, b) => this._getNestingDepth(a) - this._getNestingDepth(b)
+            );
         };
 
         /**
@@ -3927,25 +4028,7 @@ class Blocks {
                     continue;
                 }
 
-                if (
-                    ![
-                        "do",
-                        "calc",
-                        "doArg",
-                        "calcArg",
-                        "action",
-                        "offbeatdo",
-                        "onbeatdo",
-                        "listen"
-                    ].includes(blkParent.name)
-                ) {
-                    continue;
-                }
-
-                if (
-                    (blkParent.name === "onbeatdo" || blkParent.name === "listen") &&
-                    blkParent.connections.indexOf(blk) !== 2
-                ) {
+                if (blkParent.connections.indexOf(blk) !== ACTION_NAME_SLOTS[blkParent.name]) {
                     continue;
                 }
 
@@ -4339,7 +4422,7 @@ class Blocks {
          * @returns expandable block
          */
         this.insideExpandableBlock = blk => {
-            if (this.blockList[blk] === null) {
+            if (this.blockList[blk] === null || this.blockList[blk] === undefined) {
                 /** race condition? */
 
                 console.debug("null block in blockList? " + blk);
@@ -4352,7 +4435,8 @@ class Blocks {
                     /** If it is the last connection, keep searching. */
                     if (
                         this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
+                        this.blockList[cblk].isLeftClampBlock() ||
+                        this.blockList[cblk].isArgBlock()
                     ) {
                         return cblk;
                     } else if (blk === last(this.blockList[cblk].connections)) {
@@ -5579,14 +5663,13 @@ class Blocks {
                         case "namedcalcArg":
                             doNames[b] = blkData[1][1]["value"];
                             break;
-                        case "do":
-                        case "stack":
-                            if (blkData[4][1] !== null) {
-                                doNames[b] = blkData[4][1];
+                        default: {
+                            const label = blkData[4][ACTION_NAME_SLOTS[name]];
+                            if (["text", "string"].includes(blockObjs[label]?.[1][0])) {
+                                doNames[b] = label;
                             }
                             break;
-                        default:
-                            break;
+                        }
                     }
 
                     const proto = this.protoBlockDict[name];
@@ -5997,6 +6080,33 @@ class Blocks {
                                     ]);
                                     extraBlocksLength += 1;
                                 }
+                            }
+                            break;
+                        case "aidebugger":
+                        case "reflection":
+                            /**
+                             * The window opens when the clamp's flow reaches the
+                             * hiddennoflow block below it (Logo.setDispatchBlock).
+                             * Blocks saved before the macro added one, with only
+                             * [parent, clamp], or rebuilt by an AI edit with an
+                             * empty tail, have none, so the window never opened.
+                             */
+                            if (blockObjs[b][4].length === 2) {
+                                blockObjs[b][4].push(null);
+                            }
+                            if (blockObjs[b][4].length === 3 && blockObjs[b][4][2] === null) {
+                                console.debug(
+                                    "last connection of " + name + " is null: adding hidden block"
+                                );
+                                blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
+                                blockObjs.push([
+                                    blockObjsLength + extraBlocksLength,
+                                    "hiddennoflow",
+                                    0,
+                                    0,
+                                    [b, null]
+                                ]);
+                                extraBlocksLength += 1;
                             }
                             break;
                         default:
