@@ -94,18 +94,14 @@ The test job runs:
 npm test -- --coverage --ci
 ```
 
-Jest enforces the global minimums in [`jest.config.js`](../jest.config.js):
+`jest.config.js` has no fixed coverage minimum. Coverage is uploaded to
+Codecov when a token is available, and upload failures do not fail the job.
 
-| Metric     | Minimum |
-| ---------- | ------: |
-| Statements |     34% |
-| Branches   |     29% |
-| Functions  |     41% |
-| Lines      |     34% |
-
-Coverage is uploaded to Codecov when a token is available. Codecov upload
-failures do not fail the job, while the Jest thresholds still apply to every
-pull request.
+Coverage is gated by the separate
+[`coverage-delta.yml`](../.github/workflows/coverage-delta.yml) workflow. It
+measures coverage on the base commit and on the pull request merged with the
+base, and its **Coverage delta vs base** check fails when statements,
+branches, functions or lines drop by more than 0.1 percentage points.
 
 ### Cypress
 
@@ -151,7 +147,7 @@ items rather than claims that the workflows are currently failing.
 | Medium        | The build job runs `npm run build --if-present`, but `package.json` does not define a `build` script.       | The job installs dependencies but currently performs no real build or application smoke test.      | Add a supported build command, or rename/rework the job so its checks match its purpose.                                            |
 | Medium        | Lighthouse assertions are warning-only.                                                                     | Performance, accessibility, best-practice, and SEO regressions do not block CI.                    | Agree on stable thresholds and convert selected assertions to errors.                                                               |
 | Low           | Cypress currently runs in Chrome only.                                                                      | Firefox, Edge, and other browser-specific regressions are not covered.                             | Add another browser to the matrix if the additional CI time is acceptable.                                                          |
-| Low           | Codecov upload is optional for fork pull requests because repository secrets are unavailable there.         | Fork PRs still receive Jest threshold enforcement but may not receive a PR-vs-base Codecov report. | Keep the current behavior documented, or evaluate a tokenless/report-only upload strategy.                                          |
+| Low           | Codecov upload is optional for fork pull requests because repository secrets are unavailable there.         | Fork PRs are still gated by the coverage-delta check, but may not get a PR-vs-base Codecov report. | Keep the current behavior documented, or evaluate a tokenless/report-only upload strategy.                                          |
 | Informational | Release deployment is intentionally manual.                                                                 | Releases are tagged and reported, but deployment is not automated.                                 | If deployment policy changes, add build, publish, or deployment steps to the release workflow with explicit permissions and review. |
 
 ## Keeping this page current
