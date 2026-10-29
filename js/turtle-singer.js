@@ -1632,10 +1632,12 @@ class Singer {
                 : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
-                activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                activity.logo.musicKeyboard.noteNames.push(nnote[0]);
-                activity.logo.musicKeyboard.octaves.push(nnote[1]);
-                activity.logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard =
+                    activity.logo.musicKeyboardByTurtle?.[turtle] || activity.logo.musicKeyboard;
+                musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                musicKeyboard.noteNames.push(nnote[0]);
+                musicKeyboard.octaves.push(nnote[1]);
+                musicKeyboard.addRowBlock(blk);
                 tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
             }
         } else {

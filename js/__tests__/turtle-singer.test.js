@@ -2251,6 +2251,28 @@ describe("processPitch music keyboard with movable Do", () => {
         expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
         expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
     });
+
+    test("routes the row to the turtle's own keyboard", () => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        const lastActive = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+        const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+        activityMock.logo.musicKeyboard = lastActive;
+        activityMock.logo.musicKeyboardByTurtle = { 0: own };
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "blk");
+
+        expect(own.noteNames).toEqual(["C"]);
+        expect(lastActive.noteNames).toEqual([]);
+    });
 });
 
 describe("processPitch in the pitch-drum matrix", () => {

@@ -330,7 +330,14 @@ window.widgetWindows = {
             }
         }
 
+        const previous = this.focused;
         this.focused = clickedWindow;
+        if (clickedWindow && typeof clickedWindow.onfocused === "function") {
+            clickedWindow.onfocused();
+        }
+        if (previous && previous !== clickedWindow && typeof previous.onblurred === "function") {
+            previous.onblurred();
+        }
     }
 };
 
@@ -816,6 +823,9 @@ class WidgetWindow {
      */
     takeFocus() {
         window.widgetWindows.focused = this;
+        if (typeof this.onfocused === "function") {
+            this.onfocused();
+        }
         const windows = docById("floatingWindows");
         if (windows && windows.children) {
             const siblings = windows.children;
