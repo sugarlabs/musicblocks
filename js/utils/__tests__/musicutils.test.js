@@ -1958,6 +1958,34 @@ describe("GetNotesForInterval", () => {
             octave: 0
         });
     });
+    it("should read notes stored as frequencies (cents or hertz)", () => {
+        // 450 Hz is A4 plus about 39 cents; 659.26 Hz is E5.
+        expect(GetNotesForInterval({ singer: { noteStatus: [[450]] } })).toEqual({
+            firstNote: "A",
+            secondNote: "A",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [["C4", 659.26]] } })).toEqual({
+            firstNote: "C",
+            secondNote: "E",
+            octave: 1
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[]] } })).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[440]] } }, "equal19")).toEqual({
+            firstNote: "A",
+            secondNote: "A",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[450]] } }, "equal19")).toEqual({
+            firstNote: "A#",
+            secondNote: "A#",
+            octave: 0
+        });
+    });
     it("should handle note pitches with accidentals", () => {
         const tur = {
             singer: {
