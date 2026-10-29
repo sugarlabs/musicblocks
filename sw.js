@@ -12,7 +12,7 @@
 // This is the "Offline page" service worker
 
 const CACHE = "pwabuilder-precache";
-const offlineFallbackPage = "/index.html";
+const offlineFallbackPage = "index.html";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
     offlineFallbackPage
