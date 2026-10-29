@@ -148,6 +148,36 @@ self.addEventListener("fetch", function (event) {
 
     if (event.request.method !== "GET") return;
 
+    // The page itself goes to the network first, so a deploy is picked up on
+    // the next load instead of the one after; the cached copy is the offline
+    // fallback. Scripts are versioned by RequireJS's urlArgs and are never
+    // cached (see isStaticAssetRequest), so the page is what could go stale.
+    if (isAppShellNavigation(event.request)) {
+        event.respondWith(
+            fetch(event.request)
+                .then(function (response) {
+                    if (response.ok) {
+                        event.waitUntil(updateCache(event.request, response.clone()));
+                    }
+                    return response;
+                })
+                .catch(function () {
+                    return fromCache(event.request).catch(function () {
+                        return caches.match(offlineFallbackPage).then(function (fallback) {
+                            return (
+                                fallback ||
+                                new Response("Service Unavailable", {
+                                    status: 503,
+                                    statusText: "offline"
+                                })
+                            );
+                        });
+                    });
+                })
+        );
+        return;
+    }
+
     event.respondWith(
         fromCache(event.request).then(
             function (response) {
