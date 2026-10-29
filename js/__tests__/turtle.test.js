@@ -544,6 +544,7 @@ describe("Turtle accessors", () => {
             ["parentFlowQueue", "_parentFlowQueue", [7]],
             ["unhighlightQueue", "_unhighlightQueue", [8]],
             ["parameterQueue", "_parameterQueue", [9]],
+            ["actionBoundaries", "_actionBoundaries", [0]],
             ["listeners", "_listeners", { CursorOver0: () => {} }],
             ["media", "_media", [{ type: "gif" }]],
             ["x", "_x", 42],
@@ -681,6 +682,7 @@ describe("Turtle.TurtleModel", () => {
             expect(model._parentFlowQueue).toEqual([]);
             expect(model._unhighlightQueue).toEqual([]);
             expect(model._parameterQueue).toEqual([]);
+            expect(model._actionBoundaries).toEqual([]);
             expect(model._media).toEqual([]);
         });
 
