@@ -526,9 +526,9 @@
       "hasRestParam": false,
       "isAsync": false,
       "isGenerator": false,
-      "returns": 6,
+      "returns": 7,
       "throws": 0,
-      "branches": 8
+      "branches": 9
     },
     {
       "name": "nearestBeat",
@@ -1004,8 +1004,8 @@
     }
   ],
   "totals": {
-    "branches": 213,
-    "returns": 109,
+    "branches": 214,
+    "returns": 110,
     "throws": 0
   }
 }
