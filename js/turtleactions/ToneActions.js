@@ -77,12 +77,10 @@ function setupToneActions(activity) {
             if (name === null || name === undefined) return false;
             for (const capture of [...(logo.instrumentCaptures || [])].reverse()) capture.abort();
             activity.errorMsg(
-                name +
-                    ": " +
-                    _("Multisample instruments are not supported in") +
-                    " " +
-                    destination +
-                    ".",
+                _("Multisample instrument “%1” is not supported in %2.").replace(
+                    /%[12]/g,
+                    placeholder => (placeholder === "%1" ? name : destination)
+                ),
                 blk
             );
             logo.stopTurtle = true;
