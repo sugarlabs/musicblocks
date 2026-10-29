@@ -69,6 +69,13 @@
     "branch": "fix/widget-window-position-restore",
     "headRepo": "shivv23/musicblocks"
   },
+  "9741": {
+    "pushedAt": "2026-10-29T16:08:07.172Z",
+    "sha": "4dfed5b89462462935c08c801422d091f719f37b",
+    "actor": "lavjeetrai",
+    "branch": "fix/audiofile-updateblocktext-error-handling",
+    "headRepo": "lavjeetrai/musicblocks"
+  },
   "9751": {
     "pushedAt": "2026-10-28T23:12:07.599Z",
     "sha": "51013da1bcbe6723b20b3672cefd51a3e815119e",
