@@ -1038,28 +1038,6 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.custom).toEqual([5, 7]);
     });
 
-    test("defineMode tells the user when the result does not fit the tuning", () => {
-        let listener;
-        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
-        Singer.IntervalsActions.defineMode("custom", 0, undefined);
-        turtle.singer.defineMode.push(0, 4, 7, 7);
-        listener();
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "This mode does not fit the current tuning."
-        );
-    });
-
-    test("defineMode does not warn about the tuning when the mode fits", () => {
-        let listener;
-        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
-        Singer.IntervalsActions.defineMode("custom", 0, undefined);
-        turtle.singer.defineMode.push(0, 4, 7);
-        listener();
-        expect(activity.errorMsg).not.toHaveBeenCalledWith(
-            "This mode does not fit the current tuning."
-        );
-    });
-
     test("defineMode listener does not update block text when there is no connected child block", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
@@ -1287,6 +1265,25 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(
             "The custom mode does not fit the new tuning, so it was reset."
         );
+    });
+
+    test("setTemperament warns only once for the same mode and tuning", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        const warning = "The custom mode does not fit the new tuning, so it was reset.";
+        const countWarnings = () =>
+            activity.errorMsg.mock.calls.filter(c => c[0] === warning).length;
+
+        // the same saved 12-EDO mode comes back (e.g. after a reload) and is run in 19-EDO again
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(countWarnings()).toBe(1);
+
+        // a different mode still gets its own warning
+        MUSICALMODES.custom = [3, 4, 5];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(countWarnings()).toBe(2);
     });
 
     test("setTemperament stays quiet when it only resizes the default chromatic mode", () => {

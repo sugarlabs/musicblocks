@@ -62,6 +62,10 @@ const MIN_SCALAR_INTERVAL = -63;
  * @returns {void}
  */
 function setupIntervalsActions(activity) {
+    // Custom modes (pattern + tuning) we've already warned about resetting, so
+    // re-running or reloading the same project doesn't repeat the message.
+    const warnedCustomModeResets = new Set();
+
     Singer.IntervalsActions = class {
         /**
          * Utility function that returns appropriate object key in MUSICMODES corresponding to passed parameter.
@@ -381,17 +385,6 @@ function setupIntervalsActions(activity) {
                     }
                 }
 
-                // Say so when the result can't be used as defined, instead of
-                // letting it quietly play as a chromatic scale later.
-                const steps = MUSICALMODES[modeName];
-                if (
-                    steps.length === 0 ||
-                    !steps.every(step => Number.isInteger(step) && step > 0) ||
-                    steps.reduce((a, b) => a + b, 0) !== temperamentLength
-                ) {
-                    activity.errorMsg(_("This mode does not fit the current tuning."));
-                }
-
                 if (blk !== undefined && blk in activity.blocks.blockList) {
                     const cblk = activity.blocks.blockList[blk].connections[1];
                     if (
@@ -593,7 +586,9 @@ function setupIntervalsActions(activity) {
                 // when the default chromatic pattern is resized.
                 const wasDefined = Array.isArray(custom) && custom.some(step => step !== 1);
                 MUSICALMODES["custom"] = new Array(edo).fill(1);
-                if (wasDefined) {
+                const warningKey = wasDefined ? custom.join(",") + "@" + edo : null;
+                if (wasDefined && !warnedCustomModeResets.has(warningKey)) {
+                    warnedCustomModeResets.add(warningKey);
                     activity.errorMsg(
                         _("The custom mode does not fit the new tuning, so it was reset.")
                     );

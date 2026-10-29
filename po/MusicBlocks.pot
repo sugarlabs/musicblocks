@@ -7561,10 +7561,6 @@ msgid "Ignoring duplicate pitch numbers."
 msgstr ""
 
 #: js/turtleactions/IntervalsActions.js
-msgid "This mode does not fit the current tuning."
-msgstr ""
-
-#: js/turtleactions/IntervalsActions.js
 msgid "The custom mode does not fit the new tuning, so it was reset."
 msgstr ""
 
