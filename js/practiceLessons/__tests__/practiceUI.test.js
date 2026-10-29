@@ -87,6 +87,18 @@ const stubActivity = blockList => {
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
+const mockPubsub = () => {
+    const listeners = new Set();
+    global.pubsub = {
+        on: jest.fn((event, callback) => listeners.add(callback)),
+        off: jest.fn((event, callback) => listeners.delete(callback))
+    };
+
+    return payload => {
+        for (const listener of listeners) listener(payload);
+    };
+};
+
 const mountPracticeContent = () => {
     document.body.innerHTML = '<div id="practice-content"></div>';
     return document.getElementById("practice-content");
@@ -106,6 +118,8 @@ beforeEach(() => {
     PracticeUI.currentLevel = null;
     PracticeUI.starterBlockCount = null;
     PracticeUI.starterLoadGeneration = 0;
+    PracticeUI.starterLoadPending = false;
+    delete global.pubsub;
     delete window.ActivityContext;
 });
 
@@ -141,11 +155,11 @@ describe("PracticeUI canvas inspection", () => {
         expect(PracticeUI.countLiveBlocks()).toBe(0);
     });
 
-    test("reports no extra blocks while the starter count is unknown", () => {
+    test("treats live blocks as learner work while the starter count is unknown", () => {
         stubActivity({ a: {}, b: {} });
         PracticeUI.starterBlockCount = null;
 
-        expect(PracticeUI.hasExtraBlocks()).toBe(false);
+        expect(PracticeUI.hasExtraBlocks()).toBe(true);
     });
 
     test("reports no extra blocks when only the starter set is present", () => {
@@ -454,6 +468,7 @@ describe("PracticeUI.renderLevel", () => {
     test("moves straight on when the canvas holds only the starter blocks", () => {
         const container = mountPracticeContent();
         PracticeUI.renderLevel(1);
+        const hasExtraBlocks = PracticeUI.hasExtraBlocks;
         PracticeUI.hasExtraBlocks = () => false;
         global.confirm = jest.fn();
 
@@ -461,12 +476,13 @@ describe("PracticeUI.renderLevel", () => {
 
         expect(global.confirm).not.toHaveBeenCalled();
         expect(PracticeUI.currentLevel).toBe(2);
-        delete PracticeUI.hasExtraBlocks;
+        PracticeUI.hasExtraBlocks = hasExtraBlocks;
     });
 
     test("asks before clearing work the learner added", () => {
         const container = mountPracticeContent();
         PracticeUI.renderLevel(1);
+        const hasExtraBlocks = PracticeUI.hasExtraBlocks;
         PracticeUI.hasExtraBlocks = () => true;
         global.confirm = jest.fn(() => false);
 
@@ -476,19 +492,20 @@ describe("PracticeUI.renderLevel", () => {
             "Starting the next lesson will clear the blocks on your canvas. Continue?"
         );
         expect(PracticeUI.currentLevel).toBe(1);
-        delete PracticeUI.hasExtraBlocks;
+        PracticeUI.hasExtraBlocks = hasExtraBlocks;
     });
 
     test("moves on when the learner accepts losing their blocks", () => {
         const container = mountPracticeContent();
         PracticeUI.renderLevel(1);
+        const hasExtraBlocks = PracticeUI.hasExtraBlocks;
         PracticeUI.hasExtraBlocks = () => true;
         global.confirm = jest.fn(() => true);
 
         container.querySelector("#next-level").onclick();
 
         expect(PracticeUI.currentLevel).toBe(2);
-        delete PracticeUI.hasExtraBlocks;
+        PracticeUI.hasExtraBlocks = hasExtraBlocks;
     });
 });
 
@@ -727,38 +744,52 @@ describe("PracticeUI canvas loading", () => {
         delete global.fetch;
     });
 
-    test("blocks Next Lesson during fetch and block loading, then allows it after failure", async () => {
-        const activity = stubActivity({});
-        let blocksLoading = false;
-        let resolveFetch;
-        activity.blocks.isLoading = jest.fn(() => blocksLoading);
-        activity.blocks.loadNewBlocks.mockImplementation(() => {
-            blocksLoading = true;
-        });
+    test("clears pending after a matching load failure and warns about unknown baseline work", async () => {
+        const activity = stubActivity({ learnerBlock: {} });
+        const emitLoadFailed = mockPubsub();
+        activity.blocks.loadNewBlocks.mockReturnValue(42);
         activity.blocks.runAfterLoad = jest.fn();
-        PracticeUI.hasExtraBlocks = jest.fn(() => false);
-        global.fetch = jest.fn(
-            () =>
-                new Promise(resolve => {
-                    resolveFetch = resolve;
-                })
+        activity.blocks.runAfterLoad = jest.fn();
+        global.fetch = jest.fn(() =>
+            Promise.resolve({ text: () => Promise.resolve('[[0,"start"]]') })
         );
         const container = mountPracticeContent();
+        global.confirm = jest.fn(() => false);
 
         PracticeUI.renderLevel(1);
-        container.querySelector("#next-level").onclick();
-        expect(PracticeUI.currentLevel).toBe(1);
-
-        resolveFetch({ text: () => Promise.resolve('[[0,"start"]]') });
         await flushPromises();
+        expect(PracticeUI.starterLoadPending).toBe(true);
 
+        emitLoadFailed({ token: 42, error: new Error("deferred failure") });
         expect(PracticeUI.starterLoadPending).toBe(false);
-        container.querySelector("#next-level").onclick();
-        expect(PracticeUI.currentLevel).toBe(1);
+        expect(PracticeUI.starterBlockCount).toBeNull();
+        expect(PracticeUI.hasExtraBlocks()).toBe(true);
 
-        blocksLoading = false;
         container.querySelector("#next-level").onclick();
-        expect(PracticeUI.currentLevel).toBe(2);
+        expect(global.confirm).toHaveBeenCalled();
+        expect(PracticeUI.currentLevel).toBe(1);
+        delete global.fetch;
+    });
+
+    test("ignores unrelated and stale starter load failures", async () => {
+        const activity = stubActivity({});
+        const emitLoadFailed = mockPubsub();
+        const resolvers = [];
+        let loadToken = 10;
+        activity.blocks.loadNewBlocks.mockImplementation(() => loadToken++);
+        activity.blocks.runAfterLoad = jest.fn();
+        activity.blocks.runAfterLoad = jest.fn();
+        global.fetch = jest.fn(() => new Promise(resolve => resolvers.push(resolve)));
+
+        PracticeUI.loadStarterBlocks(1);
+        resolvers[0]({ text: () => Promise.resolve('[[0,"start"]]') });
+        await flushPromises();
+        emitLoadFailed({ token: 999 });
+        expect(PracticeUI.starterLoadPending).toBe(true);
+
+        PracticeUI.loadStarterBlocks(2);
+        emitLoadFailed({ token: 10 });
+        expect(PracticeUI.starterLoadPending).toBe(true);
         delete global.fetch;
     });
 

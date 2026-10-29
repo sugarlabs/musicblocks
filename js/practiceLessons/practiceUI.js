@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, escapeHTML, loadPracticeLessons */
+/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, escapeHTML, loadPracticeLessons, pubsub */
 /* exported PracticeUI, ExplorerJournalUI */
 
 // Criteria that mean the level itself is finished, as opposed to a hidden discovery.
@@ -346,9 +346,10 @@ const PracticeUI = {
                 activity.turtles.getTurtle(turtle).painter.doClear(true, true, true);
             }
         }
-        activity.blocks.loadNewBlocks(projectData);
+        const loadToken = activity.blocks.loadNewBlocks(projectData);
         activity.blocks.adjustDocks();
         activity.refreshCanvas();
+        return loadToken;
     },
 
     countLiveBlocks() {
@@ -360,7 +361,7 @@ const PracticeUI = {
     // A count only catches blocks added on top of the starter set; a child who deletes and
     // rebuilds back to the same total is not warned.
     hasExtraBlocks() {
-        if (this.starterBlockCount === null) return false;
+        if (this.starterBlockCount === null) return this.countLiveBlocks() > 0;
 
         return this.countLiveBlocks() > this.starterBlockCount;
     },
@@ -449,11 +450,25 @@ const PracticeUI = {
                 if (loadGeneration !== this.starterLoadGeneration) return;
 
                 const projectData = JSON.parse(data);
-                this.loadProjectData(activity, projectData);
-                if (loadGeneration === this.starterLoadGeneration) {
-                    this.starterLoadPending = false;
+                const loadToken = this.loadProjectData(activity, projectData);
+                const eventBus = typeof pubsub === "undefined" ? null : pubsub;
+                const onLoadFailed = payload => {
+                    if (!payload || payload.token !== loadToken) return;
+
+                    if (eventBus && typeof eventBus.off === "function") {
+                        eventBus.off("loadFailed", onLoadFailed);
+                    }
+                    if (loadGeneration === this.starterLoadGeneration) {
+                        this.starterLoadPending = false;
+                    }
+                };
+                if (eventBus && typeof eventBus.on === "function") {
+                    eventBus.on("loadFailed", onLoadFailed);
                 }
                 activity.blocks.runAfterLoad(() => {
+                    if (eventBus && typeof eventBus.off === "function") {
+                        eventBus.off("loadFailed", onLoadFailed);
+                    }
                     if (loadGeneration === this.starterLoadGeneration) {
                         this.starterBlockCount = projectData.length;
                     }
@@ -545,8 +560,7 @@ const PracticeUI = {
         const nextButton = document.getElementById("next-level");
         if (nextButton) {
             nextButton.onclick = () => {
-                const blocks = this.getActivity()?.blocks;
-                if (this.starterLoadPending || blocks?.isLoading?.()) return;
+                if (this.starterLoadPending) return;
 
                 const confirmed =
                     !this.hasExtraBlocks() ||
