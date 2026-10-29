@@ -13,15 +13,19 @@ npm run serve:dev
 Run the benchmark in another terminal:
 
 ```sh
-npx cypress run --spec cypress/e2e/large-workspace-benchmark.cy.js
+npx cypress run --spec cypress/e2e/large-workspace-benchmark.cy.js --env runLargeWorkspaceBenchmark=true
 ```
+
+Enable the benchmark explicitly when running the full Cypress suite; without
+`runLargeWorkspaceBenchmark=true`, this spec is skipped so normal E2E runs do
+not spend time measuring large workspaces.
 
 The default run covers 500, 2,000, and 5,000 blocks in both workload shapes, with three measured iterations and one untimed warm-up for each operation. Cypress writes `cypress/downloads/large-workspace-benchmark.json`. A failed or incomplete operation is recorded in the JSON and fails the Cypress spec; there is no performance threshold.
 
 For a quicker check, use a single size and one measured iteration:
 
 ```sh
-npx cypress run --spec cypress/e2e/large-workspace-benchmark.cy.js --env benchmarkSizes=500,benchmarkIterations=1,replacementIterations=1,benchmarkOutput=cypress/downloads/benchmark-smoke.json
+npx cypress run --spec cypress/e2e/large-workspace-benchmark.cy.js --env runLargeWorkspaceBenchmark=true,benchmarkSizes=500,benchmarkIterations=1,replacementIterations=1,benchmarkOutput=cypress/downloads/benchmark-smoke.json
 ```
 
 `benchmarkSizes` accepts a comma-separated subset of `500,2000,5000`. `benchmarkIterations` controls timed loads; `replacementIterations` controls timed replacements. `benchmarkOutput` is a repository-relative output path. Use the same browser, machine, Cypress version, viewport, and iteration settings when comparing revisions.

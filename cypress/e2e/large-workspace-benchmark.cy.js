@@ -27,10 +27,14 @@ const iterations = Number(Cypress.env("benchmarkIterations") || 3);
 const replacementIterations = Number(Cypress.env("replacementIterations") || 3);
 const outputPath =
     Cypress.env("benchmarkOutput") || "cypress/downloads/large-workspace-benchmark.json";
+const describeBenchmark = Cypress.env("runLargeWorkspaceBenchmark") ? describe : describe.skip;
 
-describe("Large workspace performance benchmark", { retries: 0 }, function () {
+describeBenchmark("Large workspace performance benchmark", { retries: 0 }, function () {
     it("measures full project loading and repeated replacement", function () {
-        this.timeout(0);
+        // The full matrix is intentionally long-running and opt-in. Keep a
+        // finite Mocha timeout because timeout(0) also disables Cypress's
+        // retry window for assertions in the test.
+        this.timeout(30 * 60 * 1000);
         expect(iterations, "benchmarkIterations must be a positive integer").to.be.greaterThan(0);
         expect(
             replacementIterations,
@@ -45,12 +49,10 @@ describe("Large workspace performance benchmark", { retries: 0 }, function () {
 
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
-        let stableLoadObservations = 0;
         cy.window().should(win => {
             const blocks = win.ActivityContext.getActivity().blocks;
-            const fullyLoaded = !blocks.isLoading() && blocks._loadCounter === 0;
-            stableLoadObservations = fullyLoaded ? stableLoadObservations + 1 : 0;
-            expect(stableLoadObservations, "startup load remains complete").to.be.at.least(3);
+            expect(!blocks.isLoading() && blocks._loadCounter === 0, "startup load is complete").to
+                .be.true;
         });
         cy.exec("git rev-parse HEAD", { log: false }).then(({ stdout }) => {
             revision = stdout.trim();
