@@ -71,7 +71,6 @@ const {
     deleteTemperamentFromList,
     DEFAULTINVERT,
     DEFAULTMODE,
-    customMode,
     getInvertMode,
     getIntervalNumber,
     getIntervalDirection,
@@ -660,17 +659,18 @@ describe("Constants", () => {
     });
 });
 
-describe("customMode", () => {
-    it("should return custom mode from MUSICALMODES", () => {
-        expect(customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-    });
-});
-
 describe("getInvertMode", () => {
     it("should return the correct invert mode name", () => {
         expect(getInvertMode("even")).toBe("even");
         expect(getInvertMode("scalar")).toBe("scalar");
         expect(getInvertMode("nonexistent")).toBe("nonexistent");
+    });
+    it("should safely return non-string or nullish inputs without throwing", () => {
+        expect(getInvertMode(null)).toBeNull();
+        expect(getInvertMode(undefined)).toBeUndefined();
+        expect(getInvertMode(123)).toBe(123);
+        expect(getInvertMode({})).toEqual({});
+        expect(getInvertMode("")).toBe("");
     });
 });
 
@@ -919,6 +919,12 @@ describe("getFilterTypes", () => {
         expect(getFilterTypes("highpass")).toBe("highpass");
         expect(getFilterTypes("notch")).toBe("notch");
     });
+    it("should return default filter type for non-string or nullish inputs", () => {
+        expect(getFilterTypes(null)).toBe("highpass");
+        expect(getFilterTypes(undefined)).toBe("highpass");
+        expect(getFilterTypes(123)).toBe("highpass");
+        expect(getFilterTypes({})).toBe("highpass");
+    });
 });
 
 describe("getOscillatorTypes", () => {
@@ -942,6 +948,12 @@ describe("getOscillatorTypes", () => {
     it("should return null for invalid oscillator types", () => {
         expect(getOscillatorTypes("invalid")).toBe(null);
         expect(getOscillatorTypes("random")).toBe(null);
+    });
+    it("should return null for empty string or non-string inputs", () => {
+        expect(getOscillatorTypes("")).toBe(null);
+        expect(getOscillatorTypes(null)).toBe(null);
+        expect(getOscillatorTypes(undefined)).toBe(null);
+        expect(getOscillatorTypes(123)).toBe(null);
     });
 });
 
@@ -1404,6 +1416,19 @@ describe("cents calculations", () => {
 });
 
 describe("getArticulation", () => {
+    it.each(["x", "##", "bb", "𝄪", "𝄫"])(
+        "extracts %s from lowercase note names without changing solfege parsing",
+        accidental => {
+            for (const note of ["a", "b", "c", "d", "e", "f", "g"]) {
+                expect(getArticulation(note + accidental)).toBe(accidental);
+                expect(getArticulation(note.toUpperCase() + accidental)).toBe(accidental);
+                expect(getArticulation("^" + note + accidental)).toBe(accidental);
+            }
+            expect(getArticulation("do" + accidental)).toBe(accidental);
+            expect(getArticulation("fa" + accidental)).toBe(accidental);
+        }
+    );
+
     it("should remove solfege syllables", () => {
         expect(getArticulation("do")).toBe("");
         expect(getArticulation("re")).toBe("");
@@ -1419,6 +1444,12 @@ describe("getArticulation", () => {
     it("should handle empty and special cases", () => {
         expect(getArticulation("")).toBe("");
         expect(getArticulation("doremifa")).toBe("remifa"); // Only strips the first prefix
+    });
+    it("should return an empty string for invalid inputs", () => {
+        expect(getArticulation(null)).toBe("");
+        expect(getArticulation(undefined)).toBe("");
+        expect(getArticulation(42)).toBe("");
+        expect(getArticulation({})).toBe("");
     });
     it("should handle custom note names like BAGPIPE_D correctly", () => {
         // "BAGPIPE_D" should not have internal letters stripped.
@@ -1556,6 +1587,14 @@ describe("modeMapper", () => {
         ["C", "locrian", ["d♭", "major"]],
         ["G♭", "lydian", ["d♭", "major"]]
     ])("should map %s %s to the flat key %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
+    });
+
+    it.each([
+        ["D", "major pentatonic", ["d", "major"]],
+        ["B", "minor pentatonic", ["b", "minor"]],
+        ["B", "minyo", ["b", "minor"]]
+    ])("should map %s %s to its parent key %j", (key, mode, expected) => {
         expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
@@ -1930,6 +1969,34 @@ describe("GetNotesForInterval", () => {
         expect(GetNotesForInterval(tur)).toEqual({
             firstNote: "C",
             secondNote: "E",
+            octave: 0
+        });
+    });
+    it("should read notes stored as frequencies (cents or hertz)", () => {
+        // 450 Hz is A4 plus about 39 cents; 659.26 Hz is E5.
+        expect(GetNotesForInterval({ singer: { noteStatus: [[450]] } })).toEqual({
+            firstNote: "A",
+            secondNote: "A",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [["C4", 659.26]] } })).toEqual({
+            firstNote: "C",
+            secondNote: "E",
+            octave: 1
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[]] } })).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[440]] } }, "equal19")).toEqual({
+            firstNote: "A",
+            secondNote: "A",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[450]] } }, "equal19")).toEqual({
+            firstNote: "A#",
+            secondNote: "A#",
             octave: 0
         });
     });
@@ -2345,6 +2412,28 @@ describe("buildScale", () => {
         expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
     });
 
+    it.each([
+        ["D major pentatonic", "D E F♯ A B D"],
+        ["A major pentatonic", "A B C♯ E F♯ A"],
+        ["E major pentatonic", "E F♯ G♯ B C♯ E"],
+        ["B major pentatonic", "B C♯ D♯ F♯ G♯ B"],
+        ["B minor pentatonic", "B D E F♯ A B"],
+        ["B minyo", "B D E F♯ A B"],
+        ["B♭ major pentatonic", "B♭ C D F G B♭"],
+        ["F minor pentatonic", "F A♭ B♭ C E♭ F"]
+    ])("should spell %s with the accidentals of its key", (keySignature, expected) => {
+        expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it("should give each note of D major pentatonic one scale degree", () => {
+        expect(scaleDegreeToPitchMapping("D major pentatonic", 3, false, null)).toBe("F♯");
+        expect(scaleDegreeToPitchMapping("D major pentatonic", null, false, "G")).toEqual([
+            "4",
+            "♮"
+        ]);
+        expect(getSharpFlatPreference("D major pentatonic")).toBe("sharp");
+    });
+
     it("should not repeat a letter in any seven-note scale it can spell", () => {
         const roots = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
         const modes = ["harmonic minor", "melodic minor", "harmonic major", "hungarian"];
@@ -2425,6 +2514,56 @@ describe("getModePattern", () => {
 
     it("keeps the 12-EDO pattern identical", () => {
         expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    describe("custom mode", () => {
+        let savedCustom;
+
+        beforeEach(() => {
+            savedCustom = MUSICALMODES.custom;
+        });
+
+        afterEach(() => {
+            MUSICALMODES.custom = savedCustom;
+        });
+
+        it("keeps the default chromatic pattern in 12-EDO", () => {
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("uses the current pattern after MUSICALMODES.custom is replaced", () => {
+            // The define mode block (default name "custom") replaces the array.
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            expect(getModePattern("custom", 12)).toEqual([2, 2, 3, 2, 3]);
+            expect(buildScale("C custom")).toEqual([
+                ["C", "D", "E", "G", "A", "C"],
+                [2, 2, 3, 2, 3]
+            ]);
+        });
+
+        it("uses a replaced pattern in another EDO when its steps fit that EDO", () => {
+            MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2]; // sums to 19
+            expect(getModePattern("custom", 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+        });
+
+        it("falls back to one step per pitch when the pattern doesn't fit the EDO", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
+            expect(getModePattern("custom", 19)).toEqual(new Array(19).fill(1));
+        });
+
+        it("falls back when a step is not a positive integer, even if the sum fits", () => {
+            MUSICALMODES.custom = [4, 3, 0, 3]; // sums to 10, but has a 0 step
+            expect(getModePattern("custom", 10)).toEqual(new Array(10).fill(1));
+            MUSICALMODES.custom = [6, -1, 7]; // sums to 12
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("returns a copy, not the stored array", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            const out = getModePattern("custom", 12);
+            out.push(99);
+            expect(MUSICALMODES.custom).toEqual([2, 2, 3, 2, 3]);
+        });
     });
 
     it("rescales a native 19-EDO custom mode requested at EDO 12", () => {
@@ -3409,7 +3548,10 @@ describe("calcOctave", () => {
         expect(calcOctave(4, "7", ["C"], "C")).toBe(7);
     });
 
-    it("should clamp a numeric string to the 1..9 octave range", () => {
+    it("should clamp numeric arguments to the 1..9 octave range", () => {
+        expect(calcOctave(4, 0, ["C"], "C")).toBe(1);
+        expect(calcOctave(4, 12, ["C"], "C")).toBe(9);
+        expect(calcOctave(4, 3.7, ["C"], "C")).toBe(3);
         expect(calcOctave(4, "0", ["C"], "C")).toBe(1);
         expect(calcOctave(4, "12", ["C"], "C")).toBe(9);
         expect(calcOctave(4, "3.7", ["C"], "C")).toBe(3);
@@ -3420,6 +3562,10 @@ describe("calcOctave", () => {
             calcOctave(4, "current", ["C"], "C")
         );
         expect(calcOctave(4, "", ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, NaN, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, NaN, ["C"], "G")).toBe(3);
+        expect(calcOctave(4, null, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, undefined, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
     });
 
     it("should return correct octave based on currentNote and lastNotePlayed", () => {
@@ -3906,6 +4052,101 @@ describe("getPitchInfo", () => {
     it("handles solfege class with accidental", () => {
         // C♯ keeps its spelling (D♭ is not in C major either), so its class is do.
         expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("do");
+    });
+
+    describe("solfege for every spelling (#9776)", () => {
+        const solfege = (type, note, keySignature, movable) =>
+            getPitchInfo(activity, type, note, { singer: { keySignature, movable } });
+
+        it("gives fixed Do syllables for E♯ and F♭", () => {
+            expect(solfege("solfege syllable", "E♯4", "C major", false)).toBe("mi♯");
+            expect(solfege("solfege syllable", "F♭4", "C major", false)).toBe("fa♭");
+            expect(solfege("solfege class", "E♯4", "C major", false)).toBe("mi");
+            expect(solfege("solfege class", "F♭4", "C major", false)).toBe("fa");
+        });
+
+        it("keeps the fixed Do syllables the table already had", () => {
+            expect(solfege("solfege syllable", "C♯4", "C major", false)).toBe("do♯");
+            expect(solfege("solfege syllable", "C♭4", "C major", false)).toBe("do♭");
+            expect(solfege("solfege syllable", "B♯4", "C major", false)).toBe("ti♯");
+            expect(solfege("solfege syllable", "R", "C major", false)).toBe("rest");
+        });
+
+        it("gives the movable Do class of the key's own sharps and flats", () => {
+            expect(solfege("solfege class", "F♯4", "D major", true)).toBe("mi");
+            expect(solfege("solfege class", "C♯4", "D major", true)).toBe("ti");
+            expect(solfege("solfege class", "B♭4", "F major", true)).toBe("fa");
+        });
+
+        it("gives movable Do syllables for notes outside the key", () => {
+            expect(solfege("solfege syllable", "C♯4", "C major", true)).toBe("do♯");
+            expect(solfege("solfege syllable", "C4", "D major", true)).toBe("ti♭");
+            expect(solfege("solfege syllable", "G♯4", "D major", true)).toBe("fa♯");
+            expect(solfege("solfege class", "C4", "D major", true)).toBe("ti");
+        });
+
+        it("drops a double accidental from the movable Do class", () => {
+            // C♭ is two steps below the C♯ of C♯ major.
+            expect(solfege("solfege syllable", "C♭4", "C♯ major", true)).toBe("do𝄫");
+            expect(solfege("solfege class", "C♭4", "C♯ major", true)).toBe("do");
+        });
+
+        it("measures an outside note against the mode's own scale", () => {
+            // F is mi in D minor, so F♯ is mi♯ rather than the major scale's mi.
+            expect(solfege("solfege syllable", "F4", "D minor", true)).toBe("mi");
+            expect(solfege("solfege syllable", "F♯4", "D minor", true)).toBe("mi♯");
+        });
+
+        it("gives a syllable past the seventh note of a longer scale", () => {
+            // B is the eighth note of C algerian, so its index runs off the end of the names.
+            expect(solfege("solfege syllable", "B4", "C algerian", true)).toBe("ti");
+        });
+
+        it("leaves notes inside the key as they were", () => {
+            expect(solfege("solfege syllable", "D4", "D major", true)).toBe("do");
+            expect(solfege("solfege syllable", "F♯4", "D major", true)).toBe("mi");
+            expect(solfege("solfege syllable", "D4", "F major", true)).toBe("la");
+        });
+
+        it("still returns undefined for text that is not a note", () => {
+            expect(solfege("solfege syllable", "xyz", "C major", false)).toBeUndefined();
+            expect(solfege("solfege class", "xyz", "D major", true)).toBeUndefined();
+        });
+
+        it("gives a syllable for every spelling in every key and mode", () => {
+            const notes = [];
+            for (const letter of ["C", "D", "E", "F", "G", "A", "B"]) {
+                notes.push(letter, letter + SHARP, letter + FLAT);
+            }
+            const keys = ["C", "C♯", "D", "E♭", "F♯", "A", "B♭", "C♭"];
+            const syllables = "(do|re|mi|fa|sol|la|ti)";
+            const pattern = {
+                "solfege syllable": new RegExp(
+                    `^${syllables}(${SHARP}|${FLAT}|${DOUBLESHARP}|${DOUBLEFLAT})?$`,
+                    "u"
+                ),
+                "solfege class": new RegExp(`^${syllables}$`)
+            };
+            for (const mode of Object.keys(MUSICALMODES)) {
+                for (const key of keys) {
+                    const keySignature = key + " " + mode;
+                    for (const note of notes) {
+                        for (const movable of [false, true]) {
+                            for (const type of Object.keys(pattern)) {
+                                const result = solfege(type, note + "4", keySignature, movable);
+                                expect([keySignature, note, movable, type, result]).toEqual([
+                                    keySignature,
+                                    note,
+                                    movable,
+                                    type,
+                                    expect.stringMatching(pattern[type])
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     });
 
     it("returns pitch number", () => {
@@ -4492,13 +4733,25 @@ describe("getNoteFromInterval edge intervals", () => {
         ["C4", "augmented 8", ["C" + SHARP, 5]],
         ["C4", "up-major 3", ["E" + SHARP, 4]],
         ["C4", "down-minor 3", ["E" + DOUBLEFLAT, 4]],
-        ["C4", "mid 3", ["E" + FLAT, 4]]
+        ["C4", "mid 3", ["E" + FLAT, 4]],
+        ["C4", "chromatic semitone", ["C" + SHARP, 4]],
+        ["C4", "whole tone", ["D", 4]],
+        ["C4", "diminished octave", ["C" + FLAT, 5]],
+        ["C4", "octave", ["C", 5]]
     ];
 
     cases.forEach(([pitch, interval, expected]) => {
         it(`finds ${interval} from ${pitch}`, () => {
             expect(getNoteFromInterval(pitch, interval)).toEqual(expected);
         });
+    });
+
+    it.each(Object.keys(INTERVALVALUES))("spells %s from any root", interval => {
+        for (const root of ["C4", "E" + FLAT + "4", "F" + SHARP + "4", "B4"]) {
+            const [note, octave] = getNoteFromInterval(root, interval);
+            expect(typeof note).toBe("string");
+            expect(Number.isInteger(octave)).toBe(true);
+        }
     });
 });
 
@@ -5107,6 +5360,33 @@ describe("mode pie menu shared helpers", () => {
                 JSON.stringify([{ name: "my mode", pattern: [1, 2] }, { pattern: [1] }, null])
             );
             expect(getSavedCustomModes()).toEqual([{ name: "my mode", pattern: [1, 2] }]);
+        });
+
+        it("drops saved modes whose pattern isn't a list of positive whole steps", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "good", pattern: [2, 2, 3, 2, 3] },
+                    { name: "zero step", pattern: [4, 3, 0, 3] },
+                    { name: "fraction", pattern: [1.5, 10.5] },
+                    { name: "empty", pattern: [] },
+                    { name: "no pattern" }
+                ])
+            );
+            expect(getSavedCustomModes()).toEqual([{ name: "good", pattern: [2, 2, 3, 2, 3] }]);
+        });
+
+        it("keeps a saved mode only when its steps add up to its own saved EDO", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "fits 12", pattern: [2, 2, 3, 2, 3], edo: 12 },
+                    { name: "fits 19", pattern: [3, 3, 2, 3, 3, 3, 2], edo: 19 },
+                    { name: "wrong sum", pattern: [2, 2, 3, 2, 3], edo: 19 },
+                    { name: "bad edo", pattern: [2, 2, 3, 2, 3], edo: "12" }
+                ])
+            );
+            expect(getSavedCustomModes().map(m => m.name)).toEqual(["fits 12", "fits 19"]);
         });
 
         it("returns an empty list for corrupt or non-array data", () => {

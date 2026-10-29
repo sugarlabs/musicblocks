@@ -40,7 +40,7 @@ try {
    setupBlockScaleController,
    setupContextMenuController,
    requestClear,
-   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
+   setupActivityAbcParser, setupActivityMxmlParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, docByClass,
@@ -114,6 +114,7 @@ let MYDEFINES = [
     "utils/error-handler",
     "utils/debugLog",
     "activity/artwork",
+    "widgets/HarmonyUtils",
     "widgets/status",
     "utils/munsell",
     "activity/toolbar",
@@ -249,11 +250,12 @@ function lazyLoad(modulePaths) {
 let globalActivity;
 
 /**
- * Performs analysis on the project using the global activity.
+ * Performs analysis on a project: the given blocks, or the open workspace if none.
+ * @param {{blockList: Array}} [blocks] - blocks parsed from a saved project.
  * @returns {object} - The analysis result.
  */
-const doAnalyzeProject = function () {
-    return analyzeProject(globalActivity);
+const doAnalyzeProject = function (blocks) {
+    return analyzeProject(blocks ? { blocks } : globalActivity);
 };
 
 /**
@@ -1032,7 +1034,7 @@ class Activity {
             this.scrollBlockContainer = !this.scrollBlockContainer;
             const enableHorizScrollIcon = document.getElementById("enableHorizScrollIcon");
             const disableHorizScrollIcon = document.getElementById("disableHorizScrollIcon");
-            if (this.scrollBlockContainer && !this.beginnerMode) {
+            if (this.scrollBlockContainer) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
 
@@ -2309,6 +2311,7 @@ class Activity {
 
         this._loadProject = (...args) => this.projectManager._loadProject(...args);
         setupActivityAbcParser(this);
+        setupActivityMxmlParser(this);
         this.loadStartWrapper = (...args) => this.projectManager.loadStartWrapper(...args);
 
         this.showContents = (...args) => this.projectManager.showContents(...args);
@@ -3234,8 +3237,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
 
         if (globalsReady) {
             activity.setupDependencies();
-            activity.domReady(doc);
-            activity.doContextMenus();
+            activity.domReady(doc).then(() => activity.doContextMenus());
             activity.doPluginsAndPaletteCols();
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
@@ -3245,8 +3247,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
                 waitForReadiness(
                     () => {
                         activity.setupDependencies();
-                        activity.domReady(doc);
-                        activity.doContextMenus();
+                        activity.domReady(doc).then(() => activity.doContextMenus());
                         activity.doPluginsAndPaletteCols();
                     },
                     {

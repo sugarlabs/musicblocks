@@ -150,6 +150,29 @@ describe("setupMeterActions", () => {
         });
     });
 
+    describe("weak beat chosen with on weak beat alone", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.onWeakBeatDo("testAction", false, null, 0, 1);
+        });
+
+        // Weak beats are determined by exclusion from beatList (beatValue > 1 and
+        // !beatList.includes(beatValue)), so default strong beats must return for
+        // the new meter to distinguish strong beats from weak beats.
+        it("restores default strong beats for the new meter while preserving offbeat", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            expect(targetTurtle.singer.beatList).toEqual(["offbeat", 1, 4]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(true);
+        });
+
+        it("restores default strong beats across multiple meter changes", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            expect(targetTurtle.singer.beatList).toEqual(["offbeat", 1, 3]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(true);
+        });
+    });
+
     it("keeps a strong beat past the end of the measure from bringing the defaults back", () => {
         Singer.MeterActions.setMeter(4, 1 / 4, 0);
         Singer.MeterActions.onStrongBeatDo(9, "testAction", false, null, 0, 1);
@@ -687,7 +710,17 @@ describe("setupMeterActions", () => {
         expect(mockMouse.MB.listeners).toContain("_drift_0");
     });
 
-    test.each([[null], [0]])("should return 0 when noteValue is %p", noteValue => {
+    test.each([
+        [null],
+        [0],
+        [undefined],
+        [NaN],
+        [-1],
+        [-0.25],
+        [Infinity],
+        [-Infinity],
+        ["invalid"]
+    ])("should return 0 when noteValue is %p", noteValue => {
         const result = Singer.MeterActions.getNotesPlayed(noteValue, 0);
         expect(result).toBe(0);
     });
@@ -696,6 +729,7 @@ describe("setupMeterActions", () => {
         targetTurtle.singer.notesPlayed = [12, 3];
         const result = Singer.MeterActions.getNotesPlayed(2, 0);
         expect(result).toBe(2);
+        expect(Singer.MeterActions.getNotesPlayed(0.25, 0)).toBe(16);
     });
 
     it("should calculate whole notes played correctly", () => {

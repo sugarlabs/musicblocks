@@ -14,7 +14,7 @@
 
    _b64Cache, wholeNoteImg, halfNoteImg, quarterNoteImg, eighthNoteImg,
    sixteenthNoteImg, thirtysecondNoteImg, sixtyfourthNoteImg, CHORDVALUES,
-   setCustomChord, MUSICALMODES, customMode, getModeNumbers,
+   setCustomChord, MUSICALMODES, getModeNumbers,
    getNonEDOModeSteps, getArticulation, modeMapper, getCustomNote,
    GetNotesForInterval, base64Encode, MOVABLE_TONIC_DEGREE, scalePatternToEDO,
    PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern, MusicUtilsModeCore
@@ -48,7 +48,8 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { stripMicrotonalPrefix, normalizeNoteAccidentals, parseNoteString } = MusicUtilsPitch;
+    var { stripMicrotonalPrefix, normalizeNoteAccidentals, parseNoteString, frequencyToPitch } =
+        MusicUtilsPitch;
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
@@ -230,12 +231,6 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 /**
- * Custom mode from the musical modes dictionary.
- * @constant {Object}
- */
-var customMode = MUSICALMODES["custom"];
-
-/**
  * Get the mode numbers for a specific mode name.
  * @function
  * @param {string} name - The name of the mode.
@@ -256,6 +251,10 @@ var getModeNumbers = name => {
 
         return m;
     };
+
+    if (typeof name !== "string") {
+        return "";
+    }
 
     const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
@@ -348,7 +347,7 @@ var getNonEDOModeSteps = (mode, temperament) => {
  */
 var getArticulation = note => {
     const stripped = stripMicrotonalPrefix(note);
-    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-Ga-g])(.*)/);
     return match ? match[1] : stripped;
 };
 
@@ -362,8 +361,8 @@ var getArticulation = note => {
 var modeMapper = (key, mode) => {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
-    key = key.toLowerCase();
-    mode = mode.toLowerCase();
+    key = typeof key === "string" && key.trim() !== "" ? key.trim().toLowerCase() : "c";
+    mode = typeof mode === "string" && mode.trim() !== "" ? mode.trim().toLowerCase() : "major";
 
     switch (mode) {
         case "ionian":
@@ -682,6 +681,13 @@ var modeMapper = (key, mode) => {
         case "natural minor":
             mode = "minor";
             break;
+        case "major pentatonic":
+            mode = "major";
+            break;
+        case "minor pentatonic":
+        case "minyo":
+            mode = "minor";
+            break;
         case "major":
         case "minor":
         default:
@@ -700,8 +706,11 @@ var modeMapper = (key, mode) => {
  */
 var getCustomNote = note => {
     // For custom temperament note
-    if (note instanceof Array) {
+    if (Array.isArray(note)) {
         note = note[0];
+    }
+    if (typeof note !== "string") {
+        return "";
     }
 
     let centsInfo = "";
@@ -739,12 +748,18 @@ var getCustomNote = note => {
     return note;
 };
 
-var GetNotesForInterval = tur => {
+var GetNotesForInterval = (tur, temperament) => {
     const parseFn =
         typeof parseNoteString !== "undefined"
             ? parseNoteString
             : typeof MusicUtilsPitch !== "undefined"
               ? MusicUtilsPitch.parseNoteString
+              : null;
+    const freqToPitchFn =
+        typeof frequencyToPitch !== "undefined"
+            ? frequencyToPitch
+            : typeof MusicUtilsPitch !== "undefined"
+              ? MusicUtilsPitch.frequencyToPitch
               : null;
     const noteStatus = tur?.singer?.noteStatus;
     const notePitches = tur?.singer?.notePitches;
@@ -753,14 +768,28 @@ var GetNotesForInterval = tur => {
     let firstNote = "C",
         secondNote = "C",
         octave = 0;
-    if (noteStatus && noteStatus[0]) {
-        const [parsedFirstNote, parsedOctaveA] = parseFn(String(noteStatus[0][0]));
+    if (noteStatus && noteStatus[0]?.length) {
+        const formatNote = note => {
+            if (note === undefined || note === null) {
+                return "";
+            }
+            if (typeof note === "number" && freqToPitchFn) {
+                const [name, noteOct] = freqToPitchFn(note, temperament);
+                return name + noteOct;
+            }
+            return String(note);
+        };
+        const [parsedFirstNote, parsedOctaveA] = parseFn
+            ? parseFn(formatNote(noteStatus[0][0]))
+            : ["C", NaN];
         firstNote = parsedFirstNote || "C";
         if (!noteStatus[0][1]) {
             firstNote = normalizeNoteAccidentals(firstNote);
             return { firstNote, secondNote: firstNote, octave };
         }
-        const [parsedSecondNote, parsedOctaveB] = parseFn(String(noteStatus[0][1]));
+        const [parsedSecondNote, parsedOctaveB] = parseFn
+            ? parseFn(formatNote(noteStatus[0][1]))
+            : ["C", NaN];
         secondNote = parsedSecondNote || "C";
         if (!Number.isNaN(parsedOctaveA) && !Number.isNaN(parsedOctaveB)) {
             octave = parsedOctaveB - parsedOctaveA;
@@ -872,9 +901,12 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * Get the step pattern for a mode in the given EDO (or temperament).
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
- * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
- * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
- * returns a full EDO-length step-1 pattern.
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom" mode,
+ * the current MUSICALMODES.custom pattern is used when its steps sum to the
+ * EDO; otherwise a full EDO-length step-1 (chromatic) pattern is returned.
+ * Unlike other modes, custom is not rescaled with scalePatternToEDO: define
+ * mode always stores steps that sum to the current EDO, and set temperament
+ * resets it when the EDO changes.
  *
  * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
  * EDO step model does not apply, so the returned array is a list of per-step
@@ -887,13 +919,24 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * @returns {Array} Integer step pattern.
  */
 var getModePattern = (mode, edo = 12) => {
+    if (typeof mode !== "string") {
+        return scalePatternToEDO(MUSICALMODES.major, edo);
+    }
     const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
     if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
         return overrides[mode].slice();
     }
     if (mode.toLowerCase() === "custom") {
-        if (edo === 12) {
-            return customMode.slice();
+        // Read MUSICALMODES.custom on each call instead of keeping a copy: the
+        // define mode block, set temperament and saved custom modes all
+        // replace that array, so the copy taken at load time goes stale.
+        const custom = MUSICALMODES.custom;
+        if (
+            Array.isArray(custom) &&
+            custom.every(step => Number.isInteger(step) && step > 0) &&
+            custom.reduce((a, b) => a + b, 0) === edo
+        ) {
+            return custom.slice();
         }
         return new Array(edo).fill(1);
     }
@@ -915,7 +958,6 @@ var MusicUtilsModeCore = {
     CHORDVALUES,
     setCustomChord,
     MUSICALMODES,
-    customMode,
     getModeNumbers,
     getNonEDOModeSteps,
     getArticulation,

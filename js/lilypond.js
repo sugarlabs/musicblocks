@@ -123,6 +123,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "𝄫": "eses",
             "♯": "is",
             "♭": "es",
+            "-2": ",,,,,",
+            "-1": ",,,,",
             "10": "'''''''",
             "0": ",,,",
             "1": ",,",
@@ -137,8 +139,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         };
 
         return (
-            note.replace(/[♮♯♭𝄪𝄫]|10|[0-9]/gu, match => replacements[match]).toLowerCase() +
-            (natural ? "!" : "")
+            note
+                .replace(/[♮♯♭𝄪𝄫]|10|-[12]|[0-9]/gu, match => replacements[match] ?? match)
+                .toLowerCase() + (natural ? "!" : "")
         );
     };
 
@@ -843,7 +846,8 @@ const saveLilypondOutput = function (activity) {
                         if (obj[0][ii] === "R") {
                             continue;
                         } else if (typeof obj[0][ii] === "string") {
-                            octaveTotal += Number(obj[0][ii].slice(-1));
+                            const match = String(obj[0][ii]).match(/(-?\d+)$/);
+                            octaveTotal += match ? Number(match[1]) : 4;
                         } else {
                             const pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];
@@ -860,18 +864,13 @@ const saveLilypondOutput = function (activity) {
                 console.debug(
                     octaveTotal + " " + noteCount + " " + Math.floor(0.5 + octaveTotal / noteCount)
                 );
-                switch (Math.floor(0.5 + octaveTotal / noteCount)) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        clef.push("bass_8");
-                        break;
-                    case 3:
-                        clef.push("bass");
-                        break;
-                    default:
-                        clef.push("treble");
-                        break;
+                const avgOctave = Math.floor(0.5 + octaveTotal / noteCount);
+                if (avgOctave <= 2) {
+                    clef.push("bass_8");
+                } else if (avgOctave === 3) {
+                    clef.push("bass");
+                } else {
+                    clef.push("treble");
                 }
             } else {
                 clef.push("treble");

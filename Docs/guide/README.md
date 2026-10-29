@@ -2068,15 +2068,22 @@ saved modes.
 
 The *EDO/Temperament* dropdown lets you select how many equal
 divisions the octave is split into. The default is `12-EDO` (standard
-Western tuning). Selecting a different EDO (such as `5`, `17`, `19`,
-or `31`) redraws the pie wheel with that many slices. The mode wheel
-shows numeric indices (`0`, `1`, `2`, ...) while the note wheel uses
-`x` markers to indicate selected scale degrees.
+Western tuning). Selecting a different tuning (the `5`, `7`, `17`, `19`, and
+`31` EDOs, or a non-EDO temperament) redraws the pie wheel with that many
+slices. The mode wheel shows numeric indices (`0`, `1`, `2`, ...) while the
+note wheel uses `x` markers to indicate selected scale degrees.
 
 Non-EDO temperaments (*5-limit Just Intonation*, *Pythagorean
 Tuning*, *1/3 Comma Meantone*, *1/4 Comma Meantone*) use ratio-based
-tuning rather than equal divisions. The pie wheel shows the closest
-scale degrees for the selected temperament.
+tuning rather than equal divisions. For these the pie wheel draws
+each slice in proportion to that interval's real size, so a wide
+interval such as a major third takes up visibly more of the circle
+than a narrow one. Each slice spans the interval from its pitch to the
+next, so the numeric labels sit in the centres of those intervals;
+equal EDOs keep evenly sized slices and their original label positions.
+Degree labels are hidden on slices too narrow to
+hold them; the `x` markers on the outer ring still show which degrees
+are selected.
 
 State is cached per-EDO when switching between equally-tempered
 settings, so switching back to a previous EDO restores your previous
@@ -2084,6 +2091,12 @@ notes. Selecting a non-EDO temperament replaces the current tuning
 state entirely. When playing under non-EDO temperaments, frequencies
 are computed from the temperament's ratios rather than
 equal-temperament formulas.
+
+A custom mode also remembers the tuning it was saved in. Opening a
+mode adopts that mode's EDO and temperament, switching from the
+current tuning if necessary. If the stored tuning cannot serve the
+mode's pitch count, the widget falls back to equal divisions of that
+EDO.
 
 ![widget](./mode_scalar_21edo.svg "widget with 1/4 Comma Meantone selected")
 

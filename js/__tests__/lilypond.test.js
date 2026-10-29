@@ -123,6 +123,22 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("a,,,4 c,,4 c,4 c4 ");
     });
 
+    test("should format negative octaves (-1 and -2) with correct LilyPond octave commas and no hyphens", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C-1"], 4, 0, null, 0, -1, false],
+            [["D-2"], 4, 0, null, 0, -1, false],
+            [["F♯-1"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("c,,,,4 d,,,,,4 fis,,,,4 ");
+    });
+
+    test("should not produce undefined when processing unsupported negative octaves", () => {
+        logo.notation.notationStaging[turtle] = [[["C-3"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("undefined");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);
@@ -929,6 +945,29 @@ describe("saveLilypondOutput", () => {
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('\\clef "bass_8"');
+    });
+    test("should select bass_8 clef for negative octave sub-bass notes", () => {
+        activity.logo.notation.notationStaging = {
+            0: [[["C-1"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+    });
+    test("should select bass_8 clef for numeric frequency in negative octave", () => {
+        frequencyToPitch.mockReturnValue(["C", -1]);
+        activity.logo.notation.notationStaging = {
+            0: [[[16.35], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+        expect(frequencyToPitch).toHaveBeenCalledWith(16.35, "equal");
+    });
+    test("should parse signed and multi-digit octaves in octave calculation", () => {
+        activity.logo.notation.notationStaging = {
+            0: [[["C10", "C4"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "treble"');
     });
     test("should select bass clef for mid-low notes", () => {
         frequencyToPitch.mockReturnValue(["C", 3]);
