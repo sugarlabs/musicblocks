@@ -402,7 +402,8 @@ describe("MeterBlocks setup", () => {
         logo.actions = { action: jest.fn(), clap: jest.fn() };
 
         offBeat.flow(["missing"], logo, 0, "off");
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "off", undefined);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "off", "missing");
+        expect(Singer.MeterActions.onWeakBeatDo).not.toHaveBeenCalled();
 
         offBeat.flow(["action"], logo, 0, "off", null, null, true);
         expect(Singer.MeterActions.onWeakBeatDo).toHaveBeenCalledWith(
@@ -740,25 +741,52 @@ describe("MeterBlocks setup", () => {
         expect(logo.statusFields).toContainEqual(["en2Blk", "elapsednotes2"]);
     });
 
+    it("offbeatdo shows error when action not found", () => {
+        const block = getBlock("offbeatdo");
+        logo.actions = {};
+        block.flow(["missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onWeakBeatDo).not.toHaveBeenCalled();
+    });
+
     it("onbeatdo shows error when action not found", () => {
         const block = getBlock("onbeatdo");
         logo.actions = {};
-        block.flow([1, "missing"], logo, 0, "blk", null, [], false);
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", "missing");
+        block.flow([1, "missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onStrongBeatDo).not.toHaveBeenCalled();
     });
 
     it("everybeatdonew shows error when action not found", () => {
         const block = getBlock("everybeatdonew");
         logo.actions = {};
-        block.flow(["missing"], logo, 0, "blk", null, [], false);
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", undefined);
+        block.flow(["missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onEveryBeatDo).not.toHaveBeenCalled();
     });
 
     it("everybeatdo shows error when action not found", () => {
         const block = getBlock("everybeatdo");
         logo.actions = {};
-        block.flow(["missing"], logo, 0, "blk", null, [], false);
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", undefined);
+        block.flow(["missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onEveryNoteDo).not.toHaveBeenCalled();
     });
 
     it("setter clamps BPM to 60 when value is not a number", () => {

@@ -75,6 +75,11 @@ const PracticeUI = {
         return "0";
     },
 
+    getToolbarHeight() {
+        const toolbars = document.getElementById("toolbars");
+        return toolbars?.offsetHeight || 64;
+    },
+
     keepPanelInViewport(panel) {
         if (
             panel.dataset.userMoved !== "true" ||
@@ -84,11 +89,19 @@ const PracticeUI = {
             return;
         }
 
+        const toolbarHeight = this.getToolbarHeight();
         const rect = panel.getBoundingClientRect();
         const maxLeft = Math.max(this.COLLAPSE_TOGGLE_WIDTH, window.innerWidth - rect.width);
-        const maxTop = Math.max(64, window.innerHeight - rect.height);
+        const maxTop = Math.max(toolbarHeight, window.innerHeight - rect.height);
+
+        const currentTop = Number.parseFloat(panel.style.top) || rect.top || 0;
+        const baseTop =
+            panel.dataset.draggedTop !== undefined && panel.dataset.draggedTop !== ""
+                ? Number.parseFloat(panel.dataset.draggedTop)
+                : currentTop;
+
         panel.style.left = `${Math.min(Math.max(this.COLLAPSE_TOGGLE_WIDTH, rect.left), maxLeft)}px`;
-        panel.style.top = `${Math.min(Math.max(64, rect.top), maxTop)}px`;
+        panel.style.top = `${Math.min(Math.max(toolbarHeight, baseTop), maxTop)}px`;
         panel.style.right = "auto";
     },
 
@@ -140,33 +153,47 @@ const PracticeUI = {
 
     savePanelExpandState(panel) {
         panel.dataset.savedLeft = panel.style.left || "";
-        panel.dataset.savedTop = panel.style.top || "";
+        panel.dataset.savedTop =
+            panel.dataset.userMoved === "true"
+                ? panel.dataset.draggedTop || panel.style.top || ""
+                : "";
         panel.dataset.savedRight = panel.style.right || "";
         panel.dataset.savedUserMoved = panel.dataset.userMoved || "false";
     },
 
     restorePanelExpandState(panel) {
         panel.style.left = panel.dataset.savedLeft || "auto";
-        panel.style.top = panel.dataset.savedTop || "64px";
+        const defaultTop = `${this.getToolbarHeight()}px`;
+        if (panel.dataset.savedUserMoved === "true") {
+            const saved = panel.dataset.savedTop || "";
+            panel.style.top = saved ? (saved.endsWith("px") ? saved : `${saved}px`) : defaultTop;
+            panel.dataset.draggedTop = panel.dataset.savedTop || "";
+        } else {
+            panel.style.top = defaultTop;
+            panel.dataset.draggedTop = "";
+        }
         panel.style.right = panel.dataset.savedRight || "0";
         panel.dataset.userMoved = panel.dataset.savedUserMoved || "false";
         panel.style.transform = "translateX(0)";
     },
 
     getCollapsedLaneTop(panel) {
+        const toolbar = document.getElementById("toolbars");
+        const laneBaseTop =
+            toolbar && toolbar.offsetHeight ? toolbar.offsetHeight + 12 : this.COLLAPSED_LANE_TOP;
         const practicePanel = this.getVisiblePanel("practice-panel");
         const practiceCollapsed =
             practicePanel && practicePanel.classList.contains("practice-panel-collapsed");
 
         if (panel.id === "practice-panel") {
-            return this.COLLAPSED_LANE_TOP;
+            return laneBaseTop;
         }
 
         if (practicePanel && practiceCollapsed) {
-            return this.COLLAPSED_LANE_TOP + this.COLLAPSE_TOGGLE_HEIGHT + this.COLLAPSE_TOGGLE_GAP;
+            return laneBaseTop + this.COLLAPSE_TOGGLE_HEIGHT + this.COLLAPSE_TOGGLE_GAP;
         }
 
-        return this.COLLAPSED_LANE_TOP;
+        return laneBaseTop;
     },
 
     syncCollapseToggle(panel) {
@@ -223,6 +250,23 @@ const PracticeUI = {
         });
     },
 
+    refreshOnToolbarChange() {
+        const practicePanel = this.getVisiblePanel("practice-panel");
+        const journalPanel = this.getVisiblePanel("explorer-journal-panel");
+
+        [practicePanel, journalPanel].forEach(panel => {
+            if (panel) {
+                if (panel.classList.contains("practice-panel-collapsed")) {
+                    panel.style.top = `${this.getCollapsedLaneTop(panel)}px`;
+                } else if (panel.dataset.userMoved === "true") {
+                    this.keepPanelInViewport(panel);
+                } else {
+                    panel.style.top = `${this.getToolbarHeight()}px`;
+                }
+            }
+        });
+    },
+
     wirePanelCollapse(panel) {
         const toggle = panel.querySelector(".practice-panel-collapse-toggle");
         if (!toggle) return;
@@ -274,6 +318,7 @@ const PracticeUI = {
             startTop = rect.top;
 
             panel.dataset.userMoved = "true";
+            panel.dataset.draggedTop = `${rect.top}`;
             panel.classList.remove("practice-panel-collapsed");
             panel.style.transform = "translateX(0)";
             this.syncCollapseToggle(panel);
@@ -286,8 +331,11 @@ const PracticeUI = {
         handle.onpointermove = event => {
             if (!dragging) return;
 
-            panel.style.left = `${startLeft + event.clientX - startX}px`;
-            panel.style.top = `${startTop + event.clientY - startY}px`;
+            const nextLeft = startLeft + event.clientX - startX;
+            const nextTop = startTop + event.clientY - startY;
+            panel.dataset.draggedTop = `${nextTop}`;
+            panel.style.left = `${nextLeft}px`;
+            panel.style.top = `${nextTop}px`;
             this.keepPanelInViewport(panel);
         };
 
@@ -329,9 +377,12 @@ const PracticeUI = {
 
     restorePanel(panel, fallbackRight) {
         panel.style.display = "flex";
-        if (!panel.dataset.userMoved || panel.dataset.userMoved !== "true") {
+        if (panel.classList.contains("practice-panel-collapsed")) {
+            this.refreshCollapsedLane();
+        } else if (!panel.dataset.userMoved || panel.dataset.userMoved !== "true") {
             panel.style.left = "auto";
             panel.style.right = fallbackRight !== undefined ? fallbackRight : "0";
+            panel.style.top = `${this.getToolbarHeight()}px`;
         }
         this.keepPanelInViewport(panel);
         this.bringPanelToFront(panel);
@@ -1358,6 +1409,11 @@ const ExplorerJournalUI = {
         return this.escapeHTML(value);
     }
 };
+
+if (typeof window !== "undefined") {
+    window.PracticeUI = PracticeUI;
+    window.ExplorerJournalUI = ExplorerJournalUI;
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { PracticeUI, ExplorerJournalUI };

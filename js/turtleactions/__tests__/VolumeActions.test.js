@@ -19,6 +19,7 @@
 
 global.clampNumber = require("../../utils/utils-logic").clampNumber;
 const setupVolumeActions = require("../VolumeActions");
+const { Logo } = require("../../logo");
 
 describe("setupVolumeActions", () => {
     let activity;
@@ -542,6 +543,113 @@ describe("setupVolumeActions", () => {
             expect(() => {
                 Singer.VolumeActions.setRelativeVolume(20, 0);
             }).not.toThrow();
+        });
+    });
+
+    describe("volume clamp cleanup through Logo listeners", () => {
+        let stageListeners;
+
+        const dispatch = name => activity.logo.stage.dispatchEvent(name);
+        const relative = (volume, blk = 1) =>
+            Singer.VolumeActions.setRelativeVolume(volume, 0, blk);
+        const crescendo = (value, blk = 1) =>
+            Singer.VolumeActions.doCrescendo("crescendo", value, 0, blk);
+        const expectVolumes = expected => {
+            expect(targetTurtle.singer.synthVolume).toEqual(expected);
+            for (const stack of Object.values(targetTurtle.singer.synthVolume)) {
+                expect(stack.length).toBeGreaterThan(0);
+                for (const value of stack) expect(Number.isFinite(value)).toBe(true);
+            }
+            for (const call of synthVolumeSpy.mock.calls) {
+                expect(Number.isFinite(call[3])).toBe(true);
+            }
+        };
+
+        beforeEach(() => {
+            stageListeners = new Map();
+            targetTurtle.listeners = {};
+            targetTurtle.endOfClampSignals = {};
+            targetTurtle.singer.backward = [];
+            targetTurtle.singer.synthVolume = { default: [50] };
+            targetTurtle.singer.crescendoInitialVolume = { default: [50] };
+            activity.blocks.blockList = {
+                1: { connections: [null, 3] },
+                2: { connections: [null, 4] }
+            };
+            Object.assign(activity.logo, {
+                turtles: activity.turtles,
+                blockList: activity.blocks.blockList,
+                deps: { utils: { last: global.last } },
+                stage: {
+                    addEventListener: (name, listener) => stageListeners.set(name, listener),
+                    removeEventListener: (name, listener) => {
+                        if (stageListeners.get(name) === listener) stageListeners.delete(name);
+                    },
+                    dispatchEvent: name => {
+                        const listener = stageListeners.get(name);
+                        if (listener) listener({ type: name });
+                    }
+                },
+                setTurtleListener: Logo.prototype.setTurtleListener,
+                setDispatchBlock: Logo.prototype.setDispatchBlock
+            });
+        });
+
+        test("each nested clamp cleans up only the instruments it changed", () => {
+            relative(50);
+            // A newly selected timbre inherits the current default voice volume.
+            targetTurtle.singer.synthVolume.piano = [75];
+            relative(10, 2);
+            expectVolumes({ default: [50, 75, 82.5], piano: [75, 82.5] });
+
+            dispatch(targetTurtle.endOfClampSignals[4].pop());
+            expectVolumes({ default: [50, 75], piano: [75] });
+            dispatch(targetTurtle.endOfClampSignals[3].pop());
+            expectVolumes({ default: [50], piano: [75] });
+            expect(beginArticulationSpy).toHaveBeenCalledTimes(2);
+            expect(endArticulationSpy).toHaveBeenCalledTimes(2);
+
+            relative(10);
+            expect(Singer.VolumeActions.getSynthVolume("piano", 0)).toBe(82.5);
+            dispatch("_articulation_0_1");
+            expectVolumes({ default: [50], piano: [75] });
+        });
+
+        test("sibling clamps and repeated execution restore their entry volumes", () => {
+            for (let run = 0; run < 3; run++) {
+                relative(50);
+                dispatch("_articulation_0_1");
+                targetTurtle.singer.synthVolume.piano = [60];
+                relative(10, 2);
+                expectVolumes({ default: [50, 55], piano: [60, 66] });
+                dispatch("_articulation_0_2");
+                expectVolumes({ default: [50], piano: [60] });
+            }
+        });
+
+        test("nested crescendos retain their own instrument and initial-volume stacks", () => {
+            crescendo(5);
+            targetTurtle.singer.synthVolume.default[1] = 60;
+            targetTurtle.singer.synthVolume.piano = [60];
+            targetTurtle.singer.crescendoInitialVolume.piano = [60];
+            crescendo(10, 2);
+            targetTurtle.singer.synthVolume.default[2] = 70;
+            targetTurtle.singer.synthVolume.piano[1] = 70;
+            dispatch("_crescendo_0_2");
+            expectVolumes({ default: [50, 60], piano: [60] });
+            expect(targetTurtle.singer.crescendoDelta).toEqual([5]);
+            dispatch("_crescendo_0_1");
+            expectVolumes({ default: [50], piano: [60] });
+            expect(targetTurtle.singer.crescendoInitialVolume).toEqual({
+                default: [50],
+                piano: [60]
+            });
+            expect(targetTurtle.singer.crescendoDelta).toEqual([]);
+            expect(targetTurtle.singer.inCrescendo).toEqual([]);
+            expect(crescendoEndSpy.mock.calls).toEqual([
+                [0, 10],
+                [0, 5]
+            ]);
         });
     });
 

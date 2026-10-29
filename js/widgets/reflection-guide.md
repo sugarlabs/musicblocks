@@ -109,7 +109,7 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
     ```json
     {
         "algorithm": "<algorithm string>",
-        "message": "<first message>"
+        "response": "<first message>"
     }
     ```
     or
@@ -192,7 +192,7 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
     ```json
     {
         "algorithm": "<new algorithm string>",
-        "message": "<response message>"
+        "response": "<response message>"
     }
     ```
 

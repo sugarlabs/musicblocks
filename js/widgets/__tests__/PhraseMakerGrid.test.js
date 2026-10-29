@@ -672,6 +672,73 @@ describe("PhraseMakerGrid", () => {
 
             expect(result).toEqual([1]);
         });
+
+        test("returns empty array when clamp has no child blocks", () => {
+            const pm = createMockPM();
+            pm.blockNo = 0;
+            pm.activity.blocks.blockList = [{ name: "phrasemaker2", connections: [null, null] }];
+
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "all")).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "all")).toEqual([]);
+        });
+
+        test("returns empty array when clamp has no child blocks and withName is true", () => {
+            const pm = createMockPM();
+            pm.blockNo = 0;
+            pm.activity.blocks.blockList = [{ name: "phrasemaker2", connections: [null, null] }];
+
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "all", true)).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "all", true)).toEqual([]);
+        });
+
+        test("returns empty array when child block reference does not exist in blockList", () => {
+            const pm = createMockPM();
+            pm.blockNo = 0;
+            pm.activity.blocks.blockList = [{ name: "phrasemaker2", connections: [null, 99] }];
+
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "all")).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "all")).toEqual([]);
+        });
+
+        test("returns empty array when clamp block itself or its connections are missing", () => {
+            const pm = createMockPM();
+            pm.blockNo = 0;
+            pm.activity.blocks.blockList = [];
+
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "all")).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "all")).toEqual([]);
+
+            pm.activity.blocks.blockList = [{ name: "phrasemaker2" }];
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "all")).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "all")).toEqual([]);
+        });
+
+        test("correctly maps child block when child block ID is 0", () => {
+            const pm = createMockPM();
+            pm.blockNo = 1;
+            pm.activity.blocks.blockList = [
+                { name: "newnote", connections: [1, null] },
+                { name: "phrasemaker2", connections: [null, 0] }
+            ];
+
+            const result = PhraseMakerGrid.mapNotesBlocks(pm, "newnote");
+            expect(result).toEqual([0]);
+
+            const resultWithName = PhraseMakerGrid.mapNotesBlocks(pm, "newnote", true);
+            expect(resultWithName).toEqual([[0, "newnote"]]);
+        });
+
+        test("stops traversal safely if a connected block in the chain is missing", () => {
+            const pm = createMockPM();
+            pm.blockNo = 0;
+            pm.activity.blocks.blockList = [
+                { name: "phrasemaker2", connections: [null, 1] },
+                { name: "newnote", connections: [0, 99] }
+            ];
+
+            expect(() => PhraseMakerGrid.mapNotesBlocks(pm, "all")).not.toThrow();
+            expect(PhraseMakerGrid.mapNotesBlocks(pm, "all")).toEqual([1]);
+        });
     });
 
     describe("lookForNoteBlocksOrRepeat", () => {
