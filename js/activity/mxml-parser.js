@@ -71,10 +71,12 @@ const _addFractions = ([n1, d1], [n2, d2]) => {
 // _processPart) are the same. A real tie is always same-pitch; used to
 // decide whether a <tie type="stop"/> note genuinely continues the open
 // chain, or just happens to carry a tie tag that doesn't actually apply to it.
+// A chord is compared as a set: MusicXML doesn't fix the order its <chord/>
+// notes are written in, so C-E tied to E-C is still the same chord.
 const _contentsEqual = (a, b) => {
     if (a === null || b === null) return a === b;
     if (a.type !== b.type) return false;
-    const membersOf = c => [c, ...(c.chord ?? [])].map(m => `${m.name}/${m.octave ?? ""}`);
+    const membersOf = c => [c, ...(c.chord ?? [])].map(m => `${m.name}/${m.octave ?? ""}`).sort();
     return membersOf(a).join(" ") === membersOf(b).join(" ");
 };
 
@@ -703,15 +705,13 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
                             : content.type === "drum" && nextUnpitched !== null
                               ? { name: _drumName(next, doc) }
                               : null;
+                    // Each sounding note on its own: the lead's content.chord
+                    // already holds the members pushed so far, and comparing
+                    // the whole chord against one note would keep a doubled C.
                     const sounding = [content, ...content.chord];
                     if (
                         member !== null &&
-                        !sounding.some(m =>
-                            _contentsEqual(
-                                { ...m, type: content.type },
-                                { ...member, type: content.type }
-                            )
-                        )
+                        !sounding.some(m => m.name === member.name && m.octave === member.octave)
                     ) {
                         content.chord.push(member);
                     }

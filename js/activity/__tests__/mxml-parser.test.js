@@ -417,6 +417,33 @@ describe("Test 7: Chords join their note, a second voice is skipped", () => {
         ]);
     });
 
+    it("ties a chord to the same chord written in another order", async () => {
+        const note = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>1</duration>${tie}<type>quarter</type></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                note("C", '<tie type="start"/>') +
+                    CHORD_NOTE("E", 4, '<tie type="start"/>') +
+                    note("E", '<tie type="stop"/>') +
+                    CHORD_NOTE("C", 4, '<tie type="stop"/>')
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+    });
+
+    it("keeps one of a pitch doubled inside a chord, wherever it repeats", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(SIMPLE_NOTE("C", 4, "quarter") + CHORD_NOTE("E", 4) + CHORD_NOTE("C", 4))
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("stops a measure at <backup>, taking only the first voice", async () => {
         const xml = scorePartwise(
             SIMPLE_NOTE("C", 4, "quarter") +
