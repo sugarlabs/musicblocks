@@ -122,10 +122,20 @@ describe("musicutils-lookups", () => {
 
     it("looks up invert modes, intervals, filters and oscillators", () => {
         expect(lookups.getInvertMode("even")).toBe("even");
+        expect(lookups.getInvertMode(null)).toBeNull();
+        expect(lookups.getInvertMode(undefined)).toBeUndefined();
+        expect(lookups.getInvertMode(123)).toBe(123);
+        expect(lookups.getInvertMode({})).toEqual({});
+        expect(lookups.getInvertMode("")).toBe("");
         expect(lookups.getIntervalNumber("perfect 5")).toBe(7);
         expect(lookups.getIntervalDirection("perfect 5")).toBe(0);
         expect(lookups.getIntervalRatio("perfect 5")).toBeCloseTo(1.5, 5);
         expect(lookups.getFilterTypes("highpass")).toBe("highpass");
+        expect(lookups.getFilterTypes(null)).toBe("highpass");
+        expect(lookups.getFilterTypes(undefined)).toBe("highpass");
+        expect(lookups.getFilterTypes(123)).toBe("highpass");
+        expect(lookups.getFilterTypes({})).toBe("highpass");
+        expect(lookups.getFilterTypes("")).toBe("highpass");
         expect(lookups.getOscillatorTypes("sine")).toBe("sine");
     });
 
