@@ -117,13 +117,18 @@ function _noteDuration(noteEl, divisions) {
     // beat late. Its <duration> is the length that counts.
     // An empty or non-numeric <duration> says nothing, so it doesn't outrank
     // <type> (Number("") is 0, not "missing").
+    // A cue note is imported as a rest that holds its place in time, and
+    // <duration> is what advances the position; its <type> only says how the
+    // small cue is drawn.
     const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
-    const isMeasureRest =
-        noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes" &&
+    const isMeasureRest = noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
+    const isCue = noteEl.querySelector(":scope > cue") !== null;
+    const durationWins =
+        (isMeasureRest || isCue) &&
         Number.isFinite(measureRestLength) &&
         measureRestLength > 0 &&
         divisions > 0;
-    if (!isMeasureRest && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
+    if (!durationWins && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
         // <type> is the note as written, so a tuplet note has to be shortened by
@@ -658,8 +663,11 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
             const duration = _noteDuration(child, divisions);
             const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
+            // A cue note shows another part's line during this one's rest
+            // and MusicXML says it isn't played, but it still fills the time.
             const isRest =
                 child.querySelector(":scope > rest") !== null ||
+                child.querySelector(":scope > cue") !== null ||
                 (pitchEl === null && unpitchedEl === null);
 
             let content;
