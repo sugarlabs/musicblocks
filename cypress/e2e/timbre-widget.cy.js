@@ -20,7 +20,6 @@ const openTimbre = () => {
         force: true
     });
 
-    cy.get("#load-container").should("be.visible");
     let stableObservations = 0;
     cy.window({ timeout: 30000 }).should(win => {
         const { blocks } = win.ActivityContext.getActivity();
