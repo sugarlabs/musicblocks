@@ -638,6 +638,22 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
         for (const child of measureEl.children) {
             if (child.tagName === "backup") break;
 
+            // <forward> moves this voice on by its <duration> with no note
+            // written. Skipping it brought every later note in early.
+            if (child.tagName === "forward") {
+                const durationText = _text(child, "duration");
+                const length = durationText?.trim() ? Number(durationText) : NaN;
+                if (Number.isFinite(length) && length > 0 && divisions > 0) {
+                    if (tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
+                    emitNote([length, divisions * 4], null);
+                }
+                continue;
+            }
+
             if (child.tagName === "barline") {
                 const repeatEl = child.querySelector(":scope > repeat");
                 const direction = repeatEl?.getAttribute("direction");
