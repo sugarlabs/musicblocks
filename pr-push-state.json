@@ -125,6 +125,13 @@
     "branch": "fix/pitch-actions-clamp-listeners",
     "headRepo": "aarav-pathak/musicblocks"
   },
+  "9895": {
+    "pushedAt": "2026-10-29T07:16:16.592Z",
+    "sha": "e247e1d82c7238b31fc590faf752b18641eb50ba",
+    "actor": "dhruvpatil972",
+    "branch": "fix/9599-resize-decoration-null-check",
+    "headRepo": "dhruvpatil972/musicblocks"
+  },
   "9908": {
     "pushedAt": "2026-10-29T05:32:23.010Z",
     "sha": "2d71e13a9f8acb9fb0435b314925aeb32f8bdf1c",
