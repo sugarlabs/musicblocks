@@ -29,8 +29,20 @@
  * JavaScript based Music Blocks code.
  */
 class ASTUtils {
+    /**
+     * Whether a box can be exported as a plain variable of the same name. Reserved words and the
+     * names the generated code relies on can't be, so those boxes use setBox/getBox instead.
+     *
+     * @static
+     * @param {*} name - box name
+     * @returns {Boolean}
+     */
     static _isValidIdentifier(name) {
-        return typeof name === "string" && /^[A-Za-z_$][0-9A-Za-z_$]*$/.test(name);
+        return (
+            typeof name === "string" &&
+            /^[A-Za-z_$][0-9A-Za-z_$]*$/.test(name) &&
+            !ASTUtils._RESERVED_NAMES.has(name)
+        );
     }
 
     /**
