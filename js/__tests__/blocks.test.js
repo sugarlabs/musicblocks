@@ -479,16 +479,34 @@ describe("renameDos", () => {
             expect(blocks.blockList[1].container.updateCache).toHaveBeenCalled();
         });
 
-        it.each(["do", "calc", "doArg", "calcArg", "action"])(
-            "renames the argument of a %s block",
-            name => {
-                blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
+        it.each([
+            "do",
+            "calc",
+            "doArg",
+            "calcArg",
+            "action",
+            "offbeatdo",
+            "everybeatdo",
+            "everybeatdonew"
+        ])("renames the argument of a %s block", name => {
+            blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
 
-                blocks.renameDos("myAction", "newAction");
+            blocks.renameDos("myAction", "newAction");
 
-                expect(blocks.blockList[1].value).toBe("newAction");
-            }
-        );
+            expect(blocks.blockList[1].value).toBe("newAction");
+        });
+
+        it("leaves a value passed to a do with arguments alone", () => {
+            blocks.blockList = [
+                parentBlock("doArg", [null, 1, 2]),
+                textBlock("otherAction", 0),
+                textBlock("myAction", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[2].value).toBe("myAction");
+        });
 
         it("leaves a block naming a different action alone", () => {
             blocks.blockList = [parentBlock("do", [null, 1]), textBlock("otherAction", 0)];
@@ -2116,7 +2134,23 @@ describe("Blocks Foundation", () => {
                     { name: "text", value: "action", trash: false, connections: [0] }
                 ];
                 blocks.protoBlockDict = {};
-                for (const name of ["start", "action", "text", "nameddo", "do"]) {
+                for (const name of [
+                    "start",
+                    "action",
+                    "text",
+                    "namedbox",
+                    "nameddo",
+                    "do",
+                    "stack",
+                    "calc",
+                    "doArg",
+                    "calcArg",
+                    "listen",
+                    "onbeatdo",
+                    "offbeatdo",
+                    "everybeatdo",
+                    "everybeatdonew"
+                ]) {
                     blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
                 }
                 blocks.setActionProtoVisibility = jest.fn();
@@ -2161,6 +2195,28 @@ describe("Blocks Foundation", () => {
                 expect(project[8][1][1]).toEqual({ value: "action11" });
             });
 
+            it("keeps a legacy stack block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "stack", 0, 0, [4, 6, null]]);
+                project.push([6, ["text", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+            });
+
+            it("keeps a do block named by a legacy string block on its action", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, null]]);
+                project.push([6, ["string", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+            });
+
             it("leaves do blocks alone when no action is renamed", () => {
                 const project = [
                     [0, ["action", { collapsed: false }], 0, 0, [null, 1, null, null]],
@@ -2173,6 +2229,47 @@ describe("Blocks Foundation", () => {
 
                 expect(project[1][1][1]).toEqual({ value: "chorus" });
                 expect(project[3][1][1]).toEqual({ value: "chorus" });
+            });
+
+            it.each([
+                ["calc", 1],
+                ["doArg", 1],
+                ["calcArg", 1],
+                ["listen", 2],
+                ["onbeatdo", 2],
+                ["offbeatdo", 1],
+                ["everybeatdo", 1],
+                ["everybeatdonew", 1]
+            ])("keeps each %s block on the action it called", (name, slot) => {
+                const project = actionsNamedByDefault();
+                const caller = (id, prev, next, action) => {
+                    const connections = [prev, id + 2, id + 2, next];
+                    connections[slot] = id + 1;
+                    project.push([id, name, 0, 0, connections]);
+                    project.push([id + 1, ["text", { value: action }], 0, 0, [id]]);
+                    project.push([id + 2, ["text", { value: "action" }], 0, 0, [id]]);
+                };
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                caller(5, 4, 8, "action");
+                caller(8, 5, null, "action1");
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+                expect(project[9][1][1]).toEqual({ value: "action11" });
+                expect(project[7][1][1]).toEqual({ value: "action" });
+                expect(project[10][1][1]).toEqual({ value: "action" });
+            });
+
+            it("leaves a box naming the action of a do block alone", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, null]]);
+                project.push([6, ["namedbox", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action" });
             });
         });
 
