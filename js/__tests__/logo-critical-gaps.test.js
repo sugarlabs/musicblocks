@@ -633,6 +633,9 @@ describe("recordingBuffer", () => {
     beforeEach(() => {
         resetGlobals();
         logo = new Logo(makeActivity());
+        logo._restoreConnections = jest.fn();
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [];
     });
 
     test("starts empty with hasData false", () => {
@@ -650,16 +653,7 @@ describe("recordingBuffer", () => {
         };
         logo.recording = false;
 
-        // mirror the guard in runLogoCommands
-        if (logo.recordingBuffer && !logo.recording) {
-            logo.recordingBuffer = {
-                hasData: false,
-                notationOutput: "",
-                notationNotes: {},
-                notationStaging: {},
-                notationDrumStaging: {}
-            };
-        }
+        logo.runLogoCommands(null, null);
 
         expect(logo.recordingBuffer.hasData).toBe(false);
         expect(logo.recordingBuffer.notationOutput).toBe("");
@@ -675,15 +669,7 @@ describe("recordingBuffer", () => {
         };
         logo.recording = true;
 
-        if (logo.recordingBuffer && !logo.recording) {
-            logo.recordingBuffer = {
-                hasData: false,
-                notationOutput: "",
-                notationNotes: {},
-                notationStaging: {},
-                notationDrumStaging: {}
-            };
-        }
+        logo.runLogoCommands(null, null);
 
         expect(logo.recordingBuffer.hasData).toBe(true);
         expect(logo.recordingBuffer.notationOutput).toBe("recording in progress");
