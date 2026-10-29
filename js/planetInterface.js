@@ -266,6 +266,7 @@ class PlanetInterface {
             this.activity.blocks.trashStacks = [];
             this.activity.blocks.actionHistory = [];
             this.activity.blocks.redoActionHistory = [];
+            this.activity.blocks.trashPreviews = {};
         };
 
         /**
