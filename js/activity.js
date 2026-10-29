@@ -2611,10 +2611,9 @@ class Activity {
         };
 
         this.saveSessionAsync = async () => {
-            // First, trigger __saveLocally for the image thumb and fallback.
-            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            // A localStorage failure is recoverable while IndexedDB is still available.
             if (typeof this.__saveLocally === "function") {
-                this.__saveLocally();
+                this.__saveLocally({ reportSaveErrors: !this.sessionStorageManager });
             }
             // Second, save the massive payload safely to IndexedDB.
             if (this.sessionStorageManager) {
@@ -2654,6 +2653,11 @@ class Activity {
                     }
                 } catch (e) {
                     console.error("Failed to save session to IndexedDB:", e);
+                    this.textMsg(
+                        _(
+                            "Could not save the session to IndexedDB. Retry saving or export a Music Blocks project to keep your work."
+                        )
+                    );
                     throw e;
                 }
             }
