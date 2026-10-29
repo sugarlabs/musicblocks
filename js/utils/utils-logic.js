@@ -377,6 +377,10 @@ var mixedNumber = d => {
         return d;
     }
 
+    if (!Number.isFinite(d)) {
+        return String(d);
+    }
+
     const sign = d < 0 ? "-" : "";
     const magnitude = Math.abs(d);
     const floor = Math.floor(magnitude);

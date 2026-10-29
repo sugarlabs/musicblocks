@@ -206,6 +206,12 @@ describe("Utility Logic Functions", () => {
         it("falls back to two decimals for an awkward negative denominator", () => {
             expect(mixedNumber(-2.123456)).toBe("-2.12");
         });
+
+        it("returns standard string representation for non-finite numbers", () => {
+            expect(mixedNumber(NaN)).toBe("NaN");
+            expect(mixedNumber(Infinity)).toBe("Infinity");
+            expect(mixedNumber(-Infinity)).toBe("-Infinity");
+        });
     });
 
     describe("nearestBeat()", () => {
