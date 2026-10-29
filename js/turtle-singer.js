@@ -2502,7 +2502,8 @@ class Singer {
                                         chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
                                     }
                                 } else {
-                                    if (courtesy[i]) {
+                                    // A frequency (cents or hertz) has no accidental to restate.
+                                    if (courtesy[i] && typeof notationNote !== "number") {
                                         if (!chordNotes.includes(notationNote + "♮")) {
                                             chordNotes.push(notationNote + "♮");
                                         }
@@ -2550,8 +2551,16 @@ class Singer {
                                 activity.logo.runningMIDI;
                             if (typeof d === "number" && d > 0 && isFinite(d)) {
                                 if (exporting) {
+                                    // A note with cents or set in hertz is a frequency; MIDI
+                                    // takes the nearest 12-EDO note name.
                                     activity.logo.notationMIDI(
-                                        chordNotes,
+                                        chordNotes.map(note => {
+                                            if (typeof note !== "number") {
+                                                return note;
+                                            }
+                                            const [name, octave] = frequencyToPitch(note);
+                                            return name + octave;
+                                        }),
                                         chordDrums,
                                         d,
                                         turtle,
