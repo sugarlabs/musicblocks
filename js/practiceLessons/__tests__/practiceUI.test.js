@@ -727,6 +727,41 @@ describe("PracticeUI canvas loading", () => {
         delete global.fetch;
     });
 
+    test("blocks Next Lesson during fetch and block loading, then allows it after failure", async () => {
+        const activity = stubActivity({});
+        let blocksLoading = false;
+        let resolveFetch;
+        activity.blocks.isLoading = jest.fn(() => blocksLoading);
+        activity.blocks.loadNewBlocks.mockImplementation(() => {
+            blocksLoading = true;
+        });
+        activity.blocks.runAfterLoad = jest.fn();
+        PracticeUI.hasExtraBlocks = jest.fn(() => false);
+        global.fetch = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    resolveFetch = resolve;
+                })
+        );
+        const container = mountPracticeContent();
+
+        PracticeUI.renderLevel(1);
+        container.querySelector("#next-level").onclick();
+        expect(PracticeUI.currentLevel).toBe(1);
+
+        resolveFetch({ text: () => Promise.resolve('[[0,"start"]]') });
+        await flushPromises();
+
+        expect(PracticeUI.starterLoadPending).toBe(false);
+        container.querySelector("#next-level").onclick();
+        expect(PracticeUI.currentLevel).toBe(1);
+
+        blocksLoading = false;
+        container.querySelector("#next-level").onclick();
+        expect(PracticeUI.currentLevel).toBe(2);
+        delete global.fetch;
+    });
+
     test("records the full starter count after a chunked project load completes", async () => {
         const blockList = {};
         const activity = stubActivity(blockList);

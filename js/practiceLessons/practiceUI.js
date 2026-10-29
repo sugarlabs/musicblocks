@@ -450,10 +450,12 @@ const PracticeUI = {
 
                 const projectData = JSON.parse(data);
                 this.loadProjectData(activity, projectData);
+                if (loadGeneration === this.starterLoadGeneration) {
+                    this.starterLoadPending = false;
+                }
                 activity.blocks.runAfterLoad(() => {
                     if (loadGeneration === this.starterLoadGeneration) {
                         this.starterBlockCount = projectData.length;
-                        this.starterLoadPending = false;
                     }
                 });
             })
@@ -543,7 +545,8 @@ const PracticeUI = {
         const nextButton = document.getElementById("next-level");
         if (nextButton) {
             nextButton.onclick = () => {
-                if (this.starterLoadPending) return;
+                const blocks = this.getActivity()?.blocks;
+                if (this.starterLoadPending || blocks?.isLoading?.()) return;
 
                 const confirmed =
                     !this.hasExtraBlocks() ||
