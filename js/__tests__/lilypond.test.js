@@ -947,17 +947,24 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('\\clef "bass_8"');
     });
     test("should select bass_8 clef for negative octave sub-bass notes", () => {
-        frequencyToPitch.mockReturnValue(["C", -1]);
-
         activity.logo.notation.notationStaging = {
             0: [[["C-1"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('\\clef "bass_8"');
     });
+    test("should select bass_8 clef for numeric frequency in negative octave", () => {
+        frequencyToPitch.mockReturnValue(["C", -1]);
+        activity.logo.notation.notationStaging = {
+            0: [[[16.35], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+        expect(frequencyToPitch).toHaveBeenCalledWith(16.35, "equal");
+    });
     test("should parse signed and multi-digit octaves in octave calculation", () => {
         activity.logo.notation.notationStaging = {
-            0: [[["C10"], 4, 0, null, 0, -1, false]]
+            0: [[["C10", "C4"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('\\clef "treble"');
