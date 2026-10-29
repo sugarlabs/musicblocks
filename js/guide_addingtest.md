@@ -140,7 +140,7 @@ Open `coverage/lcov-report/index.html` in a browser to explore line-by-line cove
 
 ### Coverage Policy
 
-There is no fixed coverage minimum in `jest.config.js`. Instead, the Coverage delta workflow (`.github/workflows/coverage-delta.yml`) runs on every pull request to `master`:
+There is no fixed coverage minimum in `jest.config.js`. Instead, the Coverage delta workflow (`.github/workflows/coverage-delta.yml`) runs on pull requests to `master`, except Renovate's:
 
 1. It measures coverage on the base commit and on the pull request merged with the base, in separate jobs.
 2. It compares statements, branches, functions and lines between the two.
