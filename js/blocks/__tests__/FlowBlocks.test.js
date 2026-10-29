@@ -777,14 +777,13 @@ describe("FlowBlocks integration", () => {
 
             logo.inStatusMatrix = true;
             logo.statusFields = [];
-            block.arg(logo, 0, blk);
+            expect(block.arg(logo, 0, blk)).toBeUndefined();
             expect(logo.statusFields).toContainEqual([blk, "duplicate"]);
 
             logo.inStatusMatrix = false;
-            block.arg(logo, 0, blk);
-            expect(activity.blocks.blockList[blk].value).toBe(
-                activity.turtles.ithTurtle(0).singer.duplicateFactor
-            );
+            const expectedFactor = activity.turtles.ithTurtle(0).singer.duplicateFactor;
+            expect(block.arg(logo, 0, blk)).toBe(expectedFactor);
+            expect(activity.blocks.blockList[blk].value).toBe(expectedFactor);
         });
 
         test("arg() returns duplicateFactor and assigns blockList[blk].value directly", () => {
@@ -859,6 +858,26 @@ describe("FlowBlocks integration", () => {
             }
         });
 
+        test("evaluates duplicateFactor for different turtle indices independently", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: null
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 3;
+            activity.turtles.ithTurtle(1).singer.duplicateFactor = 5;
+
+            logo.inStatusMatrix = false;
+            expect(Logo.prototype.parseArg.call(logo, logo, 0, blk)).toBe(3);
+            expect(activity.blocks.blockList[blk].value).toBe(3);
+
+            expect(Logo.prototype.parseArg.call(logo, logo, 1, blk)).toBe(5);
+            expect(activity.blocks.blockList[blk].value).toBe(5);
+        });
+
         test("status-matrix with print parent registers field and does not assign value", () => {
             const block = getBlock("duplicatefactor");
             const blk = 11;
@@ -876,6 +895,26 @@ describe("FlowBlocks integration", () => {
 
             expect(logo.statusFields).toEqual([[blk, "duplicate"]]);
             expect(res).toBeUndefined();
+        });
+
+        test("logo.parseArg() in status-matrix with print parent returns undefined and registers field", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: "initial"
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 4;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const res = Logo.prototype.parseArg.call(logo, logo, 0, blk);
+
+            expect(res).toBeUndefined();
+            expect(activity.blocks.blockList[blk].value).toBeUndefined();
+            expect(logo.statusFields).toEqual([[blk, "duplicate"]]);
         });
 
         test("status-matrix with non-print parent returns duplicateFactor", () => {
