@@ -1979,8 +1979,34 @@ class Blocks {
                 }
             }
 
-            for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
-                this.raiseStackToTop(this._adjustTheseStacks[blk]);
+            if (this._adjustTheseStacks.length > 0) {
+                const container = this.activity.blocksContainer;
+                const order = new Map(container.children.map((child, index) => [child, index]));
+                let nextIndex = container.children.length;
+                let canBatch = true;
+
+                for (const blk of this._adjustTheseStacks) {
+                    this.findDragGroup(this.findTopBlock(blk));
+                    const seen = new Set();
+                    for (let b = this.dragGroup.length - 1; b >= 0; b--) {
+                        const child = this.blockList[this.dragGroup[b]].container;
+                        if (seen.has(child) || child?.parent !== container || !order.has(child)) {
+                            canBatch = false;
+                            break;
+                        }
+                        seen.add(child);
+                        order.set(child, nextIndex++);
+                    }
+                    if (!canBatch) break;
+                }
+
+                if (canBatch) {
+                    container.sortChildren((a, b) => order.get(a) - order.get(b));
+                } else {
+                    for (const blk of this._adjustTheseStacks) {
+                        this.raiseStackToTop(blk);
+                    }
+                }
             }
 
             this.activity.refreshCanvas();
