@@ -91,6 +91,24 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.pitchToNumber("dobb", 4, "C major", "equal")).toBe(37);
         expect(pitchscale.pitchToNumber("do♭♭", 4, "C major", "equal")).toBe(37);
         expect(pitchscale.pitchToNumber("do♯♯", 4, "C major", "equal")).toBe(41);
+        expect(pitchscale.pitchToNumber("C#b", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("Cb#", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C#♭", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♯b", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("Cb♯", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♭#", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
     });
 
     it("keeps the full solfege root when parsing double accidentals", () => {

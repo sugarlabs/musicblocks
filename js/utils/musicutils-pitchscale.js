@@ -351,8 +351,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
         } else if (
             pitch.endsWith("#b") ||
             pitch.endsWith(SHARP + FLAT) ||
+            pitch.endsWith("#" + FLAT) ||
+            pitch.endsWith(SHARP + "b") ||
             pitch.endsWith("b#") ||
-            pitch.endsWith(FLAT + SHARP)
+            pitch.endsWith(FLAT + SHARP) ||
+            pitch.endsWith("b" + SHARP) ||
+            pitch.endsWith(FLAT + "#")
         ) {
             // Mixed sharp+flat cancels out to a natural; this must be checked
             // before the single-accidental checks below, since a mixed suffix
