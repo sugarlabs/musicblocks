@@ -18,7 +18,7 @@
    last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
    DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
    PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
-   MusicKeyboardRendering, getCurrentEDO, generateNoteNames */
+   MusicKeyboardRendering, getCurrentEDO, generateNoteNames, MidiManager */
 /*
    Global Locations
     - js/utils/utils.js
@@ -968,6 +968,10 @@ function MusicKeyboard(activity) {
             this.playingNow = false;
 
             // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
+            if (typeof MidiManager !== "undefined" && this._midiListener) {
+                MidiManager.removeListener(this._midiListener);
+                this._midiListener = null;
+            }
             if (this.midiAccess && this.midiAccess.inputs) {
                 this.midiAccess.inputs.forEach(input => {
                     input.onmidimessage = null;
@@ -2114,9 +2118,16 @@ function MusicKeyboard(activity) {
         /**
          * Requests MIDI access from the browser and initializes MIDI-related functionality.
          * Calls success or failure callback functions based on the result of the request.
+         * Uses central MidiManager if available, falling back to direct navigator access.
          * @memberof MusicKeyboard
          */
-        navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
+        if (typeof MidiManager !== "undefined" && typeof MidiManager.requestAccess === "function") {
+            MidiManager.addListener(onMIDIMessage);
+            this._midiListener = onMIDIMessage;
+            MidiManager.requestAccess({ sysex: true }).then(onMIDISuccess).catch(onMIDIFailure);
+        } else {
+            navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
+        }
     };
 
     /**

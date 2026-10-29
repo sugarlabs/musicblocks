@@ -117,6 +117,9 @@ requirejs.config({
         "utils/camera-utils": {
             exports: "CameraUtils"
         },
+        "utils/midiutils": {
+            exports: "MidiUtils"
+        },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
@@ -733,6 +736,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "utils/dom-helpers",
                 "utils/utils",
                 "utils/camera-utils",
+                "utils/midiutils",
                 "utils/plugin-utils",
                 "utils/macro-utils",
                 "activity/pubsub",

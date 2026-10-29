@@ -63,7 +63,8 @@ try {
    MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader,
+   MidiManager
  */
 
 /*
@@ -108,6 +109,7 @@ let MYDEFINES = [
     "utils/http-utils",
     "utils/utils",
     "utils/camera-utils",
+    "utils/midiutils",
     "utils/plugin-utils",
     "utils/macro-utils",
     "utils/retryWithBackoff",
@@ -567,6 +569,7 @@ class Activity {
             this.pasteBox = null;
             this.languageBox = null;
             this.themeBox = null;
+            this.midi = null;
             this.planet = null;
             window.converter = null;
             this.buttonsVisible = true;
@@ -2770,6 +2773,7 @@ class Activity {
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
             this.themeBox = new ThemeBox(this);
+            this.midi = typeof MidiManager !== "undefined" ? MidiManager : null;
             // Initialize theme state on page load if method exists
             if (this.themeBox && typeof this.themeBox.initializeTheme === "function") {
                 this.themeBox.initializeTheme();
