@@ -1,5 +1,5 @@
 [
-    [0, "harmony", 900, 80, [null, null, 1]],
+    [0, "status", 900, 80, [null, null, 1]],
     [1, "hiddennoflow", 0, 0, [0, null]],
     [2, ["start", {"collapsed": false, "xcor": 0, "ycor": 0, "heading": 0, "color": 0, "shade": 50, "pensize": 5, "grey": 100}], 100, 100, [null, 3, null]],
     [3, "newnote", 0, 0, [2, 4, 7, 11]],

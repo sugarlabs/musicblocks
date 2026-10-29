@@ -190,6 +190,24 @@ describe("download", () => {
         expect(spy).not.toHaveBeenCalled();
     });
 
+    it("should revoke the Blob URL when the user cancels the prompt", () => {
+        global.URL.revokeObjectURL = jest.fn();
+        window.prompt = jest.fn(() => null);
+        instance.download("svg", "blob:mock-svg", null);
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
+    });
+
+    it("should revoke the Blob URL when the MBDialog prompt is cancelled", async () => {
+        global.URL.revokeObjectURL = jest.fn();
+        let cancelled;
+        window.MBDialog = { prompt: jest.fn(() => (cancelled = Promise.resolve(null))) };
+        instance.download("svg", "blob:mock-svg", null);
+        await cancelled;
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
+    });
+
     it("should handle empty extension gracefully", () => {
         const other = new SaveInterface({
             PlanetInterface: { getCurrentProjectName: () => "Test" }
@@ -399,6 +417,30 @@ describe("save HTML methods", () => {
 
         expect(html).toContain('window.addEventListener("load", function() {');
         expect(html).not.toContain("window.onload = function()");
+    });
+
+    it("should not expand $ replacement patterns from project data in prepareHTML", () => {
+        const { unescapeHTML, extractProjectDataFromHTML } = require("../utils/utils");
+        const data = JSON.stringify([
+            [0, ["text", { value: "Price: 5$" }], 0, 0, [null]],
+            [1, ["text", { value: "cost $$5" }], 0, 0, [null]],
+            [2, ["text", { value: "a$<b $' $&" }], 0, 0, [null]]
+        ]);
+        const si = new SaveInterface({
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "My $& project"),
+                getCurrentProjectDescription: jest.fn(() => "Costs 5$'"),
+                getCurrentProjectImage: jest.fn(() => "")
+            },
+            prepareExport: jest.fn(() => data)
+        });
+
+        const html = si.prepareHTML();
+
+        expect(html).toContain("<title>My $&amp; project</title>");
+        expect(html).toContain("<p>Costs 5$&#039;</p>");
+        const extracted = extractProjectDataFromHTML(html.replace(/\n/g, " "));
+        expect(unescapeHTML(extracted)).toBe(data);
     });
 
     it("escapeHTML should encode all five HTML special characters", () => {
@@ -943,12 +985,21 @@ describe("save artwork methods", () => {
     let instance;
     const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };
 
+    // jsdom's Blob has no text(), so read it back with a FileReader.
+    const readBlob = blob =>
+        new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsText(blob);
+        });
+
     beforeEach(() => {
         instance = new SaveInterface(mockActivity);
         document.body.innerHTML = `
             <canvas id="overlayCanvas"></canvas>
         `;
         docById.mockImplementation(id => document.getElementById(id));
+        global.URL.createObjectURL = jest.fn(() => "blob:mock-svg");
     });
 
     afterEach(() => {
@@ -977,11 +1028,28 @@ describe("save artwork methods", () => {
             activity.canvas.height,
             1.0
         );
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            null
-        );
+        expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", null);
+    });
+
+    it("should keep the whole SVG when it has '#' colours", async () => {
+        const svgData =
+            '<svg><rect fill="#ffffff"/><text fill="#ff0031">C#</text>' +
+            '<path d="M 0,0 10,10 " /></svg>';
+        global.doSVG = jest.fn(() => svgData);
+        const activity = {
+            save: {
+                download: mockDownload
+            },
+            canvas: { width: 500, height: 500 },
+            logo: "mockLogo",
+            turtles: "mockTurtles"
+        };
+
+        instance.saveSVG(activity);
+        const blob = URL.createObjectURL.mock.calls[0][0];
+        expect(blob.type).toBe("image/svg+xml;charset=utf-8");
+        expect(await readBlob(blob)).toBe(svgData);
     });
 
     it("should save the SVG under a given file name", () => {
@@ -996,11 +1064,7 @@ describe("save artwork methods", () => {
         };
 
         instance.saveSVG(activity, "drawing.svg");
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            "drawing.svg"
-        );
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", "drawing.svg");
     });
 
     it("should call toDataURL and download the PNG file", () => {
@@ -1017,8 +1081,10 @@ describe("save artwork methods", () => {
         expect(mockDownload).toHaveBeenCalledWith("png", "data:image/png;base64,mockdata", null);
     });
 
-    it("should call printBlockSVG and download the SVG file", () => {
-        const mockPrintBlockSVG = jest.fn(() => "<svg>Mock SVG</svg>");
+    it("should call printBlockSVG and download the SVG file", async () => {
+        const mockPrintBlockSVG = jest.fn(
+            () => "<svg>" + encodeURIComponent('<rect fill="#ffffff"/></svg>')
+        );
         const activity = {
             save: {
                 download: mockDownload
@@ -1028,11 +1094,9 @@ describe("save artwork methods", () => {
         instance.saveBlockArtwork(activity);
 
         expect(mockPrintBlockSVG).toHaveBeenCalled();
-        expect(mockDownload).toHaveBeenCalledWith(
-            "svg",
-            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
-            null
-        );
+        expect(mockDownload).toHaveBeenCalledWith("svg", "blob:mock-svg", null);
+        const blob = URL.createObjectURL.mock.calls[0][0];
+        expect(await readBlob(blob)).toBe('<svg><rect fill="#ffffff"/></svg>');
     });
 
     it("should call printBlockPNG and download the PNG file", async () => {

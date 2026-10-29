@@ -96,10 +96,10 @@ global.MeterWidget = jest.fn();
 global.MeterWidget.dependencies = ["widgets/meterwidget"];
 global.Oscilloscope = jest.fn();
 global.Oscilloscope.dependencies = ["widgets/oscilloscope"];
-global.HarmonyWidget = jest.fn(() => ({ close: jest.fn() }));
-global.HarmonyWidget.dependencies = ["widgets/HarmonyUtils", "widgets/harmony"];
 global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
+global.ChordBuilderWidget = jest.fn();
+global.ChordBuilderWidget.dependencies = ["widgets/ChordBuilderAudio", "widgets/chordbuilder"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
 global.Tempo.dependencies = [
@@ -354,6 +354,7 @@ describe("setupWidgetBlocks", () => {
             expect(getBlock("timbre")).toBeDefined();
             expect(getBlock("tempo")).toBeDefined();
             expect(getBlock("meterwidget")).toBeDefined();
+            expect(getBlock("chordbuilder")).toBeDefined();
             expect(activity.blockTypes).toEqual([
                 "aidebugger",
                 "envelope",
@@ -364,11 +365,11 @@ describe("setupWidgetBlocks", () => {
                 "timbre",
                 "temperament",
                 "modewidget",
+                "chordbuilder",
                 "meterwidget",
                 "tempo",
                 "sampler",
                 "oscilloscope",
-                "harmony",
                 "pitchdrummatrix",
                 "arpeggiomatrix",
                 "pitchstaircase",
@@ -630,38 +631,61 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
+    describe("ChordBuilderBlock", () => {
+        it("sets insideChordBuilder and returns child block", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            const result = chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+            expect(logo.insideChordBuilder).toBe(true);
+            expect(result).toEqual(["childBlk", 1]);
+        });
+
+        it("shows existing widget window if widget already exists", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            const showMock = jest.fn();
+            logo.chordBuilderWidget = { widgetWindow: { show: showMock } };
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+            expect(showMock).toHaveBeenCalled();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+
+        it("does not trigger second load and resets flag if widget is loading", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            logo.chordBuilderWidget = "loading";
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            global.ChordBuilderWidget.mockClear();
+
+            listener();
+            expect(global.ChordBuilderWidget).not.toHaveBeenCalled();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+
+        it("clears loading placeholder and resets insideChordBuilder if widget construction fails", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            global.ChordBuilderWidget.mockImplementationOnce(() => {
+                throw new Error("Load failed");
+            });
+
+            listener();
+            expect(logo.chordBuilderWidget).toBeNull();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+    });
+
     describe("OscilloscopeWidgetBlock", () => {
         it("sets inOscilloscope and returns child block", () => {
             const oscilloscope = getBlock("oscilloscope");
             const result = oscilloscope.flow(["childBlk"], logo, 0, "oscBlk");
             expect(logo.inOscilloscope).toBe(true);
             expect(result).toEqual(["childBlk", 1]);
-        });
-    });
-
-    describe("HarmonyWidgetBlock", () => {
-        it("puts the hiddennoflow block below the clamp, where the widget listener waits", () => {
-            const macro = getBlock("harmony").macroFunc(10, 20);
-            expect(macro).toEqual([
-                [0, "harmony", 10, 20, [null, null, 1]],
-                [1, "hiddennoflow", 0, 0, [0, null]]
-            ]);
-        });
-
-        it("returns the child block", () => {
-            const result = getBlock("harmony").flow(["childBlk"], logo, 0, "harmonyBlk");
-            expect(result).toEqual(["childBlk", 1]);
-        });
-
-        it("closes the widget left open by the previous run", () => {
-            const previous = { close: jest.fn() };
-            logo.harmonyWidget = previous;
-
-            getBlock("harmony").flow(["childBlk"], logo, 0, "harmonyBlk");
-            logo.setTurtleListener.mock.calls[0][2]();
-
-            expect(previous.close).toHaveBeenCalledTimes(1);
-            expect(logo.harmonyWidget).not.toBe(previous);
         });
     });
 
@@ -742,6 +766,17 @@ describe("setupWidgetBlocks", () => {
             expect(result).toEqual(["childBlk", 1]);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
+
+        it.each(["aidebugger", "reflection"])(
+            "gives the %s block a hidden block below its clamp to open the window from",
+            name => {
+                const macro = getBlock(name).macroFunc(0, 0);
+                const tail = macro[macro[0][4][2]];
+                expect(macro[0][4]).toHaveLength(3);
+                expect(tail[1]).toBe("hiddennoflow");
+                expect(tail[4]).toEqual([0, null]);
+            }
+        );
     });
 
     describe("First-Click Flow (Lazy Loading)", () => {
@@ -1072,8 +1107,8 @@ describe("setupWidgetBlocks", () => {
             const lazyLoadWidgetSites = [
                 ["meterWidget", "MeterWidget"],
                 ["Oscilloscope", "Oscilloscope"],
-                ["harmonyWidget", "HarmonyWidget"],
-                ["modeWidget", "ModeWidget"]
+                ["modeWidget", "ModeWidget"],
+                ["chordBuilderWidget", "ChordBuilderWidget"]
             ];
 
             const notWired = [];
@@ -1131,8 +1166,8 @@ describe("setupWidgetBlocks", () => {
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
-            ["harmony", "harmonyBlk", "harmonyWidget", global.HarmonyWidget],
-            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
+            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget],
+            ["chordbuilder", "chordBlk", "chordBuilderWidget", global.ChordBuilderWidget]
         ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
             if (type === "meterwidget") {
                 activity.blocks.blockList = {

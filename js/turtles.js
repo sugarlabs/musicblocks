@@ -977,6 +977,26 @@ Turtles.TurtlesView = class {
         };
 
         /**
+         * Hides the auxiliary toolbar and refreshes widget window geometry.
+         *
+         * @returns {void}
+         */
+        const __hideAuxToolbar = () => {
+            const auxToolbar = docById("aux-toolbar");
+
+            if (auxToolbar.style.display !== "block") return;
+
+            const menuIcon = docById("menu");
+            auxToolbar.style.display = "none";
+            menuIcon.textContent = "menu";
+            docById("toggleAuxBtn").classList.remove("blue", "darken-1");
+
+            if (window.widgetWindows && typeof window.widgetWindows._handleResize === "function") {
+                window.widgetWindows._handleResize();
+            }
+        };
+
+        /**
          * Toggles visibility of menu and grids.
          * Scales down all 'turtles' in turtleList.
          * Removes the stage and adds it back at the top.
@@ -1060,14 +1080,7 @@ Turtles.TurtlesView = class {
             );
 
             this._collapseButton.onclick = () => {
-                // If the aux toolbar is open, close it.
-                const auxToolbar = docById("aux-toolbar");
-                if (auxToolbar.style.display === "block") {
-                    const menuIcon = docById("menu");
-                    auxToolbar.style.display = "none";
-                    menuIcon.textContent = "menu";
-                    docById("toggleAuxBtn").classList.remove("blue", "darken-1");
-                }
+                __hideAuxToolbar();
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
                 this.activity.helpfulWheelItems.forEach(ele => {
@@ -1084,13 +1097,7 @@ Turtles.TurtlesView = class {
         };
 
         this.collapse = () => {
-            const auxToolbar = docById("aux-toolbar");
-            if (auxToolbar.style.display === "block") {
-                const menuIcon = docById("menu");
-                auxToolbar.style.display = "none";
-                menuIcon.textContent = "menu";
-                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
-            }
+            __hideAuxToolbar();
 
             this._expandButton.style.visibility = "visible";
             this._collapseButton.style.visibility = "hidden";
@@ -1135,14 +1142,7 @@ Turtles.TurtlesView = class {
         };
 
         this.expand = () => {
-            // If the aux toolbar is open, close it.
-            const auxToolbar = docById("aux-toolbar");
-            if (auxToolbar.style.display === "block") {
-                const menuIcon = docById("menu");
-                auxToolbar.style.display = "none";
-                menuIcon.textContent = "menu";
-                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
-            }
+            __hideAuxToolbar();
             this.hideMenu();
             this.setStageScale(1.0);
             this._expandedBoundary.visible = true;

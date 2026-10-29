@@ -687,7 +687,17 @@ describe("setupMeterActions", () => {
         expect(mockMouse.MB.listeners).toContain("_drift_0");
     });
 
-    test.each([[null], [0]])("should return 0 when noteValue is %p", noteValue => {
+    test.each([
+        [null],
+        [0],
+        [undefined],
+        [NaN],
+        [-1],
+        [-0.25],
+        [Infinity],
+        [-Infinity],
+        ["invalid"]
+    ])("should return 0 when noteValue is %p", noteValue => {
         const result = Singer.MeterActions.getNotesPlayed(noteValue, 0);
         expect(result).toBe(0);
     });
@@ -696,6 +706,7 @@ describe("setupMeterActions", () => {
         targetTurtle.singer.notesPlayed = [12, 3];
         const result = Singer.MeterActions.getNotesPlayed(2, 0);
         expect(result).toBe(2);
+        expect(Singer.MeterActions.getNotesPlayed(0.25, 0)).toBe(16);
     });
 
     it("should calculate whole notes played correctly", () => {

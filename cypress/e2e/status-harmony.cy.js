@@ -1,17 +1,25 @@
 /* global cy, beforeEach, describe, it */
 
 /**
- * Cypress E2E test suite for the Harmony widget.
+ * Cypress E2E test suite for the Harmony row of the Status widget.
  *
- * The Harmony widget (js/widgets/harmony.js) shows the intervals between the
- * notes the mice are playing. It is opened by running a `harmony` block.
+ * The Status widget (js/widgets/status.js) has a Harmony row that shows the
+ * chord and the intervals sounding across all the mice.
  *
- * The fixture has three mice. On the first beat they play C4, E4 and G4.
- * On the second beat the first mouse plays C4, the second rests and the third
- * plays only a drum, so only one pitch is sounding.
+ * The fixture has a status block and three mice. On the first beat they play
+ * C4, E4 and G4. On the second beat the first mouse plays C4, the second rests
+ * and the third plays only a drum, so only one pitch is sounding.
  */
 
-describe("Harmony widget", () => {
+const harmonyCell = () =>
+    cy
+        .get('.windowFrame[aria-label="status"]', { timeout: 30000 })
+        .contains("td", "Harmony")
+        .parent("tr")
+        .find("td")
+        .eq(1);
+
+describe("Status widget Harmony row", () => {
     beforeEach(() => {
         cy.visit("http://127.0.0.1:3000");
         cy.clearLocalStorage();
@@ -19,7 +27,7 @@ describe("Harmony widget", () => {
         cy.waitForAppReady();
 
         cy.get("#load").click();
-        cy.get("#myOpenFile").selectFile("cypress/fixtures/harmony-widget-minimal.tb", {
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/status-harmony-minimal.tb", {
             force: true
         });
         cy.get("#load-container").should("be.visible");
@@ -30,9 +38,8 @@ describe("Harmony widget", () => {
     it("shows the chord across mice, then leaves out rests and drums", () => {
         cy.get("#play").click();
 
-        cy.get('.windowFrame[aria-label="harmony"]', { timeout: 30000 }).as("hw");
-        cy.get("@hw").contains("C major").should("be.visible");
-        cy.get("@hw")
+        harmonyCell().should("contain.text", "C major");
+        harmonyCell()
             .contains("td", "C4 → E4")
             .parent()
             .find("td")
@@ -45,7 +52,7 @@ describe("Harmony widget", () => {
                     "+13.7"
                 ]);
             });
-        cy.get("@hw").contains("td", "C4 → G4").should("be.visible");
+        harmonyCell().contains("td", "C4 → G4").should("be.visible");
 
         // Second beat: while the C4 mouse's second note is still sounding, the
         // rest and the drum of the other mice must not produce interval rows.
@@ -58,9 +65,10 @@ describe("Harmony widget", () => {
             expect(secondC4, "the C4 mouse is on its second note").to.exist;
             expect(Date.now(), "that note is still sounding").to.be.below(secondC4.endsAt);
 
-            const frame = win.document.querySelector('.windowFrame[aria-label="harmony"]');
-            expect(frame.querySelectorAll("td"), "no interval rows").to.have.length(0);
-            expect(frame.textContent).to.contain("Play two or more notes at the same time.");
+            const row = [
+                ...win.document.querySelectorAll('.windowFrame[aria-label="status"] tr')
+            ].find(tr => tr.cells[0] && tr.cells[0].textContent.includes("Harmony"));
+            expect(row.cells[1].textContent, "no chord or intervals").to.equal("");
         });
     });
 });

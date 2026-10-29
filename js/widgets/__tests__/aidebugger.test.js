@@ -21,6 +21,7 @@
  */
 
 const AIDebuggerWidget = require("../aidebugger.js");
+const { aiWidgetConsent } = require("../../utils/ai-widget-lifecycle");
 
 // Mock globals
 global._ = str => str;
@@ -39,6 +40,12 @@ if (typeof Blob !== "undefined" && !Blob.prototype.text) {
 }
 
 describe("AIDebuggerWidget", () => {
+    beforeEach(() => {
+        // Consent is shared by the AI widgets for the page session, so each
+        // test starts from a child who has not agreed yet.
+        aiWidgetConsent.given = false;
+    });
+
     afterEach(() => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         jest.useRealTimers();
@@ -831,7 +838,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget._lifecycle.isMounted = true;
             debuggerWidget._sendToBackend = jest.fn();
             debuggerWidget._updateMessageCount = jest.fn();
-            debuggerWidget._consentGiven = true;
+            debuggerWidget._lifecycle.giveConsent();
         });
 
         test("does nothing with empty input", () => {
@@ -848,7 +855,7 @@ describe("AIDebuggerWidget", () => {
         });
 
         test("shows consent banner and does not send message if consent not given", () => {
-            debuggerWidget._consentGiven = false;
+            aiWidgetConsent.given = false;
             debuggerWidget.messageInput.value = "Hello AI";
             debuggerWidget._showConsentBanner = jest.fn();
             debuggerWidget._sendMessage();
@@ -857,9 +864,21 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget._sendToBackend).not.toHaveBeenCalled();
         });
 
+        test("sends the waiting message once consent is given", () => {
+            aiWidgetConsent.given = false;
+            debuggerWidget.messageInput.value = "Hello AI";
+            debuggerWidget._showConsentBanner = jest.fn();
+            debuggerWidget._sendMessage();
+
+            debuggerWidget._lifecycle.giveConsent();
+            debuggerWidget._showConsentBanner.mock.calls[0][0]();
+            expect(debuggerWidget.chatHistory).toHaveLength(1);
+            expect(debuggerWidget._sendToBackend).toHaveBeenCalledWith("Hello AI");
+        });
+
         test("sends message and clears input", () => {
             debuggerWidget.messageInput.value = "Hello AI";
-            debuggerWidget._consentGiven = true;
+            debuggerWidget._lifecycle.giveConsent();
             debuggerWidget._sendMessage();
             expect(debuggerWidget.chatHistory).toHaveLength(1);
             expect(debuggerWidget.chatHistory[0].type).toBe("user");
@@ -884,6 +903,7 @@ describe("AIDebuggerWidget", () => {
         test("resets chat history and prompt count", () => {
             debuggerWidget.chatHistory = [{ type: "user", content: "test" }];
             debuggerWidget.promptCount = 5;
+            debuggerWidget._lifecycle.giveConsent();
             const oldId = debuggerWidget.conversationId;
 
             debuggerWidget._resetConversation();
@@ -892,6 +912,16 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.promptCount).toBe(0);
             expect(debuggerWidget.conversationId).not.toBe(oldId);
             expect(debuggerWidget._loadProjectAndInitialize).toHaveBeenCalled();
+        });
+
+        test("sends nothing on reset before consent", () => {
+            aiWidgetConsent.given = false;
+            debuggerWidget._showStart = jest.fn();
+
+            debuggerWidget._resetConversation();
+
+            expect(debuggerWidget._loadProjectAndInitialize).not.toHaveBeenCalled();
+            expect(debuggerWidget._showStart).toHaveBeenCalled();
         });
     });
 
@@ -991,7 +1021,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget.messageInput.value = "Help me debug";
             debuggerWidget._lifecycle.isMounted = false;
-            debuggerWidget._consentGiven = true;
+            debuggerWidget._lifecycle.giveConsent();
 
             const sendSpy = jest.spyOn(debuggerWidget, "_sendToBackend");
 
@@ -1103,6 +1133,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget._lifecycle.isMounted = true;
             debuggerWidget.chatHistory = [{ type: "user", content: "hello" }];
             debuggerWidget.promptCount = 3;
+            debuggerWidget._lifecycle.giveConsent();
 
             const abortSpy = jest.fn();
             debuggerWidget._lifecycle.pendingRequests.add({ abort: abortSpy });
@@ -1124,7 +1155,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget._lifecycle.isMounted = true;
-            debuggerWidget._consentGiven = true;
+            debuggerWidget._lifecycle.giveConsent();
 
             let resolveFirst;
             global.fetch.mockImplementation(() => {
@@ -1516,10 +1547,37 @@ describe("AIDebuggerWidget", () => {
             expect(typeof mockWidgetWindow.onmaximize).toBe("function");
         });
 
-        test("preserves existing conversationId if already generated", () => {
-            debuggerWidget.conversationId = "conv_pre_existing_id";
+        test("starts a fresh conversation but keeps Undo when reopened after closing", () => {
+            const before = JSON.stringify([[0, "start", 0, 0, [null, null, null]]]);
             debuggerWidget.init(mockActivity);
-            expect(debuggerWidget.conversationId).toBe("conv_pre_existing_id");
+            debuggerWidget.chatHistory = [{ role: "user", content: "make it faster" }];
+            debuggerWidget.promptCount = 1;
+            debuggerWidget._projectBeforeFix = before;
+            const firstId = debuggerWidget.conversationId;
+            mockWidgetWindow.onclose();
+
+            debuggerWidget.init(mockActivity);
+            expect(debuggerWidget.chatHistory).toEqual([]);
+            expect(debuggerWidget.promptCount).toBe(0);
+            expect(debuggerWidget.conversationId).not.toBe(firstId);
+            // Undo is about the canvas, which the close did not change.
+            expect(debuggerWidget._projectBeforeFix).toBe(before);
+            expect(debuggerWidget._undoButton.style.display).toBe("");
+        });
+
+        test("drops Undo when reopened in a different project", () => {
+            let projectId = "first";
+            mockActivity.planet = { getCurrentProjectID: () => projectId };
+            debuggerWidget.init(mockActivity);
+            debuggerWidget._projectBeforeFix = "[]";
+            debuggerWidget._projectBeforeFixId = "first";
+            mockWidgetWindow.onclose();
+
+            // New project, or another one opened from a file or Planet.
+            projectId = "second";
+            debuggerWidget.init(mockActivity);
+            expect(debuggerWidget._projectBeforeFix).toBeNull();
+            expect(debuggerWidget._undoButton.style.display).toBe("none");
         });
 
         test("generates new conversationId if null when initializing", () => {
@@ -1628,8 +1686,22 @@ describe("AIDebuggerWidget", () => {
             );
             const buttons = banner.querySelectorAll("button");
             expect(buttons.length).toBe(2);
-            expect(buttons[0].textContent).toBe("Analyze my project");
+            expect(buttons[0].textContent).toBe("Agree and continue");
             expect(buttons[1].textContent).toBe("Cancel");
+        });
+
+        test("opening shows only the welcome, with no banner or button, and sends nothing", () => {
+            const loadProjectSpy = jest
+                .spyOn(debuggerWidget, "_loadProjectAndInitialize")
+                .mockImplementation(() => {});
+
+            debuggerWidget._showStart();
+
+            expect(debuggerWidget.chatLog.querySelector(".aidebugger-consent-banner")).toBeNull();
+            expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
+            expect(debuggerWidget.chatLog.textContent).toContain("Welcome to");
+            expect(loadProjectSpy).not.toHaveBeenCalled();
+            loadProjectSpy.mockRestore();
         });
 
         test("accepting banner sets consent, removes banner, and loads project", () => {
@@ -1641,7 +1713,7 @@ describe("AIDebuggerWidget", () => {
             const acceptBtn = debuggerWidget.chatLog.querySelectorAll("button")[0];
             acceptBtn.onclick();
 
-            expect(debuggerWidget._consentGiven).toBe(true);
+            expect(debuggerWidget._lifecycle.hasConsent()).toBe(true);
             expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
             expect(loadProjectSpy).toHaveBeenCalled();
             loadProjectSpy.mockRestore();
@@ -1649,13 +1721,13 @@ describe("AIDebuggerWidget", () => {
 
         test("canceling banner removes banner and adds system decline message", () => {
             debuggerWidget._showConsentBanner();
-            const declineBtn = debuggerWidget.chatLog.querySelectorAll("button")[1];
+            const declineBtn = debuggerWidget.chatLog.querySelector(".aidebugger-cancel-btn");
             declineBtn.onclick();
 
-            expect(debuggerWidget._consentGiven).toBe(false);
+            expect(debuggerWidget._lifecycle.hasConsent()).toBe(false);
             expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
             expect(debuggerWidget.chatLog.textContent).toContain(
-                "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
+                "Nothing was sent. Your project stays here until you agree."
             );
         });
     });
@@ -2283,12 +2355,12 @@ describe("AIDebuggerWidget", () => {
 
         test("re-prompts with consent banner if message submitted when consent was declined", () => {
             debuggerWidget._showConsentBanner();
-            const declineBtn = debuggerWidget.chatLog.querySelectorAll("button")[1];
+            const declineBtn = debuggerWidget.chatLog.querySelector(".aidebugger-cancel-btn");
             declineBtn.onclick();
 
-            expect(debuggerWidget._consentGiven).toBe(false);
+            expect(debuggerWidget._lifecycle.hasConsent()).toBe(false);
             expect(debuggerWidget.chatLog.textContent).toContain(
-                "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
+                "Nothing was sent. Your project stays here until you agree."
             );
 
             // User types message and sends
@@ -2694,6 +2766,343 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget._addMessageToUI(customMessage);
 
             expect(debuggerWidget.chatLog.children.length).toBe(1);
+        });
+    });
+
+    describe("Edit tab", () => {
+        const before = JSON.stringify([[0, "start", 100, 100, [null, null, null]]]);
+        const fixed = [[0, "start", 100, 100, [null, 1, null]]];
+        const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+        let widget;
+        let activity;
+        let originalFetch;
+
+        beforeEach(() => {
+            originalFetch = global.fetch;
+            global.fetch = jest.fn();
+            activity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => before),
+                sendAllToTrash: jest.fn(),
+                blocks: { loadNewBlocks: jest.fn() }
+            };
+            widget = new AIDebuggerWidget();
+            widget.activity = activity;
+            widget.chatLog = document.createElement("div");
+            widget.widgetWindow = {};
+            widget._undoButton = document.createElement("div");
+            widget._undoButton.style.display = "none";
+            widget._lifecycle.giveConsent();
+            widget._lifecycle.mount();
+            widget.chatHistory = [
+                { type: "user", content: "It should play three times", timestamp: "" }
+            ];
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+        });
+
+        test("asks what to change when there is no request and no chat", () => {
+            widget.chatHistory = [];
+            widget._fixProject("");
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(widget.chatLog.textContent).toContain("Tell me what to change first");
+        });
+
+        test("sends a typed change as the prompt, not twice in the history", async () => {
+            widget.chatHistory = [];
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "Done.", project: fixed })
+            });
+
+            widget._fixProject("make it play three times");
+            await flushPromises();
+
+            const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+            expect(body.prompt).toBe("make it play three times");
+            expect(body.history).toEqual([]);
+            expect(widget.chatHistory[0]).toEqual(
+                expect.objectContaining({ type: "user", content: "make it play three times" })
+            );
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+        });
+
+        test("makes a new project and keeps the old one for Undo", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "I made **Drums**.", project: fixed })
+            });
+
+            widget._makeProject("a rock drum beat");
+            await flushPromises();
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://localhost:8000/make",
+                expect.objectContaining({
+                    body: JSON.stringify({ description: "a rock drum beat", code: before })
+                })
+            );
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+            expect(widget._projectBeforeFix).toBe(before);
+        });
+
+        test("makes a new project after consent without analyzing the old one", async () => {
+            aiWidgetConsent.given = false;
+            const loadProjectSpy = jest.spyOn(widget, "_loadProjectAndInitialize");
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "I made **Drums**.", project: fixed })
+            });
+
+            widget._makeProject("a rock drum beat");
+            expect(global.fetch).not.toHaveBeenCalled();
+            const buttons = widget.chatLog.querySelectorAll(".aidebugger-consent-banner button");
+            expect(buttons[0].textContent).toBe("Agree and continue");
+            buttons[0].onclick();
+            await flushPromises();
+
+            expect(loadProjectSpy).not.toHaveBeenCalled();
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(global.fetch.mock.calls[0][0]).toBe("http://localhost:8000/make");
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+        });
+
+        test("asks what to make when the description is empty", () => {
+            widget._makeProject("  ");
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(widget.chatLog.textContent).toContain("Tell me what project to make");
+        });
+
+        test("a second Make press while the first is running says it is still working", () => {
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+            widget.editInput = document.createElement("textarea");
+            widget.editInput.value = "a rock drum beat";
+
+            widget._makeProject(widget.editInput.value);
+            // The first press emptied the box, so the second one reads "".
+            widget._makeProject(widget.editInput.value);
+
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(widget.chatLog.textContent).not.toContain("Tell me what project to make");
+            expect(widget.chatLog.textContent).toContain("still working");
+        });
+
+        test("a chat sent while a change is running says it is still working", () => {
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+            widget.messageInput = document.createElement("input");
+
+            widget._fixProject("make it faster");
+            widget.messageInput.value = "Why is it quiet?";
+            widget._sendMessage();
+
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(widget.chatHistory.map(message => message.content)).not.toContain(
+                "Why is it quiet?"
+            );
+            // Kept, so the child can send it once the change is done.
+            expect(widget.messageInput.value).toBe("Why is it quiet?");
+            expect(widget.chatLog.textContent).toContain("still working");
+        });
+
+        test("loads the fixed project and keeps the old one for Undo", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "I changed repeat to 3.", project: fixed })
+            });
+
+            widget._fixProject();
+            await flushPromises();
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://localhost:8000/fix",
+                expect.objectContaining({
+                    body: expect.stringContaining("It should play three times")
+                })
+            );
+            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true, false);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(fixed);
+            expect(widget._projectBeforeFix).toBe(before);
+            expect(widget._undoButton.style.display).toBe("");
+            expect(widget.chatHistory[widget.chatHistory.length - 1].content).toBe(
+                "I changed repeat to 3."
+            );
+            expect(widget._isProcessing).toBe(false);
+
+            widget._undoFix();
+            expect(activity.blocks.loadNewBlocks).toHaveBeenLastCalledWith(JSON.parse(before));
+            expect(widget._projectBeforeFix).toBeNull();
+            expect(widget._undoButton.style.display).toBe("none");
+        });
+
+        test("block names in a reply light up the matching blocks on hover", () => {
+            const block = (name, label) => ({
+                name: name,
+                trash: false,
+                protoblock: { staticLabels: [label] },
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            });
+            activity.refreshCanvas = jest.fn();
+            activity.blocks.blockList = [
+                block("repeat", "repeat"),
+                block("settimbre", "set instrument"),
+                block("pitch", "pitch"),
+                { ...block("repeat", "repeat"), trash: true },
+                block("setmasterbpm2", "beats per minute"),
+                block("octave", "octave")
+            ];
+
+            expect(widget._blocksNamedBy("repeat 4")).toEqual([0]);
+            expect(widget._blocksNamedBy("set instrument guitar")).toEqual([1]);
+            expect(widget._blocksNamedBy("pitch name E, octave 5")).toEqual([2]);
+            expect(widget._blocksNamedBy("master beats per minute bpm 180")).toEqual([4]);
+            expect(widget._blocksNamedBy("forever")).toEqual([]);
+
+            const body = document.createElement("div");
+            body.innerHTML = "<p>Use <code>repeat 4</code> and <code>forever</code>.</p>";
+            widget._linkBlockNames(body);
+            const [linked, plain] = body.querySelectorAll("code");
+            expect(linked.classList.contains("ai-block-link")).toBe(true);
+            expect(plain.classList.contains("ai-block-link")).toBe(false);
+
+            linked.dispatchEvent(new Event("mouseenter"));
+            expect(activity.blocks.blockList[0].highlight).toHaveBeenCalled();
+            linked.dispatchEvent(new Event("mouseleave"));
+            expect(activity.blocks.blockList[0].unhighlight).toHaveBeenCalled();
+            expect(activity.blocks.blockList[3].highlight).not.toHaveBeenCalled();
+        });
+
+        test("shows the backend's error and leaves the project alone", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                json: async () => ({ error: "I can't change this project automatically." })
+            });
+
+            widget._fixProject();
+            await flushPromises();
+
+            expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(widget.chatLog.textContent).toContain(
+                "I can't change this project automatically."
+            );
+            expect(widget._projectBeforeFix).toBeNull();
+        });
+
+        test("waits for a loading project before changing it or undoing", () => {
+            activity.blocks.isLoading = () => true;
+            widget._projectBeforeFix = before;
+
+            widget._undoFix();
+            widget._fixProject("make it faster");
+
+            expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+            expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(widget._projectBeforeFix).toBe(before);
+            expect(widget.chatLog.textContent).toContain("still loading");
+        });
+
+        test("shows a message when a change comes back without one", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ project: fixed })
+            });
+
+            widget._fixProject("make it faster");
+            await flushPromises();
+
+            const reply = widget.chatHistory[widget.chatHistory.length - 1];
+            expect(reply.content).toBe("I changed your project. Press Undo to go back.");
+            expect(widget.chatLog.textContent).not.toContain("undefined");
+        });
+    });
+
+    describe("Everyday use", () => {
+        const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+        let widget;
+        let activity;
+        let widgetWindow;
+        let originalFetch;
+        let originalWidgetWindows;
+
+        beforeEach(() => {
+            originalFetch = global.fetch;
+            global.fetch = jest.fn();
+            const body = document.createElement("div");
+            widgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                sendToCenter: jest.fn(),
+                isMaximized: jest.fn(() => false),
+                getWidgetBody: jest.fn(() => body),
+                addButton: jest.fn(() => document.createElement("button")),
+                onclose: null,
+                onmaximize: null
+            };
+            originalWidgetWindows = window.widgetWindows;
+            window.widgetWindows = { windowFor: jest.fn(() => widgetWindow) };
+            activity = {
+                isInputON: false,
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => "[]")
+            };
+            widget = new AIDebuggerWidget();
+            widget._lifecycle.giveConsent();
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+            window.widgetWindows = originalWidgetWindows;
+        });
+
+        test("running the block again while a reply is on its way leaves Send working", () => {
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+            widget.init(activity);
+            widget.messageInput.value = "Why is it quiet?";
+            widget._sendMessage();
+            const pending = [...widget._lifecycle.pendingRequests][0];
+            expect(widget._isProcessing).toBe(true);
+
+            widget.init(activity);
+
+            expect(pending.signal.aborted).toBe(true);
+            expect(widget._isProcessing).toBe(false);
+            expect(widget.chatLog.querySelector(".typing-indicator")).toBeNull();
+            widget.messageInput.value = "Hello again";
+            widget._sendMessage();
+            expect(global.fetch).toHaveBeenCalledTimes(2);
+        });
+
+        test("caps the chat and edit inputs at the server's 2000 characters", () => {
+            widget.init(activity);
+            expect(widget.messageInput.maxLength).toBe(2000);
+            expect(widget.editInput.maxLength).toBe(2000);
+        });
+
+        test("shows the server's reason when it refuses a question", async () => {
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                status: 429,
+                statusText: "Too Many Requests",
+                json: async () => ({
+                    error: "That is a lot of requests in one minute. Please wait a little."
+                })
+            });
+            widget.init(activity);
+            widget.messageInput.value = "Why is it quiet?";
+            widget._sendMessage();
+            await flushPromises();
+
+            expect(widget.chatLog.textContent).toContain(
+                "That is a lot of requests in one minute. Please wait a little."
+            );
+            expect(widget.chatLog.textContent).not.toContain("check your connection");
+            expect(widget._isProcessing).toBe(false);
+            errorSpy.mockRestore();
         });
     });
 });

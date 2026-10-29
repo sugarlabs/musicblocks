@@ -337,8 +337,8 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
+        this._iterationBudget = this._MAX_ITERATIONS + 1;
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -1074,6 +1074,7 @@ class Logo {
                     ) {
                         if (!tur.singer.runningFromEvent) {
                             this.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
+                            tur.endOfClampSignals[b][i] = null;
                         }
                     }
                 }
@@ -1636,10 +1637,21 @@ class Logo {
                     this._unhighlightStepQueue[turtle] = null;
                 }
 
-                const blk = this.stepQueue[turtle].pop();
-                // eslint-disable-next-line eqeqeq
-                if (blk != null) {
-                    this.runFromBlockNow(this, turtle, blk, 0, null);
+                const stepItem = this.stepQueue[turtle].shift();
+                if (stepItem !== null && stepItem !== undefined) {
+                    const blk =
+                        typeof stepItem === "object" && stepItem !== null ? stepItem.blk : stepItem;
+                    const isflow =
+                        typeof stepItem === "object" && stepItem !== null
+                            ? (stepItem.isflow ?? 0)
+                            : 0;
+                    const receivedArg =
+                        typeof stepItem === "object" && stepItem !== null
+                            ? (stepItem.receivedArg ?? null)
+                            : null;
+                    if (blk !== null && blk !== undefined) {
+                        this.runFromBlockNow(this, turtle, blk, isflow, receivedArg);
+                    }
                 }
             }
         }
@@ -1656,8 +1668,8 @@ class Logo {
      *     builds the named-action table by scanning `blocks.stackList`.
      *
      *   Phase 2 — Dispatch: kicks off execution by calling `runFromBlock` for
-     *     each start/drum/status/oscilloscope/harmony block found on the canvas.
-     *     Status, oscilloscope and harmony blocks run first (with a 250 ms head-start so
+     *     each start/drum/status/oscilloscope block found on the canvas.
+     *     Status and oscilloscope blocks run first (with a 250 ms head-start so
      *     they can display their widgets before music begins); all other start
      *     blocks follow together in a single guarded timeout.
      *
@@ -1877,7 +1889,7 @@ class Logo {
         const stackListLength = this.blocks.stackList.length;
         for (let blk = 0; blk < stackListLength; blk++) {
             if (
-                ["start", "drum", "status", "oscilloscope", "harmony"].includes(
+                ["start", "drum", "status", "oscilloscope"].includes(
                     this.blockList[this.blocks.stackList[blk]].name
                 )
             ) {
@@ -1963,12 +1975,10 @@ class Logo {
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
             const startBlocksLength = startBlocks.length;
-            // Look for status, oscilloscope and harmony blocks.
+            // Look for status and oscilloscope blocks.
             for (let b = 0; b < startBlocksLength; b++) {
                 if (
-                    ["status", "oscilloscope", "harmony"].includes(
-                        this.blockList[startBlocks[b]].name
-                    ) &&
+                    ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
                 ) {
                     const turtle = 0;
@@ -1988,7 +1998,7 @@ class Logo {
             this._timerManager.setGuardedTimeout(
                 () => {
                     if (delayStart !== 0) {
-                        // Launching status/oscilloscope/harmony block would have hidden the
+                        // Launching status/oscilloscope block would have hidden the
                         // Stop Button so show it again.
                         this.onRunTurtle();
                     }
@@ -1996,7 +2006,7 @@ class Logo {
                     // If there are multiple start blocks, run them all.
                     for (let b = 0; b < startBlocksLength; b++) {
                         if (
-                            !["status", "oscilloscope", "harmony"].includes(
+                            !["status", "oscilloscope"].includes(
                                 this.blockList[startBlocks[b]].name
                             )
                         ) {
@@ -2091,7 +2101,11 @@ class Logo {
                 if (!(turtle in logo.stepQueue)) {
                     logo.stepQueue[turtle] = [];
                 }
-                logo.stepQueue[turtle].push(blk);
+                logo.stepQueue[turtle].push({
+                    blk: blk,
+                    isflow: isflow,
+                    receivedArg: receivedArg
+                });
             } else if (
                 logo.turtleDelay === 0 &&
                 delay > 0 &&

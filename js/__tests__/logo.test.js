@@ -458,6 +458,11 @@ describe("Logo constructor", () => {
         expect(logo.firstNoteTime).toBeNull();
     });
 
+    test("initializes iteration budget and maximum iterations", () => {
+        expect(logo._MAX_ITERATIONS).toBe(1000000);
+        expect(logo._iterationBudget).toBe(1000001);
+    });
+
     test("initializes widget properties to null/false", () => {
         expect(logo.reflection).toBeNull();
         expect(logo.phraseMaker).toBeNull();
@@ -845,6 +850,70 @@ describe("Logo step", () => {
         logo.step();
 
         expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+    });
+
+    test("processes step queue in FIFO order (shift instead of pop)", () => {
+        const executionOrder = [];
+        logo.stepQueue = { 0: [{ blk: 1 }, { blk: 2 }, { blk: 3 }] };
+        logo.runFromBlockNow = jest.fn((self, turtle, blk) => {
+            executionOrder.push(blk);
+        });
+
+        logo.step();
+        expect(executionOrder).toEqual([1]);
+        expect(logo.stepQueue[0]).toEqual([{ blk: 2 }, { blk: 3 }]);
+
+        logo.step();
+        expect(executionOrder).toEqual([1, 2]);
+        expect(logo.stepQueue[0]).toEqual([{ blk: 3 }]);
+
+        logo.step();
+        expect(executionOrder).toEqual([1, 2, 3]);
+        expect(logo.stepQueue[0]).toEqual([]);
+    });
+
+    test("forwards isflow and receivedArg from queued stepItem into runFromBlockNow", () => {
+        logo.stepQueue = {
+            0: [
+                {
+                    blk: 42,
+                    isflow: 1,
+                    receivedArg: 100
+                }
+            ]
+        };
+        logo.runFromBlockNow = jest.fn();
+
+        logo.step();
+
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 42, 1, 100);
+    });
+
+    test("handles primitive numbers in stepQueue for backward compatibility", () => {
+        logo.stepQueue = { 0: [10] };
+        logo.runFromBlockNow = jest.fn();
+
+        logo.step();
+
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 10, 0, null);
+    });
+
+    test("runFromBlock enqueues object with blk, isflow, and receivedArg in TURTLESTEP mode", () => {
+        const mockTurtle = createMockTurtle();
+        mockActivity.turtles.ithTurtle = jest.fn().mockReturnValue(mockTurtle);
+        logo.turtleDelay = TURTLESTEP;
+        logo.stopTurtle = false;
+        logo.stepQueue = {};
+
+        logo.runFromBlock(logo, 0, 12, 1, "test-arg");
+
+        expect(logo.stepQueue[0]).toEqual([
+            {
+                blk: 12,
+                isflow: 1,
+                receivedArg: "test-arg"
+            }
+        ]);
     });
 });
 
@@ -2653,6 +2722,28 @@ describe("Logo runFromBlockNow", () => {
             expect(turtle0.running).toBe(true);
             expect(logo.onStopTurtle).not.toHaveBeenCalled();
             expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
+        test("dispatchUnissuedSignals does not double-dispatch previously issued signals", () => {
+            turtle0.endOfClampSignals = { 7: ["_transposition_0", "_tie_0"] };
+            turtle0.butNotThese = { 7: [0] };
+
+            logo.dispatchUnissuedSignals(turtle0);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_transposition_0");
+
+            mockActivity.stage.dispatchEvent.mockClear();
+
+            // When dispatchUnissuedSignals is called again (e.g. at turtle completion
+            // after butNotThese is restored), _tie_0 must not fire again.
+            turtle0.butNotThese = {};
+            logo.dispatchUnissuedSignals(turtle0);
+
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
+            expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_transposition_0");
+            expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_tie_0");
         });
 
         test("a note counter's silent run keeps its signals on a premature restart", () => {

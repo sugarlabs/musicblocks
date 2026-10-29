@@ -25,9 +25,9 @@
 
 /**
  * @file HarmonyUtils.js
- * @description Pure helpers for the Harmony widget: name the intervals and
- * chord formed by the notes sounding at one moment, and compare each played
- * frequency ratio with its just-intonation ideal.
+ * @description Pure helpers for the Harmony row of the Status widget: name the
+ * intervals and chord formed by the notes sounding at one moment, and compare
+ * each played frequency ratio with its just-intonation ideal.
  */
 
 const HarmonyUtils = {

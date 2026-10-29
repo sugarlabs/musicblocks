@@ -607,7 +607,7 @@ function setupExtrasBlocks(activity) {
                 logo.phraseMaker.lyricsON = true;
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
-                    if (args[0] !== null) {
+                    if (args[0] !== null && args[0] !== undefined) {
                         const tur = activity.turtles.ithTurtle(turtle);
 
                         if (!tur.singer.suppressOutput) {

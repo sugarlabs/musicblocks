@@ -1779,17 +1779,28 @@ class Palette {
                     img.style.top = pageY - halfH + "px";
                 };
 
+                let rAFId = null;
+                let ticking = false;
+                let lastX, lastY;
                 const onMouseMove = e => {
                     e.preventDefault();
-                    let x, y;
-                    if (e.type === "touchmove") {
-                        x = e.touches[0].clientX;
-                        y = e.touches[0].clientY;
+                    if (e.type === "touchstart" || e.type === "touchmove") {
+                        const touch = e.touches && e.touches[0];
+                        if (touch) {
+                            lastX = touch.pageX !== undefined ? touch.pageX : touch.clientX;
+                            lastY = touch.pageY !== undefined ? touch.pageY : touch.clientY;
+                        }
                     } else {
-                        x = e.pageX;
-                        y = e.pageY;
+                        lastX = e.pageX;
+                        lastY = e.pageY;
                     }
-                    moveAt(x, y);
+                    if (!ticking) {
+                        ticking = true;
+                        rAFId = window.requestAnimationFrame(() => {
+                            moveAt(lastX, lastY);
+                            ticking = false;
+                        });
+                    }
                 };
                 onMouseMove(event);
 
@@ -1797,12 +1808,21 @@ class Palette {
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
-                const up = event => {
+                let cancel;
+                const up = (event, cancelled = false) => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
-                    img.onmouseup = null;
-                    img.ontouchend = null;
+                    document.removeEventListener("mouseup", up);
+                    document.removeEventListener("touchend", up);
+                    document.removeEventListener("touchcancel", cancel);
+
+                    if (rAFId) {
+                        window.cancelAnimationFrame(rAFId);
+                        rAFId = null;
+                        ticking = false;
+                        moveAt(lastX, lastY);
+                    }
 
                     const x = parseInt(img.style.left, 10);
                     const y = parseInt(img.style.top, 10);
@@ -1811,6 +1831,8 @@ class Palette {
                     img.style.zIndex = zInd;
                     document.body.removeChild(img);
                     itemCell.appendChild(img);
+
+                    if (cancelled) return;
 
                     // if (!x || !y) return;
 
@@ -1825,9 +1847,11 @@ class Palette {
                             that.activity.blocksContainer.y
                     );
                 };
+                cancel = () => up(null, true);
 
-                img.ontouchend = up;
-                img.onmouseup = up;
+                document.addEventListener("mouseup", up);
+                document.addEventListener("touchend", up);
+                document.addEventListener("touchcancel", cancel);
             };
 
             img.ontouchstart = down;

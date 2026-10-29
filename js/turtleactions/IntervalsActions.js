@@ -346,24 +346,29 @@ function setupIntervalsActions(activity) {
                 }
                 pitchNumbers = inBounds;
 
+                // Remove repeated pitch numbers before calculating intervals.
+                // Computing a step to a duplicate first leaves a zero-length
+                // step in the mode and drops the interval after the duplicate.
+                const uniquePitchNumbers = [];
+                const seenPitchNumbers = new Set();
+                for (const pitchNumber of pitchNumbers) {
+                    const normalizedPitchNumber = pitchNumber % temperamentLength;
+                    if (seenPitchNumbers.has(normalizedPitchNumber)) {
+                        activity.errorMsg(_("Ignoring duplicate pitch numbers."));
+                        continue;
+                    }
+                    seenPitchNumbers.add(normalizedPitchNumber);
+                    uniquePitchNumbers.push(normalizedPitchNumber);
+                }
+                pitchNumbers = uniquePitchNumbers;
+
                 if (pitchNumbers.length > temperamentLength) {
                     activity.errorMsg(EDOBOUNDEXCEEDED, null);
                 }
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     // Apply mod arithmetic for custom temperaments
-                    let normalizedPitchNumber = pitchNumbers[i] % temperamentLength;
-                    if (normalizedPitchNumber < 0) {
-                        normalizedPitchNumber += temperamentLength;
-                    }
-
-                    if (
-                        i > 0 &&
-                        normalizedPitchNumber === pitchNumbers[i - 1] % temperamentLength
-                    ) {
-                        activity.errorMsg(_("Ignoring duplicate pitch numbers."));
-                        continue;
-                    }
+                    const normalizedPitchNumber = pitchNumbers[i];
 
                     if (i < pitchNumbers.length - 1) {
                         let nextPitchNumber = pitchNumbers[i + 1] % temperamentLength;

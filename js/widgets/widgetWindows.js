@@ -23,6 +23,33 @@ window.widgetWindows = {
     focused: null,
     draggingWindow: null,
     _globalListenersInitialized: false,
+    /**
+     * Returns the bottom edge of the visible toolbar area.
+     *
+     * @returns {number} Toolbar bottom position in viewport pixels.
+     */
+    _getToolbarBottom() {
+        const mainToolbar = document.querySelector("#toolbars .main-nav-container");
+        const auxToolbar = docById("aux-toolbar");
+
+        let bottom = 64;
+
+        if (mainToolbar) {
+            const mainRect = mainToolbar.getBoundingClientRect();
+            if (mainRect.bottom > 0) {
+                bottom = mainRect.bottom;
+            }
+        }
+
+        if (auxToolbar && window.getComputedStyle(auxToolbar).display !== "none") {
+            const auxRect = auxToolbar.getBoundingClientRect();
+            if (auxRect.bottom > bottom) {
+                bottom = auxRect.bottom;
+            }
+        }
+
+        return bottom;
+    },
 
     // NOTE: This mapping only works for widgets that never set their own
     // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
@@ -43,14 +70,14 @@ window.widgetWindows = {
         "sampler": "sampler",
         "rhythm maker": "rhythm maker",
         "oscilloscope": "oscilloscope",
-        "harmony": "harmony",
         "temperament": "temperament",
         "meter": "meter",
         "LEGO Bricks": "LEGO Bricks",
         "pitch slider": "slider",
         "pitch staircase": "pitch staircase",
         "music keyboard": "music keyboard",
-        "status": "status"
+        "status": "status",
+        "chord progression": "chord progression"
     },
 
     /**
@@ -80,7 +107,8 @@ window.widgetWindows = {
         "meter",
         "temperament",
         "mode",
-        "timbre"
+        "timbre",
+        "chord progression"
     ]),
 
     /**
@@ -200,19 +228,36 @@ window.widgetWindows = {
             }
         }
     },
+    /**
+     * Repositions open widget windows to respect the visible toolbar and viewport bounds.
+     *
+     * @returns {void}
+     */
     _handleResize() {
-        if (window.innerWidth <= 600) return;
+        const toolbarBottom = this._getToolbarBottom();
 
         for (const win of Object.values(this.openWindows)) {
-            if (!win || win._maximized || win._frame.style.display === "none") continue;
+            if (!win || win._frame.style.display === "none") continue;
+
+            if (win._maximized) {
+                win._frame.style.top = `${toolbarBottom}px`;
+                win._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
+                continue;
+            }
+
+            // Preserve the existing small-screen behavior for floating windows.
+            if (window.innerWidth <= 600) continue;
 
             const rect = win._frame.getBoundingClientRect();
             const x = Math.min(Math.max(rect.left, 0), Math.max(0, window.innerWidth - rect.width));
             const y = Math.min(
-                Math.max(rect.top, 64),
-                Math.max(64, window.innerHeight - rect.height)
+                Math.max(rect.top, toolbarBottom),
+                Math.max(toolbarBottom, window.innerHeight - rect.height)
             );
-            if (x !== rect.left || y !== rect.top) win.setPosition(x, y);
+
+            if (x !== rect.left || y !== rect.top) {
+                win.setPosition(x, y);
+            }
         }
     },
     _initGlobalListeners() {
@@ -466,6 +511,47 @@ class WidgetWindow {
         this._toolbar.setAttribute("aria-label", _("Widget toolbar"));
 
         this._widget = this._create("div", "wfbWidget", this._body);
+
+        /**
+         * The innermost element under the pointer that can still scroll in
+         * the wheel's direction, or the widget itself.
+         * @param {EventTarget} target
+         * @param {number} deltaX
+         * @param {number} deltaY
+         * @returns {HTMLElement}
+         */
+        this._scrollTargetFor = (target, deltaX, deltaY) => {
+            const canScroll = (overflow, position, size, view, delta) =>
+                /(auto|scroll)/.test(overflow) &&
+                size > view &&
+                ((delta < 0 && position > 0) || (delta > 0 && position + view < size));
+
+            let node = target instanceof Element ? target : null;
+            while (node && node !== this._widget && this._widget.contains(node)) {
+                const style = window.getComputedStyle(node);
+                if (
+                    canScroll(
+                        style.overflowY,
+                        node.scrollTop,
+                        node.scrollHeight,
+                        node.clientHeight,
+                        deltaY
+                    ) ||
+                    canScroll(
+                        style.overflowX,
+                        node.scrollLeft,
+                        node.scrollWidth,
+                        node.clientWidth,
+                        deltaX
+                    )
+                ) {
+                    return node;
+                }
+                node = node.parentElement;
+            }
+            return this._widget;
+        };
+
         this._widgetWheelHandler = event => {
             const deltaY =
                 typeof event.deltaY === "number"
@@ -475,8 +561,11 @@ class WidgetWindow {
                       : 0;
             const deltaX = typeof event.deltaX === "number" ? event.deltaX : 0;
 
-            this._widget.scrollTop += deltaY;
-            this._widget.scrollLeft += deltaX;
+            // Scrolling only this._widget left inner scroll areas, such as the
+            // AI Debugger's chat log, unable to scroll at all.
+            const scroller = this._scrollTargetFor(event.target, deltaX, deltaY);
+            scroller.scrollTop += deltaY;
+            scroller.scrollLeft += deltaX;
 
             if (event.cancelable) {
                 event.preventDefault();
@@ -520,7 +609,9 @@ class WidgetWindow {
         this._rafTicking = true;
 
         requestAnimationFrame(() => {
-            if (this._fullscreenEnabled && this._frame.style.top === "64px") {
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
+            if (this._fullscreenEnabled && this._frame.style.top === `${toolbarBottom}px`) {
                 this._overlay(true);
             } else {
                 this._overlay(false);
@@ -538,9 +629,11 @@ class WidgetWindow {
             this._frame.style.zIndex = "10";
             this._overlayframe.style.left = "0";
             this._overlayframe.style.zIndex = "1";
-            this._overlayframe.style.top = "64px";
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
+            this._overlayframe.style.top = `${toolbarBottom}px`;
             this._overlayframe.style.width = "100vw";
-            this._overlayframe.style.height = "calc(100vh - 64px)";
+            this._overlayframe.style.height = `calc(100vh - ${toolbarBottom}px)`;
             this._overlayframe.style.border = "0.25vw solid black";
             this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
@@ -557,7 +650,13 @@ class WidgetWindow {
      * @returns {void}
      */
     _dragTopHandler(e) {
-        if (this._fullscreenEnabled && this._frame.style.top === "64px" && !this._maximized) {
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
+        if (
+            this._fullscreenEnabled &&
+            this._frame.style.top === `${toolbarBottom}px` &&
+            !this._maximized
+        ) {
             this._maximize();
             this.takeFocus();
             this.onmaximize();
@@ -801,10 +900,13 @@ class WidgetWindow {
         this.takeFocus();
 
         this._savedPos = [this._frame.style.left, this._frame.style.top];
+
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
         this._frame.style.width = "100vw";
-        this._frame.style.height = "calc(100vh - 64px)";
+        this._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
         this._frame.style.left = "0";
-        this._frame.style.top = "64px";
+        this._frame.style.top = `${toolbarBottom}px`;
     }
 
     /**
@@ -894,9 +996,12 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+        const top = Math.max(y, toolbarBottom);
+
         this._frame.style.left = `${x}px`;
-        this._frame.style.top = `${Math.max(y, 64)}px`;
-        window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
+        this._frame.style.top = `${top}px`;
+        window.widgetWindows._posCache[this._key] = [x, top];
         return this;
     }
 
