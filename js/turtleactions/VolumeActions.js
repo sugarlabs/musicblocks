@@ -47,10 +47,17 @@ function setupVolumeActions(activity) {
     const resolveSynthName = synthname => {
         if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) return DEFAULTVOICE;
         if (synthname === "custom" || synthname === _("custom")) return "custom";
+        if (typeof synthname !== "string") return null;
+
+        const normalizedSynthName = synthname.toLowerCase();
 
         for (const voice in VOICENAMES) {
-            if (VOICENAMES[voice][0] === synthname) return VOICENAMES[voice][1];
-            if (VOICENAMES[voice][1] === synthname) return synthname;
+            if (VOICENAMES[voice][0].toLowerCase() === normalizedSynthName) {
+                return VOICENAMES[voice][1];
+            }
+            if (VOICENAMES[voice][1].toLowerCase() === normalizedSynthName) {
+                return VOICENAMES[voice][1];
+            }
         }
 
         for (const drum in DRUMNAMES) {
@@ -325,7 +332,11 @@ function setupVolumeActions(activity) {
          */
         static getSynthVolume(targetSynth, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-            const synth = resolveSynthName(targetSynth);
+            let synth = targetSynth;
+
+            if (!Object.prototype.hasOwnProperty.call(tur.singer.synthVolume, synth)) {
+                synth = resolveSynthName(targetSynth);
+            }
 
             if (
                 synth !== null &&
