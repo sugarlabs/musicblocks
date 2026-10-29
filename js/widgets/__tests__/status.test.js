@@ -758,7 +758,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["C4"], 0.25]
+                                noteStatus: [["C4"], 4]
                             }
                         };
                     case 1:
@@ -766,7 +766,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["X4"], 0.25]
+                                noteStatus: [["X4"], 4]
                             }
                         };
                     case 2:
@@ -774,7 +774,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["E4"], 0.5]
+                                noteStatus: [["E4"], 2]
                             }
                         };
                     default:
@@ -793,16 +793,24 @@ describe("StatusMatrix Widget", () => {
         });
 
         test("displays note names from noteStatus", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "E4"], 0.25]
+                    noteStatus: [["C4", "E4"], 4]
                 }
             });
 
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
             statusMatrix.updateAll();
-            expect(rationalToFraction).toHaveBeenCalledWith(0.25);
+            expect(rationalToFraction).toHaveBeenCalledWith(4);
+            expect(mockCell.textContent).toContain("C4");
+            expect(mockCell.textContent).toContain("E4");
+            expect(mockCell.textContent).toBe("C4 E4 1/4");
         });
 
         test("collapses duplicate note names in the note row display", () => {
@@ -813,7 +821,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["G4", "G4"], 0.125]
+                    noteStatus: [["G4", "G4"], 8]
                 }
             });
 
@@ -822,6 +830,25 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.updateAll();
 
             expect(mockCell.textContent).toBe("G4 1/8");
+        });
+
+        test("formats non-unit fraction durations with numerator and denominator", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], 8 / 3]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([8, 3]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("C4 3/8");
         });
 
         test("formats numeric frequencies with Hz suffix", () => {
@@ -1161,7 +1188,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "C4", 440], 0.25]
+                    noteStatus: [["C4", "C4", 440], 4]
                 }
             });
 
@@ -1169,6 +1196,55 @@ describe("StatusMatrix Widget", () => {
             const noteCell = statusMatrix._statusTable.rows[1].cells[1];
             expect(noteCell.textContent.match(/C4/g) || []).toHaveLength(1);
             expect(noteCell.textContent).toBe("C4 440.00Hz 1/4");
+        });
+
+        test("formats duration correctly using real rationalToFraction helper", () => {
+            const utilsLogic = require("../../utils/utils-logic.js");
+            const originalRationalToFraction = global.rationalToFraction;
+            global.rationalToFraction = utilsLogic.rationalToFraction;
+
+            try {
+                // Quarter note: beat value 4 -> duration 1/4
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["C4"], 4]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                let noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("C4 1/4");
+
+                // Half note: beat value 2 -> duration 1/2
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["G4"], 2]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("G4 1/2");
+
+                // Dotted quarter note: beat value 8/3 -> duration 3/8
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["D4"], 8 / 3]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("D4 3/8");
+            } finally {
+                global.rationalToFraction = originalRationalToFraction;
+            }
         });
     });
 

@@ -462,6 +462,10 @@ class StatusMatrix {
                     if (value !== undefined && value !== null) {
                         obj = rationalToFraction(value);
                         if (obj && obj.length >= 2) {
+                            // noteStatus[1] stores noteBeatValue (1 / duration, e.g. 4 for quarter note,
+                            // 2 for half note, 8/3 for dotted quarter). rationalToFraction(noteBeatValue)
+                            // returns [numerator, denominator], so the duration fraction (1 / beatValue)
+                            // is denominator / numerator (obj[1] / obj[0]).
                             note += obj[1] + "/" + obj[0];
                         }
                     }
