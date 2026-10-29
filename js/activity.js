@@ -904,7 +904,7 @@ class Activity {
             // Unlock the Web Audio context while the play click is still a user
             // gesture, then run the rest of the Play action once that settles.
             if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
-                this.logo.synth.startAudio().then(runPlayAction).catch(runPlayAction);
+                this.logo.synth.startAudio().then(runPlayAction, runPlayAction);
             } else {
                 runPlayAction();
             }
