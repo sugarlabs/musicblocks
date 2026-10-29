@@ -997,6 +997,14 @@ describe("setupVolumeActions", () => {
             expect(triggerSpy).toHaveBeenCalledWith(0, "G4", 1 / 4, "piano", null, null, false);
         });
 
+        it("should trigger tone for target turtle when turtle index is non-zero", () => {
+            Singer.VolumeActions.setSynthVolume("Piano", 70, 2, null);
+
+            jest.advanceTimersByTime(250);
+
+            expect(triggerSpy).toHaveBeenCalledWith(2, "G4", 1 / 4, "piano", null, null, false);
+        });
+
         it("should not trigger tone when connections exist", () => {
             Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
 
