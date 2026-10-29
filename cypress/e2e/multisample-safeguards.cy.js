@@ -13,7 +13,7 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
     const value = (type = "") => ({
         type: "multisample",
         version: 1,
-        name: "弦 <b>Strings</b> " + type,
+        name: "弦 <b>Strings</b> $& $1 " + type,
         samples: [
             {
                 name: "C4.wav",
@@ -131,7 +131,9 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
                 );
                 cy.window({ timeout: 20000 }).should(win => {
                     const activity = win.ActivityContext.getActivity();
-                    expect(errors).to.have.been.calledWithMatch(value(type).name + ":");
+                    expect(errors).to.have.been.calledWithMatch(
+                        "Multisample instrument “" + value(type).name + "” is not supported in"
+                    );
                     expect(errors.args.map(args => args[0]).join("\n")).to.include(destination);
                     expect(activity.logo.stopTurtle).to.equal(true);
                     expect(init).not.to.have.been.called;
@@ -171,7 +173,9 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
             reset.click();
             expect(editor.textContent).to.equal("const kept = 'my program';");
             expect(errors).to.have.been.calledWithMatch(
-                "JavaScript export does not support multisample instrument"
+                "JavaScript export does not support multisample instrument “" +
+                    value("matrix").name +
+                    "” yet. Export the Music Blocks project instead."
             );
             expect(errors.args.some(args => args[0].includes("Music Blocks project"))).to.equal(
                 true

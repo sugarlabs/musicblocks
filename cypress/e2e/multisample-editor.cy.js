@@ -933,6 +933,41 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         }
     );
 
+    it("creates a visible stack after workspace scrolling and reopens through touch fallback", () => {
+        cy.window().then(win => {
+            activity(win).blocksContainer.x = -1600;
+            activity(win).blocksContainer.y = 900;
+        });
+        create();
+        cy.window().then(win => {
+            const current = activity(win);
+            const owner = owners(win)[0];
+            const stack = current.blocks.blockList[owner.connections[0]];
+            expect(stack.container.x + current.blocksContainer.x).to.equal(100);
+            expect(stack.container.y + current.blocksContainer.y).to.equal(100);
+            current.blocks.mouseDownTime = Date.now();
+            owner._mouseoutCallback({}, false, false, false);
+            expect(current.multisampleEditor.owner).to.equal(owner);
+        });
+        cy.get(editor).should("be.visible");
+        cy.contains(editor + " button", /^Cancel$/).click();
+    });
+
+    it("honors a project switch requested after the dirty Cancel choice opened", () => {
+        create();
+        reopen();
+        cy.get(editor + ' input[name="multisample-name"]')
+            .clear()
+            .type("Unsaved change");
+        cy.contains(editor + " button", /^Cancel$/).click();
+        cy.window().then(win => activity(win).projectManager.newProject());
+        cy.contains(editor + " button", "Discard changes").click();
+        cy.window().should(win => {
+            expect(activity(win).multisampleEditor).to.equal(null);
+            expect(owners(win).length).to.equal(0);
+        });
+    });
+
     it("edits an ordinary independent copy without changing the authored original", () => {
         create();
         let original;

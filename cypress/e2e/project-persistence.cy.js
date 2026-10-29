@@ -425,14 +425,22 @@ describe("Multisample value persistence", { testIsolation: true, retries: 0 }, (
                 instruments(win)[0].value.samples
             );
         });
-        cy.window().then(win => {
+        cy.window().then(async win => {
             const activity = win.ActivityContext.getActivity();
             const messages = cy.spy(activity, "textMsg");
             expect(activity.__saveLocally()).to.equal(false);
+            expect(messages).not.to.have.been.called;
+            await activity.saveSessionAsync();
+            exported = activity.prepareExport();
+            const session = await activity.sessionStorageManager.loadSession(
+                "SESSION" + activity.storage.currentProject
+            );
+            expect(session.data === exported).to.equal(true);
+            expect(messages).not.to.have.been.called;
+            expect(activity.__saveLocally({ reportSaveErrors: true })).to.equal(false);
             expect(messages).to.have.been.calledWithMatch(
                 "Could not write the local-storage session"
             );
-            exported = activity.prepareExport();
             expect(
                 JSON.stringify(instruments(win)[0].value) === JSON.stringify(descriptor)
             ).to.equal(true);

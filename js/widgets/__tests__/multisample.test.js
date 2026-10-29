@@ -62,6 +62,7 @@ describe("Focused multisample authoring", () => {
             }
         };
         activity = {
+            blocksContainer: { x: 0, y: 0 },
             blocks: { blockList: [], isLoading: () => false },
             turtles: { running: () => false },
             logo: { synth: {} },
@@ -763,7 +764,10 @@ describe("Focused multisample authoring", () => {
         activity.saveLocally = jest.fn();
         activity.blocks.highlight = jest.fn();
         activity.blocks.actionHistory = [];
+        activity.blocksContainer = { x: -900, y: 450 };
+        let createdStack;
         activity.blocks.loadNewBlocks = stack => {
+            createdStack = stack;
             activity.blocks.blockList.push(
                 { name: "settimbre", blockIndex: 0 },
                 {
@@ -786,6 +790,7 @@ describe("Focused multisample authoring", () => {
         await new Promise(resolve => setTimeout(resolve, 0));
         expect(activity.multisampleEditor).toBeNull();
         await applying;
+        expect(createdStack[0].slice(2, 4)).toEqual([1000, -350]);
         expect(activity.blocks.actionHistory).toEqual([{ type: "restore", blockId: 0 }]);
         expect(activity.saveLocally).toHaveBeenCalledTimes(1);
     });
@@ -974,6 +979,27 @@ describe("Focused multisample authoring", () => {
         expect(activity.multisampleEditor.owner).toBe(other);
         expect(activity.multisampleEditor.nameInput.value).toBe("Original");
     });
+
+    test.each(["switch", "cancel", "replace"])(
+        "uses the latest close request when a dirty choice is already open: %s",
+        action => {
+            MultisampleEditor.open(activity);
+            const editor = activity.multisampleEditor;
+            editor.nameInput.value = "Changed";
+            editor.nameInput.dispatchEvent(new Event("input"));
+            const first = jest.fn();
+            const latest = jest.fn();
+            editor.requestClose(action === "switch" ? undefined : first);
+            const choice = editor.choice;
+            editor.requestClose(action === "cancel" ? undefined : latest);
+            expect(editor.choice).toBe(choice);
+            expect(document.activeElement).toBe(button("Keep editing"));
+            button("Discard changes").click();
+            expect(activity.multisampleEditor).toBeNull();
+            expect(first).not.toHaveBeenCalled();
+            expect(latest).toHaveBeenCalledTimes(action === "cancel" ? 0 : 1);
+        }
+    );
 
     test("refuses opening during execution or pending preparation without stopping the program", () => {
         activity.logo._executionRequest = { started: false };
