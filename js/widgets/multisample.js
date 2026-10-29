@@ -735,14 +735,25 @@ class MultisampleEditor {
     static async saveAppliedProject(activity, generation) {
         // Publication is complete. Storage failure must never roll back the blocks.
         try {
-            const result = await activity.saveLocally({ rejectOnProjectSaveError: true });
+            const result = await activity.saveLocally({
+                rejectOnProjectSaveError: true,
+                reportSaveErrors: false
+            });
             if (result === false) throw new Error("Local save failed");
-        } catch {
+        } catch (error) {
             if ((activity.multisampleProjectGeneration || 0) !== generation) return;
+            const quota =
+                error?.name === "QuotaExceededError" ||
+                error?.code === DOMException.QUOTA_EXCEEDED_ERR ||
+                error?.message === "Not enough space to save locally";
             activity.textMsg(
-                _(
-                    "Blocks were applied, but local saving failed. Retry saving or export a Music Blocks project to keep your recordings."
-                )
+                (quota
+                    ? _(
+                          "Blocks were applied, but local storage is full. Try deleting some saved projects."
+                      )
+                    : _("Blocks were applied, but local saving failed.")) +
+                    " " +
+                    _("Retry saving or export a Music Blocks project to keep your recordings.")
             );
         }
     }

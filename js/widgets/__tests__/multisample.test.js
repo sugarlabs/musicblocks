@@ -523,9 +523,32 @@ describe("Focused multisample authoring", () => {
             true
         );
         expect(activity.logo.synth.unregisterMultisample).toHaveBeenCalledTimes(1);
-        expect(activity.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(activity.saveLocally).toHaveBeenCalledWith({
+            rejectOnProjectSaveError: true,
+            reportSaveErrors: false
+        });
         expect(activity.multisampleEditor).toBeNull();
     });
+
+    test.each([new Error("failed"), new DOMException("full", "QuotaExceededError")])(
+        "reports an applied-but-unsaved project once: %s",
+        async error => {
+            activity.saveLocally = jest.fn().mockRejectedValue(error);
+            await MultisampleEditor.saveAppliedProject(activity, 0);
+            expect(activity.saveLocally).toHaveBeenCalledWith({
+                rejectOnProjectSaveError: true,
+                reportSaveErrors: false
+            });
+            expect(activity.textMsg).toHaveBeenCalledTimes(1);
+            const message = activity.textMsg.mock.calls[0][0];
+            expect(message).toContain("Blocks were applied");
+            expect(message).toContain("Retry saving or export");
+            if (error.name === "QuotaExceededError") {
+                expect(message).toContain("local storage is full");
+                expect(message).toContain("deleting some saved projects");
+            }
+        }
+    );
 
     test("an unchanged edit closes without preparation or history", async () => {
         const owner = { blockIndex: 0, value: value(), setMultisampleValue: jest.fn() };

@@ -78,6 +78,21 @@ beforeAll(() => {
 // ---------------------------------------------------------------------------
 
 describe("multisample session recovery", () => {
+    it("lets the caller handle a session quota failure without losing rejection", () => {
+        const activity = makeActivity();
+        const error = new DOMException("full", "QuotaExceededError");
+        Object.defineProperty(activity.storage, "SESSIONTest Project", {
+            set() {
+                throw error;
+            }
+        });
+        const manager = new ProjectManager(activity);
+        expect(() =>
+            manager.saveLocally({ rejectOnProjectSaveError: true, reportSaveErrors: false })
+        ).toThrow(error);
+        expect(activity.textMsg).not.toHaveBeenCalled();
+    });
+
     it("reports a storage failure without changing embedded values and permits retry/export", () => {
         const activity = makeActivity();
         const value = { type: "multisample", version: 9, name: "recover", audio: ["exact bytes"] };

@@ -123,6 +123,48 @@ describe("Activity Storage (loadStart / saveSessionAsync / _handleBeforeUnload)"
     });
 
     describe("saveSessionAsync", () => {
+        it.each([false, true])(
+            "reports only a failed final storage tier after localStorage quota; IndexedDB failure=%s",
+            async failIndexedDB => {
+                const storage = { currentProject: "TestProject" };
+                Object.defineProperty(storage, "SESSIONTestProject", {
+                    set() {
+                        throw new DOMException("full", "QuotaExceededError");
+                    }
+                });
+                const error = new Error("IndexedDB failed");
+                const activity = {
+                    blocks: { isLoading: () => false },
+                    storage,
+                    textMsg: jest.fn(),
+                    prepareExport: () => "[]",
+                    sessionStorageManager: {
+                        saveSession: failIndexedDB
+                            ? jest.fn().mockRejectedValue(error)
+                            : jest.fn().mockResolvedValue()
+                    }
+                };
+                const manager = new ProjectManager(activity);
+                manager.prepareExport = activity.prepareExport;
+                activity.__saveLocally = options => manager.saveLocally(options);
+                if (failIndexedDB) {
+                    await expect(saveSessionAsync.call(activity)).rejects.toBe(error);
+                    expect(activity.textMsg).toHaveBeenCalledTimes(1);
+                    expect(activity.textMsg).toHaveBeenCalledWith(
+                        expect.stringContaining("Could not save the session to IndexedDB")
+                    );
+                } else {
+                    await expect(saveSessionAsync.call(activity)).resolves.toBeUndefined();
+                    expect(activity.textMsg).not.toHaveBeenCalled();
+                }
+                expect(activity.sessionStorageManager.saveSession).toHaveBeenCalledWith(
+                    "SESSIONTestProject",
+                    "[]",
+                    1000000
+                );
+            }
+        );
+
         it("should call __saveLocally and save to IndexedDB", async () => {
             const mockSessionStorageManager = {
                 saveSession: jest.fn().mockResolvedValue()
@@ -162,6 +204,7 @@ describe("Activity Storage (loadStart / saveSessionAsync / _handleBeforeUnload)"
             };
             const activity = {
                 __saveLocally: jest.fn(),
+                textMsg: jest.fn(),
                 sessionStorageManager: mockSessionStorageManager,
                 prepareExport: jest.fn().mockReturnValue('{"blocks":[]}'),
                 storage: mockStorage

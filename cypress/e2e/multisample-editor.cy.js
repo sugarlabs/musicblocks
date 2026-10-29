@@ -1190,7 +1190,10 @@ describe("Minimal multisample authoring", { testIsolation: true, retries: 0 }, (
         });
         create();
         cy.window().then(win => {
-            expect(errors).to.have.been.calledWithMatch("local saving failed");
+            expect(errors).to.have.been.calledWithMatch(
+                "Blocks were applied, but local storage is full"
+            );
+            expect(errors).to.have.been.calledWithMatch("Retry saving or export");
             expect(
                 JSON.parse(activity(win).prepareExport()).some(b => b[1]?.[0] === "multisample")
             ).to.equal(true);
