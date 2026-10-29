@@ -818,7 +818,13 @@ class MultisampleEditor {
             pubsub.on("loadFailed", failed);
             try {
                 token = blocks.loadNewBlocks([
-                    [0, "settimbre", 100, 100, [null, 1, null, 2]],
+                    [
+                        0,
+                        "settimbre",
+                        100 - this.activity.blocksContainer.x,
+                        100 - this.activity.blocksContainer.y,
+                        [null, 1, null, 2]
+                    ],
                     [1, ["multisample", { value: snapshot }], 0, 0, [0]],
                     [2, "hidden", 0, 0, [0, null]]
                 ]);
@@ -854,6 +860,7 @@ class MultisampleEditor {
     requestClose(afterClose) {
         if (this.closed) return;
         if (this.publishing) return;
+        this.afterClose = afterClose;
         this.stop();
         if (this.initial === JSON.stringify(this.draft)) {
             this.close();
@@ -875,6 +882,7 @@ class MultisampleEditor {
             () => {
                 this.choice.remove();
                 this.choice = null;
+                this.afterClose = null;
                 this.nameInput.focus();
             },
             this.choice
@@ -882,8 +890,9 @@ class MultisampleEditor {
         this.button(
             _("Discard changes"),
             () => {
+                const continuation = this.afterClose;
                 this.close();
-                afterClose?.();
+                continuation?.();
             },
             this.choice
         );
@@ -914,6 +923,7 @@ class MultisampleEditor {
         this.removed = this.replacing = null;
         this.owner = null;
         this.ownerValue = null;
+        this.afterClose = null;
         this.initial = null;
         this.origin = null;
         this.root = this.list = this.nameInput = this.picker = this.actions = this.status = null;

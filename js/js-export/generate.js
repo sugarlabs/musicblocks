@@ -135,12 +135,9 @@ class JSGenerate {
                             typeof arg.value?.name === "string"
                                 ? arg.value.name
                                 : _("Multisample instrument");
-                        JSGenerate.exportError =
-                            _("JavaScript export does not support multisample instrument") +
-                            " “" +
-                            name +
-                            "” " +
-                            _("yet. Export the Music Blocks project instead.");
+                        JSGenerate.exportError = _(
+                            "JavaScript export does not support multisample instrument “%s” yet. Export the Music Blocks project instead."
+                        ).replace(/%s/g, () => name);
                         args.push(null);
                         continue;
                     }

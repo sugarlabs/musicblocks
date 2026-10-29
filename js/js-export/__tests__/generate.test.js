@@ -66,7 +66,7 @@ describe("JSGenerate Class", () => {
     });
 
     test.each([
-        { type: "multisample", version: 1, name: "Strings" },
+        { type: "multisample", version: 1, name: "Strings $& $1 %s" },
         { type: "multisample", version: 99, name: "Strings", extra: [1] },
         null
     ])("refuses an instrument stored in a box before generating any JavaScript: %p", value => {
@@ -95,12 +95,45 @@ describe("JSGenerate Class", () => {
             );
             if (value)
                 expect(globalActivity.errorMsg).toHaveBeenCalledWith(
-                    expect.stringContaining("Strings")
+                    expect.stringContaining(value.name)
                 );
         } finally {
             global._ = previousTranslate;
             globalActivity.blocks.stackList = [];
             globalActivity.blocks.blockList = {};
+        }
+    });
+
+    test("translates the complete export refusal and preserves literal name placeholders", () => {
+        const previousTranslate = global._;
+        const message =
+            "JavaScript export does not support multisample instrument “%s” yet. Export the Music Blocks project instead.";
+        global._ = jest.fn(text =>
+            text === message ? "Export a Music Blocks project instead: %s is unsupported." : text
+        );
+        globalActivity.errorMsg = jest.fn();
+        globalActivity.blocks.stackList = [0];
+        globalActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, 1, null] },
+            1: {
+                name: "settimbre",
+                connections: [0, 2, null, null],
+                protoblock: { style: "flow", args: 1 }
+            },
+            2: {
+                name: "multisample",
+                value: { name: "Strings $& $1 %s" },
+                protoblock: { style: "value", args: 0 }
+            }
+        };
+        try {
+            expect(JSGenerate.run(false, false)).toBe(false);
+            expect(global._).toHaveBeenCalledWith(message);
+            expect(globalActivity.errorMsg).toHaveBeenCalledWith(
+                "Export a Music Blocks project instead: Strings $& $1 %s is unsupported."
+            );
+        } finally {
+            global._ = previousTranslate;
         }
     });
 
