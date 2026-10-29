@@ -307,6 +307,9 @@ class Singer {
         this.lastPitchPlayed = {}; // for a stand-alone pitch block
         this.previousNotePlayed = null;
         this.noteStatus = null;
+        // Pitched notes of the latest note group, each with its start in turtle time and
+        // when it sounds, in wall-clock milliseconds (for the Harmony row of the Status widget)
+        this.pitchStatus = null;
         this.noteDirection = 0;
         this.pitchNumberOffset = 39; // 39, C4
         this.currentOctave = 4;
@@ -2350,6 +2353,7 @@ class Singer {
 
                 const notes = [];
                 const drums = [];
+                let hasSetTimbreInSetDrum = false;
                 // let insideChord = -1;
                 // if (
                 //     tur.singer.notePitches[thisBlk].length + tur.singer.oscList[thisBlk].length >
@@ -2385,6 +2389,8 @@ class Singer {
                         beatValue = bpmFactor / noteBeatValue;
                     }
                 }
+
+                let pitchStatusBeatValue = beatValue;
 
                 if (effects.doVibrato) {
                     vibratoValue = effects.vibratoRate
@@ -2642,7 +2648,7 @@ class Singer {
                                 };
 
                                 // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
-                                let hasSetTimbreInSetDrum = false;
+                                hasSetTimbreInSetDrum = false;
                                 // This case is only applicable if the note block is at all inside a setdrum block
                                 if (
                                     tur.singer.drumStyle.length > 0 &&
@@ -2758,6 +2764,7 @@ class Singer {
                                                         // trigger first note for entire duration of the glissando
                                                         const beatValueOverride =
                                                             bpmFactor * tur.singer.glideOverride;
+                                                        pitchStatusBeatValue = beatValueOverride;
                                                         activity.logo.synth.trigger(
                                                             turtle,
                                                             notes[d],
@@ -2825,6 +2832,46 @@ class Singer {
                         tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                         tur.singer.lastNotePlayed = [notes[0], noteBeatValue];
                         tur.singer.noteStatus = [notes, noteBeatValue];
+                        // Record what is heard as pitch, for the Status widget. A zero-length
+                        // note (the first half of a tie) is not played, and counting passes
+                        // and muted runs make no sound.
+                        if (
+                            duration > 0 &&
+                            !tur.singer.justCounting.length &&
+                            !tur.singer.suppressOutput
+                        ) {
+                            // Same choice as the triggers above: an oscillator plays pitches,
+                            // otherwise Set Drum and the pitch-drum table play drum samples.
+                            let pitchedNotes = notes;
+                            if (
+                                !(tur.singer.oscList[thisBlk].length > 0) &&
+                                !hasSetTimbreInSetDrum
+                            ) {
+                                pitchedNotes =
+                                    tur.singer.drumStyle.length > 0
+                                        ? []
+                                        : notes.filter(n => !(n in tur.singer.pitchDrumTable));
+                            }
+
+                            // Notes nested in a note share its start in turtle time and
+                            // sound together with it, so keep them; a new start replaces all.
+                            const start = tur.singer.previousTurtleTime;
+                            const sounds = (tur.singer.pitchStatus || []).filter(
+                                sound => sound.start === start
+                            );
+                            if (pitchedNotes.length > 0) {
+                                // Wall-clock span of the sound (beatValue includes staccato
+                                // and slur), so it stays right in slow and step mode as well.
+                                const startsAt = Date.now() + future * 1000;
+                                sounds.push({
+                                    notes: pitchedNotes.slice(),
+                                    start,
+                                    startsAt,
+                                    endsAt: startsAt + pitchStatusBeatValue * 1000
+                                });
+                            }
+                            tur.singer.pitchStatus = sounds;
+                        }
                         tur.singer.lastPitchPlayed = tur.singer.lastNotePlayed; // for a stand-alone pitch block
                     }
                 }

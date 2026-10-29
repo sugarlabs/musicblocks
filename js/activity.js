@@ -114,6 +114,7 @@ let MYDEFINES = [
     "utils/error-handler",
     "utils/debugLog",
     "activity/artwork",
+    "widgets/HarmonyUtils",
     "widgets/status",
     "utils/munsell",
     "activity/toolbar",
