@@ -1740,6 +1740,39 @@ describe("Logo runLogoCommands", () => {
         expect(logo.collectingStats).toBe(false);
     });
 
+    test.each(
+        [false, true].flatMap(started =>
+            ["runningLilypond", "runningAbc", "runningMxml", "runningMIDI", "collectingStats"].map(
+                mode => [started, mode]
+            )
+        )
+    )(
+        "preserves incoming %s/%s intent while cancelling the previous audio run",
+        (started, mode) => {
+            logo._executionRequest = { owners: [{}], started };
+            mockActivity.turtles.running = jest.fn(() => started);
+            logo[mode] = true;
+            if (mode === "collectingStats") logo.runningLilypond = true;
+            logo.synth.registerMultisample = jest.fn();
+            logo._restoreConnections = jest.fn();
+            logo.blockList = [
+                { name: "start", value: 0, connections: [] },
+                { name: "multisample", value: {}, trash: false }
+            ];
+            logo.runFromBlock = jest.fn(() => {
+                expect(logo._exportingNotation).toBe(true);
+                expect(logo[mode]).toBe(true);
+            });
+
+            logo.runLogoCommands(0);
+
+            expect(mockActivity.turtles.markAllAsStopped).toHaveBeenCalled();
+            expect(logo.runFromBlock).toHaveBeenCalledTimes(1);
+            expect(logo.synth.registerMultisample).not.toHaveBeenCalled();
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
+        }
+    );
+
     test("a synchronous silent failure does not leave later starts running", async () => {
         logo.runningLilypond = true;
         mockActivity.turtles.markAllAsStopped.mockImplementation(() => {

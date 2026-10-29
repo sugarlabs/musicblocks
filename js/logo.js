@@ -1748,8 +1748,18 @@ class Logo {
         if (
             this._executionRequest?.owners.length &&
             (!this._executionRequest.started || this.turtles.running())
-        )
+        ) {
+            // Export callers set the next run's intent before entering this method.
+            const intent = {
+                runningLilypond: this.runningLilypond,
+                runningAbc: this.runningAbc,
+                runningMxml: this.runningMxml,
+                runningMIDI: this.runningMIDI,
+                collectingStats: this.collectingStats
+            };
             this.doStopTurtles();
+            Object.assign(this, intent);
+        }
         this.synth.releaseMultisamples?.();
         const request = { owners: [] };
         this._executionRequest = request;

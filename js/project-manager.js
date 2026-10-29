@@ -951,11 +951,13 @@ class ProjectManager {
                 activity.storage.allProjects = JSON.stringify(["My Project"]);
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
-                activity.textMsg(
-                    _(
-                        "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your recordings."
-                    )
-                );
+                if (options.reportSaveErrors !== false) {
+                    activity.textMsg(
+                        _(
+                            "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your work."
+                        )
+                    );
+                }
                 if (rejectOnProjectSaveError) throw e;
                 return false;
             }
@@ -971,11 +973,13 @@ class ProjectManager {
             // (IndexedDB) handles large payloads.
             console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
-            activity.textMsg(
-                _(
-                    "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your recordings."
-                )
-            );
+            if (options.reportSaveErrors !== false) {
+                activity.textMsg(
+                    _(
+                        "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your work."
+                    )
+                );
+            }
             if (rejectOnProjectSaveError) throw e;
             return false;
         }
